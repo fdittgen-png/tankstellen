@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import '../data/obd2/trip_distance_source.dart' show kDistanceSourceVirtual;
 import 'harsh_event_detector.dart';
+import 'services/trip_consumption_reliability.dart';
 import 'trip_sample.dart';
 import 'trip_summary.dart';
 
@@ -49,6 +50,15 @@ class TripRecorder {
   double _idleSeconds = 0;
   double _fuelLiters = 0;
   bool _hadFuelRate = false;
+  // #2835 — fuel-integration cadence bookkeeping. A sparse-sampled trip
+  // (e.g. 58.8 km / 126 samples ≈ 1/min in the field backup) integrates
+  // fuel across intervals too wide to assume a constant rate, collapsing
+  // the litres toward zero and reporting ~0 L/100 km. We track how many
+  // intervals actually contributed litres and their summed Δt so
+  // [buildSummary] can mark the figure unavailable rather than report
+  // the near-zero artefact (see [isTripConsumptionReliable]).
+  int _fuelIntervalCount = 0;
+  double _fuelIntegratedSeconds = 0;
   // #2692 C4-E — last non-null fuel-rate reading, carried forward across a
   // single transient null PID. The pre-fix "both endpoints non-null" gate
   // zeroed the whole interval on any single null read (~11 % of intervals
@@ -191,6 +201,9 @@ class TripRecorder {
       final avgRate = (pRate + cRate) / 2.0;
       _fuelLiters += avgRate * dt / 3600.0;
       _hadFuelRate = true;
+      // #2835 — cadence bookkeeping for the sparse-sample reliability gate.
+      _fuelIntervalCount++;
+      _fuelIntegratedSeconds += dt;
     }
     _lastKnownFuelRate = sample.fuelRateLPerHour ?? _lastKnownFuelRate;
 
@@ -200,8 +213,27 @@ class TripRecorder {
   /// Build a [TripSummary] snapshot from the samples fed so far. Safe
   /// to call at any time — the recorder keeps accumulating.
   TripSummary buildSummary() {
+    // #2835 — two independent reliability gates, applied separately so
+    // each failure mode is handled honestly:
+    //
+    //  * Sparse cadence (failure mode 2): fuel integrated across a mean
+    //    interval too wide to trust (the field backup's ~1/min sampling
+    //    collapsed the integral toward 0 L). When this fails the LITRES
+    //    are themselves untrustworthy, so BOTH fuelLitersConsumed and
+    //    avgLPer100Km are nulled — never a fabricated zero.
+    //
+    //  * Tiny distance (failure mode 1): a sub-km denominator amplifies
+    //    one warm-up burst into an absurd ratio (0.4 km → 306 L/100 km).
+    //    The litres are still a real measured quantity, so we keep
+    //    fuelLitersConsumed but suppress only avgLPer100Km — the figure
+    //    that blows up and would poison the rolling average.
+    final fuelCadenceReliable = _hadFuelRate &&
+        isFuelCadenceReliable(
+          fuelIntervalCount: _fuelIntervalCount,
+          fuelIntegratedSeconds: _fuelIntegratedSeconds,
+        );
     double? avgLPer100Km;
-    if (_hadFuelRate && _distanceKm > 0.001) {
+    if (fuelCadenceReliable && isDistanceReliableForRatio(_distanceKm)) {
       avgLPer100Km = _fuelLiters / _distanceKm * 100.0;
     }
 
@@ -249,7 +281,11 @@ class TripRecorder {
       harshBrakes: _harshDetector.brakes,
       harshAccelerations: _harshDetector.accelerations,
       avgLPer100Km: avgLPer100Km,
-      fuelLitersConsumed: _hadFuelRate ? _fuelLiters : null,
+      // #2835 — null the litres only on the sparse-cadence failure (the
+      // integral itself is untrustworthy). A tiny-distance trip keeps its
+      // real measured litres; only its blow-up-prone avgLPer100Km above
+      // was suppressed.
+      fuelLitersConsumed: fuelCadenceReliable ? _fuelLiters : null,
       startedAt: _startedAt,
       endedAt: _endedAt,
       coldStartSurcharge: coldStartSurcharge,
@@ -268,6 +304,8 @@ class TripRecorder {
     _harshDetector.reset();
     _fuelLiters = 0;
     _hadFuelRate = false;
+    _fuelIntervalCount = 0;
+    _fuelIntegratedSeconds = 0;
     _lastKnownFuelRate = null;
     _startedAt = null;
     _endedAt = null;

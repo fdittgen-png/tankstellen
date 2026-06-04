@@ -39,6 +39,7 @@ library;
 import '../../data/trip_history_repository.dart';
 import '../trip_recorder.dart';
 import 'trip_consumed_liters.dart';
+import 'trip_consumption_reliability.dart';
 
 /// Bands the aggregator considers "noise" for the consumption average.
 /// Below 5 km a single coast or a long warm-up dominates the figure.
@@ -204,20 +205,35 @@ MonthlyInsightsSummary aggregateMonthlyInsights(
     // legacy trips written before #1040 persisted samples.
     final samples = entry.samples;
     if (samples.isNotEmpty) {
-      final (distanceKm, fuelLitres, hadFuelRate) =
-          _integrateSamples(samples);
-      bucket.distanceKm += distanceKm;
+      final integ = _integrateSamples(samples);
+      bucket.distanceKm += integ.distanceKm;
       bucket.climbMeters += _climbMeters(samples); // #2697 P3
-      if (hadFuelRate && distanceKm > 0) {
-        bucket.fuelLitres += fuelLitres;
-        bucket.consumptionDistanceKm += distanceKm;
+      // #2835 — only fold the re-integrated fuel into the average when it
+      // clears the same reliability gates the live recorder applies: a
+      // sane distance denominator AND a dense-enough fuel cadence. A
+      // sparse-sampled trip (the field backup's ~1/min) otherwise
+      // contributes a near-zero L/100 km artefact; we fall through to the
+      // summary's stored figure (already nulled by the recorder for such
+      // trips) instead.
+      final reliable = integ.hadFuelRate &&
+          isTripConsumptionReliable(
+            distanceKm: integ.distanceKm,
+            fuelIntervalCount: integ.fuelIntervalCount,
+            fuelIntegratedSeconds: integ.fuelIntegratedSeconds,
+          );
+      if (reliable) {
+        bucket.fuelLitres += integ.fuelLitres;
+        bucket.consumptionDistanceKm += integ.distanceKm;
       } else {
         // #2447 — samples carried no per-tick fuel rate (GPS-only / EV /
-        // no-fuel-PID). Rather than dropping the trip from the
-        // consumption average, count the canonical trip litres (the
-        // summary's GPS estimate) over the trip's distance, so this
-        // surface agrees with the Carbon charts + reconciliation basis.
-        _addSummaryFuelFallback(bucket, entry.summary, distanceKm);
+        // no-fuel-PID), OR (#2835) the fuel cadence was too sparse /
+        // distance too short to trust the re-integration. Rather than
+        // dropping the trip from the consumption average, count the
+        // canonical trip litres (the summary's measured / GPS estimate,
+        // itself nulled by the recorder for unreliable trips) over the
+        // trip's distance, so this surface agrees with the Carbon charts
+        // + reconciliation basis.
+        _addSummaryFuelFallback(bucket, entry.summary, integ.distanceKm);
       }
     } else {
       // No samples — use the persisted summary. We cannot re-integrate a
@@ -271,18 +287,39 @@ void _addSummaryFuelFallback(
   bucket.consumptionDistanceKm += distanceKm;
 }
 
-/// Walk the per-tick samples and return `(distanceKm, fuelLitres,
-/// hadFuelRate)`. Mirrors `TripRecorder.onSample` so the per-trip
-/// figures the user already sees on the trip detail screen line up
-/// with the monthly aggregate (no parallel-implementation drift).
-(double, double, bool) _integrateSamples(List<TripSample> samples) {
-  if (samples.length < 2) return (0, 0, false);
+/// Result of re-integrating a trip's per-tick samples. Carries the fuel
+/// cadence bookkeeping (#2835) alongside distance + litres so the caller
+/// can apply [isTripConsumptionReliable] — the same gate the live
+/// recorder uses.
+typedef _Integration = ({
+  double distanceKm,
+  double fuelLitres,
+  bool hadFuelRate,
+  int fuelIntervalCount,
+  double fuelIntegratedSeconds,
+});
+
+/// Walk the per-tick samples and return the re-integrated distance +
+/// fuel plus the cadence bookkeeping. Mirrors `TripRecorder.onSample` so
+/// the per-trip figures the user already sees on the trip detail screen
+/// line up with the monthly aggregate (no parallel-implementation drift).
+_Integration _integrateSamples(List<TripSample> samples) {
+  const empty = (
+    distanceKm: 0.0,
+    fuelLitres: 0.0,
+    hadFuelRate: false,
+    fuelIntervalCount: 0,
+    fuelIntegratedSeconds: 0.0,
+  );
+  if (samples.length < 2) return empty;
   final sorted = [...samples]
     ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
   double distanceKm = 0;
   double fuelLitres = 0;
   bool hadFuelRate = false;
+  int fuelIntervalCount = 0;
+  double fuelIntegratedSeconds = 0;
 
   for (var i = 1; i < sorted.length; i++) {
     final prev = sorted[i - 1];
@@ -298,10 +335,18 @@ void _addSummaryFuelFallback(
       final avgRate = (prev.fuelRateLPerHour! + cur.fuelRateLPerHour!) / 2.0;
       fuelLitres += avgRate * dt / 3600.0;
       hadFuelRate = true;
+      fuelIntervalCount++;
+      fuelIntegratedSeconds += dt;
     }
   }
 
-  return (distanceKm, fuelLitres, hadFuelRate);
+  return (
+    distanceKm: distanceKm,
+    fuelLitres: fuelLitres,
+    hadFuelRate: hadFuelRate,
+    fuelIntervalCount: fuelIntervalCount,
+    fuelIntegratedSeconds: fuelIntegratedSeconds,
+  );
 }
 
 /// Sum of positive altitude deltas (metres climbed) across [samples]

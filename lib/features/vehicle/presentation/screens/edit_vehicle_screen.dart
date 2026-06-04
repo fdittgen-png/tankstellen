@@ -11,7 +11,9 @@ import '../../../../core/widgets/discard_changes_dialog.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/domain/direct_fuel_rate_detector.dart';
 import '../../../consumption/presentation/widgets/broken_map_widgets.dart';
+import '../../../consumption/providers/trip_history_provider.dart';
 import '../../data/obd2_vin_reader.dart';
 import '../../data/reference_vehicle_catalog_provider.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
@@ -768,9 +770,18 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
                   profile: profile,
                   catalog: catalog,
                 );
+                // #2837 — when this vehicle's recorded trips show it
+                // reports fuel rate directly (PID 5E / MAF), the η_v
+                // calibration is irrelevant; de-emphasise that UI.
+                final directFuelRate = vehicleReportsDirectFuelRate(
+                  ref.watch(tripHistoryRepositoryProvider)?.loadAll() ??
+                      const [],
+                  vehicleId: profile.id,
+                );
                 return CalibrationSection(
                   profile: profile,
                   referenceVehicle: referenceVehicle,
+                  directFuelRateSupported: directFuelRate,
                   onDisplacementChanged: (v) => _saveCalibrationOverride(
                     manualEngineDisplacementCcOverride: v,
                   ),

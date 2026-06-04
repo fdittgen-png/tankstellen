@@ -4064,6 +4064,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get calibrationDirectFuelRateNote =>
+      'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'O seu $makeModel está marcado como diesel mas corresponde a uma entrada de catálogo de gasolina. Toque para atualizar.';
   }
@@ -5259,6 +5263,25 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get pumpCameraRotateToLandscape =>
       'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
+  String get fillUpWarningDialogTitle => 'Check this fill-up';
+
+  @override
+  String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel) {
+    return 'You picked $chosenFuel, but this vehicle runs on $vehicleFuel.';
+  }
+
+  @override
+  String fillUpWarningOdometerBelowPrevious(String entered, String previous) {
+    return 'Odometer $entered km is below the previous fill-up\'s $previous km — distance can\'t go backwards.';
+  }
+
+  @override
+  String get fillUpWarningGoBack => 'Go back and fix';
+
+  @override
+  String get fillUpWarningSaveAnyway => 'Save anyway';
 
   @override
   String get fillUpSectionWhatTitle => 'O que abasteceu';

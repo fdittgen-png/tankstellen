@@ -136,17 +136,23 @@ void main() {
     });
 
     test('average L/100 km uses fuel rate × time ÷ distance', () {
-      // 60 km/h for 1 h = 60 km, fuel rate 6 L/h → 10 L over the hour
-      // → 10 L / 60 km × 100 = 16.67 L/100 km.
+      // 60 km/h for 1 h = 60 km, fuel rate 6 L/h → 6 L over the hour
+      // → 6 L / 60 km × 100 = 10 L/100 km.
+      //
+      // #2835 — fed at a realistic 10 s cadence (361 samples) rather than
+      // one synthetic 1-hour interval: the recorder now rejects fuel
+      // integrated across a mean interval wider than the gap the live
+      // integrators bridge, so a lone 3600 s step is (correctly) treated
+      // as too sparse to trust. The integral is identical at any cadence.
       final start = DateTime.utc(2026);
-      recorder.onSample(TripSample(
-          timestamp: start, speedKmh: 60, rpm: 2000, fuelRateLPerHour: 6));
-      recorder.onSample(TripSample(
-        timestamp: start.add(const Duration(hours: 1)),
-        speedKmh: 60,
-        rpm: 2000,
-        fuelRateLPerHour: 6,
-      ));
+      for (var t = 0; t <= 3600; t += 10) {
+        recorder.onSample(TripSample(
+          timestamp: start.add(Duration(seconds: t)),
+          speedKmh: 60,
+          rpm: 2000,
+          fuelRateLPerHour: 6,
+        ));
+      }
       final summary = recorder.buildSummary();
       expect(summary.distanceKm, closeTo(60, 0.1));
       expect(summary.avgLPer100Km, closeTo(10.0, 0.1));
@@ -155,29 +161,110 @@ void main() {
     test(
         '#2692 C4-E — a single transient null fuelRate is carried forward, '
         'integrating BOTH intervals (not zero them)', () {
-      // [rate=5, null, 5] over two equal 1-hour steps. Pre-fix the
-      // both-endpoints-non-null gate skipped BOTH intervals (each touches
-      // the middle null) → 0 L. With carry-forward the middle sample
-      // resolves the last-known 5 L/h, so both 1-hour intervals integrate
-      // at 5 L/h → 2 × 5 = 10 L total.
+      // rate=5 throughout, with the sample at the 1-hour mark carrying a
+      // transient null PID. Pre-fix the both-endpoints-non-null gate
+      // skipped the two intervals touching the null → under-count. With
+      // carry-forward the null resolves the last-known 5 L/h, so the full
+      // 2 h integrates at 5 L/h → 10 L total.
+      //
+      // #2835 — fed at a 10 s cadence (so the cadence reliability gate
+      // passes); the carry-forward still spans the single null sample.
       final start = DateTime.utc(2026);
-      recorder.onSample(TripSample(
-          timestamp: start, speedKmh: 60, rpm: 2000, fuelRateLPerHour: 5));
-      recorder.onSample(TripSample(
-        timestamp: start.add(const Duration(hours: 1)),
-        speedKmh: 60,
-        rpm: 2000,
-        // fuelRateLPerHour omitted → null (transient PID dropout).
-      ));
-      recorder.onSample(TripSample(
-        timestamp: start.add(const Duration(hours: 2)),
-        speedKmh: 60,
-        rpm: 2000,
-        fuelRateLPerHour: 5,
-      ));
-      // 5 L/h × 2 h = 10 L; pre-fix would have been 0 L (both intervals
-      // touch the middle null and were skipped entirely).
+      const nullAt = 3600; // the transient-dropout sample, mid-trip.
+      for (var t = 0; t <= 7200; t += 10) {
+        recorder.onSample(TripSample(
+          timestamp: start.add(Duration(seconds: t)),
+          speedKmh: 60,
+          rpm: 2000,
+          // omit the rate on exactly one mid-trip sample → null dropout.
+          fuelRateLPerHour: t == nullAt ? null : 5,
+        ));
+      }
+      // 5 L/h × 2 h = 10 L; pre-fix the intervals touching the null read
+      // would have been skipped, under-counting the litres.
       expect(recorder.buildSummary().fuelLitersConsumed, closeTo(10.0, 0.01));
+    });
+
+    group('consumption reliability gates (#2835)', () {
+      test(
+          'tiny-distance trip suppresses avgLPer100Km (no blow-up) but keeps '
+          'the real measured litres', () {
+        // The field backup: a 0.4 km trip integrated to 306 L/100 km.
+        // Reproduce a sub-1 km trip with a dense cadence: 30 km/h for
+        // 48 s ≈ 0.4 km, burning fuel at 6 L/h. Pre-fix avgLPer100Km
+        // would be (6 × 48/3600) / 0.4 × 100 ≈ 20 L/100 km here, and a
+        // tighter denominator drives it arbitrarily high. The litres
+        // themselves (~0.08 L) are real and must survive.
+        final start = DateTime.utc(2026);
+        for (var t = 0; t <= 48; t += 2) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(seconds: t)),
+            speedKmh: 30,
+            rpm: 1500,
+            fuelRateLPerHour: 6,
+          ));
+        }
+        final s = recorder.buildSummary();
+        expect(s.distanceKm, lessThan(1.0),
+            reason: 'sanity: this is a sub-km trip');
+        expect(s.avgLPer100Km, isNull,
+            reason: 'tiny-distance L/100 km is suppressed (the blow-up '
+                'fix) so it cannot pollute the rolling average');
+        expect(s.fuelLitersConsumed, isNotNull,
+            reason: 'the measured litres are a real quantity — only the '
+                'ratio is suppressed, not the burn');
+        expect(s.fuelLitersConsumed!, greaterThan(0));
+      });
+
+      test(
+          'sparse-cadence trip marks BOTH litres and avgLPer100Km '
+          'unavailable (no fabricated ~0)', () {
+        // The field backup: a 58.8 km trip with only 126 samples
+        // (~1/min) reported ~0 L/100 km because a 60 s interval assumes
+        // a constant fuel rate for a whole minute. Reproduce a long trip
+        // sampled once a minute: 60 km/h, fuel 6 L/h, for ~70 min ⇒ 70 km
+        // (well past the distance floor), but the mean interval is 60 s,
+        // beyond the 30 s cadence gate.
+        final start = DateTime.utc(2026);
+        for (var minute = 0; minute <= 70; minute++) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(minutes: minute)),
+            speedKmh: 60,
+            rpm: 2000,
+            fuelRateLPerHour: 6,
+          ));
+        }
+        final s = recorder.buildSummary();
+        expect(s.distanceKm, greaterThan(50.0),
+            reason: 'sanity: the distance denominator is fine — only the '
+                'fuel cadence is too sparse');
+        expect(s.fuelLitersConsumed, isNull,
+            reason: 'a ~1/min cadence cannot integrate fuel honestly, so '
+                'litres are unavailable rather than a near-zero artefact');
+        expect(s.avgLPer100Km, isNull,
+            reason: 'and the derived L/100 km is unavailable too');
+      });
+
+      test(
+          'a normal dense-cadence trip over the distance floor reports a '
+          'reliable figure (gates do not over-reach)', () {
+        // 60 km/h, 6 L/h, sampled every 5 s for 5 min ⇒ 5 km, mean
+        // interval 5 s. Both gates pass. 6 L/h × (300/3600) h = 0.5 L
+        // over 5 km ⇒ 10 L/100 km.
+        final start = DateTime.utc(2026);
+        for (var t = 0; t <= 300; t += 5) {
+          recorder.onSample(TripSample(
+            timestamp: start.add(Duration(seconds: t)),
+            speedKmh: 60,
+            rpm: 2000,
+            fuelRateLPerHour: 6,
+          ));
+        }
+        final s = recorder.buildSummary();
+        expect(s.distanceKm, closeTo(5.0, 0.05));
+        expect(s.fuelLitersConsumed, closeTo(0.5, 0.01));
+        expect(s.avgLPer100Km, closeTo(10.0, 0.2));
+      });
     });
 
     test('throttlePercent on TripSample is preserved (#1261)', () {

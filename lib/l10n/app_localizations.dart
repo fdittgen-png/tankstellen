@@ -7318,6 +7318,12 @@ abstract class AppLocalizations {
   /// **'(catalog: {makeModel} — {basis} default)'**
   String calibrationSourceCatalogWithBasis(String makeModel, String basis);
 
+  /// Replaces the editable volumetric-efficiency field + its learner readout on the Advanced calibration card when the vehicle reports fuel rate directly via PID 5E / MAF, making the η_v calibration irrelevant (#2837).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.'**
+  String get calibrationDirectFuelRateNote;
+
   /// One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.
   ///
   /// In en, this message translates to:
@@ -9295,6 +9301,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright'**
   String get pumpCameraRotateToLandscape;
+
+  /// Title of the confirmation dialog shown on save when a fill-up has data-quality warnings (wrong fuel for the engine, or an odometer below the previous reading) before persisting (#2836).
+  ///
+  /// In en, this message translates to:
+  /// **'Check this fill-up'**
+  String get fillUpWarningDialogTitle;
+
+  /// Warning line shown when the chosen fuel belongs to a different engine family than the vehicle's configured fuel, e.g. petrol on a diesel car (#2836). Both fuel names are pre-localised by the caller.
+  ///
+  /// In en, this message translates to:
+  /// **'You picked {chosenFuel}, but this vehicle runs on {vehicleFuel}.'**
+  String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel);
+
+  /// Warning line shown when the entered odometer is lower than the most recent prior fill-up's odometer for the same vehicle (#2836). Both numbers are pre-formatted by the caller.
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer {entered} km is below the previous fill-up\'s {previous} km — distance can\'t go backwards.'**
+  String fillUpWarningOdometerBelowPrevious(String entered, String previous);
+
+  /// Button on the fill-up warning dialog that dismisses it without saving so the user can correct the flagged field (#2836).
+  ///
+  /// In en, this message translates to:
+  /// **'Go back and fix'**
+  String get fillUpWarningGoBack;
+
+  /// Button on the fill-up warning dialog that proceeds to save the fill-up despite the warnings (#2836).
+  ///
+  /// In en, this message translates to:
+  /// **'Save anyway'**
+  String get fillUpWarningSaveAnyway;
 
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///

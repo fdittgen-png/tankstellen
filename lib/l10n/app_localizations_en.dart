@@ -4022,6 +4022,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get calibrationDirectFuelRateNote =>
+      'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
   }
@@ -5198,6 +5202,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pumpCameraRotateToLandscape =>
       'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+
+  @override
+  String get fillUpWarningDialogTitle => 'Check this fill-up';
+
+  @override
+  String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel) {
+    return 'You picked $chosenFuel, but this vehicle runs on $vehicleFuel.';
+  }
+
+  @override
+  String fillUpWarningOdometerBelowPrevious(String entered, String previous) {
+    return 'Odometer $entered km is below the previous fill-up\'s $previous km — distance can\'t go backwards.';
+  }
+
+  @override
+  String get fillUpWarningGoBack => 'Go back and fix';
+
+  @override
+  String get fillUpWarningSaveAnyway => 'Save anyway';
 
   @override
   String get fillUpSectionWhatTitle => 'What you filled';
@@ -11499,6 +11522,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
+  String get calibrationDirectFuelRateNote =>
+      '⟦Ŧĥîš ṽéĥîçłé řéƥóřŧš îŧš ƒúéł řáŧé đîřéçŧłý (ƤÎĐ 5É), šó ṽółúɱéŧřîç-éƒƒîçîéñçý çáłîƀřáŧîóñ îš ñóŧ úšéđ — ýóúř çóñšúɱƥŧîóñ îš ɱéášúřéđ, ñóŧ ɱóđéłłéđ. ······················································⟧';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return '⟦Ýóúř $makeModel îš ɱářķéđ áš đîéšéł ƀúŧ ɱáŧçĥéš á ƥéŧřół çáŧáłóǧ éñŧřý. Ŧáƥ ŧó úƥđáŧé. ···························⟧';
   }
@@ -12717,6 +12744,25 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get pumpCameraRotateToLandscape =>
       '⟦Ŧúřñ ýóúř ƥĥóñé šîđéŵáýš — ŧĥé ƥúɱƥ đîšƥłáý îš ŵîđé, šó ŧĥé ñúɱƀéřš çóɱé óúŧ łářǧéř áñđ úƥřîǧĥŧ ··································⟧';
+
+  @override
+  String get fillUpWarningDialogTitle => '⟦Çĥéçķ ŧĥîš ƒîłł-úƥ ·······⟧';
+
+  @override
+  String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel) {
+    return '⟦Ýóú ƥîçķéđ $chosenFuel, ƀúŧ ŧĥîš ṽéĥîçłé řúñš óñ $vehicleFuel. ·············⟧';
+  }
+
+  @override
+  String fillUpWarningOdometerBelowPrevious(String entered, String previous) {
+    return '⟦Óđóɱéŧéř $entered ķɱ îš ƀéłóŵ ŧĥé ƥřéṽîóúš ƒîłł-úƥ\'š $previous ķɱ — đîšŧáñçé çáñ\'ŧ ǧó ƀáçķŵářđš. ···························⟧';
+  }
+
+  @override
+  String get fillUpWarningGoBack => '⟦Ǧó ƀáçķ áñđ ƒîẋ ·····⟧';
+
+  @override
+  String get fillUpWarningSaveAnyway => '⟦Šáṽé áñýŵáý ·····⟧';
 
   @override
   String get fillUpSectionWhatTitle => '⟦Ŵĥáŧ ýóú ƒîłłéđ ······⟧';

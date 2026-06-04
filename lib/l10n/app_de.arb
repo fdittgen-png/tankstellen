@@ -1771,6 +1771,7 @@
       }
     }
   },
+  "calibrationDirectFuelRateNote": "Dieses Fahrzeug meldet seinen Verbrauch direkt (PID 5E), daher wird keine Kalibrierung der volumetrischen Effizienz verwendet – dein Verbrauch wird gemessen, nicht geschätzt.",
   "catalogReresolveSnackbarMessage": "Dein {makeModel} ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.",
   "@catalogReresolveSnackbarMessage": {
     "description": "One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.",
@@ -2333,6 +2334,31 @@
   "pumpCameraGlareWarning": "Zu viel Blendung — leicht neigen, um Reflexionen zu vermeiden",
   "pumpCameraAlignHint": "Anzeige im Rahmen ausrichten, dann aufnehmen",
   "pumpCameraRotateToLandscape": "Drehe dein Telefon quer — die Zapfsäulenanzeige ist breit, so werden die Zahlen größer und stehen aufrecht",
+  "fillUpWarningDialogTitle": "Tankvorgang prüfen",
+  "fillUpWarningFuelMismatch": "Du hast {chosenFuel} gewählt, aber dieses Fahrzeug fährt mit {vehicleFuel}.",
+  "@fillUpWarningFuelMismatch": {
+    "placeholders": {
+      "chosenFuel": {
+        "type": "String"
+      },
+      "vehicleFuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningOdometerBelowPrevious": "Kilometerstand {entered} km liegt unter dem vorherigen Tankvorgang ({previous} km) – die Strecke kann nicht rückwärts laufen.",
+  "@fillUpWarningOdometerBelowPrevious": {
+    "placeholders": {
+      "entered": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningGoBack": "Zurück und korrigieren",
+  "fillUpWarningSaveAnyway": "Trotzdem speichern",
   "fillUpSectionWhatTitle": "Was du getankt hast",
   "fillUpSectionWhatSubtitle": "Kraftstoff, Menge, Preis",
   "fillUpSectionWhereTitle": "Wo du warst",

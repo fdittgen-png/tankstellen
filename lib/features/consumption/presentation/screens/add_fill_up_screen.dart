@@ -22,6 +22,7 @@ import '../../data/ocr/pump_ocr_config.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../domain/add_fill_up_fuel_resolver.dart';
 import '../../domain/add_fill_up_validators.dart';
+import '../../domain/add_fill_up_warnings.dart';
 import '../../domain/entities/fill_up.dart';
 import '../../domain/fill_up_auto_cost_calculator.dart';
 import '../../domain/fill_up_variance.dart';
@@ -34,6 +35,7 @@ import '../widgets/fill_up_reconciliation_launcher.dart';
 import '../widgets/fill_up_scan_handlers.dart';
 import '../widgets/fill_up_share_scan_handlers.dart';
 import '../widgets/fill_up_variance_prompt.dart';
+import '../widgets/fill_up_warning_dialog.dart';
 import 'pump_display_camera_screen.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -344,6 +346,12 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // #2836 — data-quality gate: warn (don't block) when the chosen fuel
+    // doesn't match the vehicle's engine family, or the odometer is below
+    // the previous fill-up. A dismiss / "Go back" aborts the save.
+    if (!await _confirmDataQualityWarnings()) return;
+    if (!mounted) return;
+
     final userLiters = AddFillUpValidators.parseDouble(_litersCtrl.text);
     // #1434 — capture the post-fill tank level NOW (form-submit). The
     // before-fill capture happened in initState and lives on the
@@ -423,6 +431,50 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     context.pop();
     messenger.showSnackBar(
       SnackBarHelper.successSnackBar(scheme, savedMessage),
+    );
+  }
+
+  /// #2836 — compute the fuel-mismatch / odometer-monotonicity warnings
+  /// for the pending entry and, when any fire, confirm with the user.
+  /// Returns true when it is OK to proceed (no warnings, or "Save
+  /// anyway"); false to abort the save ("Go back and fix" / dismiss).
+  Future<bool> _confirmDataQualityWarnings() async {
+    final vehicleId = _vehicleId;
+    if (vehicleId == null) return true; // no vehicle → no engine to match.
+    VehicleProfile? vehicle;
+    List<FillUp> allFills = const [];
+    try {
+      final vehicles = ref.read(vehicleProfileListProvider);
+      for (final v in vehicles) {
+        if (v.id == vehicleId) vehicle = v;
+      }
+      allFills = ref.read(fillUpListProvider);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: const {'where': 'AddFillUp: warning-gate read failed'}));
+      return true; // can't evaluate → don't block the save.
+    }
+    if (vehicle == null) return true;
+    final enteredOdo = AddFillUpValidators.parseDouble(_odoCtrl.text);
+    final previousOdo = previousFillUpOdometerKm(
+      vehicleId: vehicleId,
+      date: _date,
+      allFillUps: allFills,
+    );
+    final warnings = computeFillUpWarnings(
+      vehicle: vehicle,
+      chosenFuel: _fuelType,
+      enteredOdometerKm: enteredOdo,
+      previousOdometerKm: previousOdo,
+    );
+    if (warnings.isEmpty) return true;
+    return showFillUpWarningDialog(
+      context: context,
+      warnings: warnings,
+      chosenFuel: _fuelType,
+      vehicleFuel: AddFillUpFuelResolver.fuelForVehicle(vehicle),
+      enteredOdoKm: enteredOdo.toStringAsFixed(0),
+      previousOdoKm: previousOdo?.toStringAsFixed(0),
     );
   }
 

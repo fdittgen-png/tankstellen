@@ -231,7 +231,12 @@ void main() {
     // banner copy. Net +4 (getter + 2-line dartdoc); a pure read-through that
     // must live on the controller's public surface. Decomposition stays
     // tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1640,
+    // #2835 — re-grandfathered 1640 → 1641: one import of the shared
+    // trip-consumption-reliability gate so `_finaliseSummary` re-applies
+    // the tiny-distance L/100 km floor against the swapped odometer
+    // distance (the code change itself is net-zero). Decomposition stays
+    // tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1641,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The
@@ -263,8 +268,14 @@ void main() {
     // single existing `scheduleSharedReceiptScanIfPending` call site was
     // renamed in place to `scheduleSharedReceiptPrefillIfPending`, which
     // drains both stashes), so this only corrects the snapshot to reality.
+    // #2836 — re-grandfathered 539 → 588: the data-quality save gate
+    // (_confirmDataQualityWarnings) must read the State's controllers +
+    // providers, so it lives here; the pure warning logic + the dialog
+    // are extracted (add_fill_up_warnings.dart, fill_up_warning_dialog.dart)
+    // to keep the growth to the gate method + its call site. Decomposition
+    // stays tracked under #2187/#2188/#2190.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        539,
+        588,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
@@ -398,9 +409,19 @@ void main() {
     // snapshot per the shrink ratchet; every extracted file is new and
     // under 400.
     'lib/features/vehicle/domain/entities/vehicle_profile.dart': 453,
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 806,
+    // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
+    // receives a directFuelRateSupported flag computed from the vehicle's
+    // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE
+    // UI hides on PID-5E cars. Decomposition tracked under #2187/#2188.
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 817,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,
-    'lib/features/vehicle/presentation/widgets/calibration_section.dart': 465,
+    // #2837 — re-grandfathered 465 → 523: on a direct-fuel-rate (PID 5E)
+    // car the η_v field + its "0 samples" learner readout + Reset learner
+    // are replaced by an explanatory _DirectFuelRateNote, since η_v never
+    // touches the direct branch. The note widget + the conditional
+    // rendering account for the growth. Decomposition tracked under
+    // #2187/#2188.
+    'lib/features/vehicle/presentation/widgets/calibration_section.dart': 523,
     'lib/features/widget/data/home_widget_service.dart': 696,
   };
 

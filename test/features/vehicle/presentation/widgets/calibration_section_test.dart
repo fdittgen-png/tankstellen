@@ -27,6 +27,7 @@ Widget _harness(
   VehicleProfile profile,
   _CapturedCalls calls, {
   ReferenceVehicle? referenceVehicle,
+  bool directFuelRateSupported = false,
 }) {
   return MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -36,6 +37,7 @@ Widget _harness(
         child: CalibrationSection(
           profile: profile,
           referenceVehicle: referenceVehicle,
+          directFuelRateSupported: directFuelRateSupported,
           onDisplacementChanged: (v) {
             calls.lastDisplacement = v;
             calls.displacementFired = true;
@@ -372,6 +374,48 @@ void main() {
         find.text('(catalog: Volkswagen Golf — Turbocharged + DI default)'),
         findsNothing,
       );
+    });
+  });
+
+  group('direct-fuel-rate de-emphasis (#2837)', () {
+    const profile = VehicleProfile(id: 'v', name: 'Skoda Diesel');
+
+    testWidgets(
+        'PID-5E car hides the η_v field + learner readout + Reset learner '
+        'behind the explanatory note', (tester) async {
+      await tester.pumpWidget(
+        _harness(profile, _CapturedCalls(), directFuelRateSupported: true),
+      );
+      await tester.pump();
+      await tester.tap(find.text('Advanced calibration'));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // The η_v editable field, the "samples" learner nudge and the
+      // Reset learner button are all gone.
+      expect(find.text('Volumetric efficiency (η_v)'), findsNothing);
+      expect(find.text('Reset learner'), findsNothing);
+      expect(find.textContaining('samples'), findsNothing);
+      // ...replaced by the direct-fuel-rate note (mentions PID 5E).
+      expect(find.textContaining('PID 5E'), findsOneWidget);
+      // The other calibration fields stay — only η_v is hidden.
+      expect(find.text('Engine displacement (cc)'), findsOneWidget);
+      expect(find.text('Air-to-fuel ratio (AFR)'), findsOneWidget);
+      expect(find.text('Fuel density (g/L)'), findsOneWidget);
+    });
+
+    testWidgets(
+        'speed-density car (flag false) keeps the full η_v calibration UI',
+        (tester) async {
+      await tester.pumpWidget(
+        _harness(profile, _CapturedCalls()),
+      );
+      await tester.pump();
+      await tester.tap(find.text('Advanced calibration'));
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('Volumetric efficiency (η_v)'), findsOneWidget);
+      expect(find.text('Reset learner'), findsOneWidget);
+      expect(find.textContaining('PID 5E'), findsNothing);
     });
   });
 

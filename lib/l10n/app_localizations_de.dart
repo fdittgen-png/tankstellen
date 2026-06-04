@@ -4064,6 +4064,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get calibrationDirectFuelRateNote =>
+      'Dieses Fahrzeug meldet seinen Verbrauch direkt (PID 5E), daher wird keine Kalibrierung der volumetrischen Effizienz verwendet – dein Verbrauch wird gemessen, nicht geschätzt.';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Dein $makeModel ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.';
   }
@@ -5260,6 +5264,25 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get pumpCameraRotateToLandscape =>
       'Drehe dein Telefon quer — die Zapfsäulenanzeige ist breit, so werden die Zahlen größer und stehen aufrecht';
+
+  @override
+  String get fillUpWarningDialogTitle => 'Tankvorgang prüfen';
+
+  @override
+  String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel) {
+    return 'Du hast $chosenFuel gewählt, aber dieses Fahrzeug fährt mit $vehicleFuel.';
+  }
+
+  @override
+  String fillUpWarningOdometerBelowPrevious(String entered, String previous) {
+    return 'Kilometerstand $entered km liegt unter dem vorherigen Tankvorgang ($previous km) – die Strecke kann nicht rückwärts laufen.';
+  }
+
+  @override
+  String get fillUpWarningGoBack => 'Zurück und korrigieren';
+
+  @override
+  String get fillUpWarningSaveAnyway => 'Trotzdem speichern';
 
   @override
   String get fillUpSectionWhatTitle => 'Was du getankt hast';

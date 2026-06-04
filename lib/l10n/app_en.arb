@@ -2600,6 +2600,10 @@
       }
     }
   },
+  "calibrationDirectFuelRateNote": "This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.",
+  "@calibrationDirectFuelRateNote": {
+    "description": "Replaces the editable volumetric-efficiency field + its learner readout on the Advanced calibration card when the vehicle reports fuel rate directly via PID 5E / MAF, making the η_v calibration irrelevant (#2837)."
+  },
   "catalogReresolveSnackbarMessage": "Your {makeModel} is marked as diesel but matches a petrol catalog entry. Tap to update.",
   "@catalogReresolveSnackbarMessage": {
     "description": "One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.",
@@ -4112,6 +4116,42 @@
   "pumpCameraRotateToLandscape": "Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright",
   "@pumpCameraRotateToLandscape": {
     "description": "Highest-priority feedback shown over the camera while the phone is held portrait; the shutter is disabled until the user rotates to landscape so the wide pump display fills the frame with large, upright digits (#2477)."
+  },
+  "fillUpWarningDialogTitle": "Check this fill-up",
+  "@fillUpWarningDialogTitle": {
+    "description": "Title of the confirmation dialog shown on save when a fill-up has data-quality warnings (wrong fuel for the engine, or an odometer below the previous reading) before persisting (#2836)."
+  },
+  "fillUpWarningFuelMismatch": "You picked {chosenFuel}, but this vehicle runs on {vehicleFuel}.",
+  "@fillUpWarningFuelMismatch": {
+    "description": "Warning line shown when the chosen fuel belongs to a different engine family than the vehicle's configured fuel, e.g. petrol on a diesel car (#2836). Both fuel names are pre-localised by the caller.",
+    "placeholders": {
+      "chosenFuel": {
+        "type": "String"
+      },
+      "vehicleFuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningOdometerBelowPrevious": "Odometer {entered} km is below the previous fill-up's {previous} km — distance can't go backwards.",
+  "@fillUpWarningOdometerBelowPrevious": {
+    "description": "Warning line shown when the entered odometer is lower than the most recent prior fill-up's odometer for the same vehicle (#2836). Both numbers are pre-formatted by the caller.",
+    "placeholders": {
+      "entered": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningGoBack": "Go back and fix",
+  "@fillUpWarningGoBack": {
+    "description": "Button on the fill-up warning dialog that dismisses it without saving so the user can correct the flagged field (#2836)."
+  },
+  "fillUpWarningSaveAnyway": "Save anyway",
+  "@fillUpWarningSaveAnyway": {
+    "description": "Button on the fill-up warning dialog that proceeds to save the fill-up despite the warnings (#2836)."
   },
   "fillUpSectionWhatTitle": "What you filled",
   "@fillUpSectionWhatTitle": {
