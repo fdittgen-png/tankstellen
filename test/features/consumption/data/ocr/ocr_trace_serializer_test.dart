@@ -128,4 +128,49 @@ void main() {
     expect(decoded['schema'], 1);
     expect(decoded['crossCheck'], isA<Map>());
   });
+
+  group('includeImage (#2853 — clipboard TransactionTooLargeException)', () {
+    // A recorder run plus a ~5 MB base64 capture image — the same shape that
+    // tripped Android's ~1 MB Binder limit when the clipboard carried it.
+    OcrTracePackage withLargeImage() {
+      // 4 MB of bytes → ~5.3 MB base64, mirroring the real crash payload.
+      final bytes = List<int>.filled(4 * 1024 * 1024, 7);
+      final recorder = runPump()
+        ..image(fileName: 'capture.jpg', base64: base64Encode(bytes));
+      return recorder.build();
+    }
+
+    test('default serialisation (file export) STILL carries the image', () {
+      final json = formatOcrTracePackageJson(withLargeImage());
+      final decoded = jsonDecode(json) as Map<String, dynamic>;
+      expect(decoded.containsKey('image'), isTrue);
+      expect((decoded['image'] as Map)['base64'], isNotEmpty);
+      // The file payload is necessarily huge (it embeds the capture).
+      expect(utf8.encode(json).length, greaterThan(5 * 1024 * 1024));
+    });
+
+    test('includeImage:false omits the base64 blob entirely', () {
+      final pkg = withLargeImage();
+      final clip = formatOcrTracePackageJson(pkg, includeImage: false);
+
+      // The base64 bytes must not appear anywhere in the clipboard JSON.
+      expect(clip.contains(pkg.image!.base64), isFalse);
+      expect((jsonDecode(clip) as Map).containsKey('image'), isFalse);
+      // And the document is now far under the ~1 MB Binder transaction cap.
+      expect(utf8.encode(clip).length, lessThan(64 * 1024));
+
+      // Eliding the image leaves the rest of the reasoning chain intact.
+      final decoded = jsonDecode(clip) as Map<String, dynamic>;
+      expect(decoded['kind'], 'pump');
+      expect((decoded['result'] as Map)['totalCost'], closeTo(18.59, 0.001));
+    });
+
+    test('an image-less trace serialises identically either way', () {
+      final pkg = runPump().build();
+      expect(
+        formatOcrTracePackageJson(pkg, includeImage: false),
+        formatOcrTracePackageJson(pkg),
+      );
+    });
+  });
 }

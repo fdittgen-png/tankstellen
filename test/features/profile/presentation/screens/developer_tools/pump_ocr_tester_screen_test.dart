@@ -282,24 +282,53 @@ void main() {
     });
   });
 
-  group('OcrTesterExport', () {
-    test('copyAsJson serialises the package to the clipboard', () async {
+  group('OcrTesterExport.copyAsJson (#2853)', () {
+    /// Captures the `Clipboard.setData` text via the platform-channel mock,
+    /// returning a getter so the test reads the latest captured value.
+    String? Function() interceptClipboard() {
       TestWidgetsFlutterBinding.ensureInitialized();
-      String? copied;
+      final captured = <String?>[null];
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(SystemChannels.platform, (call) async {
         if (call.method == 'Clipboard.setData') {
-          copied = (call.arguments as Map)['text'] as String?;
+          captured[0] = (call.arguments as Map)['text'] as String?;
         }
         return null;
       });
+      addTearDown(() => TestDefaultBinaryMessengerBinding
+          .instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null));
+      return () => captured[0];
+    }
+
+    test('copies the image-elided trace to the clipboard', () async {
+      final clipboard = interceptClipboard();
       final pkg = seededPumpTrace();
-      final json = await OcrTesterExport.copyAsJson(pkg);
-      expect(json, contains('"kind": "pump"'));
+      expect(await OcrTesterExport.copyAsJson(pkg), isTrue);
+      expect(clipboard(), isNotNull);
+      expect(clipboard(), contains('"kind": "pump"'));
+      // No image on this trace, so it equals the image-elided serialisation.
+      expect(clipboard(),
+          equals(formatOcrTracePackageJson(pkg, includeImage: false)));
+    });
+
+    test('does NOT put the base64 capture image on the clipboard', () async {
+      final clipboard = interceptClipboard();
+      // A real-shaped ~5 MB base64 capture — what tripped the Binder limit.
+      final trace = OcrTraceRecorder(kind: OcrTraceKind.pump)
+        ..result(totalCost: 18.59)
+        ..image(
+          fileName: 'capture.jpg',
+          base64: base64Encode(List<int>.filled(4 * 1024 * 1024, 7)),
+        );
+      final pkg = trace.build();
+
+      expect(await OcrTesterExport.copyAsJson(pkg), isTrue);
+      final copied = clipboard();
       expect(copied, isNotNull);
-      expect(copied, equals(formatOcrTracePackageJson(pkg)));
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, null);
+      // The clipboard string omits the base64 bytes and stays tiny.
+      expect(copied!.contains(pkg.image!.base64), isFalse);
+      expect(utf8.encode(copied).length, lessThan(64 * 1024));
     });
   });
 }

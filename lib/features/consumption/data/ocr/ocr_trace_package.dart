@@ -102,7 +102,12 @@ class OcrTracePackage {
     this.image,
   });
 
-  Map<String, dynamic> toJson() => {
+  /// Serialises the trace. The capture [image] is ~5 MB of base64 and is
+  /// only meaningful as a sibling file, so callers headed for a size-bounded
+  /// sink (the clipboard — #2853, Android's Binder limit is ~1 MB) pass
+  /// `includeImage: false` to elide it; the file/fixture export keeps the
+  /// default so the source frame still rides alongside the JSON.
+  Map<String, dynamic> toJson({bool includeImage = true}) => {
         'schema': schema,
         'kind': kind.name,
         'capturedAt': capturedAt.toIso8601String(),
@@ -123,7 +128,7 @@ class OcrTracePackage {
         if (receipt != null) 'receipt': receipt!.toJson(),
         if (result != null) 'result': result!.toJson(),
         if (expected != null) 'expected': expected!.toJson(),
-        if (image != null) 'image': image!.toJson(),
+        if (includeImage && image != null) 'image': image!.toJson(),
       };
 }
 
