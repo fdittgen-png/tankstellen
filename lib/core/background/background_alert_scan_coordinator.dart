@@ -10,10 +10,14 @@ import '../../features/widget/data/home_widget_service.dart';
 import '../logging/error_logger.dart';
 import '../storage/hive_storage.dart';
 import '../telemetry/storage/isolate_error_spool.dart';
+import '../cache/cache_manager.dart';
+import '../services/country_service_registry.dart';
 import 'background_price_history_writer.dart';
 import 'background_price_source.dart';
 import 'background_scan_dedup_store.dart';
 import 'background_scan_runners.dart';
+import 'bulk_dataset_alert_strategy.dart';
+import 'country_alert_strategy_resolver.dart';
 import 'daily_collection.dart';
 import 'hive_isolate_lock.dart';
 import 'notification_templates.dart';
@@ -254,6 +258,26 @@ class BackgroundAlertScanCoordinator {
       fallbackCountryCode: activeCountry,
       apiKey: apiKey,
     );
+
+    // #2863 — bulk-dataset countries (ES/IT/AR/DK + flag-gated FR/GB) are not
+    // served by the polled [BackgroundPriceSource]; their alert stations flow
+    // through a [BulkDatasetAlertStrategy] resolved per country. The dataset is
+    // downloaded at most once per scan (per its datasetTtl) then local-filtered
+    // — zero per-alert network. Merged into the same Tankerkönig-shaped map the
+    // evaluator consumes, so per-station price alerts in bulk countries now
+    // fire too. (Radius alerts in bulk countries are handled below, in the
+    // strategy-aware [BackgroundScanRunners.runRadiusAlerts].)
+    final resolver = CountryAlertStrategyResolver(
+      storage: storage,
+      cache: CacheManager(storage),
+      apiKey: apiKey,
+    );
+    prices.addAll(await _fetchBulkAlertPrices(
+      alertStationIds: alertStationIds,
+      fallbackCountryCode: activeCountry,
+      resolver: resolver,
+    ));
+
     debugPrint('BackgroundAlertScanCoordinator: fetched prices for '
         '${prices.length} stations');
 
@@ -277,8 +301,7 @@ class BackgroundAlertScanCoordinator {
 
     await BackgroundScanRunners.runRadiusAlerts(
       now: now,
-      source: source,
-      apiKey: apiKey,
+      resolver: resolver,
       templates: templates,
     );
 
@@ -288,6 +311,41 @@ class BackgroundAlertScanCoordinator {
       settingsStorage: storage,
     );
     await _refreshNearestWidgetFromSearch(storage, source: source);
+  }
+
+  /// #2863 — fetch per-station alert prices for **bulk-dataset** countries via
+  /// their [BulkDatasetAlertStrategy] (resolved per country by [resolver]).
+  ///
+  /// Groups the alert station ids by derived country (the same lazy derivation
+  /// the polled grouping uses), keeps only the bulk-policy countries (polled
+  /// ones were already fetched by [BackgroundPriceSource]), and asks each
+  /// country's strategy for its prices. Each bulk strategy answers by local
+  /// geo-filter over its cached whole-country dataset — at most one dataset
+  /// download per country per scan, then zero per-alert network. Each strategy
+  /// swallows + spools its own faults (its documented boundary, fault-tested in
+  /// `country_alert_strategy_test.dart`), so a bulk-country provider fault
+  /// degrades to "no fresh prices this scan" rather than failing the scan.
+  Future<Map<String, Map<String, dynamic>>> _fetchBulkAlertPrices({
+    required Set<String> alertStationIds,
+    required String? fallbackCountryCode,
+    required CountryAlertStrategyResolver resolver,
+  }) async {
+    final byCountry = <String, Set<String>>{};
+    for (final id in alertStationIds) {
+      final code =
+          CountryServiceRegistry.countryForStationId(id) ?? fallbackCountryCode;
+      // Only the bulk-dataset countries; polled ids were already fetched.
+      if (code == null || !BulkDatasetAlertStrategy.isBulk(code)) continue;
+      byCountry.putIfAbsent(code, () => <String>{}).add(id);
+    }
+
+    final merged = <String, Map<String, dynamic>>{};
+    for (final entry in byCountry.entries) {
+      final strategy = resolver.strategyFor(entry.key);
+      if (strategy == null) continue;
+      merged.addAll(await strategy.fetchPrices(entry.value));
+    }
+    return merged;
   }
 
   /// #609 — nearest-widget refresh from a real search (or legacy fallback).
