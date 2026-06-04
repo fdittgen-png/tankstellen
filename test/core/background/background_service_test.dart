@@ -481,11 +481,15 @@ void main() {
   // platform engine.
   group('background isolate Dio construction (#2249)', () {
     // #2415 — the Dio construction moved into the coordinator with the scan
-    // body. #2862 — it moved again, into the registry-driven
-    // BackgroundPriceSource (which builds each polled country's Dio). The
-    // #2249 invariant (rate-limited factory, never raw Dio) still applies;
-    // the source-scan now reads the price source + the coordinator, and
-    // neither may hand-roll a Dio.
+    // body. #2862 — it moved into the registry-driven BackgroundPriceSource.
+    // #2863 — it moved once more, into the polled CountryAlertStrategy
+    // (PolledAlertStrategy builds each polled country's Dio). The #2249
+    // invariant (rate-limited factory, never raw Dio) still applies; the
+    // source-scan now reads the polled strategy + the price source + the
+    // coordinator + the runners, and none may hand-roll a Dio.
+    final polledStrategy =
+        File('lib/core/background/polled_alert_strategy.dart')
+            .readAsStringSync();
     final priceSource =
         File('lib/core/background/background_price_source.dart')
             .readAsStringSync();
@@ -498,12 +502,12 @@ void main() {
 
     test('routes every Dio through DioFactory', () {
       expect(
-        priceSource.contains("import '../services/dio_factory.dart';"),
+        polledStrategy.contains("import '../services/dio_factory.dart';"),
         isTrue,
-        reason: 'the background price source must import DioFactory',
+        reason: 'the polled alert strategy must import DioFactory',
       );
       expect(
-        priceSource.contains('DioFactory.create('),
+        polledStrategy.contains('DioFactory.create('),
         isTrue,
         reason: 'the background isolate must build its Dio via '
             'DioFactory.create',
@@ -511,7 +515,7 @@ void main() {
     });
 
     test('constructs no raw Dio(BaseOptions(...)) instances', () {
-      for (final source in [priceSource, coordinator, runners]) {
+      for (final source in [polledStrategy, priceSource, coordinator, runners]) {
         expect(
           source.contains('Dio(BaseOptions('),
           isFalse,

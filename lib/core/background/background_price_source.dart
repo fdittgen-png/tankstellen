@@ -3,47 +3,38 @@
 
 import 'dart:async';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../features/search/data/models/search_params.dart';
 import '../../features/search/domain/entities/station.dart';
 import '../cache/cache_manager.dart';
-import '../constants/field_names.dart';
 import '../data/storage_repository.dart';
-import '../logging/error_logger.dart';
 import '../services/country_service_registry.dart';
-import '../services/dio_factory.dart';
-import '../services/service_config.dart';
 import '../services/station_service.dart';
+import 'country_alert_strategy.dart';
+import 'polled_alert_strategy.dart';
 
-/// The 11 polled / realtime providers a background scan may query directly,
-/// reusing the per-country `StationServiceChain` within each provider's
-/// `FuelServicePolicy.minInterval` (Epic #2860, child #2862).
-///
-/// Bulk-dataset countries (ES, IT, AR, DK + the flag-gated FR/GB bulk paths)
-/// are deliberately **excluded** here — they need the download-once +
-/// local-filter flow of child #2863, never a per-alert network hit. Until
-/// then those countries simply are not scanned (no regression vs today, where
-/// only DE was). AU is excluded as a throwing stub (#804).
-const Set<String> kBackgroundPolledCountries = {
-  'DE', 'AT', 'PT', 'GB', 'LU', 'SI', 'GR', 'RO', 'MX', 'KR', 'CL',
-};
+// `kBackgroundPolledCountries` now lives in `polled_alert_strategy.dart` (the
+// per-country polled specialization, #2863). Re-exported here so existing
+// imports (`background_price_source.dart`) keep compiling.
+export 'polled_alert_strategy.dart' show kBackgroundPolledCountries;
 
-/// Builds the right country [StationService] (Riverpod-free, via
-/// [CountryServiceRegistry.buildBackgroundService]) inside the WorkManager /
-/// BGAppRefresh isolate and fetches current prices through it — replacing the
-/// three hardcoded Tankerkönig instantiations (#2862).
+/// Multi-country price-fetch orchestrator for a background scan, grouping a
+/// mixed-country station-id set by derived country so each polled provider is
+/// queried **at most once per scan** (Epic #2860, child #2862).
 ///
-/// This is the *which-service-fetches* seam, grouped per country so each
-/// provider is hit at most once per scan. The price **evaluation** stays as
-/// it is today (euro / e5-e10-diesel); making it country/currency-aware is
-/// child #2864.
+/// Since #2863 the per-country work is delegated to a [PolledAlertStrategy] —
+/// the [SourceModel.polledApi] specialization of [CountryAlertStrategy] — built
+/// once per country and cached, so a scan that fetches station prices AND runs
+/// a radius search for the same country reuses one strategy (and one provider
+/// service). Bulk-dataset countries (ES/IT/AR/DK + flag-gated FR/GB) are NOT
+/// handled here; they flow through [BulkDatasetAlertStrategy], resolved by the
+/// scan coordinator via [CountryAlertStrategy.forCountry]. This source remains
+/// the polled-only seam the velocity/per-station price refresh + nearest-widget
+/// search use.
 ///
-/// Construction is per-country and cheap, but the source caches the built
-/// service per country code so a scan that fetches station prices AND runs a
-/// radius search for the same country reuses one service (and so a test can
-/// assert each provider is built exactly once).
+/// The price **evaluation** stays as it is today (euro / e5-e10-diesel); making
+/// it country/currency/fuel-set aware is child #2864.
 class BackgroundPriceSource {
   BackgroundPriceSource({
     required StorageRepository storage,
@@ -52,102 +43,68 @@ class BackgroundPriceSource {
     @visibleForTesting StationService? Function(String code, {String? apiKey})?
         serviceBuilder,
   })  : _storage = storage,
-        _connectTimeout = connectTimeout,
-        _receiveTimeout = receiveTimeout,
         _cache = CacheManager(storage),
-        _serviceBuilder = serviceBuilder;
+        _deps = PolledAlertStrategyDeps(
+          connectTimeout: connectTimeout,
+          receiveTimeout: receiveTimeout,
+          serviceBuilder: serviceBuilder,
+        );
 
   final StorageRepository _storage;
   final CacheStrategy _cache;
-  final Duration _connectTimeout;
-  final Duration _receiveTimeout;
+  final PolledAlertStrategyDeps _deps;
 
-  /// Test seam (#2862): a fake per-country service builder. Production leaves
-  /// this null and goes through [CountryServiceRegistry.buildBackgroundService].
-  /// Called at most once per country (the result is cached), so a test can
-  /// assert each provider is built exactly once per scan.
-  final StationService? Function(String code, {String? apiKey})? _serviceBuilder;
-
-  /// Per-scan service cache so each country's provider is built at most once.
-  final Map<String, StationService> _services = {};
+  /// Per-scan strategy cache so each country's polled provider is built at most
+  /// once. Keyed by country code; a `null` value records a country we already
+  /// determined has no buildable polled strategy this scan.
+  final Map<String, PolledAlertStrategy?> _strategies = {};
 
   /// Whether [countryCode] is one of the polled providers this source serves.
   static bool isPolled(String countryCode) =>
-      kBackgroundPolledCountries.contains(countryCode);
+      PolledAlertStrategy.isPolled(countryCode);
+
+  /// Build (once per scan) and return the [PolledAlertStrategy] for
+  /// [countryCode], or null when the country is not a polled provider / its
+  /// service cannot be built.
+  PolledAlertStrategy? _strategyFor(String countryCode, {String? apiKey}) {
+    if (_strategies.containsKey(countryCode)) return _strategies[countryCode];
+    final strategy = PolledAlertStrategy.forCountry(
+      countryCode,
+      storage: _storage,
+      cache: _cache,
+      apiKey: apiKey,
+      deps: _deps,
+    );
+    _strategies[countryCode] = strategy;
+    return strategy;
+  }
 
   /// Builds (once per scan) and returns the chained [StationService] for
   /// [countryCode], or null when the country is not a polled provider.
   ///
-  /// [apiKey] is the user's key from the shared encrypted Hive box, threaded
-  /// into the isolate. Only DE needs it on the Dio (sent as the `apikey`
-  /// query param, since the isolate has no Dio interceptor); KR/CL read their
-  /// key from [_storage] inside the registry factory.
-  StationService? serviceFor(String countryCode, {String? apiKey}) {
-    if (!isPolled(countryCode)) return null;
-    final cached = _services[countryCode];
-    if (cached != null) return cached;
-    final built = _serviceBuilder != null
-        ? _serviceBuilder(countryCode, apiKey: apiKey)
-        : CountryServiceRegistry.buildBackgroundService(
-            countryCode,
-            storage: _storage,
-            cache: _cache,
-            tankerkoenigDio:
-                countryCode == 'DE' ? _buildTankerkoenigDio(apiKey) : null,
-          );
-    if (built != null) _services[countryCode] = built;
-    return built;
-  }
-
-  /// Tankerkönig Dio for the background isolate: rate-limited + conditional
-  /// GET (via [DioFactory]) with the API key baked into the query parameters,
-  /// since there is no Riverpod interceptor here.
-  Dio _buildTankerkoenigDio(String? apiKey) {
-    final dio = DioFactory.create(
-      baseUrl: ServiceConfigs.tankerkoenig.baseUrl,
-      connectTimeout: _connectTimeout,
-      receiveTimeout: _receiveTimeout,
-    );
-    if (apiKey != null && apiKey.isNotEmpty) {
-      dio.options.queryParameters = {'apikey': apiKey};
-    }
-    return dio;
-  }
+  /// Kept for the nearest-widget search (#609 / #2862), which needs a raw
+  /// [StationService] handle rather than the strategy facade. [apiKey] is the
+  /// user's key threaded into the isolate.
+  StationService? serviceFor(String countryCode, {String? apiKey}) =>
+      _strategyFor(countryCode, apiKey: apiKey)?.service;
 
   /// Fetch current prices for [stationIds] in [countryCode], returning the
   /// Tankerkönig-shaped `id → {status, e5, e10, diesel, …}` map the existing
   /// downstream price-history + alert evaluation consume unchanged.
   ///
-  /// Batches where the provider supports it (the country service's
-  /// [StationService.getPrices] chunks internally — DE Tankerkönig batch is
-  /// the template); a provider with no batch endpoint returns an empty map
-  /// and per-station alerts for that country simply find no fresh price this
-  /// scan (radius alerts still work via [searchStations]).
-  ///
-  /// Returns an empty map for an unpolled country, no station ids, or any
-  /// fetch error (spooled, never thrown — this runs in an OS-spawned isolate).
+  /// Delegates to the country's [PolledAlertStrategy] (which chunks to the
+  /// provider's batch size internally). Returns an empty map for an unpolled
+  /// country, no station ids, or any fetch error (spooled, never thrown — this
+  /// runs in an OS-spawned isolate).
   Future<Map<String, Map<String, dynamic>>> fetchPrices({
     required String countryCode,
     required Set<String> stationIds,
     String? apiKey,
   }) async {
     if (stationIds.isEmpty) return const {};
-    final service = serviceFor(countryCode, apiKey: apiKey);
-    if (service == null) return const {};
-    try {
-      final result = await service.getPrices(stationIds.toList());
-      final out = <String, Map<String, dynamic>>{};
-      for (final entry in result.data.entries) {
-        out[entry.key] = _toTankerkoenigShape(entry.value);
-      }
-      return out;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-        'where': 'BackgroundPriceSource.fetchPrices($countryCode)',
-        'ids': stationIds.length,
-      }));
-      return const {};
-    }
+    final strategy = _strategyFor(countryCode, apiKey: apiKey);
+    if (strategy == null) return const {};
+    return strategy.fetchPrices(stationIds);
   }
 
   /// Fetch prices for a mixed-country [stationIds] set, grouping by derived
@@ -159,7 +116,8 @@ class BackgroundPriceSource {
   /// [fallbackCountryCode] (the active country) so legacy favorites saved
   /// before the #753 prefix scheme are still refreshed. Ids whose country is
   /// not a polled provider (e.g. bulk-dataset ES/IT — child #2863) are
-  /// silently skipped this scan.
+  /// silently skipped here (the scan coordinator scans them via
+  /// [BulkDatasetAlertStrategy]).
   ///
   /// Returns one merged Tankerkönig-shaped map across all countries, keyed by
   /// the original (prefixed) station id.
@@ -188,42 +146,17 @@ class BackgroundPriceSource {
     return merged;
   }
 
-  /// Run a radius search in [countryCode] via its provider — the registry-
-  /// driven replacement for the hardcoded Tankerkönig search the radius-alert
-  /// runner used. Returns the priced stations, or an empty list for an
-  /// unpolled country / a fetch error.
+  /// Run a radius search in [countryCode] via its polled provider — the
+  /// registry-driven replacement for the hardcoded Tankerkönig search the
+  /// radius-alert runner used. Returns the priced stations, or an empty list
+  /// for an unpolled country / a fetch error.
   Future<List<Station>> searchStations({
     required String countryCode,
     required SearchParams params,
     String? apiKey,
   }) async {
-    final service = serviceFor(countryCode, apiKey: apiKey);
-    if (service == null) return const [];
-    try {
-      final result = await service.searchStations(params);
-      return result.data;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-        'where': 'BackgroundPriceSource.searchStations($countryCode)',
-      }));
-      return const [];
-    }
+    final strategy = _strategyFor(countryCode, apiKey: apiKey);
+    if (strategy == null) return const [];
+    return strategy.searchArea(params);
   }
-
-  /// Adapt a country-agnostic [StationPrices] back to the legacy
-  /// Tankerkönig-shaped map the per-station / velocity runners read today.
-  /// Carries every priced fuel so #2864 can widen the evaluation without
-  /// re-touching this seam.
-  static Map<String, dynamic> _toTankerkoenigShape(StationPrices prices) => {
-        TankerkoenigFields.status:
-            prices.isOpen ? TankerkoenigFields.statusOpen : 'closed',
-        TankerkoenigFields.e5: prices.e5,
-        TankerkoenigFields.e10: prices.e10,
-        TankerkoenigFields.diesel: prices.diesel,
-        'e98': prices.e98,
-        'dieselPremium': prices.dieselPremium,
-        'e85': prices.e85,
-        'lpg': prices.lpg,
-        'cng': prices.cng,
-      };
 }

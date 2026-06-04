@@ -25,7 +25,7 @@ import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
 import '../telemetry/storage/isolate_error_spool.dart';
 import '../utils/json_extensions.dart';
-import 'background_price_source.dart';
+import 'country_alert_strategy_resolver.dart';
 import 'notification_templates.dart';
 
 /// Alert-evaluation runners invoked by [BackgroundAlertScanCoordinator]
@@ -190,18 +190,23 @@ class BackgroundScanRunners {
 
   /// #578 phase 3 — radius alerts via [RadiusAlertRunner] (reused read-only).
   ///
-  /// #2862 — each alert's samples now come from the registry-driven
-  /// [BackgroundPriceSource] for the **country its centre falls in**
-  /// (derived via the bounding box), instead of a single hardcoded
-  /// Tankerkönig search, so a radius alert in PT / AT / … is evaluated
-  /// against that country's provider. The source caches its per-country
-  /// services, so all alerts in one country reuse one provider. Centres in a
-  /// non-polled country (e.g. bulk-dataset ES/IT — child #2863) yield no
-  /// samples this scan.
+  /// #2862 — each alert's samples come from the per-country source for the
+  /// **country its centre falls in** (derived via the bounding box), instead
+  /// of a single hardcoded Tankerkönig search, so a radius alert in PT / AT /
+  /// … is evaluated against that country's provider.
+  ///
+  /// #2863 — the country is now resolved to a [CountryAlertStrategy] via the
+  /// per-scan [CountryAlertStrategyResolver], so **both** polled and bulk
+  /// countries flow through one seam: a polled centre searches its provider
+  /// within `minInterval`; a bulk centre (ES/IT/AR/DK + flag-gated FR/GB) is a
+  /// local geo-filter over the cached whole-country dataset — zero per-alert
+  /// network. The resolver caches strategies per country, so all alerts in one
+  /// country reuse one strategy (and, for bulk, one in-memory dataset). A
+  /// centre whose country has no buildable strategy (e.g. the AU stub) yields
+  /// no samples this scan.
   static Future<void> runRadiusAlerts({
     required DateTime now,
-    required BackgroundPriceSource source,
-    required String? apiKey,
+    required CountryAlertStrategyResolver resolver,
     required BackgroundNotificationTemplates templates,
   }) async {
     try {
@@ -225,14 +230,14 @@ class BackgroundScanRunners {
           final country = CountryServiceRegistry.countryForLatLng(
               alert.centerLat, alert.centerLng);
           if (country == null) return const <StationPriceSample>[];
-          final stations = await source.searchStations(
-            countryCode: country,
-            params: SearchParams(
+          final strategy = resolver.strategyFor(country);
+          if (strategy == null) return const <StationPriceSample>[];
+          final stations = await strategy.searchArea(
+            SearchParams(
               lat: alert.centerLat,
               lng: alert.centerLng,
               radiusKm: alert.radiusKm,
             ),
-            apiKey: apiKey,
           );
           final samples = <StationPriceSample>[];
           for (final station in stations) {
