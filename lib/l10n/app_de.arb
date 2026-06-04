@@ -1447,6 +1447,8 @@
   "veCalibratedTitle": "Verbrauchsberechnung für {vehicleName} kalibriert — Genauigkeit verbessert um {percent}%",
   "veResetConfirmTitle": "Volumetrischen Wirkungsgrad zurücksetzen?",
   "veResetConfirmBody": "Dies verwirft den gelernten volumetrischen Wirkungsgrad (η_v) und stellt den Standardwert (0,85) wieder her. Fahrt-bezogene Verbrauchsschätzungen fallen auf die Herstellerkonstante zurück, bis der Kalibrator aus kommenden Fahrten neue Messwerte sammelt.",
+  "alertsStationSectionTitle": "Stations-Alarme",
+  "alertsStationAdd": "Stations-Alarm hinzufügen",
   "alertsRadiusSectionTitle": "Umkreis-Alarme",
   "alertsRadiusAdd": "Umkreis-Alarm hinzufügen",
   "alertsRadiusEmptyTitle": "Noch keine Umkreis-Alarme",

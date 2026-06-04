@@ -3410,6 +3410,12 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ovo će odbaciti naučenu volumetrijsku učinkovitost (η_v) i vratiti zadanu vrijednost (0.85). Procjene protoka goriva na razini putovanja vraćat će se na tvornički konstantu dok kalibracija ne prikupi nove uzorke iz nadolazećih putovanja.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Upozorenja polumjera';
 
   @override

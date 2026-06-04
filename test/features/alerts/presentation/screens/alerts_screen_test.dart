@@ -49,8 +49,11 @@ void main() {
         ],
       );
 
+      // #2819 — the empty station section now shows a LABELLED header +
+      // a compact inline hint, not a full-screen "No price alerts" state.
       expect(find.byIcon(Icons.notifications_off_outlined), findsOneWidget);
-      expect(find.text('No price alerts'), findsOneWidget);
+      expect(find.textContaining('Station alerts'), findsOneWidget);
+      expect(find.textContaining("station's detail page"), findsOneWidget);
     });
 
     testWidgets('shows alert list when alerts exist', (tester) async {

@@ -4410,5 +4410,15 @@
         "type": "int"
       }
     }
+  },
+  "alertsStationSectionTitle": "Station alerts",
+  "@alertsStationSectionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertsStationAdd": "Add a station alert",
+  "@alertsStationAdd": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

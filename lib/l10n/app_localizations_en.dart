@@ -3392,6 +3392,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'This will discard the learned volumetric efficiency (η_v) and restore the default value (0.85). Trip-level fuel-flow estimates will fall back to the manufacturer constant until the calibrator collects new samples from upcoming trips.';
 
   @override
+  String get alertsStationSectionTitle => 'Station alerts';
+
+  @override
+  String get alertsStationAdd => 'Add a station alert';
+
+  @override
   String get alertsRadiusSectionTitle => 'Radius alerts';
 
   @override
@@ -10770,6 +10776,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get veResetConfirmBody =>
       '⟦Ŧĥîš ŵîłł đîšçářđ ŧĥé łéářñéđ ṽółúɱéŧřîç éƒƒîçîéñçý (η_ṽ) áñđ řéšŧóřé ŧĥé đéƒáúłŧ ṽáłúé (0.85). Ŧřîƥ-łéṽéł ƒúéł-ƒłóŵ éšŧîɱáŧéš ŵîłł ƒáłł ƀáçķ ŧó ŧĥé ɱáñúƒáçŧúřéř çóñšŧáñŧ úñŧîł ŧĥé çáłîƀřáŧóř çółłéçŧš ñéŵ šáɱƥłéš ƒřóɱ úƥçóɱîñǧ ŧřîƥš. ····················································································⟧';
+
+  @override
+  String get alertsStationSectionTitle => '⟦Šŧáŧîóñ áłéřŧš ······⟧';
+
+  @override
+  String get alertsStationAdd => '⟦Áđđ á šŧáŧîóñ áłéřŧ ·······⟧';
 
   @override
   String get alertsRadiusSectionTitle => '⟦Řáđîúš áłéřŧš ·····⟧';
