@@ -39,5 +39,29 @@
   "restoreBackupFailed": "Restore failed — the file could not be read",
   "@restoreBackupFailed": {
     "description": "Generic error SnackBar when the restore flow throws an unexpected error or the file could not be read (#2571)."
+  },
+  "backupImportProgress": "Restoring your backup…",
+  "@backupImportProgress": {
+    "description": "Label in the indeterminate progress dialog shown while a backup zip decodes, parses, and writes its records (#2815)."
+  },
+  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "@restoreBackupMergedSummary": {
+    "description": "Success SnackBar after a MERGE restore, breaking down what was added/updated per category (#2815).",
+    "placeholders": {
+      "vehicles": { "type": "int" },
+      "fillUps": { "type": "int" },
+      "trips": { "type": "int" },
+      "chargingLogs": { "type": "int" }
+    }
+  },
+  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "@restoreBackupReplacedSummary": {
+    "description": "Success SnackBar after a REPLACE-all restore, breaking down what now exists per category (#2815).",
+    "placeholders": {
+      "vehicles": { "type": "int" },
+      "fillUps": { "type": "int" },
+      "trips": { "type": "int" },
+      "chargingLogs": { "type": "int" }
+    }
   }
 }

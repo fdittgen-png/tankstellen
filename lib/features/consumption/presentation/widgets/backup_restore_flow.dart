@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'backup_progress_dialog.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/exporters/backup/backup_xml_reader.dart';
 import '../../data/exporters/backup/backup_zip_reader.dart';
@@ -75,8 +77,18 @@ class BackupRestoreFlow {
     final sinks = _sinksFor(ref);
     final importer = debugImporterOverride ?? FullBackupImporter();
     try {
-      final result =
-          await importer.import(bytes: bytes, sinks: sinks, mode: mode);
+      // #2815 — show an indeterminate progress modal while the zip decodes,
+      // the XML parses, and 100+ records are written (previously a silent
+      // freeze). Shown after the merge/replace confirmation so it doesn't
+      // stack on that dialog.
+      final result = await runWithBackupProgress(
+        context,
+        label: l?.backupImportProgress ?? 'Restoring your backup…',
+        icon: Icons.settings_backup_restore,
+        // bytes is non-null here (early-returned above); the `!` is needed
+        // because promotion doesn't cross the closure boundary.
+        work: () => importer.import(bytes: bytes!, sinks: sinks, mode: mode),
+      );
 
       // Refresh every list provider so the restored records appear
       // without a relaunch. The repositories were written directly, so
@@ -87,11 +99,25 @@ class BackupRestoreFlow {
       ref.invalidate(chargingLogsProvider);
 
       if (!context.mounted) return;
-      final msg = (result.total == 0)
-          ? (l?.restoreBackupEmpty ??
-              'Backup restored — it contained no records')
-          : (l?.restoreBackupSuccess(result.total) ??
-              'Backup restored — ${result.total} records imported');
+      // #2815 — surface the per-entity breakdown, worded by mode so the user
+      // sees exactly what was "merged" vs "replaced" (the result already
+      // carries the counts + mode).
+      final String msg;
+      if (result.total == 0) {
+        msg = l?.restoreBackupEmpty ??
+            'Backup restored — it contained no records';
+      } else if (result.mode == BackupImportMode.replace) {
+        msg = l?.restoreBackupReplacedSummary(result.vehicles, result.fillUps,
+                result.trips, result.chargingLogs) ??
+            'Replaced all data with ${result.vehicles} vehicles, '
+                '${result.fillUps} fill-ups, ${result.trips} trips, '
+                '${result.chargingLogs} charging logs';
+      } else {
+        msg = l?.restoreBackupMergedSummary(result.vehicles, result.fillUps,
+                result.trips, result.chargingLogs) ??
+            'Merged ${result.vehicles} vehicles, ${result.fillUps} fill-ups, '
+                '${result.trips} trips, ${result.chargingLogs} charging logs';
+      }
       SnackBarHelper.showSuccess(context, msg);
     } on BackupZipReadException catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.ui, e, st,
@@ -133,7 +159,15 @@ class BackupRestoreFlow {
       mimeTypes: <String>['application/zip'],
       uniformTypeIdentifiers: <String>['public.zip-archive'],
     );
-    final file = await openFile(acceptedTypeGroups: const <XTypeGroup>[group]);
+    // #2815 — open the picker ON the Downloads folder (where exports are
+    // saved) instead of the usually-empty "Recents" tab. A hint on Android
+    // SAF (honoured on most OEMs; harmless where ignored).
+    final initialDirectory =
+        await PublicFileExporter.downloadsInitialDirectory();
+    final file = await openFile(
+      initialDirectory: initialDirectory,
+      acceptedTypeGroups: const <XTypeGroup>[group],
+    );
     if (file == null) return null;
     return file.readAsBytes();
   }

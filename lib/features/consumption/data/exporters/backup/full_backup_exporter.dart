@@ -64,9 +64,16 @@ class FullBackupExportResult {
   /// failed; the temp-file + share-sheet path is unaffected.
   final String? savedPath;
 
+  /// The bare backup file name (`tankstellen_backup_<stamp>.zip`), so the
+  /// success UX can tell the user what to look for in the picker (#2815).
+  /// The platform [savedPath] (a `content://` URI on Android) is NOT
+  /// user-displayable; this is.
+  final String fileName;
+
   const FullBackupExportResult({
     required this.filePath,
     required this.byteSize,
+    required this.fileName,
     this.savedPath,
   });
 }
@@ -162,6 +169,7 @@ class FullBackupExporter {
     return FullBackupExportResult(
       filePath: filePath,
       byteSize: bytes.length,
+      fileName: fileName,
       savedPath: savedPath,
     );
   }

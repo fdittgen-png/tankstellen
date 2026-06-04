@@ -61,6 +61,7 @@ class _RecordingExporter extends FullBackupExporter {
     return const FullBackupExportResult(
       filePath: '/tmp/test_backup.zip',
       byteSize: 1234,
+      fileName: 'test_backup.zip',
     );
   }
 }
@@ -77,6 +78,28 @@ class _ThrowingExporter extends FullBackupExporter {
     required List chargingLogs,
   }) async {
     throw StateError('share-sheet refused');
+  }
+}
+
+/// Exporter that reports a successful Downloads write (savedPath set), so the
+/// success snackbar takes the #2815 "Saved to Downloads as {fileName}" branch.
+class _SavedExporter extends FullBackupExporter {
+  _SavedExporter()
+      : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
+
+  @override
+  Future<FullBackupExportResult> export({
+    required List<VehicleProfile> vehicles,
+    required List<FillUp> fillUps,
+    required List trips,
+    required List chargingLogs,
+  }) async {
+    return const FullBackupExportResult(
+      filePath: '/tmp/tankstellen_backup_2026.zip',
+      byteSize: 4096,
+      fileName: 'tankstellen_backup_2026.zip',
+      savedPath: 'content://downloads/tankstellen_backup_2026.zip',
+    );
   }
 }
 
@@ -197,6 +220,27 @@ void main() {
         find.textContaining('Backup ready'),
         findsOneWidget,
       );
+    });
+
+    testWidgets('names the saved file in the success snackbar (#2815)',
+        (tester) async {
+      ConsumptionScreen.debugExporterOverride = _SavedExporter();
+
+      final fillUp = FillUp(
+        id: '1',
+        date: DateTime.utc(2026, 4, 15),
+        liters: 40,
+        totalCost: 60,
+        odometerKm: 10000,
+        fuelType: FuelType.e10,
+      );
+      await _pumpScreen(tester, fillUps: [fillUp]);
+
+      await openExport(tester);
+
+      // The user is told the exact filename to look for (in Downloads / the
+      // restore picker), not a generic "saved to folder".
+      expect(find.textContaining('tankstellen_backup_2026.zip'), findsOneWidget);
     });
 
     testWidgets('surfaces an error snackbar when the exporter throws',

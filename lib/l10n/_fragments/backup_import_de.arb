@@ -7,5 +7,8 @@
   "restoreBackupSuccess": "Sicherung wiederhergestellt – {count} Datensätze importiert",
   "restoreBackupEmpty": "Sicherung wiederhergestellt – sie enthielt keine Datensätze",
   "restoreBackupCorrupt": "Wiederherstellung fehlgeschlagen – diese Datei ist keine gültige Tankstellen-Sicherung",
-  "restoreBackupFailed": "Wiederherstellung fehlgeschlagen – die Datei konnte nicht gelesen werden"
+  "restoreBackupFailed": "Wiederherstellung fehlgeschlagen – die Datei konnte nicht gelesen werden",
+  "backupImportProgress": "Sicherung wird wiederhergestellt…",
+  "restoreBackupMergedSummary": "{vehicles} Fahrzeuge, {fillUps} Tankvorgänge, {trips} Fahrten, {chargingLogs} Ladevorgänge zusammengeführt",
+  "restoreBackupReplacedSummary": "Alle Daten ersetzt durch {vehicles} Fahrzeuge, {fillUps} Tankvorgänge, {trips} Fahrten, {chargingLogs} Ladevorgänge"
 }

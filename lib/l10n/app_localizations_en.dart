@@ -3790,6 +3790,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportBackupFailed => 'Backup export failed — please try again';
 
   @override
+  String get backupExportProgress => 'Exporting your backup…';
+
+  @override
+  String exportBackupSavedAs(String fileName) {
+    return 'Saved to Downloads as $fileName';
+  }
+
+  @override
   String get restoreBackupTooltip => 'Restore backup';
 
   @override
@@ -3820,6 +3828,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get restoreBackupFailed =>
       'Restore failed — the file could not be read';
+
+  @override
+  String get backupImportProgress => 'Restoring your backup…';
+
+  @override
+  String restoreBackupMergedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return 'Merged $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+  }
+
+  @override
+  String restoreBackupReplacedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return 'Replaced all data with $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+  }
 
   @override
   String get brokenMapChipVerifying => 'MAP sensor verifying…';
@@ -11154,6 +11185,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ɓáçķúƥ éẋƥóřŧ ƒáîłéđ — ƥłéášé ŧřý áǧáîñ ··············⟧';
 
   @override
+  String get backupExportProgress => '⟦Éẋƥóřŧîñǧ ýóúř ƀáçķúƥ… ·········⟧';
+
+  @override
+  String exportBackupSavedAs(String fileName) {
+    return '⟦Šáṽéđ ŧó Đóŵñłóáđš áš $fileName ········⟧';
+  }
+
+  @override
   String get restoreBackupTooltip => '⟦Řéšŧóřé ƀáçķúƥ ······⟧';
 
   @override
@@ -11185,6 +11224,29 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get restoreBackupFailed =>
       '⟦Řéšŧóřé ƒáîłéđ — ŧĥé ƒîłé çóúłđ ñóŧ ƀé řéáđ ···············⟧';
+
+  @override
+  String get backupImportProgress => '⟦Řéšŧóřîñǧ ýóúř ƀáçķúƥ… ·········⟧';
+
+  @override
+  String restoreBackupMergedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return '⟦Ṁéřǧéđ $vehicles ṽéĥîçłéš, $fillUps ƒîłł-úƥš, $trips ŧřîƥš, $chargingLogs çĥářǧîñǧ łóǧš ·················⟧';
+  }
+
+  @override
+  String restoreBackupReplacedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return '⟦Řéƥłáçéđ áłł đáŧá ŵîŧĥ $vehicles ṽéĥîçłéš, $fillUps ƒîłł-úƥš, $trips ŧřîƥš, $chargingLogs çĥářǧîñǧ łóǧš ·······················⟧';
+  }
 
   @override
   String get brokenMapChipVerifying => '⟦ṀÁƤ šéñšóř ṽéřîƒýîñǧ… ········⟧';

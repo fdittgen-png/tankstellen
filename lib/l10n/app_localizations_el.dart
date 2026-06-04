@@ -3837,6 +3837,14 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αποτυχία εξαγωγής αντιγράφου — παρακαλώ δοκιμάστε ξανά';
 
   @override
+  String get backupExportProgress => 'Exporting your backup…';
+
+  @override
+  String exportBackupSavedAs(String fileName) {
+    return 'Saved to Downloads as $fileName';
+  }
+
+  @override
   String get restoreBackupTooltip => 'Restore backup';
 
   @override
@@ -3867,6 +3875,29 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get restoreBackupFailed =>
       'Restore failed — the file could not be read';
+
+  @override
+  String get backupImportProgress => 'Restoring your backup…';
+
+  @override
+  String restoreBackupMergedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return 'Merged $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+  }
+
+  @override
+  String restoreBackupReplacedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return 'Replaced all data with $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+  }
 
   @override
   String get brokenMapChipVerifying => 'Επαλήθευση αισθητήρα MAP…';
