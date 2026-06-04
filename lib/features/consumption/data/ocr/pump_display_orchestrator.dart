@@ -1,10 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:image/image.dart' as img;
+
 import '../pump_display_parser.dart';
 import 'label_anchored_extractor.dart';
 import 'ocr_trace_recorder.dart';
 import 'pump_ocr_config.dart';
+import 'pump_ocr_recognizer.dart';
+import 'pump_recognizer_source.dart';
 import 'pump_validation_gate.dart';
 import 'recognized_text_block.dart';
 
@@ -21,7 +25,15 @@ import 'recognized_text_block.dart';
 ///     geometry (block boxes too sparse / fused), fall back to the
 ///     existing pollution-strip + regex + positional-inference parser so
 ///     the German / Carrefour / Super-U paths stay unchanged.
-///  3. **Validation gate** — the same per-country range + identity gate
+///  3. **On-device 7-segment recognizer** (#2830) — STRICTLY ADDITIVE.
+///     When [frame] + [recognizerFields] are supplied (only when a brand
+///     template with `pumpDisplay` ROIs matched the country/brand —
+///     FR/Tokheim today), [mergeRecognizerSource] runs the LED decoder
+///     and lets it WIN only when it reads ≥2 fields, passes the SAME
+///     gate, and matches-or-beats the existing winner's field count.
+///     Otherwise the two-source result is returned unchanged, so
+///     production (every ROI-less path) is byte-for-byte identical.
+///  4. **Validation gate** — the same per-country range + identity gate
 ///     decides `validated`, whichever path produced the values.
 PumpDisplayParseResult orchestratePumpDisplayParse({
   required List<RecognizedTextBlock> blocks,
@@ -30,7 +42,26 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
   PumpDisplayParser parser = const PumpDisplayParser(),
   PumpValidationGate gate = const PumpValidationGate(),
   OcrTraceRecorder? trace,
+  img.Image? frame,
+  OcrPumpFieldSpec? recognizerFields,
+  PumpOcrRecognizer recognizer = const PumpOcrRecognizer(),
 }) {
+  // The #2830 3rd source is reachable only when a ROI template matched
+  // (frame + fields both present); the helper is a pass-through guard so
+  // every ROI-less path returns the existing winner untouched.
+  PumpDisplayParseResult withRecognizer(PumpDisplayParseResult existing) {
+    if (frame == null || recognizerFields == null) return existing;
+    return mergeRecognizerSource(
+      existing: existing,
+      frame: frame,
+      fields: recognizerFields,
+      profile: profile,
+      recognizer: recognizer,
+      gate: gate,
+      trace: trace,
+    ).result;
+  }
+
   final anchored = extractByLabelAnchor(blocks, profile: profile, trace: trace);
   if (anchored.boundCount < 2) {
     // Geometry too sparse to anchor — defer to the flat-string parser,
@@ -45,7 +76,7 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
       validated: fallback.validated,
       validationReason: 'flat-string-fallback',
     );
-    return fallback;
+    return withRecognizer(fallback);
   }
   final confidence = _confidenceFor(anchored);
   trace?.confidence(
@@ -72,7 +103,7 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
     validated: profile != null && result.accepted,
     validationReason: result.reason,
   );
-  return PumpDisplayParseResult(
+  return withRecognizer(PumpDisplayParseResult(
     totalCost: anchored.totalCost,
     liters: anchored.liters,
     pricePerLiter: anchored.pricePerLiter,
@@ -81,7 +112,7 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
     validationReason: result.reason,
     validationApplied: profile != null,
     derived: anchored.derived.map(pumpFieldName).toSet(),
-  );
+  ));
 }
 
 double _confidenceFor(LabelAnchoredResult r) {
