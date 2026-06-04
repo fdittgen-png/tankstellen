@@ -4,6 +4,7 @@
 import '../../../../core/utils/num_extensions.dart';
 import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../gps_driving_features.dart';
+import '../gps_driving_features_shares.dart';
 
 /// Refines a [GpsCalibrationMatrix] against the ground truth fuel
 /// burn observed at a fill-up (ADR 0010 § "update rule" / #2081 /

@@ -9518,6 +9518,42 @@ abstract class AppLocalizations {
   /// **'Inactive'**
   String get gpsLifecycleInactive;
 
+  /// Per-KPI verdict badge on the GPS-efficiency card (#2795): gentle, energy-light driving for this metric (RPA / PKE / VAPOS / coasting). Shown in the positive colour.
+  ///
+  /// In en, this message translates to:
+  /// **'Efficient'**
+  String get gpsKpiVerdictGood;
+
+  /// Per-KPI verdict badge on the GPS-efficiency card (#2795): typical mixed driving for this metric — neither notably efficient nor wasteful.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get gpsKpiVerdictModerate;
+
+  /// Per-KPI verdict badge on the GPS-efficiency card (#2795): energy-heavy driving for this metric (hard acceleration, or — for coasting — very little coasting). Shown in the warning colour.
+  ///
+  /// In en, this message translates to:
+  /// **'Aggressive'**
+  String get gpsKpiVerdictAggressive;
+
+  /// One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read efficient: praise mirroring the driving-score verdict line.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth, energy-light driving — this is what efficient looks like.'**
+  String get gpsKpiInterpretationGood;
+
+  /// One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read moderate: neutral guidance toward gentler acceleration.
+  ///
+  /// In en, this message translates to:
+  /// **'Fairly typical driving — a little smoother on the throttle would save more.'**
+  String get gpsKpiInterpretationModerate;
+
+  /// One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read aggressive: actionable guidance to accelerate gentler and coast more.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.'**
+  String get gpsKpiInterpretationAggressive;
+
   /// Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional.
   ///
   /// In en, this message translates to:
@@ -9559,6 +9595,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.'**
   String get tripAvgGpsEstimateTooltip;
+
+  /// Title of the GPS-only trip-detail panel (#2796) that replaces the engine throttle/RPM card on dongle-less trips, showing the speed-band and movement-phase split derived from the GPS track.
+  ///
+  /// In en, this message translates to:
+  /// **'How you used the road'**
+  String get gpsRoadUseCardTitle;
+
+  /// Section header on the road-use panel (#2796) above the speed-band bars (stopped / town / cruise / fast).
+  ///
+  /// In en, this message translates to:
+  /// **'Where you spent your time'**
+  String get gpsRoadUseSpeedSection;
+
+  /// Speed-band bar label on the road-use panel (#2796): time spent stationary or crawling below 5 km/h. The 5 km/h edge matches the GPS feature integration.
+  ///
+  /// In en, this message translates to:
+  /// **'Stopped (<5 km/h)'**
+  String get gpsRoadUseSpeedIdle;
+
+  /// Speed-band bar label on the road-use panel (#2796): urban / start-stop driving between 5 and 50 km/h.
+  ///
+  /// In en, this message translates to:
+  /// **'Town (5–50 km/h)'**
+  String get gpsRoadUseSpeedLow;
+
+  /// Speed-band bar label on the road-use panel (#2796): extra-urban cruising between 50 and 110 km/h.
+  ///
+  /// In en, this message translates to:
+  /// **'Cruise (50–110 km/h)'**
+  String get gpsRoadUseSpeedCruise;
+
+  /// Speed-band bar label on the road-use panel (#2796): highway driving at or above 110 km/h, the fuel-cost band.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast (≥110 km/h)'**
+  String get gpsRoadUseSpeedHigh;
+
+  /// Section header on the road-use panel (#2796) above the movement-phase bars (accelerating / holding speed / coasting).
+  ///
+  /// In en, this message translates to:
+  /// **'How you moved'**
+  String get gpsRoadUsePhaseSection;
+
+  /// Movement-phase bar label on the road-use panel (#2796): share of moving time spent speeding up (putting energy in).
+  ///
+  /// In en, this message translates to:
+  /// **'Accelerating'**
+  String get gpsRoadUsePhaseAccel;
+
+  /// Movement-phase bar label on the road-use panel (#2796): share of moving time spent at a roughly constant speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Holding speed'**
+  String get gpsRoadUsePhaseSteady;
+
+  /// Movement-phase bar label on the road-use panel (#2796): share of moving time spent coasting (foot off, gentle deceleration), the eco-positive phase.
+  ///
+  /// In en, this message translates to:
+  /// **'Coasting'**
+  String get gpsRoadUsePhaseCoast;
+
+  /// Trailing percent share for a road-use bar (#2796), e.g. "42%". Language-neutral percent mask.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}%'**
+  String gpsRoadUseShare(String pct);
+
+  /// Positive coaching line on the road-use panel (#2796), shown in green when the coasting share is high (≥ ~25%): praises the driver for coasting / engine-braking instead of accelerating then braking.
+  ///
+  /// In en, this message translates to:
+  /// **'Lots of coasting — letting the car roll instead of braking saves fuel. Nice.'**
+  String get gpsRoadUseCoastPraise;
+
+  /// Footnote on the road-use panel (#2796) clarifying the shares come from the GPS speed/position track (no OBD2 dongle needed).
+  ///
+  /// In en, this message translates to:
+  /// **'From your GPS track'**
+  String get gpsRoadUseSource;
 
   /// Section header on the Settings screen grouping wheel-lens (driving-behaviour) settings (#1122).
   ///

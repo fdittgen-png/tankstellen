@@ -138,6 +138,21 @@ class GpsDrivingFeatures {
   /// foot-off coasting). Speed-only, an eco-positive signal.
   final double coastShare;
 
+  /// Accelerating share (0.0–1.0, #2796 C7) — fraction of moving time the
+  /// car was speeding up (instantaneous `a > 0`). The road-use panel reads
+  /// it as the "putting energy in" phase. Computed from the same accel-time
+  /// integral the VAPOS index already accumulates, so it is one source of
+  /// truth with the energy KPIs.
+  final double accelShare;
+
+  /// Steady-cruise share (0.0–1.0, #2796 C7) — the moving time that is
+  /// neither accelerating nor gently coasting (≈ holding a roughly constant
+  /// speed, plus the small harsh-brake slivers the coast gate excludes). The
+  /// road-use panel reads it as the "holding speed" phase. Derived as
+  /// `1 − accelShare − coastShare` over moving time so the three movement
+  /// phases sum to the moving fraction exactly.
+  final double steadyShare;
+
   /// Climb energy per km (m/km, #2695 C9) — `gradeClimbMeters / distanceKm`,
   /// a proxy for the potential-energy work per distance (m·g·Δh ∝ Δh).
   final double climbEnergyPerKm;
@@ -161,31 +176,15 @@ class GpsDrivingFeatures {
     this.positiveKineticEnergy = 0,
     this.meanPositiveVa = 0,
     this.coastShare = 0,
+    this.accelShare = 0,
+    this.steadyShare = 0,
     this.climbEnergyPerKm = 0,
   });
 
-  /// Idle share of the trajet (0.0–1.0). Used by the matrix's
-  /// `idleCost` term. Returns 0 when the trajet has zero seconds
-  /// (degenerate empty stream).
-  double get idleShare =>
-      totalSeconds > 0 ? idleSeconds / totalSeconds : 0.0;
-
-  /// High-speed share (0.0–1.0). Used by the matrix's
-  /// `highSpeedPenalty` term.
-  double get highSpeedShare =>
-      totalSeconds > 0 ? highSpeedSeconds / totalSeconds : 0.0;
-
-  /// Acceleration events per km. Used by the matrix's
-  /// `accelEventCost` term. Returns 0 for zero-distance trajets.
-  double get accelEventsPerKm =>
-      distanceKm > 0 ? accelEvents / distanceKm : 0.0;
-
-  /// Sharp-corner events per km (#2655) — the cornering analogue of
-  /// [accelEventsPerKm], normalised so a long calm motorway leg with one
-  /// brisk exit ramp doesn't read worse than a short twisty drive.
-  /// Returns 0 for zero-distance trajets.
-  double get sharpCornersPerKm =>
-      distanceKm > 0 ? sharpCornerEvents / distanceKm : 0.0;
+  /// Derived ratio accessors (`idleShare`, `lowSpeedShare`, `cruiseShare`,
+  /// `highSpeedShare`, `accelEventsPerKm`, `sharpCornersPerKm`) live in the
+  /// `GpsDrivingFeaturesShares` extension (`gps_driving_features_shares.dart`,
+  /// #2796 C7) so this model file stays under the 400-line norm.
 
   /// Derives the feature aggregate from [samples]. Returns `null`
   /// when the stream is empty or carries fewer than 2 samples (one
@@ -338,6 +337,12 @@ class GpsDrivingFeatures {
     final pke = distM > 0 ? pkeNumerator / distM : 0.0;
     final vapos = vaPosSeconds > 0 ? vaPosSum / vaPosSeconds : 0.0;
     final coast = movingSeconds > 0 ? coastSeconds / movingSeconds : 0.0;
+    // #2796 C7 — movement-phase shares over MOVING time (so idle dwell does
+    // not dilute them). Accel = the VAPOS accel-time integral; steady is the
+    // remainder so accel + coast + steady == 1 over moving time. Clamped to
+    // guard floating-point drift on the subtraction.
+    final accel = movingSeconds > 0 ? vaPosSeconds / movingSeconds : 0.0;
+    final steady = (1.0 - accel - coast).clamp(0.0, 1.0);
     final climbPerKm = distKm > 0 ? climb / distKm : 0.0;
 
     return GpsDrivingFeatures(
@@ -359,6 +364,8 @@ class GpsDrivingFeatures {
       positiveKineticEnergy: pke,
       meanPositiveVa: vapos,
       coastShare: coast,
+      accelShare: accel,
+      steadyShare: steady,
       climbEnergyPerKm: climbPerKm,
     );
   }

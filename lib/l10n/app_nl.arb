@@ -4362,5 +4362,106 @@
   "@scanPumpInconsistent": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "gpsRoadUseCardTitle": "How you used the road",
+  "@gpsRoadUseCardTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUseSpeedSection": "Where you spent your time",
+  "@gpsRoadUseSpeedSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUseSpeedIdle": "Stopped (<5 km/h)",
+  "@gpsRoadUseSpeedIdle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUseSpeedLow": "Town (5–50 km/h)",
+  "@gpsRoadUseSpeedLow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUseSpeedCruise": "Cruise (50–110 km/h)",
+  "@gpsRoadUseSpeedCruise": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUseSpeedHigh": "Fast (≥110 km/h)",
+  "@gpsRoadUseSpeedHigh": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUsePhaseSection": "How you moved",
+  "@gpsRoadUsePhaseSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUsePhaseAccel": "Accelerating",
+  "@gpsRoadUsePhaseAccel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUsePhaseSteady": "Holding speed",
+  "@gpsRoadUsePhaseSteady": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUsePhaseCoast": "Coasting",
+  "@gpsRoadUsePhaseCoast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUseShare": "{pct}%",
+  "@gpsRoadUseShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "42"
+      }
+    }
+  },
+  "gpsRoadUseCoastPraise": "Lots of coasting — letting the car roll instead of braking saves fuel. Nice.",
+  "@gpsRoadUseCoastPraise": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsRoadUseSource": "From your GPS track",
+  "@gpsRoadUseSource": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiVerdictGood": "Efficient",
+  "@gpsKpiVerdictGood": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiVerdictModerate": "Moderate",
+  "@gpsKpiVerdictModerate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiVerdictAggressive": "Aggressive",
+  "@gpsKpiVerdictAggressive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiInterpretationGood": "Smooth, energy-light driving — this is what efficient looks like.",
+  "@gpsKpiInterpretationGood": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiInterpretationModerate": "Fairly typical driving — a little smoother on the throttle would save more.",
+  "@gpsKpiInterpretationModerate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsKpiInterpretationAggressive": "Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.",
+  "@gpsKpiInterpretationAggressive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

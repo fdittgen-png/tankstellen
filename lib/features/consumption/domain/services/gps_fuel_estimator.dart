@@ -3,6 +3,7 @@
 
 import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
 import '../gps_driving_features.dart';
+import '../gps_driving_features_shares.dart';
 
 /// Maps GPS-only driving features through a per-vehicle calibration
 /// matrix to an estimated L/100 km + total litres for a trajet

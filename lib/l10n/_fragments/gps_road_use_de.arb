@@ -1,0 +1,15 @@
+{
+  "gpsRoadUseCardTitle": "So hast du die Straße genutzt",
+  "gpsRoadUseSpeedSection": "Wo du deine Zeit verbracht hast",
+  "gpsRoadUseSpeedIdle": "Gestanden (<5 km/h)",
+  "gpsRoadUseSpeedLow": "Stadt (5–50 km/h)",
+  "gpsRoadUseSpeedCruise": "Überland (50–110 km/h)",
+  "gpsRoadUseSpeedHigh": "Schnell (≥110 km/h)",
+  "gpsRoadUsePhaseSection": "Wie du dich bewegt hast",
+  "gpsRoadUsePhaseAccel": "Beschleunigen",
+  "gpsRoadUsePhaseSteady": "Tempo halten",
+  "gpsRoadUsePhaseCoast": "Ausrollen",
+  "gpsRoadUseShare": "{pct}%",
+  "gpsRoadUseCoastPraise": "Viel ausgerollt – das Auto rollen lassen statt zu bremsen spart Sprit. Stark.",
+  "gpsRoadUseSource": "Aus deiner GPS-Aufzeichnung"
+}

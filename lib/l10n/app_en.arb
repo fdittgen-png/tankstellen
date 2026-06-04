@@ -4279,6 +4279,30 @@
   "@gpsLifecycleInactive": {
     "description": "Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765). The app was transitioning / not receiving input (e.g. iOS app switcher) when these GPS fixes were captured."
   },
+  "gpsKpiVerdictGood": "Efficient",
+  "@gpsKpiVerdictGood": {
+    "description": "Per-KPI verdict badge on the GPS-efficiency card (#2795): gentle, energy-light driving for this metric (RPA / PKE / VAPOS / coasting). Shown in the positive colour."
+  },
+  "gpsKpiVerdictModerate": "Moderate",
+  "@gpsKpiVerdictModerate": {
+    "description": "Per-KPI verdict badge on the GPS-efficiency card (#2795): typical mixed driving for this metric — neither notably efficient nor wasteful."
+  },
+  "gpsKpiVerdictAggressive": "Aggressive",
+  "@gpsKpiVerdictAggressive": {
+    "description": "Per-KPI verdict badge on the GPS-efficiency card (#2795): energy-heavy driving for this metric (hard acceleration, or — for coasting — very little coasting). Shown in the warning colour."
+  },
+  "gpsKpiInterpretationGood": "Smooth, energy-light driving — this is what efficient looks like.",
+  "@gpsKpiInterpretationGood": {
+    "description": "One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read efficient: praise mirroring the driving-score verdict line."
+  },
+  "gpsKpiInterpretationModerate": "Fairly typical driving — a little smoother on the throttle would save more.",
+  "@gpsKpiInterpretationModerate": {
+    "description": "One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read moderate: neutral guidance toward gentler acceleration."
+  },
+  "gpsKpiInterpretationAggressive": "Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.",
+  "@gpsKpiInterpretationAggressive": {
+    "description": "One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read aggressive: actionable guidance to accelerate gentler and coast more."
+  },
   "gpsMatrixMaturityCold": "Cold",
   "@gpsMatrixMaturityCold": {
     "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."
@@ -4324,6 +4348,64 @@
   "tripAvgGpsEstimateTooltip": "GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle's calibration; accuracy improves as the matrix matures.",
   "@tripAvgGpsEstimateTooltip": {
     "description": "Info tooltip on the recording-screen Average-consumption card (#2391) explaining that the leading '~' marks a GPS-modelled estimate (not a measured fuel-sensor reading) and that accuracy improves with calibration maturity."
+  },
+  "gpsRoadUseCardTitle": "How you used the road",
+  "@gpsRoadUseCardTitle": {
+    "description": "Title of the GPS-only trip-detail panel (#2796) that replaces the engine throttle/RPM card on dongle-less trips, showing the speed-band and movement-phase split derived from the GPS track."
+  },
+  "gpsRoadUseSpeedSection": "Where you spent your time",
+  "@gpsRoadUseSpeedSection": {
+    "description": "Section header on the road-use panel (#2796) above the speed-band bars (stopped / town / cruise / fast)."
+  },
+  "gpsRoadUseSpeedIdle": "Stopped (<5 km/h)",
+  "@gpsRoadUseSpeedIdle": {
+    "description": "Speed-band bar label on the road-use panel (#2796): time spent stationary or crawling below 5 km/h. The 5 km/h edge matches the GPS feature integration."
+  },
+  "gpsRoadUseSpeedLow": "Town (5–50 km/h)",
+  "@gpsRoadUseSpeedLow": {
+    "description": "Speed-band bar label on the road-use panel (#2796): urban / start-stop driving between 5 and 50 km/h."
+  },
+  "gpsRoadUseSpeedCruise": "Cruise (50–110 km/h)",
+  "@gpsRoadUseSpeedCruise": {
+    "description": "Speed-band bar label on the road-use panel (#2796): extra-urban cruising between 50 and 110 km/h."
+  },
+  "gpsRoadUseSpeedHigh": "Fast (≥110 km/h)",
+  "@gpsRoadUseSpeedHigh": {
+    "description": "Speed-band bar label on the road-use panel (#2796): highway driving at or above 110 km/h, the fuel-cost band."
+  },
+  "gpsRoadUsePhaseSection": "How you moved",
+  "@gpsRoadUsePhaseSection": {
+    "description": "Section header on the road-use panel (#2796) above the movement-phase bars (accelerating / holding speed / coasting)."
+  },
+  "gpsRoadUsePhaseAccel": "Accelerating",
+  "@gpsRoadUsePhaseAccel": {
+    "description": "Movement-phase bar label on the road-use panel (#2796): share of moving time spent speeding up (putting energy in)."
+  },
+  "gpsRoadUsePhaseSteady": "Holding speed",
+  "@gpsRoadUsePhaseSteady": {
+    "description": "Movement-phase bar label on the road-use panel (#2796): share of moving time spent at a roughly constant speed."
+  },
+  "gpsRoadUsePhaseCoast": "Coasting",
+  "@gpsRoadUsePhaseCoast": {
+    "description": "Movement-phase bar label on the road-use panel (#2796): share of moving time spent coasting (foot off, gentle deceleration), the eco-positive phase."
+  },
+  "gpsRoadUseShare": "{pct}%",
+  "@gpsRoadUseShare": {
+    "description": "Trailing percent share for a road-use bar (#2796), e.g. \"42%\". Language-neutral percent mask.",
+    "placeholders": {
+      "pct": {
+        "type": "String",
+        "example": "42"
+      }
+    }
+  },
+  "gpsRoadUseCoastPraise": "Lots of coasting — letting the car roll instead of braking saves fuel. Nice.",
+  "@gpsRoadUseCoastPraise": {
+    "description": "Positive coaching line on the road-use panel (#2796), shown in green when the coasting share is high (≥ ~25%): praises the driver for coasting / engine-braking instead of accelerating then braking."
+  },
+  "gpsRoadUseSource": "From your GPS track",
+  "@gpsRoadUseSource": {
+    "description": "Footnote on the road-use panel (#2796) clarifying the shares come from the GPS speed/position track (no OBD2 dongle needed)."
   },
   "hapticEcoCoachSectionTitle": "Driving",
   "@hapticEcoCoachSectionTitle": {
