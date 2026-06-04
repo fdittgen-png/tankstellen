@@ -66,4 +66,4 @@ final class FuelStationRadarProvider
   }
 }
 
-String _$fuelStationRadarHash() => r'f571f5d00dff05eeccb12bd475b880971dd1fbf8';
+String _$fuelStationRadarHash() => r'13ce43fe339f6bcf1e6df8c475f0e72236875a69';
