@@ -1,38 +1,22 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../cache/cache_manager.dart';
 import '../country/country_bounding_box.dart';
 import '../country/country_config.dart';
+import '../data/storage_repository.dart';
 import '../storage/storage_providers.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
-import '../../features/station_services/argentina/argentina_station_service.dart';
-import '../../features/station_services/australia/australia_station_service.dart';
-import '../../features/station_services/austria/econtrol_station_service.dart';
-import '../../features/station_services/chile/chile_station_service.dart';
-import '../../features/station_services/denmark/denmark_station_service.dart';
-import '../../features/station_services/france/prix_carburants_flux_station_service.dart';
-import '../../features/station_services/france/prix_carburants_station_service.dart';
-import '../../features/station_services/germany/tankerkoenig_station_service.dart';
-import '../../features/station_services/greece/greece_station_service.dart';
-import '../../features/station_services/italy/mise_station_service.dart';
-import '../../features/station_services/luxembourg/luxembourg_station_service.dart';
-import '../../features/station_services/mexico/mexico_station_service.dart';
-import '../../features/station_services/portugal/portugal_station_service.dart';
-import '../../features/station_services/romania/romania_station_service.dart';
-import '../../features/station_services/slovenia/slovenia_station_service.dart';
-import '../../features/station_services/south_korea/south_korea_station_service.dart';
-import '../../features/station_services/spain/miteco_station_service.dart';
-import '../../features/station_services/uk/uk_cma_bulk_station_service.dart';
-import '../../features/station_services/uk/uk_station_service.dart';
 import 'bulk_migration_flags.dart';
+import 'country_raw_service_builder.dart';
+import 'diagnostics/data_access_recorder.dart';
 import 'diagnostics/data_access_recorder_provider.dart';
 import 'fuel_service_policy.dart';
 import 'impl/demo_station_service.dart';
-import 'impl/osm_brand_enricher.dart';
 import 'service_providers.dart';
 import 'service_result.dart';
 import 'station_service.dart';
@@ -56,6 +40,14 @@ import 'station_service_chain.dart';
 /// 2. One [ServiceSource] enum value in `service_result.dart` (mechanical;
 ///    enums naturally cluster on append)
 /// 3. One new entry appended to [CountryServiceRegistry.entries]
+///
+/// The raw [StationService] is no longer a per-entry factory field: the
+/// per-country construction lives in the single, Riverpod-free
+/// [buildRawCountryService] (`country_raw_service_builder.dart`) so the
+/// foreground ([CountryServiceRegistry.buildService]) and the WorkManager /
+/// BGAppRefresh background isolate
+/// ([CountryServiceRegistry.buildBackgroundService]) share one construction
+/// path. Both dispatch on [countryCode].
 ///
 /// The country's [CountryConfig] (display name, flag, postal-code shape,
 /// currency formatting, etc.) is intentionally kept separate in
@@ -97,10 +89,6 @@ class CountryServiceEntry {
   /// TTL cache; the rate limiter reads [FuelServicePolicy.minInterval].
   final FuelServicePolicy policy;
 
-  /// Factory that creates the raw [StationService] for this country.
-  /// Receives a [Ref] for dependency injection.
-  final StationService Function(Ref ref) createService;
-
   const CountryServiceEntry({
     required this.countryCode,
     required this.errorSource,
@@ -108,7 +96,6 @@ class CountryServiceEntry {
     required this.availableFuelTypes,
     required this.policy,
     this.requiresApiKey = false,
-    required this.createService,
   });
 }
 
@@ -436,7 +423,6 @@ class CountryServiceRegistry {
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
       policy: _ptPolicy,
-      createService: _createPortugal,
     ),
     CountryServiceEntry(
       countryCode: 'GB',
@@ -453,7 +439,6 @@ class CountryServiceRegistry {
         FuelType.electric, FuelType.all,
       ],
       policy: _ukPolicy,
-      createService: _createUk,
     ),
     CountryServiceEntry(
       countryCode: 'DK',
@@ -463,7 +448,6 @@ class CountryServiceRegistry {
       ),
       availableFuelTypes: _defaultFuelTypes,
       policy: _dkPolicy,
-      createService: _createDenmark,
     ),
     CountryServiceEntry(
       countryCode: 'LU',
@@ -480,7 +464,6 @@ class CountryServiceRegistry {
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
       policy: _luPolicy,
-      createService: _createLuxembourg,
     ),
     CountryServiceEntry(
       countryCode: 'SI',
@@ -501,7 +484,6 @@ class CountryServiceRegistry {
         FuelType.electric, FuelType.all,
       ],
       policy: _siPolicy,
-      createService: _createSlovenia,
     ),
     // ── Continental EU (test order matters for shadow neighbours) ─────
     CountryServiceEntry(
@@ -512,7 +494,6 @@ class CountryServiceRegistry {
       ),
       availableFuelTypes: _defaultFuelTypes,
       policy: _atPolicy,
-      createService: _createEControl,
     ),
     CountryServiceEntry(
       countryCode: 'FR',
@@ -528,7 +509,6 @@ class CountryServiceRegistry {
         FuelType.e85, FuelType.lpg, FuelType.electric, FuelType.all,
       ],
       policy: _frPolicy,
-      createService: _createPrixCarburants,
     ),
     CountryServiceEntry(
       countryCode: 'IT',
@@ -542,7 +522,6 @@ class CountryServiceRegistry {
         FuelType.electric, FuelType.all,
       ],
       policy: _itPolicy,
-      createService: _createMise,
     ),
     CountryServiceEntry(
       countryCode: 'ES',
@@ -558,7 +537,6 @@ class CountryServiceRegistry {
         FuelType.all,
       ],
       policy: _esPolicy,
-      createService: _createMiteco,
     ),
     CountryServiceEntry(
       countryCode: 'DE',
@@ -570,7 +548,6 @@ class CountryServiceRegistry {
       // DE: Tankerkönig publishes E5, E10, Diesel.
       availableFuelTypes: _defaultFuelTypes,
       policy: _dePolicy,
-      createService: _createTankerkoenig,
     ),
     // ── Non-EU countries (no overlap concerns) ─────────────────────────
     CountryServiceEntry(
@@ -588,7 +565,6 @@ class CountryServiceRegistry {
         FuelType.electric, FuelType.all,
       ],
       policy: _mxPolicy,
-      createService: _createMexico,
     ),
     // CL before AR: Chile's narrow strip sits inside AR's generous
     // longitude range along the cordillera (#596).
@@ -605,7 +581,6 @@ class CountryServiceRegistry {
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
       policy: _clPolicy,
-      createService: _createChile,
     ),
     CountryServiceEntry(
       countryCode: 'AR',
@@ -624,7 +599,6 @@ class CountryServiceRegistry {
         FuelType.all,
       ],
       policy: _arPolicy,
-      createService: _createArgentina,
     ),
     CountryServiceEntry(
       countryCode: 'AU',
@@ -643,7 +617,6 @@ class CountryServiceRegistry {
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
       policy: _auPolicy,
-      createService: _createAustralia,
     ),
     CountryServiceEntry(
       countryCode: 'KR',
@@ -660,7 +633,6 @@ class CountryServiceRegistry {
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
       policy: _krPolicy,
-      createService: _createSouthKorea,
     ),
     CountryServiceEntry(
       countryCode: 'GR',
@@ -677,7 +649,6 @@ class CountryServiceRegistry {
         FuelType.lpg, FuelType.electric, FuelType.all,
       ],
       policy: _grPolicy,
-      createService: _createGreece,
     ),
     CountryServiceEntry(
       countryCode: 'RO',
@@ -696,7 +667,6 @@ class CountryServiceRegistry {
         FuelType.all,
       ],
       policy: _roPolicy,
-      createService: _createRomania,
     ),
   ];
 
@@ -760,7 +730,14 @@ class CountryServiceRegistry {
     }
   }
 
-  /// Build a [StationService] for [countryCode], wrapped in [StationServiceChain].
+  /// Build a [StationService] for [countryCode], wrapped in
+  /// [StationServiceChain] — the **foreground** path.
+  ///
+  /// Reads its dependencies (storage, the Tankerkönig Dio, the dev-only
+  /// #2824 recorder) from the Riverpod [ref] and delegates the actual
+  /// construction to [buildBackgroundService], so the foreground and the
+  /// WorkManager / BGAppRefresh background isolate share one code path
+  /// (#2861).
   ///
   /// Returns [DemoStationService] if:
   /// - The country has no registered entry
@@ -771,14 +748,59 @@ class CountryServiceRegistry {
     Ref ref,
     CacheStrategy cache,
   ) {
+    return buildBackgroundService(
+      countryCode,
+      storage: ref.read(storageRepositoryProvider),
+      cache: cache,
+      tankerkoenigDio: countryCode == 'DE'
+          ? ref.read(tankerkoenigDioProvider)
+          : null,
+      // #2824 — dev-only data-access tracer; null in production (zero
+      // overhead). Only the foreground has a provider scope to read it from.
+      recorder: ref.read(dataAccessRecorderProvider),
+    );
+  }
+
+  /// Build a [StationService] for [countryCode] **without a Riverpod `Ref`**
+  /// — the background-isolate construction path (#2861).
+  ///
+  /// The WorkManager / BGAppRefresh isolate has no provider scope, but the
+  /// registry's lookups (entries / policies / bounding boxes) are static and
+  /// isolate-safe; the only thing the foreground `Ref` provided was the set
+  /// of resolved dependencies, which this method takes directly:
+  ///
+  ///  - [storage] — the isolate's [HiveStorage] (API-key gate, bulk-dataset
+  ///    cache backing, OSM brand enricher).
+  ///  - [cache] — a [CacheStrategy] (the isolate builds `CacheManager(storage)`).
+  ///  - [tankerkoenigDio] — only the DE branch needs it; a background caller
+  ///    passes a plain rate-limited Dio and sends the key per-request.
+  ///  - [recorder] — the optional #2824 tracer; usually null in the isolate.
+  ///
+  /// Builds the **same** [StationServiceChain] (same primary service, error
+  /// source, policy) the foreground builds, via the single, Riverpod-free
+  /// [buildRawCountryService]. Returns [DemoStationService] when the country
+  /// has no registered entry.
+  static StationService buildBackgroundService(
+    String countryCode, {
+    required StorageRepository storage,
+    required CacheStrategy cache,
+    Dio? tankerkoenigDio,
+    DataAccessRecorder? recorder,
+  }) {
     final entry = _byCode[countryCode];
     if (entry == null) return DemoStationService(countryCode: countryCode);
 
-    // #2824 — dev-only data-access tracer; null in production (zero overhead).
-    final recorder = ref.read(dataAccessRecorderProvider);
     recorder?.notePolicy(countryCode, entry.policy.minInterval);
+    final raw = buildRawCountryService(
+      countryCode,
+      CountryServiceDependencies(
+        storage: storage,
+        cache: cache,
+        tankerkoenigDio: tankerkoenigDio,
+      ),
+    );
     return StationServiceChain(
-      entry.createService(ref),
+      raw,
       cache,
       errorSource: entry.errorSource,
       countryCode: countryCode,
@@ -788,6 +810,20 @@ class CountryServiceRegistry {
       recorder: recorder,
     );
   }
+
+  /// Derive the ISO country code an alert's **station id** belongs to
+  /// (#2861). Neither [PriceAlert] nor any favorite stores a country, so we
+  /// infer it lazily from the id's prefix (the #753 `de-`/`uk-`/… scheme).
+  /// Returns null when the id carries no recognised prefix (e.g. a raw DE
+  /// Tankerkönig UUID) — the caller can then fall back to the active country.
+  static String? countryForStationId(String? stationId) =>
+      Countries.countryCodeForStationId(stationId);
+
+  /// Derive the ISO country code a **radius-alert centre** lies in (#2861)
+  /// via the registry's bounding-box lookup. Returns null when the point is
+  /// outside every registered box.
+  static String? countryForLatLng(double lat, double lng) =>
+      entryByLatLng(lat, lng)?.countryCode;
 
   /// Asserts that every country in [Countries.all] has a registry entry.
   ///
@@ -817,108 +853,3 @@ class CountryServiceRegistry {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Factory functions for each country's raw service
-// ---------------------------------------------------------------------------
-// These are top-level functions (not closures) so they can be used in
-// const CountryServiceEntry constructors.
-
-/// Germany factory. Reads the API-key state from storage and either:
-///  - returns [DemoStationService] when no key is present (so the user sees
-///    realistic-looking data without configuring anything), or
-///  - constructs the real [TankerkoenigStationService] backed by the
-///    rate-limited Dio from [tankerkoenigDioProvider].
-///
-/// This used to live in `service_providers.dart` as a Germany special case;
-/// pulling it into the registry restores the "single source of truth"
-/// invariant the registry promises.
-StationService _createTankerkoenig(Ref ref) {
-  final storage = ref.read(storageRepositoryProvider);
-  if (!storage.hasApiKey()) return DemoStationService(countryCode: 'DE');
-  final dio = ref.read(tankerkoenigDioProvider);
-  return TankerkoenigStationService(dio);
-}
-
-StationService _createPrixCarburants(Ref ref) {
-  // #2277 — staged rollout: the bulk *flux instantané* ZIP service when the
-  // flag is on (persisted whole-country dataset, local-filtered), otherwise
-  // the legacy per-search polling service. The bulk service receives the
-  // shared CacheManager for the disk read-through, like the other bulk
-  // datasets.
-  if (BulkMigrationFlags.frFluxBulk) {
-    return PrixCarburantsFluxStationService(
-      cache: ref.read(cacheManagerProvider),
-    );
-  }
-  final enricher = ref.watch(osmBrandEnricherProvider);
-  return PrixCarburantsStationService(enricher: enricher);
-}
-
-StationService _createEControl(Ref ref) => EControlStationService();
-
-// #2264 — bulk-dataset services receive the shared CacheManager so their
-// parsed national dataset is persisted to Hive (read-through on the next
-// search), surviving cold start + offline. The providers are keepAlive
-// (service_providers.dart) so the in-memory copy also survives rebuilds.
-StationService _createMiteco(Ref ref) =>
-    MitecoStationService(cache: ref.read(cacheManagerProvider));
-StationService _createMise(Ref ref) =>
-    MiseStationService(cache: ref.read(cacheManagerProvider));
-StationService _createDenmark(Ref ref) =>
-    DenmarkStationService(cache: ref.read(cacheManagerProvider));
-StationService _createArgentina(Ref ref) =>
-    ArgentinaStationService(cache: ref.read(cacheManagerProvider));
-StationService _createPortugal(Ref ref) => PortugalStationService();
-// #2277 — staged rollout: the consolidated CMA bulk-file service when the flag
-// is on (persisted whole-country dataset, local-filtered), otherwise the legacy
-// per-search retailer fan-out. The bulk service receives the shared
-// CacheManager for the disk read-through, like the other bulk datasets.
-StationService _createUk(Ref ref) => BulkMigrationFlags.ukCmaBulk
-    ? UkCmaBulkStationService(cache: ref.read(cacheManagerProvider))
-    : UkStationService();
-StationService _createAustralia(Ref ref) => const AustraliaStationService();
-StationService _createMexico(Ref ref) =>
-    MexicoStationService(cache: ref.read(cacheManagerProvider));
-StationService _createLuxembourg(Ref ref) => LuxembourgStationService();
-StationService _createSlovenia(Ref ref) => SloveniaStationService();
-
-/// South Korea factory (#597). Reads the OPINET developer API key from
-/// storage via [storageRepositoryProvider]. When no key is present we
-/// return [DemoStationService] so a Korean user still sees realistic
-/// data until they enter their free KNOC-issued key in Settings →
-/// API keys.
-StationService _createSouthKorea(Ref ref) {
-  final storage = ref.read(storageRepositoryProvider);
-  final apiKey = storage.getApiKey();
-  if (apiKey == null || apiKey.isEmpty) {
-    return DemoStationService(countryCode: 'KR');
-  }
-  return SouthKoreaStationService(apiKey: apiKey);
-}
-
-/// Chile factory (#596). Reads the CNE "Bencina en Línea" developer
-/// API key from storage via [storageRepositoryProvider]. When no key
-/// is present we return [DemoStationService] so a Chilean user still
-/// sees realistic data until they register a free CNE key in
-/// Settings → API keys.
-StationService _createChile(Ref ref) {
-  final storage = ref.read(storageRepositoryProvider);
-  final apiKey = storage.getApiKey();
-  if (apiKey == null || apiKey.isEmpty) {
-    return DemoStationService(countryCode: 'CL');
-  }
-  return ChileStationService(apiKey: apiKey);
-}
-
-/// Greece factory (#576). The Paratiritirio Timon feed is wrapped by
-/// the community [fuelpricesgr](https://github.com/mavroprovato/fuelpricesgr)
-/// FastAPI; it is free and open, so no API key is required. Users get
-/// real prefecture-level data out-of-the-box.
-StationService _createGreece(Ref ref) => GreeceStationService();
-
-/// Romania factory (#577). *Monitorul Prețurilor la Carburanți*
-/// (pretcarburant.ro) is the Competition Council + ANPC observatory,
-/// government-mandated with 15-minute price updates. There is no
-/// documented public API — the parser is fixture-driven so a URL
-/// drift is a one-line fix. No key required.
-StationService _createRomania(Ref ref) => RomaniaStationService();

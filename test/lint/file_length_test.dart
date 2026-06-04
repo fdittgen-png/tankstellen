@@ -78,7 +78,13 @@ void main() {
     // these 5 lines are the registry's only data-access wiring and can't move
     // out without re-introducing a Germany-style special case the registry
     // exists to eliminate. Decomposition still tracked by #2187/#2188.
-    'lib/core/services/country_service_registry.dart': 921,
+    // #2861 — shrunk 921 → 852: the 17 per-entry `createService(Ref)` factory
+    // functions + the entry's `createService` field moved into the single,
+    // Riverpod-free `buildRawCountryService` (country_raw_service_builder.dart)
+    // so the foreground (buildService) and the WorkManager background isolate
+    // (buildBackgroundService) share ONE construction path. Snapshot lowered
+    // to keep the debt baseline honest.
+    'lib/core/services/country_service_registry.dart': 852,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     // #2456 — re-grandfathered 457 → 481: two new pure parsers,

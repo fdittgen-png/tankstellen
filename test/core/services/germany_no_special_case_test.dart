@@ -16,12 +16,20 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late String providersSource;
   late String registrySource;
+  // #2861 — the per-country raw service construction (incl. the Germany
+  // API-key gate) moved out of the registry into this single, Riverpod-free
+  // builder so the foreground + background isolate share one path. The #425
+  // "no Germany special case" intent now lives here.
+  late String builderSource;
 
   setUpAll(() {
     providersSource =
         File('lib/core/services/service_providers.dart').readAsStringSync();
     registrySource =
         File('lib/core/services/country_service_registry.dart')
+            .readAsStringSync();
+    builderSource =
+        File('lib/core/services/country_raw_service_builder.dart')
             .readAsStringSync();
   });
 
@@ -61,27 +69,32 @@ void main() {
     });
   });
 
-  group('CountryServiceRegistry now owns the Germany factory', () {
-    test('_createTankerkoenig is no longer an UnsupportedError stub', () {
+  group('the registry / raw builder own the Germany factory', () {
+    test('the Germany branch is no longer an UnsupportedError stub', () {
       // The stub used to throw UnsupportedError because the registry had no
       // way to wire the API-key check. After #425 it returns Demo or the
-      // real Tankerkoenig service depending on the storage state.
+      // real Tankerkoenig service depending on the storage state. (#2861 —
+      // this wiring now lives in country_raw_service_builder.dart.)
       expect(
-        registrySource,
+        builderSource,
         isNot(contains('UnsupportedError')),
-        reason: '_createTankerkoenig should be implemented, not a stub',
+        reason: 'the DE branch should be implemented, not a stub',
       );
     });
 
-    test('Germany factory falls back to DemoStationService when no API key',
+    test('Germany branch falls back to DemoStationService when no API key',
         () {
-      expect(registrySource, contains('hasApiKey()'));
-      expect(registrySource, contains("DemoStationService(countryCode: 'DE')"));
+      expect(builderSource, contains('hasApiKey()'));
+      expect(builderSource, contains("DemoStationService(countryCode: 'DE')"));
     });
 
-    test('Germany factory uses tankerkoenigDioProvider when key present', () {
+    test('Germany branch builds the real Tankerkönig service with the Dio',
+        () {
+      // #2861 — the foreground reads tankerkoenigDioProvider in the registry
+      // and threads it through to the Riverpod-free builder, which constructs
+      // the real service.
       expect(registrySource, contains('tankerkoenigDioProvider'));
-      expect(registrySource, contains('TankerkoenigStationService(dio)'));
+      expect(builderSource, contains('TankerkoenigStationService(dio)'));
     });
 
     test('every supported country still has a registry entry', () {
