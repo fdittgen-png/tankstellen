@@ -224,6 +224,26 @@ void main() {
       final out = await container.read(radarCandidateListProvider.future);
       expect(out, isEmpty);
     });
+
+    test('re-stamps each row\'s dist from the live fix (#2808)', () async {
+      // Both carry a STALE `dist` (99 km) from corridor-fetch time; the
+      // swipe-card proximity bar reads `station.dist`, so each row must be
+      // re-stamped with the LIVE distance or the bar never moves.
+      final radar = _CapturingRadar([
+        _station('NEAR', lat: 48.0, lng: 2.0, e10: 1.6).copyWith(dist: 99.0),
+        _station('MID', lat: 48.01, lng: 2.0, e10: 1.5).copyWith(dist: 99.0),
+      ]);
+      final container = _container(radar: radar);
+      addTearDown(container.dispose);
+
+      final out = await container.read(radarCandidateListProvider.future);
+      expect(out.map((s) => s.id), ['NEAR', 'MID']);
+      // RED on master (frozen 99 km passes through); GREEN after the re-stamp.
+      expect(out[0].dist, closeTo(0.0, 0.05),
+          reason: '#2808 — NEAR at the fix re-stamped to ~0 km, not 99');
+      expect(out[1].dist, closeTo(1.11, 0.1),
+          reason: '#2808 — MID re-stamped to its live ~1.11 km, not 99');
+    });
   });
 
   test('non-polling approach state → const [] (page-set stays out of the way)',

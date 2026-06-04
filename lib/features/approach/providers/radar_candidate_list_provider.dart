@@ -82,7 +82,7 @@ Future<List<Station>> radarCandidateList(Ref ref) async {
     // by distance from the live fix, then keep only stations the driver can
     // actually price-compare (a non-null, positive [priceFor] for the
     // effective fuel) so a swipe never lands on a `--` price row (#2583).
-    return (stations
+    final priced = stations
         .where((s) {
           final price = s.priceFor(fuel);
           return price != null && price > 0;
@@ -92,7 +92,23 @@ Future<List<Station>> radarCandidateList(Ref ref) async {
           .distanceMeters(gps.latitude, gps.longitude, a.lat, a.lng)
           .compareTo(
             geo.distanceMeters(gps.latitude, gps.longitude, b.lat, b.lng),
-          )));
+          ));
+    // #2808 — re-stamp each row's LIVE distance (km) from the current fix.
+    // The corridor stations carry a `dist` frozen at the corridor-fetch
+    // centre, so without this the swipe-card proximity bar + caption never
+    // move as the driver approaches. Mirrors the on-search radar.
+    return [
+      for (final s in priced)
+        s.copyWith(
+          dist: geo.distanceMeters(
+                gps.latitude,
+                gps.longitude,
+                s.lat,
+                s.lng,
+              ) /
+              1000.0,
+        ),
+    ];
   } on Object {
     // Radar / chain failure — treat as "no stations nearby". The provider
     // re-runs on the next approach-state tick.

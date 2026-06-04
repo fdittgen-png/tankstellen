@@ -63,6 +63,16 @@ class DarkModeColors {
           ? Theme.of(context).colorScheme.primary // #69A16B on dark
           : const Color(0xFF2E7D32); // icon brand green on light
 
+  /// Blue-violet accent that pairs with [brandGreen] for the Fuel Station
+  /// Radar proximity fill (#2808). The fill is a green→accent gradient so the
+  /// "getting close" bar reads as two colours and its leading edge shifts hue
+  /// as it fills. Indigo reads as "purple-like-blue" against both the green
+  /// and the fuel-hued PiP tiles, and clears contrast on light + dark.
+  static Color proximityAccent(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF7C84E8) // indigo.shade300-ish — bright on dark
+          : const Color(0xFF3F51B5); // indigo.shade600 on light
+
   // ---------------------------------------------------------------------------
   // Muted / secondary text
   // ---------------------------------------------------------------------------
