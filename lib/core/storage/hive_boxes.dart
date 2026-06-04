@@ -285,6 +285,11 @@ class HiveBoxes {
     // here while Riverpod is unavailable, drained by the foreground
     // initialiser into TraceRecorder.
     await Hive.openBox<String>(isolateErrorSpool);
+    // #2866 — feature flags (uncipher'd, mirroring the foreground open) so the
+    // background scan can read the developer-mode flag to dev-gate the #2824
+    // data-access trace export. Best-effort; the scan no-ops the trace if this
+    // is unavailable.
+    await Hive.openBox<dynamic>(featureFlags);
   }
 
   /// Close the Hive boxes opened by [initInIsolate] at the end of a
@@ -298,7 +303,7 @@ class HiveBoxes {
   /// true spawned `dart:isolate` worker never ran [init], so its registry is
   /// empty and every [initInIsolate] handle is still closed.
   static Future<void> closeIsolateBoxes() async {
-    final boxNames = [settings, favorites, alerts, cache, priceHistory, priceSnapshots, isolateErrorSpool];
+    final boxNames = [settings, favorites, alerts, cache, priceHistory, priceSnapshots, isolateErrorSpool, featureFlags];
     for (final name in boxNames) {
       if (HiveIsolateOwnership.isOwned(name)) continue;
       try {

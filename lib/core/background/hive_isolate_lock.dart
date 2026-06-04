@@ -33,13 +33,13 @@ import '../../core/logging/error_logger.dart';
 /// ### Why not check-then-create? (the bug this fixes)
 /// The previous implementation did a non-atomic
 /// `!existsSync()` → `writeAsStringSync()` → `existsSync()` dance. Two isolates
-/// firing near-simultaneously (e.g. `priceRefresh` and `priceRefreshCharging`
-/// while charging) could *both* observe the file missing, *both* write it, and
+/// firing near-simultaneously (e.g. the `priceRefresh` periodic scan and an
+/// opportunistic widget refresh) could *both* observe the file missing, *both* write it, and
 /// *both* return `true` — then open the same Hive boxes concurrently and
 /// corrupt them. The in-process gate closes that race; the file lock covers
 /// the cross-process case. (Belt-and-braces: WorkManager registration also
-/// serializes the two periodic tasks under one unique name — see
-/// `AndroidBackgroundPriceFetcher`.)
+/// serializes the periodic scan + an opportunistic widget refresh under one
+/// unique name — see `AndroidBackgroundPriceFetcher`.)
 ///
 /// The main isolate does NOT acquire this lock — it owns the boxes permanently.
 /// Only background isolates use this lock to serialize their short-lived access.

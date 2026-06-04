@@ -8,12 +8,14 @@ import 'background_service.dart';
 
 /// Android implementation of [BackgroundPriceFetcher] using WorkManager.
 ///
-/// Registers two periodic tasks with different constraints for
-/// adaptive battery-aware scheduling:
-/// - Standard task: every 1h, skipped when battery is low
-/// - Charging task: every 30min, only when device is plugged in
+/// Registers ONE periodic alert/price-scan task at the twice-daily cadence
+/// (~every 12h, [BackgroundService.refreshInterval]) — the Epic #2860 EXIT
+/// GATE (#2866) rate-limit / ToS safeguard for the now-multi-country scan.
+/// The task is skipped when the battery is low ([requiresBatteryNotLow]).
+/// The old 30-min charging task was removed: it would have let a multi-country
+/// scan hit a provider more than twice a day, breaching the cadence guarantee.
 ///
-/// #2413 — both tasks carry a `NetworkType.connected` constraint so a wake
+/// #2413 — the task carries a `NetworkType.connected` constraint so a wake
 /// without connectivity is deferred by WorkManager instead of firing a dead
 /// request. The schedule is re-established after a reboot by [BootReceiver]
 /// (Android) re-running [BackgroundService.init] via the `bootReregister`
@@ -31,14 +33,13 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
   Future<void> init() async {
     await _workmanager.initialize(callbackDispatcher);
 
-    // #2300 — register both tasks with ExistingPeriodicWorkPolicy.update so a
-    // repeated init() (every app launch) is idempotent: it refreshes the
-    // existing chain instead of stacking duplicate periodic work that could
-    // fire two refresh isolates in the same window. Concurrent-access safety
-    // between the two cadences is still backstopped by HiveIsolateLock's
-    // exclusive lock.
+    // #2300 — register with ExistingPeriodicWorkPolicy.update so a repeated
+    // init() (every app launch) is idempotent: it refreshes the existing task
+    // instead of stacking duplicate periodic work that could fire two refresh
+    // isolates in the same window. Concurrent-access safety is still
+    // backstopped by HiveIsolateLock's exclusive lock.
 
-    // Standard task: runs every 1h when battery is not low.
+    // Twice-daily task (#2866): runs ~every 12h when battery is not low.
     // Skipped automatically by Android when battery drops below ~15%.
     await _workmanager.registerPeriodicTask(
       BackgroundService.priceRefreshTask,
@@ -48,19 +49,6 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: true,
-      ),
-    );
-
-    // Charging task: runs every 30min when device is plugged in.
-    // Gives fresher prices at no battery cost.
-    await _workmanager.registerPeriodicTask(
-      BackgroundService.priceRefreshChargingTask,
-      BackgroundService.priceRefreshChargingTask,
-      frequency: BackgroundService.chargingRefreshInterval,
-      existingWorkPolicy: ExistingPeriodicWorkPolicy.update,
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-        requiresCharging: true,
       ),
     );
   }

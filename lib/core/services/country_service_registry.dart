@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../background/provider_request_budget.dart';
 import '../cache/cache_manager.dart';
 import '../country/country_bounding_box.dart';
 import '../country/country_config.dart';
@@ -755,9 +756,10 @@ class CountryServiceRegistry {
       tankerkoenigDio: countryCode == 'DE'
           ? ref.read(tankerkoenigDioProvider)
           : null,
-      // #2824 — dev-only data-access tracer; null in production (zero
-      // overhead). Only the foreground has a provider scope to read it from.
+      // #2824 — dev-only tracer (null in production); #2866 — shared per-
+      // provider budget the foreground stamps so the BG scan won't re-poll.
       recorder: ref.read(dataAccessRecorderProvider),
+      budget: ProviderRequestBudget(ref.read(storageRepositoryProvider)),
     );
   }
 
@@ -774,7 +776,8 @@ class CountryServiceRegistry {
   ///  - [cache] — a [CacheStrategy] (the isolate builds `CacheManager(storage)`).
   ///  - [tankerkoenigDio] — only the DE branch needs it; a background caller
   ///    passes a plain rate-limited Dio and sends the key per-request.
-  ///  - [recorder] — the optional #2824 tracer; usually null in the isolate.
+  ///  - [recorder] (#2824 tracer) + [budget] (#2866 shared per-provider gate
+  ///    the chain stamps on a hit) — both threaded through; usually null.
   ///
   /// Builds the **same** [StationServiceChain] (same primary service, error
   /// source, policy) the foreground builds, via the single, Riverpod-free
@@ -786,6 +789,7 @@ class CountryServiceRegistry {
     required CacheStrategy cache,
     Dio? tankerkoenigDio,
     DataAccessRecorder? recorder,
+    ProviderRequestBudget? budget,
   }) {
     final entry = _byCode[countryCode];
     if (entry == null) return DemoStationService(countryCode: countryCode);
@@ -808,6 +812,7 @@ class CountryServiceRegistry {
       // (no per-key cache) vs keep the per-key TTL cache for polled APIs.
       policy: entry.policy,
       recorder: recorder,
+      budget: budget,
     );
   }
 

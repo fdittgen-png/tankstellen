@@ -83,8 +83,8 @@ void main() {
       expect(fetcher.cancelAll, isA<Function>());
     });
 
-    test('uses BackgroundService task name constants', () {
-      // Verify the Android implementation references the shared task names
+    test('uses the BackgroundService periodic task name constant', () {
+      // Verify the Android implementation references the shared task name.
       final source = File(
         'lib/core/background/android_background_price_fetcher.dart',
       ).readAsStringSync();
@@ -94,28 +94,26 @@ void main() {
         isTrue,
         reason: 'Must use shared task name constant from BackgroundService',
       );
-      expect(
-        source.contains('BackgroundService.priceRefreshChargingTask'),
-        isTrue,
-        reason: 'Must use shared charging task name constant from BackgroundService',
-      );
     });
 
-    test('registers both standard and charging tasks', () {
+    test('registers exactly ONE periodic task — the twice-daily scan (#2866)',
+        () {
       final source = File(
         'lib/core/background/android_background_price_fetcher.dart',
       ).readAsStringSync();
 
-      // Must call registerPeriodicTask twice
+      // Exactly one registerPeriodicTask: the 30-min charging task was dropped
+      // so a multi-country scan can never hit a provider more than twice a day.
       final registerCalls = 'registerPeriodicTask'.allMatches(source).length;
       expect(
         registerCalls,
-        equals(2),
-        reason: 'Must register both standard and charging periodic tasks',
+        equals(1),
+        reason: 'Must register exactly one twice-daily periodic task',
       );
     });
 
-    test('uses battery-aware WorkManager constraints', () {
+    test('uses a battery-aware WorkManager constraint (no charging variant)',
+        () {
       final source = File(
         'lib/core/background/android_background_price_fetcher.dart',
       ).readAsStringSync();
@@ -123,16 +121,16 @@ void main() {
       expect(
         source.contains('requiresBatteryNotLow: true'),
         isTrue,
-        reason: 'Standard task must skip when battery is low',
+        reason: 'Twice-daily task must skip when battery is low',
       );
       expect(
         source.contains('requiresCharging: true'),
-        isTrue,
-        reason: 'Charging task must only run when plugged in',
+        isFalse,
+        reason: 'The charging-only task was removed (#2866)',
       );
     });
 
-    test('uses correct refresh intervals from BackgroundService', () {
+    test('uses the twice-daily refresh interval from BackgroundService', () {
       final source = File(
         'lib/core/background/android_background_price_fetcher.dart',
       ).readAsStringSync();
@@ -143,9 +141,9 @@ void main() {
         reason: 'Must use refresh interval from BackgroundService constants',
       );
       expect(
-        source.contains('BackgroundService.chargingRefreshInterval'),
-        isTrue,
-        reason: 'Must use charging refresh interval from BackgroundService constants',
+        source.contains('chargingRefreshInterval'),
+        isFalse,
+        reason: 'No separate charging interval exists anymore (#2866)',
       );
     });
   });
@@ -194,11 +192,7 @@ void main() {
       expect(BackgroundService.priceRefreshTask, 'priceRefresh');
     });
 
-    test('priceRefreshChargingTask is the expected value', () {
-      expect(BackgroundService.priceRefreshChargingTask, 'priceRefreshCharging');
-    });
-
-    test('callback dispatcher uses public task name constants', () {
+    test('callback dispatcher uses the public task name constant', () {
       final source = File(
         'lib/core/background/background_service.dart',
       ).readAsStringSync();
@@ -207,11 +201,6 @@ void main() {
         source.contains('BackgroundService.priceRefreshTask'),
         isTrue,
         reason: 'Callback dispatcher must use public task name constant',
-      );
-      expect(
-        source.contains('BackgroundService.priceRefreshChargingTask'),
-        isTrue,
-        reason: 'Callback dispatcher must use public charging task name constant',
       );
     });
   });

@@ -84,7 +84,11 @@ void main() {
     // so the foreground (buildService) and the WorkManager background isolate
     // (buildBackgroundService) share ONE construction path. Snapshot lowered
     // to keep the debt baseline honest.
-    'lib/core/services/country_service_registry.dart': 852,
+    // #2866 — re-grandfathered 852 → 857: both construction paths now thread the
+    // shared #2866 ProviderRequestBudget (import + one param + two call-site
+    // args) so foreground + background share ONE per-provider minInterval gate.
+    // Decomposing this god-class is tracked separately (#2187/#2188/#2190).
+    'lib/core/services/country_service_registry.dart': 857,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     // #2456 — re-grandfathered 457 → 481: two new pure parsers,

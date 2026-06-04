@@ -16,22 +16,22 @@ import 'background_price_history_writer.dart';
 import 'background_price_source.dart';
 import 'background_scan_dedup_store.dart';
 import 'background_scan_runners.dart';
+import 'background_scan_tracer.dart';
 import 'bulk_dataset_alert_strategy.dart';
 import 'country_alert_strategy_resolver.dart';
 import 'daily_collection.dart';
 import 'hive_isolate_lock.dart';
 import 'notification_templates.dart';
+import 'provider_request_budget.dart';
 
 /// Where a background scan came from. Threaded through to the dedup store
 /// for diagnostics and used in debug logging so a maintainer can tell
 /// whether WorkManager, the home-widget refresh, or iOS BGAppRefresh drove
 /// a given scan.
 enum BackgroundScanTrigger {
-  /// WorkManager periodic task (`priceRefresh`) — the baseline Android path.
+  /// WorkManager periodic task (`priceRefresh`) — the baseline Android path,
+  /// the twice-daily alert/price scan (#2866).
   workManagerPeriodic,
-
-  /// WorkManager charging-only periodic task (`priceRefreshCharging`).
-  workManagerCharging,
 
   /// Android home-widget refresh callback (#2412) — an opportunistic extra
   /// wake while the widget is on the home screen, NOT a reliability
@@ -44,7 +44,6 @@ enum BackgroundScanTrigger {
   /// Stable, log-friendly tag persisted alongside the last-scan timestamp.
   String get tag => switch (this) {
         BackgroundScanTrigger.workManagerPeriodic => 'workmanager_periodic',
-        BackgroundScanTrigger.workManagerCharging => 'workmanager_charging',
         BackgroundScanTrigger.androidWidget => 'android_widget',
         BackgroundScanTrigger.iosBackgroundRefresh => 'ios_bg_refresh',
       };
@@ -86,9 +85,10 @@ class BackgroundAlertScanCoordinator {
   /// Coarse cross-trigger scan cooldown (#2415). A scan that lands inside
   /// this window after a completed scan is skipped, so the WorkManager
   /// task and an opportunistic widget/BGTask wake seconds later don't both
-  /// hit the API. Chosen well below the 30-minute charging cadence so a
+  /// hit the API. Chosen far below the twice-daily periodic cadence so a
   /// legitimately-scheduled periodic task is never starved, but long enough
-  /// to absorb a burst of near-simultaneous triggers.
+  /// to absorb a burst of near-simultaneous triggers (the widget refresh +
+  /// the periodic wake landing seconds apart).
   static const scanCooldown = Duration(minutes: 10);
 
   /// Do not re-fire the same per-station price alert within this window.
@@ -238,20 +238,27 @@ class BackgroundAlertScanCoordinator {
       return;
     }
 
-    // 2. Fetch prices via the registry-driven per-country source (#2862).
-    //    The source groups the mixed-country id set by derived country and
-    //    queries each polled provider at most once, within that provider's
-    //    minInterval; a prefix-less id falls back to the active country (DE
-    //    today). This replaces the hardcoded Tankerkönig batch fetch — DE
-    //    still goes through its Tankerkönig batch service, the other ten
-    //    polled countries now go through their own. Bulk-dataset countries
-    //    (ES/IT/AR/DK) are scanned by child #2863, not here.
+    // 2. Fetch prices via the registry-driven per-country source (#2862): the
+    //    source groups the mixed-country id set by derived country and queries
+    //    each polled provider at most once, within its minInterval; a
+    //    prefix-less id falls back to the active country. Bulk-dataset
+    //    countries (ES/IT/AR/DK) are scanned below (#2863), not here.
     final activeCountry =
         storage.getSetting('active_country_code') as String? ?? 'DE';
+
+    // #2866 EXIT GATE: the shared per-provider budget (foreground + background
+    // share one minInterval gate; skip a provider the foreground just hit) +
+    // the dev-gated #2824 tracer (count + export the multi-country scan's
+    // traffic, compliant per provider). Both threaded into every service built.
+    final budget = ProviderRequestBudget(storage);
+    final tracer = BackgroundScanTracer.forScan();
+
     final source = BackgroundPriceSource(
       storage: storage,
       connectTimeout: bgConnectTimeout,
       receiveTimeout: bgReceiveTimeout,
+      recorder: tracer.recorder,
+      budget: budget,
     );
     final prices = await source.fetchPricesGrouped(
       stationIds: allStationIds,
@@ -259,18 +266,17 @@ class BackgroundAlertScanCoordinator {
       apiKey: apiKey,
     );
 
-    // #2863 — bulk-dataset countries (ES/IT/AR/DK + flag-gated FR/GB) are not
-    // served by the polled [BackgroundPriceSource]; their alert stations flow
-    // through a [BulkDatasetAlertStrategy] resolved per country. The dataset is
-    // downloaded at most once per scan (per its datasetTtl) then local-filtered
-    // — zero per-alert network. Merged into the same Tankerkönig-shaped map the
-    // evaluator consumes, so per-station price alerts in bulk countries now
-    // fire too. (Radius alerts in bulk countries are handled below, in the
-    // strategy-aware [BackgroundScanRunners.runRadiusAlerts].)
+    // #2863 — bulk-dataset countries (ES/IT/AR/DK + flag-gated FR/GB) flow
+    // through a [BulkDatasetAlertStrategy] resolved per country: ≤1 dataset
+    // download per scan (per datasetTtl) then local-filter, merged into the
+    // same Tankerkönig-shaped map the evaluator consumes. (Radius alerts in
+    // bulk countries run below via the strategy-aware runRadiusAlerts.)
     final resolver = CountryAlertStrategyResolver(
       storage: storage,
       cache: CacheManager(storage),
       apiKey: apiKey,
+      recorder: tracer.recorder,
+      budget: budget,
     );
     prices.addAll(await _fetchBulkAlertPrices(
       alertStationIds: alertStationIds,
@@ -311,6 +317,10 @@ class BackgroundAlertScanCoordinator {
       settingsStorage: storage,
     );
     await _refreshNearestWidgetFromSearch(storage, source: source);
+
+    // #2866 — dev-gated: snapshot + export this scan's data-access trace so the
+    // maintainer reads `aggregates().compliant` per provider (no-op otherwise).
+    await tracer.exportIfEnabled();
   }
 
   /// #2863 — fetch per-station alert prices for **bulk-dataset** countries via
@@ -319,12 +329,12 @@ class BackgroundAlertScanCoordinator {
   /// Groups the alert station ids by derived country (the same lazy derivation
   /// the polled grouping uses), keeps only the bulk-policy countries (polled
   /// ones were already fetched by [BackgroundPriceSource]), and asks each
-  /// country's strategy for its prices. Each bulk strategy answers by local
-  /// geo-filter over its cached whole-country dataset — at most one dataset
-  /// download per country per scan, then zero per-alert network. Each strategy
-  /// swallows + spools its own faults (its documented boundary, fault-tested in
-  /// `country_alert_strategy_test.dart`), so a bulk-country provider fault
-  /// degrades to "no fresh prices this scan" rather than failing the scan.
+  /// country's strategy for its prices — answered by local geo-filter over the
+  /// cached whole-country dataset (≤1 dataset download per country per scan,
+  /// then zero per-alert network). Each strategy swallows + spools its own
+  /// faults (its documented boundary, fault-tested in
+  /// `country_alert_strategy_test.dart`), so a bulk-country fault degrades to
+  /// "no fresh prices this scan" rather than failing the scan.
   Future<Map<String, Map<String, dynamic>>> _fetchBulkAlertPrices({
     required Set<String> alertStationIds,
     required String? fallbackCountryCode,

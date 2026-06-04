@@ -14,7 +14,7 @@ import '../storage/hive_boxes.dart';
 /// ## Why?
 /// Tier-1 background scanning is fed by *several* triggers that the OS may
 /// fire close together:
-///   * the WorkManager periodic tasks (`priceRefresh` / `priceRefreshCharging`),
+///   * the WorkManager twice-daily periodic scan (`priceRefresh`, #2866),
 ///   * the Android home-widget refresh (#2412), and
 ///   * the iOS BGAppRefreshTask (#2414).
 ///

@@ -10,9 +10,11 @@ import '../../features/search/domain/entities/station.dart';
 import '../cache/cache_manager.dart';
 import '../data/storage_repository.dart';
 import '../services/country_service_registry.dart';
+import '../services/diagnostics/data_access_recorder.dart';
 import '../services/station_service.dart';
 import 'country_alert_strategy.dart';
 import 'polled_alert_strategy.dart';
+import 'provider_request_budget.dart';
 
 // `kBackgroundPolledCountries` now lives in `polled_alert_strategy.dart` (the
 // per-country polled specialization, #2863). Re-exported here so existing
@@ -40,6 +42,8 @@ class BackgroundPriceSource {
     required StorageRepository storage,
     Duration connectTimeout = const Duration(seconds: 10),
     Duration receiveTimeout = const Duration(seconds: 15),
+    DataAccessRecorder? recorder,
+    ProviderRequestBudget? budget,
     @visibleForTesting StationService? Function(String code, {String? apiKey})?
         serviceBuilder,
   })  : _storage = storage,
@@ -47,6 +51,8 @@ class BackgroundPriceSource {
         _deps = PolledAlertStrategyDeps(
           connectTimeout: connectTimeout,
           receiveTimeout: receiveTimeout,
+          recorder: recorder,
+          budget: budget,
           serviceBuilder: serviceBuilder,
         );
 

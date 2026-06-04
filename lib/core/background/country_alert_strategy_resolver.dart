@@ -3,8 +3,10 @@
 
 import '../cache/cache_manager.dart';
 import '../data/storage_repository.dart';
+import '../services/diagnostics/data_access_recorder.dart';
 import 'country_alert_strategy.dart';
 import 'polled_alert_strategy.dart';
+import 'provider_request_budget.dart';
 
 /// Per-scan cache of [CountryAlertStrategy] instances, one per country (Epic
 /// #2860, child #2863).
@@ -26,15 +28,25 @@ class CountryAlertStrategyResolver {
     required StorageRepository storage,
     required CacheStrategy cache,
     String? apiKey,
+    DataAccessRecorder? recorder,
+    ProviderRequestBudget? budget,
     PolledAlertStrategyDeps? polledDeps,
   })  : _storage = storage,
         _cache = cache,
         _apiKey = apiKey,
+        _recorder = recorder,
+        _budget = budget,
         _polledDeps = polledDeps;
 
   final StorageRepository _storage;
   final CacheStrategy _cache;
   final String? _apiKey;
+
+  /// #2824 tracer + #2866 shared budget threaded into every strategy this
+  /// resolver builds, so the whole BG scan shares one trace and one
+  /// per-provider gate. Both null outside an instrumented / gated scan.
+  final DataAccessRecorder? _recorder;
+  final ProviderRequestBudget? _budget;
   final PolledAlertStrategyDeps? _polledDeps;
 
   final Map<String, CountryAlertStrategy?> _byCountry = {};
@@ -49,6 +61,8 @@ class CountryAlertStrategyResolver {
       storage: _storage,
       cache: _cache,
       apiKey: _apiKey,
+      recorder: _recorder,
+      budget: _budget,
       polledDeps: _polledDeps,
     );
     _byCountry[countryCode] = strategy;

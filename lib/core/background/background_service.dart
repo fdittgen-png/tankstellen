@@ -34,10 +34,14 @@ import 'notification_templates.dart';
 /// deliberately thin: it just maps the task name to a
 /// [BackgroundScanTrigger] and delegates.
 ///
-/// ## Frequency: Adaptive based on battery/charger state
-/// - **Charging**: every 30 minutes (more frequent updates while plugged in)
-/// - **On battery (not low)**: every 1 hour (standard interval)
-/// - **Low battery**: tasks are skipped by WorkManager constraints
+/// ## Frequency: twice per day (Epic #2860 EXIT GATE, #2866)
+/// The periodic scan runs ~every 12h (twice daily). Since the scan now polls
+/// every feasible country's provider, the cadence is the core rate-limit / ToS
+/// safeguard — twice-daily + the once-per-country-per-scan grouping + the
+/// shared per-provider [ProviderRequestBudget] bound every provider to well
+/// inside its limits. The low-battery skip ([Constraints.requiresBatteryNotLow])
+/// stays; the old 30-min charging cadence was dropped (it would have breached
+/// twice-daily for a multi-country scan).
 ///
 /// Background scanning is **best-effort, never real-time** — Android delays
 /// periodic work under Doze and iOS schedules BGAppRefresh opportunistically.
@@ -52,9 +56,6 @@ import 'notification_templates.dart';
 class BackgroundService {
   /// Task name for the standard periodic price refresh.
   static const priceRefreshTask = 'priceRefresh';
-
-  /// Task name for the charging-only periodic price refresh.
-  static const priceRefreshChargingTask = 'priceRefreshCharging';
 
   /// One-off task name enqueued by the Android [BootReceiver] after a
   /// reboot (#2413). Handling it re-registers the periodic tasks so the
@@ -71,13 +72,19 @@ class BackgroundService {
   /// match `FuelPriceWidgetProvider.WIDGET_SCAN_TASK`.
   static const widgetRefreshScanTask = 'widgetRefreshScan';
 
-  /// Standard refresh interval when on battery (not low).
-  /// Android may delay based on Doze mode; 1h is the minimum WorkManager honors reliably.
-  static const refreshInterval = Duration(hours: 1);
-
-  /// Faster refresh interval when the device is charging.
-  /// Plugged-in users get fresher prices without battery impact.
-  static const chargingRefreshInterval = Duration(minutes: 30);
+  /// Periodic alert/price-scan cadence — **twice per day** (~every 12h).
+  ///
+  /// Epic #2860 EXIT GATE (#2866): the background scan now polls *every*
+  /// feasible country's provider, so the cadence is the core rate-limit / ToS
+  /// safeguard. Twice-daily — combined with the once-per-country-per-scan
+  /// grouping (the registry-driven [BackgroundPriceSource]) and the shared
+  /// per-provider [ProviderRequestBudget] — keeps every provider comfortably
+  /// inside its published limits: no provider can be hit more than ~twice a
+  /// day by a background scan, batched per country. (The previous 1h standard
+  /// + 30min charging cadences breached that for a multi-country scan, so the
+  /// charging variant was dropped and the standard one raised to 12h.) Android
+  /// may still delay the wake under Doze — best-effort, never punctual.
+  static const refreshInterval = Duration(hours: 12);
 
   // Retry / dedup / batch constants live on BackgroundAlertScanCoordinator
   // (#2415) so every trigger shares one tuning surface. Kept here as thin
@@ -224,8 +231,6 @@ BackgroundScanTrigger? _triggerForTask(String task) {
   switch (task) {
     case BackgroundService.priceRefreshTask:
       return BackgroundScanTrigger.workManagerPeriodic;
-    case BackgroundService.priceRefreshChargingTask:
-      return BackgroundScanTrigger.workManagerCharging;
     case BackgroundService.widgetRefreshScanTask:
       return BackgroundScanTrigger.androidWidget;
     case Workmanager.iOSBackgroundTask:

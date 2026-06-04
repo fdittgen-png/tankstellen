@@ -30,22 +30,24 @@ void main() {
       );
     });
 
-    test('charging refresh interval is shorter than standard', () {
-      expect(
-        BackgroundService.chargingRefreshInterval.inMinutes,
-        lessThan(BackgroundService.refreshInterval.inMinutes),
-      );
+    test('refresh interval is twice-daily (~12h) — the #2866 ToS safeguard', () {
+      // Epic #2860 EXIT GATE: the now-multi-country scan polls every feasible
+      // provider, so the cadence is the core rate-limit / ToS safeguard. Twice
+      // a day keeps every provider comfortably inside its published limits.
+      expect(BackgroundService.refreshInterval, const Duration(hours: 12));
     });
 
-    test('standard refresh interval is 1 hour', () {
-      expect(BackgroundService.refreshInterval, const Duration(hours: 1));
-    });
-
-    test('charging refresh interval is 30 minutes', () {
-      expect(
-        BackgroundService.chargingRefreshInterval,
-        const Duration(minutes: 30),
-      );
+    test('the 30-min charging cadence is gone (it would breach twice-daily)',
+        () {
+      // The charging-only variant was dropped (#2866): a 30-min cadence would
+      // let a multi-country scan hit a provider far more than twice a day.
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+      expect(source.contains('chargingRefreshInterval'), isFalse,
+          reason: 'no separate charging cadence may exist');
+      expect(source.contains('priceRefreshChargingTask'), isFalse,
+          reason: 'no charging task name may exist');
     });
   });
 
@@ -163,54 +165,44 @@ void main() {
       }
     });
 
-    test('background service registers two periodic tasks for adaptive scheduling', () {
+    test('background service registers the single twice-daily periodic task '
+        '(#2866)', () {
       final source = File(
         'lib/core/background/background_service.dart',
       ).readAsStringSync();
 
-      // Must register both a standard and a charging task
+      // The one twice-daily scan task — the multi-country ToS safeguard.
       expect(
         source.contains('priceRefresh'),
         isTrue,
-        reason: 'Must register standard priceRefresh task',
-      );
-      expect(
-        source.contains('priceRefreshCharging'),
-        isTrue,
-        reason: 'Must register priceRefreshCharging task for when device is plugged in',
+        reason: 'Must register the standard priceRefresh task',
       );
     });
 
-    test('battery-aware WorkManager constraints are in Android implementation', () {
+    test('battery-aware WorkManager constraint is in Android implementation',
+        () {
       final source = File(
         'lib/core/background/android_background_price_fetcher.dart',
       ).readAsStringSync();
 
-      // Standard task should require battery not low
+      // The twice-daily task should still skip when battery is low.
       expect(
         source.contains('requiresBatteryNotLow: true'),
         isTrue,
-        reason: 'Standard task must skip when battery is low',
-      );
-
-      // Charging task should require device to be charging
-      expect(
-        source.contains('requiresCharging: true'),
-        isTrue,
-        reason: 'Charging task must only run when plugged in',
+        reason: 'Twice-daily task must skip when battery is low',
       );
     });
 
-    test('callback dispatcher handles both task names', () {
+    test('callback dispatcher handles the periodic task name', () {
       final source = File(
         'lib/core/background/background_service.dart',
       ).readAsStringSync();
 
-      // The dispatcher should check for both task names via public constants
+      // The dispatcher should check for the periodic task via the constant.
       expect(
-        source.contains('BackgroundService.priceRefreshChargingTask'),
+        source.contains('BackgroundService.priceRefreshTask'),
         isTrue,
-        reason: 'Callback dispatcher must handle the charging task',
+        reason: 'Callback dispatcher must handle the periodic task',
       );
     });
   });
