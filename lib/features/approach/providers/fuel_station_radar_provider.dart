@@ -15,6 +15,16 @@ import '../../search/domain/entities/station.dart';
 
 part 'fuel_station_radar_provider.g.dart';
 
+/// Tight near-radius (km) the polled corridor fetch ALSO queries and merges
+/// into the wide corridor (#2813). The wide corridor is row-capped with no
+/// distance ordering (e.g. FR `within_distance(60km)` + `limit:50`), so in a
+/// sparse/suburban area — exactly where few near stations are easily truncated
+/// by far-area density — the genuinely-nearest forecourts drop out and the
+/// "Closest station" card shows a far one. A sparse near-radius fetch isn't
+/// hit by the cap, so it reliably carries the nearest stations back. 15 km
+/// comfortably covers the default 10 km search radius.
+const double kCorridorNearMergeRadiusKm = 15.0;
+
 /// Fuel Station Radar data layer (#2283) — the two-tier source that backs the
 /// approach detector while a trip is recording.
 ///
@@ -126,7 +136,36 @@ FuelStationRadar fuelStationRadar(Ref ref) {
             sortBy: SortBy.distance,
           ),
         );
-        return result.data;
+        // #2813 — a polled source returns the wide corridor under a hard row
+        // cap with no distance ordering (e.g. FR `within_distance(60km)` +
+        // `limit:50`), so in a dense area the genuinely-NEAREST forecourts can
+        // be truncated out — leaving the recording "Closest station" card and
+        // the approach detector showing a far station the in-radius search
+        // would never pick. Merge a tight near-radius fetch (sparse → not row-
+        // capped) by id so the cached corridor always contains the nearest
+        // stations. Bulk-file sources read the full local dataset (no cap), so
+        // the wide fetch is already complete and the merge is skipped.
+        if (isBulk || radiusKm <= kCorridorNearMergeRadiusKm) {
+          return result.data;
+        }
+        final byId = {for (final s in result.data) s.id: s};
+        try {
+          final near = await svc.searchStations(
+            SearchParams(
+              lat: lat,
+              lng: lng,
+              radiusKm: kCorridorNearMergeRadiusKm,
+              fuelType: FuelType.all,
+              sortBy: SortBy.distance,
+            ),
+          );
+          for (final s in near.data) {
+            byId[s.id] = s;
+          }
+        } on Object {
+          // Wide-corridor-only on a near-fetch failure (offline / rate limit).
+        }
+        return byId.values.toList(growable: false);
       } on Object {
         return const <Station>[];
       }
