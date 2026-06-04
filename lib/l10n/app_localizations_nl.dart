@@ -63,11 +63,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get routeSearchPartialBanner => 'Zoekt naar meer stations…';
 
   @override
-  String get routeSearchingChip => 'Searching the route…';
+  String get routeSearchingChip => 'Route zoeken…';
 
   @override
   String routeSegmentSummaryBadge(String km) {
-    return 'Every $km km';
+    return 'Elke $km km';
   }
 
   @override
@@ -671,17 +671,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String profileSwitchedTo(String profile) {
-    return 'Switched to $profile';
+    return 'Overgeschakeld naar $profile';
   }
 
   @override
   String profileCreatedNamed(String name) {
-    return 'Profile $name created';
+    return 'Profiel $name aangemaakt';
   }
 
   @override
   String profileCountryTaken(String country) {
-    return 'A profile for $country already exists — edit it instead.';
+    return 'Er bestaat al een profiel voor $country — bewerk het in plaats van een nieuw aan te maken.';
   }
 
   @override
@@ -798,28 +798,28 @@ class AppLocalizationsNl extends AppLocalizations {
       'Prijsinformatie niet beschikbaar van aanbieder';
 
   @override
-  String get evPriceFree => 'Free';
+  String get evPriceFree => 'Gratis';
 
   @override
-  String get evPricePayAtLocation => 'Pay at location';
+  String get evPricePayAtLocation => 'Betalen op locatie';
 
   @override
-  String get evPriceMembership => 'Membership required';
+  String get evPriceMembership => 'Lidmaatschap vereist';
 
   @override
-  String get evPriceIndicative => 'Indicative price';
+  String get evPriceIndicative => 'Indicatieve prijs';
 
   @override
   String get evPriceDeclaredByOperator =>
-      'Indicative price declared by the operator — verify on site';
+      'Indicatieve prijs opgegeven door de exploitant — verifieer ter plaatse';
 
   @override
   String get evPriceFranceAttribution =>
-      'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
+      'Prijzen: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
 
   @override
   String get evPriceBestEffortOcm =>
-      'Best-effort pricing from OpenChargeMap — sparse and may be incomplete.';
+      'Best-effort-prijzen van OpenChargeMap — beperkt en mogelijk onvolledig.';
 
   @override
   String get evLastUpdated => 'Laatst bijgewerkt';
@@ -1035,55 +1035,55 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String calculatorDistanceLabel(String unit) {
-    return 'Distance ($unit)';
+    return 'Afstand ($unit)';
   }
 
   @override
   String calculatorConsumptionLabel(String unit) {
-    return 'Consumption ($unit)';
+    return 'Verbruik ($unit)';
   }
 
   @override
   String calculatorPriceLabel(String unit) {
-    return 'Fuel price ($unit)';
+    return 'Brandstofprijs ($unit)';
   }
 
   @override
-  String get calculatorUseMine => 'Use';
+  String get calculatorUseMine => 'Gebruik';
 
   @override
-  String get calculatorApplied => 'Applied';
+  String get calculatorApplied => 'Toegepast';
 
   @override
-  String get tripDetails => 'Trip details';
+  String get tripDetails => 'Ritdetails';
 
   @override
-  String get calculatorRoundTrip => 'Round trip';
+  String get calculatorRoundTrip => 'Heen en terug';
 
   @override
-  String get roundTripTotal => 'Round trip';
+  String get roundTripTotal => 'Heen en terug';
 
   @override
-  String get costPerDistance => 'Cost per km';
+  String get costPerDistance => 'Kosten per km';
 
   @override
-  String get costPerMonth => 'Cost per month';
+  String get costPerMonth => 'Kosten per maand';
 
   @override
-  String get calculatorEstimateMonthly => 'Estimate monthly cost';
+  String get calculatorEstimateMonthly => 'Maandelijkse kosten schatten';
 
   @override
-  String get calculatorTripsPerMonth => 'Trips per month';
+  String get calculatorTripsPerMonth => 'Ritten per maand';
 
   @override
-  String get calculatorTripsPerMonthHint => 'e.g. 20';
+  String get calculatorTripsPerMonthHint => 'bijv. 20';
 
   @override
-  String get calculatorReset => 'Reset';
+  String get calculatorReset => 'Herstellen';
 
   @override
   String get calculatorResultPlaceholder =>
-      'Fill in distance, consumption and price to see your trip cost';
+      'Vul afstand, verbruik en prijs in om je ritkosten te zien';
 
   @override
   String get priceHistory => 'Prijsgeschiedenis';
@@ -2173,14 +2173,15 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit wist alle geleerde steekproeven voor dit voertuig. Je valt terug op de standaardwaarden bij koude start totdat nieuwe ritten het profiel aanvullen.';
 
   @override
-  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+  String get vehicleBaselineShowDetails => 'Gedetailleerde uitsplitsing tonen';
 
   @override
-  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+  String get vehicleBaselineHideDetails =>
+      'Gedetailleerde uitsplitsing verbergen';
 
   @override
   String vehicleBaselineMissingWarning(String situations) {
-    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+    return 'Nog niet gedetecteerd: $situations. Deze rijsituaties tellen nog 0 metingen, waardoor de basislijn onvolledig is.';
   }
 
   @override
@@ -2313,13 +2314,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get situationClimbing => 'Klimmen / zwaar beladen';
 
   @override
-  String get situationColdStart => 'Cold start';
+  String get situationColdStart => 'Koude start';
 
   @override
-  String get situationSustainedLoad => 'Sustained load / towing';
+  String get situationSustainedLoad => 'Aanhoudende belasting / slepen';
 
   @override
-  String get situationPartialDecel => 'Coasting';
+  String get situationPartialDecel => 'Uitrollen';
 
   @override
   String get situationHardAccel => 'Hard optrekken';
@@ -2524,7 +2525,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get evStatusOutOfOrder => 'Buiten gebruik';
 
   @override
-  String get evStatusPartial => 'Partly available';
+  String get evStatusPartial => 'Gedeeltelijk beschikbaar';
 
   @override
   String get openOnlyFilter => 'Alleen geopend';
@@ -2568,22 +2569,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String get sectionLocation => 'Locatie';
 
   @override
-  String get sectionSetupDataSources => 'Setup & data sources';
+  String get sectionSetupDataSources => 'Instellingen & gegevensbronnen';
 
   @override
-  String get sectionFeaturesUsage => 'Features & usage';
+  String get sectionFeaturesUsage => 'Functies & gebruik';
 
   @override
-  String get sectionAccountSync => 'Account & sync';
+  String get sectionAccountSync => 'Account & synchronisatie';
 
   @override
-  String get sectionAppearanceWidgets => 'Appearance & widgets';
+  String get sectionAppearanceWidgets => 'Weergave & widgets';
 
   @override
-  String get sectionPrivacyData => 'Privacy & data';
+  String get sectionPrivacyData => 'Privacy & gegevens';
 
   @override
-  String get sectionAdvancedDeveloper => 'Advanced & developer';
+  String get sectionAdvancedDeveloper => 'Geavanceerd & ontwikkelaar';
 
   @override
   String get tooltipBack => 'Terug';
@@ -2610,37 +2611,38 @@ class AppLocalizationsNl extends AppLocalizations {
   String get coachingEasePedal => 'Gas loslaten';
 
   @override
-  String get coachingVoiceHardAcceleration => 'Easy on the accelerator';
+  String get coachingVoiceHardAcceleration => 'Rustig met het gaspedaal';
 
   @override
-  String get coachingVoiceHarshBraking => 'Try to brake more gently';
+  String get coachingVoiceHarshBraking => 'Probeer zachter te remmen';
 
   @override
-  String get coachingVoiceShiftUp => 'Shift up a gear to save fuel';
+  String get coachingVoiceShiftUp =>
+      'Schakel een versnelling hoger om brandstof te besparen';
 
   @override
-  String get coachingVoiceShiftDown => 'Shift down, the engine is labouring';
+  String get coachingVoiceShiftDown => 'Schakel terug, de motor trekt zwaar';
 
   @override
   String get coachingVoiceEasePedal =>
-      'Ease off the pedal to cut your fuel use';
+      'Druk minder op het pedaal om brandstof te besparen';
 
   @override
-  String get coachingVoiceLiftOff => 'Lift off the accelerator and coast';
+  String get coachingVoiceLiftOff => 'Neem gas terug en rol uit';
 
   @override
   String get coachingVoiceAnticipateBrake =>
-      'Look further ahead and lift off earlier';
+      'Kijk verder vooruit en neem eerder gas terug';
 
   @override
-  String get coachingVoiceSmoothAccel => 'Accelerate more smoothly';
+  String get coachingVoiceSmoothAccel => 'Accelereer vloeiender';
 
   @override
-  String get voiceCoachingSettingTitle => 'Spoken driving coaching';
+  String get voiceCoachingSettingTitle => 'Gesproken rijcoaching';
 
   @override
   String get voiceCoachingSettingSubtitle =>
-      'Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints';
+      'Hoor gesproken tips terwijl je rijdt — hard optrekken, hard remmen en schakelhints';
 
   @override
   String get tooltipUseGps => 'GPS-locatie gebruiken';
@@ -3405,8 +3407,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obd2PauseBannerEnd => 'Opname beëindigen';
 
   @override
-  String get obd2GpsDegradedBannerTitle =>
-      'Recording with GPS — OBD2 reconnecting';
+  String get obd2GpsDegradedBannerTitle => 'Opname met GPS — OBD2 herverbinden';
 
   @override
   String get obd2GpsDegradedPassiveWaitingBanner =>
@@ -3425,10 +3426,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit verwijdert het geleerde volumetrisch rendement (η_v) en herstelt de standaardwaarde (0.85). Brandstofstroominschattingen per rit vallen terug op de fabrikantconstante totdat de kalibratie nieuwe steekproeven uit aankomende ritten heeft verzameld.';
 
   @override
-  String get alertsStationSectionTitle => 'Station alerts';
+  String get alertsStationSectionTitle => 'Stationmeldingen';
 
   @override
-  String get alertsStationAdd => 'Add a station alert';
+  String get alertsStationAdd => 'Stationmelding toevoegen';
 
   @override
   String get alertsRadiusSectionTitle => 'Straalwaarschuwingen';
@@ -3474,7 +3475,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String radiusAlertDeleted(String name) {
-    return 'Radius alert \"$name\" deleted';
+    return 'Straalwaarschuwing \"$name\" verwijderd';
   }
 
   @override
@@ -3707,12 +3708,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String fuelStationRadarDistanceKm(String km) {
-    return '$km km away';
+    return '$km km verderop';
   }
 
   @override
   String fuelStationRadarProximity(int percent) {
-    return 'Proximity $percent%';
+    return 'Nabijheid $percent%';
   }
 
   @override
@@ -3834,47 +3835,48 @@ class AppLocalizationsNl extends AppLocalizations {
       'Back-up exporteren mislukt — probeer het opnieuw';
 
   @override
-  String get backupExportProgress => 'Exporting your backup…';
+  String get backupExportProgress => 'Back-up exporteren…';
 
   @override
   String exportBackupSavedAs(String fileName) {
-    return 'Saved to Downloads as $fileName';
+    return 'Opgeslagen in Downloads als $fileName';
   }
 
   @override
-  String get restoreBackupTooltip => 'Restore backup';
+  String get restoreBackupTooltip => 'Back-up terugzetten';
 
   @override
-  String get restoreBackupDialogTitle => 'Restore backup';
+  String get restoreBackupDialogTitle => 'Back-up terugzetten';
 
   @override
   String get restoreBackupDialogBody =>
-      'Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.';
+      'Samenvoegen voegt records uit de back-up toe en bij en behoudt alles wat al op dit apparaat staat. Vervangen verwijdert eerst alle huidige gegevens en zet vervolgens alleen de back-up terug — dit kan niet ongedaan worden gemaakt.';
 
   @override
-  String get restoreBackupMergeAction => 'Merge';
+  String get restoreBackupMergeAction => 'Samenvoegen';
 
   @override
-  String get restoreBackupReplaceAction => 'Replace all';
+  String get restoreBackupReplaceAction => 'Alles vervangen';
 
   @override
   String restoreBackupSuccess(int count) {
-    return 'Backup restored — $count records imported';
+    return 'Back-up teruggezet — $count records geïmporteerd';
   }
 
   @override
-  String get restoreBackupEmpty => 'Backup restored — it contained no records';
+  String get restoreBackupEmpty =>
+      'Back-up teruggezet — deze bevatte geen records';
 
   @override
   String get restoreBackupCorrupt =>
-      'Restore failed — this file is not a valid Tankstellen backup';
+      'Terugzetten mislukt — dit bestand is geen geldige Tankstellen-back-up';
 
   @override
   String get restoreBackupFailed =>
-      'Restore failed — the file could not be read';
+      'Terugzetten mislukt — het bestand kon niet worden gelezen';
 
   @override
-  String get backupImportProgress => 'Restoring your backup…';
+  String get backupImportProgress => 'Back-up terugzetten…';
 
   @override
   String restoreBackupMergedSummary(
@@ -3883,7 +3885,7 @@ class AppLocalizationsNl extends AppLocalizations {
     int trips,
     int chargingLogs,
   ) {
-    return 'Merged $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+    return 'Samengevoegd: $vehicles voertuigen, $fillUps tankbeurten, $trips ritten, $chargingLogs laadlogs';
   }
 
   @override
@@ -3893,7 +3895,7 @@ class AppLocalizationsNl extends AppLocalizations {
     int trips,
     int chargingLogs,
   ) {
-    return 'Replaced all data with $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+    return 'Alle gegevens vervangen door $vehicles voertuigen, $fillUps tankbeurten, $trips ritten, $chargingLogs laadlogs';
   }
 
   @override
@@ -4154,16 +4156,16 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voegt automatische OBD2-ritopname toe. Vereist een gekoppelde adapter.';
 
   @override
-  String get consoGroupVehicles => 'Vehicles';
+  String get consoGroupVehicles => 'Voertuigen';
 
   @override
-  String get consoGroupCoaching => 'Coaching while driving';
+  String get consoGroupCoaching => 'Coaching tijdens het rijden';
 
   @override
-  String get consoGroupRewards => 'Rewards & savings';
+  String get consoGroupRewards => 'Beloningen & besparingen';
 
   @override
-  String get consoGroupTroubleshooting => 'Troubleshooting';
+  String get consoGroupTroubleshooting => 'Probleemoplossing';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {
@@ -4192,35 +4194,35 @@ class AppLocalizationsNl extends AppLocalizations {
       'Alleen GPS — nog geen tankbeurten hebben het verbruiksmodel verankerd. Voeg een paar volle tankbeurten toe om de nauwkeurigheid te verbeteren.';
 
   @override
-  String get moreActionsTooltip => 'More';
+  String get moreActionsTooltip => 'Meer';
 
   @override
-  String get exportBackupMenuLabel => 'Export backup';
+  String get exportBackupMenuLabel => 'Back-up exporteren';
 
   @override
-  String get restoreBackupMenuLabel => 'Restore backup';
+  String get restoreBackupMenuLabel => 'Back-up terugzetten';
 
   @override
-  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+  String get carbonDashboardMenuLabel => 'CO₂-dashboard';
 
   @override
-  String get settingsMenuLabel => 'Settings';
+  String get settingsMenuLabel => 'Instellingen';
 
   @override
-  String get consumptionStatsPageTitle => 'Consumption statistics';
+  String get consumptionStatsPageTitle => 'Verbruiksstatistieken';
 
   @override
-  String get consumptionStatsComparisonTitle => 'This month vs last month';
+  String get consumptionStatsComparisonTitle => 'Deze maand vs vorige maand';
 
   @override
-  String get consumptionStatsTrendsTitle => 'Evolution over time';
+  String get consumptionStatsTrendsTitle => 'Verloop over tijd';
 
   @override
   String get consumptionStatsNeedTwoMonths =>
-      'Log fill-ups across at least two months to compare.';
+      'Registreer tankbeurten over minimaal twee maanden om te vergelijken.';
 
   @override
-  String get consumptionStatsPricePerLiter => 'Avg price/L';
+  String get consumptionStatsPricePerLiter => 'Gem. prijs/L';
 
   @override
   String consumptionStatsDeltaPercent(String pct) {
@@ -4228,16 +4230,16 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get consumptionStatsChartLiters => 'Litres per month';
+  String get consumptionStatsChartLiters => 'Liter per maand';
 
   @override
-  String get consumptionStatsChartSpend => 'Spend per month';
+  String get consumptionStatsChartSpend => 'Uitgaven per maand';
 
   @override
-  String get consumptionStatsChartPricePerLiter => 'Price per litre';
+  String get consumptionStatsChartPricePerLiter => 'Prijs per liter';
 
   @override
-  String get consumptionStatsChartConsumption => 'L/100km per month';
+  String get consumptionStatsChartConsumption => 'L/100km per maand';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
@@ -4259,7 +4261,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String statCorrectionLiters(String liters) {
-    return 'Corrections: +$liters L';
+    return 'Correcties: +$liters L';
   }
 
   @override
@@ -4305,12 +4307,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String dataSourceLinkSemantic(String source, String license) {
-    return 'Open the $source data source ($license) in your browser';
+    return 'Open de gegevensbron $source ($license) in je browser';
   }
 
   @override
   String mapAttributionOsm(String brand) {
-    return '© $brand contributors';
+    return '© $brand bijdragers';
   }
 
   @override
@@ -4395,7 +4397,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get developerToolsTestAlertNoStation =>
-      'Search for stations first, then run the test alert so the notification can open a real station.';
+      'Zoek eerst naar stations en voer dan de testwaarschuwing uit zodat de melding een echt station kan openen.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnostiek';
@@ -4507,21 +4509,21 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String insightFullThrottle(String pctTime, String liters) {
-    return 'Full throttle ($pctTime% of trip): wasted $liters L';
+    return 'Volledig gas ($pctTime% van de rit): $liters L verspild';
   }
 
   @override
   String get lessonAdviceFullThrottle =>
-      'Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.';
+      'Trap rustiger op het pedaal — 70 % van het gaspedaal is genoeg om op snelheid te komen met veel minder brandstof.';
 
   @override
   String insightLambdaEnrichment(String pctTime, String liters) {
-    return 'Rich mixture under load ($pctTime% of trip): wasted $liters L';
+    return 'Rijk mengsel onder belasting ($pctTime% van de rit): $liters L verspild';
   }
 
   @override
   String get lessonAdviceLambdaEnrichment =>
-      'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.';
+      'Zware, aanhoudende belasting maakt het mengsel te rijk — schakel vroeg en verminder de belasting bij lange beklimmingen om het mengsel mager te houden.';
 
   @override
   String insightClimbingCost(
@@ -4529,21 +4531,21 @@ class AppLocalizationsNl extends AppLocalizations {
     String pctTime,
     String liters,
   ) {
-    return 'Climbing at $gradePercent% grade ($pctTime% of trip): wasted $liters L';
+    return 'Klimmen op $gradePercent% helling ($pctTime% van de rit): $liters L verspild';
   }
 
   @override
   String get lessonAdviceClimbingCost =>
-      'Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.';
+      'Neem vaart mee een heuvel op en geef gas geleidelijk — optrekken op een helling verbruikt extra brandstof.';
 
   @override
   String insightRestartCost(String count, String liters) {
-    return '$count stop-and-go restarts: wasted $liters L';
+    return '$count stop-and-go-herstarten: $liters L verspild';
   }
 
   @override
   String get lessonAdviceRestartCost =>
-      'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.';
+      'Anticipeer op het verkeer en rol naar stops zodat je uitrolt in plaats van opnieuw optrekt — optrekken vanuit stilstand is het meest brandstofvretende deel van stop-and-go.';
 
   @override
   String get drivingScoreCardTitle => 'Rijscore';
@@ -4576,71 +4578,72 @@ class AppLocalizationsNl extends AppLocalizations {
   String get drivingScorePenaltyFullThrottle => 'Vol gas';
 
   @override
-  String get drivingScoreClassVeryGood => 'Very good';
+  String get drivingScoreClassVeryGood => 'Uitstekend';
 
   @override
-  String get drivingScoreClassGood => 'Good';
+  String get drivingScoreClassGood => 'Goed';
 
   @override
-  String get drivingScoreClassAverage => 'Average';
+  String get drivingScoreClassAverage => 'Gemiddeld';
 
   @override
-  String get drivingScoreClassBad => 'Needs work';
+  String get drivingScoreClassBad => 'Verbetering nodig';
 
   @override
-  String get drivingScorePenaltyLugging => 'Lugging';
+  String get drivingScorePenaltyLugging => 'Motor aan het sloffen';
 
   @override
-  String get drivingScorePenaltySmoothness => 'Jerky driving';
+  String get drivingScorePenaltySmoothness => 'Schokkerig rijden';
 
   @override
-  String get drivingScorePenaltyHighSpeed => 'High speed';
+  String get drivingScorePenaltyHighSpeed => 'Hoge snelheid';
 
   @override
-  String get drivingScorePenaltyPedalVelocity => 'Aggressive pedal';
+  String get drivingScorePenaltyPedalVelocity => 'Agressief pedaal';
 
   @override
-  String get drivingScorePenaltyLambda => 'Rich mixture';
+  String get drivingScorePenaltyLambda => 'Rijk mengsel';
 
   @override
-  String get gpsKpiCardTitle => 'GPS efficiency';
+  String get gpsKpiCardTitle => 'GPS-efficiëntie';
 
   @override
-  String get gpsKpiRpa => 'Positive acceleration (RPA)';
+  String get gpsKpiRpa => 'Positieve versnelling (RPA)';
 
   @override
-  String get gpsKpiPke => 'Kinetic energy demand (PKE)';
+  String get gpsKpiPke => 'Kinetische energievraag (PKE)';
 
   @override
-  String get gpsKpiVapos => 'Acceleration intensity (VAPOS)';
+  String get gpsKpiVapos => 'Versnellingsintensiteit (VAPOS)';
 
   @override
-  String get gpsKpiCoast => 'Coasting share';
+  String get gpsKpiCoast => 'Uitroolaandeel';
 
   @override
-  String get gpsKpiClimbEnergy => 'Climb energy';
+  String get gpsKpiClimbEnergy => 'Klimenergie';
 
   @override
   String drivingScoreBaselineDelta(String pct) {
-    return '$pct vs your efficient baseline';
+    return '$pct t.o.v. jouw efficiënte basislijn';
   }
 
   @override
-  String get drivingTraceCardTitle => 'Driving-analysis trace (dev)';
+  String get drivingTraceCardTitle => 'Rijanalyse-trace (dev)';
 
   @override
   String get drivingTraceCardBody =>
-      'Export this trip\'s GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.';
+      'Exporteer de GPS-KPI\'s, score en lessen van deze rit als JSON, beschrijf hoe de rit aanvoelde in het commentaarveld en deel het terug zodat de rijstijldrempels op echte ritten kunnen worden gekalibreerd.';
 
   @override
-  String get drivingTraceExportAction => 'Export analysis trace';
+  String get drivingTraceExportAction => 'Analysetrace exporteren';
 
   @override
   String get drivingTraceExported =>
-      'Analysis trace saved to Downloads — add your verdict in the comment field and share it back.';
+      'Analysetrace opgeslagen in Downloads — voeg je oordeel toe in het commentaarveld en deel het terug.';
 
   @override
-  String get drivingTraceExportFailed => 'Couldn\'t export the analysis trace.';
+  String get drivingTraceExportFailed =>
+      'De analysetrace kon niet worden geëxporteerd.';
 
   @override
   String get ecoRouteOption => 'Eco';
@@ -4916,61 +4919,64 @@ class AppLocalizationsNl extends AppLocalizations {
       'Toont een sectie Ontwikkelaarstools in de instellingen met diagnostiek: export van het foutenlogboek, testmeldingen, een testwaarschuwingspijplijn, een functievlag-overzicht, caches wissen en diagnostiek kopiëren.';
 
   @override
-  String get featureLabel_approachOverlay => 'Approach overlay';
+  String get featureLabel_approachOverlay => 'Tankstation Radar';
 
   @override
   String get featureDescription_approachOverlay =>
-      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+      'Verander de zwevende rijtegel in een live Tankstation Radar — als je een tankstation nadert, wisselt het naar de kleur van het brandstoftype en toont de prijs.';
 
   @override
-  String get featureLabel_voiceAnnouncements => 'Voice announcements';
+  String get featureLabel_voiceAnnouncements => 'Gesproken aankondigingen';
 
   @override
   String get featureDescription_voiceAnnouncements =>
-      'Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.';
+      'Spreek goedkope tankstations in de buurt hardop uit terwijl je rijdt, zodat je ogen op de weg blijven.';
 
   @override
   String get featureBlockedEnable_voiceAnnouncements =>
-      'Enable the approach overlay first';
+      'Schakel eerst de Tankstation Radar in';
 
   @override
-  String get featureGroupTitle_finding => 'Finding & map';
+  String get featureGroupTitle_finding => 'Zoeken & kaart';
 
   @override
   String get featureGroupDescription_finding =>
-      'Where to fuel up or charge — search, map, routing.';
+      'Waar te tanken of op te laden — zoeken, kaart, routeplanning.';
 
   @override
-  String get featureGroupTitle_prices => 'Prices & alerts';
+  String get featureGroupTitle_prices => 'Prijzen & meldingen';
 
   @override
   String get featureGroupDescription_prices =>
-      'Price drops, history, and reporting.';
+      'Prijsdalingen, geschiedenis en rapportage.';
 
   @override
-  String get featureGroupTitle_radar => 'Fuel Station Radar';
+  String get featureGroupTitle_radar => 'Tankstation Radar';
 
   @override
-  String get featureGroupDescription_radar => 'Live price nudges as you drive.';
+  String get featureGroupDescription_radar =>
+      'Live prijsnudges tijdens het rijden.';
 
   @override
-  String get featureGroupTitle_sync => 'Sync & backup';
+  String get featureGroupTitle_sync => 'Synchronisatie & back-up';
 
   @override
-  String get featureGroupDescription_sync => 'Keep your data across devices.';
+  String get featureGroupDescription_sync =>
+      'Houd je gegevens gesynchroniseerd tussen apparaten.';
 
   @override
-  String get featureGroupTitle_input => 'Input & scanning';
+  String get featureGroupTitle_input => 'Invoer & scannen';
 
   @override
-  String get featureGroupDescription_input => 'Helpers for logging fill-ups.';
+  String get featureGroupDescription_input =>
+      'Hulpmiddelen voor het loggen van tankbeurten.';
 
   @override
-  String get featureGroupTitle_developer => 'Developer & experimental';
+  String get featureGroupTitle_developer => 'Ontwikkelaar & experimenteel';
 
   @override
   String get featureGroupDescription_developer =>
-      'Power-user and contributor tools.';
+      'Geavanceerde en bijdragershulpmiddelen.';
 
   @override
   String get feedbackConsentTitle => 'Rapport versturen naar GitHub?';
@@ -5014,30 +5020,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Persoonlijk toegangstoken';
 
   @override
-  String get fillUpGuidanceTitle => 'Best time to fill up';
+  String get fillUpGuidanceTitle => 'Beste moment om te tanken';
 
   @override
   String fillUpGuidanceGoodTimeNow(int days) {
-    return 'The current price is among the cheapest of the last $days days — a good time to fill up.';
+    return 'De huidige prijs behoort tot de goedkoopste van de afgelopen $days dagen — een goed moment om te tanken.';
   }
 
   @override
   String fillUpGuidanceWaitCheaper(int days, String window) {
-    return 'Prices are near their $days-day high. They are usually cheaper $window — consider waiting.';
+    return 'De prijzen liggen dicht bij het hoogste punt van de afgelopen $days dagen. Ze zijn meestal goedkoper $window — overweeg te wachten.';
   }
 
   @override
   String get fillUpGuidanceFillSoon =>
-      'Prices are trending up — consider filling up soon.';
+      'De prijzen stijgen — overweeg snel te tanken.';
 
   @override
   String fillUpGuidanceNeutral(int days) {
-    return 'Today\'s price is around the $days-day average.';
+    return 'De prijs van vandaag ligt rond het $days-daags gemiddelde.';
   }
 
   @override
   String fillUpGuidanceSaving(String amount) {
-    return 'Could save about $amount/L by timing your fill-up.';
+    return 'Bespaar circa $amount/L door je tankmoment slim te kiezen.';
   }
 
   @override
@@ -5045,8 +5051,8 @@ class AppLocalizationsNl extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Based on $count price readings',
-      one: 'Based on 1 price reading',
+      other: 'Gebaseerd op $count prijsmetingen',
+      one: 'Gebaseerd op 1 prijsmeting',
     );
     return '$_temp0';
   }
@@ -5058,52 +5064,52 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String fillUpGuidanceWindowDayOnly(String day) {
-    return 'on $day';
+    return 'op $day';
   }
 
   @override
   String fillUpGuidanceWindowPartOnly(String part) {
-    return 'in the $part';
+    return '\'s $part';
   }
 
   @override
-  String get fillUpGuidanceWindowGeneric => 'at other times';
+  String get fillUpGuidanceWindowGeneric => 'op andere tijden';
 
   @override
-  String get fillUpGuidanceWeekday1 => 'Mondays';
+  String get fillUpGuidanceWeekday1 => 'maandagen';
 
   @override
-  String get fillUpGuidanceWeekday2 => 'Tuesdays';
+  String get fillUpGuidanceWeekday2 => 'dinsdagen';
 
   @override
-  String get fillUpGuidanceWeekday3 => 'Wednesdays';
+  String get fillUpGuidanceWeekday3 => 'woensdagen';
 
   @override
-  String get fillUpGuidanceWeekday4 => 'Thursdays';
+  String get fillUpGuidanceWeekday4 => 'donderdagen';
 
   @override
-  String get fillUpGuidanceWeekday5 => 'Fridays';
+  String get fillUpGuidanceWeekday5 => 'vrijdagen';
 
   @override
-  String get fillUpGuidanceWeekday6 => 'Saturdays';
+  String get fillUpGuidanceWeekday6 => 'zaterdagen';
 
   @override
-  String get fillUpGuidanceWeekday7 => 'Sundays';
+  String get fillUpGuidanceWeekday7 => 'zondagen';
 
   @override
-  String get fillUpGuidancePartEarlyMorning => 'early mornings';
+  String get fillUpGuidancePartEarlyMorning => 'vroege ochtenden';
 
   @override
-  String get fillUpGuidancePartMorning => 'mornings';
+  String get fillUpGuidancePartMorning => 'ochtenden';
 
   @override
-  String get fillUpGuidancePartAfternoon => 'afternoons';
+  String get fillUpGuidancePartAfternoon => 'middagen';
 
   @override
-  String get fillUpGuidancePartEvening => 'evenings';
+  String get fillUpGuidancePartEvening => 'avonden';
 
   @override
-  String get fillUpGuidancePartNight => 'nights';
+  String get fillUpGuidancePartNight => 'nachten';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel =>
@@ -5151,7 +5157,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get scanPumpInconsistent =>
-      'The scanned values don\'t add up — please enter them manually.';
+      'De gescande waarden kloppen niet — voer ze handmatig in.';
 
   @override
   String scanPumpFailed(String error) {
@@ -5259,7 +5265,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get pumpCameraRotateToLandscape =>
-      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+      'Draai je telefoon zijwaarts — het pompscherm is breed, zodat de cijfers groter en rechtop komen';
 
   @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
@@ -5341,10 +5347,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Hoe dit voertuig rijdt';
 
   @override
-  String get profileSectionDisplayStations => 'Display & stations';
+  String get profileSectionDisplayStations => 'Weergave & stations';
 
   @override
-  String get profileSectionRegion => 'Region';
+  String get profileSectionRegion => 'Regio';
 
   @override
   String get calibrationModeLabel => 'Kalibratiemodus';
@@ -5401,17 +5407,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String gpsDiagnosticsLargestGap(int seconds) {
-    return 'Largest gap: $seconds s';
+    return 'Grootste onderbreking: $seconds s';
   }
 
   @override
-  String get gpsLifecycleResumed => 'Resumed';
+  String get gpsLifecycleResumed => 'Hervat';
 
   @override
-  String get gpsLifecyclePaused => 'Paused';
+  String get gpsLifecyclePaused => 'Gepauzeerd';
 
   @override
-  String get gpsLifecycleInactive => 'Inactive';
+  String get gpsLifecycleInactive => 'Inactief';
 
   @override
   String get gpsKpiVerdictGood => 'Efficient';
@@ -5460,7 +5466,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tripAvgGpsEstimateTooltip =>
-      'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.';
+      'GPS-schatting (~) — geen brandstofmeter voor deze rit. De waarde is berekend op basis van snelheid en de kalibratie van je voertuig; de nauwkeurigheid verbetert naarmate de matrix rijper wordt.';
 
   @override
   String get gpsRoadUseCardTitle => 'How you used the road';
@@ -5791,37 +5797,38 @@ class AppLocalizationsNl extends AppLocalizations {
   String get home => 'Home';
 
   @override
-  String get accelBrakeCardTitle => 'Acceleration & braking';
+  String get accelBrakeCardTitle => 'Acceleratie & remmen';
 
   @override
-  String get accelBrakeHardAccel => 'Hard accelerations';
+  String get accelBrakeHardAccel => 'Hard optrekken';
 
   @override
-  String get accelBrakeHardBrake => 'Hard braking';
+  String get accelBrakeHardBrake => 'Hard remmen';
 
   @override
-  String get accelBrakeSharpCorner => 'Sharp corners';
+  String get accelBrakeSharpCorner => 'Scherpe bochten';
 
   @override
-  String get accelBrakeSource => 'From the phone\'s motion sensors';
+  String get accelBrakeSource =>
+      'Afkomstig van de bewegingssensoren van de telefoon';
 
   @override
   String lessonHardBrake(String count) {
-    return '$count hard braking events';
+    return '$count keer hard geremd';
   }
 
   @override
   String get lessonAdviceHardBrake =>
-      'Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.';
+      'Anticipeer op stops en neem eerder gas terug — hard remmen gooit de brandstof weg die je net hebt verbruikt om op snelheid te komen.';
 
   @override
   String lessonSharpCornering(String count) {
-    return '$count sharp corners';
+    return '$count scherpe bochten';
   }
 
   @override
   String get lessonAdviceSharpCornering =>
-      'Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.';
+      'Rem voor de bocht, niet erin — hard door een bocht rijden kost snelheid die je daarna opnieuw moet opbouwen.';
 
   @override
   String get locationConsentTitle => 'Locatietoegang';
@@ -5952,7 +5959,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Minimaal 3 ritten per maand nodig voor vergelijking';
 
   @override
-  String get consumptionMonthlyClimbLabel => 'Climbed';
+  String get consumptionMonthlyClimbLabel => 'Geklommen';
 
   @override
   String get obd2CapabilitySectionTitle => 'Adaptermogelijkheden';
@@ -6001,40 +6008,40 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obd2DebugSessionShareLabel => 'OBD2-sessielogboek delen';
 
   @override
-  String get obd2DiagnosticsTitle => 'OBD2 communication health';
+  String get obd2DiagnosticsTitle => 'OBD2 communicatiestatus';
 
   @override
   String obd2DiagnosticsHeader(String percent, String duty, int drops) {
     String _temp0 = intl.Intl.pluralLogic(
       drops,
       locale: localeName,
-      other: '$drops drops',
-      one: '1 drop',
-      zero: 'no drops',
+      other: '$drops onderbrekingen',
+      one: '1 onderbreking',
+      zero: 'geen onderbrekingen',
     );
-    return '$percent% complete · $duty% duty · $_temp0';
+    return '$percent% volledig · $duty% duty · $_temp0';
   }
 
   @override
   String get obd2DiagnosticsAdapterSection => 'Adapter';
 
   @override
-  String get obd2DiagnosticsConnectionSection => 'Connection lifecycle';
+  String get obd2DiagnosticsConnectionSection => 'Verbindingslevenscyclus';
 
   @override
-  String get obd2DiagnosticsPidSection => 'Per-PID outcomes';
+  String get obd2DiagnosticsPidSection => 'Resultaten per PID';
 
   @override
-  String get obd2DiagnosticsSchedulerSection => 'Scheduler health';
+  String get obd2DiagnosticsSchedulerSection => 'Plannerstatus';
 
   @override
-  String get obd2DiagnosticsCompletenessSection => 'Completeness';
+  String get obd2DiagnosticsCompletenessSection => 'Volledigheid';
 
   @override
-  String get obd2DiagnosticsSupportSection => 'Discovered-supported PIDs';
+  String get obd2DiagnosticsSupportSection => 'Ontdekte ondersteunde PIDs';
 
   @override
-  String get obd2DiagnosticsFuelSection => 'Fuel-tier rollup';
+  String get obd2DiagnosticsFuelSection => 'Brandstoftier-samenvatting';
 
   @override
   String obd2DiagnosticsAdapterIdentity(
@@ -6054,12 +6061,12 @@ class AppLocalizationsNl extends AppLocalizations {
     String p50,
     String p95,
   ) {
-    return '$attempts attempts · $successes ok · $drops drops · time-to-connect p50 $p50 / p95 $p95';
+    return '$attempts pogingen · $successes ok · $drops onderbrekingen · verbindingstijd p50 $p50 / p95 $p95';
   }
 
   @override
   String obd2DiagnosticsReconnectLine(int silent, int visible) {
-    return 'Reconnects: $silent silent · $visible visible';
+    return 'Herverbindingen: $silent stil · $visible zichtbaar';
   }
 
   @override
@@ -6068,16 +6075,16 @@ class AppLocalizationsNl extends AppLocalizations {
     int skips,
     int demotions,
   ) {
-    return '$tickRate Hz tick · $skips back-pressure skips · $demotions demotions';
+    return '$tickRate Hz takt · $skips wachtrij-overgeslagen · $demotions degradaties';
   }
 
   @override
   String get obd2DiagnosticsStarved =>
-      'Dynamics tier starved — RPM / speed fell below the governor floor.';
+      'Dynamicatier uitgehongerd — RPM / snelheid viel onder de governordrempel.';
 
   @override
   String obd2DiagnosticsCompletenessLine(String percent, String duty) {
-    return 'Overall $percent% · active duty $duty%';
+    return 'Totaal $percent% · actieve duty $duty%';
   }
 
   @override
@@ -6091,12 +6098,12 @@ class AppLocalizationsNl extends AppLocalizations {
     int unsupported,
     int unknown,
   ) {
-    return '$supported supported · $unsupported unsupported · $unknown unknown';
+    return '$supported ondersteund · $unsupported niet ondersteund · $unknown onbekend';
   }
 
   @override
   String obd2DiagnosticsFuelLine(int suspicious, int total) {
-    return 'Suspicious $suspicious of $total samples';
+    return 'Verdacht $suspicious van $total metingen';
   }
 
   @override
@@ -6112,11 +6119,11 @@ class AppLocalizationsNl extends AppLocalizations {
     String effectiveHz,
     String targetHz,
   ) {
-    return '$pid: $polled polled · $ok ok · $noData ND · $timeout TO · $error err · p50 $p50 / p95 $p95 ms · $effectiveHz/$targetHz Hz';
+    return '$pid: $polled gepolled · $ok ok · $noData ND · $timeout TO · $error fout · p50 $p50 / p95 $p95 ms · $effectiveHz/$targetHz Hz';
   }
 
   @override
-  String get obd2DiagnosticsInitSection => 'Dongle init transcript';
+  String get obd2DiagnosticsInitSection => 'Dongle init-transcript';
 
   @override
   String obd2DiagnosticsInitHeader(
@@ -6138,93 +6145,93 @@ class AppLocalizationsNl extends AppLocalizations {
   String get obd2DiagnosticsInitWarm => 'warm';
 
   @override
-  String get obd2DiagnosticsInitCold => 'cold';
+  String get obd2DiagnosticsInitCold => 'koud';
 
   @override
-  String get obd2HealthCopyInitTranscript => 'Copy init transcript only';
+  String get obd2HealthCopyInitTranscript => 'Alleen init-transcript kopiëren';
 
   @override
   String get obd2DiagnosticsEmpty =>
-      'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.';
+      'Nog geen OBD2-sessie geregistreerd — sluit een adapter aan en registreer een rit met Ontwikkelaarsmodus ingeschakeld.';
 
   @override
   String get obd2DiagnosticsExplain =>
-      'Captured while recording to debug the dongle↔app communication — only collected in Developer mode.';
+      'Vastgelegd tijdens de opname om de dongle↔app-communicatie te debuggen — alleen beschikbaar in Ontwikkelaarsmodus.';
 
   @override
-  String get obd2HealthScreenTitle => 'OBD2 communication health';
+  String get obd2HealthScreenTitle => 'OBD2 communicatiestatus';
 
   @override
-  String get obd2HealthNavLabel => 'OBD2 communication health';
+  String get obd2HealthNavLabel => 'OBD2 communicatiestatus';
 
   @override
-  String get obd2HealthLiveSection => 'Live session';
+  String get obd2HealthLiveSection => 'Live sessie';
 
   @override
-  String get obd2HealthHistorySection => 'Recent sessions';
+  String get obd2HealthHistorySection => 'Recente sessies';
 
   @override
-  String get obd2HealthCopyJson => 'Copy as JSON';
+  String get obd2HealthCopyJson => 'Kopiëren als JSON';
 
   @override
-  String get obd2HealthCopied => 'OBD2 diagnostics copied to clipboard.';
+  String get obd2HealthCopied => 'OBD2-diagnose gekopieerd naar klembord.';
 
   @override
-  String get obd2TestRunTitle => 'Run adapter test';
+  String get obd2TestRunTitle => 'Adaptertest uitvoeren';
 
   @override
-  String get obd2TestRunButton => 'Run adapter test';
+  String get obd2TestRunButton => 'Adaptertest uitvoeren';
 
   @override
-  String get obd2TestRunPassed => 'Adapter test passed';
+  String get obd2TestRunPassed => 'Adaptertest geslaagd';
 
   @override
-  String get obd2TestRunFailed => 'Adapter test failed';
+  String get obd2TestRunFailed => 'Adaptertest mislukt';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
-    return '$passed of $total steps OK · $elapsed ms';
+    return '$passed van $total stappen OK · $elapsed ms';
   }
 
   @override
   String get obd2TestRunCannotWhileRecording =>
-      'Stop the active recording before running the adapter test.';
+      'Stop de actieve opname voordat je de adaptertest uitvoert.';
 
   @override
-  String get obd2TestStepScan => 'Scan for adapter';
+  String get obd2TestStepScan => 'Adapter scannen';
 
   @override
-  String get obd2TestStepConnect => 'Connect & init';
+  String get obd2TestStepConnect => 'Verbinden & initialiseren';
 
   @override
-  String get obd2TestStepInfo => 'Adapter info';
+  String get obd2TestStepInfo => 'Adapterinfo';
 
   @override
-  String get obd2TestStepSupportedPids => 'Supported PIDs';
+  String get obd2TestStepSupportedPids => 'Ondersteunde PIDs';
 
   @override
-  String get obd2TestStepSampleReads => 'Sample reads';
+  String get obd2TestStepSampleReads => 'Steekproefmetingen';
 
   @override
-  String get obd2TestStepReconnect => 'Reconnect test';
+  String get obd2TestStepReconnect => 'Herverbindingstest';
 
   @override
-  String get obd2TestStepDisconnect => 'Disconnect';
+  String get obd2TestStepDisconnect => 'Verbinding verbreken';
 
   @override
   String get obd2TestStatusOk => 'OK';
 
   @override
-  String get obd2TestStatusTimeout => 'Timed out';
+  String get obd2TestStatusTimeout => 'Time-out';
 
   @override
-  String get obd2TestStatusGarbage => 'Unreadable reply';
+  String get obd2TestStatusGarbage => 'Onleesbaar antwoord';
 
   @override
-  String get obd2TestStatusNoResponse => 'No response';
+  String get obd2TestStatusNoResponse => 'Geen antwoord';
 
   @override
-  String get obd2TestStatusFail => 'Failed';
+  String get obd2TestStatusFail => 'Mislukt';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
@@ -6232,77 +6239,79 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get ocrTesterTitle => 'OCR tester';
+  String get ocrTesterTitle => 'OCR-tester';
 
   @override
-  String get ocrTesterNavLabel => 'OCR tester';
+  String get ocrTesterNavLabel => 'OCR-tester';
 
   @override
   String get ocrTesterExplain =>
-      'Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.';
+      'Voer de OCR-pijplijn voor pomp / bon uit op een gekozen foto en bekijk elke stap — alleen beschikbaar in Ontwikkelaarsmodus.';
 
   @override
-  String get ocrTesterModePump => 'Pump';
+  String get ocrTesterModePump => 'Pomp';
 
   @override
-  String get ocrTesterModeReceipt => 'Receipt';
+  String get ocrTesterModeReceipt => 'Bon';
 
   @override
-  String get ocrTesterCapture => 'Capture';
+  String get ocrTesterCapture => 'Vastleggen';
 
   @override
-  String get ocrTesterPickImage => 'Pick image';
+  String get ocrTesterPickImage => 'Afbeelding kiezen';
 
   @override
-  String get ocrTesterRun => 'Run';
+  String get ocrTesterRun => 'Uitvoeren';
 
   @override
-  String get ocrTesterCountry => 'Country';
+  String get ocrTesterCountry => 'Land';
 
   @override
-  String get ocrTesterCountryNone => 'Default (no profile)';
+  String get ocrTesterCountryNone => 'Standaard (geen profiel)';
 
   @override
-  String get ocrTesterNoImage => 'Pick or capture an image, then Run.';
+  String get ocrTesterNoImage =>
+      'Kies of maak een afbeelding, druk dan op Uitvoeren.';
 
   @override
-  String get ocrTesterRunning => 'Running OCR…';
+  String get ocrTesterRunning => 'OCR uitvoeren…';
 
   @override
-  String get ocrTesterNoResult => 'OCR produced no readable result.';
+  String get ocrTesterNoResult =>
+      'OCR heeft geen leesbaar resultaat opgeleverd.';
 
   @override
-  String get ocrTesterOverlaySection => 'Block overlay';
+  String get ocrTesterOverlaySection => 'Blokoverlay';
 
   @override
-  String get ocrTesterStepsSection => 'Pipeline steps';
+  String get ocrTesterStepsSection => 'Pijplijnstappen';
 
   @override
   String get ocrTesterLegendLabel => 'Label';
 
   @override
-  String get ocrTesterLegendNumeric => 'Numeric';
+  String get ocrTesterLegendNumeric => 'Numeriek';
 
   @override
-  String get ocrTesterLegendNoise => 'Noise';
+  String get ocrTesterLegendNoise => 'Ruis';
 
   @override
-  String get ocrTesterLegendDerived => 'Derived';
+  String get ocrTesterLegendDerived => 'Afgeleid';
 
   @override
-  String get ocrTesterStageGlare => 'Capture / glare';
+  String get ocrTesterStageGlare => 'Vastlegging / glare';
 
   @override
   String get ocrTesterStageMlkit => 'ML Kit';
 
   @override
-  String get ocrTesterStageClassify => 'Classify';
+  String get ocrTesterStageClassify => 'Classificeren';
 
   @override
-  String get ocrTesterStageAssemble => 'Assemble';
+  String get ocrTesterStageAssemble => 'Samenstellen';
 
   @override
-  String get ocrTesterStageAnchor => 'Anchor';
+  String get ocrTesterStageAnchor => 'Ankerpunt';
 
   @override
   String get ocrTesterStageFallback => 'Fallback';
@@ -6311,60 +6320,60 @@ class AppLocalizationsNl extends AppLocalizations {
   String get ocrTesterStageCrossCheck => 'Cross-check';
 
   @override
-  String get ocrTesterStageConfidence => 'Confidence';
+  String get ocrTesterStageConfidence => 'Betrouwbaarheid';
 
   @override
   String get ocrTesterStageGate => 'Gate';
 
   @override
-  String get ocrTesterStageBrand => 'Brand';
+  String get ocrTesterStageBrand => 'Merk';
 
   @override
-  String get ocrTesterStageOverrides => 'Overrides';
+  String get ocrTesterStageOverrides => 'Overschrijvingen';
 
   @override
-  String get ocrTesterStageReconcile => 'Reconcile';
+  String get ocrTesterStageReconcile => 'Afstemmen';
 
   @override
-  String get ocrTesterStageResult => 'Result';
+  String get ocrTesterStageResult => 'Resultaat';
 
   @override
-  String get ocrTesterChipRead => 'READ';
+  String get ocrTesterChipRead => 'GELEZEN';
 
   @override
-  String get ocrTesterChipDerived => 'DERIVED';
+  String get ocrTesterChipDerived => 'AFGELEID';
 
   @override
-  String get ocrTesterGateAccepted => 'Accepted';
+  String get ocrTesterGateAccepted => 'Geaccepteerd';
 
   @override
-  String get ocrTesterGateRejected => 'Rejected';
+  String get ocrTesterGateRejected => 'Geweigerd';
 
   @override
   String get ocrTesterFallbackBanner =>
-      'A field was recovered via magnitude fallback — verify it.';
+      'Een veld is hersteld via magnitude-fallback — verifieer het.';
 
   @override
-  String get ocrTesterStageNoData => 'Stage did not run.';
+  String get ocrTesterStageNoData => 'Stap niet uitgevoerd.';
 
   @override
-  String get ocrTesterCopyJson => 'Copy as JSON';
+  String get ocrTesterCopyJson => 'Kopiëren als JSON';
 
   @override
-  String get ocrTesterExportPackage => 'Export package';
+  String get ocrTesterExportPackage => 'Pakket exporteren';
 
   @override
-  String get ocrTesterCopied => 'OCR trace copied to clipboard.';
+  String get ocrTesterCopied => 'OCR-trace gekopieerd naar klembord.';
 
   @override
-  String get ocrTesterExported => 'OCR package saved to your Downloads folder.';
+  String get ocrTesterExported => 'OCR-pakket opgeslagen in de map Downloads.';
 
   @override
-  String get ocrTesterSaveFixture => 'Save as fixture';
+  String get ocrTesterSaveFixture => 'Opslaan als fixture';
 
   @override
   String get ocrTesterFixtureSaved =>
-      'Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.';
+      'Fixture opgeslagen in de map Downloads. Verplaats het naar test/fixtures en voer tool/promote_ocr_fixture.dart uit.';
 
   @override
   String get onboardingObd2StepTitle => 'Verbind je OBD2-adapter';
@@ -6397,76 +6406,76 @@ class AppLocalizationsNl extends AppLocalizations {
   String get openNow => 'Open';
 
   @override
-  String get openNowClosed => 'Closed';
+  String get openNowClosed => 'Gesloten';
 
   @override
-  String get openHoursUnknown => 'Hours unknown';
+  String get openHoursUnknown => 'Openingstijden onbekend';
 
   @override
   String closesAt(String time) {
-    return 'Closes $time';
+    return 'Sluit $time';
   }
 
   @override
   String opensAt(String day, String time) {
-    return 'Opens $day $time';
+    return 'Opent $day $time';
   }
 
   @override
   String opensToday(String time) {
-    return 'Opens $time';
+    return 'Opent $time';
   }
 
   @override
-  String get open24Hours => 'Open 24 hours';
+  String get open24Hours => '24 uur open';
 
   @override
-  String get badge24h => '24h';
+  String get badge24h => '24u';
 
   @override
-  String get openingHoursAutomate24h => '24/7 automate';
+  String get openingHoursAutomate24h => '24/7 automatiseren';
 
   @override
-  String get dayMon => 'Monday';
+  String get dayMon => 'Maandag';
 
   @override
-  String get dayTue => 'Tuesday';
+  String get dayTue => 'Dinsdag';
 
   @override
-  String get dayWed => 'Wednesday';
+  String get dayWed => 'Woensdag';
 
   @override
-  String get dayThu => 'Thursday';
+  String get dayThu => 'Donderdag';
 
   @override
-  String get dayFri => 'Friday';
+  String get dayFri => 'Vrijdag';
 
   @override
-  String get daySat => 'Saturday';
+  String get daySat => 'Zaterdag';
 
   @override
-  String get daySun => 'Sunday';
+  String get daySun => 'Zondag';
 
   @override
-  String get dayShortMon => 'Mon';
+  String get dayShortMon => 'Ma';
 
   @override
-  String get dayShortTue => 'Tue';
+  String get dayShortTue => 'Di';
 
   @override
-  String get dayShortWed => 'Wed';
+  String get dayShortWed => 'Wo';
 
   @override
-  String get dayShortThu => 'Thu';
+  String get dayShortThu => 'Do';
 
   @override
-  String get dayShortFri => 'Fri';
+  String get dayShortFri => 'Vr';
 
   @override
-  String get dayShortSat => 'Sat';
+  String get dayShortSat => 'Za';
 
   @override
-  String get dayShortSun => 'Sun';
+  String get dayShortSun => 'Zo';
 
   @override
   String dayRange(String from, String to) {
@@ -6474,43 +6483,43 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get publicHolidays => 'Public holidays';
+  String get publicHolidays => 'Feestdagen';
 
   @override
-  String get closedLabel => 'Closed';
+  String get closedLabel => 'Gesloten';
 
   @override
-  String get openingHoursNotAvailable => 'Opening hours not available';
+  String get openingHoursNotAvailable => 'Openingstijden niet beschikbaar';
 
   @override
-  String get showAllHours => 'Show all hours';
+  String get showAllHours => 'Alle tijden tonen';
 
   @override
-  String get showLessHours => 'Show less';
+  String get showLessHours => 'Minder tonen';
 
   @override
-  String get tripRecordingPipEstConsumptionCaption => 'est. L/100 km';
+  String get tripRecordingPipEstConsumptionCaption => 'gesch. L/100 km';
 
   @override
   String get tripRecordingEstimatedInfo =>
-      'Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle\'s calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.';
+      'Geschatte waarde (~) — voor deze rit is geen brandstofmeter aanwezig, dus het L/100 km-getal is berekend op basis van GPS-snelheid en de kalibratie van je voertuig. Het is een benadering (doorgaans ±10–30 %, verbetert naarmate de kalibratie rijper wordt), geen gemeten waarde.';
 
   @override
   String get tripRecordingPipElapsedCaption => 'verstreken';
 
   @override
-  String get radarPinHelpTitle => 'About pin';
+  String get radarPinHelpTitle => 'Over vastpinnen';
 
   @override
   String get radarPinHelpBody =>
-      'Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.';
+      'Vastpinnen houdt het scherm aan en verbergt systeembalken zodat de dichtstbijzijnde-stationweergave leesbaar blijft op een dashboardhouder. Tik nogmaals om los te maken. Wordt automatisch losgemaakt als de radar stopt.';
 
   @override
-  String get radarAutoPinTitle => 'Always pin when the radar starts';
+  String get radarAutoPinTitle => 'Altijd vastpinnen als de radar start';
 
   @override
   String get radarAutoPinSubtitle =>
-      'Pin the radar automatically every time instead of tapping each time. Uses more battery.';
+      'De radar automatisch elke keer vastpinnen in plaats van elke keer te tikken. Verbruikt meer batterij.';
 
   @override
   String get alertsRadiusFrequencyLabel => 'Controlefrequentie';
@@ -6557,11 +6566,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get reconcileWorkflowTitle => 'Reconcile your fuel';
+  String get reconcileWorkflowTitle => 'Brandstof afstemmen';
 
   @override
   String reconcileWorkflowExplainHeadline(String gap) {
-    return 'We found a $gap L gap';
+    return 'We vonden een verschil van $gap L';
   }
 
   @override
@@ -6570,82 +6579,83 @@ class AppLocalizationsNl extends AppLocalizations {
     String consumed,
     String gap,
   ) {
-    return 'You pumped $pumped L, but your recorded trips only account for $consumed L. That leaves $gap L unexplained.';
+    return 'Je hebt $pumped L getankt, maar je geregistreerde ritten verantwoorden slechts $consumed L. Dat laat $gap L onverklaard.';
   }
 
   @override
   String get reconcileWorkflowExplainCauses =>
-      'This usually means a drive wasn\'t recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.';
+      'Dit betekent doorgaans dat een rit niet is geregistreerd (de adapter was losgekoppeld of de app was gesloten), of dat een tankbeurt ontbreekt of verkeerd is ingevoerd.';
 
   @override
   String get reconcileWorkflowExplainConsequence =>
-      'Until this is resolved, your fuel total and your trips total won\'t match.';
+      'Zolang dit niet is opgelost, kloppen je brandstoftotaal en rijtotaal niet met elkaar.';
 
   @override
-  String get reconcileWorkflowAttributeQuestion => 'Help us attribute the gap';
+  String get reconcileWorkflowAttributeQuestion =>
+      'Help ons het verschil toe te wijzen';
 
   @override
   String get reconcileWorkflowFillUpsCompleteQuestion =>
-      'Are all your fill-ups for this tank complete and correct?';
+      'Zijn alle tankbeurten voor deze tank volledig en correct?';
 
   @override
   String get reconcileWorkflowDrivesRecordedQuestion =>
-      'Are all your drives recorded?';
+      'Zijn alle ritten geregistreerd?';
 
   @override
-  String get reconcileWorkflowAnswerYes => 'Yes';
+  String get reconcileWorkflowAnswerYes => 'Ja';
 
   @override
-  String get reconcileWorkflowAnswerNo => 'No';
+  String get reconcileWorkflowAnswerNo => 'Nee';
 
   @override
   String get reconcileWorkflowPathAHint =>
-      'A fill-up is missing or wrong — we\'ll add a correction so your fill-ups add up.';
+      'Een tankbeurt ontbreekt of is fout — we voegen een correctie toe zodat je tankbeurten kloppen.';
 
   @override
   String get reconcileWorkflowPathBHint =>
-      'Your fill-ups are right and a drive went unrecorded — we\'ll add a virtual trip for the missing distance.';
+      'Je tankbeurten kloppen en een rit is niet geregistreerd — we voegen een virtuele rit toe voor de ontbrekende afstand.';
 
   @override
-  String get reconcileWorkflowCorrectionLitersLabel => 'Correction litres';
+  String get reconcileWorkflowCorrectionLitersLabel => 'Correctieliter';
 
   @override
   String get reconcileWorkflowVirtualDistanceLabel =>
-      'How far was the unrecorded drive? (km)';
+      'Hoe ver was de niet-geregistreerde rit? (km)';
 
   @override
-  String get reconcileWorkflowDecideLater => 'Decide later';
+  String get reconcileWorkflowDecideLater => 'Later beslissen';
 
   @override
-  String get reconcileWorkflowBack => 'Back';
+  String get reconcileWorkflowBack => 'Terug';
 
   @override
-  String get reconcileWorkflowNext => 'Next';
+  String get reconcileWorkflowNext => 'Volgende';
 
   @override
-  String get reconcileWorkflowApply => 'Apply';
+  String get reconcileWorkflowApply => 'Toepassen';
 
   @override
-  String get reconcileVirtualTrajetLabel => 'Virtual trip — tap to edit';
+  String get reconcileVirtualTrajetLabel => 'Virtuele rit — tik om te bewerken';
 
   @override
-  String get reconcileVirtualTrajetEditTitle => 'Edit virtual trip';
+  String get reconcileVirtualTrajetEditTitle => 'Virtuele rit bewerken';
 
   @override
   String get reconcileVirtualTrajetEditExplainer =>
-      'This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.';
+      'Deze rit is toegevoegd om brandstof te verantwoorden die je hebt verbruikt zonder registratie. Pas de afstand of brandstof aan, of verwijder de rit.';
 
   @override
-  String get reconcileVirtualTrajetDelete => 'Delete virtual trip';
+  String get reconcileVirtualTrajetDelete => 'Virtuele rit verwijderen';
 
   @override
   String reconcileResolveGapBanner(String gap) {
-    return 'Unresolved fuel/trip gap of $gap L — tap to resolve';
+    return 'Onopgelost brandstof-/ritverschil van $gap L — tik om op te lossen';
   }
 
   @override
   String get reconcileResolveGapSemanticLabel =>
-      'Resolve unresolved fuel and trip gap';
+      'Onopgelost brandstof- en ritverschil oplossen';
 
   @override
   String get refuelUnitPerLiter => '/L';
@@ -6657,23 +6667,23 @@ class AppLocalizationsNl extends AppLocalizations {
   String get refuelUnitPerSession => '/sessie';
 
   @override
-  String get shareReceiptImporting => 'Importing shared receipt…';
+  String get shareReceiptImporting => 'Gedeelde bon importeren…';
 
   @override
   String get shareReceiptUnsupportedFormat =>
-      'That file type can\'t be imported yet — share a photo of the receipt instead.';
+      'Dit bestandstype kan nog niet worden geïmporteerd — deel in plaats daarvan een foto van de bon.';
 
   @override
   String get shareReceiptFailed =>
-      'Couldn\'t read the shared receipt — try sharing it again or add the fill-up manually.';
+      'De gedeelde bon kon niet worden gelezen — probeer opnieuw te delen of voeg de tankbeurt handmatig toe.';
 
   @override
   String get featureLabel_addFillUpShareIntentReceipt =>
-      'Share receipt to import';
+      'Bon delen om te importeren';
 
   @override
   String get featureDescription_addFillUpShareIntentReceipt =>
-      'Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.';
+      'Deel een bonfoto vanuit een andere app om een tankbeurt voor te invullen — datum, liters, totaal en station worden op het apparaat uitgelezen.';
 
   @override
   String get speedConsumptionCardTitle => 'Verbruik per snelheid';
@@ -6872,13 +6882,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Opname starten…';
 
   @override
-  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+  String get tripSaveProgressFinalizingSummary => 'Samenvatting afronden…';
 
   @override
-  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+  String get tripSaveProgressSavingToHistory => 'Opslaan in geschiedenis…';
 
   @override
-  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+  String get tripSaveProgressSyncingToCloud =>
+      'Op de achtergrond synchroniseren…';
 
   @override
   String get trajetsEmptyStateTitle => 'Nog geen ritten';
@@ -6951,16 +6962,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Motorbelasting (%)';
 
   @override
-  String get trajetDetailChartThrottle => 'Throttle / pedal (%)';
+  String get trajetDetailChartThrottle => 'Gasklep / pedaal (%)';
 
   @override
-  String get trajetDetailChartCoolant => 'Coolant (°C)';
+  String get trajetDetailChartCoolant => 'Koelvloeistof (°C)';
 
   @override
-  String get trajetDetailChartAltitude => 'Altitude (m)';
+  String get trajetDetailChartAltitude => 'Hoogte (m)';
 
   @override
-  String get trajetDetailChartLambda => 'Commanded λ';
+  String get trajetDetailChartLambda => 'Ingestelde λ';
 
   @override
   String get trajetDetailChartsSection => 'Grafieken';
@@ -6976,7 +6987,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Geen steekproeven geregistreerd';
 
   @override
-  String get trajetDetailChartEstimatedBadge => 'estimated';
+  String get trajetDetailChartEstimatedBadge => 'geschat';
 
   @override
   String get trajetDetailShareAction => 'Delen';
@@ -7000,13 +7011,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deelafbeelding kon niet worden gegenereerd';
 
   @override
-  String get trajetDetailDownloadCsvOption => 'Download telemetry (CSV)';
+  String get trajetDetailDownloadCsvOption => 'Telemetrie downloaden (CSV)';
 
   @override
-  String get trajetDetailDownloadJsonOption => 'Download telemetry (JSON)';
+  String get trajetDetailDownloadJsonOption => 'Telemetrie downloaden (JSON)';
 
   @override
-  String get trajetDetailDownloadError => 'Couldn\'t save the file';
+  String get trajetDetailDownloadError => 'Bestand kon niet worden opgeslagen';
 
   @override
   String get trajetDetailDeleteAction => 'Verwijderen';
@@ -7090,28 +7101,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tripPathLegendWasteful => 'Verspillend (≥ 10 L/100km)';
 
   @override
-  String get tripRadarClosestStation => 'Closest station';
+  String get tripRadarClosestStation => 'Tankstation Radar';
 
   @override
-  String get tripRadarScanning => 'Scanning for nearby stations';
+  String get tripRadarScanning => 'Scannen op nabijgelegen stations';
 
   @override
-  String get tripRadarNoStationNearby => 'No station nearby';
+  String get tripRadarNoStationNearby => 'Geen station in de buurt';
 
   @override
-  String get fuelStationRadarNearer => 'Nearer station';
+  String get fuelStationRadarNearer => 'Dichter station';
 
   @override
-  String get fuelStationRadarFarther => 'Farther station';
+  String get fuelStationRadarFarther => 'Verder station';
 
   @override
-  String get fuelStationRadarStart => 'Start fuel station radar';
+  String get fuelStationRadarStart => 'Tankstation Radar starten';
 
   @override
-  String get stopRadar => 'Stop radar';
+  String get stopRadar => 'Radar stoppen';
 
   @override
-  String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
+  String get fuelStationRadarResultBadge => 'Tankstation Radar-resultaat';
 
   @override
   String get tripRecordingPinTooltip =>
@@ -7161,18 +7172,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Opname starten…';
 
   @override
-  String get tripRecordingSavingTitle => 'Saving trip…';
+  String get tripRecordingSavingTitle => 'Rit opslaan…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>
-      'Recording discarded — no movement detected';
+      'Opname verwijderd — geen beweging gedetecteerd';
 
   @override
-  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+  String get tripRecordingGpsNotificationTitle => 'Rit wordt opgenomen';
 
   @override
   String get tripRecordingGpsNotificationText =>
-      'Tracking your route for fuel & driving stats';
+      'Route volgen voor brandstof- en rijstatistieken';
 
   @override
   String get tripShareAction => 'Delen met een ander account';
@@ -7262,23 +7273,23 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String stationUpdatedLabel(String time) {
-    return 'Updated $time';
+    return 'Bijgewerkt $time';
   }
 
   @override
   String amenityMoreTooltip(String names) {
-    return 'Also: $names';
+    return 'Ook: $names';
   }
 
   @override
-  String get favoriteAdd => 'Add to favorites';
+  String get favoriteAdd => 'Toevoegen aan favorieten';
 
   @override
-  String get favoriteRemove => 'Remove from favorites';
+  String get favoriteRemove => 'Verwijderen uit favorieten';
 
   @override
   String loyaltyRawPriceTooltip(String price) {
-    return 'Raw: $price';
+    return 'Origineel: $price';
   }
 
   @override
@@ -7406,7 +7417,7 @@ class AppLocalizationsNl extends AppLocalizations {
     String euros,
     String cents,
   ) {
-    return '$name, $distanceKm kilometers ahead, $fuelType $euros euros $cents';
+    return '$name, $distanceKm kilometer verderop, $fuelType $euros euro $cents';
   }
 
   @override

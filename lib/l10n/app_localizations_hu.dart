@@ -63,11 +63,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get routeSearchPartialBanner => 'További állomások keresése…';
 
   @override
-  String get routeSearchingChip => 'Searching the route…';
+  String get routeSearchingChip => 'Az útvonal keresése…';
 
   @override
   String routeSegmentSummaryBadge(String km) {
-    return 'Every $km km';
+    return 'Minden $km km-ben';
   }
 
   @override
@@ -671,17 +671,17 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String profileSwitchedTo(String profile) {
-    return 'Switched to $profile';
+    return 'Átváltva: $profile';
   }
 
   @override
   String profileCreatedNamed(String name) {
-    return 'Profile $name created';
+    return '$name profil létrehozva';
   }
 
   @override
   String profileCountryTaken(String country) {
-    return 'A profile for $country already exists — edit it instead.';
+    return '$country profilja már létezik — szerkessze helyette.';
   }
 
   @override
@@ -798,28 +798,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get evPricingUnavailable => 'Árazás nem elérhető a szolgáltatótól';
 
   @override
-  String get evPriceFree => 'Free';
+  String get evPriceFree => 'Ingyenes';
 
   @override
-  String get evPricePayAtLocation => 'Pay at location';
+  String get evPricePayAtLocation => 'Helyszíni fizetés';
 
   @override
-  String get evPriceMembership => 'Membership required';
+  String get evPriceMembership => 'Tagság szükséges';
 
   @override
-  String get evPriceIndicative => 'Indicative price';
+  String get evPriceIndicative => 'Tájékoztató ár';
 
   @override
   String get evPriceDeclaredByOperator =>
-      'Indicative price declared by the operator — verify on site';
+      'Az üzemeltető által megadott tájékoztató ár — ellenőrizze a helyszínen';
 
   @override
   String get evPriceFranceAttribution =>
-      'Pricing: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
+      'Árazás: Base nationale des IRVE — Licence Ouverte / data.gouv.fr / ODRÉ';
 
   @override
   String get evPriceBestEffortOcm =>
-      'Best-effort pricing from OpenChargeMap — sparse and may be incomplete.';
+      'Legjobb erőfeszítéssel megadott ár az OpenChargeMap-ből — ritka és hiányos lehet.';
 
   @override
   String get evLastUpdated => 'Utoljára frissítve';
@@ -1035,55 +1035,55 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String calculatorDistanceLabel(String unit) {
-    return 'Distance ($unit)';
+    return 'Távolság ($unit)';
   }
 
   @override
   String calculatorConsumptionLabel(String unit) {
-    return 'Consumption ($unit)';
+    return 'Fogyasztás ($unit)';
   }
 
   @override
   String calculatorPriceLabel(String unit) {
-    return 'Fuel price ($unit)';
+    return 'Üzemanyag ára ($unit)';
   }
 
   @override
-  String get calculatorUseMine => 'Use';
+  String get calculatorUseMine => 'Használat';
 
   @override
-  String get calculatorApplied => 'Applied';
+  String get calculatorApplied => 'Alkalmazva';
 
   @override
-  String get tripDetails => 'Trip details';
+  String get tripDetails => 'Út részletei';
 
   @override
-  String get calculatorRoundTrip => 'Round trip';
+  String get calculatorRoundTrip => 'Oda-vissza';
 
   @override
-  String get roundTripTotal => 'Round trip';
+  String get roundTripTotal => 'Oda-vissza összesen';
 
   @override
-  String get costPerDistance => 'Cost per km';
+  String get costPerDistance => 'Költség km-enként';
 
   @override
-  String get costPerMonth => 'Cost per month';
+  String get costPerMonth => 'Havi költség';
 
   @override
-  String get calculatorEstimateMonthly => 'Estimate monthly cost';
+  String get calculatorEstimateMonthly => 'Havi költség becslése';
 
   @override
-  String get calculatorTripsPerMonth => 'Trips per month';
+  String get calculatorTripsPerMonth => 'Utak száma havonta';
 
   @override
-  String get calculatorTripsPerMonthHint => 'e.g. 20';
+  String get calculatorTripsPerMonthHint => 'pl. 20';
 
   @override
-  String get calculatorReset => 'Reset';
+  String get calculatorReset => 'Visszaállítás';
 
   @override
   String get calculatorResultPlaceholder =>
-      'Fill in distance, consumption and price to see your trip cost';
+      'Adja meg a távolságot, fogyasztást és árat az út költségének megtekintéséhez';
 
   @override
   String get priceHistory => 'Ártörténet';
@@ -2175,14 +2175,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez törli az ehhez a járműhöz tanult összes mintát. A profil újbóli feltöltéséig visszatér az alap értékekhez.';
 
   @override
-  String get vehicleBaselineShowDetails => 'Show per-situation breakdown';
+  String get vehicleBaselineShowDetails => 'Helyzetenkénti bontás mutatása';
 
   @override
-  String get vehicleBaselineHideDetails => 'Hide per-situation breakdown';
+  String get vehicleBaselineHideDetails => 'Helyzetenkénti bontás elrejtése';
 
   @override
   String vehicleBaselineMissingWarning(String situations) {
-    return 'Not detected yet: $situations. These driving situations still read 0 samples, so the baseline is incomplete.';
+    return 'Még nem észlelt: $situations. Ezek a vezetési helyzetek még 0 mintát tartalmaznak, így az alap hiányos.';
   }
 
   @override
@@ -2315,13 +2315,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get situationClimbing => 'Emelkedő / terhelt';
 
   @override
-  String get situationColdStart => 'Cold start';
+  String get situationColdStart => 'Hidegindítás';
 
   @override
-  String get situationSustainedLoad => 'Sustained load / towing';
+  String get situationSustainedLoad => 'Tartós terhelés / vontatás';
 
   @override
-  String get situationPartialDecel => 'Coasting';
+  String get situationPartialDecel => 'Gurulás';
 
   @override
   String get situationHardAccel => 'Erős gyorsítás';
@@ -2526,7 +2526,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get evStatusOutOfOrder => 'Meghibásodott';
 
   @override
-  String get evStatusPartial => 'Partly available';
+  String get evStatusPartial => 'Részlegesen elérhető';
 
   @override
   String get openOnlyFilter => 'Csak nyitva';
@@ -2571,22 +2571,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get sectionLocation => 'Helyszín';
 
   @override
-  String get sectionSetupDataSources => 'Setup & data sources';
+  String get sectionSetupDataSources => 'Beállítás és adatforrások';
 
   @override
-  String get sectionFeaturesUsage => 'Features & usage';
+  String get sectionFeaturesUsage => 'Funkciók és használat';
 
   @override
-  String get sectionAccountSync => 'Account & sync';
+  String get sectionAccountSync => 'Fiók és szinkronizálás';
 
   @override
-  String get sectionAppearanceWidgets => 'Appearance & widgets';
+  String get sectionAppearanceWidgets => 'Megjelenés és widgetek';
 
   @override
-  String get sectionPrivacyData => 'Privacy & data';
+  String get sectionPrivacyData => 'Adatvédelem és adatok';
 
   @override
-  String get sectionAdvancedDeveloper => 'Advanced & developer';
+  String get sectionAdvancedDeveloper => 'Haladó és fejlesztői';
 
   @override
   String get tooltipBack => 'Vissza';
@@ -2613,37 +2613,39 @@ class AppLocalizationsHu extends AppLocalizations {
   String get coachingEasePedal => 'Engedd a gázt';
 
   @override
-  String get coachingVoiceHardAcceleration => 'Easy on the accelerator';
+  String get coachingVoiceHardAcceleration => 'Óvatosan a gázpedállal';
 
   @override
-  String get coachingVoiceHarshBraking => 'Try to brake more gently';
+  String get coachingVoiceHarshBraking => 'Próbáljon lassabban fékezni';
 
   @override
-  String get coachingVoiceShiftUp => 'Shift up a gear to save fuel';
+  String get coachingVoiceShiftUp =>
+      'Kapcsoljon felsőbb fokozatba az üzemanyag-megtakarításhoz';
 
   @override
-  String get coachingVoiceShiftDown => 'Shift down, the engine is labouring';
+  String get coachingVoiceShiftDown =>
+      'Váltson alacsonyabb fokozatba, a motor túl sokat dolgozik';
 
   @override
   String get coachingVoiceEasePedal =>
-      'Ease off the pedal to cut your fuel use';
+      'Engedje fel a pedált az üzemanyag-fogyasztás csökkentéséhez';
 
   @override
-  String get coachingVoiceLiftOff => 'Lift off the accelerator and coast';
+  String get coachingVoiceLiftOff => 'Engedje fel a gázpedált és guruljon';
 
   @override
   String get coachingVoiceAnticipateBrake =>
-      'Look further ahead and lift off earlier';
+      'Nézzen távolabbra és emelje fel korábban a lábát';
 
   @override
-  String get coachingVoiceSmoothAccel => 'Accelerate more smoothly';
+  String get coachingVoiceSmoothAccel => 'Gyorsítson simábban';
 
   @override
-  String get voiceCoachingSettingTitle => 'Spoken driving coaching';
+  String get voiceCoachingSettingTitle => 'Hangos vezetési coaching';
 
   @override
   String get voiceCoachingSettingSubtitle =>
-      'Hear spoken tips while you drive — hard acceleration, harsh braking and gear hints';
+      'Halljon hangos tippeket vezetés közben — erős gyorsítás, hirtelen fékezés és sebességváltó-javaslatok';
 
   @override
   String get tooltipUseGps => 'GPS-helyzet használata';
@@ -3412,7 +3414,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get obd2GpsDegradedBannerTitle =>
-      'Recording with GPS — OBD2 reconnecting';
+      'Rögzítés GPS-sel — OBD2 újracsatlakozik';
 
   @override
   String get obd2GpsDegradedPassiveWaitingBanner =>
@@ -3432,10 +3434,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez elveti a tanult volumetrikus hatékonyságot (η_v), és visszaállítja az alapértéket (0,85). Az útszintű üzemanyag-áramlás becslések visszaesnek a gyártói konstansra, amíg a kalibrátor új mintákat nem gyűjt a következő utakból.';
 
   @override
-  String get alertsStationSectionTitle => 'Station alerts';
+  String get alertsStationSectionTitle => 'Állomásriasztások';
 
   @override
-  String get alertsStationAdd => 'Add a station alert';
+  String get alertsStationAdd => 'Állomásriasztás hozzáadása';
 
   @override
   String get alertsRadiusSectionTitle => 'Sugárkörös riasztások';
@@ -3481,7 +3483,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String radiusAlertDeleted(String name) {
-    return 'Radius alert \"$name\" deleted';
+    return '\"$name\" sugaras riasztás törölve';
   }
 
   @override
@@ -3714,12 +3716,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String fuelStationRadarDistanceKm(String km) {
-    return '$km km away';
+    return '$km km-re';
   }
 
   @override
   String fuelStationRadarProximity(int percent) {
-    return 'Proximity $percent%';
+    return 'Közelség: $percent%';
   }
 
   @override
@@ -3844,47 +3846,48 @@ class AppLocalizationsHu extends AppLocalizations {
       'A biztonsági mentés exportálása sikertelen — kérjük, próbálja újra';
 
   @override
-  String get backupExportProgress => 'Exporting your backup…';
+  String get backupExportProgress => 'Biztonsági mentés exportálása…';
 
   @override
   String exportBackupSavedAs(String fileName) {
-    return 'Saved to Downloads as $fileName';
+    return 'Mentve a Letöltésekbe: $fileName';
   }
 
   @override
-  String get restoreBackupTooltip => 'Restore backup';
+  String get restoreBackupTooltip => 'Biztonsági mentés visszaállítása';
 
   @override
-  String get restoreBackupDialogTitle => 'Restore backup';
+  String get restoreBackupDialogTitle => 'Biztonsági mentés visszaállítása';
 
   @override
   String get restoreBackupDialogBody =>
-      'Merge adds and updates records from the backup and keeps everything already on this device. Replace deletes all current data first, then restores only the backup — this cannot be undone.';
+      'Az összevonás hozzáadja és frissíti a biztonsági mentés rekordjait, és megőriz mindent, ami már az eszközön van. A csere először törli az összes jelenlegi adatot, majd csak a biztonsági mentést állítja vissza — ez nem vonható vissza.';
 
   @override
-  String get restoreBackupMergeAction => 'Merge';
+  String get restoreBackupMergeAction => 'Összevonás';
 
   @override
-  String get restoreBackupReplaceAction => 'Replace all';
+  String get restoreBackupReplaceAction => 'Összes cseréje';
 
   @override
   String restoreBackupSuccess(int count) {
-    return 'Backup restored — $count records imported';
+    return 'Biztonsági mentés visszaállítva — $count rekord importálva';
   }
 
   @override
-  String get restoreBackupEmpty => 'Backup restored — it contained no records';
+  String get restoreBackupEmpty =>
+      'Biztonsági mentés visszaállítva — nem tartalmazott rekordokat';
 
   @override
   String get restoreBackupCorrupt =>
-      'Restore failed — this file is not a valid Tankstellen backup';
+      'Visszaállítás sikertelen — ez a fájl nem érvényes Tankstellen biztonsági mentés';
 
   @override
   String get restoreBackupFailed =>
-      'Restore failed — the file could not be read';
+      'Visszaállítás sikertelen — a fájl nem olvasható';
 
   @override
-  String get backupImportProgress => 'Restoring your backup…';
+  String get backupImportProgress => 'Biztonsági mentés visszaállítása…';
 
   @override
   String restoreBackupMergedSummary(
@@ -3893,7 +3896,7 @@ class AppLocalizationsHu extends AppLocalizations {
     int trips,
     int chargingLogs,
   ) {
-    return 'Merged $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+    return '$vehicles jármű, $fillUps tankolás, $trips út, $chargingLogs töltési napló összevonva';
   }
 
   @override
@@ -3903,7 +3906,7 @@ class AppLocalizationsHu extends AppLocalizations {
     int trips,
     int chargingLogs,
   ) {
-    return 'Replaced all data with $vehicles vehicles, $fillUps fill-ups, $trips trips, $chargingLogs charging logs';
+    return 'Minden adat felváltva: $vehicles jármű, $fillUps tankolás, $trips út, $chargingLogs töltési napló';
   }
 
   @override
@@ -4167,16 +4170,16 @@ class AppLocalizationsHu extends AppLocalizations {
       'Automatikus OBD2-útfelvételt ad hozzá. Párosított adapter szükséges.';
 
   @override
-  String get consoGroupVehicles => 'Vehicles';
+  String get consoGroupVehicles => 'Járművek';
 
   @override
-  String get consoGroupCoaching => 'Coaching while driving';
+  String get consoGroupCoaching => 'Vezetés közbeni coaching';
 
   @override
-  String get consoGroupRewards => 'Rewards & savings';
+  String get consoGroupRewards => 'Jutalmak és megtakarítások';
 
   @override
-  String get consoGroupTroubleshooting => 'Troubleshooting';
+  String get consoGroupTroubleshooting => 'Hibaelhárítás';
 
   @override
   String consumptionAccuracyLabel(String level, String band) {
@@ -4205,35 +4208,35 @@ class AppLocalizationsHu extends AppLocalizations {
       'Csak GPS — még egyetlen tankolás sem rögzítette a fogyasztási modellt. Adj hozzá néhány teljes tankolást a pontosság javításához.';
 
   @override
-  String get moreActionsTooltip => 'More';
+  String get moreActionsTooltip => 'Több';
 
   @override
-  String get exportBackupMenuLabel => 'Export backup';
+  String get exportBackupMenuLabel => 'Biztonsági mentés exportálása';
 
   @override
-  String get restoreBackupMenuLabel => 'Restore backup';
+  String get restoreBackupMenuLabel => 'Biztonsági mentés visszaállítása';
 
   @override
-  String get carbonDashboardMenuLabel => 'Carbon dashboard';
+  String get carbonDashboardMenuLabel => 'Szén-dioxid irányítópult';
 
   @override
-  String get settingsMenuLabel => 'Settings';
+  String get settingsMenuLabel => 'Beállítások';
 
   @override
-  String get consumptionStatsPageTitle => 'Consumption statistics';
+  String get consumptionStatsPageTitle => 'Fogyasztási statisztikák';
 
   @override
-  String get consumptionStatsComparisonTitle => 'This month vs last month';
+  String get consumptionStatsComparisonTitle => 'Ez a hónap vs. múlt hónap';
 
   @override
-  String get consumptionStatsTrendsTitle => 'Evolution over time';
+  String get consumptionStatsTrendsTitle => 'Időbeli fejlődés';
 
   @override
   String get consumptionStatsNeedTwoMonths =>
-      'Log fill-ups across at least two months to compare.';
+      'Legalább két hónap tankolásait naplózza az összehasonlításhoz.';
 
   @override
-  String get consumptionStatsPricePerLiter => 'Avg price/L';
+  String get consumptionStatsPricePerLiter => 'Átlagos ár/L';
 
   @override
   String consumptionStatsDeltaPercent(String pct) {
@@ -4241,16 +4244,16 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get consumptionStatsChartLiters => 'Litres per month';
+  String get consumptionStatsChartLiters => 'Liter havonta';
 
   @override
-  String get consumptionStatsChartSpend => 'Spend per month';
+  String get consumptionStatsChartSpend => 'Kiadás havonta';
 
   @override
-  String get consumptionStatsChartPricePerLiter => 'Price per litre';
+  String get consumptionStatsChartPricePerLiter => 'Ár literenként';
 
   @override
-  String get consumptionStatsChartConsumption => 'L/100km per month';
+  String get consumptionStatsChartConsumption => 'L/100km havonta';
 
   @override
   String consumptionStatsOpenWindowBanner(int count) {
@@ -4271,7 +4274,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String statCorrectionLiters(String liters) {
-    return 'Corrections: +$liters L';
+    return 'Korrekciók: +$liters L';
   }
 
   @override
@@ -4318,12 +4321,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String dataSourceLinkSemantic(String source, String license) {
-    return 'Open the $source data source ($license) in your browser';
+    return 'Nyissa meg a $source adatforrást ($license) a böngészőben';
   }
 
   @override
   String mapAttributionOsm(String brand) {
-    return '© $brand contributors';
+    return '© $brand közreműködők';
   }
 
   @override
@@ -4407,7 +4410,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get developerToolsTestAlertNoStation =>
-      'Search for stations first, then run the test alert so the notification can open a real station.';
+      'Először keressen állomásokat, majd futtassa a tesztriadót, hogy az értesítés valódi állomást nyithasson meg.';
 
   @override
   String get developerToolsDiagnosticsGroupTitle => 'Diagnosztika';
@@ -4519,21 +4522,21 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String insightFullThrottle(String pctTime, String liters) {
-    return 'Full throttle ($pctTime% of trip): wasted $liters L';
+    return 'Teljes gáz (az út $pctTime%-a): $liters L pazarlás';
   }
 
   @override
   String get lessonAdviceFullThrottle =>
-      'Ease onto the pedal — a gentler 70 % of the throttle gets you up to speed on far less fuel.';
+      'Nyomja le finoman a pedált — kíméletes, 70%-os gáznyomással sokkal kevesebb üzemanyaggal éri el a kívánt sebességet.';
 
   @override
   String insightLambdaEnrichment(String pctTime, String liters) {
-    return 'Rich mixture under load ($pctTime% of trip): wasted $liters L';
+    return 'Gazdag keverék terhelés alatt (az út $pctTime%-a): $liters L pazarlás';
   }
 
   @override
   String get lessonAdviceLambdaEnrichment =>
-      'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.';
+      'A nagy, tartós terhelés gazdag keveréket okoz — korai sebességváltással és visszafogással hosszú emelkedőkön tartsa soványan a keveréket.';
 
   @override
   String insightClimbingCost(
@@ -4541,21 +4544,21 @@ class AppLocalizationsHu extends AppLocalizations {
     String pctTime,
     String liters,
   ) {
-    return 'Climbing at $gradePercent% grade ($pctTime% of trip): wasted $liters L';
+    return 'Emelkedő mászása $gradePercent%-os lejtőn (az út $pctTime%-a): $liters L pazarlás';
   }
 
   @override
   String get lessonAdviceClimbingCost =>
-      'Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.';
+      'Vigyen lendületet a dombra, és adagolja finoman a gázt — emelkedőn való hirtelen gyorsítás extra üzemanyagot éget.';
 
   @override
   String insightRestartCost(String count, String liters) {
-    return '$count stop-and-go restarts: wasted $liters L';
+    return '$count stop-and-go újraindulás: $liters L pazarlás';
   }
 
   @override
   String get lessonAdviceRestartCost =>
-      'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.';
+      'Számolja előre a forgalmat, és guruljon a megállók felé, hogy guruljon inkább, mint megálljon teljesen — a holttpontról való elindulás a legfogyasztóbb része a stop-and-go-nak.';
 
   @override
   String get drivingScoreCardTitle => 'Vezetési pontszám';
@@ -4588,71 +4591,72 @@ class AppLocalizationsHu extends AppLocalizations {
   String get drivingScorePenaltyFullThrottle => 'Teljes gáz';
 
   @override
-  String get drivingScoreClassVeryGood => 'Very good';
+  String get drivingScoreClassVeryGood => 'Kiváló';
 
   @override
-  String get drivingScoreClassGood => 'Good';
+  String get drivingScoreClassGood => 'Jó';
 
   @override
-  String get drivingScoreClassAverage => 'Average';
+  String get drivingScoreClassAverage => 'Átlagos';
 
   @override
-  String get drivingScoreClassBad => 'Needs work';
+  String get drivingScoreClassBad => 'Fejlesztésre szorul';
 
   @override
-  String get drivingScorePenaltyLugging => 'Lugging';
+  String get drivingScorePenaltyLugging => 'Túlterhelés';
 
   @override
-  String get drivingScorePenaltySmoothness => 'Jerky driving';
+  String get drivingScorePenaltySmoothness => 'Rázós vezetés';
 
   @override
-  String get drivingScorePenaltyHighSpeed => 'High speed';
+  String get drivingScorePenaltyHighSpeed => 'Nagy sebesség';
 
   @override
-  String get drivingScorePenaltyPedalVelocity => 'Aggressive pedal';
+  String get drivingScorePenaltyPedalVelocity => 'Agresszív pedál';
 
   @override
-  String get drivingScorePenaltyLambda => 'Rich mixture';
+  String get drivingScorePenaltyLambda => 'Gazdag keverék';
 
   @override
-  String get gpsKpiCardTitle => 'GPS efficiency';
+  String get gpsKpiCardTitle => 'GPS-hatékonyság';
 
   @override
-  String get gpsKpiRpa => 'Positive acceleration (RPA)';
+  String get gpsKpiRpa => 'Pozitív gyorsulás (RPA)';
 
   @override
-  String get gpsKpiPke => 'Kinetic energy demand (PKE)';
+  String get gpsKpiPke => 'Mozgási energia igény (PKE)';
 
   @override
-  String get gpsKpiVapos => 'Acceleration intensity (VAPOS)';
+  String get gpsKpiVapos => 'Gyorsulási intenzitás (VAPOS)';
 
   @override
-  String get gpsKpiCoast => 'Coasting share';
+  String get gpsKpiCoast => 'Gurulás aránya';
 
   @override
-  String get gpsKpiClimbEnergy => 'Climb energy';
+  String get gpsKpiClimbEnergy => 'Emelkedési energia';
 
   @override
   String drivingScoreBaselineDelta(String pct) {
-    return '$pct vs your efficient baseline';
+    return '$pct az Ön hatékony alapjához képest';
   }
 
   @override
-  String get drivingTraceCardTitle => 'Driving-analysis trace (dev)';
+  String get drivingTraceCardTitle => 'Vezetéselemzési nyomkövetés (fejl.)';
 
   @override
   String get drivingTraceCardBody =>
-      'Export this trip\'s GPS KPIs, score and lessons as JSON, write how the drive actually felt in the comment field, and share it back so the driving-style thresholds can be calibrated against real trips.';
+      'Exportálja az út GPS KPI-jeit, pontszámát és leckéit JSON-ként, írja le, hogyan érezte ténylegesen a menetet a megjegyzés mezőbe, és ossza meg vissza, hogy a vezetési stílus küszöbértékei valódi utakkal kalibrálhatók legyenek.';
 
   @override
-  String get drivingTraceExportAction => 'Export analysis trace';
+  String get drivingTraceExportAction => 'Elemzési nyomkövetés exportálása';
 
   @override
   String get drivingTraceExported =>
-      'Analysis trace saved to Downloads — add your verdict in the comment field and share it back.';
+      'Elemzési nyomkövetés mentve a Letöltésekbe — adja hozzá véleményét a megjegyzés mezőbe, és ossza meg vissza.';
 
   @override
-  String get drivingTraceExportFailed => 'Couldn\'t export the analysis trace.';
+  String get drivingTraceExportFailed =>
+      'Nem sikerült exportálni az elemzési nyomkövetést.';
 
   @override
   String get ecoRouteOption => 'Öko';
@@ -4932,61 +4936,63 @@ class AppLocalizationsHu extends AppLocalizations {
       'Megjelenít egy Fejlesztői eszközök szakaszt a beállításokban diagnosztikával: hibanapló exportálása, tesztértesítések, tesztriasztási folyamat futtatása, funkciójelzők listázása, gyorsítótárak törlése és diagnosztika másolása.';
 
   @override
-  String get featureLabel_approachOverlay => 'Approach overlay';
+  String get featureLabel_approachOverlay => 'Töltőállomás-radar';
 
   @override
   String get featureDescription_approachOverlay =>
-      'During a recorded trip, flip the floating tile to the fuel type\'s colour and show the price as you near a fuel station.';
+      'Az úszó utazáscsempét élő töltőállomás-radárrá alakítja — ahogy közeledik egy töltőállomáshoz, az üzemanyag típusának színére vált, és megjeleníti az árat.';
 
   @override
-  String get featureLabel_voiceAnnouncements => 'Voice announcements';
+  String get featureLabel_voiceAnnouncements => 'Hangos bejelentések';
 
   @override
   String get featureDescription_voiceAnnouncements =>
-      'Speak nearby cheap fuel stations aloud as you drive, so you can keep your eyes on the road.';
+      'Hangosan bejelenti a közeli olcsó töltőállomásokat vezetés közben, hogy szemét az úton tartsa.';
 
   @override
   String get featureBlockedEnable_voiceAnnouncements =>
-      'Enable the approach overlay first';
+      'Először engedélyezze a töltőállomás-radart';
 
   @override
-  String get featureGroupTitle_finding => 'Finding & map';
+  String get featureGroupTitle_finding => 'Keresés és térkép';
 
   @override
   String get featureGroupDescription_finding =>
-      'Where to fuel up or charge — search, map, routing.';
+      'Hol tankoljon vagy töltsön — keresés, térkép, útvonaltervezés.';
 
   @override
-  String get featureGroupTitle_prices => 'Prices & alerts';
+  String get featureGroupTitle_prices => 'Árak és riasztások';
 
   @override
   String get featureGroupDescription_prices =>
-      'Price drops, history, and reporting.';
+      'Áresések, előzmények és bejelentések.';
 
   @override
-  String get featureGroupTitle_radar => 'Fuel Station Radar';
+  String get featureGroupTitle_radar => 'Töltőállomás-radar';
 
   @override
-  String get featureGroupDescription_radar => 'Live price nudges as you drive.';
+  String get featureGroupDescription_radar => 'Élő árnudge-ok vezetés közben.';
 
   @override
-  String get featureGroupTitle_sync => 'Sync & backup';
+  String get featureGroupTitle_sync => 'Szinkronizálás és biztonsági mentés';
 
   @override
-  String get featureGroupDescription_sync => 'Keep your data across devices.';
+  String get featureGroupDescription_sync =>
+      'Tartsa meg adatait minden eszközön.';
 
   @override
-  String get featureGroupTitle_input => 'Input & scanning';
+  String get featureGroupTitle_input => 'Bevitel és szkennelés';
 
   @override
-  String get featureGroupDescription_input => 'Helpers for logging fill-ups.';
+  String get featureGroupDescription_input =>
+      'Segédeszközök a tankolások naplózásához.';
 
   @override
-  String get featureGroupTitle_developer => 'Developer & experimental';
+  String get featureGroupTitle_developer => 'Fejlesztői és kísérleti';
 
   @override
   String get featureGroupDescription_developer =>
-      'Power-user and contributor tools.';
+      'Haladó és közreműködői eszközök.';
 
   @override
   String get feedbackConsentTitle => 'Elküldi a jelentést GitHub-ra?';
@@ -5031,30 +5037,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Személyes hozzáférési token';
 
   @override
-  String get fillUpGuidanceTitle => 'Best time to fill up';
+  String get fillUpGuidanceTitle => 'Legjobb idő tankolni';
 
   @override
   String fillUpGuidanceGoodTimeNow(int days) {
-    return 'The current price is among the cheapest of the last $days days — a good time to fill up.';
+    return 'A jelenlegi ár az elmúlt $days nap legolcsóbbjai közé tartozik — jó alkalom tankolni.';
   }
 
   @override
   String fillUpGuidanceWaitCheaper(int days, String window) {
-    return 'Prices are near their $days-day high. They are usually cheaper $window — consider waiting.';
+    return 'Az árak közel vannak a $days napos csúcshoz. Általában olcsóbb $window — érdemes megvárni.';
   }
 
   @override
   String get fillUpGuidanceFillSoon =>
-      'Prices are trending up — consider filling up soon.';
+      'Az árak emelkedő tendenciát mutatnak — tankoljon hamarosan.';
 
   @override
   String fillUpGuidanceNeutral(int days) {
-    return 'Today\'s price is around the $days-day average.';
+    return 'A mai ár a $days napos átlag körül van.';
   }
 
   @override
   String fillUpGuidanceSaving(String amount) {
-    return 'Could save about $amount/L by timing your fill-up.';
+    return 'A tankolás időzítésével kb. $amount/L megtakarítás lehetséges.';
   }
 
   @override
@@ -5062,8 +5068,8 @@ class AppLocalizationsHu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Based on $count price readings',
-      one: 'Based on 1 price reading',
+      other: '$count áradat alapján',
+      one: '1 áradat alapján',
     );
     return '$_temp0';
   }
@@ -5075,52 +5081,52 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String fillUpGuidanceWindowDayOnly(String day) {
-    return 'on $day';
+    return '$day';
   }
 
   @override
   String fillUpGuidanceWindowPartOnly(String part) {
-    return 'in the $part';
+    return '$part';
   }
 
   @override
-  String get fillUpGuidanceWindowGeneric => 'at other times';
+  String get fillUpGuidanceWindowGeneric => 'más időpontokban';
 
   @override
-  String get fillUpGuidanceWeekday1 => 'Mondays';
+  String get fillUpGuidanceWeekday1 => 'Hétfőn';
 
   @override
-  String get fillUpGuidanceWeekday2 => 'Tuesdays';
+  String get fillUpGuidanceWeekday2 => 'Kedden';
 
   @override
-  String get fillUpGuidanceWeekday3 => 'Wednesdays';
+  String get fillUpGuidanceWeekday3 => 'Szerdán';
 
   @override
-  String get fillUpGuidanceWeekday4 => 'Thursdays';
+  String get fillUpGuidanceWeekday4 => 'Csütörtökön';
 
   @override
-  String get fillUpGuidanceWeekday5 => 'Fridays';
+  String get fillUpGuidanceWeekday5 => 'Pénteken';
 
   @override
-  String get fillUpGuidanceWeekday6 => 'Saturdays';
+  String get fillUpGuidanceWeekday6 => 'Szombaton';
 
   @override
-  String get fillUpGuidanceWeekday7 => 'Sundays';
+  String get fillUpGuidanceWeekday7 => 'Vasárnap';
 
   @override
-  String get fillUpGuidancePartEarlyMorning => 'early mornings';
+  String get fillUpGuidancePartEarlyMorning => 'kora reggel';
 
   @override
-  String get fillUpGuidancePartMorning => 'mornings';
+  String get fillUpGuidancePartMorning => 'reggel';
 
   @override
-  String get fillUpGuidancePartAfternoon => 'afternoons';
+  String get fillUpGuidancePartAfternoon => 'délután';
 
   @override
-  String get fillUpGuidancePartEvening => 'evenings';
+  String get fillUpGuidancePartEvening => 'este';
 
   @override
-  String get fillUpGuidancePartNight => 'nights';
+  String get fillUpGuidancePartNight => 'éjjel';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel =>
@@ -5169,7 +5175,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get scanPumpInconsistent =>
-      'The scanned values don\'t add up — please enter them manually.';
+      'A beolvasott értékek nem adnak össze — adja meg manuálisan.';
 
   @override
   String scanPumpFailed(String error) {
@@ -5278,7 +5284,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get pumpCameraRotateToLandscape =>
-      'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
+      'Fordítsa oldalra a telefont — a kút kijelzője széles, így a számok nagyobbak és egyenesek lesznek';
 
   @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
@@ -5361,10 +5367,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get vehicleSectionDrivetrainSubtitle => 'Hogyan mozog ez a jármű';
 
   @override
-  String get profileSectionDisplayStations => 'Display & stations';
+  String get profileSectionDisplayStations => 'Megjelenítés és állomások';
 
   @override
-  String get profileSectionRegion => 'Region';
+  String get profileSectionRegion => 'Régió';
 
   @override
   String get calibrationModeLabel => 'Kalibrációs mód';
@@ -5422,17 +5428,17 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String gpsDiagnosticsLargestGap(int seconds) {
-    return 'Largest gap: $seconds s';
+    return 'Legnagyobb rés: $seconds s';
   }
 
   @override
-  String get gpsLifecycleResumed => 'Resumed';
+  String get gpsLifecycleResumed => 'Folytatva';
 
   @override
-  String get gpsLifecyclePaused => 'Paused';
+  String get gpsLifecyclePaused => 'Szüneteltetve';
 
   @override
-  String get gpsLifecycleInactive => 'Inactive';
+  String get gpsLifecycleInactive => 'Inaktív';
 
   @override
   String get gpsKpiVerdictGood => 'Efficient';
@@ -5481,7 +5487,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tripAvgGpsEstimateTooltip =>
-      'GPS estimate (~) — no fuel sensor on this trip. The figure is modelled from speed and your vehicle\'s calibration; accuracy improves as the matrix matures.';
+      'GPS-becslés (~) — ezen az úton nincs üzemanyag-szenzor. Az érték sebességből és a jármű kalibrálásából van modellezve; a pontosság javul, ahogy a mátrix érik.';
 
   @override
   String get gpsRoadUseCardTitle => 'How you used the road';
@@ -5811,37 +5817,37 @@ class AppLocalizationsHu extends AppLocalizations {
   String get home => 'Kezdőlap';
 
   @override
-  String get accelBrakeCardTitle => 'Acceleration & braking';
+  String get accelBrakeCardTitle => 'Gyorsítás és fékezés';
 
   @override
-  String get accelBrakeHardAccel => 'Hard accelerations';
+  String get accelBrakeHardAccel => 'Erős gyorsítások';
 
   @override
-  String get accelBrakeHardBrake => 'Hard braking';
+  String get accelBrakeHardBrake => 'Hirtelen fékezések';
 
   @override
-  String get accelBrakeSharpCorner => 'Sharp corners';
+  String get accelBrakeSharpCorner => 'Éles kanyarok';
 
   @override
-  String get accelBrakeSource => 'From the phone\'s motion sensors';
+  String get accelBrakeSource => 'A telefon mozgásérzékelőiből';
 
   @override
   String lessonHardBrake(String count) {
-    return '$count hard braking events';
+    return '$count hirtelen fékezési esemény';
   }
 
   @override
   String get lessonAdviceHardBrake =>
-      'Anticipate stops and ease off the accelerator earlier — hard braking throws away the fuel you just spent getting up to speed.';
+      'Számolja előre a megállásokat, és korábban emelje fel a lábát a gázpedálról — a hirtelen fékezés elveszíti a sebességre fordított üzemanyagot.';
 
   @override
   String lessonSharpCornering(String count) {
-    return '$count sharp corners';
+    return '$count éles kanyar';
   }
 
   @override
   String get lessonAdviceSharpCornering =>
-      'Slow before the bend, not in it — hard cornering scrubs off speed you then have to rebuild.';
+      'Lassítson a kanyar előtt, ne benne — az éles kanyar elveszi a sebességet, amelyet aztán vissza kell nyerni.';
 
   @override
   String get locationConsentTitle => 'Helyhozzáférés';
@@ -5973,7 +5979,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az összehasonlításhoz havonta legalább 3 út szükséges';
 
   @override
-  String get consumptionMonthlyClimbLabel => 'Climbed';
+  String get consumptionMonthlyClimbLabel => 'Mászott';
 
   @override
   String get obd2CapabilitySectionTitle => 'Adapter-képességek';
@@ -6023,40 +6029,40 @@ class AppLocalizationsHu extends AppLocalizations {
       'OBD2-munkamenet naplójának megosztása';
 
   @override
-  String get obd2DiagnosticsTitle => 'OBD2 communication health';
+  String get obd2DiagnosticsTitle => 'OBD2 kommunikáció állapota';
 
   @override
   String obd2DiagnosticsHeader(String percent, String duty, int drops) {
     String _temp0 = intl.Intl.pluralLogic(
       drops,
       locale: localeName,
-      other: '$drops drops',
-      one: '1 drop',
-      zero: 'no drops',
+      other: '$drops kiesés',
+      one: '1 kiesés',
+      zero: 'nincs kiesés',
     );
-    return '$percent% complete · $duty% duty · $_temp0';
+    return '$percent% kész · $duty% terhelés · $_temp0';
   }
 
   @override
   String get obd2DiagnosticsAdapterSection => 'Adapter';
 
   @override
-  String get obd2DiagnosticsConnectionSection => 'Connection lifecycle';
+  String get obd2DiagnosticsConnectionSection => 'Kapcsolat életciklusa';
 
   @override
-  String get obd2DiagnosticsPidSection => 'Per-PID outcomes';
+  String get obd2DiagnosticsPidSection => 'PID-enkénti eredmények';
 
   @override
-  String get obd2DiagnosticsSchedulerSection => 'Scheduler health';
+  String get obd2DiagnosticsSchedulerSection => 'Ütemező állapota';
 
   @override
-  String get obd2DiagnosticsCompletenessSection => 'Completeness';
+  String get obd2DiagnosticsCompletenessSection => 'Teljesség';
 
   @override
-  String get obd2DiagnosticsSupportSection => 'Discovered-supported PIDs';
+  String get obd2DiagnosticsSupportSection => 'Felismert támogatott PID-ek';
 
   @override
-  String get obd2DiagnosticsFuelSection => 'Fuel-tier rollup';
+  String get obd2DiagnosticsFuelSection => 'Üzemanyag-szint összesítő';
 
   @override
   String obd2DiagnosticsAdapterIdentity(
@@ -6065,7 +6071,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String protocol,
     String mtu,
   ) {
-    return '$mac · $firmware · protocol $protocol · MTU $mtu';
+    return '$mac · $firmware · protokoll: $protocol · MTU $mtu';
   }
 
   @override
@@ -6076,12 +6082,12 @@ class AppLocalizationsHu extends AppLocalizations {
     String p50,
     String p95,
   ) {
-    return '$attempts attempts · $successes ok · $drops drops · time-to-connect p50 $p50 / p95 $p95';
+    return '$attempts kísérlet · $successes ok · $drops kiesés · csatlakozási idő p50 $p50 / p95 $p95';
   }
 
   @override
   String obd2DiagnosticsReconnectLine(int silent, int visible) {
-    return 'Reconnects: $silent silent · $visible visible';
+    return 'Újracsatlakozások: $silent néma · $visible látható';
   }
 
   @override
@@ -6090,16 +6096,16 @@ class AppLocalizationsHu extends AppLocalizations {
     int skips,
     int demotions,
   ) {
-    return '$tickRate Hz tick · $skips back-pressure skips · $demotions demotions';
+    return '$tickRate Hz ütem · $skips visszaterhelési kihagyás · $demotions lefokozás';
   }
 
   @override
   String get obd2DiagnosticsStarved =>
-      'Dynamics tier starved — RPM / speed fell below the governor floor.';
+      'A dinamikus szint kiéhezett — az RPM / sebesség a szabályozó küszöbe alá esett.';
 
   @override
   String obd2DiagnosticsCompletenessLine(String percent, String duty) {
-    return 'Overall $percent% · active duty $duty%';
+    return 'Összesített $percent% · aktív terhelés $duty%';
   }
 
   @override
@@ -6113,12 +6119,12 @@ class AppLocalizationsHu extends AppLocalizations {
     int unsupported,
     int unknown,
   ) {
-    return '$supported supported · $unsupported unsupported · $unknown unknown';
+    return '$supported támogatott · $unsupported nem támogatott · $unknown ismeretlen';
   }
 
   @override
   String obd2DiagnosticsFuelLine(int suspicious, int total) {
-    return 'Suspicious $suspicious of $total samples';
+    return 'Gyanús $suspicious / $total minta';
   }
 
   @override
@@ -6134,11 +6140,11 @@ class AppLocalizationsHu extends AppLocalizations {
     String effectiveHz,
     String targetHz,
   ) {
-    return '$pid: $polled polled · $ok ok · $noData ND · $timeout TO · $error err · p50 $p50 / p95 $p95 ms · $effectiveHz/$targetHz Hz';
+    return '$pid: $polled lekérdezve · $ok ok · $noData ND · $timeout TO · $error hiba · p50 $p50 / p95 $p95 ms · $effectiveHz/$targetHz Hz';
   }
 
   @override
-  String get obd2DiagnosticsInitSection => 'Dongle init transcript';
+  String get obd2DiagnosticsInitSection => 'Dongle inicializálási napló';
 
   @override
   String obd2DiagnosticsInitHeader(
@@ -6148,7 +6154,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String tier,
     int pids,
   ) {
-    return 'Protocol $protocol · $start · firmware $firmware · $tier · $pids PIDs';
+    return 'Protokoll $protocol · $start · firmware $firmware · $tier · $pids PID';
   }
 
   @override
@@ -6157,96 +6163,97 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get obd2DiagnosticsInitWarm => 'warm';
+  String get obd2DiagnosticsInitWarm => 'meleg';
 
   @override
-  String get obd2DiagnosticsInitCold => 'cold';
+  String get obd2DiagnosticsInitCold => 'hideg';
 
   @override
-  String get obd2HealthCopyInitTranscript => 'Copy init transcript only';
+  String get obd2HealthCopyInitTranscript =>
+      'Csak inicializálási napló másolása';
 
   @override
   String get obd2DiagnosticsEmpty =>
-      'No OBD2 session recorded yet — connect an adapter and record a trip with Developer mode on.';
+      'Még nem rögzített OBD2-munkamenet — csatlakoztasson adaptert, és rögzítsen egy utat Fejlesztői módban.';
 
   @override
   String get obd2DiagnosticsExplain =>
-      'Captured while recording to debug the dongle↔app communication — only collected in Developer mode.';
+      'Rögzítés közben gyűjtve a dongle↔alkalmazás kommunikáció hibakeresésére — csak Fejlesztői módban gyűjtött adat.';
 
   @override
-  String get obd2HealthScreenTitle => 'OBD2 communication health';
+  String get obd2HealthScreenTitle => 'OBD2 kommunikáció állapota';
 
   @override
-  String get obd2HealthNavLabel => 'OBD2 communication health';
+  String get obd2HealthNavLabel => 'OBD2 kommunikáció állapota';
 
   @override
-  String get obd2HealthLiveSection => 'Live session';
+  String get obd2HealthLiveSection => 'Élő munkamenet';
 
   @override
-  String get obd2HealthHistorySection => 'Recent sessions';
+  String get obd2HealthHistorySection => 'Legutóbbi munkamenetek';
 
   @override
-  String get obd2HealthCopyJson => 'Copy as JSON';
+  String get obd2HealthCopyJson => 'Másolás JSON-ként';
 
   @override
-  String get obd2HealthCopied => 'OBD2 diagnostics copied to clipboard.';
+  String get obd2HealthCopied => 'OBD2-diagnosztika másolva a vágólapra.';
 
   @override
-  String get obd2TestRunTitle => 'Run adapter test';
+  String get obd2TestRunTitle => 'Adapterteszt futtatása';
 
   @override
-  String get obd2TestRunButton => 'Run adapter test';
+  String get obd2TestRunButton => 'Adapterteszt futtatása';
 
   @override
-  String get obd2TestRunPassed => 'Adapter test passed';
+  String get obd2TestRunPassed => 'Adapterteszt sikeres';
 
   @override
-  String get obd2TestRunFailed => 'Adapter test failed';
+  String get obd2TestRunFailed => 'Adapterteszt sikertelen';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
-    return '$passed of $total steps OK · $elapsed ms';
+    return '$passed / $total lépés OK · $elapsed ms';
   }
 
   @override
   String get obd2TestRunCannotWhileRecording =>
-      'Stop the active recording before running the adapter test.';
+      'Állítsa le az aktív rögzítést az adapterteszt futtatása előtt.';
 
   @override
-  String get obd2TestStepScan => 'Scan for adapter';
+  String get obd2TestStepScan => 'Adapter keresése';
 
   @override
-  String get obd2TestStepConnect => 'Connect & init';
+  String get obd2TestStepConnect => 'Csatlakozás és inicializálás';
 
   @override
-  String get obd2TestStepInfo => 'Adapter info';
+  String get obd2TestStepInfo => 'Adapter adatai';
 
   @override
-  String get obd2TestStepSupportedPids => 'Supported PIDs';
+  String get obd2TestStepSupportedPids => 'Támogatott PID-ek';
 
   @override
-  String get obd2TestStepSampleReads => 'Sample reads';
+  String get obd2TestStepSampleReads => 'Mintaolvasások';
 
   @override
-  String get obd2TestStepReconnect => 'Reconnect test';
+  String get obd2TestStepReconnect => 'Újracsatlakozás teszt';
 
   @override
-  String get obd2TestStepDisconnect => 'Disconnect';
+  String get obd2TestStepDisconnect => 'Lecsatlakozás';
 
   @override
   String get obd2TestStatusOk => 'OK';
 
   @override
-  String get obd2TestStatusTimeout => 'Timed out';
+  String get obd2TestStatusTimeout => 'Időtúllépés';
 
   @override
-  String get obd2TestStatusGarbage => 'Unreadable reply';
+  String get obd2TestStatusGarbage => 'Olvashatatlan válasz';
 
   @override
-  String get obd2TestStatusNoResponse => 'No response';
+  String get obd2TestStatusNoResponse => 'Nincs válasz';
 
   @override
-  String get obd2TestStatusFail => 'Failed';
+  String get obd2TestStatusFail => 'Sikertelen';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {
@@ -6254,139 +6261,140 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get ocrTesterTitle => 'OCR tester';
+  String get ocrTesterTitle => 'OCR tesztelő';
 
   @override
-  String get ocrTesterNavLabel => 'OCR tester';
+  String get ocrTesterNavLabel => 'OCR tesztelő';
 
   @override
   String get ocrTesterExplain =>
-      'Run the pump / receipt OCR pipeline on a chosen photo and inspect every step — only available in Developer mode.';
+      'Futtassa a kút/blokk OCR-folyamatot egy kiválasztott fotón, és vizsgálja meg minden lépést — csak Fejlesztői módban érhető el.';
 
   @override
-  String get ocrTesterModePump => 'Pump';
+  String get ocrTesterModePump => 'Kút';
 
   @override
-  String get ocrTesterModeReceipt => 'Receipt';
+  String get ocrTesterModeReceipt => 'Bizonylat';
 
   @override
-  String get ocrTesterCapture => 'Capture';
+  String get ocrTesterCapture => 'Fénykép';
 
   @override
-  String get ocrTesterPickImage => 'Pick image';
+  String get ocrTesterPickImage => 'Kép kiválasztása';
 
   @override
-  String get ocrTesterRun => 'Run';
+  String get ocrTesterRun => 'Futtatás';
 
   @override
-  String get ocrTesterCountry => 'Country';
+  String get ocrTesterCountry => 'Ország';
 
   @override
-  String get ocrTesterCountryNone => 'Default (no profile)';
+  String get ocrTesterCountryNone => 'Alapértelmezett (nincs profil)';
 
   @override
-  String get ocrTesterNoImage => 'Pick or capture an image, then Run.';
+  String get ocrTesterNoImage =>
+      'Válasszon vagy készítsen képet, majd futtassa.';
 
   @override
-  String get ocrTesterRunning => 'Running OCR…';
+  String get ocrTesterRunning => 'OCR futtatása…';
 
   @override
-  String get ocrTesterNoResult => 'OCR produced no readable result.';
+  String get ocrTesterNoResult => 'Az OCR nem hozott olvasható eredményt.';
 
   @override
-  String get ocrTesterOverlaySection => 'Block overlay';
+  String get ocrTesterOverlaySection => 'Blokk-réteg';
 
   @override
-  String get ocrTesterStepsSection => 'Pipeline steps';
+  String get ocrTesterStepsSection => 'Folyamat lépései';
 
   @override
-  String get ocrTesterLegendLabel => 'Label';
+  String get ocrTesterLegendLabel => 'Címke';
 
   @override
-  String get ocrTesterLegendNumeric => 'Numeric';
+  String get ocrTesterLegendNumeric => 'Numerikus';
 
   @override
-  String get ocrTesterLegendNoise => 'Noise';
+  String get ocrTesterLegendNoise => 'Zaj';
 
   @override
-  String get ocrTesterLegendDerived => 'Derived';
+  String get ocrTesterLegendDerived => 'Levezetett';
 
   @override
-  String get ocrTesterStageGlare => 'Capture / glare';
+  String get ocrTesterStageGlare => 'Felvétel / fényvisszaverődés';
 
   @override
   String get ocrTesterStageMlkit => 'ML Kit';
 
   @override
-  String get ocrTesterStageClassify => 'Classify';
+  String get ocrTesterStageClassify => 'Osztályozás';
 
   @override
-  String get ocrTesterStageAssemble => 'Assemble';
+  String get ocrTesterStageAssemble => 'Összeállítás';
 
   @override
-  String get ocrTesterStageAnchor => 'Anchor';
+  String get ocrTesterStageAnchor => 'Horgony';
 
   @override
-  String get ocrTesterStageFallback => 'Fallback';
+  String get ocrTesterStageFallback => 'Tartalék';
 
   @override
-  String get ocrTesterStageCrossCheck => 'Cross-check';
+  String get ocrTesterStageCrossCheck => 'Keresztellenőrzés';
 
   @override
-  String get ocrTesterStageConfidence => 'Confidence';
+  String get ocrTesterStageConfidence => 'Konfidencia';
 
   @override
-  String get ocrTesterStageGate => 'Gate';
+  String get ocrTesterStageGate => 'Kapu';
 
   @override
-  String get ocrTesterStageBrand => 'Brand';
+  String get ocrTesterStageBrand => 'Márka';
 
   @override
-  String get ocrTesterStageOverrides => 'Overrides';
+  String get ocrTesterStageOverrides => 'Felülírások';
 
   @override
-  String get ocrTesterStageReconcile => 'Reconcile';
+  String get ocrTesterStageReconcile => 'Egyeztetés';
 
   @override
-  String get ocrTesterStageResult => 'Result';
+  String get ocrTesterStageResult => 'Eredmény';
 
   @override
-  String get ocrTesterChipRead => 'READ';
+  String get ocrTesterChipRead => 'OLVASVA';
 
   @override
-  String get ocrTesterChipDerived => 'DERIVED';
+  String get ocrTesterChipDerived => 'LEVEZETETT';
 
   @override
-  String get ocrTesterGateAccepted => 'Accepted';
+  String get ocrTesterGateAccepted => 'Elfogadva';
 
   @override
-  String get ocrTesterGateRejected => 'Rejected';
+  String get ocrTesterGateRejected => 'Visszautasítva';
 
   @override
   String get ocrTesterFallbackBanner =>
-      'A field was recovered via magnitude fallback — verify it.';
+      'Egy mezőt magnitúdó-tartalékkal állítottak helyre — ellenőrizze.';
 
   @override
-  String get ocrTesterStageNoData => 'Stage did not run.';
+  String get ocrTesterStageNoData => 'A lépés nem futott le.';
 
   @override
-  String get ocrTesterCopyJson => 'Copy as JSON';
+  String get ocrTesterCopyJson => 'Másolás JSON-ként';
 
   @override
-  String get ocrTesterExportPackage => 'Export package';
+  String get ocrTesterExportPackage => 'Csomag exportálása';
 
   @override
-  String get ocrTesterCopied => 'OCR trace copied to clipboard.';
+  String get ocrTesterCopied => 'OCR-nyomkövetés másolva a vágólapra.';
 
   @override
-  String get ocrTesterExported => 'OCR package saved to your Downloads folder.';
+  String get ocrTesterExported => 'OCR-csomag mentve a Letöltések mappába.';
 
   @override
-  String get ocrTesterSaveFixture => 'Save as fixture';
+  String get ocrTesterSaveFixture => 'Mentés fixture-ként';
 
   @override
   String get ocrTesterFixtureSaved =>
-      'Fixture saved to your Downloads folder. Move it under test/fixtures and run tool/promote_ocr_fixture.dart.';
+      'Fixture mentve a Letöltések mappába. Helyezze a test/fixtures alá, és futtassa a tool/promote_ocr_fixture.dart-ot.';
 
   @override
   String get onboardingObd2StepTitle => 'OBD2-adapter csatlakoztatása';
@@ -6417,79 +6425,79 @@ class AppLocalizationsHu extends AppLocalizations {
       'Válasszon használati módot a folytatáshoz.';
 
   @override
-  String get openNow => 'Open';
+  String get openNow => 'Nyitva';
 
   @override
-  String get openNowClosed => 'Closed';
+  String get openNowClosed => 'Zárva';
 
   @override
-  String get openHoursUnknown => 'Hours unknown';
+  String get openHoursUnknown => 'Nyitvatartás ismeretlen';
 
   @override
   String closesAt(String time) {
-    return 'Closes $time';
+    return 'Zár: $time';
   }
 
   @override
   String opensAt(String day, String time) {
-    return 'Opens $day $time';
+    return 'Nyit: $day $time';
   }
 
   @override
   String opensToday(String time) {
-    return 'Opens $time';
+    return 'Nyit: $time';
   }
 
   @override
-  String get open24Hours => 'Open 24 hours';
+  String get open24Hours => 'Éjjel-nappal nyitva';
 
   @override
   String get badge24h => '24h';
 
   @override
-  String get openingHoursAutomate24h => '24/7 automate';
+  String get openingHoursAutomate24h => '24/7 automatizálás';
 
   @override
-  String get dayMon => 'Monday';
+  String get dayMon => 'Hétfő';
 
   @override
-  String get dayTue => 'Tuesday';
+  String get dayTue => 'Kedd';
 
   @override
-  String get dayWed => 'Wednesday';
+  String get dayWed => 'Szerda';
 
   @override
-  String get dayThu => 'Thursday';
+  String get dayThu => 'Csütörtök';
 
   @override
-  String get dayFri => 'Friday';
+  String get dayFri => 'Péntek';
 
   @override
-  String get daySat => 'Saturday';
+  String get daySat => 'Szombat';
 
   @override
-  String get daySun => 'Sunday';
+  String get daySun => 'Vasárnap';
 
   @override
-  String get dayShortMon => 'Mon';
+  String get dayShortMon => 'H';
 
   @override
-  String get dayShortTue => 'Tue';
+  String get dayShortTue => 'K';
 
   @override
-  String get dayShortWed => 'Wed';
+  String get dayShortWed => 'Sze';
 
   @override
-  String get dayShortThu => 'Thu';
+  String get dayShortThu => 'Cs';
 
   @override
-  String get dayShortFri => 'Fri';
+  String get dayShortFri => 'P';
 
   @override
-  String get dayShortSat => 'Sat';
+  String get dayShortSat => 'Szo';
 
   @override
-  String get dayShortSun => 'Sun';
+  String get dayShortSun => 'V';
 
   @override
   String dayRange(String from, String to) {
@@ -6497,43 +6505,43 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get publicHolidays => 'Public holidays';
+  String get publicHolidays => 'Állami ünnepek';
 
   @override
-  String get closedLabel => 'Closed';
+  String get closedLabel => 'Zárva';
 
   @override
-  String get openingHoursNotAvailable => 'Opening hours not available';
+  String get openingHoursNotAvailable => 'A nyitvatartási idő nem elérhető';
 
   @override
-  String get showAllHours => 'Show all hours';
+  String get showAllHours => 'Összes óra megjelenítése';
 
   @override
-  String get showLessHours => 'Show less';
+  String get showLessHours => 'Kevesebb megjelenítése';
 
   @override
-  String get tripRecordingPipEstConsumptionCaption => 'est. L/100 km';
+  String get tripRecordingPipEstConsumptionCaption => 'becsült L/100 km';
 
   @override
   String get tripRecordingEstimatedInfo =>
-      'Estimated value (~) — no fuel sensor on this trip, so the L/100 km figure is modelled from GPS speed and your vehicle\'s calibration. It is approximate (typically ±10–30 %, tightening as the calibration matures), not a measured reading.';
+      'Becsült érték (~) — ezen az úton nincs üzemanyag-szenzor, ezért a L/100 km értéket GPS-sebesség és a jármű kalibrálása alapján modellezi a rendszer. Hozzávetőleges (általában ±10–30%, szűkülve a kalibráció érettségével), nem mért adat.';
 
   @override
   String get tripRecordingPipElapsedCaption => 'eltelt';
 
   @override
-  String get radarPinHelpTitle => 'About pin';
+  String get radarPinHelpTitle => 'A rögzítésről';
 
   @override
   String get radarPinHelpBody =>
-      'Pin keeps the screen on and hides system bars so the closest-station readout stays readable on a dashboard mount. Tap again to release. Auto-releases when the radar stops.';
+      'A rögzítés bekapcsolva tartja a képernyőt, és elrejti a rendszersávokat, hogy a legközelebbi állomás kijelzője olvasható maradjon a műszerfalon. Érintse meg újra a feloldáshoz. Automatikusan feloldódik, amikor a radar leáll.';
 
   @override
-  String get radarAutoPinTitle => 'Always pin when the radar starts';
+  String get radarAutoPinTitle => 'Mindig rögzít, amikor a radar elindul';
 
   @override
   String get radarAutoPinSubtitle =>
-      'Pin the radar automatically every time instead of tapping each time. Uses more battery.';
+      'Automatikusan rögzíti a radart minden alkalommal, ahelyett, hogy minden alkalommal meg kellene érinteni. Több akkumulátort használ.';
 
   @override
   String get alertsRadiusFrequencyLabel => 'Ellenőrzési gyakoriság';
@@ -6581,11 +6589,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get reconcileWorkflowTitle => 'Reconcile your fuel';
+  String get reconcileWorkflowTitle => 'Üzemanyag-egyeztetés';
 
   @override
   String reconcileWorkflowExplainHeadline(String gap) {
-    return 'We found a $gap L gap';
+    return '$gap L eltérést találtunk';
   }
 
   @override
@@ -6594,82 +6602,84 @@ class AppLocalizationsHu extends AppLocalizations {
     String consumed,
     String gap,
   ) {
-    return 'You pumped $pumped L, but your recorded trips only account for $consumed L. That leaves $gap L unexplained.';
+    return '$pumped L-t tankolt, de a rögzített utak csak $consumed L-t magyaráznak meg. Ez $gap L megmagyarázatlan eltérést hagy.';
   }
 
   @override
   String get reconcileWorkflowExplainCauses =>
-      'This usually means a drive wasn\'t recorded (the adapter was unplugged or the app was closed), or a fill-up is missing or mistyped.';
+      'Ez általában azt jelenti, hogy egy menetet nem rögzítettek (az adapter ki volt húzva vagy az alkalmazás zárva volt), vagy hiányzik illetve tévesen szerepel egy tankolt adat.';
 
   @override
   String get reconcileWorkflowExplainConsequence =>
-      'Until this is resolved, your fuel total and your trips total won\'t match.';
+      'Amíg ez nincs feloldva, az üzemanyag-összesítő és az utak összesítője nem fog egyezni.';
 
   @override
-  String get reconcileWorkflowAttributeQuestion => 'Help us attribute the gap';
+  String get reconcileWorkflowAttributeQuestion =>
+      'Segítsen az eltérés azonosításában';
 
   @override
   String get reconcileWorkflowFillUpsCompleteQuestion =>
-      'Are all your fill-ups for this tank complete and correct?';
+      'Minden tankolt adat teljes és helyes ehhez a tartályhoz?';
 
   @override
   String get reconcileWorkflowDrivesRecordedQuestion =>
-      'Are all your drives recorded?';
+      'Minden menet rögzítve van?';
 
   @override
-  String get reconcileWorkflowAnswerYes => 'Yes';
+  String get reconcileWorkflowAnswerYes => 'Igen';
 
   @override
-  String get reconcileWorkflowAnswerNo => 'No';
+  String get reconcileWorkflowAnswerNo => 'Nem';
 
   @override
   String get reconcileWorkflowPathAHint =>
-      'A fill-up is missing or wrong — we\'ll add a correction so your fill-ups add up.';
+      'Hiányzik vagy hibás egy tankolás — korrekciót adunk hozzá, hogy a tankolások összeadódjanak.';
 
   @override
   String get reconcileWorkflowPathBHint =>
-      'Your fill-ups are right and a drive went unrecorded — we\'ll add a virtual trip for the missing distance.';
+      'A tankolások helyesek, de egy menet nem lett rögzítve — virtuális utat adunk hozzá a hiányzó távolságra.';
 
   @override
-  String get reconcileWorkflowCorrectionLitersLabel => 'Correction litres';
+  String get reconcileWorkflowCorrectionLitersLabel => 'Korrekció literben';
 
   @override
   String get reconcileWorkflowVirtualDistanceLabel =>
-      'How far was the unrecorded drive? (km)';
+      'Mekkora volt a nem rögzített menet? (km)';
 
   @override
-  String get reconcileWorkflowDecideLater => 'Decide later';
+  String get reconcileWorkflowDecideLater => 'Döntök később';
 
   @override
-  String get reconcileWorkflowBack => 'Back';
+  String get reconcileWorkflowBack => 'Vissza';
 
   @override
-  String get reconcileWorkflowNext => 'Next';
+  String get reconcileWorkflowNext => 'Tovább';
 
   @override
-  String get reconcileWorkflowApply => 'Apply';
+  String get reconcileWorkflowApply => 'Alkalmaz';
 
   @override
-  String get reconcileVirtualTrajetLabel => 'Virtual trip — tap to edit';
+  String get reconcileVirtualTrajetLabel =>
+      'Virtuális út — érintse meg a szerkesztéshez';
 
   @override
-  String get reconcileVirtualTrajetEditTitle => 'Edit virtual trip';
+  String get reconcileVirtualTrajetEditTitle => 'Virtuális út szerkesztése';
 
   @override
   String get reconcileVirtualTrajetEditExplainer =>
-      'This trip was added to account for fuel you used while driving without recording. Adjust the distance or fuel, or delete it.';
+      'Ez az út azért lett hozzáadva, hogy elszámolja a rögzítés nélkül felhasznált üzemanyagot. Módosítsa a távolságot vagy az üzemanyagot, vagy törölje.';
 
   @override
-  String get reconcileVirtualTrajetDelete => 'Delete virtual trip';
+  String get reconcileVirtualTrajetDelete => 'Virtuális út törlése';
 
   @override
   String reconcileResolveGapBanner(String gap) {
-    return 'Unresolved fuel/trip gap of $gap L — tap to resolve';
+    return 'Feloldatlan üzemanyag/út eltérés: $gap L — érintse meg a feloldáshoz';
   }
 
   @override
   String get reconcileResolveGapSemanticLabel =>
-      'Resolve unresolved fuel and trip gap';
+      'Feloldatlan üzemanyag- és úteltérés feloldása';
 
   @override
   String get refuelUnitPerLiter => '/L';
@@ -6681,23 +6691,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get refuelUnitPerSession => '/munkamenet';
 
   @override
-  String get shareReceiptImporting => 'Importing shared receipt…';
+  String get shareReceiptImporting => 'Megosztott bizonylat importálása…';
 
   @override
   String get shareReceiptUnsupportedFormat =>
-      'That file type can\'t be imported yet — share a photo of the receipt instead.';
+      'Ez a fájltípus még nem importálható — osszon meg helyette egy fényképet a bizonylatról.';
 
   @override
   String get shareReceiptFailed =>
-      'Couldn\'t read the shared receipt — try sharing it again or add the fill-up manually.';
+      'Nem sikerült olvasni a megosztott bizonylatot — próbálja meg újra megosztani, vagy adja hozzá a tankolást manuálisan.';
 
   @override
   String get featureLabel_addFillUpShareIntentReceipt =>
-      'Share receipt to import';
+      'Bizonylat megosztása importáláshoz';
 
   @override
   String get featureDescription_addFillUpShareIntentReceipt =>
-      'Share a receipt photo from another app to pre-fill a fill-up — date, litres, total, and station are read on-device.';
+      'Osszon meg egy bizonylat fotót egy másik alkalmazásból a tankolás előkitöltéséhez — dátum, liter, összeg és állomás az eszközön kerül beolvasásra.';
 
   @override
   String get speedConsumptionCardTitle => 'Fogyasztás sebességenként';
@@ -6895,13 +6905,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripStartProgressStartingRecording => 'Rögzítés indítása…';
 
   @override
-  String get tripSaveProgressFinalizingSummary => 'Finalizing summary…';
+  String get tripSaveProgressFinalizingSummary => 'Összesítés véglegesítése…';
 
   @override
-  String get tripSaveProgressSavingToHistory => 'Saving to history…';
+  String get tripSaveProgressSavingToHistory => 'Mentés az előzményekbe…';
 
   @override
-  String get tripSaveProgressSyncingToCloud => 'Syncing in background…';
+  String get tripSaveProgressSyncingToCloud => 'Szinkronizálás a háttérben…';
 
   @override
   String get trajetsEmptyStateTitle => 'Még nincs út';
@@ -6974,16 +6984,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailChartEngineLoad => 'Motorterhelés (%)';
 
   @override
-  String get trajetDetailChartThrottle => 'Throttle / pedal (%)';
+  String get trajetDetailChartThrottle => 'Gáz / pedál (%)';
 
   @override
-  String get trajetDetailChartCoolant => 'Coolant (°C)';
+  String get trajetDetailChartCoolant => 'Hűtőfolyadék (°C)';
 
   @override
-  String get trajetDetailChartAltitude => 'Altitude (m)';
+  String get trajetDetailChartAltitude => 'Magasság (m)';
 
   @override
-  String get trajetDetailChartLambda => 'Commanded λ';
+  String get trajetDetailChartLambda => 'Parancsolt λ';
 
   @override
   String get trajetDetailChartsSection => 'Diagramok';
@@ -6999,7 +7009,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailChartEmpty => 'Nincsenek rögzített minták';
 
   @override
-  String get trajetDetailChartEstimatedBadge => 'estimated';
+  String get trajetDetailChartEstimatedBadge => 'becsült';
 
   @override
   String get trajetDetailShareAction => 'Megosztás';
@@ -7023,13 +7033,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült megosztási képet generálni';
 
   @override
-  String get trajetDetailDownloadCsvOption => 'Download telemetry (CSV)';
+  String get trajetDetailDownloadCsvOption => 'Telemetria letöltése (CSV)';
 
   @override
-  String get trajetDetailDownloadJsonOption => 'Download telemetry (JSON)';
+  String get trajetDetailDownloadJsonOption => 'Telemetria letöltése (JSON)';
 
   @override
-  String get trajetDetailDownloadError => 'Couldn\'t save the file';
+  String get trajetDetailDownloadError => 'Nem sikerült menteni a fájlt';
 
   @override
   String get trajetDetailDeleteAction => 'Törlés';
@@ -7112,28 +7122,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripPathLegendWasteful => 'Pazarló (≥ 10 L/100km)';
 
   @override
-  String get tripRadarClosestStation => 'Closest station';
+  String get tripRadarClosestStation => 'Töltőállomás-radar';
 
   @override
-  String get tripRadarScanning => 'Scanning for nearby stations';
+  String get tripRadarScanning => 'Közeli állomások keresése';
 
   @override
-  String get tripRadarNoStationNearby => 'No station nearby';
+  String get tripRadarNoStationNearby => 'Nincs közeli állomás';
 
   @override
-  String get fuelStationRadarNearer => 'Nearer station';
+  String get fuelStationRadarNearer => 'Közelebbi állomás';
 
   @override
-  String get fuelStationRadarFarther => 'Farther station';
+  String get fuelStationRadarFarther => 'Távolabbi állomás';
 
   @override
-  String get fuelStationRadarStart => 'Start fuel station radar';
+  String get fuelStationRadarStart => 'Töltőállomás-radar indítása';
 
   @override
-  String get stopRadar => 'Stop radar';
+  String get stopRadar => 'Radar leállítása';
 
   @override
-  String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
+  String get fuelStationRadarResultBadge => 'Töltőállomás-radar eredménye';
 
   @override
   String get tripRecordingPinTooltip =>
@@ -7183,18 +7193,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tripRecordingConnectingTitle => 'Felvétel indítása…';
 
   @override
-  String get tripRecordingSavingTitle => 'Saving trip…';
+  String get tripRecordingSavingTitle => 'Út mentése…';
 
   @override
   String get tripRecordingDiscardedNoMovement =>
-      'Recording discarded — no movement detected';
+      'Rögzítés elvetve — nem észlelt mozgás';
 
   @override
-  String get tripRecordingGpsNotificationTitle => 'Recording your trip';
+  String get tripRecordingGpsNotificationTitle => 'Az út rögzítése';
 
   @override
   String get tripRecordingGpsNotificationText =>
-      'Tracking your route for fuel & driving stats';
+      'Az útvonal követése üzemanyag- és vezetési statisztikákhoz';
 
   @override
   String get tripShareAction => 'Megosztás másik fiókkal';
@@ -7278,31 +7288,31 @@ class AppLocalizationsHu extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count stations',
-      one: '1 station',
+      other: '$count állomás',
+      one: '1 állomás',
     );
     return '$_temp0';
   }
 
   @override
   String stationUpdatedLabel(String time) {
-    return 'Updated $time';
+    return 'Frissítve: $time';
   }
 
   @override
   String amenityMoreTooltip(String names) {
-    return 'Also: $names';
+    return 'Továbbá: $names';
   }
 
   @override
-  String get favoriteAdd => 'Add to favorites';
+  String get favoriteAdd => 'Hozzáadás a kedvencekhez';
 
   @override
-  String get favoriteRemove => 'Remove from favorites';
+  String get favoriteRemove => 'Eltávolítás a kedvencekből';
 
   @override
   String loyaltyRawPriceTooltip(String price) {
-    return 'Raw: $price';
+    return 'Alap: $price';
   }
 
   @override
@@ -7430,7 +7440,7 @@ class AppLocalizationsHu extends AppLocalizations {
     String euros,
     String cents,
   ) {
-    return '$name, $distanceKm kilometers ahead, $fuelType $euros euros $cents';
+    return '$name, $distanceKm kilométerre előre, $fuelType $euros euró $cents';
   }
 
   @override
