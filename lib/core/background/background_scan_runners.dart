@@ -17,15 +17,15 @@ import '../../features/alerts/domain/radius_alert_evaluator.dart';
 import '../../features/alerts/domain/velocity_alert_detector.dart';
 import '../../features/search/data/models/search_params.dart';
 import '../../features/search/domain/entities/fuel_type.dart';
-import '../../features/station_services/germany/tankerkoenig_station_service.dart';
 import '../constants/field_names.dart';
 import '../logging/error_logger.dart';
 import '../notifications/local_notification_service.dart';
-import '../services/dio_factory.dart';
+import '../services/country_service_registry.dart';
 import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
 import '../telemetry/storage/isolate_error_spool.dart';
 import '../utils/json_extensions.dart';
+import 'background_price_source.dart';
 import 'notification_templates.dart';
 
 /// Alert-evaluation runners invoked by [BackgroundAlertScanCoordinator]
@@ -40,11 +40,6 @@ import 'notification_templates.dart';
 /// VelocityAlertRunner) and never mutates their throttle behaviour.
 class BackgroundScanRunners {
   BackgroundScanRunners._();
-
-  /// Connect / receive timeouts for the BG-isolate Dio client. Mirrors the
-  /// coordinator's so radius/widget searches share one budget.
-  static const bgConnectTimeout = Duration(seconds: 10);
-  static const bgReceiveTimeout = Duration(seconds: 15);
 
   /// Do not re-fire the same per-station price alert within this window.
   static const priceAlertRetriggerCooldown = Duration(hours: 4);
@@ -194,8 +189,18 @@ class BackgroundScanRunners {
   }
 
   /// #578 phase 3 — radius alerts via [RadiusAlertRunner] (reused read-only).
+  ///
+  /// #2862 — each alert's samples now come from the registry-driven
+  /// [BackgroundPriceSource] for the **country its centre falls in**
+  /// (derived via the bounding box), instead of a single hardcoded
+  /// Tankerkönig search, so a radius alert in PT / AT / … is evaluated
+  /// against that country's provider. The source caches its per-country
+  /// services, so all alerts in one country reuse one provider. Centres in a
+  /// non-polled country (e.g. bulk-dataset ES/IT — child #2863) yield no
+  /// samples this scan.
   static Future<void> runRadiusAlerts({
     required DateTime now,
+    required BackgroundPriceSource source,
     required String? apiKey,
     required BackgroundNotificationTemplates templates,
   }) async {
@@ -206,20 +211,8 @@ class BackgroundScanRunners {
         debugPrint('BackgroundScanRunners: no active radius alerts');
         return;
       }
-      if (apiKey == null || apiKey.isEmpty) {
-        debugPrint('BackgroundScanRunners: radius alerts skipped — '
-            'no Tankerkoenig API key');
-        return;
-      }
       final notifier = LocalNotificationService();
       await notifier.initialize();
-      // #2249 — rate-limited + conditional-GET Dio (radius-alert search).
-      final dio = DioFactory.create(
-        baseUrl: 'https://creativecommons.tankerkoenig.de/json',
-        connectTimeout: bgConnectTimeout,
-        receiveTimeout: bgReceiveTimeout,
-      )..options.queryParameters = {'apikey': apiKey};
-      final service = TankerkoenigStationService(dio);
       final runner = RadiusAlertRunner(
         store: store,
         dedup: RadiusAlertDedup(),
@@ -229,24 +222,23 @@ class BackgroundScanRunners {
       final fired = await runner.run(
         now: now,
         samplesFor: (alert) async {
-          try {
-            final result = await service.searchStations(SearchParams(
+          final country = CountryServiceRegistry.countryForLatLng(
+              alert.centerLat, alert.centerLng);
+          if (country == null) return const <StationPriceSample>[];
+          final stations = await source.searchStations(
+            countryCode: country,
+            params: SearchParams(
               lat: alert.centerLat,
               lng: alert.centerLng,
               radiusKm: alert.radiusKm,
-            ));
-            final samples = <StationPriceSample>[];
-            for (final station in result.data) {
-              samples.addAll(StationPriceSample.fromStation(station));
-            }
-            return samples;
-          } catch (e, st) {
-            unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-              'where':
-                  'BackgroundScanRunners: radius samples for ${alert.id} failed'
-            }));
-            return const <StationPriceSample>[];
+            ),
+            apiKey: apiKey,
+          );
+          final samples = <StationPriceSample>[];
+          for (final station in stations) {
+            samples.addAll(StationPriceSample.fromStation(station));
           }
+          return samples;
         },
       );
       debugPrint('BackgroundScanRunners: ${fired.length} radius alerts fired');
