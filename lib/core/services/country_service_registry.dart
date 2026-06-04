@@ -29,6 +29,7 @@ import '../../features/station_services/spain/miteco_station_service.dart';
 import '../../features/station_services/uk/uk_cma_bulk_station_service.dart';
 import '../../features/station_services/uk/uk_station_service.dart';
 import 'bulk_migration_flags.dart';
+import 'diagnostics/data_access_recorder_provider.dart';
 import 'fuel_service_policy.dart';
 import 'impl/demo_station_service.dart';
 import 'impl/osm_brand_enricher.dart';
@@ -773,6 +774,9 @@ class CountryServiceRegistry {
     final entry = _byCode[countryCode];
     if (entry == null) return DemoStationService(countryCode: countryCode);
 
+    // #2824 — dev-only data-access tracer; null in production (zero overhead).
+    final recorder = ref.read(dataAccessRecorderProvider);
+    recorder?.notePolicy(countryCode, entry.policy.minInterval);
     return StationServiceChain(
       entry.createService(ref),
       cache,
@@ -781,6 +785,7 @@ class CountryServiceRegistry {
       // #2264 — the chain branches on this to local-filter bulk datasets
       // (no per-key cache) vs keep the per-key TTL cache for polled APIs.
       policy: entry.policy,
+      recorder: recorder,
     );
   }
 

@@ -71,7 +71,14 @@ void main() {
     // (which carries the wrong e10), with a 4-line rationale comment. Premium
     // is MX's high-octane grade, not the European e10 blend. Decomposition of
     // this registry is tracked separately by #2187/#2188.
-    'lib/core/services/country_service_registry.dart': 916,
+    // #2824 — re-grandfathered 916 → 921: buildService reads the dev-only
+    // data-access tracer (dataAccessRecorderProvider), notes the country's
+    // configured rate-limit interval, and threads the recorder into the
+    // StationServiceChain. The tap is null in production (zero overhead);
+    // these 5 lines are the registry's only data-access wiring and can't move
+    // out without re-introducing a Germany-style special case the registry
+    // exists to eliminate. Decomposition still tracked by #2187/#2188.
+    'lib/core/services/country_service_registry.dart': 921,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     // #2456 — re-grandfathered 457 → 481: two new pure parsers,

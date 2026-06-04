@@ -4299,6 +4299,21 @@ class AppLocalizationsNb extends AppLocalizations {
   String get developerToolsSectionTitle => 'Utviklerverktøy';
 
   @override
+  String get dataAccessTracerExport => 'Export data-access trace';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      'Data-access trace saved to Downloads.';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      'Couldn\'t export the data-access trace.';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      'No data-access events recorded yet — search or open stations first, then export.';
+
+  @override
   String get developerToolsSubtitle =>
       'Diagnostikk og feilsøkingsverktøy — vises bare i utvikler-/feilsøkingsmodus.';
 

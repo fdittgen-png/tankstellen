@@ -4305,6 +4305,21 @@ class AppLocalizationsSl extends AppLocalizations {
   String get developerToolsSectionTitle => 'Razvijalska orodja';
 
   @override
+  String get dataAccessTracerExport => 'Export data-access trace';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      'Data-access trace saved to Downloads.';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      'Couldn\'t export the data-access trace.';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      'No data-access events recorded yet — search or open stations first, then export.';
+
+  @override
   String get developerToolsSubtitle =>
       'Diagnostika in orodja za odpravljanje napak — vidna samo v razvijalskem načinu / načinu za odpravljanje napak.';
 

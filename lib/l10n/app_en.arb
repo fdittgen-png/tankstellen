@@ -2917,6 +2917,22 @@
   "@developerToolsSectionTitle": {
     "description": "Title of the Settings section / screen hosting dev-only diagnostics, shown only when Developer / Debug mode is on (#2248)."
   },
+  "dataAccessTracerExport": "Export data-access trace",
+  "@dataAccessTracerExport": {
+    "description": "Label for the Developer-tools action that exports the recorded network-vs-cache data-access trace (cache-hit ratio + per-provider request intervals) as JSON to Downloads (#2824)."
+  },
+  "dataAccessTracerExportSuccess": "Data-access trace saved to Downloads.",
+  "@dataAccessTracerExportSuccess": {
+    "description": "Confirmation snackbar after the data-access trace JSON was written to the Downloads folder (#2824)."
+  },
+  "dataAccessTracerExportFailure": "Couldn't export the data-access trace.",
+  "@dataAccessTracerExportFailure": {
+    "description": "Snackbar shown when writing the data-access trace JSON to Downloads failed (#2824)."
+  },
+  "dataAccessTracerEmpty": "No data-access events recorded yet — search or open stations first, then export.",
+  "@dataAccessTracerEmpty": {
+    "description": "Snackbar shown when the data-access tracer export is tapped but nothing has been recorded yet (tracer off or no queries made) (#2824)."
+  },
   "developerToolsSubtitle": "Diagnostics and tools for debugging — only visible in Developer / Debug mode.",
   "@developerToolsSubtitle": {
     "description": "One-line subtitle under the Developer tools section explaining it is gated on Developer / Debug mode (#2248)."

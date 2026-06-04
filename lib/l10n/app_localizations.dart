@@ -7756,6 +7756,30 @@ abstract class AppLocalizations {
   /// **'Developer tools'**
   String get developerToolsSectionTitle;
 
+  /// Label for the Developer-tools action that exports the recorded network-vs-cache data-access trace (cache-hit ratio + per-provider request intervals) as JSON to Downloads (#2824).
+  ///
+  /// In en, this message translates to:
+  /// **'Export data-access trace'**
+  String get dataAccessTracerExport;
+
+  /// Confirmation snackbar after the data-access trace JSON was written to the Downloads folder (#2824).
+  ///
+  /// In en, this message translates to:
+  /// **'Data-access trace saved to Downloads.'**
+  String get dataAccessTracerExportSuccess;
+
+  /// Snackbar shown when writing the data-access trace JSON to Downloads failed (#2824).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t export the data-access trace.'**
+  String get dataAccessTracerExportFailure;
+
+  /// Snackbar shown when the data-access tracer export is tapped but nothing has been recorded yet (tracer off or no queries made) (#2824).
+  ///
+  /// In en, this message translates to:
+  /// **'No data-access events recorded yet — search or open stations first, then export.'**
+  String get dataAccessTracerEmpty;
+
   /// One-line subtitle under the Developer tools section explaining it is gated on Developer / Debug mode (#2248).
   ///
   /// In en, this message translates to:

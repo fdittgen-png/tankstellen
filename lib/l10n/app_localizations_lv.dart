@@ -4326,6 +4326,21 @@ class AppLocalizationsLv extends AppLocalizations {
   String get developerToolsSectionTitle => 'Izstrādātāja rīki';
 
   @override
+  String get dataAccessTracerExport => 'Export data-access trace';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      'Data-access trace saved to Downloads.';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      'Couldn\'t export the data-access trace.';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      'No data-access events recorded yet — search or open stations first, then export.';
+
+  @override
   String get developerToolsSubtitle =>
       'Diagnostika un atkļūdošanas rīki — redzami tikai izstrādātāja/atkļūdošanas režīmā.';
 

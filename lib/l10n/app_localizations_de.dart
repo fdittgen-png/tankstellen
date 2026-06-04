@@ -4328,6 +4328,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get developerToolsSectionTitle => 'Entwicklerwerkzeuge';
 
   @override
+  String get dataAccessTracerExport => 'Datenzugriffs-Trace exportieren';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      'Datenzugriffs-Trace im Download-Ordner gespeichert.';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      'Datenzugriffs-Trace konnte nicht exportiert werden.';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      'Noch keine Datenzugriffe aufgezeichnet — zuerst suchen oder Tankstellen öffnen, dann exportieren.';
+
+  @override
   String get developerToolsSubtitle =>
       'Diagnose und Werkzeuge zur Fehlersuche — nur im Entwickler-/Debug-Modus sichtbar.';
 

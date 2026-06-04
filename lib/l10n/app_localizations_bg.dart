@@ -4330,6 +4330,21 @@ class AppLocalizationsBg extends AppLocalizations {
   String get developerToolsSectionTitle => 'Инструменти за разработчици';
 
   @override
+  String get dataAccessTracerExport => 'Export data-access trace';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      'Data-access trace saved to Downloads.';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      'Couldn\'t export the data-access trace.';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      'No data-access events recorded yet — search or open stations first, then export.';
+
+  @override
   String get developerToolsSubtitle =>
       'Диагностика и инструменти за отстраняване на грешки — видими само в режим за разработчици / отстраняване на грешки.';
 

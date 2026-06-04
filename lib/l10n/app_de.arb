@@ -1912,6 +1912,10 @@
       }
     }
   },
+  "dataAccessTracerExport": "Datenzugriffs-Trace exportieren",
+  "dataAccessTracerExportSuccess": "Datenzugriffs-Trace im Download-Ordner gespeichert.",
+  "dataAccessTracerExportFailure": "Datenzugriffs-Trace konnte nicht exportiert werden.",
+  "dataAccessTracerEmpty": "Noch keine Datenzugriffe aufgezeichnet — zuerst suchen oder Tankstellen öffnen, dann exportieren.",
   "developerToolsSectionTitle": "Entwicklerwerkzeuge",
   "developerToolsSubtitle": "Diagnose und Werkzeuge zur Fehlersuche — nur im Entwickler-/Debug-Modus sichtbar.",
   "developerToolsMenuSubtitle": "Fehlerprotokoll, Test-Alarme, Diagnose",

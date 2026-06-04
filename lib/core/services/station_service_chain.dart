@@ -11,6 +11,8 @@ import '../../features/search/domain/entities/station.dart';
 import '../cache/cache_manager.dart';
 import '../error/exceptions.dart';
 import '../logging/error_logger.dart';
+import 'diagnostics/data_access_event.dart';
+import 'diagnostics/data_access_recorder.dart';
 import 'fuel_service_policy.dart';
 import 'service_result.dart';
 import 'station_failure_classifier.dart';
@@ -56,6 +58,14 @@ class StationServiceChain implements StationService {
   /// and supplies the per-key TTL for polled sources. Null → polled defaults.
   final FuelServicePolicy? _policy;
 
+  /// Dev-only data-access tracer (#2824). Null in production (the default), in
+  /// which case every `recordDataAccess` call is a single null-check early
+  /// return — the chain's only added cost. When a developer arms
+  /// `Feature.debugMode` the registry hands a live recorder here and the
+  /// network-vs-cache outcome of each access is recorded for the rate-limit
+  /// compliance + cache-hit-ratio export.
+  final DataAccessRecorder? _recorder;
+
   /// In-flight request deduplication: concurrent calls for the same cache key
   /// share a single Future instead of hitting the API multiple times.
   /// Entries are removed in the finally block of [_throughChain] and also
@@ -70,8 +80,10 @@ class StationServiceChain implements StationService {
     ServiceSource errorSource = ServiceSource.tankerkoenigApi,
     this.countryCode = '',
     FuelServicePolicy? policy,
+    DataAccessRecorder? recorder,
   })  : _errorSource = errorSource,
-        _policy = policy;
+        _policy = policy,
+        _recorder = recorder;
 
   /// Generic cache-through + request coalescing.
   ///
@@ -82,6 +94,7 @@ class StationServiceChain implements StationService {
   ///   5. All failed → throw ServiceChainExhaustedException
   Future<ServiceResult<T>> _throughChain<T>({
     required String cacheKey,
+    required DataAccessEndpoint endpoint,
     required Future<ServiceResult<T>> Function() apiCall,
     required Map<String, dynamic> Function(T data) serialize,
     required T? Function(Map<String, dynamic> data) deserialize,
@@ -95,6 +108,9 @@ class StationServiceChain implements StationService {
     if (_inFlight.containsKey(cacheKey)) {
       final result = await _inFlight[cacheKey]!;
       if (result.data is T) {
+        recordDataAccess(_recorder, countryCode, endpoint,
+            DataAccessHit.coalesced, result.source,
+            count: dataAccessResultCount(result.data), isStale: result.isStale);
         return ServiceResult<T>(
           data: result.data as T,
           source: result.source,
@@ -108,6 +124,7 @@ class StationServiceChain implements StationService {
 
     final future = _executeChain<T>(
       cacheKey: cacheKey,
+      endpoint: endpoint,
       apiCall: apiCall,
       serialize: serialize,
       deserialize: deserialize,
@@ -129,6 +146,7 @@ class StationServiceChain implements StationService {
 
   Future<ServiceResult<T>> _executeChain<T>({
     required String cacheKey,
+    required DataAccessEndpoint endpoint,
     required Future<ServiceResult<T>> Function() apiCall,
     required Map<String, dynamic> Function(T data) serialize,
     required T? Function(Map<String, dynamic> data) deserialize,
@@ -143,6 +161,9 @@ class StationServiceChain implements StationService {
     if (fresh != null) {
       final data = deserialize(fresh.payload);
       if (data != null && check(data)) {
+        recordDataAccess(_recorder, countryCode, endpoint,
+            DataAccessHit.hiveFresh, fresh.originalSource,
+            count: dataAccessResultCount(data));
         return ServiceResult(
           data: data,
           source: fresh.originalSource,
@@ -159,14 +180,20 @@ class StationServiceChain implements StationService {
     // under load) and the Argentina CKAN bulk-download (#1955 — slow
     // first-byte triggering Dio's connect timeout). Both recover on a
     // second attempt within a second.
+    final apiClock = Stopwatch()..start();
     try {
       final result = await callWithTransientRetry(apiCall);
+      apiClock.stop();
       await _cache.put(
         cacheKey,
         serialize(result.data),
         ttl: ttl,
         source: result.source,
       );
+      recordDataAccess(_recorder, countryCode, endpoint,
+          DataAccessHit.networkApi, result.source,
+          count: dataAccessResultCount(result.data),
+          latencyMicros: apiClock.elapsedMicroseconds);
       return result;
     } on Exception catch (e, st) {
       // #2296 — log the API-failure path (stack was previously discarded)
@@ -191,6 +218,9 @@ class StationServiceChain implements StationService {
     if (stale != null) {
       final data = deserialize(stale.payload);
       if (data != null && check(data)) {
+        recordDataAccess(_recorder, countryCode, endpoint,
+            DataAccessHit.hiveStale, ServiceSource.cache,
+            count: dataAccessResultCount(data), isStale: true);
         return ServiceResult(
           data: data,
           source: ServiceSource.cache,
@@ -235,6 +265,9 @@ class StationServiceChain implements StationService {
         postalCode: params.postalCode,
         locationName: params.locationName,
       ),
+      endpoint: params.postalCode != null
+          ? DataAccessEndpoint.searchPostcode
+          : DataAccessEndpoint.searchGeo,
       apiCall: () => _primary.searchStations(params, cancelToken: cancelToken),
       serialize: serializeStationList,
       deserialize: deserializeStationList,
@@ -264,6 +297,11 @@ class StationServiceChain implements StationService {
     if (_inFlight.containsKey(key)) {
       final result = await _inFlight[key]!;
       if (result.data is List<Station>) {
+        recordDataAccess(_recorder, countryCode,
+            DataAccessEndpoint.bulkDataset, DataAccessHit.coalesced,
+            result.source,
+            count: dataAccessResultCount(result.data),
+            isStale: result.isStale);
         return ServiceResult<List<Station>>(
           data: result.data as List<Station>,
           source: result.source,
@@ -279,8 +317,16 @@ class StationServiceChain implements StationService {
     );
     _inFlight[key] = future;
     _inFlightTimestamps[key] = DateTime.now();
+    final bulkClock = Stopwatch()..start();
     try {
-      return await future;
+      final result = await future;
+      bulkClock.stop();
+      recordDataAccess(_recorder, countryCode, DataAccessEndpoint.bulkDataset,
+          DataAccessHit.networkApi, result.source,
+          count: dataAccessResultCount(result.data),
+          latencyMicros: bulkClock.elapsedMicroseconds,
+          isStale: result.isStale);
+      return result;
     } finally {
       unawaited(_inFlight.remove(key) ?? Future<void>.value());
       _inFlightTimestamps.remove(key);
@@ -293,6 +339,7 @@ class StationServiceChain implements StationService {
   ) =>
       _throughChain<StationDetail>(
         cacheKey: CacheKey.stationDetail(stationId),
+        endpoint: DataAccessEndpoint.stationDetail,
         apiCall: () => _primary.getStationDetail(stationId),
         serialize: serializeStationDetail,
         deserialize: deserializeStationDetail,
@@ -305,6 +352,7 @@ class StationServiceChain implements StationService {
   ) =>
       _throughChain<Map<String, StationPrices>>(
         cacheKey: CacheKey.prices(ids),
+        endpoint: DataAccessEndpoint.batchPrices,
         apiCall: () => _primary.getPrices(ids),
         serialize: serializePrices,
         deserialize: deserializePrices,

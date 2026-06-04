@@ -10,6 +10,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/notifications/notification_providers.dart';
+import '../../../../../core/services/diagnostics/data_access_recorder_provider.dart';
+import '../../../../../core/services/diagnostics/data_access_trace_export.dart';
 import '../../../../../core/storage/storage_providers.dart';
 import '../../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../../core/widgets/page_scaffold.dart';
@@ -169,6 +171,18 @@ class DeveloperToolsScreen extends ConsumerWidget {
               l?.developerToolsCopyDiagnostics ?? 'Copy diagnostics',
             ),
           ),
+          const SizedBox(height: 8),
+          // #2824 — export the recorded network-vs-cache data-access trace so
+          // the cache-hit ratio + per-provider request intervals can be read
+          // against each provider's rate-limit policy.
+          OutlinedButton.icon(
+            key: const ValueKey('debug-data-access-tracer'),
+            onPressed: () => _exportDataAccessTrace(context, ref),
+            icon: const Icon(Icons.network_check_outlined),
+            label: Text(
+              l?.dataAccessTracerExport ?? 'Export data-access trace',
+            ),
+          ),
           const SizedBox(height: 16),
 
           // --- Approach overlay -----------------------------------------
@@ -310,6 +324,41 @@ class DeveloperToolsScreen extends ConsumerWidget {
       l?.developerToolsDiagnosticsCopied ??
           'Diagnostics copied to clipboard.',
     );
+  }
+
+  /// #2824 — build a [DataAccessTrace] from the recorded events and write it to
+  /// Downloads. When the tracer is off (production) or has recorded nothing
+  /// yet, tell the user to search / use the app first.
+  Future<void> _exportDataAccessTrace(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final l = AppLocalizations.of(context);
+    final recorder = ref.read(dataAccessRecorderProvider);
+    if (recorder == null || recorder.events.isEmpty) {
+      SnackBarHelper.show(
+        context,
+        l?.dataAccessTracerEmpty ??
+            'No data-access events recorded yet — search or open stations '
+                'first, then export.',
+      );
+      return;
+    }
+    final ok = await DataAccessTraceExport.export(recorder.build());
+    if (!context.mounted) return;
+    if (ok) {
+      SnackBarHelper.showSuccess(
+        context,
+        l?.dataAccessTracerExportSuccess ??
+            'Data-access trace saved to Downloads.',
+      );
+    } else {
+      SnackBarHelper.showError(
+        context,
+        l?.dataAccessTracerExportFailure ??
+            "Couldn't export the data-access trace.",
+      );
+    }
   }
 }
 

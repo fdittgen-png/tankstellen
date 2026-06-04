@@ -4327,6 +4327,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get developerToolsSectionTitle => 'Ferramentas de programador';
 
   @override
+  String get dataAccessTracerExport => 'Export data-access trace';
+
+  @override
+  String get dataAccessTracerExportSuccess =>
+      'Data-access trace saved to Downloads.';
+
+  @override
+  String get dataAccessTracerExportFailure =>
+      'Couldn\'t export the data-access trace.';
+
+  @override
+  String get dataAccessTracerEmpty =>
+      'No data-access events recorded yet — search or open stations first, then export.';
+
+  @override
   String get developerToolsSubtitle =>
       'Diagnósticos e ferramentas de depuração — visíveis apenas no modo programador / depuração.';
 
