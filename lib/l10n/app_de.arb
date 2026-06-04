@@ -2333,6 +2333,31 @@
   "pumpCameraGlareWarning": "Zu viel Blendung — leicht neigen, um Reflexionen zu vermeiden",
   "pumpCameraAlignHint": "Anzeige im Rahmen ausrichten, dann aufnehmen",
   "pumpCameraRotateToLandscape": "Drehe dein Telefon quer — die Zapfsäulenanzeige ist breit, so werden die Zahlen größer und stehen aufrecht",
+  "fillUpWarningDialogTitle": "Tankvorgang prüfen",
+  "fillUpWarningFuelMismatch": "Du hast {chosenFuel} gewählt, aber dieses Fahrzeug fährt mit {vehicleFuel}.",
+  "@fillUpWarningFuelMismatch": {
+    "placeholders": {
+      "chosenFuel": {
+        "type": "String"
+      },
+      "vehicleFuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningOdometerBelowPrevious": "Kilometerstand {entered} km liegt unter dem vorherigen Tankvorgang ({previous} km) – die Strecke kann nicht rückwärts laufen.",
+  "@fillUpWarningOdometerBelowPrevious": {
+    "placeholders": {
+      "entered": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningGoBack": "Zurück und korrigieren",
+  "fillUpWarningSaveAnyway": "Trotzdem speichern",
   "fillUpSectionWhatTitle": "Was du getankt hast",
   "fillUpSectionWhatSubtitle": "Kraftstoff, Menge, Preis",
   "fillUpSectionWhereTitle": "Wo du warst",

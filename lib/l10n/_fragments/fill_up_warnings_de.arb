@@ -1,0 +1,27 @@
+{
+  "fillUpWarningDialogTitle": "Tankvorgang prüfen",
+  "fillUpWarningFuelMismatch": "Du hast {chosenFuel} gewählt, aber dieses Fahrzeug fährt mit {vehicleFuel}.",
+  "@fillUpWarningFuelMismatch": {
+    "placeholders": {
+      "chosenFuel": {
+        "type": "String"
+      },
+      "vehicleFuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningOdometerBelowPrevious": "Kilometerstand {entered} km liegt unter dem vorherigen Tankvorgang ({previous} km) – die Strecke kann nicht rückwärts laufen.",
+  "@fillUpWarningOdometerBelowPrevious": {
+    "placeholders": {
+      "entered": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningGoBack": "Zurück und korrigieren",
+  "fillUpWarningSaveAnyway": "Trotzdem speichern"
+}

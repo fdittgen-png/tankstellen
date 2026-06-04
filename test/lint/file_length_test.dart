@@ -268,8 +268,14 @@ void main() {
     // single existing `scheduleSharedReceiptScanIfPending` call site was
     // renamed in place to `scheduleSharedReceiptPrefillIfPending`, which
     // drains both stashes), so this only corrects the snapshot to reality.
+    // #2836 — re-grandfathered 539 → 588: the data-quality save gate
+    // (_confirmDataQualityWarnings) must read the State's controllers +
+    // providers, so it lives here; the pure warning logic + the dialog
+    // are extracted (add_fill_up_warnings.dart, fill_up_warning_dialog.dart)
+    // to keep the growth to the gate method + its call site. Decomposition
+    // stays tracked under #2187/#2188/#2190.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        539,
+        588,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead

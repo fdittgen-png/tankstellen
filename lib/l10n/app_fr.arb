@@ -4531,5 +4531,46 @@
   "@gpsRoadUseSource": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fillUpWarningDialogTitle": "Check this fill-up",
+  "@fillUpWarningDialogTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpWarningFuelMismatch": "You picked {chosenFuel}, but this vehicle runs on {vehicleFuel}.",
+  "@fillUpWarningFuelMismatch": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "chosenFuel": {
+        "type": "String"
+      },
+      "vehicleFuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningOdometerBelowPrevious": "Odometer {entered} km is below the previous fill-up's {previous} km — distance can't go backwards.",
+  "@fillUpWarningOdometerBelowPrevious": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "entered": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningGoBack": "Go back and fix",
+  "@fillUpWarningGoBack": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpWarningSaveAnyway": "Save anyway",
+  "@fillUpWarningSaveAnyway": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

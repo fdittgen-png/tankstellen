@@ -9296,6 +9296,36 @@ abstract class AppLocalizations {
   /// **'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright'**
   String get pumpCameraRotateToLandscape;
 
+  /// Title of the confirmation dialog shown on save when a fill-up has data-quality warnings (wrong fuel for the engine, or an odometer below the previous reading) before persisting (#2836).
+  ///
+  /// In en, this message translates to:
+  /// **'Check this fill-up'**
+  String get fillUpWarningDialogTitle;
+
+  /// Warning line shown when the chosen fuel belongs to a different engine family than the vehicle's configured fuel, e.g. petrol on a diesel car (#2836). Both fuel names are pre-localised by the caller.
+  ///
+  /// In en, this message translates to:
+  /// **'You picked {chosenFuel}, but this vehicle runs on {vehicleFuel}.'**
+  String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel);
+
+  /// Warning line shown when the entered odometer is lower than the most recent prior fill-up's odometer for the same vehicle (#2836). Both numbers are pre-formatted by the caller.
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer {entered} km is below the previous fill-up\'s {previous} km — distance can\'t go backwards.'**
+  String fillUpWarningOdometerBelowPrevious(String entered, String previous);
+
+  /// Button on the fill-up warning dialog that dismisses it without saving so the user can correct the flagged field (#2836).
+  ///
+  /// In en, this message translates to:
+  /// **'Go back and fix'**
+  String get fillUpWarningGoBack;
+
+  /// Button on the fill-up warning dialog that proceeds to save the fill-up despite the warnings (#2836).
+  ///
+  /// In en, this message translates to:
+  /// **'Save anyway'**
+  String get fillUpWarningSaveAnyway;
+
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///
   /// In en, this message translates to:

@@ -5268,6 +5268,25 @@ class AppLocalizationsBg extends AppLocalizations {
       'Turn your phone sideways — the pump display is wide, so the numbers come out larger and upright';
 
   @override
+  String get fillUpWarningDialogTitle => 'Check this fill-up';
+
+  @override
+  String fillUpWarningFuelMismatch(String chosenFuel, String vehicleFuel) {
+    return 'You picked $chosenFuel, but this vehicle runs on $vehicleFuel.';
+  }
+
+  @override
+  String fillUpWarningOdometerBelowPrevious(String entered, String previous) {
+    return 'Odometer $entered km is below the previous fill-up\'s $previous km — distance can\'t go backwards.';
+  }
+
+  @override
+  String get fillUpWarningGoBack => 'Go back and fix';
+
+  @override
+  String get fillUpWarningSaveAnyway => 'Save anyway';
+
+  @override
   String get fillUpSectionWhatTitle => 'Какво сте заредили';
 
   @override

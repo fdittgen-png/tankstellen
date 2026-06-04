@@ -1,0 +1,38 @@
+{
+  "fillUpWarningDialogTitle": "Check this fill-up",
+  "@fillUpWarningDialogTitle": {
+    "description": "Title of the confirmation dialog shown on save when a fill-up has data-quality warnings (wrong fuel for the engine, or an odometer below the previous reading) before persisting (#2836)."
+  },
+  "fillUpWarningFuelMismatch": "You picked {chosenFuel}, but this vehicle runs on {vehicleFuel}.",
+  "@fillUpWarningFuelMismatch": {
+    "description": "Warning line shown when the chosen fuel belongs to a different engine family than the vehicle's configured fuel, e.g. petrol on a diesel car (#2836). Both fuel names are pre-localised by the caller.",
+    "placeholders": {
+      "chosenFuel": {
+        "type": "String"
+      },
+      "vehicleFuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningOdometerBelowPrevious": "Odometer {entered} km is below the previous fill-up's {previous} km — distance can't go backwards.",
+  "@fillUpWarningOdometerBelowPrevious": {
+    "description": "Warning line shown when the entered odometer is lower than the most recent prior fill-up's odometer for the same vehicle (#2836). Both numbers are pre-formatted by the caller.",
+    "placeholders": {
+      "entered": {
+        "type": "String"
+      },
+      "previous": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpWarningGoBack": "Go back and fix",
+  "@fillUpWarningGoBack": {
+    "description": "Button on the fill-up warning dialog that dismisses it without saving so the user can correct the flagged field (#2836)."
+  },
+  "fillUpWarningSaveAnyway": "Save anyway",
+  "@fillUpWarningSaveAnyway": {
+    "description": "Button on the fill-up warning dialog that proceeds to save the fill-up despite the warnings (#2836)."
+  }
+}
