@@ -31,14 +31,17 @@ class _RunningRow extends StatelessWidget {
 
 /// The source image + classified-block overlay inside an InteractiveViewer.
 class _OverlayView extends StatelessWidget {
-  final String imagePath;
+  /// #2821 — the EXIF-baked image bytes (NOT the raw file): rendered via
+  /// [Image.memory] so the displayed pixels match [imageSize] and the block
+  /// overlay, which all live in baked-pixel space.
+  final Uint8List imageBytes;
   final Size imageSize;
   final OcrTracePackage package;
   final int? selectedIndex;
   final ValueChanged<int?> onTapBlock;
 
   const _OverlayView({
-    required this.imagePath,
+    required this.imageBytes,
     required this.imageSize,
     required this.package,
     required this.selectedIndex,
@@ -71,7 +74,7 @@ class _OverlayView extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.file(File(imagePath), fit: BoxFit.fill),
+                    Image.memory(imageBytes, fit: BoxFit.fill),
                     CustomPaint(
                       key: const Key('ocr_block_overlay'),
                       painter: painter,
@@ -192,6 +195,7 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       _imagePath = result.path;
       _roi = result.roi;
       _package = null;
+      _bakedImageBytes = null;
     });
   }
 
@@ -207,6 +211,7 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       _imagePath = shot.path;
       _roi = null;
       _package = null;
+      _bakedImageBytes = null;
     });
   }
 
@@ -217,6 +222,7 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       _imagePath = shot.path;
       _roi = null;
       _package = null;
+      _bakedImageBytes = null;
     });
   }
 
@@ -254,11 +260,12 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       debugPrint('PumpOcrTester: pipeline run failed — $e\n$st');
     }
     if (!mounted) return;
-    final size = await _decodeImageSize(path);
+    final decoded = await _decodeBaked(path);
     if (!mounted) return;
     _rebuild(() {
       _package = trace.build();
-      _imageSize = size;
+      _imageSize = decoded?.size;
+      _bakedImageBytes = decoded?.bytes;
       _running = false;
     });
   }
@@ -287,14 +294,23 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
     }
   }
 
-  Future<Size?> _decodeImageSize(String path) async {
+  /// #2821 — read the capture, BAKE its EXIF orientation, and measure the
+  /// baked pixels. Returns the baked bytes + their size so the preview
+  /// ([Image.memory]) and the overlay scale ([imageSize]) share the same
+  /// baked space the ML Kit blocks were produced in — otherwise an EXIF tag
+  /// makes the preview appear flipped/rotated against the boxes.
+  Future<({Uint8List bytes, Size size})?> _decodeBaked(String path) async {
     try {
-      final bytes = await File(path).readAsBytes();
-      final codec = await instantiateImageCodec(bytes);
+      final raw = await File(path).readAsBytes();
+      final baked = bakeImageOrientation(raw) ?? raw;
+      final codec = await instantiateImageCodec(baked);
       final frame = await codec.getNextFrame();
-      return Size(
-        frame.image.width.toDouble(),
-        frame.image.height.toDouble(),
+      return (
+        bytes: baked,
+        size: Size(
+          frame.image.width.toDouble(),
+          frame.image.height.toDouble(),
+        ),
       );
     } catch (_) {
       return null;
