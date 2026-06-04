@@ -199,6 +199,29 @@ void main() {
         print(buffer.toString());
       }
     });
+
+    // #2857 — the redesigned alerts screen's "Station alerts" header shipped
+    // as English-equal autofill placeholders in French (a primary locale).
+    // The presence-based coverage gates above can't catch this (the keys ARE
+    // present, just holding the English value), so assert value-distinctness
+    // for the alerts-screen section labels a French user reads.
+    test('French alerts-section labels are real translations, not English '
+        'placeholders (#2857)', () {
+      final frFile = arbFiles.firstWhere((f) => f.path.endsWith('app_fr.arb'));
+      final fr = jsonDecode(frFile.readAsStringSync()) as Map<String, dynamic>;
+
+      for (final key in const [
+        'alertsStationSectionTitle',
+        'alertsStationAdd',
+      ]) {
+        expect(fr[key], isNotNull,
+            reason: 'app_fr.arb must contain $key');
+        expect(fr[key], isNot(equals(referenceArb[key])),
+            reason: 'French $key still equals the English value — it is an '
+                'untranslated autofill placeholder. Provide a real French '
+                'string in app_fr.arb (#2857).');
+      }
+    });
   });
 }
 

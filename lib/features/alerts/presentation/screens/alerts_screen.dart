@@ -17,6 +17,7 @@ import '../../domain/entities/price_alert.dart';
 import '../../domain/entities/radius_alert.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/radius_alerts_provider.dart';
+import '../widgets/alert_station_picker_sheet.dart';
 import '../widgets/alert_statistics_card.dart';
 import '../widgets/radius_alert_create_sheet.dart';
 
@@ -85,11 +86,11 @@ class _AlertsBody extends ConsumerWidget {
           title: l10n?.alertsStationSectionTitle ?? 'Station alerts',
           count: alerts.length,
           addTooltip: l10n?.alertsStationAdd ?? 'Add a station alert',
-          onAdd: () => SnackBarHelper.show(
-            context,
-            l10n?.noPriceAlertsHint ??
-                'Create an alert from a station\'s detail page.',
-          ),
+          // #2857 — the "+" used to be a dead-end that only re-showed the
+          // "create from a station's detail page" hint. It now opens the
+          // favorite-station picker and, on selection, the same
+          // [CreateAlertDialog] the station-detail app bar uses.
+          onAdd: () => AlertStationPickerSheet.addStationAlert(context, ref),
         ),
         if (alerts.isEmpty)
           _SectionEmpty(
