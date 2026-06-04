@@ -1,0 +1,15 @@
+IP Gruppo api
+Stazione di Servizio
+Viale Lazio 8
+00198 Roma (RM)
+
+Ricevuta digitale
+Data: 03/06/2026 09:17
+Erogatore 2 – Benzina
+
+Litri      27,540
+Prezzo al litro   1,879 €/L
+Importo      51,75 €
+
+Totale      51,75 €
+Grazie per averci scelto

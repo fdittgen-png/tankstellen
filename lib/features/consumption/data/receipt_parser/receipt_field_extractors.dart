@@ -45,18 +45,29 @@ FuelType? extractFuelType(String text) {
   if (RegExp(r'\be98\b|sp98|super\s*98').hasMatch(lower)) {
     return FuelType.e98;
   }
-  if (RegExp(r'diesel\s*premium|premium\s*diesel|gazole\s*premium')
+  if (RegExp(r'diesel\s*premium|premium\s*diesel|gazole\s*premium|'
+          r'gasolio\s*premium|hi\s*-?\s*q\s*diesel|excellium\s*diesel|'
+          r'v[- ]?power\s*diesel')
       .hasMatch(lower)) {
     return FuelType.dieselPremium;
   }
-  if (RegExp(r'\bdiesel\b|\bgazole\b|\bb7\b').hasMatch(lower)) {
+  // #2838 — Italian e-receipts label diesel "Gasolio" (compound forms like
+  // "Gasolio Auto", "Diesel+", "Blu Diesel" common on Eni/IP receipts).
+  if (RegExp(r'\bdiesel\b|\bgazole\b|\bb7\b|\bgasolio\b').hasMatch(lower)) {
     return FuelType.diesel;
   }
   if (RegExp(r'\bgpl\b|\blpg\b').hasMatch(lower)) {
     return FuelType.lpg;
   }
-  if (RegExp(r'\bgnv\b|\bcng\b').hasMatch(lower)) {
+  if (RegExp(r'\bgnv\b|\bcng\b|\bmetano\b').hasMatch(lower)) {
     return FuelType.cng;
+  }
+  // #2838 — Italian petrol is "Benzina" (E10 wasn't rolled out in IT for a
+  // long time, so an unqualified "Benzina" is E5). A qualified "Benzina E10"
+  // already matched the \be10\b branch above, so this only catches the bare
+  // petrol label — kept LAST so the specific E5/E10/E85/E98 codes win first.
+  if (RegExp(r'\bbenzina\b').hasMatch(lower)) {
+    return FuelType.e5;
   }
   return null;
 }
@@ -99,9 +110,10 @@ double? extractLiters(String text) {
     // the bottom of this function prunes the remaining false positives
     // (TVA percentages stay outside range).
     RegExp(r'(\d{1,3}[.,]\d{2,3})(?!\d)\s*[?|itjP1](?![A-Za-z0-9.,])'),
-    // "VOLUME : 42.35" / "Volume: 42,35" / "Quantité = 5.27"
+    // "VOLUME : 42.35" / "Volume: 42,35" / "Quantité = 5.27" / "Litri 38,42"
+    // (#2838 — Italian e-receipts label the volume "Litri" / "Quantità").
     RegExp(
-      r'(?:volume|quantit[eé])\s*[:=]?\s*(\d{1,3}[.,]\d{1,3})',
+      r'(?:volume|quantit[eéà]|litri)\s*[:=]?\s*(\d{1,3}[.,]\d{1,3})',
       caseSensitive: false,
     ),
     // "5,00 x SP95E5" / "42,50 X GAZOLE" / "10,00 × SP98" — French
@@ -141,11 +153,15 @@ double? extractTotalCost(String text, {OcrLocaleProfile? profile}) {
   final sym = currency.majorUnitPattern;
 
   final labelled = matchFirst(text, [
-    // TOTAL / TOT TTC / MONTANT[ REEL / TTC] / TTC / German labels.
+    // TOTAL / TOT TTC / MONTANT[ REEL / TTC] / TTC / German + Italian labels.
     // Accept ":" or "=" between label and amount, optional currency sym.
+    // #2838 — Italian e-receipts label the charged amount "Importo" or
+    // "Totale" (matched by the leading `total` alt). "Importo" is the
+    // line-item value, "Totale"/"Totale documento" the document total.
     RegExp(
-      r'(?:total|tot\s*ttc|montant(?:\s*(?:ttc|reel|r[eé]el))?|ttc|'
-      r'betrag|summe|gesamt)'
+      r'(?:totale(?:\s*documento)?|total|tot\s*ttc|'
+      r'montant(?:\s*(?:ttc|reel|r[eé]el))?|ttc|'
+      r'betrag|summe|gesamt|importo)'
       '\\s*[:=]?\\s*(?:$sym)?\\s*(\\d+[.,]\\d+)',
       caseSensitive: false,
     ),
@@ -219,11 +235,14 @@ double? extractPricePerLiter(String text, {OcrLocaleProfile? profile}) {
     // "€ 1.999/L" / "£ 1.429/L" — currency symbol before the number.
     RegExp('(?:$sym)\\s*(\\d+[.,]\\d{2,3})\\s*/\\s*[lLℓ]', caseSensitive: false),
     // Labels: PRIX/L, PU, Preis/L, Literpreis, Prix unit(.), Preis je
-    // Liter, plus generic English "Unit price" / "Price/L". Also accepts
-    // `ℓ` in place of `l` in the slash-L forms.
+    // Liter, plus generic English "Unit price" / "Price/L". #2838 — Italian
+    // e-receipts label the per-litre price "Prezzo unitario", "Prezzo/Litro"
+    // or "Prezzo al litro". Also accepts `ℓ` in place of `l` in the
+    // slash-L forms.
     RegExp(
       r'(?:prix\s*/\s*[lℓ]|prix\s*unit\.?|pu|preis\s*/\s*[lℓ]|'
-      r'preis\s*je\s*liter|literpreis|unit\s*price|price\s*/\s*[lℓ])'
+      r'preis\s*je\s*liter|literpreis|unit\s*price|price\s*/\s*[lℓ]|'
+      r'prezzo\s*(?:unitario|/\s*litro|al\s*litro))'
       '\\s*[:=]?\\s*(?:$sym)?\\s*(\\d+[.,]\\d{2,3})',
       caseSensitive: false,
     ),

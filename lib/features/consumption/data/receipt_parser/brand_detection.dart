@@ -27,6 +27,14 @@ String? detectBrand(List<String> lines, String fullText) {
   if (haystack.contains('shell')) return 'shell';
   if (haystack.contains('esso')) return 'esso';
   if (haystack.contains('aral')) return 'aral';
+  // #2838 — Italian retailers (e-receipt phase 1). enilive is Eni's
+  // forecourt brand; check it before the broader "eni" token so the more
+  // specific name wins. Q8 / IP / Tamoil / Api round out the IT majors.
+  if (haystack.contains('enilive')) return 'enilive';
+  if (RegExp(r'\beni\b').hasMatch(haystack)) return 'eni';
+  if (RegExp(r'\bq8\b').hasMatch(haystack)) return 'q8';
+  if (RegExp(r'\bip\b').hasMatch(haystack)) return 'ip';
+  if (haystack.contains('tamoil')) return 'tamoil';
   return null;
 }
 
@@ -37,6 +45,8 @@ String? extractStationName(List<String> lines) {
     'avia', 'jet', 'elf', 'agip', 'q8', 'omv', 'mol', 'orlen',
     'intermarché', 'intermarche', 'leclerc', 'carrefour', 'auchan',
     'super u', 'système u', 'systeme u', 'casino',
+    // #2838 — Italian retailers (e-receipt phase 1).
+    'enilive', 'eni', 'ip', 'tamoil', 'api',
   ];
 
   for (final line in lines.take(5)) {
