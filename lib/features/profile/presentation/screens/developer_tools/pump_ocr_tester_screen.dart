@@ -6,6 +6,7 @@ library;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' show instantiateImageCodec;
 
 import 'package:flutter/material.dart';
@@ -72,6 +73,10 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
   bool _running = false;
   OcrTracePackage? _package;
   Size? _imageSize;
+  // #2821 — the EXIF-baked image bytes for the preview, so the displayed
+  // pixels, the measured [_imageSize], and the ML Kit block overlay (which
+  // ran on the baked upright copy) all share one coordinate space.
+  Uint8List? _bakedImageBytes;
   int? _selectedBlock;
 
   late final ReceiptScanService _service =
@@ -227,7 +232,6 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
     AppLocalizations? l,
     OcrTracePackage package,
   ) {
-    final path = _imagePath;
     return [
       SectionHeader(
         leadingIcon: Icons.grid_on_outlined,
@@ -235,9 +239,9 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
         padding: EdgeInsets.zero,
       ),
       const SizedBox(height: 8),
-      if (path != null && _imageSize != null)
+      if (_bakedImageBytes != null && _imageSize != null)
         _OverlayView(
-          imagePath: path,
+          imageBytes: _bakedImageBytes!,
           imageSize: _imageSize!,
           package: package,
           selectedIndex: _selectedBlock,
