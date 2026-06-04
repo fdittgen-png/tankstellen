@@ -616,5 +616,63 @@ void main() {
       expect(decoded!.country, 'it');
       expect(decoded.stationId, 'it-001');
     });
+
+    test(
+        '#2864 — countryResolver wins over the fallback country per alert',
+        () async {
+      final store = RadiusAlertStore();
+      final dedup = RadiusAlertDedup();
+      final notifier = _FakeNotifier();
+      // Fallback is 'de', but the resolver derives the centre's country
+      // ('gb' here) so the deep-link payload points at the right country.
+      final runner = RadiusAlertRunner(
+        store: store,
+        dedup: dedup,
+        notifier: notifier,
+        copyBuilder: _copy,
+        country: 'de',
+        countryResolver: (alert) => 'gb',
+      );
+
+      await store.upsert(makeAlert(id: 'r1'));
+
+      await runner.run(
+        now: DateTime.utc(2026, 4, 22, 12),
+        samplesFor: (a) async => [sample(stationId: 'uk-001', price: 1.540)],
+      );
+
+      final decoded = NotificationPayload.tryDecode(
+          notifier.priceAlerts.single.payload);
+      expect(decoded, isNotNull);
+      expect(decoded!.country, 'gb',
+          reason: 'The resolved centre country must win over the fallback.');
+    });
+
+    test(
+        '#2864 — falls back to country when the resolver returns null',
+        () async {
+      final store = RadiusAlertStore();
+      final dedup = RadiusAlertDedup();
+      final notifier = _FakeNotifier();
+      final runner = RadiusAlertRunner(
+        store: store,
+        dedup: dedup,
+        notifier: notifier,
+        copyBuilder: _copy,
+        country: 'de',
+        countryResolver: (alert) => null,
+      );
+
+      await store.upsert(makeAlert(id: 'r1'));
+
+      await runner.run(
+        now: DateTime.utc(2026, 4, 22, 12),
+        samplesFor: (a) async => [sample(stationId: 's1', price: 1.540)],
+      );
+
+      final decoded = NotificationPayload.tryDecode(
+          notifier.priceAlerts.single.payload);
+      expect(decoded!.country, 'de');
+    });
   });
 }

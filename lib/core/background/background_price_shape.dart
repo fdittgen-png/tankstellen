@@ -24,11 +24,11 @@ Map<String, dynamic> stationPricesToTankerkoenigShape(StationPrices prices) => {
       TankerkoenigFields.e5: prices.e5,
       TankerkoenigFields.e10: prices.e10,
       TankerkoenigFields.diesel: prices.diesel,
-      'e98': prices.e98,
-      'dieselPremium': prices.dieselPremium,
-      'e85': prices.e85,
-      'lpg': prices.lpg,
-      'cng': prices.cng,
+      TankerkoenigFields.e98: prices.e98,
+      TankerkoenigFields.dieselPremium: prices.dieselPremium,
+      TankerkoenigFields.e85: prices.e85,
+      TankerkoenigFields.lpg: prices.lpg,
+      TankerkoenigFields.cng: prices.cng,
     };
 
 /// Adapt a priced [Station] (a bulk-dataset local-filter result) to the
@@ -42,9 +42,9 @@ Map<String, dynamic> stationToTankerkoenigShape(Station station) => {
       TankerkoenigFields.e5: station.e5,
       TankerkoenigFields.e10: station.e10,
       TankerkoenigFields.diesel: station.diesel,
-      'e98': station.e98,
-      'dieselPremium': station.dieselPremium,
-      'e85': station.e85,
-      'lpg': station.lpg,
-      'cng': station.cng,
+      TankerkoenigFields.e98: station.e98,
+      TankerkoenigFields.dieselPremium: station.dieselPremium,
+      TankerkoenigFields.e85: station.e85,
+      TankerkoenigFields.lpg: station.lpg,
+      TankerkoenigFields.cng: station.cng,
     };

@@ -27,6 +27,21 @@ class BackgroundPriceHistoryWriter {
   /// Keep this much price-history per station; older points are trimmed.
   static const retention = Duration(days: 30);
 
+  /// #2864 — every fuel grade the country-agnostic price map can carry
+  /// (`background_price_shape.dart`). The writer extracts each one so a non-DE
+  /// fuel set (FR E85 / LPG, IT CNG, …) is recorded too. DE stays byte-identical
+  /// — e5/e10/diesel are still read from the same keys.
+  static const _fuelFields = <String>[
+    TankerkoenigFields.e5,
+    TankerkoenigFields.e10,
+    TankerkoenigFields.e98,
+    TankerkoenigFields.diesel,
+    TankerkoenigFields.dieselPremium,
+    TankerkoenigFields.e85,
+    TankerkoenigFields.lpg,
+    TankerkoenigFields.cng,
+  ];
+
   static Future<void> recordHistory(
     HiveStorage storage,
     Map<String, Map<String, dynamic>> prices,
@@ -43,7 +58,12 @@ class BackgroundPriceHistoryWriter {
         recordedAt: now,
         e5: p.getDouble(TankerkoenigFields.e5),
         e10: p.getDouble(TankerkoenigFields.e10),
+        e98: p.getDouble(TankerkoenigFields.e98),
         diesel: p.getDouble(TankerkoenigFields.diesel),
+        dieselPremium: p.getDouble(TankerkoenigFields.dieselPremium),
+        e85: p.getDouble(TankerkoenigFields.e85),
+        lpg: p.getDouble(TankerkoenigFields.lpg),
+        cng: p.getDouble(TankerkoenigFields.cng),
       );
       final existing = storage.getPriceRecords(stationId);
       final lastRecordedAt = existing.isNotEmpty
@@ -79,12 +99,12 @@ class BackgroundPriceHistoryWriter {
       final cachedData = cached?.getMap('data');
       if (cachedData == null) continue;
       final stationData = Map<String, dynamic>.from(cachedData);
-      final e5 = p.getDouble(TankerkoenigFields.e5);
-      final e10 = p.getDouble(TankerkoenigFields.e10);
-      final diesel = p.getDouble(TankerkoenigFields.diesel);
-      if (e5 != null) stationData[TankerkoenigFields.e5] = e5;
-      if (e10 != null) stationData[TankerkoenigFields.e10] = e10;
-      if (diesel != null) stationData[TankerkoenigFields.diesel] = diesel;
+      // #2864 — patch every fuel grade present in the fetched prices, not just
+      // e5/e10/diesel, so a non-DE station's full fuel set stays fresh in cache.
+      for (final field in _fuelFields) {
+        final value = p.getDouble(field);
+        if (value != null) stationData[field] = value;
+      }
       stationData[TankerkoenigFields.isOpen] =
           p[TankerkoenigFields.status] == TankerkoenigFields.statusOpen;
       await storage.cacheData('station:$stationId', stationData);

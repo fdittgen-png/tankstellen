@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/background_alert_scan_coordinator.dart';
 import 'package:tankstellen/core/background/background_scan_runners.dart';
+import 'package:tankstellen/core/background/fuel_price_fields.dart';
 import 'package:tankstellen/core/background/notification_templates.dart';
 import 'package:tankstellen/features/alerts/data/radius_alert_runner.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
@@ -58,16 +59,26 @@ void main() {
     });
   });
 
-  group('tankerkoenigKeyFor', () {
-    test('maps the three BG-supported fuels', () {
-      expect(tankerkoenigKeyFor(FuelType.e5), 'e5');
-      expect(tankerkoenigKeyFor(FuelType.e10), 'e10');
-      expect(tankerkoenigKeyFor(FuelType.diesel), 'diesel');
+  group('priceFieldKeyFor (#2864)', () {
+    test('maps the DE-historical fuels to their byte-identical keys', () {
+      expect(priceFieldKeyFor(FuelType.e5), 'e5');
+      expect(priceFieldKeyFor(FuelType.e10), 'e10');
+      expect(priceFieldKeyFor(FuelType.diesel), 'diesel');
     });
 
-    test('returns null for fuels the BG isolate cannot fetch', () {
-      expect(tankerkoenigKeyFor(FuelType.lpg), isNull);
-      expect(tankerkoenigKeyFor(FuelType.electric), isNull);
+    test('maps the widened fuel set to the price-map keys', () {
+      expect(priceFieldKeyFor(FuelType.e98), 'e98');
+      // diesel-premium is camelCase in the map, NOT its snake_case apiValue.
+      expect(priceFieldKeyFor(FuelType.dieselPremium), 'dieselPremium');
+      expect(priceFieldKeyFor(FuelType.e85), 'e85');
+      expect(priceFieldKeyFor(FuelType.lpg), 'lpg');
+      expect(priceFieldKeyFor(FuelType.cng), 'cng');
+    });
+
+    test('returns null for fuels with no price field in the feed', () {
+      expect(priceFieldKeyFor(FuelType.electric), isNull);
+      expect(priceFieldKeyFor(FuelType.hydrogen), isNull);
+      expect(priceFieldKeyFor(FuelType.all), isNull);
     });
   });
 
@@ -135,6 +146,49 @@ void main() {
       // total = visible (1) + truncated (4) = 5
       expect(copy.title, contains('5'));
       expect(copy.body, contains('4'));
+    });
+
+    test('a DE centre renders the euro (byte-identical, #2864)', () {
+      // Berlin (52.5, 13.4) → DE → €.
+      final copy = buildRadiusAlertCopy(
+        RadiusAlertGroupedEvent(
+          alert: alert(),
+          matches: [sample('s1', 1.629)],
+        ),
+        templates,
+      );
+      expect(copy.title, contains('€'));
+      expect(copy.body, contains('€'));
+    });
+
+    test('a GB centre renders £, not a forced euro (#2864)', () {
+      // Manchester (53.48, -2.24) → GB → £ (well north of FR's box, so the
+      // bounding-box derivation is unambiguous).
+      final gbAlert = RadiusAlert(
+        id: 'gb1',
+        fuelType: 'diesel',
+        threshold: 1.459,
+        centerLat: 53.48,
+        centerLng: -2.24,
+        radiusKm: 5,
+        label: 'Manchester diesel',
+        createdAt: DateTime.utc(2026, 5, 30),
+      );
+      const gbSample = StationPriceSample(
+        stationId: 'uk-1',
+        name: 'Shell Manchester',
+        lat: 53.48,
+        lng: -2.24,
+        fuelType: 'diesel',
+        pricePerLiter: 1.439,
+      );
+      final copy = buildRadiusAlertCopy(
+        RadiusAlertGroupedEvent(alert: gbAlert, matches: [gbSample]),
+        templates,
+      );
+      expect(copy.title, contains('£'));
+      expect(copy.title, isNot(contains('€')));
+      expect(copy.body, contains('£'));
     });
   });
 }

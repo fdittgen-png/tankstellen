@@ -70,6 +70,14 @@ void main() {
       );
     });
 
+    test('price-alert body honours a per-alert currency override (#2864)', () {
+      // A GB alert renders the body in £, not a forced euro.
+      expect(
+        t.renderPriceAlertBody(price: '1.459', target: '1.500', currency: '£'),
+        '1.459 £ (target: 1.500 £)',
+      );
+    });
+
     test('velocity body fills count + cents', () {
       expect(
         t.renderVelocityBody(count: 4, cents: 7),
@@ -84,8 +92,32 @@ void main() {
       );
     });
 
+    test('radius title honours a per-alert currency override (#2864)', () {
+      expect(
+        t.renderRadiusTitle(
+            label: 'Home', count: 3, threshold: '1.600', currency: 'kr'),
+        'Home: 3 stations ≤ 1.600 kr',
+      );
+    });
+
     test('radius "+ N more" line fills count', () {
       expect(t.renderRadiusMore(count: 5), '+ 5 more');
+    });
+  });
+
+  group('currencyForCountry (#2864) — derive symbol from country', () {
+    final t = BackgroundNotificationTemplates.resolveForLanguage('en');
+
+    test('resolves the registered currency per country', () {
+      expect(t.currencyForCountry('DE'), '€');
+      expect(t.currencyForCountry('GB'), '£');
+      expect(t.currencyForCountry('DK'), 'kr');
+      expect(t.currencyForCountry('KR'), '₩');
+    });
+
+    test('falls back to the template default (euro) for null / unknown', () {
+      expect(t.currencyForCountry(null), '€');
+      expect(t.currencyForCountry('ZZ'), '€');
     });
   });
 
