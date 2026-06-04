@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/trip_recorder.dart';
+import 'trip_dedup.dart';
 import 'trip_sample_codec.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -301,10 +302,23 @@ class TripHistoryRepository {
   /// Box name used by the production wiring.
   static const String boxName = 'obd2_trip_history';
 
-  /// Persist [entry]. Drops the oldest trip when the box reaches
-  /// [cap]. Errors are logged but swallowed — losing one rolling-log
-  /// entry shouldn't propagate up into the trip-stop flow.
+  /// Persist [entry]. Drops the oldest trip when the box reaches [cap].
+  /// Errors are logged but swallowed. #2833 — a 0-sample ghost whose
+  /// sampled twin already exists is a no-op; a sampled twin deletes any
+  /// pre-existing 0-sample ghost (see [guardGhostDoubleSave]).
   Future<void> save(TripHistoryEntry entry) async {
+    try {
+      // A guard hiccup must never block the save — fall through to a write.
+      final skip = await guardGhostDoubleSave(
+        entry: entry,
+        existing: loadAll(dedupe: false),
+        deleteById: _box.delete,
+      );
+      if (skip) return;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: const {'where': 'TripHistoryRepository.save ghost-guard'}));
+    }
     try {
       await _box.put(entry.id, jsonEncode(entry.toJson()));
     } catch (e, st) {
@@ -344,10 +358,11 @@ class TripHistoryRepository {
     }
   }
 
-  /// Return every persisted trip, sorted newest-first. Corrupt
-  /// payloads are silently skipped so one bad write doesn't hide the
-  /// whole list.
-  List<TripHistoryEntry> loadAll() {
+  /// Return every persisted trip, sorted newest-first. Corrupt payloads
+  /// are silently skipped. #2833 — by default ghost 0-sample duplicates
+  /// are removed so the list, the aggregates (`loadAll().length`) and the
+  /// re-export see the de-duped truth; `dedupe: false` is the raw set.
+  List<TripHistoryEntry> loadAll({bool dedupe = true}) {
     final result = <TripHistoryEntry>[];
     for (final key in _box.keys) {
       final entry = _decode(key);
@@ -358,7 +373,7 @@ class TripHistoryRepository {
       final bx = b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
       return bx.compareTo(ax); // newest first
     });
-    return result;
+    return dedupe ? dedupeGhostTrips(result) : result;
   }
 
   /// O(1) lookup of one persisted trip by [id] (#2304) — the box is keyed

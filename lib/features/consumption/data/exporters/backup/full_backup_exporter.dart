@@ -14,6 +14,7 @@ import '../../../../../core/sharing/public_file_exporter.dart';
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
+import '../../trip_dedup.dart';
 import '../../trip_history_repository.dart';
 import 'backup_xml_writer.dart';
 import 'backup_zipper.dart';
@@ -114,10 +115,15 @@ class FullBackupExporter {
     final now = clock();
     final appVersion = debugBackupAppVersionOverride ?? AppConstants.appVersion;
 
+    // #2833 — drop ghost 0-sample trip duplicates so a backup carries the
+    // de-duped truth (the in-app `loadAll` already de-dupes, but a caller
+    // that passes a raw list is covered here too).
+    final cleanTrips = dedupeGhostTrips(trips);
+
     final xml = xmlWriter.build(
       vehicles: vehicles,
       fillUps: fillUps,
-      trips: trips,
+      trips: cleanTrips,
       chargingLogs: chargingLogs,
       appVersion: appVersion,
       exportedAt: now,

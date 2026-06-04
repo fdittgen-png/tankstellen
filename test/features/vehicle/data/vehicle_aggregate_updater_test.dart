@@ -471,7 +471,7 @@ class _FakeTripHistory implements TripHistoryRepository {
   List<TripHistoryEntry> entries = <TripHistoryEntry>[];
 
   @override
-  List<TripHistoryEntry> loadAll() {
+  List<TripHistoryEntry> loadAll({bool dedupe = true}) {
     final sorted = [...entries];
     sorted.sort((a, b) {
       final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
