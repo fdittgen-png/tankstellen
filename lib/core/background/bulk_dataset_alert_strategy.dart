@@ -11,11 +11,13 @@ import '../cache/cache_manager.dart';
 import '../data/storage_repository.dart';
 import '../logging/error_logger.dart';
 import '../services/country_service_registry.dart';
+import '../services/diagnostics/data_access_recorder.dart';
 import '../services/fuel_service_policy.dart';
 import '../services/station_service.dart';
 import '../utils/json_extensions.dart';
 import 'background_price_shape.dart';
 import 'country_alert_strategy.dart';
+import 'provider_request_budget.dart';
 
 /// [CountryAlertStrategy] for a [SourceModel.bulkFile] country (#2863) — ES,
 /// IT, AR, DK, plus the flag-gated GB-bulk / FR-bulk paths.
@@ -59,13 +61,21 @@ class BulkDatasetAlertStrategy implements CountryAlertStrategy {
     required StorageRepository storage,
     required CacheStrategy cache,
     required FuelServicePolicy policy,
+    DataAccessRecorder? recorder,
+    ProviderRequestBudget? budget,
     @visibleForTesting StationService? service,
     @visibleForTesting StationCoordsResolver? coordsResolver,
   })  : _storage = storage,
         _cache = cache,
         _policy = policy,
+        _recorder = recorder,
+        _budget = budget,
         _serviceOverride = service,
-        _coordsResolver = coordsResolver ?? _defaultCoordsResolver(storage);
+        _coordsResolver = coordsResolver ?? _defaultCoordsResolver(storage) {
+    // #2866 — note the dataset-refresh interval so the trace can judge the
+    // bulk download's compliance against datasetTtl-derived minInterval.
+    recorder?.notePolicy(countryCode, policy.minInterval);
+  }
 
   @override
   final String countryCode;
@@ -73,6 +83,14 @@ class BulkDatasetAlertStrategy implements CountryAlertStrategy {
   final StorageRepository _storage;
   final CacheStrategy _cache;
   final FuelServicePolicy _policy;
+
+  /// #2824 tracer threaded into the BG isolate (#2866). Null outside an
+  /// instrumented scan; the bulk-backed chain stamps network/coalesced events.
+  final DataAccessRecorder? _recorder;
+
+  /// #2866 shared per-provider (per-dataset) request budget the bulk chain
+  /// stamps on a dataset download. Null in the legacy/test call sites.
+  final ProviderRequestBudget? _budget;
 
   /// Test seam: a pre-built bulk service (a fake dataset). Production leaves
   /// this null and builds the real bulk chain on first use.
@@ -107,6 +125,10 @@ class BulkDatasetAlertStrategy implements CountryAlertStrategy {
           countryCode,
           storage: _storage,
           cache: _cache,
+          // #2866 — count the bulk download in the trace + share the dataset
+          // refresh budget with the foreground.
+          recorder: _recorder,
+          budget: _budget,
         );
   }
 

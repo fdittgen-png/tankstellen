@@ -12,11 +12,14 @@ import '../cache/cache_manager.dart';
 import '../data/storage_repository.dart';
 import '../logging/error_logger.dart';
 import '../services/country_service_registry.dart';
+import '../services/diagnostics/data_access_recorder.dart';
 import '../services/dio_factory.dart';
+import '../services/fuel_service_policy.dart';
 import '../services/service_config.dart';
 import '../services/station_service.dart';
 import 'background_price_shape.dart';
 import 'country_alert_strategy.dart';
+import 'provider_request_budget.dart';
 
 /// The 11 polled / realtime providers a background scan may query directly,
 /// reusing the per-country `StationServiceChain` within each provider's
@@ -37,15 +40,31 @@ const Set<String> kBackgroundPolledCountries = {
 /// [serviceBuilder] is the #2862 test seam: a fake per-country service builder.
 /// Production leaves it null and goes through
 /// [CountryServiceRegistry.buildBackgroundService].
+///
+/// [recorder] is the #2824 data-access tracer, threaded through the BG isolate
+/// by #2866 so background traffic is counted (it was previously null in the
+/// isolate — only the foreground saw it). [budget] is the #2866 shared
+/// per-provider request budget the BG scan consults before firing and the
+/// chain stamps on a hit.
 class PolledAlertStrategyDeps {
   const PolledAlertStrategyDeps({
     this.connectTimeout = const Duration(seconds: 10),
     this.receiveTimeout = const Duration(seconds: 15),
     this.serviceBuilder,
+    this.recorder,
+    this.budget,
   });
 
   final Duration connectTimeout;
   final Duration receiveTimeout;
+
+  /// #2824 data-access tracer threaded into the BG isolate (#2866). Null
+  /// outside an instrumented scan.
+  final DataAccessRecorder? recorder;
+
+  /// #2866 shared foreground+background per-provider request budget. Null in
+  /// the legacy/test call sites that don't gate.
+  final ProviderRequestBudget? budget;
 
   @visibleForTesting
   final StationService? Function(String code, {String? apiKey})? serviceBuilder;
@@ -63,18 +82,36 @@ class PolledAlertStrategyDeps {
 class PolledAlertStrategy implements CountryAlertStrategy {
   PolledAlertStrategy._(
     this.countryCode,
-    this._service,
-  );
+    this._service, {
+    this.minInterval,
+    ProviderRequestBudget? budget,
+  }) : _budget = budget;
 
   @override
   final String countryCode;
 
   final StationService _service;
 
+  /// The provider's configured min inter-request spacing (#2866), read from
+  /// the registry policy. Used with [_budget] to skip a too-soon BG poll.
+  final Duration? minInterval;
+
+  /// Shared foreground+background per-provider request budget (#2866). When
+  /// present, a fetch / search is skipped if the provider was hit (by EITHER
+  /// isolate) within [minInterval]; the cache then answers from the last hit.
+  final ProviderRequestBudget? _budget;
+
   /// The built country [StationService] backing this strategy. Exposed for the
   /// nearest-widget search (#609 / #2862), which needs a raw service handle
   /// rather than the strategy facade.
   StationService get service => _service;
+
+  /// `true` when the shared budget allows a fresh provider request for this
+  /// country right now — i.e. no budget is wired, or the last request is at
+  /// least [minInterval] old. A blocked request leaves the previous prices in
+  /// place (the foreground / a prior scan already populated the cache).
+  bool get _budgetAllows =>
+      _budget?.canFire(countryCode, minInterval) ?? true;
 
   /// Whether [countryCode] is one of the polled providers this strategy serves.
   static bool isPolled(String countryCode) =>
@@ -105,9 +142,25 @@ class PolledAlertStrategy implements CountryAlertStrategy {
             tankerkoenigDio: countryCode == 'DE'
                 ? _buildTankerkoenigDio(apiKey, d)
                 : null,
+            // #2866 — count BG traffic + share the per-provider budget with the
+            // foreground; both null outside an instrumented / gated scan.
+            recorder: d.recorder,
+            budget: d.budget,
           );
     if (service == null) return null;
-    return PolledAlertStrategy._(countryCode, service);
+    // #2866 — the provider's configured minInterval, fed to the shared budget
+    // so a too-soon BG poll after a foreground hit is skipped. The recorder
+    // also notes it (in buildBackgroundService) so the trace can judge
+    // compliance against it. A fake serviceBuilder may yield no policy.
+    final minInterval =
+        CountryServiceRegistry.policyFor(countryCode)?.minInterval;
+    d.recorder?.notePolicy(countryCode, minInterval);
+    return PolledAlertStrategy._(
+      countryCode,
+      service,
+      minInterval: minInterval,
+      budget: d.budget,
+    );
   }
 
   /// Tankerkönig Dio for the background isolate: rate-limited + conditional
@@ -138,6 +191,14 @@ class PolledAlertStrategy implements CountryAlertStrategy {
     Set<String> stationIds,
   ) async {
     if (stationIds.isEmpty) return const {};
+    // #2866 — shared-budget gate: skip a too-soon poll the foreground (or a
+    // prior scan) already covered within minInterval. The cache still holds
+    // those prices, so per-station alerts evaluate against the last fetch.
+    if (!_budgetAllows) {
+      debugPrint('PolledAlertStrategy.fetchPrices($countryCode): skipped — '
+          'within shared minInterval budget');
+      return const {};
+    }
     try {
       final result = await _service.getPrices(stationIds.toList());
       final out = <String, Map<String, dynamic>>{};
@@ -158,6 +219,13 @@ class PolledAlertStrategy implements CountryAlertStrategy {
   /// or an empty list on a fetch fault.
   @override
   Future<List<Station>> searchArea(SearchParams params) async {
+    // #2866 — same shared-budget gate as fetchPrices: a radius search is a
+    // provider request, so skip it when the shared minInterval is not yet up.
+    if (!_budgetAllows) {
+      debugPrint('PolledAlertStrategy.searchArea($countryCode): skipped — '
+          'within shared minInterval budget');
+      return const [];
+    }
     try {
       final result = await _service.searchStations(params);
       return result.data;

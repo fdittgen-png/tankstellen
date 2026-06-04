@@ -26,22 +26,27 @@ void main() {
       expect(
         tags,
         containsAll(<String>[
+          // #2866 — the charging-only trigger was dropped with the 30-min
+          // cadence; the twice-daily scan reports `workmanager_periodic`.
           'workmanager_periodic',
-          'workmanager_charging',
           'android_widget',
           'ios_bg_refresh',
         ]),
       );
+      expect(tags, isNot(contains('workmanager_charging')),
+          reason: 'the charging trigger was removed (#2866)');
     });
   });
 
   group('cooldown tuning', () {
-    test('scan cooldown is shorter than the charging cadence', () {
+    test('scan cooldown is far shorter than the twice-daily cadence', () {
       // The coarse cross-trigger cooldown must never starve a legitimately
-      // scheduled 30-minute charging task.
+      // scheduled periodic scan. With the twice-daily (~12h) cadence (#2866)
+      // a 10-minute cooldown only ever dedups a burst of near-simultaneous
+      // triggers (e.g. an opportunistic widget refresh + the periodic wake).
       expect(
         BackgroundAlertScanCoordinator.scanCooldown,
-        lessThan(const Duration(minutes: 30)),
+        lessThan(const Duration(hours: 12)),
       );
       expect(
         BackgroundAlertScanCoordinator.scanCooldown,

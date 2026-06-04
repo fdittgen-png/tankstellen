@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../features/search/data/models/search_params.dart';
 import '../../features/search/domain/entities/station.dart';
+import '../background/provider_request_budget.dart';
 import '../cache/cache_manager.dart';
 import '../error/exceptions.dart';
 import '../logging/error_logger.dart';
@@ -66,6 +67,14 @@ class StationServiceChain implements StationService {
   /// compliance + cache-hit-ratio export.
   final DataAccessRecorder? _recorder;
 
+  /// Shared foreground+background per-provider request budget (#2866). When
+  /// supplied, the chain stamps [ProviderRequestBudget.recordRequest] for this
+  /// [countryCode] on every successful upstream (`networkApi`) request, so the
+  /// next background scan can see that the foreground just hit this provider
+  /// and skip it within its `minInterval`. Null for the legacy call sites /
+  /// unit tests that don't wire a budget — then no stamp is written.
+  final ProviderRequestBudget? _budget;
+
   /// In-flight request deduplication: concurrent calls for the same cache key
   /// share a single Future instead of hitting the API multiple times.
   /// Entries are removed in the finally block of [_throughChain] and also
@@ -81,9 +90,11 @@ class StationServiceChain implements StationService {
     this.countryCode = '',
     FuelServicePolicy? policy,
     DataAccessRecorder? recorder,
+    ProviderRequestBudget? budget,
   })  : _errorSource = errorSource,
         _policy = policy,
-        _recorder = recorder;
+        _recorder = recorder,
+        _budget = budget;
 
   /// Generic cache-through + request coalescing.
   ///
@@ -194,6 +205,10 @@ class StationServiceChain implements StationService {
           DataAccessHit.networkApi, result.source,
           count: dataAccessResultCount(result.data),
           latencyMicros: apiClock.elapsedMicroseconds);
+      // #2866 — stamp the shared budget so a background scan (a different
+      // isolate) sees this hit and won't re-poll the provider within its
+      // minInterval. Fire-and-forget; null in legacy/test call sites.
+      _budget?.recordRequest(countryCode);
       return result;
     } on Exception catch (e, st) {
       // #2296 — log the API-failure path (stack was previously discarded)
@@ -326,6 +341,10 @@ class StationServiceChain implements StationService {
           count: dataAccessResultCount(result.data),
           latencyMicros: bulkClock.elapsedMicroseconds,
           isStale: result.isStale);
+      // #2866 — stamp the shared per-provider (here: per-dataset) budget so a
+      // background scan won't re-download the whole-country dataset within the
+      // policy's minInterval after a foreground search just fetched it.
+      _budget?.recordRequest(countryCode);
       return result;
     } finally {
       unawaited(_inFlight.remove(key) ?? Future<void>.value());

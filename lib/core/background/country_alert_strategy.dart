@@ -6,9 +6,11 @@ import '../../features/search/domain/entities/station.dart';
 import '../cache/cache_manager.dart';
 import '../data/storage_repository.dart';
 import '../services/country_service_registry.dart';
+import '../services/diagnostics/data_access_recorder.dart';
 import '../services/fuel_service_policy.dart';
 import 'bulk_dataset_alert_strategy.dart';
 import 'polled_alert_strategy.dart';
+import 'provider_request_budget.dart';
 
 /// The per-country **specialization seam** a background alert scan resolves to
 /// (Epic #2860, child #2863).
@@ -76,11 +78,19 @@ abstract class CountryAlertStrategy {
   ///
   /// [apiKey] is the user's key threaded into the isolate (DE needs it on the
   /// Dio; KR/CL read theirs from [storage] inside the registry factory).
+  ///
+  /// [recorder] is the #2824 data-access tracer and [budget] the #2866 shared
+  /// per-provider request budget — both threaded through so the chain each
+  /// strategy builds counts its background traffic and shares one minInterval
+  /// gate with the foreground. The [polledDeps] (when supplied) already carry
+  /// these for the polled branch; the bulk branch reads them here.
   static CountryAlertStrategy? forCountry(
     String countryCode, {
     required StorageRepository storage,
     required CacheStrategy cache,
     String? apiKey,
+    DataAccessRecorder? recorder,
+    ProviderRequestBudget? budget,
     PolledAlertStrategyDeps? polledDeps,
   }) {
     // AU is a documented throwing stub (#804) — never scanned in the BG isolate.
@@ -96,6 +106,8 @@ abstract class CountryAlertStrategy {
           storage: storage,
           cache: cache,
           policy: policy,
+          recorder: recorder,
+          budget: budget,
         );
       case SourceModel.polledApi:
         return PolledAlertStrategy.forCountry(
@@ -103,7 +115,8 @@ abstract class CountryAlertStrategy {
           storage: storage,
           cache: cache,
           apiKey: apiKey,
-          deps: polledDeps,
+          deps: polledDeps ??
+              PolledAlertStrategyDeps(recorder: recorder, budget: budget),
         );
     }
   }
