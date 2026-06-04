@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../domain/correction_fill_up.dart';
 import '../../../domain/entities/fill_up.dart';
 import '../../trip_dedup.dart';
 import '../../trip_history_repository.dart';
@@ -117,7 +118,13 @@ class FullBackupImporter {
     final xml = zipReader.readXml(bytes);
     final payload = xmlReader.read(xml);
 
-    final fillUps = payload.fillUps;
+    // #2834 — drop OBD2-reconciliation correction records before they
+    // reach the store. They are derived data (TotalCost 0, IsFullTank
+    // false, unrounded litres); a v1 backup loses the `isCorrection` flag
+    // so the durable `correction_` id prefix is what identifies them. Left
+    // in, they resurface as phantom zero-cost fill-ups and re-export
+    // forever.
+    final fillUps = withoutReconciliationCorrections(payload.fillUps);
     // #2833 — drop ghost 0-sample trips whose sampled twin is also in the
     // backup (a finalisation double-save artefact), so the import neither
     // restores nor counts the duplicate.
