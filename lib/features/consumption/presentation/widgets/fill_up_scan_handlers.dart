@@ -8,6 +8,7 @@ import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
+import '../../data/pump_scan_disposition.dart';
 import '../../data/receipt_scan_service.dart';
 import '../screens/pump_display_camera_screen.dart';
 import 'bad_scan_report_sheet.dart';
@@ -191,11 +192,28 @@ Future<void> runPumpDisplayScan(
       return;
     }
     final result = outcome.parse;
-    if (!result.hasUsableData) {
-      if (context.mounted) {
-        await _showPumpScanFailureSheet(context, state, outcome);
-      }
-      return;
+    switch (pumpScanDispositionFor(result)) {
+      case PumpScanDisposition.unreadable:
+        if (context.mounted) {
+          await _showPumpScanFailureSheet(context, state, outcome);
+        }
+        return;
+      case PumpScanDisposition.inconsistent:
+        // #2828 — the country gate rejected this read (the numbers don't
+        // reconcile, or a value is out of range). Auto-filling here would
+        // silently log a plausible-but-wrong pair, so drop the frame and
+        // ask the user to enter the values manually.
+        await state.readService()?.deleteCapturedImage(outcome.imagePath);
+        if (state.isMounted() && context.mounted) {
+          SnackBarHelper.show(
+            context,
+            l?.scanPumpInconsistent ??
+                'The scanned values don\'t add up — please enter them manually.',
+          );
+        }
+        return;
+      case PumpScanDisposition.autofill:
+        break;
     }
     if (result.liters != null) {
       state.litersCtrl.text = result.liters!.toStringAsFixed(2);

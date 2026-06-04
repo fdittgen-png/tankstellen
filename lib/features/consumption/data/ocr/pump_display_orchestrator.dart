@@ -79,6 +79,7 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
     confidence: confidence,
     validated: profile != null && result.accepted,
     validationReason: result.reason,
+    validationApplied: profile != null,
     derived: anchored.derived.map(pumpFieldName).toSet(),
   );
 }

@@ -114,6 +114,7 @@ class PumpDisplayParser {
       // conservative and leave it false.
       validated: profile != null && gateResult.accepted,
       validationReason: gateResult.reason,
+      validationApplied: profile != null,
     );
   }
 
