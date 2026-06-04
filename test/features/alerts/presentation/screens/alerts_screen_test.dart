@@ -9,6 +9,7 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/screens/alerts_screen.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/create_alert_dialog.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
@@ -135,6 +136,108 @@ void main() {
       );
 
       expect(find.byType(ServiceChainErrorWidget), findsOneWidget);
+    });
+  });
+
+  // #2857 — the Station-alerts "+" must reach a real add flow, not re-show
+  // the "create from a station's detail page" snackbar.
+  group('AlertsScreen — Station "+" add flow (#2857)', () {
+    Map<String, dynamic> stationJson(String id, String brand) => {
+          'id': id,
+          'name': brand,
+          'brand': brand,
+          'street': 'Hauptstr. 1',
+          'postCode': '10115',
+          'place': 'Berlin',
+          'lat': 52.5,
+          'lng': 13.4,
+          'isOpen': true,
+          'diesel': 1.55,
+        };
+
+    testWidgets('tapping the Station "+" opens the station picker, not a '
+        'snackbar', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+      when(() => test.mockStorage.getFavoriteIds()).thenReturn(['fav-1']);
+      when(() => test.mockStorage.getFavoriteStationData('fav-1'))
+          .thenReturn(stationJson('fav-1', 'Shell Berlin'));
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertProvider.overrideWith(() => _EmptyAlerts()),
+        ],
+      );
+
+      // The Station section "+" is the first add button (Zone "+" is second).
+      await tester.tap(find.byIcon(Icons.add).first);
+      await tester.pumpAndSettle();
+
+      // The picker is shown with the favorite station — NOT the dead-end
+      // snackbar from the old implementation.
+      expect(find.text('Pick a station'), findsOneWidget);
+      expect(find.text('Shell Berlin'), findsOneWidget);
+      expect(
+        find.byKey(const Key('alert_pick_station_tile_fav-1')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('selecting a station opens CreateAlertDialog', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+      when(() => test.mockStorage.getFavoriteIds()).thenReturn(['fav-1']);
+      when(() => test.mockStorage.getFavoriteStationData('fav-1'))
+          .thenReturn(stationJson('fav-1', 'Shell Berlin'));
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertProvider.overrideWith(() => _EmptyAlerts()),
+        ],
+      );
+
+      await tester.tap(find.byIcon(Icons.add).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('alert_pick_station_tile_fav-1')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CreateAlertDialog), findsOneWidget);
+    });
+
+    testWidgets('with no favorites the picker offers a Search fallback, not a '
+        'dead-end', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+      when(() => test.mockStorage.getFavoriteIds()).thenReturn(<String>[]);
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertProvider.overrideWith(() => _EmptyAlerts()),
+        ],
+      );
+
+      await tester.tap(find.byIcon(Icons.add).first);
+      await tester.pumpAndSettle();
+
+      // Picker is shown with the empty hint + a real Search CTA — the user
+      // can still reach a station's detail page from here.
+      expect(find.text('Pick a station'), findsOneWidget);
+      expect(
+        find.byKey(const Key('alert_pick_station_search')),
+        findsOneWidget,
+      );
     });
   });
 }
