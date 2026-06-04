@@ -5329,6 +5329,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gpsLifecycleInactive => 'Inactive';
 
   @override
+  String get gpsKpiVerdictGood => 'Efficient';
+
+  @override
+  String get gpsKpiVerdictModerate => 'Moderate';
+
+  @override
+  String get gpsKpiVerdictAggressive => 'Aggressive';
+
+  @override
+  String get gpsKpiInterpretationGood =>
+      'Smooth, energy-light driving — this is what efficient looks like.';
+
+  @override
+  String get gpsKpiInterpretationModerate =>
+      'Fairly typical driving — a little smoother on the throttle would save more.';
+
+  @override
+  String get gpsKpiInterpretationAggressive =>
+      'Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.';
+
+  @override
   String get gpsMatrixMaturityCold => 'Cold';
 
   @override
@@ -12824,6 +12845,27 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get gpsLifecycleInactive => '⟦Îñáçŧîṽé ····⟧';
+
+  @override
+  String get gpsKpiVerdictGood => '⟦Éƒƒîçîéñŧ ····⟧';
+
+  @override
+  String get gpsKpiVerdictModerate => '⟦Ṁóđéřáŧé ····⟧';
+
+  @override
+  String get gpsKpiVerdictAggressive => '⟦Áǧǧřéššîṽé ·····⟧';
+
+  @override
+  String get gpsKpiInterpretationGood =>
+      '⟦Šɱóóŧĥ, éñéřǧý-łîǧĥŧ đřîṽîñǧ — ŧĥîš îš ŵĥáŧ éƒƒîçîéñŧ łóóķš łîķé. ·······················⟧';
+
+  @override
+  String get gpsKpiInterpretationModerate =>
+      '⟦Ƒáîřłý ŧýƥîçáł đřîṽîñǧ — á łîŧŧłé šɱóóŧĥéř óñ ŧĥé ŧĥřóŧŧłé ŵóúłđ šáṽé ɱóřé. ···························⟧';
+
+  @override
+  String get gpsKpiInterpretationAggressive =>
+      '⟦Éñéřǧý-ĥéáṽý đřîṽîñǧ — éášîñǧ óƒƒ ŧĥé áççéłéřáŧóř áñđ çóášŧîñǧ ɱóřé ŵóúłđ çúŧ ƒúéł úšé. ································⟧';
 
   @override
   String get gpsMatrixMaturityCold => '⟦Çółđ ··⟧';

@@ -5368,6 +5368,27 @@ class AppLocalizationsHr extends AppLocalizations {
   String get gpsLifecycleInactive => 'Inactive';
 
   @override
+  String get gpsKpiVerdictGood => 'Efficient';
+
+  @override
+  String get gpsKpiVerdictModerate => 'Moderate';
+
+  @override
+  String get gpsKpiVerdictAggressive => 'Aggressive';
+
+  @override
+  String get gpsKpiInterpretationGood =>
+      'Smooth, energy-light driving — this is what efficient looks like.';
+
+  @override
+  String get gpsKpiInterpretationModerate =>
+      'Fairly typical driving — a little smoother on the throttle would save more.';
+
+  @override
+  String get gpsKpiInterpretationAggressive =>
+      'Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.';
+
+  @override
   String get gpsMatrixMaturityCold => 'Hladna';
 
   @override

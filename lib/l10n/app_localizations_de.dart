@@ -5393,6 +5393,27 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gpsLifecycleInactive => 'Inaktiv';
 
   @override
+  String get gpsKpiVerdictGood => 'Effizient';
+
+  @override
+  String get gpsKpiVerdictModerate => 'Mittel';
+
+  @override
+  String get gpsKpiVerdictAggressive => 'Aggressiv';
+
+  @override
+  String get gpsKpiInterpretationGood =>
+      'Ruhige, energiesparende Fahrweise – genau so sieht effizient aus.';
+
+  @override
+  String get gpsKpiInterpretationModerate =>
+      'Recht durchschnittliche Fahrweise – etwas sanfter am Gas würde mehr sparen.';
+
+  @override
+  String get gpsKpiInterpretationAggressive =>
+      'Energieintensive Fahrweise – weniger Gas und mehr Ausrollen senken den Verbrauch.';
+
+  @override
   String get gpsMatrixMaturityCold => 'Kalt';
 
   @override

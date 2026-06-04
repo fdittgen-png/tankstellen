@@ -2430,6 +2430,12 @@
   "@gpsLifecycleInactive": {
     "description": "Localized label for the 'inactive' app-lifecycle state in the GPS diagnostics lifecycle breakdown (#2765)."
   },
+  "gpsKpiVerdictGood": "Effizient",
+  "gpsKpiVerdictModerate": "Mittel",
+  "gpsKpiVerdictAggressive": "Aggressiv",
+  "gpsKpiInterpretationGood": "Ruhige, energiesparende Fahrweise – genau so sieht effizient aus.",
+  "gpsKpiInterpretationModerate": "Recht durchschnittliche Fahrweise – etwas sanfter am Gas würde mehr sparen.",
+  "gpsKpiInterpretationAggressive": "Energieintensive Fahrweise – weniger Gas und mehr Ausrollen senken den Verbrauch.",
   "gpsMatrixMaturityCold": "Kalt",
   "@gpsMatrixMaturityCold": {
     "description": "Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional."

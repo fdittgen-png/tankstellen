@@ -1,0 +1,8 @@
+{
+  "gpsKpiVerdictGood": "Effizient",
+  "gpsKpiVerdictModerate": "Mittel",
+  "gpsKpiVerdictAggressive": "Aggressiv",
+  "gpsKpiInterpretationGood": "Ruhige, energiesparende Fahrweise – genau so sieht effizient aus.",
+  "gpsKpiInterpretationModerate": "Recht durchschnittliche Fahrweise – etwas sanfter am Gas würde mehr sparen.",
+  "gpsKpiInterpretationAggressive": "Energieintensive Fahrweise – weniger Gas und mehr Ausrollen senken den Verbrauch."
+}

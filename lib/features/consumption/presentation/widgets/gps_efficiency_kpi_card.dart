@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/gps_driving_features.dart';
+import '../../domain/gps_kpi_verdict.dart';
 import '../../domain/trip_recorder.dart';
 
 /// GPS-only efficiency KPI card on the Trip detail screen (#2695 C9 /
@@ -53,23 +54,51 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
+    // #2795 C6 — band each interpretable KPI into good / moderate /
+    // aggressive so the raw figure carries a verdict + colour, mirroring
+    // DrivingScoreCard's class band. Climb energy is terrain, not driving
+    // style, so it stays an un-banded plain row.
+    final rpaVerdict = GpsKpiVerdicts.rpa(features.relativePositiveAcceleration);
+    final pkeVerdict = GpsKpiVerdicts.pke(features.positiveKineticEnergy);
+    final vaposVerdict = GpsKpiVerdicts.vapos(features.meanPositiveVa);
+    final coastVerdict = GpsKpiVerdicts.coast(features.coastShare);
+
     final rows = <Widget>[
-      _kpiRow(theme, key: const Key('gps_kpi_rpa'),
+      _kpiRow(theme, l, key: const Key('gps_kpi_rpa'),
           label: l?.gpsKpiRpa ?? 'Positive acceleration (RPA)',
-          value: features.relativePositiveAcceleration.toStringAsFixed(2)),
-      _kpiRow(theme, key: const Key('gps_kpi_pke'),
+          value: features.relativePositiveAcceleration.toStringAsFixed(2),
+          verdict: rpaVerdict),
+      _kpiRow(theme, l, key: const Key('gps_kpi_pke'),
           label: l?.gpsKpiPke ?? 'Kinetic energy demand (PKE)',
-          value: features.positiveKineticEnergy.toStringAsFixed(2)),
-      _kpiRow(theme, key: const Key('gps_kpi_vapos'),
+          value: features.positiveKineticEnergy.toStringAsFixed(2),
+          verdict: pkeVerdict),
+      _kpiRow(theme, l, key: const Key('gps_kpi_vapos'),
           label: l?.gpsKpiVapos ?? 'Acceleration intensity (VAPOS)',
-          value: features.meanPositiveVa.toStringAsFixed(2)),
-      _kpiRow(theme, key: const Key('gps_kpi_coast'),
+          value: features.meanPositiveVa.toStringAsFixed(2),
+          verdict: vaposVerdict),
+      _kpiRow(theme, l, key: const Key('gps_kpi_coast'),
           label: l?.gpsKpiCoast ?? 'Coasting share',
-          value: '${(features.coastShare * 100).toStringAsFixed(0)}%'),
-      _kpiRow(theme, key: const Key('gps_kpi_climb'),
+          value: '${(features.coastShare * 100).toStringAsFixed(0)}%',
+          verdict: coastVerdict),
+      _kpiRow(theme, l, key: const Key('gps_kpi_climb'),
           label: l?.gpsKpiClimbEnergy ?? 'Climb energy',
           value: '${features.climbEnergyPerKm.toStringAsFixed(0)} m/km'),
     ];
+
+    // Overall verdict = the worst of the four style KPIs, so the one-line
+    // interpretation is conservative + actionable (a single aggressive
+    // metric is worth flagging even amid otherwise calm figures).
+    final overall = _worst(
+        [rpaVerdict, pkeVerdict, vaposVerdict, coastVerdict]);
+    rows.add(const SizedBox(height: 10));
+    rows.add(Text(
+      _interpretation(l, overall),
+      key: const Key('gps_kpi_interpretation'),
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: _verdictColor(theme, overall),
+        fontWeight: FontWeight.w600,
+      ),
+    ));
 
     final delta = baselineDeltaPercent;
     if (delta != null) {
@@ -106,10 +135,12 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
   }
 
   Widget _kpiRow(
-    ThemeData theme, {
+    ThemeData theme,
+    AppLocalizations? l, {
     required Key key,
     required String label,
     required String value,
+    GpsKpiVerdict? verdict,
   }) {
     return Padding(
       key: key,
@@ -120,6 +151,16 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
           Expanded(
             child: Text(label, style: theme.textTheme.bodyMedium),
           ),
+          if (verdict != null) ...[
+            Text(
+              _verdictLabel(l, verdict),
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: _verdictColor(theme, verdict),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
           Text(
             value,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -130,5 +171,62 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Localized per-KPI verdict badge ("Efficient" / "Moderate" /
+  /// "Aggressive").
+  String _verdictLabel(AppLocalizations? l, GpsKpiVerdict v) {
+    switch (v) {
+      case GpsKpiVerdict.good:
+        return l?.gpsKpiVerdictGood ?? 'Efficient';
+      case GpsKpiVerdict.moderate:
+        return l?.gpsKpiVerdictModerate ?? 'Moderate';
+      case GpsKpiVerdict.aggressive:
+        return l?.gpsKpiVerdictAggressive ?? 'Aggressive';
+    }
+  }
+
+  /// One-line overall interpretation under the KPI rows.
+  String _interpretation(AppLocalizations? l, GpsKpiVerdict v) {
+    switch (v) {
+      case GpsKpiVerdict.good:
+        return l?.gpsKpiInterpretationGood ??
+            'Smooth, energy-light driving — this is what efficient looks like.';
+      case GpsKpiVerdict.moderate:
+        return l?.gpsKpiInterpretationModerate ??
+            'Fairly typical driving — a little smoother on the throttle would '
+                'save more.';
+      case GpsKpiVerdict.aggressive:
+        return l?.gpsKpiInterpretationAggressive ??
+            'Energy-heavy driving — easing off the accelerator and coasting '
+                'more would cut fuel use.';
+    }
+  }
+
+  /// Verdict colour band, mirroring DrivingScoreCard._scoreColor: the
+  /// positive [ColorScheme.primary] for good, the warm
+  /// [ColorScheme.tertiary] for moderate, the [ColorScheme.error] for
+  /// aggressive — theme-driven, no brand-specific colours.
+  Color _verdictColor(ThemeData theme, GpsKpiVerdict v) {
+    switch (v) {
+      case GpsKpiVerdict.good:
+        return theme.colorScheme.primary;
+      case GpsKpiVerdict.moderate:
+        return theme.colorScheme.tertiary;
+      case GpsKpiVerdict.aggressive:
+        return theme.colorScheme.error;
+    }
+  }
+
+  /// The worst (most aggressive) of [verdicts] — drives the overall
+  /// interpretation line so a single hard metric is never masked.
+  GpsKpiVerdict _worst(List<GpsKpiVerdict> verdicts) {
+    if (verdicts.contains(GpsKpiVerdict.aggressive)) {
+      return GpsKpiVerdict.aggressive;
+    }
+    if (verdicts.contains(GpsKpiVerdict.moderate)) {
+      return GpsKpiVerdict.moderate;
+    }
+    return GpsKpiVerdict.good;
   }
 }

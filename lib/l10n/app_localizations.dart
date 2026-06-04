@@ -9518,6 +9518,42 @@ abstract class AppLocalizations {
   /// **'Inactive'**
   String get gpsLifecycleInactive;
 
+  /// Per-KPI verdict badge on the GPS-efficiency card (#2795): gentle, energy-light driving for this metric (RPA / PKE / VAPOS / coasting). Shown in the positive colour.
+  ///
+  /// In en, this message translates to:
+  /// **'Efficient'**
+  String get gpsKpiVerdictGood;
+
+  /// Per-KPI verdict badge on the GPS-efficiency card (#2795): typical mixed driving for this metric — neither notably efficient nor wasteful.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get gpsKpiVerdictModerate;
+
+  /// Per-KPI verdict badge on the GPS-efficiency card (#2795): energy-heavy driving for this metric (hard acceleration, or — for coasting — very little coasting). Shown in the warning colour.
+  ///
+  /// In en, this message translates to:
+  /// **'Aggressive'**
+  String get gpsKpiVerdictAggressive;
+
+  /// One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read efficient: praise mirroring the driving-score verdict line.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth, energy-light driving — this is what efficient looks like.'**
+  String get gpsKpiInterpretationGood;
+
+  /// One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read moderate: neutral guidance toward gentler acceleration.
+  ///
+  /// In en, this message translates to:
+  /// **'Fairly typical driving — a little smoother on the throttle would save more.'**
+  String get gpsKpiInterpretationModerate;
+
+  /// One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read aggressive: actionable guidance to accelerate gentler and coast more.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.'**
+  String get gpsKpiInterpretationAggressive;
+
   /// Maturity tier label (#2082) — GPS calibration matrix has had fewer than 3 fill-up reconciliations OR residual variance > 1.5. Estimates are provisional.
   ///
   /// In en, this message translates to:

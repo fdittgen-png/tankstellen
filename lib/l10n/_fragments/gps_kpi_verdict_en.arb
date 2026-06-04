@@ -1,0 +1,26 @@
+{
+  "gpsKpiVerdictGood": "Efficient",
+  "@gpsKpiVerdictGood": {
+    "description": "Per-KPI verdict badge on the GPS-efficiency card (#2795): gentle, energy-light driving for this metric (RPA / PKE / VAPOS / coasting). Shown in the positive colour."
+  },
+  "gpsKpiVerdictModerate": "Moderate",
+  "@gpsKpiVerdictModerate": {
+    "description": "Per-KPI verdict badge on the GPS-efficiency card (#2795): typical mixed driving for this metric — neither notably efficient nor wasteful."
+  },
+  "gpsKpiVerdictAggressive": "Aggressive",
+  "@gpsKpiVerdictAggressive": {
+    "description": "Per-KPI verdict badge on the GPS-efficiency card (#2795): energy-heavy driving for this metric (hard acceleration, or — for coasting — very little coasting). Shown in the warning colour."
+  },
+  "gpsKpiInterpretationGood": "Smooth, energy-light driving — this is what efficient looks like.",
+  "@gpsKpiInterpretationGood": {
+    "description": "One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read efficient: praise mirroring the driving-score verdict line."
+  },
+  "gpsKpiInterpretationModerate": "Fairly typical driving — a little smoother on the throttle would save more.",
+  "@gpsKpiInterpretationModerate": {
+    "description": "One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read moderate: neutral guidance toward gentler acceleration."
+  },
+  "gpsKpiInterpretationAggressive": "Energy-heavy driving — easing off the accelerator and coasting more would cut fuel use.",
+  "@gpsKpiInterpretationAggressive": {
+    "description": "One-line interpretation under the GPS-efficiency KPIs (#2795) when the metrics overall read aggressive: actionable guidance to accelerate gentler and coast more."
+  }
+}
