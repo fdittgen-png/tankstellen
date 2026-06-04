@@ -4289,5 +4289,63 @@
   "@drivingTraceExportFailed": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "backupExportProgress": "Exporting your backup…",
+  "@backupExportProgress": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "@exportBackupSavedAs": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "backupImportProgress": "Restoring your backup…",
+  "@backupImportProgress": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "@restoreBackupMergedSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      },
+      "trips": {
+        "type": "int"
+      },
+      "chargingLogs": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "@restoreBackupReplacedSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      },
+      "trips": {
+        "type": "int"
+      },
+      "chargingLogs": {
+        "type": "int"
+      }
+    }
   }
 }

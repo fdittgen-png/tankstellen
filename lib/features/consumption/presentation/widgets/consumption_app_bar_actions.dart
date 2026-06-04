@@ -19,6 +19,7 @@ import '../../providers/consumption_providers.dart';
 import '../../providers/trip_history_provider.dart';
 import '../screens/consumption_screen.dart';
 import '../screens/trajets_map_screen.dart';
+import 'backup_progress_dialog.dart';
 import 'backup_restore_flow.dart';
 import 'obd2_status_chip.dart';
 
@@ -78,18 +79,27 @@ class ConsumptionAppBarActions extends ConsumerWidget {
       // ignore: invalid_use_of_visible_for_testing_member
       final exporter = ConsumptionScreen.debugExporterOverride ??
           FullBackupExporter();
-      final result = await exporter.export(
-        vehicles: vehicles,
-        fillUps: fillUps,
-        trips: trips,
-        chargingLogs: chargingLogs,
+      // #2815 — show an indeterminate progress modal while the XML builds,
+      // zips, and writes (1-3 s, previously a silent freeze).
+      final result = await runWithBackupProgress(
+        context,
+        label: l?.backupExportProgress ?? 'Exporting your backup…',
+        icon: Icons.archive_outlined,
+        work: () => exporter.export(
+          vehicles: vehicles,
+          fillUps: fillUps,
+          trips: trips,
+          chargingLogs: chargingLogs,
+        ),
       );
 
       if (!context.mounted) return;
-      // #2014 — when the exporter also wrote a copy to the device's
-      // public Downloads folder, confirm with a folder-level snackbar.
+      // #2014 / #2815 — when the exporter wrote a copy to the public Downloads
+      // folder, name the file so the user can find it (e.g. in the restore
+      // picker, which now also opens on Downloads).
       final message = (result.savedPath != null)
-          ? (l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder')
+          ? (l?.exportBackupSavedAs(result.fileName) ??
+              'Saved to Downloads as ${result.fileName}')
           : (l?.exportBackupReady ?? 'Backup ready — pick a destination');
       SnackBarHelper.showSuccess(context, message);
     } catch (e, st) {

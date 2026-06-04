@@ -6954,6 +6954,18 @@ abstract class AppLocalizations {
   /// **'Backup export failed — please try again'**
   String get exportBackupFailed;
 
+  /// Label in the indeterminate progress dialog shown while the full backup zips and writes to Downloads (#2815).
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting your backup…'**
+  String get backupExportProgress;
+
+  /// Success SnackBar after a backup export, naming the file the user will find in the Downloads folder / the restore picker (#2815).
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to Downloads as {fileName}'**
+  String exportBackupSavedAs(String fileName);
+
   /// AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571).
   ///
   /// In en, this message translates to:
@@ -7007,6 +7019,34 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore failed — the file could not be read'**
   String get restoreBackupFailed;
+
+  /// Label in the indeterminate progress dialog shown while a backup zip decodes, parses, and writes its records (#2815).
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring your backup…'**
+  String get backupImportProgress;
+
+  /// Success SnackBar after a MERGE restore, breaking down what was added/updated per category (#2815).
+  ///
+  /// In en, this message translates to:
+  /// **'Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs'**
+  String restoreBackupMergedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  );
+
+  /// Success SnackBar after a REPLACE-all restore, breaking down what now exists per category (#2815).
+  ///
+  /// In en, this message translates to:
+  /// **'Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs'**
+  String restoreBackupReplacedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  );
 
   /// Diagnostic-overlay chip shown while the broken-MAP belief is in the 0.4–0.7 confidence band — the app is still gathering observations and not yet ready to warn the user (#1423 phase 5).
   ///

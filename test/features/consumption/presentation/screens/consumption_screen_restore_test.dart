@@ -139,7 +139,7 @@ void main() {
       expect(find.text('Merge'), findsNothing);
     });
 
-    testWidgets('choosing Merge imports and shows a success snackbar',
+    testWidgets('choosing Merge shows a per-entity MERGED summary (#2815)',
         (tester) async {
       BackupRestoreFlow.debugFilePickerOverride =
           () async => _sampleBackupBytes();
@@ -149,8 +149,27 @@ void main() {
       await tester.tap(find.text('Merge'));
       await tester.pumpAndSettle();
 
-      // 2 records (1 vehicle + 1 fill-up) restored.
-      expect(find.textContaining('restored'), findsOneWidget);
+      // #2815 — the snackbar now breaks down the import by category and is
+      // worded "Merged …" (was a flat "restored — 2 records" before). Sample
+      // backup = 1 vehicle + 1 fill-up + 0 trips + 0 charging logs.
+      expect(find.textContaining('Merged'), findsOneWidget);
+      expect(find.textContaining('1 vehicles'), findsOneWidget);
+      expect(find.textContaining('1 fill-ups'), findsOneWidget);
+    });
+
+    testWidgets('choosing Replace all shows a REPLACED summary (#2815)',
+        (tester) async {
+      BackupRestoreFlow.debugFilePickerOverride =
+          () async => _sampleBackupBytes();
+      await _pumpScreen(tester);
+
+      await openRestore(tester);
+      await tester.tap(find.text('Replace all'));
+      await tester.pumpAndSettle();
+
+      // Wording is mode-specific so the user sees "Replaced", not "Merged".
+      expect(find.textContaining('Replaced all data'), findsOneWidget);
+      expect(find.textContaining('Merged'), findsNothing);
     });
 
     testWidgets('a corrupt file surfaces a localized error snackbar',

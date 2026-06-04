@@ -2218,6 +2218,19 @@
   "@exportBackupFailed": {
     "description": "SnackBar shown when the backup export pipeline throws (#1317)."
   },
+  "backupExportProgress": "Exporting your backup…",
+  "@backupExportProgress": {
+    "description": "Label in the indeterminate progress dialog shown while the full backup zips and writes to Downloads (#2815)."
+  },
+  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "@exportBackupSavedAs": {
+    "description": "Success SnackBar after a backup export, naming the file the user will find in the Downloads folder / the restore picker (#2815).",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
   "restoreBackupTooltip": "Restore backup",
   "@restoreBackupTooltip": {
     "description": "AppBar IconButton tooltip on the consumption screen for the full-backup RESTORE flow (#2571)."
@@ -2258,6 +2271,46 @@
   "restoreBackupFailed": "Restore failed — the file could not be read",
   "@restoreBackupFailed": {
     "description": "Generic error SnackBar when the restore flow throws an unexpected error or the file could not be read (#2571)."
+  },
+  "backupImportProgress": "Restoring your backup…",
+  "@backupImportProgress": {
+    "description": "Label in the indeterminate progress dialog shown while a backup zip decodes, parses, and writes its records (#2815)."
+  },
+  "restoreBackupMergedSummary": "Merged {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "@restoreBackupMergedSummary": {
+    "description": "Success SnackBar after a MERGE restore, breaking down what was added/updated per category (#2815).",
+    "placeholders": {
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      },
+      "trips": {
+        "type": "int"
+      },
+      "chargingLogs": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreBackupReplacedSummary": "Replaced all data with {vehicles} vehicles, {fillUps} fill-ups, {trips} trips, {chargingLogs} charging logs",
+  "@restoreBackupReplacedSummary": {
+    "description": "Success SnackBar after a REPLACE-all restore, breaking down what now exists per category (#2815).",
+    "placeholders": {
+      "vehicles": {
+        "type": "int"
+      },
+      "fillUps": {
+        "type": "int"
+      },
+      "trips": {
+        "type": "int"
+      },
+      "chargingLogs": {
+        "type": "int"
+      }
+    }
   },
   "brokenMapChipVerifying": "MAP sensor verifying…",
   "@brokenMapChipVerifying": {

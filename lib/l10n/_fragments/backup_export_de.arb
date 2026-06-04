@@ -1,5 +1,7 @@
 {
   "exportBackupTooltip": "Sicherung exportieren",
   "exportBackupReady": "Sicherung bereit – Ziel auswählen",
-  "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen"
+  "exportBackupFailed": "Sicherungsexport fehlgeschlagen – bitte erneut versuchen",
+  "backupExportProgress": "Sicherung wird exportiert…",
+  "exportBackupSavedAs": "In Downloads gespeichert als {fileName}"
 }

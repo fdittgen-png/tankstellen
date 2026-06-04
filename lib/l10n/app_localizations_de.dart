@@ -3832,6 +3832,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sicherungsexport fehlgeschlagen – bitte erneut versuchen';
 
   @override
+  String get backupExportProgress => 'Sicherung wird exportiert…';
+
+  @override
+  String exportBackupSavedAs(String fileName) {
+    return 'In Downloads gespeichert als $fileName';
+  }
+
+  @override
   String get restoreBackupTooltip => 'Sicherung wiederherstellen';
 
   @override
@@ -3863,6 +3871,29 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get restoreBackupFailed =>
       'Wiederherstellung fehlgeschlagen – die Datei konnte nicht gelesen werden';
+
+  @override
+  String get backupImportProgress => 'Sicherung wird wiederhergestellt…';
+
+  @override
+  String restoreBackupMergedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return '$vehicles Fahrzeuge, $fillUps Tankvorgänge, $trips Fahrten, $chargingLogs Ladevorgänge zusammengeführt';
+  }
+
+  @override
+  String restoreBackupReplacedSummary(
+    int vehicles,
+    int fillUps,
+    int trips,
+    int chargingLogs,
+  ) {
+    return 'Alle Daten ersetzt durch $vehicles Fahrzeuge, $fillUps Tankvorgänge, $trips Fahrten, $chargingLogs Ladevorgänge';
+  }
 
   @override
   String get brokenMapChipVerifying => 'MAP-Sensor wird geprüft…';

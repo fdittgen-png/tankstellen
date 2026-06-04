@@ -10,5 +10,18 @@
   "exportBackupFailed": "Backup export failed — please try again",
   "@exportBackupFailed": {
     "description": "SnackBar shown when the backup export pipeline throws (#1317)."
+  },
+  "backupExportProgress": "Exporting your backup…",
+  "@backupExportProgress": {
+    "description": "Label in the indeterminate progress dialog shown while the full backup zips and writes to Downloads (#2815)."
+  },
+  "exportBackupSavedAs": "Saved to Downloads as {fileName}",
+  "@exportBackupSavedAs": {
+    "description": "Success SnackBar after a backup export, naming the file the user will find in the Downloads folder / the restore picker (#2815).",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
   }
 }

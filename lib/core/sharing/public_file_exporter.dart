@@ -22,6 +22,12 @@ typedef PublicFileExporterOverride = Future<String> Function({
 @visibleForTesting
 PublicFileExporterOverride? debugPublicFileExporterOverride;
 
+/// Test-only override for [PublicFileExporter.downloadsInitialDirectory] so a
+/// widget test can assert the import picker is opened with the Downloads hint
+/// without touching path_provider / the platform (#2815).
+@visibleForTesting
+String? Function()? debugDownloadsInitialDirectoryOverride;
+
 /// Writes user-visible exports to the device's **public** Downloads
 /// folder (#2014). Replaces [LocalFileSaver], which saved to
 /// `getApplicationDocumentsDirectory()/Downloads/` — a path that is
@@ -88,5 +94,26 @@ class PublicFileExporter {
     final dir = Directory('${docs.path}${Platform.pathSeparator}Downloads');
     await dir.create(recursive: true);
     return dir;
+  }
+
+  /// The directory a document picker should OPEN ON for an import, so the user
+  /// lands where exports were saved instead of the (usually empty) "Recents"
+  /// tab (#2815). iOS: the same `<docs>/Downloads` the exporter writes to.
+  /// Android: the conventional public Downloads path — MediaStore (the export
+  /// target) exposes no filesystem path, but `file_selector`'s SAF
+  /// `initialDirectory` accepts this as a starting hint (honoured on most
+  /// OEMs; harmless where ignored — the picker just falls back to its default).
+  /// Returns null when the location can't be resolved (caller then opens the
+  /// picker with no hint).
+  static Future<String?> downloadsInitialDirectory() async {
+    final override = debugDownloadsInitialDirectoryOverride;
+    if (override != null) return override();
+    if (Platform.isAndroid) return '/storage/emulated/0/Download';
+    try {
+      final dir = await _iosDocumentsDownloads();
+      return dir.path;
+    } on Object {
+      return null;
+    }
   }
 }
