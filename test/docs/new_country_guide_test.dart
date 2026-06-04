@@ -135,6 +135,13 @@ void main() {
         final registryContent = registryFile.existsSync()
             ? registryFile.readAsStringSync()
             : '';
+        // #2861 — the per-country construction switch (and its imports) moved
+        // out of the registry into the single Ref-free builder, so a service
+        // wired there counts too.
+        final builderFile =
+            File('lib/core/services/country_raw_service_builder.dart');
+        final builderContent =
+            builderFile.existsSync() ? builderFile.readAsStringSync() : '';
 
         final serviceFiles = featuresDir
             .listSync(recursive: true)
@@ -150,10 +157,12 @@ void main() {
           // The file must be imported in service_providers.dart or registry.
           expect(
             serviceProviders.contains(fileName) ||
-                registryContent.contains(fileName),
+                registryContent.contains(fileName) ||
+                builderContent.contains(fileName),
             isTrue,
             reason:
-                'service_providers.dart or country_service_registry.dart must import $fileName',
+                'service_providers.dart, country_service_registry.dart, or '
+                'country_raw_service_builder.dart must import $fileName',
           );
         }
       });
