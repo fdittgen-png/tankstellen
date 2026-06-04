@@ -63,7 +63,9 @@ Features that don't serve at least one of those three layers don't belong.
 - **One central search button** — a docked button seated in a concave notch at the centre of the 5-tab bottom bar (Favorites · Map · **Search** · Fuel · Trips). Tap it to open the **Search criteria** sheet — Nearby vs Search-along-route, fuel-type chips (Super E10 / E5 / 98, Diesel, LPG, CNG, E85, plus EV charging), a radius slider, an *Open only* toggle, amenity filters (Shop, Car Wash, Air, WC…), a highway / no-highway filter, and *Save as my defaults*.
 - **Result sorting & detail** — *N stations found*, sort by Distance / Price / A-Z / 24h-open; each card shows price, an up/down price-trend arrow, a community star rating, amenity badges, distance, last-update time, and a one-tap favourite star.
 - **Route-aware search** — plan a trip and switch between *All stations* and *Best stops*; distances are measured **along the corridor**, the cheapest stop carries a *Cheapest* badge (e.g. *117 km · 78 min · 24 stations*), and a partial-results banner means a slow country never blocks the cheap result
+- **Cross-border route search** — a route that crosses a national border queries every country the corridor passes through, using each country's own data provider and the fuel grade from its matching profile. The result header credits all contributing sources (e.g. *España — Geoportal Gasolineras (MITECO) · France — Prix Carburants*). Results stream in progressively as each country's batch arrives — near stations appear first, and the full corridor populates within a few seconds.
 - **Cross-border suggestions** — when the next country over is meaningfully cheaper, the app says so
+- **Fuel Station Radar** — a one-tap scan centered on your current GPS position. On the search-results screen a floating *Start fuel station radar* pill launches it; the results list switches to *Fuel Station Radar result* mode and shows priced stations sorted by distance. During a trip recording a *Closest station* card is pinned to the top of the screen at all times — it shows the nearest station with its price and a proximity fill-bar, and you can swipe left/right to page through the ranked candidates. When you drive inside the station's configured radius the card locks onto that station and the approach overlay flips to the large-price PiP view.
 - **Price alerts** — per-station thresholds (e.g. *Diesel ≤ 2.040 €*) plus radius alerts (e.g. *Super E10 ≤ 2.100 € · 10 km*), with an Active / Today / This week activity summary. On-device, consent-respecting, evaluated only when you're nearby.
 - **Price history & predictions** — 30-day charts plus "best time to fill" guidance (a day-of-week + price-threshold heuristic) from your local history
 - **Brand filter** — Total / Esso / Shell / Aral, country-aware brand registry
@@ -101,6 +103,7 @@ Features that don't serve at least one of those three layers don't belong.
 ### Cross-cutting
 
 - **Feature-management presets** — right-size the app to how you actually use it: **Basic** (cheapest fuel + EV charging nearby, favourites, price alerts), **Medium** (+ track fill-ups and EV charging by hand), **Full** (+ automatic OBD2 trip recording, driving scores, loyalty cards), or **Custom** (à la carte). Switching is one tap in Settings.
+- **One profile per country** — each profile is tied to a country and a preferred fuel grade; the app activates the matching data provider when you switch profiles. Add one profile per country you drive in — a French profile (E85 / SP95) for France, a German profile (E10) for Germany, and so on. Route-mode cross-border searches read the preferred fuel from each country's profile so every leg is priced correctly.
 - **Multiple profiles** — preferred fuel, search radius, start screen, and route-planning settings per profile; the redesigned profile editor groups everything into section cards with a docked Save bar.
 - **Grouped Settings** — Profile · Setup & data sources · Features & usage · Account & sync · Appearance · Privacy · About.
 - **Approach-station overlay** — when you drive near a station, a Picture-in-Picture overlay flips to a big live price (Epic #2065); a *Test approach overlay* button in the Privacy Dashboard fires a synthetic in-radius signal so you can verify it from the couch.
@@ -153,6 +156,59 @@ Captured 2026-06 on Android running Sparkilo against the live `Prix-Carburants` 
 |:--:|:--:|
 | ![Settings — Feature management with Basic / Medium / Full / Custom preset cards, each describing the feature set it enables](docs/screenshots/14-feature-presets.jpg) | ![Privacy Dashboard — your data belongs to you, with Profile, API keys (community + shared defaults), Cloud Sync status and a privacy summary noting GPS and API keys never leave the device](docs/screenshots/13-privacy-dashboard.jpg) |
 | Right-size the app: Basic (cheapest fuel + EV, favourites, alerts), Medium (+ manual fill-up & EV tracking), Full (+ OBD2 auto-record, driving scores, loyalty), or Custom. | See, export or delete everything stored on-device in one place; GPS position and API keys never leave the device, with optional TankSync for cross-device access. |
+
+### Fuel Station Radar & cross-border search
+
+| Radar — idle (search screen) | Radar — active results | Trip recording — radar card |
+|:--:|:--:|:--:|
+| ![Search results screen — France/Prix-Carburants source, 10 stations nearby, with a floating "Start fuel station radar" pill bottom-right](docs/screenshots/15-radar-search-fab.jpg) | ![Search results in Fuel Station Radar mode — "Fuel Station Radar result" chip in the header, 28 stations sorted by distance, with "Arrêter le radar" (Stop radar) pill](docs/screenshots/16-radar-active-results.jpg) | ![Trip recording screen — "Closest station" radar card pinned at the top, showing 18 Avenue de Verdun at 1.999 € Super E10 · 2.2 km away with a proximity fill-bar](docs/screenshots/18-trip-radar-card.jpg) |
+| Tap *Start fuel station radar* in the search results to scan around your current GPS position. The pill flips to *Stop radar* once active. | The results list switches to radar mode and shows all priced stations sorted by distance. The header chip confirms the data source. | During any trip recording a *Closest station* card is pinned to the top — nearest station, its price, fuel type, distance, and a fill-bar that fills as you approach. Swipe left/right to page through candidates. |
+
+| Cross-border route — dual-source header |
+|:--:|
+| ![Search results for a 305 km cross-border route — header credits both "España — Geoportal Gasolineras (MITECO)" and "France — Prix Carburants (data.economie.gouv.fr)", 55 stations found, with a "Start fuel station radar" pill](docs/screenshots/17-cross-border-route-results.jpg) |
+| A route crossing the FR/ES border queries both country data providers simultaneously — the header credits both sources and results stream in as each country's batch resolves. |
+
+## How it works: radar, cross-border data, and incremental loading
+
+### Fuel Station Radar
+
+The radar is a live scan around your current GPS position that works in two contexts:
+
+- **On the search screen** — after a standard nearby or route search, a floating *Start fuel station radar* pill appears in the results list. Tapping it refreshes your GPS fix and runs a scan: the app fetches a 60 km wide-area corridor of station locations (cached for up to an hour so subsequent polls need no extra network calls), merges a direct in-radius fetch to guarantee the result is a superset of the regular search, and injects the priced, distance-sorted list into the results view. The pill flips to *Stop radar* to dismiss and return to the regular list.
+
+- **During trip recording** — as soon as a GPS-only or OBD2 recording starts, a *Closest station* card is pinned permanently to the top of the recording screen. It shows the nearest priced station, its price for your preferred fuel, its distance, and a proximity fill-bar that fills from 0 % (at the radar radius edge) to 100 % (at the station forecourt). You can swipe left to jump to a nearer candidate or right to a farther one. When you actually drive inside the configured approach radius the card locks onto that station and the PiP Picture-in-Picture overlay flips to a large price view.
+
+The radar keeps network usage minimal: station *locations* are stable (forecourts don't move), so they are cached for up to an hour; only the *price* for imminent stations is fetched just-in-time, through the same rate-limited per-country service the regular search uses.
+
+### Cross-border data sources
+
+Each country is backed by its own official government open-data source — there is no single aggregator. The result header always names the active source (e.g. *France — Prix-Carburants (gouv.fr)*, *España — Geoportal Gasolineras (MITECO)*, *Deutschland — Tankerkönig*). Because the sources differ, the available fuel grades, the station density, and the price-update cadence all vary across borders:
+
+| Country | Provider | Update cadence |
+|---------|----------|---------------|
+| Germany | Tankerkönig (CC BY 4.0) | ~5 min |
+| France | Prix Carburants (Licence Ouverte 2.0) | ~10 min (flux instantané) |
+| Austria | E-Control / Spritpreisrechner (CC BY 3.0 AT) | Hourly |
+| Spain | MITECO Geoportal Gasolineras | Daily bulk (local-filtered) |
+| Italy | MIMIT osservaprezzi (IODL 2.0) | Daily bulk |
+| UK | CMA Fuel Finder (OGL v3.0) | Twice daily bulk |
+| Luxembourg | gouvernement.lu (CC0 1.0) | Daily |
+| Portugal | DGEG (preçoscombustíveis) | Daily |
+| Denmark | OK / Shell / Q8 aggregate | Every few hours |
+| South Korea | OPINET / KNOC (KOGL Type 1) | ~30 min |
+| Argentina | Secretaría de Energía | Daily bulk |
+| … | Country-specific government source | Varies |
+
+A route that crosses a border queries **all** countries the corridor passes through — each with its own service — and the results header credits every source that returned at least one priced station. A station that appears as `--` on one side of the border may be fully priced on the other because the two providers track different fuel grades.
+
+### One profile per country
+
+Each profile is tied to a country and a preferred fuel grade. The app activates the matching data provider when you switch profiles, and route-mode cross-border searches read the preferred fuel from each country's profile so every leg is priced in the right grade (e.g. SP95-E5 for your French leg, Super E10 for your German leg). Add one profile per country you drive in — you can switch between them at any time or let the route search pick them automatically.
+
+### Incremental (progressive) loading
+
+Route searches sample the corridor at regular intervals, query each country's service for those sample points, and stream partial results to the UI as each batch arrives. You will see the first stations appear within a second or two; the full result set (the *N stations found* count in the header) populates as the remaining batches resolve. A *still loading* indicator in the header shows when a sweep is in progress. The cheapest stop badge and segment-best stops update each time a new batch arrives, so they converge on the final answer rather than appearing all at once at the end.
 
 ## Getting Started
 
