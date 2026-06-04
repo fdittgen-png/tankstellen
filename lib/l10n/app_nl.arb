@@ -4509,5 +4509,10 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "calibrationDirectFuelRateNote": "This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.",
+  "@calibrationDirectFuelRateNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

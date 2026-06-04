@@ -4022,6 +4022,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get calibrationDirectFuelRateNote =>
+      'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Your $makeModel is marked as diesel but matches a petrol catalog entry. Tap to update.';
   }
@@ -11516,6 +11520,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String calibrationSourceCatalogWithBasis(String makeModel, String basis) {
     return '⟦(çáŧáłóǧ: $makeModel — $basis đéƒáúłŧ) ······⟧';
   }
+
+  @override
+  String get calibrationDirectFuelRateNote =>
+      '⟦Ŧĥîš ṽéĥîçłé řéƥóřŧš îŧš ƒúéł řáŧé đîřéçŧłý (ƤÎĐ 5É), šó ṽółúɱéŧřîç-éƒƒîçîéñçý çáłîƀřáŧîóñ îš ñóŧ úšéđ — ýóúř çóñšúɱƥŧîóñ îš ɱéášúřéđ, ñóŧ ɱóđéłłéđ. ······················································⟧';
 
   @override
   String catalogReresolveSnackbarMessage(String makeModel) {

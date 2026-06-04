@@ -104,5 +104,9 @@
       "makeModel": {"type": "String", "example": "Dacia Duster 1.5 dCi"},
       "basis": {"type": "String", "example": "VNT diesel + DI"}
     }
+  },
+  "calibrationDirectFuelRateNote": "This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.",
+  "@calibrationDirectFuelRateNote": {
+    "description": "Replaces the editable volumetric-efficiency field + its learner readout on the Advanced calibration card when the vehicle reports fuel rate directly via PID 5E / MAF, making the η_v calibration irrelevant (#2837)."
   }
 }

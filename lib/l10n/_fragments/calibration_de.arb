@@ -42,5 +42,6 @@
       "makeModel": {"type": "String"},
       "basis": {"type": "String"}
     }
-  }
+  },
+  "calibrationDirectFuelRateNote": "Dieses Fahrzeug meldet seinen Verbrauch direkt (PID 5E), daher wird keine Kalibrierung der volumetrischen Effizienz verwendet – dein Verbrauch wird gemessen, nicht geschätzt."
 }

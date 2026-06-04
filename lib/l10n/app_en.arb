@@ -2600,6 +2600,10 @@
       }
     }
   },
+  "calibrationDirectFuelRateNote": "This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.",
+  "@calibrationDirectFuelRateNote": {
+    "description": "Replaces the editable volumetric-efficiency field + its learner readout on the Advanced calibration card when the vehicle reports fuel rate directly via PID 5E / MAF, making the η_v calibration irrelevant (#2837)."
+  },
   "catalogReresolveSnackbarMessage": "Your {makeModel} is marked as diesel but matches a petrol catalog entry. Tap to update.",
   "@catalogReresolveSnackbarMessage": {
     "description": "One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.",

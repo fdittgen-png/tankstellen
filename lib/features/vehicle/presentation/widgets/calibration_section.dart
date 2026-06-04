@@ -95,6 +95,15 @@ class CalibrationSection extends StatefulWidget {
   /// falls back to the plain `(catalog: ...)` label for every field.
   final ReferenceVehicle? referenceVehicle;
 
+  /// Whether the vehicle reports its fuel rate directly via PID 5E (or a
+  /// MAF-derived rate), making the volumetric-efficiency calibration
+  /// irrelevant (#2837). η_v only scales the speed-density branch, never
+  /// the direct branch, so when this is true the η_v field, its learner
+  /// readout and the "Reset learner" button are de-emphasised behind an
+  /// explanatory note rather than presented as actionable calibration.
+  /// Defaults false — speed-density cars keep the full calibration UI.
+  final bool directFuelRateSupported;
+
   const CalibrationSection({
     super.key,
     required this.profile,
@@ -104,6 +113,7 @@ class CalibrationSection extends StatefulWidget {
     required this.onFuelDensityChanged,
     required this.onResetLearner,
     this.referenceVehicle,
+    this.directFuelRateSupported = false,
   });
 
   @override
@@ -399,13 +409,19 @@ class _CalibrationSectionState extends State<CalibrationSection> {
             l: l,
           ),
           const SizedBox(height: 12),
-          _buildField(
-            field: _CalibrationField.volumetricEfficiency,
-            controller: _veCtrl,
-            labelText: l?.calibrationVolumetricEfficiencyLabel ??
-                'Volumetric efficiency (η_v)',
-            l: l,
-          ),
+          // #2837 — η_v only feeds the speed-density fuel model. When the
+          // car reports fuel rate directly (PID 5E / MAF) the calibration
+          // is irrelevant, so hide the editable field behind a note.
+          if (widget.directFuelRateSupported)
+            _DirectFuelRateNote(l: l)
+          else
+            _buildField(
+              field: _CalibrationField.volumetricEfficiency,
+              controller: _veCtrl,
+              labelText: l?.calibrationVolumetricEfficiencyLabel ??
+                  'Volumetric efficiency (η_v)',
+              l: l,
+            ),
           const SizedBox(height: 12),
           _buildField(
             field: _CalibrationField.afr,
@@ -420,23 +436,28 @@ class _CalibrationSectionState extends State<CalibrationSection> {
             labelText: l?.calibrationFuelDensityLabel ?? 'Fuel density (g/L)',
             l: l,
           ),
-          const SizedBox(height: 16),
-          // Live η_v readout — text + reset button.
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  _learnerStatus(l),
-                  style: Theme.of(context).textTheme.bodyMedium,
+          // #2837 — the live η_v readout + Reset learner only matter for
+          // the speed-density model; skip them entirely on direct-fuel-
+          // rate cars so the "0 samples" nudge can't mislead.
+          if (!widget.directFuelRateSupported) ...[
+            const SizedBox(height: 16),
+            // Live η_v readout — text + reset button.
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _learnerStatus(l),
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              OutlinedButton(
-                onPressed: widget.onResetLearner,
-                child: Text(l?.calibrationResetLearner ?? 'Reset learner'),
-              ),
-            ],
-          ),
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: widget.onResetLearner,
+                  child: Text(l?.calibrationResetLearner ?? 'Reset learner'),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -463,6 +484,43 @@ class _CalibrationSectionState extends State<CalibrationSection> {
         ),
       ),
       onChanged: (text) => _commitField(field, text),
+    );
+  }
+}
+
+/// #2837 — replaces the η_v field + learner readout when the car reports
+/// fuel rate directly (PID 5E / MAF). A muted info row explaining that
+/// volumetric-efficiency calibration is not used for this vehicle, so the
+/// "0 samples" nudge can't read as a calibration the user must complete.
+class _DirectFuelRateNote extends StatelessWidget {
+  const _DirectFuelRateNote({required this.l});
+
+  final AppLocalizations? l;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.verified_outlined,
+          size: 20,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            l?.calibrationDirectFuelRateNote ??
+                'This vehicle reports its fuel rate directly (PID 5E), so '
+                    'volumetric-efficiency calibration is not used — your '
+                    'consumption is measured, not modelled.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -7318,6 +7318,12 @@ abstract class AppLocalizations {
   /// **'(catalog: {makeModel} — {basis} default)'**
   String calibrationSourceCatalogWithBasis(String makeModel, String basis);
 
+  /// Replaces the editable volumetric-efficiency field + its learner readout on the Advanced calibration card when the vehicle reports fuel rate directly via PID 5E / MAF, making the η_v calibration irrelevant (#2837).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.'**
+  String get calibrationDirectFuelRateNote;
+
   /// One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.
   ///
   /// In en, this message translates to:

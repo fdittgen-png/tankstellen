@@ -1191,6 +1191,7 @@
   "calibrationBasisTurbo": "⟦Ŧúřƀóçĥářǧéđ ·····⟧",
   "calibrationBasisNaDi": "⟦Ñáŧúřáłłý ášƥîřáŧéđ + ĐÎ ·········⟧",
   "calibrationSourceCatalogWithBasis": "⟦(çáŧáłóǧ: {makeModel} — {basis} đéƒáúłŧ) ······⟧",
+  "calibrationDirectFuelRateNote": "⟦Ŧĥîš ṽéĥîçłé řéƥóřŧš îŧš ƒúéł řáŧé đîřéçŧłý (ƤÎĐ 5É), šó ṽółúɱéŧřîç-éƒƒîçîéñçý çáłîƀřáŧîóñ îš ñóŧ úšéđ — ýóúř çóñšúɱƥŧîóñ îš ɱéášúřéđ, ñóŧ ɱóđéłłéđ. ······················································⟧",
   "catalogReresolveSnackbarMessage": "⟦Ýóúř {makeModel} îš ɱářķéđ áš đîéšéł ƀúŧ ɱáŧçĥéš á ƥéŧřół çáŧáłóǧ éñŧřý. Ŧáƥ ŧó úƥđáŧé. ···························⟧",
   "catalogReresolveSnackbarAction": "⟦Úƥđáŧé ···⟧",
   "consumptionTabFuel": "⟦Ƒúéł ··⟧",

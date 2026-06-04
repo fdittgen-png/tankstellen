@@ -409,9 +409,19 @@ void main() {
     // snapshot per the shrink ratchet; every extracted file is new and
     // under 400.
     'lib/features/vehicle/domain/entities/vehicle_profile.dart': 453,
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 806,
+    // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
+    // receives a directFuelRateSupported flag computed from the vehicle's
+    // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE
+    // UI hides on PID-5E cars. Decomposition tracked under #2187/#2188.
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 817,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,
-    'lib/features/vehicle/presentation/widgets/calibration_section.dart': 465,
+    // #2837 — re-grandfathered 465 → 523: on a direct-fuel-rate (PID 5E)
+    // car the η_v field + its "0 samples" learner readout + Reset learner
+    // are replaced by an explanatory _DirectFuelRateNote, since η_v never
+    // touches the direct branch. The note widget + the conditional
+    // rendering account for the growth. Decomposition tracked under
+    // #2187/#2188.
+    'lib/features/vehicle/presentation/widgets/calibration_section.dart': 523,
     'lib/features/widget/data/home_widget_service.dart': 696,
   };
 

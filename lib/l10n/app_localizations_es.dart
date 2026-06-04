@@ -4063,6 +4063,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get calibrationDirectFuelRateNote =>
+      'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.';
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Tu $makeModel está marcado como diésel pero coincide con una entrada de gasolina del catálogo. Toca para actualizar.';
   }
