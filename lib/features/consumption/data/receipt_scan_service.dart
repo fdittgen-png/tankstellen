@@ -113,8 +113,8 @@ class ReceiptScanService {
     OcrTraceRecorder? trace,
   }) async {
     trace?.input(country: country, brand: brand);
-    final text = await _recognise(path, trace: trace);
-    if (text == null) {
+    final recognised = await _recognise(path, trace: trace);
+    if (recognised == null) {
       await _tryDelete(path);
       return null;
     }
@@ -123,9 +123,13 @@ class ReceiptScanService {
       await _ocrConfig.load();
       profile = _ocrConfig.profileFor(country);
     }
+    // #2848 — pass ML Kit's block geometry to the parser so a fuel-station
+    // receipt (Volume/Prix/TOT TTC row-aligned with their left-column labels)
+    // routes to the label-anchored extractor; non-fuel receipts fall back.
     return ReceiptScanOutcome(
-      parse: _parser.parse(text, profile: profile, trace: trace),
-      ocrText: text,
+      parse: _parser.parseBlocks(recognised.blocks, recognised.text,
+          profile: profile, trace: trace),
+      ocrText: recognised.text,
       imagePath: path,
     );
   }
@@ -293,7 +297,7 @@ class ReceiptScanService {
   /// #1860 — when [enhanceContrast] is set (the pump-display path) the
   /// temp copy also gets a grayscale + histogram-normalise + contrast
   /// pass so 7-segment LCDs and washed-out displays become readable.
-  Future<String?> _recognise(
+  Future<({String text, List<RecognizedTextBlock> blocks})?> _recognise(
     String path, {
     bool enhanceContrast = false,
     OcrNormalizedRect? roi,
@@ -301,14 +305,14 @@ class ReceiptScanService {
   }) async {
     final recognized =
         await _recogniseRaw(path, enhanceContrast: enhanceContrast, roi: roi);
-    final text = recognized?.text;
-    if (text != null) debugPrint('OCR text (${text.length} chars):\n$text');
-    // #2517 — TRACE ONLY: recover the ML Kit geometry the receipt path
-    // discards (production still reads only the flat [text]).
-    if (trace != null && recognized != null) {
-      trace.blocks(recognized.text, mapRecognizedText(recognized));
-    }
-    return text;
+    if (recognized == null) return null;
+    final text = recognized.text;
+    debugPrint('OCR text (${text.length} chars):\n$text');
+    // #2848 — keep ML Kit's block geometry so the receipt path can route a
+    // fuel-station receipt to the label-anchored extractor (was trace-only).
+    final blocks = mapRecognizedText(recognized);
+    trace?.blocks(text, blocks);
+    return (text: text, blocks: blocks);
   }
 
   /// Runs ML Kit on the pump-display crop and returns BOTH the flat text

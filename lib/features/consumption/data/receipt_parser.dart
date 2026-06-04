@@ -4,10 +4,13 @@
 import '../../search/domain/entities/fuel_type.dart';
 import 'ocr/ocr_trace_recorder.dart';
 import 'ocr/pump_ocr_config.dart';
+import 'ocr/pump_validation_gate.dart';
+import 'ocr/recognized_text_block.dart';
 import 'receipt_override_registry.dart';
 import 'receipt_parser/brand_detection.dart';
 import 'receipt_parser/brand_layouts.dart';
 import 'receipt_parser/receipt_field_extractors.dart';
+import 'receipt_parser/receipt_orchestrator.dart';
 import 'receipt_parser/receipt_parse_result.dart';
 
 // Re-export the result type so every existing caller that does
@@ -91,6 +94,50 @@ class ReceiptParser {
     return reconciled;
   }
 
+  /// Geometry-aware parse for the receipt OCR path (#2848).
+  ///
+  /// When ML Kit's [blocks] (with their boxes) look like a fuel-station
+  /// receipt — pump/volume/price markers plus a per-litre signal — the
+  /// values sit in a right column row-aligned with their left-column
+  /// labels, exactly the geometry the pump-display path already solves.
+  /// We route those to the label-anchored extractor (binding Volume→
+  /// litres, Prix→€/L, TOT TTC→total by row) + the SAME validation gate,
+  /// so a fully-legible FR receipt comes back with all three fields and
+  /// `validated:true`. Everything else falls back to the flat-string
+  /// [parse], byte-for-byte unchanged — strictly additive.
+  ReceiptParseResult parseBlocks(
+    List<RecognizedTextBlock> blocks,
+    String text, {
+    String? stationId,
+    OcrLocaleProfile? profile,
+    PumpValidationGate gate = const PumpValidationGate(),
+    OcrTraceRecorder? trace,
+  }) {
+    if (shouldUseReceiptLabelAnchor(text, blocks)) {
+      final lines = text.split('\n').map((l) => l.trim()).toList();
+      trace?.brand(null, 'fuel_station');
+      final anchored = orchestrateReceiptParse(
+        blocks: blocks,
+        text: text,
+        lines: lines,
+        profile: profile,
+        gate: gate,
+        trace: trace,
+      );
+      // The geometry read found enough → use it. If it read fewer than two
+      // fields (sparse/fused boxes), defer to the flat-string parser so we
+      // never regress a receipt the generic path could still handle.
+      if (anchored.derived.isNotEmpty ||
+          [anchored.liters, anchored.totalCost, anchored.pricePerLiter]
+                  .where((v) => v != null)
+                  .length >=
+              2) {
+        return _applyOverrides(anchored, text, stationId, trace);
+      }
+    }
+    return parse(text, stationId: stationId, profile: profile, trace: trace);
+  }
+
   /// Apply per-station overrides on top of the brand-layout result. Any
   /// non-null field on the matching [OverrideSpec] replaces the default.
   /// If the override's regex doesn't match, the brand layout's value
@@ -160,6 +207,12 @@ class ReceiptParser {
       stationName: stationName,
       fuelType: fuelType,
       brandLayout: result.brandLayout,
+      // #2848 — carry the geometry-aware path's validation metadata through
+      // the override merge so a fuel_station read keeps validated/confidence.
+      confidence: result.confidence,
+      validated: result.validated,
+      validationReason: result.validationReason,
+      derived: result.derived,
     );
   }
 
