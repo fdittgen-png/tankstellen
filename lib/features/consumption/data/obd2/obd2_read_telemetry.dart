@@ -32,6 +32,17 @@ bool isExpectedObd2ReadTransient(Object error) =>
 /// instead; a GENUINE fault still `errorLogger.log`s at [ErrorLayer.other] so
 /// it stays visible. Shared by the data-layer `readVin` and the onboarding
 /// connector so the two sites can't drift.
+///
+/// #2855 — also backs the high-frequency live-poll reads (`readSpeedKmh`,
+/// `readRpm`, and every `_readDouble`-based PID: throttle / load / fuel-rate
+/// / MAF / MAP / IAT / baro / fuel-trims / …). An engine-off or busy adapter
+/// times the speed/RPM PID out every ~2.5 s poll cycle; a real log showed
+/// 50× `readSpeed failed` ERROR traces in 2 min. Routing those through here
+/// turns each transient into the designed 'no reading this cycle' null +
+/// breadcrumb, so the per-poll flood stops while genuine parse/IO faults
+/// still surface. Persistent non-response is already covered by the
+/// comm-health diagnostics (#2464) + passive-waiting banner (#2767), so no
+/// real signal is lost. Same spirit as the #2379 odometer fix.
 void recordObd2ReadFailure(
   Object error,
   StackTrace stack, {
