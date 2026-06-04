@@ -9,8 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/receipt_parser.dart';
 import '../../data/receipt_scan_service.dart';
 import '../../providers/pending_shared_receipt_provider.dart';
+import '../../providers/pending_shared_receipt_text_provider.dart';
 import 'fill_up_scan_handlers.dart';
 
 /// Shared receipt-prefill body + the path-fed share-scan sibling
@@ -145,11 +147,27 @@ Future<void> runSharedReceiptScan(
   }
 }
 
+/// #2735/#2838 — single `initState` entry point that drains BOTH inbound-share
+/// stashes the screen can be routed with: an image / PDF receipt path (OCR'd)
+/// and a parsed e-receipt text result (applied directly). Keeping it one call
+/// keeps `AddFillUpScreen` at its grandfathered size (#1680). Both branches
+/// are no-ops when their stash is empty, so the common manual-open case does
+/// nothing.
+void scheduleSharedReceiptPrefillIfPending(
+  WidgetRef ref,
+  BuildContext context,
+  FillUpScanHostState Function() buildHost,
+  bool Function() isMounted,
+) {
+  scheduleSharedReceiptScanIfPending(ref, context, buildHost, isMounted);
+  scheduleSharedReceiptTextIfPending(ref, context, buildHost, isMounted);
+}
+
 /// #2735 — drains the inbound-share receipt path stashed by
 /// `ShareReceiptHandler` and runs [runSharedReceiptScan] on the next
 /// frame, prefilling the host form from the shared receipt's OCR. Called
-/// from `AddFillUpScreen.initState`; a no-op when nothing was shared (the
-/// common case of opening the form manually).
+/// via [scheduleSharedReceiptPrefillIfPending]; a no-op when nothing was
+/// shared (the common case of opening the form manually).
 ///
 /// Lives here, not on the screen, so the screen file stays close to its
 /// grandfathered size (#1680). [ref] reads the stash via `consumeDeferred`
@@ -180,5 +198,56 @@ void scheduleSharedReceiptScanIfPending(
   WidgetsBinding.instance.addPostFrameCallback((_) {
     if (!isMounted()) return;
     unawaited(runSharedReceiptScan(context, buildHost(), sharedPath));
+  });
+}
+
+/// #2838 — drains the inbound-share e-receipt TEXT result stashed by
+/// `ShareReceiptHandler` (already parsed by the pure-Dart `EReceiptTextParser`
+/// at receive time — there is no file to OCR) and prefills the host form on
+/// the next frame through the SAME [applyReceiptOutcome] body the camera /
+/// image-share paths use. Called from `AddFillUpScreen.initState`; a no-op
+/// when nothing text-shaped was shared.
+///
+/// The parsed [ReceiptParseResult] is wrapped in a synthetic
+/// [ReceiptScanOutcome] (empty `imagePath` — there is no photo to report) so
+/// it flows through the identical prefill body, guaranteeing zero drift
+/// between a text e-receipt and a scanned photo. [consumeDeferred] is used
+/// for the same `initState`-is-Riverpod-locked reason as the path sibling.
+void scheduleSharedReceiptTextIfPending(
+  WidgetRef ref,
+  BuildContext context,
+  FillUpScanHostState Function() buildHost,
+  bool Function() isMounted,
+) {
+  ReceiptParseResult? result;
+  try {
+    result =
+        ref.read(pendingSharedReceiptTextProvider.notifier).consumeDeferred();
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+      'where': 'AddFillUp: pending shared-receipt text read failed',
+    }));
+    return;
+  }
+  if (result == null || !result.hasData) return;
+  final parsed = result;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!isMounted()) return;
+    try {
+      final outcome = ReceiptScanOutcome(
+        parse: parsed,
+        ocrText: '',
+        imagePath: '',
+      );
+      applyReceiptOutcome(buildHost(), outcome);
+      final l = AppLocalizations.of(context);
+      if (isMounted() && context.mounted) {
+        SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
+      }
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'AddFillUp: shared-receipt text prefill failed',
+      }));
+    }
   });
 }

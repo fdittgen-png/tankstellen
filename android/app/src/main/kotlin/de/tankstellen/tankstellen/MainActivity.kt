@@ -56,6 +56,18 @@ class MainActivity : FlutterActivity() {
         // app-private save target was invisible.
         PublicFileExporterChannel.registerWith(flutterEngine, applicationContext)
 
+        // GMS-free inbound share-intent receiver (#2735). Same app-internal
+        // channel pattern as the bridges above — replaces the third-party
+        // share_handler plugin so the F-Droid build pulls no extra share
+        // dependency that could drag in Play Services. Register BEFORE
+        // replaying the launch intent below so a cold-launch SEND is cached
+        // for the Dart getInitialShare probe.
+        ShareIntentChannel.registerWith(flutterEngine, applicationContext)
+        // Replay the intent that launched this activity — a cold-launch SEND
+        // (the user picked Sparkilo from another app's share sheet) arrives
+        // as the launch intent, not via onNewIntent.
+        ShareIntentChannel.handleIntent(intent)
+
         // Picture-in-Picture bridge (#1884).
         val pip = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
@@ -133,6 +145,13 @@ class MainActivity : FlutterActivity() {
      */
     override fun onNewIntent(intent: Intent) {
         setIntent(intent)
+        // #2735 — a warm-share SEND (app already running, the user picked
+        // Sparkilo from another app's share sheet) arrives here on this
+        // singleTop activity. Forward it to the GMS-free receiver, which
+        // emits it on the EventChannel the Dart ShareReceiptListener
+        // subscribes to. A non-SEND intent (widget deep-link, etc.) is a
+        // no-op for the receiver and falls through unchanged.
+        ShareIntentChannel.handleIntent(intent)
         super.onNewIntent(intent)
     }
 

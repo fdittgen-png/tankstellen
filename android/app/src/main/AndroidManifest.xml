@@ -108,21 +108,23 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- #2735 — inbound OS share-intent receiver (Epic #2687).
-                 When the user shares a receipt image (or, once #2737
-                 lands, a PDF) from another app, Android offers Sparkilo
-                 in the share sheet; the share_handler plugin reads the
-                 SEND / SEND_MULTIPLE intent on this singleTop activity
-                 (via the onNewIntent + setIntent already overridden in
-                 MainActivity.kt) and hands the attachment path to the
-                 Dart ShareReceiptListener. image/* flows through receipt
-                 OCR; application/pdf currently shows the graceful
-                 "unsupported format — coming soon" message (#2737). -->
+            <!-- #2735 — GMS-free inbound OS share-intent receiver (Epic #2687).
+                 When the user shares a receipt from another app, Android
+                 offers Sparkilo in the share sheet. The in-repo
+                 ShareIntentChannel (registered on this singleTop activity in
+                 MainActivity.kt, via configureFlutterEngine for cold launch +
+                 onNewIntent for warm) decodes the SEND / SEND_MULTIPLE intent
+                 and hands the payload to the Dart ShareReceiptListener — no
+                 third-party plugin, so the F-Droid dex stays GMS-free.
+                 image/* flows through receipt OCR; application/pdf is
+                 rasterised then OCR'd (#2737); text/plain is parsed by the
+                 pure-Dart e-receipt text parser (#2838). -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="image/*"/>
                 <data android:mimeType="application/pdf"/>
+                <data android:mimeType="text/plain"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE"/>

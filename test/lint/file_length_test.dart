@@ -251,8 +251,14 @@ void main() {
     // `fill_up_share_scan_handlers.dart`, NOT here, to keep this file's
     // growth to the call site + dartdoc). Decomposition stays tracked under
     // #2187/#2188/#2190.
+    // #2838 — realign 537 → 539: the actual file already stood at 539 on
+    // master (#2840/#2841 grew it +2 without bumping this snapshot). The
+    // share-intent text-prefill wiring here is net-zero on the file (the
+    // single existing `scheduleSharedReceiptScanIfPending` call site was
+    // renamed in place to `scheduleSharedReceiptPrefillIfPending`, which
+    // drains both stashes), so this only corrects the snapshot to reality.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        537,
+        539,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
