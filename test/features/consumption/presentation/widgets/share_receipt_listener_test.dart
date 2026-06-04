@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:share_handler/share_handler.dart';
 import 'package:tankstellen/app/router.dart';
+import 'package:tankstellen/features/consumption/data/share/'
+    'share_intent_channel.dart';
+import 'package:tankstellen/features/consumption/data/share/'
+    'shared_receipt_intent.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/'
     'share_receipt_listener.dart';
 import 'package:tankstellen/features/consumption/providers/'
@@ -19,33 +21,33 @@ import 'package:tankstellen/features/feature_management/application/'
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
-/// Fake [ShareHandlerPlatform] whose cold-launch media + warm stream the
-/// test drives. `initialThrows` forces `getInitialSharedMedia` to throw,
-/// and `addError` on [controller] simulates a platform-channel stream
-/// fault — both #2349 fault-injection seams.
-class _FakeShareHandler extends ShareHandlerPlatform
-    with MockPlatformInterfaceMixin {
-  _FakeShareHandler({this.initial, this.initialThrows = false});
+/// Fake [ShareIntentChannel] whose cold-launch share + warm stream the test
+/// drives. `initialThrows` forces `getInitialShare` to throw, and `addError`
+/// on [controller] simulates a platform-channel stream fault — both #2349
+/// fault-injection seams. Replaces the old `ShareHandlerPlatform` fake now
+/// that the GMS-free in-repo channel owns the share path.
+class _FakeShareChannel implements ShareIntentChannel {
+  _FakeShareChannel({this.initial, this.initialThrows = false});
 
-  final SharedMedia? initial;
+  final SharedReceiptIntent? initial;
   final bool initialThrows;
   // Closed by the test's addTearDown — the linter can't trace it there.
   // ignore: close_sinks
-  final controller = StreamController<SharedMedia>.broadcast();
+  final controller = StreamController<SharedReceiptIntent>.broadcast();
 
   @override
-  Future<SharedMedia?> getInitialSharedMedia() async {
-    if (initialThrows) throw StateError('initial-media probe barfed');
+  Future<SharedReceiptIntent?> getInitialShare() async {
+    if (initialThrows) throw StateError('initial-share probe barfed');
     return initial;
   }
 
   @override
-  Stream<SharedMedia> get sharedMediaStream => controller.stream;
+  Stream<SharedReceiptIntent> get shareStream => controller.stream;
 }
 
-/// A real [GoRouter] with `/` + `/consumption/add` so a routed share can
-/// be asserted via the landed route (GoRouter is a factory — it cannot
-/// be subclassed, so we drive a real one, same as the notification test).
+/// A real [GoRouter] with `/` + `/consumption/add` so a routed share can be
+/// asserted via the landed route (GoRouter is a factory — it cannot be
+/// subclassed, so we drive a real one, same as the notification test).
 GoRouter _router() => GoRouter(
       initialLocation: '/',
       routes: [
@@ -57,20 +59,17 @@ GoRouter _router() => GoRouter(
       ],
     );
 
-SharedMedia _imageMedia(String path) => SharedMedia(
-      attachments: [
-        SharedAttachment(path: path, type: SharedAttachmentType.image),
-      ],
-    );
+SharedReceiptIntent _imageIntent(String path) =>
+    SharedReceiptIntent(items: [SharedReceiptItem.image(path)]);
 
 Future<ProviderContainer> _pumpListener(
   WidgetTester tester, {
-  required _FakeShareHandler handler,
+  required _FakeShareChannel channel,
   required GoRouter router,
   Set<Feature> enabled = const {Feature.addFillUpShareIntentReceipt},
   bool gateThrows = false,
 }) async {
-  addTearDown(() => handler.controller.close());
+  addTearDown(() => channel.controller.close());
   final container = ProviderContainer(
     overrides: [
       if (gateThrows)
@@ -88,7 +87,7 @@ Future<ProviderContainer> _pumpListener(
       child: MaterialApp.router(
         routerConfig: router,
         builder: (context, child) => ShareReceiptListener(
-          shareHandler: handler,
+          shareChannel: channel,
           child: child ?? const SizedBox(),
         ),
       ),
@@ -103,14 +102,14 @@ void main() {
   group('ShareReceiptListener — warm share', () {
     testWidgets('a streamed image share is routed through the handler',
         (tester) async {
-      final handler = _FakeShareHandler();
+      final channel = _FakeShareChannel();
       final container = await _pumpListener(
         tester,
-        handler: handler,
+        channel: channel,
         router: _router(),
       );
 
-      handler.controller.add(_imageMedia('/tmp/warm.jpg'));
+      channel.controller.add(_imageIntent('/tmp/warm.jpg'));
       await tester.pumpAndSettle();
 
       expect(container.read(pendingSharedReceiptProvider), '/tmp/warm.jpg');
@@ -119,17 +118,17 @@ void main() {
   });
 
   group('ShareReceiptListener — cold share', () {
-    testWidgets('the initial shared media is dispatched after first frame',
+    testWidgets('the initial shared intent is dispatched after first frame',
         (tester) async {
-      final handler = _FakeShareHandler(initial: _imageMedia('/tmp/cold.jpg'));
+      final channel = _FakeShareChannel(initial: _imageIntent('/tmp/cold.jpg'));
       final container = await _pumpListener(
         tester,
-        handler: handler,
+        channel: channel,
         router: _router(),
       );
 
-      // getInitialSharedMedia resolves async, then a post-frame callback
-      // dispatches it — settle to drain both.
+      // getInitialShare resolves async, then a post-frame callback dispatches
+      // it — settle to drain both.
       await tester.pumpAndSettle();
 
       expect(container.read(pendingSharedReceiptProvider), '/tmp/cold.jpg');
@@ -141,24 +140,20 @@ void main() {
     testWidgets(
         'a failing initial probe + a stream error + a throwing downstream '
         'still pump normally', (tester) async {
-      // Cold probe throws, the gate read throws (handler downstream
-      // fault), and the warm stream emits a raw error event — all three
-      // surfaces the listener funnels. None may escape as an unhandled
-      // async error or fail the pump.
-      final handler = _FakeShareHandler(initialThrows: true);
+      final channel = _FakeShareChannel(initialThrows: true);
       await _pumpListener(
         tester,
-        handler: handler,
+        channel: channel,
         router: _router(),
         gateThrows: true,
       );
       await tester.pumpAndSettle();
 
       // A warm image share whose downstream gate read throws — emitting it
-      // must return normally (the dispatch is synchronous; the throw is
-      // caught inside the handler, never propagated out of the callback).
+      // must return normally (the throw is caught inside the handler, never
+      // propagated out of the callback).
       expect(
-        () => handler.controller.add(_imageMedia('/tmp/boom.jpg')),
+        () => channel.controller.add(_imageIntent('/tmp/boom.jpg')),
         returnsNormally,
         reason: 'a thrown downstream must be swallowed, not propagated '
             'out of the stream callback (#2349)',
@@ -167,13 +162,13 @@ void main() {
 
       // A raw stream error event — caught by the listener's onError.
       expect(
-        () => handler.controller.addError(StateError('platform channel error')),
+        () => channel.controller.addError(StateError('platform channel error')),
         returnsNormally,
       );
       await tester.pump();
 
-      // No exception bubbled out of the pumps — the listener is alive,
-      // still showing home (nothing was routed because the gate threw).
+      // No exception bubbled out of the pumps — the listener is alive, still
+      // showing home (nothing routed because the gate threw).
       expect(find.text('home'), findsOneWidget);
     });
   });

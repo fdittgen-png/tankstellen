@@ -1,27 +1,32 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:share_handler/share_handler.dart';
 import 'package:tankstellen/app/router.dart';
 import 'package:tankstellen/features/consumption/data/ocr/'
     'receipt_pdf_rasterizer.dart';
+import 'package:tankstellen/features/consumption/data/share/'
+    'shared_receipt_intent.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/'
     'share_receipt_handler.dart';
 import 'package:tankstellen/features/consumption/providers/'
     'pending_shared_receipt_provider.dart';
+import 'package:tankstellen/features/consumption/providers/'
+    'pending_shared_receipt_text_provider.dart';
 import 'package:tankstellen/features/feature_management/application/'
     'feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
-/// A real [GoRouter] with `/` and `/consumption/add` routes so the
-/// handler's `push` resolves exactly as production does and the landed
-/// route can be asserted (the same fake-router-by-real-route pattern as
-/// `notification_launch_listener_test.dart`).
+/// A real [GoRouter] with `/` and `/consumption/add` routes so the handler's
+/// `push` resolves exactly as production does (the same fake-router-by-real-
+/// route pattern as `notification_launch_listener_test.dart`).
 GoRouter _router({String? Function()? onAdd}) {
   return GoRouter(
     initialLocation: '/',
@@ -38,36 +43,27 @@ GoRouter _router({String? Function()? onAdd}) {
   );
 }
 
-SharedMedia _imageMedia(String path) => SharedMedia(
-      attachments: [
-        SharedAttachment(path: path, type: SharedAttachmentType.image),
-      ],
-    );
+SharedReceiptIntent _imageIntent(String path) =>
+    SharedReceiptIntent(items: [SharedReceiptItem.image(path)]);
 
-/// A shared PDF arrives via `share_handler` as a `file` attachment (the
-/// package has no `pdf` type and carries no MIME) — the handler keys off
-/// the `.pdf` extension.
-SharedMedia _pdfMedia(String path) => SharedMedia(
-      attachments: [
-        SharedAttachment(path: path, type: SharedAttachmentType.file),
-      ],
-    );
+SharedReceiptIntent _pdfIntent(String path) =>
+    SharedReceiptIntent(items: [SharedReceiptItem.pdf(path)]);
 
-/// A genuinely-unsupported share (video, or a non-PDF arbitrary file).
-SharedMedia _fileMedia(String path) => SharedMedia(
-      attachments: [
-        SharedAttachment(path: path, type: SharedAttachmentType.file),
-      ],
+SharedReceiptIntent _fileIntent(String path) =>
+    SharedReceiptIntent(items: [SharedReceiptItem.file(path)]);
+
+SharedReceiptIntent _textIntent(String text, {String? country}) =>
+    SharedReceiptIntent(
+      items: [SharedReceiptItem.text(text)],
+      countryCode: country,
     );
 
 /// Test double for the on-device PDF rasteriser (#2737) — the native
 /// PdfRenderer is unavailable under `flutter test`, so the PDF branch is
-/// driven with an injected fake that records the path it was asked to
-/// rasterise and returns a canned result.
+/// driven with an injected fake that records the path and returns a canned
+/// result.
 class _FakeRasterizer extends ReceiptPdfRasterizer {
   _FakeRasterizer(this._result);
-
-  /// The JPEG path the rasteriser "produced", or null to model failure.
   final String? _result;
   String? receivedPdfPath;
 
@@ -77,6 +73,10 @@ class _FakeRasterizer extends ReceiptPdfRasterizer {
     return _result;
   }
 }
+
+String _fixture(String name) => File(
+      'test/features/consumption/data/ereceipt/fixtures/$name',
+    ).readAsStringSync();
 
 void main() {
   silenceErrorLoggerSpool();
@@ -107,7 +107,7 @@ void main() {
     return container;
   }
 
-  group('ShareReceiptHandler.handle', () {
+  group('ShareReceiptHandler.handle — image', () {
     testWidgets('stashes a shared image path and routes to /consumption/add',
         (tester) async {
       final router = _router();
@@ -115,7 +115,7 @@ void main() {
 
       container
           .read(shareReceiptHandlerProvider)
-          .handle(_imageMedia('/tmp/receipt.jpg'));
+          .handle(_imageIntent('/tmp/receipt.jpg'));
       await tester.pumpAndSettle();
 
       expect(container.read(pendingSharedReceiptProvider), '/tmp/receipt.jpg',
@@ -131,17 +131,19 @@ void main() {
 
       container
           .read(shareReceiptHandlerProvider)
-          .handle(_imageMedia('/tmp/receipt.jpg'));
+          .handle(_imageIntent('/tmp/receipt.jpg'));
       await tester.pumpAndSettle();
 
       expect(container.read(pendingSharedReceiptProvider), isNull,
           reason: 'a disabled feature must never stash or route');
       expect(find.text('home'), findsOneWidget);
     });
+  });
 
+  group('ShareReceiptHandler.handle — PDF (#2737)', () {
     testWidgets(
-        'a shared PDF is rasterised, then takes the SAME stash+route '
-        'path as an image (#2737)', (tester) async {
+        'a shared PDF is rasterised, then takes the SAME stash+route path '
+        'as an image', (tester) async {
       final router = _router();
       final fake = _FakeRasterizer('/tmp/receipt.pdf.page1.jpg');
       final container = await pump(tester,
@@ -149,40 +151,90 @@ void main() {
 
       container
           .read(shareReceiptHandlerProvider)
-          .handle(_pdfMedia('/tmp/receipt.pdf'));
+          .handle(_pdfIntent('/tmp/receipt.pdf'));
       await tester.pumpAndSettle();
 
-      expect(fake.receivedPdfPath, '/tmp/receipt.pdf',
-          reason: 'the PDF path must be handed to the rasteriser');
+      expect(fake.receivedPdfPath, '/tmp/receipt.pdf');
       expect(container.read(pendingSharedReceiptProvider),
           '/tmp/receipt.pdf.page1.jpg',
-          reason: 'the rasterised JPEG must be stashed for the SAME OCR path '
-              'an image share uses (#2737)');
-      expect(find.text('add-fill-up'), findsOneWidget,
-          reason: 'a rasterised PDF routes the user to the Add-fill-up form');
+          reason: 'the rasterised JPEG must be stashed for the SAME OCR path');
+      expect(find.text('add-fill-up'), findsOneWidget);
     });
 
-    testWidgets(
-        'a PDF whose rasterisation fails does NOT stash or route '
-        '(graceful fallback)', (tester) async {
+    testWidgets('a PDF whose rasterisation fails does NOT stash or route',
+        (tester) async {
       final router = _router();
-      // A null result models a corrupt PDF / absent native renderer.
       final fake = _FakeRasterizer(null);
       final container = await pump(tester,
           router: router, enabled: featureOn, rasterizer: fake);
 
       container
           .read(shareReceiptHandlerProvider)
-          .handle(_pdfMedia('/tmp/corrupt.pdf'));
+          .handle(_pdfIntent('/tmp/corrupt.pdf'));
       await tester.pumpAndSettle();
 
       expect(fake.receivedPdfPath, '/tmp/corrupt.pdf');
       expect(container.read(pendingSharedReceiptProvider), isNull,
-          reason: 'a failed rasterisation must fall back gracefully, not '
-              'stash a non-existent bitmap');
+          reason: 'a failed rasterisation must fall back gracefully');
+      expect(find.text('home'), findsOneWidget);
+    });
+  });
+
+  group('ShareReceiptHandler.handle — text (#2838)', () {
+    testWidgets(
+        'a shared e-receipt text body is parsed by the REAL parser and the '
+        'result stashed + routed', (tester) async {
+      final router = _router();
+      final container = await pump(tester, router: router, enabled: featureOn);
+
+      container.read(shareReceiptHandlerProvider).handle(
+            _textIntent(_fixture('eni_milano_2026-05-12.txt'), country: 'IT'),
+          );
+      await tester.pumpAndSettle();
+
+      final result = container.read(pendingSharedReceiptTextProvider);
+      expect(result, isNotNull,
+          reason: 'the parsed text result must be stashed for the form');
+      expect(result!.liters, closeTo(42.18, 0.01));
+      expect(result.totalCost, closeTo(75.46, 0.01));
+      expect(result.fuelType, FuelType.diesel);
+      // The path stash stays empty — a text share has no file to OCR.
+      expect(container.read(pendingSharedReceiptProvider), isNull);
+      expect(find.text('add-fill-up'), findsOneWidget,
+          reason: 'a parseable text receipt routes to the Add-fill-up form');
+    });
+
+    testWidgets('a text body with no parseable receipt does NOT stash or route',
+        (tester) async {
+      final router = _router();
+      final container = await pump(tester, router: router, enabled: featureOn);
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_textIntent('Hi! Your order ships tomorrow.', country: 'DE'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(pendingSharedReceiptTextProvider), isNull,
+          reason: 'non-receipt text must not route to a blank form');
       expect(find.text('home'), findsOneWidget);
     });
 
+    testWidgets('text share is also gated by the opt-in feature flag',
+        (tester) async {
+      final router = _router();
+      final container = await pump(tester, router: router, enabled: const {});
+
+      container.read(shareReceiptHandlerProvider).handle(
+            _textIntent(_fixture('eni_milano_2026-05-12.txt'), country: 'IT'),
+          );
+      await tester.pumpAndSettle();
+
+      expect(container.read(pendingSharedReceiptTextProvider), isNull);
+      expect(find.text('home'), findsOneWidget);
+    });
+  });
+
+  group('ShareReceiptHandler.handle — unsupported / empty', () {
     testWidgets('a non-PDF file is never sent to the rasteriser (unsupported)',
         (tester) async {
       final router = _router();
@@ -192,27 +244,26 @@ void main() {
 
       container
           .read(shareReceiptHandlerProvider)
-          .handle(_fileMedia('/tmp/statement.docx'));
+          .handle(_fileIntent('/tmp/statement.docx'));
       await tester.pumpAndSettle();
 
-      expect(fake.receivedPdfPath, isNull,
-          reason: 'only .pdf files are rasterised; other files are '
-              'unsupported');
+      expect(fake.receivedPdfPath, isNull);
       expect(container.read(pendingSharedReceiptProvider), isNull);
       expect(find.text('home'), findsOneWidget);
     });
 
-    testWidgets('null / empty media is a no-op', (tester) async {
+    testWidgets('null / empty intent is a no-op', (tester) async {
       final router = _router();
       final container = await pump(tester, router: router, enabled: featureOn);
 
       container.read(shareReceiptHandlerProvider).handle(null);
       container
           .read(shareReceiptHandlerProvider)
-          .handle(SharedMedia(attachments: const []));
+          .handle(const SharedReceiptIntent(items: []));
       await tester.pumpAndSettle();
 
       expect(container.read(pendingSharedReceiptProvider), isNull);
+      expect(container.read(pendingSharedReceiptTextProvider), isNull);
       expect(find.text('home'), findsOneWidget);
     });
   });
@@ -220,10 +271,6 @@ void main() {
   group('ShareReceiptHandler — never throws (#2349 fault injection)', () {
     testWidgets('returns normally when a downstream read throws',
         (tester) async {
-      // Inject a feature-flags read that throws — the handler's gate
-      // read is the first downstream dependency, and the #2349 contract
-      // says a thrown dependency must be caught + logged, never
-      // propagated out of the platform stream callback.
       final router = _router();
       final container = ProviderContainer(
         overrides: [
@@ -243,12 +290,11 @@ void main() {
       expect(
         () => container
             .read(shareReceiptHandlerProvider)
-            .handle(_imageMedia('/tmp/receipt.jpg')),
+            .handle(_imageIntent('/tmp/receipt.jpg')),
         returnsNormally,
         reason: 'a thrown downstream dependency must be caught + logged, '
             'never propagated (#2349)',
       );
-      // A failed gate read defaults to "disabled" → no stash, no route.
       expect(container.read(pendingSharedReceiptProvider), isNull);
       expect(find.text('home'), findsOneWidget);
     });

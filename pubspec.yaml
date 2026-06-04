@@ -90,14 +90,12 @@ dependencies:
   # Pinned to 12.x — share_plus 13.x is a major bump; deferred to its
   # own migration pass (#1684).
   share_plus: ^12.0.2
-  # Inbound OS share-intent receiver (#2735 / Epic #2687) — a receipt
-  # image shared from another app lands in Sparkilo and prefills the
-  # Add fill-up form. OS-native + GMS-free (no Play Services / ML Kit),
-  # MIT-licensed. Android intent-filters are declared in
-  # AndroidManifest.xml; the iOS Share Extension target + App Group are
-  # deferred to #2736, so on iOS the share path simply receives nothing
-  # until that target ships — the package still builds without it.
-  share_handler: ^0.0.25
+  # Inbound OS share-intent receiver (#2735 / Epic #2687) is now served by
+  # the in-repo, GMS-free ShareIntentChannel (Android MethodChannel/
+  # EventChannel on MainActivity, declared via AndroidManifest intent-filters)
+  # — the third-party share_handler plugin was removed so the F-Droid build
+  # carries no extra share dependency that could drag in Play Services. iOS is
+  # deferred to #2736.
   # On-device PDF e-receipt rasteriser (#2737 / Epic #2687) — a shared PDF
   # receipt is rendered to a bitmap so it flows through the SAME ML Kit OCR
   # path as image shares. MIT-licensed and GMS-FREE: its Android renderer is

@@ -8,22 +8,16 @@ part of 'share_receipt_handler.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs
-/// through (#2737). Exposed as its own provider so a test can override it
-/// with a fake — the native PdfRenderer is unavailable under `flutter
-/// test`, so the PDF branch is unit-tested by injecting a fake that
-/// returns a known JPEG path (success) or null (graceful fallback),
-/// asserting it routes to the SAME stash+OCR path as an image.
+/// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs through
+/// (#2737). Exposed as its own provider so a test can override it with a fake
+/// — the native PdfRenderer is unavailable under `flutter test`.
 
 @ProviderFor(receiptPdfRasterizer)
 final receiptPdfRasterizerProvider = ReceiptPdfRasterizerProvider._();
 
-/// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs
-/// through (#2737). Exposed as its own provider so a test can override it
-/// with a fake — the native PdfRenderer is unavailable under `flutter
-/// test`, so the PDF branch is unit-tested by injecting a fake that
-/// returns a known JPEG path (success) or null (graceful fallback),
-/// asserting it routes to the SAME stash+OCR path as an image.
+/// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs through
+/// (#2737). Exposed as its own provider so a test can override it with a fake
+/// — the native PdfRenderer is unavailable under `flutter test`.
 
 final class ReceiptPdfRasterizerProvider
     extends
@@ -33,12 +27,9 @@ final class ReceiptPdfRasterizerProvider
           ReceiptPdfRasterizer
         >
     with $Provider<ReceiptPdfRasterizer> {
-  /// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs
-  /// through (#2737). Exposed as its own provider so a test can override it
-  /// with a fake — the native PdfRenderer is unavailable under `flutter
-  /// test`, so the PDF branch is unit-tested by injecting a fake that
-  /// returns a known JPEG path (success) or null (graceful fallback),
-  /// asserting it routes to the SAME stash+OCR path as an image.
+  /// The on-device PDF→bitmap rasteriser the handler feeds shared PDFs through
+  /// (#2737). Exposed as its own provider so a test can override it with a fake
+  /// — the native PdfRenderer is unavailable under `flutter test`.
   ReceiptPdfRasterizerProvider._()
     : super(
         from: null,

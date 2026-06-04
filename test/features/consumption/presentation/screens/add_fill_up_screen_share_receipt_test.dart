@@ -9,11 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tankstellen/features/consumption/data/ereceipt/ereceipt_text_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/add_fill_up_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_numeric_field.dart';
 import 'package:tankstellen/features/consumption/providers/pending_shared_receipt_provider.dart';
+import 'package:tankstellen/features/consumption/providers/pending_shared_receipt_text_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
@@ -164,6 +166,59 @@ void main() {
     });
   });
 
+  testWidgets(
+      'a stashed shared-receipt TEXT result prefills the form via the real '
+      'e-receipt parser (#2838)', (tester) async {
+    // The share handler parses shared text at receive time; the screen
+    // applies the stashed result through the same prefill body. Seed the
+    // stash with the REAL EReceiptTextParser's output for a German e-receipt
+    // fixture so this drives the actual parse→apply path end to end.
+    final parsed = const EReceiptTextParser().parse(
+      File('test/features/consumption/data/ereceipt/fixtures/'
+              'aral_koeln_2026-05-28.txt')
+          .readAsStringSync(),
+      countryCode: 'DE',
+    );
+    expect(parsed.hasData, isTrue, reason: 'fixture must parse');
+
+    final router = GoRouter(
+      initialLocation: '/add',
+      routes: [
+        GoRoute(
+          path: '/add',
+          builder: (context, state) => const AddFillUpScreen(),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          vehicleProfileListProvider.overrideWith(() => _StubVehicleList()),
+          featureFlagsProvider.overrideWith(() => _ShareIntentEnabled()),
+          pendingSharedReceiptTextProvider.overrideWith(
+            () => _SeededPendingSharedReceiptText(parsed),
+          ),
+        ],
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The Aral Köln fixture parses to 44.07 L / €77.52 — the apply body
+    // formats them to 2 decimals into the controllers.
+    expect(_valueOf(tester, 'Liters'), '44.07',
+        reason: 'the shared text result prefilled litres');
+    expect(_valueOf(tester, 'Total cost'), '77.52',
+        reason: 'the shared text result prefilled the total');
+  });
+
   testWidgets('no stashed path → the form opens blank (manual entry)',
       (tester) async {
     final router = GoRouter(
@@ -207,4 +262,15 @@ class _SeededPendingSharedReceipt extends PendingSharedReceipt {
 
   @override
   String? build() => _path;
+}
+
+/// Seeds [pendingSharedReceiptTextProvider] with a parsed result at build so
+/// the screen applies it on open, simulating the share handler having parsed
+/// shared e-receipt text before routing to `/consumption/add` (#2838).
+class _SeededPendingSharedReceiptText extends PendingSharedReceiptText {
+  _SeededPendingSharedReceiptText(this._result);
+  final ReceiptParseResult _result;
+
+  @override
+  ReceiptParseResult? build() => _result;
 }

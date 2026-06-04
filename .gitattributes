@@ -14,6 +14,11 @@
 *.pro text eol=lf
 *.toml text eol=lf
 
+# #2838 — e-receipt text fixtures must keep their on-disk bytes verbatim:
+# one fixture deliberately carries CRLF line endings + NBSP to exercise the
+# parser's normalisation, so they must NOT be EOL-normalised on checkout.
+test/features/consumption/data/ereceipt/fixtures/*.txt -text
+
 # Generated files — collapse in GitHub PR diffs
 *.g.dart linguist-generated=true
 *.freezed.dart linguist-generated=true

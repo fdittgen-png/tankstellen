@@ -160,10 +160,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     // value without spinning up the trip-recording graph.
     _fuelLevelBeforeL =
         widget.initialFuelLevelBeforeL ?? _readObd2FuelLevelLitres();
-    // #2735 — when an OS share intent routed the user here with a receipt
-    // image, OCR + prefill it after the first frame (helper lives in
-    // `fill_up_share_scan_handlers.dart` to keep this file lean, #1680).
-    scheduleSharedReceiptScanIfPending(
+    // #2735/#2838 — when an OS share intent routed the user here, prefill
+    // from it after the first frame: image/PDF OCR'd, e-receipt text applied
+    // (one helper drains both stashes; lives in the widgets file, #1680).
+    scheduleSharedReceiptPrefillIfPending(
       ref,
       context,
       _buildScanHostState,
