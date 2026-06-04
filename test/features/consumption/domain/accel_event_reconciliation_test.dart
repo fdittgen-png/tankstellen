@@ -153,6 +153,77 @@ void main() {
     });
   });
 
+  group('refractory-window debounce — #2846', () {
+    /// A continuous hard brake delivered as the coarse "drop, hold, drop,
+    /// hold" staircase a ~1 Hz integer speed PID produces. Each 15 km/h
+    /// pulse over 1 s is -4.17 m/s² (harsh); the 1 s hold between pulses
+    /// dips the derivative below the threshold. ONE physical manoeuvre.
+    List<AccelSamplePoint> oneStaircaseBrake() {
+      const speeds = <double>[90, 75, 75, 60, 60, 45, 45, 30, 30, 20];
+      return [
+        for (var i = 0; i < speeds.length; i++)
+          AccelSamplePoint(
+              timestamp: t0.add(Duration(seconds: i)), speedKmh: speeds[i]),
+      ];
+    }
+
+    test('one manoeuvre crossing the threshold N times within the '
+        'refractory window → ONE brake (not N)', () {
+      final counts = countAccelEvents(oneStaircaseBrake());
+      expect(counts.brakeEvents, 1,
+          reason: 'the staircase hold-jitter is debounced into one event');
+      expect(counts.accelEvents, 0);
+    });
+
+    test('a clean steady cruise → zero events', () {
+      final pts = <AccelSamplePoint>[
+        for (var s = 0; s <= 20; s++)
+          AccelSamplePoint(
+              timestamp: t0.add(Duration(seconds: s)), speedKmh: 90),
+      ];
+      final counts = countAccelEvents(pts);
+      expect(counts.brakeEvents, 0);
+      expect(counts.accelEvents, 0);
+    });
+
+    test('two genuinely separate manoeuvres → two', () {
+      final pts = <AccelSamplePoint>[];
+      void add(int s, double v) =>
+          pts.add(AccelSamplePoint(timestamp: t0.add(Duration(seconds: s)), speedKmh: v));
+      // Brake #1: 90 → 50 over 2 s.
+      add(0, 90);
+      add(1, 70);
+      add(2, 50);
+      // Long cruise far beyond the refractory window.
+      for (var s = 3; s <= 12; s++) {
+        add(s, 50);
+      }
+      // Re-accelerate then brake #2: 90 → 50 over 2 s.
+      add(13, 90);
+      for (var s = 14; s <= 18; s++) {
+        add(s, 90);
+      }
+      add(19, 70);
+      add(20, 50);
+      final counts = countAccelEvents(pts);
+      expect(counts.brakeEvents, 2,
+          reason: 'two manoeuvres parted by a long cruise count twice');
+    });
+
+    test('all three detector paths agree on the debounced count', () {
+      // The whole point of #2667 + #2846: the staircase manoeuvre yields
+      // ONE brake across the shared gate AND the HarshEventDetector.
+      final gate = countAccelEvents(oneStaircaseBrake());
+      final d = HarshEventDetector();
+      const speeds = <double>[90, 75, 75, 60, 60, 45, 45, 30, 30, 20];
+      for (var i = 0; i < speeds.length; i++) {
+        d.onSample(speeds[i], t0.add(Duration(seconds: i)));
+      }
+      expect(gate.brakeEvents, 1);
+      expect(d.brakes, gate.brakeEvents);
+    });
+  });
+
   group('canonical constants are the single source — #2667', () {
     test('the shared gate re-exports the score calculator constants', () {
       // The accel-event gate and the score calculator MUST be the same

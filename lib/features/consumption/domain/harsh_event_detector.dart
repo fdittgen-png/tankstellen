@@ -63,6 +63,7 @@ class HarshEventDetector {
     this.minSustainedSec = kAccelEventMinSustainedSec,
     this.minSpeedKmh = kAccelEventMinSpeedKmh,
     this.maxHAccuracyM = kAccelEventAccuracyGateM,
+    this.refractorySec = kAccelEventRefractorySec,
     this.smoothSpeed = false,
     this.onEvent,
   });
@@ -102,6 +103,12 @@ class HarshEventDetector {
   /// as "unknown, accept" so OBD-speed-only samples (no GPS) still flow.
   final double maxHAccuracyM;
 
+  /// Refractory window (seconds) the derivative must stay continuously
+  /// below the threshold before another same-type event can fire (#2846).
+  /// Debounces one physical manoeuvre's staircase jitter into ONE event;
+  /// shared default with `countAccelEvents` so every path agrees.
+  final double refractorySec;
+
   /// When true, speed is passed through a 3-sample moving average before
   /// differentiation (#2653), damping 1 km/h quantisation jitter. Off by
   /// default — the canonical OBD path keeps its raw-speed behaviour.
@@ -128,11 +135,18 @@ class HarshEventDetector {
   // Episode latches (#2667). An "event" is one sustained threshold-crossing
   // episode, not one per evaluated ~1 s interval — a multi-second hard
   // brake is ONE brake. We count on the transition INTO an episode and
-  // re-arm only when an evaluated interval falls back below the threshold.
-  // This is the count semantics shared with `countAccelEvents`, so the
-  // detector agrees with the score / insights / GPS features.
+  // re-arm only once the signal has stayed below the threshold for a
+  // continuous [minSustainedSec]·-independent refractory window
+  // ([refractorySec], #2846): the staircase a coarse ~1 Hz speed PID
+  // produces dips below the threshold for a single hold interval inside one
+  // manoeuvre, and the old "re-arm after one sub-threshold interval" latch
+  // counted each pulse as a new event (the ~100× over-count). This is the
+  // count semantics shared with `countAccelEvents`, so the detector agrees
+  // with the score / insights / GPS features.
   bool _inAccelEpisode = false;
   bool _inBrakeEpisode = false;
+  double _accelBelowSec = 0;
+  double _brakeBelowSec = 0;
 
   /// Number of harsh-braking events counted so far.
   int get brakes => _events
@@ -179,6 +193,8 @@ class HarshEventDetector {
       _speedWindow.clear();
       _inAccelEpisode = false;
       _inBrakeEpisode = false;
+      _accelBelowSec = 0;
+      _brakeBelowSec = 0;
       return;
     }
 
@@ -205,14 +221,17 @@ class HarshEventDetector {
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
     final accelMps2 = ((speed - anchorSpeed) / 3.6) / dt;
 
-    // Episode semantics (#2667): record at most once on entry into a
-    // sustained harsh stretch, and re-arm only when an evaluated interval
-    // drops back below the threshold — so a multi-interval manoeuvre is
-    // ONE event, agreeing with the shared gate.
+    // Episode semantics (#2667 + #2846): record at most once on entry into
+    // a sustained harsh stretch, and re-arm only once the derivative has
+    // stayed below the threshold for a continuous [refractorySec] window —
+    // so a multi-interval manoeuvre (and the staircase hold-jitter that a
+    // coarse speed PID adds inside it) is ONE event, agreeing with the
+    // shared gate.
     final isBrake = scorable && accelMps2 <= -brakeThresholdMps2;
     final isAccel = scorable && accelMps2 >= accelThresholdMps2;
 
     if (isBrake) {
+      _brakeBelowSec = 0;
       if (!_inBrakeEpisode) {
         _record(HarshEvent(
           timestamp: timestamp,
@@ -222,11 +241,16 @@ class HarshEventDetector {
         ));
         _inBrakeEpisode = true;
       }
-    } else {
-      _inBrakeEpisode = false;
+    } else if (_inBrakeEpisode) {
+      _brakeBelowSec += dt;
+      if (_brakeBelowSec >= refractorySec) {
+        _inBrakeEpisode = false;
+        _brakeBelowSec = 0;
+      }
     }
 
     if (isAccel) {
+      _accelBelowSec = 0;
       if (!_inAccelEpisode) {
         _record(HarshEvent(
           timestamp: timestamp,
@@ -236,8 +260,12 @@ class HarshEventDetector {
         ));
         _inAccelEpisode = true;
       }
-    } else {
-      _inAccelEpisode = false;
+    } else if (_inAccelEpisode) {
+      _accelBelowSec += dt;
+      if (_accelBelowSec >= refractorySec) {
+        _inAccelEpisode = false;
+        _accelBelowSec = 0;
+      }
     }
     _anchorAt = timestamp;
     _anchorSpeedKmh = speed;
@@ -272,5 +300,7 @@ class HarshEventDetector {
     _anchorAt = null;
     _inAccelEpisode = false;
     _inBrakeEpisode = false;
+    _accelBelowSec = 0;
+    _brakeBelowSec = 0;
   }
 }

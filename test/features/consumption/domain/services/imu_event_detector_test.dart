@@ -121,8 +121,8 @@ void main() {
     expect(det.sharpCornerCount, 0);
   });
 
-  test('two separate 1.5 s accel bursts with a sub-threshold gap → TWO '
-      '(re-arm)', () {
+  test('two separate 1.5 s accel bursts with a calm gap → TWO '
+      '(re-arm past the refractory window)', () {
     final det = ImuEventDetector();
     var t = feed(det,
         start: t0,
@@ -130,10 +130,14 @@ void main() {
         mag: 4.0,
         startSpeedKmh: 30,
         speedStepKmh: 0.5);
-    // A 1 s calm gap (below threshold) re-arms the latch.
+    // A calm gap LONGER than the kAccelEventRefractorySec refractory window
+    // (#2846) re-arms the latch — 60 samples × 50 ms = 3 s of below-threshold
+    // cruise, the multi-second plateau that parts two genuinely distinct
+    // manoeuvres (a sub-refractory ~1 s dip, the staircase hold-jitter inside
+    // ONE manoeuvre, must NOT re-arm — that was the ~100× over-count).
     t = feed(det,
         start: t,
-        count: 20,
+        count: 60,
         mag: 0.2,
         startSpeedKmh: 45,
         speedStepKmh: 0.0);
@@ -144,7 +148,39 @@ void main() {
         startSpeedKmh: 45,
         speedStepKmh: 0.5);
     expect(det.hardAccelCount, 2,
-        reason: 'the calm gap re-arms, so the second burst counts again');
+        reason: 'the multi-second calm gap clears the refractory window, '
+            'so the second burst counts again');
+  });
+
+  test('a 1 s sub-threshold dip INSIDE one manoeuvre → ONE '
+      '(refractory window debounces, #2846)', () {
+    // The smoking gun from the Skoda-diesel backup: ONE continuous hard
+    // accel whose strong-magnitude stretch dips below the threshold for a
+    // single ~1 s hold (the staircase a coarse signal inserts), then crosses
+    // it again. The sub-refractory dip must NOT re-arm → ONE event, not two.
+    final det = ImuEventDetector();
+    var t = feed(det,
+        start: t0,
+        count: 30,
+        mag: 4.0,
+        startSpeedKmh: 30,
+        speedStepKmh: 0.5);
+    // 20 samples × 50 ms = 1 s below threshold — shorter than the 2 s
+    // refractory window — while speed keeps climbing (still one manoeuvre).
+    t = feed(det,
+        start: t,
+        count: 20,
+        mag: 0.2,
+        startSpeedKmh: 45,
+        speedStepKmh: 0.5);
+    feed(det,
+        start: t,
+        count: 30,
+        mag: 4.0,
+        startSpeedKmh: 55,
+        speedStepKmh: 0.5);
+    expect(det.hardAccelCount, 1,
+        reason: 'a sub-refractory dip inside one manoeuvre does not re-arm');
   });
 
   test('one continuous 3 s accel stretch → ONE (latch holds)', () {
@@ -169,10 +205,10 @@ void main() {
         mag: 4.0,
         startSpeedKmh: 30,
         speedStepKmh: 0.5);
-    // Calm gap, then a brake.
+    // Calm gap LONGER than the refractory window (#2846), then a brake.
     t = feed(det,
         start: t,
-        count: 20,
+        count: 60,
         mag: 0.2,
         startSpeedKmh: 45,
         speedStepKmh: 0.0);

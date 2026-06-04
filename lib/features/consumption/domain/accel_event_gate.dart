@@ -26,17 +26,32 @@
 /// event yields ONE count across the score, the insights, and the GPS
 /// features.
 ///
-/// ## Count semantics — one event per *episode*
+/// ## Count semantics — one event per *episode*, with a refractory window
 ///
 /// An "event" is one sustained threshold-crossing *episode*, not one per
 /// qualifying sample interval. A 4-second hard brake is ONE brake, not
 /// four. The detector arms when the speed derivative first holds at or
 /// beyond the threshold for at least [kAccelEventMinSustainedSec], counts
-/// once, then re-arms only after the derivative drops back below the
-/// threshold. This matches the physical intuition of "how many times did
-/// the driver brake/accelerate hard", and is the semantics the GPS
-/// features already used — it is the harsh detector's old
-/// once-per-resample-interval count that was the outlier.
+/// once, then **re-arms only after the derivative has stayed below the
+/// threshold for a continuous [kAccelEventRefractorySec] window** (#2846).
+///
+/// The refractory window is the fix for the ~100× over-count (#2846): on a
+/// real Skoda-diesel OBD2 backup ONE braking manoeuvre logged dozens of
+/// "harsh brakes" because the ~1 Hz integer speed PID arrives as a
+/// staircase — a "drop, hold, drop, hold" series whose derivative dips
+/// below the threshold for a single hold interval and then crosses it
+/// again. The old "re-arm after one sub-threshold interval" latch counted
+/// each pulse of that ONE manoeuvre as a new event (2 734 brakes + 3 882
+/// accels across 33 trips, ~10/km). Requiring the signal to settle below
+/// the threshold for a real ~[kAccelEventRefractorySec] gap before another
+/// same-type event can fire collapses a manoeuvre into ONE event while
+/// still separating two genuinely distinct manoeuvres (which are parted by
+/// a cruise far longer than the refractory window).
+///
+/// This matches the physical intuition of "how many times did the driver
+/// brake/accelerate hard", and is the semantics every consumer routes
+/// through ([HarshEventDetector], [ImuEventDetector], and the GPS-features
+/// / insights / score paths) so a given physical event yields ONE count.
 library;
 
 /// Acceleration (m/s²) at/above which an interval is a hard-accel event.
@@ -58,6 +73,21 @@ const double kAccelEventMinSustainedSec = 1.0;
 /// scored (#2653). Dead-reckoning noise at a near-standstill manufactures
 /// phantom events; genuine harsh manoeuvres happen above a walking pace.
 const double kAccelEventMinSpeedKmh = 5.0;
+
+/// Refractory window (seconds): after a hard-accel / hard-brake event
+/// fires, the derivative must stay BELOW the threshold for at least this
+/// long continuously before another same-type event can fire (#2846).
+///
+/// This debounces one physical manoeuvre into ONE event. A coarse ~1 Hz
+/// integer speed PID arrives as a "drop, hold, drop, hold" staircase whose
+/// derivative dips below the threshold for a single hold interval and then
+/// crosses it again; the old "re-arm after one sub-threshold interval"
+/// latch counted each pulse as a new event (the ~100× over-count). 2.0 s
+/// is longer than the ~1 s hold interval a coarse ~1 Hz speed staircase
+/// inserts inside a single continuous manoeuvre, yet shorter than the
+/// multi-second cruise plateau that separates two genuinely distinct
+/// manoeuvres, so it collapses the former while preserving the latter.
+const double kAccelEventRefractorySec = 2.0;
 
 /// Reported horizontal GPS accuracy (metres) above which a sample is
 /// dropped *and* the episode anchor reset, so the derivative is never
@@ -150,14 +180,20 @@ AccelEventCounts countAccelEvents(
   final accelStartIndices = <int>[];
 
   // Episode state: accumulate the sustained duration above each threshold;
-  // arm once it first reaches the sustained-window floor; re-arm only when
-  // the derivative drops back below the threshold.
+  // arm once it first reaches the sustained-window floor; re-arm only once
+  // the derivative has stayed BELOW the threshold for a continuous
+  // refractory window (#2846), so one manoeuvre's staircase jitter is ONE
+  // event. `belowDur` tracks how long we've been continuously sub-threshold
+  // while latched.
   var accelDur = 0.0, brakeDur = 0.0;
+  var accelBelowDur = 0.0, brakeBelowDur = 0.0;
   var inAccel = false, inBrake = false;
 
   void breakEpisodes() {
     accelDur = 0;
     brakeDur = 0;
+    accelBelowDur = 0;
+    brakeBelowDur = 0;
     inAccel = false;
     inBrake = false;
   }
@@ -195,6 +231,7 @@ AccelEventCounts countAccelEvents(
     if (accelMps2 >= kHardAccelThresholdMps2) {
       accelDur += dt;
       accelSeconds += dt;
+      accelBelowDur = 0;
       if (!inAccel && accelDur >= kAccelEventMinSustainedSec) {
         accelEvents++;
         // Confirm at the END index of the interval that crossed the
@@ -204,19 +241,36 @@ AccelEventCounts countAccelEvents(
         inAccel = true;
       }
     } else {
+      // Sub-threshold: don't re-arm immediately (#2846). While latched,
+      // accumulate the continuous below-threshold time and only re-arm once
+      // it clears the refractory window, so one manoeuvre's hold-jitter
+      // can't fire a second event.
       accelDur = 0;
-      inAccel = false;
+      if (inAccel) {
+        accelBelowDur += dt;
+        if (accelBelowDur >= kAccelEventRefractorySec) {
+          inAccel = false;
+          accelBelowDur = 0;
+        }
+      }
     }
 
     if (accelMps2 <= -kHardBrakeThresholdMps2) {
       brakeDur += dt;
+      brakeBelowDur = 0;
       if (!inBrake && brakeDur >= kAccelEventMinSustainedSec) {
         brakeEvents++;
         inBrake = true;
       }
     } else {
       brakeDur = 0;
-      inBrake = false;
+      if (inBrake) {
+        brakeBelowDur += dt;
+        if (brakeBelowDur >= kAccelEventRefractorySec) {
+          inBrake = false;
+          brakeBelowDur = 0;
+        }
+      }
     }
   }
 

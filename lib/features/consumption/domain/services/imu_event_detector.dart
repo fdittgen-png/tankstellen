@@ -94,10 +94,14 @@ class ImuEventDetector {
 
   // Episode-latch state, mirroring `countAccelEvents`: accumulate the
   // sustained time above each threshold, count once on first crossing the
-  // sustained floor, and re-arm only when the signal drops back below the
-  // threshold.
+  // sustained floor, and re-arm only once the signal has stayed below the
+  // threshold for a continuous refractory window (#2846) — so one
+  // manoeuvre's transient dips can't fire a second event. `_*BelowDur`
+  // tracks the continuous sub-threshold time while latched.
   double _maneuverDur = 0;
   double _cornerDur = 0;
+  double _accelBelowDur = 0;
+  double _brakeBelowDur = 0;
   bool _inAccel = false;
   bool _inBrake = false;
   bool _inCorner = false;
@@ -167,6 +171,7 @@ class ImuEventDetector {
       constantSpeed: constantSpeed,
     );
     _scoreAccelBrake(
+      dt: dt,
       horizMag: horizMag,
       highYaw: highYaw,
       constantSpeed: constantSpeed,
@@ -201,6 +206,7 @@ class ImuEventDetector {
   }
 
   void _scoreAccelBrake({
+    required double dt,
     required double horizMag,
     required bool highYaw,
     required bool constantSpeed,
@@ -212,9 +218,12 @@ class ImuEventDetector {
     // horizontal accel is centripetal (lateral), not a longitudinal
     // accel/brake — so don't score it as one. When speed IS changing through
     // a bend, the net-speed classification below correctly takes over.
+    // Treat the cornering interval as below-threshold for the refractory
+    // accumulators so it counts toward re-arming rather than re-arming
+    // instantly (#2846).
     if (highYaw && constantSpeed) {
-      _inAccel = false;
-      _inBrake = false;
+      _decayAccelLatch(dt);
+      _decayBrakeLatch(dt);
       return;
     }
 
@@ -229,13 +238,14 @@ class ImuEventDetector {
         horizMag >= kHardAccelThresholdMps2 &&
         netSpeedDeltaKmh > _constantSpeedDeltaKmh;
     if (isAccel) {
+      _accelBelowDur = 0;
       if (!_inAccel) {
         _hardAccelCount++;
         _inAccel = true;
         _emit(HarshEventType.acceleration, horizMag, t, speedKmh);
       }
     } else {
-      _inAccel = false;
+      _decayAccelLatch(dt);
     }
 
     // Hard brake: held while speed FELL, with the harder 3.5 m/s² magnitude
@@ -245,13 +255,35 @@ class ImuEventDetector {
         horizMag >= kHardBrakeThresholdMps2 &&
         netSpeedDeltaKmh < -_constantSpeedDeltaKmh;
     if (isBrake) {
+      _brakeBelowDur = 0;
       if (!_inBrake) {
         _hardBrakeCount++;
         _inBrake = true;
         _emit(HarshEventType.brake, horizMag, t, speedKmh);
       }
     } else {
+      _decayBrakeLatch(dt);
+    }
+  }
+
+  /// Re-arm the accel latch only once the signal has stayed below the
+  /// threshold for a continuous [kAccelEventRefractorySec] window (#2846),
+  /// so one manoeuvre's transient dips don't fire a second event.
+  void _decayAccelLatch(double dt) {
+    if (!_inAccel) return;
+    _accelBelowDur += dt;
+    if (_accelBelowDur >= kAccelEventRefractorySec) {
+      _inAccel = false;
+      _accelBelowDur = 0;
+    }
+  }
+
+  void _decayBrakeLatch(double dt) {
+    if (!_inBrake) return;
+    _brakeBelowDur += dt;
+    if (_brakeBelowDur >= kAccelEventRefractorySec) {
       _inBrake = false;
+      _brakeBelowDur = 0;
     }
   }
 
@@ -272,6 +304,8 @@ class ImuEventDetector {
   void _breakEpisodes() {
     _maneuverDur = 0;
     _cornerDur = 0;
+    _accelBelowDur = 0;
+    _brakeBelowDur = 0;
     _inAccel = false;
     _inBrake = false;
     _inCorner = false;
