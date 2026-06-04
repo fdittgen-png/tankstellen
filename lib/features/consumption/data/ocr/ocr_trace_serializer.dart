@@ -30,7 +30,15 @@ import 'ocr_trace_package.dart';
 ///   "result": { "totalCost": 18.59, "derived": [], ... }
 /// }
 /// ```
-String formatOcrTracePackageJson(OcrTracePackage package) {
+///
+/// [includeImage] defaults to `true` (the file / fixture export carries the
+/// base64 capture). Pass `false` for size-bounded sinks like the clipboard
+/// (#2853) — the ~5 MB base64 blob is meaningless as pasted text and trips
+/// Android's ~1 MB Binder limit.
+String formatOcrTracePackageJson(
+  OcrTracePackage package, {
+  bool includeImage = true,
+}) {
   const encoder = JsonEncoder.withIndent('  ');
-  return encoder.convert(package.toJson());
+  return encoder.convert(package.toJson(includeImage: includeImage));
 }

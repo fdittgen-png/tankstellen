@@ -320,9 +320,15 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
   // --- Export --------------------------------------------------------------
 
   Future<void> _copyAsJson(OcrTracePackage package) async {
-    await OcrTesterExport.copyAsJson(package);
+    final copied = await OcrTesterExport.copyAsJson(package);
     if (!mounted) return;
     final l = AppLocalizations.of(context);
+    if (!copied) {
+      // The image-elided trace is still too large for the clipboard (#2853)
+      // — route it to the Downloads / share-sheet export instead.
+      await _exportPackage(package);
+      return;
+    }
     SnackBarHelper.showSuccess(
       context,
       l?.ocrTesterCopied ?? 'OCR trace copied to clipboard.',

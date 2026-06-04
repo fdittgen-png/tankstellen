@@ -35,6 +35,14 @@ Future<Directory> Function()? debugOcrPackageTempDirectoryOverride;
 /// some clipboard managers silently drop large payloads.
 const int kOcrPackageClipboardThresholdBytes = 64 * 1024;
 
+/// Hard upper bound (UTF-8 bytes) on what [OcrTesterExport.copyAsJson] will
+/// hand to the system clipboard (#2853). Android marshals clipboard data
+/// over a Binder transaction capped near 1 MB; well above this and
+/// `Clipboard.setData` throws `TransactionTooLargeException`. The
+/// image-elided trace is normally a few KB, so this is a defensive ceiling
+/// that routes any pathological payload to the file export instead.
+const int kOcrPackageClipboardMaxBytes = 256 * 1024;
+
 /// Local-only export of a built [OcrTracePackage] for the gated OCR tester
 /// (#2518, Epic #2516 Child 2). No paid services, no network — the JSON
 /// (and, when present, the capture image) lands in the device's Downloads
@@ -44,12 +52,23 @@ const int kOcrPackageClipboardThresholdBytes = 64 * 1024;
 class OcrTesterExport {
   OcrTesterExport._();
 
-  /// Copies the pretty-printed trace JSON to the clipboard. Returns the
-  /// JSON so the caller can size / log it.
-  static Future<String> copyAsJson(OcrTracePackage package) async {
-    final json = formatOcrTracePackageJson(package);
+  /// Copies the pretty-printed trace JSON to the clipboard, WITHOUT the
+  /// base64 capture image (#2853): the image is ~5 MB and meaningless as
+  /// pasted text, and the full payload tripped Android's ~1 MB Binder limit
+  /// (`TransactionTooLargeException`). The capture still rides alongside the
+  /// JSON via [exportPackage] / [saveAsFixture], which keep the image.
+  ///
+  /// Returns `true` when the JSON reached the clipboard, `false` when even
+  /// the image-elided document exceeds [kOcrPackageClipboardMaxBytes] — in
+  /// which case nothing is written and the caller should fall back to the
+  /// file export.
+  static Future<bool> copyAsJson(OcrTracePackage package) async {
+    final json = formatOcrTracePackageJson(package, includeImage: false);
+    if (utf8.encode(json).length > kOcrPackageClipboardMaxBytes) {
+      return false;
+    }
     await Clipboard.setData(ClipboardData(text: json));
-    return json;
+    return true;
   }
 
   /// Writes the trace JSON (and the sibling capture image, when the
