@@ -9,6 +9,7 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
+import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/obd2/obd2_connection_service.dart';
 import '../../data/obd2/obd2_service.dart';
 import '../obd2_connect_telemetry.dart';
@@ -129,6 +130,20 @@ class RecordingStartCoordinator {
         // User dismissed the picker without connecting — leave the
         // recording screen's connecting view and revert to idle.
         notifier.cancelConnecting();
+        return;
+      }
+      // #2892 — the ELM chip can connect cleanly (every AT OK) while the
+      // vehicle bus is silent (ignition off / ECU asleep): ATDPN→NO DATA
+      // caches no protocol and 0100→NO DATA leaves zero supported PIDs, yet
+      // `connect()` still returned true. Starting here would yield a degraded
+      // GPS-only trip with no telemetry and no explanation. Surface the
+      // EXISTING localized "turn the ignition on" condition instead, roll the
+      // connecting phase back, and tear down the dead link. Gated STRICTLY on
+      // the no-answer signal so it never trips when discovery found PIDs.
+      if (!service.busAnswered) {
+        notifier.cancelConnecting();
+        onConnectionError(const Obd2AdapterUnresponsive());
+        unawaited(service.disconnect());
         return;
       }
       notifier.setConnectStage(TripStartStage.readingVehicleData);

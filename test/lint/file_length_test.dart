@@ -157,7 +157,12 @@ void main() {
     // #2763 — 1599 → 1603: route the best-effort readVin catch through
     // recordObd2ReadFailure (de-noise flaky-comms timeouts to breadcrumbs) +
     // its import. Decomposition still tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1603,
+    // #2892 — re-grandfathered 1603 → 1618: the `busAnswered` getter (a
+    // silent-bus signal: protocol-cached OR ≥1 PID) + its 11-line dartdoc, so
+    // the recording coordinator can surface "turn the ignition on" instead of
+    // a silent green connect into a degraded GPS-only trip. Decomposition of
+    // this god-class still tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1618,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb

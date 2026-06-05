@@ -3,9 +3,9 @@
 
 import 'dart:async';
 
-import '../../../../core/logging/error_logger.dart';
 import 'adapter_registry.dart';
 import 'obd2_connection_service.dart';
+import 'obd2_read_telemetry.dart';
 import 'obd2_service.dart';
 import 'reconnect_rssi_gate.dart';
 
@@ -90,9 +90,13 @@ class ReconnectConnector {
         return true;
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'ReconnectConnector direct connect failed',
-      }));
+      // #2892 — an EXPECTED, user-surfaced connect condition (the bus is
+      // silent / the dongle is out of range on a parked car) is a breadcrumb,
+      // not an ERROR trace: this attempt repeats on the scanner's backoff
+      // schedule, so a raw `errorLogger.log` here floods (error-log #22:
+      // Obd2AdapterUnresponsive ×20). A genuine fault still ERROR-logs.
+      recordObd2ConnectTransient(e, st,
+          where: 'ReconnectConnector direct connect failed');
     }
 
     // 2) SCAN FALLBACK (ultimate). One scan window: track the strongest
@@ -134,9 +138,11 @@ class ReconnectConnector {
         return true;
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'ReconnectConnector scan fallback failed',
-      }));
+      // #2892 — same de-noise: a scan-path `connect(candidate)` that throws
+      // the EXPECTED Obd2AdapterUnresponsive (classic_elm_channel.dart /
+      // _openAndInit) on a silent bus is a breadcrumb, not an ERROR trace.
+      recordObd2ConnectTransient(e, st,
+          where: 'ReconnectConnector scan fallback failed');
     }
     return false;
   }
@@ -163,9 +169,10 @@ class ReconnectConnector {
         return true;
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'ReconnectConnector passive connect failed',
-      }));
+      // #2892 — same de-noise: the paced passive/Classic retry on a parked
+      // car routinely raises the EXPECTED user condition; breadcrumb it.
+      recordObd2ConnectTransient(e, st,
+          where: 'ReconnectConnector passive connect failed');
     }
     return false;
   }
