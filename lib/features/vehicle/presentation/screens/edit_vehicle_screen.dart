@@ -83,6 +83,9 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
 
   // #710 — combustion default; user can flip to Hybrid/Electric.
   VehicleType _type = VehicleType.combustion;
+  // #2885 — multi-fuel capability flag. Loaded from the profile,
+  // surfaced (and toggleable) only when the preferred fuel is E10 / E85.
+  bool _multiFuelCapable = false;
   final Set<ConnectorType> _connectors = {};
   String? _existingId;
   String? _adapterMac;
@@ -175,6 +178,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       _engineDisplacementCc = snap.engineDisplacementCc;
       _engineCylinders = snap.engineCylinders;
       _curbWeightKg = snap.curbWeightKg;
+      _multiFuelCapable = snap.multiFuelCapable;
       _hasInitiallyLoaded = true;
     });
     return true;
@@ -287,6 +291,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       engineDisplacementCc: _engineDisplacementCc,
       engineCylinders: _engineCylinders,
       curbWeightKg: _curbWeightKg,
+      multiFuelCapable: _multiFuelCapable,
       referenceVehicle: _pickedReferenceVehicle,
     );
     await ref.read(vehicleProfileListProvider.notifier).save(profile);
@@ -686,6 +691,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
               }),
               tankController: _ctrl.tankController,
               fuelTypeController: _ctrl.fuelTypeController,
+              multiFuelCapable: _multiFuelCapable,
+              onMultiFuelCapableChanged: (v) =>
+                  setState(() => _multiFuelCapable = v),
+              // #2885 — rebuild so the multi-fuel switch shows / hides as
+              // the preferred fuel moves in and out of the E10 / E85 set.
+              onFuelTypeChanged: (_) => setState(() {}),
               numberValidator: _validateOptionalNumber,
             ),
             // Extras for saved vehicles — adapter, baselines, VE

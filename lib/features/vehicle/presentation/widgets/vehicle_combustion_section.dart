@@ -14,17 +14,46 @@ import '../../../search/domain/entities/fuel_type.dart';
 /// every surface (profile, vehicle, fill-up) shows the same polished labels
 /// (#713). Electric and the synthetic "all" sentinel are excluded — EV
 /// fuel is configured via the EV section.
+///
+/// #2885 — when the chosen preferred fuel is in the PETROL family AND is
+/// E10 or E85 (the flex-fuel grades the per-fuel €/km comparison targets),
+/// a "I may fill up with different fuel types" switch is offered. It is
+/// hidden for diesel / LPG / CNG / E5 / E98 / EV — a single-fuel vehicle
+/// has nothing to compare. The flag drives the per-fill fuel prompt (#2886)
+/// and the per-fuel efficiency card (#2887).
 class VehicleCombustionSection extends StatelessWidget {
   final TextEditingController tankController;
   final TextEditingController fuelTypeController;
   final String? Function(String?) numberValidator;
+
+  /// #2885 — current value of [VehicleProfile.multiFuelCapable]. Only
+  /// surfaced (and toggleable) when [_offersMultiFuel] is true for the
+  /// selected fuel.
+  final bool multiFuelCapable;
+  final ValueChanged<bool> onMultiFuelCapableChanged;
+
+  /// #2885 — fired when the user changes the preferred-fuel dropdown.
+  /// The owning screen `setState`s on this so the multi-fuel switch
+  /// shows / hides as the fuel moves in and out of the E10 / E85 set.
+  final ValueChanged<FuelType?> onFuelTypeChanged;
 
   const VehicleCombustionSection({
     super.key,
     required this.tankController,
     required this.fuelTypeController,
     required this.numberValidator,
+    required this.multiFuelCapable,
+    required this.onMultiFuelCapableChanged,
+    required this.onFuelTypeChanged,
   });
+
+  /// The flex-fuel grades the multi-fuel comparison targets. E5 / E98 are
+  /// intentionally excluded — a regular SP95 / SP98 car is single-fuel in
+  /// practice; the E85 ↔ E10 (↔ E5) decision is the one the feature serves.
+  static bool _offersMultiFuel(FuelType? fuel) =>
+      fuel != null &&
+      fuelCompatibilityFamily(fuel) == FuelCompatibilityFamily.petrol &&
+      (fuel == FuelType.e10 || fuel == FuelType.e85);
 
   static const List<FuelType> _combustionFuels = [
     FuelType.e5,
@@ -71,8 +100,32 @@ class VehicleCombustionSection extends StatelessWidget {
             // Store the canonical apiValue (lower-case) so existing
             // call sites that read the string continue to work.
             fuelTypeController.text = v?.apiValue ?? '';
+            // #2885 — let the owning screen rebuild so the multi-fuel
+            // switch shows / hides as the selection moves in and out of
+            // the E10 / E85 set.
+            onFuelTypeChanged(v);
           },
         ),
+        // #2885 — multi-fuel capability switch. Offered only for the
+        // flex-fuel petrol grades (E10 / E85); single-fuel vehicles have
+        // nothing to compare per kilometre.
+        if (_offersMultiFuel(currentValue)) ...[
+          const SizedBox(height: 8),
+          SwitchListTile(
+            key: const Key('vehicle_multi_fuel_capable_switch'),
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              l?.vehicleMultiFuelCapableLabel ??
+                  'I may fill up with different fuel types',
+            ),
+            subtitle: Text(
+              l?.vehicleMultiFuelCapableHelper ??
+                  'Tracks which fuel is cheapest per kilometre',
+            ),
+            value: multiFuelCapable,
+            onChanged: onMultiFuelCapableChanged,
+          ),
+        ],
       ],
     );
   }

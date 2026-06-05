@@ -1,4 +1,12 @@
 {
+  "vehicleMultiFuelCapableLabel": "I may fill up with different fuel types",
+  "@vehicleMultiFuelCapableLabel": {
+    "description": "Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885)."
+  },
+  "vehicleMultiFuelCapableHelper": "Tracks which fuel is cheapest per kilometre",
+  "@vehicleMultiFuelCapableHelper": {
+    "description": "Helper subtitle under the multi-fuel-capable switch on the vehicle edit screen, explaining the per-fuel efficiency comparison it unlocks (#2885)."
+  },
   "vinLabel": "VIN (optional)",
   "vinDecodeTooltip": "Decode VIN",
   "vinConfirmAction": "Yes, auto-fill",

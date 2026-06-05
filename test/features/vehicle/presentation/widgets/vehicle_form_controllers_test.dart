@@ -537,6 +537,107 @@ void main() {
     });
   });
 
+  group('VehicleFormControllers — multiFuelCapable (#2885)', () {
+    VehicleProfile build(
+      VehicleFormControllers c, {
+      required bool multiFuel,
+    }) {
+      const existing = VehicleProfile(id: 'mf-1', name: 'old');
+      return c.buildProfile(
+        existing: existing,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        multiFuelCapable: multiFuel,
+      );
+    }
+
+    test('persists the flag for an E85 (flex-fuel) vehicle', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.nameController.text = 'Saxo Flex';
+      c.fuelTypeController.text = 'e85';
+      expect(build(c, multiFuel: true).multiFuelCapable, isTrue);
+    });
+
+    test('persists the flag for an E10 vehicle', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.fuelTypeController.text = 'e10';
+      expect(build(c, multiFuel: true).multiFuelCapable, isTrue);
+    });
+
+    test('forces false for a diesel vehicle even when requested true', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.fuelTypeController.text = 'diesel';
+      expect(build(c, multiFuel: true).multiFuelCapable, isFalse,
+          reason: 'diesel is single-fuel — the flag must never stick');
+    });
+
+    test('forces false for an E5 vehicle (not a targeted flex grade)', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.fuelTypeController.text = 'e5';
+      expect(build(c, multiFuel: true).multiFuelCapable, isFalse);
+    });
+
+    test('forces false for an EV vehicle', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.fuelTypeController.text = 'e85';
+      const existing = VehicleProfile(id: 'ev-mf', name: 'old');
+      final p = c.buildProfile(
+        existing: existing,
+        type: VehicleType.ev,
+        connectors: const {ConnectorType.type2},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        multiFuelCapable: true,
+      );
+      expect(p.multiFuelCapable, isFalse);
+    });
+
+    test('defaults to false when the param is omitted', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.fuelTypeController.text = 'e85';
+      const existing = VehicleProfile(id: 'def-mf', name: 'old');
+      final p = c.buildProfile(
+        existing: existing,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+      );
+      expect(p.multiFuelCapable, isFalse);
+    });
+
+    test('load() snapshots the flag off the profile', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      const profile = VehicleProfile(
+        id: 'load-mf',
+        name: 'Flex',
+        type: VehicleType.combustion,
+        preferredFuelType: 'e85',
+        multiFuelCapable: true,
+      );
+      final snap = c.load(profile);
+      expect(snap.multiFuelCapable, isTrue);
+    });
+  });
+
   group('VehicleFormControllers.dispose', () {
     test('does not throw when called once after construction', () {
       final c = VehicleFormControllers();
@@ -609,6 +710,7 @@ void main() {
         engineDisplacementCc: 1500,
         engineCylinders: 4,
         curbWeightKg: 1300,
+        multiFuelCapable: true,
       );
 
       expect(snapshot.id, 'snap-1');
@@ -616,6 +718,7 @@ void main() {
       expect(snapshot.connectors, {ConnectorType.ccs});
       expect(snapshot.adapterMac, 'mac');
       expect(snapshot.adapterName, 'name');
+      expect(snapshot.multiFuelCapable, isTrue);
       expect(snapshot.engineDisplacementCc, 1500);
       expect(snapshot.engineCylinders, 4);
       expect(snapshot.curbWeightKg, 1300);

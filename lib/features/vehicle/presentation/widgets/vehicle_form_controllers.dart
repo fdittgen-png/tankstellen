@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../search/domain/entities/fuel_type.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../domain/entities/vehicle_profile.dart';
@@ -57,6 +58,7 @@ class VehicleFormControllers {
       engineDisplacementCc: profile.engineDisplacementCc,
       engineCylinders: profile.engineCylinders,
       curbWeightKg: profile.curbWeightKg,
+      multiFuelCapable: profile.multiFuelCapable,
     );
   }
 
@@ -90,6 +92,13 @@ class VehicleFormControllers {
   /// `NullableFuelTypeDropdown` consumes). `electric` returns the
   /// empty string so the EV path doesn't surface a meaningless
   /// preferred-petrol selection.
+  /// #2885 — the flex-fuel petrol grades (E10 / E85) the multi-fuel
+  /// comparison targets. Mirrors `VehicleCombustionSection._offersMultiFuel`
+  /// so the persisted flag can never disagree with the rendered switch.
+  static bool _offersMultiFuel(FuelType fuel) =>
+      fuelCompatibilityFamily(fuel) == FuelCompatibilityFamily.petrol &&
+      (fuel == FuelType.e10 || fuel == FuelType.e85);
+
   static String _preferredFuelTypeFor(String catalogFuelType) {
     switch (catalogFuelType.toLowerCase()) {
       case 'diesel':
@@ -137,6 +146,7 @@ class VehicleFormControllers {
     required int? engineDisplacementCc,
     required int? engineCylinders,
     required int? curbWeightKg,
+    bool multiFuelCapable = false,
     ReferenceVehicle? referenceVehicle,
   }) {
     final batteryKwh = type == VehicleType.combustion
@@ -154,6 +164,14 @@ class VehicleFormControllers {
         : (fuelTypeController.text.trim().isEmpty
             ? null
             : fuelTypeController.text.trim());
+    // #2885 — only persist the multi-fuel flag for an E10 / E85 petrol
+    // vehicle (the grades the per-fuel comparison serves). A diesel / EV /
+    // LPG vehicle, or a petrol car flipped to E5 / E98, always saves
+    // `false` so a stale flag from a prior fuel can never linger.
+    final effectiveMultiFuel = type != VehicleType.ev &&
+        preferredFuelType != null &&
+        _offersMultiFuel(FuelType.fromString(preferredFuelType)) &&
+        multiFuelCapable;
     final chargingPreferences = ChargingPreferences(
       minSocPercent: _parseIntOr(minSocController.text, 20).clamp(0, 100),
       maxSocPercent: _parseIntOr(maxSocController.text, 80).clamp(0, 100),
@@ -188,6 +206,7 @@ class VehicleFormControllers {
         supportedConnectors: supportedConnectors,
         tankCapacityL: tankCapacityL,
         preferredFuelType: preferredFuelType,
+        multiFuelCapable: effectiveMultiFuel,
         chargingPreferences: chargingPreferences,
         obd2AdapterMac: adapterMac,
         obd2AdapterName: adapterName,
@@ -215,6 +234,7 @@ class VehicleFormControllers {
       supportedConnectors: supportedConnectors,
       tankCapacityL: tankCapacityL,
       preferredFuelType: preferredFuelType,
+      multiFuelCapable: effectiveMultiFuel,
       chargingPreferences: chargingPreferences,
       obd2AdapterMac: adapterMac,
       obd2AdapterName: adapterName,
@@ -290,6 +310,7 @@ class VehicleFormSnapshot {
   final int? engineDisplacementCc;
   final int? engineCylinders;
   final int? curbWeightKg;
+  final bool multiFuelCapable;
 
   VehicleFormSnapshot({
     required this.id,
@@ -300,5 +321,6 @@ class VehicleFormSnapshot {
     required this.engineDisplacementCc,
     required this.engineCylinders,
     required this.curbWeightKg,
+    required this.multiFuelCapable,
   });
 }
