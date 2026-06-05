@@ -78,8 +78,11 @@ Builds:
     versionCode: 5132
     commit: v5.0.0
     subdir: android/app
-    # ndk: r27  # TODO: set the exact NDK after a clean `fdroid build` test —
-    #           # F-Droid's buildserver reports the version it needs in the log.
+    # ndk: r28b  # = 28.2.13676358, which this build requests: android/app/
+    #            # build.gradle.kts sets `ndkVersion = flutter.ndkVersion` and
+    #            # Flutter 3.41.9 pins 28.2.13676358 (r28b). Uncomment + confirm
+    #            # against F-Droid's buildserver NDK list on the first MR
+    #            # `fdroid build` (it logs the version it actually provisions).
     gradle:
       - fdroid
     srclibs:

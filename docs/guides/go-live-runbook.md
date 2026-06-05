@@ -154,3 +154,32 @@ does **not** satisfy it.
 ### Not required (skip)
 Pre-registration, app indexing (deep links), and the pre-launch report are all
 **optional** — none block a production submission.
+
+---
+
+## F-Droid & Apple production readiness (verified 2026-06-05)
+
+### F-Droid — **needs-user-action** (recipe is submission-ready)
+Both recipes are complete and `fdroid lint`-clean (Summary/Description/AuthorName/
+AuthorEmail/Categories/Builds/AutoUpdate). The NDK comment now records the real
+value: `android/app/build.gradle.kts` uses `flutter.ndkVersion` → Flutter 3.41.9 =
+**28.2.13676358 (r28b)**; uncomment + confirm against F-Droid's buildserver on the
+first MR `fdroid build`. Remaining is user-owned:
+- **Official MR:** your GitLab @username → fork fdroiddata → lint/build → pin NDK
+  from the build log → MR. (F-Droid signs it — no keystore needed.)
+- **Self-hosted:** app release keystore + repo key → `scripts/fdroid_publish.sh`.
+
+### Apple — **metadata-ready, not submittable today** (no in-repo blocker left)
+Provisioning is **resolved** (fastlane match + `fdittgen-png/tankstellen-ios-certs`
++ active enrollment; nightly `ios-testflight.yml` produces signed builds).
+`ITSAppUsesNonExemptEncryption=false` set; bundle `de.tankstellen.tankstellen`;
+all 5 locales' metadata within Apple limits. **Now added:** the required
+`privacy_url` (live policy) + `support_url` (repo issues) + `marketing_url` for all
+5 locales. What still gates an App Store submission (all off-repo, your action):
+- **iOS App Store screenshots** — none exist in Apple sizes; need ≥1 iPhone
+  **6.9″** set (1290×2796) + ≥1 iPad **13″** set (2064×2752, app is universal),
+  captured from a build/simulator. The Android shots don't qualify.
+- **App Store Connect (console-only):** App Privacy nutrition labels, Age Rating,
+  Primary Category, Pricing & Availability, Content Rights, **EU DSA trader status**.
+- **A build attached + submitted:** promote a TestFlight build (signed IPA) to the
+  App Store version, then submit for review.
