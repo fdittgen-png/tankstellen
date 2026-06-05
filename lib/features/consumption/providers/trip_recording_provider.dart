@@ -17,6 +17,7 @@ import '../../feature_management/domain/feature.dart';
 import '../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/active_trip_repository.dart';
+import '../data/obd2/obd2_comm_diagnostics.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/trip_recording_controller.dart';
 import '../data/trip_history_repository.dart';
@@ -998,6 +999,8 @@ class TripRecording extends _$TripRecording {
       if (repo == null) return TripPersistOutcome.saved;
       final id = summary.startedAt?.toIso8601String() ??
           DateTime.now().toIso8601String();
+      // #2912 — per-trip OBD2 comm-health diagnostic (never-throws capture).
+      final obd2Diagnostic = Obd2CommDiagnostics.instance.captureForTrip();
       await repo.save(TripHistoryEntry(
         id: id,
         vehicleId: vehicleId,
@@ -1014,6 +1017,7 @@ class TripRecording extends _$TripRecording {
         // recording. Empty when the GPS feature flag was off for this
         // trip; the entry's JSON serialiser elides the key in that case.
         gpsSampleDiagnostics: gpsSampleDiagnostics,
+        obd2Diagnostic: obd2Diagnostic, // #2912 — per-trip comm-health
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();
       // #2392 — calibrate the vehicle's physicsScale from this trip's
