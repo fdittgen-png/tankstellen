@@ -20,6 +20,55 @@ WebSite: https://github.com/fdittgen-png/tankstellen
 SourceCode: https://github.com/fdittgen-png/tankstellen
 IssueTracker: https://github.com/fdittgen-png/tankstellen/issues
 
+Name: Sparkilo
+Summary: Find the cheapest fuel and EV charging nearby and cut driving costs
+Description: |-
+  Sparkilo compares real-time fuel and EV-charging prices and helps you spend
+  less to run your car: pay less per litre, burn less per kilometre, and keep a
+  clear record of what you actually spend. It is free, ad-free, has no account
+  and is privacy-first — your GPS position and any API keys never leave the
+  device. The interface is available in 23 languages.
+
+  Prices come from each country's official open-data source, not from
+  crowdsourcing, covering Austria, Argentina, Australia, Chile, Denmark, France,
+  Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South
+  Korea, Spain and the United Kingdom, plus EV charging worldwide via Open Charge
+  Map.
+
+  '''Find cheaper fuel'''
+
+  * Search nearby or along a route, filtered by fuel type, radius, open-now and amenities.
+  * Petrol, diesel, LPG, CNG, E85 and electric in one unified search and map.
+  * Price pins coloured cheapest-to-priciest; along a route the best-value stops are flagged.
+  * Per-station and radius price alerts, evaluated on the device and only when you are nearby.
+  * Favourites with full price rows, and EV chargers showing power, connectors and availability.
+
+  '''Burn less per kilometre'''
+
+  * Connect any ELM327-compatible OBD-II adapter for live eco-coaching.
+  * Per-trip driving score, throttle and RPM histograms, and hard-acceleration insights.
+  * Hands-free trip logbook over OBD-II or GPS only, with each route coloured by efficiency.
+
+  '''See what you spend'''
+
+  * Consumption tracker: average L/100 km, cost per kilometre, total spent and fill-up history.
+  * Built-in fuel-cost calculator and a CO2 dashboard broken down by trip length and speed band.
+  * Approach overlay, a home-screen widget, and spoken price announcements while you drive.
+
+  '''Privacy'''
+
+  A Privacy Dashboard lets you view, export or delete all of your data at any
+  time. Optional TankSync synchronises favourites, vehicles, fill-ups and alerts
+  to a server you control.
+
+  '''About this F-Droid build'''
+
+  This is the fully free build, with no Google Play Services and no other
+  proprietary Google libraries. Maps use OpenStreetMap and positioning uses
+  Android's location manager. Because the pump-display, receipt and barcode
+  scanners rely on Google ML Kit, scanning is not available in this build — add
+  fill-ups by hand instead. Every other feature works as described.
+
 RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
