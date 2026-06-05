@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
@@ -72,6 +73,39 @@ void main() {
           .lastIndexWhere((e) => e == 'ble:stopScan');
       expect(lastStopBeforeOpen, greaterThanOrEqualTo(0),
           reason: 'stopScan must run before the scan-fallback channel opens');
+    });
+
+    test(
+        'no active BLE scan ⇒ the settle pause is skipped (no leaked timer, '
+        '#2918)', () {
+      // The settle pause only matters when a scan was actually winding down on
+      // the radio. With nothing scanning (a cold direct connect, the recording
+      // pre-warm, or a widget test driving the prod graph) it must be skipped —
+      // otherwise its Future.delayed leaks a pending timer past widget
+      // disposal, which is exactly what broke consumption_app_bar_actions_test.
+      fakeAsync((async) {
+        final log = _EventLog();
+        final svc = Obd2ConnectionService(
+          registry: Obd2AdapterRegistry.defaults(),
+          permissions: _GrantPermissions(),
+          bluetooth: _OrderedFacade(log),
+          // A huge settle that WOULD dominate (and leak) if the gate regressed.
+          scanSettleDelay: const Duration(seconds: 5),
+        );
+
+        var done = false;
+        svc.stopScanBeforeConnect().then((_) => done = true);
+        async.flushMicrotasks();
+
+        // FlutterBluePlus.isScanningNow is false in tests, so the settle is
+        // skipped: the call already completed without elapsing the 5 s timer.
+        expect(done, isTrue,
+            reason: 'the settle must be skipped when no scan was active — '
+                'else a pending timer outlives widget disposal (#2918)');
+        // The stop itself still runs unconditionally (the #2906 guarantee).
+        expect(log.events, contains('ble:stopScan'));
+        // No pending timer remains — fakeAsync throws at teardown otherwise.
+      });
     });
   });
 }

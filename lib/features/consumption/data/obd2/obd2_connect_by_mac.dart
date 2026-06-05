@@ -174,6 +174,13 @@ Future<Obd2Service?> _connectByMacPassive(
 /// plugin quirk) is logged as a recoverable OBD2/BLE transient and never
 /// aborts the connect.
 Future<void> _stopScanBeforeConnect(Obd2ConnectionService svc) async {
+  // #2906 — capture whether a BLE scan is ACTUALLY in flight before we stop
+  // it. The settle pause below is only needed to let the radio quiesce after a
+  // real scan winds down (the in-trip-reconnect GATT_ERROR 133 race). With no
+  // active scan — a cold direct connect, the recording pre-warm, or a widget
+  // test driving the prod connection graph — the pause buys nothing and would
+  // leave a pending timer past widget disposal (the #2918 prewarm leak).
+  final wasScanning = FlutterBluePlus.isScanningNow;
   try {
     await svc.bluetooth.stopScan();
   } catch (e, st) {
@@ -189,7 +196,7 @@ Future<void> _stopScanBeforeConnect(Obd2ConnectionService svc) async {
       'where': 'Obd2ConnectionService: stopScan (classic) before connect',
     }));
   }
-  if (svc.scanSettleDelay > Duration.zero) {
+  if (wasScanning && svc.scanSettleDelay > Duration.zero) {
     await Future<void>.delayed(svc.scanSettleDelay);
   }
 }
