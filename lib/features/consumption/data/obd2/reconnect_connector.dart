@@ -10,6 +10,7 @@ import 'obd2_read_telemetry.dart';
 import 'obd2_reconnect_telemetry.dart';
 import 'obd2_service.dart';
 import 'reconnect_rssi_gate.dart';
+import 'transport_fallback_policy.dart';
 
 /// Drives a single in-trip reconnect attempt for a pinned adapter MAC,
 /// DIRECT-CONNECT-FIRST with an RSSI-gated scan fallback (#2245).
@@ -58,12 +59,28 @@ class ReconnectConnector {
   int? _lastSuccessfulRssi;
   var _consecutiveBatchesSeen = 0;
 
+  /// #2908 — count of [attempt] cycles where the PREFERRED transport (direct +
+  /// scan) failed to establish a link this drop. The cross-transport fallback
+  /// only fires once this reaches [crossTransportThreshold], so a single
+  /// transient blip (which the direct / `channel.open()` retries already
+  /// absorb) doesn't thrash BOTH transports — only a sustained storm on the
+  /// preferred transport escalates to the alternate.
+  var _preferredFailures = 0;
+
+  /// #2908 — number of consecutive preferred-transport [attempt] failures
+  /// after which the alternate transport is tried. 1 ⇒ try the alternate as
+  /// soon as the first full direct+scan budget is exhausted; higher values
+  /// wait for a sustained storm. Default 2: don't escalate on the very first
+  /// miss, but don't let a wedged transport spin for long either.
+  final int crossTransportThreshold;
+
   ReconnectConnector({
     required this.connection,
     required this.onConnected,
     this.transportHint,
     this.attemptNumber,
     this.backoffMs,
+    this.crossTransportThreshold = 2,
   });
 
   /// #2905 — record one per-attempt reconnect-telemetry row (gated; a no-op
@@ -231,7 +248,89 @@ class ReconnectConnector {
       recordObd2ConnectTransient(e, st,
           where: 'ReconnectConnector scan fallback failed');
     }
+
+    // 3) CROSS-TRANSPORT FALLBACK (#2908). The preferred transport (the one
+    //    that just dropped) exhausted its direct + scan budget this cycle —
+    //    a BLE 133 storm or a Classic rfcomm-open-fail. Once that has happened
+    //    [crossTransportThreshold] times this drop, try the OTHER transport
+    //    for the same adapter (many ELM327 clones expose both a Classic SPP
+    //    and a BLE GATT endpoint) rather than spin the backoff on the SAME
+    //    doomed transport. Gated on the threshold so a single transient blip
+    //    — which the direct / `channel.open()` retries already absorb —
+    //    doesn't thrash BOTH transports. Best-effort: a clean failure just
+    //    returns false and the scanner keeps its schedule.
+    _preferredFailures++;
+    if (_preferredFailures >= crossTransportThreshold &&
+        await _attemptAlternateTransport(mac)) {
+      return true;
+    }
     return false;
+  }
+
+  /// #2908 — try the transport the live link was NOT using, once the
+  /// preferred transport exhausted its direct + scan budget this cycle.
+  /// Returns `true` once a session lands on the alternate transport (which is
+  /// then handed to [onConnected]); `false` when the alternate is unavailable
+  /// or also fails. The successful path is surfaced in the per-attempt
+  /// telemetry as `'fallback-ble'` / `'fallback-classic'` and a
+  /// [Obd2SessionState.reconnected] transition whose detail names the switch,
+  /// so the next capture shows WHICH transport recovered the link.
+  Future<bool> _attemptAlternateTransport(String mac) async {
+    final alternate = alternateReconnectTransport(
+      droppedTransport: transportHint,
+      hasClassicFacade: connection.classicBluetooth != null,
+    );
+    if (alternate == null) return false; // no usable alternate wired
+    final isClassic = alternate == BluetoothTransport.classic;
+    final path = isClassic ? 'fallback-classic' : 'fallback-ble';
+    final sw = Stopwatch()..start();
+    try {
+      // The dropped transport was Classic ⇒ try BLE direct; the dropped
+      // transport was BLE/unknown ⇒ try Classic direct.
+      final svc = isClassic
+          ? await connection.connectByMacClassicDirect(mac)
+          : await connection.connectByMacDirect(mac, fallbackToScan: false);
+      if (svc != null) {
+        _recordAttempt(
+            succeeded: true, path: path, latencyMs: sw.elapsedMilliseconds);
+        _noteTransportSwitch(alternate);
+        onConnected(svc);
+        return true;
+      }
+      _recordAttempt(
+        succeeded: false,
+        path: path,
+        reasonCode: Obd2ReconnectReason.deviceNotConnected.code,
+        latencyMs: sw.elapsedMilliseconds,
+      );
+    } catch (e, st) {
+      _recordAttempt(
+        succeeded: false,
+        path: path,
+        reasonCode: classifyReconnectReason(e),
+        latencyMs: sw.elapsedMilliseconds,
+      );
+      // #2892 — the alternate transport on a silent bus / parked car raises
+      // the EXPECTED user condition; breadcrumb it, don't ERROR-trace it.
+      recordObd2ConnectTransient(e, st,
+          where: 'ReconnectConnector alternate-transport fallback failed');
+    }
+    return false;
+  }
+
+  /// #2908 — record the connected→reconnected transition with a detail naming
+  /// the transport switch (e.g. `'classic→ble'`), so the #2905 export shows
+  /// which transport recovered the link. Gated; a no-op unless the collector
+  /// is armed.
+  void _noteTransportSwitch(BluetoothTransport landed) {
+    final diag = Obd2CommDiagnostics.instance;
+    if (!diag.enabled) return;
+    final from = transportHint ?? 'unknown';
+    final to = landed == BluetoothTransport.classic ? 'classic' : 'ble';
+    diag.noteSessionTransition(
+      Obd2SessionState.reconnected,
+      detail: 'transport-fallback:$from→$to',
+    );
   }
 
   /// Passive-wait connect cycle for [mac] (#2261 concern 2). Handed to
