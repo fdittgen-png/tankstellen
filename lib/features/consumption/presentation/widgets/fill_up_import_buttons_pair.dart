@@ -26,11 +26,23 @@ import '../../../feature_management/domain/feature.dart';
 /// `Feature.addFillUpOcrReceipt` (default-on — works reliably) and
 /// `Feature.addFillUpOcrPump` (default-off — recognizer immature).
 /// When both flags are off the widget collapses to `SizedBox.shrink()`.
+///
+/// #2687 — a third, full-width "Paste text" affordance sits below the
+/// scan row when [onPasteReceipt] is provided. It opens the on-device
+/// e-receipt TEXT parser (no camera, no cloud) so a digital fuel receipt
+/// the user copied — an e-mail body, an SMS confirmation, or a PDF's
+/// selectable text — can pre-fill the form. It rides the same
+/// `addFillUpOcrReceipt` gate as the camera receipt button (both are the
+/// "import a receipt" capability; one reads a photo, one reads text).
 class FillUpImportButtonsPair extends ConsumerWidget {
   final bool scanningReceipt;
   final bool scanningPump;
   final VoidCallback onScanReceipt;
   final VoidCallback onScanPumpDisplay;
+
+  /// #2687 — opens the paste-receipt-text dialog. When null (e.g. a host
+  /// that hasn't wired the manual path) the paste affordance is omitted.
+  final VoidCallback? onPasteReceipt;
 
   const FillUpImportButtonsPair({
     super.key,
@@ -38,6 +50,7 @@ class FillUpImportButtonsPair extends ConsumerWidget {
     required this.scanningPump,
     required this.onScanReceipt,
     required this.onScanPumpDisplay,
+    this.onPasteReceipt,
   });
 
   @override
@@ -94,12 +107,36 @@ class FillUpImportButtonsPair extends ConsumerWidget {
           )
         : null;
 
-    return Row(
+    // #2687 — the camera-free "Paste text" affordance rides the receipt
+    // gate. Full-width below the scan row so three controls never crowd a
+    // single Row on narrow phones.
+    final pasteBtn = (receiptOn && onPasteReceipt != null)
+        ? TextButton.icon(
+            key: const Key('import_paste_receipt_button'),
+            onPressed: onPasteReceipt,
+            icon: const Icon(Icons.content_paste_outlined, size: 18),
+            label: Text(l?.fillUpImportPasteLabel ?? 'Paste text'),
+          )
+        : null;
+
+    final scanRow = Row(
       children: [
         ?receiptBtn,
         if (receiptBtn != null && pumpBtn != null)
           const SizedBox(width: 8),
         ?pumpBtn,
+      ],
+    );
+
+    if (pasteBtn == null) return scanRow;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        scanRow,
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: pasteBtn,
+        ),
       ],
     );
   }

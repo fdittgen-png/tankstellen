@@ -1,0 +1,11 @@
+TotalEnergies
+STATION RELAIS PART-DIEU
+69003 LYON
+Recu client
+Date 15/05/2026 08:42
+Pompe 4
+38,72 X SP95-E10
+Prix 1,829 EUR/L
+TOTAL TTC 70,83 EUR
+Mode de paiement CB
+Merci de votre visite

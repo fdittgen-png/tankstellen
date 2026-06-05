@@ -5073,6 +5073,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fillUpGuidancePartNight => 'nights';
 
   @override
+  String get fillUpImportPasteLabel => 'Paste text';
+
+  @override
+  String get pasteReceiptDialogTitle => 'Paste receipt text';
+
+  @override
+  String get pasteReceiptDialogHint =>
+      'Paste the text of a fuel receipt — e-mail, SMS, or a shared PDF. The litres, price per litre, fuel grade, total and station are read on-device and used to pre-fill the form. Nothing is sent to a server.';
+
+  @override
+  String get pasteReceiptFieldHint => 'Receipt text';
+
+  @override
+  String get pasteReceiptParseAction => 'Pre-fill';
+
+  @override
+  String get pasteReceiptNoData =>
+      'Couldn\'t read any fuel data from that text — check it\'s a fuel receipt and try again.';
+
+  @override
   String get fillUpReconciliationVerifiedBadgeLabel => 'Verified by adapter';
 
   @override
@@ -12732,6 +12752,26 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fillUpGuidancePartNight => '⟦ñîǧĥŧš ···⟧';
+
+  @override
+  String get fillUpImportPasteLabel => '⟦Ƥášŧé ŧéẋŧ ····⟧';
+
+  @override
+  String get pasteReceiptDialogTitle => '⟦Ƥášŧé řéçéîƥŧ ŧéẋŧ ·······⟧';
+
+  @override
+  String get pasteReceiptDialogHint =>
+      '⟦Ƥášŧé ŧĥé ŧéẋŧ óƒ á ƒúéł řéçéîƥŧ — é-ɱáîł, ŠṀŠ, óř á šĥářéđ ƤĐƑ. Ŧĥé łîŧřéš, ƥřîçé ƥéř łîŧřé, ƒúéł ǧřáđé, ŧóŧáł áñđ šŧáŧîóñ ářé řéáđ óñ-đéṽîçé áñđ úšéđ ŧó ƥřé-ƒîłł ŧĥé ƒóřɱ. Ñóŧĥîñǧ îš šéñŧ ŧó á šéřṽéř. ····································································⟧';
+
+  @override
+  String get pasteReceiptFieldHint => '⟦Řéçéîƥŧ ŧéẋŧ ·····⟧';
+
+  @override
+  String get pasteReceiptParseAction => '⟦Ƥřé-ƒîłł ···⟧';
+
+  @override
+  String get pasteReceiptNoData =>
+      '⟦Çóúłđñ\'ŧ řéáđ áñý ƒúéł đáŧá ƒřóɱ ŧĥáŧ ŧéẋŧ — çĥéçķ îŧ\'š á ƒúéł řéçéîƥŧ áñđ ŧřý áǧáîñ. ·····························⟧';
 
   @override
   String get fillUpReconciliationVerifiedBadgeLabel =>

@@ -37,6 +37,10 @@ class AddFillUpFormFields extends StatelessWidget {
   final VoidCallback onScanReceipt;
   final VoidCallback onScanPumpDisplay;
 
+  /// #2687 — opens the manual paste-receipt-text dialog (on-device,
+  /// no camera / no cloud). Threaded to [FillUpImportButtonsPair].
+  final VoidCallback onPasteReceipt;
+
   /// Optional station pre-fill banner — non-null station name renders
   /// the banner above the cards, otherwise the slot is omitted.
   final String? stationName;
@@ -75,6 +79,7 @@ class AddFillUpFormFields extends StatelessWidget {
     required this.scanningPump,
     required this.onScanReceipt,
     required this.onScanPumpDisplay,
+    required this.onPasteReceipt,
     required this.stationName,
     required this.dateLabel,
     required this.onPickDate,
@@ -109,6 +114,7 @@ class AddFillUpFormFields extends StatelessWidget {
           scanningPump: scanningPump,
           onScanReceipt: onScanReceipt,
           onScanPumpDisplay: onScanPumpDisplay,
+          onPasteReceipt: onPasteReceipt,
         ),
         const SizedBox(height: 16),
         // Station pre-fill callout — rendered above the cards so it's

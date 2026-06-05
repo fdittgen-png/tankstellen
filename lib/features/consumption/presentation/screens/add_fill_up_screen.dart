@@ -30,6 +30,7 @@ import '../../providers/consumption_providers.dart';
 import '../../providers/current_obd2_fuel_level_provider.dart';
 import '../widgets/add_fill_up_form_fields.dart';
 import '../widgets/fill_up_no_vehicle_cta.dart';
+import '../widgets/fill_up_paste_receipt_handler.dart';
 import '../widgets/fill_up_pinned_save_bar.dart';
 import '../widgets/fill_up_reconciliation_launcher.dart';
 import '../widgets/fill_up_scan_handlers.dart';
@@ -351,6 +352,13 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
   Future<void> _scanPumpDisplay() =>
       runPumpDisplayScan(context, _buildScanHostState());
 
+  /// #2687 — the manual, on-device "paste receipt text" entry point.
+  /// Opens the paste dialog, parses the pasted text with the pure-Dart
+  /// [EReceiptTextParser] (no camera, no cloud) and pre-fills the form
+  /// through the SAME body the camera / share paths use. Never auto-saves.
+  Future<void> _pasteReceiptText() =>
+      runPasteReceiptText(context, _buildScanHostState());
+
   Future<void> _reportBadScan() async {
     final scan = _lastScan;
     if (scan == null) return;
@@ -582,6 +590,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               scanningPump: _scanningPump,
               onScanReceipt: _scanReceipt,
               onScanPumpDisplay: _scanPumpDisplay,
+              onPasteReceipt: _pasteReceiptText,
               stationName: widget.stationName,
               dateLabel: dateStr,
               onPickDate: _pickDate,
