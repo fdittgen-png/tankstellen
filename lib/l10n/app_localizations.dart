@@ -8924,6 +8924,12 @@ abstract class AppLocalizations {
   /// **'Personal Access Token'**
   String get feedbackTokenFieldLabel;
 
+  /// Hint shown under the fuel picker on the Add-Fill-up form for a multi-fuel-capable vehicle, reminding the user to log the exact fuel they pumped so the per-fuel cost-per-km comparison stays accurate (#2886).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle can use different fuels — log the one you actually pumped'**
+  String get fillUpMultiFuelHint;
+
   /// Title of the on-device 'best time to fill up' guidance card on the price-history screen (#1543).
   ///
   /// In en, this message translates to:
@@ -9481,6 +9487,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Region'**
   String get profileSectionRegion;
+
+  /// Title of the per-fuel-type efficiency comparison card on the consumption-statistics page, comparing real cost-per-km across the fuels a multi-fuel vehicle has used (#2887, Epic #2881).
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per kilometre by fuel'**
+  String get fuelEfficiencyCardTitle;
+
+  /// Subtitle of the per-fuel efficiency card explaining it ranks fuels by real driving cost per kilometre, not pump price per litre (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Which fuel is actually cheapest to drive on'**
+  String get fuelEfficiencyCardSubtitle;
+
+  /// Winner chip at the top of the per-fuel efficiency card, crowning the fuel with the lowest verified cost per kilometre (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest per km: {fuel} ({costPerKm})'**
+  String fuelEfficiencyWinnerChip(String fuel, String costPerKm);
+
+  /// Column header for the litres-per-100km metric in the per-fuel efficiency card (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'L/100km'**
+  String get fuelEfficiencyColL100km;
+
+  /// Column header for the cost-per-kilometre metric in the per-fuel efficiency card (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Cost/km'**
+  String get fuelEfficiencyColCostPerKm;
+
+  /// Column header for the total-spent metric in the per-fuel efficiency card (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Total spent'**
+  String get fuelEfficiencyColTotalSpent;
+
+  /// Number of fill-ups logged for a fuel, shown on its row in the per-fuel efficiency card (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill} other{{count} fills}}'**
+  String fuelEfficiencyFillCount(int count);
+
+  /// Transparency footnote on the per-fuel efficiency card, disclosing how many tanks contained more than one fuel and were each attributed whole to their dominant fuel (#2887, ADR 0014).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}'**
+  String fuelEfficiencyMixedFootnote(int count);
+
+  /// Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one fuel has fewer than two closed plein-to-plein intervals (#2887, ADR 0014 verdict gate).
+  ///
+  /// In en, this message translates to:
+  /// **'Log at least two full tanks per fuel to crown the cheapest.'**
+  String get fuelEfficiencyInsufficientData;
+
+  /// Localized display name for the E5 (Super, up to 5% ethanol) petrol grade, used on the per-fuel efficiency card (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Super E5'**
+  String get fuelNameE5;
+
+  /// Localized display name for the E10 (up to 10% ethanol) petrol grade (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Super E10'**
+  String get fuelNameE10;
+
+  /// Localized display name for the 98-octane petrol grade (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Super 98'**
+  String get fuelNameE98;
+
+  /// Localized display name for diesel fuel (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Diesel'**
+  String get fuelNameDiesel;
+
+  /// Localized display name for premium diesel (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Diesel Premium'**
+  String get fuelNameDieselPremium;
+
+  /// Localized display name for the E85 flex-fuel (up to 85% bioethanol) grade (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'E85 Bioethanol'**
+  String get fuelNameE85;
+
+  /// Localized display name for liquefied petroleum gas (autogas) (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'LPG'**
+  String get fuelNameLpg;
+
+  /// Localized display name for compressed natural gas (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'CNG'**
+  String get fuelNameCng;
+
+  /// Localized display name for hydrogen fuel (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Hydrogen'**
+  String get fuelNameHydrogen;
+
+  /// Localized display name for electric charging (#2887).
+  ///
+  /// In en, this message translates to:
+  /// **'Electric'**
+  String get fuelNameElectric;
 
   /// Label above the rule/fuzzy segmented button on the vehicle edit screen (#894).
   ///
@@ -12730,6 +12850,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{sources}'**
   String routeDataSourceMulti(String sources);
+
+  /// Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885).
+  ///
+  /// In en, this message translates to:
+  /// **'I may fill up with different fuel types'**
+  String get vehicleMultiFuelCapableLabel;
+
+  /// Helper subtitle under the multi-fuel-capable switch on the vehicle edit screen, explaining the per-fuel efficiency comparison it unlocks (#2885).
+  ///
+  /// In en, this message translates to:
+  /// **'Tracks which fuel is cheapest per kilometre'**
+  String get vehicleMultiFuelCapableHelper;
 
   /// No description provided for @vinLabel.
   ///

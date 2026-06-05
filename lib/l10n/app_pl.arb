@@ -4179,5 +4179,137 @@
         "type": "String"
       }
     }
+  },
+  "fillUpMultiFuelHint": "This vehicle can use different fuels — log the one you actually pumped",
+  "@fillUpMultiFuelHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyCardTitle": "Cost per kilometre by fuel",
+  "@fuelEfficiencyCardTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyCardSubtitle": "Which fuel is actually cheapest to drive on",
+  "@fuelEfficiencyCardSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyWinnerChip": "Cheapest per km: {fuel} ({costPerKm})",
+  "@fuelEfficiencyWinnerChip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "costPerKm": {
+        "type": "String",
+        "example": "0,086 €/km"
+      }
+    }
+  },
+  "fuelEfficiencyColL100km": "L/100km",
+  "@fuelEfficiencyColL100km": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyColCostPerKm": "Cost/km",
+  "@fuelEfficiencyColCostPerKm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyColTotalSpent": "Total spent",
+  "@fuelEfficiencyColTotalSpent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyFillCount": "{count, plural, =1{1 fill} other{{count} fills}}",
+  "@fuelEfficiencyFillCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
+  "@fuelEfficiencyMixedFootnote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "fuelEfficiencyInsufficientData": "Log at least two full tanks per fuel to crown the cheapest.",
+  "@fuelEfficiencyInsufficientData": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE5": "Super E5",
+  "@fuelNameE5": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE10": "Super E10",
+  "@fuelNameE10": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE98": "Super 98",
+  "@fuelNameE98": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameDiesel": "Diesel",
+  "@fuelNameDiesel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameDieselPremium": "Diesel Premium",
+  "@fuelNameDieselPremium": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE85": "E85 Bioethanol",
+  "@fuelNameE85": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameLpg": "LPG",
+  "@fuelNameLpg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameCng": "CNG",
+  "@fuelNameCng": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameHydrogen": "Hydrogen",
+  "@fuelNameHydrogen": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameElectric": "Electric",
+  "@fuelNameElectric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleMultiFuelCapableLabel": "I may fill up with different fuel types",
+  "@vehicleMultiFuelCapableLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleMultiFuelCapableHelper": "Tracks which fuel is cheapest per kilometre",
+  "@vehicleMultiFuelCapableHelper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

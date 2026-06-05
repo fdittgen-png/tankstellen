@@ -14,6 +14,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../providers/consumption_providers.dart';
 import '../../providers/monthly_fuel_stats_provider.dart';
+import '../widgets/fuel_type_efficiency_card.dart';
 import '../widgets/monthly_fuel_charts.dart';
 import '../widgets/monthly_fuel_comparison_card.dart';
 
@@ -45,6 +46,11 @@ class ConsumptionStatisticsPage extends ConsumerWidget {
             children: [
               _HeaderTiles(stats: stats),
               MonthlyFuelComparisonCard(months: months),
+              // #2887 — per-fuel €/km comparison for a multi-fuel
+              // vehicle. Self-hides (SizedBox.shrink) when the active
+              // vehicle is not multiFuelCapable or fewer than two fuels
+              // have been logged, so single-fuel users never see it.
+              const FuelTypeEfficiencyCard(),
               const SizedBox(height: 4),
               SectionHeader(
                 title: l?.consumptionStatsTrendsTitle ?? 'Evolution over time',
