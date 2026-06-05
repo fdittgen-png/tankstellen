@@ -7,6 +7,29 @@ import workmanager_apple
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+  /// Host-side bridge for the iOS Share Extension (#2736, Epic #2687).
+  ///
+  /// The extension (`ios/ShareExtension/ShareViewController.swift`) writes the
+  /// shared receipt + a `pending_share.json` manifest into the App Group
+  /// container, then opens `sparkilo-share://receipt`. This drains that
+  /// manifest and replays it down the SAME `tankstellen/share_intent/*`
+  /// channels the Android `ShareIntentChannel.kt` feeds — so the existing Dart
+  /// `ShareReceiptListener` / `ShareReceiptHandler` (#2735) handles iOS shares
+  /// with no new Dart code.
+  ///
+  /// Kept INLINE in this file (not a separate Swift file) on purpose: a new
+  /// file under `ios/Runner/` is NOT in the Runner target's compile sources
+  /// until a Mac developer adds it in Xcode, and referencing an uncompiled
+  /// class would break the build. Defined in `AppDelegate.swift` — already in
+  /// the target — it compiles today with zero `project.pbxproj` edit. On a
+  /// build without the extension installed the manifest never exists, so every
+  /// entry point here is a harmless no-op (`getInitialShare` → nil).
+  ///
+  /// Shared singleton so `SceneDelegate` (which handles the warm URL-open under
+  /// the scene lifecycle this app uses) drains the SAME bridge instance the
+  /// channels are registered on.
+  private let shareIntent = ShareIntentBridge.shared
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -44,5 +67,115 @@ import workmanager_apple
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // Register the share-intent channels on the implicit engine's messenger
+    // and immediately scan for a cold-launch share the extension left behind.
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "ShareIntentBridge") {
+      shareIntent.register(messenger: registrar.messenger())
+    }
+  }
+
+  /// Handles the `sparkilo-share://receipt` URL the Share Extension opens to
+  /// wake the host. This fires on builds WITHOUT the scene lifecycle; under the
+  /// scene manifest this app declares, the warm URL open is delivered to
+  /// `SceneDelegate.scene(_:openURLContexts:)` instead (see SceneDelegate). A
+  /// non-share URL is passed to `super` so other deep links keep working.
+  override func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    if url.scheme == "sparkilo-share" {
+      shareIntent.drainPendingShare()
+      return true
+    }
+    return super.application(app, open: url, options: options)
+  }
+}
+
+/// In-repo, plugin-free bridge that serves the `tankstellen/share_intent/*`
+/// method + event channels on iOS by draining the Share Extension's App Group
+/// manifest. The exact host counterpart of Android's `ShareIntentChannel.kt`,
+/// emitting the IDENTICAL `{ "items": [...], "country": "XX" }` payload that
+/// `SharedReceiptIntent.fromPlatform` already decodes.
+final class ShareIntentBridge: NSObject, FlutterStreamHandler {
+  /// Single instance both `AppDelegate` and `SceneDelegate` reach, so the
+  /// scene-lifecycle warm URL-open drains the bridge the channels live on.
+  static let shared = ShareIntentBridge()
+
+  private static let appGroupId = "group.de.tankstellen.tankstellen"
+  private static let manifestName = "pending_share.json"
+  private static let methodChannelName = "tankstellen/share_intent/methods"
+  private static let eventChannelName = "tankstellen/share_intent/events"
+
+  private var eventSink: FlutterEventSink?
+  /// A share decoded before Dart subscribed (cold launch); drained by
+  /// `getInitialShare`.
+  private var pendingInitial: [String: Any]?
+
+  /// Wires both channels onto `messenger`. Called once when the Flutter engine
+  /// is ready (see `didInitializeImplicitFlutterEngine`).
+  func register(messenger: FlutterBinaryMessenger) {
+    let methods = FlutterMethodChannel(name: Self.methodChannelName, binaryMessenger: messenger)
+    methods.setMethodCallHandler { [weak self] call, result in
+      switch call.method {
+      case "getInitialShare":
+        let payload = self?.pendingInitial
+        self?.pendingInitial = nil
+        result(payload)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
+    let events = FlutterEventChannel(name: Self.eventChannelName, binaryMessenger: messenger)
+    events.setStreamHandler(self)
+
+    // The extension may have left a manifest from a cold launch before the
+    // channels existed — pick it up now so `getInitialShare` can return it.
+    drainPendingShare()
+  }
+
+  // MARK: FlutterStreamHandler
+
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
+
+  /// Reads + deletes the App Group manifest the extension wrote. If a Dart
+  /// subscriber is live (warm) the payload is emitted on the event channel;
+  /// otherwise it is cached for `getInitialShare` (cold). A missing or
+  /// malformed manifest is a silent no-op — the common case on a build with no
+  /// extension installed.
+  func drainPendingShare() {
+    guard let payload = readManifest() else { return }
+    if let sink = eventSink {
+      sink(payload)
+    } else {
+      pendingInitial = payload
+    }
+  }
+
+  /// Reads `pending_share.json` from the App Group container, validates it is a
+  /// non-empty `{items:[...]}` map, deletes it (so a share is consumed once),
+  /// and returns the channel payload. Returns nil on any failure.
+  private func readManifest() -> [String: Any]? {
+    guard let container = FileManager.default.containerURL(
+      forSecurityApplicationGroupIdentifier: Self.appGroupId
+    ) else { return nil }
+    let url = container.appendingPathComponent(Self.manifestName)
+    guard let data = try? Data(contentsOf: url) else { return nil }
+    // Consume once — delete before parsing so a malformed file can't replay.
+    try? FileManager.default.removeItem(at: url)
+    guard
+      let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+      let items = json["items"] as? [Any], !items.isEmpty
+    else { return nil }
+    return json
   }
 }

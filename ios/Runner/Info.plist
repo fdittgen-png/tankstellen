@@ -31,6 +31,26 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- #2736 — custom URL scheme the Share Extension opens to wake the host
+	     and hand off a shared receipt. The extension
+	     (ios/ShareExtension/ShareViewController.swift) writes the receipt +
+	     pending_share.json into the App Group then opens
+	     `sparkilo-share://receipt`; AppDelegate.application(_:open:options:)
+	     drains the manifest into the tankstellen/share_intent/* channels.
+	     Harmless without the extension installed — nothing opens the scheme. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>de.tankstellen.tankstellen.share</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>sparkilo-share</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
