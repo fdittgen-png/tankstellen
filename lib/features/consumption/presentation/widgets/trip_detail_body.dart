@@ -290,8 +290,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
           ),
         // OBD2 communication-health diagnostics (#2470). Dev-only — the
         // card self-hides unless Feature.debugMode is on AND a session was
-        // captured, the OBD2 analogue of the GPS card above.
-        const Obd2DiagnosticsTripCard(),
+        // captured, the OBD2 analogue of the GPS card above. #2912 — feeds
+        // the trip's PERSISTED diagnostic so the card shows THIS trip's
+        // health (restart-durable) instead of the in-memory singleton that
+        // surfaced as "always empty"; null falls back to the live collector.
+        Obd2DiagnosticsTripCard(tripDiagnostic: widget.entry.obd2Diagnostic),
         // Driving-analysis trace export (#2804). Dev-only — self-hides unless
         // Feature.debugMode is on. Exports this trip's KPIs / score / lessons
         // as an annotatable JSON so the maintainer can label real trips and

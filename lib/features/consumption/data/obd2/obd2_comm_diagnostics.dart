@@ -304,6 +304,54 @@ class Obd2CommDiagnostics {
     return _summarise(cur);
   }
 
+  /// Capture the diagnostic worth PERSISTING with a finished trip (#2912).
+  ///
+  /// The trip-detail comm-health card was always empty because it read the
+  /// process-wide singleton instead of the viewed trip's own diagnostic; the
+  /// fix snapshots this at trip finish and stores it on the trip record. We
+  /// prefer the live session (which carries THIS trip's connection attempts,
+  /// reconnect timeline + fallback markers, even when the adapter never
+  /// connected) and fall back to the most recent finished session.
+  ///
+  /// Returns `null` — never the empty const sentinel — when there is nothing
+  /// worth persisting (disabled, or a session with no signal at all), so a
+  /// pure GPS-only trip that never touched OBD2 stores zero extra bytes and
+  /// the card keeps self-hiding. "Has signal" mirrors the card's own
+  /// `computeObd2DiagnosticsSummary` gate so a session the card would render
+  /// is exactly a session we persist.
+  ///
+  /// **Never-throws contract:** called from the trip-save flow at trip finish,
+  /// so any internal fault degrades to `null` (the trip still saves, just
+  /// without a diagnostic) rather than derailing the save (#1103).
+  Obd2SessionDiagnostic? captureForTrip() {
+    if (!enabled) return null;
+    try {
+      final live = _current != null ? _summarise(_current!) : null;
+      if (live != null && _hasSignal(live)) return live;
+      if (_finished.isNotEmpty && _hasSignal(_finished.last)) {
+        return _finished.last;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Whether [d] carries any diagnostic signal worth surfacing — the same
+  /// predicate `computeObd2DiagnosticsSummary` uses to choose its non-empty
+  /// branch. Kept inline so the collector stays free of a presentation-layer
+  /// import; a connection ATTEMPT alone (even a failed connect) counts, which
+  /// is exactly the "adapter never connected" case #2912 must still surface.
+  static bool _hasSignal(Obd2SessionDiagnostic d) =>
+      d.pidStats.isNotEmpty ||
+      d.connection.attempts > 0 ||
+      d.redactedMac != null ||
+      d.elmVersion != null ||
+      d.reconnectAttempts.isNotEmpty ||
+      d.transitions.isNotEmpty ||
+      d.disconnectExceptions > 0 ||
+      d.fallbackActivatedAtMs != null;
+
   /// Finalise the live session into the capped ring. No-op when disabled
   /// or when there is no live session.
   void endSession() {

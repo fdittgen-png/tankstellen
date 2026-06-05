@@ -264,4 +264,31 @@ void main() {
       expect(c.snapshot(), const Obd2SessionDiagnostic());
     });
   });
+
+  group('Obd2CommDiagnostics.captureForTrip — never-throws contract '
+      '(#2349/#2912)', () {
+    test('an internal fault degrades to null — the trip save is never derailed',
+        () {
+      // The trip-save flow calls captureForTrip at trip finish and relies on
+      // its #1103 never-throws contract: any internal fault must degrade to
+      // null (the trip still saves, just without a diagnostic), never rethrow.
+      // Inject the fault through the clock seam — armed only AFTER the session
+      // is set up, so beginSession succeeds and _summarise then throws.
+      var armed = false;
+      final c = Obd2CommDiagnostics(
+        enabled: true,
+        clock: () {
+          if (armed) throw StateError('injected clock fault');
+          return DateTime(2026, 1, 1);
+        },
+      );
+      c.beginSession(redactedMac: 'AA:BB:**:**:**:FF');
+      c.recordAdapterIdentity(elmVersion: 'ELM327 v1.5');
+      armed = true;
+
+      expect(c.captureForTrip(), isNull,
+          reason: 'an internal fault degrades to null, never an exception');
+      expect(c.captureForTrip, returnsNormally);
+    });
+  });
 }

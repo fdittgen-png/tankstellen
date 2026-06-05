@@ -413,7 +413,12 @@ void main() {
     // #2787 — 1240 → 1246: the no-movement discard now only error-logs when
     // captured signal is actually dropped (the droppedCapturedSignal guard +
     // its comment), so an empty stop no longer spams the error log.
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1246,
+    // #2912 — 1246 → 1250: `_saveToHistory` now captures + persists the
+    // per-trip OBD2 comm-health diagnostic (the never-throws `captureForTrip`
+    // call + the `obd2Diagnostic` constructor arg) so the always-empty card is
+    // fixed. Minimum footprint for a new persisted field; the god-class
+    // decomposition stays tracked by #2187/#2188/#2190.
+    'lib/features/consumption/providers/trip_recording_provider.dart': 1250,
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
     // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
     // hides results behind count-clusters. Adds the `rankForEmphasis`
