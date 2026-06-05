@@ -49,6 +49,43 @@ void main() {
       );
     });
 
+    test(
+        'an AT echo inside the early-init window gets the wake grace (#2889)',
+        () {
+      // RED before #2889: ATE0 as the SECOND command (index 1) — no longer
+      // firstCommandOnFreshLink — used to fall to trivialAt (1 s), which a
+      // slow clone answering in 2.3 s could not beat. It must now be `wake`.
+      for (var idx = 0; idx < earlyInitGraceCount; idx++) {
+        expect(
+          classifyReadTimeout('ATE0\r', atCommandsSinceOpen: idx),
+          Obd2ReadTimeoutClass.wake,
+          reason: 'AT command #$idx is inside the early-init grace window',
+        );
+      }
+    });
+
+    test(
+        'an AT echo PAST the early-init window falls back to trivialAt (#2889)',
+        () {
+      expect(
+        classifyReadTimeout('ATL0\r',
+            atCommandsSinceOpen: earlyInitGraceCount),
+        Obd2ReadTimeoutClass.trivialAt,
+      );
+      expect(
+        classifyReadTimeout('ATL0\r',
+            atCommandsSinceOpen: earlyInitGraceCount + 5),
+        Obd2ReadTimeoutClass.trivialAt,
+      );
+    });
+
+    test('omitting the AT counter preserves the legacy trivialAt default',
+        () {
+      // No counter → defaults past the window, so behaviour matches the
+      // pre-#2889 single-command grace exactly.
+      expect(classifyReadTimeout('ATE0\r'), Obd2ReadTimeoutClass.trivialAt);
+    });
+
     test('an OBD request: protocolSearch first, wake thereafter', () {
       expect(
         classifyReadTimeout('0100\r', firstCommandOnFreshLink: true),
@@ -73,31 +110,34 @@ void main() {
     test(
         'a trivial AT echo that never answers times out at ~1 s, not 5 s',
         () async {
-      final channel = _SilentChannel();
+      // #2889 — the first [earlyInitGraceCount] AT echoes now get the
+      // longer wake grace, so prime PAST that window with answered AT
+      // commands first, then assert the trivialAt (~1 s) class applies to
+      // a LATER trivial AT echo that never answers.
+      final channel = _PrimeThenSilentChannel(
+        answered: {'ATZ\r', 'ATE0\r', 'ATL0\r'},
+      );
       final transport = BluetoothObd2Transport(channel);
       await transport.connect();
 
-      // The FIRST command would get the wake grace, so prime the link
-      // with one cheap command first (it also never answers, but we only
-      // care that the SECOND — a trivial AT — uses the trivialAt class).
-      final sw = Stopwatch()..start();
-      // ATE0 is the first command → wake class (~2.5 s). We assert the
-      // trivialAt path on a LATER command instead: send a successful one
-      // first to clear _firstCommandPending.
-      await _safeSend(transport, 'ATZ\r'); // first cmd, answered below
-      sw.stop();
+      // ATZ (idx 0, wake), ATE0 (idx 1, early-init wake), ATL0 (idx 2,
+      // early-init wake) — all answered instantly, so they cost ~0 ms and
+      // advance the AT counter to 3 (past the early-init window).
+      await _safeSend(transport, 'ATZ\r');
+      await _safeSend(transport, 'ATE0\r');
+      await _safeSend(transport, 'ATL0\r');
 
-      // Now a trivial AT that never answers should time out near 1 s,
-      // well under the old flat 5 s.
+      // Now a trivial AT (idx 3, past the early-init window) that never
+      // answers should time out near 1 s, well under the old flat 5 s.
       final sw2 = Stopwatch()..start();
       await expectLater(
-        transport.sendCommand('ATE0\r'),
+        transport.sendCommand('ATH0\r'),
         throwsA(isA<TimeoutException>()),
       );
       sw2.stop();
       expect(sw2.elapsed.inMilliseconds, lessThan(2000),
-          reason: 'a trivial AT echo must time out near its ~1 s class, '
-              'not the old flat 5 s');
+          reason: 'a trivial AT echo past the early-init window must time '
+              'out near its ~1 s class, not the old flat 5 s');
       expect(sw2.elapsed.inMilliseconds, greaterThanOrEqualTo(800),
           reason: 'and not faster than its ~1 s class either');
     });
@@ -168,8 +208,12 @@ Future<void> _safeSend(BluetoothObd2Transport t, String cmd) async {
   } catch (_) {/* expected timeout */}
 }
 
-/// Channel that opens but never emits a reply — every read times out.
-class _SilentChannel implements ElmByteChannel {
+/// #2889 — answers a known set of priming commands instantly with `OK>`
+/// (so they cost ~0 ms and advance the early-init AT counter), and stays
+/// SILENT for every other command (so it times out at its class budget).
+class _PrimeThenSilentChannel implements ElmByteChannel {
+  _PrimeThenSilentChannel({required this.answered});
+  final Set<String> answered;
   // ignore: close_sinks
   final StreamController<List<int>> _c =
       StreamController<List<int>>.broadcast();
@@ -183,5 +227,12 @@ class _SilentChannel implements ElmByteChannel {
   @override
   Stream<List<int>> get incoming => _c.stream;
   @override
-  Future<void> write(List<int> bytes) async {}
+  Future<void> write(List<int> bytes) async {
+    final command = String.fromCharCodes(bytes);
+    if (answered.contains(command)) {
+      await Future<void>.delayed(Duration.zero);
+      _c.add('OK>'.codeUnits);
+    }
+    // Otherwise stay silent → the read hits its per-class timeout.
+  }
 }
