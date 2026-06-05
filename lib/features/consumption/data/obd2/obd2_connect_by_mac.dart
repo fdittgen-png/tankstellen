@@ -42,6 +42,11 @@ Future<Obd2Service?> _connectByMacDirect(
   Duration timeout = const Duration(seconds: 4),
   bool fallbackToScan = true,
 }) async {
+  // #2906 — stop any active scan + settle before the direct GATT open. An
+  // in-trip reconnect can reach here while the scanner's last active scan is
+  // still winding down on the radio; an unstopped scan racing this connect()
+  // is the Android GATT_ERROR 133 trap.
+  await svc.stopScanBeforeConnect();
   // Tear down a prior direct channel BEFORE reopening (dead-GATT
   // teardown). LOAD-BEARING on Android — a still-open GATT client for
   // the same device yields GATT_ERROR 133 on the next connect.
@@ -93,6 +98,8 @@ Future<Obd2Service?> _connectByMacClassicDirect(
 ) async {
   final classic = svc.classicBluetooth;
   if (classic == null) return null;
+  // #2906 — stop scan + settle before the RFCOMM open (mirrors the BLE path).
+  await svc.stopScanBeforeConnect();
   await svc._teardownLastDirectChannel();
 
   // No scan ⇒ no resolved profile. Pick the best-fit Classic profile so
@@ -129,6 +136,8 @@ Future<Obd2Service?> _connectByMacPassive(
   Obd2ConnectionService svc,
   String mac,
 ) async {
+  // #2906 — stop scan + settle before the passive autoConnect GATT open.
+  await svc.stopScanBeforeConnect();
   await svc._teardownLastDirectChannel();
   final generic = _genericBleProfile(svc);
   final channel = svc.bluetooth.channelForDirect(mac, autoConnect: true);
@@ -151,6 +160,37 @@ Future<Obd2Service?> _connectByMacPassive(
         layer: ErrorLayer.other);
     await svc._teardownLastDirectChannel();
     return null;
+  }
+}
+
+/// Body of [Obd2ConnectionService.stopScanBeforeConnect] (#2906). Stops the
+/// active BLE + Classic scan, then pauses [Obd2ConnectionService.scanSettleDelay]
+/// so the radio quiesces before a `channel.open()`. Android returns
+/// GATT_ERROR 133 when a `connect()` races a scan still winding down on the
+/// controller; the in-trip scan-fallback `connect` is the worst offender (it
+/// reaches the open straight out of an `await for` scan loop whose
+/// subscription — and so `stopScan()` — cancels only asynchronously).
+/// Idempotent + best-effort: a `stopScan()` that throws (no scan in flight,
+/// plugin quirk) is logged as a recoverable OBD2/BLE transient and never
+/// aborts the connect.
+Future<void> _stopScanBeforeConnect(Obd2ConnectionService svc) async {
+  try {
+    await svc.bluetooth.stopScan();
+  } catch (e, st) {
+    // #2379 — OBD2/BLE radio, not local storage. Best-effort; never fatal.
+    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      'where': 'Obd2ConnectionService: stopScan (BLE) before connect',
+    }));
+  }
+  try {
+    await svc.classicBluetooth?.stopScan();
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+      'where': 'Obd2ConnectionService: stopScan (classic) before connect',
+    }));
+  }
+  if (svc.scanSettleDelay > Duration.zero) {
+    await Future<void>.delayed(svc.scanSettleDelay);
   }
 }
 

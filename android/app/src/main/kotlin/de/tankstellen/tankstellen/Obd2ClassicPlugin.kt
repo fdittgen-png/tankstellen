@@ -50,6 +50,15 @@ object Obd2ClassicPlugin {
     private const val METHOD_CHANNEL = "tankstellen.obd2/classic"
     private const val INCOMING_CHANNEL = "tankstellen.obd2/classic/incoming"
 
+    /** #2906 — bounded RFCOMM connect attempts before falling back to the
+     *  insecure / reflection channel-1 socket. Real ELM327 clones routinely
+     *  reject the FIRST `connect()` (the adapter is still waking the SPP
+     *  service) with `IOException: read failed, socket might closed ... -1`,
+     *  but answer the 2nd or 3rd try. ~3 attempts with a short backoff between
+     *  each mirrors the Dart-side #2909 `channel.open()` retry shape. */
+    private const val MAX_RFCOMM_ATTEMPTS = 3
+    private const val RFCOMM_RETRY_BASE_MS = 150L
+
     private var socket: BluetoothSocket? = null
     private var readerThread: Thread? = null
     private val readerRunning = AtomicBoolean(false)
@@ -126,20 +135,91 @@ object Obd2ClassicPlugin {
             Log.e(TAG, "connect: bad address $address", e)
             return false
         }
+        // cancelDiscovery() is required before EVERY connect() — a live
+        // discovery slows the RFCOMM handshake to a crawl (and can fail it).
+        @Suppress("MissingPermission")
+        adapter.cancelDiscovery()
+
+        val serviceUuid = UUID.fromString(uuid)
+        // 1) Bounded retry on the standard secure SPP socket. This runs on the
+        //    background "obd2-classic-connect" thread, so the Thread.sleep
+        //    backoff between attempts never blocks the Flutter main thread.
+        for (attempt in 1..MAX_RFCOMM_ATTEMPTS) {
+            @Suppress("MissingPermission")
+            val s = try {
+                device.createRfcommSocketToServiceRecord(serviceUuid)
+            } catch (e: IOException) {
+                Log.e(TAG, "connect: createRfcommSocket failed (attempt $attempt)", e)
+                null
+            }
+            if (s != null && tryConnectSocket(s, attempt)) return true
+            if (attempt < MAX_RFCOMM_ATTEMPTS) {
+                try {
+                    Thread.sleep(RFCOMM_RETRY_BASE_MS * attempt)
+                } catch (_: InterruptedException) {
+                    Thread.currentThread().interrupt()
+                    return false
+                }
+            }
+        }
+        // 2) Documented clone fallback: the INSECURE SPP socket. Many ELM327
+        //    clones never complete the secure (authenticated/encrypted) RFCOMM
+        //    handshake but connect fine over the insecure variant.
+        @Suppress("MissingPermission")
+        val insecure = try {
+            device.createInsecureRfcommSocketToServiceRecord(serviceUuid)
+        } catch (e: IOException) {
+            Log.e(TAG, "connect: createInsecureRfcommSocket failed", e)
+            null
+        }
+        if (insecure != null && tryConnectSocket(insecure, MAX_RFCOMM_ATTEMPTS + 1)) {
+            return true
+        }
+        // 3) Last-resort reflection on the hidden channel-1 RFCOMM socket —
+        //    the long-standing workaround for clones whose SDP record is
+        //    missing/garbage so the UUID lookup resolves to no channel.
+        val reflected = reflectChannelOneSocket(device)
+        if (reflected != null && tryConnectSocket(reflected, MAX_RFCOMM_ATTEMPTS + 2)) {
+            return true
+        }
+        Log.e(TAG, "connect: all RFCOMM strategies exhausted for $address")
+        return false
+    }
+
+    /** Attempt to connect [s], adopt it as the live socket + start the reader
+     *  on success, or close it on failure. Returns true on a connected socket. */
+    private fun tryConnectSocket(s: BluetoothSocket, attempt: Int): Boolean {
         return try {
-            @Suppress("MissingPermission")
-            val s = device.createRfcommSocketToServiceRecord(UUID.fromString(uuid))
-            @Suppress("MissingPermission")
-            adapter.cancelDiscovery() // required before connect()
             s.connect()
             socket = s
             startReader()
             true
         } catch (e: IOException) {
-            Log.e(TAG, "connect: RFCOMM open failed", e)
-            try { socket?.close() } catch (_: IOException) {}
-            socket = null
+            Log.w(TAG, "connect: RFCOMM open failed (attempt $attempt)", e)
+            try { s.close() } catch (_: IOException) {}
+            if (socket === s) socket = null
             false
+        }
+    }
+
+    /** Reflectively open a channel-1 RFCOMM socket (#2906 clone fallback). Some
+     *  ELM327 clones expose no usable SDP service record, so the UUID-based
+     *  socket never resolves a channel; the hidden `createRfcommSocket(int)`
+     *  on channel 1 is the documented community workaround. Returns null when
+     *  the reflection is unavailable (future Android hides it) — the caller
+     *  then surfaces a clean connect failure. */
+    @Suppress("MissingPermission")
+    private fun reflectChannelOneSocket(
+        device: android.bluetooth.BluetoothDevice,
+    ): BluetoothSocket? {
+        return try {
+            val m = device.javaClass.getMethod(
+                "createRfcommSocket", Int::class.javaPrimitiveType,
+            )
+            m.invoke(device, 1) as? BluetoothSocket
+        } catch (e: Exception) {
+            Log.w(TAG, "connect: channel-1 reflection unavailable", e)
+            null
         }
     }
 
