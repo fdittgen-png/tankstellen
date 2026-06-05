@@ -423,6 +423,21 @@ class Obd2Service implements Obd2RawCommandPort {
   /// connection to the vehicle's ELM327 adapter.
   bool get isConnected => _transport.isConnected;
 
+  /// `true` when the vehicle bus actually answered during the last connect —
+  /// a protocol digit was cached (`ATDPN` returned a real protocol) OR PID
+  /// discovery (`0100`) found ≥1 supported PID (#2892).
+  ///
+  /// A HEALTHY ELM chip on a SILENT bus (ignition off / ECU asleep) passes
+  /// every AT command — [isConnected] and [connect] both report success — yet
+  /// `ATDPN`→NO DATA caches no protocol and `0100`→NO DATA leaves
+  /// [debugSupportedPids] empty, so a started trip is degraded GPS-only with
+  /// no explanation. Callers gate on [busAnswered] after connect to surface
+  /// the localized "turn the ignition on" condition ([Obd2AdapterUnresponsive])
+  /// instead. Cheap (reads already-resolved fields, no I/O); gated STRICTLY on
+  /// the no-answer signal so it never trips when discovery returned PIDs.
+  bool get busAnswered =>
+      _cachedProtocolDigit() != null || debugSupportedPids.isNotEmpty;
+
   /// Send a raw command to the ELM327 adapter and return the raw
   /// response. Exposed for the [PidScheduler]-based trip recording
   /// loop (#814) — the scheduler dispatches individual PID commands
