@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/logging/error_logger.dart';
+import '../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../features/route_search/providers/route_search_provider.dart';
 import '../../features/search/presentation/screens/search_criteria_screen.dart';
 import '../../features/search/providers/search_provider.dart';
@@ -290,12 +291,15 @@ class ShellBottomBar extends ConsumerWidget {
       // repeat tap would push a second copy ("search just re-opens the same
       // form again and again"). Bail if it is already current.
       if (searchCriteriaRouteIsCurrent(searchNav)) {
-        unawaited(errorLogger.log(
-          ErrorLayer.ui,
+        // #2874 — re-tapping the FAB while the criteria sheet is already open
+        // is an EXPECTED no-op, not a fault: spooling it at [ErrorLayer.ui]
+        // surfaced it in the user-facing error log (error-log #21). Keep the
+        // #2810 diagnostic trail as a breadcrumb so it attaches to any LATER
+        // genuine trace instead of standing alone as a phantom ERROR.
+        BreadcrumbCollector.add(
           'search criteria re-open suppressed (already current)',
-          StackTrace.current,
-          context: {'source': 'openCriteriaOnSearchBranch', 'branch': i},
-        ));
+          detail: 'openCriteriaOnSearchBranch branch=$i',
+        );
         return;
       }
       searchNav.push<void>(
