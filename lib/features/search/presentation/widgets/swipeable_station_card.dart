@@ -28,6 +28,11 @@ class SwipeableStationCard extends ConsumerWidget {
   /// The user's preferred fuel type from their profile.
   final FuelType? profileFuelType;
 
+  /// #2899 — radius (in metres) the Fuel Station Radar closeness bar scales
+  /// to, or null to hide it. Threaded straight through to [StationCard]; only
+  /// the on-search radar result list passes it.
+  final double? closenessRadiusMeters;
+
   const SwipeableStationCard({
     super.key,
     required this.station,
@@ -39,6 +44,7 @@ class SwipeableStationCard extends ConsumerWidget {
     this.priceTier,
     this.rating,
     this.profileFuelType,
+    this.closenessRadiusMeters,
   });
 
   @override
@@ -96,6 +102,7 @@ class SwipeableStationCard extends ConsumerWidget {
         priceTier: priceTier,
         rating: rating,
         profileFuelType: profileFuelType,
+        closenessRadiusMeters: closenessRadiusMeters,
         // #1120 — collapse the loyalty-card map to canonical-brand
         // strings so the StationCard widget stays decoupled from the
         // [LoyaltyBrand] enum.

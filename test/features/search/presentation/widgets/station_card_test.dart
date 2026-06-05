@@ -8,6 +8,7 @@ import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
@@ -1291,6 +1292,96 @@ void main() {
       );
       expect(shell.stripeColor, success);
       expect(shell.stripeWidth, 6);
+    });
+  });
+
+  // #2899 — surface 3 of 3: the Fuel Station Radar result list. The card only
+  // carries the closeness bar when the on-search radar passes a radius; the
+  // regular search list (null radius) is unchanged.
+  group('StationCard closeness bar (#2899 — radar result list)', () {
+    const radarStation = Station(
+      id: 'de-radar-1',
+      name: 'Radar Tankstelle',
+      brand: 'STAR',
+      street: 'Hauptstr. 1',
+      postCode: '10115',
+      place: 'Berlin',
+      lat: 52.52,
+      lng: 13.40,
+      dist: 0.2, // 0.2 km from the user
+      e10: 1.799,
+      isOpen: true,
+    );
+
+    testWidgets('no bar when closenessRadiusMeters is null (regular list)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const StationCard(
+          station: radarStation,
+          selectedFuelType: FuelType.e10,
+        ),
+      );
+      expect(find.byType(ProximityFillBar), findsNothing);
+    });
+
+    testWidgets('renders the bar in radar mode at the expected fraction',
+        (tester) async {
+      // 0.2 km station scaled to a 1 km search radius → 80% full.
+      await pumpApp(
+        tester,
+        const StationCard(
+          station: radarStation,
+          selectedFuelType: FuelType.e10,
+          closenessRadiusMeters: 1000,
+        ),
+      );
+
+      final bar = tester.widget<ProximityFillBar>(
+        find.byType(ProximityFillBar),
+      );
+      expect(bar.distanceMeters, closeTo(200, 1e-9),
+          reason: 'station.dist (km) → metres for the bar');
+      expect(bar.radiusMeters, 1000);
+      expect(
+        ProximityFillBar.fillFor(bar.distanceMeters, bar.radiusMeters!),
+        closeTo(0.8, 1e-9),
+      );
+    });
+
+    testWidgets('a far station scales to near-empty against the search radius',
+        (tester) async {
+      // 6.2 km exceeds the 1 km trip geo-fence but reads as RELATIVE closeness
+      // against the wider search radius (10 km) → ~0.38, not pinned to empty.
+      const farStation = Station(
+        id: 'de-radar-2',
+        name: 'Far Tankstelle',
+        brand: 'STAR',
+        street: 'Hauptstr. 2',
+        postCode: '10115',
+        place: 'Berlin',
+        lat: 52.6,
+        lng: 13.5,
+        dist: 6.2,
+        e10: 1.759,
+        isOpen: true,
+      );
+      await pumpApp(
+        tester,
+        const StationCard(
+          station: farStation,
+          selectedFuelType: FuelType.e10,
+          closenessRadiusMeters: 10000,
+        ),
+      );
+
+      final bar = tester.widget<ProximityFillBar>(
+        find.byType(ProximityFillBar),
+      );
+      expect(
+        ProximityFillBar.fillFor(bar.distanceMeters, bar.radiusMeters!),
+        closeTo(0.38, 1e-9),
+      );
     });
   });
 }

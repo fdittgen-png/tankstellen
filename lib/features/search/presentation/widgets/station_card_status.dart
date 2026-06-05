@@ -48,7 +48,16 @@ class _StationDetails extends StatelessWidget {
   final Station station;
   final bool hasBrand;
 
-  const _StationDetails({required this.station, required this.hasBrand});
+  /// #2899 — when non-null, the Fuel Station Radar "closeness" bar is rendered
+  /// under the distance row, scaled to this radius (the search radius, in
+  /// metres). Null on the regular search list, so the card is unchanged there.
+  final double? closenessRadiusMeters;
+
+  const _StationDetails({
+    required this.station,
+    required this.hasBrand,
+    this.closenessRadiusMeters,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -116,6 +125,20 @@ class _StationDetails extends StatelessWidget {
             ],
           ],
         ),
+        // #2899 — Fuel Station Radar closeness bar: the SAME green→accent
+        // [ProximityFillBar] the trip radar card + PiP overlay use, so all
+        // three radar surfaces fill identically as the driver nears a station.
+        // `station.dist` is the great-circle distance in km → metres for the
+        // bar; it scales to the search radius (see [StationCard]). Live: the
+        // radar re-stamps `dist` on each scan, so the bar re-fills as the
+        // result set refreshes around the moving user.
+        if (closenessRadiusMeters != null) ...[
+          const SizedBox(height: Spacing.xs),
+          ProximityFillBar(
+            distanceMeters: station.dist * 1000.0,
+            radiusMeters: closenessRadiusMeters,
+          ),
+        ],
         if (station.amenities.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 2),

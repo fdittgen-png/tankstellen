@@ -14,6 +14,7 @@ import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../consumption/presentation/widgets/proximity_fill_bar.dart';
 import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
 import '../../domain/entities/brand_registry.dart';
 import '../../domain/entities/fuel_type.dart';
@@ -57,6 +58,20 @@ class StationCard extends StatelessWidget {
   /// the canonical-brand string keys.
   final Map<String, double>? activeDiscountsByBrand;
 
+  /// Radius (in metres) the Fuel Station Radar "closeness" bar scales to,
+  /// or `null` to hide the bar (#2899). Only the on-search Fuel Station Radar
+  /// result list passes it — the regular search list leaves it null so the
+  /// card is unchanged.
+  ///
+  /// The list scales to the **search radius** (`searchRadiusProvider × 1000`),
+  /// not the small 1 km radar geo-fence: result-list stations routinely exceed
+  /// the geo-fence (2.4 km, 6.2 km, …), so scaling to the search radius makes
+  /// the bar read as RELATIVE closeness across the list — the nearest forecourt
+  /// reads near-full, the farthest near-empty — instead of every row pinning to
+  /// empty. The same green→accent [ProximityFillBar] used by the trip card +
+  /// PiP overlay, so all three radar surfaces share one fill metaphor.
+  final double? closenessRadiusMeters;
+
   const StationCard({
     super.key,
     required this.station,
@@ -69,6 +84,7 @@ class StationCard extends StatelessWidget {
     this.rating,
     this.profileFuelType,
     this.activeDiscountsByBrand,
+    this.closenessRadiusMeters,
   });
 
   /// True if the station has a real brand name (not empty, not generic "Station")
@@ -152,7 +168,11 @@ class StationCard extends StatelessWidget {
               _StatusColumn(station: station),
               const SizedBox(width: 12),
               Expanded(
-                child: _StationDetails(station: station, hasBrand: _hasBrand),
+                child: _StationDetails(
+                  station: station,
+                  hasBrand: _hasBrand,
+                  closenessRadiusMeters: closenessRadiusMeters,
+                ),
               ),
               const SizedBox(width: 8),
               _StationPriceColumn(
