@@ -141,6 +141,84 @@ void main() {
       );
     });
 
+    group('RECOVERY relaxation (#2907)', () {
+      test('a marginal single-batch sighting connects in recovery but NOT '
+          'in the default gate', () {
+        // Baseline −60, seen −90 ⇒ a 30 dBm drop, seen exactly once. The
+        // default gate skips it (beyond 15 dBm AND not seen twice); the
+        // recovery gate attempts it (within the widened 35 dBm tolerance).
+        expect(
+          shouldConnectFromScan(
+            lastSuccessfulRssi: -60,
+            seenRssi: -90,
+            consecutiveBatchesSeen: 1,
+          ),
+          isFalse,
+          reason: 'the default initial-pick gate skips a far, single sighting',
+        );
+        expect(
+          shouldConnectFromScan(
+            lastSuccessfulRssi: -60,
+            seenRssi: -90,
+            consecutiveBatchesSeen: 1,
+            recovery: true,
+          ),
+          isTrue,
+          reason: 'recovery widens the tolerance to 35 dBm — the pinned '
+              'adapter is worth a marginal reconnect attempt',
+        );
+      });
+
+      test('with no baseline, ANY single sighting connects in recovery', () {
+        // The first reconnect of the session has no relative baseline. The
+        // default gate needs two consecutive batches; recovery attempts the
+        // pinned MAC on the first sighting (no wrong-device risk).
+        expect(
+          shouldConnectFromScan(
+            lastSuccessfulRssi: null,
+            seenRssi: -88,
+            consecutiveBatchesSeen: 1,
+          ),
+          isFalse,
+        );
+        expect(
+          shouldConnectFromScan(
+            lastSuccessfulRssi: null,
+            seenRssi: -88,
+            consecutiveBatchesSeen: 1,
+            recovery: true,
+          ),
+          isTrue,
+          reason: 'a pinned-MAC recovery scan attempts any first sighting',
+        );
+      });
+
+      test('recovery still rejects a sighting weaker than the widened '
+          'tolerance when seen only once', () {
+        // Baseline −50, seen −95 ⇒ a 45 dBm drop, beyond even the 35 dBm
+        // recovery window, and seen exactly once ⇒ still skipped.
+        expect(
+          shouldConnectFromScan(
+            lastSuccessfulRssi: -50,
+            seenRssi: -95,
+            consecutiveBatchesSeen: 1,
+            recovery: true,
+          ),
+          isFalse,
+        );
+        // …but a second consecutive sighting of even that weak link connects.
+        expect(
+          shouldConnectFromScan(
+            lastSuccessfulRssi: -50,
+            seenRssi: -95,
+            consecutiveBatchesSeen: 2,
+            recovery: true,
+          ),
+          isTrue,
+        );
+      });
+    });
+
     test('honours custom thresholds', () {
       // Tighten the window to 5 dBm: a 10 dBm drop now fails the
       // relative gate and, seen once, is skipped.

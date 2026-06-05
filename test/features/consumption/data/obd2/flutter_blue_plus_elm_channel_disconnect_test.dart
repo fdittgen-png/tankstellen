@@ -204,6 +204,55 @@ void main() {
     });
   });
 
+  group('FlutterBluePlusElmChannel — full session teardown on drop (#2907)',
+      () {
+    test(
+        'a write-time drop tears down the FULL session (notify char + both '
+        'subscriptions), not just _open/_writeChar', () async {
+      final ch = _channelThatFailsWith(FlutterBluePlusException(
+        ErrorPlatform.android,
+        'writeCharacteristic',
+        6,
+        'device is not connected',
+      ));
+      // The prime seam wires _writeChar + _notifyChar + both subscriptions —
+      // the full state a live session holds.
+      expect(ch.debugResidualSessionState, isTrue,
+          reason: 'a primed session holds notify-char + subscription state');
+
+      await expectLater(
+          ch.write([0x01]), throwsA(isA<Obd2DisconnectedException>()));
+
+      expect(ch.isOpen, isFalse);
+      expect(ch.debugResidualSessionState, isFalse,
+          reason: '#2907 — a confirmed drop must clear `_notifyChar` and '
+              'cancel both subscriptions too. Before #2907 the handler cleared '
+              'only `_open`/`_writeChar`, leaving stale notify/conn-state '
+              'subscriptions a reconnect would double-wire on the next open()');
+    });
+
+    test(
+        'a GENUINE non-disconnect write fault does NOT tear the session down',
+        () async {
+      // Regression-lock: only a confirmed disconnect clears the session. A
+      // clone rejecting the write mode must leave the live session intact.
+      final ch = _channelThatFailsWith(FlutterBluePlusException(
+        ErrorPlatform.android,
+        'writeCharacteristic',
+        1,
+        'characteristic does not support write without response',
+      ));
+
+      await expectLater(
+        ch.write([0x01]),
+        throwsA(isA<FlutterBluePlusException>()),
+      );
+      expect(ch.isOpen, isTrue);
+      expect(ch.debugResidualSessionState, isTrue,
+          reason: 'a non-disconnect fault keeps the session fully wired');
+    });
+  });
+
   group('the reclassified disconnect de-noises through recordObd2ReadFailure',
       () {
     test(

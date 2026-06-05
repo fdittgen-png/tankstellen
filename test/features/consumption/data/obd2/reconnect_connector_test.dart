@@ -104,14 +104,18 @@ void main() {
       await connected!.disconnect();
     });
 
-    test('refreshes lastCandidate to the strongest-seen advertisement',
+    test('records the first-batch sighting RSSI on a recovery connect (#2907)',
         () async {
+      // #2907 — the connector is the in-trip RECOVERY path: the MAC is pinned
+      // (no wrong-device risk), so the relaxed gate attempts the FIRST sighting
+      // rather than waiting for a stronger second batch. The strong second
+      // sighting is therefore never reached — recovery connects on −85.
       final fake = _FakeFacade(
         directChannel: _FakeChannel(openError: StateError('GATT 133')),
         channel: _FakeChannel(respondTo: _elmOk()),
         batches: [
-          [_cand('aa:bb', -85)], // weak first
-          [_cand('aa:bb', -50)], // much stronger — becomes lastCandidate
+          [_cand('aa:bb', -85)], // first sighting — recovery connects here
+          [_cand('aa:bb', -50)], // never reached
         ],
       );
       Obd2Service? connected;
@@ -123,21 +127,23 @@ void main() {
       await connector.attempt('aa:bb');
 
       expect(connector.lastCandidate, isNotNull);
-      expect(connector.lastCandidate!.candidate.rssi, -50,
-          reason: 'lastCandidate tracks the strongest sighting');
-      // No baseline existed this drop, so the strong 2nd sighting connects
-      // via the two-consecutive-batches rule and records its RSSI.
-      expect(connector.lastSuccessfulRssi, -50);
+      expect(connector.lastCandidate!.candidate.rssi, -85,
+          reason: 'recovery connects on the first sighting of the pinned MAC');
+      expect(connector.lastSuccessfulRssi, -85);
       await connected?.disconnect();
     });
 
-    test('skips a lone weak sighting (gate not satisfied) and returns false',
-        () async {
+    test('attempts even a lone WEAK sighting of the pinned MAC in recovery '
+        '(#2907 relaxation)', () async {
+      // Pre-#2907 a lone −90 sighting with no baseline was skipped (the strict
+      // initial-pick gate). The connector is the recovery path now, so it
+      // attempts the marginal sighting rather than spinning the backoff for
+      // another window — exactly the "once lost it can't re-establish" fix.
       final fake = _FakeFacade(
         directChannel: _FakeChannel(openError: StateError('GATT 133')),
         channel: _FakeChannel(respondTo: _elmOk()),
         batches: [
-          [_cand('aa:bb', -90)], // weak, seen exactly once → never connects
+          [_cand('aa:bb', -90)], // weak, seen once → recovery STILL attempts
         ],
       );
       Obd2Service? connected;
@@ -148,9 +154,11 @@ void main() {
 
       final ok = await connector.attempt('aa:bb');
 
-      expect(ok, isFalse,
-          reason: 'no baseline + seen once + weak ⇒ gate skips, no connect');
-      expect(connected, isNull);
+      expect(ok, isTrue,
+          reason: '#2907 — a marginal single sighting of the PINNED adapter is '
+              'worth a recovery connect attempt');
+      expect(connected, isNotNull);
+      await connected?.disconnect();
     });
   });
 

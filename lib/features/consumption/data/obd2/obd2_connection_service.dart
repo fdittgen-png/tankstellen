@@ -157,6 +157,15 @@ class Obd2ConnectionService {
   /// [Obd2AdapterUnresponsive] when init fails (channel is closed
   /// before the error is rethrown).
   Future<Obd2Service> connect(ResolvedObd2Candidate candidate) async {
+    // #2907 — tear down any stale direct/passive channel from a PRIOR
+    // by-MAC connect before the scan path opens a fresh one. The
+    // [connectByMacDirect]/[connectByMacPassive] paths already self-clean,
+    // but the SCAN-fallback `connect` did not — so an in-trip reconnect that
+    // tried a direct connect (which retained `_lastDirectChannel`) and then
+    // fell back to the gated scan left that GATT client open, and Android
+    // returned GATT_ERROR 133 on the scan-path open against the same device
+    // (the repeat-133 reconnect trap). Idempotent + best-effort.
+    await _teardownLastDirectChannel();
     final channel = switch (candidate.profile.transport) {
       BluetoothTransport.ble => bluetooth.channelFor(
           candidate.candidate.deviceId, candidate.profile),

@@ -10,12 +10,18 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_reconnect_scanner.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
+import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
+import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/data/obd2/paused_trip_repository.dart';
+import 'package:tankstellen/features/consumption/data/obd2/reconnect_connector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 
@@ -738,7 +744,217 @@ void main() {
         AutoRecordTraceLog.clear();
       });
     });
+
+    // ── #2907 — reconnect RECOVERY: never poll a dead transport; the swap
+    //    must reach the controller through the REAL connector chain ──────────
+    group('reconnect recovery — dead-transport gate + real-chain swap (#2907)',
+        () {
+      test(
+          '_runTransport short-circuits a DEAD service instead of writing into '
+          'the closed socket', () async {
+        // A transport that answers init (so start() completes) but whose
+        // isConnected flips false after a drop — modelling a channel-level
+        // drop the controller has not yet swapped away from.
+        final transport = _DroppableTransport(initResponses());
+        await transport.connect();
+        final ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-2907-gate',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+        );
+        await ctl.start();
+        final callsBefore = transport.commandCount;
+
+        // Simulate a channel-level drop: the link is dead but the controller
+        // still points at this service.
+        transport.simulateDrop();
+
+        // The poll must NOT reach the dead transport — it short-circuits with
+        // the recoverable typed disconnect (RED before #2907: the old code
+        // dereferenced sendCommand on the dead transport, timing out).
+        await expectLater(
+          ctl.debugRunTransport('010D\r'),
+          throwsA(isA<Obd2DisconnectedException>()),
+          reason: '#2907 — a dead transport must be short-circuited, not '
+              'polled, so the loop never spins on a closed socket',
+        );
+        expect(transport.commandCount, callsBefore,
+            reason: 'the gate must NOT dispatch into the dead transport');
+
+        await ctl.stop();
+      });
+
+      test(
+          'drop → reconnect via the REAL ReconnectConnector swaps the service '
+          'and polling RESUMES on the LIVE transport (not the dead one)',
+          () async {
+        // The OLD link: answers init/odometer/VIN (start completes) then dies.
+        final deadTransport = _DroppableTransport(initResponses());
+        await deadTransport.connect();
+
+        // The NEW live link the reconnect builds — only IT answers the speed
+        // PID, so a 50 km/h reading proves the loop polls the LIVE transport.
+        final liveTransport = _LiveTransport({
+          ...initResponses(),
+          '010D': '41 0D 32>', // 50 km/h
+          '010C': '41 0C 0E A6>', // ~937 rpm
+        });
+        await liveTransport.connect();
+
+        // A fake connection whose direct connect hands back the live service —
+        // exactly what ReconnectConnector.onConnected forwards to the
+        // controller's replaceService in production.
+        final connection =
+            _ReconnectingFakeConnection(liveService: Obd2Service(liveTransport));
+
+        late TripRecordingController ctl;
+        ctl = TripRecordingController(
+          service: Obd2Service(deadTransport),
+          pollInterval: const Duration(milliseconds: 30),
+          schedulerTickRate: const Duration(milliseconds: 10),
+          vehicleId: 'car-2907-chain',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          // Default 6 s silent window — the reconnect lands silently inside it.
+          pinnedAdapterMac: 'AA:BB',
+          // The REAL production wiring: a ReconnectConnector whose onConnected
+          // calls ctl.replaceService, driven by a real AdapterReconnectScanner.
+          reconnectScannerFactory: (mac, onReconnect) {
+            final connector = ReconnectConnector(
+              connection: connection,
+              onConnected: ctl.replaceService,
+            );
+            return AdapterReconnectScanner(
+              pinnedMac: mac,
+              probe: (_) async => true,
+              connect: connector.attempt,
+              onReconnect: onReconnect,
+              firstProbeDelay: const Duration(milliseconds: 10),
+              initialBackoff: const Duration(milliseconds: 20),
+            );
+          },
+        );
+
+        await ctl.start();
+        // Drop the OLD link → the controller disconnects it (handleDrop) and
+        // the scanner starts probing.
+        deadTransport.simulateDrop();
+        ctl.debugTriggerDrop();
+
+        // Let the real scanner fire: probe→connect→onConnected(replaceService)
+        // →onReconnect→resume. This is the full production chain, in order.
+        final readings = <TripLiveReading>[];
+        final sub = ctl.live.listen(readings.add);
+        await Future<void>.delayed(const Duration(milliseconds: 400));
+
+        expect(ctl.currentState, TripRecordingControllerState.recording,
+            reason: 'the silent reconnect must restore the recording state');
+        expect(connection.directConnectCount, greaterThanOrEqualTo(1),
+            reason: 'the real connector must have run a direct reconnect');
+        expect(liveTransport.pidPollCount, greaterThan(0),
+            reason: '#2907 — after the swap the scheduler must poll the LIVE '
+                'transport, not the orphaned dead one');
+        expect(readings.any((r) => r.speedKmh == 50), isTrue,
+            reason: '#2907 — the 50 km/h sample exists ONLY on the live '
+                'transport: its presence proves polling resumed on the '
+                'reconnected link (RED before — the loop polled the dead one)');
+
+        await sub.cancel();
+        await ctl.stop();
+      });
+    });
   });
+}
+
+/// A transport that answers scripted commands until [simulateDrop] flips it
+/// to a dead, NOT-connected state (the channel-level drop the controller has
+/// not yet swapped away from). Counts dispatched commands so a test can prove
+/// the #2907 dead-transport gate never reaches it after a drop.
+class _DroppableTransport implements Obd2Transport {
+  _DroppableTransport(this._responses);
+
+  final Map<String, String> _responses;
+  bool _connected = false;
+  int commandCount = 0;
+
+  void simulateDrop() => _connected = false;
+
+  @override
+  Future<void> connect() async => _connected = true;
+
+  @override
+  bool get isConnected => _connected;
+
+  @override
+  Future<String> sendCommand(String command) async {
+    commandCount++;
+    if (!_connected) throw StateError('Not connected');
+    return _responses[command.trim()] ?? 'NO DATA>';
+  }
+
+  @override
+  Future<void> disconnect() async => _connected = false;
+}
+
+/// A fake [Obd2ConnectionService] whose direct-by-MAC reconnect hands back a
+/// pre-built LIVE service — standing in for the real connect dance so the
+/// reconnect chain (connector → onConnected → replaceService → resume) runs
+/// end-to-end without a Bluetooth stack (#2907).
+class _ReconnectingFakeConnection extends Obd2ConnectionService {
+  _ReconnectingFakeConnection({required this.liveService})
+      : super(
+          registry: Obd2AdapterRegistry.defaults(),
+          permissions: _AlwaysGrant(),
+          bluetooth: _UnusedFacade(),
+        );
+
+  final Obd2Service liveService;
+  int directConnectCount = 0;
+
+  @override
+  Future<Obd2Service?> connectByMacDirect(
+    String mac, {
+    Duration timeout = const Duration(seconds: 4),
+    bool fallbackToScan = true,
+  }) async {
+    directConnectCount++;
+    return liveService;
+  }
+}
+
+class _AlwaysGrant implements Obd2Permissions {
+  @override
+  Future<Obd2PermissionState> current() async => Obd2PermissionState.granted;
+  @override
+  Future<Obd2PermissionState> request() async => Obd2PermissionState.granted;
+  @override
+  Future<bool> requestNotifications() async => true;
+}
+
+/// The BLE facade is never touched in the #2907 chain test — the fake
+/// connection short-circuits the direct connect — so every member throws to
+/// fail loudly if the path is ever taken.
+class _UnusedFacade implements BluetoothFacade {
+  @override
+  Stream<List<Obd2AdapterCandidate>> scan({
+    required Set<String> serviceUuids,
+    Duration timeout = const Duration(seconds: 8),
+  }) =>
+      throw UnimplementedError();
+  @override
+  Future<void> stopScan() async {}
+  @override
+  ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile) =>
+      throw UnimplementedError();
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
+  }) =>
+      throw UnimplementedError();
 }
 
 /// Captures every `errorLogger.log` call routed through the foreground
