@@ -108,3 +108,49 @@ re-pin both F-Droid recipes). I can do the bump prep on request.
 3. **F-Droid self-hosted**: create the keystore + choose repo-key passwords → I run
    `fdroid_publish.sh`.
 4. **(Optional)** decide the version label.
+
+---
+
+## Play production pre-submission gap check (verified 2026-06-05)
+
+### 🚩 The one thing that gates everything — verify FIRST
+**Closed-testing access requirement.** Personal Play accounts created after
+**2023-11-13** must run a **closed test with ≥12 testers opted in for 14 continuous
+days**, then file **"Apply for production access"** (Google reviews ~7 days). The
+threshold dropped 20→**12** on 2024-12-11. **Open-testing and internal installs do
+NOT count** — only opted-in *closed-track* testers held 14 days. The "42 installs"
+does **not** satisfy it.
+- **Check:** Production → can you actually click *Send for review*, or is there an
+  "Apply for production access" banner? If blocked, production today is impossible
+  (14-day gate); start the closed test now. If the account predates 2023-11-13 or is
+  an org account, the gate doesn't apply.
+
+### Already done — no action
+- **AAB**: `2026061061` (5.0.0) is uploaded & Active in Play → **promote it** (no
+  rebuild). Open testing live in 39 countries.
+- Privacy policy (live), data-safety content, account-deletion (in-app + TankSync),
+  listing text + 8 screenshots/locale (6 langs), **feature graphic + icon now present
+  for all 6 locales**, release notes (5132 content), target API 36, clean permissions
+  (no Ad ID / background-location / SMS → no extra permission forms).
+
+### Console-only, do this afternoon (every input is prepped)
+- **Developer identity verification + $25 fee** — must be complete first.
+- **App content declarations** — Content rating (IARC: Utility/Reference, No to
+  violence/sexual/gambling/UGC, declare location); Target audience (18+, not for
+  children); Ads = **No**; App access = **All functionality available without special
+  access**; Government / Financial / Health / News / COVID / Advertising-ID = **None /
+  No** (submit each).
+- **Data safety** (fill from `DATA_SAFETY.md`): collects + shares = Yes; encrypted in
+  transit = Yes; deletion = Yes; URL = the privacy policy. Only two data types —
+  **Approximate location** (Collected Yes, **Shared Yes** → fuel APIs, ephemeral,
+  optional) and **Other IDs** anonymous UUID (Collected Yes iff TankSync, Shared No).
+  **Device IDs / Advertising ID = NOT collected.** Everything else = Not collected.
+  No account-deletion URL (anonymous model).
+- **Release flow**: select **countries** (currently 0) → confirm AAB `2026061061` →
+  paste the `changelogs/5132.txt` content as release notes → *Review* (clear all
+  Errors) → *Start rollout to production* → check **Managed Publishing** isn't holding
+  it.
+
+### Not required (skip)
+Pre-registration, app indexing (deep links), and the pre-launch report are all
+**optional** — none block a production submission.
