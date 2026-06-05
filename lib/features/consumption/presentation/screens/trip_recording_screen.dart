@@ -36,6 +36,7 @@ import '../widgets/obd2_breadcrumb_overlay.dart';
 import '../widgets/recording_app_bar_actions.dart';
 import '../widgets/trip_avg_consumption_card.dart';
 import '../widgets/trip_radar_card.dart';
+import '../widgets/trip_recording_landscape_body.dart';
 import '../widgets/trip_save_progress.dart';
 import '../widgets/trip_start_progress.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -868,6 +869,21 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final brokenMapOverride = band == BrokenMapBand.hardDisable
         ? (_receiptDerivedLPer100Km(ref) ?? '—')
         : null;
+
+    // #2903 — in LANDSCAPE the driver is driving: swap the scrolling
+    // portrait list for the glanceable, zero-touch two-zone split (live
+    // feedback left, trip + radar right) so every key metric is visible
+    // at once, large and high-contrast, with no scrolling. Orientation
+    // is read the same way the shell / favorites / search screens do
+    // (`MediaQuery.orientation`). Portrait is unchanged below.
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    if (isLandscape) {
+      return TripRecordingLandscapeBody(
+        reading: r,
+        brokenMapOverride: brokenMapOverride,
+      );
+    }
 
     // #2380 — the radar card + five metric cards + coaching card can
     // exceed a short viewport, so the recording column scrolls rather

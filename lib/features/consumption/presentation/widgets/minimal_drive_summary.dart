@@ -137,9 +137,13 @@ class MinimalDriveSummary extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 6),
+            // #2903 — each symbol gets an equal Expanded share so the
+            // triplet fits a narrow pane (the landscape split's left
+            // zone) and a large text scale without overflowing.
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: tiles,
+              children: [
+                for (final tile in tiles) Expanded(child: Center(child: tile)),
+              ],
             ),
           ],
         ),
@@ -178,9 +182,14 @@ class _CoachingSymbol extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 24, color: color),
+          // #2903 — shrink-to-fit so the cue label never overflows its
+          // (now Expanded) cell at a large text scale / narrow pane.
           Text(
             label,
             style: TextStyle(fontSize: 10, color: color),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
         ],
       ),
