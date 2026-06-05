@@ -1,18 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/logging/error_logger.dart';
-import '../../features/route_search/providers/route_search_provider.dart';
-import '../../features/search/presentation/screens/search_criteria_screen.dart';
-import '../../features/search/providers/search_provider.dart';
-import '../routes/shell_branches.dart';
 import 'notched_bar_border.dart';
 import 'search_fab_action_provider.dart';
+import 'search_fab_tap.dart';
 import 'shell_nav_item.dart';
 
 /// Compact-screen bottom navigation bar (#1874).
@@ -260,92 +254,20 @@ class ShellBottomBar extends ConsumerWidget {
     // (or stale) action no longer swallows the tap — see [onTapHandler].
     final actionEnabled = action?.enabled ?? true;
 
-    // #2131 — push the criteria modal onto the **Search branch's**
-    // nested Navigator (via [searchBranchNavigatorKey]) instead of the
-    // root one. The root push covered the shell + bottom bar, hiding
-    // the FAB mid-flow; the branch push keeps the shell visible.
-    // Switching to the Search branch first ensures the criteria
-    // modal appears on the currently-displayed branch.
-    void openCriteriaOnSearchBranch() {
-      if (i != currentIndex) onTap(i);
-      final searchNav = searchBranchNavigatorKey.currentState;
-      if (searchNav == null) {
-        // #2811 — branch nav unmounted (early frame / unwired test). Do NOT
-        // root-push here: from the bar's context `Navigator.of(context)` is the
-        // ROOT navigator, and a fullscreen route there covers the whole shell —
-        // bar included — stranding it until restart if orphaned. Degrade to a
-        // branch jump, and trace it (a missing nav on a user tap is abnormal).
-        unawaited(errorLogger.log(
-          ErrorLayer.ui,
-          'search branch navigator not mounted on FAB tap — degraded to '
-              'branch jump (no root push)',
-          StackTrace.current,
-          context: {'source': 'openCriteriaOnSearchBranch', 'branch': i},
-        ));
-        onTap(i);
-        return;
-      }
-      // #2810 — refuse to stack a duplicate criteria modal: the FAB stays
-      // visible while it is open (branch-push keeps the shell mounted), so a
-      // repeat tap would push a second copy ("search just re-opens the same
-      // form again and again"). Bail if it is already current.
-      if (searchCriteriaRouteIsCurrent(searchNav)) {
-        unawaited(errorLogger.log(
-          ErrorLayer.ui,
-          'search criteria re-open suppressed (already current)',
-          StackTrace.current,
-          context: {'source': 'openCriteriaOnSearchBranch', 'branch': i},
-        ));
-        return;
-      }
-      searchNav.push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => const SearchCriteriaScreen(),
-          fullscreenDialog: true,
-          settings: const RouteSettings(name: kSearchCriteriaRouteName),
-        ),
-      );
-    }
-
-    void defaultOnTap() {
-      // Defensive read: in widget tests without the search-state
-      // providers wired, the reads can throw; fall back to the
-      // historical branch-switch so existing tests keep passing
-      // and so the FAB never deadlocks on an unwired provider.
-      bool hasResults;
-      try {
-        final hasFuelResults = ref.read(searchStateProvider).when(
-              data: (r) => r.data.isNotEmpty,
-              loading: () => false,
-              error: (_, _) => false,
-            );
-        final hasRouteResults = ref.read(routeSearchStateProvider).when(
-              data: (r) => r != null,
-              loading: () => false,
-              error: (_, _) => false,
-            );
-        hasResults = hasFuelResults || hasRouteResults;
-      } catch (_) {
-        onTap(i);
-        return;
-      }
-      final onSearchBranch = i == currentIndex;
-      if (onSearchBranch || !hasResults) {
-        // Open criteria modal — refine (on Search) or start (no results).
-        openCriteriaOnSearchBranch();
-      } else {
-        // Other tab, results exist → switch to Search branch.
-        onTap(i);
-      }
-    }
-
     // #2553 — a registered-but-DISABLED (or stale) action must never
     // produce a dead `() {}` no-op. Only an enabled action overrides the
     // tap; anything else (null OR disabled OR stale) FALLS BACK to the
-    // default branch behaviour. Worst case the FAB opens criteria / jumps
-    // to Search — it can never become a permanent dead hit-target.
-    final onTapHandler =
-        (action != null && actionEnabled) ? action.onTap : defaultOnTap;
+    // default branch behaviour (#2113 three-branch matrix, implemented in
+    // search_fab_tap.dart). Worst case the FAB opens criteria / jumps to
+    // Search — it can never become a permanent dead hit-target.
+    final onTapHandler = (action != null && actionEnabled)
+        ? action.onTap
+        : () => handleSearchFabDefaultTap(
+              ref: ref,
+              slot: i,
+              currentIndex: currentIndex,
+              onTap: onTap,
+            );
 
     // #2131 — surface + icon both dim when the registered action is
     // disabled, mirroring Material's standard disabled-button look.

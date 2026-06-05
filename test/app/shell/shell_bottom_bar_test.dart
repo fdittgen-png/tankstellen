@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/app/routes/shell_branches.dart';
 import 'package:tankstellen/app/shell/notched_bar_border.dart';
 import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
 import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
 import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_criteria_screen.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
@@ -287,6 +289,58 @@ void main() {
       expect(find.byType(SearchCriteriaScreen), findsNothing,
           reason: '#2811 — must NOT root-push a fullscreen route over the '
               'shell when the branch nav is unmounted');
+    });
+
+    testWidgets(
+        're-tapping the FAB while criteria is current records a breadcrumb, '
+        'not a UI ERROR trace, and pushes no duplicate (#2810 + #2874)',
+        (tester) async {
+      // Mount the search-branch navigator the bar reaches via the global key,
+      // with the criteria route already current → the #2810 guard fires.
+      final taps = <int>[];
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: Stack(
+              children: [
+                Navigator(
+                  key: searchBranchNavigatorKey,
+                  onGenerateRoute: (_) => MaterialPageRoute<void>(
+                    settings:
+                        const RouteSettings(name: kSearchCriteriaRouteName),
+                    builder: (_) => const Scaffold(body: Text('criteria')),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ShellBottomBar(
+                    items: items,
+                    branchForSlot: const [0, 1, 2],
+                    currentIndex: 1, // Search selected → onSearchBranch path
+                    iconControllers: controllers(3),
+                    isLandscape: false,
+                    onTap: taps.add,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      BreadcrumbCollector.clear();
+      await tester.tap(find.byIcon(Icons.search)); // the centre FAB
+      await tester.pump();
+
+      // #2810 — the guard refuses to stack a second criteria modal: the real
+      // SearchCriteriaScreen is never pushed (it would also need Hive).
+      expect(find.byType(SearchCriteriaScreen), findsNothing);
+      // #2874 — the suppression is a diagnostic breadcrumb, NOT an
+      // ErrorLayer.ui trace that would surface in the user-facing error log.
+      final crumbs = BreadcrumbCollector.snapshot();
+      expect(crumbs, hasLength(1));
+      expect(crumbs.single.action, contains('re-open suppressed'));
     });
   });
 
