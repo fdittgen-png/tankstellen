@@ -5,11 +5,24 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import 'ble_disconnect_classifier.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_read_timeout.dart';
 import 'obd2_transport.dart';
+
+/// #2906 — whether a `channel.open()` failure is a transient worth retrying:
+/// a slow/flaky adapter ([TimeoutException]), a typed recoverable disconnect
+/// (`Obd2AdapterUnresponsive` / `Obd2DisconnectedException` —
+/// [Obd2ConnectionError.isExpectedUserCondition]), or a raw BLE GATT-133 /
+/// "device not connected" the classic/BLE channels surface
+/// ([isBleAdapterDisconnect]). A genuine fault (permission denied, protocol
+/// init) is NOT retried — it rethrows so the caller surfaces it.
+bool _isRecoverableOpenFailure(Object e) =>
+    e is TimeoutException ||
+    (e is Obd2ConnectionError && e.isExpectedUserCondition) ||
+    isBleAdapterDisconnect(e);
 
 /// [Obd2Transport] that moves bytes over a generic [ElmByteChannel]
 /// (#716 step 1).
@@ -89,7 +102,32 @@ class BluetoothObd2Transport implements Obd2Transport {
     // unblocks instead of hanging forever.
     _failPending(StateError('Transport reconnecting'));
     _buffer.clear();
-    await _channel.open();
+    // #2906 — the channel open is the #1 fragility point: a transient BLE
+    // GATT-133 / Classic rfcomm-open-fail used to abort the whole connect with
+    // ZERO retry (the existing _withConnectRetry only wraps the ELM send
+    // handshake, AFTER the channel is already open). Bounded retry + backoff,
+    // with a best-effort teardown between attempts so a half-open GATT/socket
+    // is cleared before the next try (the stale-client → repeat-133 trap).
+    const maxOpenAttempts = 3;
+    for (var attempt = 1; ; attempt++) {
+      try {
+        await _channel.open();
+        break;
+      } catch (e, st) {
+        if (attempt >= maxOpenAttempts || !_isRecoverableOpenFailure(e)) {
+          rethrow;
+        }
+        debugPrint('BluetoothObd2Transport: channel.open attempt $attempt/'
+            '$maxOpenAttempts failed ($e), tearing down + retrying after '
+            'backoff\n$st');
+        try {
+          await _channel.close();
+        } catch (_) {
+          // best-effort teardown of a half-open link before retrying
+        }
+        await Future<void>.delayed(Duration(milliseconds: 150 * attempt));
+      }
+    }
     _subscription = _channel.incoming.listen(
       _onBytes,
       onError: (e, st) {

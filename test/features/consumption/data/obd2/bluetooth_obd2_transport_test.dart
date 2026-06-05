@@ -23,6 +23,42 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 void main() {
   group('BluetoothObd2Transport (#716)', () {
     test(
+        '#2906 connect RETRIES a transient channel.open() failure '
+        '(GATT-133 / rfcomm-open-fail) with teardown between attempts',
+        () async {
+      final channel = _ScriptedChannel();
+      // First two open() attempts throw a typed recoverable disconnect, the
+      // third succeeds — exactly the stale-GATT/rfcomm transient that used to
+      // abort the whole connect with no retry.
+      channel.scriptOpenFailures(2, const Obd2AdapterUnresponsive());
+
+      final transport = BluetoothObd2Transport(channel);
+      await transport.connect();
+
+      expect(transport.isConnected, isTrue,
+          reason: 'connect must succeed after retrying the transient open');
+      expect(channel.openAttempts, 3,
+          reason: 'two failures + one success = three open() attempts');
+      expect(channel.closeCalls, 2,
+          reason: 'a teardown runs between each failed attempt to clear the '
+              'half-open GATT/socket');
+    });
+
+    test(
+        '#2906 connect does NOT retry a genuine (non-transient) open() '
+        'failure — it rethrows after one attempt', () async {
+      final channel = _ScriptedChannel();
+      // A permission denial is a real fault, not a flaky link → no retry.
+      channel.scriptOpenFailures(99, const Obd2PermissionDenied());
+
+      final transport = BluetoothObd2Transport(channel);
+
+      await expectLater(transport.connect(), throwsA(isA<Obd2PermissionDenied>()));
+      expect(channel.openAttempts, 1, reason: 'genuine fault is not retried');
+      expect(transport.isConnected, isFalse);
+    });
+
+    test(
         'connect opens the channel and leaves isConnected=true WITHOUT '
         'sending the ELM init (init is the service\'s job now, #2233)',
         () async {
@@ -358,6 +394,17 @@ class _ScriptedChannel implements ElmByteChannel {
   final List<List<int>> _writes = [];
   bool _open = false;
 
+  // #2906 — make the first N open() calls throw a transient, then succeed.
+  int _openFailuresRemaining = 0;
+  Object _openFailure = StateError('open failed');
+  int openAttempts = 0;
+  int closeCalls = 0;
+
+  void scriptOpenFailures(int count, Object error) {
+    _openFailuresRemaining = count;
+    _openFailure = error;
+  }
+
   void scriptResponse(String command, String reply) {
     _chunksByCommand[command] = [reply.codeUnits];
   }
@@ -384,10 +431,20 @@ class _ScriptedChannel implements ElmByteChannel {
       _writes.map((w) => String.fromCharCodes(w)).toList();
 
   @override
-  Future<void> open() async => _open = true;
+  Future<void> open() async {
+    openAttempts++;
+    if (_openFailuresRemaining > 0) {
+      _openFailuresRemaining--;
+      throw _openFailure;
+    }
+    _open = true;
+  }
 
   @override
-  Future<void> close() async => _open = false;
+  Future<void> close() async {
+    closeCalls++;
+    _open = false;
+  }
 
   @override
   bool get isOpen => _open;
