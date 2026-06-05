@@ -145,6 +145,17 @@ class TripSummary {
   /// UI row is an explicit follow-up. Defaults `0` for OBD2 / legacy trips.
   final int sharpCornerCount;
 
+  /// Whether the phone's inertial sensor actually ran for this trip (#2895).
+  /// `true` only for a dongle-less recording whose accelerometer/gyroscope
+  /// produced samples. It is what distinguishes a genuine IMU zero ("you
+  /// drove smoothly") from "no IMU signal" — when `true`, the driving score
+  /// PREFERS the IMU hard-accel/brake counts (even when they are 0), so a
+  /// noisy GPS speed-derivative over-count is VETOED by the accurate inertial
+  /// reading. Defaults `false`: OBD2 trips, every legacy trip, and dongle-less
+  /// trips on a device without an IMU all carry no inertial signal, so the
+  /// score falls back to the (clamped) GPS-derived counts.
+  final bool imuActive;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -167,6 +178,7 @@ class TripSummary {
     this.imuHardAccelCount = 0,
     this.imuHardBrakeCount = 0,
     this.sharpCornerCount = 0,
+    this.imuActive = false,
   });
 
   /// IMU hard-accel episodes per km (#2760). Derived, not stored — the raw
@@ -212,6 +224,7 @@ class TripSummary {
     int? imuHardAccelCount,
     int? imuHardBrakeCount,
     int? sharpCornerCount,
+    bool? imuActive,
   }) =>
       TripSummary(
         distanceKm: distanceKm ?? this.distanceKm,
@@ -237,6 +250,7 @@ class TripSummary {
         imuHardAccelCount: imuHardAccelCount ?? this.imuHardAccelCount,
         imuHardBrakeCount: imuHardBrakeCount ?? this.imuHardBrakeCount,
         sharpCornerCount: sharpCornerCount ?? this.sharpCornerCount,
+        imuActive: imuActive ?? this.imuActive,
       );
 }
 

@@ -142,16 +142,20 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // into the canonical score so the over-rev/shift family includes it
     // (the calculator can't recompute gear inference from samples alone).
     //
-    // #2794 — for a GPS-only trip, score against the pipeline's RESOLVED harsh
-    // counts (IMU-preferred when the inertial sensor was the better dongle-less
-    // signal) instead of re-deriving from the noisy GPS speed derivative, so
-    // the displayed score matches the figure the recorder intended.
-    final gpsOnly = summary.kind == TripKind.gpsOnly;
+    // #2794 / #2895 — when the phone IMU actually RAN for this trip, score
+    // against the pipeline's RESOLVED harsh counts (the accurate inertial
+    // figures, persisted on the summary) instead of re-deriving from the noisy
+    // GPS speed derivative. This is keyed off `imuActive`, not the trip kind:
+    // a gpsPlusObd2 trip that started dongle-less still has the inertial counts,
+    // and a genuine IMU zero must VETO a GPS over-count (the #2895 16-vs-0 bug).
+    // When no IMU ran, the (now physically-clamped, #2895) GPS-derived counts
+    // remain the source.
+    final useImu = summary.imuActive;
     return computeDrivingScore(
       tripSamples,
       secondsBelowOptimalGear: summary.secondsBelowOptimalGear,
-      hardAccelEventsOverride: gpsOnly ? summary.harshAccelerations : null,
-      hardBrakeEventsOverride: gpsOnly ? summary.harshBrakes : null,
+      hardAccelEventsOverride: useImu ? summary.harshAccelerations : null,
+      hardBrakeEventsOverride: useImu ? summary.harshBrakes : null,
     );
   }
 

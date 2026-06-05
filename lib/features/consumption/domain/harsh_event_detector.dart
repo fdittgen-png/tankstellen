@@ -221,6 +221,23 @@ class HarshEventDetector {
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
     final accelMps2 = ((speed - anchorSpeed) / 3.6) / dt;
 
+    // Physical-plausibility clamp (#2895): a speed-derivative beyond what a
+    // real car can produce (forward > ~0.61 g, braking > ~1.12 g) is GPS
+    // speed noise, not a manoeuvre — break the anchor + running episode so it
+    // never counts. Mirrors `countAccelEvents` so the recorder's
+    // harshAccelerations agrees with the gate the score / insights use.
+    if (accelMps2 >= kMaxPlausibleAccelMps2 ||
+        accelMps2 <= -kMaxPlausibleBrakeMps2) {
+      _anchorAt = null;
+      _anchorSpeedKmh = null;
+      _speedWindow.clear();
+      _inAccelEpisode = false;
+      _inBrakeEpisode = false;
+      _accelBelowSec = 0;
+      _brakeBelowSec = 0;
+      return;
+    }
+
     // Episode semantics (#2667 + #2846): record at most once on entry into
     // a sustained harsh stretch, and re-arm only once the derivative has
     // stayed below the threshold for a continuous [refractorySec] window —

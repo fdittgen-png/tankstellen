@@ -188,6 +188,68 @@ void main() {
 
       await harness.pipeline.stop();
     });
+
+    test('#2895 IMU ZERO VETO: the inertial sensor ran and saw NO hard events '
+        'while a noisy GPS speed jump would manufacture one — the persisted '
+        'summary marks imuActive AND zeroes harshAccelerations so the score '
+        'reflects the accurate inertial zero, not the GPS over-count',
+        () async {
+      // The IMU emits CALM samples (~0 m/s² horizontal) — a smooth driver — so
+      // the detector confirms zero hard accels but IS active (it ran).
+      final calm = <ImuSample>[
+        for (var i = 0; i < 40; i++)
+          ImuSample(
+            t: DateTime(2026, 6, 5, 9).add(Duration(milliseconds: i * 50)),
+            axMps2: 0.2,
+            ayMps2: 0.1,
+            azMps2: 0,
+            gyroZRadPerSec: 0,
+          ),
+      ];
+      final imu = _FakeImuSource(calm);
+      final repo = TripHistoryRepository(box: box);
+      final harness = _Harness(repo: repo, imu: imu);
+      addTearDown(harness.dispose);
+
+      harness.pipeline.start();
+      final t0 = DateTime(2026, 6, 5, 9);
+      // A GPS speed jump the speed-derivative would otherwise read as a hard
+      // accel (18 → 30 m/s over 1 s = +12 m/s² ≈ 1.2 g — exactly the kind of
+      // impossible spike #2895 over-counted). With the clamp this no longer
+      // counts anyway, and the IMU-active zero is the authoritative figure.
+      harness.geo.emit(_pos(43.4, 3.5, speedMps: 18.0, at: t0));
+      await _pump();
+      harness.imu.emitBurst(0, 20);
+      await _pump();
+      harness.geo.emit(_pos(43.41, 3.51,
+          speedMps: 30.0, at: t0.add(const Duration(seconds: 1))));
+      await _pump();
+      harness.imu.emitBurst(20);
+      await _pump();
+      // A couple more calm fixes so the trip has plausible distance/duration.
+      harness.geo.emit(_pos(43.42, 3.52,
+          speedMps: 28.0, at: t0.add(const Duration(seconds: 2))));
+      await _pump();
+
+      await harness.pipeline.stop();
+
+      final entries = repo.loadAll();
+      expect(entries, hasLength(1));
+      final summary = entries.single.summary;
+      expect(summary.imuActive, isTrue,
+          reason: 'the sensor ran, so its zero is authoritative');
+      expect(summary.imuHardAccelCount, 0);
+      expect(summary.harshAccelerations, 0,
+          reason: 'the IMU zero is preferred over the noisy GPS count');
+      expect(summary.harshBrakes, 0);
+
+      // And it round-trips through the on-disk JSON (the display recompute
+      // reads imuActive from there).
+      final raw = box.get(entries.single.id)!;
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final summaryJson = decoded['summary'] as Map<String, dynamic>;
+      expect(summaryJson['ima'], true, reason: 'imuActive persisted (key ima)');
+    });
   });
 }
 

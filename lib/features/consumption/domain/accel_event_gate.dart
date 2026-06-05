@@ -74,6 +74,29 @@ const double kAccelEventMinSustainedSec = 1.0;
 /// phantom events; genuine harsh manoeuvres happen above a walking pace.
 const double kAccelEventMinSpeedKmh = 5.0;
 
+/// Upper physically-plausible longitudinal acceleration (m/s²) for the
+/// GPS-speed-derivative path (#2895). ~0.9 g. A real car's traction- and
+/// power-limited forward acceleration tops out around 0.5 g for an economy
+/// car and up to ~0.8 g for a quick one; a genuine "hard launch" the score
+/// already penalises sits near 0.7 g (0 → 50 km/h in 2 s ≈ 0.71 g). Set the
+/// ceiling at 0.9 g so EVERY realistic hard acceleration still counts, while
+/// a derivative beyond it is GPS speed noise differentiated into an
+/// impossible spike (the #2895 export logged maxAccelG 1.086 ≈ 10.65 m/s²
+/// ≈ 1.09 g — impossible for a 68 hp Peugeot 107). An interval above this
+/// ceiling is treated like a bad fix: it BREAKS the running episode rather
+/// than counting, so noise can't manufacture a hard-accel event ("a noise
+/// spike is worse than no reading").
+const double kMaxPlausibleAccelMps2 = 8.83;
+
+/// Upper physically-plausible deceleration (m/s², positive) for the
+/// GPS-speed-derivative path (#2895). ~1.12 g — looser than the accel
+/// ceiling because emergency braking on dry asphalt legitimately reaches
+/// ~1.0 g, so we must not clip a genuine hard stop; but a derivative beyond
+/// ~1.1 g is GPS noise (street tyres can't decelerate harder). An interval
+/// past this ceiling breaks the running brake episode, mirroring the accel
+/// clamp above.
+const double kMaxPlausibleBrakeMps2 = 11.0;
+
 /// Refractory window (seconds): after a hard-accel / hard-brake event
 /// fires, the derivative must stay BELOW the threshold for at least this
 /// long continuously before another same-type event can fire (#2846).
@@ -227,6 +250,18 @@ AccelEventCounts countAccelEvents(
 
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
     final accelMps2 = ((cur.speedKmh - prev.speedKmh) / 3.6) / dt;
+
+    // Physical-plausibility clamp (#2895). A speed-derivative beyond what a
+    // real car can produce (forward > ~0.61 g, braking > ~1.12 g) is GPS
+    // speed noise, not a manoeuvre — a 68 hp economy car cannot do the
+    // 1.086 g the bug logged. Break the running episode rather than count it,
+    // so noise can't fabricate a hard-accel/brake event. Asymmetric ceilings
+    // because braking legitimately reaches ~1 g where acceleration does not.
+    if (accelMps2 >= kMaxPlausibleAccelMps2 ||
+        accelMps2 <= -kMaxPlausibleBrakeMps2) {
+      breakEpisodes();
+      continue;
+    }
 
     if (accelMps2 >= kHardAccelThresholdMps2) {
       accelDur += dt;
