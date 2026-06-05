@@ -142,10 +142,13 @@ Future<Obd2Service?> _connectByMacPassive(
       logFailureAsError: false, // #2379 — recoverable (scanner re-arms)
     );
   } on Object catch (e, st) {
-    // #2379 — OBD2/BLE, not local storage.
-    unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-      'where': 'Obd2ConnectionService.connectByMacPassive failed',
-    }));
+    // #2892 — the passive autoConnect wait routinely raises the EXPECTED
+    // Obd2AdapterUnresponsive on a parked car (silent bus / out of range);
+    // breadcrumb it instead of an ERROR trace (error-log #22 flood). A
+    // genuine fault still ERROR-logs (#2379 — OBD2/BLE → `other`).
+    recordObd2ConnectTransient(e, st,
+        where: 'Obd2ConnectionService.connectByMacPassive failed',
+        layer: ErrorLayer.other);
     await svc._teardownLastDirectChannel();
     return null;
   }

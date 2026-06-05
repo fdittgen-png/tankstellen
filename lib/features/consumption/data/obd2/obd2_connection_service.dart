@@ -16,6 +16,7 @@ import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_permissions.dart';
+import 'obd2_read_telemetry.dart';
 import 'obd2_service.dart';
 import 'supported_pids_cache.dart';
 import '../../../../core/logging/error_logger.dart';

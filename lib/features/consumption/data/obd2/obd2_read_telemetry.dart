@@ -58,3 +58,56 @@ void recordObd2ReadFailure(
   unawaited(errorLogger.log(ErrorLayer.other, error, stack,
       context: {'where': where}));
 }
+
+/// #2892 — true when [error] is an EXPECTED, user-surfaced *connect* failure
+/// (the data-layer twin of `recordObd2ConnectFailure`'s
+/// [Obd2ConnectionError.isExpectedUserCondition] gate, plus the bare transport
+/// races that connect can raise before a typed error is in flight):
+///
+/// - [Obd2ConnectionError] whose [Obd2ConnectionError.isExpectedUserCondition]
+///   is true — the "adapter off / out of range / ignition off / not bonded"
+///   family ([Obd2AdapterUnresponsive] et al.) the UI already handles;
+/// - [StateError] 'transport closed' / 'not connected' — a channel that was
+///   torn down mid-connect (a parked-car reconnect racing the teardown);
+/// - [TimeoutException] — a bounded direct/scan connect that didn't land.
+///
+/// GENUINE faults — [Obd2PermissionDenied] (needs a settings deep-link),
+/// [Obd2ProtocolInitFailed] (a counterfeit-clone diagnostic), and any other
+/// exception — return false so they stay ERROR traces.
+bool isExpectedObd2ConnectTransient(Object error) {
+  if (error is Obd2ConnectionError) return error.isExpectedUserCondition;
+  if (error is TimeoutException) return true;
+  if (error is StateError) {
+    final m = error.message.toLowerCase();
+    return m.contains('transport closed') || m.contains('not connected');
+  }
+  return false;
+}
+
+/// #2892 — route an OBD2 *connect* failure to the right telemetry level, the
+/// connect-path twin of [recordObd2ReadFailure] / `recordObd2ConnectFailure`.
+///
+/// Error-log #22 showed an EXPECTED [Obd2AdapterUnresponsive] ("turn the
+/// ignition on and retry") spooled 20× as ERROR traces from the in-trip
+/// reconnect storm (`ReconnectConnector` retries on a parked car). An expected
+/// connect transient ([isExpectedObd2ConnectTransient]) records a diagnostic
+/// breadcrumb instead; a GENUINE fault still `errorLogger.log`s at the given
+/// [layer] (defaults to [ErrorLayer.storage], the reconnect-path layer) so it
+/// stays visible. Lives in the data layer (alongside [recordObd2ReadFailure])
+/// so the reconnect connector + connection service use it without a
+/// presentation→data inversion.
+void recordObd2ConnectTransient(
+  Object error,
+  StackTrace stack, {
+  required String where,
+  ErrorLayer layer = ErrorLayer.storage,
+}) {
+  if (isExpectedObd2ConnectTransient(error)) {
+    BreadcrumbCollector.add(
+      'OBD2 connect failed — expected transient',
+      detail: '$where: ${error.runtimeType}',
+    );
+    return;
+  }
+  unawaited(errorLogger.log(layer, error, stack, context: {'where': where}));
+}
