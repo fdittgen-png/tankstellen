@@ -4,8 +4,10 @@
 import 'dart:async';
 
 import 'adapter_registry.dart';
+import 'obd2_comm_diagnostics.dart';
 import 'obd2_connection_service.dart';
 import 'obd2_read_telemetry.dart';
+import 'obd2_reconnect_telemetry.dart';
 import 'obd2_service.dart';
 import 'reconnect_rssi_gate.dart';
 
@@ -44,6 +46,14 @@ class ReconnectConnector {
   /// behaviour unchanged.
   final String? transportHint;
 
+  /// #2905 — reads the scanner's current attempt ordinal + backoff so each
+  /// recorded per-attempt telemetry row is correctly placed in the episode
+  /// timeline. Null in unit contexts with no scanner wired (the rows then
+  /// carry ordinal/backoff 0, still useful for the path/reason/rssi).
+  /// Wired by `buildReconnectScannerFactory` after the scanner is built.
+  int Function()? attemptNumber;
+  int Function()? backoffMs;
+
   ResolvedObd2Candidate? _lastCandidate;
   int? _lastSuccessfulRssi;
   var _consecutiveBatchesSeen = 0;
@@ -52,7 +62,34 @@ class ReconnectConnector {
     required this.connection,
     required this.onConnected,
     this.transportHint,
+    this.attemptNumber,
+    this.backoffMs,
   });
+
+  /// #2905 — record one per-attempt reconnect-telemetry row (gated; a no-op
+  /// unless `Feature.debugMode` armed the collector). [path] is
+  /// `'direct'`/`'scan'`/`'passive'`; [reasonCode] is null on success and a
+  /// [classifyReconnectReason] tag otherwise; [rssi] is set on the scan
+  /// path only.
+  void _recordAttempt({
+    required bool succeeded,
+    required String path,
+    String? reasonCode,
+    int? rssi,
+    int latencyMs = 0,
+  }) {
+    final diag = Obd2CommDiagnostics.instance;
+    if (!diag.enabled) return;
+    diag.noteReconnectAttempt(
+      attemptNumber: attemptNumber?.call() ?? 0,
+      backoffMs: backoffMs?.call() ?? 0,
+      succeeded: succeeded,
+      reasonCode: reasonCode,
+      rssi: rssi,
+      latencyMs: latencyMs,
+      path: path,
+    );
+  }
 
   /// `true` when the live link that dropped was Bluetooth Classic AND a
   /// Classic facade is wired (#2565). Drives the transport-correct reconnect
@@ -78,6 +115,7 @@ class ReconnectConnector {
     //    `channelForDirect` path can only ever 4 s-timeout for a Classic
     //    adapter (no `channelForDirect` on the Classic facade), so dispatching
     //    by transport is what de-flaps SPP adapters.
+    final directSw = Stopwatch()..start();
     try {
       final direct = _isClassicDrop
           ? await connection.connectByMacClassicDirect(mac)
@@ -86,10 +124,32 @@ class ReconnectConnector {
         // A direct connect carries no RSSI (it never scanned), so the
         // relative-RSSI baseline is left as-is — it is only ever set
         // from a scan-path candidate, which has a real RSSI reading.
+        _recordAttempt(
+          succeeded: true,
+          path: 'direct',
+          latencyMs: directSw.elapsedMilliseconds,
+        );
         onConnected(direct);
         return true;
       }
+      // #2905 — a clean null (no throw) is a connect that didn't land:
+      // the adapter wasn't reachable on the direct path this cycle.
+      _recordAttempt(
+        succeeded: false,
+        path: 'direct',
+        reasonCode: Obd2ReconnectReason.deviceNotConnected.code,
+        latencyMs: directSw.elapsedMilliseconds,
+      );
     } catch (e, st) {
+      // #2905 — forward the reconnect-PATH failure reason (normalised) into
+      // the per-attempt telemetry. The init-path channels only ever recorded
+      // init reasons; this is the missing reconnect-path reason.
+      _recordAttempt(
+        succeeded: false,
+        path: 'direct',
+        reasonCode: classifyReconnectReason(e),
+        latencyMs: directSw.elapsedMilliseconds,
+      );
       // #2892 — an EXPECTED, user-surfaced connect condition (the bus is
       // silent / the dongle is out of range on a parked car) is a breadcrumb,
       // not an ERROR trace: this attempt repeats on the scanner's backoff
@@ -132,10 +192,32 @@ class ReconnectConnector {
           // a later batch may strengthen or repeat it.
           continue;
         }
-        final svc = await connection.connect(candidate);
-        _lastSuccessfulRssi = candidate.candidate.rssi;
-        onConnected(svc);
-        return true;
+        final scanSw = Stopwatch()..start();
+        try {
+          final svc = await connection.connect(candidate);
+          _lastSuccessfulRssi = candidate.candidate.rssi;
+          _recordAttempt(
+            succeeded: true,
+            path: 'scan',
+            rssi: candidate.candidate.rssi,
+            latencyMs: scanSw.elapsedMilliseconds,
+          );
+          onConnected(svc);
+          return true;
+          // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
+        } catch (e) {
+          // #2905 — record the per-candidate scan-connect failure (with its
+          // sighting RSSI + normalised reason) then rethrow to the outer
+          // de-noise handler, which keeps the existing breadcrumb behaviour.
+          _recordAttempt(
+            succeeded: false,
+            path: 'scan',
+            reasonCode: classifyReconnectReason(e),
+            rssi: candidate.candidate.rssi,
+            latencyMs: scanSw.elapsedMilliseconds,
+          );
+          rethrow;
+        }
       }
     } catch (e, st) {
       // #2892 — same de-noise: a scan-path `connect(candidate)` that throws
@@ -160,15 +242,33 @@ class ReconnectConnector {
   /// `connectByMacClassicDirect` retry — same paced cadence the scanner
   /// drives, but over the transport that can actually reconnect.
   Future<bool> attemptPassive(String mac) async {
+    final passiveSw = Stopwatch()..start();
     try {
       final svc = _isClassicDrop
           ? await connection.connectByMacClassicDirect(mac)
           : await connection.connectByMacPassive(mac);
       if (svc != null) {
+        _recordAttempt(
+          succeeded: true,
+          path: 'passive',
+          latencyMs: passiveSw.elapsedMilliseconds,
+        );
         onConnected(svc);
         return true;
       }
+      _recordAttempt(
+        succeeded: false,
+        path: 'passive',
+        reasonCode: Obd2ReconnectReason.deviceNotConnected.code,
+        latencyMs: passiveSw.elapsedMilliseconds,
+      );
     } catch (e, st) {
+      _recordAttempt(
+        succeeded: false,
+        path: 'passive',
+        reasonCode: classifyReconnectReason(e),
+        latencyMs: passiveSw.elapsedMilliseconds,
+      );
       // #2892 — same de-noise: the paced passive/Classic retry on a parked
       // car routinely raises the EXPECTED user condition; breadcrumb it.
       recordObd2ConnectTransient(e, st,

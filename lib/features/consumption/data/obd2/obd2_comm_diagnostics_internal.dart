@@ -18,6 +18,105 @@ String? redactObd2Mac(String? mac) {
   return '${'·' * (mac.length - 4)}$visible';
 }
 
+/// Reconnect-telemetry record API (#2905) — split into this part so the
+/// collector file stays under the 400-line cap. The methods are gated
+/// (`if (!enabled) return;` first) exactly like the rest of the collector,
+/// so production (developer mode off) pays one cached-bool read per call.
+extension Obd2ReconnectTelemetryRecording on Obd2CommDiagnostics {
+  /// Record one per-reconnect ATTEMPT into the bounded timeline.
+  ///
+  /// The aggregate [noteConnectionEvent] tally (`fr`/`sr`/`vr`) can't say
+  /// WHEN a reconnect was tried, with what backoff, at what RSSI, or why a
+  /// given try failed — this can. Called once per try by the scanner /
+  /// reconnect connector. [reasonCode] is forced null on [succeeded] and a
+  /// normalised [classifyReconnectReason] tag otherwise. FIFO-capped at
+  /// [Obd2SessionDiagnostic.maxReconnectAttempts]; oldest dropped first.
+  /// No-op when disabled.
+  void noteReconnectAttempt({
+    required int attemptNumber,
+    required bool succeeded,
+    String? reasonCode,
+    int backoffMs = 0,
+    int? rssi,
+    int latencyMs = 0,
+    String? path,
+    DateTime? at,
+  }) {
+    if (!enabled) return;
+    final cur = _current;
+    if (cur == null) return;
+    cur.reconnectAttempts.add(
+      Obd2ReconnectAttempt(
+        timestampMs: (at ?? _clock()).millisecondsSinceEpoch,
+        attemptNumber: attemptNumber,
+        succeeded: succeeded,
+        reasonCode: succeeded ? null : reasonCode,
+        backoffMs: backoffMs,
+        rssi: rssi,
+        latencyMs: latencyMs,
+        path: path,
+      ),
+    );
+    if (cur.reconnectAttempts.length >
+        Obd2SessionDiagnostic.maxReconnectAttempts) {
+      cur.reconnectAttempts.removeAt(0);
+    }
+  }
+
+  /// Record one session-state TRANSITION marker:
+  /// connected→dropped→reconnecting→reconnected/orphaned, plus the
+  /// `disconnectedException` + `fallbackActivated` markers. [detail] carries
+  /// the low-cardinality drop reason / fallback kind. FIFO-capped at
+  /// [Obd2SessionDiagnostic.maxTransitions]. No-op when disabled.
+  void noteSessionTransition(
+    Obd2SessionState state, {
+    String? detail,
+    DateTime? at,
+  }) {
+    if (!enabled) return;
+    final cur = _current;
+    if (cur == null) return;
+    cur.transitions.add(
+      Obd2SessionTransition(
+        timestampMs: (at ?? _clock()).millisecondsSinceEpoch,
+        state: state.name,
+        detail: detail,
+      ),
+    );
+    if (cur.transitions.length > Obd2SessionDiagnostic.maxTransitions) {
+      cur.transitions.removeAt(0);
+    }
+  }
+
+  /// Note that an `Obd2DisconnectedException` was raised on the byte stream
+  /// — the typed-drop marker the trajet export previously omitted. Also
+  /// records a [Obd2SessionState.disconnectedException] transition. No-op
+  /// when disabled.
+  void noteDisconnectException({DateTime? at}) {
+    if (!enabled) return;
+    final cur = _current;
+    if (cur == null) return;
+    cur.disconnectExceptions++;
+    noteSessionTransition(Obd2SessionState.disconnectedException, at: at);
+  }
+
+  /// Stamp the GPS-only-fallback-activation wall clock — the OBD2 link
+  /// dropped but GPS is alive, so the trip kept recording GPS-only. Records
+  /// the timestamp ONCE (first activation wins) plus a
+  /// [Obd2SessionState.fallbackActivated] transition. No-op when disabled.
+  void noteFallbackActivated({String? detail, DateTime? at}) {
+    if (!enabled) return;
+    final cur = _current;
+    if (cur == null) return;
+    cur.fallbackActivatedAtMs ??= (at ?? _clock()).millisecondsSinceEpoch;
+    noteSessionTransition(
+      Obd2SessionState.fallbackActivated,
+      detail: detail,
+      at: at,
+    );
+  }
+}
+
 /// Mutable live-session accumulator. Converted to the immutable
 /// [Obd2SessionDiagnostic] on `snapshot()`/`endSession()`.
 class _LiveSession {
@@ -47,6 +146,15 @@ class _LiveSession {
   int visibleReconnects = 0;
   final _LatencyReservoir timeToConnect = _LatencyReservoir();
   final _LatencyReservoir timeToReconnect = _LatencyReservoir();
+
+  // Reconnect telemetry (#2905): bounded per-attempt + transition timelines
+  // plus the typed-drop count + the GPS-fallback-activation marker. Each
+  // list is FIFO-capped so a long out-of-range drive can't grow them
+  // unboundedly — the most recent rows are the diagnostic value.
+  final List<Obd2ReconnectAttempt> reconnectAttempts = <Obd2ReconnectAttempt>[];
+  final List<Obd2SessionTransition> transitions = <Obd2SessionTransition>[];
+  int disconnectExceptions = 0;
+  int? fallbackActivatedAtMs;
 
   int partialFrames = 0;
   int leftoverBytes = 0;
@@ -98,6 +206,10 @@ class _LiveSession {
           timeToReconnectP50Ms: timeToReconnect.percentileOrNull(50),
           timeToReconnectP95Ms: timeToReconnect.percentileOrNull(95),
         ),
+        reconnectAttempts: List.unmodifiable(reconnectAttempts),
+        transitions: List.unmodifiable(transitions),
+        disconnectExceptions: disconnectExceptions,
+        fallbackActivatedAtMs: fallbackActivatedAtMs,
         scheduler: Obd2SchedulerStats(
           tickRateHz: tickRateHz,
           backpressureSkips: backpressureSkips,

@@ -6103,6 +6103,28 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2DiagnosticsPidSection => 'Rezultati po PID';
 
   @override
+  String get obd2DiagnosticsReconnectSection => 'Reconnect telemetry';
+
+  @override
+  String obd2DiagnosticsReconnectAttemptsLine(
+    int attempts,
+    int successes,
+    int transitions,
+    int disconnects,
+  ) {
+    return '$attempts reconnect attempts · $successes ok · $transitions transitions · $disconnects typed drops';
+  }
+
+  @override
+  String obd2DiagnosticsReconnectReasonLine(String reason, int count) {
+    return '$reason: $count';
+  }
+
+  @override
+  String get obd2DiagnosticsFallbackLine =>
+      'GPS-only fallback activated this session.';
+
+  @override
   String get obd2DiagnosticsSchedulerSection => 'Zdravje razporejanja';
 
   @override

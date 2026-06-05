@@ -69,7 +69,13 @@ bool _hasSignal(Obd2SessionDiagnostic s) =>
     s.connection.attempts > 0 ||
     s.redactedMac != null ||
     s.elmVersion != null ||
-    s.initTranscript.isNotEmpty;
+    s.initTranscript.isNotEmpty ||
+    // #2905 — a reconnect-only / drop-only / fallback-only session is the
+    // field case worth exporting even when no cold connect ever landed.
+    s.reconnectAttempts.isNotEmpty ||
+    s.transitions.isNotEmpty ||
+    s.disconnectExceptions > 0 ||
+    s.fallbackActivatedAtMs != null;
 
 /// Compact JSON map for the session, re-scrubbing the MAC defensively.
 Map<String, Object?> _compact(Obd2SessionDiagnostic session) {

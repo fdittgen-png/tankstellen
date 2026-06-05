@@ -5129,6 +5129,44 @@
   "@obd2DiagnosticsPidSection": {
     "description": "Section header above the per-PID outcome table (polled/ok/no-data/timeout/error counts + p50/p95 round-trip latency + effective-vs-target Hz) on the OBD2 diagnostics card (#2470)."
   },
+  "obd2DiagnosticsReconnectSection": "Reconnect telemetry",
+  "@obd2DiagnosticsReconnectSection": {
+    "description": "Section header above the per-reconnect-attempt + session-state-transition telemetry rows (attempt count, successes, failure-reason tally, typed disconnects, GPS-fallback marker) on the OBD2 diagnostics card (#2905, Epic #2904)."
+  },
+  "obd2DiagnosticsReconnectAttemptsLine": "{attempts} reconnect attempts · {successes} ok · {transitions} transitions · {disconnects} typed drops",
+  "@obd2DiagnosticsReconnectAttemptsLine": {
+    "description": "Reconnect-telemetry summary line on the OBD2 diagnostics card (#2905). attempts is the per-attempt-timeline row count; successes the attempts that re-established a link; transitions the session-state-transition marker count; disconnects the Obd2DisconnectedException (typed drop) count.",
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      },
+      "successes": {
+        "type": "int"
+      },
+      "transitions": {
+        "type": "int"
+      },
+      "disconnects": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsReconnectReasonLine": "{reason}: {count}",
+  "@obd2DiagnosticsReconnectReasonLine": {
+    "description": "One failed-reconnect-attempt reason-tally row on the OBD2 diagnostics card (#2905). reason is the low-cardinality failure tag (rfcomm-open-fail / gatt-133 / device-not-connected / timeout / other), count how many attempts failed for that reason this session.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsFallbackLine": "GPS-only fallback activated this session.",
+  "@obd2DiagnosticsFallbackLine": {
+    "description": "Marker line on the OBD2 diagnostics card (#2905) shown when GPS-only fallback recording was activated during the session — the OBD2 link dropped but GPS kept the trip recording."
+  },
   "obd2DiagnosticsSchedulerSection": "Scheduler health",
   "@obd2DiagnosticsSchedulerSection": {
     "description": "Section header above the scheduler-health rows (achieved tick-rate, back-pressure skips, governor demotions, starvation) on the OBD2 diagnostics card (#2470)."

@@ -4414,5 +4414,47 @@
   "@vehicleMultiFuelCapableHelper": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsReconnectSection": "Reconnect telemetry",
+  "@obd2DiagnosticsReconnectSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsReconnectAttemptsLine": "{attempts} reconnect attempts · {successes} ok · {transitions} transitions · {disconnects} typed drops",
+  "@obd2DiagnosticsReconnectAttemptsLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      },
+      "successes": {
+        "type": "int"
+      },
+      "transitions": {
+        "type": "int"
+      },
+      "disconnects": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsReconnectReasonLine": "{reason}: {count}",
+  "@obd2DiagnosticsReconnectReasonLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2DiagnosticsFallbackLine": "GPS-only fallback activated this session.",
+  "@obd2DiagnosticsFallbackLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

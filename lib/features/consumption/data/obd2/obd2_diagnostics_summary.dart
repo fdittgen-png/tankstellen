@@ -62,6 +62,20 @@ class Obd2DiagnosticsSummary {
   final int fuelSuspicious;
   final int fuelTotal;
 
+  /// #2905 — reconnect-attempt timeline rollup: total attempts recorded,
+  /// how many succeeded, and the failed-attempt reason tally (reason → count)
+  /// sorted by count desc for a stable render order.
+  final int reconnectAttemptCount;
+  final int reconnectSuccessCount;
+  final Map<String, int> reconnectReasonCounts;
+
+  /// #2905 — session-state-transition count + the typed-drop
+  /// (`Obd2DisconnectedException`) count + whether GPS-only fallback
+  /// activated this session.
+  final int transitionCount;
+  final int disconnectExceptions;
+  final bool fallbackActivated;
+
   const Obd2DiagnosticsSummary({
     required this.presentable,
     required this.completenessPercent,
@@ -75,6 +89,12 @@ class Obd2DiagnosticsSummary {
     required this.perTierPercent,
     required this.fuelSuspicious,
     required this.fuelTotal,
+    this.reconnectAttemptCount = 0,
+    this.reconnectSuccessCount = 0,
+    this.reconnectReasonCounts = const <String, int>{},
+    this.transitionCount = 0,
+    this.disconnectExceptions = 0,
+    this.fallbackActivated = false,
   });
 
   /// Stable empty value — the not-presentable sentinel the card renders as
@@ -108,6 +128,17 @@ class Obd2DiagnosticsSummary {
     if (other.unknownCount != unknownCount) return false;
     if (other.fuelSuspicious != fuelSuspicious) return false;
     if (other.fuelTotal != fuelTotal) return false;
+    if (other.reconnectAttemptCount != reconnectAttemptCount) return false;
+    if (other.reconnectSuccessCount != reconnectSuccessCount) return false;
+    if (other.transitionCount != transitionCount) return false;
+    if (other.disconnectExceptions != disconnectExceptions) return false;
+    if (other.fallbackActivated != fallbackActivated) return false;
+    if (other.reconnectReasonCounts.length != reconnectReasonCounts.length) {
+      return false;
+    }
+    for (final entry in reconnectReasonCounts.entries) {
+      if (other.reconnectReasonCounts[entry.key] != entry.value) return false;
+    }
     if (!listEquals(other.pidRows, pidRows)) return false;
     if (other.perTierPercent.length != perTierPercent.length) return false;
     for (final entry in perTierPercent.entries) {
@@ -131,6 +162,16 @@ class Obd2DiagnosticsSummary {
         Object.hashAll(pidRows),
         Object.hashAllUnordered(
           perTierPercent.entries.map((e) => Object.hash(e.key, e.value)),
+        ),
+        Object.hash(
+          reconnectAttemptCount,
+          reconnectSuccessCount,
+          transitionCount,
+          disconnectExceptions,
+          fallbackActivated,
+          Object.hashAllUnordered(
+            reconnectReasonCounts.entries.map((e) => Object.hash(e.key, e.value)),
+          ),
         ),
       );
 }
@@ -171,7 +212,14 @@ Obd2DiagnosticsSummary computeObd2DiagnosticsSummary(
   final hasSignal = session.pidStats.isNotEmpty ||
       session.connection.attempts > 0 ||
       session.redactedMac != null ||
-      session.elmVersion != null;
+      session.elmVersion != null ||
+      // #2905 — a reconnect-only / drop-only session (no successful cold
+      // connect, ran entirely on fallback) is exactly the field case worth
+      // surfacing — it must NOT be the empty sentinel.
+      session.reconnectAttempts.isNotEmpty ||
+      session.transitions.isNotEmpty ||
+      session.disconnectExceptions > 0 ||
+      session.fallbackActivatedAtMs != null;
   if (!hasSignal) return Obd2DiagnosticsSummary.empty;
 
   final completeness = session.completeness;
@@ -215,6 +263,25 @@ Obd2DiagnosticsSummary computeObd2DiagnosticsSummary(
     for (final e in tierEntries) e.key: e.value.round(),
   };
 
+  // #2905 — reconnect-attempt rollup: success count + failed-reason tally,
+  // sorted by count desc then reason for a deterministic render order.
+  final attempts = session.reconnectAttempts;
+  final reconnectSuccesses = attempts.where((a) => a.succeeded).length;
+  final reasonTally = <String, int>{};
+  for (final a in attempts) {
+    final reason = a.reasonCode;
+    if (a.succeeded || reason == null) continue;
+    reasonTally[reason] = (reasonTally[reason] ?? 0) + 1;
+  }
+  final reasonEntries = reasonTally.entries.toList()
+    ..sort((a, b) {
+      final byCount = b.value.compareTo(a.value);
+      return byCount != 0 ? byCount : a.key.compareTo(b.key);
+    });
+  final reasonCounts = <String, int>{
+    for (final e in reasonEntries) e.key: e.value,
+  };
+
   return Obd2DiagnosticsSummary(
     presentable: true,
     completenessPercent: completeness.overallPercent.round(),
@@ -228,5 +295,11 @@ Obd2DiagnosticsSummary computeObd2DiagnosticsSummary(
     perTierPercent: perTier,
     fuelSuspicious: session.fuelDowngrade.suspiciousSamples,
     fuelTotal: session.fuelDowngrade.totalSamples,
+    reconnectAttemptCount: attempts.length,
+    reconnectSuccessCount: reconnectSuccesses,
+    reconnectReasonCounts: reasonCounts,
+    transitionCount: session.transitions.length,
+    disconnectExceptions: session.disconnectExceptions,
+    fallbackActivated: session.fallbackActivatedAtMs != null,
   );
 }
