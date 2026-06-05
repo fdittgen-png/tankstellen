@@ -183,3 +183,13 @@ all 5 locales' metadata within Apple limits. **Now added:** the required
   Primary Category, Pricing & Availability, Content Rights, **EU DSA trader status**.
 - **A build attached + submitted:** promote a TestFlight build (signed IPA) to the
   App Store version, then submit for review.
+- **iOS Share Extension (#2736) — Xcode + Apple signing, optional pre-launch:**
+  the cross-platform Dart receiver + the iOS extension source ship in-repo
+  (`ios/ShareExtension/`, inline `ShareIntentBridge` in `AppDelegate.swift`), but
+  the extension is **not yet wired into `Runner.xcodeproj`** (kept out so the
+  host build stays green). To enable "share a receipt into Sparkilo" on iOS,
+  follow `docs/guides/ios-share-extension.md`: register the extension App ID
+  (`de.tankstellen.tankstellen.ShareExtension`) + App Group under the Apple
+  Developer account, add the target in Xcode, re-provision (fastlane match
+  `--force`). The host app ships fine without it; this is an additive feature,
+  not a launch gate.
