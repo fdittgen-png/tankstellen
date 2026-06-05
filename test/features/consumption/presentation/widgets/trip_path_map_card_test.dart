@@ -286,18 +286,20 @@ void main() {
     testWidgets(
         'hard-acceleration events render bolt markers on top of the heatmap',
         (tester) async {
-      // Two hard-accel events: 0 → 60 km/h in 1 s (≈ 16.67 m/s²) at the
-      // 0 → 1 boundary, and 30 → 80 km/h in 1 s (≈ 13.89 m/s²) at the
-      // 4 → 5 boundary. Both well above the 3.0 m/s² threshold. The
-      // segments between them stay calm so no other event fires.
+      // Two hard-accel events, both PLAUSIBLE (≤ the ~0.9 g physical ceiling
+      // the #2895 clamp enforces, so GPS noise can't fabricate them but a
+      // real hard launch still fires): 0 → 28 km/h in 1 s (≈ 7.78 m/s² ≈
+      // 0.79 g) at the 0 → 1 boundary, and 30 → 58 km/h in 1 s (≈ 7.78 m/s²)
+      // at the 4 → 5 boundary. Both above the 3.0 m/s² threshold, below the
+      // ceiling. The segments between them stay calm so no other event fires.
       final samples = [
         _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 0),
-        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60), // hard accel #1
-        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 60),
-        _sample(sec: 3, lat: 43.43, lng: 3.43, speed: 60),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 28), // hard accel #1
+        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 28),
+        _sample(sec: 3, lat: 43.43, lng: 3.43, speed: 28),
         _sample(sec: 4, lat: 43.44, lng: 3.44, speed: 30),
-        _sample(sec: 5, lat: 43.45, lng: 3.45, speed: 80), // hard accel #2
-        _sample(sec: 6, lat: 43.46, lng: 3.46, speed: 80),
+        _sample(sec: 5, lat: 43.45, lng: 3.45, speed: 58), // hard accel #2
+        _sample(sec: 6, lat: 43.46, lng: 3.46, speed: 58),
       ];
 
       await pumpApp(tester, TripPathMapCard(samples: samples));

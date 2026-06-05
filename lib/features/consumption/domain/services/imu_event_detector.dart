@@ -77,9 +77,23 @@ class ImuEventDetector {
   /// Confirmed sharp-cornering episodes so far.
   int get sharpCornerCount => _sharpCornerCount;
 
+  /// Whether the inertial sensor actually ran for this trip (#2895). True
+  /// once at least one real sample has been folded in (i.e. past the seed),
+  /// false when the device has no accelerometer/gyroscope or the platform
+  /// plugin never bound (a quiet stream that never emits). Lets the pipeline
+  /// distinguish a genuine IMU zero ("you drove smoothly") from
+  /// "no IMU signal" — so an IMU count of 0 can VETO a noisy GPS-derived
+  /// over-count rather than being indistinguishable from "no reading".
+  bool get isActive => _sampleCount > 1;
+
   int _hardAccelCount = 0;
   int _hardBrakeCount = 0;
   int _sharpCornerCount = 0;
+
+  /// Total samples handed to [onSample]. The first only seeds the dt anchor;
+  /// `isActive` therefore requires > 1 so a single stray emit doesn't claim
+  /// the sensor produced a usable signal.
+  int _sampleCount = 0;
 
   /// Lateral (horizontal) accel must hold above 3.5 m/s² and the yaw rate
   /// above 0.30 rad/s for at least this long before a corner is confirmed —
@@ -121,6 +135,7 @@ class ImuEventDetector {
     final lastT = _lastT;
     final speedKmh = currentSpeedKmh;
     _lastT = s.t;
+    _sampleCount++;
     if (lastT == null) return; // first sample seeds the dt anchor only.
 
     final dt = s.t.difference(lastT).inMicroseconds /

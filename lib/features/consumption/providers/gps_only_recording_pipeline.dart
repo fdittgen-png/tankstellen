@@ -280,23 +280,35 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     final kind = TripKind.fromSamples(samples);
     // #2760 — stamp the aggregate-only IMU event counts. THREE scalars; the
     // raw ~50 Hz inertial stream was folded into them in real time and is
-    // never persisted. When the IMU produced events on a dongle-less trip,
-    // PREFER them for the `harshAccelerations` / `harshBrakes` the driving
-    // score reads (`driving_score_calculator.dart`): a direct inertial
-    // reading is a more accurate harsh-manoeuvre signal than the GPS
-    // speed-derivative the recorder's [HarshEventDetector] used. The
-    // speed-derived counts stay the fallback when the IMU saw nothing.
+    // never persisted.
+    //
+    // #2895 — PREFER the IMU counts for the `harshAccelerations` / `harshBrakes`
+    // the driving score reads whenever the inertial sensor actually RAN —
+    // INCLUDING when it counted zero. A direct inertial reading is the accurate
+    // harsh-manoeuvre signal; the GPS speed-derivative the recorder used can
+    // differentiate ~1 Hz Doppler noise into impossible >1 g spikes (the
+    // #2895 Peugeot 107: IMU 0 vs GPS 16, maxAccelG 1.086). So a genuine IMU
+    // zero must VETO the noisy GPS over-count — the old `(imuAccel > 0 ||
+    // imuBrake > 0)` gate let the over-count win on exactly the smooth trip it
+    // should have zeroed. We gate on the sensor having run, not on it being
+    // non-zero, and on EITHER kind: the IMU detector runs in this dongle-less
+    // pipeline regardless of whether OBD2 attached mid-trip (a gpsPlusObd2
+    // trip that started dongle-less still has the accurate inertial counts).
+    // `imuActive` is persisted so the trip-detail score recompute reconciles
+    // the same way. When the sensor never ran (no IMU hardware / OBD2-from-the-
+    // start), the (now physically-clamped) GPS-derived counts stay the source.
     final imuAccel = imuDetector?.hardAccelCount ?? 0;
     final imuBrake = imuDetector?.hardBrakeCount ?? 0;
     final imuCorners = imuDetector?.sharpCornerCount ?? 0;
-    final preferImu = kind == TripKind.gpsOnly && (imuAccel > 0 || imuBrake > 0);
+    final imuActive = imuDetector?.isActive ?? false;
     var summary = recorder.buildSummary().copyWith(
           kind: kind,
           imuHardAccelCount: imuAccel,
           imuHardBrakeCount: imuBrake,
           sharpCornerCount: imuCorners,
-          harshAccelerations: preferImu ? imuAccel : null,
-          harshBrakes: preferImu ? imuBrake : null,
+          imuActive: imuActive,
+          harshAccelerations: imuActive ? imuAccel : null,
+          harshBrakes: imuActive ? imuBrake : null,
         );
     // #2080 — for GPS-only / hybrid trips (no OBD2 fuel-rate
     // coverage), feed the sample stream through GpsDrivingFeatures +

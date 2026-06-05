@@ -206,14 +206,13 @@ Map<String, dynamic> _summaryToJson(TripSummary s) => {
       // Omitted when false (every real trip) so legacy trips round-trip
       // with zero bytes added.
       if (s.isVirtual) 'virt': true,
-      // #2760: IMU-detected aggregate event counts for dongle-less
-      // (GPS+IMU) trips. THREE scalars only — never the raw ~50 Hz sample
-      // stream (the aggregate-only / disk-efficient constraint). Compact
-      // keys 'iha' / 'ihb' / 'sc'; each omitted when 0 so OBD2 trips and
-      // every legacy trip round-trip with zero bytes added.
+      // #2760: IMU-detected aggregate event counts for dongle-less (GPS+IMU)
+      // trips — THREE scalars only (never the raw ~50 Hz stream). Compact keys
+      // 'iha'/'ihb'/'sc'; each omitted when 0 so OBD2 / legacy trips add 0 bytes.
       if (s.imuHardAccelCount != 0) 'iha': s.imuHardAccelCount,
       if (s.imuHardBrakeCount != 0) 'ihb': s.imuHardBrakeCount,
       if (s.sharpCornerCount != 0) 'sc': s.sharpCornerCount,
+      if (s.imuActive) 'ima': true, // #2895 IMU-ran bit (prefer IMU zero)
     };
 
 TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -266,6 +265,7 @@ TripSummary _summaryFromJson(Map<String, dynamic> j) => TripSummary(
       imuHardAccelCount: (j['iha'] as num?)?.toInt() ?? 0,
       imuHardBrakeCount: (j['ihb'] as num?)?.toInt() ?? 0,
       sharpCornerCount: (j['sc'] as num?)?.toInt() ?? 0,
+      imuActive: (j['ima'] as bool?) ?? false, // #2895 IMU-ran bit
     );
 
 /// Hive-backed list of finalised trips (#726).

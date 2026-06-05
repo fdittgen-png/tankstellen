@@ -57,6 +57,10 @@ class DrivingAnalysisTrace {
           'distanceSource': summary.distanceSource,
         },
         'imu': {
+          // #2895 — whether the inertial sensor ran. A genuine IMU zero with
+          // active=true VETOES a noisy GPS over-count in the score; active=false
+          // means the (clamped) GPS-derived counts were used.
+          'active': summary.imuActive,
           'hardAccelCount': summary.imuHardAccelCount,
           'hardBrakeCount': summary.imuHardBrakeCount,
           'sharpCornerCount': summary.sharpCornerCount,

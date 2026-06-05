@@ -359,19 +359,21 @@ void main() {
     test(
         'five samples with one accel event in the middle → only that index '
         'is reported', () {
-      // Indices and segments:
+      // Indices and segments (#2895 — the middle event is a PLAUSIBLE hard
+      // accel, ≤ the ~0.9 g physical ceiling, so the clamp leaves it):
       //   0 → 1: 30 → 32 km/h over 1 s → accel ≈ 0.56 m/s² (below).
-      //   1 → 2: 32 → 80 km/h over 1 s → accel ≈ 13.33 m/s² (above).
-      //   2 → 3: 80 → 82 km/h over 1 s → accel ≈ 0.56 m/s² (below).
-      //   3 → 4: 82 → 80 km/h over 1 s → DECEL (negative, ignored).
+      //   1 → 2: 32 → 60 km/h over 1 s → accel ≈ 7.78 m/s² ≈ 0.79 g (above
+      //          threshold, below the ceiling — a real hard launch).
+      //   2 → 3: 60 → 62 km/h over 1 s → accel ≈ 0.56 m/s² (below).
+      //   3 → 4: 62 → 60 km/h over 1 s → DECEL (negative, ignored).
       // Only index 2 (the end of the middle interval) trips the
       // threshold.
       final samples = [
         sample(sec: 0, speedKmh: 30),
         sample(sec: 1, speedKmh: 32),
-        sample(sec: 2, speedKmh: 80),
-        sample(sec: 3, speedKmh: 82),
-        sample(sec: 4, speedKmh: 80),
+        sample(sec: 2, speedKmh: 60),
+        sample(sec: 3, speedKmh: 62),
+        sample(sec: 4, speedKmh: 60),
       ];
       expect(hardAccelSampleIndices(samples), [2]);
     });
