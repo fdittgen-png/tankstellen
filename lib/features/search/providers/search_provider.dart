@@ -3,11 +3,13 @@
 
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../core/error/exceptions.dart';
 import '../../../core/location/location_service.dart';
 import '../../../core/telemetry/collectors/app_state_collector.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
+import '../../../core/utils/geo_utils.dart';
 import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/search_result_item.dart';
@@ -152,6 +154,17 @@ class SearchState extends _$SearchState {
       final position =
           await ref.read(locationServiceProvider).getCurrentPosition();
       if (!ref.mounted) return;
+      // #2872 — defence-in-depth behind getCurrentPosition's own guard:
+      // never persist a degenerate fix ((0,0)/(lat,0)) to
+      // userPositionProvider — a poisoned user position would later seed a
+      // route origin in the Gulf of Guinea. Surface the same "could not
+      // determine your location" error (LocationException → errorLocation)
+      // instead of storing it.
+      if (!isUsableCoord(position.latitude, position.longitude)) {
+        throw const LocationException(
+          message: 'Degenerate GPS fix; refusing to search from null island.',
+        );
+      }
       ref.read(userPositionProvider.notifier).setFromGps(
             position.latitude, position.longitude,
           );

@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/error/exceptions.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/utils/frame_callbacks.dart';
+import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
@@ -95,6 +97,16 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       final locationService = ref.read(locationServiceProvider);
       final position = await locationService.getCurrentPosition();
       if (!mounted) return;
+      // #2872 — defence-in-depth behind getCurrentPosition's own guard:
+      // never seed the route start from a degenerate fix. A (0,0)/(lat,0)
+      // origin makes OSRM route from the Gulf of Guinea and centres the
+      // route map in the Sahara. Fall through to the manual-entry / GPS
+      // error path instead of calling setStartCoords.
+      if (!isUsableCoord(position.latitude, position.longitude)) {
+        throw const LocationException(
+          message: 'Degenerate GPS fix; ask the user for a manual start.',
+        );
+      }
       final coords = LatLng(position.latitude, position.longitude);
       ref.read(routeInputControllerProvider.notifier).setStartCoords(coords);
       final l10n = AppLocalizations.of(context);
@@ -193,7 +205,15 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         }
       }
 
-      if (startCoords == null || endCoords == null) {
+      // #2872 — a required endpoint that is missing OR degenerate ((0,0),
+      // a one-axis-unacquired (lat,0), or out-of-range) must not reach
+      // OSRM: it would route from the Gulf of Guinea and centre the route
+      // map in the Sahara. Treat an unusable start/destination exactly
+      // like an unresolved one and ask the user for a manual entry.
+      if (startCoords == null ||
+          endCoords == null ||
+          !isUsableCoord(startCoords.latitude, startCoords.longitude) ||
+          !isUsableCoord(endCoords.latitude, endCoords.longitude)) {
         if (mounted) {
           SnackBarHelper.showError(
               context,
@@ -209,8 +229,13 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
           lng: startCoords.longitude,
           label: _startController.text,
         ),
+        // #2872 — silently drop a degenerate optional stop (a Nominatim
+        // geocode that fell back to (lat,0) via the `?? 0` default) rather
+        // than letting it bend the route to null island. Start/end are the
+        // anchors and are already validated above.
         for (var i = 0; i < stopCoords.length; i++)
-          if (stopCoords[i] != null)
+          if (stopCoords[i] != null &&
+              isUsableCoord(stopCoords[i]!.latitude, stopCoords[i]!.longitude))
             RouteWaypoint(
               lat: stopCoords[i]!.latitude,
               lng: stopCoords[i]!.longitude,

@@ -65,6 +65,56 @@ void main() {
     });
   });
 
+  group('isUsableCoord (#2872 — degenerate GPS guard)', () {
+    test('a valid France point is usable', () {
+      // Rivesaltes (the real-report origin, near the ES/FR border).
+      expect(isUsableCoord(42.7667, 2.8667), isTrue);
+    });
+
+    test('a valid southern-hemisphere point is usable', () {
+      expect(isUsableCoord(-33.8688, 151.2093), isTrue); // Sydney
+    });
+
+    test('the (0,0) null-island sentinel is NOT usable', () {
+      expect(isUsableCoord(0, 0), isFalse);
+    });
+
+    test('a one-axis-unacquired (lat,0) fix is NOT usable', () {
+      // The Sahara/Gulf-of-Guinea poisoner: latitude acquired, longitude
+      // still 0 — the exact shape the route origin must never accept.
+      expect(isUsableCoord(42.7, 0), isFalse);
+    });
+
+    test('a one-axis-unacquired (0,lng) fix is NOT usable', () {
+      expect(isUsableCoord(0, 2.86), isFalse);
+    });
+
+    test('a NaN axis is NOT usable', () {
+      expect(isUsableCoord(double.nan, 2.86), isFalse);
+      expect(isUsableCoord(42.7, double.nan), isFalse);
+    });
+
+    test('an infinite axis is NOT usable', () {
+      expect(isUsableCoord(double.infinity, 2.86), isFalse);
+      expect(isUsableCoord(42.7, double.negativeInfinity), isFalse);
+    });
+
+    test('an out-of-range latitude is NOT usable', () {
+      expect(isUsableCoord(90.5, 2.86), isFalse);
+      expect(isUsableCoord(-91, 2.86), isFalse);
+    });
+
+    test('an out-of-range longitude is NOT usable', () {
+      expect(isUsableCoord(42.7, 180.5), isFalse);
+      expect(isUsableCoord(42.7, -181), isFalse);
+    });
+
+    test('the antimeridian / poles (in-range extremes) ARE usable', () {
+      expect(isUsableCoord(90, 180), isTrue);
+      expect(isUsableCoord(-90, -180), isTrue);
+    });
+  });
+
   group('distanceMeters (#2169 — shared metre haversine)', () {
     test('Berlin to Paris is approximately 878 km', () {
       final m = distanceMeters(52.5200, 13.4050, 48.8566, 2.3522);

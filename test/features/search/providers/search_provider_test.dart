@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/location/location_service.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
@@ -42,6 +43,45 @@ class _FixedUserPosition extends UserPosition {
 
   @override
   UserPositionData? build() => _data;
+}
+
+/// #2872 — records every `setFromGps` so a test can assert that a
+/// degenerate fix is NEVER persisted as the user position.
+class _SpyUserPosition extends UserPosition {
+  final List<({double lat, double lng})> persisted = [];
+
+  @override
+  UserPositionData? build() => null;
+
+  @override
+  void setFromGps(double lat, double lng) {
+    persisted.add((lat: lat, lng: lng));
+    super.setFromGps(lat, lng);
+  }
+}
+
+/// #2872 — a fake [GeolocatorWrapper] that hands back a caller-chosen fix
+/// (e.g. the degenerate (0,0)/(lat,0)) through the REAL [LocationService]
+/// acquisition chokepoint, so the search path exercises the production
+/// guard rather than a mock that bypasses it.
+class _FakeGeolocatorWrapper extends GeolocatorWrapper {
+  _FakeGeolocatorWrapper(this._position);
+  final Position _position;
+
+  @override
+  Future<bool> isLocationServiceEnabled() async => true;
+
+  @override
+  Future<LocationPermission> checkPermission() async =>
+      LocationPermission.whileInUse;
+
+  @override
+  Future<LocationPermission> requestPermission() async =>
+      LocationPermission.whileInUse;
+
+  @override
+  Future<Position> getCurrentPosition({LocationSettings? locationSettings}) async =>
+      _position;
 }
 
 /// EV fake that returns one charging station, so unified-search tests
@@ -1069,6 +1109,96 @@ void main() {
       ));
 
       await expectLater(searchFuture, completes);
+    });
+  });
+
+  group('searchByGps — degenerate-fix guard (#2872)', () {
+    Position fix(double lat, double lng) => Position(
+          latitude: lat,
+          longitude: lng,
+          timestamp: DateTime.now(),
+          accuracy: 5.0,
+          altitude: 0.0,
+          altitudeAccuracy: 0.0,
+          heading: 0.0,
+          headingAccuracy: 0.0,
+          speed: 0.0,
+          speedAccuracy: 0.0,
+        );
+
+    /// Wires the REAL [LocationService] to a fake [GeolocatorWrapper] that
+    /// returns [position], plus a spy [UserPosition], so a search exercises
+    /// the production acquisition guard end-to-end.
+    ({ProviderContainer container, _SpyUserPosition spy}) containerFor(
+      Position position,
+    ) {
+      final spy = _SpyUserPosition();
+      final c = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(fakeStorage),
+        stationServiceProvider.overrideWithValue(mockStationService),
+        geocodingChainProvider.overrideWithValue(mockGeocoding),
+        geolocatorWrapperProvider
+            .overrideWithValue(_FakeGeolocatorWrapper(position)),
+        userPositionProvider.overrideWith(() => spy),
+      ]);
+      addTearDown(c.dispose);
+      return (container: c, spy: spy);
+    }
+
+    void stubStation() {
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: [testStation],
+                source: ServiceSource.tankerkoenigApi,
+                fetchedAt: DateTime.now(),
+              ));
+    }
+
+    test('a (0,0) fix surfaces an error and is NOT persisted', () async {
+      stubStation();
+      final t = containerFor(fix(0, 0));
+
+      await t.container.read(searchStateProvider.notifier).searchByGps();
+
+      expect(t.container.read(searchStateProvider), isA<AsyncError>());
+      expect(t.spy.persisted, isEmpty,
+          reason: 'a null-island fix must never reach userPositionProvider');
+      verifyNever(() => mockStationService.searchStations(any(),
+          cancelToken: any(named: 'cancelToken')));
+    });
+
+    test('a one-axis-unacquired (lat,0) fix surfaces an error and is NOT '
+        'persisted', () async {
+      stubStation();
+      final t = containerFor(fix(42.7, 0));
+
+      await t.container.read(searchStateProvider.notifier).searchByGps();
+
+      expect(t.container.read(searchStateProvider), isA<AsyncError>());
+      expect(t.spy.persisted, isEmpty);
+      verifyNever(() => mockStationService.searchStations(any(),
+          cancelToken: any(named: 'cancelToken')));
+    });
+
+    test('a valid France fix persists the position and searches — no '
+        'regression', () async {
+      stubStation();
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) async => ServiceResult(
+                data: 'Rivesaltes',
+                source: ServiceSource.nominatimGeocoding,
+                fetchedAt: DateTime.now(),
+              ));
+      final t = containerFor(fix(42.7667, 2.8667));
+
+      await t.container.read(searchStateProvider.notifier).searchByGps();
+
+      expect(t.container.read(searchStateProvider), isA<AsyncData>());
+      expect(t.spy.persisted, hasLength(1));
+      expect(t.spy.persisted.single.lat, closeTo(42.7667, 0.0001));
+      expect(t.spy.persisted.single.lng, closeTo(2.8667, 0.0001));
     });
   });
 
