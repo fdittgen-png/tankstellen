@@ -3,14 +3,12 @@
   SPDX-License-Identifier: MIT
 -->
 
-# Per-fuel-type efficiency attribution (v1 — dominant-fuel)
+# ADR 0014: Per-fuel-type efficiency attribution (v1 — dominant-fuel)
 
-| Section  | Value                                                          |
-|----------|----------------------------------------------------------------|
-| Status   | Accepted                                                       |
-| Date     | 2026-06-05                                                    |
-| Epic     | [#2881](https://github.com/fdittgen-png/tankstellen/issues/2881) |
-| Child    | [#2882](https://github.com/fdittgen-png/tankstellen/issues/2882) (this note) |
+**Status:** Accepted
+**Date:** 2026-06-05
+**Issue:** #2882
+**Parent Epic:** #2881
 
 ## Context
 
@@ -165,7 +163,7 @@ is sorted by `avgCostPerKm` ascending, so **E85 sorts first**, E10 second.
   only one E85 tank gets numbers but no crown until a second closed E85 tank
   confirms it.
 
-## Alternatives considered
+## Alternatives Considered
 
 - **Proportional litre-split.** Split a mixed interval's distance between fuels
   in proportion to their litres. Rejected for v1: distance per fuel is not

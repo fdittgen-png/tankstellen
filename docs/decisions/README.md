@@ -47,12 +47,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0011 | Approach-detection + speed-aware polling scheduler | Accepted |
 | 0012 | GPS-only live consumption estimator | Accepted |
 | 0013 | Map tile proxy + `initialCameraFit` camera + `bestDisplayPrice` markers | Accepted |
-
-## Topical notes
-
-Decisions scoped to a single feature/Epic live as named notes rather than
-sequential ADRs:
-
-| File                                      | Topic                                            | Status   |
-|-------------------------------------------|--------------------------------------------------|----------|
-| `per-fuel-efficiency-attribution.md`      | Per-fuel-type efficiency attribution (dominant-fuel, Epic #2881) | Accepted |
+| 0014 | Per-fuel-type efficiency attribution (dominant-fuel, Epic #2881) | Accepted |
