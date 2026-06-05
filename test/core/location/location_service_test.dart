@@ -90,6 +90,55 @@ void main() {
       );
     });
 
+    // #2872 — a degenerate fix that slips through the platform must be
+    // rejected at this single acquisition chokepoint so it can never seed
+    // the route origin (→ OSRM routes from the Gulf of Guinea → the route
+    // map centres in the Sahara) nor be persisted as the user position.
+    Position degenerate(double lat, double lng) => Position(
+          latitude: lat,
+          longitude: lng,
+          timestamp: DateTime.now(),
+          accuracy: 10,
+          altitude: 0,
+          altitudeAccuracy: 0,
+          heading: 0,
+          headingAccuracy: 0,
+          speed: 0,
+          speedAccuracy: 0,
+        );
+
+    test('throws on a (0,0) null-island fix (#2872)', () {
+      fakeGeolocator.positionToReturn = degenerate(0, 0);
+      expect(
+        () => service.getCurrentPosition(),
+        throwsA(isA<LocationException>()),
+      );
+    });
+
+    test('throws on a one-axis-unacquired (lat,0) fix (#2872)', () {
+      fakeGeolocator.positionToReturn = degenerate(42.7, 0);
+      expect(
+        () => service.getCurrentPosition(),
+        throwsA(isA<LocationException>()),
+      );
+    });
+
+    test('throws on a one-axis-unacquired (0,lng) fix (#2872)', () {
+      fakeGeolocator.positionToReturn = degenerate(0, 2.86);
+      expect(
+        () => service.getCurrentPosition(),
+        throwsA(isA<LocationException>()),
+      );
+    });
+
+    test('returns a valid France fix unchanged — no regression (#2872)',
+        () async {
+      fakeGeolocator.positionToReturn = degenerate(42.7667, 2.8667);
+      final position = await service.getCurrentPosition();
+      expect(position.latitude, closeTo(42.7667, 0.0001));
+      expect(position.longitude, closeTo(2.8667, 0.0001));
+    });
+
     test('throws when permission permanently denied', () {
       fakeGeolocator.permission = LocationPermission.deniedForever;
       expect(

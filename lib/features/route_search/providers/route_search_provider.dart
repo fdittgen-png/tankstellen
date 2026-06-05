@@ -11,6 +11,7 @@ import '../../../core/error/exceptions.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/country/country_bounding_box.dart';
 import '../../../core/country/country_provider.dart';
+import '../../../core/utils/geo_utils.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../profile/data/models/user_profile.dart';
 import '../../search/providers/ev_charging_service_provider.dart';
@@ -54,6 +55,19 @@ class RouteSearchState extends _$RouteSearchState {
   }) async {
     state = const AsyncValue.loading();
     try {
+      // #2872 — last-line guard before routing: drop degenerate waypoints
+      // ((0,0)/(lat,0) GPS or a `?? 0`-fallback geocode) so OSRM can't
+      // route from the Gulf of Guinea and centre the route map in the
+      // Sahara. < 2 usable → throw so the UI asks for a manual start.
+      final usableWaypoints =
+          waypoints.where((w) => isUsableCoord(w.lat, w.lng)).toList();
+      if (usableWaypoints.length < 2) {
+        throw const LocationException(
+          message: 'Route needs two usable waypoints; '
+              'a degenerate GPS/geocode origin was rejected.',
+        );
+      }
+
       // 1. Get route from OSRM
       final profile = ref.read(activeProfileProvider);
       final avoidHighways = profile?.avoidHighways ?? false;
@@ -64,8 +78,8 @@ class RouteSearchState extends _$RouteSearchState {
       final criterion =
           profile?.routeSearchCriterion ?? RouteSearchCriterion.cheapest;
       final routingService = RoutingService();
-      debugPrint('RouteSearch: fetching route for ${waypoints.length} waypoints, avoidHighways=$avoidHighways, strategy=${strategyType.key}');
-      final routeResult = await routingService.getRoute(waypoints, avoidHighways: avoidHighways);
+      debugPrint('RouteSearch: fetching route for ${usableWaypoints.length} waypoints, avoidHighways=$avoidHighways, strategy=${strategyType.key}');
+      final routeResult = await routingService.getRoute(usableWaypoints, avoidHighways: avoidHighways);
       final route = routeResult.data;
       debugPrint('RouteSearch: route=${route.distanceKm.round()}km, ${route.geometry.length} polyline pts, ${route.samplePoints.length} sample pts');
 

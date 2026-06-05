@@ -19,10 +19,11 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 /// only write `AsyncValue.error`.
 ///
 /// The OSRM `RoutingService` is constructed internally and not
-/// injectable, but `getRoute` throws `ApiException` SYNCHRONOUSLY (before
-/// any network call) when fewer than 2 waypoints are supplied — which
-/// lands in the `on AppException` outer catch. That gives a deterministic,
-/// network-free way to exercise the breadcrumb.
+/// injectable, but the notifier rejects fewer than 2 usable waypoints
+/// SYNCHRONOUSLY (before any network call) — the #2872 degenerate-origin
+/// guard throws a `LocationException` (an `AppException`) that lands in the
+/// `on AppException` outer catch. That gives a deterministic, network-free
+/// way to exercise the breadcrumb.
 class _FakeTraceRecorder implements TraceRecorder {
   final calls = <Object>[];
 
@@ -72,8 +73,9 @@ void main() {
 
     final notifier = container.read(routeSearchStateProvider.notifier);
 
-    // A single waypoint trips `getRoute`'s `waypoints.length < 2` guard,
-    // which throws ApiException (an AppException) synchronously.
+    // A single waypoint leaves < 2 usable waypoints, which the #2872 guard
+    // rejects with a LocationException (an AppException) synchronously,
+    // before any OSRM call.
     await notifier.searchAlongRoute(
       waypoints: const [
         RouteWaypoint(lat: 52.52, lng: 13.41, label: 'Berlin'),
@@ -93,6 +95,67 @@ void main() {
     expect(ctx.layer, ErrorLayer.providers);
     expect(ctx.context, contains('where'));
     expect(ctx.context!['where'], 'RouteSearchState.searchAlongRoute');
-    expect(ctx.inner, isA<ApiException>());
+    expect(ctx.inner, isA<LocationException>());
+  });
+
+  // #2872 — a degenerate origin ((0,0) / a one-axis-unacquired (lat,0))
+  // must be rejected BEFORE the OSRM fetch so the route never starts from
+  // the Gulf of Guinea and the route map can't centre in the Sahara. With
+  // only one usable waypoint left, the guard throws a LocationException
+  // (NOT a network/ApiException) — i.e. it asks for a manual start rather
+  // than routing through null island.
+  test(
+      'searchAlongRoute rejects a degenerate origin before OSRM with a '
+      'LocationException (#2872)', () async {
+    final container = ProviderContainer(
+      overrides: [
+        activeProfileProvider.overrideWith(_NullActiveProfile.new),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final notifier = container.read(routeSearchStateProvider.notifier);
+
+    // A (0,0) origin paired with a real Catalonia destination: exactly the
+    // real-report shape. The origin is dropped, leaving < 2 usable
+    // waypoints, so no OSRM request is ever built.
+    await notifier.searchAlongRoute(
+      waypoints: const [
+        RouteWaypoint(lat: 0, lng: 0, label: 'GPS'),
+        RouteWaypoint(lat: 42.43, lng: 2.86, label: 'Catalonia'),
+      ],
+      fuelType: FuelType.e10,
+    );
+
+    final state = container.read(routeSearchStateProvider);
+    expect(state.hasError, isTrue);
+    expect(state.error, isA<LocationException>(),
+        reason: 'a degenerate origin must be rejected as a location error, '
+            'not reach OSRM and fail as a network/ApiException');
+  });
+
+  test(
+      'searchAlongRoute also rejects a one-axis-unacquired (lat,0) origin '
+      'before OSRM (#2872)', () async {
+    final container = ProviderContainer(
+      overrides: [
+        activeProfileProvider.overrideWith(_NullActiveProfile.new),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final notifier = container.read(routeSearchStateProvider.notifier);
+
+    await notifier.searchAlongRoute(
+      waypoints: const [
+        RouteWaypoint(lat: 42.7, lng: 0, label: 'GPS'),
+        RouteWaypoint(lat: 42.43, lng: 2.86, label: 'Catalonia'),
+      ],
+      fuelType: FuelType.e10,
+    );
+
+    final state = container.read(routeSearchStateProvider);
+    expect(state.hasError, isTrue);
+    expect(state.error, isA<LocationException>());
   });
 }

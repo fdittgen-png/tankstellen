@@ -10,6 +10,40 @@ import 'package:latlong2/latlong.dart';
 /// a named constant so the metre formula has one source (#2169).
 const double earthRadiusMeters = 6371000.0;
 
+/// Whether [lat]/[lng] is a real, usable coordinate fit to drive routing,
+/// the route origin, or a persisted user position (#2872).
+///
+/// A coordinate is usable when it is finite, in range
+/// (`|lat| <= 90`, `|lng| <= 180`), and NOT a degenerate GPS fix. The
+/// degenerate shapes the issue calls out are:
+///   * `(0,0)` — the "null island" sentinel the rest of the geo layer
+///     already treats as "unset" (see [distanceKm]'s short-circuit and
+///     the per-country parser guards);
+///   * a one-axis-unacquired `(lat,0)` / `(0,lng)` — a fix where the
+///     device returned one axis but the other is still exactly `0`;
+///   * a `NaN`/`Inf` axis.
+///
+/// Any of these slipping into the route origin makes OSRM route from the
+/// Gulf of Guinea so the polyline + bounds span 0°N..42°N and the route
+/// map centres in the Sahara. Rejecting them here, at the GPS-*acquisition*
+/// boundary the existing station/distance guards never covered, is the fix.
+///
+/// ## Why an *exact* `0.0` axis is rejected
+/// A real GNSS fix reports each axis to many decimal places; an axis that
+/// is *exactly* `0.0` is the unacquired-axis sentinel, not a genuine point
+/// on the equator / prime meridian. The vanishingly rare legitimate point
+/// that lands on `lat == 0` or `lng == 0` to full float precision is a
+/// worthwhile trade for never letting a half-acquired fix poison routing —
+/// nudging it by a metre yields a usable coordinate. Callers that need a
+/// real distance through a genuine `(0,…)` point use [distanceMeters],
+/// which has no such guard.
+bool isUsableCoord(double lat, double lng) {
+  if (!lat.isFinite || !lng.isFinite) return false;
+  if (lat == 0 || lng == 0) return false;
+  if (lat.abs() > 90 || lng.abs() > 180) return false;
+  return true;
+}
+
 /// Haversine distance between two coordinates in kilometers.
 ///
 /// Short-circuits a `(0,0)` endpoint to `0` — an unset coordinate is
