@@ -29,15 +29,39 @@ enum Obd2ReadTimeoutClass {
   final Duration timeout;
 }
 
+/// #2889 — how many AT commands at the very start of a fresh link get the
+/// [Obd2ReadTimeoutClass.wake] grace instead of [Obd2ReadTimeoutClass
+/// .trivialAt]. A slow Classic-SPP clone (observed: a vLinker FS answering
+/// `ATE0` in 2276 ms) keeps echo/headers on while it finishes
+/// re-enumerating after the `ATZ` reset; the old single-command grace had
+/// already expired by `ATE0` (the SECOND command), so its 1000 ms
+/// `trivialAt` budget fired BEFORE the device replied — and the late reply
+/// then desynced every following command. Covering the first ~3 AT echoes
+/// (ATE0/ATL0/ATH0 in the standard init) with the 2500 ms `wake` budget
+/// accommodates the observed latency while still staying under the
+/// transport's 5 s read ceiling. Every command past the early-init window
+/// — and every real OBD query — keeps its original, tighter class.
+const int earlyInitGraceCount = 3;
+
 /// Classify [command] (a raw ELM327 command string, with or without its
 /// trailing `\r`) into its read-timeout class (#2261 concern 5).
 ///
 /// [firstCommandOnFreshLink] is true for the very first command sent
 /// after the channel opened — the ECU may still be waking, so even a
 /// trivial AT echo is given the [Obd2ReadTimeoutClass.wake] grace.
+///
+/// [atCommandsSinceOpen] (#2889) is the 0-based index of this AT command
+/// within the fresh-link init burst (0 for the very first AT command, 1
+/// for the second, …). While it is below [earlyInitGraceCount] a trivial
+/// AT echo is upgraded to the [Obd2ReadTimeoutClass.wake] grace, so a slow
+/// clone that keeps echo on for the first few commands still completes
+/// before its read budget fires. Callers that don't track the counter may
+/// omit it (defaults to a value past the window, preserving the legacy
+/// single-command [firstCommandOnFreshLink] behaviour).
 Obd2ReadTimeoutClass classifyReadTimeout(
   String command, {
   bool firstCommandOnFreshLink = false,
+  int atCommandsSinceOpen = earlyInitGraceCount,
 }) {
   final c = command.trim().toUpperCase();
 
@@ -49,8 +73,12 @@ Obd2ReadTimeoutClass classifyReadTimeout(
 
   final isAt = c.startsWith('AT') || c.startsWith('ST');
   if (isAt) {
-    // A trivial AT echo, unless it is the first thing on a fresh link.
-    return firstCommandOnFreshLink
+    // #2889 — a trivial AT echo gets the wake grace when it is the first
+    // command on a fresh link OR still inside the early-init window (the
+    // first [earlyInitGraceCount] AT commands), where a slow clone has not
+    // yet finished re-enumerating. Otherwise it's a plain trivial echo.
+    final inEarlyInitWindow = atCommandsSinceOpen < earlyInitGraceCount;
+    return firstCommandOnFreshLink || inEarlyInitWindow
         ? Obd2ReadTimeoutClass.wake
         : Obd2ReadTimeoutClass.trivialAt;
   }

@@ -38,6 +38,25 @@ class BluetoothObd2Transport implements Obd2Transport {
   /// same command would later. Reset on every [connect].
   bool _firstCommandPending = true;
 
+  /// #2889 — count of AT commands sent since the channel opened. Fed to
+  /// [classifyReadTimeout] as `atCommandsSinceOpen` so the first
+  /// [earlyInitGraceCount] AT echoes (ATE0/ATL0/ATH0 in the standard init)
+  /// get the longer `wake` budget — a slow Classic-SPP clone keeps echo on
+  /// for the first couple of commands and answers ATE0 in ~2.3 s, which the
+  /// old flat 1 s `trivialAt` budget could not absorb. Reset on [connect].
+  int _atCommandsSinceOpen = 0;
+
+  /// #2889 — one-shot latch armed when a per-command read times out. The
+  /// device's slow original reply can still land AFTER the timeout fired;
+  /// without this it would be matched to the NEXT command's `_pending`,
+  /// desyncing the whole init burst by one command forever. When set, the
+  /// next complete `>`-terminated frame that arrives with NO `_pending`
+  /// awaiting it (i.e. the stale late reply) is DROPPED and the latch
+  /// cleared, instead of completing any completer. Always cleared again on
+  /// the next successfully-matched completion and on [disconnect], so it can
+  /// never swallow a legitimate reply.
+  bool _swallowNextFrame = false;
+
   /// Tail of the command queue. Every [sendCommand] chains onto this so
   /// overlapping callers — e.g. the VIN reader racing the auto-record
   /// PID poller, both sharing one transport — serialise instead of
@@ -58,6 +77,8 @@ class BluetoothObd2Transport implements Obd2Transport {
   Future<void> connect() async {
     if (_connected) return;
     _firstCommandPending = true;
+    _atCommandsSinceOpen = 0; // #2889 — fresh early-init grace window.
+    _swallowNextFrame = false; // #2889 — never carry a latch across links.
     // #2524 — reset any state a previous link left behind so a reused or
     // half-dead instance can't carry stale pending into the fresh link. A
     // dropped session that never ran `disconnect()` can leave `_pending`
@@ -147,6 +168,7 @@ class BluetoothObd2Transport implements Obd2Transport {
     await _channel.close();
     _failPending(StateError('Transport closed'));
     _buffer.clear();
+    _swallowNextFrame = false; // #2889 — never carry a latch across links.
   }
 
   Future<String> _sendRaw(String command) async {
@@ -169,11 +191,17 @@ class BluetoothObd2Transport implements Obd2Transport {
     // #2261 concern 5 — right-size the read timeout per command class
     // instead of a flat 5 s. Clamped to the configured [_readTimeout] so
     // an explicit override still acts as a hard ceiling.
+    // #2889 — pass the AT-command index so the first [earlyInitGraceCount]
+    // AT echoes on a fresh link get the longer `wake` budget. The counter
+    // is read BEFORE the post-increment below so this command sees its own
+    // 0-based position; non-AT (OBD) commands don't advance it.
     final cls = classifyReadTimeout(
       command,
       firstCommandOnFreshLink: _firstCommandPending,
+      atCommandsSinceOpen: _atCommandsSinceOpen,
     );
     _firstCommandPending = false;
+    if (_isAtCommand(command)) _atCommandsSinceOpen++;
     final timeout = cls.timeout > _readTimeout ? _readTimeout : cls.timeout;
 
     _buffer.clear();
@@ -191,6 +219,12 @@ class BluetoothObd2Transport implements Obd2Transport {
       return await completer.future.timeout(
         timeout,
         onTimeout: () {
+          // #2889 — the reply may STILL land after this fires (the observed
+          // 2.3 s ATE0 on a slow clone). Arm the one-shot latch so the late
+          // `>`-terminated frame is dropped by [_onBytes] instead of being
+          // matched to the NEXT command's completer — that mismatch was the
+          // permanent one-command desync (protocol unknown → 0 PIDs).
+          _swallowNextFrame = true;
           throw TimeoutException(
             'ELM327 did not respond within $timeout',
             timeout,
@@ -200,6 +234,14 @@ class BluetoothObd2Transport implements Obd2Transport {
     } finally {
       if (identical(_pending, completer)) _pending = null;
     }
+  }
+
+  /// #2889 — whether [command] is an AT/ST configuration command (vs an
+  /// OBD request). Mirrors the AT detection in [classifyReadTimeout]; only
+  /// AT commands advance the early-init grace counter.
+  static bool _isAtCommand(String command) {
+    final c = command.trim().toUpperCase();
+    return c.startsWith('AT') || c.startsWith('ST');
   }
 
   void _onBytes(List<int> chunk) {
@@ -216,6 +258,19 @@ class BluetoothObd2Transport implements Obd2Transport {
     }
     final completer = _pending;
     _pending = null;
+    // #2889 — resync after a per-command timeout. When the latch is armed
+    // AND no completer is awaiting this frame, it is the stale late reply
+    // of the command that just timed out (e.g. a slow clone's 2.3 s ATE0).
+    // Drop it and clear the latch so the NEXT command stays aligned with
+    // ITS own reply instead of inheriting this one (the desync root cause).
+    if (_swallowNextFrame && completer == null) {
+      _swallowNextFrame = false;
+      return;
+    }
+    // A legitimate reply matched a waiting command — the link is back in
+    // sync, so the latch (if somehow still set) must not survive to swallow
+    // a future real reply.
+    if (completer != null) _swallowNextFrame = false;
     completer?.complete(body);
   }
 
