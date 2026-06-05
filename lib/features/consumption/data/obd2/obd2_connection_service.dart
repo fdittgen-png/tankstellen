@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'adapter_registry.dart';
@@ -93,6 +94,15 @@ class Obd2ConnectionService {
   /// can change between trips. Null ⇒ adapterMac-only keying.
   final Obd2VehicleKeyFields Function()? activeVehicleKeyFields;
 
+  /// #2906 — settle pause after [_stopScanBeforeConnect] stops the radio and
+  /// before a `channel.open()` fires. Android BLE is fragile if a `connect()`
+  /// races an active scan still winding down on the radio — a stale scan can
+  /// hold the controller long enough that the connect returns GATT_ERROR 133.
+  /// A short settle lets `stopScan()` actually quiesce the radio. Injectable
+  /// so tests run it as [Duration.zero] (no real wait); production keeps the
+  /// observed-safe ~120 ms.
+  final Duration scanSettleDelay;
+
   Obd2ConnectionService({
     required this.registry,
     required this.permissions,
@@ -102,6 +112,7 @@ class Obd2ConnectionService {
     this.negotiatedProtocolCache,
     this.adapterWakeCache,
     this.activeVehicleKeyFields,
+    this.scanSettleDelay = const Duration(milliseconds: 120),
   });
 
   /// Stream of ranked, profile-matched candidates for the picker UI.
@@ -157,6 +168,14 @@ class Obd2ConnectionService {
   /// [Obd2AdapterUnresponsive] when init fails (channel is closed
   /// before the error is rethrown).
   Future<Obd2Service> connect(ResolvedObd2Candidate candidate) async {
+    // #2906 — stop any active scan (BLE + Classic) and let the radio settle
+    // BEFORE the channel opens. Android BLE returns GATT_ERROR 133 when a
+    // `connect()` races a scan still winding down on the controller; the
+    // scan-fallback `connect` is the worst offender (it reaches here straight
+    // out of the `await for` scan loop, whose subscription cancels — and so
+    // calls `stopScan()` — only asynchronously). Stopping + settling here
+    // closes that race for every connect path that funnels through `connect`.
+    await stopScanBeforeConnect();
     // #2907 — tear down any stale direct/passive channel from a PRIOR
     // by-MAC connect before the scan path opens a fresh one. The
     // [connectByMacDirect]/[connectByMacPassive] paths already self-clean,
@@ -307,6 +326,13 @@ class Obd2ConnectionService {
   /// [_connectByMacPassive]. Thin overridable instance method.
   Future<Obd2Service?> connectByMacPassive(String mac) =>
       _connectByMacPassive(this, mac);
+
+  /// #2906 — stop the active BLE + Classic scan and pause [scanSettleDelay]
+  /// so the radio quiesces before a `channel.open()` connect. Idempotent +
+  /// best-effort. Body lives in `obd2_connect_by_mac` (a `part`) so this file
+  /// stays under the #1680 cap; the thin instance method keeps it reachable
+  /// from [connect] here and from the by-MAC direct/passive paths there.
+  Future<void> stopScanBeforeConnect() => _stopScanBeforeConnect(this);
 
   Future<void> _teardownLastDirectChannel() async {
     final prior = _lastDirectChannel;
