@@ -3667,12 +3667,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Prix cible ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Seuil ($currency/L)';
   }
 
   @override

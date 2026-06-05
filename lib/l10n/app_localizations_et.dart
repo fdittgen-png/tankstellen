@@ -3635,12 +3635,12 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Sihthind ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Lävi ($currency/L)';
   }
 
   @override

@@ -3660,12 +3660,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Célár ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Küszöb ($currency/L)';
   }
 
   @override

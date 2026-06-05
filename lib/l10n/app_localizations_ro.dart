@@ -3660,12 +3660,12 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Preț țintă ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Prag ($currency/L)';
   }
 
   @override

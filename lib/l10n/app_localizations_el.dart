@@ -3662,12 +3662,12 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Τιμή-στόχος ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Όριο ($currency/L)';
   }
 
   @override

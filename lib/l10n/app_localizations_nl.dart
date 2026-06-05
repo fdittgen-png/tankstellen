@@ -3651,12 +3651,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Streefprijs ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Drempel ($currency/L)';
   }
 
   @override

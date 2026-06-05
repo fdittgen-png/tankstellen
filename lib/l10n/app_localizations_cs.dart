@@ -3648,12 +3648,12 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Cílová cena ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Práh ($currency/L)';
   }
 
   @override

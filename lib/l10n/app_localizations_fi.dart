@@ -3638,12 +3638,12 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Tavoitehinta ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Kynnys ($currency/L)';
   }
 
   @override

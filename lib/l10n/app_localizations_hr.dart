@@ -3642,12 +3642,12 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Ciljna cijena ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Prag ($currency/L)';
   }
 
   @override

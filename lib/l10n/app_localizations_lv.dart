@@ -3658,12 +3658,12 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String alertTargetPriceWithCurrency(String currency) {
-    return 'Target price ($currency)';
+    return 'Mērķa cena ($currency)';
   }
 
   @override
   String alertThresholdWithCurrency(String currency) {
-    return 'Threshold ($currency/L)';
+    return 'Slieksnis ($currency/L)';
   }
 
   @override
