@@ -14,6 +14,55 @@ Widget _host(Widget child) => MaterialApp(
     );
 
 void main() {
+  group('fillFor (#2899 — the closeness fraction)', () {
+    test('0% at distance >= radius (empty at the edge)', () {
+      expect(ProximityFillBar.fillFor(1000, 1000), 0.0);
+    });
+
+    test('~0.8 at 0.2 km inside a 1 km radius', () {
+      expect(ProximityFillBar.fillFor(200, 1000), closeTo(0.8, 1e-9));
+    });
+
+    test('~0.9 at 0.1 km inside a 1 km radius', () {
+      expect(ProximityFillBar.fillFor(100, 1000), closeTo(0.9, 1e-9));
+    });
+
+    test('100% at distance 0 (full at the station)', () {
+      expect(ProximityFillBar.fillFor(0, 1000), 1.0);
+    });
+
+    test('clamps to 0 beyond the radius (no negative)', () {
+      expect(ProximityFillBar.fillFor(2400, 1000), 0.0);
+    });
+
+    test('clamps to 1 at/under the station (no overflow)', () {
+      expect(ProximityFillBar.fillFor(-50, 1000), 1.0);
+    });
+
+    test('0 for a non-positive radius (no divide-by-zero blow-up)', () {
+      expect(ProximityFillBar.fillFor(100, 0), 0.0);
+    });
+  });
+
+  testWidgets('the rendered fill width matches fillFor (live fraction)',
+      (tester) async {
+    // 0.2 km inside a 1 km radius → the FractionallySizedBox settles at 0.8.
+    await tester.pumpWidget(
+      _host(
+        const SizedBox(
+          width: 200,
+          child: ProximityFillBar(distanceMeters: 200, radiusMeters: 1000),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final box = tester.widget<FractionallySizedBox>(
+      find.byType(FractionallySizedBox),
+    );
+    expect(box.widthFactor, closeTo(0.8, 1e-6));
+  });
+
   testWidgets('fill is a two-colour green→accent gradient (#2808)',
       (tester) async {
     await tester.pumpWidget(

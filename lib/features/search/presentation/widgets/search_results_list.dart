@@ -25,6 +25,7 @@ import '../../domain/entities/station.dart';
 import '../../providers/selected_station_provider.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
+import '../../providers/radar_search_provider.dart';
 import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';
 import '../../providers/station_rating_provider.dart';
@@ -332,6 +333,17 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
     );
     final stationRating = ref.watch(stationRatingProvider(station.id));
 
+    // #2899 — when the on-search Fuel Station Radar owns the result list, each
+    // card carries the green→accent closeness bar (the SAME [ProximityFillBar]
+    // as the trip card + PiP). The list scales to the SEARCH radius
+    // (`searchRadiusProvider × 1000`, the radius the radar fetch itself used),
+    // not the 1 km trip geo-fence: result rows routinely exceed that fence, so
+    // scaling to the search radius makes the bar read as RELATIVE closeness
+    // across the visible list. Null off radar mode → regular cards unchanged.
+    final radarActive = ref.watch(radarSearchProvider).active;
+    final closenessRadiusMeters =
+        radarActive ? ref.watch(searchRadiusProvider) * 1000.0 : null;
+
     return SwipeableStationCard(
       key: ValueKey('station-${station.id}'),
       station: station,
@@ -339,6 +351,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
       priceTier: tier,
       rating: stationRating,
       profileFuelType: profileFuel,
+      closenessRadiusMeters: closenessRadiusMeters,
       onNavigate: () => NavigationUtils.openInMaps(
         station.lat, station.lng,
         label: station.displayName,
