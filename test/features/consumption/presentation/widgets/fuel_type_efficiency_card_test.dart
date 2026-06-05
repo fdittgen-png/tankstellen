@@ -260,6 +260,29 @@ void main() {
     },
   );
 
+  testWidgets(
+    '#2888 — winner chip never shows a "(--)" cost: a crowned-but-null '
+    'fuel is treated as no winner',
+    (tester) async {
+      // Both fuels clear the interval gate (so cheapestPerKm WOULD crown
+      // one) but neither has a per-km figure (odometer reset zeroed every
+      // distance). The card must withhold the chip rather than render a
+      // placeholder cost inside it.
+      await pumpCard(
+        tester,
+        vehicle: flexCar,
+        data: [
+          stats(fuel: FuelType.e85, totalSpent: 100, fillCount: 3, attributed: 2),
+          stats(fuel: FuelType.e10, totalSpent: 120, fillCount: 3, attributed: 2),
+        ],
+      );
+      expect(find.byKey(const ValueKey('fuel_efficiency_winner_chip')),
+          findsNothing);
+      // And the chip text fragment never appears with a placeholder cost.
+      expect(find.textContaining('(--)'), findsNothing);
+    },
+  );
+
   testWidgets('never throws on legacy/all fuel + zero data shape',
       (tester) async {
     // A degenerate "all" wildcard fuel with null metrics must render

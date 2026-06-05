@@ -57,7 +57,15 @@ class FuelTypeEfficiencyCard extends ConsumerWidget {
     final withFills = stats.where((s) => s.fillCount > 0).toList();
     if (withFills.length < 2) return const SizedBox.shrink();
 
-    final winner = FuelTypeEfficiencyAggregator.cheapestPerKm(withFills);
+    final crowned = FuelTypeEfficiencyAggregator.cheapestPerKm(withFills);
+    // #2888 — only crown a winner whose €/km is actually non-null. The
+    // aggregator already guarantees this, but the gate is cheap and
+    // hardens the chip against any future change to `cheapestPerKm` (a
+    // crowned-but-null fuel would otherwise render "Cheapest per km:
+    // … (--)").
+    final winner = (crowned != null && _costPerKmOf(withFills, crowned) != null)
+        ? crowned
+        : null;
     // Best (lowest) non-null €/km — the sentiment baseline for the delta
     // arrows. Independent of the verdict gate so arrows render even when
     // no crown is awarded.
