@@ -68,8 +68,14 @@ class FavoritesHiveStore
   @override
   Map<String, dynamic>? getFavoriteStationData(String stationId) {
     final raw = _getFavoriteStationDataRaw()[stationId];
-    if (raw is Map) return Map<String, dynamic>.from(raw);
-    return null;
+    if (raw is! Map) return null;
+    // #2893 — deep-convert so nested objects (e.g. the #2777 structured
+    // `openingHours`, whose `days`/`ranges` Hive round-trips as
+    // `Map<dynamic, dynamic>`) keep `Map<String, dynamic>` typing. A shallow
+    // `Map<String, dynamic>.from` left those inner maps dynamic-keyed, so
+    // `Station.fromJson`'s nested cast threw and the whole favorite was
+    // silently dropped. Mirrors the EV path's existing deep-convert (#690).
+    return HiveBoxes.toStringDynamicMap(raw);
   }
 
   @override
