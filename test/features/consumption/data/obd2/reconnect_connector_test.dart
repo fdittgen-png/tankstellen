@@ -8,6 +8,7 @@ import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_comm_diagnostics.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
@@ -293,6 +294,76 @@ void main() {
           reason: 'a classic drop must NOT open a BLE autoConnect channel');
       expect(ble.directCalls, 0);
       await connected!.disconnect();
+    });
+  });
+
+  group('ReconnectConnector → per-attempt telemetry (#2905)', () {
+    setUp(Obd2CommDiagnostics.instance.reset);
+    tearDown(() {
+      Obd2CommDiagnostics.instance
+        ..enabled = false
+        ..reset();
+    });
+
+    test('a successful DIRECT reconnect records a direct success row', () async {
+      Obd2CommDiagnostics.instance
+        ..enabled = true
+        ..beginSession();
+      final fake = _FakeFacade(
+        directChannel: _FakeChannel(respondTo: _elmOk()),
+        batches: const [[]],
+      );
+      Obd2Service? connected;
+      final connector = ReconnectConnector(
+        connection: _build(fake),
+        onConnected: (s) => connected = s,
+        attemptNumber: () => 1,
+        backoffMs: () => 0,
+      );
+
+      await connector.attempt('aa:bb');
+
+      final rows = Obd2CommDiagnostics.instance.snapshot().reconnectAttempts;
+      expect(rows, hasLength(1));
+      expect(rows.single.succeeded, isTrue);
+      expect(rows.single.path, 'direct');
+      expect(rows.single.attemptNumber, 1);
+      await connected?.disconnect();
+    });
+
+    test('a failed DIRECT reconnect records a failed direct row with the '
+        'forwarded scanner ordinal + backoff', () async {
+      Obd2CommDiagnostics.instance
+        ..enabled = true
+        ..beginSession();
+      final fake = _FakeFacade(
+        // The connection service catches the GATT-133 internally and returns
+        // null (no rethrow) — the connector's clean-null branch tags the
+        // reconnect-path reason as device-not-connected.
+        directChannel: _FakeChannel(openError: StateError('GATT_ERROR 133')),
+        // No scan sighting ⇒ the scan fallback finds nothing and returns false.
+        batches: const [[]],
+      );
+      final connector = ReconnectConnector(
+        connection: _build(fake),
+        onConnected: (_) {},
+        attemptNumber: () => 3,
+        backoffMs: () => 5000,
+      );
+
+      final ok = await connector.attempt('aa:bb');
+
+      expect(ok, isFalse);
+      final rows = Obd2CommDiagnostics.instance.snapshot().reconnectAttempts;
+      final directRow = rows.firstWhere((r) => r.path == 'direct');
+      expect(directRow.succeeded, isFalse);
+      // The reconnect-PATH reason is forwarded into the per-attempt timeline
+      // (init-path channels only ever recorded init-path reasons before).
+      expect(directRow.reasonCode, 'device-not-connected');
+      expect(directRow.attemptNumber, 3,
+          reason: 'the scanner ordinal is forwarded onto the row');
+      expect(directRow.backoffMs, 5000,
+          reason: 'the scanner backoff is forwarded onto the row');
     });
   });
 }

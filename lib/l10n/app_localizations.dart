@@ -10657,6 +10657,35 @@ abstract class AppLocalizations {
   /// **'Per-PID outcomes'**
   String get obd2DiagnosticsPidSection;
 
+  /// Section header above the per-reconnect-attempt + session-state-transition telemetry rows (attempt count, successes, failure-reason tally, typed disconnects, GPS-fallback marker) on the OBD2 diagnostics card (#2905, Epic #2904).
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect telemetry'**
+  String get obd2DiagnosticsReconnectSection;
+
+  /// Reconnect-telemetry summary line on the OBD2 diagnostics card (#2905). attempts is the per-attempt-timeline row count; successes the attempts that re-established a link; transitions the session-state-transition marker count; disconnects the Obd2DisconnectedException (typed drop) count.
+  ///
+  /// In en, this message translates to:
+  /// **'{attempts} reconnect attempts · {successes} ok · {transitions} transitions · {disconnects} typed drops'**
+  String obd2DiagnosticsReconnectAttemptsLine(
+    int attempts,
+    int successes,
+    int transitions,
+    int disconnects,
+  );
+
+  /// One failed-reconnect-attempt reason-tally row on the OBD2 diagnostics card (#2905). reason is the low-cardinality failure tag (rfcomm-open-fail / gatt-133 / device-not-connected / timeout / other), count how many attempts failed for that reason this session.
+  ///
+  /// In en, this message translates to:
+  /// **'{reason}: {count}'**
+  String obd2DiagnosticsReconnectReasonLine(String reason, int count);
+
+  /// Marker line on the OBD2 diagnostics card (#2905) shown when GPS-only fallback recording was activated during the session — the OBD2 link dropped but GPS kept the trip recording.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS-only fallback activated this session.'**
+  String get obd2DiagnosticsFallbackLine;
+
   /// Section header above the scheduler-health rows (achieved tick-rate, back-pressure skips, governor demotions, starvation) on the OBD2 diagnostics card (#2470).
   ///
   /// In en, this message translates to:

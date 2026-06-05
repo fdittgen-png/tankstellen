@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'reconnect_scanner_diagnostics.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Callback signature: "is the pinned adapter MAC currently
@@ -194,6 +195,14 @@ class AdapterReconnectScanner {
   @visibleForTesting
   int get consecutiveMisses => _consecutiveMisses;
 
+  /// #2905 — 1-based ordinal + current backoff (ms) of the attempt the
+  /// scanner is ABOUT to make, read by the [ReconnectConnector] so each
+  /// per-attempt telemetry row carries its episode ordinal + backoff.
+  int get currentAttemptNumber => _consecutiveMisses + 1;
+
+  /// See [currentAttemptNumber].
+  int get currentBackoffMs => _currentBackoff.inMilliseconds;
+
   /// Schedule the first probe cycle. Safe to call repeatedly — a
   /// second call while already scanning is a no-op so the caller
   /// (typically [TripRecordingController._handleDrop]) doesn't have
@@ -214,6 +223,8 @@ class AdapterReconnectScanner {
     _notifiedPassiveWait = false;
     _sinceStart =
         Obd2CommDiagnostics.instance.enabled ? (Stopwatch()..start()) : null;
+    // #2905 — mark the episode entering the active reconnecting state.
+    recordReconnectingStarted();
     // #1991 — first probe fast (a transient drop recovers quickest with
     // a near-immediate retry); subsequent misses fall back to the
     // exponential backoff via `_scheduleNext`.
@@ -376,24 +387,15 @@ class AdapterReconnectScanner {
     _backoffEscalated = true;
   }
 
-  /// #2466 — record one successful reconnect into the gated comm-health
-  /// collector: a silent-vs-visible tally plus the time-to-reconnect
-  /// measured from [start]. A no-op unless `Feature.debugMode` armed the
-  /// collector (the Stopwatch is only allocated then). Called once, right
-  /// before [_onReconnect] fires, after the scanner has self-stopped.
+  /// #2466 + #2905 — record one successful reconnect via the gated
+  /// comm-health helper: the silent-vs-visible tally + time-to-reconnect
+  /// sample (from [start]) PLUS the `reconnected` transition marker. A
+  /// no-op unless `Feature.debugMode` armed the collector. The per-attempt
+  /// `succeeded:true` row is recorded by the [ReconnectConnector], the
+  /// single owner of per-attempt path/reason/rssi detail.
   void _noteReconnectDiagnostics() {
-    final diag = Obd2CommDiagnostics.instance;
-    if (!diag.enabled) return;
     final elapsed = _sinceStart?.elapsedMilliseconds;
     _sinceStart = null;
-    // Silent ⇒ recovered before the backoff ever escalated (the fast
-    // firstProbeDelay probe / first attempt healed it inside the grace
-    // window); visible ⇒ it took at least one backoff step or passive mode.
-    final silent = !_backoffEscalated;
-    diag.noteConnectionEvent(
-      silentReconnect: silent,
-      visibleReconnect: !silent,
-      timeToReconnectMs: elapsed,
-    );
+    recordReconnectSuccess(silent: !_backoffEscalated, elapsedMs: elapsed);
   }
 }

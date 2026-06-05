@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'obd2_comm_diagnostics.dart';
 import 'obd2_connection_errors.dart';
 
 /// Owns the connection-drop *detection* heuristics extracted from
@@ -79,8 +80,15 @@ class TripDropDetector {
     _recentErrors.removeWhere(
       (ts) => now.difference(ts) > _dropWindow,
     );
-    return _isTypedDisconnect(error) ||
-        _recentErrors.length >= _dropThreshold;
+    final typedDisconnect = _isTypedDisconnect(error);
+    // #2905 — the single canonical point where an Obd2DisconnectedException /
+    // 'transport closed' is recognised as a drop. Record the typed-drop
+    // marker the trajet export previously omitted (gated; a no-op unless
+    // Feature.debugMode armed the collector).
+    if (typedDisconnect) {
+      Obd2CommDiagnostics.instance.noteDisconnectException();
+    }
+    return typedDisconnect || _recentErrors.length >= _dropThreshold;
   }
 
   /// Observe a high-priority PID parse outcome and report whether the

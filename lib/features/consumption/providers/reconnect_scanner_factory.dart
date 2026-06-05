@@ -62,7 +62,7 @@ AdapterReconnectScanner? Function(
       // BLE-direct-first path (behaviour unchanged for BLE adapters).
       transportHint: readLinkKind(),
     );
-    return AdapterReconnectScanner(
+    final scanner = AdapterReconnectScanner(
       pinnedMac: pinnedMac,
       probe: (mac) async => true,
       connect: connector.attempt,
@@ -71,5 +71,12 @@ AdapterReconnectScanner? Function(
       passiveConnect: connector.attemptPassive,
       onReconnect: onReconnect,
     );
+    // #2905 — let the connector's per-attempt telemetry rows carry the
+    // scanner's live episode ordinal + backoff. Wired here (not via the ctor)
+    // so the connector→scanner dependency stays one-directional.
+    connector
+      ..attemptNumber = (() => scanner.currentAttemptNumber)
+      ..backoffMs = (() => scanner.currentBackoffMs);
+    return scanner;
   };
 }

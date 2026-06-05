@@ -921,6 +921,12 @@ class _ObservableScanner implements AdapterReconnectScanner {
   Duration get currentBackoff => const Duration(seconds: 5);
 
   @override
+  int get currentAttemptNumber => 1;
+
+  @override
+  int get currentBackoffMs => 5000;
+
+  @override
   Future<void> start() async {
     _scanning = true;
     onStart();

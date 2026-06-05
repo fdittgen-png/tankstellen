@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2/obd2_diagnostics_summary.dart';
 import '../../data/obd2/obd2_session_diagnostic.dart';
 import 'obd2_init_transcript_section.dart';
+import 'obd2_reconnect_section.dart';
 
 /// Read-only inspector card for one OBD2 communication-health session
 /// (#2470, TAIL of Epic #2463) — the dev-tools analogue of
@@ -97,6 +98,10 @@ class Obd2DiagnosticsCard extends StatelessWidget {
         children: [
           _adapterSection(context, l, theme),
           _connectionSection(context, l, theme, summary),
+          if (summary.reconnectAttemptCount > 0 ||
+              summary.transitionCount > 0 ||
+              summary.fallbackActivated)
+            Obd2ReconnectSection(summary: summary),
           _pidSection(context, l, theme, summary),
           _schedulerSection(context, l, theme),
           _completenessSection(context, l, theme, summary),

@@ -9,6 +9,8 @@ import '../../../../core/logging/error_logger.dart';
 import '../trip_history_repository.dart';
 import 'adapter_reconnect_scanner.dart';
 import 'auto_record_trace_log.dart';
+import 'obd2_comm_diagnostics.dart';
+import 'obd2_session_diagnostic.dart';
 import 'dropped_session_host.dart';
 import 'dropped_session_repo_resolver.dart';
 import 'paused_trip_repository.dart';
@@ -149,6 +151,9 @@ class DroppedSessionManager {
     // #1920 — trace every detected drop so a failed recording session
     // can be analysed from the exportable OBD2 diagnostic log.
     _trace(AutoRecordEventKind.dropDetected, detail: reason.name);
+    // #2905 — record the connected→dropped transition (gated comm-health).
+    Obd2CommDiagnostics.instance
+        .noteSessionTransition(Obd2SessionState.dropped, detail: reason.name);
     _host.stopScheduler();
     // #2671 — also GATE dispatch (not just cancel the timer): if a later
     // path restarts the scheduler while the link is still flapping, a paused
@@ -208,6 +213,8 @@ class DroppedSessionManager {
   void _enterDegradedGpsOnly(TripDropReason reason) {
     _host.degradedGpsOnly = true;
     _dropReason = reason;
+    // #2905 — stamp the GPS-only-fallback-activation marker the trajet omitted.
+    Obd2CommDiagnostics.instance.noteFallbackActivated(detail: reason.name);
     _trace(AutoRecordEventKind.silentReconnectStarted);
     if (_reconnectScanner == null) _startReconnectScanner();
     _host.emitState();
