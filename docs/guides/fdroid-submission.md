@@ -49,6 +49,32 @@ untouched: real GMS, full functionality (fused location + ML Kit OCR/barcode).
 
 ## Submitting the official fdroiddata recipe
 
+### Maintainer account binding
+
+An fdroiddata recipe has **no** maintainer, submitter, or GitLab-id field — the
+[Build Metadata Reference](https://f-droid.org/docs/Build_Metadata_Reference/)
+defines none. The only identity fields a recipe carries are `AuthorName`,
+`AuthorEmail` and `AuthorWebSite`. Your status as submitter / maintainer-of-record
+is therefore **implicit**: it is whichever GitLab account forks
+`fdroid/fdroiddata`, authors the git commits, and opens the merge request.
+
+Bind it by being signed in as the maintainer account through the whole
+fork → push → MR flow:
+
+- **GitLab account:** user id `38723484`, display name "Florian FloDitt"
+- **Fork URL:** `https://gitlab.com/<your-gitlab-username>/fdroiddata`
+  (the numeric id does **not** resolve — the fork path needs your @username;
+  fill it in here once confirmed)
+- **Contact:** fdittgen@gmail.com (also set in the recipe as `AuthorEmail`)
+- **Local git author:** run `git config user.email fdittgen@gmail.com` on the
+  fdroiddata-fork clone so the commit author matches the account opening the MR.
+
+The recipe's `AuthorName: Florian DITTGEN` is the **public author credit** (free
+text) and is deliberately the real-name form — consistent with the project's
+copyright headers, git author, GitHub (`fdittgen-png`) and Apple Developer
+identity — not the GitLab display name. The numeric GitLab id never appears in
+the `.yml`; encoding it there would fail `fdroid lint`.
+
 Prerequisites: `fdroidserver` (`brew install fdroidserver`) and a GitLab
 account.
 
