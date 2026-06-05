@@ -1,4 +1,5 @@
 {
+  "fillUpMultiFuelHint": "Dieses Fahrzeug kann verschiedene Kraftstoffe nutzen – erfasse den, den du tatsächlich getankt hast",
   "fillUpGuidanceTitle": "Bester Zeitpunkt zum Tanken",
   "@fillUpGuidanceTitle": {
     "description": "Title of the on-device 'best time to fill up' guidance card on the price-history screen (#1543)."

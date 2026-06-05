@@ -5055,6 +5055,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Personal Access Token';
 
   @override
+  String get fillUpMultiFuelHint =>
+      'Ce véhicule peut utiliser différents carburants — enregistrez celui que vous avez réellement mis';
+
+  @override
   String get fillUpGuidanceTitle => 'Meilleur moment pour faire le plein';
 
   @override
@@ -5388,6 +5392,83 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profileSectionRegion => 'Région';
+
+  @override
+  String get fuelEfficiencyCardTitle => 'Coût au kilomètre par carburant';
+
+  @override
+  String get fuelEfficiencyCardSubtitle =>
+      'Quel carburant revient réellement le moins cher à rouler';
+
+  @override
+  String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
+    return 'Le moins cher au km : $fuel ($costPerKm)';
+  }
+
+  @override
+  String get fuelEfficiencyColL100km => 'L/100km';
+
+  @override
+  String get fuelEfficiencyColCostPerKm => 'Coût/km';
+
+  @override
+  String get fuelEfficiencyColTotalSpent => 'Total dépensé';
+
+  @override
+  String fuelEfficiencyFillCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pleins',
+      one: '1 plein',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyMixedFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pleins mixtes attribués à leur carburant principal',
+      one: '1 plein mixte attribué à son carburant principal',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fuelEfficiencyInsufficientData =>
+      'Enregistrez au moins deux pleins complets par carburant pour désigner le moins cher.';
+
+  @override
+  String get fuelNameE5 => 'Super E5';
+
+  @override
+  String get fuelNameE10 => 'Super E10';
+
+  @override
+  String get fuelNameE98 => 'Super 98';
+
+  @override
+  String get fuelNameDiesel => 'Diesel';
+
+  @override
+  String get fuelNameDieselPremium => 'Diesel Premium';
+
+  @override
+  String get fuelNameE85 => 'E85 Bioéthanol';
+
+  @override
+  String get fuelNameLpg => 'GPL';
+
+  @override
+  String get fuelNameCng => 'GNV';
+
+  @override
+  String get fuelNameHydrogen => 'Hydrogène';
+
+  @override
+  String get fuelNameElectric => 'Électrique';
 
   @override
   String get calibrationModeLabel => 'Mode de calibration';
@@ -7355,6 +7436,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String routeDataSourceMulti(String sources) {
     return '$sources';
   }
+
+  @override
+  String get vehicleMultiFuelCapableLabel =>
+      'Je peux faire le plein avec différents carburants';
+
+  @override
+  String get vehicleMultiFuelCapableHelper =>
+      'Détermine quel carburant est le moins cher au kilomètre';
 
   @override
   String get vinLabel => 'VIN (optionnel)';

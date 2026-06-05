@@ -4977,6 +4977,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Personal Access Token';
 
   @override
+  String get fillUpMultiFuelHint =>
+      'This vehicle can use different fuels — log the one you actually pumped';
+
+  @override
   String get fillUpGuidanceTitle => 'Best time to fill up';
 
   @override
@@ -5304,6 +5308,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileSectionRegion => 'Region';
+
+  @override
+  String get fuelEfficiencyCardTitle => 'Cost per kilometre by fuel';
+
+  @override
+  String get fuelEfficiencyCardSubtitle =>
+      'Which fuel is actually cheapest to drive on';
+
+  @override
+  String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
+    return 'Cheapest per km: $fuel ($costPerKm)';
+  }
+
+  @override
+  String get fuelEfficiencyColL100km => 'L/100km';
+
+  @override
+  String get fuelEfficiencyColCostPerKm => 'Cost/km';
+
+  @override
+  String get fuelEfficiencyColTotalSpent => 'Total spent';
+
+  @override
+  String fuelEfficiencyFillCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills',
+      one: '1 fill',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyMixedFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mixed tanks counted toward their main fuel',
+      one: '1 mixed tank counted toward its main fuel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fuelEfficiencyInsufficientData =>
+      'Log at least two full tanks per fuel to crown the cheapest.';
+
+  @override
+  String get fuelNameE5 => 'Super E5';
+
+  @override
+  String get fuelNameE10 => 'Super E10';
+
+  @override
+  String get fuelNameE98 => 'Super 98';
+
+  @override
+  String get fuelNameDiesel => 'Diesel';
+
+  @override
+  String get fuelNameDieselPremium => 'Diesel Premium';
+
+  @override
+  String get fuelNameE85 => 'E85 Bioethanol';
+
+  @override
+  String get fuelNameLpg => 'LPG';
+
+  @override
+  String get fuelNameCng => 'CNG';
+
+  @override
+  String get fuelNameHydrogen => 'Hydrogen';
+
+  @override
+  String get fuelNameElectric => 'Electric';
 
   @override
   String get calibrationModeLabel => 'Calibration mode';
@@ -7235,6 +7316,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String routeDataSourceMulti(String sources) {
     return '$sources';
   }
+
+  @override
+  String get vehicleMultiFuelCapableLabel =>
+      'I may fill up with different fuel types';
+
+  @override
+  String get vehicleMultiFuelCapableHelper =>
+      'Tracks which fuel is cheapest per kilometre';
 
   @override
   String get vinLabel => 'VIN (optional)';
@@ -12527,6 +12616,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get feedbackTokenFieldLabel => '⟦Ƥéřšóñáł Áççéšš Ŧóķéñ ·········⟧';
 
   @override
+  String get fillUpMultiFuelHint =>
+      '⟦Ŧĥîš ṽéĥîçłé çáñ úšé đîƒƒéřéñŧ ƒúéłš — łóǧ ŧĥé óñé ýóú áçŧúáłłý ƥúɱƥéđ ··························⟧';
+
+  @override
   String get fillUpGuidanceTitle => '⟦Ɓéšŧ ŧîɱé ŧó ƒîłł úƥ ·······⟧';
 
   @override
@@ -12865,6 +12958,84 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get profileSectionRegion => '⟦Řéǧîóñ ···⟧';
+
+  @override
+  String get fuelEfficiencyCardTitle =>
+      '⟦Çóšŧ ƥéř ķîłóɱéŧřé ƀý ƒúéł ··········⟧';
+
+  @override
+  String get fuelEfficiencyCardSubtitle =>
+      '⟦Ŵĥîçĥ ƒúéł îš áçŧúáłłý çĥéáƥéšŧ ŧó đřîṽé óñ ················⟧';
+
+  @override
+  String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
+    return '⟦Çĥéáƥéšŧ ƥéř ķɱ: $fuel ($costPerKm) ······⟧';
+  }
+
+  @override
+  String get fuelEfficiencyColL100km => '⟦Ł/100ķɱ ·⟧';
+
+  @override
+  String get fuelEfficiencyColCostPerKm => '⟦Çóšŧ/ķɱ ···⟧';
+
+  @override
+  String get fuelEfficiencyColTotalSpent => '⟦Ŧóŧáł šƥéñŧ ·····⟧';
+
+  @override
+  String fuelEfficiencyFillCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills',
+      one: '1 fill',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String fuelEfficiencyMixedFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mixed tanks counted toward their main fuel',
+      one: '1 mixed tank counted toward its main fuel',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get fuelEfficiencyInsufficientData =>
+      '⟦Łóǧ áŧ łéášŧ ŧŵó ƒúłł ŧáñķš ƥéř ƒúéł ŧó çřóŵñ ŧĥé çĥéáƥéšŧ. ·····················⟧';
+
+  @override
+  String get fuelNameE5 => '⟦Šúƥéř É5 ···⟧';
+
+  @override
+  String get fuelNameE10 => '⟦Šúƥéř É10 ···⟧';
+
+  @override
+  String get fuelNameE98 => '⟦Šúƥéř 98 ··⟧';
+
+  @override
+  String get fuelNameDiesel => '⟦Đîéšéł ···⟧';
+
+  @override
+  String get fuelNameDieselPremium => '⟦Đîéšéł Ƥřéɱîúɱ ······⟧';
+
+  @override
+  String get fuelNameE85 => '⟦É85 Ɓîóéŧĥáñół ·····⟧';
+
+  @override
+  String get fuelNameLpg => '⟦ŁƤǦ ·⟧';
+
+  @override
+  String get fuelNameCng => '⟦ÇÑǦ ·⟧';
+
+  @override
+  String get fuelNameHydrogen => '⟦Ĥýđřóǧéñ ····⟧';
+
+  @override
+  String get fuelNameElectric => '⟦Éłéçŧřîç ····⟧';
 
   @override
   String get calibrationModeLabel => '⟦Çáłîƀřáŧîóñ ɱóđé ·······⟧';
@@ -14843,6 +15014,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String routeDataSourceMulti(String sources) {
     return '⟦$sources⟧';
   }
+
+  @override
+  String get vehicleMultiFuelCapableLabel =>
+      '⟦Î ɱáý ƒîłł úƥ ŵîŧĥ đîƒƒéřéñŧ ƒúéł ŧýƥéš ··············⟧';
+
+  @override
+  String get vehicleMultiFuelCapableHelper =>
+      '⟦Ŧřáçķš ŵĥîçĥ ƒúéł îš çĥéáƥéšŧ ƥéř ķîłóɱéŧřé ·················⟧';
 
   @override
   String get vinLabel => '⟦ṼÎÑ (óƥŧîóñáł) ·····⟧';

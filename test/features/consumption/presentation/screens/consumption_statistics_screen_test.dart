@@ -10,6 +10,8 @@ import 'package:tankstellen/features/consumption/presentation/screens/consumptio
 import 'package:tankstellen/features/consumption/presentation/widgets/monthly_fuel_comparison_card.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/silence_error_logger.dart';
@@ -24,6 +26,16 @@ class _FixedFillUpList extends FillUpList {
 
   @override
   List<FillUp> build() => _value;
+}
+
+/// #2898 — the stats page now hosts FuelTypeEfficiencyCard, which watches the
+/// active-vehicle provider (Hive-backed). In a widget test without Hive that
+/// read throws, so override it to a null active vehicle: the per-fuel card then
+/// self-hides (this test covers the header tiles / comparison card / chart, not
+/// the per-fuel card).
+class _NoVehicle extends ActiveVehicleProfile {
+  @override
+  VehicleProfile? build() => null;
 }
 
 FillUp _f(String id, DateTime date, double liters, double cost, double odo) =>
@@ -48,6 +60,7 @@ void main() {
 
   List<Object> overrides(List<FillUp> fills) => [
     fillUpListProvider.overrideWith(() => _FixedFillUpList(fills)),
+    activeVehicleProfileProvider.overrideWith(() => _NoVehicle()),
   ];
 
   testWidgets('renders header tiles, comparison card and a chart', (

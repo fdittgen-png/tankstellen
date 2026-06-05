@@ -46,6 +46,7 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
             ),
       tankCapacityL: (json['tankCapacityL'] as num?)?.toDouble(),
       preferredFuelType: json['preferredFuelType'] as String?,
+      multiFuelCapable: json['multiFuelCapable'] as bool? ?? false,
       engineDisplacementCc: (json['engineDisplacementCc'] as num?)?.toInt(),
       engineCylinders: (json['engineCylinders'] as num?)?.toInt(),
       volumetricEfficiency:
@@ -132,6 +133,7 @@ Map<String, dynamic> _$VehicleProfileToJson(
   ),
   'tankCapacityL': instance.tankCapacityL,
   'preferredFuelType': instance.preferredFuelType,
+  'multiFuelCapable': instance.multiFuelCapable,
   'engineDisplacementCc': instance.engineDisplacementCc,
   'engineCylinders': instance.engineCylinders,
   'volumetricEfficiency': instance.volumetricEfficiency,

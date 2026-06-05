@@ -130,6 +130,23 @@ abstract class VehicleProfile with _$VehicleProfile {
     double? tankCapacityL,
     String? preferredFuelType,
 
+    // Multi-fuel capability (#2885 / Epic #2881). When `true` the user
+    // has declared this vehicle may be filled with more than one fuel
+    // type — the canonical case is a flex-fuel petrol car alternating
+    // E85 / E10 / E5 depending on availability. Drives:
+    //   * the per-fill fuel prompt on the Add-Fill-up form (#2886): the
+    //     fuel picker is seeded from the LAST-USED fuel rather than the
+    //     vehicle default, so the user logs the fuel they actually
+    //     pumped this tank.
+    //   * the per-fuel €/km comparison card on the consumption stats
+    //     page (#2887): the card self-hides unless the active vehicle is
+    //     `multiFuelCapable`.
+    // The vehicle form only OFFERS the toggle for E10 / E85 petrol-family
+    // vehicles (#2885) — the comparison is meaningless for a single-fuel
+    // diesel / LPG / CNG / EV. Defaults `false` so legacy profiles
+    // deserialize cleanly via freezed's `@Default`.
+    @Default(false) bool multiFuelCapable,
+
     // Engine parameters for the speed-density fuel-rate fallback
     // (#812). Only populated when the VIN decoder or the user's
     // manual onboarding entry provides them. `readFuelRateLPerHour`

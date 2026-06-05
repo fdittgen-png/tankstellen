@@ -5035,6 +5035,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get feedbackTokenFieldLabel => 'Personal Access Token';
 
   @override
+  String get fillUpMultiFuelHint =>
+      'Dieses Fahrzeug kann verschiedene Kraftstoffe nutzen – erfasse den, den du tatsächlich getankt hast';
+
+  @override
   String get fillUpGuidanceTitle => 'Bester Zeitpunkt zum Tanken';
 
   @override
@@ -5368,6 +5372,83 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get profileSectionRegion => 'Region';
+
+  @override
+  String get fuelEfficiencyCardTitle => 'Kosten pro Kilometer nach Kraftstoff';
+
+  @override
+  String get fuelEfficiencyCardSubtitle =>
+      'Mit welchem Kraftstoff das Fahren wirklich am günstigsten ist';
+
+  @override
+  String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
+    return 'Günstigster pro km: $fuel ($costPerKm)';
+  }
+
+  @override
+  String get fuelEfficiencyColL100km => 'L/100km';
+
+  @override
+  String get fuelEfficiencyColCostPerKm => 'Kosten/km';
+
+  @override
+  String get fuelEfficiencyColTotalSpent => 'Gesamtausgaben';
+
+  @override
+  String fuelEfficiencyFillCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tankungen',
+      one: '1 Tankung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelEfficiencyMixedFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gemischte Tankungen ihrem Hauptkraftstoff zugerechnet',
+      one: '1 gemischte Tankung dem Hauptkraftstoff zugerechnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fuelEfficiencyInsufficientData =>
+      'Erfasse mindestens zwei volle Tankfüllungen pro Kraftstoff, um den günstigsten zu küren.';
+
+  @override
+  String get fuelNameE5 => 'Super E5';
+
+  @override
+  String get fuelNameE10 => 'Super E10';
+
+  @override
+  String get fuelNameE98 => 'Super 98';
+
+  @override
+  String get fuelNameDiesel => 'Diesel';
+
+  @override
+  String get fuelNameDieselPremium => 'Diesel Premium';
+
+  @override
+  String get fuelNameE85 => 'E85 Bioethanol';
+
+  @override
+  String get fuelNameLpg => 'Autogas (LPG)';
+
+  @override
+  String get fuelNameCng => 'Erdgas (CNG)';
+
+  @override
+  String get fuelNameHydrogen => 'Wasserstoff';
+
+  @override
+  String get fuelNameElectric => 'Elektrisch';
 
   @override
   String get calibrationModeLabel => 'Kalibrierungsmodus';
@@ -7314,6 +7395,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String routeDataSourceMulti(String sources) {
     return '$sources';
   }
+
+  @override
+  String get vehicleMultiFuelCapableLabel =>
+      'Ich tanke eventuell verschiedene Kraftstoffarten';
+
+  @override
+  String get vehicleMultiFuelCapableHelper =>
+      'Ermittelt, welcher Kraftstoff pro Kilometer am günstigsten ist';
 
   @override
   String get vinLabel => 'FIN (optional)';

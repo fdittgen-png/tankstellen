@@ -1,4 +1,6 @@
 {
+  "vehicleMultiFuelCapableLabel": "Ich tanke eventuell verschiedene Kraftstoffarten",
+  "vehicleMultiFuelCapableHelper": "Ermittelt, welcher Kraftstoff pro Kilometer am günstigsten ist",
   "vinLabel": "FIN (optional)",
   "vinDecodeTooltip": "FIN entschlüsseln",
   "vinConfirmAction": "Ja, automatisch ausfüllen",

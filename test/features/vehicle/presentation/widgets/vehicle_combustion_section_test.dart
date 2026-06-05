@@ -19,6 +19,23 @@ String? _requireNumber(String? v) {
 }
 
 void main() {
+  /// Helper that builds the section with the #2885 multi-fuel params.
+  Widget buildSection({
+    required TextEditingController tank,
+    required TextEditingController fuel,
+    bool multiFuelCapable = false,
+    ValueChanged<bool>? onMultiFuel,
+    ValueChanged<FuelType?>? onFuelChanged,
+  }) =>
+      VehicleCombustionSection(
+        tankController: tank,
+        fuelTypeController: fuel,
+        multiFuelCapable: multiFuelCapable,
+        onMultiFuelCapableChanged: onMultiFuel ?? (_) {},
+        onFuelTypeChanged: onFuelChanged ?? (_) {},
+        numberValidator: _requireNumber,
+      );
+
   group('VehicleCombustionSection', () {
     testWidgets('renders section title, tank field, fuel type field',
         (tester) async {
@@ -27,19 +44,91 @@ void main() {
       addTearDown(tank.dispose);
       addTearDown(fuel.dispose);
 
-      await pumpApp(
-        tester,
-        VehicleCombustionSection(
-          tankController: tank,
-          fuelTypeController: fuel,
-          numberValidator: _requireNumber,
-        ),
-      );
+      await pumpApp(tester, buildSection(tank: tank, fuel: fuel));
 
       expect(find.text('Combustion'), findsOneWidget);
       expect(find.text('Tank capacity (L)'), findsOneWidget);
       expect(find.text('Preferred fuel'), findsOneWidget);
     });
+
+    testWidgets(
+      '#2885 — multi-fuel switch is SHOWN for E10 and E85 but HIDDEN for '
+      'diesel / E5 (single-fuel grades)',
+      (tester) async {
+        const switchKey = Key('vehicle_multi_fuel_capable_switch');
+
+        for (final fuelCode in ['e10', 'e85']) {
+          final tank = TextEditingController();
+          final fuel = TextEditingController(text: fuelCode);
+          addTearDown(tank.dispose);
+          addTearDown(fuel.dispose);
+          await pumpApp(tester, buildSection(tank: tank, fuel: fuel));
+          expect(find.byKey(switchKey), findsOneWidget,
+              reason: '$fuelCode is a flex-fuel grade — offer the switch');
+        }
+
+        for (final fuelCode in ['diesel', 'e5', 'lpg']) {
+          final tank = TextEditingController();
+          final fuel = TextEditingController(text: fuelCode);
+          addTearDown(tank.dispose);
+          addTearDown(fuel.dispose);
+          await pumpApp(tester, buildSection(tank: tank, fuel: fuel));
+          expect(find.byKey(switchKey), findsNothing,
+              reason: '$fuelCode is single-fuel — hide the switch');
+        }
+      },
+    );
+
+    testWidgets('#2885 — toggling the multi-fuel switch fires the callback',
+        (tester) async {
+      final tank = TextEditingController();
+      final fuel = TextEditingController(text: 'e85');
+      addTearDown(tank.dispose);
+      addTearDown(fuel.dispose);
+      bool? captured;
+
+      await pumpApp(
+        tester,
+        buildSection(
+          tank: tank,
+          fuel: fuel,
+          multiFuelCapable: false,
+          onMultiFuel: (v) => captured = v,
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('vehicle_multi_fuel_capable_switch')));
+      await tester.pump();
+      expect(captured, isTrue);
+    });
+
+    testWidgets(
+      '#2885 — changing the fuel dropdown notifies onFuelTypeChanged',
+      (tester) async {
+        final tank = TextEditingController();
+        final fuel = TextEditingController(text: 'e10');
+        addTearDown(tank.dispose);
+        addTearDown(fuel.dispose);
+        FuelType? changed;
+
+        await pumpApp(
+          tester,
+          buildSection(
+            tank: tank,
+            fuel: fuel,
+            onFuelChanged: (v) => changed = v,
+          ),
+        );
+
+        await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(FuelType.diesel.displayName).last);
+        await tester.pumpAndSettle();
+
+        expect(changed, equals(FuelType.diesel));
+        expect(fuel.text, FuelType.diesel.apiValue);
+      },
+    );
 
     testWidgets('user-typed tank capacity flows to the controller',
         (tester) async {
@@ -48,14 +137,7 @@ void main() {
       addTearDown(tank.dispose);
       addTearDown(fuel.dispose);
 
-      await pumpApp(
-        tester,
-        VehicleCombustionSection(
-          tankController: tank,
-          fuelTypeController: fuel,
-          numberValidator: _requireNumber,
-        ),
-      );
+      await pumpApp(tester, buildSection(tank: tank, fuel: fuel));
 
       await tester.enterText(
         find.widgetWithText(TextFormField, 'Tank capacity (L)'),
@@ -73,14 +155,7 @@ void main() {
         addTearDown(tank.dispose);
         addTearDown(fuel.dispose);
 
-        await pumpApp(
-          tester,
-          VehicleCombustionSection(
-            tankController: tank,
-            fuelTypeController: fuel,
-            numberValidator: _requireNumber,
-          ),
-        );
+        await pumpApp(tester, buildSection(tank: tank, fuel: fuel));
 
         // Open the dropdown.
         await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
@@ -108,11 +183,7 @@ void main() {
         tester,
         Form(
           key: formKey,
-          child: VehicleCombustionSection(
-            tankController: tank,
-            fuelTypeController: fuel,
-            numberValidator: _requireNumber,
-          ),
+          child: buildSection(tank: tank, fuel: fuel),
         ),
       );
 
@@ -147,14 +218,7 @@ void main() {
         addTearDown(tank.dispose);
         addTearDown(fuel.dispose);
 
-        await pumpApp(
-          tester,
-          VehicleCombustionSection(
-            tankController: tank,
-            fuelTypeController: fuel,
-            numberValidator: _requireNumber,
-          ),
-        );
+        await pumpApp(tester, buildSection(tank: tank, fuel: fuel));
 
         await tester.tap(find.byType(DropdownButtonFormField<FuelType?>));
         await tester.pumpAndSettle();

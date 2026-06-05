@@ -3828,6 +3828,10 @@
   "@feedbackTokenFieldLabel": {
     "description": "Label of the obscured-text field that captures the GitHub PAT (#952 phase 3)."
   },
+  "fillUpMultiFuelHint": "This vehicle can use different fuels — log the one you actually pumped",
+  "@fillUpMultiFuelHint": {
+    "description": "Hint shown under the fuel picker on the Add-Fill-up form for a multi-fuel-capable vehicle, reminding the user to log the exact fuel they pumped so the per-fuel cost-per-km comparison stays accurate (#2886)."
+  },
   "fillUpGuidanceTitle": "Best time to fill up",
   "@fillUpGuidanceTitle": {
     "description": "Title of the on-device 'best time to fill up' guidance card on the price-history screen (#1543)."
@@ -4262,6 +4266,104 @@
   "profileSectionRegion": "Region",
   "@profileSectionRegion": {
     "description": "Card title grouping the country and language selectors on the edit-profile form (#2551)."
+  },
+  "fuelEfficiencyCardTitle": "Cost per kilometre by fuel",
+  "@fuelEfficiencyCardTitle": {
+    "description": "Title of the per-fuel-type efficiency comparison card on the consumption-statistics page, comparing real cost-per-km across the fuels a multi-fuel vehicle has used (#2887, Epic #2881)."
+  },
+  "fuelEfficiencyCardSubtitle": "Which fuel is actually cheapest to drive on",
+  "@fuelEfficiencyCardSubtitle": {
+    "description": "Subtitle of the per-fuel efficiency card explaining it ranks fuels by real driving cost per kilometre, not pump price per litre (#2887)."
+  },
+  "fuelEfficiencyWinnerChip": "Cheapest per km: {fuel} ({costPerKm})",
+  "@fuelEfficiencyWinnerChip": {
+    "description": "Winner chip at the top of the per-fuel efficiency card, crowning the fuel with the lowest verified cost per kilometre (#2887).",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "costPerKm": {
+        "type": "String",
+        "example": "0,086 €/km"
+      }
+    }
+  },
+  "fuelEfficiencyColL100km": "L/100km",
+  "@fuelEfficiencyColL100km": {
+    "description": "Column header for the litres-per-100km metric in the per-fuel efficiency card (#2887)."
+  },
+  "fuelEfficiencyColCostPerKm": "Cost/km",
+  "@fuelEfficiencyColCostPerKm": {
+    "description": "Column header for the cost-per-kilometre metric in the per-fuel efficiency card (#2887)."
+  },
+  "fuelEfficiencyColTotalSpent": "Total spent",
+  "@fuelEfficiencyColTotalSpent": {
+    "description": "Column header for the total-spent metric in the per-fuel efficiency card (#2887)."
+  },
+  "fuelEfficiencyFillCount": "{count, plural, =1{1 fill} other{{count} fills}}",
+  "@fuelEfficiencyFillCount": {
+    "description": "Number of fill-ups logged for a fuel, shown on its row in the per-fuel efficiency card (#2887).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}",
+  "@fuelEfficiencyMixedFootnote": {
+    "description": "Transparency footnote on the per-fuel efficiency card, disclosing how many tanks contained more than one fuel and were each attributed whole to their dominant fuel (#2887, ADR 0014).",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "fuelEfficiencyInsufficientData": "Log at least two full tanks per fuel to crown the cheapest.",
+  "@fuelEfficiencyInsufficientData": {
+    "description": "Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one fuel has fewer than two closed plein-to-plein intervals (#2887, ADR 0014 verdict gate)."
+  },
+  "fuelNameE5": "Super E5",
+  "@fuelNameE5": {
+    "description": "Localized display name for the E5 (Super, up to 5% ethanol) petrol grade, used on the per-fuel efficiency card (#2887)."
+  },
+  "fuelNameE10": "Super E10",
+  "@fuelNameE10": {
+    "description": "Localized display name for the E10 (up to 10% ethanol) petrol grade (#2887)."
+  },
+  "fuelNameE98": "Super 98",
+  "@fuelNameE98": {
+    "description": "Localized display name for the 98-octane petrol grade (#2887)."
+  },
+  "fuelNameDiesel": "Diesel",
+  "@fuelNameDiesel": {
+    "description": "Localized display name for diesel fuel (#2887)."
+  },
+  "fuelNameDieselPremium": "Diesel Premium",
+  "@fuelNameDieselPremium": {
+    "description": "Localized display name for premium diesel (#2887)."
+  },
+  "fuelNameE85": "E85 Bioethanol",
+  "@fuelNameE85": {
+    "description": "Localized display name for the E85 flex-fuel (up to 85% bioethanol) grade (#2887)."
+  },
+  "fuelNameLpg": "LPG",
+  "@fuelNameLpg": {
+    "description": "Localized display name for liquefied petroleum gas (autogas) (#2887)."
+  },
+  "fuelNameCng": "CNG",
+  "@fuelNameCng": {
+    "description": "Localized display name for compressed natural gas (#2887)."
+  },
+  "fuelNameHydrogen": "Hydrogen",
+  "@fuelNameHydrogen": {
+    "description": "Localized display name for hydrogen fuel (#2887)."
+  },
+  "fuelNameElectric": "Electric",
+  "@fuelNameElectric": {
+    "description": "Localized display name for electric charging (#2887)."
   },
   "calibrationModeLabel": "Calibration mode",
   "@calibrationModeLabel": {
@@ -6775,6 +6877,14 @@
         "example": "France — Prix-Carburants · Spain — Geoportal Gasolineras"
       }
     }
+  },
+  "vehicleMultiFuelCapableLabel": "I may fill up with different fuel types",
+  "@vehicleMultiFuelCapableLabel": {
+    "description": "Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885)."
+  },
+  "vehicleMultiFuelCapableHelper": "Tracks which fuel is cheapest per kilometre",
+  "@vehicleMultiFuelCapableHelper": {
+    "description": "Helper subtitle under the multi-fuel-capable switch on the vehicle edit screen, explaining the per-fuel efficiency comparison it unlocks (#2885)."
   },
   "vinLabel": "VIN (optional)",
   "vinDecodeTooltip": "Decode VIN",

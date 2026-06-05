@@ -296,8 +296,11 @@ void main() {
     // are extracted (add_fill_up_warnings.dart, fill_up_warning_dialog.dart)
     // to keep the growth to the gate method + its call site. Decomposition
     // stays tracked under #2187/#2188/#2190.
+    // #2886 — +41: multi-fuel per-fill prompt — `_safeFillUps` helper +
+    // the resolver re-seeding from last-used fuel on both the init and
+    // vehicle-change paths. Decomposition stays tracked under #2187.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        588,
+        629,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
@@ -430,12 +433,16 @@ void main() {
     // dropped to ~168 content lines (below the cap). Removed from the
     // snapshot per the shrink ratchet; every extracted file is new and
     // under 400.
-    'lib/features/vehicle/domain/entities/vehicle_profile.dart': 453,
+    // #2885 — +17: the multiFuelCapable combustion field + its
+    // documentation block (the per-fuel comparison flag, Epic #2881).
+    'lib/features/vehicle/domain/entities/vehicle_profile.dart': 470,
     // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
     // receives a directFuelRateSupported flag computed from the vehicle's
     // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE
     // UI hides on PID-5E cars. Decomposition tracked under #2187/#2188.
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 817,
+    // #2885 — +11: the multiFuelCapable form state + its load / save /
+    // drivetrain-section wiring.
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 828,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,
     // #2837 — re-grandfathered 465 → 523: on a direct-fuel-rate (PID 5E)
     // car the η_v field + its "0 samples" learner readout + Reset learner

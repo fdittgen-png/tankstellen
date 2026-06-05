@@ -4282,5 +4282,137 @@
         "type": "String"
       }
     }
+  },
+  "fillUpMultiFuelHint": "Ce véhicule peut utiliser différents carburants — enregistrez celui que vous avez réellement mis",
+  "@fillUpMultiFuelHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyCardTitle": "Coût au kilomètre par carburant",
+  "@fuelEfficiencyCardTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyCardSubtitle": "Quel carburant revient réellement le moins cher à rouler",
+  "@fuelEfficiencyCardSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyWinnerChip": "Le moins cher au km : {fuel} ({costPerKm})",
+  "@fuelEfficiencyWinnerChip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E85"
+      },
+      "costPerKm": {
+        "type": "String",
+        "example": "0,086 €/km"
+      }
+    }
+  },
+  "fuelEfficiencyColL100km": "L/100km",
+  "@fuelEfficiencyColL100km": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyColCostPerKm": "Coût/km",
+  "@fuelEfficiencyColCostPerKm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyColTotalSpent": "Total dépensé",
+  "@fuelEfficiencyColTotalSpent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyFillCount": "{count, plural, =1{1 plein} other{{count} pleins}}",
+  "@fuelEfficiencyFillCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "fuelEfficiencyMixedFootnote": "{count, plural, =1{1 plein mixte attribué à son carburant principal} other{{count} pleins mixtes attribués à leur carburant principal}}",
+  "@fuelEfficiencyMixedFootnote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "fuelEfficiencyInsufficientData": "Enregistrez au moins deux pleins complets par carburant pour désigner le moins cher.",
+  "@fuelEfficiencyInsufficientData": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE5": "Super E5",
+  "@fuelNameE5": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE10": "Super E10",
+  "@fuelNameE10": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE98": "Super 98",
+  "@fuelNameE98": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameDiesel": "Diesel",
+  "@fuelNameDiesel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameDieselPremium": "Diesel Premium",
+  "@fuelNameDieselPremium": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameE85": "E85 Bioéthanol",
+  "@fuelNameE85": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameLpg": "GPL",
+  "@fuelNameLpg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameCng": "GNV",
+  "@fuelNameCng": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameHydrogen": "Hydrogène",
+  "@fuelNameHydrogen": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelNameElectric": "Électrique",
+  "@fuelNameElectric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleMultiFuelCapableLabel": "Je peux faire le plein avec différents carburants",
+  "@vehicleMultiFuelCapableLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleMultiFuelCapableHelper": "Détermine quel carburant est le moins cher au kilomètre",
+  "@vehicleMultiFuelCapableHelper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
