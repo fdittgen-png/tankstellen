@@ -113,10 +113,13 @@ class BluetoothObd2Transport implements Obd2Transport {
       try {
         await _channel.open();
         break;
-      } catch (e) {
+      } catch (e, st) {
         if (attempt >= maxOpenAttempts || !_isRecoverableOpenFailure(e)) {
           rethrow;
         }
+        debugPrint('BluetoothObd2Transport: channel.open attempt $attempt/'
+            '$maxOpenAttempts failed ($e), tearing down + retrying after '
+            'backoff\n$st');
         try {
           await _channel.close();
         } catch (_) {
