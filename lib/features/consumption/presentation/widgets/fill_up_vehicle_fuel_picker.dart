@@ -49,25 +49,57 @@ class FillUpVehicleFuelPicker extends StatelessWidget {
     final value =
         compatible.contains(fuelType) ? fuelType : compatible.first;
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: FuelTypeDropdown(
-            value: value,
-            options: compatible,
-            prefixIcon: const Icon(Icons.local_gas_station),
-            labelText: '${l?.fuelType ?? 'Fuel type'} • ${vehicle.name}',
-            onChanged: onChanged,
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: FuelTypeDropdown(
+                value: value,
+                options: compatible,
+                prefixIcon: const Icon(Icons.local_gas_station),
+                labelText: '${l?.fuelType ?? 'Fuel type'} • ${vehicle.name}',
+                onChanged: onChanged,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.open_in_new),
+              tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
+              onPressed: onOpenVehicle,
+              style: IconButton.styleFrom(
+                foregroundColor: theme.colorScheme.primary,
+              ),
+            ),
+          ],
         ),
-        IconButton(
-          icon: const Icon(Icons.open_in_new),
-          tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
-          onPressed: onOpenVehicle,
-          style: IconButton.styleFrom(
-            foregroundColor: theme.colorScheme.primary,
+        // #2886 — a multi-fuel vehicle gets a prominent hint reminding
+        // the user to log the fuel they ACTUALLY pumped this tank, since
+        // the per-fuel €/km comparison depends on that being accurate.
+        if (vehicle.multiFuelCapable) ...[
+          const SizedBox(height: 4),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 16,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l?.fillUpMultiFuelHint ??
+                      'This vehicle can use different fuels — log the one '
+                          'you actually pumped',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
+        ],
       ],
     );
   }

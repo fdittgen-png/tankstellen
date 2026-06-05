@@ -1,4 +1,8 @@
 {
+  "fillUpMultiFuelHint": "This vehicle can use different fuels — log the one you actually pumped",
+  "@fillUpMultiFuelHint": {
+    "description": "Hint shown under the fuel picker on the Add-Fill-up form for a multi-fuel-capable vehicle, reminding the user to log the exact fuel they pumped so the per-fuel cost-per-km comparison stays accurate (#2886)."
+  },
   "fillUpGuidanceTitle": "Best time to fill up",
   "@fillUpGuidanceTitle": {
     "description": "Title of the on-device 'best time to fill up' guidance card on the price-history screen (#1543)."

@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/add_fill_up_fuel_resolver.dart';
+import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 
@@ -149,6 +150,122 @@ void main() {
       expect(
         AddFillUpFuelResolver.resolveDefaultFuel(vehicle: unconfiguredCar),
         equals(FuelType.e10),
+      );
+    });
+  });
+
+  group('AddFillUpFuelResolver.resolveDefaultFuel — #2886 multi-fuel', () {
+    test(
+      'allowAnyCompatible=false IGNORES lastUsedFuel (pre-#2886 behaviour '
+      'preserved)',
+      () {
+        // Even with an E5 last-used, the legacy path lands on the
+        // vehicle/profile chain — lastUsedFuel must not be consulted.
+        expect(
+          AddFillUpFuelResolver.resolveDefaultFuel(
+            vehicle: flexFuelCar,
+            lastUsedFuel: FuelType.e5,
+          ),
+          equals(FuelType.e85),
+          reason: 'flex car falls back to its own e85 when the flag is off',
+        );
+      },
+    );
+
+    test('allowAnyCompatible=true seeds from a compatible lastUsedFuel', () {
+      expect(
+        AddFillUpFuelResolver.resolveDefaultFuel(
+          vehicle: flexFuelCar,
+          allowAnyCompatible: true,
+          lastUsedFuel: FuelType.e10,
+        ),
+        equals(FuelType.e10),
+        reason: 'multi-fuel car re-seeds from the fuel it pumped last tank',
+      );
+    });
+
+    test('OCR preFill still wins over lastUsedFuel', () {
+      expect(
+        AddFillUpFuelResolver.resolveDefaultFuel(
+          vehicle: flexFuelCar,
+          allowAnyCompatible: true,
+          lastUsedFuel: FuelType.e10,
+          preFill: FuelType.e5,
+        ),
+        equals(FuelType.e5),
+        reason: 'the OCR-extracted fuel is the strongest pre-fill',
+      );
+    });
+
+    test('incompatible lastUsedFuel is skipped, falls through the chain', () {
+      // Diesel is not in the petrol family — ignore it and fall back.
+      expect(
+        AddFillUpFuelResolver.resolveDefaultFuel(
+          vehicle: flexFuelCar,
+          allowAnyCompatible: true,
+          lastUsedFuel: FuelType.diesel,
+        ),
+        equals(FuelType.e85),
+      );
+    });
+  });
+
+  group('AddFillUpFuelResolver.lastUsedFuelForVehicle — #2886', () {
+    FillUp fill(
+      String fuel,
+      DateTime date, {
+      String vehicleId = 'v1',
+      bool isCorrection = false,
+    }) =>
+        FillUp(
+          id: date.toIso8601String(),
+          date: date,
+          liters: 30,
+          totalCost: 45,
+          odometerKm: 1000,
+          fuelType: FuelType.fromString(fuel),
+          vehicleId: vehicleId,
+          isCorrection: isCorrection,
+        );
+
+    test('returns the most recent fill\'s fuel for the vehicle', () {
+      final fills = [
+        fill('e10', DateTime(2026, 1, 1)),
+        fill('e85', DateTime(2026, 3, 1)),
+        fill('e5', DateTime(2026, 2, 1)),
+      ];
+      expect(
+        AddFillUpFuelResolver.lastUsedFuelForVehicle(fills, vehicleId: 'v1'),
+        equals(FuelType.e85),
+      );
+    });
+
+    test('ignores other vehicles', () {
+      final fills = [
+        fill('e85', DateTime(2026, 3, 1), vehicleId: 'other'),
+        fill('e10', DateTime(2026, 1, 1), vehicleId: 'v1'),
+      ];
+      expect(
+        AddFillUpFuelResolver.lastUsedFuelForVehicle(fills, vehicleId: 'v1'),
+        equals(FuelType.e10),
+      );
+    });
+
+    test('ignores correction entries', () {
+      final fills = [
+        fill('e10', DateTime(2026, 1, 1)),
+        fill('e85', DateTime(2026, 3, 1), isCorrection: true),
+      ];
+      expect(
+        AddFillUpFuelResolver.lastUsedFuelForVehicle(fills, vehicleId: 'v1'),
+        equals(FuelType.e10),
+      );
+    });
+
+    test('returns null when the vehicle has no fills', () {
+      expect(
+        AddFillUpFuelResolver.lastUsedFuelForVehicle(const [], vehicleId: 'v1'),
+        isNull,
       );
     });
   });

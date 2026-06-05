@@ -223,12 +223,38 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       (v) => v.id == _vehicleId,
       orElse: () => vehicles.first,
     );
+    // #2886 — a multi-fuel vehicle re-seeds the picker from the fuel the
+    // user actually pumped last tank (when the OCR/station pre-fill
+    // doesn't already pin one). Single-fuel vehicles keep the pre-#2886
+    // behaviour: `allowAnyCompatible` stays false, so `lastUsedFuel` is
+    // never consulted.
+    final lastUsed = selected.multiFuelCapable
+        ? AddFillUpFuelResolver.lastUsedFuelForVehicle(
+            _safeFillUps(),
+            vehicleId: selected.id,
+          )
+        : null;
     _fuelType = AddFillUpFuelResolver.resolveDefaultFuel(
       vehicle: selected,
       profilePreferred: profilePreferred,
       preFill: widget.preFilledFuelType,
+      allowAnyCompatible: selected.multiFuelCapable,
+      lastUsedFuel: lastUsed,
     );
     _vehicleInitialized = true;
+  }
+
+  /// Read the fill-up history defensively (#2886) — a partially-built
+  /// test container without Hive must degrade to an empty list rather
+  /// than throw while seeding the multi-fuel picker.
+  List<FillUp> _safeFillUps() {
+    try {
+      return ref.read(fillUpListProvider);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: const {'where': 'AddFillUp: fill-up history unavailable'}));
+      return const [];
+    }
   }
 
   /// Listener bridging the liters controller to the auto-cost
@@ -564,9 +590,24 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               onVehicleChanged: (id, selected) {
                 setState(() {
                   _vehicleId = id;
-                  final derived =
-                      AddFillUpFuelResolver.fuelForVehicle(selected);
-                  if (derived != null) _fuelType = derived;
+                  if (selected.multiFuelCapable) {
+                    // #2886 — seed the picker from the fuel last pumped
+                    // for this multi-fuel vehicle, falling back through
+                    // the resolver chain when it has no history yet.
+                    _fuelType = AddFillUpFuelResolver.resolveDefaultFuel(
+                      vehicle: selected,
+                      allowAnyCompatible: true,
+                      lastUsedFuel:
+                          AddFillUpFuelResolver.lastUsedFuelForVehicle(
+                        _safeFillUps(),
+                        vehicleId: selected.id,
+                      ),
+                    );
+                  } else {
+                    final derived =
+                        AddFillUpFuelResolver.fuelForVehicle(selected);
+                    if (derived != null) _fuelType = derived;
+                  }
                 });
               },
               fuelType: _fuelType,
