@@ -299,8 +299,15 @@ void main() {
     // #2886 — +41: multi-fuel per-fill prompt — `_safeFillUps` helper +
     // the resolver re-seeding from last-used fuel on both the init and
     // vehicle-change paths. Decomposition stays tracked under #2187.
+    // #2687 — re-grandfathered 629 → 638: the manual "paste receipt text"
+    // entry point — the `fill_up_paste_receipt_handler.dart` import + the
+    // 6-line `_pasteReceiptText` delegator (cohesive with the adjacent
+    // `_scanReceipt`/`_scanPumpDisplay` cluster) + the `onPasteReceipt`
+    // callback wiring. The dialog + parse-and-prefill body live in the
+    // extracted handler file; only the thin delegation lands here.
+    // Decomposition stays tracked under #2187.
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        629,
+        638,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead

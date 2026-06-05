@@ -5131,6 +5131,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fillUpGuidancePartNight => 'nachts';
 
   @override
+  String get fillUpImportPasteLabel => 'Text einfügen';
+
+  @override
+  String get pasteReceiptDialogTitle => 'Belegtext einfügen';
+
+  @override
+  String get pasteReceiptDialogHint =>
+      'Füge den Text eines Tankbelegs ein — E-Mail, SMS oder ein geteiltes PDF. Liter, Preis pro Liter, Kraftstoffsorte, Gesamtbetrag und Tankstelle werden auf dem Gerät ausgelesen und zum Vorausfüllen des Formulars verwendet. Es wird nichts an einen Server gesendet.';
+
+  @override
+  String get pasteReceiptFieldHint => 'Belegtext';
+
+  @override
+  String get pasteReceiptParseAction => 'Vorausfüllen';
+
+  @override
+  String get pasteReceiptNoData =>
+      'Aus diesem Text konnten keine Tankdaten gelesen werden — prüfe, ob es ein Tankbeleg ist, und versuche es erneut.';
+
+  @override
   String get fillUpReconciliationVerifiedBadgeLabel => 'Vom Adapter bestätigt';
 
   @override

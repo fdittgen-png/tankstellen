@@ -1,0 +1,26 @@
+{
+  "fillUpImportPasteLabel": "Paste text",
+  "@fillUpImportPasteLabel": {
+    "description": "Label of the third import button on the Add-Fill-Up form that opens a dialog to paste a digital fuel-receipt's text (no camera, no cloud) and pre-fill the form from it (#2687)."
+  },
+  "pasteReceiptDialogTitle": "Paste receipt text",
+  "@pasteReceiptDialogTitle": {
+    "description": "Title of the dialog where the user pastes a fuel-receipt's text (e-mail body, SMS confirmation, or PDF text) to pre-fill the fill-up (#2687)."
+  },
+  "pasteReceiptDialogHint": "Paste the text of a fuel receipt — e-mail, SMS, or a shared PDF. The litres, price per litre, fuel grade, total and station are read on-device and used to pre-fill the form. Nothing is sent to a server.",
+  "@pasteReceiptDialogHint": {
+    "description": "Helper text in the paste-receipt dialog explaining what to paste and that parsing happens on-device (#2687)."
+  },
+  "pasteReceiptFieldHint": "Receipt text",
+  "@pasteReceiptFieldHint": {
+    "description": "hintText of the multiline text field in the paste-receipt dialog (#2687)."
+  },
+  "pasteReceiptParseAction": "Pre-fill",
+  "@pasteReceiptParseAction": {
+    "description": "Confirm button in the paste-receipt dialog that runs the parser and pre-fills the form; the user still reviews and saves manually (#2687)."
+  },
+  "pasteReceiptNoData": "Couldn't read any fuel data from that text — check it's a fuel receipt and try again.",
+  "@pasteReceiptNoData": {
+    "description": "Snackbar shown when the pasted text yields no usable fuel fields (#2687)."
+  }
+}

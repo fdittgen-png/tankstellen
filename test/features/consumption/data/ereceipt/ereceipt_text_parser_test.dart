@@ -58,6 +58,47 @@ void main() {
     });
   });
 
+  group('EReceiptTextParser — French e-receipt fixtures (#2687)', () {
+    test(
+        'TotalEnergies Lyon: extracts the five fields from a comma-decimal '
+        'SP95-E10 receipt (QTY x CODE line + 1,829 EUR/L)', () {
+      final result = parser.parse(fixture('totalenergies_lyon_2026-05-15.txt'),
+          countryCode: 'FR');
+
+      expect(result.liters, closeTo(38.72, 0.01),
+          reason: 'French comma decimal "38,72 X SP95-E10"');
+      expect(result.pricePerLiter, closeTo(1.829, 0.001));
+      expect(result.totalCost, closeTo(70.83, 0.01),
+          reason: 'TOTAL TTC, not the price-per-litre');
+      expect(result.fuelType, FuelType.e10, reason: '"SP95-E10" → E10');
+      expect(result.stationName, contains('Total'));
+      expect(result.date, DateTime(2026, 5, 15));
+      expect(result.hasData, isTrue);
+    });
+
+    test(
+        'Intermarche Nantes: Gazole receipt with the GRADE on its own line '
+        '(grade not glued to the volume) + labelled Volume/Prix/MONTANT', () {
+      final raw = fixture('intermarche_nantes_2026-05-22.txt');
+      // Guard the fixture really separates the grade onto its own line — the
+      // point of this case. If a future edit glued "GAZOLE" to the volume row
+      // the test would pass for the wrong reason.
+      expect(raw.contains('\nGAZOLE\n'), isTrue,
+          reason: 'fixture must carry the grade on a standalone line');
+
+      final result = parser.parse(raw, countryCode: 'FR');
+
+      expect(result.liters, closeTo(45.30, 0.01));
+      expect(result.pricePerLiter, closeTo(1.729, 0.001));
+      expect(result.totalCost, closeTo(78.32, 0.01),
+          reason: 'MONTANT is the charged total, not the 13,05 € TVA line');
+      expect(result.fuelType, FuelType.diesel,
+          reason: '"Gazole" on its own line is French diesel');
+      expect(result.stationName?.toUpperCase(), contains('INTERMARCHE'));
+      expect(result.date, DateTime(2026, 5, 22));
+    });
+  });
+
   group('EReceiptTextParser — German e-receipt fixtures', () {
     test(
         'Shell Berlin: extracts the five fields from a digital "Quittung" with '
@@ -102,6 +143,55 @@ void main() {
       expect(result.pricePerLiter, closeTo(1.800, 0.001));
       expect(result.totalCost, closeTo(54.00, 0.01),
           reason: 'total = 30.00 × 1.800, derived by the shared reconcile()');
+    });
+  });
+
+  group('EReceiptTextParser — absent fields stay null, never fabricated '
+      '(#2687)', () {
+    test(
+        'a receipt with NO recognisable station leaves stationName null '
+        'while still extracting the numeric fields', () {
+      // An anonymous independent station: header is a bare street + town,
+      // no known brand keyword anywhere. The grade is on its own line.
+      const text = 'STATION SERVICE\n'
+          '12 ROUTE DE LA MER\n'
+          '34300 AGDE\n'
+          'Date 02/06/2026 09:14\n'
+          'SP98\n'
+          'Volume : 31,40 L\n'
+          'Prix / L : 1,959 €\n'
+          'TOTAL : 61,51 €\n';
+      final result = parser.parse(text, countryCode: 'FR');
+
+      expect(result.liters, closeTo(31.40, 0.01));
+      expect(result.pricePerLiter, closeTo(1.959, 0.001));
+      expect(result.totalCost, closeTo(61.51, 0.01));
+      expect(result.fuelType, FuelType.e98, reason: '"SP98" → E98 grade');
+      expect(result.stationName, isNull,
+          reason: 'no known brand on the receipt — must NOT be fabricated');
+    });
+
+    test(
+        'a receipt without a per-litre price leaves pricePerLiter null '
+        '(it is not invented when only volume + total are printed) — '
+        'station present, grade absent stays null', () {
+      // Volume + total only — no "Prix/L" line and no 3-decimal price. The
+      // parser must not guess a grade that was never printed.
+      const text = 'TotalEnergies\n'
+          'LE MANS\n'
+          'Date 03/06/2026\n'
+          'Volume : 20,00 L\n'
+          'TOTAL TTC : 38,00 €\n';
+      final result = parser.parse(text, countryCode: 'FR');
+
+      expect(result.liters, closeTo(20.00, 0.01));
+      expect(result.totalCost, closeTo(38.00, 0.01));
+      // Reconcile derives the unit price from total ÷ volume (1.90), so it
+      // is legitimately present — but the GRADE was never printed and must
+      // come back null rather than being defaulted to E10/Diesel/etc.
+      expect(result.fuelType, isNull,
+          reason: 'no fuel-grade keyword on the receipt — never guessed');
+      expect(result.stationName, contains('Total'));
     });
   });
 

@@ -5135,6 +5135,26 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fillUpGuidancePartNight => 'éjjel';
 
   @override
+  String get fillUpImportPasteLabel => 'Paste text';
+
+  @override
+  String get pasteReceiptDialogTitle => 'Paste receipt text';
+
+  @override
+  String get pasteReceiptDialogHint =>
+      'Paste the text of a fuel receipt — e-mail, SMS, or a shared PDF. The litres, price per litre, fuel grade, total and station are read on-device and used to pre-fill the form. Nothing is sent to a server.';
+
+  @override
+  String get pasteReceiptFieldHint => 'Receipt text';
+
+  @override
+  String get pasteReceiptParseAction => 'Pre-fill';
+
+  @override
+  String get pasteReceiptNoData =>
+      'Couldn\'t read any fuel data from that text — check it\'s a fuel receipt and try again.';
+
+  @override
   String get fillUpReconciliationVerifiedBadgeLabel =>
       'Adapter által ellenőrzött';
 

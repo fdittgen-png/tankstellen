@@ -9068,6 +9068,42 @@ abstract class AppLocalizations {
   /// **'nights'**
   String get fillUpGuidancePartNight;
 
+  /// Label of the third import button on the Add-Fill-Up form that opens a dialog to paste a digital fuel-receipt's text (no camera, no cloud) and pre-fill the form from it (#2687).
+  ///
+  /// In en, this message translates to:
+  /// **'Paste text'**
+  String get fillUpImportPasteLabel;
+
+  /// Title of the dialog where the user pastes a fuel-receipt's text (e-mail body, SMS confirmation, or PDF text) to pre-fill the fill-up (#2687).
+  ///
+  /// In en, this message translates to:
+  /// **'Paste receipt text'**
+  String get pasteReceiptDialogTitle;
+
+  /// Helper text in the paste-receipt dialog explaining what to paste and that parsing happens on-device (#2687).
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the text of a fuel receipt — e-mail, SMS, or a shared PDF. The litres, price per litre, fuel grade, total and station are read on-device and used to pre-fill the form. Nothing is sent to a server.'**
+  String get pasteReceiptDialogHint;
+
+  /// hintText of the multiline text field in the paste-receipt dialog (#2687).
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt text'**
+  String get pasteReceiptFieldHint;
+
+  /// Confirm button in the paste-receipt dialog that runs the parser and pre-fills the form; the user still reviews and saves manually (#2687).
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-fill'**
+  String get pasteReceiptParseAction;
+
+  /// Snackbar shown when the pasted text yields no usable fuel fields (#2687).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read any fuel data from that text — check it\'s a fuel receipt and try again.'**
+  String get pasteReceiptNoData;
+
   /// Chip label rendered on a fill-up card when both fuelLevelBeforeL and fuelLevelAfterL were captured by the OBD2 adapter, signalling the pumped litres match the car's own tank-level sensor delta (#1401 phase 7b).
   ///
   /// In en, this message translates to:
