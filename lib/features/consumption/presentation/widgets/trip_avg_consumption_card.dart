@@ -59,33 +59,50 @@ class TripAvgConsumptionCard extends ConsumerWidget {
   // i18n-ignore: ADR 0012 estimate marker, language-neutral
   static const String _tilde = '~';
 
+  /// The single source of truth for the average's display value and
+  /// whether it is a GPS-only estimate, given a [live] reading and an
+  /// optional [brokenMapOverride]. Mode selection (see class doc):
+  /// override → measured → estimate → placeholder.
+  ///
+  /// Extracted so an alternate presentation — e.g. the #2903 landscape
+  /// 2×2 grid tile, which renders the average as a big centred figure
+  /// rather than this label/value Row — reuses the exact same decision
+  /// instead of duplicating it.
+  static ({String value, bool isEstimate}) resolveDisplay(
+    TripLiveReading? live, {
+    String? brokenMapOverride,
+  }) {
+    final measured = live?.liveAvgLPer100Km;
+    final estimated = live?.gpsEstimatedAvgLPer100Km;
+    final override = brokenMapOverride;
+    if (override != null) {
+      return (value: override, isEstimate: false);
+    } else if (measured != null) {
+      return (
+        value: UnitFormatter.formatConsumption(measured, isEv: false),
+        isEstimate: false,
+      );
+    } else if (estimated != null) {
+      return (
+        value:
+            '$_tilde${UnitFormatter.formatConsumption(estimated, isEv: false)}',
+        isEstimate: true,
+      );
+    }
+    return (value: '—', isEstimate: false);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final r = live;
 
-    final measured = r?.liveAvgLPer100Km;
-    final estimated = r?.gpsEstimatedAvgLPer100Km;
-
-    // Mode selection (see class doc): override → measured → estimate.
-    final override = brokenMapOverride;
-    final bool isEstimate;
-    final String value;
-    if (override != null) {
-      value = override;
-      isEstimate = false;
-    } else if (measured != null) {
-      value = UnitFormatter.formatConsumption(measured, isEv: false);
-      isEstimate = false;
-    } else if (estimated != null) {
-      value =
-          '$_tilde${UnitFormatter.formatConsumption(estimated, isEv: false)}';
-      isEstimate = true;
-    } else {
-      value = '—';
-      isEstimate = false;
-    }
+    // Mode selection (override → measured → estimate) lives in the
+    // shared resolver so the landscape grid tile stays in sync.
+    final display = resolveDisplay(r, brokenMapOverride: brokenMapOverride);
+    final value = display.value;
+    final isEstimate = display.isEstimate;
 
     // The maturity badge + estimate tooltip only ride along the GPS
     // estimate branch; the active vehicle's calibration matrix drives

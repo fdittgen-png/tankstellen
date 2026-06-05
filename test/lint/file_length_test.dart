@@ -333,8 +333,13 @@ void main() {
     // #2764 — shrank 1123 → 1090: the 5 inline app-bar IconButtons moved
     // into the new RecordingAppBarActions widget (Pause + Stop primary,
     // Pin/Help/PiP folded into an overflow kebab). Net -33 lines here.
+    // #2903 — grew 1090 → 1106 (+16): the landscape orientation dispatch.
+    // The bulk of the landscape layout was extracted to the new
+    // trip_recording_landscape_body.dart (262 lines); only the
+    // MediaQuery.orientation branch + its import remain here. Full
+    // decomposition of this screen still tracked under #2187/#2188.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1090,
+        1106,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':

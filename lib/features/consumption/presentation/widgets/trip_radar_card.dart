@@ -260,7 +260,17 @@ class RadarCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(title, style: theme.textTheme.bodySmall),
+                  // #2903 — Flexible so the overline ellipsizes in a
+                  // narrow ListTile (e.g. the landscape split's right
+                  // pane) instead of overflowing the title slot.
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   if (swipeable) ...[
                     const SizedBox(width: 6),
                     // Faint, decorative swipe-available hint — the
