@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import '../../../../core/background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -33,30 +34,39 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
   late FuelType _selectedFuelType;
   late TextEditingController _priceController;
 
-  // #2246 — restricted to the fuels the on-device background evaluator
-  // can actually resolve. Tankerkönig's prices feed only exposes e5/e10/
-  // diesel (the German MTS-K mandate); e98/dieselPremium/e85/lpg/cng are
-  // not in the upstream feed, so offering them produced silently-dead
-  // alerts that could never fire. Mirrors the radius sheet's #2211 fix.
-  static const _alertFuelTypes = [
-    FuelType.e5,
-    FuelType.e10,
-    FuelType.diesel,
-  ];
+  /// The station's origin country (#2865) — derived once from the id
+  /// prefix. Background alerts now fire for every supported country, so
+  /// the form is country-aware: it offers that country's fuels and shows
+  /// its currency. Falls back to the default country when the id carries
+  /// no recognised prefix (legacy / demo ids).
+  late final String _stationCountry =
+      Countries.countryCodeForStationId(widget.stationId) ??
+          Countries.germany.code;
 
-  /// True when the station's id prefix resolves to a non-DE country.
-  /// The background evaluator is Tankerkönig-only today, so a non-DE
-  /// alert is saved but can't fire — we warn the user at creation
-  /// rather than letting it silently never notify (#2246).
-  bool get _isNonDeStation {
-    final country = Countries.countryCodeForStationId(widget.stationId);
-    return country != null && country != 'DE';
-  }
+  /// The fuels the background evaluator can actually resolve for this
+  /// station's country (#2865) — drops the search wildcard and any fuel
+  /// the country's provider doesn't price, so a saved alert can always
+  /// fire. DE keeps its historical e5/e10/diesel set.
+  late final List<FuelType> _alertFuelTypes =
+      alertEvaluableFuelsFor(_stationCountry);
+
+  /// Currency symbol of the station's country (#2865), used in the
+  /// target-price label + suffix instead of a hardcoded euro.
+  late final String _currencySymbol =
+      Countries.byCode(_stationCountry)?.currencySymbol ??
+          Countries.germany.currencySymbol;
 
   @override
   void initState() {
     super.initState();
-    _selectedFuelType = FuelType.diesel;
+    // Default to diesel when the country offers it (it almost always
+    // does); otherwise fall back to the first evaluable fuel so the
+    // dropdown's initial value is always a valid item (#2865).
+    _selectedFuelType = _alertFuelTypes.contains(FuelType.diesel)
+        ? FuelType.diesel
+        : (_alertFuelTypes.isNotEmpty
+            ? _alertFuelTypes.first
+            : FuelType.diesel);
     final prefilled = widget.currentPrice != null
         ? (widget.currentPrice! - 0.05).toStringAsFixed(3)
         : '';
@@ -106,7 +116,13 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
                 border: const OutlineInputBorder(),
                 isDense: true,
               ),
-              items: _alertFuelTypes
+              items: <FuelType>{
+                ..._alertFuelTypes,
+                // Keep the selected value present even in the unlikely
+                // case it's not in the evaluable set, so the dropdown
+                // never asserts on a missing initial value (#2865).
+                _selectedFuelType,
+              }
                   .map((ft) => DropdownMenuItem(
                         value: ft,
                         child: Text(ft.displayName),
@@ -122,10 +138,12 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
             TextFormField(
               controller: _priceController,
               decoration: InputDecoration(
-                labelText: l10n?.targetPrice ?? 'Target price (EUR)',
+                labelText:
+                    l10n?.alertTargetPriceWithCurrency(_currencySymbol) ??
+                        'Target price ($_currencySymbol)',
                 border: const OutlineInputBorder(),
                 hintText: '1.500',
-                suffixText: '\u20ac/L',
+                suffixText: '$_currencySymbol/L',
               ),
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
@@ -143,18 +161,6 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
                 return null;
               },
             ),
-            // #2246 — honest creation gating: the on-device background
-            // evaluator is Tankerkönig-only, so an alert on a non-DE
-            // station is saved but can't fire yet. Surface that instead
-            // of letting it silently never notify.
-            if (_isNonDeStation) ...[
-              const SizedBox(height: 16),
-              _NonDeStationWarning(
-                message: l10n?.alertGatingNonDeStationWarning ??
-                    'Background price alerts currently only work for '
-                        'stations in Germany.',
-              ),
-            ],
           ],
         ),
       ),
@@ -187,41 +193,5 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
     );
 
     Navigator.of(context).pop(alert);
-  }
-}
-
-/// Inline amber warning banner shown when the alert's station is outside
-/// Germany — the on-device background evaluator can't reach it yet
-/// (#2246).
-class _NonDeStationWarning extends StatelessWidget {
-  const _NonDeStationWarning({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colorScheme.tertiary;
-    return Container(
-      key: const Key('alert_non_de_warning'),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.info_outline, size: 18, color: color),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: theme.textTheme.bodySmall?.copyWith(color: color),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

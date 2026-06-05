@@ -3635,12 +3635,14 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Prislarm i bakgrunden fungerar för närvarande endast för bensinstationer i Tyskland. Det här larmet sparas, men kanske aldrig meddelar dig förrän larm mellan länder blir tillgängliga.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Målpris ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Radielarm kontrollerar för närvarande endast bensinstationer i Tyskland.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Tröskel ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Inflygningsöverlägg';

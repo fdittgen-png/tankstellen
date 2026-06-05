@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Canale build",
   "featureLabel_debugMode": "Modalità sviluppatore / debug",
   "featureDescription_debugMode": "Mostra una sezione Strumenti di sviluppo nelle impostazioni con diagnostica: esportazione del registro errori, notifiche di prova, esecuzione della pipeline di avviso di prova, dump dei flag delle funzionalità, svuotamento cache e copia della diagnostica.",
-  "alertGatingNonDeStationWarning": "Gli avvisi sui prezzi in background attualmente funzionano solo per le stazioni in Germania. Questo avviso verrà salvato, ma potrebbe non avvisarti mai finché non arriveranno gli avvisi tra paesi.",
-  "alertGatingRadiusGermanyOnlyNote": "Gli avvisi per raggio attualmente controllano solo le stazioni in Germania.",
   "tripShareAction": "Condividi con un altro account",
   "tripShareSheetTitle": "Condividi questo viaggio",
   "tripShareSheetSubtitle": "Concedi a un altro account TankSync l'accesso in sola lettura a questo viaggio registrato.",
@@ -4163,5 +4161,23 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Prezzo obiettivo ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Soglia ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

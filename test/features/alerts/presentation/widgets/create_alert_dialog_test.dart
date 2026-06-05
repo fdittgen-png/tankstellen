@@ -265,19 +265,19 @@ void main() {
     });
   });
 
-  group('CreateAlertDialog fuel gating (#2246)', () {
-    testWidgets('only offers Tankerkönig-evaluable fuels (e5/e10/diesel)',
+  group('CreateAlertDialog fuel gating — DE (#2246/#2865)', () {
+    testWidgets('a German station offers only e5/e10/diesel',
         (tester) async {
-      await _openDialog(tester);
+      await _openDialog(tester, stationId: 'de-abc-uuid');
 
       await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
       await tester.pumpAndSettle();
 
-      // The three evaluable fuels are offered.
+      // The three DE-evaluable fuels are offered.
       expect(find.text(FuelType.e5.displayName), findsWidgets);
       expect(find.text(FuelType.e10.displayName), findsWidgets);
       expect(find.text(FuelType.diesel.displayName), findsWidgets);
-      // The non-evaluable fuels (not in the Tankerkönig feed) are gone.
+      // Fuels the German feed doesn't price are gone.
       expect(find.text(FuelType.e98.displayName), findsNothing);
       expect(find.text(FuelType.dieselPremium.displayName), findsNothing);
       expect(find.text(FuelType.e85.displayName), findsNothing);
@@ -286,26 +286,62 @@ void main() {
     });
   });
 
-  group('CreateAlertDialog non-DE creation gating (#2246)', () {
-    testWidgets('shows the non-DE warning for a non-German station',
+  group('CreateAlertDialog country-aware creation (#2865)', () {
+    testWidgets('a non-DE (FR) station shows NO Germany-only warning',
         (tester) async {
       await _openDialog(tester, stationId: 'fr-12345');
 
-      expect(find.byKey(const Key('alert_non_de_warning')), findsOneWidget);
+      // The DE-only gate is gone — background alerts now fire everywhere.
+      expect(find.byKey(const Key('alert_non_de_warning')), findsNothing);
     });
 
-    testWidgets('hides the warning for a German station', (tester) async {
+    testWidgets('a German station also shows no warning', (tester) async {
       await _openDialog(tester, stationId: 'de-abc-uuid');
 
       expect(find.byKey(const Key('alert_non_de_warning')), findsNothing);
     });
 
-    testWidgets('hides the warning for an unprefixed legacy station id',
+    testWidgets('an FR station labels the target price in euro', (tester) async {
+      await _openDialog(tester, stationId: 'fr-12345');
+
+      // FR currency is the euro → label reads "Target price (€)".
+      expect(find.text('Target price (€)'), findsOneWidget);
+    });
+
+    testWidgets('a GB station labels the target price in pounds',
+        (tester) async {
+      await _openDialog(tester, stationId: 'uk-9001');
+
+      expect(find.text('Target price (£)'), findsOneWidget);
+    });
+
+    testWidgets('an FR station offers FR-specific fuels (E85, LPG, SP98)',
+        (tester) async {
+      await _openDialog(tester, stationId: 'fr-12345');
+
+      await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
+      await tester.pumpAndSettle();
+
+      // France's provider exposes super-unleaded, bioethanol and LPG —
+      // all now offered because alerts fire for FR.
+      expect(find.text(FuelType.e98.displayName), findsWidgets);
+      expect(find.text(FuelType.e85.displayName), findsWidgets);
+      expect(find.text(FuelType.lpg.displayName), findsWidgets);
+      // The wildcard is never an alert target.
+      expect(find.text(FuelType.all.displayName), findsNothing);
+    });
+
+    testWidgets('an unprefixed legacy id falls back to the default (DE) set',
         (tester) async {
       await _openDialog(tester, stationId: 'station-1');
 
-      // No recognised prefix → can't assume non-DE → no warning.
+      // No recognised prefix → default country → euro label + e5/e10/diesel.
+      expect(find.text('Target price (€)'), findsOneWidget);
       expect(find.byKey(const Key('alert_non_de_warning')), findsNothing);
+
+      await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
+      await tester.pumpAndSettle();
+      expect(find.text(FuelType.lpg.displayName), findsNothing);
     });
   });
 }

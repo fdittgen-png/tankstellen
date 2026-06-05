@@ -3641,12 +3641,14 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Pozadinska upozorenja o cijenama trenutačno rade samo za benzinske postaje u Njemačkoj. Ovo upozorenje bit će spremljeno, ali možda vas nikada neće obavijestiti dok ne postanu dostupna međudržavna upozorenja.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Ciljna cijena ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Upozorenja po radijusu trenutačno provjeravaju samo benzinske postaje u Njemačkoj.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Prag ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection =>

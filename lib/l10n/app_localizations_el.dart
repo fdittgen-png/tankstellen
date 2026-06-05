@@ -3661,12 +3661,14 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Οι ειδοποιήσεις τιμών στο παρασκήνιο λειτουργούν προς το παρόν μόνο για πρατήρια στη Γερμανία. Αυτή η ειδοποίηση θα αποθηκευτεί, αλλά ενδέχεται να μην σας ειδοποιήσει ποτέ μέχρι να γίνουν διαθέσιμες οι διασυνοριακές ειδοποιήσεις.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Τιμή-στόχος ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Οι ειδοποιήσεις ακτίνας ελέγχουν προς το παρόν μόνο πρατήρια στη Γερμανία.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Όριο ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection =>

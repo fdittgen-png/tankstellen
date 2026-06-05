@@ -3657,12 +3657,14 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Fona cenu brīdinājumi pašlaik darbojas tikai Vācijas degvielas uzpildes stacijām. Šis brīdinājums tiks saglabāts, taču tas var nekad jūs nebrīdināt, līdz būs pieejami starpvalstu brīdinājumi.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Mērķa cena ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Rādiusa brīdinājumi pašlaik pārbauda tikai Vācijas degvielas uzpildes stacijas.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Slieksnis ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection =>

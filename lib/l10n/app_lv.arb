@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Būvējuma kanāls",
   "featureLabel_debugMode": "Izstrādātāja/atkļūdošanas režīms",
   "featureDescription_debugMode": "Iestatījumos parāda sadaļu Izstrādātāja rīki ar diagnostiku: kļūdu žurnāla eksports, testa paziņojumi, testa brīdinājumu plūsmas palaišana, funkciju karodziņu saraksts, kešatmiņu notīrīšana un diagnostikas kopēšana.",
-  "alertGatingNonDeStationWarning": "Fona cenu brīdinājumi pašlaik darbojas tikai Vācijas degvielas uzpildes stacijām. Šis brīdinājums tiks saglabāts, taču tas var nekad jūs nebrīdināt, līdz būs pieejami starpvalstu brīdinājumi.",
-  "alertGatingRadiusGermanyOnlyNote": "Rādiusa brīdinājumi pašlaik pārbauda tikai Vācijas degvielas uzpildes stacijas.",
   "tripShareAction": "Kopīgot ar citu kontu",
   "tripShareSheetTitle": "Kopīgot šo braucienu",
   "tripShareSheetSubtitle": "Piešķiriet citam TankSync kontam tikai lasīšanas piekļuvi šim ierakstītajam braucienam.",
@@ -4163,5 +4161,23 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Mērķa cena ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Slieksnis ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

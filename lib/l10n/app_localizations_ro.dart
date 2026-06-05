@@ -3659,12 +3659,14 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Alertele de preț în fundal funcționează momentan doar pentru stațiile din Germania. Această alertă va fi salvată, dar este posibil să nu vă notifice niciodată până când vor fi disponibile alertele între țări.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Preț țintă ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Alertele pe rază verifică momentan doar stațiile din Germania.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Prag ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Suprapunere la apropierea de stație';

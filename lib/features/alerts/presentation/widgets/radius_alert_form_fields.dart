@@ -40,32 +40,36 @@ class RadiusAlertLabelField extends StatelessWidget {
 }
 
 /// Dropdown picking the fuel type the alert watches. #2211 — restricted
-/// to the fuels the background radius search (Tankerkönig) can actually
-/// return; offering LPG/CNG/H2/EV produced silently-dead alerts (no
-/// samples ever matched). [FuelType.all] is excluded — an alert needs a
-/// concrete fuel to compare against.
+/// to the fuels the background radius search can actually return; offering
+/// fuels with no priced field produced silently-dead alerts (no samples
+/// ever matched). [FuelType.all] is excluded — an alert needs a concrete
+/// fuel to compare against.
+///
+/// #2865 — the evaluable set is now per-country: the parent passes the
+/// fuels the centre's country provider exposes (`alertEvaluableFuelsFor`),
+/// so an FR centre offers SP98 / E85 / LPG while DE keeps e5/e10/diesel.
 class RadiusAlertFuelTypeField extends StatelessWidget {
   const RadiusAlertFuelTypeField({
     super.key,
     required this.value,
+    required this.evaluableFuels,
     required this.onChanged,
   });
 
-  /// Fuels the background radius evaluator can actually surface.
-  static const evaluableFuels = [
-    FuelType.e5,
-    FuelType.e10,
-    FuelType.diesel,
-  ];
-
   final FuelType value;
+
+  /// Fuels the background radius evaluator can surface for the centre's
+  /// country (#2865), supplied by the parent sheet.
+  final List<FuelType> evaluableFuels;
+
   final ValueChanged<FuelType> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     // Keep the current value selectable even if it's a legacy fuel no
-    // longer offered, so editing an old alert doesn't crash the dropdown.
+    // longer offered (or not in the new centre's country set), so the
+    // dropdown never crashes on a missing initial value.
     final fuels = <FuelType>{
       ...evaluableFuels,
       if (value != FuelType.all) value,
@@ -91,14 +95,23 @@ class RadiusAlertFuelTypeField extends StatelessWidget {
 
 /// Decimal price-per-litre threshold field. Accepts `,` or `.` as the
 /// decimal separator; the parent's parser normalises the input.
+///
+/// #2865 — the label carries the centre country's currency symbol
+/// (supplied by the parent), so an FR centre reads `Threshold (€/L)`,
+/// a GB centre `Threshold (£/L)`, etc.
 class RadiusAlertThresholdField extends StatelessWidget {
   const RadiusAlertThresholdField({
     super.key,
     required this.controller,
+    required this.currencySymbol,
     required this.onChanged,
   });
 
   final TextEditingController controller;
+
+  /// Currency symbol of the alert centre's country (#2865).
+  final String currencySymbol;
+
   final VoidCallback onChanged;
 
   @override
@@ -108,7 +121,8 @@ class RadiusAlertThresholdField extends StatelessWidget {
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
-        labelText: l10n?.alertsRadiusThreshold ?? 'Threshold (€/L)',
+        labelText: l10n?.alertThresholdWithCurrency(currencySymbol) ??
+            'Threshold ($currencySymbol/L)',
         border: const OutlineInputBorder(),
       ),
       onChanged: (_) => onChanged(),

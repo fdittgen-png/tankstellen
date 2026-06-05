@@ -56,3 +56,18 @@ String? priceFieldKeyForCountry(FuelType fuelType, String countryCode) {
   }
   return key;
 }
+
+/// The fuels an alert in [countryCode] can actually be evaluated against
+/// (Epic #2860, child #2865) — i.e. every fuel that country's provider
+/// exposes *and* which carries a comparable per-litre price in the
+/// background price map.
+///
+/// This is exactly the set for which [priceFieldKeyForCountry] is non-null:
+/// it drops [FuelType.all] (a search wildcard, not a concrete fuel) and the
+/// no-price-field fuels (electric / hydrogen), so the creation UI never
+/// offers a fuel whose alert could only ever silently never fire. Ordering
+/// follows [CountryServiceRegistry.fuelTypesFor]'s provider-declared order.
+List<FuelType> alertEvaluableFuelsFor(String countryCode) => [
+      for (final fuel in CountryServiceRegistry.fuelTypesFor(countryCode))
+        if (priceFieldKeyForCountry(fuel, countryCode) != null) fuel,
+    ];

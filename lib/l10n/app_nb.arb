@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Build-kanal",
   "featureLabel_debugMode": "Utvikler-/feilsøkingsmodus",
   "featureDescription_debugMode": "Viser en seksjon med utviklerverktøy i innstillingene med diagnostikk: eksport av feillogg, testvarsler, kjøring av testvarselflyt, oversikt over funksjonsflagg, tømming av hurtigbuffere og kopiering av diagnostikk.",
-  "alertGatingNonDeStationWarning": "Prisvarsler i bakgrunnen fungerer foreløpig bare for bensinstasjoner i Tyskland. Dette varselet lagres, men varsler deg kanskje aldri før varsler på tvers av land blir tilgjengelige.",
-  "alertGatingRadiusGermanyOnlyNote": "Radiusvarsler sjekker foreløpig bare bensinstasjoner i Tyskland.",
   "tripShareAction": "Del med en annen konto",
   "tripShareSheetTitle": "Del denne turen",
   "tripShareSheetSubtitle": "Gi en annen TankSync-konto skrivebeskyttet tilgang til denne registrerte turen.",
@@ -4163,5 +4161,23 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Målpris ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Terskel ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Build-kanaal",
   "featureLabel_debugMode": "Ontwikkelaars-/foutopsporingsmodus",
   "featureDescription_debugMode": "Toont een sectie Ontwikkelaarstools in de instellingen met diagnostiek: export van het foutenlogboek, testmeldingen, een testwaarschuwingspijplijn, een functievlag-overzicht, caches wissen en diagnostiek kopiëren.",
-  "alertGatingNonDeStationWarning": "Prijswaarschuwingen op de achtergrond werken momenteel alleen voor tankstations in Duitsland. Deze waarschuwing wordt opgeslagen, maar geeft je mogelijk nooit een melding totdat grensoverschrijdende waarschuwingen beschikbaar zijn.",
-  "alertGatingRadiusGermanyOnlyNote": "Straalwaarschuwingen controleren momenteel alleen tankstations in Duitsland.",
   "tripShareAction": "Delen met een ander account",
   "tripShareSheetTitle": "Deze rit delen",
   "tripShareSheetSubtitle": "Geef een ander TankSync-account alleen-lezentoegang tot deze opgenomen rit.",
@@ -4163,5 +4161,23 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Streefprijs ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Drempel ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

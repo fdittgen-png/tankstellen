@@ -15,7 +15,8 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('RadiusAlertCreateSheet (#578 phase 2)', () {
-    testWidgets('shows the Germany-only gating note (#2246)', (tester) async {
+    testWidgets('no longer shows the Germany-only gating note (#2865)',
+        (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -28,10 +29,37 @@ void main() {
         ],
       );
 
+      // Background radius alerts now fire for every supported country, so
+      // the "only checks stations in Germany" note is gone.
       expect(
         find.byKey(const Key('radius_alert_germany_only_note')),
-        findsOneWidget,
+        findsNothing,
       );
+    });
+
+    testWidgets('threshold label uses the centre country currency (#2865)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const RadiusAlertCreateSheet(),
+        overrides: [
+          ...test.overrides,
+          radiusAlertsProvider.overrideWith(_CapturingRadiusAlerts.new),
+          // London → GB → pound sterling.
+          userPositionOverride(lat: 51.5074, lng: -0.1278, source: 'GPS'),
+        ],
+      );
+
+      // Before a centre is bound the form defaults to euro; once the user
+      // taps "Use my location" (GB position) the threshold reads £.
+      await tester.tap(find.text('Use my location'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Threshold (£/L)'), findsOneWidget);
+      expect(find.text('Threshold (€/L)'), findsNothing);
     });
 
     testWidgets('save button builds a RadiusAlert and calls add()',

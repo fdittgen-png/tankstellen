@@ -3651,12 +3651,14 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Gli avvisi sui prezzi in background attualmente funzionano solo per le stazioni in Germania. Questo avviso verrà salvato, ma potrebbe non avvisarti mai finché non arriveranno gli avvisi tra paesi.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Prezzo obiettivo ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Gli avvisi per raggio attualmente controllano solo le stazioni in Germania.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Soglia ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection =>

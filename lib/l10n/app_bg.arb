@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Канал на компилацията",
   "featureLabel_debugMode": "Режим за разработчици / отстраняване на грешки",
   "featureDescription_debugMode": "Показва раздел Инструменти за разработчици в настройките с диагностика: експорт на дневника с грешки, тестови известия, изпълнение на тестов поток за сигнали, списък на флаговете за функции, изчистване на кешовете и копиране на диагностиката.",
-  "alertGatingNonDeStationWarning": "Известията за цени във фонов режим в момента работят само за бензиностанции в Германия. Този известителен сигнал ще бъде запазен, но може никога да не ви уведоми, докато не станат достъпни междудържавните известия.",
-  "alertGatingRadiusGermanyOnlyNote": "Известията по радиус в момента проверяват само бензиностанции в Германия.",
   "tripShareAction": "Споделяне с друг акаунт",
   "tripShareSheetTitle": "Споделяне на това пътуване",
   "tripShareSheetSubtitle": "Дайте на друг акаунт в TankSync достъп само за четене до това записано пътуване.",
@@ -4163,5 +4161,23 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Целева цена ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Праг ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

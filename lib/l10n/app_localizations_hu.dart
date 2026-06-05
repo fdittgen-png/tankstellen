@@ -3659,12 +3659,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'A háttérben futó árriasztások jelenleg csak németországi töltőállomásokra működnek. Ez a riasztás mentésre kerül, de előfordulhat, hogy soha nem értesít, amíg az országok közötti riasztások meg nem érkeznek.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Célár ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'A sugár alapú riasztások jelenleg csak németországi töltőállomásokat ellenőriznek.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Küszöb ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Töltőállomás-megközelítési átfedés';

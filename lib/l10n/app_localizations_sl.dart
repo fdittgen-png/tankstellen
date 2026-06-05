@@ -3636,12 +3636,14 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Cenovna opozorila v ozadju trenutno delujejo samo za bencinske črpalke v Nemčiji. To opozorilo bo shranjeno, vendar vas morda nikoli ne bo obvestilo, dokler ne bodo na voljo čezmejna opozorila.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Ciljna cena ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Opozorila po polmeru trenutno preverjajo samo bencinske črpalke v Nemčiji.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Prag ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Prekrivanje pri približevanju črpalki';

@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Koontikanava",
   "featureLabel_debugMode": "Kehittäjä-/virheenkorjaustila",
   "featureDescription_debugMode": "Näyttää asetuksissa Kehittäjätyökalut-osion, jossa on diagnostiikkaa: virhelokin vienti, testi-ilmoitukset, testihälytysputken suoritus, ominaisuuslippujen luettelo, välimuistien tyhjennys ja diagnostiikan kopiointi.",
-  "alertGatingNonDeStationWarning": "Taustahintahälytykset toimivat tällä hetkellä vain Saksan huoltoasemilla. Tämä hälytys tallennetaan, mutta se ei välttämättä ilmoita sinulle ennen kuin maiden väliset hälytykset ovat käytettävissä.",
-  "alertGatingRadiusGermanyOnlyNote": "Sädehälytykset tarkistavat tällä hetkellä vain Saksan huoltoasemat.",
   "tripShareAction": "Jaa toiselle tilille",
   "tripShareSheetTitle": "Jaa tämä matka",
   "tripShareSheetSubtitle": "Anna toiselle TankSync-tilille vain luku -oikeus tähän tallennettuun matkaan.",
@@ -4163,5 +4161,23 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Tavoitehinta ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Kynnys ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

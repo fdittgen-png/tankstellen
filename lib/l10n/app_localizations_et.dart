@@ -3634,12 +3634,14 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Tausta hinnateavitused töötavad praegu ainult Saksamaa tanklate puhul. See teavitus salvestatakse, kuid ei pruugi teid kunagi teavitada, kuni riikidevahelised teavitused saabuvad.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Sihthind ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Raadiuse teavitused kontrollivad praegu ainult Saksamaa tanklaid.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Lävi ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Tankla lähenemise ülekate';

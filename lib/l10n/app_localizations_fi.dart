@@ -3637,12 +3637,14 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Taustahintahälytykset toimivat tällä hetkellä vain Saksan huoltoasemilla. Tämä hälytys tallennetaan, mutta se ei välttämättä ilmoita sinulle ennen kuin maiden väliset hälytykset ovat käytettävissä.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Tavoitehinta ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Sädehälytykset tarkistavat tällä hetkellä vain Saksan huoltoasemat.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Kynnys ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Aseman lähestymisilmoitus';

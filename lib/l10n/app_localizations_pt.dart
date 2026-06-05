@@ -3658,12 +3658,14 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Os alertas de preço em segundo plano atualmente só funcionam para postos na Alemanha. Este alerta será guardado, mas poderá nunca o notificar até que cheguem os alertas entre países.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Preço-alvo ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Os alertas por raio atualmente só verificam postos na Alemanha.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Limite ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Overlay ao aproximar-se de um posto';

@@ -6,7 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/background/fuel_price_fields.dart';
+import '../../../../core/country/country_config.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -146,6 +149,31 @@ class _RadiusAlertCreateSheetState
         postalCode: _postalCodeController.text,
       );
 
+  /// The country the alert's centre falls in (#2865) — resolved from the
+  /// picked coordinates via the registry's bounding boxes, exactly like
+  /// the background radius runner. Before a centre is set the form has no
+  /// location yet, so it falls back to the default country (preserving the
+  /// historical euro labels). Updates live as the user picks GPS / a map
+  /// point; the parent re-`build`s on every centre change.
+  String get _centerCountry {
+    final lat = _centerLat;
+    final lng = _centerLng;
+    if (lat == null || lng == null) return Countries.germany.code;
+    return CountryServiceRegistry.countryForLatLng(lat, lng) ??
+        Countries.germany.code;
+  }
+
+  /// Currency symbol for the centre's country (#2865) — used on the
+  /// threshold label so an FR centre reads `€`, a GB centre `£`, etc.
+  String get _currencySymbol =>
+      Countries.byCode(_centerCountry)?.currencySymbol ??
+      Countries.germany.currencySymbol;
+
+  /// Fuels the background radius runner can actually evaluate for the
+  /// centre's country (#2865) — the same provider-exposed, priced set the
+  /// per-station dialog offers.
+  List<FuelType> get _evaluableFuels => alertEvaluableFuelsFor(_centerCountry);
+
   Future<void> _save() async {
     final threshold =
         RadiusAlertValidators.parseThreshold(_thresholdController.text);
@@ -204,23 +232,13 @@ class _RadiusAlertCreateSheetState
           const SizedBox(height: 16),
           RadiusAlertFuelTypeField(
             value: _fuelType,
+            evaluableFuels: _evaluableFuels,
             onChanged: (v) => setState(() => _fuelType = v),
-          ),
-          const SizedBox(height: 8),
-          // #2246 — honest gating: the background radius runner is
-          // Tankerkönig-only, so a centre outside Germany returns no
-          // samples and the alert never fires. State that up front.
-          Text(
-            l10n?.alertGatingRadiusGermanyOnlyNote ??
-                'Radius alerts currently only check stations in Germany.',
-            key: const Key('radius_alert_germany_only_note'),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
           ),
           const SizedBox(height: 16),
           RadiusAlertThresholdField(
             controller: _thresholdController,
+            currencySymbol: _currencySymbol,
             onChanged: _rebuild,
           ),
           const SizedBox(height: 16),

@@ -51,11 +51,16 @@ void main() {
     });
   });
 
+  // #2865 — the BG-evaluable fuel set is now passed in per-country by the
+  // parent sheet (DE's historical e5/e10/diesel here).
+  const deFuels = [FuelType.e5, FuelType.e10, FuelType.diesel];
+
   group('RadiusAlertFuelTypeField', () {
     testWidgets('renders with the current value selected', (tester) async {
       await tester.pumpWidget(
         _wrap(RadiusAlertFuelTypeField(
           value: FuelType.diesel,
+          evaluableFuels: deFuels,
           onChanged: (_) {},
         )),
       );
@@ -73,6 +78,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(RadiusAlertFuelTypeField(
           value: FuelType.diesel,
+          evaluableFuels: deFuels,
           onChanged: picked.add,
         )),
       );
@@ -89,11 +95,12 @@ void main() {
       expect(picked, [FuelType.e10]);
     });
 
-    testWidgets('does NOT include FuelType.all in the menu items',
+    testWidgets('offers exactly the passed-in evaluable fuels (no all)',
         (tester) async {
       await tester.pumpWidget(
         _wrap(RadiusAlertFuelTypeField(
           value: FuelType.diesel,
+          evaluableFuels: deFuels,
           onChanged: (_) {},
         )),
       );
@@ -116,21 +123,51 @@ void main() {
           .toSet();
 
       expect(menuValues, isNot(contains(FuelType.all)));
-      // #2211 — restricted to the BG-evaluable fuels (E5/E10/diesel);
-      // LPG/CNG/H2/EV are excluded because the radius search can't surface
-      // them (they only ever produced silently-dead alerts).
+      // The DE set passed in (#2865): e5/e10/diesel, nothing else.
       expect(menuValues, contains(FuelType.diesel));
       expect(menuValues, contains(FuelType.e10));
       expect(menuValues, isNot(contains(FuelType.lpg)));
-      expect(menuValues.length, RadiusAlertFuelTypeField.evaluableFuels.length);
+      expect(menuValues.length, deFuels.length);
+    });
+
+    testWidgets('honours a per-country fuel set (FR offers LPG/E85)',
+        (tester) async {
+      const frFuels = [
+        FuelType.e10, FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.e85, FuelType.lpg,
+      ];
+      await tester.pumpWidget(
+        _wrap(RadiusAlertFuelTypeField(
+          value: FuelType.diesel,
+          evaluableFuels: frFuels,
+          onChanged: (_) {},
+        )),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownButtonFormField<FuelType>));
+      await tester.pumpAndSettle();
+
+      final menuValues = tester
+          .widgetList<DropdownMenuItem<FuelType>>(
+            find.byType(DropdownMenuItem<FuelType>),
+          )
+          .map((i) => i.value)
+          .toSet();
+
+      expect(menuValues, contains(FuelType.lpg));
+      expect(menuValues, contains(FuelType.e85));
+      expect(menuValues, isNot(contains(FuelType.all)));
     });
   });
 
   group('RadiusAlertThresholdField', () {
-    testWidgets('renders the localized label', (tester) async {
+    testWidgets('renders the localized label with the given currency',
+        (tester) async {
       await tester.pumpWidget(
         _wrap(RadiusAlertThresholdField(
           controller: TextEditingController(text: '1.499'),
+          currencySymbol: '€',
           onChanged: () {},
         )),
       );
@@ -140,10 +177,25 @@ void main() {
       expect(find.text('1.499'), findsOneWidget);
     });
 
+    testWidgets('shows a non-euro currency symbol when passed one (#2865)',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(RadiusAlertThresholdField(
+          controller: TextEditingController(),
+          currencySymbol: '£',
+          onChanged: () {},
+        )),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Threshold (£/L)'), findsOneWidget);
+    });
+
     testWidgets('uses a decimal keyboard type', (tester) async {
       await tester.pumpWidget(
         _wrap(RadiusAlertThresholdField(
           controller: TextEditingController(),
+          currencySymbol: '€',
           onChanged: () {},
         )),
       );
@@ -161,6 +213,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(RadiusAlertThresholdField(
           controller: controller,
+          currencySymbol: '€',
           onChanged: () => fired++,
         )),
       );
