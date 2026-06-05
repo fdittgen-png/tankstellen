@@ -61,6 +61,14 @@ void main() {
     'fr_tokheim_9548': (total: 8.03, volume: 8.93, ppl: 0.899),
     'fr_tokheim_9550': (total: 10.00, volume: 11.12, ppl: 0.899),
     'fr_tokheim_9690': (total: 24.94, volume: 29.37, ppl: 0.849),
+    // #2831 — the 105,49 € / 52,77 L / 1,999 €/L frame the issue calls
+    // out. UNCROPPED full-pump shot like the others, so its per-value
+    // assertion joins the honest markTestSkipped path below (NOT faked
+    // green): the per-value greening of this raw frame needs the
+    // on-device reticle capture / VLM pass that remains #2831's device
+    // remainder. It still runs end-to-end without throwing here, and its
+    // identity holds (52.77 × 1.999 = 105.49).
+    'fr_tokheim_105_49eur_52_77l': (total: 105.49, volume: 52.77, ppl: 1.999),
     // 9518 (heavy reflection) + 9496 (Wayne, sky-washed) are not
     // confidently ground-truthable by eye — diagnostic only.
   };
