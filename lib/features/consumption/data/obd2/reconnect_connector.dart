@@ -187,6 +187,11 @@ class ReconnectConnector {
           seenRssi: candidate.candidate.rssi,
           consecutiveBatchesSeen: _consecutiveBatchesSeen,
           transportHint: transportHint,
+          // #2907 — every scan the connector runs IS an in-trip recovery: the
+          // MAC is pinned (no wrong-device risk), so relax the gate so a
+          // marginal single-batch sighting of the dropped adapter is
+          // attempted instead of spinning the backoff for another window.
+          recovery: true,
         )) {
           // Too weak AND not yet seen twice — keep scanning this window;
           // a later batch may strengthen or repeat it.

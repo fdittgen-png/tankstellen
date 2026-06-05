@@ -37,17 +37,44 @@
 /// [transportHint] is `'classic'` AND the sentinel RSSI is seen, the gate
 /// passes on the FIRST batch. This is scoped to the Classic transport only —
 /// a real BLE adapter never reports a 0 dBm RSSI, so the BLE gate is unchanged.
+///
+/// #2907 — the RECOVERY relaxation. The default gate (two consecutive batches
+/// OR within 15 dBm of the last-good RSSI) is tuned for the INITIAL pick: it
+/// guards against latching a neighbouring car's weaker adapter. But during an
+/// in-trip RECONNECT the MAC is already pinned — there is no risk of picking
+/// the wrong device — and a marginal, single-batch sighting of the pinned
+/// adapter is exactly the recovery we want to attempt rather than spin the
+/// backoff for another window. When [recovery] is true the gate therefore:
+///   * widens the relative-RSSI tolerance to [recoveryRelativeDropDbm]
+///     (default 35 dBm — a far weaker but still-reachable link is attempted
+///     on the FIRST sighting), and
+///   * with no baseline yet this drop, attempts ANY first sighting of the
+///     pinned MAC, and
+///   * still lets a SECOND consecutive sighting override even a beyond-the-
+///     widened-window RSSI (a stable-but-very-weak link).
+/// [recovery] defaults to false so every initial-pick call site is unchanged.
 bool shouldConnectFromScan({
   required int? lastSuccessfulRssi,
   required int seenRssi,
   required int consecutiveBatchesSeen,
   String? transportHint,
+  bool recovery = false,
   int relativeDropDbm = 15,
   int requiredConsecutiveBatches = 2,
+  int recoveryRelativeDropDbm = 35,
 }) {
   // #2565 — a bonded Classic sighting (no RSSI; the `0` sentinel) is in range
   // by construction: connect on the first batch, never wait for a second one.
   if (transportHint == 'classic' && seenRssi == 0) return true;
+  // #2907 — RECOVERY: the pinned MAC was just seen, so attempt it eagerly.
+  // No baseline ⇒ any first sighting connects; with a baseline the RSSI bar
+  // is the widened recovery window (a far-but-reachable link on the first
+  // sighting), and a second consecutive sighting overrides even that.
+  if (recovery) {
+    if (lastSuccessfulRssi == null) return true;
+    return seenRssi >= lastSuccessfulRssi - recoveryRelativeDropDbm ||
+        consecutiveBatchesSeen >= 2;
+  }
   final seenEnoughTimes = consecutiveBatchesSeen >= requiredConsecutiveBatches;
   if (lastSuccessfulRssi == null) return seenEnoughTimes;
   final strongEnough = seenRssi >= lastSuccessfulRssi - relativeDropDbm;

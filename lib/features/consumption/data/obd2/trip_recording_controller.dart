@@ -587,6 +587,13 @@ class TripRecordingController {
     final old = _service;
     if (identical(old, service)) return;
     _service = service;
+    // #2907 — the reconnected link is healthy: clear the drop detector's
+    // error window (incl. any dead-transport short-circuits the [_runTransport]
+    // gate logged against the OLD service) so the first poll on the new live
+    // transport starts clean instead of re-tripping a drop. The scanner resume
+    // path also resets it, but doing it AT the swap makes recovery robust to
+    // swap-vs-resume call ordering.
+    _dropDetector.reset();
     // Tear down the abandoned link off the hot path. `disconnect()` is
     // idempotent and never throws for the typed-closed states, but guard
     // anyway — the old transport is already dead, so any error here is
@@ -1030,7 +1037,7 @@ class TripRecordingController {
   /// scheduler the moment we cross the threshold.
   Future<String> _runTransport(String command) async {
     try {
-      final response = await _service.sendCommand(command);
+      final response = await _sendOrShortCircuit(command);
       // A clean read is the only signal strong enough to clear the
       // error window; ELM327 NO DATA responses come back via the
       // response string, not an exception.
@@ -1045,7 +1052,7 @@ class TripRecordingController {
       // a real drop signal.
       await Future<void>.delayed(_transportRetryDelay);
       try {
-        final response = await _service.sendCommand(command);
+        final response = await _sendOrShortCircuit(command);
         _dropDetector.registerSuccess();
         return response;
       } catch (e, st) { // ignore: unused_catch_stack
@@ -1053,6 +1060,24 @@ class TripRecordingController {
         rethrow;
       }
     }
+  }
+
+  /// #2907 — never write into a DEAD transport. A drop disconnects the service
+  /// (`isConnected == false`); the reconnect [replaceService]-swaps a fresh
+  /// one. If a poll dereferences a service that is no longer connected — the
+  /// orphaned-reconnect window, or a swap that hasn't landed — fail FAST with
+  /// a recoverable typed disconnect instead of writing into a closed socket
+  /// and waiting out the full per-command read timeout. Throwing here routes
+  /// through [_runTransport]'s existing retry → [_registerTransportError]
+  /// path unchanged, so the drop threshold + timing behaviour is identical to
+  /// a real dead-link `sendCommand` throw — it just never spins the radio.
+  Future<String> _sendOrShortCircuit(String command) {
+    if (!_service.isConnected) {
+      throw const Obd2DisconnectedException(
+        'TripRecordingController: transport not connected — link is recovering',
+      );
+    }
+    return _service.sendCommand(command);
   }
 
   /// #1904 — pause before the single transport retry, giving the

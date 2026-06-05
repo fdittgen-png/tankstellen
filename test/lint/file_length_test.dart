@@ -258,7 +258,15 @@ void main() {
     // the tiny-distance L/100 km floor against the swapped odometer
     // distance (the code change itself is net-zero). Decomposition stays
     // tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1641,
+    // #2907 — re-grandfathered 1641 → 1666: the reconnect-RECOVERY core fix.
+    // `_runTransport` now routes every poll through `_sendOrShortCircuit`,
+    // which fails FAST with a recoverable typed disconnect when the service is
+    // no longer connected (never poll a DEAD transport / never orphan a
+    // just-reconnected one), and `replaceService` resets the drop detector at
+    // the swap so the new live link starts from a clean streak. Both are
+    // load-bearing recovery logic in the hot polling path that cannot move out
+    // of the controller. Decomposition stays tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1666,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The

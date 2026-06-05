@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'ble_disconnect_classifier.dart';
+import 'ble_link_tuner.dart';
 import 'connection_drop_debouncer.dart';
 import 'elm_byte_channel.dart';
 import 'obd2_comm_diagnostics.dart';
@@ -50,12 +51,6 @@ class Elm327BleUuids {
 class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
   final BluetoothDevice _device;
   final Elm327BleUuids _uuids;
-
-  /// #2261 concern 4 — best-effort MTU to request on a high-throughput
-  /// (recording) link. 247 is the practical ATT payload ceiling on most
-  /// Android BLE stacks; the negotiated value is whatever the peripheral
-  /// grants. Skipped on the autoConnect passive path (FBP forbids requestMtu).
-  static const int _recordingMtu = 247;
 
   /// Optional bounded timeout passed to `device.connect` (#2242). When null,
   /// `connect` uses the legacy `mtu: null` form with no timeout (the scan-first
@@ -222,8 +217,9 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
         // drop detector sees a typed disconnect — never an ERROR trace. A
         // genuine non-disconnect error keeps its #2295 behaviour (below).
         if (isBleAdapterDisconnect(e)) {
-          _open = false;
-          _writeChar = null;
+          // #2907 — FULL session teardown on a confirmed drop (was clearing
+          // only `_open`/`_writeChar`, leaving stale notify state behind).
+          _clearSessionOnDrop();
           if (!_incoming.isClosed) {
             _incoming.addError(
               const Obd2DisconnectedException(
@@ -280,43 +276,12 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
   }
 
   @override
-  Future<void> tuneForRecording() async {
-    await _setConnectionPriority(ConnectionPriority.high);
-    // requestMtu is forbidden with autoConnect:true (FBP throws); the
-    // passive path never calls this, but guard anyway.
-    if (_autoConnect) return;
-    try {
-      final granted = await _device.requestMtu(_recordingMtu);
-      // #2466 — record the negotiated ATT MTU into the gated comm-health
-      // session (no-op unless Feature.debugMode armed the collector). The
-      // peripheral may grant less than requested; the granted value wins.
-      final diag = Obd2CommDiagnostics.instance;
-      if (diag.enabled) diag.recordAdapterIdentity(mtu: granted);
-    } catch (e, st) {
-      // Many clones reject a non-default MTU — harmless, the default 23-byte
-      // MTU still works. PHY (2M) is deliberately NOT requested (a clone trap).
-      debugPrint('FlutterBluePlusElmChannel requestMtu skipped: $e\n$st');
-    }
-  }
+  Future<void> tuneForRecording() =>
+      const BleLinkTuner().tuneForRecording(_device, autoConnect: _autoConnect);
 
   @override
-  Future<void> tuneForBackground() async {
-    await _setConnectionPriority(ConnectionPriority.balanced);
-  }
-
-  /// Best-effort connection-priority request (#2261 concern 4). Android
-  /// only — FBP throws `androidOnly` elsewhere — so the try/catch keeps
-  /// iOS / a rejecting clone from ever breaking a session.
-  Future<void> _setConnectionPriority(ConnectionPriority priority) async {
-    try {
-      await _device.requestConnectionPriority(
-        connectionPriorityRequest: priority,
-      );
-    } catch (e, st) {
-      debugPrint('FlutterBluePlusElmChannel requestConnectionPriority '
-          'skipped: $e\n$st');
-    }
-  }
+  Future<void> tuneForBackground() =>
+      const BleLinkTuner().tuneForBackground(_device);
 
   @override
   Future<void> write(List<int> bytes) async {
@@ -349,8 +314,9 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
       // [ClassicElmChannel] + #2524 [BluetoothObd2Transport] precedents) and
       // clear the session so the next write short-circuits on the open-guard.
       if (isBleAdapterDisconnect(e)) {
-        _open = false;
-        _writeChar = null;
+        // #2907 — full session teardown on a write-time drop (was clearing
+        // only `_open`/`_writeChar`), so a reconnect's open() starts clean.
+        _clearSessionOnDrop();
         debugPrint('FlutterBluePlusElmChannel: write failed — reclassifying '
             'as a recoverable disconnect (#2900): $e\n$st');
         throw const Obd2DisconnectedException(
@@ -373,11 +339,44 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
       char.write(bytes, withoutResponse: true);
 
   /// #2900 test seam — prime an established session so a fault-injection test
-  /// can drive [write] without the real connect path. Never used in production.
+  /// can drive [write] without the real connect path. #2907 — also wires
+  /// `_notifyChar` + inert subscriptions so a test can prove a confirmed drop
+  /// fully tears the session down (see [debugResidualSessionState]).
   @visibleForTesting
   void debugPrimeOpenSession(BluetoothCharacteristic writeChar) {
     _writeChar = writeChar;
+    _notifyChar = writeChar;
     _open = true;
+    _subscription ??= const Stream<List<int>>.empty().listen((_) {});
+    _connStateSubscription ??=
+        const Stream<BluetoothConnectionState>.empty().listen((_) {});
+  }
+
+  /// #2907 test seam — true while ANY per-session state survives a drop (the
+  /// write/notify chars or either subscription); [_clearSessionOnDrop] clears
+  /// them all.
+  @visibleForTesting
+  bool get debugResidualSessionState =>
+      _notifyChar != null ||
+      _writeChar != null ||
+      _subscription != null ||
+      _connStateSubscription != null;
+
+  /// #2907 — fully clear per-session BLE state the instant a drop is confirmed
+  /// (notify-stream error / write failure) so a subsequent [open] starts
+  /// clean. Used to clear only `_open`/`_writeChar`, leaving `_notifyChar` +
+  /// both subscriptions dangling for the next open to double-wire. Cancels
+  /// fire-and-forget: it can run INSIDE the notify subscription's own
+  /// `onError`, where awaiting its own cancellation would deadlock. `_incoming`
+  /// is NOT closed here — [close] owns that.
+  void _clearSessionOnDrop() {
+    _open = false;
+    _writeChar = null;
+    _notifyChar = null;
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+    unawaited(_connStateSubscription?.cancel());
+    _connStateSubscription = null;
   }
 
   @override
