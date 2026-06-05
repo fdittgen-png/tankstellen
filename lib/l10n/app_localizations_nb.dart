@@ -3633,12 +3633,14 @@ class AppLocalizationsNb extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Prisvarsler i bakgrunnen fungerer foreløpig bare for bensinstasjoner i Tyskland. Dette varselet lagres, men varsler deg kanskje aldri før varsler på tvers av land blir tilgjengelige.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Target price ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Radiusvarsler sjekker foreløpig bare bensinstasjoner i Tyskland.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Threshold ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Innflygingsoverlegg';

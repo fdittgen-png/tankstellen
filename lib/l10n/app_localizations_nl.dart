@@ -3650,12 +3650,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Prijswaarschuwingen op de achtergrond werken momenteel alleen voor tankstations in Duitsland. Deze waarschuwing wordt opgeslagen, maar geeft je mogelijk nooit een melding totdat grensoverschrijdende waarschuwingen beschikbaar zijn.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Target price ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Straalwaarschuwingen controleren momenteel alleen tankstations in Duitsland.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Threshold ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection =>

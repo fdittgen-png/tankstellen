@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Byggkanal",
   "featureLabel_debugMode": "Utvecklar-/felsökningsläge",
   "featureDescription_debugMode": "Visar en sektion med utvecklarverktyg i inställningarna med diagnostik: export av fellogg, testaviseringar, körning av testvarningsflöde, lista över funktionsflaggor, rensning av cacheminnen och kopiering av diagnostik.",
-  "alertGatingNonDeStationWarning": "Prislarm i bakgrunden fungerar för närvarande endast för bensinstationer i Tyskland. Det här larmet sparas, men kanske aldrig meddelar dig förrän larm mellan länder blir tillgängliga.",
-  "alertGatingRadiusGermanyOnlyNote": "Radielarm kontrollerar för närvarande endast bensinstationer i Tyskland.",
   "tripShareAction": "Dela med ett annat konto",
   "tripShareSheetTitle": "Dela den här resan",
   "tripShareSheetSubtitle": "Ge ett annat TankSync-konto skrivskyddad åtkomst till den här inspelade resan.",
@@ -4163,5 +4161,25 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

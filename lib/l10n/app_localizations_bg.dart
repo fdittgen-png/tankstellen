@@ -3664,12 +3664,14 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Известията за цени във фонов режим в момента работят само за бензиностанции в Германия. Този известителен сигнал ще бъде запазен, но може никога да не ви уведоми, докато не станат достъпни междудържавните известия.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Target price ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Известията по радиус в момента проверяват само бензиностанции в Германия.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Threshold ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection =>

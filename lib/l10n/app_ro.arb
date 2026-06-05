@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Canal de compilare",
   "featureLabel_debugMode": "Mod dezvoltator / depanare",
   "featureDescription_debugMode": "Afișează o secțiune Instrumente pentru dezvoltatori în setări cu diagnosticare: exportul jurnalului de erori, notificări de test, rularea fluxului de alertă de test, lista indicatorilor de funcții, golirea memoriilor cache și copierea diagnosticării.",
-  "alertGatingNonDeStationWarning": "Alertele de preț în fundal funcționează momentan doar pentru stațiile din Germania. Această alertă va fi salvată, dar este posibil să nu vă notifice niciodată până când vor fi disponibile alertele între țări.",
-  "alertGatingRadiusGermanyOnlyNote": "Alertele pe rază verifică momentan doar stațiile din Germania.",
   "tripShareAction": "Partajează cu alt cont",
   "tripShareSheetTitle": "Partajează acest traseu",
   "tripShareSheetSubtitle": "Acordă altui cont TankSync acces doar pentru citire la acest traseu înregistrat.",
@@ -4163,5 +4161,25 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

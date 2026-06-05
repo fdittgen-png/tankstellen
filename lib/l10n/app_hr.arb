@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Kanal međuverzije",
   "featureLabel_debugMode": "Razvojni način / način za otklanjanje pogrešaka",
   "featureDescription_debugMode": "Prikazuje odjeljak Razvojni alati u postavkama s dijagnostikom: izvoz zapisnika pogrešaka, testne obavijesti, pokretanje testnog tijeka upozorenja, popis zastavica značajki, čišćenje predmemorija i kopiranje dijagnostike.",
-  "alertGatingNonDeStationWarning": "Pozadinska upozorenja o cijenama trenutačno rade samo za benzinske postaje u Njemačkoj. Ovo upozorenje bit će spremljeno, ali možda vas nikada neće obavijestiti dok ne postanu dostupna međudržavna upozorenja.",
-  "alertGatingRadiusGermanyOnlyNote": "Upozorenja po radijusu trenutačno provjeravaju samo benzinske postaje u Njemačkoj.",
   "tripShareAction": "Podijeli s drugim računom",
   "tripShareSheetTitle": "Podijeli ovu vožnju",
   "tripShareSheetSubtitle": "Dajte drugom TankSync računu pristup samo za čitanje ovoj snimljenoj vožnji.",
@@ -4163,5 +4161,25 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Κανάλι έκδοσης",
   "featureLabel_debugMode": "Λειτουργία προγραμματιστή / εντοπισμού σφαλμάτων",
   "featureDescription_debugMode": "Εμφανίζει μια ενότητα Εργαλεία προγραμματιστή στις ρυθμίσεις με διαγνωστικά: εξαγωγή αρχείου σφαλμάτων, δοκιμαστικές γνωστοποιήσεις, εκτέλεση δοκιμαστικής ροής ειδοποιήσεων, καταγραφή σημαιών λειτουργιών, εκκαθάριση κρυφών μνημών και αντιγραφή διαγνωστικών.",
-  "alertGatingNonDeStationWarning": "Οι ειδοποιήσεις τιμών στο παρασκήνιο λειτουργούν προς το παρόν μόνο για πρατήρια στη Γερμανία. Αυτή η ειδοποίηση θα αποθηκευτεί, αλλά ενδέχεται να μην σας ειδοποιήσει ποτέ μέχρι να γίνουν διαθέσιμες οι διασυνοριακές ειδοποιήσεις.",
-  "alertGatingRadiusGermanyOnlyNote": "Οι ειδοποιήσεις ακτίνας ελέγχουν προς το παρόν μόνο πρατήρια στη Γερμανία.",
   "tripShareAction": "Κοινοποίηση σε άλλον λογαριασμό",
   "tripShareSheetTitle": "Κοινοποίηση αυτής της διαδρομής",
   "tripShareSheetSubtitle": "Δώστε σε άλλον λογαριασμό TankSync πρόσβαση μόνο για ανάγνωση σε αυτή την καταγεγραμμένη διαδρομή.",
@@ -4163,5 +4161,25 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

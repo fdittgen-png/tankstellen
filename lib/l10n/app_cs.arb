@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Kanál sestavení",
   "featureLabel_debugMode": "Vývojářský/ladicí režim",
   "featureDescription_debugMode": "Zobrazí v nastavení sekci Nástroje pro vývojáře s diagnostikou: export protokolu chyb, testovací oznámení, spuštění testovacího procesu upozornění, výpis příznaků funkcí, vymazání mezipamětí a kopírování diagnostiky.",
-  "alertGatingNonDeStationWarning": "Cenová upozornění na pozadí aktuálně fungují pouze pro čerpací stanice v Německu. Toto upozornění bude uloženo, ale nemusí vás upozornit, dokud nebudou k dispozici upozornění napříč zeměmi.",
-  "alertGatingRadiusGermanyOnlyNote": "Upozornění podle okruhu aktuálně kontrolují pouze čerpací stanice v Německu.",
   "tripShareAction": "Sdílet s jiným účtem",
   "tripShareSheetTitle": "Sdílet tuto jízdu",
   "tripShareSheetSubtitle": "Poskytněte jinému účtu TankSync přístup pouze ke čtení k této zaznamenané jízdě.",
@@ -4163,5 +4161,25 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

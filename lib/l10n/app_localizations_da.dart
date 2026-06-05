@@ -3634,12 +3634,14 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Baggrunds-prisalarmer fungerer i øjeblikket kun for tankstationer i Tyskland. Denne alarm gemmes, men giver dig måske aldrig besked, før alarmer på tværs af lande bliver tilgængelige.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Target price ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Radiusalarmer tjekker i øjeblikket kun tankstationer i Tyskland.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Threshold ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Indflyvningsoverlay';

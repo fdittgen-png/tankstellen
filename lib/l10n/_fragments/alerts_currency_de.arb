@@ -1,0 +1,16 @@
+{
+  "alertTargetPriceWithCurrency": "Zielpreis ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "Label of the target-price field in the create-alert dialog, parameterised with the station country's currency symbol now that background alerts fire for every country (#2865).",
+    "placeholders": {
+      "currency": { "type": "String" }
+    }
+  },
+  "alertThresholdWithCurrency": "Schwellenwert ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "Label of the price-per-litre threshold field in the radius-alert create sheet, parameterised with the alert centre's country currency symbol (#2865).",
+    "placeholders": {
+      "currency": { "type": "String" }
+    }
+  }
+}

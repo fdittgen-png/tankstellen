@@ -3657,12 +3657,14 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Hintergrund-Preisalarme funktionieren derzeit nur für Tankstellen in Deutschland. Dieser Alarm wird gespeichert, benachrichtigt dich aber möglicherweise erst, wenn länderübergreifende Alarme verfügbar sind.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Zielpreis ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Umkreis-Alarme prüfen derzeit nur Tankstellen in Deutschland.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Schwellenwert ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Tankstellen-Radar';

@@ -3651,12 +3651,14 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Cenové upozornenia na pozadí momentálne fungujú iba pre čerpacie stanice v Nemecku. Toto upozornenie sa uloží, ale nemusí vás upozorniť, kým nebudú dostupné medzištátne upozornenia.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Target price ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Upozornenia podľa okruhu momentálne kontrolujú iba čerpacie stanice v Nemecku.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Threshold ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Prekryv pri približovaní k stanici';

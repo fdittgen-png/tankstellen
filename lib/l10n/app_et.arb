@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Järgu kanal",
   "featureLabel_debugMode": "Arendaja/silumisrežiim",
   "featureDescription_debugMode": "Kuvab seadetes jaotise Arendaja tööriistad koos diagnostikaga: vealogi eksport, testteatised, testhoiatuse konveieri käivitamine, funktsioonilippude loend, vahemälude tühjendamine ja diagnostika kopeerimine.",
-  "alertGatingNonDeStationWarning": "Tausta hinnateavitused töötavad praegu ainult Saksamaa tanklate puhul. See teavitus salvestatakse, kuid ei pruugi teid kunagi teavitada, kuni riikidevahelised teavitused saabuvad.",
-  "alertGatingRadiusGermanyOnlyNote": "Raadiuse teavitused kontrollivad praegu ainult Saksamaa tanklaid.",
   "tripShareAction": "Jaga teise kontoga",
   "tripShareSheetTitle": "Jaga seda sõitu",
   "tripShareSheetSubtitle": "Anna teisele TankSynci kontole sellele salvestatud sõidule kirjutuskaitstud juurdepääs.",
@@ -4163,5 +4161,25 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

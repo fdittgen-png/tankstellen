@@ -6672,17 +6672,17 @@ abstract class AppLocalizations {
   /// **'+ {count} more'**
   String radiusAlertGroupedMore(String count);
 
-  /// Warning shown in the create-alert dialog when the station is outside Germany, because the on-device background evaluator is Tankerkönig-only today (#2246).
+  /// Label of the target-price field in the create-alert dialog, parameterised with the station country's currency symbol now that background alerts fire for every country (#2865).
   ///
   /// In en, this message translates to:
-  /// **'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.'**
-  String get alertGatingNonDeStationWarning;
+  /// **'Target price ({currency})'**
+  String alertTargetPriceWithCurrency(String currency);
 
-  /// Informational note in the radius-alert create sheet that the on-device background runner only evaluates German (Tankerkönig) stations today (#2246).
+  /// Label of the price-per-litre threshold field in the radius-alert create sheet, parameterised with the alert centre's country currency symbol (#2865).
   ///
   /// In en, this message translates to:
-  /// **'Radius alerts currently only check stations in Germany.'**
-  String get alertGatingRadiusGermanyOnlyNote;
+  /// **'Threshold ({currency}/L)'**
+  String alertThresholdWithCurrency(String currency);
 
   /// Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661).
   ///

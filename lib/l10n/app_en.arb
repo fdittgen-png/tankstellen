@@ -1994,13 +1994,23 @@
       }
     }
   },
-  "alertGatingNonDeStationWarning": "Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.",
-  "@alertGatingNonDeStationWarning": {
-    "description": "Warning shown in the create-alert dialog when the station is outside Germany, because the on-device background evaluator is Tankerkönig-only today (#2246)."
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "description": "Label of the target-price field in the create-alert dialog, parameterised with the station country's currency symbol now that background alerts fire for every country (#2865).",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   },
-  "alertGatingRadiusGermanyOnlyNote": "Radius alerts currently only check stations in Germany.",
-  "@alertGatingRadiusGermanyOnlyNote": {
-    "description": "Informational note in the radius-alert create sheet that the on-device background runner only evaluates German (Tankerkönig) stations today (#2246)."
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "description": "Label of the price-per-litre threshold field in the radius-alert create sheet, parameterised with the alert centre's country currency symbol (#2865).",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   },
   "approachOverlaySection": "Fuel Station Radar",
   "@approachOverlaySection": {

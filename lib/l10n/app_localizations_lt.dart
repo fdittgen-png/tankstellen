@@ -3658,12 +3658,14 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Foninės kainų perspėjimai šiuo metu veikia tik Vokietijos degalinėms. Šis perspėjimas bus išsaugotas, bet jis gali niekada jūsų neįspėti, kol bus prieinami tarptautiniai perspėjimai.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Target price ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Spindulio perspėjimai šiuo metu tikrina tik Vokietijos degalines.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Threshold ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Užklotis artėjant prie degalinės';

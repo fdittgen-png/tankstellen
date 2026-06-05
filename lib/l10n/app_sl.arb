@@ -1934,8 +1934,6 @@
   "developerToolsBuildChannel": "Kanal gradnje",
   "featureLabel_debugMode": "Razvijalski način / način za odpravljanje napak",
   "featureDescription_debugMode": "V nastavitvah prikaže razdelek Razvijalska orodja z diagnostiko: izvoz dnevnika napak, testna obvestila, zagon testnega cevovoda opozoril, izpis zastavic funkcij, čiščenje predpomnilnikov in kopiranje diagnostike.",
-  "alertGatingNonDeStationWarning": "Cenovna opozorila v ozadju trenutno delujejo samo za bencinske črpalke v Nemčiji. To opozorilo bo shranjeno, vendar vas morda nikoli ne bo obvestilo, dokler ne bodo na voljo čezmejna opozorila.",
-  "alertGatingRadiusGermanyOnlyNote": "Opozorila po polmeru trenutno preverjajo samo bencinske črpalke v Nemčiji.",
   "tripShareAction": "Deli z drugim računom",
   "tripShareSheetTitle": "Deli to vožnjo",
   "tripShareSheetSubtitle": "Drugemu računu TankSync dajte dostop samo za branje do te zabeležene vožnje.",
@@ -4163,5 +4161,25 @@
   "@fillUpWarningSaveAnyway": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertTargetPriceWithCurrency": "Target price ({currency})",
+  "@alertTargetPriceWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "alertThresholdWithCurrency": "Threshold ({currency}/L)",
+  "@alertThresholdWithCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
   }
 }

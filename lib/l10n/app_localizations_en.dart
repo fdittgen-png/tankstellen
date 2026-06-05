@@ -3619,12 +3619,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      'Background price alerts currently only work for stations in Germany. This alert will be saved but may never notify you until cross-country alerts arrive.';
+  String alertTargetPriceWithCurrency(String currency) {
+    return 'Target price ($currency)';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      'Radius alerts currently only check stations in Germany.';
+  String alertThresholdWithCurrency(String currency) {
+    return 'Threshold ($currency/L)';
+  }
 
   @override
   String get approachOverlaySection => 'Fuel Station Radar';
@@ -11118,12 +11120,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String get alertGatingNonDeStationWarning =>
-      '⟦Ɓáçķǧřóúñđ ƥřîçé áłéřŧš çúřřéñŧłý óñłý ŵóřķ ƒóř šŧáŧîóñš îñ Ǧéřɱáñý. Ŧĥîš áłéřŧ ŵîłł ƀé šáṽéđ ƀúŧ ɱáý ñéṽéř ñóŧîƒý ýóú úñŧîł çřóšš-çóúñŧřý áłéřŧš ářřîṽé. ·························································⟧';
+  String alertTargetPriceWithCurrency(String currency) {
+    return '⟦Ŧářǧéŧ ƥřîçé ($currency) ·····⟧';
+  }
 
   @override
-  String get alertGatingRadiusGermanyOnlyNote =>
-      '⟦Řáđîúš áłéřŧš çúřřéñŧłý óñłý çĥéçķ šŧáŧîóñš îñ Ǧéřɱáñý. ·····················⟧';
+  String alertThresholdWithCurrency(String currency) {
+    return '⟦Ŧĥřéšĥółđ ($currency/Ł) ·····⟧';
+  }
 
   @override
   String get approachOverlaySection => '⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧';
