@@ -283,9 +283,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   Widget _buildWideLayout(BuildContext context) {
     final selectedId = ref.watch(selectedStationProvider);
 
+    // #2939 — while the Fuel Station Radar owns the results, the split MAP
+    // stays put and SYNCS the selection (clustered, fit-to-pane, two-way
+    // list<->map sync) — exactly like route mode keeps its map. Selecting a
+    // row must NOT swap the right pane to the detail card and hide the radar
+    // map. The dedicated detail is still reachable from the marker/row's
+    // "view details" affordance (the list-card detail navigation). Off radar,
+    // the pre-#2939 behaviour is unchanged: a selection shows the inline
+    // detail, falling back to the map placeholder.
+    final radarActive = ref.watch(radarSearchProvider).active;
+
     return ResponsiveMasterDetail(
       master: _buildSearchContent(context),
-      detail: selectedId != null
+      detail: (!radarActive && selectedId != null)
           ? StationDetailInline(
               stationId: selectedId,
               onClose: () =>

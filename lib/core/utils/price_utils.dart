@@ -106,6 +106,25 @@ const List<FuelType> _displayFallbackOrder = [
   return (minP, maxP);
 }
 
+/// (min, max) over each station's price for the fuel its [resolver] picks —
+/// the cross-border case (#2631) where each station is priced by ITS country's
+/// profile fuel. Returns `(0, 0)` when none resolve to a price.
+(double, double) resolvedPriceRangeWith(
+  Iterable<Station> stations,
+  FuelType Function(Station) resolver,
+) {
+  double minP = double.infinity;
+  double maxP = 0;
+  for (final s in stations) {
+    final p = priceForFuelType(s, resolver(s));
+    if (p != null) {
+      if (p < minP) minP = p;
+      if (p > maxP) maxP = p;
+    }
+  }
+  return minP == double.infinity ? (0, 0) : (minP, maxP);
+}
+
 /// Compares two stations by price for [fuelType]. Stations without a price sort last.
 int compareByPrice(Station a, Station b, FuelType fuelType) {
   final pa = priceForFuelType(a, fuelType) ?? AppConstants.noPriceSentinel;
