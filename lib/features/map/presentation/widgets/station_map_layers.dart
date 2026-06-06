@@ -6,7 +6,6 @@ import 'dart:math' as math;
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../data/sparkilo_tile_layer.dart';
@@ -16,6 +15,7 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/presentation/widgets/sort_selector.dart';
 import 'price_legend.dart';
+import 'station_cluster_layers.dart';
 import 'station_marker.dart';
 
 /// Camera zoom bounds (#1457). Top end matches the OSM tile cap so a
@@ -98,6 +98,18 @@ class StationMapLayers extends StatefulWidget {
   /// behaviour (#2510), unchanged.
   final FuelType Function(Station)? fuelResolver;
 
+  /// #2939 — "Clustered + cheapest-labelled". When true, EVERY result set is
+  /// proximity-clustered (regardless of count) with a cheapest-price badge so
+  /// the narrow landscape-radar split pane never overlaps. When false (the
+  /// default) the legacy emphasis-then-cluster-at-[clusterThreshold] behaviour
+  /// is byte-identical to pre-#2939.
+  final bool clusterAlways;
+
+  /// #2939 — when set, a marker tap fires this with the station id INSTEAD of
+  /// navigating to `/station/{id}`, so the radar split map can select the
+  /// matching list row (the inverse of a row tap) and keep the map visible.
+  final void Function(String stationId)? onStationTap;
+
   const StationMapLayers({
     super.key,
     required this.mapController,
@@ -115,6 +127,8 @@ class StationMapLayers extends StatefulWidget {
     this.selectedStationIds,
     this.extraLayers = const [],
     this.fuelResolver,
+    this.clusterAlways = false,
+    this.onStationTap,
   });
 
   @override
@@ -217,11 +231,9 @@ class StationMapLayers extends StatefulWidget {
   @visibleForTesting
   static const int emphasisCount = 4;
 
-  /// At or above this many stations the map falls back to count-clustering
-  /// (#2510). A bounded nearby search (the 10-station / 10 km case) stays
-  /// well under this, so every result renders as its own marker; only a
-  /// genuinely huge / zoomed-far set collapses into tappable clusters
-  /// rather than painting hundreds of overlapping dots.
+  /// At or above this many stations a NON-[clusterAlways] map falls back to
+  /// count-clustering (#2510): a bounded nearby search stays well under this,
+  /// only a genuinely huge / zoomed-far set collapses into tappable clusters.
   @visibleForTesting
   static const int clusterThreshold = 80;
 
@@ -267,6 +279,11 @@ class _StationMapLayersState extends State<StationMapLayers> {
   late List<Marker> _markers;
   late (double, double) _priceRange;
 
+  /// #2939 — per-marker price + station id, keyed on marker identity, so the
+  /// cluster badge can roll a cluster up to its cheapest member + spot the
+  /// selected one (the builder only gets the [Marker]s). Rebuilt with [_markers].
+  final Map<Marker, MarkerMeta> _markerMeta = {};
+
   /// True once FlutterMap has laid out and emitted `onMapReady`. The
   /// guarded `didUpdateWidget` fit waits on this so a `fitCamera` call
   /// never lands before the controller has a real viewport (#2399).
@@ -302,7 +319,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
     final resolver = widget.fuelResolver;
     _priceRange = resolver == null
         ? priceRange(widget.stations, widget.selectedFuel)
-        : _resolvedRange(widget.stations, resolver);
+        : resolvedPriceRangeWith(widget.stations, resolver);
     final ids = widget.selectedStationIds;
     final hasSelection = ids != null && ids.isNotEmpty;
 
@@ -327,39 +344,35 @@ class _StationMapLayersState extends State<StationMapLayers> {
       widget.selectedFuel,
       fuelResolver: resolver,
     );
+
+    // #2939 — in clusterAlways mode the clustering de-overlaps the pane, so a
+    // SINGLETON keeps its full price pill (never a dot); only clustered members
+    // roll up into the cheapest-price badge. The emphasis-dot scheme stays for
+    // the legacy non-clustered surfaces.
+    final onTap = widget.onStationTap;
+    _markerMeta.clear();
     _markers = ordered.map((station) {
       final isPastel = hasSelection && !ids.contains(station.id);
-      return StationMarkerBuilder.build(
+      final isSelected = hasSelection && ids.contains(station.id);
+      final marker = StationMarkerBuilder.build(
         context,
         station,
         widget.selectedFuel,
         _priceRange.$1,
         _priceRange.$2,
         pastel: isPastel,
-        compact: !emphasized.contains(station.id),
+        compact: !widget.clusterAlways && !emphasized.contains(station.id),
+        selected: isSelected,
+        onTap: onTap == null ? null : () => onTap(station.id),
         fuelResolver: resolver,
       );
+      _markerMeta[marker] = (
+        id: station.id,
+        price: priceForFuelType(
+            station, resolver != null ? resolver(station) : widget.selectedFuel),
+      );
+      return marker;
     }).toList();
-  }
-
-  /// (min, max) over each station's per-country resolved-fuel price (#2631),
-  /// used to colour cross-border markers consistently with the price each
-  /// one actually shows. Mirrors [priceRange] but resolves the fuel per
-  /// station via [resolver]. Returns `(0, 0)` when none resolve to a price.
-  static (double, double) _resolvedRange(
-    List<Station> stations,
-    FuelType Function(Station) resolver,
-  ) {
-    double minP = double.infinity;
-    double maxP = 0;
-    for (final s in stations) {
-      final p = priceForFuelType(s, resolver(s));
-      if (p != null) {
-        if (p < minP) minP = p;
-        if (p > maxP) maxP = p;
-      }
-    }
-    return minP == double.infinity ? (0, 0) : (minP, maxP);
   }
 
   @override
@@ -522,44 +535,25 @@ class _StationMapLayersState extends State<StationMapLayers> {
                 ),
               ],
             ),
-            // Station markers. #1774 — `_markers` is memoised; this
-            // builder just places the pre-built list.
-            //
-            // #2510 — a BOUNDED nearby-search result set renders every
-            // station as its OWN marker (a plain [MarkerLayer]), so a
-            // 10-station / 10 km search shows all ten — never hidden behind
-            // count bubbles. De-overlap is by emphasis, not aggregation:
-            // the top-ranked stations (cheapest / closest per the active
-            // sort) keep the full price label, the rest are compact dots
-            // (see `_recomputeMarkers`). This reverses the #2490
-            // over-correction that routed EVERY set through
-            // [MarkerClusterLayerWidget] and so collapsed a small radius
-            // search into "4"/"2"/"3" count clusters.
-            //
-            // Clustering is kept ONLY as a fallback for a genuinely huge /
-            // zoomed-far set ([StationMapLayers.clusterThreshold]+), where
-            // painting hundreds of overlapping dots would itself be
-            // illegible; the bounded nearby case never reaches it.
+            // Station markers (#1774 — `_markers` is memoised). Three modes:
+            //  - #2939 `clusterAlways` (radar split pane): proximity-cluster
+            //    EVERY set with the cheapest-labelled badge so the narrow
+            //    pane never overlaps; un-clustered singletons keep their pill;
+            //  - legacy huge set (≥ clusterThreshold): bare count cluster;
+            //  - legacy bounded set (#2510): plain [MarkerLayer], de-overlap
+            //    by emphasis (top-ranked keep the pill, rest are dots).
             if (_markers.isNotEmpty)
-              if (widget.stations.length >= StationMapLayers.clusterThreshold)
-                MarkerClusterLayerWidget(
-                  options: MarkerClusterLayerOptions(
-                    maxClusterRadius: 50,
-                    markers: _markers,
-                    builder: (context, clusterMarkers) => Container(
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${clusterMarkers.length}',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
+              if (widget.clusterAlways)
+                cheapestLabelledClusterLayer(
+                  markers: _markers,
+                  metaOf: (m) => _markerMeta[m],
+                  priceRange: _priceRange,
+                  selectedIds:
+                      widget.selectedStationIds ?? const <String>{},
                 )
+              else if (widget.stations.length >=
+                  StationMapLayers.clusterThreshold)
+                countClusterLayer(markers: _markers, theme: theme)
               else
                 MarkerLayer(markers: _markers),
             // Extra layers (e.g. EV overlay)

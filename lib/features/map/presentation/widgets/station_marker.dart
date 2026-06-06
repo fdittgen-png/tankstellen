@@ -63,6 +63,15 @@ class StationMarkerBuilder {
   /// would actually pay, instead of '--'. When [fuelResolver] is null the
   /// strict single-[fuel] behaviour (#2510) is unchanged — a station
   /// lacking that fuel still shows '--', never a within-country fallback.
+  ///
+  /// #2939 — the radar split map passes [onTap] to intercept the marker tap:
+  /// instead of navigating to `/station/{id}`, it SELECTS the station's list
+  /// row (`selectedStationProvider`) and keeps the map visible, so tapping a
+  /// marker is the inverse of tapping a row. When [onTap] is null the marker
+  /// keeps the default push-to-detail behaviour (the full-screen [MapScreen]
+  /// and the route map). [selected] paints the pill with a brand-primary ring
+  /// and forces the full price label (never a compact dot) so the chosen
+  /// station's marker reads as emphasised even amid a dense pane.
   static Marker build(
     BuildContext context,
     Station station,
@@ -71,6 +80,8 @@ class StationMarkerBuilder {
     double maxPrice, {
     bool pastel = false,
     bool compact = false,
+    bool selected = false,
+    VoidCallback? onTap,
     FuelType Function(Station)? fuelResolver,
   }) {
     // #2510 — strict selected-fuel price, exactly like the list card. No
@@ -94,14 +105,26 @@ class StationMarkerBuilder {
         ? PriceFormatter.formatPriceCompact(price)
         : '--'; // i18n-ignore: language-neutral no-price placeholder
 
-    final Widget badge = compact
+    // #2939 — a selected station is ALWAYS the full pill (never a compact
+    // dot) and rings in brand-primary so a list-row tap visibly emphasises
+    // its marker even in a dense pane. The ring colour is resolved in a
+    // [Builder] at paint time, never eagerly here: [StationMapLayers] builds
+    // the markers in `initState`/`didUpdateWidget`, where `Theme.of(context)`
+    // is illegal (the dependency must be registered in `build`).
+    final bool showCompact = compact && !selected;
+    final Widget badge = showCompact
         ? _dot(color, pastel)
-        : _priceBubble(color, pastel, priceText);
+        : selected
+            ? Builder(
+                builder: (ctx) => _priceBubble(color, pastel, priceText,
+                    ringColor: Theme.of(ctx).colorScheme.primary),
+              )
+            : _priceBubble(color, pastel, priceText);
 
     return Marker(
       point: LatLng(station.lat, station.lng),
-      width: compact ? kStationDotSize : kStationMarkerWidth,
-      height: compact ? kStationDotSize : kStationMarkerHeight,
+      width: showCompact ? kStationDotSize : kStationMarkerWidth,
+      height: showCompact ? kStationDotSize : kStationMarkerHeight,
       // #1772 — isolate each marker's raster so an animation or rebuild
       // on one marker (e.g. the selected-station pastel swap) does not
       // repaint the entire marker layer.
@@ -109,8 +132,11 @@ class StationMarkerBuilder {
         child: Semantics(
           label: semanticLabel,
           button: true,
+          selected: selected,
           child: GestureDetector(
-            onTap: () => GoRouter.of(context).push('/station/${station.id}'),
+            // #2939 — [onTap] lets the radar split map select the row instead
+            // of navigating; null keeps the default push-to-detail.
+            onTap: onTap ?? () => GoRouter.of(context).push('/station/${station.id}'),
             child: Tooltip(
               message: brand,
               waitDuration: const Duration(milliseconds: 300),
@@ -123,16 +149,24 @@ class StationMarkerBuilder {
   }
 
   /// The full colour-coded price bubble shown for emphasized stations.
-  static Widget _priceBubble(Color color, bool pastel, String priceText) {
+  ///
+  /// #2939 — [ringColor] (the selected-station case) overrides the default
+  /// white hairline with a thicker brand-primary ring so the chosen marker
+  /// stands out from its neighbours.
+  static Widget _priceBubble(Color color, bool pastel, String priceText,
+      {Color? ringColor}) {
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
         color: color.withValues(alpha: pastel ? 0.5 : 0.92),
         borderRadius: BorderRadius.circular(6),
-        border: pastel
-            ? null
-            : Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1),
+        border: ringColor != null
+            ? Border.all(color: ringColor, width: 2)
+            : pastel
+                ? null
+                : Border.all(
+                    color: Colors.white.withValues(alpha: 0.8), width: 1),
         boxShadow: pastel
             ? null
             : [
