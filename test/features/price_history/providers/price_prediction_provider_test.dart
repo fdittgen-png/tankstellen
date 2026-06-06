@@ -3,7 +3,9 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
+import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/price_history/data/models/price_record.dart';
@@ -21,10 +23,22 @@ import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 /// [priceHistoryRepositoryProvider] that returns predetermined price
 /// records. Covers all branches of the "best time to fill" computation.
 void main() {
-  ProviderContainer makeContainer(List<PriceRecord> records) {
+  // The recommendation weekday is rendered through `intl`'s
+  // `DateFormat.EEEE(locale)` (#2978), which needs locale-symbol data for
+  // any non-`en_US` locale. The app loads it at startup; tests must too.
+  setUpAll(initializeDateFormatting);
+
+  /// Builds a container with a fixed [language] so the provider's
+  /// locale-driven weekday formatting (#2978) is deterministic. Defaults
+  /// to English to match the existing English recommendation assertions.
+  ProviderContainer makeContainer(
+    List<PriceRecord> records, {
+    AppLanguage language = const AppLanguage('en', 'English', 'English'),
+  }) {
     final repo = _FakePriceHistoryRepository(records);
     final c = ProviderContainer(overrides: [
       priceHistoryRepositoryProvider.overrideWithValue(repo),
+      activeLanguageProvider.overrideWith(() => _FixedActiveLanguage(language)),
     ]);
     addTearDown(c.dispose);
     return c;
@@ -329,6 +343,90 @@ void main() {
     });
   });
 
+  group('pricePrediction — localized weekday in recommendation (#2978)', () {
+    // Cheapest day fixture: 5 expensive Mondays + 5 cheap Wednesdays so the
+    // recommendation surfaces the Wednesday weekday. DateTime(2026, 3, 4) is
+    // a Wednesday; DateTime(2026, 3, 2) is a Monday.
+    List<PriceRecord> cheapestWednesdayRecords() {
+      final records = <PriceRecord>[];
+      for (int w = 0; w < 5; w++) {
+        records.add(PriceRecord(
+          stationId: 's1',
+          recordedAt: DateTime(2026, 3, 2 + w * 7, 10),
+          e10: 1.60,
+        ));
+      }
+      for (int w = 0; w < 5; w++) {
+        records.add(PriceRecord(
+          stationId: 's1',
+          recordedAt: DateTime(2026, 3, 4 + w * 7, 10),
+          e10: 1.30,
+        ));
+      }
+      return records;
+    }
+
+    test('English locale renders the English weekday name', () {
+      final container = makeContainer(
+        cheapestWednesdayRecords(),
+        language: const AppLanguage('en', 'English', 'English'),
+      );
+      final result =
+          container.read(pricePredictionProvider('s1', FuelType.e10));
+
+      expect(result, isNotNull);
+      expect(result!.recommendation, contains('Wednesday'));
+    });
+
+    test('French locale renders the French weekday name (not English)', () {
+      final container = makeContainer(
+        cheapestWednesdayRecords(),
+        language: const AppLanguage('fr', 'Français', 'French'),
+      );
+      final result =
+          container.read(pricePredictionProvider('s1', FuelType.e10));
+
+      expect(result, isNotNull);
+      // French weekday for Wednesday — locale DATA, not an ARB string.
+      expect(result!.recommendation, contains('mercredi'));
+      expect(result.recommendation, isNot(contains('Wednesday')));
+    });
+
+    test('German locale renders the German weekday name (not English)', () {
+      final container = makeContainer(
+        cheapestWednesdayRecords(),
+        language: const AppLanguage('de', 'Deutsch', 'German'),
+      );
+      final result =
+          container.read(pricePredictionProvider('s1', FuelType.e10));
+
+      expect(result, isNotNull);
+      expect(result!.recommendation, contains('Mittwoch'));
+      expect(result.recommendation, isNot(contains('Wednesday')));
+    });
+
+    test(
+        'unknown/unsupported locale → never throws, falls back to the '
+        'English weekday', () {
+      // `intl` rejects an unknown locale with an ArgumentError; the
+      // never-throws guard in `_localizedWeekday` must swallow it and fall
+      // back to English instead of leaking the error into the provider.
+      final container = makeContainer(
+        cheapestWednesdayRecords(),
+        language: const AppLanguage('zz-ZZ', 'Klingon', 'Klingon'),
+      );
+
+      expect(
+        () => container.read(pricePredictionProvider('s1', FuelType.e10)),
+        returnsNormally,
+      );
+      final result =
+          container.read(pricePredictionProvider('s1', FuelType.e10));
+      expect(result, isNotNull);
+      expect(result!.recommendation, contains('Wednesday'));
+    });
+  });
+
   group('pricePrediction — hour-range formatting', () {
     test('formats morning hours as "<n> AM-<m> AM" (e.g. 6 AM-8 AM)', () {
       // Make hour 6 cheapest; we expect "6 AM-8 AM" in the recommendation.
@@ -614,6 +712,11 @@ void main() {
             .overrideWithValue(_FakePriceHistoryRepository(seedRecords())),
         featureFlagsProvider.overrideWith(() => _TestFeatureFlags(enabled)),
         tflitePricePredictorProvider.overrideWith((ref) async => predictor),
+        activeLanguageProvider.overrideWith(
+          () => _FixedActiveLanguage(
+            const AppLanguage('en', 'English', 'English'),
+          ),
+        ),
       ]);
       addTearDown(c.dispose);
       return c;
@@ -759,6 +862,18 @@ class _FakePriceHistoryRepository extends PriceHistoryRepository {
   List<PriceRecord> getHistory(String stationId, {int days = 30}) {
     return List.of(_records);
   }
+}
+
+/// Fixed [ActiveLanguage] notifier — pins the active language so the
+/// provider's locale-driven weekday formatting (#2978) is deterministic
+/// without depending on the platform locale or a persisted profile. Same
+/// shape as `_FixedActiveLanguage` in `test/app/app_test.dart`.
+class _FixedActiveLanguage extends ActiveLanguage {
+  _FixedActiveLanguage(this._language);
+  final AppLanguage _language;
+
+  @override
+  AppLanguage build() => _language;
 }
 
 /// Notifier override that returns a fixed enabled-set for the test's
