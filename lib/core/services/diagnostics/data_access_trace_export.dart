@@ -3,6 +3,9 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show MissingPluginException;
+
 import '../../../core/logging/error_logger.dart';
 import '../../../core/sharing/public_file_exporter.dart';
 import 'data_access_trace.dart';
@@ -30,6 +33,14 @@ class DataAccessTraceExport {
         mimeType: 'application/json',
       );
       return true;
+    } on MissingPluginException {
+      // #2933 (error-log #25) — the `tankstellen/public_files` channel has no
+      // registrant outside the root isolate (e.g. a WorkManager background
+      // isolate). Writing to Downloads is a foreground sink; degrade to a skip
+      // (debug breadcrumb) rather than spool a spurious ERROR trace.
+      debugPrint('DataAccessTraceExport.export: public_files channel '
+          'unavailable — skipping Downloads write.');
+      return false;
     } on Object catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
         'where': 'DataAccessTraceExport.export: json write',
