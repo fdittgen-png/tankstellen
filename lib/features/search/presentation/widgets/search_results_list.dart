@@ -9,6 +9,7 @@ import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
+import '../../../../core/utils/radar_closeness.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
@@ -333,16 +334,20 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
     );
     final stationRating = ref.watch(stationRatingProvider(station.id));
 
-    // #2899 — when the on-search Fuel Station Radar owns the result list, each
+    // #2956 — when the on-search Fuel Station Radar owns the result list, each
     // card carries the green→accent closeness bar (the SAME [ProximityFillBar]
-    // as the trip card + PiP). The list scales to the SEARCH radius
-    // (`searchRadiusProvider × 1000`, the radius the radar fetch itself used),
-    // not the 1 km trip geo-fence: result rows routinely exceed that fence, so
-    // scaling to the search radius makes the bar read as RELATIVE closeness
-    // across the visible list. Null off radar mode → regular cards unchanged.
-    final radarActive = ref.watch(radarSearchProvider).active;
-    final closenessRadiusMeters =
-        radarActive ? ref.watch(searchRadiusProvider) * 1000.0 : null;
+    // / [RadarCloseness] as the trip card + PiP). The bar scales to the SPAN of
+    // the surfaced results — the farthest station's distance — NOT the static
+    // `searchRadiusProvider` slider. The slider (up to 25 km) is decoupled from
+    // where the stations actually are, so scaling to it compressed every fill
+    // toward 1.0 and made all bars look the same length (the recurring #2956
+    // field report). Scaling to the result span makes closeness read RELATIVE
+    // across the list: the nearest forecourt near-full, the farthest near-empty.
+    // Null off radar mode (or an unlocated/empty set) → regular cards unchanged.
+    final radar = ref.watch(radarSearchProvider);
+    final closenessRadiusMeters = radar.active
+        ? RadarCloseness.spanRadiusMeters(radar.stations.value ?? const [])
+        : null;
 
     return SwipeableStationCard(
       key: ValueKey('station-${station.id}'),
