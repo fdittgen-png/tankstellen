@@ -40,4 +40,10 @@ TripSample tripDetailToTripSample(TripDetailSample s) => TripSample(
       coolantTempC: s.coolantTempC,
       stft: s.stft,
       ltft: s.ltft,
+      // #2963 — carry the GPS horizontal accuracy back so `countAccelEvents`'
+      // bad-fix accuracy gate (kAccelEventAccuracyGateM) can drop a jittery
+      // GPS-derived accel sample on the recomputed saved-trip score. Dropping
+      // it here (and in the forward converter) left a null accuracy = "accept"
+      // on every persisted sample, so the gate never fired post-persist.
+      hAccuracyM: s.hAccuracyM,
     );

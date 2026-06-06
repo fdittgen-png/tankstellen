@@ -118,6 +118,16 @@ class TripDetailSample {
   /// combustion-health heuristic (total trim = STFT + LTFT).
   final double? ltft;
 
+  /// Reported horizontal GPS accuracy in metres (#2963). Carried through
+  /// from `TripSample.hAccuracyM` so the canonical accel-event gate's
+  /// bad-fix guard (`countAccelEvents`, kAccelEventAccuracyGateM) can fire
+  /// on the saved-trip score path. Both converters used to drop it, so the
+  /// gate — which treats a null accuracy as "accept" — never rejected a
+  /// jittery GPS-derived accel sample once a trip was persisted and
+  /// reopened. Null on legacy trips, on non-GPS trips, and before the first
+  /// fix (same semantics as [latitude]).
+  final double? hAccuracyM;
+
   const TripDetailSample({
     required this.timestamp,
     required this.speedKmh,
@@ -134,6 +144,7 @@ class TripDetailSample {
     this.altitudeM,
     this.stft,
     this.ltft,
+    this.hAccuracyM,
   });
 }
 

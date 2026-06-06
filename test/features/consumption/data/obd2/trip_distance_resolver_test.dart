@@ -274,4 +274,86 @@ void main() {
       );
     });
   });
+
+  group('TripDistanceResolver — short idle-heavy OBD2 trip (#2963)', () {
+    // Reproduces the field export: a 22 s trip parked at idle. The phone
+    // emits ~22 GPS fixes scattering within ±25 m of one coordinate, each
+    // reporting ~30 m accuracy (a parked phone's reported accuracy is itself
+    // noisy and sits above the 25 m gate), plus one ~200 m cold-start jump.
+    // On master
+    // the resolver returned distanceKm ≈ 0.8-1.0 with source == gps (the
+    // 154 km/h-average corruption). After the #2963 gates the whole track
+    // is rejected → gps source nulled → falls back (here to virtual = 0 for
+    // a parked car).
+    //
+    // Driven through the REAL resolver via `debugAddGpsFix` carrying real
+    // accuracy + timestamps — no fake echoing the answer (the
+    // false-green-fakes rule).
+    final base = DateTime.utc(2026, 4, 22, 12);
+    const dLat = <double>[0, 0.00018, -0.00012, 0.00022, -0.00020, 0.00015];
+    const dLon = <double>[0, -0.00021, 0.00019, -0.00014, 0.00023, -0.00017];
+
+    void feedIdleJitter(TripDistanceResolver r) {
+      // One cold-start jump first: ~200 m north of the parking spot, 1 s in.
+      r.debugAddGpsFix(
+        latitude: 45.0,
+        longitude: 5.0,
+        hAccuracyM: 30.0,
+        at: base,
+      );
+      r.debugAddGpsFix(
+        latitude: 45.0018, // ~200 m north
+        longitude: 5.0,
+        hAccuracyM: 30.0,
+        at: base.add(const Duration(seconds: 1)),
+      );
+      // Then 22 stationary fixes scattering ±25 m around the parking spot.
+      for (var i = 0; i < 22; i++) {
+        r.debugAddGpsFix(
+          latitude: 45.0018 + dLat[i % dLat.length],
+          longitude: 5.0 + dLon[i % dLon.length],
+          hAccuracyM: 30.0,
+          at: base.add(Duration(seconds: 2 + i)),
+        );
+      }
+    }
+
+    test('the idle scatter no longer surfaces as a GPS distance source', () {
+      final r = build();
+      feedIdleJitter(r);
+      // The whole poor-accuracy + teleport track collapses below the 50 m
+      // resolver floor, so the GPS source is nulled (RED on master, where it
+      // returned ~0.8-1.0 km / kDistanceSourceGps).
+      expect(
+        r.distanceKm(odometerStartKm: null, odometerLatestKm: null),
+        lessThan(0.05),
+      );
+      expect(
+        r.distanceSource(odometerStartKm: null, odometerLatestKm: null),
+        isNot(kDistanceSourceGps),
+      );
+    });
+
+    test('a real moving track is still used as the GPS source', () {
+      // Guard against over-rejection: good-accuracy fixes moving at a
+      // plausible ~40 km/h must still resolve to GPS.
+      final r = build();
+      for (var i = 0; i < 12; i++) {
+        r.debugAddGpsFix(
+          latitude: 45.0 + i * 0.001, // ~111 m steps
+          longitude: 5.0,
+          hAccuracyM: 6.0,
+          at: base.add(Duration(seconds: i * 10)), // 40 km/h
+        );
+      }
+      expect(
+        r.distanceSource(odometerStartKm: null, odometerLatestKm: null),
+        kDistanceSourceGps,
+      );
+      expect(
+        r.distanceKm(odometerStartKm: null, odometerLatestKm: null),
+        greaterThan(1.0),
+      );
+    });
+  });
 }

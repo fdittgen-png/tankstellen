@@ -274,7 +274,14 @@ void main() {
     // the swap so the new live link starts from a clean streak. Both are
     // load-bearing recovery logic in the hot polling path that cannot move out
     // of the controller. Decomposition stays tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1666,
+    // #2963 — re-grandfathered 1666 → 1694: the short-idle-OBD2-trip
+    // corruption fix. `updateGpsFix` now forwards the fix's accuracy +
+    // timestamp to the haversine distance source (reject parked-car jitter +
+    // a cold-start teleport), and the `_emit` speed-persist guard stops
+    // `speedKmh ?? 0` fabricating a leading `0` that scored a phantom
+    // hard-accel. Both are hot-path recording logic that can't move out of
+    // the controller. Decomposition stays tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1694,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The
