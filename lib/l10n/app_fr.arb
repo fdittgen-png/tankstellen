@@ -4491,5 +4491,31 @@
   "@voiceAnnouncementPriceLimit": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelEfficiencyPureBadge": "Pure",
+  "@fuelEfficiencyPureBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyMixBadge": "Blend",
+  "@fuelEfficiencyMixBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelEfficiencyMixDominant": "Mostly {fuel}",
+  "@fuelEfficiencyMixDominant": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "Super E85"
+      }
+    }
+  },
+  "fuelEfficiencyCompositionFootnote": "Tanks are grouped by composition: a tank is pure when one fuel is at least 85% of it, otherwise a blend.",
+  "@fuelEfficiencyCompositionFootnote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
