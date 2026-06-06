@@ -1,0 +1,60 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Android Auto v1 (#2951 / epic #2946) PLAY-FLAVOR enablement.
+
+         Promotes the v1 CarAppService from the previous DEBUG-only overlay
+         into the `play` flavor so the daily "Open-Testing Build" CI
+         (.github/workflows/daily-beta.yml: flutter build appbundle release
+         flavor play, producing the playRelease AAB uploaded to the
+         open-testing track) actually ships it to testers. Scoping it to the
+         play source set (not src/main) keeps the GMS-free `fdroid` flavor free
+         of the car components entirely: the merged fdroid manifest never sees
+         TankstellenCarAppService.
+
+         Why this ships WITHOUT the #1498 "Foreground Service Use" form:
+         A POI CarAppService rendering PlaceListMapTemplate is a BOUND service.
+         The Android Auto / Automotive host binds it through the car-app
+         framework; it does NOT start itself as a foreground service, and it
+         reads its station data from SharedPreferences (written by the Flutter
+         app), so it accesses no runtime location in the car process. Per
+         Google's POI manifest example (the car-app-library-fundamentals
+         codelab on developer.android.com) the service carries NO
+         android:permission and the app declares NO FOREGROUND_SERVICE
+         permission for it. Host trust is enforced in code by
+         TankstellenCarAppService.createHostValidator(), not a manifest
+         bind-permission (androidx.car.app 1.4.0 defines no BIND permission).
+
+         The FOREGROUND_SERVICE permissions stay stripped with
+         tools:node="remove" in the MAIN manifest (androidx.work:work-runtime
+         declares android.permission.FOREGROUND_SERVICE in its own manifest and
+         would otherwise be merged back in). With the strip intact the merged
+         playRelease manifest has ZERO FOREGROUND_SERVICE permission, so the
+         Open-Testing upload (edits.commit) does not 403 on the #1498 form.
+
+         NOT enabled here: AutoRecordForegroundService. It genuinely is a
+         foreground service (connectedDevice) and DOES require FOREGROUND_SERVICE
+         plus the #1498 form, so it stays gated in the main manifest. -->
+
+    <application>
+        <!-- Bound POI service: no android:permission (host trust handled by
+             createHostValidator), no FOREGROUND_SERVICE. -->
+        <service
+            android:name=".TankstellenCarAppService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.POI" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="1" />
+    </application>
+</manifest>
