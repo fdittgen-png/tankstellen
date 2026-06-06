@@ -65,6 +65,12 @@ class TripRecordingPipView extends StatelessWidget {
   /// proximity fill bar's "indicated radius" (#2661). Null collapses the bar.
   final double? radiusMeters;
 
+  /// Invoked when the user taps the tile body (#2964) — the host wires this
+  /// to bring the app back to the foreground in full screen. Wired by the
+  /// PiP host (the banner) for every layout; null leaves the body
+  /// non-tappable (plain previews / widget tests without a PiP host).
+  final VoidCallback? onBodyTap;
+
   const TripRecordingPipView({
     super.key,
     required this.state,
@@ -75,6 +81,7 @@ class TripRecordingPipView extends StatelessWidget {
     this.radarStation,
     this.radarDistanceMeters,
     this.radiusMeters,
+    this.onBodyTap,
   });
 
   @override
@@ -97,6 +104,7 @@ class TripRecordingPipView extends StatelessWidget {
         distanceMeters: dist,
         kmCaption: false,
         radiusMeters: radiusMeters,
+        onBodyTap: onBodyTap,
       );
     }
 
@@ -112,6 +120,7 @@ class TripRecordingPipView extends StatelessWidget {
         distanceMeters: radarDistanceMeters,
         kmCaption: true,
         radiusMeters: radiusMeters,
+        onBodyTap: onBodyTap,
       );
     }
 
@@ -250,6 +259,7 @@ class TripRecordingPipView extends StatelessWidget {
     }
 
     return _pipStack(
+      l: l,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -305,8 +315,13 @@ class TripRecordingPipView extends StatelessWidget {
   /// clipping (#2620). The single outer FittedBox(scaleDown) measures the
   /// column's full intrinsic size and shrinks it on both axes; Center keeps
   /// it optically centred when it already fits.
-  Widget _pipStack({required Widget child}) {
-    return Material(
+  ///
+  /// #2964 — when [onBodyTap] is wired the whole tile becomes a tap target
+  /// that brings the app back to the foreground in full screen (the user
+  /// expects a tap on the floating window to restore full screen). Null
+  /// leaves the body non-tappable (previews / widget tests without a host).
+  Widget _pipStack({required Widget child, AppLocalizations? l}) {
+    final body = Material(
       color: backgroundColor,
       child: SafeArea(
         child: Padding(
@@ -314,6 +329,21 @@ class TripRecordingPipView extends StatelessWidget {
           child: Center(
             child: FittedBox(fit: BoxFit.scaleDown, child: child),
           ),
+        ),
+      ),
+    );
+    final onTap = onBodyTap;
+    if (onTap == null) return body;
+    final label = l?.pipTapToRestore ?? 'Tap to open the full app';
+    return Tooltip(
+      message: label,
+      child: Semantics(
+        button: true,
+        label: label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: body,
         ),
       ),
     );

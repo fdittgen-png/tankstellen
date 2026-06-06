@@ -3722,6 +3722,9 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork => 'Žádné síťové připojení. Zkuste to znovu.';
 
   @override

@@ -3,7 +3,6 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -18,10 +17,11 @@ import 'proximity_fill_bar.dart';
 ///
 /// Renders, top to bottom: the huge price for the driver's fuel type, the
 /// fuel label, the station name (→ brand fallback), a distance caption, and
-/// the corporate-green [ProximityFillBar]. The whole tile is tap-to-navigate
-/// (`NavigationUtils.openInMaps`, #2601) and is scaled down uniformly by one
-/// outer `FittedBox(scaleDown)` so the bottom line never clips the small 2:1
-/// tile (#2620).
+/// the corporate-green [ProximityFillBar]. Tapping the tile body brings the
+/// full app back to the foreground via [onBodyTap] (#2964 — the user expects
+/// a tap on the little floating window to restore full screen). The content
+/// is scaled down uniformly by one outer `FittedBox(scaleDown)` so the bottom
+/// line never clips the small 2:1 tile (#2620).
 ///
 /// Two callers, identical visual, only the distance unit + radius differ:
 ///
@@ -46,6 +46,12 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
   /// proximity fill bar's "indicated radius". Null collapses the bar.
   final double? radiusMeters;
 
+  /// Invoked when the user taps the tile body (#2964) — the host wires this
+  /// to bring the app back to the foreground in full screen. Null leaves the
+  /// body non-tappable (so the widget stays usable from plain widget tests
+  /// and previews without a PiP host).
+  final VoidCallback? onBodyTap;
+
   const TripRecordingPipPriceLayout({
     super.key,
     required this.station,
@@ -55,6 +61,7 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
     required this.distanceMeters,
     required this.kmCaption,
     required this.radiusMeters,
+    this.onBodyTap,
   });
 
   @override
@@ -138,38 +145,44 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
           )
         : null;
 
-    // #2601 — tap to navigate to the station in the user's maps app. #2620 —
-    // one outer FittedBox(scaleDown) shrinks the price stack so it never
-    // bleeds past the small 2:1 tile; the proximity band sits below it at the
-    // tile's full width (#2808).
-    return Tooltip(
-      message: l?.navigate ?? 'Navigate',
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => NavigationUtils.openInMaps(
-          station.lat,
-          station.lng,
-          label: station.navLabel,
-        ),
-        child: Material(
-          color: backgroundColor,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Center(
-                      child: FittedBox(fit: BoxFit.scaleDown, child: content),
-                    ),
-                  ),
+    // #2620 — one outer FittedBox(scaleDown) shrinks the price stack so it
+    // never bleeds past the small 2:1 tile; the proximity band sits below it
+    // at the tile's full width (#2808).
+    final body = Material(
+      color: backgroundColor,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Center(
+                  child: FittedBox(fit: BoxFit.scaleDown, child: content),
                 ),
-                ?proximityBand,
-              ],
+              ),
             ),
-          ),
+            ?proximityBand,
+          ],
+        ),
+      ),
+    );
+
+    // #2964 — tapping the tile body brings the full app back to the
+    // foreground (the user expects a tap on the floating window to restore
+    // full screen). When no [onBodyTap] is wired (e.g. a plain preview) the
+    // body renders untapped, matching the pre-#2964 default-layout behaviour.
+    final onTap = onBodyTap;
+    if (onTap == null) return body;
+    return Tooltip(
+      message: l?.pipTapToRestore ?? 'Tap to open the full app',
+      child: Semantics(
+        button: true,
+        label: l?.pipTapToRestore ?? 'Tap to open the full app',
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: body,
         ),
       ),
     );

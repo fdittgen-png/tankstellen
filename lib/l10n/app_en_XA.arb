@@ -1104,6 +1104,7 @@
   "approachStationDistance": "⟦{meters} ɱ áŵáý ··⟧",
   "fuelStationRadarDistanceKm": "⟦{km} ķɱ áŵáý ···⟧",
   "fuelStationRadarProximity": "⟦Ƥřóẋîɱîŧý {percent}% ····⟧",
+  "pipTapToRestore": "⟦Ŧáƥ ŧó óƥéñ ŧĥé ƒúłł áƥƥ ·········⟧",
   "authErrorNoNetwork": "⟦Ñó ñéŧŵóřķ çóññéçŧîóñ. Ŧřý áǧáîñ łáŧéř. ··············⟧",
   "authErrorInvalidCredentials": "⟦Îñṽáłîđ éɱáîł óř ƥáššŵóřđ. Çĥéçķ ýóúř çřéđéñŧîáłš. ···················⟧",
   "authErrorUserAlreadyExists": "⟦Ŧĥîš éɱáîł îš áłřéáđý řéǧîšŧéřéđ. Ŧřý šîǧñîñǧ îñ îñšŧéáđ. ·····················⟧",

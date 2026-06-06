@@ -4633,5 +4633,10 @@
   "@lessonAdviceCombustionHealthEnrichment": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "pipTapToRestore": "Tap to open the full app",
+  "@pipTapToRestore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

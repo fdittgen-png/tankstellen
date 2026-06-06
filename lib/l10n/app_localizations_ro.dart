@@ -3734,6 +3734,9 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork =>
       'Nicio conexiune la rețea. Încercați mai târziu.';
 

@@ -3741,6 +3741,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork =>
       'Pas de connexion réseau. Veuillez réessayer plus tard.';
 

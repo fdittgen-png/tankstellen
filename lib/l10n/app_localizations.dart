@@ -6786,6 +6786,12 @@ abstract class AppLocalizations {
   /// **'Proximity {percent}%'**
   String fuelStationRadarProximity(int percent);
 
+  /// Tooltip + accessibility label on the floating Picture-in-Picture tile body (#2964): tapping the little window brings the full Sparkilo app back to the foreground / full screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to open the full app'**
+  String get pipTapToRestore;
+
   /// Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186.
   ///
   /// In en, this message translates to:

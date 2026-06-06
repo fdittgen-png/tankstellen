@@ -49,6 +49,25 @@ class PipController {
     }
   }
 
+  /// Bring the app back to the foreground in full screen (#2964).
+  ///
+  /// Tapping the body of the floating PiP tile calls this so the user can
+  /// restore the full app with a single tap — the native side reorders the
+  /// EXISTING task to the front (preserving the live recording / engine
+  /// state) and the OS leaves PiP. Returns false on an unsupported platform
+  /// or when the native reorder could not be performed; the tile then simply
+  /// stays in PiP (the system expand control remains available).
+  Future<bool> bringToFront() async {
+    if (!isSupported) return false;
+    try {
+      return await _channel.invokeMethod<bool>('bringToFront') ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+
   /// Tell the native layer whether to auto-enter PiP when the user
   /// leaves the app (Home / Recents). The recording screen enables
   /// this only while a trip is recording, so leaving the app from an

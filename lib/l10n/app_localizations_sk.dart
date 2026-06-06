@@ -3727,6 +3727,9 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork =>
       'Žiadne sieťové pripojenie. Skúste to neskôr.';
 

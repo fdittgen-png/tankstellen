@@ -19,5 +19,9 @@
     "placeholders": {
       "percent": {"type": "int", "example": "60"}
     }
+  },
+  "pipTapToRestore": "Tippen, um die ganze App zu öffnen",
+  "@pipTapToRestore": {
+    "description": "Tooltip + accessibility label on the floating Picture-in-Picture tile body (#2964): tapping the little window brings the full Sparkilo app back to the foreground / full screen."
   }
 }
