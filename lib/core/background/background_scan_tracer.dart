@@ -3,11 +3,22 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart'
+    show MissingPluginException, RootIsolateToken;
 import 'package:hive/hive.dart';
 
 import '../logging/error_logger.dart';
 import '../services/diagnostics/data_access_recorder.dart';
 import '../services/diagnostics/data_access_trace_export.dart';
+
+/// #2933 (error-log #25) test seam: force the background-isolate verdict so a
+/// foreground unit test can drive both branches of [exportIfEnabled] without a
+/// real WorkManager isolate. Null ⇒ the real `RootIsolateToken.instance == null`
+/// probe. The platform-channel-bound `RootIsolateToken.instance` can't be
+/// mutated from a test, so this override is the only way to exercise the skip.
+@visibleForTesting
+bool? debugIsBackgroundIsolateOverride;
 
 /// Dev-gated #2824 data-access tracer for the background scan (Epic #2860 EXIT
 /// GATE, #2866).
@@ -54,19 +65,52 @@ class BackgroundScanTracer {
   /// When tracing, snapshot the recorder into a [DataAccessTrace] and export it
   /// to Downloads (the same dev-only sink the foreground uses). No-op + never
   /// throws when not tracing; a write fault is swallowed (logged downstream).
+  ///
+  /// #2933 (error-log #25) — the Downloads write goes through the
+  /// `tankstellen/public_files` platform channel, which is UNAVAILABLE in the
+  /// WorkManager background isolate (no plugin registrant) — it threw
+  /// `MissingPluginException` and spooled a spurious background ERROR. This is
+  /// inherently a foreground/UI sink, so in a background isolate we SKIP the
+  /// Downloads export entirely (debug breadcrumb only); the in-app
+  /// Developer-tools export still writes it from the root isolate.
+  /// [DataAccessTraceExport.export] also degrades a stray
+  /// [MissingPluginException] to a skip; the defensive catch here is the
+  /// second line of the same never-throws contract.
   Future<void> exportIfEnabled({String? comment}) async {
     final r = recorder;
     if (r == null) return;
+    if (_isBackgroundIsolate()) {
+      // The public-files channel has no registrant here; writing to Downloads
+      // is a foreground operation. Skip gracefully — no ERROR spool.
+      debugPrint('BackgroundScanTracer.exportIfEnabled: background isolate — '
+          'skipping Downloads export (foreground-only sink).');
+      return;
+    }
     try {
       final trace = r.build(
         comment: comment ?? 'Background multi-country alert scan (#2866).',
       );
       await DataAccessTraceExport.export(trace);
+    } on MissingPluginException {
+      // Defensive: the channel was unavailable despite the root-isolate probe
+      // (e.g. an isolate without a registrant). Degrade to a skip, not ERROR.
+      debugPrint('BackgroundScanTracer.exportIfEnabled: public_files channel '
+          'unavailable — skipping Downloads export.');
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
         'where': 'BackgroundScanTracer.exportIfEnabled',
       }));
     }
+  }
+
+  /// #2933 — true when this code is running in a non-root (background) isolate,
+  /// where platform channels have no registrant. `RootIsolateToken.instance` is
+  /// non-null ONLY on the root isolate; a WorkManager-spawned isolate returns
+  /// null. Honours [debugIsBackgroundIsolateOverride] for tests.
+  static bool _isBackgroundIsolate() {
+    final override = debugIsBackgroundIsolateOverride;
+    if (override != null) return override;
+    return RootIsolateToken.instance == null;
   }
 
   /// Read the persisted `debugMode` feature flag the foreground wrote to the

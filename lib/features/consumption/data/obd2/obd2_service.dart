@@ -672,10 +672,13 @@ class Obd2Service implements Obd2RawCommandPort {
       );
       return true;
     } catch (e, st) {
-      // #2379 — recoverable attempts suppress this; only a final failure
-      // logs (OBD2/BLE → `other`). The breadcrumb below always records it.
+      // #2379 final-failure log → #2933 (error-log #25): an EXPECTED engine-off
+      // condition (Obd2AdapterUnresponsive et al.) de-noises to a breadcrumb
+      // instead of an ERROR every retry (42/44 of that log); a GENUINE fault
+      // (permission / counterfeit-clone init) still ERROR-logs on `other`.
       if (logFailureAsError) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OBD2 connect failed'}));
+        recordObd2ConnectTransient(e, st,
+            where: 'OBD2 connect failed', layer: ErrorLayer.other);
       }
       // #1920 — record the failure so the diagnostic log shows the
       // connect attempt that never produced a session.
