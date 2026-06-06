@@ -8120,6 +8120,60 @@ abstract class AppLocalizations {
   /// **'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.'**
   String get lessonAdviceRestartCost;
 
+  /// Combustion-health HEURISTIC headline (#2931), borderline lean case. Deliberately tentative ('looks a little lean', 'compensate') — a coarse health signal from sustained positive fuel trim, NOT a diagnosis of a fault. Placeholder is the pre-formatted mean total-trim percent.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixture looks a little lean — the engine added fuel ({pctTrim}% trim) to compensate'**
+  String lessonCombustionHealthLeanBorderline(String pctTrim);
+
+  /// Combustion-health HEURISTIC headline (#2931), marked lean case (large sustained positive trim). Still tentative ('looks', 'possible inefficiency') — never claims a definite fault. Placeholder is the pre-formatted mean total-trim percent.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixture looks lean — the engine sustained a large {pctTrim}% fuel addition, a possible inefficiency'**
+  String lessonCombustionHealthLeanMarked(String pctTrim);
+
+  /// Combustion-health HEURISTIC headline (#2931), borderline rich case. Deliberately tentative — a coarse health signal from sustained negative fuel trim, NOT a diagnosis. Placeholder is the pre-formatted mean total-trim percent (magnitude).
+  ///
+  /// In en, this message translates to:
+  /// **'Mixture looks a little rich — the engine pulled fuel ({pctTrim}% trim) to compensate'**
+  String lessonCombustionHealthRichBorderline(String pctTrim);
+
+  /// Combustion-health HEURISTIC headline (#2931), marked rich case (large sustained negative trim). Still tentative ('looks', 'possible inefficiency') — never claims a definite fault. Placeholder is the pre-formatted mean total-trim percent (magnitude).
+  ///
+  /// In en, this message translates to:
+  /// **'Mixture looks rich — the engine sustained a large {pctTrim}% fuel cut, a possible inefficiency'**
+  String lessonCombustionHealthRichMarked(String pctTrim);
+
+  /// Combustion-health HEURISTIC headline (#2931), commanded-enrichment case — the ECU commanded a rich mixture (lambda < 1) for a large share of the warm engine window. Tentative ('possible wasted fuel'). Placeholder is the pre-formatted percent of the warm drive spent enriched.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine ran rich under load ({pctShare}% of the warm drive) — possible wasted fuel'**
+  String lessonCombustionHealthEnrichment(String pctShare);
+
+  /// Subtitle under every combustion-health lesson (#2931) making it explicit that the line is a coarse heuristic from fuel trims / commanded lambda, NOT a per-cylinder diagnosis or a diagnostic certainty.
+  ///
+  /// In en, this message translates to:
+  /// **'Heuristic health signal, not a diagnosis'**
+  String get lessonCombustionHealthSubtitle;
+
+  /// How-to-improve advice for the lean combustion-health heuristic (#2931). Frames it as a heads-up to confirm with a proper scan, never as a definite fault. Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.'**
+  String get lessonAdviceCombustionHealthLean;
+
+  /// How-to-improve advice for the rich combustion-health heuristic (#2931). Frames it as a heads-up to confirm with a proper scan, never as a definite fault. Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.'**
+  String get lessonAdviceCombustionHealthRich;
+
+  /// How-to-improve advice for the commanded-enrichment combustion-health heuristic (#2931). Points at the driving that triggers enrichment. Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.'**
+  String get lessonAdviceCombustionHealthEnrichment;
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:

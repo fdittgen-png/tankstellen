@@ -4460,5 +4460,75 @@
         "example": "vLinker FS"
       }
     }
+  },
+  "lessonCombustionHealthLeanBorderline": "Mixture looks a little lean — the engine added fuel ({pctTrim}% trim) to compensate",
+  "@lessonCombustionHealthLeanBorderline": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonCombustionHealthLeanMarked": "Mixture looks lean — the engine sustained a large {pctTrim}% fuel addition, a possible inefficiency",
+  "@lessonCombustionHealthLeanMarked": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonCombustionHealthRichBorderline": "Mixture looks a little rich — the engine pulled fuel ({pctTrim}% trim) to compensate",
+  "@lessonCombustionHealthRichBorderline": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonCombustionHealthRichMarked": "Mixture looks rich — the engine sustained a large {pctTrim}% fuel cut, a possible inefficiency",
+  "@lessonCombustionHealthRichMarked": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonCombustionHealthEnrichment": "Engine ran rich under load ({pctShare}% of the warm drive) — possible wasted fuel",
+  "@lessonCombustionHealthEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonCombustionHealthSubtitle": "Heuristic health signal, not a diagnosis",
+  "@lessonCombustionHealthSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "lessonAdviceCombustionHealthLean": "A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.",
+  "@lessonAdviceCombustionHealthLean": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "lessonAdviceCombustionHealthRich": "A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.",
+  "@lessonAdviceCombustionHealthRich": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "lessonAdviceCombustionHealthEnrichment": "Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.",
+  "@lessonAdviceCombustionHealthEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

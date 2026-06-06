@@ -10,6 +10,7 @@ import '../../domain/trip_recorder.dart';
 import '../driving_insights_analyzer.dart';
 import '../driving_score_calculator.dart';
 import 'rules/climbing_cost_rule.dart';
+import 'rules/combustion_health_rule.dart';
 import 'rules/full_throttle_rule.dart';
 import 'rules/hard_accel_rule.dart';
 import 'rules/hard_brake_rule.dart';
@@ -57,12 +58,16 @@ class DrivingLessonRegistry {
   ///   * [HighSpeedBandRule] — drag-dominated high-speed penalty (#2287);
   ///   * [FullThrottleRule]   — time at full throttle / pedal (#2461);
   ///   * [LambdaEnrichmentRule] — rich-mixture (λ < 1) fuel waste (#2461);
+  ///   * [CombustionHealthRule] — heuristic mixture-health note from
+  ///     sustained fuel trims + commanded enrichment (#2931);
   ///   * [SmoothDrivingRule] — positive reinforcement (#2287).
   ///
   /// Declaration order is the tie-break for equal-impact lessons (see
   /// [evaluate]); the low-gear rule is first so it keeps its
   /// rendered-above-cost-lines position, and the smooth-driving praise is
-  /// last so it never outranks an actual waste lesson.
+  /// last so it never outranks an actual waste lesson. The combustion-
+  /// health heuristic sits just before the praise — a neutral health note
+  /// that ranks below every quantified-waste lesson but above pure praise.
   factory DrivingLessonRegistry.standard() => DrivingLessonRegistry(const [
         LowGearRule(),
         HighRpmRule(),
@@ -75,6 +80,7 @@ class DrivingLessonRegistry {
         RestartCostRule(),
         HardBrakeRule(),
         SharpCorneringRule(),
+        CombustionHealthRule(),
         SmoothDrivingRule(),
       ]);
 

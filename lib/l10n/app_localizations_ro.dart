@@ -4572,6 +4572,47 @@ class AppLocalizationsRo extends AppLocalizations {
       'Anticipați traficul și rulați liber spre opriri pentru a merge pe inerție mai degrabă decât să reporniți — pornirea de pe loc este cea mai consumatoare parte din circulația stop-and-go.';
 
   @override
+  String lessonCombustionHealthLeanBorderline(String pctTrim) {
+    return 'Mixture looks a little lean — the engine added fuel ($pctTrim% trim) to compensate';
+  }
+
+  @override
+  String lessonCombustionHealthLeanMarked(String pctTrim) {
+    return 'Mixture looks lean — the engine sustained a large $pctTrim% fuel addition, a possible inefficiency';
+  }
+
+  @override
+  String lessonCombustionHealthRichBorderline(String pctTrim) {
+    return 'Mixture looks a little rich — the engine pulled fuel ($pctTrim% trim) to compensate';
+  }
+
+  @override
+  String lessonCombustionHealthRichMarked(String pctTrim) {
+    return 'Mixture looks rich — the engine sustained a large $pctTrim% fuel cut, a possible inefficiency';
+  }
+
+  @override
+  String lessonCombustionHealthEnrichment(String pctShare) {
+    return 'Engine ran rich under load ($pctShare% of the warm drive) — possible wasted fuel';
+  }
+
+  @override
+  String get lessonCombustionHealthSubtitle =>
+      'Heuristic health signal, not a diagnosis';
+
+  @override
+  String get lessonAdviceCombustionHealthLean =>
+      'A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+
+  @override
+  String get lessonAdviceCombustionHealthRich =>
+      'A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+
+  @override
+  String get lessonAdviceCombustionHealthEnrichment =>
+      'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
+
+  @override
   String get drivingScoreCardTitle => 'Scor de condus';
 
   @override

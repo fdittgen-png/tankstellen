@@ -4568,6 +4568,47 @@ class AppLocalizationsDe extends AppLocalizations {
       'Vorausschauend fahren und vor Stopps ausrollen, statt anzuhalten – das Anfahren aus dem Stand verbraucht im Stop-and-go am meisten.';
 
   @override
+  String lessonCombustionHealthLeanBorderline(String pctTrim) {
+    return 'Gemisch wirkt etwas mager – der Motor hat zum Ausgleich Sprit zugegeben ($pctTrim% Korrektur)';
+  }
+
+  @override
+  String lessonCombustionHealthLeanMarked(String pctTrim) {
+    return 'Gemisch wirkt mager – der Motor hielt dauerhaft eine große Spritzugabe von $pctTrim% – mögliche Ineffizienz';
+  }
+
+  @override
+  String lessonCombustionHealthRichBorderline(String pctTrim) {
+    return 'Gemisch wirkt etwas fett – der Motor hat zum Ausgleich Sprit weggenommen ($pctTrim% Korrektur)';
+  }
+
+  @override
+  String lessonCombustionHealthRichMarked(String pctTrim) {
+    return 'Gemisch wirkt fett – der Motor hielt dauerhaft eine große Spritreduktion von $pctTrim% – mögliche Ineffizienz';
+  }
+
+  @override
+  String lessonCombustionHealthEnrichment(String pctShare) {
+    return 'Motor lief unter Last fett ($pctShare% der warmen Fahrt) – möglicherweise verschwendeter Sprit';
+  }
+
+  @override
+  String get lessonCombustionHealthSubtitle =>
+      'Heuristisches Gesundheitssignal, keine Diagnose';
+
+  @override
+  String get lessonAdviceCombustionHealthLean =>
+      'Eine dauerhafte Magerkorrektur kann auf ein Falschluftleck, eine schwache Spritzufuhr oder einen alternden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.';
+
+  @override
+  String get lessonAdviceCombustionHealthRich =>
+      'Eine dauerhafte Fettkorrektur kann auf eine undichte Einspritzdüse, zu hohen Spritdruck oder einen falsch messenden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.';
+
+  @override
+  String get lessonAdviceCombustionHealthEnrichment =>
+      'Fettes Laufen unter hoher Last verbraucht zusätzlich Sprit. Früher hochschalten und bei langen Zügen Gas wegnehmen, damit der Motor näher am stöchiometrischen Gemisch bleibt.';
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override

@@ -4518,6 +4518,47 @@ class AppLocalizationsEn extends AppLocalizations {
       'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.';
 
   @override
+  String lessonCombustionHealthLeanBorderline(String pctTrim) {
+    return 'Mixture looks a little lean — the engine added fuel ($pctTrim% trim) to compensate';
+  }
+
+  @override
+  String lessonCombustionHealthLeanMarked(String pctTrim) {
+    return 'Mixture looks lean — the engine sustained a large $pctTrim% fuel addition, a possible inefficiency';
+  }
+
+  @override
+  String lessonCombustionHealthRichBorderline(String pctTrim) {
+    return 'Mixture looks a little rich — the engine pulled fuel ($pctTrim% trim) to compensate';
+  }
+
+  @override
+  String lessonCombustionHealthRichMarked(String pctTrim) {
+    return 'Mixture looks rich — the engine sustained a large $pctTrim% fuel cut, a possible inefficiency';
+  }
+
+  @override
+  String lessonCombustionHealthEnrichment(String pctShare) {
+    return 'Engine ran rich under load ($pctShare% of the warm drive) — possible wasted fuel';
+  }
+
+  @override
+  String get lessonCombustionHealthSubtitle =>
+      'Heuristic health signal, not a diagnosis';
+
+  @override
+  String get lessonAdviceCombustionHealthLean =>
+      'A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+
+  @override
+  String get lessonAdviceCombustionHealthRich =>
+      'A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.';
+
+  @override
+  String get lessonAdviceCombustionHealthEnrichment =>
+      'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
+
+  @override
   String get drivingScoreCardTitle => 'Driving score';
 
   @override
@@ -12223,6 +12264,47 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get lessonAdviceRestartCost =>
       '⟦Áñŧîçîƥáŧé ŧřáƒƒîç áñđ çóášŧ ŧóŵářđ šŧóƥš šó ýóú řółł řáŧĥéř ŧĥáñ řéšŧářŧ — ƥúłłîñǧ áŵáý ƒřóɱ á đéáđ šŧóƥ îš ŧĥé ŧĥîřšŧîéšŧ ƥářŧ óƒ šŧóƥ-áñđ-ǧó. ····················································⟧';
+
+  @override
+  String lessonCombustionHealthLeanBorderline(String pctTrim) {
+    return '⟦Ṁîẋŧúřé łóóķš á łîŧŧłé łéáñ — ŧĥé éñǧîñé áđđéđ ƒúéł ($pctTrim% ŧřîɱ) ŧó çóɱƥéñšáŧé ··························⟧';
+  }
+
+  @override
+  String lessonCombustionHealthLeanMarked(String pctTrim) {
+    return '⟦Ṁîẋŧúřé łóóķš łéáñ — ŧĥé éñǧîñé šúšŧáîñéđ á łářǧé $pctTrim% ƒúéł áđđîŧîóñ, á ƥóššîƀłé îñéƒƒîçîéñçý ·································⟧';
+  }
+
+  @override
+  String lessonCombustionHealthRichBorderline(String pctTrim) {
+    return '⟦Ṁîẋŧúřé łóóķš á łîŧŧłé řîçĥ — ŧĥé éñǧîñé ƥúłłéđ ƒúéł ($pctTrim% ŧřîɱ) ŧó çóɱƥéñšáŧé ··························⟧';
+  }
+
+  @override
+  String lessonCombustionHealthRichMarked(String pctTrim) {
+    return '⟦Ṁîẋŧúřé łóóķš řîçĥ — ŧĥé éñǧîñé šúšŧáîñéđ á łářǧé $pctTrim% ƒúéł çúŧ, á ƥóššîƀłé îñéƒƒîçîéñçý ·······························⟧';
+  }
+
+  @override
+  String lessonCombustionHealthEnrichment(String pctShare) {
+    return '⟦Éñǧîñé řáñ řîçĥ úñđéř łóáđ ($pctShare% óƒ ŧĥé ŵářɱ đřîṽé) — ƥóššîƀłé ŵášŧéđ ƒúéł ························⟧';
+  }
+
+  @override
+  String get lessonCombustionHealthSubtitle =>
+      '⟦Ĥéúřîšŧîç ĥéáłŧĥ šîǧñáł, ñóŧ á đîáǧñóšîš ···············⟧';
+
+  @override
+  String get lessonAdviceCombustionHealthLean =>
+      '⟦Á šúšŧáîñéđ łéáñ-çóřřéçŧîñǧ ŧřîɱ çáñ ɱéáñ áñ îñŧáķé-áîř łéáķ, á ŵéáķ ƒúéł šúƥƥłý, óř áñ áǧéîñǧ šéñšóř. Îƒ çóñšúɱƥŧîóñ óř řúññîñǧ ɋúáłîŧý ŵóřšéñš, á ŵóřķšĥóƥ šçáñ çáñ çóñƒîřɱ. ·······························································⟧';
+
+  @override
+  String get lessonAdviceCombustionHealthRich =>
+      '⟦Á šúšŧáîñéđ řîçĥ-çóřřéçŧîñǧ ŧřîɱ çáñ ɱéáñ á łéáķîñǧ îñĵéçŧóř, ĥîǧĥ ƒúéł ƥřéššúřé, óř áñ óṽéř-řéáđîñǧ šéñšóř. Îƒ çóñšúɱƥŧîóñ óř řúññîñǧ ɋúáłîŧý ŵóřšéñš, á ŵóřķšĥóƥ šçáñ çáñ çóñƒîřɱ. ··································································⟧';
+
+  @override
+  String get lessonAdviceCombustionHealthEnrichment =>
+      '⟦Řúññîñǧ řîçĥ úñđéř ĥéáṽý łóáđ ƀúřñš éẋŧřá ƒúéł. Šĥóřŧ-šĥîƒŧ áñđ éášé óƒƒ óñ łóñǧ ƥúłłš šó ŧĥé éñǧîñé çáñ šŧáý ñéář á šŧóîçĥîóɱéŧřîç ɱîẋŧúřé. ···················································⟧';
 
   @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';

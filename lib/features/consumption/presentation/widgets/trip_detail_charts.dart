@@ -104,6 +104,20 @@ class TripDetailSample {
   /// optional altitude chart.
   final double? altitudeM;
 
+  /// Short-term fuel trim bank 1 in percent (PID 0x06, #2931). Null on
+  /// cars that don't expose the PID, for legacy trips, and on trips
+  /// recorded without diagnostic capture (the trim is read for the
+  /// fuel-rate correction but only persisted onto samples under the
+  /// diagnostic-capture flag). Carried through so the combustion-health
+  /// heuristic (`CombustionHealthRule`) can read the sustained mixture
+  /// trim when it IS present.
+  final double? stft;
+
+  /// Long-term fuel trim bank 1 in percent (PID 0x07, #2931). Same
+  /// null-semantics as [stft]; the two are read together by the
+  /// combustion-health heuristic (total trim = STFT + LTFT).
+  final double? ltft;
+
   const TripDetailSample({
     required this.timestamp,
     required this.speedKmh,
@@ -118,6 +132,8 @@ class TripDetailSample {
     this.pedalPercent,
     this.lambda,
     this.altitudeM,
+    this.stft,
+    this.ltft,
   });
 }
 

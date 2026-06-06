@@ -32,4 +32,12 @@ TripSample tripDetailToTripSample(TripDetailSample s) => TripSample(
       latitude: s.latitude,
       longitude: s.longitude,
       altitudeM: s.altitudeM,
+      // #2931 — carry coolant + fuel trims so the combustion-health
+      // heuristic (`CombustionHealthRule`) can gate on a warm closed-loop
+      // engine and read the sustained mixture trim. The reverse converter
+      // dropped these, so the heuristic would have seen an always-cold
+      // engine (warm gate never satisfied) on a real persisted trip.
+      coolantTempC: s.coolantTempC,
+      stft: s.stft,
+      ltft: s.ltft,
     );

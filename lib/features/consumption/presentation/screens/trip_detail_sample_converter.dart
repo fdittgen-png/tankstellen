@@ -24,4 +24,8 @@ TripDetailSample toDetailSample(TripSample s) => TripDetailSample(
       pedalPercent: s.pedalPercent,
       lambda: s.lambda,
       altitudeM: s.altitudeM,
+      // #2931 — carry the persisted fuel trims through so the
+      // combustion-health heuristic sees the sustained mixture trim.
+      stft: s.stft,
+      ltft: s.ltft,
     );

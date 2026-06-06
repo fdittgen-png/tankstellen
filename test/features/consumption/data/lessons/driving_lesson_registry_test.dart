@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/lessons/driving_lesson_registry.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/climbing_cost_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/combustion_health_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/full_throttle_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/hard_accel_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/hard_brake_rule.dart';
@@ -99,6 +100,7 @@ void main() {
           restartCostLessonId,
           hardBrakeLessonId,
           sharpCorneringLessonId,
+          combustionHealthLessonId,
           smoothDrivingLessonId,
         ],
       );
