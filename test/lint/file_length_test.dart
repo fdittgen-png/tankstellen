@@ -482,7 +482,13 @@ void main() {
     // UI hides on PID-5E cars. Decomposition tracked under #2187/#2188.
     // #2885 — +11: the multiFuelCapable form state + its load / save /
     // drivetrain-section wiring.
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 828,
+    // #2960 — re-grandfathered 828 → 878: the adapter pair / forget handler
+    // now persists IN PLACE via a dedicated `_persistAdapterChange` helper
+    // (build profile from live controllers + save + syncActiveProfile,
+    // wrapped never-throws) instead of routing through `_save`, whose
+    // trailing `Navigator.pop()` closed the whole Edit-vehicle form on every
+    // add/remove. Decomposition tracked under #2187/#2188.
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 878,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,
     // #2837 — re-grandfathered 465 → 523: on a direct-fuel-rate (PID 5E)
     // car the η_v field + its "0 samples" learner readout + Reset learner
