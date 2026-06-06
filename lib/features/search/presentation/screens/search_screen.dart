@@ -211,7 +211,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     }
 
     return PageScaffold(
-      title: l10n?.appTitle ?? 'Fuel Prices',
+      title: l10n?.appTitle ?? 'Sparkilo', // i18n-ignore: brand name
       toolbarHeight: isLandscape ? 40 : null,
       actions: [
         IconButton(

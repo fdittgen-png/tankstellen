@@ -16,7 +16,7 @@
 //
 // These tests verify the parts that are pure widget-tree composition:
 //
-//   * `MaterialApp.router` is the root, with `title: 'Fuel Prices'`,
+//   * `MaterialApp.router` is the root, with `title: 'Sparkilo'`,
 //     `debugShowCheckedModeBanner: false`, and `routerConfig` set.
 //   * `themeMode` reflects `themeModeSettingProvider`.
 //   * `locale` and the `ValueKey` reflect `activeLanguageProvider`.
@@ -189,7 +189,7 @@ void main() {
       expect(find.byType(MaterialApp), findsOneWidget);
     });
 
-    testWidgets('MaterialApp.router has title "Fuel Prices" and '
+    testWidgets('MaterialApp.router has title "Sparkilo" and '
         'debugShowCheckedModeBanner: false', (tester) async {
       final router = _stubRouter();
       addTearDown(router.dispose);
@@ -206,7 +206,7 @@ void main() {
       await tester.pump();
 
       final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
-      expect(app.title, 'Fuel Prices');
+      expect(app.title, 'Sparkilo');
       expect(app.debugShowCheckedModeBanner, isFalse);
       expect(app.routerConfig, same(router));
     });

@@ -22,7 +22,7 @@ class WelcomeStep extends StatelessWidget {
           const FuelPumpIllustration(size: 160),
           const SizedBox(height: 24),
           Text(
-            l10n?.welcome ?? 'Fuel Prices',
+            l10n?.welcome ?? 'Sparkilo', // i18n-ignore: brand name
             style: theme.textTheme.headlineLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),

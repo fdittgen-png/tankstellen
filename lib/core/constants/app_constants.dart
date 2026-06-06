@@ -4,7 +4,7 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'Fuel Prices';
+  static const String appName = 'Sparkilo'; // i18n-ignore: brand name
   static const String appPackage = 'de.tankstellen.app';
 
   /// Runtime app version cached at startup by [AppInitializer].

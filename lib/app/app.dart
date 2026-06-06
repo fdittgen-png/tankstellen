@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/constants/app_constants.dart';
 import '../core/country/country_switch_listener.dart';
 import '../core/language/language_provider.dart';
 import '../core/notifications/notification_launch_listener.dart';
@@ -102,7 +103,7 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
       // Keying on language.code forces a full rebuild whenever the user
       // changes locale, so AppLocalizations lookups everywhere refresh.
       key: ValueKey(language.code),
-      title: 'Fuel Prices',
+      title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       // #1712 — the green Eco theme occupies the `light` slot: when
       // chosen it is supplied here and `themeMode` resolves to light.
