@@ -298,5 +298,51 @@ void main() {
       expect(hardAccel.title, '5 hard accelerations: wasted 0.3 L');
       expect(hardAccel.trailing, '+0.3 L');
     });
+
+    test('hard-accel lesson sources its count from the IMU-preferred figure '
+        'when the IMU ran (#2789 C5 single source of truth)', () {
+      // A GPS-only trip whose phone IMU actually ran (imuActive=true) and
+      // counted N=2 hard accelerations — but the noisy GPS speed-derivative
+      // over-counts 5 from the same sample stream (the #2895 over-count).
+      // The recording pipeline persists the IMU figure into
+      // harshAccelerations; the lesson must mirror the score + HardBrakeRule
+      // and headline the IMU count (2), NOT the GPS-derived 5.
+      const imuActiveSummary = TripSummary(
+        distanceKm: 5,
+        maxRpm: 4000,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 2, // IMU-preferred count (#2895)
+        kind: TripKind.gpsOnly,
+        imuHardAccelCount: 2,
+        imuActive: true,
+      );
+      final reg = DrivingLessonRegistry.standard();
+      final lessons = reg.evaluate(imuActiveSummary, hardAccelSamples(), l);
+      final hardAccel = lessons.firstWhere((e) => e.id == hardAccelLessonId);
+      // Headline reflects the IMU count (2), not the GPS-derived 5.
+      expect(hardAccel.title, startsWith('2 hard accelerations'));
+    });
+
+    test('hard-accel lesson keeps the GPS-derived count when the IMU did NOT '
+        'run (#2789 C5 fallback)', () {
+      // imuActive=false → no inertial signal → fall back to the (clamped)
+      // GPS-derived eventCount exactly as before.
+      const noImuSummary = TripSummary(
+        distanceKm: 5,
+        maxRpm: 4000,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 2, // ignored — IMU did not run
+        kind: TripKind.gpsOnly,
+        imuActive: false,
+      );
+      final reg = DrivingLessonRegistry.standard();
+      final lessons = reg.evaluate(noImuSummary, hardAccelSamples(), l);
+      final hardAccel = lessons.firstWhere((e) => e.id == hardAccelLessonId);
+      expect(hardAccel.title, startsWith('5 hard accelerations'));
+    });
   });
 }
