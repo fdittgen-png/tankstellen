@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
@@ -16,6 +17,7 @@ import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/'
     'negotiated_protocol_cache.dart';
 import 'package:tankstellen/features/consumption/data/obd2/supported_pids_cache.dart';
@@ -412,6 +414,7 @@ void main() {
       errorLogger.resetForTest();
       recorder = _CaptureRecorder();
       errorLogger.testRecorderOverride = recorder;
+      BreadcrumbCollector.clear();
     });
 
     tearDown(() {
@@ -507,12 +510,18 @@ void main() {
       );
     });
 
+    // ── #2943 (error-log #28/29) — complete the #2935 connect de-noise ──
+    //
+    // connectBest's catch used to spool EVERY rethrown Obd2ConnectionError as
+    // a full ERROR (5× expected Obd2AdapterUnresponsive in errorlog_28/29
+    // from probing a parked, engine-off car). It now routes through the
+    // #2745/#2763/#2892 de-noiser: the expected engine-off family + a bare
+    // ELM327 connect TimeoutException record a breadcrumb, while GENUINE
+    // faults still ERROR-log on `other`. The error is rethrown either way.
+
     test(
-        'a genuinely unrecovered connect failure (connectBest) IS still '
-        'logged — under ErrorLayer.other, never storage (#2379)', () async {
-      // connectBest surfaces a real, unrecovered failure to its caller
-      // (it rethrows). That genuine failure stays logged — but tagged
-      // `other`, not `storage`.
+        'an EXPECTED engine-off Obd2AdapterUnresponsive at connectBest is a '
+        'breadcrumb, NOT an ERROR (#2943) — and is still rethrown', () async {
       final fake = _FakeFacade(
         batches: [
           [
@@ -524,7 +533,8 @@ void main() {
             ),
           ],
         ],
-        // Silent channel ⇒ init never completes ⇒ Obd2AdapterUnresponsive.
+        // Silent channel ⇒ init never completes ⇒ Obd2AdapterUnresponsive,
+        // i.e. the engine is simply off (isExpectedUserCondition == true).
         channel: _FakeChannel(silent: true),
       );
       final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
@@ -532,14 +542,93 @@ void main() {
       // Populate _lastRanked so connectBest has a candidate to try.
       await svc.scan(timeout: const Duration(milliseconds: 50)).toList();
 
-      await expectLater(svc.connectBest(), throwsA(isA<Obd2ConnectionError>()));
+      await expectLater(
+          svc.connectBest(), throwsA(isA<Obd2AdapterUnresponsive>()),
+          reason: 'the caller still sees the typed error — only the log level '
+              'changed');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        recorder.calls
+            .whereType<ContextualError>()
+            .where((e) => e.toString().contains('connectBest failed')),
+        isEmpty,
+        reason: 'an expected engine-off condition must NOT spool an ERROR '
+            'trace at connectBest (the errorlog_28/29 ×5 flood)',
+      );
+      expect(
+        BreadcrumbCollector.snapshot().map((b) => b.action),
+        contains('OBD2 connect failed — expected transient'),
+      );
+    });
+
+    test(
+        'a bare ELM327 connect TimeoutException at connectBest is a breadcrumb, '
+        'NOT an ERROR (#2943)', () async {
+      final svc = _ThrowingConnectBest(
+        directError: TimeoutException(
+          'ELM327 did not respond',
+          const Duration(milliseconds: 2500),
+        ),
+      );
+
+      await svc.primeLastRanked();
+      await expectLater(svc.connectBest(), throwsA(isA<TimeoutException>()));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        recorder.calls
+            .whereType<ContextualError>()
+            .where((e) => e.toString().contains('connectBest failed')),
+        isEmpty,
+        reason: 'a bounded ELM327 connect timeout is an expected transient — '
+            'no ERROR spool (the errorlog_28/29 timeouts)',
+      );
+      expect(
+        BreadcrumbCollector.snapshot().map((b) => b.action),
+        contains('OBD2 connect failed — expected transient'),
+      );
+    });
+
+    test(
+        'a GENUINE Obd2PermissionDenied at connectBest IS still logged — '
+        'ErrorLayer.other, never storage (#2943)', () async {
+      final svc = _ThrowingConnectBest(directError: const Obd2PermissionDenied());
+
+      await svc.primeLastRanked();
+      await expectLater(
+          svc.connectBest(), throwsA(isA<Obd2PermissionDenied>()));
+      await Future<void>.delayed(Duration.zero);
+
       final logged = recorder.calls.whereType<ContextualError>().toList();
       expect(logged, isNotEmpty,
-          reason: 'a genuinely unrecovered connect failure stays in triage');
+          reason: 'a real, actionable fault must stay a visible ERROR trace');
       expect(logged.every((e) => e.layer == ErrorLayer.other), isTrue,
           reason: 'OBD2/BLE failures must not carry the storage layer');
       expect(logged.any((e) => e.toString().contains('connectBest failed')),
           isTrue);
+      expect(logged.any((e) => e.toString().contains('Obd2PermissionDenied')),
+          isTrue);
+      expect(BreadcrumbCollector.snapshot(), isEmpty);
+    });
+
+    test(
+        'a GENUINE Obd2ProtocolInitFailed at connectBest IS still logged '
+        '(#2943)', () async {
+      final svc =
+          _ThrowingConnectBest(directError: const Obd2ProtocolInitFailed('?'));
+
+      await svc.primeLastRanked();
+      await expectLater(
+          svc.connectBest(), throwsA(isA<Obd2ProtocolInitFailed>()));
+      await Future<void>.delayed(Duration.zero);
+
+      final logged = recorder.calls.whereType<ContextualError>().toList();
+      expect(logged.any((e) => e.toString().contains('connectBest failed')),
+          isTrue,
+          reason: 'a counterfeit-clone init failure is a genuine fault worth '
+              'keeping as an ERROR');
+      expect(BreadcrumbCollector.snapshot(), isEmpty);
     });
   });
 
@@ -818,6 +907,44 @@ class _CaptureRecorder implements TraceRecorder {
   @override
   dynamic noSuchMethod(Invocation invocation) =>
       super.noSuchMethod(invocation);
+}
+
+/// #2943 — drives the `connectBest` catch in isolation. A real `scan()` seeds
+/// the private `_lastRanked` with one vLinker candidate (so `connectBest` has
+/// something to try), then the overridden `connect()` throws the injected
+/// error — exercising precisely the `connectBest failed` catch's routing
+/// without depending on the channel/init internals. Mirrors the
+/// `_ThrowingConnection` seam in `obd2_connect_transient_denoise_test.dart`.
+class _ThrowingConnectBest extends Obd2ConnectionService {
+  _ThrowingConnectBest({required this.directError})
+      : super(
+          registry: Obd2AdapterRegistry.defaults(),
+          permissions: _FakePermissions(Obd2PermissionState.granted),
+          bluetooth: _FakeFacade(
+            batches: [
+              [
+                Obd2AdapterCandidate(
+                  deviceId: 'aa:bb',
+                  deviceName: 'vLinker FD',
+                  advertisedServiceUuids: const [],
+                  rssi: -55,
+                ),
+              ],
+            ],
+          ),
+        );
+
+  final Object directError;
+
+  /// Runs the real scan once so `_lastRanked` is non-empty.
+  Future<void> primeLastRanked() async {
+    await scan(timeout: const Duration(milliseconds: 50)).toList();
+  }
+
+  @override
+  Future<Obd2Service> connect(ResolvedObd2Candidate candidate) async {
+    throw directError;
+  }
 }
 
 Obd2ConnectionService _build({
