@@ -76,9 +76,12 @@ void main() {
       ]);
     });
 
-    test('postResetDelay and interCommandDelay are both 100 ms', () {
+    test('postResetDelay is 1 s (#2969 cold-clone settle), interCommand 100 ms',
+        () {
       const adapter = GenericElm327Adapter();
-      expect(adapter.postResetDelay, const Duration(milliseconds: 100));
+      // #2969 — bumped 100 ms → 1 s: cold clones need ≥1 s to re-enumerate
+      // after ATZ before answering the next command.
+      expect(adapter.postResetDelay, const Duration(seconds: 1));
       expect(adapter.interCommandDelay, const Duration(milliseconds: 100));
     });
 

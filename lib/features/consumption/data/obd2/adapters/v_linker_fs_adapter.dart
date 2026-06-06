@@ -16,8 +16,14 @@ class VLinkerFsAdapter implements Elm327Adapter {
   @override
   List<String> get initSequence => Elm327Commands.initCommands;
 
+  // #2969 — bumped 200 ms → 1 s. Field evidence (the "OBD2 is a total mess"
+  // report) is that the real vLinker FS-class hardware — especially the cheaper
+  // clones that advertise the same name over Classic SPP — needs ≥1 s to
+  // re-enumerate after ATZ before it will answer the next command; a 200 ms
+  // settle raced the reset and produced the unresponsive-after-connect storm.
+  // This is a once-per-connect cold-start cost, not a per-command one.
   @override
-  Duration get postResetDelay => const Duration(milliseconds: 200);
+  Duration get postResetDelay => const Duration(seconds: 1);
 
   @override
   Duration get interCommandDelay => const Duration(milliseconds: 50);

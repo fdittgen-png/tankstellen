@@ -3,6 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../data/obd2/obd2_connect_trace.dart';
 import '../data/obd2/obd2_connection_service.dart';
 import '../data/obd2/obd2_self_test_driver.dart';
 import 'obd2_self_test_state.dart';
@@ -47,7 +48,15 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
   /// of the app uses for a paired adapter — instead of the blind scan that
   /// times out on real hardware. A null/empty MAC keeps the legacy blind
   /// scan (back-compat with the original Run button).
-  Future<void> run({String? targetMac}) async {
+  ///
+  /// [transportHint] (#2969) routes the pinned connect + reconnect over the
+  /// inferred transport — Classic takes the RFCOMM path
+  /// (`connectByMacClassicDirect`) instead of the BLE GATT direct path. The
+  /// panel infers it from the selected adapter's stored name via the registry
+  /// name matchers — for a Classic-SPP adapter (vLinker FS) the BLE path can
+  /// ONLY 4 s-timeout, so this is the reliability fix. A null hint defaults to
+  /// BLE but records `no-hint-defaulted-ble` on the trace.
+  Future<void> run({String? targetMac, Obd2ConnectTransport? transportHint}) async {
     if (state.phase == Obd2SelfTestPhase.running) return;
 
     // Guard the single-link adapter: a self-test connect during a live
@@ -72,6 +81,7 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
     final report = await runObd2SelfTest(
       connection,
       pinnedMac: pinnedMac,
+      transportHint: transportHint,
       isCancelled: () => _cancelled,
       onStep: _onStep,
     );

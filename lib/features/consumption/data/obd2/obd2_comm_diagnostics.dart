@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'obd2_connect_trace_log.dart';
 import 'obd2_response_class.dart';
 import 'obd2_session_completeness.dart';
 import 'obd2_session_diagnostic.dart';
@@ -117,6 +118,15 @@ class Obd2CommDiagnostics {
   /// lines are dropped (the early handshake is the diagnostic value).
   /// No-op when disabled.
   void recordHandshakeLine(String cmd, String rawResponse, int latencyMs) {
+    // #2969 correction 4 — tee the AT line into the active connect trace at
+    // this single chokepoint, so EVERY caller (incl. the failing init in
+    // `obd2_service`) records its handshake into the trace without
+    // instrumenting the service. Deliberately BEFORE the `!enabled` gate: the
+    // connect-trace ring is written even with developer mode off so a field
+    // failure's PARTIAL AT transcript is captured the first time (the per-PID
+    // table + the rest of the session stay gated below). A no-op when no
+    // connect trace is active (e.g. a steady-state recording session line).
+    Obd2ConnectTraceLog.teeHandshakeLine(cmd, rawResponse, latencyMs);
     if (!enabled) return;
     final cur = _current;
     if (cur == null) return;

@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_radius.dart';
 import '../../../../../core/widgets/section_header.dart';
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../consumption/data/obd2/adapter_registry.dart';
+import '../../../../consumption/data/obd2/obd2_connect_trace.dart';
 import '../../../../consumption/data/obd2/obd2_self_test_driver.dart';
 import '../../../../consumption/providers/obd2_self_test_controller.dart';
 import '../../../../vehicle/providers/vehicle_providers.dart';
@@ -46,6 +48,8 @@ class Obd2SelfTestPanel extends ConsumerWidget {
     final selectedMac =
         ref.watch(obd2SelfTestSelectedAdapterProvider(defaultMac));
     final selectedName = _nameForMac(adapters, selectedMac);
+    // #2969 — route the run over the inferred transport of the chosen adapter.
+    final selectedTransport = _transportHintForMac(adapters, selectedMac);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -72,7 +76,9 @@ class Obd2SelfTestPanel extends ConsumerWidget {
                 ? null
                 : () => ref
                     .read(obd2SelfTestControllerProvider.notifier)
-                    .run(targetMac: selectedMac),
+                    .run(
+                        targetMac: selectedMac,
+                        transportHint: selectedTransport),
             icon: running
                 ? const SizedBox(
                     width: 16,
@@ -119,6 +125,11 @@ class Obd2SelfTestPanel extends ConsumerWidget {
   /// legacy profile carries a MAC with no name.
   List<Obd2PairedAdapter> _pairedAdapters(WidgetRef ref) {
     final profiles = ref.watch(vehicleProfileListProvider);
+    // #2969 — infer each adapter's transport from its stored name (a paired
+    // profile stores MAC + name, never a transport) so the self-test can take
+    // the RFCOMM path for a Classic-SPP adapter instead of a doomed BLE
+    // 4 s-timeout.
+    final registry = Obd2AdapterRegistry.defaults();
     final byMac = <String, Obd2PairedAdapter>{};
     for (final p in profiles) {
       final mac = p.obd2AdapterMac;
@@ -129,10 +140,32 @@ class Obd2SelfTestPanel extends ConsumerWidget {
         () => Obd2PairedAdapter(
           mac: mac,
           name: (name != null && name.isNotEmpty) ? name : mac,
+          transport: registry.transportForName(name),
         ),
       );
     }
     return byMac.values.toList(growable: false);
+  }
+
+  /// The inferred connect-transport hint for the selected MAC (#2969), mapped
+  /// from the paired adapter's registry-inferred [BluetoothTransport]. Null ⇒
+  /// no paired adapter selected / no name match → the run defaults to BLE and
+  /// records `no-hint-defaulted-ble`.
+  Obd2ConnectTransport? _transportHintForMac(
+      List<Obd2PairedAdapter> adapters, String? mac) {
+    if (mac == null) return null;
+    for (final a in adapters) {
+      if (a.mac != mac) continue;
+      switch (a.transport) {
+        case BluetoothTransport.classic:
+          return Obd2ConnectTransport.classic;
+        case BluetoothTransport.ble:
+          return Obd2ConnectTransport.ble;
+        case null:
+          return null;
+      }
+    }
+    return null;
   }
 
   /// The default selection: the active vehicle's paired adapter when set and

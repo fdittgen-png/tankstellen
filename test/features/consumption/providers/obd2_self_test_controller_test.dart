@@ -7,6 +7,7 @@ import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_comm_diagnostics.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_self_test_driver.dart';
@@ -182,27 +183,55 @@ void main() {
       // own MAC regardless, so we only assert the scan path was taken.)
       expect(conn.connectBestCalls, 1);
     });
+
+    test(
+        'run(transportHint:classic) routes a CLASSIC adapter over RFCOMM, NOT '
+        'the doomed BLE direct path (#2969)', () async {
+      final conn = _FakeConnection(adapterIsClassic: true);
+      final container = ProviderContainer(
+        overrides: [obd2ConnectionProvider.overrideWith((_) => conn)],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(obd2SelfTestControllerProvider.notifier).run(
+            targetMac: 'AA:BB:CC:DD:EE:FF',
+            transportHint: Obd2ConnectTransport.classic,
+          );
+
+      // The connect + reconnect both took the Classic RFCOMM path.
+      expect(conn.classicMacsConnected, isNotEmpty);
+      // The BLE direct path was NEVER used for this Classic adapter.
+      expect(conn.macsConnected, isEmpty);
+      expect(container.read(obd2SelfTestControllerProvider).passed, isTrue);
+    });
   });
 }
 
 class _FakeConnection extends Obd2ConnectionService {
-  _FakeConnection()
+  _FakeConnection({this.adapterIsClassic = false})
       : super(
           registry: Obd2AdapterRegistry.defaults(),
           permissions: _GrantedPermissions(),
           bluetooth: _UnusedBluetoothFacade(),
         );
 
+  /// #2969 — when true the BLE direct path fails (a Classic adapter can only
+  /// 4 s-timeout on it) and only the RFCOMM path connects, like production.
+  final bool adapterIsClassic;
+
   /// How many times the blind-scan path (connectBest) was taken.
   int connectBestCalls = 0;
 
-  /// The MACs passed to the no-scan connect-by-MAC path, in call order.
+  /// The MACs passed to the BLE no-scan connect-by-MAC path, in call order.
   final List<String> macsConnected = [];
+
+  /// The MACs passed to the Classic RFCOMM connect-by-MAC path (#2969).
+  final List<String> classicMacsConnected = [];
 
   Future<Obd2Service?> _open() async {
     final service = Obd2Service(FakeObd2Transport(Map.of(_happyPathResponses)))
       ..adapterMac = 'AA:BB:CC:DD:EE:FF'
-      ..linkKind = 'ble';
+      ..linkKind = adapterIsClassic ? 'classic' : 'ble';
     await service.connect();
     return service;
   }
@@ -218,8 +247,17 @@ class _FakeConnection extends Obd2ConnectionService {
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
-  }) {
+  }) async {
     macsConnected.add(mac);
+    // A Classic adapter cannot answer the BLE direct path.
+    if (adapterIsClassic) return null;
+    return _open();
+  }
+
+  @override
+  Future<Obd2Service?> connectByMacClassicDirect(String mac) async {
+    classicMacsConnected.add(mac);
+    if (!adapterIsClassic) return null;
     return _open();
   }
 }

@@ -150,20 +150,24 @@ void main() {
       overrides: overrides(connection: conn, withPairedAdapter: true),
     );
 
-    // The adapter choice is shown, defaulting to the active vehicle's adapter.
+    // The adapter choice is shown, defaulting to the active vehicle's adapter,
+    // with its inferred transport tag (#2969 — "vLinker FS" → Classic SPP).
     expect(
       find.byKey(const ValueKey('obd2-self-test-adapter-choice')),
       findsOneWidget,
     );
-    expect(find.text(_pairedName), findsWidgets);
+    expect(find.textContaining(_pairedName), findsWidgets);
+    expect(find.textContaining('Classic (SPP)'), findsWidgets);
 
     await tester.tap(find.byKey(const ValueKey('obd2-self-test-run')));
     await tester.pumpAndSettle();
 
-    // The run took the no-scan connect-by-MAC path with the chosen MAC, and
-    // never touched the blind scan (connectBest).
+    // #2969 — "vLinker FS" name-matches the Classic profile, so the run took
+    // the RFCOMM path (connectByMacClassicDirect), NOT the BLE direct path and
+    // NOT the blind scan.
     expect(conn.connectBestCalls, 0);
-    expect(conn.macsConnected, contains(_pairedMac));
+    expect(conn.macsConnected, isEmpty);
+    expect(conn.classicMacsConnected, contains(_pairedMac));
     // The first step is relabelled "Connect to <adapter>", not "Scan…".
     expect(find.text('Connect to $_pairedName'), findsOneWidget);
     expect(find.text('Scan for adapter'), findsNothing);
@@ -206,13 +210,18 @@ class _FakeConnection extends Obd2ConnectionService {
   /// How many times the blind-scan path (connectBest) was taken.
   int connectBestCalls = 0;
 
-  /// The MACs passed to the no-scan connect-by-MAC path, in call order.
+  /// The MACs passed to the BLE no-scan connect-by-MAC path, in call order.
   final List<String> macsConnected = [];
 
-  Future<Obd2Service?> _open() async {
+  /// The MACs passed to the Classic RFCOMM connect-by-MAC path (#2969). The
+  /// `vLinker FS` paired profile name-matches the Classic profile, so the
+  /// transport-aware self-test takes THIS path, not the BLE one.
+  final List<String> classicMacsConnected = [];
+
+  Future<Obd2Service?> _open(String linkKind) async {
     final service = Obd2Service(FakeObd2Transport(Map.of(_happyPathResponses)))
       ..adapterMac = _pairedMac
-      ..linkKind = 'ble';
+      ..linkKind = linkKind;
     await service.connect();
     return service;
   }
@@ -220,7 +229,7 @@ class _FakeConnection extends Obd2ConnectionService {
   @override
   Future<Obd2Service?> connectBest() {
     connectBestCalls++;
-    return _open();
+    return _open('ble');
   }
 
   @override
@@ -230,7 +239,13 @@ class _FakeConnection extends Obd2ConnectionService {
     bool fallbackToScan = true,
   }) {
     macsConnected.add(mac);
-    return _open();
+    return _open('ble');
+  }
+
+  @override
+  Future<Obd2Service?> connectByMacClassicDirect(String mac) {
+    classicMacsConnected.add(mac);
+    return _open('classic');
   }
 }
 

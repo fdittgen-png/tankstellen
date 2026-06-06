@@ -92,7 +92,30 @@ void main() {
     // args) so foreground + background share ONE per-provider minInterval gate.
     // Decomposing this god-class is tracked separately (#2187/#2188/#2190).
     'lib/core/services/country_service_registry.dart': 857,
-    'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
+    // #2969 — re-grandfathered 500 → 522: the `transportForName` inference
+    // (matches a stored adapter name against the profile nameMatchers so the
+    // transport-aware self-test takes RFCOMM for a Classic-SPP adapter instead
+    // of a doomed BLE 4 s-timeout) + its dartdoc. A pure-data lookup append to
+    // the existing catalog class.
+    'lib/features/consumption/data/obd2/adapter_registry.dart': 522,
+    // #2969 — grandfathered at 563 (was 389, under-cap before). The #2969
+    // connect-trace instrumentation opens/finalises a trace at the FIVE public
+    // connect entry points (the single virtual-dispatch chokepoint every live
+    // caller funnels through — this is what makes a FAILED connect leave a
+    // trace), records the scan list + resolved transport, and classifies the
+    // init failure from the teed transcript. The pure classifier + the trace
+    // ring/model were split into separate files (obd2_connect_classifier.dart /
+    // obd2_connect_trace_log.dart, both < 400); the remaining bulk is the
+    // per-method trace wrappers on this already-near-cap connect service.
+    // Further decomposition of this god-class is tracked by #2190.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 563,
+    // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
+    // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
+    // on a vanished candidate) + the channel-open connect-trace stamp (the one
+    // place the REAL FBP/StateError is in hand before Obd2Service.connect
+    // swallows it). The stamp was already factored to the shared
+    // Obd2ConnectTraceLog.stampOpenFailure one-liner.
+    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 419,
     // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
     // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
     // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off

@@ -5,17 +5,37 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../../l10n/app_localizations.dart';
+import '../../../../consumption/data/obd2/adapter_registry.dart';
 
 part 'obd2_self_test_adapter_choice.g.dart';
 
 /// A paired OBD2 adapter the user can target with the self-test (#2938):
 /// the stable MAC the app reconnects by + a display name (the advertised
 /// adapter name, falling back to the MAC for legacy profiles).
+///
+/// [transport] (#2969) is inferred from the stored name via the adapter
+/// registry's name matchers — a paired profile stores only MAC + name, never a
+/// transport. Null ⇒ no profile name-matched (an unfamiliar adapter); the
+/// self-test then defaults to BLE but records that decision explicitly. The
+/// inference is what lets the self-test take the RFCOMM path for a Classic-SPP
+/// adapter (vLinker FS) instead of a doomed BLE 4 s-timeout.
 class Obd2PairedAdapter {
-  const Obd2PairedAdapter({required this.mac, required this.name});
+  const Obd2PairedAdapter({
+    required this.mac,
+    required this.name,
+    this.transport,
+  });
 
   final String mac;
   final String name;
+
+  /// The inferred transport, or null when no registry profile name-matched.
+  final BluetoothTransport? transport;
+
+  /// Whether the self-test should take the Classic RFCOMM path. False (BLE)
+  /// when the transport is BLE or unknown — the conservative default, recorded
+  /// as `no-hint-defaulted-ble` on the trace.
+  bool get isClassic => transport == BluetoothTransport.classic;
 }
 
 /// The MAC the user picked for the next self-test run (#2938). `null` ⇒ the
@@ -82,7 +102,13 @@ class Obd2SelfTestAdapterChoice extends StatelessWidget {
           for (final a in adapters)
             DropdownMenuItem<String>(
               value: a.mac,
-              child: Text(a.name, overflow: TextOverflow.ellipsis),
+              child: Text(
+                // #2969 — show the inferred transport per entry so the user
+                // sees WHY the run takes RFCOMM vs BLE (vs the visible
+                // "defaulting to BLE" honesty for an unfamiliar adapter).
+                '${a.name} · ${_transportLabel(l, a.transport)}',
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           DropdownMenuItem<String>(
             value: _scanSentinel,
@@ -95,5 +121,19 @@ class Obd2SelfTestAdapterChoice extends StatelessWidget {
             : null,
       ),
     );
+  }
+
+  /// Localised transport tag shown next to each paired adapter (#2969).
+  static String _transportLabel(
+      AppLocalizations? l, BluetoothTransport? transport) {
+    switch (transport) {
+      case BluetoothTransport.classic:
+        return l?.obd2TestAdapterTransportClassic ?? 'Classic (SPP)';
+      case BluetoothTransport.ble:
+        return l?.obd2TestAdapterTransportBle ?? 'Bluetooth LE';
+      case null:
+        return l?.obd2TestAdapterTransportUnknown ??
+            'unknown — defaulting to BLE';
+    }
   }
 }

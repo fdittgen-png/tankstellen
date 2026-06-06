@@ -90,8 +90,12 @@ object Obd2ClassicPlugin {
                     val uuid = call.argument<String>("uuid")
                         ?: return result.error("arg", "uuid missing", null)
                     thread(name = "obd2-classic-connect") {
-                        val ok = connect(context, address, uuid)
-                        result.success(ok)
+                        // #2969 — return a Map{ok, strategy, error} so the Dart
+                        // side surfaces WHICH RFCOMM strategy won (or that all
+                        // were exhausted) + the last IOException, instead of a
+                        // bare Boolean that threw away every diagnostic (only
+                        // Logcat had it). The Dart binding accepts BOTH shapes.
+                        result.success(connect(context, address, uuid))
                     }
                 }
                 "write" -> {
@@ -125,15 +129,30 @@ object Obd2ClassicPlugin {
         }
     }
 
-    private fun connect(context: Context, address: String, uuid: String): Boolean {
+    /** #2969 — build the connect result map the Dart side reads. `ok` is the
+     *  only field the legacy bool path used; `strategy` names which RFCOMM
+     *  variant won / the terminal failure mode; `error` carries the last
+     *  IOException message. */
+    private fun connectResult(
+        ok: Boolean,
+        strategy: String,
+        error: String? = null,
+    ): Map<String, Any?> = mapOf(
+        "ok" to ok,
+        "strategy" to strategy,
+        "error" to error,
+    )
+
+    private fun connect(context: Context, address: String, uuid: String): Map<String, Any?> {
         disconnect() // ensure any prior socket is closed
-        val adapter = adapterOrNull(context) ?: return false
+        val adapter = adapterOrNull(context)
+            ?: return connectResult(false, "no-adapter", "Bluetooth adapter unavailable")
         @Suppress("MissingPermission")
         val device = try {
             adapter.getRemoteDevice(address)
         } catch (e: IllegalArgumentException) {
             Log.e(TAG, "connect: bad address $address", e)
-            return false
+            return connectResult(false, "bad-address", e.message ?: "bad address")
         }
         // cancelDiscovery() is required before EVERY connect() — a live
         // discovery slows the RFCOMM handshake to a crawl (and can fail it).
@@ -141,6 +160,9 @@ object Obd2ClassicPlugin {
         adapter.cancelDiscovery()
 
         val serviceUuid = UUID.fromString(uuid)
+        // #2969 — capture the last IOException across ALL strategies so the
+        // returned map can carry it (was Logcat-only).
+        var lastError: String? = null
         // 1) Bounded retry on the standard secure SPP socket. This runs on the
         //    background "obd2-classic-connect" thread, so the Thread.sleep
         //    backoff between attempts never blocks the Flutter main thread.
@@ -150,15 +172,20 @@ object Obd2ClassicPlugin {
                 device.createRfcommSocketToServiceRecord(serviceUuid)
             } catch (e: IOException) {
                 Log.e(TAG, "connect: createRfcommSocket failed (attempt $attempt)", e)
+                lastError = e.message ?: "createRfcommSocket failed"
                 null
             }
-            if (s != null && tryConnectSocket(s, attempt)) return true
+            if (s != null) {
+                val r = tryConnectSocket(s, attempt)
+                if (r == null) return connectResult(true, "secure")
+                lastError = r
+            }
             if (attempt < MAX_RFCOMM_ATTEMPTS) {
                 try {
                     Thread.sleep(RFCOMM_RETRY_BASE_MS * attempt)
                 } catch (_: InterruptedException) {
                     Thread.currentThread().interrupt()
-                    return false
+                    return connectResult(false, "interrupted", lastError)
                 }
             }
         }
@@ -170,35 +197,41 @@ object Obd2ClassicPlugin {
             device.createInsecureRfcommSocketToServiceRecord(serviceUuid)
         } catch (e: IOException) {
             Log.e(TAG, "connect: createInsecureRfcommSocket failed", e)
+            lastError = e.message ?: "createInsecureRfcommSocket failed"
             null
         }
-        if (insecure != null && tryConnectSocket(insecure, MAX_RFCOMM_ATTEMPTS + 1)) {
-            return true
+        if (insecure != null) {
+            val r = tryConnectSocket(insecure, MAX_RFCOMM_ATTEMPTS + 1)
+            if (r == null) return connectResult(true, "insecure")
+            lastError = r
         }
         // 3) Last-resort reflection on the hidden channel-1 RFCOMM socket —
         //    the long-standing workaround for clones whose SDP record is
         //    missing/garbage so the UUID lookup resolves to no channel.
         val reflected = reflectChannelOneSocket(device)
-        if (reflected != null && tryConnectSocket(reflected, MAX_RFCOMM_ATTEMPTS + 2)) {
-            return true
+        if (reflected != null) {
+            val r = tryConnectSocket(reflected, MAX_RFCOMM_ATTEMPTS + 2)
+            if (r == null) return connectResult(true, "reflection")
+            lastError = r
         }
         Log.e(TAG, "connect: all RFCOMM strategies exhausted for $address")
-        return false
+        return connectResult(false, "exhausted", lastError)
     }
 
     /** Attempt to connect [s], adopt it as the live socket + start the reader
-     *  on success, or close it on failure. Returns true on a connected socket. */
-    private fun tryConnectSocket(s: BluetoothSocket, attempt: Int): Boolean {
+     *  on success, or close it on failure. Returns null on success, or the
+     *  IOException message on failure (#2969 — was a bare Boolean). */
+    private fun tryConnectSocket(s: BluetoothSocket, attempt: Int): String? {
         return try {
             s.connect()
             socket = s
             startReader()
-            true
+            null
         } catch (e: IOException) {
             Log.w(TAG, "connect: RFCOMM open failed (attempt $attempt)", e)
             try { s.close() } catch (_: IOException) {}
             if (socket === s) socket = null
-            false
+            e.message ?: "RFCOMM open failed (attempt $attempt)"
         }
     }
 

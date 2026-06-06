@@ -15,8 +15,13 @@ import '../../../../../core/widgets/section_header.dart';
 import '../../../../../core/widgets/snackbar_helper.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../consumption/data/obd2/obd2_comm_diagnostics.dart';
+import '../../../../consumption/data/obd2/obd2_connect_trace.dart';
+import '../../../../consumption/data/obd2/obd2_connect_trace_log.dart';
 import '../../../../consumption/data/obd2/obd2_session_diagnostic.dart';
+import '../../../../consumption/presentation/widgets/obd2_connect_trace_card.dart';
 import '../../../../consumption/presentation/widgets/obd2_diagnostics_card.dart';
+import '../../../../consumption/providers/obd2_connect_trace_revision_provider.dart';
+import '../../../../consumption/providers/obd2_self_test_controller.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/feature.dart';
 import 'obd2_self_test_panel.dart';
@@ -61,11 +66,24 @@ class Obd2HealthScreen extends ConsumerWidget {
       return PageScaffold(title: title, body: const SizedBox.shrink());
     }
 
+    // #2969 — rebuild when a NEW connect trace lands (a self-test run completes
+    // OR a LIVE reconnect / first-connect fails while the screen is open). The
+    // screen read the collector once with no listen, so a trace captured while
+    // it was open stayed invisible until re-navigation. Watching the self-test
+    // controller covers the in-screen run; the trace-revision provider (bumped
+    // by the static trace log) covers the live-failure case the user never
+    // triggered here.
+    ref.watch(obd2SelfTestControllerProvider);
+    ref.watch(obd2ConnectTraceRevisionProvider);
+
     final collector = Obd2CommDiagnostics.instance;
     final enabled = collector.enabled;
     final live = collector.snapshot();
     // Newest-first so the most recent finished session reads at the top.
     final finished = collector.finishedSessions.reversed.toList();
+    // #2969 — newest-first; NON-EMPTY even when a connect FAILED before any
+    // comm-health session could begin (the literal complaint).
+    final connectTraces = Obd2ConnectTraceLog.snapshot();
 
     return PageScaffold(
       title: title,
@@ -83,6 +101,67 @@ class Obd2HealthScreen extends ConsumerWidget {
 
           // --- Active adapter self-test (#2645) -------------------------
           const Obd2SelfTestPanel(),
+
+          // --- Recent connect attempts (#2969) --------------------------
+          // The section that is NON-EMPTY on a FAILED connect — the artefact
+          // the user's #1 complaint was about (a failed connect left nothing
+          // because the comm-health session only begins AFTER the channel
+          // opens). Captured even with developer mode off, surfaced here.
+          SectionHeader(
+            key: const Key('obd2_health_connect_attempts_section'),
+            leadingIcon: Icons.cable_outlined,
+            title: l?.obd2HealthConnectAttemptsSection ??
+                'Recent connect attempts',
+            padding: EdgeInsets.zero,
+          ),
+          if (connectTraces.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+              child: Text(
+                l?.obd2HealthConnectAttemptsEmpty ??
+                    'No connect attempts recorded yet.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            )
+          else ...[
+            for (var i = 0; i < connectTraces.length; i++) ...[
+              Obd2ConnectTraceCard(
+                key: Key('obd2_health_connect_trace_card_$i'),
+                trace: connectTraces[i],
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: TextButton.icon(
+                    key: Key('obd2_health_download_connect_trace_$i'),
+                    onPressed: () =>
+                        _downloadConnectTrace(context, l, connectTraces[i]),
+                    icon: const Icon(Icons.download_outlined, size: 18),
+                    label: Text(l?.obd2HealthDownloadConnectTrace ??
+                        'Download connect trace'),
+                  ),
+                ),
+              ),
+            ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton.icon(
+                  key: const Key('obd2_health_download_all_connect_traces'),
+                  onPressed: () =>
+                      _downloadAllConnectTraces(context, l, connectTraces),
+                  icon: const Icon(Icons.download_for_offline_outlined, size: 18),
+                  label: Text(l?.obd2HealthDownloadAllConnectTraces ??
+                      'Download all connect traces'),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
 
           // --- Live session ---------------------------------------------
           SectionHeader(
@@ -163,6 +242,30 @@ class Obd2HealthScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Write ONE connect-attempt trace's JSON to the public Downloads folder
+  /// (#2969) via the SAME never-throws sink as the session export. This is the
+  /// trace that is non-empty on a FAILED connect.
+  Future<void> _downloadConnectTrace(
+    BuildContext context,
+    AppLocalizations? l,
+    Obd2ConnectTrace trace,
+  ) async {
+    final json = const JsonEncoder.withIndent('  ').convert(trace.toJson());
+    await _saveJsonToDownloads(context, l, json, 'connect-trace');
+  }
+
+  /// Write EVERY recent connect-attempt trace as one JSON array to the public
+  /// Downloads folder (#2969).
+  Future<void> _downloadAllConnectTraces(
+    BuildContext context,
+    AppLocalizations? l,
+    List<Obd2ConnectTrace> traces,
+  ) async {
+    final json = const JsonEncoder.withIndent('  ')
+        .convert([for (final t in traces) t.toJson()]);
+    await _saveJsonToDownloads(context, l, json, 'connect-traces');
   }
 
   /// Write the full per-session diagnostics JSON to the public Downloads

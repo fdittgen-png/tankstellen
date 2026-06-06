@@ -9,6 +9,8 @@ import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_connect_trace.dart';
+import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -58,9 +60,15 @@ class ClassicElmChannel implements ElmByteChannel {
     final connectSw = diag.enabled ? (Stopwatch()..start()) : null;
     if (diag.enabled) diag.noteConnectionEvent(attempt: true);
 
-    final bool ok;
+    final ClassicConnectResult connectResult;
     try {
-      ok = await _plugin.connect(address: address, uuid: sppUuid);
+      // #2969 — connectDetailed surfaces WHICH RFCOMM strategy won / the
+      // terminal failure mode + the last native IOException, so the connect
+      // trace carries the native cause (not just "rfcomm open returned false").
+      connectResult = await _plugin.connectDetailed(
+        address: address,
+        uuid: sppUuid,
+      );
       // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
     } catch (e) {
       // A thrown platform error during the RFCOMM open (bonding,
@@ -70,14 +78,28 @@ class ClassicElmChannel implements ElmByteChannel {
           failureReason: _classifyClassicConnectFailure(e),
         );
       }
+      // #2969 — stamp the RFCOMM-open outcome on the active connect trace
+      // (first-wins) so a thrown Classic-open failure is captured even with
+      // developer mode off.
+      Obd2ConnectTraceLog.stampOpenFailure(
+          Obd2ConnectOutcome.rfcommOpenFail, e.toString());
       rethrow;
     }
-    if (!ok) {
+    if (!connectResult.ok) {
       // The plugin reported a clean RFCOMM-open failure (false, not a
       // throw): the adapter is unbonded or out of range.
       if (diag.enabled) {
         diag.noteConnectionEvent(failureReason: 'rfcomm-open-fail');
       }
+      // #2969 — the clean rfcomm-open failure is the dominant Classic mode;
+      // stamp it on the trace (first-wins) so the user sees rfcommOpenFail, not
+      // a generic ignition-off. The native strategy + last IOException
+      // (correction 5 — the Kotlin Map return shape) land in [detail].
+      final detail = 'rfcomm open failed '
+          '(strategy: ${connectResult.strategy ?? 'unknown'}'
+          '${connectResult.error != null ? ', error: ${connectResult.error}' : ''})';
+      Obd2ConnectTraceLog.stampOpenFailure(
+          Obd2ConnectOutcome.rfcommOpenFail, detail);
       // #2745 — this was a raw `StateError`, which the connect flow logged as
       // an `[unknown]` ERROR trace (field trace #6) even though it is an
       // EXPECTED, user-surfaced "adapter not reachable" condition (the dongle

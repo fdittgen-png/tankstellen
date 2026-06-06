@@ -71,9 +71,12 @@ void main() {
       ]);
     });
 
-    test('postResetDelay is 200 ms', () {
+    test('postResetDelay is 1 s (#2969 cold-clone settle)', () {
       const adapter = VLinkerFsAdapter();
-      expect(adapter.postResetDelay, const Duration(milliseconds: 200));
+      // #2969 — bumped 200 ms → 1 s: field evidence the real vLinker FS-class
+      // hardware (and the cheaper clones using its name) needs ≥1 s to
+      // re-enumerate after ATZ before answering the next command.
+      expect(adapter.postResetDelay, const Duration(seconds: 1));
     });
 
     test('interCommandDelay is 50 ms', () {
@@ -96,8 +99,8 @@ void main() {
 
   group('Obd2Service.connect with VLinkerFsAdapter (#1330 phase 2)', () {
     test(
-      'settles 200 ms after ATZ only — no inter-command sleep between '
-      'trivial AT echoes (#2261 concern 5)',
+      'settles postResetDelay after ATZ only — no inter-command sleep between '
+      'trivial AT echoes (#2261 concern 5, #2969)',
       () async {
         final transport = _RecordingObd2Transport({
           'ATZ': 'ELM327 v1.5>',

@@ -195,6 +195,25 @@ class Obd2AdapterRegistry {
     return null;
   }
 
+  /// Infer the [BluetoothTransport] for a stored adapter [name] (#2969) by
+  /// matching it against every profile's [Obd2AdapterProfile.nameMatchers]. A
+  /// paired adapter stores only its MAC + name (no transport), so the
+  /// transport-aware self-test recovers it here: a name like `vLinker FS 1234`
+  /// matches the `vlinker-fs-classic` profile → [BluetoothTransport.classic],
+  /// so the self-test takes the RFCOMM path instead of a doomed BLE 4 s-timeout.
+  ///
+  /// Returns null when no profile name-matches (an unfamiliar adapter), so the
+  /// caller can record an explicit "no hint — defaulting to BLE" decision
+  /// rather than silently guessing. First name-match wins (same order as
+  /// [resolve]'s pass 1).
+  BluetoothTransport? transportForName(String? name) {
+    if (name == null || name.isEmpty) return null;
+    for (final p in profiles) {
+      if (p.matchesName(name)) return p.transport;
+    }
+    return null;
+  }
+
   /// Rank a list of candidates for display in the picker. Primary
   /// key: resolved-profile-matched first (unresolved dropped). Secondary
   /// key: stronger RSSI (closer adapter) first.

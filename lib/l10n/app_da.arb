@@ -4535,5 +4535,65 @@
   "@pipTapToRestore": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2TestAdapterTransportClassic": "Classic (SPP)",
+  "@obd2TestAdapterTransportClassic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestAdapterTransportBle": "Bluetooth LE",
+  "@obd2TestAdapterTransportBle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestAdapterTransportUnknown": "unknown — defaulting to BLE",
+  "@obd2TestAdapterTransportUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthConnectAttemptsSection": "Recent connect attempts",
+  "@obd2HealthConnectAttemptsSection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthConnectAttemptsEmpty": "No connect attempts recorded yet.",
+  "@obd2HealthConnectAttemptsEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthDownloadConnectTrace": "Download connect trace",
+  "@obd2HealthDownloadConnectTrace": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthDownloadAllConnectTraces": "Download all connect traces",
+  "@obd2HealthDownloadAllConnectTraces": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthConnectOrigin": "Origin",
+  "@obd2HealthConnectOrigin": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthConnectTransport": "Transport",
+  "@obd2HealthConnectTransport": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthConnectOutcome": "Outcome",
+  "@obd2HealthConnectOutcome": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthConnectScanList": "Scanned devices",
+  "@obd2HealthConnectScanList": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthConnectSteps": "Steps",
+  "@obd2HealthConnectSteps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -11,6 +11,8 @@ import 'ble_link_tuner.dart';
 import 'connection_drop_debouncer.dart';
 import 'elm_byte_channel.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_connect_classifier.dart';
+import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -49,6 +51,10 @@ class Elm327BleUuids {
 /// iOS BLE ELM adapters are rare; add iOS-specific handling when the
 /// app starts supporting them.
 class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
+  /// #2969 — bound the scan-path `connect()` (the `connectTimeout == null`
+  /// branch) so FBP can't block ~35 s on a vanished candidate.
+  static const Duration _scanPathConnectTimeout = Duration(seconds: 10);
+
   final BluetoothDevice _device;
   final Elm327BleUuids _uuids;
 
@@ -135,6 +141,12 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
           failureReason: classifyBleConnectFailure(e),
         );
       }
+      // #2969 correction 3 — stamp the channel-open outcome on the active
+      // connect trace where the REAL FBP/StateError is in hand
+      // (Obd2Service.connect swallows it into a generic false). FIRST-wins, so
+      // the wrong-transport gattTimeout outlives the scan fallback's scanEmpty.
+      Obd2ConnectTraceLog.stampOpenFailure(
+          classifyBleOpenOutcome(e), e.toString());
       rethrow;
     }
     if (connectSw != null) {
@@ -158,7 +170,12 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
       // autoConnect:true, so `mtu: null`.
       await _device.connect(autoConnect: true, mtu: null);
     } else if (timeout == null) {
-      await _device.connect(autoConnect: false, mtu: null);
+      // #2969 — bound the scan-path open (was UNBOUNDED): FBP's
+      // `autoConnect:false` connect can otherwise block ~35 s on a candidate the
+      // scan saw but that has since vanished, freezing the connect (and any
+      // self-test / first-connect riding it). A miss now fails fast.
+      await _device.connect(
+          autoConnect: false, mtu: null, timeout: _scanPathConnectTimeout);
     } else {
       // Direct-by-MAC path (#2242). Tear down any stale GATT client FIRST —
       // Android returns GATT_ERROR 133 if a prior (dropped-but-not-closed)

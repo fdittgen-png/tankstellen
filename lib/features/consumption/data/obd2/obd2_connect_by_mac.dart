@@ -56,6 +56,10 @@ Future<Obd2Service?> _connectByMacDirect(
   // BLE profile for the adapter init quirks + display name; its UUIDs
   // match the channel [channelForDirect] builds.
   final generic = _genericBleProfile(svc);
+  // #2969 — this is the BLE direct path. Stamp the resolved transport so a
+  // wrong-transport attempt (a BLE direct connect against a Classic adapter)
+  // shows resolvedTransport:ble in the trace.
+  Obd2ConnectTraceLog.active?.setResolvedTransport(Obd2ConnectTransport.ble);
   final channel = svc.bluetooth.channelForDirect(mac, connectTimeout: timeout);
   svc._lastDirectChannel = channel;
   try {
@@ -66,10 +70,40 @@ Future<Obd2Service?> _connectByMacDirect(
       name: generic.displayName,
       logFailureAsError: false, // #2379 — recoverable (scan fallback)
     );
-  } on Object catch (_) {
-    // #2379 — a RECOVERABLE attempt (scan fallback below routinely
-    // succeeds): NOT an error trace. Inner connect already suppressed
-    // its trace; the outcome is owned by the orchestrator + breadcrumbs.
+  } on Object catch (e, st) {
+    // #2969 correction 3 — the channel-open outcome is normally stamped FIRST
+    // (first-wins) at the channel-open catch (FlutterBluePlusElmChannel), where
+    // the REAL FBP error is in hand; an init failure is classified in
+    // `_openAndInit` from the AT transcript. This is the BACKSTOP for the case
+    // where a raw channel-open error reaches here UN-stamped (a non-FBP channel
+    // / a fake). first-wins means a real channel-layer stamp always wins, so
+    // the wrong-transport gattTimeout is never overwritten by the fallback's
+    // scanEmpty.
+    final trace = Obd2ConnectTraceLog.active;
+    if (trace != null) {
+      trace.addStep(
+        label: 'direct-connect-failed',
+        status: Obd2ConnectStepStatus.fail,
+        detail: e.toString(),
+      );
+      if (!trace.hasOutcome) {
+        trace.setOutcome(
+          e is Obd2ConnectionError
+              ? classifyObd2ConnectError(e)
+              : classifyBleOpenOutcome(e),
+          failureDetail: e.toString(),
+        );
+      }
+    }
+    // #2379 — a RECOVERABLE attempt (scan fallback below routinely succeeds):
+    // NOT an error trace, so the stack stays debug-only (#1103 — st bound +
+    // piped to debugPrint). Inner connect already suppressed its trace; the
+    // outcome is owned by the orchestrator + breadcrumbs.
+    assert(() {
+      debugPrint('_connectByMacDirect: recoverable direct-connect failure, '
+          'falling back to scan: $e\n$st');
+      return true;
+    }());
     await svc._teardownLastDirectChannel();
     if (!fallbackToScan) return null;
     return svc.connectByMac(mac);
@@ -105,6 +139,9 @@ Future<Obd2Service?> _connectByMacClassicDirect(
   // No scan ⇒ no resolved profile. Pick the best-fit Classic profile so
   // the init quirks + display name match the bonded adapter.
   final profile = _classicProfileForReconnect(svc);
+  // #2969 — the RFCOMM path: stamp resolvedTransport:classic.
+  Obd2ConnectTraceLog.active
+      ?.setResolvedTransport(Obd2ConnectTransport.classic);
   final channel = classic.channelFor(mac);
   svc._lastDirectChannel = channel;
   try {
@@ -116,9 +153,22 @@ Future<Obd2Service?> _connectByMacClassicDirect(
       linkKind: 'classic',
       logFailureAsError: false, // #2379 — recoverable (scanner re-arms)
     );
-  } on Object catch (_) {
-    // #2565 — RECOVERABLE: the scanner owns its transport-aware scan
-    // fallback + re-arm. Inner connect already suppressed its trace.
+  } on Object catch (e, st) {
+    // #2969 — the rfcomm-open outcome was already stamped FIRST at the Classic
+    // channel-open catch; the init-failure outcome inside _openAndInit. Record
+    // the direct-path step here for the timeline.
+    Obd2ConnectTraceLog.active?.addStep(
+      label: 'classic-direct-connect-failed',
+      status: Obd2ConnectStepStatus.fail,
+      detail: e.toString(),
+    );
+    // #2565 — RECOVERABLE: the scanner owns its transport-aware scan fallback +
+    // re-arm. Inner connect already suppressed its trace, so the stack stays
+    // debug-only (#1103 — st bound + piped to debugPrint).
+    assert(() {
+      debugPrint('_connectByMacClassicDirect: recoverable failure: $e\n$st');
+      return true;
+    }());
     await svc._teardownLastDirectChannel();
     return null;
   }
