@@ -7,14 +7,14 @@ import 'package:tankstellen/features/consumption/domain/entities/fuel_type_effic
 import 'package:tankstellen/features/consumption/domain/services/fuel_type_efficiency_aggregator.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
-/// Coverage for [FuelTypeEfficiencyAggregator] (Epic #2881, child #2883).
+/// Coverage for [FuelTypeEfficiencyAggregator] under the v2 COMPOSITION-BUCKET
+/// model (Epic #2881, #2928, ADR 0015 — supersedes ADR 0014's dominant-fuel
+/// collapse).
 ///
-/// The decision-doc worked example
-/// (`docs/decisions/per-fuel-efficiency-attribution.md`) is turned into
-/// assertions verbatim, plus the dominant-fuel edge cases the doc enumerates:
-/// mono interval, mixed → dominant + mixedIntervalCount, single fill → null
-/// metrics, correction inheritance never flipping dominance, verdict gate
-/// boundary, and odometer-reset (negative delta) clamping.
+/// Each closed plein-to-plein interval is now classified by its fuel
+/// composition: a tank ≥ 85 % one fuel is a PURE bucket (e.g. `E85`), a more
+/// even blend is a `dominant/secondary` MIX bucket (`E85/E10`). Pure and mix
+/// buckets are directly comparable; the verdict compares across all of them.
 
 FillUp _f({
   required String id,
@@ -41,245 +41,274 @@ FillUp _f({
 
 DateTime _d(int day) => DateTime(2026, 1, day);
 
-FuelTypeEfficiencyStats _statsFor(
+/// Find the bucket stats with the given language-neutral [label]
+/// (`E85` / `E85/E10`), failing loudly if absent.
+FuelTypeEfficiencyStats _byLabel(
   List<FuelTypeEfficiencyStats> all,
-  FuelType fuel,
+  String label,
 ) =>
-    all.firstWhere((s) => s.fuelType.apiValue == fuel.apiValue);
+    all.firstWhere(
+      (s) => s.label == label,
+      orElse: () => throw StateError(
+        'no bucket "$label" in ${all.map((s) => s.label).toList()}',
+      ),
+    );
+
+bool _has(List<FuelTypeEfficiencyStats> all, String label) =>
+    all.any((s) => s.label == label);
 
 void main() {
-  group('FuelTypeEfficiencyAggregator.byFuelType', () {
+  group('FuelTypeEfficiencyAggregator.byFuelType — composition buckets', () {
     test('empty list returns empty list', () {
       expect(FuelTypeEfficiencyAggregator.byFuelType(const []), isEmpty);
     });
 
-    test('decision-doc worked example — frozen per-fuel numbers', () {
-      // F0..F5 from per-fuel-efficiency-attribution.md.
+    test('mono-fuel interval → a single PURE bucket (not a mix)', () {
       final fills = [
-        _f(id: 'F0', date: _d(1), liters: 40, cost: 68.00, odo: 0,
-            fuelType: FuelType.e10),
-        _f(id: 'F1', date: _d(2), liters: 30, cost: 51.00, odo: 600,
-            fuelType: FuelType.e10),
-        _f(id: 'F2', date: _d(3), liters: 45, cost: 45.00, odo: 1100,
+        _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 0,
             fuelType: FuelType.e85),
-        _f(id: 'F3', date: _d(4), liters: 20, cost: 20.00, odo: 1400,
-            fuelType: FuelType.e85, isFullTank: false),
-        _f(id: 'F4', date: _d(5), liters: 35, cost: 59.50, odo: 1700,
-            fuelType: FuelType.e10),
-        _f(id: 'F5', date: _d(6), liters: 50, cost: 50.00, odo: 2300,
-            fuelType: FuelType.e85),
+        _f(id: 'b', date: _d(2), liters: 30, cost: 45, odo: 600,
+            fuelType: FuelType.e85), // closes
       ];
-
-      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
-      expect(result.length, 2);
-
-      // Sorted by €/km ascending — E85 (cheaper per km) first.
-      expect(result.first.fuelType.apiValue, FuelType.e85.apiValue);
-      expect(result.last.fuelType.apiValue, FuelType.e10.apiValue);
-
-      final e10 = _statsFor(result, FuelType.e10);
-      expect(e10.avgL100km, closeTo(7.0833, 1e-3)); // 85 / 1200 * 100
-      expect(e10.avgCostPerKm, closeTo(0.108750, 1e-6)); // 130.50 / 1200
-      expect(e10.totalSpent, closeTo(178.50, 1e-9)); // 68 + 51 + 59.50
-      expect(e10.fillCount, 3); // F0, F1, F4
-      expect(e10.attributedIntervalCount, 2); // A + C
-      expect(e10.mixedIntervalCount, 1); // C
-
-      final e85 = _statsFor(result, FuelType.e85);
-      expect(e85.avgL100km, closeTo(8.6364, 1e-3)); // 95 / 1100 * 100
-      expect(e85.avgCostPerKm, closeTo(0.086364, 1e-6)); // 95 / 1100
-      expect(e85.totalSpent, closeTo(115.00, 1e-9)); // 45 + 20 + 50
-      expect(e85.fillCount, 3); // F2, F3, F5
-      expect(e85.attributedIntervalCount, 2); // B + D
-      expect(e85.mixedIntervalCount, 0);
-
-      // Verdict: both clear the gate; E85 wins per km despite more L/100km.
-      expect(
-        FuelTypeEfficiencyAggregator.cheapestPerKm(result)?.apiValue,
-        FuelType.e85.apiValue,
-      );
-    });
-
-    test('mono-fuel intervals attribute correctly (no mixing)', () {
-      final fills = [
-        _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 0),
-        _f(id: 'b', date: _d(2), liters: 30, cost: 45, odo: 600), // closes
-        _f(id: 'c', date: _d(3), liters: 25, cost: 40, odo: 1100), // closes
-      ];
-
       final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
       expect(result.length, 1);
-      final e10 = result.single;
-      // Two closed intervals, distance 600 + 500 = 1100, litres 30 + 25 = 55.
-      expect(e10.attributedIntervalCount, 2);
-      expect(e10.mixedIntervalCount, 0);
-      expect(e10.avgL100km, closeTo(55 / 1100 * 100, 1e-9));
-      expect(e10.avgCostPerKm, closeTo((45 + 40) / 1100, 1e-9));
-      expect(e10.fillCount, 3);
+      final e85 = result.single;
+      expect(e85.label, 'E85');
+      expect(e85.isMix, isFalse);
+      expect(e85.dominant.apiValue, FuelType.e85.apiValue);
+      expect(e85.secondary, isNull);
+      expect(e85.attributedIntervalCount, 1);
+      expect(e85.avgL100km, closeTo(30 / 600 * 100, 1e-9));
     });
 
-    test('mixed interval → dominant fuel, mixedIntervalCount increments', () {
-      // One closed interval containing E85 (60 L) + E10 (20 L). E85 dominates.
+    test('90% E85 + 10% E10 (minority ≤ 15%) → PURE "E85" bucket', () {
+      // One closed interval: contributing fills E85=45, E10=5 (10% minority).
+      final fills = [
+        _f(id: 'open', date: _d(1), liters: 40, cost: 40, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'top', date: _d(2), liters: 5, cost: 8, odo: 200,
+            fuelType: FuelType.e10, isFullTank: false), // 10% minority
+        _f(id: 'close', date: _d(3), liters: 45, cost: 45, odo: 1000,
+            fuelType: FuelType.e85), // closes; E85 90%
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      // 45+5 = 50 L, E85 share 45/50 = 90% ≥ 85% → PURE E85, NOT a mix.
+      expect(result.length, 1);
+      final e85 = result.single;
+      expect(e85.label, 'E85');
+      expect(e85.isMix, isFalse);
+      expect(e85.secondary, isNull);
+      expect(e85.attributedIntervalCount, 1);
+      // No "E85/E10" mix bucket exists.
+      expect(_has(result, 'E85/E10'), isFalse);
+    });
+
+    test('exactly 15% minority → PURE (inclusive boundary)', () {
+      // E85 = 85 L, E10 = 15 L → minority exactly 15% → pure E85.
+      final fills = [
+        _f(id: 'open', date: _d(1), liters: 40, cost: 40, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'top', date: _d(2), liters: 15, cost: 24, odo: 200,
+            fuelType: FuelType.e10, isFullTank: false), // 15% minority
+        _f(id: 'close', date: _d(3), liters: 85, cost: 85, odo: 1000,
+            fuelType: FuelType.e85), // closes; E85 = 85 / 100 = 85%
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.length, 1);
+      expect(result.single.label, 'E85');
+      expect(result.single.isMix, isFalse);
+      expect(_has(result, 'E85/E10'), isFalse);
+    });
+
+    test('70% E85 + 30% E10 (E85 major) → MIX "E85/E10"', () {
+      // E85 = 70 L, E10 = 30 L → 30% minority > 15% → mix, E85 dominant.
+      final fills = [
+        _f(id: 'open', date: _d(1), liters: 40, cost: 40, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'top', date: _d(2), liters: 30, cost: 48, odo: 300,
+            fuelType: FuelType.e10, isFullTank: false), // 30% minority
+        _f(id: 'close', date: _d(3), liters: 70, cost: 70, odo: 1000,
+            fuelType: FuelType.e85), // closes; E85 = 70 / 100 = 70%
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.length, 1);
+      final mix = result.single;
+      expect(mix.label, 'E85/E10'); // dominant first
+      expect(mix.isMix, isTrue);
+      expect(mix.dominant.apiValue, FuelType.e85.apiValue);
+      expect(mix.secondary?.apiValue, FuelType.e10.apiValue);
+      // No pure buckets for this interval.
+      expect(_has(result, 'E85'), isFalse);
+      expect(_has(result, 'E10'), isFalse);
+    });
+
+    test('70% E10 + 30% E85 (E10 major) → MIX "E10/E85"', () {
+      // E10 = 70 L, E85 = 30 L → 30% minority > 15% → mix, E10 dominant.
+      final fills = [
+        _f(id: 'open', date: _d(1), liters: 40, cost: 40, odo: 0,
+            fuelType: FuelType.e10),
+        _f(id: 'top', date: _d(2), liters: 30, cost: 30, odo: 300,
+            fuelType: FuelType.e85, isFullTank: false), // 30% minority
+        _f(id: 'close', date: _d(3), liters: 70, cost: 112, odo: 1000,
+            fuelType: FuelType.e10), // closes; E10 = 70%
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.length, 1);
+      final mix = result.single;
+      expect(mix.label, 'E10/E85'); // dominant (E10) first
+      expect(mix.isMix, isTrue);
+      expect(mix.dominant.apiValue, FuelType.e10.apiValue);
+      expect(mix.secondary?.apiValue, FuelType.e85.apiValue);
+    });
+
+    test(
+        'pure E85 + an E85/E10 mix both present → BOTH appear, cheapestPerKm '
+        'compares across them', () {
+      // Two pure-E85 closed intervals + two E85/E10 mix intervals. Make the
+      // mix CHEAPER per km so the verdict crowns the mix across buckets.
+      final fills = [
+        // ── Pure E85 interval 1: 50 L over 500 km, €50 → 0.10 €/km ──
+        _f(id: 'p0', date: _d(1), liters: 40, cost: 40, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'p1', date: _d(2), liters: 50, cost: 50, odo: 500,
+            fuelType: FuelType.e85),
+        // ── Pure E85 interval 2: 50 L over 500 km, €50 → 0.10 €/km ──
+        _f(id: 'p2', date: _d(3), liters: 50, cost: 50, odo: 1000,
+            fuelType: FuelType.e85),
+        // ── Mix E85/E10 interval 1: E85 35 + E10 15 = 50 L (E10 30%),
+        //     800 km, €40 → 0.05 €/km ──
+        _f(id: 'm1a', date: _d(4), liters: 15, cost: 12, odo: 1300,
+            fuelType: FuelType.e10, isFullTank: false),
+        _f(id: 'm1b', date: _d(5), liters: 35, cost: 28, odo: 1800,
+            fuelType: FuelType.e85), // closes; E85 70% dominant
+        // ── Mix E85/E10 interval 2: same shape, 800 km, €40 → 0.05 €/km ──
+        _f(id: 'm2a', date: _d(6), liters: 15, cost: 12, odo: 2100,
+            fuelType: FuelType.e10, isFullTank: false),
+        _f(id: 'm2b', date: _d(7), liters: 35, cost: 28, odo: 2600,
+            fuelType: FuelType.e85), // closes; E85 70% dominant
+      ];
+
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      // BOTH buckets exist, distinct and comparable.
+      expect(_has(result, 'E85'), isTrue);
+      expect(_has(result, 'E85/E10'), isTrue);
+      final pure = _byLabel(result, 'E85');
+      final mix = _byLabel(result, 'E85/E10');
+      expect(pure.isMix, isFalse);
+      expect(mix.isMix, isTrue);
+      expect(pure.attributedIntervalCount, 2);
+      expect(mix.attributedIntervalCount, 2);
+
+      // Both clear the verdict gate → cheapest compares ACROSS pure + mix.
+      final crowned = FuelTypeEfficiencyAggregator.cheapestPerKm(result);
+      expect(crowned, isNotNull);
+      expect(crowned!.label, 'E85/E10',
+          reason: 'the cheaper-per-km mix wins across pure + mix buckets');
+    });
+
+    test('only-used: a fuel never used produces no bucket', () {
+      // Only E85 logged → E10/Diesel/etc never appear.
       final fills = [
         _f(id: 'a', date: _d(1), liters: 40, cost: 40, odo: 0,
             fuelType: FuelType.e85),
-        _f(id: 'b', date: _d(2), liters: 60, cost: 60, odo: 500,
-            fuelType: FuelType.e85, isFullTank: false),
-        _f(id: 'c', date: _d(3), liters: 20, cost: 34, odo: 1000,
-            fuelType: FuelType.e10), // closes
+        _f(id: 'b', date: _d(2), liters: 30, cost: 30, odo: 600,
+            fuelType: FuelType.e85),
       ];
-
       final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
-      final e85 = _statsFor(result, FuelType.e85);
-      // Whole interval (litres 60+20=80, distance 1000, cost 60+34=94)
-      // attributed to E85 (60 L > 20 L).
-      expect(e85.attributedIntervalCount, 1);
-      expect(e85.mixedIntervalCount, 1);
-      expect(e85.avgL100km, closeTo(80 / 1000 * 100, 1e-9));
-      expect(e85.avgCostPerKm, closeTo(94 / 1000, 1e-9));
-
-      // E10 was a minority → it appears (has a fill) but with null metrics.
-      final e10 = _statsFor(result, FuelType.e10);
-      expect(e10.attributedIntervalCount, 0);
-      expect(e10.avgL100km, isNull);
-      expect(e10.avgCostPerKm, isNull);
-      expect(e10.fillCount, 1);
-      expect(e10.totalSpent, closeTo(34, 1e-9));
+      expect(result.length, 1);
+      expect(result.single.label, 'E85');
+      expect(_has(result, 'E10'), isFalse);
+      expect(_has(result, 'Diesel'), isFalse);
+      expect(_has(result, 'E85/E10'), isFalse);
     });
 
-    test('single fill → null per-km metrics (no closed interval)', () {
+    test('3-way blend folds into the TWO-LARGEST mix label, all litres kept',
+        () {
+      // E85 50 + E10 30 + E5 20 = 100 L (E85 dominant 50%, E10 second 30%).
+      // Label = E85/E10; the E5 litres still fold into that bucket.
+      final fills = [
+        _f(id: 'open', date: _d(1), liters: 30, cost: 30, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 't1', date: _d(2), liters: 30, cost: 48, odo: 200,
+            fuelType: FuelType.e10, isFullTank: false),
+        _f(id: 't2', date: _d(3), liters: 20, cost: 34, odo: 400,
+            fuelType: FuelType.e5, isFullTank: false),
+        _f(id: 'close', date: _d(4), liters: 50, cost: 50, odo: 1000,
+            fuelType: FuelType.e85), // closes
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.length, 1);
+      final mix = result.single;
+      expect(mix.label, 'E85/E10'); // two largest, dominant first
+      expect(mix.isMix, isTrue);
+      // All litres folded: 50 + 30 + 20 = 100 over 1000 km.
+      expect(mix.avgL100km, closeTo(100 / 1000 * 100, 1e-9));
+    });
+
+    test('correction in interval inherits the bucket, never enters tally', () {
+      // Pure E85 interval with a large E10-typed CORRECTION. The correction
+      // must NOT create a mix and NOT enter the composition tally.
+      final fills = [
+        _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'corr', date: _d(2), liters: 999, cost: 0, odo: 300,
+            fuelType: FuelType.e10, isFullTank: false, isCorrection: true),
+        _f(id: 'b', date: _d(3), liters: 30, cost: 45, odo: 600,
+            fuelType: FuelType.e85), // closes
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.length, 1);
+      final e85 = result.single;
+      expect(e85.label, 'E85'); // pure, no mix despite the E10 correction
+      expect(e85.isMix, isFalse);
+      // Interval litres include the correction (inherits the bucket).
+      expect(e85.avgL100km, closeTo((30 + 999) / 600 * 100, 1e-9));
+      // Cost excludes the zero-cost correction.
+      expect(e85.avgCostPerKm, closeTo(45 / 600, 1e-9));
+      // fillCount counts only the non-correction fill (just the closing).
+      expect(e85.fillCount, 1);
+    });
+
+    test('single fill → no closed interval → empty', () {
       final result = FuelTypeEfficiencyAggregator.byFuelType([
         _f(id: 'only', date: _d(1), liters: 40, cost: 60, odo: 100),
       ]);
-      expect(result.length, 1);
-      final s = result.single;
-      expect(s.attributedIntervalCount, 0);
-      expect(s.avgL100km, isNull);
-      expect(s.avgCostPerKm, isNull);
-      expect(s.fillCount, 1);
-      expect(s.totalSpent, closeTo(60, 1e-9));
-      expect(s.mixedIntervalCount, 0);
-    });
-
-    test('correction in interval inherits dominant fuel, never flips it', () {
-      // E10 opens + closes; a large E85-typed CORRECTION sits inside. The
-      // correction must NOT win dominance even though its litres exceed the
-      // real E10 fill — corrections never enter the tally.
-      final fills = [
-        _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 0,
-            fuelType: FuelType.e10),
-        _f(id: 'corr', date: _d(2), liters: 999, cost: 0, odo: 300,
-            fuelType: FuelType.e85, isFullTank: false, isCorrection: true),
-        _f(id: 'b', date: _d(3), liters: 30, cost: 45, odo: 600,
-            fuelType: FuelType.e10), // closes
-      ];
-
-      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
-      // E85 must NOT appear at all — the correction is its only "fill" and
-      // corrections are excluded from per-fill facts too.
-      expect(
-        result.any((s) => s.fuelType.apiValue == FuelType.e85.apiValue),
-        isFalse,
-      );
-      final e10 = _statsFor(result, FuelType.e10);
-      expect(e10.attributedIntervalCount, 1);
-      // Interval litres include the correction (inherits E10): 30 + 999.
-      expect(e10.avgL100km, closeTo((30 + 999) / 600 * 100, 1e-9));
-      // Cost excludes the zero-cost correction: just the 45.
-      expect(e10.avgCostPerKm, closeTo(45 / 600, 1e-9));
-      // mixedIntervalCount counts >1 NON-correction fuel — here only E10.
-      expect(e10.mixedIntervalCount, 0);
-      // Per-fill facts ignore the correction.
-      expect(e10.fillCount, 2);
-      expect(e10.totalSpent, closeTo(105, 1e-9)); // 60 + 45
+      // The opening fill anchors no closed interval, so no bucket emerges.
+      expect(result, isEmpty);
     });
 
     test('verdict gate returns null below the threshold', () {
-      // Two fuels, but E85 has only ONE attributed interval (< 2).
+      // Pure E85 has 2 intervals, pure E10 has only 1 → gate stays shut.
       final fills = [
         _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 0,
-            fuelType: FuelType.e10),
+            fuelType: FuelType.e85),
         _f(id: 'b', date: _d(2), liters: 30, cost: 45, odo: 600,
-            fuelType: FuelType.e10), // closes E10 interval 1
+            fuelType: FuelType.e85), // E85 interval 1
         _f(id: 'c', date: _d(3), liters: 25, cost: 38, odo: 1100,
-            fuelType: FuelType.e10), // closes E10 interval 2
-        _f(id: 'd', date: _d(4), liters: 45, cost: 45, odo: 1600,
-            fuelType: FuelType.e85), // closes E85 interval 1 only
+            fuelType: FuelType.e85), // E85 interval 2
+        _f(id: 'd', date: _d(4), liters: 45, cost: 76, odo: 1600,
+            fuelType: FuelType.e10), // E10 interval 1 only
       ];
-
       final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
-      final e85 = _statsFor(result, FuelType.e85);
-      expect(e85.attributedIntervalCount, 1); // below threshold
+      expect(_byLabel(result, 'E10').attributedIntervalCount, 1);
       expect(FuelTypeEfficiencyAggregator.cheapestPerKm(result), isNull);
     });
 
-    test('verdict gate returns the right winner at/above the threshold', () {
-      // E10: 2 intervals @ pricey per km. E85: 2 intervals @ cheaper per km.
-      final fills = [
-        // E10 interval 1
-        _f(id: 'a', date: _d(1), liters: 40, cost: 68, odo: 0,
-            fuelType: FuelType.e10),
-        _f(id: 'b', date: _d(2), liters: 30, cost: 51, odo: 600,
-            fuelType: FuelType.e10),
-        // E85 interval 1
-        _f(id: 'c', date: _d(3), liters: 45, cost: 45, odo: 1100,
-            fuelType: FuelType.e85),
-        // E85 interval 2
-        _f(id: 'd', date: _d(4), liters: 50, cost: 50, odo: 1700,
-            fuelType: FuelType.e85),
-        // E10 interval 2
-        _f(id: 'e', date: _d(5), liters: 35, cost: 60, odo: 2200,
-            fuelType: FuelType.e10),
-      ];
-
-      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
-      expect(_statsFor(result, FuelType.e10).attributedIntervalCount, 2);
-      expect(_statsFor(result, FuelType.e85).attributedIntervalCount, 2);
-      expect(
-        FuelTypeEfficiencyAggregator.cheapestPerKm(result)?.apiValue,
-        FuelType.e85.apiValue,
-      );
-    });
-
     test('odometer-reset (negative delta) clamps to 0 without crashing', () {
-      // The closing fill's odometer is LOWER than the opening — a reset or
-      // bad import. Distance clamps to 0 → that interval contributes no
-      // distance, so per-km metrics stay null (no division by zero).
       final fills = [
         _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 5000),
         _f(id: 'b', date: _d(2), liters: 30, cost: 45, odo: 100), // reset
       ];
-
       late List<FuelTypeEfficiencyStats> result;
       expect(
         () => result = FuelTypeEfficiencyAggregator.byFuelType(fills),
         returnsNormally,
       );
       final e10 = result.single;
+      expect(e10.label, 'E10');
       expect(e10.attributedIntervalCount, 1); // interval closed
       expect(e10.avgL100km, isNull); // zero distance → null
       expect(e10.avgCostPerKm, isNull);
-      expect(e10.fillCount, 2);
-      expect(e10.totalSpent, closeTo(105, 1e-9));
-    });
-
-    test('tie on litres → closing plein fuel wins', () {
-      // Interval contributes E10 30 L + E85 30 L (tie). Closing fill is E85.
-      final fills = [
-        _f(id: 'a', date: _d(1), liters: 40, cost: 40, odo: 0,
-            fuelType: FuelType.e10),
-        _f(id: 'b', date: _d(2), liters: 30, cost: 51, odo: 400,
-            fuelType: FuelType.e10, isFullTank: false),
-        _f(id: 'c', date: _d(3), liters: 30, cost: 30, odo: 1000,
-            fuelType: FuelType.e85), // closing plein E85
-      ];
-
-      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
-      final e85 = _statsFor(result, FuelType.e85);
-      expect(e85.attributedIntervalCount, 1); // tie → closing E85 wins
-      expect(e85.mixedIntervalCount, 1);
-      final e10 = _statsFor(result, FuelType.e10);
-      expect(e10.attributedIntervalCount, 0);
     });
 
     test('unsorted input is handled (sorts chronologically first)', () {
@@ -291,6 +320,23 @@ void main() {
       final e10 = result.single;
       expect(e10.attributedIntervalCount, 1);
       expect(e10.avgL100km, closeTo(30 / 600 * 100, 1e-9));
+    });
+
+    test('result is sorted by €/km ascending across buckets', () {
+      // Pure E85 @ 0.10 €/km, pure E10 @ ~0.13 €/km → E85 sorts first.
+      final fills = [
+        _f(id: 'e85a', date: _d(1), liters: 40, cost: 40, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'e85b', date: _d(2), liters: 50, cost: 50, odo: 500,
+            fuelType: FuelType.e85), // 0.10 €/km
+        _f(id: 'e10a', date: _d(3), liters: 50, cost: 80, odo: 600,
+            fuelType: FuelType.e10),
+        _f(id: 'e10b', date: _d(4), liters: 40, cost: 64, odo: 1100,
+            fuelType: FuelType.e10), // 64/500 = 0.128 €/km
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills);
+      expect(result.first.label, 'E85');
+      expect(result.last.label, 'E10');
     });
   });
 }
