@@ -265,9 +265,20 @@ class Obd2ConnectionService {
     if (_lastRanked.isEmpty) return null;
     try {
       return await connect(_lastRanked.first);
-    } on Obd2ConnectionError catch (e, st) {
-      // #2379 — OBD2/BLE → `other`; still logged (final, rethrown).
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Obd2ConnectionService.connectBest failed'}));
+    } catch (e, st) {
+      // #2379 final-failure log → #2943 (error-log #28/29): completing the
+      // #2935 de-noise. An EXPECTED engine-off condition (Obd2AdapterUnresponsive
+      // et al.) or a bare ELM327 connect TimeoutException de-noises to a
+      // breadcrumb here instead of spooling an ERROR on every probe of a
+      // parked car (5× in that log); a GENUINE fault (Obd2PermissionDenied,
+      // Obd2ProtocolInitFailed, any non-expected error) still ERROR-logs on
+      // `other`. The error is rethrown either way so the caller's own
+      // handling is unchanged. (Catching broadly — not just
+      // Obd2ConnectionError — lets the shared de-noiser classify a raw
+      // TimeoutException too; #1103 satisfied via the (e, st) binding.)
+      recordObd2ConnectTransient(e, st,
+          where: 'Obd2ConnectionService.connectBest failed',
+          layer: ErrorLayer.other);
       rethrow;
     }
   }
