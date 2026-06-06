@@ -100,6 +100,14 @@ class ProximityFillBar extends StatelessWidget {
             curve: Curves.easeOut,
             builder: (context, value, _) => FractionallySizedBox(
               widthFactor: value,
+              // #2988 — without heightFactor the childless DecoratedBox had no
+              // intrinsic height and the parent Container's centerLeft
+              // alignment loosened its height constraint to min 0, so the
+              // gradient fill painted at ZERO height (invisible) on every
+              // surface. Fill the full bar height and keep the leading edge
+              // pinned left so the fill grows rightward as the driver nears.
+              heightFactor: 1,
+              alignment: Alignment.centerLeft,
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [green, accent]),
