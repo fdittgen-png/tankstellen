@@ -83,6 +83,18 @@ class TripRecordingBanner extends ConsumerWidget {
           }
         } on Object { /* no on-search radar */ }
       }
+      // #2964 — tapping the floating PiP tile body restores the full app.
+      // Built here where `ref` is in scope; the controller is the app-wide
+      // singleton (PiP is Activity-bound) and bringToFront is an inert no-op
+      // off Android, so the tile stays safe on every other platform.
+      void onBodyTap() {
+        try {
+          ref.read(pipControllerProvider).bringToFront();
+        } on Object {
+          // Best-effort: a failed reorder just leaves the tile in PiP.
+        }
+      }
+
       return _pipView(
         context,
         state,
@@ -91,6 +103,7 @@ class TripRecordingBanner extends ConsumerWidget {
         radarStation: radarStation,
         radiusMeters: radiusMeters,
         searchRadarActive: searchRadarActive,
+        onBodyTap: onBodyTap,
       );
     }
 
@@ -185,6 +198,7 @@ class TripRecordingBanner extends ConsumerWidget {
     required Station? radarStation,
     required double? radiusMeters,
     bool searchRadarActive = false,
+    VoidCallback? onBodyTap,
   }) {
     if (!state.isActive) {
       // #2677 — the on-search Fuel Station Radar runs WITHOUT a trip. When it
@@ -204,6 +218,7 @@ class TripRecordingBanner extends ConsumerWidget {
               : null,
           kmCaption: true,
           radiusMeters: radiusMeters,
+          onBodyTap: onBodyTap,
         );
       }
       // A trip ended while the app sat in PiP — the OS restores the
@@ -234,6 +249,7 @@ class TripRecordingBanner extends ConsumerWidget {
           ? radarStation.dist * 1000.0
           : null,
       radiusMeters: radiusMeters,
+      onBodyTap: onBodyTap,
     );
   }
 

@@ -3741,6 +3741,9 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork => 'Няма мрежова връзка. Опитайте по-късно.';
 
   @override

@@ -58,6 +58,33 @@ void main() {
       expect(await pip.enterPip(), isFalse);
     });
 
+    test('bringToFront invokes the bringToFront method and returns its result',
+        () async {
+      // #2964 — tapping the floating PiP tile body restores the full app.
+      final calls = <MethodCall>[];
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        calls.add(call);
+        return true;
+      });
+
+      final pip = PipController();
+      addTearDown(pip.dispose);
+
+      expect(await pip.bringToFront(), isTrue);
+      expect(calls.single.method, 'bringToFront');
+    });
+
+    test('bringToFront returns false when the platform call fails', () async {
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        throw PlatformException(code: 'noLaunchIntent');
+      });
+
+      final pip = PipController();
+      addTearDown(pip.dispose);
+
+      expect(await pip.bringToFront(), isFalse);
+    });
+
     test('setAutoEnterEnabled forwards the flag to setAutoEnter', () async {
       final calls = <MethodCall>[];
       messenger.setMockMethodCallHandler(channel, (call) async {
@@ -107,6 +134,7 @@ void main() {
 
       expect(pip.isSupported, isFalse);
       expect(await pip.enterPip(), isFalse);
+      expect(await pip.bringToFront(), isFalse);
       await pip.setAutoEnterEnabled(true);
       expect(invoked, isFalse,
           reason: 'no platform channel traffic on a non-PiP platform');

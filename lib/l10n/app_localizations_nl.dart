@@ -3726,6 +3726,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork =>
       'Geen netwerkverbinding. Probeer het later opnieuw.';
 

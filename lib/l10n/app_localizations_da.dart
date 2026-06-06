@@ -3709,6 +3709,9 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork =>
       'Ingen netværksforbindelse. Prøv igen senere.';
 
