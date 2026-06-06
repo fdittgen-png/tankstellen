@@ -162,10 +162,23 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     // decimal of precision so sub-km radius selections aren't silently
     // rounded to the nearest integer.
     final radiusStr = radiusKm.toStringAsFixed(1);
+    // #2966 — order the corridor server-side by distance so the `limit: 50`
+    // slice keeps the NEAREST 50, not an arbitrary 50. Without it a dense
+    // corridor (e.g. 140 stations within 10 km of central Paris) returns an
+    // un-distance-ordered subset and the genuinely-nearest forecourt can be
+    // truncated out entirely — the server-side root cause behind the radar /
+    // closeness / in-trip "missing nearest station" symptoms (deferred #2813
+    // dense case; #2806 / #2965 in-radius merges become belt-and-braces). The
+    // old `distance()` "0 results" note was the metres form; the validated v2.1
+    // ODSQL `order_by=distance(geom,geom'POINT(lon lat)')` form (lon-lat order)
+    // is accepted live and returns rows nearest-first — it changes only the
+    // ordering / cap survival, never which stations are in-radius (still gated
+    // by the unchanged `within_distance` filter).
+    final point = "geom'POINT($lng $lat)'";
     try {
       final response = await _dio.get(_baseUrl, queryParameters: {
-        'where':
-            "within_distance(geom,geom'POINT($lng $lat)',${radiusStr}km)",
+        'where': 'within_distance(geom,$point,${radiusStr}km)',
+        'order_by': 'distance(geom,$point)',
         'limit': 50,
       }, cancelToken: cancelToken);
       return parser.extractPrixCarburantsResults(response.data);
