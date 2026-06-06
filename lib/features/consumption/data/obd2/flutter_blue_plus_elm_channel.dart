@@ -51,6 +51,11 @@ class Elm327BleUuids {
 /// iOS BLE ELM adapters are rare; add iOS-specific handling when the
 /// app starts supporting them.
 class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
+  /// #2969 — bound the scan-path `connect()` (the `connectTimeout == null`
+  /// branch) instead of letting FBP block ~35 s on a vanished candidate.
+  /// Generous (the scan just saw the adapter) but bounded.
+  static const Duration _scanPathConnectTimeout = Duration(seconds: 10);
+
   final BluetoothDevice _device;
   final Elm327BleUuids _uuids;
 
@@ -173,7 +178,15 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
       // autoConnect:true, so `mtu: null`.
       await _device.connect(autoConnect: true, mtu: null);
     } else if (timeout == null) {
-      await _device.connect(autoConnect: false, mtu: null);
+      // #2969 — the scan-path open. Previously UNBOUNDED: FBP's
+      // `autoConnect:false` connect can block ~35 s on a candidate the scan saw
+      // but that has since gone out of range / standby, freezing the connect
+      // attempt (and any self-test / first-connect riding it) for half a
+      // minute. Bound it with the direct path's precedent — the scan JUST saw
+      // this adapter, so a generous-but-bounded window is enough; a miss now
+      // fails fast instead of hanging.
+      await _device.connect(
+          autoConnect: false, mtu: null, timeout: _scanPathConnectTimeout);
     } else {
       // Direct-by-MAC path (#2242). Tear down any stale GATT client FIRST —
       // Android returns GATT_ERROR 133 if a prior (dropped-but-not-closed)

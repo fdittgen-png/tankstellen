@@ -283,10 +283,12 @@ void main() {
   });
 
   group('Obd2AdapterProfile', () {
-    test('vLinker BLE defaults to GenericElm327Adapter (100 ms / 100 ms)', () {
+    test('vLinker BLE defaults to GenericElm327Adapter (#2969: 1 s / 100 ms)',
+        () {
       final v = registry.profiles.firstWhere((p) => p.id == 'vlinker-ble');
       expect(v.adapter, isA<GenericElm327Adapter>());
-      expect(v.adapter.postResetDelay, const Duration(milliseconds: 100));
+      // #2969 — generic postResetDelay bumped 100 ms → 1 s for cold clones.
+      expect(v.adapter.postResetDelay, const Duration(seconds: 1));
       expect(v.adapter.interCommandDelay, const Duration(milliseconds: 100));
     });
 
@@ -310,7 +312,9 @@ void main() {
           registry.profiles.firstWhere((p) => p.id == 'vlinker-fs-classic');
       expect(v.adapter, isA<VLinkerFsAdapter>());
       expect(v.adapter.id, 'vlinker-fs');
-      expect(v.adapter.postResetDelay, const Duration(milliseconds: 200));
+      // #2969 — vLinker FS postResetDelay bumped 200 ms → 1 s (field evidence
+      // the clones need ≥1 s to re-enumerate after ATZ).
+      expect(v.adapter.postResetDelay, const Duration(seconds: 1));
       expect(v.adapter.interCommandDelay, const Duration(milliseconds: 50));
     });
 

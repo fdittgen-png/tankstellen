@@ -128,8 +128,14 @@ class GenericElm327Adapter implements Elm327Adapter {
   @override
   List<String> get initSequence => Elm327Commands.initCommands;
 
+  // #2969 — bumped 100 ms → 1 s. The generic profile is the catch-all for
+  // UNFAMILIAR cold clones (incl. the generic-classic SPP fallback). A cheap
+  // clone routinely needs ≥1 s to re-enumerate after ATZ before it answers the
+  // next command; the old 100 ms raced the reset and made the connect fail with
+  // a silent/garbage first reply. A once-per-connect cold-start cost only —
+  // the inter-command delay below is unchanged.
   @override
-  Duration get postResetDelay => const Duration(milliseconds: 100);
+  Duration get postResetDelay => const Duration(seconds: 1);
 
   @override
   Duration get interCommandDelay => const Duration(milliseconds: 100);
