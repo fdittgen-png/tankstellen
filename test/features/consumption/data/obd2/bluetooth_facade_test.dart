@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 
@@ -126,6 +129,60 @@ void main() {
       final err = StateError('transport closed');
       final mapped = PluginBluetoothFacade.debugMapBluetoothError(err);
       expect(mapped, same(err));
+    });
+  });
+
+  // #2953 — the `scanResults` listener fed `controller.add(...)` with NO
+  // `isClosed` guard, so a `FlutterBluePlus.scanResults` callback that
+  // fires AFTER the scan's timeout `Timer` closed the controller threw
+  // `Bad state: Cannot add event after closing` straight into the zone
+  // error handler — the engine-off field-log #30 flood (14/22 entries).
+  // The guarded feed must drop a late result silently and never throw.
+  group('PluginBluetoothFacade.debugSafeAddScanResults (#2953)', () {
+    final candidate = Obd2AdapterCandidate(
+      deviceId: 'AA:BB:CC:DD:EE:01',
+      deviceName: 'OBDII',
+      advertisedServiceUuids: const [],
+      rssi: -60,
+    );
+
+    test('forwards results to an OPEN controller (the normal path)', () async {
+      final controller = StreamController<List<Obd2AdapterCandidate>>();
+      final received = <List<Obd2AdapterCandidate>>[];
+      final sub = controller.stream.listen(received.add);
+
+      PluginBluetoothFacade.debugSafeAddScanResults(controller, [candidate]);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(received, hasLength(1));
+      expect(received.single.single.deviceId, 'AA:BB:CC:DD:EE:01');
+
+      await sub.cancel();
+      await controller.close();
+    });
+
+    test('a late add AFTER close is dropped silently — does NOT throw',
+        () async {
+      final controller = StreamController<List<Obd2AdapterCandidate>>();
+      // A drained listener so the non-broadcast controller's `close()`
+      // future completes (mirrors a consumer that already cancelled).
+      final sub = controller.stream.listen((_) {});
+      // Close it first (mirrors the timeout Timer / onCancel having run),
+      // then deliver a late scan result the way a queued `scanResults`
+      // callback would.
+      await controller.close();
+      expect(controller.isClosed, isTrue);
+
+      expect(
+        () => PluginBluetoothFacade.debugSafeAddScanResults(controller, [
+          candidate,
+        ]),
+        returnsNormally,
+        reason: 'a post-close scanResults callback must be a no-op, not a '
+            '`Bad state: Cannot add event after closing` (field log #30)',
+      );
+
+      await sub.cancel();
     });
   });
 }
