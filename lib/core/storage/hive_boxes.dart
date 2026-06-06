@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'hive_isolate_ownership.dart';
 import 'hive_legacy_migration.dart';
+import 'hive_schema_migration.dart';
 
 /// Thrown by [HiveBoxes.init] when a persistent box cannot be opened —
 /// its file is damaged beyond Hive's own crash recovery (#1686).
@@ -134,9 +135,17 @@ class HiveBoxes {
   /// schema migration instead of silently mis-reading old on-disk data.
   static const String boxSchema = 'box_schema';
 
-  /// Current persistent-storage schema version. Bump when the on-disk
-  /// shape of any box changes; pair the bump with a migration step.
-  static const int currentSchemaVersion = 1;
+  /// Current persistent-storage schema version. Bump when the on-disk shape of
+  /// any box changes; pair the bump with a migration step.
+  ///
+  /// #2922 — 1 → 2: `Station.openingHours` went JSON-EXCLUDED (#2722) →
+  /// SERIALIZED (#2776/#2777) without a bump, so old-format `Station` blobs kept
+  /// being served (phantom brand, truncated far-only results, missing prices)
+  /// until a manual app-data clear. The bump drives
+  /// [HiveSchemaMigration.evictStaleCacheOnUpgrade] to clear the network-cache
+  /// entries (only) so they refetch fresh; the schema-guard test pins the
+  /// cached-`Station` key set here so a future change without a bump FAILS.
+  static const int currentSchemaVersion = 2;
 
   static Future<HiveAesCipher> _loadCipher() async {
     const secureStorage = FlutterSecureStorage();
@@ -233,22 +242,28 @@ class HiveBoxes {
       isolateErrorSpool, featureFlags, appProfile, boxSchema,
     ]);
 
-    // #1686 — stamp the current schema version for any box that lacks
-    // one, so a future release can detect and migrate old on-disk data.
+    // #1686 stamp missing schema versions + #2922 run the cache eviction for
+    // any box whose stamp is below currentSchemaVersion.
     await _ensureSchemaVersions();
   }
 
-  /// Records [currentSchemaVersion] for every encrypted domain box that
-  /// is not yet stamped (#1686). Existing stamps are left untouched — a
-  /// real schema migration owns bumping them.
-  static Future<void> _ensureSchemaVersions() async {
-    final schema = Hive.box<int>(boxSchema);
-    for (final boxName in _encryptedBoxes) {
-      if (schema.get(boxName) == null) {
-        await schema.put(boxName, currentSchemaVersion);
-      }
-    }
-  }
+  /// Stamps + migrates the persistent boxes against [currentSchemaVersion]
+  /// (#1686 stamp + #2922 cache eviction). Delegates to [HiveSchemaMigration];
+  /// the heavy logic lives there so this box-lifecycle file stays under the
+  /// file-length norm.
+  static Future<void> _ensureSchemaVersions() =>
+      HiveSchemaMigration.ensureSchemaVersions(
+        boxSchema: boxSchema,
+        encryptedBoxes: _encryptedBoxes,
+        cacheBox: cache,
+        currentSchemaVersion: currentSchemaVersion,
+      );
+
+  /// Test hook for the #2922 stamp + cache-eviction migration: drives the same
+  /// [_ensureSchemaVersions] path `init()` runs, against boxes the test has
+  /// already opened, without FlutterSecureStorage / `initFlutter` (#2922).
+  @visibleForTesting
+  static Future<void> ensureSchemaVersionsForTest() => _ensureSchemaVersions();
 
   /// The recorded schema version of [boxName], or null when the box has
   /// no stamp yet or the meta box is not open (#1686).
@@ -256,7 +271,6 @@ class HiveBoxes {
     if (!Hive.isBoxOpen(boxSchema)) return null;
     return Hive.box<int>(boxSchema).get(boxName);
   }
-
 
   /// Opens the deep-feature boxes ([_deferredBoxes]) that the landing
   /// screen does not need (#1794).
