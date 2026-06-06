@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/user_position_provider.dart';
@@ -8,6 +11,7 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
 import '../../approach/providers/fuel_station_radar_provider.dart';
+import '../../widget/data/car_station_writer.dart';
 import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/station.dart';
@@ -66,6 +70,13 @@ class RadarSearchState {
 class RadarSearch extends _$RadarSearch {
   @override
   RadarSearchState build() => RadarSearchState.idle;
+
+  /// Android Auto v1 (#2948) — mirrors each radar run into the
+  /// `car_radar_json` SharedPreferences key the native car Radar screen
+  /// reads. Overridable so tests can assert the write without a platform
+  /// channel; the headless-engine live bridge is the v2 rewrite (#2947).
+  @visibleForTesting
+  CarStationWriter carWriter = const CarStationWriter();
 
   /// Run the radar around the user's CURRENT position. No-op (leaves the radar
   /// inactive) when no position is known yet — the user must search / locate at
@@ -137,6 +148,10 @@ class RadarSearch extends _$RadarSearch {
         fuel,
       ).toList()
         ..sort((a, b) => a.dist.compareTo(b.dist));
+
+      // #2948 — publish the radar list to the Android Auto Radar screen.
+      // Never throws (CarStationWriter swallows write faults).
+      unawaited(carWriter.writeRadar(priced, fuel));
 
       state = state.copyWith(
         active: true,

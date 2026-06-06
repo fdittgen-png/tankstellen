@@ -91,6 +91,14 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    // Android Auto v1 (#2948) — the car-screen JVM tests run under Robolectric
+    // (androidx.car.app:app-testing + ScreenController), which needs the merged
+    // Android resources (string lookups) and unmocked android.* stubs.
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+        unitTests.isReturnDefaultValues = true
+    }
+
     defaultConfig {
         applicationId = "de.tankstellen.fuelprices"
         minSdk = flutter.minSdkVersion
@@ -229,6 +237,15 @@ dependencies {
     // to the plugin's (workmanager_android 0.9.0 → work-runtime 2.10.2) to
     // avoid a resolved-version split.
     implementation("androidx.work:work-runtime-ktx:2.10.2")
+
+    // Android Auto v1 (#2948) — JVM tests for the car screens
+    // (MenuScreen/SearchScreen/RadarScreen) drive androidx.car.app's
+    // ScreenController under Robolectric, so they need a real CarContext +
+    // merged Android resources.
+    testImplementation("androidx.car.app:app-testing:1.4.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.12.2")
+    testImplementation("androidx.test:core:1.6.1")
 }
 
 flutter {

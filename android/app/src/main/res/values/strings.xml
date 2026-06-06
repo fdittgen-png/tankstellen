@@ -32,4 +32,20 @@
     <string name="widget_config_variant_label">Content</string>
     <string name="widget_variant_default">Current price only</string>
     <string name="widget_variant_predictive">Predictive: best time to fill</string>
+
+    <!-- Android Auto v1 (#2948 / epic #2946). Native car-screen strings live
+         in Android string resources (not Flutter ARB) — the car UI is the
+         androidx.car.app host, which can't read the Flutter ARB bundle, same
+         as the home-widget renderer above. Base English here; per-locale
+         values-<locale>/ overlays are a follow-up (the Flutter ARB fan-out
+         covers the in-app surfaces). -->
+    <string name="car_app_title">Sparkilo</string>
+    <string name="car_menu_search">Search</string>
+    <string name="car_menu_search_subtitle">Stations from your last in-app search</string>
+    <string name="car_menu_radar">Radar</string>
+    <string name="car_menu_radar_subtitle">Cheapest stations around your route</string>
+    <string name="car_search_title">Search</string>
+    <string name="car_radar_title">Radar</string>
+    <string name="car_empty_search">Open the app and run a search first, then it will show up here.</string>
+    <string name="car_empty_radar">Open the app and start the radar first, then it will show up here.</string>
 </resources>

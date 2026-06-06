@@ -1,7 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/location/location_service.dart';
@@ -10,9 +13,11 @@ import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/utils/geo_utils.dart';
+import '../../widget/data/car_station_writer.dart';
 import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
 import '../domain/entities/search_result_item.dart';
+import '../domain/entities/station.dart';
 // #727 — SearchState reads `searchLocationProvider` so we import
 // filters_provider directly (re-exports don't surface symbols here).
 import 'search_filters_provider.dart';
@@ -49,6 +54,21 @@ class SearchState extends _$SearchState {
   /// observers (e.g. MapScreen's app-resume handler, #1268) refresh
   /// stale data without knowing which search-by-X variant was invoked.
   Future<void> Function()? _lastSearchReplay;
+
+  /// Android Auto v1 (#2948) — mirrors each successful fuel search into the
+  /// `car_search_json` SharedPreferences key the native car Search screen
+  /// reads. Overridable so tests can assert the write without a platform
+  /// channel; the headless-engine live bridge is the v2 rewrite (#2947).
+  @visibleForTesting
+  CarStationWriter carWriter = const CarStationWriter();
+
+  /// #2948 — publish the just-fetched fuel stations to the Android Auto
+  /// Search screen. EV searches are skipped (the car v1 surfaces fuel
+  /// stations only). Never throws — [CarStationWriter] swallows write faults.
+  void _publishCarSearch(List<Station> stations, FuelType fuel) {
+    if (fuel == FuelType.electric) return;
+    unawaited(carWriter.writeSearch(stations, fuel));
+  }
 
   /// Cancel any in-flight search and create a fresh [CancelToken].
   CancelToken _newCancelToken() {
@@ -206,6 +226,7 @@ class SearchState extends _$SearchState {
           .read(stationServiceProvider)
           .searchStations(params, cancelToken: cancelToken);
       if (!ref.mounted) return;
+      _publishCarSearch(result.data, resolved.fuelType);
       final finalState = await finalizeUnifiedResult(ref, result, evFuture);
       if (!ref.mounted) return;
       state = finalState;
@@ -278,6 +299,7 @@ class SearchState extends _$SearchState {
 
       final adjustedStations =
           recalcDistancesFrom(result.data, ref.read(userPositionProvider));
+      _publishCarSearch(adjustedStations, resolved.fuelType);
 
       final fuelResult = mergeGeocodingIntoStationResult(
         stationResult: result,
@@ -346,6 +368,7 @@ class SearchState extends _$SearchState {
       if (!ref.mounted) return;
       final adjustedStations =
           recalcDistancesFrom(result.data, ref.read(userPositionProvider));
+      _publishCarSearch(adjustedStations, resolved.fuelType);
 
       final fuelResult = withStations(result, adjustedStations);
       final finalState = await finalizeUnifiedResult(ref, fuelResult, evFuture);
