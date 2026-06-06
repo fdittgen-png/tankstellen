@@ -12946,6 +12946,12 @@ abstract class AppLocalizations {
   /// **'{sources}'**
   String routeDataSourceMulti(String sources);
 
+  /// Station-card title fallback for a forecourt that carries no brand AND no station name (#2926). The street stays as the address subtitle; this label replaces showing the bare street as a duplicate title.
+  ///
+  /// In en, this message translates to:
+  /// **'Unbranded station'**
+  String get stationUnbrandedTitle;
+
   /// Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885).
   ///
   /// In en, this message translates to:

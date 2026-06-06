@@ -63,7 +63,23 @@ class _StationDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final titleText = hasBrand ? station.brand : station.street;
+    // #2926 — title fallback brand → name → localized "Unbranded station".
+    // The raw street is NEVER the title: it is the address subtitle below, so
+    // promoting it to the title read as a broken duplicate (e.g. "26 AVENUE DE
+    // VERDUN" shown as the station "name", repeated on the next line). An
+    // unbranded forecourt that carries a real name (e.g. a Mexican CRE company
+    // name) still shows that name; one with no brand AND no name gets the
+    // localized label, and the street drops to the address line instead.
+    final useName = !hasBrand && station.name.isNotEmpty;
+    final titleText = hasBrand
+        ? station.brand
+        : useName
+            ? station.name
+            : (l10n?.stationUnbrandedTitle ?? 'Unbranded station');
+    // The street is shown on the address line whenever it is NOT the title —
+    // i.e. for a branded station (it was already), and now also for the
+    // unbranded label case (the street is no longer hoisted to the title).
+    final showStreetInAddress = hasBrand || !useName;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -82,9 +98,7 @@ class _StationDetails extends StatelessWidget {
         ),
         const SizedBox(height: Spacing.xs),
         Text(
-          hasBrand
-              ? '${station.street}, ${station.postCode} ${station.place}'
-              : '${station.postCode} ${station.place}',
+          _addressLine(station, showStreetInAddress),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -147,4 +161,16 @@ class _StationDetails extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Build the address subtitle line, collapsing empty parts so the line never
+/// shows an orphan comma (#2704). [includeStreet] adds the street as the first
+/// segment (for branded stations and the unbranded-label case, where the
+/// street is no longer the title — #2926); the city block is always
+/// `postCode place` joined on whitespace.
+String _addressLine(Station station, bool includeStreet) {
+  final city = '${station.postCode} ${station.place}'.trim();
+  if (!includeStreet || station.street.isEmpty) return city;
+  if (city.isEmpty) return station.street;
+  return '${station.street}, $city';
 }

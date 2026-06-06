@@ -7498,6 +7498,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get stationUnbrandedTitle => 'Unbranded station';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'Je peux faire le plein avec différents carburants';
 

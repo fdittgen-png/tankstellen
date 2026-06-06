@@ -15,6 +15,7 @@ import '../logging/error_logger.dart';
 import 'diagnostics/data_access_event.dart';
 import 'diagnostics/data_access_recorder.dart';
 import 'fuel_service_policy.dart';
+import 'mixins/station_service_helpers.dart';
 import 'service_result.dart';
 import 'station_failure_classifier.dart';
 import 'station_service.dart';
@@ -122,13 +123,7 @@ class StationServiceChain implements StationService {
         recordDataAccess(_recorder, countryCode, endpoint,
             DataAccessHit.coalesced, result.source,
             count: dataAccessResultCount(result.data), isStale: result.isStale);
-        return ServiceResult<T>(
-          data: result.data as T,
-          source: result.source,
-          fetchedAt: result.fetchedAt,
-          isStale: result.isStale,
-          errors: result.errors,
-        );
+        return result.withData<T>(result.data as T);
       }
       // Type mismatch from coalesced result — fall through to fresh request
     }
@@ -265,32 +260,47 @@ class StationServiceChain implements StationService {
   Future<ServiceResult<List<Station>>> searchStations(
     SearchParams params, {
     CancelToken? cancelToken,
-  }) {
+  }) async {
     // #2264 — bulk-file sources local-filter a persisted whole-country
     // dataset, so a per-search-key cache only duplicates that work and can
     // serve a stale slice; answer nearby straight from the primary instead.
-    if (_policy?.isBulkFile ?? false) {
-      return _bulkSearch(params, cancelToken: cancelToken);
-    }
+    final result = (_policy?.isBulkFile ?? false)
+        ? await _bulkSearch(params, cancelToken: cancelToken)
+        : await _throughChain<List<Station>>(
+            cacheKey: CacheKey.stationSearch(
+              params.lat, params.lng, params.radiusKm, params.fuelType.apiValue,
+              countryCode: countryCode,
+              postalCode: params.postalCode,
+              locationName: params.locationName,
+            ),
+            endpoint: params.postalCode != null
+                ? DataAccessEndpoint.searchPostcode
+                : DataAccessEndpoint.searchGeo,
+            apiCall: () =>
+                _primary.searchStations(params, cancelToken: cancelToken),
+            serialize: serializeStationList,
+            deserialize: deserializeStationList,
+            // Polled sources use the policy's per-key TTL; fall back to the
+            // global default for legacy call sites that supply no policy.
+            ttl: _policy?.searchResultTtl ?? CacheTtl.stationSearch,
+            isValid: (stations) => stations.isNotEmpty,
+          );
 
-    return _throughChain<List<Station>>(
-      cacheKey: CacheKey.stationSearch(
-        params.lat, params.lng, params.radiusKm, params.fuelType.apiValue,
-        countryCode: countryCode,
-        postalCode: params.postalCode,
-        locationName: params.locationName,
-      ),
-      endpoint: params.postalCode != null
-          ? DataAccessEndpoint.searchPostcode
-          : DataAccessEndpoint.searchGeo,
-      apiCall: () => _primary.searchStations(params, cancelToken: cancelToken),
-      serialize: serializeStationList,
-      deserialize: deserializeStationList,
-      // Polled sources use the policy's per-key TTL; fall back to the global
-      // default for legacy call sites that supply no policy.
-      ttl: _policy?.searchResultTtl ?? CacheTtl.stationSearch,
-      isValid: (stations) => stations.isNotEmpty,
-    );
+    // #2926 — the SHARED hard-fuel-filter chokepoint. The cache stores the
+    // full in-radius set (honest, fuel-agnostic, keyed per fuel anyway), but
+    // every consumer — the regular search AND the on-search Fuel Station Radar
+    // (which calls this same method for its in-radius merge) — sees ONLY
+    // stations that actually sell the selected fuel. This guarantees search and
+    // radar return an identical result set for the same position + radius +
+    // fuel across all 17 countries. `FuelType.all` (and electric/hydrogen,
+    // which route to the EV feed) pass through unfiltered.
+    // The cross-border route corridor opts out (params.applyFuelFilter=false)
+    // so its E5↔E10 sibling fallback can still price a country that sells only
+    // the sibling grade (#2641/#2680); search + radar keep the hard filter.
+    final filtered = params.applyFuelFilter
+        ? StationServiceHelpers.filterByFuel(result.data, params.fuelType)
+        : result.data;
+    return identical(filtered, result.data) ? result : result.withData(filtered);
   }
 
   /// Bulk-dataset search path (#2264): no per-key Hive cache. Adds only the
@@ -317,13 +327,7 @@ class StationServiceChain implements StationService {
             result.source,
             count: dataAccessResultCount(result.data),
             isStale: result.isStale);
-        return ServiceResult<List<Station>>(
-          data: result.data as List<Station>,
-          source: result.source,
-          fetchedAt: result.fetchedAt,
-          isStale: result.isStale,
-          errors: result.errors,
-        );
+        return result.withData<List<Station>>(result.data as List<Station>);
       }
     }
 

@@ -199,6 +199,53 @@ void main() {
     });
   });
 
+  group('filterByFuel (#2926 — shared hard-fuel-filter chokepoint)', () {
+    // Esso sells no E85 (e85 null); Total does (0.84). The hard filter keeps
+    // ONLY the station that actually sells the selected fuel.
+    final esso = _makeStation(id: 'esso', e5: 1.80, e10: 1.75, diesel: 1.60);
+    final total =
+        _makeStation(id: 'total', e5: 1.82, e10: 1.77, diesel: 1.62, e85: 0.84);
+
+    test('a specific fuel keeps only stations that sell it', () {
+      final result =
+          StationServiceHelpers.filterByFuel([esso, total], FuelType.e85);
+      expect(result.map((s) => s.id), ['total'],
+          reason: 'Esso has no E85 price → dropped; Total sells it → kept');
+    });
+
+    test('drops stations whose price for the fuel is zero/negative', () {
+      final zero = _makeStation(id: 'zero', e10: 0.0);
+      final neg = _makeStation(id: 'neg', e10: -1.0);
+      final ok = _makeStation(id: 'ok', e10: 1.75);
+      final result =
+          StationServiceHelpers.filterByFuel([zero, neg, ok], FuelType.e10);
+      expect(result.map((s) => s.id), ['ok']);
+    });
+
+    test('FuelType.all returns every station unchanged (no filter)', () {
+      final input = [esso, total, _makeStation(id: 'empty')];
+      final result = StationServiceHelpers.filterByFuel(input, FuelType.all);
+      expect(result, same(input),
+          reason: 'all wildcard short-circuits — identical list returned');
+    });
+
+    test('electric/hydrogen are not hard-filtered (route to the EV feed)', () {
+      // Station has no electric/hydrogen price (the entity never models them),
+      // so a hard filter would wrongly empty the list. filterByFuel must NOT
+      // drop on these — they go through their own EV feed.
+      final input = [esso, total];
+      expect(StationServiceHelpers.filterByFuel(input, FuelType.electric),
+          same(input));
+      expect(StationServiceHelpers.filterByFuel(input, FuelType.hydrogen),
+          same(input));
+    });
+
+    test('empty input yields empty output', () {
+      expect(StationServiceHelpers.filterByFuel(const [], FuelType.diesel),
+          isEmpty);
+    });
+  });
+
   group('emptyPricesResult', () {
     test('returns ServiceResult with empty map', () {
       final result = helper.emptyPricesResult(ServiceSource.denmarkApi);
@@ -274,6 +321,7 @@ Station _makeStation({
   double? e5,
   double? e10,
   double? diesel,
+  double? e85,
 }) {
   return Station(
     id: id,
@@ -288,6 +336,7 @@ Station _makeStation({
     e5: e5,
     e10: e10,
     diesel: diesel,
+    e85: e85,
     isOpen: true,
   );
 }

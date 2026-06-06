@@ -4,6 +4,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../features/search/data/models/search_params.dart';
+import '../../../features/search/domain/entities/fuel_type.dart';
 import '../../../features/search/domain/entities/station.dart';
 import '../../error/exceptions.dart';
 import '../../utils/geo_utils.dart';
@@ -109,6 +110,37 @@ mixin StationServiceHelpers {
       ..sort((a, b) => a.dist.compareTo(b.dist));
     return sorted.take(fallbackCount).toList();
   }
+
+  /// Keep only stations that actually SELL [fuelType] — i.e. carry a usable
+  /// (`> 0`) price for it (#2926). This is the HARD-filter semantic the search
+  /// and the Fuel Station Radar must share: when the user selects a specific
+  /// fuel, both surfaces show ONLY forecourts that sell it, never a `--`
+  /// placeholder row, so the two result sets are identical for the same
+  /// position + radius + fuel.
+  ///
+  /// Returns the list unchanged for:
+  ///  - [FuelType.all] — the explicit "every fuel" wildcard (no filter), and
+  ///  - fuels the [Station] entity does not price (electric / hydrogen, whose
+  ///    [StationDisplay.priceFor] is always `null`). Those run through their
+  ///    own (EV) feed; filtering here would wrongly empty every list.
+  static List<Station> filterByFuel(List<Station> stations, FuelType fuelType) {
+    if (fuelType == FuelType.all || !_isPricedFuel(fuelType)) return stations;
+    return stations
+        .where((s) {
+          final price = s.priceFor(fuelType);
+          return price != null && price > 0;
+        })
+        .toList(growable: false);
+  }
+
+  /// Whether [fuelType] is one the [Station] entity carries a price for — the
+  /// liquid/gas pumps (E5/E10/E98/diesel/diesel+/E85/LPG/CNG). Electric and
+  /// hydrogen are never priced on [Station] (their `priceFor` is `null`), so
+  /// [filterByFuel] must not hard-drop on them.
+  static bool _isPricedFuel(FuelType fuelType) => switch (fuelType) {
+        FuelTypeHydrogen() || FuelTypeElectric() || FuelTypeAll() => false,
+        _ => true,
+      };
 
   // ---------------------------------------------------------------------------
   // Default implementations for unsupported endpoints

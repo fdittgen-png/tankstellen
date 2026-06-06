@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
+import 'package:tankstellen/core/services/mixins/station_service_helpers.dart';
 import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
@@ -315,6 +316,68 @@ void main() {
       // No error surfaced; the radar still shows the corridor it had.
       expect(state.stations.hasError, isFalse);
       expect(state.stations.value!.map((s) => s.id), ['FAR1', 'FAR2']);
+    });
+
+    test(
+        'consistency invariant: the radar set equals the in-radius search '
+        'hard-filtered by the same fuel (#2926)', () async {
+      // Same position + radius + specific fuel. The corridor + in-radius slice
+      // both contain stations that DON\'T sell E85 (e10-only). Both the regular
+      // search (StationServiceChain → filterByFuel) and the radar must surface
+      // ONLY the E85 sellers, so the two result sets are identical.
+      final e85Total = _station('TOTAL', 48.0, 2.0)
+          .copyWith(e85: 0.84, e10: 1.77);
+      final e85Avia =
+          _station('AVIA', 48.01, 2.0).copyWith(e85: 0.86, e10: 1.79);
+      final e10Only = _station('ESSO', 48.005, 2.0, e10: 1.75); // no E85
+      final container = _container(
+        position: (lat: 48.0, lng: 2.0),
+        corridor: [e85Total, e10Only],
+        inRadius: [e85Avia, e10Only],
+        fuel: FuelType.e85,
+      );
+      addTearDown(container.dispose);
+
+      await container.read(radarSearchProvider.notifier).runRadar();
+      final radarIds = container
+          .read(radarSearchProvider)
+          .stations
+          .value!
+          .map((s) => s.id)
+          .toSet();
+
+      // The in-radius search, run through the SAME shared filter the chain
+      // applies, over the merged corridor+in-radius superset.
+      final expected = StationServiceHelpers.filterByFuel(
+        [e85Total, e85Avia, e10Only],
+        FuelType.e85,
+      ).map((s) => s.id).toSet();
+
+      expect(radarIds, expected,
+          reason: 'radar set == in-radius search hard-filtered by fuel');
+      expect(radarIds, {'TOTAL', 'AVIA'},
+          reason: 'the e10-only ESSO is dropped on BOTH paths');
+    });
+
+    test('FuelType.all keeps every station on the radar path (no filter)',
+        () async {
+      final container = _container(
+        position: (lat: 48.0, lng: 2.0),
+        corridor: [_station('A', 48.0, 2.0, e10: 1.50)],
+        inRadius: [_station('B', 48.01, 2.0)], // no priced fuel at all
+        fuel: FuelType.all,
+      );
+      addTearDown(container.dispose);
+
+      await container.read(radarSearchProvider.notifier).runRadar();
+      final ids = container
+          .read(radarSearchProvider)
+          .stations
+          .value!
+          .map((s) => s.id)
+          .toSet();
+      expect(ids, {'A', 'B'},
+          reason: 'the all wildcard surfaces every station, priced or not');
     });
 
     test('refreshes live GPS, so it scans the user\'s current position',

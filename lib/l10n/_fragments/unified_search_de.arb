@@ -10,5 +10,6 @@
   "favoriteAdd": "Zu Favoriten hinzufügen",
   "favoriteRemove": "Aus Favoriten entfernen",
   "loyaltyRawPriceTooltip": "Roh: {price}",
-  "routeDataSourceMulti": "{sources}"
+  "routeDataSourceMulti": "{sources}",
+  "stationUnbrandedTitle": "Tankstelle ohne Marke"
 }

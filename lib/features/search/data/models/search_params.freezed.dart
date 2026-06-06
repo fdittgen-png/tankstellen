@@ -14,7 +14,14 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SearchParams {
 
- double get lat; double get lng; double get radiusKm; FuelType get fuelType; SortBy get sortBy; String? get postalCode; String? get locationName;
+ double get lat; double get lng; double get radiusKm; FuelType get fuelType; SortBy get sortBy; String? get postalCode; String? get locationName;// #2926 follow-up — the SHARED hard-fuel-filter (StationServiceChain →
+// filterByFuel) applies to the main search + radar so a specific fuel
+// shows ONLY forecourts selling it. The cross-border route corridor opts
+// OUT (applyFuelFilter:false) because it does its own per-country pricing
+// with the E5↔E10 sibling fallback (#2641/#2680) — a country that sells
+// only E5 must still be priced for an E10 request, which a hard E10 drop
+// here would break.
+ bool get applyFuelFilter;
 /// Create a copy of SearchParams
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +32,16 @@ $SearchParamsCopyWith<SearchParams> get copyWith => _$SearchParamsCopyWithImpl<S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchParams&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.sortBy, sortBy) || other.sortBy == sortBy)&&(identical(other.postalCode, postalCode) || other.postalCode == postalCode)&&(identical(other.locationName, locationName) || other.locationName == locationName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SearchParams&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.sortBy, sortBy) || other.sortBy == sortBy)&&(identical(other.postalCode, postalCode) || other.postalCode == postalCode)&&(identical(other.locationName, locationName) || other.locationName == locationName)&&(identical(other.applyFuelFilter, applyFuelFilter) || other.applyFuelFilter == applyFuelFilter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lat,lng,radiusKm,fuelType,sortBy,postalCode,locationName);
+int get hashCode => Object.hash(runtimeType,lat,lng,radiusKm,fuelType,sortBy,postalCode,locationName,applyFuelFilter);
 
 @override
 String toString() {
-  return 'SearchParams(lat: $lat, lng: $lng, radiusKm: $radiusKm, fuelType: $fuelType, sortBy: $sortBy, postalCode: $postalCode, locationName: $locationName)';
+  return 'SearchParams(lat: $lat, lng: $lng, radiusKm: $radiusKm, fuelType: $fuelType, sortBy: $sortBy, postalCode: $postalCode, locationName: $locationName, applyFuelFilter: $applyFuelFilter)';
 }
 
 
@@ -45,7 +52,7 @@ abstract mixin class $SearchParamsCopyWith<$Res>  {
   factory $SearchParamsCopyWith(SearchParams value, $Res Function(SearchParams) _then) = _$SearchParamsCopyWithImpl;
 @useResult
 $Res call({
- double lat, double lng, double radiusKm, FuelType fuelType, SortBy sortBy, String? postalCode, String? locationName
+ double lat, double lng, double radiusKm, FuelType fuelType, SortBy sortBy, String? postalCode, String? locationName, bool applyFuelFilter
 });
 
 
@@ -62,7 +69,7 @@ class _$SearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of SearchParams
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? lat = null,Object? lng = null,Object? radiusKm = null,Object? fuelType = null,Object? sortBy = null,Object? postalCode = freezed,Object? locationName = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? lat = null,Object? lng = null,Object? radiusKm = null,Object? fuelType = null,Object? sortBy = null,Object? postalCode = freezed,Object? locationName = freezed,Object? applyFuelFilter = null,}) {
   return _then(_self.copyWith(
 lat: null == lat ? _self.lat : lat // ignore: cast_nullable_to_non_nullable
 as double,lng: null == lng ? _self.lng : lng // ignore: cast_nullable_to_non_nullable
@@ -71,7 +78,8 @@ as double,fuelType: null == fuelType ? _self.fuelType : fuelType // ignore: cast
 as FuelType,sortBy: null == sortBy ? _self.sortBy : sortBy // ignore: cast_nullable_to_non_nullable
 as SortBy,postalCode: freezed == postalCode ? _self.postalCode : postalCode // ignore: cast_nullable_to_non_nullable
 as String?,locationName: freezed == locationName ? _self.locationName : locationName // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,applyFuelFilter: null == applyFuelFilter ? _self.applyFuelFilter : applyFuelFilter // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -156,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double lat,  double lng,  double radiusKm,  FuelType fuelType,  SortBy sortBy,  String? postalCode,  String? locationName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double lat,  double lng,  double radiusKm,  FuelType fuelType,  SortBy sortBy,  String? postalCode,  String? locationName,  bool applyFuelFilter)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SearchParams() when $default != null:
-return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_that.postalCode,_that.locationName);case _:
+return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_that.postalCode,_that.locationName,_that.applyFuelFilter);case _:
   return orElse();
 
 }
@@ -177,10 +185,10 @@ return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double lat,  double lng,  double radiusKm,  FuelType fuelType,  SortBy sortBy,  String? postalCode,  String? locationName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double lat,  double lng,  double radiusKm,  FuelType fuelType,  SortBy sortBy,  String? postalCode,  String? locationName,  bool applyFuelFilter)  $default,) {final _that = this;
 switch (_that) {
 case _SearchParams():
-return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_that.postalCode,_that.locationName);case _:
+return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_that.postalCode,_that.locationName,_that.applyFuelFilter);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +205,10 @@ return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double lat,  double lng,  double radiusKm,  FuelType fuelType,  SortBy sortBy,  String? postalCode,  String? locationName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double lat,  double lng,  double radiusKm,  FuelType fuelType,  SortBy sortBy,  String? postalCode,  String? locationName,  bool applyFuelFilter)?  $default,) {final _that = this;
 switch (_that) {
 case _SearchParams() when $default != null:
-return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_that.postalCode,_that.locationName);case _:
+return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_that.postalCode,_that.locationName,_that.applyFuelFilter);case _:
   return null;
 
 }
@@ -212,7 +220,7 @@ return $default(_that.lat,_that.lng,_that.radiusKm,_that.fuelType,_that.sortBy,_
 
 
 class _SearchParams implements SearchParams {
-  const _SearchParams({required this.lat, required this.lng, this.radiusKm = 10.0, this.fuelType = FuelType.all, this.sortBy = SortBy.price, this.postalCode, this.locationName});
+  const _SearchParams({required this.lat, required this.lng, this.radiusKm = 10.0, this.fuelType = FuelType.all, this.sortBy = SortBy.price, this.postalCode, this.locationName, this.applyFuelFilter = true});
   
 
 @override final  double lat;
@@ -222,6 +230,14 @@ class _SearchParams implements SearchParams {
 @override@JsonKey() final  SortBy sortBy;
 @override final  String? postalCode;
 @override final  String? locationName;
+// #2926 follow-up — the SHARED hard-fuel-filter (StationServiceChain →
+// filterByFuel) applies to the main search + radar so a specific fuel
+// shows ONLY forecourts selling it. The cross-border route corridor opts
+// OUT (applyFuelFilter:false) because it does its own per-country pricing
+// with the E5↔E10 sibling fallback (#2641/#2680) — a country that sells
+// only E5 must still be priced for an E10 request, which a hard E10 drop
+// here would break.
+@override@JsonKey() final  bool applyFuelFilter;
 
 /// Create a copy of SearchParams
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +249,16 @@ _$SearchParamsCopyWith<_SearchParams> get copyWith => __$SearchParamsCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchParams&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.sortBy, sortBy) || other.sortBy == sortBy)&&(identical(other.postalCode, postalCode) || other.postalCode == postalCode)&&(identical(other.locationName, locationName) || other.locationName == locationName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SearchParams&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.radiusKm, radiusKm) || other.radiusKm == radiusKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.sortBy, sortBy) || other.sortBy == sortBy)&&(identical(other.postalCode, postalCode) || other.postalCode == postalCode)&&(identical(other.locationName, locationName) || other.locationName == locationName)&&(identical(other.applyFuelFilter, applyFuelFilter) || other.applyFuelFilter == applyFuelFilter));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lat,lng,radiusKm,fuelType,sortBy,postalCode,locationName);
+int get hashCode => Object.hash(runtimeType,lat,lng,radiusKm,fuelType,sortBy,postalCode,locationName,applyFuelFilter);
 
 @override
 String toString() {
-  return 'SearchParams(lat: $lat, lng: $lng, radiusKm: $radiusKm, fuelType: $fuelType, sortBy: $sortBy, postalCode: $postalCode, locationName: $locationName)';
+  return 'SearchParams(lat: $lat, lng: $lng, radiusKm: $radiusKm, fuelType: $fuelType, sortBy: $sortBy, postalCode: $postalCode, locationName: $locationName, applyFuelFilter: $applyFuelFilter)';
 }
 
 
@@ -253,7 +269,7 @@ abstract mixin class _$SearchParamsCopyWith<$Res> implements $SearchParamsCopyWi
   factory _$SearchParamsCopyWith(_SearchParams value, $Res Function(_SearchParams) _then) = __$SearchParamsCopyWithImpl;
 @override @useResult
 $Res call({
- double lat, double lng, double radiusKm, FuelType fuelType, SortBy sortBy, String? postalCode, String? locationName
+ double lat, double lng, double radiusKm, FuelType fuelType, SortBy sortBy, String? postalCode, String? locationName, bool applyFuelFilter
 });
 
 
@@ -270,7 +286,7 @@ class __$SearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of SearchParams
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? lat = null,Object? lng = null,Object? radiusKm = null,Object? fuelType = null,Object? sortBy = null,Object? postalCode = freezed,Object? locationName = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? lat = null,Object? lng = null,Object? radiusKm = null,Object? fuelType = null,Object? sortBy = null,Object? postalCode = freezed,Object? locationName = freezed,Object? applyFuelFilter = null,}) {
   return _then(_SearchParams(
 lat: null == lat ? _self.lat : lat // ignore: cast_nullable_to_non_nullable
 as double,lng: null == lng ? _self.lng : lng // ignore: cast_nullable_to_non_nullable
@@ -279,7 +295,8 @@ as double,fuelType: null == fuelType ? _self.fuelType : fuelType // ignore: cast
 as FuelType,sortBy: null == sortBy ? _self.sortBy : sortBy // ignore: cast_nullable_to_non_nullable
 as SortBy,postalCode: freezed == postalCode ? _self.postalCode : postalCode // ignore: cast_nullable_to_non_nullable
 as String?,locationName: freezed == locationName ? _self.locationName : locationName // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,applyFuelFilter: null == applyFuelFilter ? _self.applyFuelFilter : applyFuelFilter // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

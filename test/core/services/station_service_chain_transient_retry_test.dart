@@ -93,11 +93,16 @@ class _MemCache implements CacheStrategy {
   CacheEntry? getFresh(String key) => _store[key];
 }
 
+// #2926 — these tests verify retry mechanics, not fuel filtering, and their
+// fixture stations carry no per-fuel price. Search "all" so the new
+// hard-fuel-filter (which would correctly drop a price-less station for a
+// SPECIFIC fuel) doesn't mask the retry assertion. The filter is covered by
+// station_service_chain_new_test.dart.
 SearchParams _params() => const SearchParams(
       lat: 48.85,
       lng: 2.35,
       radiusKm: 5,
-      fuelType: FuelType.e5,
+      fuelType: FuelType.all,
     );
 
 void main() {
