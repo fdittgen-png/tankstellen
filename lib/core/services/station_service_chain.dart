@@ -294,8 +294,12 @@ class StationServiceChain implements StationService {
     // radar return an identical result set for the same position + radius +
     // fuel across all 17 countries. `FuelType.all` (and electric/hydrogen,
     // which route to the EV feed) pass through unfiltered.
-    final filtered =
-        StationServiceHelpers.filterByFuel(result.data, params.fuelType);
+    // The cross-border route corridor opts out (params.applyFuelFilter=false)
+    // so its E5↔E10 sibling fallback can still price a country that sells only
+    // the sibling grade (#2641/#2680); search + radar keep the hard filter.
+    final filtered = params.applyFuelFilter
+        ? StationServiceHelpers.filterByFuel(result.data, params.fuelType)
+        : result.data;
     return identical(filtered, result.data) ? result : result.withData(filtered);
   }
 
