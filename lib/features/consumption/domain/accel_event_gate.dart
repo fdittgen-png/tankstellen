@@ -124,6 +124,23 @@ const double kAccelEventAccuracyGateM = 10.0;
 /// derivative across it would fabricate an event.
 const double kAccelEventMaxGapSec = 60.0;
 
+/// Clamp a signed longitudinal speed-derivative [accelMps2] to the
+/// physically-plausible band (#2940). A GPS speed spike differentiated past
+/// the asymmetric ceilings the event gate uses ([kMaxPlausibleAccelMps2]
+/// ~0.9 g forward, −[kMaxPlausibleBrakeMps2] ~1.12 g braking) is speed noise,
+/// not a manoeuvre — pin it to the nearest ceiling so a *reported* peak (e.g.
+/// `GpsDrivingFeatures.maxAccelG`) can never surface an impossible value,
+/// consistently with how [countAccelEvents] refuses to *count* the same spike
+/// (it breaks the running episode). The asymmetry mirrors the event gate:
+/// braking legitimately reaches ~1 g where acceleration does not. Finite
+/// in-band and NaN inputs are returned unchanged (NaN exceeds neither
+/// ceiling, so a degenerate reading is never silently turned into a ceiling).
+double clampPlausibleAccelMps2(double accelMps2) {
+  if (accelMps2 >= kMaxPlausibleAccelMps2) return kMaxPlausibleAccelMps2;
+  if (accelMps2 <= -kMaxPlausibleBrakeMps2) return -kMaxPlausibleBrakeMps2;
+  return accelMps2;
+}
+
 /// One sample fed to [countAccelEvents]. Decoupled from any concrete
 /// sample type so both `TripSample` (with `hAccuracyM`) and the leaner
 /// `TripDetailSample` (no accuracy) can map onto it.
@@ -251,12 +268,15 @@ AccelEventCounts countAccelEvents(
     // Δspeed km/h → m/s by / 3.6, then / Δt for m/s².
     final accelMps2 = ((cur.speedKmh - prev.speedKmh) / 3.6) / dt;
 
-    // Physical-plausibility clamp (#2895). A speed-derivative beyond what a
-    // real car can produce (forward > ~0.61 g, braking > ~1.12 g) is GPS
+    // Physical-plausibility gate (#2895). A speed-derivative beyond what a
+    // real car can produce (forward > ~0.9 g, braking > ~1.12 g) is GPS
     // speed noise, not a manoeuvre — a 68 hp economy car cannot do the
     // 1.086 g the bug logged. Break the running episode rather than count it,
     // so noise can't fabricate a hard-accel/brake event. Asymmetric ceilings
     // because braking legitimately reaches ~1 g where acceleration does not.
+    // The reported `maxAccelG` peak pins to the SAME band via the shared
+    // [clampPlausibleAccelMps2] (#2940), so the count and the displayed figure
+    // can never disagree about what is physically possible.
     if (accelMps2 >= kMaxPlausibleAccelMps2 ||
         accelMps2 <= -kMaxPlausibleBrakeMps2) {
       breakEpisodes();
