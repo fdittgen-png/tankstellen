@@ -4,6 +4,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+// `intl` also exports a `TextDirection`; hide it so the painter keeps using
+// the dart:ui/material one (with `.ltr`).
+import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/monthly_summary.dart';
@@ -44,6 +47,10 @@ class MonthlyBarChart extends StatelessWidget {
         child: Center(child: Text(l?.noDataAvailable ?? 'No data')),
       );
     }
+    // Month-axis labels are locale DATA, not a translatable string: resolve
+    // the active locale's short-month names via intl (matches price_chart.dart's
+    // `DateFormat.Md(locale)` pattern). #2971.
+    final locale = Localizations.localeOf(context).toString();
     return SizedBox(
       height: 180,
       child: CustomPaint(
@@ -53,6 +60,7 @@ class MonthlyBarChart extends StatelessWidget {
           color: color,
           unitLabel: unitLabel,
           labelColor: onSurface,
+          monthFormat: DateFormat.MMM(locale),
         ),
         size: Size.infinite,
       ),
@@ -67,12 +75,16 @@ class _BarChartPainter extends CustomPainter {
   final String unitLabel;
   final Color labelColor;
 
+  /// Locale-aware short-month formatter for the X-axis labels (#2971).
+  final DateFormat monthFormat;
+
   _BarChartPainter({
     required this.summaries,
     required this.valueOf,
     required this.color,
     required this.unitLabel,
     required this.labelColor,
+    required this.monthFormat,
   });
 
   @override
@@ -137,7 +149,7 @@ class _BarChartPainter extends CustomPainter {
       final m = summaries[i].month;
       _drawText(
         canvas,
-        _shortMonth(m),
+        monthFormat.format(m),
         Offset(cx, topInset + chartHeight + 4),
         anchorCenter: true,
         color: labelColor.withAlpha(160),
@@ -168,28 +180,11 @@ class _BarChartPainter extends CustomPainter {
     tp.paint(canvas, Offset(dx, offset.dy));
   }
 
-  String _shortMonth(DateTime d) {
-    const names = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return names[d.month - 1];
-  }
-
   @override
   bool shouldRepaint(_BarChartPainter oldDelegate) {
     return oldDelegate.summaries != summaries ||
         oldDelegate.color != color ||
-        oldDelegate.unitLabel != unitLabel;
+        oldDelegate.unitLabel != unitLabel ||
+        oldDelegate.monthFormat.locale != monthFormat.locale;
   }
 }

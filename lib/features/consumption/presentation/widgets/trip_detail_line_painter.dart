@@ -20,60 +20,41 @@ class _LineChartPainter extends CustomPainter {
   final Color labelColor;
   final String unit;
 
+  /// #2977 — index of the scrubbed sample whose crosshair + marker is drawn,
+  /// or null when the user has not scrubbed. Projected with the same
+  /// [_TripChartGeometry] the nearest-point hit-test uses, so the marker
+  /// lands exactly on the read value.
+  final int? selectedIndex;
+
   _LineChartPainter({
     required this.points,
     required this.color,
     required this.labelColor,
     required this.unit,
+    this.selectedIndex,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
 
-    const leftInset = 8.0;
-    const rightInset = 8.0;
-    const topInset = 18.0;
-    const bottomInset = 22.0;
-
-    final chartWidth = size.width - leftInset - rightInset;
-    final chartHeight = size.height - topInset - bottomInset;
-
-    final values = points.map((p) => p.value).toList(growable: false);
-    final minV = values.reduce(math.min);
-    final maxV = values.reduce(math.max);
-    final range = (maxV - minV).abs();
-    final padding = range > 0 ? range * 0.1 : 1.0;
-    final yMin = (minV - padding).clamp(-double.infinity, double.infinity);
-    final yMax = maxV + padding;
-    final ySpan = (yMax - yMin) == 0 ? 1.0 : (yMax - yMin);
-
-    final firstTs = points.first.timestamp.millisecondsSinceEpoch;
-    final lastTs = points.last.timestamp.millisecondsSinceEpoch;
-    final tSpan = (lastTs - firstTs) == 0 ? 1 : (lastTs - firstTs);
-
-    double xFor(DateTime t) {
-      final rel = (t.millisecondsSinceEpoch - firstTs) / tSpan;
-      return leftInset + rel * chartWidth;
-    }
-
-    double yFor(double v) =>
-        topInset + chartHeight - ((v - yMin) / ySpan) * chartHeight;
+    final geo = _TripChartGeometry.forSize(size, points);
 
     // Max / min labels at the corners — gives the user a quick read
     // on the range without cluttering the plot with grid lines.
     _drawText(
       canvas,
-      '${maxV.toStringAsFixed(1)} $unit',
-      Offset(size.width - rightInset, 2),
+      '${geo.maxV.toStringAsFixed(1)} $unit',
+      Offset(size.width - _TripChartGeometry.rightInset, 2),
       anchorRight: true,
       color: labelColor.withAlpha(160),
       fontSize: 10,
     );
     _drawText(
       canvas,
-      minV.toStringAsFixed(1),
-      Offset(leftInset, size.height - bottomInset + 4),
+      geo.minV.toStringAsFixed(1),
+      Offset(_TripChartGeometry.leftInset,
+          size.height - _TripChartGeometry.bottomInset + 4),
       color: labelColor.withAlpha(160),
       fontSize: 10,
     );
@@ -87,7 +68,7 @@ class _LineChartPainter extends CustomPainter {
     final path = Path();
     for (int i = 0; i < points.length; i++) {
       final p = points[i];
-      final pt = Offset(xFor(p.timestamp), yFor(p.value));
+      final pt = Offset(geo.xFor(p.timestamp), geo.yFor(p.value));
       if (i == 0) {
         path.moveTo(pt.dx, pt.dy);
       } else {
@@ -95,6 +76,34 @@ class _LineChartPainter extends CustomPainter {
       }
     }
     canvas.drawPath(path, linePaint);
+
+    // #2977 — scrub crosshair: a faint vertical guide at the selected x plus
+    // a filled marker + ring on the data point. Mirrors the price-chart
+    // selected-point highlight (#2384) so the two charts feel identical.
+    if (selectedIndex != null && selectedIndex! < points.length) {
+      final sel = points[selectedIndex!];
+      final cx = geo.xFor(sel.timestamp);
+      final cy = geo.yFor(sel.value);
+      canvas.drawLine(
+        Offset(cx, _TripChartGeometry.topInset),
+        Offset(cx, size.height - _TripChartGeometry.bottomInset),
+        Paint()
+          ..color = color.withAlpha(120)
+          ..strokeWidth = 1,
+      );
+      final dotPaint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(cx, cy), 4, dotPaint);
+      canvas.drawCircle(
+        Offset(cx, cy),
+        6,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
+    }
   }
 
   void _drawText(
@@ -111,7 +120,7 @@ class _LineChartPainter extends CustomPainter {
         text: text,
         style: TextStyle(color: color, fontSize: fontSize),
       ),
-      textDirection: TextDirection.ltr,
+      textDirection: ui.TextDirection.ltr,
     )..layout();
     var dx = offset.dx;
     if (anchorRight) dx -= tp.width;
@@ -123,5 +132,6 @@ class _LineChartPainter extends CustomPainter {
   bool shouldRepaint(_LineChartPainter oldDelegate) =>
       oldDelegate.points != points ||
       oldDelegate.color != color ||
-      oldDelegate.unit != unit;
+      oldDelegate.unit != unit ||
+      oldDelegate.selectedIndex != selectedIndex;
 }

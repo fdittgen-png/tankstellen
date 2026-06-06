@@ -80,6 +80,7 @@ class MainActivity : FlutterActivity() {
                     autoEnterPip = call.arguments as? Boolean ?: false
                     result.success(null)
                 }
+                "bringToFront" -> result.success(bringToFront())
                 else -> result.notImplemented()
             }
         }
@@ -125,6 +126,41 @@ class MainActivity : FlutterActivity() {
                 .build()
             enterPictureInPictureMode(params)
         } catch (e: IllegalStateException) {
+            false
+        }
+    }
+
+    /**
+     * Bring the app back to the foreground in full screen (#2964). Tapping
+     * the body of the floating PiP tile calls this — the user expects a tap
+     * on the little window to restore the full Sparkilo app, mirroring how
+     * Google Maps' navigation tile expands.
+     *
+     * Re-launches THIS activity via the package launch intent with
+     * `REORDER_TO_FRONT | NEW_TASK | SINGLE_TOP`, which reorders the
+     * EXISTING task to the front rather than cold-starting a fresh instance
+     * — so the live recording / engine state is preserved. Because the
+     * activity is `singleTop` with `taskAffinity=""`, the OS routes this
+     * through [onNewIntent] on the running instance and leaves PiP, restoring
+     * the full window.
+     *
+     * Wrapped in a best-effort try: a failed reorder just leaves the user in
+     * PiP (they can still use the system expand control), never crashes.
+     * Returns false when the launch intent can't be resolved or the start
+     * throws — the Dart side treats that as "not restored".
+     */
+    private fun bringToFront(): Boolean {
+        return try {
+            val launch = packageManager.getLaunchIntentForPackage(packageName)
+                ?: return false
+            launch.addFlags(
+                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP,
+            )
+            startActivity(launch)
+            true
+        } catch (e: Exception) {
             false
         }
     }

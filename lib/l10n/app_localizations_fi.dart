@@ -3712,6 +3712,9 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork =>
       'Ei verkkoyhteyttä. Yritä myöhemmin uudelleen.';
 

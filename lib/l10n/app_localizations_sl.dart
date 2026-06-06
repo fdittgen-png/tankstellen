@@ -3712,6 +3712,9 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork =>
       'Ni omrežne povezave. Poskusite znova pozneje.';
 

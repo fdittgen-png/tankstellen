@@ -92,8 +92,26 @@ class TripDistanceResolver {
   /// oldest slice when the cap is hit. The controller calls this only for
   /// non-null coordinate pairs — a null-coord call clears the per-tick
   /// latch and is not a fix.
-  void addGpsFix(double latitude, double longitude) {
-    _gpsTrack.add(GpsTrackPoint(latitude, longitude));
+  ///
+  /// [hAccuracyM] (the fix's reported horizontal accuracy) and [at] (its
+  /// timestamp) are forwarded onto the buffered point so
+  /// [GpsTrackDistance.haversineKm] can reject a parked car's jitter
+  /// (accuracy gate) and a cold-start position jump (teleport gate) at
+  /// finalisation (#2963). Both are optional: a null `at` falls back to the
+  /// resolver clock, a null `hAccuracyM` is "unknown, accept", so a caller
+  /// passing only coordinates behaves exactly as before.
+  void addGpsFix(
+    double latitude,
+    double longitude, {
+    double? hAccuracyM,
+    DateTime? at,
+  }) {
+    _gpsTrack.add(GpsTrackPoint(
+      latitude,
+      longitude,
+      hAccuracyM: hAccuracyM,
+      at: at ?? _now(),
+    ));
     if (_gpsTrack.length > kVirtualOdometerSampleCap) {
       _gpsTrack.removeRange(
         0,
@@ -186,8 +204,22 @@ class TripDistanceResolver {
   /// Mirrors the controller's pre-extraction `debugAppendGpsFix`
   /// semantics. Plain (not `@visibleForTesting`) for the same reason as
   /// [debugAddSpeedSample].
-  void debugAddGpsFix({required double latitude, required double longitude}) {
-    _gpsTrack.add(GpsTrackPoint(latitude, longitude));
+  ///
+  /// [hAccuracyM] / [at] are optional so a test can drive the #2963
+  /// accuracy + teleport gates deterministically; null `at` falls back to
+  /// the resolver clock, matching [addGpsFix].
+  void debugAddGpsFix({
+    required double latitude,
+    required double longitude,
+    double? hAccuracyM,
+    DateTime? at,
+  }) {
+    _gpsTrack.add(GpsTrackPoint(
+      latitude,
+      longitude,
+      hAccuracyM: hAccuracyM,
+      at: at ?? _now(),
+    ));
   }
 
   /// Read-only view of the captured speed samples. Surfaced so the

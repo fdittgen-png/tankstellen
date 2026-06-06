@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -98,6 +99,11 @@ class AppInitializer {
 
     _bootstrap();
     StartupTimer.instance.mark('binding');
+
+    // #2978 — load `intl` locale date-symbols so `DateFormat.EEEE` (the
+    // localized price-prediction weekday) works for non-`en_US` locales
+    // instead of throwing `LocaleDataException`. In-memory, off the I/O path.
+    await initializeDateFormatting();
 
     // #2294 — a Hive box damaged beyond crash recovery throws a
     // HiveCorruptionException out of the storage phase. Previously it

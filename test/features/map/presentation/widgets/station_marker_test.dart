@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/price_band_colors.dart';
+import 'package:tankstellen/core/widgets/animated_price_text.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -508,6 +510,65 @@ void main() {
       // reader user can find it (#566).
       expect(find.bySemanticsLabel(RegExp(r'STAR.*1[.,]7')), findsOneWidget);
       handle.dispose();
+    });
+  });
+
+  group('StationMarkerBuilder price-flash — selected only (#2973)', () {
+    Future<void> pumpMarker(WidgetTester tester, Marker marker) =>
+        pumpApp(
+          tester,
+          SizedBox(
+            width: marker.width,
+            height: marker.height,
+            child: (((marker.child as RepaintBoundary).child as Semantics)
+                    .child as GestureDetector)
+                .child,
+          ),
+        );
+
+    testWidgets('the SELECTED marker wraps its price in AnimatedPriceText',
+        (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation, // e10 = 1.799
+        FuelType.e10,
+        1.50,
+        2.00,
+        selected: true,
+      );
+      await pumpMarker(tester, marker);
+      expect(find.byType(AnimatedPriceText), findsOneWidget,
+          reason: 'the chosen station flashes on a price refresh');
+      expect(find.text('1,799'), findsOneWidget);
+    });
+
+    testWidgets('an UN-selected bubble has NO AnimatedPriceText',
+        (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation,
+        FuelType.e10,
+        1.50,
+        2.00,
+        // selected defaults to false.
+      );
+      await pumpMarker(tester, marker);
+      expect(find.byType(AnimatedPriceText), findsNothing,
+          reason: 'the flash must never run across the whole marker layer — '
+              'only the selected marker animates');
+    });
+
+    testWidgets('a compact dot has NO AnimatedPriceText', (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation,
+        FuelType.e10,
+        1.50,
+        2.00,
+        compact: true,
+      );
+      await pumpMarker(tester, marker);
+      expect(find.byType(AnimatedPriceText), findsNothing);
     });
   });
 }

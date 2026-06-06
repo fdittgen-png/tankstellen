@@ -28,7 +28,7 @@ CARNET DE BORD & ÉCO-CONDUITE
 • L'éco-conduite repère les gaspillages avec histogrammes d'accélérateur et de régime et comparaison mensuelle.
 
 PLUS
-• Affichage du prix en direct à l'approche, widget d'accueil et annonces vocales pendant la conduite.
+• Affichage du prix en direct à l'approche, widget d'accueil, Android Auto et annonces vocales pendant la conduite.
 • Préréglages Basic / Medium / Complet pour adapter l'appli ; plusieurs profils possibles.
 • Tableau de bord Confidentialité pour voir, exporter ou tout supprimer. Synchronisation TankSync optionnelle.
 

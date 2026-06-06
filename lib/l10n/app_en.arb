@@ -2113,6 +2113,10 @@
       }
     }
   },
+  "pipTapToRestore": "Tap to open the full app",
+  "@pipTapToRestore": {
+    "description": "Tooltip + accessibility label on the floating Picture-in-Picture tile body (#2964): tapping the little window brings the full Sparkilo app back to the foreground / full screen."
+  },
   "authErrorNoNetwork": "No network connection. Try again later.",
   "@authErrorNoNetwork": {
     "description": "Auth error pill — shown when the device has no network connectivity (DNS failure, dropped socket, AuthRetryableFetchException). Replaces the raw exception text leaked by #1186."

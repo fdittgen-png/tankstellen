@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:tankstellen/features/carbon/domain/monthly_summary.dart';
 import 'package:tankstellen/features/carbon/presentation/widgets/monthly_bar_chart.dart';
 
@@ -32,6 +33,60 @@ double _cost(MonthlySummary s) => s.totalCost;
 /// so structural assertions stick to the [CustomPaint] widget itself and
 /// to the painter's exposed fields.
 void main() {
+  group('MonthlyBarChart month-axis i18n (#2971)', () {
+    // The painter draws month labels straight onto the canvas, so we inspect
+    // the painter's resolved DateFormat (driven by the pumped locale) rather
+    // than querying for a Text widget that does not exist.
+    DateFormat monthFormatFor(WidgetTester tester) {
+      final painter = tester
+          .widgetList<CustomPaint>(find.byType(CustomPaint))
+          .map((p) => p.painter)
+          .firstWhere(
+            (p) => p != null && p.runtimeType.toString().contains('BarChart'),
+          );
+      // ignore: avoid_dynamic_calls
+      return (painter as dynamic).monthFormat as DateFormat;
+    }
+
+    final summaries = [
+      _summary(month: DateTime(2026, 1), co2: 12),
+      _summary(month: DateTime(2026, 2), co2: 30),
+    ];
+
+    testWidgets('axis month abbreviations localize under French', (tester) async {
+      await pumpApp(
+        tester,
+        MonthlyBarChart(
+          summaries: summaries,
+          valueOf: _co2,
+          color: Colors.green,
+          unitLabel: 'kg',
+        ),
+        locale: const Locale('fr'),
+      );
+
+      final label = monthFormatFor(tester).format(DateTime(2026, 1));
+      // French January abbreviation is "janv." — NOT the English "Jan".
+      expect(label.toLowerCase(), startsWith('janv'));
+      expect(label, isNot('Jan'));
+    });
+
+    testWidgets('axis month abbreviations stay English under English',
+        (tester) async {
+      await pumpApp(
+        tester,
+        MonthlyBarChart(
+          summaries: summaries,
+          valueOf: _co2,
+          color: Colors.green,
+          unitLabel: 'kg',
+        ),
+      );
+
+      expect(monthFormatFor(tester).format(DateTime(2026, 1)), 'Jan');
+    });
+  });
+
   group('MonthlyBarChart', () {
     testWidgets(
       'renders the localized empty placeholder when summaries is empty',

@@ -3694,6 +3694,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get pipTapToRestore => 'Tap to open the full app';
+
+  @override
   String get authErrorNoNetwork => 'No network connection. Try again later.';
 
   @override
@@ -11451,6 +11454,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String fuelStationRadarProximity(int percent) {
     return '⟦Ƥřóẋîɱîŧý $percent% ····⟧';
   }
+
+  @override
+  String get pipTapToRestore => '⟦Ŧáƥ ŧó óƥéñ ŧĥé ƒúłł áƥƥ ·········⟧';
 
   @override
   String get authErrorNoNetwork =>

@@ -97,20 +97,28 @@ class _FuelBadge extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 4),
-          Text(
-            isUnavailable
-                ? (l10n?.outOfStock ?? 'Out of stock')
-                : PriceFormatter.formatPriceCompact(price),
-            style: TextStyle(
-              fontSize: priceFontSize,
-              fontWeight: FontWeight.bold,
-              color: isUnavailable
-                  ? theme.colorScheme.onSurfaceVariant
-                  : isChampion
-                      ? Colors.white
-                      : isHighlighted
-                          ? color
-                          : theme.colorScheme.onSurface,
+          // #2973 — flash the per-fuel price on change (the SAME
+          // AnimatedPriceText the search card uses), so an all-prices row
+          // that drops is noticeable. The out-of-stock case carries no
+          // numeric price, so it passes null and never flashes. Reduced
+          // motion is honoured inside AnimatedPriceText.
+          AnimatedPriceText(
+            price: isUnavailable ? null : price,
+            child: Text(
+              isUnavailable
+                  ? (l10n?.outOfStock ?? 'Out of stock')
+                  : PriceFormatter.formatPriceCompact(price),
+              style: TextStyle(
+                fontSize: priceFontSize,
+                fontWeight: FontWeight.bold,
+                color: isUnavailable
+                    ? theme.colorScheme.onSurfaceVariant
+                    : isChampion
+                        ? Colors.white
+                        : isHighlighted
+                            ? color
+                            : theme.colorScheme.onSurface,
+              ),
             ),
           ),
         ],

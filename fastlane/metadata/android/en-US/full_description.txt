@@ -28,7 +28,7 @@ TRIP LOGBOOK & ECO-COACHING
 • Eco-coaching flags wasteful behaviour with throttle and RPM histograms and monthly comparisons.
 
 MORE
-• Approach-station live-price overlay, home-screen widget and voice announcements while driving.
+• Approach-station live-price overlay, home-screen widget, Android Auto and voice announcements while driving.
 • Basic / Medium / Full presets right-size the app; multiple profiles supported.
 • Privacy Dashboard to see, export or delete all your data. Optional TankSync cross-device sync.
 

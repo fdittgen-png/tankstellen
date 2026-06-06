@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -73,6 +74,11 @@ class FuelTypeSelector extends ConsumerWidget {
                 label: Text(label),
                 selected: selected == type,
                 onSelected: (_) {
+                  // #2974 — a selection tick on the per-fuel chip re-search,
+                  // matching the everyday tap-surface haptics. selectionClick
+                  // only (never heavyImpact); never fires on scroll because
+                  // ChoiceChip.onSelected is a discrete tap, not a drag.
+                  HapticFeedback.selectionClick();
                   ref.read(selectedFuelTypeProvider.notifier).select(type);
                 },
                 visualDensity: VisualDensity.compact,

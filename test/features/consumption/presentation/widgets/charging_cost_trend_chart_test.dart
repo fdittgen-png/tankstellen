@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/charging_cost_trend_chart.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -20,6 +21,41 @@ Iterable<CustomPaint> _chartPaints(WidgetTester tester) =>
         );
 
 void main() {
+  group('ChargingCostTrendChart month-axis i18n (#2971)', () {
+    DateFormat monthFormatFor(WidgetTester tester) {
+      final painter = _chartPaints(tester).first.painter;
+      // ignore: avoid_dynamic_calls
+      return (painter as dynamic).monthFormat as DateFormat;
+    }
+
+    final monthly = <DateTime, double>{
+      DateTime(2026, 1): 12.0,
+      DateTime(2026, 2): 30.0,
+    };
+
+    testWidgets('axis month abbreviations localize under French', (tester) async {
+      await pumpApp(
+        tester,
+        ChargingCostTrendChart(monthlyCost: monthly),
+        locale: const Locale('fr'),
+      );
+
+      final label = monthFormatFor(tester).format(DateTime(2026, 1));
+      expect(label.toLowerCase(), startsWith('janv'));
+      expect(label, isNot('Jan'));
+    });
+
+    testWidgets('axis month abbreviations stay English under English',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ChargingCostTrendChart(monthlyCost: monthly),
+      );
+
+      expect(monthFormatFor(tester).format(DateTime(2026, 1)), 'Jan');
+    });
+  });
+
   group('ChargingCostTrendChart', () {
     testWidgets(
       'renders the localized empty placeholder when monthlyCost is empty',

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/country/country_config.dart';
@@ -117,6 +118,47 @@ void main() {
       final chips = tester.widgetList<ChoiceChip>(find.byType(ChoiceChip));
       final e10Chip = chips.firstWhere((c) => (c.label as Text).data == 'Super E10');
       expect(e10Chip.selected, isTrue);
+    });
+
+    testWidgets(
+        '#2974 — tapping a fuel chip fires a selectionClick haptic, '
+        'a scroll does NOT', (tester) async {
+      final storage = mockHiveStorageOverride();
+      when(() => storage.mock.getActiveProfileId()).thenReturn(null);
+      when(() => storage.mock.getSetting(any())).thenReturn(null);
+
+      final haptics = <String?>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'HapticFeedback.vibrate') {
+            haptics.add(call.arguments as String?);
+          }
+          return null;
+        },
+      );
+      addTearDown(() => tester.binding.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null));
+
+      await pumpApp(
+        tester,
+        const FuelTypeSelector(),
+        overrides: [
+          storage.override,
+          activeCountryOverride(Countries.germany),
+          selectedFuelTypeOverride(FuelType.all),
+        ],
+      );
+
+      // A scroll over the horizontal chip strip must NOT buzz.
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(-80, 0));
+      await tester.pumpAndSettle();
+      expect(haptics, isEmpty, reason: 'scroll must never fire a haptic');
+
+      // A discrete chip tap fires exactly one selectionClick.
+      await tester.tap(find.text('Super E10'));
+      await tester.pumpAndSettle();
+      expect(haptics, ['HapticFeedbackType.selectionClick']);
     });
 
     testWidgets('has correct semantics labels', (tester) async {

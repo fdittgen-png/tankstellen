@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
+import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/theme/price_band_colors.dart';
 import 'cluster_badge.dart';
 
 /// The per-marker side data the cheapest-labelled cluster builder needs to
@@ -58,9 +60,21 @@ Widget cheapestLabelledClusterLayer({
   );
 }
 
-/// The legacy bare count-cluster layer — the #2510 fallback for a genuinely
-/// huge non-radar result set, where painting hundreds of overlapping dots
-/// would itself be illegible. Unchanged from the pre-#2939 inline builder.
+/// The count-cluster layer — the #2510 fallback for a genuinely huge non-radar
+/// result set, where painting hundreds of overlapping dots would itself be
+/// illegible.
+///
+/// #2975 — the bubble is themed onto the canonical brand price-band ramp
+/// ([PriceBandColors.cheap], the forest-green leitmotiv) instead of the
+/// plugin-default `colorScheme.primaryContainer`, so a count cluster reads as
+/// part of the same map colour language as the cheapest-labelled clusters
+/// ([ClusterBadge]), the singleton price pills and the legend. A count cluster
+/// carries no per-member price (it is the "too many to label" fallback), so it
+/// uses the cheap stop as a neutral brand anchor — white text + hairline +
+/// the dark-mode map-overlay shadow token match the [ClusterBadge] grammar.
+///
+/// STATIC theming only — the builder allocates no animation and runs no
+/// per-frame work, so the huge-set path stays cheap.
 Widget countClusterLayer({
   required List<Marker> markers,
   required ThemeData theme,
@@ -69,18 +83,42 @@ Widget countClusterLayer({
     options: MarkerClusterLayerOptions(
       maxClusterRadius: 50,
       markers: markers,
-      builder: (context, clusterMarkers) => Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.primaryContainer,
-          shape: BoxShape.circle,
-        ),
+      builder: (context, clusterMarkers) => DecoratedBox(
+        decoration: countClusterDecoration(context),
         child: Center(
           child: Text(
             '${clusterMarkers.length}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
         ),
       ),
     ),
   );
 }
+
+/// The brand-themed decoration painted behind a count cluster (#2975).
+///
+/// Pulled out of the [countClusterLayer] builder so the theming can be
+/// asserted in a unit test without forcing real marker overlap, and so the
+/// builder stays a thin, allocation-light shell. The fill is the canonical
+/// brand price-band [PriceBandColors.cheap] (NOT the plugin-default
+/// `colorScheme.primaryContainer`), with the same white hairline + dark-mode
+/// map-overlay shadow grammar as [ClusterBadge].
+BoxDecoration countClusterDecoration(BuildContext context) => BoxDecoration(
+      color: PriceBandColors.cheap.withValues(alpha: 0.94),
+      shape: BoxShape.circle,
+      border: Border.all(
+        color: Colors.white.withValues(alpha: 0.85),
+        width: 1.5,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: DarkModeColors.mapOverlayShadow(context),
+          blurRadius: 4,
+          offset: const Offset(0, 1),
+        ),
+      ],
+    );

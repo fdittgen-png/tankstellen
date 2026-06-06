@@ -144,6 +144,32 @@ void main() {
       expect(hardAccel.litersWasted, closeTo(0.25, 0.001));
     });
 
+    test('a SINGLE hard-accel event no longer fires the lesson (#2963)', () {
+      // One sustained acceleration: 0 → 50 km/h in 2 s (≈ 6.94 m/s², over
+      // the 3.0 threshold, sustained ≥ 1 s). One event × 0.05 L exactly
+      // equals the 0.05 L noise floor — on the old `>=` it cleared and
+      // rendered "0.1 L" (a 2× overstatement of a single near-zero event).
+      // The `>` gate now drops it.
+      final samples = <TripSample>[
+        TripSample(timestamp: start, speedKmh: 0, rpm: 1000),
+        TripSample(
+            timestamp: start.add(const Duration(seconds: 2)),
+            speedKmh: 50,
+            rpm: 3000),
+        TripSample(
+            timestamp: start.add(const Duration(seconds: 12)),
+            speedKmh: 50,
+            rpm: 2000),
+      ];
+      final insights = analyzeTrip(samples);
+      expect(
+        insights.where((i) => i.labelKey == 'insightHardAccel'),
+        isEmpty,
+        reason: 'a single 0.05 L event must not clear the noise floor by '
+            'equality and surface as "0.1 L"',
+      );
+    });
+
     test('all-below-noise-floor trip → empty list', () {
       // 10s of low-RPM, gentle cruising — nothing trips a category.
       final samples = <TripSample>[

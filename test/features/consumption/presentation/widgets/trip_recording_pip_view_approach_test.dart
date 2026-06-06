@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
@@ -641,40 +640,135 @@ void main() {
     });
   });
 
-  group('TripRecordingPipView (#2601) — approach tap-to-navigate', () {
-    // #2601 — the approach-price tile is tappable: tapping it opens the
-    // station in the user's maps app via NavigationUtils.openInMaps,
-    // which goes through the url_launcher platform channel. We mock that
-    // channel to capture the launched URL (a geo: URI for the station's
-    // coords) without touching a real OS intent.
-    const channel = MethodChannel('plugins.flutter.io/url_launcher');
-    final launchedUrls = <String>[];
-
-    setUp(() {
-      launchedUrls.clear();
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (call) async {
-            if (call.method == 'launch' || call.method == 'launchUrl') {
-              final args = call.arguments;
-              final url = args is Map
-                  ? args['url'] as String?
-                  : args as String?;
-              if (url != null) launchedUrls.add(url);
-              return true;
-            }
-            if (call.method == 'canLaunch') return true;
-            return null;
-          });
-    });
-
-    tearDown(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, null);
-    });
+  group('TripRecordingPipView (#2964) — tap the tile body to restore', () {
+    // #2964 — the user expects a tap on the floating PiP window to bring the
+    // full app back to the foreground. The host (the banner) passes an
+    // onBodyTap callback; tapping the tile body must invoke it (this replaces
+    // the prior #2601 tap-to-navigate on the price layout). Tests assert the
+    // callback fires exactly once per tap, and that the body stays
+    // non-tappable when no callback is wired (preview / no-host fallback).
 
     testWidgets(
-      'tapping the approach-price tile launches the station in maps',
+      'tapping the approach-price tile body invokes onBodyTap (restore)',
       (tester) async {
+        var taps = 0;
+        await tester.pumpWidget(
+          _wrap(
+            TripRecordingPipView(
+              state: _activeState(),
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              approachState: const ApproachInRadius(
+                station: _stationE10,
+                distanceMeters: 350,
+              ),
+              fuelType: FuelType.e10,
+              onBodyTap: () => taps++,
+            ),
+          ),
+        );
+
+        // The tile body carries a live GestureDetector wired to onBodyTap.
+        final gesture = tester.widget<GestureDetector>(
+          find.descendant(
+            of: find.byType(Tooltip),
+            matching: find.byType(GestureDetector),
+          ),
+        );
+        expect(gesture.onTap, isNotNull);
+
+        await tester.tap(find.byType(GestureDetector));
+        await tester.pumpAndSettle();
+        expect(taps, 1, reason: 'tapping the tile body must restore the app');
+      },
+    );
+
+    testWidgets(
+      'tapping the radar-price tile body invokes onBodyTap (restore)',
+      (tester) async {
+        var taps = 0;
+        await tester.pumpWidget(
+          _wrap(
+            TripRecordingPipView(
+              state: _activeState(),
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              radarStation: _stationE10.copyWith(dist: 2.4),
+              radarDistanceMeters: 2400,
+              radiusMeters: 5000,
+              fuelType: FuelType.e10,
+              onBodyTap: () => taps++,
+            ),
+          ),
+        );
+        await tester.tap(find.byType(GestureDetector).first);
+        await tester.pumpAndSettle();
+        expect(taps, 1);
+      },
+    );
+
+    testWidgets(
+      'tapping the default consumption tile body invokes onBodyTap (restore)',
+      (tester) async {
+        // #2964 — unlike #2601 (which only made the price layout tappable),
+        // the default consumption layout is now tappable too: a tap on ANY
+        // tile body restores the app.
+        var taps = 0;
+        await tester.pumpWidget(
+          _wrap(
+            TripRecordingPipView(
+              state: _activeState(),
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              approachState: const ApproachIdle(),
+              onBodyTap: () => taps++,
+            ),
+          ),
+        );
+        // L/100 km default layout, with a body tap target.
+        expect(find.text('L/100 km'), findsOneWidget);
+        await tester.tap(find.byType(GestureDetector));
+        await tester.pumpAndSettle();
+        expect(taps, 1);
+      },
+    );
+
+    testWidgets(
+      'the tile body exposes the restore tooltip + a11y label',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrap(
+            TripRecordingPipView(
+              state: _activeState(),
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              approachState: const ApproachIdle(),
+              onBodyTap: () {},
+            ),
+          ),
+        );
+        final tooltip = tester.widget<Tooltip>(find.byType(Tooltip));
+        expect(tooltip.message, 'Tap to open the full app');
+        // The body is announced as a button carrying the restore label so a
+        // screen-reader user knows the tap brings the app back.
+        final semantics = tester.widget<Semantics>(
+          find.descendant(
+            of: find.byType(Tooltip),
+            matching: find.byWidgetPredicate(
+              (w) => w is Semantics && w.properties.label != null,
+            ),
+          ),
+        );
+        expect(semantics.properties.label, 'Tap to open the full app');
+        expect(semantics.properties.button, isTrue);
+      },
+    );
+
+    testWidgets(
+      'no onBodyTap → the tile body is NOT tappable (no host fallback)',
+      (tester) async {
+        // Without a wired host the tile renders plainly — no GestureDetector,
+        // so previews / widget tests without a PiP host stay inert.
         await tester.pumpWidget(
           _wrap(
             TripRecordingPipView(
@@ -689,49 +783,9 @@ void main() {
             ),
           ),
         );
-
-        // The tile carries a navigate Tooltip + a GestureDetector with a
-        // live onTap (the seam wired in #2601).
-        final gesture = tester.widget<GestureDetector>(
-          find.descendant(
-            of: find.byType(Tooltip),
-            matching: find.byType(GestureDetector),
-          ),
-        );
-        expect(gesture.onTap, isNotNull);
-
-        await tester.tap(find.byType(GestureDetector));
-        await tester.pumpAndSettle();
-
-        // openInMaps fired → a geo: URI for the station coordinates.
-        expect(
-          launchedUrls,
-          isNotEmpty,
-          reason: 'tapping the approach tile must open the maps app',
-        );
-        expect(launchedUrls.first, startsWith('geo:'));
-        expect(launchedUrls.first, contains('${_stationE10.lat}'));
-        expect(launchedUrls.first, contains('${_stationE10.lng}'));
+        expect(find.byType(GestureDetector), findsNothing);
       },
     );
-
-    testWidgets('the default L/100 km layout is NOT tappable (no nav seam)', (
-      tester,
-    ) async {
-      // Only the approach layout navigates; the default layout keeps its
-      // existing non-tappable behavior (#2601 scope guard).
-      await tester.pumpWidget(
-        _wrap(
-          TripRecordingPipView(
-            state: _activeState(),
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-            approachState: const ApproachIdle(),
-          ),
-        ),
-      );
-      expect(find.byType(GestureDetector), findsNothing);
-    });
   });
 
   group('TripRecordingPipView (#2620) — no clip in a small PiP viewport', () {

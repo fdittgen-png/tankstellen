@@ -50,7 +50,10 @@ void main() {
     // lines next to the adjacent country/language backfill migration).
     // #2772 — 957 → 961: the isBenignStreamCancel de-noise helper + its
     // services import + the two global-handler filter calls. Bootstrap file.
-    'lib/app/app_initializer.dart': 961,
+    // #2978 — 961 → 964: `initializeDateFormatting()` + its import + comment,
+    // so `intl` locale date-symbols are loaded once at startup and the
+    // localized price-prediction weekday renders for non-`en_US` locales.
+    'lib/app/app_initializer.dart': 964,
     // #2415 — background_service.dart graduated: the scan body moved into
     // BackgroundAlertScanCoordinator + BackgroundScanRunners +
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
@@ -274,7 +277,14 @@ void main() {
     // the swap so the new live link starts from a clean streak. Both are
     // load-bearing recovery logic in the hot polling path that cannot move out
     // of the controller. Decomposition stays tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1666,
+    // #2963 — re-grandfathered 1666 → 1694: the short-idle-OBD2-trip
+    // corruption fix. `updateGpsFix` now forwards the fix's accuracy +
+    // timestamp to the haversine distance source (reject parked-car jitter +
+    // a cold-start teleport), and the `_emit` speed-persist guard stops
+    // `speedKmh ?? 0` fabricating a leading `0` that scored a phantom
+    // hard-accel. Both are hot-path recording logic that can't move out of
+    // the controller. Decomposition stays tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1694,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The
@@ -464,7 +474,11 @@ void main() {
     // getter / `initialCameraFit` substitution that frames the explicit
     // bounds (route mode: the full itinerary) instead of the search circle.
     // Null path unchanged (nearby mode). Decomposition tracked by #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 622,
+    // #2974 — re-grandfathered 622 → 625: the marker-selection haptic wraps
+    // the onStationTap callback once (3 lines: the selectionClick + the
+    // delegate + its dartdoc) so a marker tap that selects a list row buzzes
+    // like the other everyday tap surfaces. Decomposition still #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 625,
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,

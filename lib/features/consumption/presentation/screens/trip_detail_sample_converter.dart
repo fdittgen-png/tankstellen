@@ -28,4 +28,8 @@ TripDetailSample toDetailSample(TripSample s) => TripDetailSample(
       // combustion-health heuristic sees the sustained mixture trim.
       stft: s.stft,
       ltft: s.ltft,
+      // #2963 — carry the GPS horizontal accuracy through so the saved-trip
+      // score path's accel-event accuracy gate can fire (it was dropped here
+      // and in the reverse converter, leaving the gate dead once persisted).
+      hAccuracyM: s.hAccuracyM,
     );

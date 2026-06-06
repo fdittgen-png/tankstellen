@@ -111,5 +111,41 @@ void main() {
         const Duration(milliseconds: 720),
       );
     });
+
+    testWidgets(
+        '#2972 — reduced motion: rows render at end-state (no FadeTransition '
+        'slice) even with the timeline at 0', (tester) async {
+      final controller = AnimationController(
+        vsync: const TestVSync(),
+        duration: StaggeredFadeIn.timelineDuration,
+      );
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: MaterialApp(
+          home: Scaffold(
+            body: StaggeredFadeIn(
+              controller: controller,
+              index: 1000, // would normally fade in LAST.
+              child: const Text('card'),
+            ),
+          ),
+        ),
+      ));
+
+      // Timeline never advanced (value still 0). Without the guard the row
+      // would be invisible (opacity 0); with it the child is rendered
+      // directly with no FadeTransition driving its opacity.
+      expect(
+        find.descendant(
+          of: find.byType(StaggeredFadeIn),
+          matching: find.byType(FadeTransition),
+        ),
+        findsNothing,
+        reason: 'reduced motion bypasses the fade timeline entirely',
+      );
+      expect(find.text('card'), findsOneWidget);
+    });
   });
 }

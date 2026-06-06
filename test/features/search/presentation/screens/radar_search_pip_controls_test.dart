@@ -115,6 +115,53 @@ void main() {
   });
 
   testWidgets(
+      '#2974 — tapping the radar pin button fires a selectionClick haptic',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+    final haptics = <String?>[];
+    TestWidgetsFlutterBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      if (call.method == 'HapticFeedback.vibrate') {
+        haptics.add(call.arguments as String?);
+      }
+      return null;
+    });
+    addTearDown(() => TestWidgetsFlutterBinding
+        .instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null));
+
+    final test = standardTestOverrides();
+    when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+    when(() => test.mockStorage.getRatings()).thenReturn(const <String, int>{});
+
+    await pumpApp(
+      tester,
+      const SearchScreen(),
+      overrides: [
+        ...test.overrides,
+        userPositionNullOverride(),
+        wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
+        radarSearchProvider.overrideWith(
+          () => _ActiveRadar([_station('NEAR')]),
+        ),
+      ],
+    );
+
+    // The radar starts unpinned (auto-pin preference defaults are mocked off
+    // in the standard overrides). Tapping the pin button must buzz.
+    haptics.clear();
+    await tester.tap(find.byKey(const Key('radarPinButton')));
+    await tester.pumpAndSettle();
+
+    expect(haptics, contains('HapticFeedbackType.selectionClick'),
+        reason: 'the pin TOGGLE fires a selection tick');
+
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets(
       'PiP small window with on-search radar active + a nearest station '
       'renders the trip price layout (no trip needed)', (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;

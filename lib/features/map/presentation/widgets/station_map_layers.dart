@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -349,7 +350,15 @@ class _StationMapLayersState extends State<StationMapLayers> {
     // SINGLETON keeps its full price pill (never a dot); only clustered members
     // roll up into the cheapest-price badge. The emphasis-dot scheme stays for
     // the legacy non-clustered surfaces.
-    final onTap = widget.onStationTap;
+    // #2974 — a marker tap that selects its list row also fires a selection
+    // tick (selectionClick only). Null on the default push-to-detail map → no
+    // haptic; the route push owns its own feedback.
+    final onTap = widget.onStationTap == null
+        ? null
+        : (String id) {
+            HapticFeedback.selectionClick();
+            widget.onStationTap!(id);
+          };
     _markerMeta.clear();
     _markers = ordered.map((station) {
       final isPastel = hasSelection && !ids.contains(station.id);
