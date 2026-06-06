@@ -390,6 +390,19 @@ void main() {
       );
       addTearDown(container.dispose);
 
+      // #2349 fault-idiom assertion: with the in-radius `searchStations`
+      // dependency throwing, resolving the provider future must NOT throw — it
+      // degrades to corridor-only rather than surfacing the fault. This is the
+      // syntactic never-throws contract the static scanner
+      // (`test/lint/never_throws_contract_test.dart`) greps the sibling test
+      // for (`, completes)`).
+      await expectLater(
+        container.read(radarCandidateListProvider.future),
+        completes,
+        reason: '#2349 — a throwing in-radius fetch must not break the card; '
+            'the provider future completes normally (corridor-only fallback)',
+      );
+
       final out = await container.read(radarCandidateListProvider.future);
 
       // The corridor's priced station survives; the throwing in-radius fetch is
