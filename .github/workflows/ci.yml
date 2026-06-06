@@ -703,6 +703,26 @@ jobs:
       - name: Build App Bundle (release)
         if: github.event_name != 'pull_request'
         run: flutter build appbundle --release --flavor play
+      # #2947 — assert the MERGED play manifest declares ZERO
+      # FOREGROUND_SERVICE* permissions, so a future accidental FGS re-merge
+      # (the Android Auto v2 live bridge is a BOUND service, no FGS) trips CI
+      # here instead of surfacing as the opaque #1498 Play 403 on the
+      # Open-Testing upload. Mirrors the fdroid no-GMS gate pattern. The PR
+      # build produces playDebug's merged manifest; the master/tag build
+      # produces playRelease's. Audit whichever exists.
+      - name: Audit — zero FOREGROUND_SERVICE permissions (play)
+        if: always()
+        run: |
+          DEBUG_MANIFEST="build/app/intermediates/merged_manifests/playDebug/processPlayDebugManifest/AndroidManifest.xml"
+          RELEASE_MANIFEST="build/app/intermediates/merged_manifests/playRelease/processPlayReleaseManifest/AndroidManifest.xml"
+          if [ -f "$RELEASE_MANIFEST" ]; then
+            bash scripts/audit_no_fgs.sh "$RELEASE_MANIFEST"
+          elif [ -f "$DEBUG_MANIFEST" ]; then
+            bash scripts/audit_no_fgs.sh "$DEBUG_MANIFEST"
+          else
+            echo "::error::No merged play manifest found to audit for FGS permissions." >&2
+            exit 1
+          fi
       - name: Clean up decoded keystore
         if: always()
         run: rm -f "$RUNNER_TEMP/tankstellen-release.jks"

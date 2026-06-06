@@ -11,22 +11,31 @@ import androidx.car.app.SessionInfo
 import androidx.car.app.validation.HostValidator
 
 /**
- * Android Auto car app service for Tankstellen.
+ * Android Auto / Automotive car app service for Tankstellen (epic #2946).
  *
- * Provides a car-optimized UI for browsing nearby fuel stations,
- * viewing prices, and navigating to stations. Communicates with
- * the Flutter app via MethodChannel through [CarDataBridge].
+ * A POI [CarAppService] that serves a car-optimised list+map UI for nearby fuel
+ * stations. It is a BOUND service the Android Auto / Automotive host binds via
+ * the `androidx.car.app.category.POI` intent-filter (declared in the `play`
+ * source set only) — it never starts itself as a foreground service, so it
+ * carries no FOREGROUND_SERVICE permission (#1498).
  *
  * ## Architecture
- * - CarAppService creates Sessions (one per connection)
- * - Each Session creates a NearbyScreen as the root
- * - Screens use CarDataBridge to fetch data from the Flutter/Dart side
- * - Navigation actions launch Google Maps / Waze via Intent
+ * - [CarAppService] creates one [TankstellenCarSession] per host connection.
+ * - The session's root is [de.tankstellen.tankstellen.car.MenuScreen]
+ *   (Search + Radar), which pushes
+ *   [de.tankstellen.tankstellen.car.SearchScreen] /
+ *   [de.tankstellen.tankstellen.car.RadarScreen]
+ *   (each a `PlaceListMapTemplate` over [de.tankstellen.tankstellen.car.CarStation]).
+ * - Data sources (v2 SLICE 1, #2947): the Search screen fetches LIVE through a
+ *   headless Flutter engine via [de.tankstellen.tankstellen.car.CarDataBridge]
+ *   (created/destroyed with the session lifecycle, no FGS). Radar still renders
+ *   the v1 SharedPreferences snapshot the in-app radar wrote (slice 2 wires its
+ *   live fetch).
  *
  * ## Limitations
- * - Android Auto templates limit UI to lists + detail views
- * - Max 6 items per list on most head units
- * - No custom rendering (no Canvas, no Maps in POI template)
+ * - Android Auto templates limit UI to lists + detail views.
+ * - The host caps list length on most head units.
+ * - No custom rendering (no Canvas; the host draws the POI map).
  */
 class TankstellenCarAppService : CarAppService() {
 

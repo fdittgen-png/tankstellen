@@ -19,44 +19,131 @@ import androidx.car.app.model.Row
 import androidx.car.app.model.Template
 
 /**
- * Android Auto v1 (#2948 / epic #2946) — base car screen that renders a
- * SharedPreferences-fed station list as a [PlaceListMapTemplate]: the POI list
- * on the left and the host-drawn map with a coloured anchor per station on the
- * right. Tapping a row pans/selects on the map (standard
- * `PlaceListMapTemplate` behaviour — no extra wiring needed).
+ * Android Auto base car screen that renders a station list as a
+ * [PlaceListMapTemplate]: the POI list on the left and the host-drawn map with
+ * a coloured anchor per station on the right. Tapping a row pans/selects on the
+ * map (standard `PlaceListMapTemplate` behaviour — no extra wiring needed).
  *
- * Subclasses supply the title, the SharedPreferences key, and the empty-state
- * message. A missing/empty/malformed key renders the friendly empty message
- * (never crashes) — see [CarStation.read].
+ * ## v1 snapshot vs v2 live SEARCH (#2947 / epic #2946)
+ * v1 (#2948) renders the SharedPreferences snapshot the last in-app search /
+ * radar wrote (`CarStation.read`). Slice 1 of v2 swaps the SEARCH data source
+ * for a LIVE on-demand fetch via the headless [CarDataBridge]:
+ *
+ *  - `onGetTemplate` returns the snapshot IMMEDIATELY (instant, no blank) and
+ *    kicks `CarDataBridge.fetch([kind])` when [liveFetchEnabled] is true.
+ *  - On a live result it sets [liveStations] and calls [invalidate], which
+ *    rebuilds the template from the live list.
+ *  - The host Refresh button ([PlaceListMapTemplate.Builder.setOnContentRefreshListener])
+ *    re-fetches; that callback is quota-exempt.
+ *  - A cold start with an empty snapshot shows the loading state until the
+ *    first live result; if no snapshot AND no live data arrive (e.g. a fresh
+ *    Automotive head unit with no persisted fix) it shows [emptyMessageRes]
+ *    (the no-GPS message for Search).
+ *
+ * Subclasses that stay on the v1 snapshot (Radar this slice) leave
+ * [liveFetchEnabled] false. A missing/empty/malformed snapshot still degrades
+ * to the friendly empty message (never crashes) — see [CarStation.read].
  */
 abstract class StationListScreen(carContext: CarContext) : Screen(carContext) {
 
     /** Template title (a string resource id). */
     protected abstract val titleRes: Int
 
-    /** SharedPreferences key holding this screen's station list. */
+    /** SharedPreferences key holding this screen's snapshot station list. */
     protected abstract val prefsKey: String
 
-    /** Empty-state message shown when the key is missing/empty (string res id). */
+    /** Empty-state message shown when there is no snapshot and no live data. */
     protected abstract val emptyMessageRes: Int
 
-    override fun onGetTemplate(): Template {
-        val stations = CarStation.read(carContext, prefsKey)
-        val listBuilder = ItemList.Builder()
+    /** Which list the live bridge fetches for this screen. */
+    protected abstract val kind: CarFetchKind
 
-        if (stations.isEmpty()) {
-            listBuilder.setNoItemsMessage(carContext.getString(emptyMessageRes))
-        } else {
-            for (station in stations) {
-                listBuilder.addItem(buildRow(station))
+    /**
+     * Whether this screen fetches LIVE data via [liveSource]. Search opts in
+     * (slice 1); Radar stays false (v1 snapshot, slice 2).
+     */
+    protected open val liveFetchEnabled: Boolean = false
+
+    /**
+     * The live data source. Defaults to the real [CarDataBridge]; overridable so
+     * a Robolectric test can inject a fake (the real bridge wraps a
+     * [io.flutter.embedding.engine.FlutterEngine] that can't run under
+     * Robolectric).
+     */
+    protected open val liveSource: CarLiveSource = CarDataBridge
+
+    /**
+     * The latest LIVE list, or null before any live result has arrived. When
+     * non-null it takes precedence over the snapshot in [onGetTemplate].
+     * Mutated only on the main thread (the bridge callback), then [invalidate].
+     */
+    private var liveStations: List<CarStation>? = null
+
+    /** True once a live fetch has completed (success OR fault). */
+    private var liveAttempted = false
+
+    override fun onGetTemplate(): Template {
+        val snapshot = CarStation.read(carContext, prefsKey)
+        val stations = liveStations ?: snapshot
+
+        // Capture the cold-start condition BEFORE kicking the fetch (which flips
+        // liveAttempted): no snapshot AND no live result AND no fetch tried yet.
+        val coldStart = liveFetchEnabled &&
+            snapshot.isEmpty() && liveStations == null && !liveAttempted
+
+        if (liveFetchEnabled && liveSource.isReady) {
+            kickLiveFetch()
+        }
+
+        val builder = PlaceListMapTemplate.Builder()
+            .setTitle(carContext.getString(titleRes))
+            .setHeaderAction(Action.BACK)
+
+        if (liveFetchEnabled) {
+            // Host Refresh button — quota-exempt; re-fetch on demand.
+            builder.setOnContentRefreshListener {
+                liveAttempted = false
+                kickLiveFetch(force = true)
             }
         }
 
-        return PlaceListMapTemplate.Builder()
-            .setTitle(carContext.getString(titleRes))
-            .setHeaderAction(Action.BACK)
-            .setItemList(listBuilder.build())
-            .build()
+        // A cold start (no snapshot, awaiting the first live result) shows the
+        // host spinner. PlaceListMapTemplate forbids an item list while loading,
+        // so set loading XOR the list — never both.
+        if (coldStart && liveSource.isReady) {
+            builder.setLoading(true)
+        } else {
+            val listBuilder = ItemList.Builder()
+            if (stations.isEmpty()) {
+                listBuilder.setNoItemsMessage(carContext.getString(emptyMessageRes))
+            } else {
+                for (station in stations) {
+                    listBuilder.addItem(buildRow(station))
+                }
+            }
+            builder.setItemList(listBuilder.build())
+        }
+
+        return builder.build()
+    }
+
+    /**
+     * Kick a live fetch (idempotent within a render — the bridge's per-kind
+     * re-entrancy guard collapses duplicate in-flight requests). On a JSON
+     * result, parse + store it and [invalidate] so the next render shows the
+     * live list; on null (timeout / fault / no fix) keep whatever is shown.
+     */
+    private fun kickLiveFetch(force: Boolean = false) {
+        if (liveAttempted && !force) return
+        liveAttempted = true
+        liveSource.fetch(kind) { json ->
+            if (json != null) {
+                liveStations = CarStation.parse(json)
+            }
+            // Even on a null result, invalidate so a cold-start spinner clears
+            // to the empty-state message rather than spinning forever.
+            invalidate()
+        }
     }
 
     private fun buildRow(station: CarStation): Row {
