@@ -48,9 +48,11 @@ class _StationDetails extends StatelessWidget {
   final Station station;
   final bool hasBrand;
 
-  /// #2899 — when non-null, the Fuel Station Radar "closeness" bar is rendered
-  /// under the distance row, scaled to this radius (the search radius, in
-  /// metres). Null on the regular search list, so the card is unchanged there.
+  /// #2899/#2984 — when non-null, the Fuel Station Radar "closeness" bar is
+  /// rendered under the distance row, scaled to this ABSOLUTE radius in metres
+  /// (`min(searchRadius, kRadarClosenessScaleCapMeters)` — a fixed scale that
+  /// does not depend on the result set, so a near station's fill is stable).
+  /// Null on the regular search list, so the card is unchanged there.
   final double? closenessRadiusMeters;
 
   const _StationDetails({
@@ -139,13 +141,15 @@ class _StationDetails extends StatelessWidget {
             ],
           ],
         ),
-        // #2899 — Fuel Station Radar closeness bar: the SAME green→accent
+        // #2899/#2984 — Fuel Station Radar closeness bar: the SAME green→accent
         // [ProximityFillBar] the trip radar card + PiP overlay use, so all
         // three radar surfaces fill identically as the driver nears a station.
         // `station.dist` is the great-circle distance in km → metres for the
-        // bar; it scales to the search radius (see [StationCard]). Live: the
-        // radar re-stamps `dist` on each scan, so the bar re-fills as the
-        // result set refreshes around the moving user.
+        // bar; it scales to an ABSOLUTE fixed radius (`closenessRadiusMeters` =
+        // min(searchRadius, cap), see [StationCard]), so closer = fuller and a
+        // given station's fill is stable across result-set changes. Live: the
+        // radar re-stamps `dist` on each scan, so the bar re-fills as the user
+        // moves — the SCALE stays put, only the distance changes.
         if (closenessRadiusMeters != null) ...[
           const SizedBox(height: Spacing.xs),
           ProximityFillBar(
