@@ -4527,5 +4527,41 @@
   "@syncSchemaOutdated": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2HealthDownloadJson": "Download as JSON",
+  "@obd2HealthDownloadJson": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthDownloadInitTranscript": "Download init transcript only",
+  "@obd2HealthDownloadInitTranscript": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2HealthDownloadError": "Couldn't save the diagnostics file",
+  "@obd2HealthDownloadError": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestAdapterLabel": "Adapter to test",
+  "@obd2TestAdapterLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestAdapterScanOption": "Scan for adapter",
+  "@obd2TestAdapterScanOption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepConnectTo": "Connect to {adapter}",
+  "@obd2TestStepConnectTo": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "adapter": {
+        "type": "String",
+        "example": "vLinker FS"
+      }
+    }
   }
 }

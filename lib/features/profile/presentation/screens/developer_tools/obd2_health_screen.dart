@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/logging/error_logger.dart';
+import '../../../../../core/sharing/public_file_exporter.dart';
 import '../../../../../core/widgets/page_scaffold.dart';
 import '../../../../../core/widgets/section_header.dart';
 import '../../../../../core/widgets/snackbar_helper.dart';
@@ -26,10 +29,16 @@ import 'obd2_self_test_panel.dart';
 ///
 /// Hosts the [Obd2DiagnosticsCard] in a full-detail scroll — the live
 /// (in-progress) session first, then the capped ring of finished
-/// sessions, newest-first — plus a copy-as-JSON affordance per session
-/// (the maintainer debugs by pasting the per-PID table elsewhere). The
-/// data comes from the process-wide `Obd2CommDiagnostics.instance`
-/// collector the comm-path layers tee into.
+/// sessions, newest-first — plus a download-as-JSON affordance per session
+/// (#2938 — the maintainer opens the saved file from the file manager to
+/// read the per-PID table). The data comes from the process-wide
+/// `Obd2CommDiagnostics.instance` collector the comm-path layers tee into.
+///
+/// The JSON exports write a FILE to the device's public Downloads folder
+/// via [PublicFileExporter] (#2938), matching the backup-export /
+/// data-access-trace UX (#2815/#2824) — not the clipboard. These are
+/// foreground actions so the `tankstellen/public_files` channel is
+/// available (the #2933 background-isolate concern does not apply).
 ///
 /// Reads the collector once per build; it is a plain in-memory singleton,
 /// so there is no provider to watch. The screen is dev-only and the
@@ -86,7 +95,8 @@ class Obd2HealthScreen extends ConsumerWidget {
             session: live,
             enabled: enabled,
           ),
-          _copyJsonButton(context, l, live, const Key('obd2_health_copy_live')),
+          _downloadJsonButton(
+              context, l, live, const Key('obd2_health_copy_live')),
           const SizedBox(height: 16),
 
           // --- Recent finished sessions ---------------------------------
@@ -101,7 +111,7 @@ class Obd2HealthScreen extends ConsumerWidget {
               session: finished[i],
               enabled: enabled,
             ),
-            _copyJsonButton(
+            _downloadJsonButton(
               context,
               l,
               finished[i],
@@ -114,14 +124,14 @@ class Obd2HealthScreen extends ConsumerWidget {
     );
   }
 
-  Widget _copyJsonButton(
+  Widget _downloadJsonButton(
     BuildContext context,
     AppLocalizations? l,
     Obd2SessionDiagnostic session,
     Key key,
   ) {
     // Derive a stable sibling key for the handshake-only button from the
-    // copy-JSON button's key (every caller passes a `ValueKey<String>`).
+    // download-JSON button's key (every caller passes a `ValueKey<String>`).
     final keyValue = key is ValueKey ? key.value : key;
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
@@ -136,18 +146,18 @@ class Obd2HealthScreen extends ConsumerWidget {
             if (session.initTranscript.isNotEmpty)
               TextButton.icon(
                 key: Key('${keyValue}_init'),
-                onPressed: () => _copyInitTranscript(context, l, session),
+                onPressed: () => _downloadInitTranscript(context, l, session),
                 icon: const Icon(Icons.terminal_outlined, size: 18),
                 label: Text(
-                  l?.obd2HealthCopyInitTranscript ??
-                      'Copy init transcript only',
+                  l?.obd2HealthDownloadInitTranscript ??
+                      'Download init transcript only',
                 ),
               ),
             TextButton.icon(
               key: key,
-              onPressed: () => _copyAsJson(context, l, session),
-              icon: const Icon(Icons.copy_all_outlined, size: 18),
-              label: Text(l?.obd2HealthCopyJson ?? 'Copy as JSON'),
+              onPressed: () => _downloadAsJson(context, l, session),
+              icon: const Icon(Icons.download_outlined, size: 18),
+              label: Text(l?.obd2HealthDownloadJson ?? 'Download as JSON'),
             ),
           ],
         ),
@@ -155,26 +165,24 @@ class Obd2HealthScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _copyAsJson(
+  /// Write the full per-session diagnostics JSON to the public Downloads
+  /// folder (#2938) and surface a single success / error snackbar. Replaces
+  /// the former clipboard copy — the maintainer opens the saved file from the
+  /// file manager.
+  Future<void> _downloadAsJson(
     BuildContext context,
     AppLocalizations? l,
     Obd2SessionDiagnostic session,
   ) async {
-    final json =
-        const JsonEncoder.withIndent('  ').convert(session.toJson());
-    await Clipboard.setData(ClipboardData(text: json));
-    if (!context.mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      l?.obd2HealthCopied ?? 'OBD2 diagnostics copied to clipboard.',
-    );
+    final json = const JsonEncoder.withIndent('  ').convert(session.toJson());
+    await _saveJsonToDownloads(context, l, json, 'session');
   }
 
-  /// Copy ONLY the dongle-init handshake payload — adapter identity, the
-  /// init transcript, MTU + the discovered-supported set — to the local
-  /// clipboard (#2511). No network / TankSync; a focused subset of the
-  /// per-session JSON for pasting a handshake into a bug report.
-  Future<void> _copyInitTranscript(
+  /// Write ONLY the dongle-init handshake payload — adapter identity, the
+  /// init transcript, MTU + the discovered-supported set — to the public
+  /// Downloads folder (#2511/#2938). A focused subset of the per-session JSON
+  /// for attaching a handshake to a bug report.
+  Future<void> _downloadInitTranscript(
     BuildContext context,
     AppLocalizations? l,
     Obd2SessionDiagnostic session,
@@ -191,11 +199,65 @@ class Obd2HealthScreen extends ConsumerWidget {
       ],
     };
     final json = const JsonEncoder.withIndent('  ').convert(payload);
-    await Clipboard.setData(ClipboardData(text: json));
-    if (!context.mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      l?.obd2HealthCopied ?? 'OBD2 diagnostics copied to clipboard.',
+    await _saveJsonToDownloads(context, l, json, 'init');
+  }
+
+  /// Shared download sink: write [json] to a timestamped file in the public
+  /// Downloads folder via [PublicFileExporter] and show a success / error
+  /// snackbar. Never throws — every failure path is caught + surfaced (the
+  /// #1103 catch-with-stacktrace + never-throws contract). The
+  /// `tankstellen/public_files` channel is registered in the foreground
+  /// isolate this screen runs in, but a `MissingPluginException` is still
+  /// handled defensively (the #2933 background-isolate degrade pattern).
+  Future<void> _saveJsonToDownloads(
+    BuildContext context,
+    AppLocalizations? l,
+    String json,
+    String kind,
+  ) async {
+    // Capture every BuildContext-derived value BEFORE the async gap so no
+    // context is touched after the await (lint: use_build_context_synchronously).
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final scheme = Theme.of(context).colorScheme;
+    final stamp =
+        DateTime.now().toIso8601String().replaceAll(RegExp(r'[:.]'), '-');
+    // i18n-ignore: language-neutral filename mask (brand + kind tag + stamp).
+    final fileName = 'tankstellen-obd2-$kind-$stamp.json';
+    try {
+      await PublicFileExporter.saveTextToDownloads(
+        text: json,
+        fileName: fileName,
+        mimeType: 'application/json',
+      );
+      messenger?.showSnackBar(
+        SnackBarHelper.successSnackBar(
+          scheme,
+          l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
+        ),
+      );
+    } on MissingPluginException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'Obd2HealthScreen download: public_files channel unavailable',
+      }));
+      _showDownloadError(scheme, l, messenger);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'Obd2HealthScreen download: json write',
+      }));
+      _showDownloadError(scheme, l, messenger);
+    }
+  }
+
+  void _showDownloadError(
+    ColorScheme scheme,
+    AppLocalizations? l,
+    ScaffoldMessengerState? messenger,
+  ) {
+    messenger?.showSnackBar(
+      SnackBarHelper.errorSnackBar(
+        scheme,
+        l?.obd2HealthDownloadError ?? "Couldn't save the diagnostics file",
+      ),
     );
   }
 }

@@ -132,6 +132,56 @@ void main() {
 
       expect(Obd2CommDiagnostics.instance.enabled, isFalse);
     });
+
+    test('run(targetMac:) connects BY MAC and never blind-scans (#2938)',
+        () async {
+      final conn = _FakeConnection();
+      final container = ProviderContainer(
+        overrides: [obd2ConnectionProvider.overrideWith((_) => conn)],
+      );
+      addTearDown(container.dispose);
+
+      await container
+          .read(obd2SelfTestControllerProvider.notifier)
+          .run(targetMac: 'AA:BB:CC:DD:EE:FF');
+
+      // The initial connect went through connectByMacDirect with the chosen
+      // MAC, and the blind scan (connectBest) was never used.
+      expect(conn.connectBestCalls, 0);
+      expect(conn.macsConnected.first, 'AA:BB:CC:DD:EE:FF');
+      expect(container.read(obd2SelfTestControllerProvider).passed, isTrue);
+    });
+
+    test('run() with no targetMac still blind-scans (back-compat #2938)',
+        () async {
+      final conn = _FakeConnection();
+      final container = ProviderContainer(
+        overrides: [obd2ConnectionProvider.overrideWith((_) => conn)],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(obd2SelfTestControllerProvider.notifier).run();
+
+      expect(conn.connectBestCalls, 1);
+    });
+
+    test('run(targetMac:) with an empty MAC blind-scans (treated as none)',
+        () async {
+      final conn = _FakeConnection();
+      final container = ProviderContainer(
+        overrides: [obd2ConnectionProvider.overrideWith((_) => conn)],
+      );
+      addTearDown(container.dispose);
+
+      await container
+          .read(obd2SelfTestControllerProvider.notifier)
+          .run(targetMac: '');
+
+      // An empty MAC is treated as "no adapter chosen" → the INITIAL connect
+      // blind-scans. (The reconnect step later connects by the live service's
+      // own MAC regardless, so we only assert the scan path was taken.)
+      expect(conn.connectBestCalls, 1);
+    });
   });
 }
 
@@ -143,6 +193,12 @@ class _FakeConnection extends Obd2ConnectionService {
           bluetooth: _UnusedBluetoothFacade(),
         );
 
+  /// How many times the blind-scan path (connectBest) was taken.
+  int connectBestCalls = 0;
+
+  /// The MACs passed to the no-scan connect-by-MAC path, in call order.
+  final List<String> macsConnected = [];
+
   Future<Obd2Service?> _open() async {
     final service = Obd2Service(FakeObd2Transport(Map.of(_happyPathResponses)))
       ..adapterMac = 'AA:BB:CC:DD:EE:FF'
@@ -152,15 +208,20 @@ class _FakeConnection extends Obd2ConnectionService {
   }
 
   @override
-  Future<Obd2Service?> connectBest() => _open();
+  Future<Obd2Service?> connectBest() {
+    connectBestCalls++;
+    return _open();
+  }
 
   @override
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
-  }) =>
-      _open();
+  }) {
+    macsConnected.add(mac);
+    return _open();
+  }
 }
 
 class _GrantedPermissions implements Obd2Permissions {

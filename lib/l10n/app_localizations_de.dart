@@ -6335,6 +6335,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2HealthCopied => 'OBD2-Diagnose in die Zwischenablage kopiert.';
 
   @override
+  String get obd2HealthDownloadJson => 'Als JSON herunterladen';
+
+  @override
+  String get obd2HealthDownloadInitTranscript =>
+      'Nur Init-Protokoll herunterladen';
+
+  @override
+  String get obd2HealthDownloadError =>
+      'Diagnosedatei konnte nicht gespeichert werden';
+
+  @override
+  String get obd2TestAdapterLabel => 'Zu testender Adapter';
+
+  @override
+  String get obd2TestAdapterScanOption => 'Adapter suchen';
+
+  @override
+  String obd2TestStepConnectTo(String adapter) {
+    return 'Mit $adapter verbinden';
+  }
+
+  @override
   String get obd2TestRunTitle => 'Adaptertest ausführen';
 
   @override
