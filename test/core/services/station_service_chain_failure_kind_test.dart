@@ -64,8 +64,12 @@ class _MemCache implements CacheStrategy {
   CacheEntry? getFresh(String key) => _store[key];
 }
 
+// #2926 — these tests verify failure-kind transience routing, not fuel
+// filtering, and `_station` carries no per-fuel price. Search "all" so the new
+// hard-fuel-filter doesn't drop the recovered station. The filter is covered
+// by station_service_chain_new_test.dart.
 SearchParams _params() =>
-    const SearchParams(lat: 48.85, lng: 2.35, radiusKm: 5, fuelType: FuelType.e5);
+    const SearchParams(lat: 48.85, lng: 2.35, radiusKm: 5, fuelType: FuelType.all);
 
 const _station = Station(
   id: 's1',

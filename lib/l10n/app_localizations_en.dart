@@ -5341,11 +5341,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fuelEfficiencyCardSubtitle =>
-      'Which fuel is actually cheapest to drive on';
+      'Which fuel mix is actually cheapest to drive on';
 
   @override
   String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
     return 'Cheapest per km: $fuel ($costPerKm)';
+  }
+
+  @override
+  String get fuelEfficiencyPureBadge => 'Pure';
+
+  @override
+  String get fuelEfficiencyMixBadge => 'Blend';
+
+  @override
+  String fuelEfficiencyMixDominant(String fuel) {
+    return 'Mostly $fuel';
   }
 
   @override
@@ -5381,7 +5392,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fuelEfficiencyInsufficientData =>
-      'Log at least two full tanks per fuel to crown the cheapest.';
+      'Log at least two full tanks per composition to crown the cheapest.';
+
+  @override
+  String get fuelEfficiencyCompositionFootnote =>
+      'Tanks are grouped by composition: a tank is pure when one fuel is at least 85% of it, otherwise a blend.';
 
   @override
   String get fuelNameE5 => 'Super E5';
@@ -7365,6 +7380,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String routeDataSourceMulti(String sources) {
     return '$sources';
   }
+
+  @override
+  String get stationUnbrandedTitle => 'Unbranded station';
 
   @override
   String get vehicleMultiFuelCapableLabel =>
@@ -13041,11 +13059,22 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fuelEfficiencyCardSubtitle =>
-      '⟦Ŵĥîçĥ ƒúéł îš áçŧúáłłý çĥéáƥéšŧ ŧó đřîṽé óñ ················⟧';
+      '⟦Ŵĥîçĥ ƒúéł ɱîẋ îš áçŧúáłłý çĥéáƥéšŧ ŧó đřîṽé óñ ··················⟧';
 
   @override
   String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
     return '⟦Çĥéáƥéšŧ ƥéř ķɱ: $fuel ($costPerKm) ······⟧';
+  }
+
+  @override
+  String get fuelEfficiencyPureBadge => '⟦Ƥúřé ··⟧';
+
+  @override
+  String get fuelEfficiencyMixBadge => '⟦Ɓłéñđ ··⟧';
+
+  @override
+  String fuelEfficiencyMixDominant(String fuel) {
+    return '⟦Ṁóšŧłý $fuel ···⟧';
   }
 
   @override
@@ -13081,7 +13110,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fuelEfficiencyInsufficientData =>
-      '⟦Łóǧ áŧ łéášŧ ŧŵó ƒúłł ŧáñķš ƥéř ƒúéł ŧó çřóŵñ ŧĥé çĥéáƥéšŧ. ·····················⟧';
+      '⟦Łóǧ áŧ łéášŧ ŧŵó ƒúłł ŧáñķš ƥéř çóɱƥóšîŧîóñ ŧó çřóŵñ ŧĥé çĥéáƥéšŧ. ························⟧';
+
+  @override
+  String get fuelEfficiencyCompositionFootnote =>
+      '⟦Ŧáñķš ářé ǧřóúƥéđ ƀý çóɱƥóšîŧîóñ: á ŧáñķ îš ƥúřé ŵĥéñ óñé ƒúéł îš áŧ łéášŧ 85% óƒ îŧ, óŧĥéřŵîšé á ƀłéñđ. ···································⟧';
 
   @override
   String get fuelNameE5 => '⟦Šúƥéř É5 ···⟧';
@@ -15113,6 +15146,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String routeDataSourceMulti(String sources) {
     return '⟦$sources⟧';
   }
+
+  @override
+  String get stationUnbrandedTitle => '⟦Úñƀřáñđéđ šŧáŧîóñ ·······⟧';
 
   @override
   String get vehicleMultiFuelCapableLabel =>

@@ -5405,11 +5405,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fuelEfficiencyCardSubtitle =>
-      'Mit welchem Kraftstoff das Fahren wirklich am günstigsten ist';
+      'Mit welcher Kraftstoffmischung das Fahren wirklich am günstigsten ist';
 
   @override
   String fuelEfficiencyWinnerChip(String fuel, String costPerKm) {
     return 'Günstigster pro km: $fuel ($costPerKm)';
+  }
+
+  @override
+  String get fuelEfficiencyPureBadge => 'Rein';
+
+  @override
+  String get fuelEfficiencyMixBadge => 'Mischung';
+
+  @override
+  String fuelEfficiencyMixDominant(String fuel) {
+    return 'Überwiegend $fuel';
   }
 
   @override
@@ -5445,7 +5456,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fuelEfficiencyInsufficientData =>
-      'Erfasse mindestens zwei volle Tankfüllungen pro Kraftstoff, um den günstigsten zu küren.';
+      'Erfasse mindestens zwei volle Tankfüllungen pro Zusammensetzung, um den günstigsten zu küren.';
+
+  @override
+  String get fuelEfficiencyCompositionFootnote =>
+      'Tankfüllungen werden nach Zusammensetzung gruppiert: rein, wenn ein Kraftstoff mindestens 85 % ausmacht, sonst eine Mischung.';
 
   @override
   String get fuelNameE5 => 'Super E5';
@@ -7444,6 +7459,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String routeDataSourceMulti(String sources) {
     return '$sources';
   }
+
+  @override
+  String get stationUnbrandedTitle => 'Tankstelle ohne Marke';
 
   @override
   String get vehicleMultiFuelCapableLabel =>

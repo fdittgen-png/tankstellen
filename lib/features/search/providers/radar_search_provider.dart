@@ -4,9 +4,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/user_position_provider.dart';
+import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
-import '../../../core/utils/station_extensions.dart';
 import '../../approach/providers/fuel_station_radar_provider.dart';
 import '../data/models/search_params.dart';
 import '../domain/entities/fuel_type.dart';
@@ -117,19 +117,25 @@ class RadarSearch extends _$RadarSearch {
       final nearby = await _inRadiusStations(pos, radiusKm, fuel);
 
       // Dedup by id (the in-radius row wins — it carries the freshest per-fuel
-      // price), stamp each station's distance (km) from the user, drop rows
-      // with no usable price for the selected fuel, then distance-sort — the
-      // radar surfaces priced stations only, like the regular search list.
+      // price) and stamp each station's distance (km) from the user.
       final byId = <String, Station>{};
       for (final s in [...raw, ...nearby]) {
         final distKm =
             geo.distanceMeters(pos.lat, pos.lng, s.lat, s.lng) / 1000.0;
         final withDist = s.copyWith(dist: distKm);
-        final price = withDist.priceFor(fuel);
-        if (price == null || price <= 0) continue;
         byId[withDist.id] = withDist;
       }
-      final priced = byId.values.toList()
+
+      // #2926 — apply the SAME shared hard-fuel-filter the regular search runs
+      // (StationServiceChain.searchStations → StationServiceHelpers.filterByFuel)
+      // so the radar surfaces exactly the stations that sell the selected fuel —
+      // never a `--` row — and its result set is identical to the in-radius
+      // search for the same position + radius + fuel. `FuelType.all` keeps every
+      // station. Then distance-sort, like the regular search list.
+      final priced = StationServiceHelpers.filterByFuel(
+        byId.values.toList(),
+        fuel,
+      ).toList()
         ..sort((a, b) => a.dist.compareTo(b.dist));
 
       state = state.copyWith(

@@ -9,6 +9,7 @@ import '../../../core/services/radar/corridor_location_cache.dart';
 import '../../../core/services/radar/jit_price_cache.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
+import '../../../core/utils/station_extensions.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
@@ -92,6 +93,13 @@ class FuelStationRadar {
     );
     if (corridor.isEmpty) return const [];
 
+    // #2926 — the corridor LOCATIONS are fetched fuel-agnostically (the
+    // geofence must see every nearby forecourt), but the result handed back to
+    // the caller must honour the selected fuel so the radar's superset is
+    // consistent with the in-radius search. Resolve the requested fuel here;
+    // `FuelType.all` (and any unknown apiValue) keeps every station.
+    final fuel = FuelType.fromString(fuelTypeApiValue);
+
     final radiusMeters = radiusKm * 1000.0;
     // Identify the imminent stations (inside the approach radius). Only these
     // get a JIT price — the rest stay location-only in the corridor set.
@@ -105,8 +113,47 @@ class FuelStationRadar {
         result.add(s);
       }
     }
-    return result;
+
+    // Fuel-filter the corridor result. A station is dropped only when we
+    // POSITIVELY know it does not sell the fuel — i.e. it carries price data
+    // but none (`> 0`) for the selected fuel. Location-only corridor stations
+    // (not yet JIT-priced for a polled source) carry no price for ANY fuel and
+    // are KEPT, so the trip geofence net stays intact and they're re-evaluated
+    // once they become imminent and get priced. `FuelType.all` keeps all.
+    return _fuelConsistent(result, fuel);
   }
+
+  /// Drop stations that positively lack [fuel] (have priced fuels, but not this
+  /// one). Keep `FuelType.all`, non-priced fuels (EV / hydrogen), and
+  /// location-only stations with no price data at all (#2926).
+  List<Station> _fuelConsistent(List<Station> stations, FuelType fuel) {
+    if (fuel == FuelType.all) return stations;
+    return stations
+        .where((s) {
+          final price = s.priceFor(fuel);
+          if (price != null && price > 0) return true;
+          // Keep location-only stations (no price for ANY fuel) so a polled
+          // source's far corridor net survives until JIT-pricing; drop a
+          // station that IS priced for other fuels but not this one.
+          return !_hasAnyPrice(s);
+        })
+        .toList(growable: false);
+  }
+
+  /// Whether [s] carries a usable (`> 0`) price for at least one fuel — i.e. it
+  /// has been priced (bulk slice or JIT), as opposed to a location-only
+  /// corridor row whose prices are all null.
+  bool _hasAnyPrice(Station s) =>
+      _positive(s.e5) ||
+      _positive(s.e10) ||
+      _positive(s.e98) ||
+      _positive(s.diesel) ||
+      _positive(s.dieselPremium) ||
+      _positive(s.e85) ||
+      _positive(s.lpg) ||
+      _positive(s.cng);
+
+  static bool _positive(double? v) => v != null && v > 0;
 }
 
 /// Builds the [FuelStationRadar] for the active country, reusing the country's

@@ -179,4 +179,125 @@ void main() {
       verify(() => mockPrimary.searchStations(any())).called(1);
     });
   });
+
+  group('searchStations hard-fuel-filter (#2926)', () {
+    // Esso sells no E85 (e85 null); Total does (0.84). The maintainer's chosen
+    // semantic: a SPECIFIC fuel must hard-filter to stations that sell it, so
+    // search and the radar return the same set. RED before #2926 (the chain
+    // returned BOTH, leaving Esso to render a "--" E85 row).
+    const esso = Station(
+      id: 'esso',
+      name: 'Esso',
+      brand: 'Esso',
+      street: '1 rue A',
+      postCode: '34120',
+      place: 'Pézenas',
+      lat: 43.46,
+      lng: 3.42,
+      isOpen: true,
+      e10: 1.75,
+      diesel: 1.60,
+    );
+    const total = Station(
+      id: 'total',
+      name: 'Total',
+      brand: 'Total',
+      street: '2 rue B',
+      postCode: '34120',
+      place: 'Pézenas',
+      lat: 43.47,
+      lng: 3.43,
+      isOpen: true,
+      e10: 1.77,
+      diesel: 1.62,
+      e85: 0.84,
+    );
+
+    const e85Params = SearchParams(
+      lat: 43.46,
+      lng: 3.42,
+      radiusKm: 10,
+      fuelType: FuelType.e85,
+    );
+    final e85Key = CacheKey.stationSearch(
+      e85Params.lat, e85Params.lng, e85Params.radiusKm,
+      e85Params.fuelType.apiValue,
+    );
+
+    test('a specific fuel keeps ONLY stations that sell it', () async {
+      when(() => mockCache.getFresh(e85Key)).thenReturn(null);
+      when(() => mockPrimary.searchStations(any())).thenAnswer(
+        (_) async => ServiceResult<List<Station>>(
+          data: const [esso, total],
+          source: ServiceSource.prixCarburantsApi,
+          fetchedAt: DateTime.now(),
+        ),
+      );
+      when(() => mockCache.put(any(), any(),
+          ttl: any(named: 'ttl'),
+          source: any(named: 'source'))).thenAnswer((_) async {});
+
+      final result = await chain.searchStations(e85Params);
+
+      expect(result.data.map((s) => s.id), ['total'],
+          reason: 'Esso has no E85 → dropped; Total sells E85 → kept');
+    });
+
+    test('the CACHE stores the FULL set — the filter is at the return boundary',
+        () async {
+      when(() => mockCache.getFresh(e85Key)).thenReturn(null);
+      when(() => mockPrimary.searchStations(any())).thenAnswer(
+        (_) async => ServiceResult<List<Station>>(
+          data: const [esso, total],
+          source: ServiceSource.prixCarburantsApi,
+          fetchedAt: DateTime.now(),
+        ),
+      );
+      final captured = <Map<String, dynamic>>[];
+      when(() => mockCache.put(any(), captureAny(),
+          ttl: any(named: 'ttl'),
+          source: any(named: 'source'))).thenAnswer((invocation) async {
+        captured.add(
+            invocation.positionalArguments[1] as Map<String, dynamic>);
+      });
+
+      await chain.searchStations(e85Params);
+
+      // The persisted payload must carry BOTH stations (honest, fuel-agnostic
+      // cache) even though the returned set is filtered to Total.
+      final stored = captured.single['stations'] as List<dynamic>;
+      expect(stored, hasLength(2),
+          reason: 'cache keeps the full in-radius set, keyed per fuel');
+    });
+
+    test('FuelType.all returns every station (no filter, both directions)',
+        () async {
+      const allParams = SearchParams(
+        lat: 43.46,
+        lng: 3.42,
+        radiusKm: 10,
+        fuelType: FuelType.all,
+      );
+      final allKey = CacheKey.stationSearch(
+        allParams.lat, allParams.lng, allParams.radiusKm,
+        allParams.fuelType.apiValue,
+      );
+      when(() => mockCache.getFresh(allKey)).thenReturn(null);
+      when(() => mockPrimary.searchStations(any())).thenAnswer(
+        (_) async => ServiceResult<List<Station>>(
+          data: const [esso, total],
+          source: ServiceSource.prixCarburantsApi,
+          fetchedAt: DateTime.now(),
+        ),
+      );
+      when(() => mockCache.put(any(), any(),
+          ttl: any(named: 'ttl'),
+          source: any(named: 'source'))).thenAnswer((_) async {});
+
+      final result = await chain.searchStations(allParams);
+
+      expect(result.data.map((s) => s.id), ['esso', 'total'],
+          reason: 'the all wildcard shows every station');
+    });
+  });
 }

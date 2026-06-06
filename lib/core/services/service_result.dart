@@ -59,6 +59,18 @@ class ServiceResult<T> {
     this.errors = const [],
   });
 
+  /// Return a copy carrying [newData] but the same metadata (source,
+  /// freshness, staleness, fallback errors). Used when a layer transforms the
+  /// payload — e.g. the search chain hard-fuel-filters the station list — but
+  /// must preserve where/when it came from (#2926).
+  ServiceResult<R> withData<R>(R newData) => ServiceResult<R>(
+        data: newData,
+        source: source,
+        fetchedAt: fetchedAt,
+        isStale: isStale,
+        errors: errors,
+      );
+
   /// True if any fallback errors were recorded (even if we got data).
   bool get hadFallbacks => errors.isNotEmpty;
 

@@ -75,5 +75,9 @@
         "example": "France — Prix-Carburants · Spain — Geoportal Gasolineras"
       }
     }
+  },
+  "stationUnbrandedTitle": "Unbranded station",
+  "@stationUnbrandedTitle": {
+    "description": "Station-card title fallback for a forecourt that carries no brand AND no station name (#2926). The street stays as the address subtitle; this label replaces showing the bare street as a duplicate title."
   }
 }

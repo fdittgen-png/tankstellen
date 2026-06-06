@@ -1171,13 +1171,16 @@ void main() {
     });
 
     testWidgets(
-      '#2061 — the "Independent" sentinel does not leak into the title',
+      '#2061 / #2926 — the "Independent" sentinel does not leak into the '
+      'title, and the bare street is NOT promoted to the title',
       (tester) async {
         // The French Prix Carburants parser tags brandless stations with
-        // `BrandRegistry.independentLabel` (== "Independent"). Before
-        // #2061 the search card rendered that sentinel as the title;
-        // after, it falls back to the street address (matching the
-        // detail screen).
+        // `BrandRegistry.independentLabel` (== "Independent"). #2061 stopped
+        // rendering that sentinel as the title; #2926 then stopped hoisting the
+        // bare STREET to the title (it read as a broken duplicate of the
+        // address subtitle, e.g. "26 AVENUE DE VERDUN" shown twice). An
+        // unbranded, name-less station now shows the localized "Unbranded
+        // station" label, with the street kept on the address line.
         const independentStation = Station(
           id: 'indep-2061',
           name: '',
@@ -1206,11 +1209,57 @@ void main() {
               'The Independent sentinel is an internal classification, '
               'not a brand to render.',
         );
+        // The bare street is no longer a TITLE (no exact-match standalone
+        // Text). It stays as part of the address subtitle line instead.
         expect(
           find.text('26 AVENUE DE VERDUN'),
-          findsOneWidget,
-          reason: 'Brandless station falls back to the street as title.',
+          findsNothing,
+          reason: 'the street must not be hoisted to the title (#2926)',
         );
+        expect(
+          find.text('Unbranded station'),
+          findsOneWidget,
+          reason: 'name-less, brand-less station shows the localized label',
+        );
+        // The street survives on the address subtitle line.
+        expect(
+          find.textContaining('26 AVENUE DE VERDUN'),
+          findsOneWidget,
+          reason: 'the street is kept as the address subtitle',
+        );
+      },
+    );
+
+    testWidgets(
+      '#2926 — an unbranded station WITH a real name shows that name '
+      '(not the localized fallback)',
+      (tester) async {
+        // Mexican CRE stations carry no brand but a real company name; that
+        // name must stay the title — the "Unbranded station" fallback is only
+        // for the no-brand AND no-name case.
+        const namedStation = Station(
+          id: 'mx-named',
+          name: 'TRENOGAS SA DE CV',
+          brand: '',
+          street: 'CALLE 5',
+          postCode: '11700',
+          place: 'CDMX',
+          lat: 19.43,
+          lng: -99.13,
+          e5: 22.95,
+          isOpen: true,
+        );
+
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: namedStation,
+            selectedFuelType: FuelType.e5,
+          ),
+        );
+
+        expect(find.text('TRENOGAS SA DE CV'), findsOneWidget);
+        expect(find.text('Unbranded station'), findsNothing);
       },
     );
   });

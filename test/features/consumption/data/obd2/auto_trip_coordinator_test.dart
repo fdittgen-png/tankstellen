@@ -5,11 +5,13 @@ import 'dart:collection';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_record_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/auto_trip_coordinator.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/fake_background_adapter_listener.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_speed_stream.dart';
@@ -94,15 +96,20 @@ class _OpenerError {
 }
 
 /// In-memory [TraceRecorder] used to drain `errorLogger.log` calls
-/// during failure-path tests. We don't assert on the captured records
-/// — we just stop the global logger from reaching Hive.
+/// during failure-path tests. It also captures the spooled errors so the
+/// #2933 de-noise tests can assert which ones reach the ERROR spool — the
+/// prior tests that don't inspect [errors] are unaffected.
 class _FakeTraceRecorder implements TraceRecorder {
+  final List<Object> errors = <Object>[];
+
   @override
   Future<void> record(
     Object error,
     StackTrace stackTrace, {
     ServiceChainSnapshot? serviceChainState,
-  }) async {}
+  }) async {
+    errors.add(error);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -120,6 +127,7 @@ void main() {
 
   late FakeBackgroundAdapterListener listener;
   late _SessionOpenerHarness opener;
+  late _FakeTraceRecorder rec;
   late int startTripCalls;
   late int stopAndSaveCalls;
   late List<Obd2Service> handedOffServices;
@@ -178,7 +186,9 @@ void main() {
     // in plain unit-test mode). Same pattern used by
     // `obd2_vin_reader_test.dart` for error-throwing assertions.
     errorLogger.resetForTest();
-    errorLogger.testRecorderOverride = _FakeTraceRecorder();
+    rec = _FakeTraceRecorder();
+    errorLogger.testRecorderOverride = rec;
+    BreadcrumbCollector.clear();
     listener = FakeBackgroundAdapterListener();
     opener = _SessionOpenerHarness();
     startTripCalls = 0;
@@ -564,6 +574,64 @@ void main() {
       isNotEmpty,
       reason: 'opener throw must record sessionOpenFailed',
     );
+  });
+
+  group('#2933 (error-log #25) — expected connect conditions de-noise', () {
+    test(
+        'an EXPECTED Obd2AdapterUnresponsive opener throw does NOT reach the '
+        'error spool — it de-noises to a breadcrumb', () async {
+      // The auto-record arm probes a PARKED car: the engine is off so the
+      // adapter never answers the ELM327 init. Error-log #25 was 42/44 of
+      // exactly this ERROR, repeated on every retry. It must not spool.
+      opener.queue.add(_OpenerError(const Obd2AdapterUnresponsive()));
+      coordinator = buildCoordinator();
+
+      await coordinator.start();
+      listener.emitConnected(mac);
+      await pumpSpeedTicks(3);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(coordinator.hasOpenSession, isFalse);
+      expect(rec.errors, isEmpty,
+          reason: 'an expected engine-off connect condition must NOT spool an '
+              'ERROR trace (the error-log #25 ×42 flood)');
+      expect(
+        BreadcrumbCollector.snapshot().map((b) => b.action),
+        contains('OBD2 connect failed — expected transient'),
+        reason: 'the expected condition is kept as a breadcrumb instead',
+      );
+      // The diagnostic auto-record trace still captures the open failure.
+      expect(
+        AutoRecordTraceLog.snapshot()
+            .where((e) => e.kind == AutoRecordEventKind.sessionOpenFailed),
+        isNotEmpty,
+      );
+    });
+
+    test(
+        'a GENUINE Obd2PermissionDenied opener throw STILL reaches the error '
+        'spool (the guard)', () async {
+      opener.queue.add(_OpenerError(const Obd2PermissionDenied()));
+      coordinator = buildCoordinator();
+
+      await coordinator.start();
+      listener.emitConnected(mac);
+      await pumpSpeedTicks(3);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(coordinator.hasOpenSession, isFalse);
+      expect(rec.errors, hasLength(1),
+          reason: 'a real, actionable fault must stay a visible ERROR trace');
+      expect(rec.errors.single.toString(), contains('Obd2PermissionDenied'));
+      expect(rec.errors.single.toString(),
+          contains('AutoTripCoordinator.openSession'));
+      // The de-noiser breadcrumb is NOT recorded — only the genuine ERROR
+      // (the `auto_record:*` lifecycle breadcrumbs are unrelated bookkeeping).
+      expect(
+        BreadcrumbCollector.snapshot().map((b) => b.action),
+        isNot(contains('OBD2 connect failed — expected transient')),
+      );
+    });
   });
 
   test('threshold-cross hands the live service into startTrip', () async {

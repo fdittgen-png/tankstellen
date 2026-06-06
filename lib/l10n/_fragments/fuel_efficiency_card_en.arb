@@ -3,16 +3,31 @@
   "@fuelEfficiencyCardTitle": {
     "description": "Title of the per-fuel-type efficiency comparison card on the consumption-statistics page, comparing real cost-per-km across the fuels a multi-fuel vehicle has used (#2887, Epic #2881)."
   },
-  "fuelEfficiencyCardSubtitle": "Which fuel is actually cheapest to drive on",
+  "fuelEfficiencyCardSubtitle": "Which fuel mix is actually cheapest to drive on",
   "@fuelEfficiencyCardSubtitle": {
-    "description": "Subtitle of the per-fuel efficiency card explaining it ranks fuels by real driving cost per kilometre, not pump price per litre (#2887)."
+    "description": "Subtitle of the per-fuel efficiency card explaining it ranks fuel compositions (pure grades and blends) by real driving cost per kilometre, not pump price per litre (#2887, ADR 0015)."
   },
   "fuelEfficiencyWinnerChip": "Cheapest per km: {fuel} ({costPerKm})",
   "@fuelEfficiencyWinnerChip": {
-    "description": "Winner chip at the top of the per-fuel efficiency card, crowning the fuel with the lowest verified cost per kilometre (#2887).",
+    "description": "Winner chip at the top of the per-fuel efficiency card, crowning the fuel composition (a pure grade or a blend) with the lowest verified cost per kilometre (#2887, ADR 0015). The {fuel} placeholder is a language-neutral grade code or A/B mix mask.",
     "placeholders": {
-      "fuel": { "type": "String", "example": "E85" },
+      "fuel": { "type": "String", "example": "E85/E10" },
       "costPerKm": { "type": "String", "example": "0,086 €/km" }
+    }
+  },
+  "fuelEfficiencyPureBadge": "Pure",
+  "@fuelEfficiencyPureBadge": {
+    "description": "Row badge on the per-fuel efficiency card marking a composition bucket that is a single pure fuel grade (>= 85% one fuel) rather than a blend (#2928, ADR 0015)."
+  },
+  "fuelEfficiencyMixBadge": "Blend",
+  "@fuelEfficiencyMixBadge": {
+    "description": "Row badge on the per-fuel efficiency card marking a composition bucket that is a blend of two fuels rather than a single pure grade (#2928, ADR 0015)."
+  },
+  "fuelEfficiencyMixDominant": "Mostly {fuel}",
+  "@fuelEfficiencyMixDominant": {
+    "description": "Secondary line on a blend row of the per-fuel efficiency card, naming the dominant (largest-share) fuel of the blend (#2928, ADR 0015).",
+    "placeholders": {
+      "fuel": { "type": "String", "example": "Super E85" }
     }
   },
   "fuelEfficiencyColL100km": "L/100km",
@@ -41,9 +56,13 @@
       "count": { "type": "int", "example": "1" }
     }
   },
-  "fuelEfficiencyInsufficientData": "Log at least two full tanks per fuel to crown the cheapest.",
+  "fuelEfficiencyInsufficientData": "Log at least two full tanks per composition to crown the cheapest.",
   "@fuelEfficiencyInsufficientData": {
-    "description": "Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one fuel has fewer than two closed plein-to-plein intervals (#2887, ADR 0014 verdict gate)."
+    "description": "Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one composition bucket has fewer than two closed plein-to-plein intervals (#2887, ADR 0015 verdict gate)."
+  },
+  "fuelEfficiencyCompositionFootnote": "Tanks are grouped by composition: a tank is pure when one fuel is at least 85% of it, otherwise a blend.",
+  "@fuelEfficiencyCompositionFootnote": {
+    "description": "Transparency footnote on the per-fuel efficiency card explaining the pure-vs-blend bucketing rule used to compare fuel compositions (#2928, ADR 0015)."
   },
   "fuelNameE5": "Super E5",
   "@fuelNameE5": {

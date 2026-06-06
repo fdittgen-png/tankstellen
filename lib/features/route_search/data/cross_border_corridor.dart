@@ -187,6 +187,11 @@ StationQueryFunction buildCorridorQueryFunction(
         radiusKm: radiusKm,
         fuelType: source.fuel,
         sortBy: SortBy.price,
+        // Opt out of the shared hard-fuel-filter: this corridor prices each
+        // country leg with its own profile fuel + the E5↔E10 sibling fallback
+        // (#2641/#2680), so a leg that sells only the sibling grade must NOT be
+        // hard-dropped before pricing.
+        applyFuelFilter: false,
       );
       final List<SearchResultItem> raw;
       try {

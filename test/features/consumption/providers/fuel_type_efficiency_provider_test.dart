@@ -80,7 +80,9 @@ FuelTypeEfficiencyStats _statsFor(
   List<FuelTypeEfficiencyStats> all,
   FuelType fuel,
 ) =>
-    all.firstWhere((s) => s.fuelType.apiValue == fuel.apiValue);
+    all.firstWhere(
+      (s) => !s.isMix && s.dominant.apiValue == fuel.apiValue,
+    );
 
 void main() {
   group('fuelTypeEfficiencyComparisonProvider', () {
@@ -112,7 +114,7 @@ void main() {
       expect(_statsFor(result, FuelType.e10).attributedIntervalCount, 2);
       expect(_statsFor(result, FuelType.e85).attributedIntervalCount, 2);
       // Sorted by €/km ascending — E85 first.
-      expect(result.first.fuelType.apiValue, FuelType.e85.apiValue);
+      expect(result.first.dominant.apiValue, FuelType.e85.apiValue);
     });
 
     test('filters out fills belonging to other vehicles', () {
@@ -130,28 +132,41 @@ void main() {
       );
 
       final result = c.read(fuelTypeEfficiencyComparisonProvider);
+      // Only v1's E10 fills survive the vehicle filter — one pure E10 bucket.
       expect(result.length, 1);
-      expect(result.single.fuelType.apiValue, FuelType.e10.apiValue);
+      expect(result.single.dominant.apiValue, FuelType.e10.apiValue);
       expect(
-        result.any((s) => s.fuelType.apiValue == FuelType.e85.apiValue),
+        result.any((s) => s.dominant.apiValue == FuelType.e85.apiValue),
         isFalse,
       );
     });
 
     test('no active vehicle → aggregates ALL fills', () {
+      // Two pure E85 intervals from v1 + two pure E10 intervals from `other`
+      // — no vehicle filter, so both compositions appear as buckets.
       final c = _container(
         activeVehicle: null,
         fillUps: [
-          _f(id: 'a', day: 1, liters: 40, cost: 60, odo: 0,
-              fuelType: FuelType.e10, vehicleId: 'v1'),
-          _f(id: 'b', day: 2, liters: 30, cost: 45, odo: 600,
-              fuelType: FuelType.e85, vehicleId: 'other'),
+          _f(id: 'v1a', day: 1, liters: 40, cost: 40, odo: 0,
+              fuelType: FuelType.e85, vehicleId: 'v1'),
+          _f(id: 'v1b', day: 2, liters: 30, cost: 30, odo: 500,
+              fuelType: FuelType.e85, vehicleId: 'v1'),
+          _f(id: 'v1c', day: 3, liters: 30, cost: 30, odo: 1000,
+              fuelType: FuelType.e85, vehicleId: 'v1'),
+          _f(id: 'ot1', day: 4, liters: 40, cost: 64, odo: 1500,
+              fuelType: FuelType.e10, vehicleId: 'other'),
+          _f(id: 'ot2', day: 5, liters: 30, cost: 48, odo: 2000,
+              fuelType: FuelType.e10, vehicleId: 'other'),
+          _f(id: 'ot3', day: 6, liters: 30, cost: 48, odo: 2500,
+              fuelType: FuelType.e10, vehicleId: 'other'),
         ],
       );
 
       final result = c.read(fuelTypeEfficiencyComparisonProvider);
-      // Both fuels present because no vehicle filter is applied.
+      // Both pure compositions present because no vehicle filter is applied.
       expect(result.length, 2);
+      expect(result.any((s) => s.label == 'E85'), isTrue);
+      expect(result.any((s) => s.label == 'E10'), isTrue);
     });
   });
 }

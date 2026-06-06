@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/logging/error_logger.dart';
 import 'auto_record_trace_log.dart';
 import 'background_adapter_listener.dart';
+import 'obd2_read_telemetry.dart';
 import 'obd2_service.dart';
 import 'obd2_speed_stream.dart';
 
@@ -457,15 +458,14 @@ class AutoTripCoordinator {
         mac: config.mac,
         detail: 'exception=$e',
       );
-      await errorLogger.log(
-        ErrorLayer.background,
-        e,
-        st,
-        context: <String, Object?>{
-          'phase': 'AutoTripCoordinator.openSession',
-          'mac': config.mac,
-        },
-      );
+      // #2933 (error-log #25) — probing a PARKED car here, an EXPECTED
+      // "engine off / adapter asleep" condition spooled 42/44 of that log as a
+      // repeated Obd2AdapterUnresponsive ERROR. Route through the shared #2892
+      // de-noiser so the expected family records a breadcrumb (sessionOpenFailed
+      // above already captures it) while a GENUINE fault still ERROR-logs.
+      recordObd2ConnectTransient(e, st,
+          where: 'AutoTripCoordinator.openSession mac=${config.mac}',
+          layer: ErrorLayer.background);
     }
     if (service == null) {
       AutoRecordTraceLog.add(

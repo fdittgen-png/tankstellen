@@ -5418,6 +5418,17 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get fuelEfficiencyPureBadge => 'Pure';
+
+  @override
+  String get fuelEfficiencyMixBadge => 'Blend';
+
+  @override
+  String fuelEfficiencyMixDominant(String fuel) {
+    return 'Mostly $fuel';
+  }
+
+  @override
   String get fuelEfficiencyColL100km => 'L/100km';
 
   @override
@@ -5451,6 +5462,10 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get fuelEfficiencyInsufficientData =>
       'Log at least two full tanks per fuel to crown the cheapest.';
+
+  @override
+  String get fuelEfficiencyCompositionFootnote =>
+      'Tanks are grouped by composition: a tank is pure when one fuel is at least 85% of it, otherwise a blend.';
 
   @override
   String get fuelNameE5 => 'Super E5';
@@ -7459,6 +7474,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String routeDataSourceMulti(String sources) {
     return '$sources';
   }
+
+  @override
+  String get stationUnbrandedTitle => 'Unbranded station';
 
   @override
   String get vehicleMultiFuelCapableLabel =>

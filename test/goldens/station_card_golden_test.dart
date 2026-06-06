@@ -185,10 +185,12 @@ void main() {
       expect(find.text('24h'), findsOneWidget);
     });
 
-    testWidgets('no brand — address used as the title', (tester) async {
+    testWidgets(
+        'no brand and no name — localized "Unbranded station" title, street '
+        'on the address line (#2926)', (tester) async {
       const noBrandStation = Station(
         id: 'no-brand',
-        name: 'Unknown',
+        name: '',
         brand: '',
         street: 'Unter den Linden',
         houseNumber: '77',
@@ -209,7 +211,11 @@ void main() {
         ),
       );
 
-      expect(find.text('Unter den Linden'), findsOneWidget);
+      // #2926 — the raw street is NEVER hoisted to the title; an unbranded,
+      // unnamed forecourt shows the localized label, and the street drops to
+      // the address line instead.
+      expect(find.text('Unbranded station'), findsOneWidget);
+      expect(find.textContaining('Unter den Linden'), findsOneWidget);
     });
   });
 }
