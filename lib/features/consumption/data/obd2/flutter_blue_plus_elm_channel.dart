@@ -11,6 +11,8 @@ import 'ble_link_tuner.dart';
 import 'connection_drop_debouncer.dart';
 import 'elm_byte_channel.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_connect_trace.dart';
+import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -135,6 +137,19 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
           failureReason: classifyBleConnectFailure(e),
         );
       }
+      // #2969 correction 3 — stamp the channel-open outcome on the active
+      // connect trace HERE, where the REAL FBP/StateError is still in hand
+      // (Obd2Service.connect swallows it into a generic Obd2AdapterUnresponsive
+      // false return). FIRST-TERMINAL-WINS, so the wrong-transport gattTimeout
+      // can never be overwritten by the scan fallback's scanEmpty. Ungated by
+      // debugMode (the connect-trace ring is, deliberately).
+      Obd2ConnectTraceLog.active
+        ?..addStep(
+          label: 'channel-open',
+          status: Obd2ConnectStepStatus.fail,
+          detail: e.toString(),
+        )
+        ..setOutcome(classifyBleOpenOutcome(e), failureDetail: e.toString());
       rethrow;
     }
     if (connectSw != null) {

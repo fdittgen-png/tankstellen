@@ -99,21 +99,22 @@ class Obd2ConnectTraceLog {
     if (handle == null) return;
     handle.addStep(
       label: cmd.trim(),
-      status: _looksLikeError(rawResponse)
-          ? Obd2ConnectStepStatus.fail
-          : Obd2ConnectStepStatus.ok,
+      status: _statusForResponse(rawResponse),
       detail: rawResponse.trim(),
       latencyMs: latencyMs,
     );
   }
 
-  static bool _looksLikeError(String raw) {
+  static Obd2ConnectStepStatus _statusForResponse(String raw) {
     final u = raw.toUpperCase();
-    return u.contains('NO DATA') ||
-        u.contains('TIMEOUT') ||
+    if (u.contains('TIMEOUT')) return Obd2ConnectStepStatus.timeout;
+    if (u.contains('NO DATA') ||
         u.contains('UNABLE') ||
         u.contains('STOPPED') ||
-        u.contains('?');
+        u.contains('?')) {
+      return Obd2ConnectStepStatus.fail;
+    }
+    return Obd2ConnectStepStatus.ok;
   }
 
   /// Finalise [handle] into the ring (stamping `endedAt`/`totalMs`) and clear
@@ -284,6 +285,32 @@ class Obd2ConnectTraceHandle {
 
   /// Whether a terminal outcome has been stamped (success or any failure).
   bool get hasOutcome => _root._outcome != null;
+
+  /// Classify an INIT failure (the channel opened, the ELM handshake failed)
+  /// from the AT steps teed so far (#2969 correction 4): distinguish a
+  /// counterfeit clone (ATZ returned garbage/`?`) from an init timeout (any AT
+  /// step timed out) from a silent ECU / ignition-off (the init structurally
+  /// ran but the first PID probe found NO DATA). Used by `_openAndInit` where
+  /// `Obd2Service.connect` already swallowed the real error into a generic
+  /// `false`, so the teed transcript is the only signal left.
+  Obd2ConnectOutcome classifyInitFailureOutcome() {
+    final steps = _root._steps;
+    for (final s in steps) {
+      final label = s.label.toUpperCase();
+      // ATZ garbage / unrecognised → a lying clone (protocol init failed).
+      if (label == 'ATZ' && s.status == Obd2ConnectStepStatus.fail) {
+        final d = (s.detail ?? '').toUpperCase();
+        if (d.contains('?') || (d.isNotEmpty && !d.contains('ELM'))) {
+          return Obd2ConnectOutcome.protocolInitFailed;
+        }
+      }
+    }
+    if (steps.any((s) => s.status == Obd2ConnectStepStatus.timeout)) {
+      return Obd2ConnectOutcome.initTimeout;
+    }
+    // The init ran but the first PID/probe was silent → ignition off / parked.
+    return Obd2ConnectOutcome.ignitionOff;
+  }
 
   Obd2ConnectTrace _snapshot(DateTime end) => Obd2ConnectTrace(
         attemptId: attemptId,

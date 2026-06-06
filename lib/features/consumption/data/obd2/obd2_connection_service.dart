@@ -15,6 +15,8 @@ import 'elm_byte_channel.dart';
 import 'negotiated_protocol_cache.dart';
 import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
+import 'obd2_connect_trace.dart';
+import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_permissions.dart';
 import 'obd2_read_telemetry.dart';
@@ -147,6 +149,12 @@ class Obd2ConnectionService {
       [bleStream, classicStream],
     );
 
+    // #2969 — record each newly-seen ranked candidate into the active connect
+    // trace so a failed connect's trace carries the scan list (device + RSSI +
+    // matched profile + transport). Deduped by MAC so a repeating batch doesn't
+    // spam the capped list. A no-op when no trace is active (the picker UI scan,
+    // which has no connect attempt in flight).
+    final tracedScanMacs = <String>{};
     await for (final batch in merged) {
       for (final c in batch) {
         accumulated[c.deviceId] = c;
@@ -154,6 +162,22 @@ class Obd2ConnectionService {
       final ranked = registry.rank(accumulated.values.toList());
       if (ranked.isNotEmpty) sawAny = true;
       _lastRanked = ranked;
+      final trace = Obd2ConnectTraceLog.active;
+      if (trace != null) {
+        for (final r in ranked) {
+          if (tracedScanMacs.add(r.candidate.deviceId)) {
+            trace.recordScan(
+              mac: r.candidate.deviceId,
+              name: r.candidate.deviceName,
+              rssi: r.candidate.rssi,
+              transport: r.profile.transport == BluetoothTransport.classic
+                  ? Obd2ConnectTransport.classic
+                  : Obd2ConnectTransport.ble,
+              matchedProfileId: r.profile.id,
+            );
+          }
+        }
+      }
       yield ranked;
     }
     if (!sawAny) {
@@ -168,6 +192,36 @@ class Obd2ConnectionService {
   /// [Obd2AdapterUnresponsive] when init fails (channel is closed
   /// before the error is rethrown).
   Future<Obd2Service> connect(ResolvedObd2Candidate candidate) async {
+    // #2969 — open (or join) a connect trace for the scan-based path. A child
+    // when an outer by-MAC/best trace is already open (so the whole attempt is
+    // ONE trace); the root when `connect(candidate)` is the entry (the
+    // reconnect scan-fallback calls it directly). On success/throw the wrapper
+    // stamps the outcome; the steps + resolved transport are recorded below.
+    final trace = Obd2ConnectTraceLog.beginTrace(
+      origin: Obd2ConnectOrigin.firstConnect,
+      mac: candidate.candidate.deviceId,
+      requestedTransport:
+          candidate.profile.transport == BluetoothTransport.classic
+              ? Obd2ConnectTransport.classic
+              : Obd2ConnectTransport.ble,
+    );
+    try {
+      final svc = await _connectResolved(candidate);
+      trace.setOutcome(Obd2ConnectOutcome.success);
+      return svc;
+    } catch (e) {
+      trace.setOutcomeFromError(e);
+      // ignore: use_rethrow_when_possible
+      throw e;
+    } finally {
+      Obd2ConnectTraceLog.endTrace(trace);
+    }
+  }
+
+  /// The scan-based connect body (#2969 extraction): channel → transport →
+  /// service → init for an already-resolved [candidate]. Kept separate so the
+  /// public [connect] can wrap it in a connect trace.
+  Future<Obd2Service> _connectResolved(ResolvedObd2Candidate candidate) async {
     // #2906 — stop any active scan (BLE + Classic) and let the radio settle
     // BEFORE the channel opens. Android BLE returns GATT_ERROR 133 when a
     // `connect()` races a scan still winding down on the controller; the
@@ -185,6 +239,14 @@ class Obd2ConnectionService {
     // returned GATT_ERROR 133 on the scan-path open against the same device
     // (the repeat-133 reconnect trap). Idempotent + best-effort.
     await _teardownLastDirectChannel();
+    // #2969 — stamp the resolved transport on the active connect trace. The
+    // scan path resolved a real profile, so this is the authoritative transport
+    // (unlike the no-scan by-MAC paths, which stamp their requested transport).
+    Obd2ConnectTraceLog.active?.setResolvedTransport(
+      candidate.profile.transport == BluetoothTransport.classic
+          ? Obd2ConnectTransport.classic
+          : Obd2ConnectTransport.ble,
+    );
     final channel = switch (candidate.profile.transport) {
       BluetoothTransport.ble => bluetooth.channelFor(
           candidate.candidate.deviceId, candidate.profile),
@@ -250,6 +312,16 @@ class Obd2ConnectionService {
     // #2268 concern 3 — persist the observed wake outcome (no-op unless the bounded window ran).
     await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
     if (!ok) {
+      // #2969 — `Obd2Service.connect` swallowed the real failure into a `false`,
+      // so classify the connect-trace outcome from the AT transcript teed so
+      // far (channel-open outcomes were already stamped FIRST at the channel
+      // layer, and first-wins keeps those): ATZ garbage → counterfeit clone,
+      // an AT timeout → init timeout, else a silent ECU / ignition off. A no-op
+      // when no trace is active (a non-connect-path caller).
+      final trace = Obd2ConnectTraceLog.active;
+      if (trace != null && !trace.hasOutcome) {
+        trace.setOutcome(trace.classifyInitFailureOutcome());
+      }
       await service.disconnect();
       throw const Obd2AdapterUnresponsive();
     }
@@ -262,7 +334,43 @@ class Obd2ConnectionService {
   /// session). Useful for the "first in-car test" flow that skips
   /// the picker UI (#742).
   Future<Obd2Service?> connectBest() async {
-    if (_lastRanked.isEmpty) return null;
+    // #2969 — connectBest() was the silent dead-end: an empty `_lastRanked`
+    // returned null with NO trace, so the user's "it won't connect" left
+    // nothing. Open a trace at the entry so even the no-candidate case is
+    // captured with a `scanEmpty` outcome. The inner `connect(candidate)` joins
+    // this as a child trace, so a real attempt is still ONE trace.
+    final trace = Obd2ConnectTraceLog.beginTrace(
+      origin: Obd2ConnectOrigin.firstConnect,
+    );
+    try {
+      if (_lastRanked.isEmpty) {
+        trace.addStep(
+          label: 'rank',
+          status: Obd2ConnectStepStatus.fail,
+          detail: 'no ranked candidate cached — scan first',
+        );
+        trace.setOutcome(Obd2ConnectOutcome.scanEmpty);
+        return null;
+      }
+      final svc = await _connectBestInner();
+      trace.setOutcome(Obd2ConnectOutcome.success);
+      return svc;
+    } catch (e) {
+      // #2969 correction 2 — classify into the connect-trace outcome at the
+      // catch arm (the permission / BT-off family throws before registry.rank,
+      // so recordScan never sees them).
+      trace.setOutcomeFromError(e);
+      rethrow;
+    } finally {
+      Obd2ConnectTraceLog.endTrace(trace);
+    }
+  }
+
+  /// De-noise wrapper preserved from the pre-#2969 `connectBest`: the trace is
+  /// owned by the public method above; this keeps the #2935/#2943 breadcrumb-
+  /// vs-ERROR behaviour. (Kept as a separate seam so the trace bookkeeping and
+  /// the error-log de-noise stay independently testable.)
+  Future<Obd2Service> _connectBestInner() async {
     try {
       return await connect(_lastRanked.first);
     } catch (e, st) {
@@ -295,48 +403,110 @@ class Obd2ConnectionService {
   Future<Obd2Service?> connectByMac(
     String mac, {
     Duration timeout = const Duration(seconds: 5),
-  }) async {
-    final stream = scan(timeout: timeout);
-    ResolvedObd2Candidate? match;
-    try {
-      await for (final batch in stream) {
-        for (final c in batch) {
-          if (c.candidate.deviceId == mac) {
-            match = c;
-            break;
+  }) =>
+      _traced(
+        origin: Obd2ConnectOrigin.firstConnect,
+        mac: mac,
+        requestedTransport: Obd2ConnectTransport.unknown,
+        body: () async {
+          final stream = scan(timeout: timeout);
+          ResolvedObd2Candidate? match;
+          try {
+            await for (final batch in stream) {
+              for (final c in batch) {
+                if (c.candidate.deviceId == mac) {
+                  match = c;
+                  break;
+                }
+              }
+              if (match != null) break;
+            }
+          } on Obd2ScanTimeout {
+            // No adapters at all in range — fall through to picker.
+            return null;
           }
-        }
-        if (match != null) break;
-      }
-    } on Obd2ScanTimeout {
-      // No adapters at all in range — fall through to picker.
-      return null;
-    }
-    if (match == null) return null;
-    return connect(match);
-  }
+          if (match == null) return null;
+          return connect(match);
+        },
+      );
 
   /// Direct-connect-by-MAC, NO scan (#2242). See [_connectByMacDirect] for the
   /// full contract. A thin INSTANCE method (not an `extension`) so test fakes
   /// can `@override` it — the body lives in the `part` file to keep this file
   /// under the #1680 cap (#2190).
+  ///
+  /// #2969 — wrapped in a connect trace at this service entry point (the single
+  /// virtual-dispatch chokepoint every by-MAC caller funnels through), so a
+  /// failed FIRST connect / in-trip reconnect — even with developer mode off —
+  /// leaves a non-empty trace. Records `requestedTransport: ble` (this IS the
+  /// BLE direct path); the inner body stamps the channel-open outcome BEFORE
+  /// any scan fallback (first-wins).
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
   }) =>
-      _connectByMacDirect(this, mac,
-          timeout: timeout, fallbackToScan: fallbackToScan);
+      _traced(
+        origin: Obd2ConnectOrigin.firstConnect,
+        mac: mac,
+        requestedTransport: Obd2ConnectTransport.ble,
+        body: () => _connectByMacDirect(this, mac,
+            timeout: timeout, fallbackToScan: fallbackToScan),
+      );
 
   /// Direct-connect-by-MAC over Bluetooth **CLASSIC** SPP, NO scan (#2565).
   /// See [_connectByMacClassicDirect]. Thin overridable instance method.
-  Future<Obd2Service?> connectByMacClassicDirect(String mac) =>
-      _connectByMacClassicDirect(this, mac);
+  Future<Obd2Service?> connectByMacClassicDirect(String mac) => _traced(
+        origin: Obd2ConnectOrigin.firstConnect,
+        mac: mac,
+        requestedTransport: Obd2ConnectTransport.classic,
+        body: () => _connectByMacClassicDirect(this, mac),
+      );
 
   /// Passive autoConnect reconnect (#2261 concern 2). See
   /// [_connectByMacPassive]. Thin overridable instance method.
-  Future<Obd2Service?> connectByMacPassive(String mac) =>
-      _connectByMacPassive(this, mac);
+  Future<Obd2Service?> connectByMacPassive(String mac) => _traced(
+        origin: Obd2ConnectOrigin.liveReconnect,
+        mac: mac,
+        requestedTransport: Obd2ConnectTransport.ble,
+        body: () => _connectByMacPassive(this, mac),
+      );
+
+  /// #2969 — open (or join) a connect trace around [body], stamp the terminal
+  /// outcome (success when a service comes back; the inner-stamped outcome — or
+  /// `scanEmpty` as the default — when null; the classified error on a throw),
+  /// and finalise it into [Obd2ConnectTraceLog]. The single wrapper every
+  /// public by-MAC connect entry threads through, so a failure at ANY phase
+  /// (incl. the pre-session phases) is captured. Re-entrant safe: a nested
+  /// connect (a fallback re-entering a public method) joins the same trace.
+  Future<Obd2Service?> _traced({
+    required Obd2ConnectOrigin origin,
+    String? mac,
+    required Obd2ConnectTransport requestedTransport,
+    required Future<Obd2Service?> Function() body,
+  }) async {
+    final trace = Obd2ConnectTraceLog.beginTrace(
+      origin: origin,
+      mac: mac,
+      requestedTransport: requestedTransport,
+    );
+    try {
+      final svc = await body();
+      if (svc != null) {
+        trace.setOutcome(Obd2ConnectOutcome.success);
+      } else if (!trace.hasOutcome) {
+        // A clean null with NO inner-stamped outcome means the scan/transport
+        // path never matched the adapter — the scan-empty / not-in-range case.
+        trace.setOutcome(Obd2ConnectOutcome.scanEmpty);
+      }
+      return svc;
+    } catch (e) {
+      trace.setOutcomeFromError(e);
+      rethrow;
+    } finally {
+      Obd2ConnectTraceLog.endTrace(trace);
+    }
+  }
 
   /// #2906 — stop the active BLE + Classic scan and pause [scanSettleDelay]
   /// so the radio quiesces before a `channel.open()` connect. Idempotent +

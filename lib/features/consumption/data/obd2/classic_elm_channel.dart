@@ -9,6 +9,8 @@ import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_connect_trace.dart';
+import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -70,6 +72,17 @@ class ClassicElmChannel implements ElmByteChannel {
           failureReason: _classifyClassicConnectFailure(e),
         );
       }
+      // #2969 — stamp the RFCOMM-open outcome on the active connect trace
+      // (first-wins) so a thrown Classic-open failure is captured even with
+      // developer mode off.
+      Obd2ConnectTraceLog.active
+        ?..addStep(
+          label: 'channel-open',
+          status: Obd2ConnectStepStatus.fail,
+          detail: e.toString(),
+        )
+        ..setOutcome(Obd2ConnectOutcome.rfcommOpenFail,
+            failureDetail: e.toString());
       rethrow;
     }
     if (!ok) {
@@ -78,6 +91,19 @@ class ClassicElmChannel implements ElmByteChannel {
       if (diag.enabled) {
         diag.noteConnectionEvent(failureReason: 'rfcomm-open-fail');
       }
+      // #2969 — the clean rfcomm bool-false is the dominant Classic failure;
+      // stamp it on the trace (first-wins) so the user sees rfcommOpenFail, not
+      // a generic ignition-off. The native strategy + last IOException land in
+      // [detail] once the Kotlin Map return shape is wired (#2969 correction 5).
+      Obd2ConnectTraceLog.active
+        ?..addStep(
+          label: 'channel-open',
+          status: Obd2ConnectStepStatus.fail,
+          detail: 'rfcomm open returned false (all strategies exhausted)',
+        )
+        ..setOutcome(Obd2ConnectOutcome.rfcommOpenFail,
+            failureDetail:
+                'rfcomm open returned false (all strategies exhausted)');
       // #2745 — this was a raw `StateError`, which the connect flow logged as
       // an `[unknown]` ERROR trace (field trace #6) even though it is an
       // EXPECTED, user-surfaced "adapter not reachable" condition (the dongle
