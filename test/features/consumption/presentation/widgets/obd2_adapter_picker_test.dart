@@ -18,6 +18,8 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_servi
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/obd2_adapter_picker.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
@@ -309,6 +311,192 @@ void main() {
       await tester.pumpAndSettle();
     });
   });
+
+  // errorlog_30 — a real Open-Testing trace: `_connect` runs `connect()`
+  // async, then `_persistPickedAdapterToActiveVehicle` touched `ref` AFTER
+  // the await. When the sheet was dismissed/unmounted while `connect()` was
+  // still resolving, that post-await `ref` read threw
+  //   `Bad state: Using "ref" when a widget is about to or has been
+  //    unmounted is unsafe.`
+  // The fix captures the active profile + list notifier BEFORE the first
+  // await, so the persist never touches `ref` post-unmount AND still
+  // completes (the connect succeeded — the pinned MAC must be written).
+  group('post-connect persist is unmount-safe (errorlog_30)', () {
+    late _CaptureRecorder rec;
+
+    setUp(() {
+      rec = _CaptureRecorder();
+      errorLogger.testRecorderOverride = rec;
+    });
+
+    testWidgets(
+        'unmounting the sheet before connect resolves does NOT ref-after-unmount',
+        (tester) async {
+      final list = _RecordingVehicleList([
+        const VehicleProfile(id: 'v1', name: 'Golf'),
+      ]);
+      // connect() is gated on a completer the test controls, so we can
+      // unmount the sheet while it is still pending.
+      final svc = _GatedConnection();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            obd2ConnectionProvider.overrideWith((_) => svc),
+            vehicleProfileListProvider.overrideWith(() => list),
+            activeVehicleProfileProvider.overrideWith(
+              () => _StubActiveVehicle(
+                const VehicleProfile(id: 'v1', name: 'Golf'),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: Obd2AdapterPickerSheet()),
+          ),
+        ),
+      );
+      // Scan emits one candidate → selecting state with a tappable tile.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(find.text('vLinker FD'));
+      await tester.pump(); // flips to connecting; connect() now pending.
+
+      // Dismiss the sheet WHILE connect() is still in flight — this is the
+      // crash window: the sheet unmounts, then connect() resolves and the
+      // post-await persist runs.
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: SizedBox.shrink())),
+      );
+      expect(
+        find.byType(Obd2AdapterPickerSheet),
+        findsNothing,
+        reason: 'sheet must be unmounted before connect resolves',
+      );
+
+      // Now resolve the connect — on master this drove a ref read after
+      // unmount, swallowed into a `[ui] Bad state` ERROR trace.
+      svc.completeConnect(_NoopObd2Service());
+      await tester.pump();
+      await tester.pump();
+
+      // No ref-after-unmount StateError reached the error logger.
+      final unmountErrors = rec.errors
+          .map((e) => e.toString())
+          .where((s) => s.contains('unmounted') || s.contains('Bad state'))
+          .toList();
+      expect(
+        unmountErrors,
+        isEmpty,
+        reason: 'post-await persist must not touch `ref` after unmount',
+      );
+      // The persist still happened via the pre-await capture — the picked
+      // adapter MAC was written even though the sheet was gone.
+      expect(list.savedProfiles, hasLength(1));
+      expect(list.savedProfiles.single.obd2AdapterMac, 'id-vLinker FD');
+    });
+
+    testWidgets('the mounted path still persists the picked adapter',
+        (tester) async {
+      final list = _RecordingVehicleList([
+        const VehicleProfile(id: 'v1', name: 'Golf'),
+      ]);
+      final svc = _GatedConnection();
+      final fakeService = _NoopObd2Service();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            obd2ConnectionProvider.overrideWith((_) => svc),
+            vehicleProfileListProvider.overrideWith(() => list),
+            activeVehicleProfileProvider.overrideWith(
+              () => _StubActiveVehicle(
+                const VehicleProfile(id: 'v1', name: 'Golf'),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(body: Obd2AdapterPickerSheet()),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(find.text('vLinker FD'));
+      await tester.pump();
+
+      // Resolve the connect while the sheet is STILL mounted (the normal
+      // happy path) → the persist must run and pop with the service.
+      svc.completeConnect(fakeService);
+      await tester.pumpAndSettle();
+
+      expect(rec.errors, isEmpty);
+      expect(list.savedProfiles, hasLength(1));
+      expect(list.savedProfiles.single.obd2AdapterMac, 'id-vLinker FD');
+      expect(list.savedProfiles.single.obd2AdapterName, 'vLinker FD');
+    });
+  });
+}
+
+/// [VehicleProfileList] fake that seeds an initial list and records every
+/// [save] so the errorlog_30 tests can assert the picked adapter MAC was
+/// persisted. Mirrors `auto_record_section_test.dart`'s pattern.
+class _RecordingVehicleList extends VehicleProfileList {
+  _RecordingVehicleList(this._seed);
+  final List<VehicleProfile> _seed;
+  final List<VehicleProfile> savedProfiles = <VehicleProfile>[];
+
+  @override
+  List<VehicleProfile> build() => List<VehicleProfile>.from(_seed);
+
+  @override
+  Future<void> save(VehicleProfile profile) async {
+    savedProfiles.add(profile);
+    state = [..._seed.where((v) => v.id != profile.id), profile];
+  }
+}
+
+/// Stub [ActiveVehicleProfile] returning a fixed value with no storage I/O.
+class _StubActiveVehicle extends ActiveVehicleProfile {
+  _StubActiveVehicle(this._value);
+  final VehicleProfile? _value;
+  @override
+  VehicleProfile? build() => _value;
+}
+
+/// Connection fake whose `connect()` is gated on a completer the test
+/// controls — so a test can unmount the sheet mid-connect and only then
+/// resolve, reproducing the errorlog_30 crash window. `scan()` emits a
+/// single candidate so the picker reaches `selecting` with a tappable tile.
+class _GatedConnection extends Obd2ConnectionService {
+  _GatedConnection()
+      : super(
+          registry: Obd2AdapterRegistry.defaults(),
+          permissions: _FakePermissions(Obd2PermissionState.granted),
+          bluetooth: _StreamingFacade(const []),
+        );
+
+  final Completer<Obd2Service> _connectGate = Completer<Obd2Service>();
+
+  void completeConnect(Obd2Service service) => _connectGate.complete(service);
+
+  @override
+  Stream<List<ResolvedObd2Candidate>> scan({
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {
+    yield [
+      ResolvedObd2Candidate(
+        candidate: _scanHit(name: 'vLinker FD', rssi: -50),
+        profile: const Obd2AdapterProfile(
+          id: 'vlinker-ble',
+          displayName: 'vLinker FD / MC (BLE)',
+        ),
+      ),
+    ];
+  }
+
+  @override
+  Future<Obd2Service> connect(ResolvedObd2Candidate candidate) =>
+      _connectGate.future;
 }
 
 /// Captures every `errorLogger.log` -> `record` call so the de-noise tests
@@ -379,7 +567,19 @@ Future<void> _pump(
 ) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+      overrides: [
+        obd2ConnectionProvider.overrideWith((_) => svc),
+        // errorlog_30 — `_connect` now reads the vehicle providers eagerly
+        // (pre-await capture) so the post-connect persist never touches
+        // `ref` after unmount. Stub them so these Hive-free widget tests
+        // don't fault the real repository's `Hive.openBox` path.
+        vehicleProfileListProvider.overrideWith(
+          () => _RecordingVehicleList(const []),
+        ),
+        activeVehicleProfileProvider.overrideWith(
+          () => _StubActiveVehicle(null),
+        ),
+      ],
       child: const MaterialApp(
         home: Scaffold(body: Obd2AdapterPickerSheet()),
       ),

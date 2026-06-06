@@ -357,8 +357,15 @@ void main() {
         1106,
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
         439,
+    // errorlog_30 — re-grandfathered 439 → 458: `_connect` now captures the
+    // active profile + vehicle-list notifier BEFORE its first `await` and
+    // threads them into `_persistPickedAdapterToActiveVehicle`, so the
+    // post-connect persist never touches `ref` after the sheet unmounts (the
+    // real Open-Testing "ref used after unmount" StateError). The growth is the
+    // two captures + the two extra params + the rationale comments; it cannot
+    // move out of the State. Decomposition stays tracked under #2187/#2188.
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
-        439,
+        458,
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
