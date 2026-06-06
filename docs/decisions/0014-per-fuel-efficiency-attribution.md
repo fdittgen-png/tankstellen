@@ -5,10 +5,18 @@
 
 # ADR 0014: Per-fuel-type efficiency attribution (v1 — dominant-fuel)
 
-**Status:** Accepted
+**Status:** Superseded
 **Date:** 2026-06-05
 **Issue:** #2882
 **Parent Epic:** #2881
+**Superseded by:** ADR 0015 (pure-vs-mix composition buckets, #2928)
+
+> **Superseded.** The dominant-fuel collapse described below was replaced by
+> the COMPOSITION-BUCKET model in
+> [ADR 0015](0015-per-fuel-efficiency-composition-buckets.md): closed intervals
+> are now grouped by their fuel composition (a pure grade or a
+> `dominant/secondary` blend) instead of being attributed whole to one dominant
+> fuel. This document is retained for historical context.
 
 ## Context
 

@@ -9536,17 +9536,35 @@ abstract class AppLocalizations {
   /// **'Cost per kilometre by fuel'**
   String get fuelEfficiencyCardTitle;
 
-  /// Subtitle of the per-fuel efficiency card explaining it ranks fuels by real driving cost per kilometre, not pump price per litre (#2887).
+  /// Subtitle of the per-fuel efficiency card explaining it ranks fuel compositions (pure grades and blends) by real driving cost per kilometre, not pump price per litre (#2887, ADR 0015).
   ///
   /// In en, this message translates to:
-  /// **'Which fuel is actually cheapest to drive on'**
+  /// **'Which fuel mix is actually cheapest to drive on'**
   String get fuelEfficiencyCardSubtitle;
 
-  /// Winner chip at the top of the per-fuel efficiency card, crowning the fuel with the lowest verified cost per kilometre (#2887).
+  /// Winner chip at the top of the per-fuel efficiency card, crowning the fuel composition (a pure grade or a blend) with the lowest verified cost per kilometre (#2887, ADR 0015). The {fuel} placeholder is a language-neutral grade code or A/B mix mask.
   ///
   /// In en, this message translates to:
   /// **'Cheapest per km: {fuel} ({costPerKm})'**
   String fuelEfficiencyWinnerChip(String fuel, String costPerKm);
+
+  /// Row badge on the per-fuel efficiency card marking a composition bucket that is a single pure fuel grade (>= 85% one fuel) rather than a blend (#2928, ADR 0015).
+  ///
+  /// In en, this message translates to:
+  /// **'Pure'**
+  String get fuelEfficiencyPureBadge;
+
+  /// Row badge on the per-fuel efficiency card marking a composition bucket that is a blend of two fuels rather than a single pure grade (#2928, ADR 0015).
+  ///
+  /// In en, this message translates to:
+  /// **'Blend'**
+  String get fuelEfficiencyMixBadge;
+
+  /// Secondary line on a blend row of the per-fuel efficiency card, naming the dominant (largest-share) fuel of the blend (#2928, ADR 0015).
+  ///
+  /// In en, this message translates to:
+  /// **'Mostly {fuel}'**
+  String fuelEfficiencyMixDominant(String fuel);
 
   /// Column header for the litres-per-100km metric in the per-fuel efficiency card (#2887).
   ///
@@ -9578,11 +9596,17 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 mixed tank counted toward its main fuel} other{{count} mixed tanks counted toward their main fuel}}'**
   String fuelEfficiencyMixedFootnote(int count);
 
-  /// Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one fuel has fewer than two closed plein-to-plein intervals (#2887, ADR 0014 verdict gate).
+  /// Footnote shown on the per-fuel efficiency card when no winner can be crowned yet because at least one composition bucket has fewer than two closed plein-to-plein intervals (#2887, ADR 0015 verdict gate).
   ///
   /// In en, this message translates to:
-  /// **'Log at least two full tanks per fuel to crown the cheapest.'**
+  /// **'Log at least two full tanks per composition to crown the cheapest.'**
   String get fuelEfficiencyInsufficientData;
+
+  /// Transparency footnote on the per-fuel efficiency card explaining the pure-vs-blend bucketing rule used to compare fuel compositions (#2928, ADR 0015).
+  ///
+  /// In en, this message translates to:
+  /// **'Tanks are grouped by composition: a tank is pure when one fuel is at least 85% of it, otherwise a blend.'**
+  String get fuelEfficiencyCompositionFootnote;
 
   /// Localized display name for the E5 (Super, up to 5% ethanol) petrol grade, used on the per-fuel efficiency card (#2887).
   ///
