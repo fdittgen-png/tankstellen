@@ -7,6 +7,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../consumption/data/obd2/broken_map_belief.dart';
 import '../../consumption/data/obd2/broken_map_detector.dart';
 import '../../consumption/data/obd2/obd2_connection_service.dart';
+import '../../consumption/data/obd2/obd2_read_telemetry.dart';
 import '../../consumption/data/obd2/obd2_service.dart';
 import '../../consumption/data/obd2/obd_adapter_blocklist.dart';
 import '../domain/entities/vehicle_profile.dart';
@@ -290,14 +291,15 @@ class VinAdapterPairAutoPopulator {
         brokenMapBelief: brokenMapBelief,
       );
     } catch (e, st) {
-      await errorLogger.log(
-        ErrorLayer.background,
-        e,
-        st,
-        context: const {
-          'op': 'vinAdapterPairAutoPopulator.run',
-        },
-      );
+      // #2953 — pairing an adapter with the engine OFF is an EXPECTED user
+      // condition: `connectByMac` propagates the typed [Obd2AdapterUnresponsive]
+      // here, which the field log #30 ERROR-spooled. Route the outer catch
+      // through the shared connect-transient de-noiser so an expected
+      // engine-off condition breadcrumbs while a GENUINE fault (permission /
+      // clone init) still ERROR-logs on the background layer.
+      recordObd2ConnectTransient(e, st,
+          where: 'vinAdapterPairAutoPopulator.run',
+          layer: ErrorLayer.background);
       return VinAdapterPairAutoPopulationOutcome.aborted();
     } finally {
       try {

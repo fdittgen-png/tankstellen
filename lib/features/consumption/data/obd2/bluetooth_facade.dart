@@ -100,7 +100,7 @@ class PluginBluetoothFacade implements BluetoothFacade {
           );
           accumulated[candidate.deviceId] = candidate;
         }
-        controller.add(accumulated.values.toList());
+        _safeAddScanResults(controller, accumulated.values.toList());
       },
       // #1392 — mirror the explicit-future catchError above. Without
       // this mapping the raw `PlatformException(startScan, "Bluetooth
@@ -115,17 +115,47 @@ class PluginBluetoothFacade implements BluetoothFacade {
       },
     );
 
-    // Clean up when the caller cancels or the timeout elapses.
+    // Clean up when the caller cancels or the timeout elapses. Both
+    // paths cancel [sub] FIRST (#2953): a still-live `scanResults`
+    // subscription is the source of the late `controller.add` that
+    // throws once the controller is closed. `onCancel` fires on a
+    // consumer cancel; the timeout `Timer` is the close path that does
+    // NOT trigger `onCancel`, so it must cancel [sub] itself.
     controller.onCancel = () async {
       await sub.cancel();
       await FlutterBluePlus.stopScan();
     };
     Timer(timeout, () async {
+      await sub.cancel();
       await FlutterBluePlus.stopScan();
       await controller.close();
     });
 
     return controller.stream;
+  }
+
+  /// #2953 — guarded feed for the `scanResults` listener. A
+  /// `FlutterBluePlus.scanResults` callback can fire AFTER [controller]
+  /// was closed (the timeout `Timer` or `onCancel` closed it, but a
+  /// result already queued on the event loop still reaches the
+  /// listener): the field log #30 spooled `Bad state: Cannot add event
+  /// after closing` 14× during the engine-off connect/scan/disconnect
+  /// churn. The `onError` path is already `isClosed`-guarded; this
+  /// mirrors it for the data path so a late result is dropped silently
+  /// instead of throwing into the zone error handler. `@visibleForTesting`
+  /// so the guard is unit-tested directly without driving the plugin.
+  @visibleForTesting
+  static void debugSafeAddScanResults(
+    StreamController<List<Obd2AdapterCandidate>> controller,
+    List<Obd2AdapterCandidate> results,
+  ) =>
+      _safeAddScanResults(controller, results);
+
+  static void _safeAddScanResults(
+    StreamController<List<Obd2AdapterCandidate>> controller,
+    List<Obd2AdapterCandidate> results,
+  ) {
+    if (!controller.isClosed) controller.add(results);
   }
 
   /// Recognise the platform-channel rejection FlutterBluePlus emits

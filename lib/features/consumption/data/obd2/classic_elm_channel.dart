@@ -101,7 +101,17 @@ class ClassicElmChannel implements ElmByteChannel {
         // wire-framing counters. Double-gated (kReleaseMode +
         // collector.enabled), so production pays nothing.
         noteObd2Framing(bytes);
-        _incoming.add(bytes);
+        // #2953 — guard the late add. A native Classic-SPP byte can land
+        // on this EventChannel listener AFTER `close()` ran (`close()`
+        // cancels `_subscription` then closes `_incoming`, but a chunk
+        // already queued on the event loop still reaches this callback):
+        // the field log #30 spooled `Bad state: Cannot add new events
+        // after calling close` during the engine-off connect/disconnect
+        // churn. The `addError` path below is already `isClosed`-guarded
+        // (#2295); mirror it here. Per the #2295 contract we do NOT tear
+        // the bridge early — late GOOD bytes still flow until `close()`,
+        // and only a post-close stray is dropped silently.
+        if (!_incoming.isClosed) _incoming.add(bytes);
       },
       onError: (Object e, StackTrace st) {
         // #2671 — a Classic-SPP drop raises a socket ERROR on the reader

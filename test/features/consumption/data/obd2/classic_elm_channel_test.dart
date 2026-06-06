@@ -71,6 +71,72 @@ class _FakeObd2ClassicMethodChannel extends Obd2ClassicMethodChannel {
   }
 }
 
+/// #2953 — a fake whose `incoming` stream hands back a [_LateByteSink] so a
+/// test can deliver a native Classic-SPP byte DIRECTLY to the SUT's
+/// installed `onData` listener even after `close()` ran — modelling the
+/// EventChannel in-flight-byte race where a chunk already queued on the
+/// event loop reaches the listener after `_incoming` was closed. A real
+/// broadcast `StreamController` would stop delivering once the SUT's
+/// subscription is cancelled in `close()`, so it can't reproduce the race.
+class _LateByteFakePlugin extends Obd2ClassicMethodChannel {
+  _LateByteFakePlugin();
+
+  final sink = _LateByteSink();
+
+  @override
+  Future<bool> connect({required String address, required String uuid}) async =>
+      true;
+
+  @override
+  Future<void> write(List<int> bytes) async {}
+
+  @override
+  Future<void> disconnect() async {}
+
+  @override
+  Stream<List<int>> get incoming => sink;
+}
+
+/// A minimal [Stream] whose subscription captures the SUT's `onData` and
+/// whose `cancel()` is a no-op for delivery — the test fires a late byte
+/// through [deliver] regardless of cancellation, reproducing a native
+/// in-flight chunk arriving after the channel closed (#2953).
+class _LateByteSink extends Stream<List<int>> {
+  void Function(List<int>)? _onData;
+
+  void deliver(List<int> bytes) => _onData?.call(bytes);
+
+  @override
+  StreamSubscription<List<int>> listen(
+    void Function(List<int>)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
+    _onData = onData;
+    return _NoopSubscription<List<int>>();
+  }
+}
+
+class _NoopSubscription<T> implements StreamSubscription<T> {
+  @override
+  Future<void> cancel() async {}
+  @override
+  void onData(void Function(T)? handleData) {}
+  @override
+  void onError(Function? handleError) {}
+  @override
+  void onDone(void Function()? handleDone) {}
+  @override
+  void pause([Future<void>? resumeSignal]) {}
+  @override
+  void resume() {}
+  @override
+  bool get isPaused => false;
+  @override
+  Future<E> asFuture<E>([E? futureValue]) => Completer<E>().future;
+}
+
 void main() {
   silenceErrorLoggerSpool();
   late _FakeObd2ClassicMethodChannel fake;
@@ -372,6 +438,40 @@ void main() {
 
       await expectLater(channel.close(), completes);
       expect(channel.isOpen, isFalse);
+    });
+
+    test(
+        '#2953 — a late native byte delivered AFTER close does NOT throw '
+        '(the incoming `add` is isClosed-guarded)', () async {
+      // Field log #30 spooled `Bad state: Cannot add new events after calling
+      // close` 14× during the engine-off connect/disconnect churn: a native
+      // Classic-SPP chunk already queued on the event loop reached the
+      // listener after `close()` closed `_incoming`. The guard must drop it.
+      final latePlugin = _LateByteFakePlugin();
+      final channel = ClassicElmChannel(address: 'AA:BB', plugin: latePlugin);
+      await channel.open();
+
+      // Sanity: an in-session byte flows through while open.
+      final received = <List<int>>[];
+      final sub = channel.incoming.listen(received.add);
+      latePlugin.sink.deliver([0x41]);
+      await Future<void>.delayed(Duration.zero);
+      expect(received, [
+        [0x41],
+      ]);
+
+      await channel.close();
+
+      // The in-flight late byte arrives at the listener AFTER `_incoming`
+      // was closed — must be a silent no-op, not a StateError.
+      expect(
+        () => latePlugin.sink.deliver([0x99]),
+        returnsNormally,
+        reason: 'a post-close native byte must be dropped silently, not '
+            'rethrown as `Cannot add new events after calling close`',
+      );
+
+      await sub.cancel();
     });
   });
 }

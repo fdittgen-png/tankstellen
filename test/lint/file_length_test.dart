@@ -90,6 +90,14 @@ void main() {
     // Decomposing this god-class is tracked separately (#2187/#2188/#2190).
     'lib/core/services/country_service_registry.dart': 857,
     'lib/features/consumption/data/obd2/adapter_registry.dart': 500,
+    // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
+    // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
+    // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off
+    // transient must breadcrumb, not spool an ERROR every backoff cycle —
+    // #2892/#2935/#2945 never reached this site) via a small shared `_denoise`
+    // helper + its dartdoc. The net push just past 400 is a real fix; further
+    // compression would hurt readability. Decomposition tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/adapter_reconnect_scanner.dart': 405,
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
     // #2456 — re-grandfathered 457 → 481: two new pure parsers,
     // `parseBaroPressureKpa` (PID 0x33) and `parseCommandedEquivalenceRatio`

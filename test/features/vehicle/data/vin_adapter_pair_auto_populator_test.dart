@@ -7,8 +7,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
@@ -197,6 +199,70 @@ void main() {
 
       expect(outcome.profile, isNull);
       expect(outcome.readVin, isFalse);
+    });
+  });
+
+  // #2953 — pairing an adapter with the engine OFF is an EXPECTED user
+  // condition: `connectByMac` propagates the typed [Obd2AdapterUnresponsive]
+  // into the populator's outer catch, which the field log #30 ERROR-spooled
+  // ({op: 'vinAdapterPairAutoPopulator.run'}). It now routes through the
+  // shared connect-transient de-noiser: an expected condition breadcrumbs; a
+  // genuine fault still spools.
+  group('engine-off connect de-noise (#2953)', () {
+    test('an EXPECTED Obd2AdapterUnresponsive breadcrumbs, NOT spool',
+        () async {
+      final rec = _CapturingRecorder();
+      errorLogger.testRecorderOverride = rec;
+      BreadcrumbCollector.clear();
+
+      final connection = _FakeConnection(
+        connectByMacError: const Obd2AdapterUnresponsive(),
+      );
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(outcome.profile, isNull, reason: 'aborted outcome, unchanged');
+      expect(rec.errors, isEmpty,
+          reason: 'engine-off after pairing must NOT spool an ERROR '
+              '(the field log #30 entry)');
+      expect(
+        BreadcrumbCollector.snapshot().map((b) => b.action),
+        contains('OBD2 connect failed — expected transient'),
+      );
+    });
+
+    test('a GENUINE Obd2PermissionDenied STILL spools an ERROR', () async {
+      final rec = _CapturingRecorder();
+      errorLogger.testRecorderOverride = rec;
+      BreadcrumbCollector.clear();
+
+      final connection = _FakeConnection(
+        connectByMacError: const Obd2PermissionDenied(),
+      );
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(outcome.profile, isNull);
+      expect(rec.errors, hasLength(1),
+          reason: 'a real, actionable fault must stay a visible ERROR');
+      expect(rec.errors.single.toString(),
+          contains('vinAdapterPairAutoPopulator.run'));
     });
   });
 
@@ -587,7 +653,7 @@ class _FakeSettingsStorage implements SettingsStorage {
 }
 
 class _FakeConnection extends Obd2ConnectionService {
-  _FakeConnection({this.connectByMacResult})
+  _FakeConnection({this.connectByMacResult, this.connectByMacError})
       : super(
           registry: Obd2AdapterRegistry.defaults(),
           permissions: _AlwaysGrantedPermissions(),
@@ -596,11 +662,16 @@ class _FakeConnection extends Obd2ConnectionService {
 
   final Obd2Service? connectByMacResult;
 
+  /// #2953 — when set, `connectByMac` THROWS this (the real service
+  /// propagates the typed [Obd2AdapterUnresponsive] on an engine-off pair).
+  final Object? connectByMacError;
+
   @override
   Future<Obd2Service?> connectByMac(
     String mac, {
     Duration timeout = const Duration(seconds: 5),
   }) async {
+    if (connectByMacError != null) throw connectByMacError!;
     final s = connectByMacResult;
     if (s == null) return null;
     // The populator expects a connected service so it can issue PID
@@ -653,6 +724,24 @@ class _NoOpRecorder implements TraceRecorder {
     StackTrace stackTrace, {
     ServiceChainSnapshot? serviceChainState,
   }) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      super.noSuchMethod(invocation);
+}
+
+/// #2953 — captures `errorLogger.log` calls so a test can assert
+/// spool-vs-breadcrumb at the populator's outer catch.
+class _CapturingRecorder implements TraceRecorder {
+  final errors = <Object>[];
+  @override
+  Future<void> record(
+    Object error,
+    StackTrace stackTrace, {
+    ServiceChainSnapshot? serviceChainState,
+  }) async {
+    errors.add(error);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
