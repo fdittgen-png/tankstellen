@@ -6350,6 +6350,27 @@ class AppLocalizationsRo extends AppLocalizations {
       'Diagnosticele OBD2 au fost copiate în clipboard.';
 
   @override
+  String get obd2HealthDownloadJson => 'Download as JSON';
+
+  @override
+  String get obd2HealthDownloadInitTranscript =>
+      'Download init transcript only';
+
+  @override
+  String get obd2HealthDownloadError => 'Couldn\'t save the diagnostics file';
+
+  @override
+  String get obd2TestAdapterLabel => 'Adapter to test';
+
+  @override
+  String get obd2TestAdapterScanOption => 'Scan for adapter';
+
+  @override
+  String obd2TestStepConnectTo(String adapter) {
+    return 'Connect to $adapter';
+  }
+
+  @override
   String get obd2TestRunTitle => 'Rulați testul adaptorului';
 
   @override

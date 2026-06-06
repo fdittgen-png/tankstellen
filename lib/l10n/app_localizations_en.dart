@@ -6270,6 +6270,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2HealthCopied => 'OBD2 diagnostics copied to clipboard.';
 
   @override
+  String get obd2HealthDownloadJson => 'Download as JSON';
+
+  @override
+  String get obd2HealthDownloadInitTranscript =>
+      'Download init transcript only';
+
+  @override
+  String get obd2HealthDownloadError => 'Couldn\'t save the diagnostics file';
+
+  @override
+  String get obd2TestAdapterLabel => 'Adapter to test';
+
+  @override
+  String get obd2TestAdapterScanOption => 'Scan for adapter';
+
+  @override
+  String obd2TestStepConnectTo(String adapter) {
+    return 'Connect to $adapter';
+  }
+
+  @override
   String get obd2TestRunTitle => 'Run adapter test';
 
   @override
@@ -14004,6 +14025,28 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2HealthCopied =>
       '⟦ÓƁĐ2 đîáǧñóšŧîçš çóƥîéđ ŧó çłîƥƀóářđ. ··············⟧';
+
+  @override
+  String get obd2HealthDownloadJson => '⟦Đóŵñłóáđ áš ĴŠÓÑ ······⟧';
+
+  @override
+  String get obd2HealthDownloadInitTranscript =>
+      '⟦Đóŵñłóáđ îñîŧ ŧřáñšçřîƥŧ óñłý ············⟧';
+
+  @override
+  String get obd2HealthDownloadError =>
+      '⟦Çóúłđñ\'ŧ šáṽé ŧĥé đîáǧñóšŧîçš ƒîłé ·············⟧';
+
+  @override
+  String get obd2TestAdapterLabel => '⟦Áđáƥŧéř ŧó ŧéšŧ ······⟧';
+
+  @override
+  String get obd2TestAdapterScanOption => '⟦Šçáñ ƒóř áđáƥŧéř ······⟧';
+
+  @override
+  String obd2TestStepConnectTo(String adapter) {
+    return '⟦Çóññéçŧ ŧó $adapter ····⟧';
+  }
 
   @override
   String get obd2TestRunTitle => '⟦Řúñ áđáƥŧéř ŧéšŧ ······⟧';

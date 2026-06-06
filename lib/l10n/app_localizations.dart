@@ -10962,6 +10962,42 @@ abstract class AppLocalizations {
   /// **'OBD2 diagnostics copied to clipboard.'**
   String get obd2HealthCopied;
 
+  /// Label for the action that saves the OBD2 session diagnostics (per-PID table + counters) as a JSON file to the device's Downloads folder, on the OBD2 communication-health screen (#2938).
+  ///
+  /// In en, this message translates to:
+  /// **'Download as JSON'**
+  String get obd2HealthDownloadJson;
+
+  /// Label for the action on the OBD2 communication-health screen (#2938) that saves only the dongle-init handshake (adapter identity + init transcript + supported PIDs) as a JSON file to the Downloads folder, without the full per-PID/session payload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download init transcript only'**
+  String get obd2HealthDownloadInitTranscript;
+
+  /// Error snackbar shown when the OBD2 communication-health screen fails to write the diagnostics JSON file to the Downloads folder (#2938).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the diagnostics file'**
+  String get obd2HealthDownloadError;
+
+  /// Label of the dropdown above the Run-adapter-test button (#2938) that lets the user choose which paired OBD2 adapter the self-test should connect to.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter to test'**
+  String get obd2TestAdapterLabel;
+
+  /// Last option in the adapter-to-test dropdown (#2938): instead of connecting to a paired adapter by MAC, fall back to the blind Bluetooth scan (the original self-test behaviour).
+  ///
+  /// In en, this message translates to:
+  /// **'Scan for adapter'**
+  String get obd2TestAdapterScanOption;
+
+  /// First step label in the OBD2 adapter self-test progress list when the run connects directly to a chosen adapter by MAC instead of scanning (#2938). adapter is the chosen adapter's display name.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to {adapter}'**
+  String obd2TestStepConnectTo(String adapter);
+
   /// Section header above the on-demand OBD2 adapter self-test on the dev-tools communication-health screen (#2645).
   ///
   /// In en, this message translates to:

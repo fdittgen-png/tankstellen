@@ -15,8 +15,13 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/developer_tools/obd2_health_screen.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../../helpers/pump_app.dart';
+
+const _pairedMac = 'AA:BB:CC:DD:EE:FF';
+const _pairedName = 'vLinker FS';
 
 const _happyPathResponses = {
   'ATZ': 'ELM327 v1.5>',
@@ -45,11 +50,23 @@ void main() {
     ..reset()
     ..enabled = false);
 
-  List<Object> overrides({TripRecordingState? recording}) => [
+  List<Object> overrides({
+    TripRecordingState? recording,
+    _FakeConnection? connection,
+    bool withPairedAdapter = false,
+  }) =>
+      [
         enabledFeaturesProvider.overrideWithValue({Feature.debugMode}),
-        obd2ConnectionProvider.overrideWith((_) => _FakeConnection()),
+        obd2ConnectionProvider
+            .overrideWith((_) => connection ?? _FakeConnection()),
         if (recording != null)
           tripRecordingProvider.overrideWithValue(recording),
+        vehicleProfileListProvider.overrideWith(
+          withPairedAdapter ? _PairedVehicleList.new : _NoVehicles.new,
+        ),
+        activeVehicleProfileProvider.overrideWith(
+          withPairedAdapter ? _PairedActiveVehicle.new : _NoActiveVehicle.new,
+        ),
       ];
 
   testWidgets('shows the Run adapter test button under Developer mode',
@@ -120,6 +137,62 @@ void main() {
     );
     expect(find.byKey(const ValueKey('obd2-self-test-summary')), findsNothing);
   });
+
+  // --- #2938: adapter choice + connect-by-MAC --------------------------
+
+  testWidgets(
+      'with a paired adapter, the choice defaults to it and the run connects '
+      'BY MAC (no blind scan)', (tester) async {
+    final conn = _FakeConnection();
+    await pumpApp(
+      tester,
+      const Obd2HealthScreen(),
+      overrides: overrides(connection: conn, withPairedAdapter: true),
+    );
+
+    // The adapter choice is shown, defaulting to the active vehicle's adapter.
+    expect(
+      find.byKey(const ValueKey('obd2-self-test-adapter-choice')),
+      findsOneWidget,
+    );
+    expect(find.text(_pairedName), findsWidgets);
+
+    await tester.tap(find.byKey(const ValueKey('obd2-self-test-run')));
+    await tester.pumpAndSettle();
+
+    // The run took the no-scan connect-by-MAC path with the chosen MAC, and
+    // never touched the blind scan (connectBest).
+    expect(conn.connectBestCalls, 0);
+    expect(conn.macsConnected, contains(_pairedMac));
+    // The first step is relabelled "Connect to <adapter>", not "Scan…".
+    expect(find.text('Connect to $_pairedName'), findsOneWidget);
+    expect(find.text('Scan for adapter'), findsNothing);
+    expect(find.text('Adapter test passed'), findsOneWidget);
+  });
+
+  testWidgets(
+      'with no paired adapter, the choice is hidden and the run blind-scans '
+      '(back-compat)', (tester) async {
+    final conn = _FakeConnection();
+    await pumpApp(
+      tester,
+      const Obd2HealthScreen(),
+      overrides: overrides(connection: conn),
+    );
+
+    // No paired adapter → no choice control.
+    expect(
+      find.byKey(const ValueKey('obd2-self-test-adapter-choice')),
+      findsNothing,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('obd2-self-test-run')));
+    await tester.pumpAndSettle();
+
+    // The legacy blind scan (connectBest) ran — no MAC was pinned.
+    expect(conn.connectBestCalls, 1);
+    expect(find.text('Adapter test passed'), findsOneWidget);
+  });
 }
 
 class _FakeConnection extends Obd2ConnectionService {
@@ -130,24 +203,65 @@ class _FakeConnection extends Obd2ConnectionService {
           bluetooth: _UnusedBluetoothFacade(),
         );
 
+  /// How many times the blind-scan path (connectBest) was taken.
+  int connectBestCalls = 0;
+
+  /// The MACs passed to the no-scan connect-by-MAC path, in call order.
+  final List<String> macsConnected = [];
+
   Future<Obd2Service?> _open() async {
     final service = Obd2Service(FakeObd2Transport(Map.of(_happyPathResponses)))
-      ..adapterMac = 'AA:BB:CC:DD:EE:FF'
+      ..adapterMac = _pairedMac
       ..linkKind = 'ble';
     await service.connect();
     return service;
   }
 
   @override
-  Future<Obd2Service?> connectBest() => _open();
+  Future<Obd2Service?> connectBest() {
+    connectBestCalls++;
+    return _open();
+  }
 
   @override
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
-  }) =>
-      _open();
+  }) {
+    macsConnected.add(mac);
+    return _open();
+  }
+}
+
+/// No stored vehicle profiles — the panel hides the adapter choice.
+class _NoVehicles extends VehicleProfileList {
+  @override
+  List<VehicleProfile> build() => const [];
+}
+
+class _NoActiveVehicle extends ActiveVehicleProfile {
+  @override
+  VehicleProfile? build() => null;
+}
+
+/// One vehicle with a paired adapter — the panel shows + defaults to it.
+const _pairedProfile = VehicleProfile(
+  id: 'car-1',
+  name: 'Daily Driver',
+  type: VehicleType.combustion,
+  obd2AdapterMac: _pairedMac,
+  obd2AdapterName: _pairedName,
+);
+
+class _PairedVehicleList extends VehicleProfileList {
+  @override
+  List<VehicleProfile> build() => const [_pairedProfile];
+}
+
+class _PairedActiveVehicle extends ActiveVehicleProfile {
+  @override
+  VehicleProfile? build() => _pairedProfile;
 }
 
 class _GrantedPermissions implements Obd2Permissions {

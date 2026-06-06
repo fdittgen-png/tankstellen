@@ -41,7 +41,13 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
   /// Run the full self-test. No-op (state unchanged) when a run is already
   /// in flight. Refuses with [Obd2SelfTestPhase.blockedByRecording] when a
   /// trip recording is active.
-  Future<void> run() async {
+  ///
+  /// [targetMac], when non-empty (#2938), takes the reliable no-scan
+  /// connect-by-MAC path — the same `connectByMacDirect` machinery the rest
+  /// of the app uses for a paired adapter — instead of the blind scan that
+  /// times out on real hardware. A null/empty MAC keeps the legacy blind
+  /// scan (back-compat with the original Run button).
+  Future<void> run({String? targetMac}) async {
     if (state.phase == Obd2SelfTestPhase.running) return;
 
     // Guard the single-link adapter: a self-test connect during a live
@@ -61,8 +67,11 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
     );
 
     final connection = ref.read(obd2ConnectionProvider);
+    final pinnedMac =
+        (targetMac != null && targetMac.isNotEmpty) ? targetMac : null;
     final report = await runObd2SelfTest(
       connection,
+      pinnedMac: pinnedMac,
       isCancelled: () => _cancelled,
       onStep: _onStep,
     );

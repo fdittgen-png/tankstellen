@@ -6299,6 +6299,27 @@ class AppLocalizationsSv extends AppLocalizations {
   String get obd2HealthCopied => 'OBD2-diagnostik kopierad till urklipp.';
 
   @override
+  String get obd2HealthDownloadJson => 'Download as JSON';
+
+  @override
+  String get obd2HealthDownloadInitTranscript =>
+      'Download init transcript only';
+
+  @override
+  String get obd2HealthDownloadError => 'Couldn\'t save the diagnostics file';
+
+  @override
+  String get obd2TestAdapterLabel => 'Adapter to test';
+
+  @override
+  String get obd2TestAdapterScanOption => 'Scan for adapter';
+
+  @override
+  String obd2TestStepConnectTo(String adapter) {
+    return 'Connect to $adapter';
+  }
+
+  @override
   String get obd2TestRunTitle => 'Kör adaptertest';
 
   @override
