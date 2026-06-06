@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -132,7 +133,15 @@ class AllPricesStationCard extends StatelessWidget {
                       isFavorite ? Icons.star : Icons.star_border,
                       color: isFavorite ? Colors.amber : null,
                     ),
-                    onPressed: onFavoriteTap,
+                    // #2974 — selection tick on the favourite toggle (the same
+                    // everyday tap haptic as the compact card). selectionClick
+                    // only; fires only on the discrete star tap, never scroll.
+                    onPressed: onFavoriteTap == null
+                        ? null
+                        : () {
+                            HapticFeedback.selectionClick();
+                            onFavoriteTap!();
+                          },
                     tooltip: isFavorite
                         ? (l10n?.removeFavorite ?? 'Remove from favorites')
                         : (l10n?.addFavorite ?? 'Add to favorites'),

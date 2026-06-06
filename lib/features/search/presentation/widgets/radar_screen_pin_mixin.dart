@@ -27,6 +27,10 @@ mixin RadarScreenPinMixin<T extends ConsumerStatefulWidget>
 
   /// Toggle the pin (the AppBar pin button).
   Future<void> togglePin() async {
+    // #2974 — a light selection tick on the toggle, mirroring the everyday
+    // tap-surface haptics. selectionClick only (never heavyImpact); fire-and-
+    // forget so the platform-channel reply never blocks the pin work.
+    unawaited(HapticFeedback.selectionClick());
     final next = !pinned;
     if (mounted) setState(() => pinned = next);
     await (next ? _enable() : _disable());
@@ -36,6 +40,10 @@ mixin RadarScreenPinMixin<T extends ConsumerStatefulWidget>
   /// and the "always pin" toggle (#2785).
   Future<void> enablePinNow() async {
     if (pinned) return;
+    // #2974 — a slightly firmer lightImpact on the pin ACTION (vs the toggle's
+    // selection tick) so "you're now pinned" reads as a deliberate state
+    // change. lightImpact only (never heavyImpact).
+    unawaited(HapticFeedback.lightImpact());
     if (mounted) setState(() => pinned = true);
     await _enable();
   }

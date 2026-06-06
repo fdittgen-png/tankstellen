@@ -464,7 +464,11 @@ void main() {
     // getter / `initialCameraFit` substitution that frames the explicit
     // bounds (route mode: the full itinerary) instead of the search circle.
     // Null path unchanged (nearby mode). Decomposition tracked by #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 622,
+    // #2974 — re-grandfathered 622 → 625: the marker-selection haptic wraps
+    // the onStationTap callback once (3 lines: the selectionClick + the
+    // delegate + its dartdoc) so a marker tap that selects a list row buzzes
+    // like the other everyday tap surfaces. Decomposition still #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 625,
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,

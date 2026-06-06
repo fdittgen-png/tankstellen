@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/widgets/animated_price_text.dart';
@@ -157,6 +158,35 @@ void main() {
       await tester.pump();
 
       expect(favTapped, isTrue);
+    });
+
+    testWidgets('#2974 — the favourite toggle fires a selectionClick haptic',
+        (tester) async {
+      final haptics = <String?>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'HapticFeedback.vibrate') {
+            haptics.add(call.arguments as String?);
+          }
+          return null;
+        },
+      );
+      addTearDown(() => tester.binding.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null));
+
+      await pumpApp(
+        tester,
+        AllPricesStationCard(
+          station: testStation,
+          onFavoriteTap: () {},
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.star_border));
+      await tester.pump();
+
+      expect(haptics, ['HapticFeedbackType.selectionClick']);
     });
 
     testWidgets('highlights cheapest price badge', (tester) async {
