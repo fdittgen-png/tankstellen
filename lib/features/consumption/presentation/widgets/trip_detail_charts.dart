@@ -2,8 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+// `intl` re-exports its own `TextDirection`, which would shadow the
+// `dart:ui` one the painter's `TextPainter` needs — so `dart:ui` is imported
+// `as ui` and `TextDirection.ltr` is qualified `ui.TextDirection.ltr` (same
+// disambiguation the price chart uses, #2384).
+import 'package:intl/intl.dart';
 
 import '../../../../l10n/app_localizations.dart';
 
@@ -17,6 +23,12 @@ part 'trip_detail_line_painter.dart';
 // file so this widget file stays under the 400-line guard. They share this
 // library's scope (the private `_TripDetailLineChart` painter wrapper).
 part 'trip_detail_signal_charts.dart';
+
+// #2977 — the scrub-to-read crosshair (nearest-point hit-test, the crosshair
+// overlay painter, and the value/time readout callout) lives in a part file so
+// this widget file stays under the 400-line guard. Mirrors the price-chart
+// tap-to-nearest pattern (#2384). Shares this library's `_ChartPoint`.
+part 'trip_chart_crosshair.dart';
 
 /// One sample of the trip recording profile (#890).
 ///
@@ -275,98 +287,8 @@ class TripDetailEngineLoadChart extends StatelessWidget {
   }
 }
 
-/// Shared implementation — every Trip-detail chart is the same
-/// rolling-window line plot over [timestamp], differing only in which
-/// sample field they extract. Keeping the painter private avoids
-/// exposing a stable but internal widget API to the rest of the app.
-class _TripDetailLineChart extends StatelessWidget {
-  final List<TripDetailSample> samples;
-  final Color? color;
-  final double? Function(TripDetailSample) valueOf;
-  final String unit;
-  final bool emptyWhenAllNull;
-
-  /// #2431 — when true the plotted series is a GPS-physics ESTIMATE, not
-  /// a measurement: a "~ geschätzt" badge is overlaid so the user is
-  /// never misled into reading it as measured data.
-  final bool estimated;
-
-  const _TripDetailLineChart({
-    required this.samples,
-    required this.color,
-    required this.valueOf,
-    required this.unit,
-    required this.emptyWhenAllNull,
-    this.estimated = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l = AppLocalizations.of(context);
-    final effective = color ?? theme.colorScheme.primary;
-
-    // Keep only samples whose value is non-null; we still need the
-    // original timestamps so the chart's X axis reflects real time.
-    final points = <_ChartPoint>[];
-    for (final s in samples) {
-      final v = valueOf(s);
-      if (v == null) continue;
-      points.add(_ChartPoint(s.timestamp, v));
-    }
-    final showEmpty =
-        samples.isEmpty || (emptyWhenAllNull && points.isEmpty);
-    if (showEmpty) {
-      return SizedBox(
-        height: 140,
-        child: Center(
-          child: Text(
-            l?.trajetDetailChartEmpty ?? 'No samples recorded',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-      );
-    }
-    points.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    final chart = SizedBox(
-      height: 160,
-      child: CustomPaint(
-        painter: _LineChartPainter(
-          points: points,
-          color: effective,
-          labelColor: theme.colorScheme.onSurface,
-          unit: unit,
-        ),
-        size: Size.infinite,
-      ),
-    );
-    if (!estimated) return chart;
-    // #2431 — overlay a clearly-marked estimate badge on the GPS-physics
-    // fallback series so it is never read as a measurement.
-    return Stack(
-      children: [
-        chart,
-        Positioned(
-          top: 0,
-          left: 8,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.secondaryContainer,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              '~ ${l?.trajetDetailChartEstimatedBadge ?? 'estimated'}',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSecondaryContainer,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
+// Shared implementation — the rolling-window line chart `_TripDetailLineChart`
+// (stateful: a tap/drag scrub selects the nearest sample and overlays the
+// crosshair + readout) lives in the `trip_chart_crosshair.dart` part file
+// alongside its scrub geometry, keeping this file under the 400-line guard.
 

@@ -297,6 +297,77 @@ void main() {
     });
   });
 
+  // #2977 — scrub-to-read crosshair. A tap/drag on a trip line chart selects
+  // the nearest sample and overlays a value + time readout, mirroring the
+  // price-chart tap-to-nearest pattern (#2384).
+  group('scrub-to-read crosshair (#2977)', () {
+    testWidgets(
+      'dragging to the right edge reveals the last sample value + unit',
+      (tester) async {
+        // _withSpeedOnly(5): speed 20, 21, 22, 23, 24 km/h, one second apart.
+        await pumpApp(
+          tester,
+          TripDetailSpeedChart(samples: _withSpeedOnly(5)),
+        );
+        // No readout before the user scrubs.
+        expect(find.textContaining('km/h'), findsNothing);
+
+        final chart = find.byType(TripDetailSpeedChart);
+        final box = tester.getRect(chart);
+        // Scrub to the far right → the last sample (24 km/h).
+        await tester.dragFrom(
+          Offset(box.right - 4, box.center.dy),
+          const Offset(-2, 0),
+        );
+        await tester.pumpAndSettle();
+
+        // The readout shows the nearest sample's value + the km/h unit.
+        expect(find.textContaining('24.0 km/h'), findsOneWidget);
+      },
+    );
+
+    testWidgets('tapping near the left edge reveals the first sample value',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripDetailSpeedChart(samples: _withSpeedOnly(5)),
+      );
+      final chart = find.byType(TripDetailSpeedChart);
+      final box = tester.getRect(chart);
+      // Tap near the far left → the first sample (20 km/h).
+      await tester.tapAt(Offset(box.left + 4, box.center.dy));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('20.0 km/h'), findsOneWidget);
+    });
+
+    testWidgets('the RPM chart readout carries the rpm unit', (tester) async {
+      await pumpApp(
+        tester,
+        TripDetailRpmChart(samples: _withAllFields(5)),
+      );
+      final chart = find.byType(TripDetailRpmChart);
+      final box = tester.getRect(chart);
+      await tester.tapAt(Offset(box.left + 4, box.center.dy));
+      await tester.pumpAndSettle();
+      // _withAllFields first sample rpm = 1500.
+      expect(find.textContaining('1500.0 rpm'), findsOneWidget);
+    });
+
+    testWidgets('a single-sample chart never shows a readout (no scrub)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripDetailSpeedChart(samples: _withSpeedOnly(1)),
+      );
+      final chart = find.byType(TripDetailSpeedChart);
+      final box = tester.getRect(chart);
+      await tester.tapAt(box.center);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('km/h'), findsNothing);
+    });
+  });
+
   group('TripDetailCoolantChart / Altitude / Lambda (#2461)', () {
     List<TripDetailSample> withSignals(int n) => [
           for (var i = 0; i < n; i++)
