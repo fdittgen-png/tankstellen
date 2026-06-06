@@ -239,7 +239,9 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
   if (hardAccelEvents > 0) {
     final liters = hardAccelEvents * _wastedLitersPerHardAccelEvent;
     final pctTime = hardAccelTotalDt / totalDt * 100.0;
-    if (liters >= _noiseFloorLiters) {
+    // #2963 — strictly `>` (not `>=`): one event's 0.05 L exactly equals the
+    // floor, clears `>=`, then renders "0.1 L" (a 2× overstatement).
+    if (liters > _noiseFloorLiters) {
       candidates.add(DrivingInsight(
         labelKey: 'insightHardAccel',
         litersWasted: liters,
