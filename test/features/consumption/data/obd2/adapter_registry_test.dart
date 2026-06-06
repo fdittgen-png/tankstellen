@@ -478,6 +478,27 @@ void main() {
           'obdlink-mx');
     });
   });
+
+  _transportForNameTests(registry);
+}
+
+void _transportForNameTests(Obd2AdapterRegistry registry) {
+  group('Obd2AdapterRegistry.transportForName (#2969)', () {
+    test('infers Classic for a stored vLinker FS name', () {
+      expect(registry.transportForName('vLinker FS 1234'),
+          BluetoothTransport.classic);
+    });
+    test('infers BLE for a stored vLinker FD name', () {
+      expect(registry.transportForName('vLinker FD'), BluetoothTransport.ble);
+    });
+    test('returns null for an unfamiliar adapter name', () {
+      expect(registry.transportForName('SomeRandomDongle'), isNull);
+    });
+    test('returns null for null / empty', () {
+      expect(registry.transportForName(null), isNull);
+      expect(registry.transportForName(''), isNull);
+    });
+  });
 }
 
 Obd2AdapterCandidate _candidate({

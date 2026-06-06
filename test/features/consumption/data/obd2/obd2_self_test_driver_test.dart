@@ -8,6 +8,8 @@ import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_comm_diagnostics.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_self_test_driver.dart';
@@ -201,13 +203,130 @@ void main() {
       expect(Obd2CommDiagnostics.instance.enabled, isFalse);
     });
   });
+
+  group('transport-aware self-test (#2969 — the reliability fix)', () {
+    setUp(Obd2ConnectTraceLog.clear);
+    tearDown(Obd2ConnectTraceLog.clear);
+
+    test(
+        'a CLASSIC adapter with transportHint:classic takes the RFCOMM path '
+        'and PASSES (the vLinker FS fix)', () async {
+      final conn = _FakeConnection(
+        transportFor: () => FakeObd2Transport(Map.of(_happyPathResponses)),
+        adapterIsClassic: true,
+      );
+
+      final report = await runObd2SelfTest(
+        conn,
+        pinnedMac: 'AA:BB:CC:DD:EE:FF',
+        transportHint: Obd2ConnectTransport.classic,
+      );
+
+      // Both connects took the Classic RFCOMM path, NOT the doomed BLE direct.
+      expect(conn.pathsTaken, everyElement('classic'));
+      expect(report.passed, isTrue);
+    });
+
+    test(
+        'the SAME classic adapter with NO hint defaults to BLE and FAILS to '
+        'connect — proving the transport-blind bug (RED-on-master signature)',
+        () async {
+      final conn = _FakeConnection(
+        transportFor: () => FakeObd2Transport(Map.of(_happyPathResponses)),
+        adapterIsClassic: true,
+      );
+
+      // No transportHint → defaults to the BLE direct path, which a Classic
+      // adapter can never answer → the connect step fails / aborts.
+      final report = await runObd2SelfTest(conn, pinnedMac: 'AA:BB:CC:DD:EE:FF');
+
+      expect(report.passed, isFalse);
+      // No connect ever landed on either path (the BLE path returned null).
+      expect(conn.pathsTaken, isEmpty);
+    });
+
+    test(
+        'a null transportHint records origin:selfTest + no-hint-defaulted-ble '
+        'on the trace the REAL service opens', () async {
+      // Drive the REAL Obd2ConnectionService (the fake here overrides
+      // connectByMacDirect and so never opens a trace — the trace lives in the
+      // real `_traced` wrapper). The BLE direct open throws, so the run fails,
+      // but the trace is the artefact under test.
+      final service = Obd2ConnectionService(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _GrantedPermissions(),
+        bluetooth: _ThrowingDirectFacade(),
+        scanSettleDelay: Duration.zero,
+      );
+
+      await runObd2SelfTest(service, pinnedMac: 'AA:BB:CC:DD:EE:FF');
+
+      final traces = Obd2ConnectTraceLog.snapshot();
+      expect(traces, isNotEmpty,
+          reason: 'a FAILED self-test connect must leave a trace');
+      // The self-test stamped its origin + the explicit BLE-default decision.
+      expect(traces.first.origin, Obd2ConnectOrigin.selfTest);
+      expect(
+        traces.first.transportDecisionReason,
+        'no-hint-defaulted-ble',
+      );
+    });
+  });
+}
+
+/// A BLE facade whose direct channel always throws on open() so the real
+/// service's connect path fails and the trace captures the failure.
+class _ThrowingDirectFacade implements BluetoothFacade {
+  @override
+  Stream<List<Obd2AdapterCandidate>> scan({
+    required Set<String> serviceUuids,
+    Duration timeout = const Duration(seconds: 8),
+  }) async* {}
+
+  @override
+  Future<void> stopScan() async {}
+
+  @override
+  ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile) =>
+      _ThrowingOpenChannel();
+
+  @override
+  ElmByteChannel channelForDirect(
+    String mac, {
+    Duration connectTimeout = const Duration(seconds: 4),
+    bool autoConnect = false,
+  }) =>
+      _ThrowingOpenChannel();
+}
+
+class _ThrowingOpenChannel implements ElmByteChannel {
+  final StreamController<List<int>> _ctrl = StreamController.broadcast();
+  @override
+  bool get isOpen => false;
+  @override
+  Stream<List<int>> get incoming => _ctrl.stream;
+  @override
+  Future<void> open() async => throw StateError('GATT_ERROR 133');
+  @override
+  Future<void> write(List<int> bytes) async {}
+  @override
+  Future<void> close() async {
+    if (!_ctrl.isClosed) await _ctrl.close();
+  }
 }
 
 /// Fake connection service whose connect/reconnect return an [Obd2Service]
-/// backed by a freshly-scripted transport per call. Overrides only the two
-/// methods the driver uses.
+/// backed by a freshly-scripted transport per call.
+///
+/// #2969 — TRANSPORT-AWARE (de-false-greened). The old fake let
+/// `connectByMacDirect` (the BLE GATT path) succeed for ANY MAC, hiding the
+/// real bug: a Classic-SPP adapter (vLinker FS) can ONLY 4 s-timeout on the BLE
+/// direct path. This fake now mimics production: when [adapterIsClassic] the
+/// BLE direct path FAILS (returns null) and only `connectByMacClassicDirect`
+/// (RFCOMM) succeeds. It records which path each connect took so a test can
+/// assert the transport-aware routing.
 class _FakeConnection extends Obd2ConnectionService {
-  _FakeConnection({required this.transportFor})
+  _FakeConnection({required this.transportFor, this.adapterIsClassic = false})
       : super(
           registry: Obd2AdapterRegistry.defaults(),
           permissions: _GrantedPermissions(),
@@ -215,21 +334,30 @@ class _FakeConnection extends Obd2ConnectionService {
         );
 
   final Obd2Transport Function() transportFor;
+
+  /// When true, the BLE direct path is doomed (returns null, like the real
+  /// 4 s-timeout) and only the Classic RFCOMM path can connect.
+  final bool adapterIsClassic;
+
   bool connectReturnsNull = false;
   bool reconnectReturnsNull = false;
   int reconnectCalls = 0;
 
-  Future<Obd2Service?> _open() async {
+  /// The connect path each successful connect took: 'ble-direct' / 'classic'.
+  final List<String> pathsTaken = [];
+
+  Future<Obd2Service?> _open(String path) async {
     if (connectReturnsNull) return null;
+    pathsTaken.add(path);
     final service = Obd2Service(transportFor())
       ..adapterMac = 'AA:BB:CC:DD:EE:FF'
-      ..linkKind = 'ble';
+      ..linkKind = adapterIsClassic ? 'classic' : 'ble';
     await service.connect();
     return service;
   }
 
   @override
-  Future<Obd2Service?> connectBest() => _open();
+  Future<Obd2Service?> connectBest() => _open('ble-direct');
 
   @override
   Future<Obd2Service?> connectByMacDirect(
@@ -237,10 +365,22 @@ class _FakeConnection extends Obd2ConnectionService {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
   }) async {
-    // The first call is the initial connect; the second is the reconnect.
     reconnectCalls++;
     if (reconnectCalls > 1 && reconnectReturnsNull) return null;
-    return _open();
+    // A Classic adapter cannot connect over the BLE direct path — exactly the
+    // production trap. Returning null models the 4 s-timeout-then-null.
+    if (adapterIsClassic) return null;
+    return _open('ble-direct');
+  }
+
+  @override
+  Future<Obd2Service?> connectByMacClassicDirect(String mac) async {
+    reconnectCalls++;
+    if (reconnectCalls > 1 && reconnectReturnsNull) return null;
+    // The RFCOMM path only works for a Classic adapter (mirrors the facade
+    // being absent / wrong for a BLE adapter).
+    if (!adapterIsClassic) return null;
+    return _open('classic');
   }
 }
 

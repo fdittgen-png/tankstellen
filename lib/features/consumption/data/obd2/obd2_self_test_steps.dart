@@ -12,6 +12,29 @@ Obd2SelfTestStepResult _step(
         Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs) =>
     Obd2SelfTestStepResult(id: id, status: status, latencyMs: latencyMs);
 
+/// #2969 — transport-aware pinned connect for the self-test, stamping
+/// `origin:selfTest` + the transport decision reason on the connect trace the
+/// service opens. A Classic adapter takes the RFCOMM direct path
+/// (`connectByMacClassicDirect`) — the BLE direct path can ONLY 4 s-timeout for
+/// a Classic-SPP adapter (the real vLinker FS trap), so this is the reliability
+/// fix that makes the self-test actually connect to the user's hardware. When
+/// the transport could NOT be inferred ([isClassic] false from a null hint) the
+/// run defaults to BLE but records `no-hint-defaulted-ble` — visible, not
+/// silent.
+Future<Obd2Service?> _selfTestConnect(
+  Obd2ConnectionService connection,
+  String pinnedMac, {
+  required bool isClassic,
+  required String decisionReason,
+}) =>
+    Obd2ConnectTraceLog.runWithOrigin(
+      Obd2ConnectOrigin.selfTest,
+      transportDecisionReason: decisionReason,
+      () => isClassic
+          ? connection.connectByMacClassicDirect(pinnedMac)
+          : connection.connectByMacDirect(pinnedMac),
+    );
+
 /// Info step: AT@1 (device description) + ATRV (battery voltage) are sent
 /// RAW because they are absent from the production init list, and treated
 /// as free-form "info" lines — a `12.4V` reply is `garbage` to the hex
@@ -141,8 +164,11 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
   Obd2Service service,
   Obd2CommDiagnostics diag,
   String? mac,
-  Duration deadline,
-) async {
+  Duration deadline, {
+  bool isClassic = false,
+  String decisionReason = 'no-hint-defaulted-ble',
+  Duration connectDeadline = const Duration(seconds: 15),
+}) async {
   try {
     await service.disconnect();
   } catch (_) {
@@ -158,8 +184,11 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
   }
   final start = DateTime.now();
   try {
-    final reconnected =
-        await connection.connectByMacDirect(mac).timeout(deadline);
+    // #2969 — transport-aware reconnect (Classic → RFCOMM) on its OWN connect
+    // budget, mirroring the initial connect step.
+    final reconnected = await _selfTestConnect(connection, mac,
+            isClassic: isClassic, decisionReason: decisionReason)
+        .timeout(connectDeadline);
     final elapsed = DateTime.now().difference(start).inMilliseconds;
     if (reconnected == null) {
       return (

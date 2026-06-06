@@ -60,6 +60,38 @@ class Obd2ConnectTraceLog {
 
   static int _seq = 0;
 
+  /// A scoped origin override (#2969 correction 1). The self-test / a live
+  /// reconnect runs its connect through the SAME public service methods as a
+  /// first-connect, so the service cannot know who called it — it opens every
+  /// trace with a default origin. A caller scopes the true origin around its
+  /// connect with [runWithOrigin]; `beginTrace` consumes this override for the
+  /// trace it opens.
+  static Obd2ConnectOrigin? _originOverride;
+  static String? _decisionReasonOverride;
+
+  /// Run [body] with every trace opened inside it stamped [origin] (and, when
+  /// given, [transportDecisionReason]). Restores the prior overrides in
+  /// `finally` (nesting-safe). Used by the self-test so the health screen reads
+  /// "self-test" instead of "first connect", and records WHY it chose a
+  /// transport (`name-matched-classic` / `no-hint-defaulted-ble`) — visible,
+  /// not silent.
+  static Future<T> runWithOrigin<T>(
+    Obd2ConnectOrigin origin,
+    Future<T> Function() body, {
+    String? transportDecisionReason,
+  }) async {
+    final priorOrigin = _originOverride;
+    final priorReason = _decisionReasonOverride;
+    _originOverride = origin;
+    _decisionReasonOverride = transportDecisionReason;
+    try {
+      return await body();
+    } finally {
+      _originOverride = priorOrigin;
+      _decisionReasonOverride = priorReason;
+    }
+  }
+
   /// Open a new connect-attempt trace. The returned handle is the mutable
   /// builder the connect path threads its steps/scan/outcome through; it
   /// becomes the [_active] trace so the handshake tee finds it. Re-entrant
@@ -79,11 +111,16 @@ class Obd2ConnectTraceLog {
     }
     final handle = Obd2ConnectTraceHandle._(
       attemptId: 't${_seq++}-${_now().microsecondsSinceEpoch}',
-      origin: origin,
+      // A scoped override (the self-test / live reconnect) wins over the
+      // service's default origin, since the service can't know its caller.
+      origin: _originOverride ?? origin,
       mac: mac,
       requestedTransport: requestedTransport,
       startedAt: _now(),
     );
+    if (_decisionReasonOverride != null) {
+      handle.setTransportDecisionReason(_decisionReasonOverride!);
+    }
     _active = handle;
     return handle;
   }
@@ -153,6 +190,7 @@ class Obd2ConnectTraceLog {
   static void clear() {
     _ring.clear();
     _active = null;
+    _originOverride = null;
     _seq = 0;
   }
 
