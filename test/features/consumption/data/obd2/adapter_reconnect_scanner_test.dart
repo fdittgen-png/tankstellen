@@ -1,8 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
+import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/consumption/data/obd2/adapter_reconnect_scanner.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// Small real-wall-clock delays keep the suite under a few seconds
@@ -526,5 +533,105 @@ void main() {
         await scanner.stop();
       });
     });
+
+    // #2953 — `_connectSafely` / `_probeSafely` previously ERROR-spooled EVERY
+    // caught failure at `ErrorLayer.storage` ({where: 'AdapterReconnectScanner
+    // connect failed' / 'probe failed'}). The #2892/#2935/#2945 connect
+    // de-noise never reached this scanner site, so an engine-off parked car
+    // (the `connect` callback surfacing a typed transient) spooled an ERROR
+    // every backoff cycle. They now route through `recordObd2ConnectTransient`:
+    // an expected transient breadcrumbs; a genuine fault still spools.
+    group('connect/probe transient de-noise (#2953)', () {
+      late _CapturingRecorder rec;
+
+      setUp(() {
+        errorLogger.resetForTest();
+        rec = _CapturingRecorder();
+        errorLogger.testRecorderOverride = rec;
+        BreadcrumbCollector.clear();
+      });
+      tearDown(errorLogger.resetForTest);
+
+      test('an EXPECTED engine-off transient on connect breadcrumbs, NOT spool',
+          () async {
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          probe: (_) async => true,
+          connect: (_) async =>
+              throw const Obd2AdapterUnresponsive(), // parked car
+          onReconnect: () {},
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+        await _waitFor(() => BreadcrumbCollector.snapshot().isNotEmpty);
+        await scanner.stop();
+        await Future<void>.delayed(Duration.zero);
+
+        expect(rec.errors, isEmpty,
+            reason: 'an expected engine-off transient must NOT spool an ERROR '
+                'every backoff cycle (the field log #30 flood)');
+        expect(
+          BreadcrumbCollector.snapshot().map((b) => b.action),
+          contains('OBD2 connect failed — expected transient'),
+        );
+      });
+
+      test('a GENUINE fault on connect STILL spools an ERROR', () async {
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          probe: (_) async => true,
+          connect: (_) async => throw const Obd2PermissionDenied(),
+          onReconnect: () {},
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+        await _waitFor(() => rec.errors.isNotEmpty);
+        await scanner.stop();
+
+        expect(rec.errors, isNotEmpty,
+            reason: 'a real, actionable fault must stay a visible ERROR');
+        expect(rec.errors.first.toString(),
+            contains('AdapterReconnectScanner connect failed'));
+      });
+
+      test('an EXPECTED transient on probe breadcrumbs, NOT spool', () async {
+        final scanner = AdapterReconnectScanner(
+          pinnedMac: 'MAC',
+          probe: (_) async => throw TimeoutException('probe'),
+          connect: (_) async => false,
+          onReconnect: () {},
+          initialBackoff: _kInitial,
+          firstProbeDelay: _kInitial,
+          maxBackoff: _kMax,
+        );
+        await scanner.start();
+        await _waitFor(() => BreadcrumbCollector.snapshot().isNotEmpty);
+        await scanner.stop();
+        await Future<void>.delayed(Duration.zero);
+
+        expect(rec.errors, isEmpty);
+        expect(
+          BreadcrumbCollector.snapshot().map((b) => b.action),
+          contains('OBD2 connect failed — expected transient'),
+        );
+      });
+    });
   });
+}
+
+/// Captures `errorLogger.log` calls so a test can assert spool-vs-breadcrumb.
+class _CapturingRecorder implements TraceRecorder {
+  final errors = <Object>[];
+  @override
+  Future<void> record(Object error, StackTrace stackTrace,
+      {ServiceChainSnapshot? serviceChainState}) async {
+    errors.add(error);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_read_telemetry.dart';
 import 'reconnect_scanner_diagnostics.dart';
-import '../../../../core/logging/error_logger.dart';
 
 /// Callback signature: "is the pinned adapter MAC currently
 /// discoverable?". Resolved by the scanner against the active
@@ -358,12 +358,20 @@ class AdapterReconnectScanner {
     _doubleBackoff();
   }
 
+  // #2953 — _probeSafely / _connectSafely route their catch through this: an
+  // EXPECTED engine-off transient (parked car) becomes a breadcrumb, not an
+  // ERROR every backoff cycle (#2892/#2935/#2945 never reached this site). A
+  // genuine fault still ERROR-logs (storage layer, the default).
+  bool _denoise(Object e, StackTrace st, String where) {
+    recordObd2ConnectTransient(e, st, where: where);
+    return false;
+  }
+
   Future<bool> _probeSafely() async {
     try {
       return await _probe(_pinnedMac);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AdapterReconnectScanner probe failed'}));
-      return false;
+      return _denoise(e, st, 'AdapterReconnectScanner probe failed');
     }
   }
 
@@ -373,8 +381,7 @@ class AdapterReconnectScanner {
     try {
       return await attempt(_pinnedMac);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AdapterReconnectScanner connect failed'}));
-      return false;
+      return _denoise(e, st, 'AdapterReconnectScanner connect failed');
     }
   }
 
