@@ -1856,6 +1856,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Διάστημα επανάληψης';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Kontinoteroi stathmoi';
 
   @override

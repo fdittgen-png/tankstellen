@@ -1853,6 +1853,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Интервал на повторение';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Nai-blizki stantsii';
 
   @override

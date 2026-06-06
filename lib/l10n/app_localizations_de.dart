@@ -1854,6 +1854,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Wiederholungsintervall';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Höchstpreis';
+
+  @override
   String get nearestStations => 'Nächste Tankstellen';
 
   @override

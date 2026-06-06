@@ -1843,6 +1843,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Toistumisväli';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Lahimmat asemat';
 
   @override

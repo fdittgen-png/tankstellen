@@ -1847,6 +1847,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Kartojimo intervalas';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Artimiausios degalines';
 
   @override

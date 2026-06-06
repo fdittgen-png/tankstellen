@@ -1839,6 +1839,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Kordamise intervall';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Lahimad jaamad';
 
   @override

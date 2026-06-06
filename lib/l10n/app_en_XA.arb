@@ -550,6 +550,7 @@
   "voiceAnnouncementCheapFuel": "⟦{station}, {distance} ķîłóɱéŧéřš áĥéáđ, {fuelType} {price} ·······⟧",
   "voiceAnnouncementProximityRadius": "⟦Áññóúñçéɱéñŧ řáđîúš ········⟧",
   "voiceAnnouncementCooldown": "⟦Řéƥéáŧ îñŧéřṽáł ······⟧",
+  "voiceAnnouncementPriceLimit": "⟦Ṁáẋîɱúɱ ƥřîçé ·····⟧",
   "nearestStations": "⟦Ñéářéšŧ šŧáŧîóñš ·······⟧",
   "nearestStationsHint": "⟦Ƒîñđ ŧĥé çłóšéšŧ šŧáŧîóñš úšîñǧ ýóúř çúřřéñŧ łóçáŧîóñ ·····················⟧",
   "consumptionLogTitle": "⟦Ƒúéł çóñšúɱƥŧîóñ ·······⟧",

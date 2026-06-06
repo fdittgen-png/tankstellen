@@ -890,6 +890,7 @@
   },
   "voiceAnnouncementProximityRadius": "Ansage-Radius",
   "voiceAnnouncementCooldown": "Wiederholungsintervall",
+  "voiceAnnouncementPriceLimit": "Höchstpreis",
   "nearestStations": "Nächste Tankstellen",
   "nearestStationsHint": "Die nächstgelegenen Tankstellen über Ihren Standort finden",
   "consumptionLogTitle": "Verbrauch",
