@@ -3,25 +3,34 @@
 
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
+import 'package:tankstellen/core/services/service_providers.dart';
+import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
+import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
 import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_radar_card.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:url_launcher_platform_interface/link.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 
+import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// #2545 — the closest-station radar card is tap-to-navigate: a tap hands
@@ -666,4 +675,124 @@ void main() {
       expect(find.text('Scanning for nearby stations'), findsNothing);
     });
   });
+
+  // --- #2965: in-radius superset merge rescues the truncated nearest ---------
+  group('TripRadarCard — dense-corridor in-radius merge (#2965)', () {
+    // End-to-end through the REAL radarCandidateListProvider + the REAL FR
+    // fuelStationRadarProvider: the wide corridor + 15 km near-merge return a
+    // far, location-only row (the `limit:50` cap truncated the nearest out), so
+    // the corridor-only path is empty → "No station nearby". The candidate
+    // list's #2965 in-radius search at the 1 km radar radius returns the 269 m
+    // priced station, which the card must then list.
+    //
+    // RED on master (card shows "No station nearby"); GREEN after the merge.
+    testWidgets(
+        'shows the 269 m station, NOT "No station nearby", when the corridor '
+        'row-cap truncated the nearest out', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            activeCountryOverride(Countries.byCode('FR')!),
+            stationServiceProvider.overrideWithValue(_RadiusKeyedService()),
+            effectiveApproachStateProvider.overrideWithValue(
+              ApproachPolling(
+                gps: _pos(lat: 48.0, lng: 2.0),
+                nextPollIn: const Duration(seconds: 5),
+              ),
+            ),
+            effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+            activeProfileProvider.overrideWith(
+              () => _StubActiveProfile(
+                const UserProfile(
+                  id: 'p1',
+                  name: 'Test',
+                  approachRadiusKm: 1.0,
+                ),
+              ),
+            ),
+          ].cast(),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: TripRadarCard()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // RED on master: the corridor-only candidate list is empty → placeholder.
+      expect(find.text('No station nearby'), findsNothing,
+          reason: '#2965 — the in-radius merge lists the nearest priced '
+              'station instead of the empty placeholder');
+      // GREEN: the 269 m station + its e10 price render.
+      expect(find.text('Station NEAR'), findsOneWidget);
+      expect(find.text(PriceFormatter.formatPrice(1.60)), findsOneWidget);
+    });
+  });
+}
+
+Position _pos({required double lat, required double lng}) => Position(
+      latitude: lat,
+      longitude: lng,
+      timestamp: DateTime(2026, 5, 1, 9),
+      accuracy: 5,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: 0,
+      headingAccuracy: 0,
+      speed: 12,
+      speedAccuracy: 0,
+    );
+
+/// Radius-keyed service mirroring the provider test: the wide corridor + near-
+/// merge return a far, location-only row (the `limit:50` cap truncated the
+/// nearest); the tight in-radius search returns the 269 m priced station.
+class _RadiusKeyedService implements StationService {
+  static Station _far() => const Station(
+        id: 'FAR_55KM',
+        name: 'Station FAR',
+        brand: 'TEST',
+        street: '',
+        postCode: '',
+        place: '',
+        lat: 48.5,
+        lng: 2.0,
+        isOpen: true,
+      );
+
+  static Station _near() => const Station(
+        id: 'NEAR_269M',
+        name: 'Station NEAR',
+        brand: 'TEST',
+        street: '',
+        postCode: '',
+        place: '',
+        lat: 48.002416, // ~269 m north of the fix
+        lng: 2.0,
+        e10: 1.60,
+        isOpen: true,
+      );
+
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async {
+    final corridorSlice = params.radiusKm >= kCorridorNearMergeRadiusKm;
+    return ServiceResult(
+      data: corridorSlice ? [_far()] : [_near()],
+      source: ServiceSource.cache,
+      fetchedAt: DateTime(2026),
+    );
+  }
+
+  @override
+  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+    List<String> ids,
+  ) =>
+      throw UnimplementedError();
 }
