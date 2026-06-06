@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
+import 'package:tankstellen/core/widgets/animated_price_text.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
@@ -18,6 +20,13 @@ void main() {
       await pumpApp(tester, const AllPricesStationCard(station: testStation));
 
       expect(find.text('STAR'), findsOneWidget);
+    });
+
+    testWidgets('#2973 — wraps each priced fuel badge in AnimatedPriceText',
+        (tester) async {
+      // testStation has e5, e10, diesel → 3 priced badges, each flashable.
+      await pumpApp(tester, const AllPricesStationCard(station: testStation));
+      expect(find.byType(AnimatedPriceText), findsNWidgets(3));
     });
 
     testWidgets('renders address line when brand is present', (tester) async {
@@ -149,6 +158,35 @@ void main() {
       await tester.pump();
 
       expect(favTapped, isTrue);
+    });
+
+    testWidgets('#2974 — the favourite toggle fires a selectionClick haptic',
+        (tester) async {
+      final haptics = <String?>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'HapticFeedback.vibrate') {
+            haptics.add(call.arguments as String?);
+          }
+          return null;
+        },
+      );
+      addTearDown(() => tester.binding.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null));
+
+      await pumpApp(
+        tester,
+        AllPricesStationCard(
+          station: testStation,
+          onFavoriteTap: () {},
+        ),
+      );
+
+      await tester.tap(find.byIcon(Icons.star_border));
+      await tester.pump();
+
+      expect(haptics, ['HapticFeedbackType.selectionClick']);
     });
 
     testWidgets('highlights cheapest price badge', (tester) async {

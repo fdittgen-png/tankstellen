@@ -53,13 +53,18 @@ class _PriceRow extends StatelessWidget {
             color: labelColor,
           ),
         ),
-        Text(
-          PriceFormatter.formatPriceCompact(price),
-          style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: fontSize,
-                fontWeight: fontWeight,
-                color: color,
-              ),
+        // #2973 — flash the alternative-fuel price on change, matching the
+        // headline price column. Reduced motion is honoured inside the widget.
+        AnimatedPriceText(
+          price: price,
+          child: Text(
+            PriceFormatter.formatPriceCompact(price),
+            style: theme.textTheme.labelSmall?.copyWith(
+                  fontSize: fontSize,
+                  fontWeight: fontWeight,
+                  color: color,
+                ),
+          ),
         ),
       ],
     );

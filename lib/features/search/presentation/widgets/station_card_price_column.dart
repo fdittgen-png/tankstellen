@@ -84,7 +84,15 @@ class _StationPriceColumn extends StatelessWidget {
               isFavorite: isFavorite,
               size: 22,
             ),
-            onPressed: onFavoriteTap,
+            // #2974 — a selection tick on the favourite toggle, matching the
+            // everyday tap-surface haptics. selectionClick only (never
+            // heavyImpact); fires only on the discrete star tap, never scroll.
+            onPressed: onFavoriteTap == null
+                ? null
+                : () {
+                    HapticFeedback.selectionClick();
+                    onFavoriteTap!();
+                  },
             tooltip: isFavorite
                 ? (l10n?.favoriteRemove ?? 'Remove from favorites')
                 : (l10n?.favoriteAdd ?? 'Add to favorites'),
