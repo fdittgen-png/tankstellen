@@ -653,7 +653,6 @@ class TripRecordingController {
     // #1979 — buffer every real fix for the GPS-distance source. A
     // null-coord call only clears the per-tick latch; it is not a fix.
     if (latitude != null && longitude != null) {
-      _distance.addGpsFix(latitude, longitude);
       // #2509 — latch the first GPS-fix timestamp as a start-time
       // fallback. On a dead OBD2 link no speed/RPM sample ever reaches
       // the recorder, so `_recorder` never stamps `startedAt`; without
@@ -664,6 +663,16 @@ class TripRecordingController {
       // owns `startedAt`); it is consulted only as a fallback in
       // [_finaliseSummary].
       final fixAt = _now();
+      // #2963 — forward the fix's accuracy + timestamp so the haversine
+      // distance source can reject a parked car's GPS jitter (accuracy gate)
+      // and a cold-start position jump (teleport gate). Dropped here before,
+      // so a 22 s idle scatter at σ≈25 m accumulated ~0.93 phantom km.
+      _distance.addGpsFix(
+        latitude,
+        longitude,
+        hAccuracyM: hAccuracyM,
+        at: fixAt,
+      );
       _gpsStartedAt ??= fixAt;
       _gpsEndedAt = fixAt;
     }
