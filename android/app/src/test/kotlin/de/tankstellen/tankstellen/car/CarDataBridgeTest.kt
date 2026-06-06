@@ -17,8 +17,8 @@ import org.robolectric.shadows.ShadowLooper
  *
  * The real [CarDataBridge] wraps a [io.flutter.embedding.engine.FlutterEngine]
  * that cannot spin up under Robolectric (no native Flutter shell), so these
- * pin the behaviour reachable WITHOUT a live engine: the not-ready guard, the
- * RADAR short-circuit (slice 1 only wires SEARCH live), and the [CarFetchKind]
+ * pin the behaviour reachable WITHOUT a live engine: the not-ready guard (for
+ * BOTH kinds now that phase-1 wires SEARCH + RADAR live) and the [CarFetchKind]
  * contract. The full snapshot-first → live-second render flow (which DOES need
  * a working live source) is covered by `CarScreensTest` via a fake [CarLiveSource].
  */
@@ -49,9 +49,10 @@ class CarDataBridgeTest {
     }
 
     @Test
-    fun fetch_returnsNull_forRadarKind_evenIfAsked() {
-        // SLICE 1 wires only SEARCH live; a RADAR fetch must short-circuit to
-        // null so Radar keeps its v1 snapshot (slice 2 wires its live fetch).
+    fun fetch_returnsNull_forRadarKind_whenNotReady() {
+        // Phase-1 wires RADAR live too, but with no engine (not ready) the RADAR
+        // fetch — like SEARCH — posts a null callback so Radar keeps its
+        // snapshot rather than blanking.
         CarDataBridge.destroy()
         var result: String? = "sentinel"
         CarDataBridge.fetch(CarFetchKind.RADAR) { json -> result = json }

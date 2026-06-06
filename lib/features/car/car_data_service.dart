@@ -23,45 +23,41 @@ import '../search/domain/entities/fuel_type.dart';
 import '../search/domain/entities/station.dart';
 import '../widget/data/car_station_data.dart';
 
-/// Android Auto v2 — SLICE 1 (#2947 / epic #2946): the headless Flutter entry
-/// point the native [CarDataBridge] runs to fetch a LIVE in-car Search list.
+/// Android Auto v2 — PHASE-1 (#2947 / epic #2946): the headless Flutter entry
+/// point the native [CarDataBridge] runs to fetch LIVE in-car Search AND Radar
+/// lists.
 ///
 /// ## Why a dedicated entry point
-/// The v1 car Search screen rendered a SharedPreferences snapshot written by
-/// the last *in-app* search (`CarStationWriter`) — stale, and empty for a
-/// driver who never opened the phone app. Slice 1 replaces the SEARCH data
-/// source with a live, on-demand fetch: the native `CarAppService`/Session
-/// (a BOUND service — never a started/foreground service, preserving the
-/// #1498 FGS-avoidance) spins up a cached headless [FlutterEngine] and runs
-/// [carDataMain] through it, then asks this side, over the
-/// `tankstellen/car_data` [MethodChannel], for the freshest nearby stations.
-///
-/// The Radar screen STAYS on the v1 snapshot in this slice (Radar = slice 2).
+/// The v1 car screens rendered a stale SharedPreferences snapshot the last
+/// *in-app* search / radar wrote (`CarStationWriter`) — empty for a driver who
+/// never opened the phone app. Phase-1 replaces both the SEARCH (slice 1, #2987)
+/// and the RADAR (slice 2) sources with a live, on-demand fetch: the native
+/// `CarAppService`/Session (a BOUND service — never a started/foreground
+/// service, preserving the #1498 FGS-avoidance) spins up a cached headless
+/// [FlutterEngine], runs [carDataMain] through it, then asks this side over the
+/// `tankstellen/car_data` [MethodChannel] for the freshest nearby stations.
+/// Search and Radar share ONE live producer (same fix + country + profile
+/// radius/fuel + distance sort + cap — the nearest priced stations, v1's in-app
+/// radar shape); they differ ONLY in the snapshot key refreshed
+/// ([CarStationData.searchKey] / [CarStationData.radarKey]).
 ///
 /// ## Persisted-fix GPS only (never a live lock)
-/// The contract (#2947) is the persisted last-known fix, exactly as the
-/// nearest-widget builder reads it — `StorageKeys.userPositionLat/Lng` with
-/// the #2872 [isUsableCoord] guard. There is no live GPS in the car process
-/// in slice 1 (that, plus the `requestPermissions` flow, is a later phase),
-/// so this never blocks on a fix; an absent/poisoned fix returns the
-/// [kNoGpsMarker] and the screen keeps its snapshot / empty-state.
+/// The contract (#2947) is the persisted last-known fix the nearest-widget
+/// builder reads — `StorageKeys.userPositionLat/Lng` with the #2872
+/// [isUsableCoord] guard. No live GPS in the car process in phase-1 (that + the
+/// `requestPermissions` flow is a later phase), so this never blocks; an absent
+/// / poisoned fix returns [kNoGpsMarker] and the screen keeps its snapshot.
 ///
-/// ## Live fetch path — bulk-country-correct
-/// The fetch goes through [CountryAlertStrategy.searchArea], which resolves
-/// the right strategy per `FuelServicePolicy.model`: a [PolledAlertStrategy]
-/// for polled APIs (DE/AT/…) and a [BulkDatasetAlertStrategy] for bulk-file
-/// countries (ES/IT/AR/DK). This is deliberate — `BackgroundPriceSource`
-/// would return empty in a bulk country, and `StationService.searchStations`
-/// returns the wrapped `ServiceResult`. The shared per-provider
-/// [ProviderRequestBudget] is consulted (never bypassed) so the live car
-/// fetch honours each free API's ToS spacing, sharing one gate with the
-/// foreground + background scan.
-///
-/// ## Never throws
-/// Every public handler completes — on any fault it returns an empty / no_gps
-/// payload, never throwing into the OS-spawned engine (mirrors the background
-/// scan coordinator). Hive is opened under [HiveIsolateLock] and always
-/// closed in `finally`.
+/// ## Live fetch path — bulk-country-correct + never throws
+/// The fetch goes through [CountryAlertStrategy.searchArea], resolving the right
+/// strategy per `FuelServicePolicy.model`: a [PolledAlertStrategy] (DE/AT/…) or
+/// a [BulkDatasetAlertStrategy] for bulk-file countries (ES/IT/AR/DK) —
+/// deliberate, since `BackgroundPriceSource` returns empty in a bulk country.
+/// The shared per-provider [ProviderRequestBudget] is consulted (never bypassed)
+/// so the car fetch honours each free API's ToS spacing. Every public handler
+/// completes — on any fault it returns an empty / no_gps payload, never throwing
+/// into the OS-spawned engine; Hive opens under [HiveIsolateLock], closed in
+/// `finally`.
 
 /// The MethodChannel name the native [CarDataBridge] and this entry point share.
 // i18n-ignore: platform channel name, not user-facing text.
@@ -71,9 +67,18 @@ const String kCarDataChannel = 'tankstellen/car_data';
 // i18n-ignore: protocol token, not user-facing text.
 const String kCarKindSearch = 'search';
 
+/// `kind` argument the native bridge passes to identify the Radar fetch.
+// i18n-ignore: protocol token, not user-facing text.
+const String kCarKindRadar = 'radar';
+
 /// Method the bridge invokes to fetch the live Search list.
 // i18n-ignore: protocol token, not user-facing text.
 const String kCarMethodFetchSearch = 'fetchSearch';
+
+/// Method the bridge invokes to fetch the live Radar list (v2 phase-1 slice 2,
+/// #2947) — same live producer as [kCarMethodFetchSearch], different snapshot.
+// i18n-ignore: protocol token, not user-facing text.
+const String kCarMethodFetchRadar = 'fetchRadar';
 
 /// Method the bridge invokes to read the persisted user location.
 // i18n-ignore: protocol token, not user-facing text.
@@ -103,6 +108,8 @@ void carDataMain() {
     switch (call.method) {
       case kCarMethodFetchSearch:
         return service.fetchSearch();
+      case kCarMethodFetchRadar:
+        return service.fetchRadar();
       case kCarMethodGetUserLocation:
         return service.getUserLocation();
       default:
@@ -167,46 +174,56 @@ class CarDataService {
   static Future<void> _defaultWriteSnapshot(String key, String value) =>
       HomeWidget.saveWidgetData(key, value);
 
-  /// Handle [kCarMethodFetchSearch]: open Hive under the isolate lock, load the
-  /// API key, run [resolveSearchJson], and ALWAYS close the boxes in `finally`.
-  ///
-  /// Returns the car JSON string, or [kNoGpsMarker] when no usable fix exists.
-  /// Never throws — any fault returns [kNoGpsMarker] so the screen degrades to
-  /// its snapshot / empty-state.
-  Future<String> fetchSearch() async {
+  /// Handle [kCarMethodFetchSearch] — see [_fetch]; refreshes
+  /// [CarStationData.searchKey]. Never throws.
+  Future<String> fetchSearch() =>
+      _fetch(CarStationData.searchKey, 'fetchSearch');
+
+  /// Handle [kCarMethodFetchRadar] (v2 phase-1 slice 2, #2947) — the SAME live
+  /// producer as [fetchSearch] (nearest priced stations within the active radius,
+  /// distance-sorted + capped — the v1 in-app radar shape), refreshing
+  /// [CarStationData.radarKey] instead. Never throws.
+  Future<String> fetchRadar() =>
+      _fetch(CarStationData.radarKey, 'fetchRadar');
+
+  /// Shared Hive-lock + isolate-init wrapper behind [fetchSearch] / [fetchRadar]:
+  /// open Hive under the isolate lock, load the API key, run [_resolveJson] for
+  /// [snapshotKey] ([where] tags the error-log context), and ALWAYS close the
+  /// boxes in `finally`. Never throws — any fault returns [kNoGpsMarker] so the
+  /// screen degrades to its snapshot / empty-state.
+  Future<String> _fetch(String snapshotKey, String where) async {
     HiveIsolateLock? lock;
     try {
       lock = await HiveIsolateLock.create();
       final acquired = await lock.acquire();
       if (!acquired) {
-        debugPrint('CarDataService.fetchSearch: Hive lock busy — no_gps');
+        debugPrint('CarDataService.$where: Hive lock busy — no_gps');
         return kNoGpsMarker;
       }
       await HiveStorage.initInIsolate();
       await HiveStorage.loadApiKey();
       final storage = HiveStorage();
-      return await resolveSearchJson(storage, apiKey: storage.getApiKey())
+      return await _resolveJson(storage, snapshotKey, apiKey: storage.getApiKey())
           .timeout(_fetchTimeout, onTimeout: () => kNoGpsMarker);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-        'where': 'CarDataService.fetchSearch',
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+        'where': 'CarDataService.$where',
       }));
       return kNoGpsMarker;
     } finally {
       try {
         await HiveStorage.closeIsolateBoxes();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-          'where': 'CarDataService.fetchSearch: close boxes',
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+          'where': 'CarDataService.$where: close boxes',
         }));
       }
       lock?.release();
     }
   }
 
-  /// Handle [kCarMethodGetUserLocation]: return `{lat,lng,source,updatedAtMs}`
-  /// for the persisted fix, or `{source: no_gps}` when absent / poisoned.
-  /// Never throws.
+  /// Handle [kCarMethodGetUserLocation]: `{lat,lng,source,updatedAtMs}` for the
+  /// persisted fix, or `{source: no_gps}` when absent / poisoned. Never throws.
   Future<Map<String, dynamic>> getUserLocation() async {
     HiveIsolateLock? lock;
     try {
@@ -229,16 +246,37 @@ class CarDataService {
     }
   }
 
-  /// Pure resolution used by both the live handler and the unit tests: read
-  /// the persisted fix (with the #2872 guard), resolve the active country +
-  /// profile, run a LIVE radius [CountryAlertStrategy.searchArea], and encode
-  /// the result with [CarStationData.encode]. Refreshes the snapshot key on a
-  /// non-empty result. Returns [kNoGpsMarker] when no usable fix exists; an
-  /// empty `[]` when the fix is good but the live search returned nothing or
-  /// faulted (the screen keeps its snapshot). Never throws.
+  /// Pure resolution of the live Search JSON — see [_resolveJson]. Refreshes
+  /// the [CarStationData.searchKey] snapshot on a non-empty result.
   @visibleForTesting
   Future<String> resolveSearchJson(
     StorageRepository storage, {
+    String? apiKey,
+  }) =>
+      _resolveJson(storage, CarStationData.searchKey, apiKey: apiKey);
+
+  /// Pure resolution of the live Radar JSON — see [_resolveJson]. Identical
+  /// producer to [resolveSearchJson] (same fix + country + profile radius/fuel +
+  /// distance sort, capped at [CarStationData.maxStations] — the nearest priced
+  /// stations, the v1 in-app radar shape), differing ONLY in refreshing the
+  /// [CarStationData.radarKey] snapshot.
+  @visibleForTesting
+  Future<String> resolveRadarJson(
+    StorageRepository storage, {
+    String? apiKey,
+  }) =>
+      _resolveJson(storage, CarStationData.radarKey, apiKey: apiKey);
+
+  /// Pure resolution used by both the live handlers and the unit tests: read
+  /// the persisted fix (with the #2872 guard), resolve the active country +
+  /// profile, run a LIVE radius [CountryAlertStrategy.searchArea], encode with
+  /// [CarStationData.encode], and refresh [snapshotKey] on a non-empty result.
+  /// Returns [kNoGpsMarker] when no usable fix exists; an empty `[]` when the
+  /// fix is good but the search returned nothing or faulted (the screen keeps
+  /// its snapshot). Never throws.
+  Future<String> _resolveJson(
+    StorageRepository storage,
+    String snapshotKey, {
     String? apiKey,
   }) async {
     final fix = _persistedFix(storage);
@@ -271,27 +309,25 @@ class CarDataService {
         ),
       );
     } catch (e, st) {
-      // searchArea is documented never-throws, but guard the seam anyway —
-      // a fault must degrade to the snapshot, never crash the engine.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-        'where': 'CarDataService.resolveSearchJson: searchArea',
+      // searchArea is documented never-throws; guard the seam anyway so a fault
+      // degrades to the snapshot rather than crashing the engine.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+        'where': 'CarDataService._resolveJson($snapshotKey): searchArea',
       }));
       return '[]';
     }
 
-    // Some country services honour sortBy server-side, others don't — sort
-    // locally too, identical to the nearest-widget builder.
+    // Sort locally too (some services honour sortBy server-side, some don't).
     final sorted = [...stations]..sort((a, b) => a.dist.compareTo(b.dist));
     final json = CarStationData.encode(sorted, profile.fuelType);
 
     if (sorted.isNotEmpty) {
-      // Refresh the fallback snapshot so a later engine failure still renders
-      // a recent list. Best-effort — a write fault never fails the fetch.
+      // Best-effort fallback-snapshot refresh (a write fault never fails fetch).
       try {
-        await _writeSnapshot(CarStationData.searchKey, json);
+        await _writeSnapshot(snapshotKey, json);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-          'where': 'CarDataService.resolveSearchJson: snapshot write',
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+          'where': 'CarDataService._resolveJson($snapshotKey): snapshot write',
         }));
       }
     }

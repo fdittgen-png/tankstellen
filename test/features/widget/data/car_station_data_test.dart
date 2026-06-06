@@ -22,14 +22,17 @@ void main() {
     required double dist,
     double? e10,
     double? diesel,
+    String street = 'Main St 1',
+    String postCode = '10115',
+    String place = 'Berlin',
   }) =>
       Station(
         id: id,
         name: '$brand forecourt',
         brand: brand,
-        street: 'Main St 1',
-        postCode: '10115',
-        place: 'Berlin',
+        street: street,
+        postCode: postCode,
+        place: place,
         lat: lat,
         lng: lng,
         dist: dist,
@@ -63,6 +66,36 @@ void main() {
       expect(r['distanceKm'], 1.2); // rounded to 1 dp
       expect(r.containsKey('band'), isTrue);
       expect(r.containsKey('bandColor'), isTrue);
+      // #2947 slice 3 — street + city address subtitle, like the in-app card.
+      expect(r['address'], 'Main St 1, 10115 Berlin');
+    });
+
+    test('address collapses empty parts (no orphan comma, #2704)', () {
+      // No street → city only.
+      final cityOnly = CarStationData.encode(
+        [
+          station(id: 'a', brand: 'A', lat: 1, lng: 1, dist: 1, e10: 1.5,
+              street: '', postCode: '10117', place: 'Berlin'),
+        ],
+        FuelType.e10,
+      );
+      expect(
+        (jsonDecode(cityOnly) as List).cast<Map<String, dynamic>>().single['address'],
+        '10117 Berlin',
+      );
+
+      // No street and no city → empty address (the Kotlin row shows no subtitle).
+      final none = CarStationData.encode(
+        [
+          station(id: 'b', brand: 'B', lat: 1, lng: 1, dist: 1, e10: 1.5,
+              street: '', postCode: '', place: ''),
+        ],
+        FuelType.e10,
+      );
+      expect(
+        (jsonDecode(none) as List).cast<Map<String, dynamic>>().single['address'],
+        '',
+      );
     });
 
     test('cheapest station is the cheap band, most expensive the expensive band',

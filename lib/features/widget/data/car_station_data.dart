@@ -33,6 +33,7 @@ import '../../search/domain/entities/station.dart';
 ///   "id": "abc",
 ///   "name": "Aral Hauptstr. 1",
 ///   "brand": "Aral",
+///   "address": "Hauptstr. 1, 10115 Berlin", // street + city, "" when unknown
 ///   "lat": 52.5, "lng": 13.4,
 ///   "price": 1.799,            // double?  — null when the fuel is unpriced
 ///   "priceText": "1.799",      // formatted (3 dp) or "" when unpriced
@@ -107,6 +108,10 @@ class CarStationData {
       'id': station.id,
       'name': station.displayName,
       'brand': station.brand,
+      // Street + city subtitle, mirroring the in-app card's address line
+      // (#2947 slice 3) — empty parts collapse so the row never shows an
+      // orphan comma (#2704). "" when the station carries no address at all.
+      'address': _address(station),
       'lat': station.lat,
       'lng': station.lng,
       'price': price,
@@ -118,6 +123,18 @@ class CarStationData {
       'distanceKm': double.parse(station.dist.toStringAsFixed(1)),
       'currency': currency,
     };
+  }
+
+  /// Street + city address subtitle for the car row, built exactly like the
+  /// in-app card's address line (`station_card_status._addressLine`, #2704):
+  /// `street, postCode place`, collapsing empty parts so the line never shows
+  /// an orphan comma. Returns "" when the station carries no street/city at all
+  /// (the Kotlin row then renders no subtitle).
+  static String _address(Station station) {
+    final city = '${station.postCode} ${station.place}'.trim();
+    if (station.street.isEmpty) return city;
+    if (city.isEmpty) return station.street;
+    return '${station.street}, $city';
   }
 
   /// Stable band name the Kotlin side maps to a `CarColor`. Mirrors the

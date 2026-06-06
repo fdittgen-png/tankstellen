@@ -115,11 +115,14 @@ class CarScreensTest {
 
     @Test
     fun radarScreen_rendersSeededStationsAndEmptyState() {
-        // Empty first: missing key shows the radar empty message.
+        // v2 PHASE-1 SLICE 2 (#2947): RadarScreen is now live-enabled, but the
+        // real CarDataBridge has no engine under Robolectric (isReady == false),
+        // so it renders the snapshot only — exactly as Search does without an
+        // engine. Empty first: missing key shows the v2 no-GPS empty message.
         var template = templateOf(RadarScreen(carContext)) as PlaceListMapTemplate
         var list = template.itemList as ItemList
         assertTrue(list.items.isEmpty())
-        assertEquals(string(R.string.car_empty_radar), list.noItemsMessage.toString())
+        assertEquals(string(R.string.car_empty_no_gps), list.noItemsMessage.toString())
 
         // Seed → renders the stations.
         seed(CarStation.RADAR_KEY, twoStationsJson())
@@ -251,16 +254,125 @@ class CarScreensTest {
         assertEquals(string(R.string.car_empty_no_gps), list.noItemsMessage.toString())
     }
 
+    // ── v2 PHASE-1 SLICE 2 (#2947) — LIVE Radar via the headless bridge ───────
+
+    /** A [RadarScreen] wired to a fake live source for deterministic tests. */
+    private inner class FakeLiveRadarScreen(
+        private val source: CarLiveSource,
+    ) : StationListScreen(carContext) {
+        override val titleRes: Int = R.string.car_radar_title
+        override val prefsKey: String = CarStation.RADAR_KEY
+        override val emptyMessageRes: Int = R.string.car_empty_no_gps
+        override val kind: CarFetchKind = CarFetchKind.RADAR
+        override val liveFetchEnabled: Boolean = true
+        override val liveSource: CarLiveSource = source
+    }
+
     @Test
-    fun radarScreen_staysOnSnapshot_doesNotFetchLive() {
-        // SLICE 1: Radar must NOT hit the live bridge — it renders the v1
-        // snapshot only. (Its kind is RADAR, liveFetchEnabled false.)
+    fun liveRadar_rendersSnapshotBeforeAnyLiveResult() {
+        // First render must show the radar snapshot — the live result lands
+        // only on the next render (never-blank-first-frame).
+        seed(CarStation.RADAR_KEY, twoStationsJson())
+        val source = FakeLiveSource().apply {
+            replies.add(oneStationJson("Esso", 52.7, 13.7))
+        }
+        val screen = FakeLiveRadarScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        val first = rows(screen.onGetTemplate())
+        assertEquals(2, first.size)
+        assertEquals("Aral", first[0].title.toString())
+    }
+
+    @Test
+    fun liveRadar_freshJsonReplacesSnapshotOnNextRender() {
+        seed(CarStation.RADAR_KEY, twoStationsJson())
+        val source = FakeLiveSource().apply {
+            replies.add(oneStationJson("Esso", 52.7, 13.7))
+        }
+        val screen = FakeLiveRadarScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        rows(screen.onGetTemplate()) // first render kicks + caches the live list
+        val second = rows(screen.onGetTemplate())
+        assertEquals(1, second.size)
+        assertEquals("Esso", second[0].title.toString())
+    }
+
+    @Test
+    fun liveRadar_emptyLiveResultKeepsSnapshot() {
+        seed(CarStation.RADAR_KEY, twoStationsJson())
+        val source = FakeLiveSource() // empty queue → fetch yields null
+        val screen = FakeLiveRadarScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        rows(screen.onGetTemplate())
+        val second = rows(screen.onGetTemplate())
+        assertEquals("a null live radar result keeps the snapshot", 2, second.size)
+        assertEquals("Aral", second[0].title.toString())
+    }
+
+    @Test
+    fun liveRadar_noSnapshotAndNoLiveShowsNoGpsMessage() {
+        // Fresh head unit: no radar snapshot AND the live fetch returns null →
+        // the car_empty_no_gps message, never a crash.
+        val source = FakeLiveSource() // empty queue → null
+        val screen = FakeLiveRadarScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        val firstLoading = (screen.onGetTemplate() as PlaceListMapTemplate).isLoading
+        assertTrue("cold start with no snapshot shows the spinner", firstLoading)
+
+        val list = (screen.onGetTemplate() as PlaceListMapTemplate).itemList as ItemList
+        assertTrue(list.items.isEmpty())
+        assertEquals(string(R.string.car_empty_no_gps), list.noItemsMessage.toString())
+    }
+
+    @Test
+    fun realRadarScreen_isLiveEnabled_andStaysOnSnapshotWithoutAnEngine() {
+        // The REAL RadarScreen opts into the live bridge (slice 2). With no
+        // engine under Robolectric (isReady == false) it renders the snapshot
+        // and never crashes — the live wiring is exercised by the fake above.
         seed(CarStation.RADAR_KEY, twoStationsJson())
         val template = templateOf(RadarScreen(carContext)) as PlaceListMapTemplate
         assertEquals(2, rows(template).size)
-        // RadarScreen leaves liveFetchEnabled false, so the default real
-        // CarDataBridge is never asked (no engine in tests) — proven by the
-        // render succeeding with the snapshot and no crash.
+    }
+
+    // ── v2 PHASE-1 SLICE 3 (#2947) — the address subtitle, lock-step ──────────
+
+    @Test
+    fun addressSubtitle_rendersOnARow() {
+        seed(CarStation.SEARCH_KEY, addressStationJson())
+        val template = templateOf(SearchScreen(carContext)) as PlaceListMapTemplate
+        val row = rows(template).first()
+
+        // The address is one of the row's secondary text lines.
+        val texts = row.texts.map { it.toString() }
+        assertTrue(
+            "the address subtitle renders on the row: $texts",
+            texts.any { it.contains("Hauptstr. 1") && it.contains("Berlin") },
+        )
+    }
+
+    @Test
+    fun carStation_parsesAddress_andOldAddresslessSnapshotDoesNotCrash() {
+        // Fresh JSON carries the address.
+        val withAddr = CarStation.parse(addressStationJson())
+        assertEquals(1, withAddr.size)
+        assertEquals("Hauptstr. 1, 10115 Berlin", withAddr[0].address)
+
+        // BACK-COMPAT: an OLD address-less snapshot (written before slice 3)
+        // parses fine, defaulting address to "" — never crashes.
+        val oldJson = """
+            [
+              {"id":"a","name":"Aral","brand":"Aral","lat":52.5,"lng":13.4,
+               "price":1.799,"priceText":"1.799","fuelLabel":"E10","band":"cheap",
+               "bandColor":4282621761,"distanceKm":1.2,"currency":"€"}
+            ]
+        """.trimIndent()
+        val old = CarStation.parse(oldJson)
+        assertEquals(1, old.size)
+        assertEquals("", old[0].address)
     }
 
     private fun oneStationJson(brand: String, lat: Double, lng: Double): String = """
@@ -268,6 +380,15 @@ class CarScreensTest {
           {"id":"x","name":"$brand X","brand":"$brand","lat":$lat,"lng":$lng,
            "price":1.749,"priceText":"1.749","fuelLabel":"E10","band":"cheap",
            "bandColor":4282621761,"distanceKm":2.1,"currency":"€"}
+        ]
+    """.trimIndent()
+
+    private fun addressStationJson(): String = """
+        [
+          {"id":"a","name":"Aral Hauptstr","brand":"Aral",
+           "address":"Hauptstr. 1, 10115 Berlin","lat":52.5,"lng":13.4,
+           "price":1.799,"priceText":"1.799","fuelLabel":"E10","band":"cheap",
+           "bandColor":4282621761,"distanceKm":1.2,"currency":"€"}
         ]
     """.trimIndent()
 }

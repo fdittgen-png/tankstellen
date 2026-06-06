@@ -149,10 +149,15 @@ abstract class StationListScreen(carContext: CarContext) : Screen(carContext) {
     private fun buildRow(station: CarStation): Row {
         val rowBuilder = Row.Builder().setTitle(station.title())
 
-        // Subtitle: price (with fuel label + currency) then distance via a
-        // DistanceSpan so the host renders the unit per the user's locale.
-        rowBuilder.addText(station.priceLine())
-        station.distanceText()?.let { rowBuilder.addText(it) }
+        // PlaceListMapTemplate rows allow at most two secondary text lines, so
+        // pack price (with fuel label + currency) AND distance — via a
+        // DistanceSpan the host renders in the user's locale unit — onto ONE
+        // line, leaving the second line for the address subtitle (#2947 slice
+        // 3). The address is rendered under the name, alongside price+distance.
+        rowBuilder.addText(station.priceAndDistanceLine())
+        if (station.address.isNotBlank()) {
+            rowBuilder.addText(station.address)
+        }
 
         if (station.hasLocation) {
             val marker = PlaceMarker.Builder()
@@ -172,23 +177,30 @@ abstract class StationListScreen(carContext: CarContext) : Screen(carContext) {
 private fun CarStation.title(): String =
     if (brand.isNotBlank()) brand else name
 
+/**
+ * One secondary line packing the price (with fuel label + currency) and the
+ * distance — the distance rendered through a [DistanceSpan] so the head unit
+ * shows it in the user's locale unit. Falls back to just the price when there
+ * is no distance, or just the fuel label when the fuel is unpriced.
+ */
+private fun CarStation.priceAndDistanceLine(): CharSequence {
+    val price = priceLine()
+    if (distanceKm <= 0.0) return price
+
+    // "<price>  ·  <distance>" — a single span placeholder anchors the
+    // DistanceSpan, which the host replaces with the locale-formatted distance.
+    val prefix = "$price  ·  "
+    val builder = android.text.SpannableStringBuilder(prefix).append(" ")
+    val span = DistanceSpan.create(
+        Distance.create(distanceKm, Distance.UNIT_KILOMETERS)
+    )
+    builder.setSpan(span, prefix.length, builder.length, 0)
+    return builder
+}
+
 /** Price line, e.g. "E10  1.799 €" — falls back to the fuel label alone. */
 private fun CarStation.priceLine(): CharSequence {
     if (priceText.isEmpty()) return fuelLabel
     val cur = if (currency.isNotBlank()) " $currency" else ""
     return if (fuelLabel.isNotBlank()) "$fuelLabel  $priceText$cur" else "$priceText$cur"
-}
-
-/**
- * Distance rendered as a [DistanceSpan] so the head unit shows it in the
- * user's locale units. Returns null when no distance is known.
- */
-private fun CarStation.distanceText(): CharSequence? {
-    if (distanceKm <= 0.0) return null
-    val builder = android.text.SpannableString(" ")
-    val span = DistanceSpan.create(
-        Distance.create(distanceKm, Distance.UNIT_KILOMETERS)
-    )
-    builder.setSpan(span, 0, builder.length, 0)
-    return builder
 }
