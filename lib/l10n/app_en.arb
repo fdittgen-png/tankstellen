@@ -5652,6 +5652,54 @@
   "@obd2TestStatusFail": {
     "description": "Accessible status / icon label for a failed (or skipped after abort) step in the OBD2 adapter self-test progress list (#2645)."
   },
+  "obd2TestAdapterTransportClassic": "Classic (SPP)",
+  "@obd2TestAdapterTransportClassic": {
+    "description": "Transport tag shown next to a paired adapter in the self-test adapter picker when its name matched a Bluetooth Classic (SPP) profile (#2969)."
+  },
+  "obd2TestAdapterTransportBle": "Bluetooth LE",
+  "@obd2TestAdapterTransportBle": {
+    "description": "Transport tag shown next to a paired adapter in the self-test adapter picker when its name matched a Bluetooth LE profile (#2969)."
+  },
+  "obd2TestAdapterTransportUnknown": "unknown — defaulting to BLE",
+  "@obd2TestAdapterTransportUnknown": {
+    "description": "Transport tag shown next to a paired adapter in the self-test adapter picker when its stored name matched no known profile, so the run defaults to Bluetooth LE (#2969)."
+  },
+  "obd2HealthConnectAttemptsSection": "Recent connect attempts",
+  "@obd2HealthConnectAttemptsSection": {
+    "description": "Section header on the OBD2 health screen for the list of recent connect attempts (each captured even when it FAILED before a session could begin) (#2969)."
+  },
+  "obd2HealthConnectAttemptsEmpty": "No connect attempts recorded yet.",
+  "@obd2HealthConnectAttemptsEmpty": {
+    "description": "Placeholder on the OBD2 health screen when no connect attempt has been traced yet (#2969)."
+  },
+  "obd2HealthDownloadConnectTrace": "Download connect trace",
+  "@obd2HealthDownloadConnectTrace": {
+    "description": "Button to download one connect-attempt trace as JSON to the Downloads folder (#2969)."
+  },
+  "obd2HealthDownloadAllConnectTraces": "Download all connect traces",
+  "@obd2HealthDownloadAllConnectTraces": {
+    "description": "Button to download every recent connect-attempt trace as one JSON file to the Downloads folder (#2969)."
+  },
+  "obd2HealthConnectOrigin": "Origin",
+  "@obd2HealthConnectOrigin": {
+    "description": "Label for the origin (self-test / live reconnect / first connect) of a connect attempt on the OBD2 health screen (#2969)."
+  },
+  "obd2HealthConnectTransport": "Transport",
+  "@obd2HealthConnectTransport": {
+    "description": "Label for the requested vs resolved transport of a connect attempt on the OBD2 health screen (#2969)."
+  },
+  "obd2HealthConnectOutcome": "Outcome",
+  "@obd2HealthConnectOutcome": {
+    "description": "Label for the terminal outcome of a connect attempt on the OBD2 health screen (#2969)."
+  },
+  "obd2HealthConnectScanList": "Scanned devices",
+  "@obd2HealthConnectScanList": {
+    "description": "Label for the list of devices seen during the scan phase of a connect attempt on the OBD2 health screen (#2969)."
+  },
+  "obd2HealthConnectSteps": "Steps",
+  "@obd2HealthConnectSteps": {
+    "description": "Label for the per-step timeline of a connect attempt on the OBD2 health screen (#2969)."
+  },
   "obd2PickerPinnedFallback": "Couldn't reach '{adapterName}' — pick another adapter",
   "@obd2PickerPinnedFallback": {
     "description": "Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.",

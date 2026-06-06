@@ -11160,6 +11160,78 @@ abstract class AppLocalizations {
   /// **'Failed'**
   String get obd2TestStatusFail;
 
+  /// Transport tag shown next to a paired adapter in the self-test adapter picker when its name matched a Bluetooth Classic (SPP) profile (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Classic (SPP)'**
+  String get obd2TestAdapterTransportClassic;
+
+  /// Transport tag shown next to a paired adapter in the self-test adapter picker when its name matched a Bluetooth LE profile (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth LE'**
+  String get obd2TestAdapterTransportBle;
+
+  /// Transport tag shown next to a paired adapter in the self-test adapter picker when its stored name matched no known profile, so the run defaults to Bluetooth LE (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'unknown — defaulting to BLE'**
+  String get obd2TestAdapterTransportUnknown;
+
+  /// Section header on the OBD2 health screen for the list of recent connect attempts (each captured even when it FAILED before a session could begin) (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Recent connect attempts'**
+  String get obd2HealthConnectAttemptsSection;
+
+  /// Placeholder on the OBD2 health screen when no connect attempt has been traced yet (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'No connect attempts recorded yet.'**
+  String get obd2HealthConnectAttemptsEmpty;
+
+  /// Button to download one connect-attempt trace as JSON to the Downloads folder (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Download connect trace'**
+  String get obd2HealthDownloadConnectTrace;
+
+  /// Button to download every recent connect-attempt trace as one JSON file to the Downloads folder (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Download all connect traces'**
+  String get obd2HealthDownloadAllConnectTraces;
+
+  /// Label for the origin (self-test / live reconnect / first connect) of a connect attempt on the OBD2 health screen (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Origin'**
+  String get obd2HealthConnectOrigin;
+
+  /// Label for the requested vs resolved transport of a connect attempt on the OBD2 health screen (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Transport'**
+  String get obd2HealthConnectTransport;
+
+  /// Label for the terminal outcome of a connect attempt on the OBD2 health screen (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Outcome'**
+  String get obd2HealthConnectOutcome;
+
+  /// Label for the list of devices seen during the scan phase of a connect attempt on the OBD2 health screen (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Scanned devices'**
+  String get obd2HealthConnectScanList;
+
+  /// Label for the per-step timeline of a connect attempt on the OBD2 health screen (#2969).
+  ///
+  /// In en, this message translates to:
+  /// **'Steps'**
+  String get obd2HealthConnectSteps;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

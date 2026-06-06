@@ -178,4 +178,46 @@ void main() {
       expect(Obd2ConnectTraceLog.snapshot(), isEmpty);
     });
   });
+
+  group('classifyInitFailureOutcome (#2969 correction 4)', () {
+    test('an AT TIMEOUT in the transcript → initTimeout, partial steps kept',
+        () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.selfTest, mac: 'AA:BB');
+      // The init got partway then a later AT timed out (the partial transcript).
+      Obd2ConnectTraceLog.teeHandshakeLine('ATZ', 'ELM327 v1.5', 95);
+      Obd2ConnectTraceLog.teeHandshakeLine('ATE0', 'OK', 30);
+      Obd2ConnectTraceLog.teeHandshakeLine('ATSP0', 'TIMEOUT', 6000);
+      expect(h.classifyInitFailureOutcome(), Obd2ConnectOutcome.initTimeout);
+      h.setOutcome(h.classifyInitFailureOutcome());
+      Obd2ConnectTraceLog.endTrace(h);
+
+      final trace = Obd2ConnectTraceLog.snapshot().single;
+      expect(trace.outcome, Obd2ConnectOutcome.initTimeout);
+      // The PARTIAL AT transcript is preserved in the steps.
+      expect(trace.steps.map((s) => s.label),
+          containsAll(<String>['ATZ', 'ATE0', 'ATSP0']));
+    });
+
+    test('ATZ garbage (a lying clone) → protocolInitFailed', () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      // ATZ returned an unrecognised string (a counterfeit clone) → fail step.
+      Obd2ConnectTraceLog.teeHandshakeLine('ATZ', '?garbage?', 120);
+      expect(
+          h.classifyInitFailureOutcome(), Obd2ConnectOutcome.protocolInitFailed);
+      Obd2ConnectTraceLog.endTrace(h);
+    });
+
+    test('a clean init that ran but no PID answered → ignitionOff (parked car)',
+        () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      Obd2ConnectTraceLog.teeHandshakeLine('ATZ', 'ELM327 v1.5', 95);
+      Obd2ConnectTraceLog.teeHandshakeLine('ATE0', 'OK', 30);
+      // No timeout, no ATZ garbage → the bus was simply silent.
+      expect(h.classifyInitFailureOutcome(), Obd2ConnectOutcome.ignitionOff);
+      Obd2ConnectTraceLog.endTrace(h);
+    });
+  });
 }

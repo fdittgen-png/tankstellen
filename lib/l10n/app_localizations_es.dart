@@ -6469,6 +6469,44 @@ class AppLocalizationsEs extends AppLocalizations {
   String get obd2TestStatusFail => 'Fallido';
 
   @override
+  String get obd2TestAdapterTransportClassic => 'Classic (SPP)';
+
+  @override
+  String get obd2TestAdapterTransportBle => 'Bluetooth LE';
+
+  @override
+  String get obd2TestAdapterTransportUnknown => 'unknown — defaulting to BLE';
+
+  @override
+  String get obd2HealthConnectAttemptsSection => 'Recent connect attempts';
+
+  @override
+  String get obd2HealthConnectAttemptsEmpty =>
+      'No connect attempts recorded yet.';
+
+  @override
+  String get obd2HealthDownloadConnectTrace => 'Download connect trace';
+
+  @override
+  String get obd2HealthDownloadAllConnectTraces =>
+      'Download all connect traces';
+
+  @override
+  String get obd2HealthConnectOrigin => 'Origin';
+
+  @override
+  String get obd2HealthConnectTransport => 'Transport';
+
+  @override
+  String get obd2HealthConnectOutcome => 'Outcome';
+
+  @override
+  String get obd2HealthConnectScanList => 'Scanned devices';
+
+  @override
+  String get obd2HealthConnectSteps => 'Steps';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'No se pudo contactar con «$adapterName»: elige otro adaptador';
   }

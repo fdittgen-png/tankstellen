@@ -239,5 +239,17 @@
   "obd2TestStatusTimeout": "Zeitüberschreitung",
   "obd2TestStatusGarbage": "Unlesbare Antwort",
   "obd2TestStatusNoResponse": "Keine Antwort",
-  "obd2TestStatusFail": "Fehlgeschlagen"
+  "obd2TestStatusFail": "Fehlgeschlagen",
+  "obd2TestAdapterTransportClassic": "Classic (SPP)",
+  "obd2TestAdapterTransportBle": "Bluetooth LE",
+  "obd2TestAdapterTransportUnknown": "unbekannt — Standard ist BLE",
+  "obd2HealthConnectAttemptsSection": "Letzte Verbindungsversuche",
+  "obd2HealthConnectAttemptsEmpty": "Noch keine Verbindungsversuche aufgezeichnet.",
+  "obd2HealthDownloadConnectTrace": "Verbindungs-Trace herunterladen",
+  "obd2HealthDownloadAllConnectTraces": "Alle Verbindungs-Traces herunterladen",
+  "obd2HealthConnectOrigin": "Auslöser",
+  "obd2HealthConnectTransport": "Transport",
+  "obd2HealthConnectOutcome": "Ergebnis",
+  "obd2HealthConnectScanList": "Gefundene Geräte",
+  "obd2HealthConnectSteps": "Schritte"
 }
