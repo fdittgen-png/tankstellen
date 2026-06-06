@@ -30,7 +30,7 @@ class SetupHeader extends StatelessWidget {
         Semantics(
           header: true,
           child: Text(
-            l10n?.welcome ?? 'Fuel Prices',
+            l10n?.welcome ?? 'Sparkilo', // i18n-ignore: brand name
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),

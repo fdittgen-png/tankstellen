@@ -117,7 +117,7 @@ class _TabSpec {
 
 const _rechercheTab = _TabSpec(
   label: 'Recherche',
-  title: 'Fuel Prices',
+  title: 'Sparkilo',
   actions: [
     IconButton(
       icon: Icon(Icons.refresh),

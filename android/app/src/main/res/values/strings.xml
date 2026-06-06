@@ -6,7 +6,7 @@
 
 <resources>
     <string name="widget_description">Fuel prices — switch between favorites and nearest stations in the header</string>
-    <string name="widget_name">Fuel Prices</string>
+    <string name="widget_name">Sparkilo</string>
     <string name="widget_empty">Add favorites to see prices here</string>
     <string name="nearest_widget_name">Nearest Stations</string>
     <string name="nearest_widget_empty">Add favorites and enable GPS to see nearby stations</string>

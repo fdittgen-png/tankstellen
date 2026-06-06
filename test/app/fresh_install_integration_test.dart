@@ -122,7 +122,7 @@ void main() {
     );
 
     // Sanity: the search shell MUST NOT be reachable before consent.
-    expect(find.text('Fuel Prices'), findsNothing);
+    expect(find.text('Sparkilo'), findsNothing);
   });
 
   test(
@@ -261,7 +261,7 @@ void main() {
             'Even on an explicit go("/") the router must redirect back to '
             '/consent when no GDPR flag is persisted. This is the guard that '
             'protects the pre-consent invariant #565 locks in.');
-    expect(find.text('Fuel Prices'), findsNothing);
+    expect(find.text('Sparkilo'), findsNothing);
   });
 }
 
