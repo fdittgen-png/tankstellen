@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/labeled_value_slider.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Profile-edit slider for the user's preferred default search radius
@@ -12,7 +13,8 @@ import '../../../../l10n/app_localizations.dart';
 /// Pulled out of `profile_edit_sheet.dart` so the sheet's `build` method
 /// drops the inline `Row` block and so the slider's range, division
 /// count, and value mirroring can be exercised by widget tests in
-/// isolation.
+/// isolation. Composes the shared [LabeledValueSlider] (#2920) so the
+/// at-rest value readout pattern has a single source of truth.
 class ProfileRadiusSlider extends StatelessWidget {
   final double value;
   final ValueChanged<double> onChanged;
@@ -26,21 +28,14 @@ class ProfileRadiusSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Row(
-      children: [
-        Text('${l10n?.defaultRadius ?? "Radius"}:'),
-        Expanded(
-          child: Slider(
-            value: value,
-            min: 1,
-            max: 25,
-            divisions: 24,
-            label: '${value.round()} km',
-            onChanged: onChanged,
-          ),
-        ),
-        Text('${value.round()} km'),
-      ],
+    return LabeledValueSlider(
+      label: '${l10n?.defaultRadius ?? "Radius"}:',
+      valueLabel: '${value.round()} km',
+      value: value,
+      min: 1,
+      max: 25,
+      divisions: 24,
+      onChanged: onChanged,
     );
   }
 }

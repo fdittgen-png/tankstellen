@@ -3446,6 +3446,12 @@ abstract class AppLocalizations {
   /// **'Repeat interval'**
   String get voiceAnnouncementCooldown;
 
+  /// Title of the voice-announcement price-threshold slider in driving settings: only stations priced at or below this per-litre figure are announced.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum price'**
+  String get voiceAnnouncementPriceLimit;
+
   /// No description provided for @nearestStations.
   ///
   /// In en, this message translates to:

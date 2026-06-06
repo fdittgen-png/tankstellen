@@ -1850,6 +1850,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Ismétlési intervallum';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Legkozelebbi kutjak';
 
   @override

@@ -1841,6 +1841,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Gjentakelsesintervall';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Naermeste stasjoner';
 
   @override

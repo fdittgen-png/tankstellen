@@ -1833,6 +1833,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Repeat interval';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Nearest stations';
 
   @override
@@ -9417,6 +9420,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get voiceAnnouncementCooldown => '⟦Řéƥéáŧ îñŧéřṽáł ······⟧';
+
+  @override
+  String get voiceAnnouncementPriceLimit => '⟦Ṁáẋîɱúɱ ƥřîçé ·····⟧';
 
   @override
   String get nearestStations => '⟦Ñéářéšŧ šŧáŧîóñš ·······⟧';

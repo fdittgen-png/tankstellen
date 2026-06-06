@@ -1851,6 +1851,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Herhalingsinterval';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Dichtstbijzijnde stations';
 
   @override

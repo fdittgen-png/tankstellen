@@ -981,6 +981,10 @@
   },
   "voiceAnnouncementProximityRadius": "Announcement radius",
   "voiceAnnouncementCooldown": "Repeat interval",
+  "voiceAnnouncementPriceLimit": "Maximum price",
+  "@voiceAnnouncementPriceLimit": {
+    "description": "Title of the voice-announcement price-threshold slider in driving settings: only stations priced at or below this per-litre figure are announced."
+  },
   "nearestStations": "Nearest stations",
   "nearestStationsHint": "Find the closest stations using your current location",
   "consumptionLogTitle": "Fuel consumption",

@@ -1842,6 +1842,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Upprepningsintervall';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Narmaste stationer';
 
   @override

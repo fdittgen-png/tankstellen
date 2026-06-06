@@ -1850,6 +1850,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Interval de repetare';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Cele mai apropiate statii';
 
   @override

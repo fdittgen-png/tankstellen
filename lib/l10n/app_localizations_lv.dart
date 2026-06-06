@@ -1848,6 +1848,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Atkārtošanas intervāls';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Tuvakias degvielas uzpildes stacijas';
 
   @override

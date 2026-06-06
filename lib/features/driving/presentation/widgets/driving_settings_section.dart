@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/labeled_value_slider.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -258,12 +259,9 @@ class _VoiceAnnouncementsTile extends ConsumerWidget {
     final config = ref.watch(voiceAnnouncementSettingsProvider);
     final notifier = ref.read(voiceAnnouncementSettingsProvider.notifier);
 
-    final thresholdLabel = config.priceThreshold != null
-        ? (l?.voiceAnnouncementThreshold(
-                PriceFormatter.formatPrice(config.priceThreshold)) ??
-            'Only below ${PriceFormatter.formatPrice(config.priceThreshold)}')
-        : (l?.voiceAnnouncementsDescription ??
-            'Announce nearby cheap stations while driving');
+    final double radiusKm = config.proximityRadiusKm.clamp(0.5, 5.0);
+    final int cooldownMin = config.cooldown.inMinutes.clamp(5, 60);
+    final double thresholdEur = (config.priceThreshold ?? 2.0).clamp(1.0, 2.5);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -282,56 +280,51 @@ class _VoiceAnnouncementsTile extends ConsumerWidget {
           contentPadding: EdgeInsets.zero,
         ),
         if (config.enabled) ...[
-          // Proximity radius — 0.5 … 5 km in 0.5 km steps.
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(
-              l?.voiceAnnouncementProximityRadius ?? 'Announcement radius',
-              style: theme.textTheme.bodyMedium,
-            ),
-            subtitle: Slider(
-              key: const Key('voiceAnnouncementRadiusSlider'),
-              value: config.proximityRadiusKm.clamp(0.5, 5.0),
-              min: 0.5,
-              max: 5.0,
-              divisions: 9,
-              label: '${config.proximityRadiusKm.toStringAsFixed(1)} km',
-              onChanged: (v) => notifier.setProximityRadiusKm(v),
-            ),
+          // Proximity radius — 0.5 … 5 km in 0.5 km steps. The current
+          // value is shown as a persistent trailing readout (#2920) — a
+          // bare `Slider.label` is only visible while dragging.
+          LabeledValueSlider(
+            sliderKey: const Key('voiceAnnouncementRadiusSlider'),
+            label: l?.voiceAnnouncementProximityRadius ?? 'Announcement radius',
+            // i18n-ignore: " km" is a language-neutral unit suffix (matches
+            // ProfileRadiusSlider + the {km} ARB masks).
+            valueLabel: '${radiusKm.toStringAsFixed(1)} km',
+            labelStyle: theme.textTheme.bodyMedium,
+            value: radiusKm,
+            min: 0.5,
+            max: 5.0,
+            divisions: 9,
+            onChanged: (v) => notifier.setProximityRadiusKm(v),
           ),
           // Repeat cooldown — 5 … 60 minutes in 5-minute steps.
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(
-              l?.voiceAnnouncementCooldown ?? 'Repeat interval',
-              style: theme.textTheme.bodyMedium,
-            ),
-            subtitle: Slider(
-              key: const Key('voiceAnnouncementCooldownSlider'),
-              value: config.cooldown.inMinutes.clamp(5, 60).toDouble(),
-              min: 5,
-              max: 60,
-              divisions: 11,
-              label: '${config.cooldown.inMinutes} min',
-              onChanged: (v) =>
-                  notifier.setCooldown(Duration(minutes: v.round())),
-            ),
+          LabeledValueSlider(
+            sliderKey: const Key('voiceAnnouncementCooldownSlider'),
+            label: l?.voiceAnnouncementCooldown ?? 'Repeat interval',
+            // i18n-ignore: " min" is a language-neutral unit abbreviation.
+            valueLabel: '$cooldownMin min',
+            labelStyle: theme.textTheme.bodyMedium,
+            value: cooldownMin.toDouble(),
+            min: 5,
+            max: 60,
+            divisions: 11,
+            onChanged: (v) =>
+                notifier.setCooldown(Duration(minutes: v.round())),
           ),
-          // Cheap-fuel price threshold — current value shown in the
-          // active currency; the slider spans a sensible per-litre band.
-          ListTile(
+          // Cheap-fuel price ceiling — only stations at or below this
+          // per-litre figure are announced. Its own distinct label
+          // ("Maximum price") fixes the #2920 fallback that duplicated the
+          // section subtitle; the value shows in the active currency.
+          LabeledValueSlider(
             key: const Key('voiceAnnouncementThresholdTile'),
-            contentPadding: EdgeInsets.zero,
-            title: Text(thresholdLabel, style: theme.textTheme.bodyMedium),
-            subtitle: Slider(
-              key: const Key('voiceAnnouncementThresholdSlider'),
-              value: (config.priceThreshold ?? 2.0).clamp(1.0, 2.5),
-              min: 1.0,
-              max: 2.5,
-              divisions: 30,
-              label: PriceFormatter.formatPrice(config.priceThreshold ?? 2.0),
-              onChanged: (v) => notifier.setPriceThreshold(v),
-            ),
+            sliderKey: const Key('voiceAnnouncementThresholdSlider'),
+            label: l?.voiceAnnouncementPriceLimit ?? 'Maximum price',
+            valueLabel: PriceFormatter.formatPrice(thresholdEur),
+            labelStyle: theme.textTheme.bodyMedium,
+            value: thresholdEur,
+            min: 1.0,
+            max: 2.5,
+            divisions: 30,
+            onChanged: (v) => notifier.setPriceThreshold(v),
           ),
         ],
       ],

@@ -1851,6 +1851,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Interval opakovania';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Najblizsie stanice';
 
   @override

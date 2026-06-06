@@ -1847,6 +1847,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get voiceAnnouncementCooldown => 'Interval opakování';
 
   @override
+  String get voiceAnnouncementPriceLimit => 'Maximum price';
+
+  @override
   String get nearestStations => 'Nejblizsi stanice';
 
   @override
