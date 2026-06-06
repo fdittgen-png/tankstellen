@@ -101,13 +101,16 @@ class CarScreensTest {
     }
 
     @Test
-    fun searchScreen_missingKeyShowsEmptyMessage() {
-        // No seed → key absent.
+    fun searchScreen_missingKeyShowsNoGpsMessage() {
+        // No seed → key absent. v2 SLICE 1 (#2947): the real SearchScreen is
+        // live-enabled, but the real CarDataBridge has no engine under
+        // Robolectric (isReady == false), so it renders the empty list with the
+        // v2 no-GPS message rather than the v1 "run a search first" copy.
         val template = templateOf(SearchScreen(carContext)) as PlaceListMapTemplate
 
         val list = template.itemList as ItemList
         assertTrue(list.items.isEmpty())
-        assertEquals(string(R.string.car_empty_search), list.noItemsMessage.toString())
+        assertEquals(string(R.string.car_empty_no_gps), list.noItemsMessage.toString())
     }
 
     @Test
@@ -141,4 +144,130 @@ class CarScreensTest {
         assertTrue(CarStation.parse("not json").isEmpty())
         assertTrue(CarStation.parse("").isEmpty())
     }
+
+    // ── Android Auto v2 SLICE 1 (#2947) — LIVE Search via the headless bridge ──
+
+    /**
+     * A fake [CarLiveSource] standing in for the real [CarDataBridge] (whose
+     * FlutterEngine can't spin up under Robolectric). [ready] toggles whether a
+     * live fetch is kicked; each `fetch` returns the next queued reply
+     * SYNCHRONOUSLY (or null when the queue is empty), so a test can assert the
+     * snapshot-first → live-second render sequence deterministically.
+     */
+    private class FakeLiveSource(
+        var ready: Boolean = true,
+    ) : CarLiveSource {
+        val replies = ArrayDeque<String?>()
+        var fetchCount = 0
+
+        override val isReady: Boolean get() = ready
+
+        override fun fetch(kind: CarFetchKind, callback: CarDataBridge.FetchCallback) {
+            fetchCount++
+            val json = if (replies.isEmpty()) null else replies.removeFirst()
+            callback.onResult(json)
+        }
+    }
+
+    /** A [SearchScreen] wired to a fake live source for deterministic tests. */
+    private inner class FakeLiveSearchScreen(
+        private val source: CarLiveSource,
+    ) : StationListScreen(carContext) {
+        override val titleRes: Int = R.string.car_search_title
+        override val prefsKey: String = CarStation.SEARCH_KEY
+        override val emptyMessageRes: Int = R.string.car_empty_no_gps
+        override val kind: CarFetchKind = CarFetchKind.SEARCH
+        override val liveFetchEnabled: Boolean = true
+        override val liveSource: CarLiveSource = source
+    }
+
+    private fun rows(t: Template): List<Row> =
+        ((t as PlaceListMapTemplate).itemList as ItemList).items.filterIsInstance<Row>()
+
+    @Test
+    fun liveSearch_rendersSnapshotBeforeAnyLiveResult() {
+        // A live reply is queued, but the FIRST render must still show the
+        // snapshot (live result lands only on the next render). Proves the
+        // never-blank-first-frame contract.
+        seed(CarStation.SEARCH_KEY, twoStationsJson())
+        val source = FakeLiveSource().apply {
+            replies.add(oneStationJson("Esso", 52.7, 13.7))
+        }
+        val screen = FakeLiveSearchScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        val first = rows(screen.onGetTemplate())
+        assertEquals(2, first.size)
+        assertEquals("Aral", first[0].title.toString())
+    }
+
+    @Test
+    fun liveSearch_freshJsonReplacesSnapshotOnNextRender() {
+        // Snapshot has 2; the live fetch returns 1 fresh station. The first
+        // render shows the snapshot; the second (post-invalidate) shows live.
+        seed(CarStation.SEARCH_KEY, twoStationsJson())
+        val source = FakeLiveSource().apply {
+            replies.add(oneStationJson("Esso", 52.7, 13.7))
+        }
+        val screen = FakeLiveSearchScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        rows(screen.onGetTemplate()) // first render kicks + caches the live list
+        val second = rows(screen.onGetTemplate())
+        assertEquals(1, second.size)
+        assertEquals("Esso", second[0].title.toString())
+    }
+
+    @Test
+    fun liveSearch_emptyLiveResultKeepsSnapshot() {
+        // A null/empty live reply must NEVER blank a good snapshot.
+        seed(CarStation.SEARCH_KEY, twoStationsJson())
+        val source = FakeLiveSource() // empty queue → fetch yields null
+        val screen = FakeLiveSearchScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        rows(screen.onGetTemplate())
+        val second = rows(screen.onGetTemplate())
+        assertEquals("a null live result keeps the snapshot", 2, second.size)
+        assertEquals("Aral", second[0].title.toString())
+    }
+
+    @Test
+    fun liveSearch_noSnapshotAndNoLiveShowsNoGpsMessage() {
+        // Fresh head unit: no snapshot AND the live fetch returns null (e.g. no
+        // persisted fix) → the car_empty_no_gps message, never a crash.
+        val source = FakeLiveSource() // empty queue → null
+        val screen = FakeLiveSearchScreen(source)
+        ScreenController(screen).moveToState(Lifecycle.State.CREATED)
+
+        // First render (cold) shows the host spinner (loading) — no item list.
+        val firstLoading = (screen.onGetTemplate() as PlaceListMapTemplate).isLoading
+        assertTrue("cold start with no snapshot shows the spinner", firstLoading)
+
+        // Second render (after the null reply) clears the spinner to the
+        // no-GPS empty message.
+        val list = (screen.onGetTemplate() as PlaceListMapTemplate).itemList as ItemList
+        assertTrue(list.items.isEmpty())
+        assertEquals(string(R.string.car_empty_no_gps), list.noItemsMessage.toString())
+    }
+
+    @Test
+    fun radarScreen_staysOnSnapshot_doesNotFetchLive() {
+        // SLICE 1: Radar must NOT hit the live bridge — it renders the v1
+        // snapshot only. (Its kind is RADAR, liveFetchEnabled false.)
+        seed(CarStation.RADAR_KEY, twoStationsJson())
+        val template = templateOf(RadarScreen(carContext)) as PlaceListMapTemplate
+        assertEquals(2, rows(template).size)
+        // RadarScreen leaves liveFetchEnabled false, so the default real
+        // CarDataBridge is never asked (no engine in tests) — proven by the
+        // render succeeding with the snapshot and no crash.
+    }
+
+    private fun oneStationJson(brand: String, lat: Double, lng: Double): String = """
+        [
+          {"id":"x","name":"$brand X","brand":"$brand","lat":$lat,"lng":$lng,
+           "price":1.749,"priceText":"1.749","fuelLabel":"E10","band":"cheap",
+           "bandColor":4282621761,"distanceKm":2.1,"currency":"€"}
+        ]
+    """.trimIndent()
 }

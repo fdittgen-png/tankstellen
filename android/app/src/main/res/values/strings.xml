@@ -48,4 +48,14 @@
     <string name="car_radar_title">Radar</string>
     <string name="car_empty_search">Open the app and run a search first, then it will show up here.</string>
     <string name="car_empty_radar">Open the app and start the radar first, then it will show up here.</string>
+
+    <!-- Android Auto v2 SLICE 1 (#2947) — live in-car Search strings. The
+         Search screen now fetches nearby stations live through a headless
+         Flutter engine; these cover the cold-start spinner, the host Refresh
+         button, and the no-persisted-fix empty state. Same native-resource
+         rationale as the car_* strings above (the androidx.car.app host can't
+         read the Flutter ARB bundle). -->
+    <string name="car_loading">Loading nearby stations…</string>
+    <string name="car_empty_no_gps">Open the app on your phone to set your location</string>
+    <string name="car_refresh">Refresh</string>
 </resources>
