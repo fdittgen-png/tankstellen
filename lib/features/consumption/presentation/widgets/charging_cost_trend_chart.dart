@@ -4,6 +4,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+// `intl` also exports a `TextDirection`; hide it so the painter keeps using
+// the dart:ui/material one (with `.ltr`).
+import 'package:intl/intl.dart' hide TextDirection;
 
 import '../../../../l10n/app_localizations.dart';
 
@@ -54,6 +57,10 @@ class ChargingCostTrendChart extends StatelessWidget {
         ),
       );
     }
+    // Month-axis labels are locale DATA, not a translatable string: resolve
+    // the active locale's short-month names via intl (matches price_chart.dart's
+    // `DateFormat.Md(locale)` pattern). #2971.
+    final locale = Localizations.localeOf(context).toString();
     return SizedBox(
       height: 160,
       child: CustomPaint(
@@ -61,6 +68,7 @@ class ChargingCostTrendChart extends StatelessWidget {
           entries: entries,
           color: effective,
           labelColor: theme.colorScheme.onSurface,
+          monthFormat: DateFormat.MMM(locale),
         ),
         size: Size.infinite,
       ),
@@ -73,10 +81,14 @@ class _CostTrendPainter extends CustomPainter {
   final Color color;
   final Color labelColor;
 
+  /// Locale-aware short-month formatter for the X-axis labels (#2971).
+  final DateFormat monthFormat;
+
   _CostTrendPainter({
     required this.entries,
     required this.color,
     required this.labelColor,
+    required this.monthFormat,
   });
 
   @override
@@ -137,7 +149,7 @@ class _CostTrendPainter extends CustomPainter {
       canvas.drawRRect(rect, barPaint);
       _drawText(
         canvas,
-        _shortMonth(entries[i].key),
+        monthFormat.format(entries[i].key),
         Offset(cx, topInset + chartHeight + 4),
         anchorCenter: true,
         color: labelColor.withAlpha(160),
@@ -168,25 +180,9 @@ class _CostTrendPainter extends CustomPainter {
     tp.paint(canvas, Offset(dx, offset.dy));
   }
 
-  String _shortMonth(DateTime d) {
-    const names = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return names[d.month - 1];
-  }
-
   @override
   bool shouldRepaint(_CostTrendPainter oldDelegate) =>
-      oldDelegate.entries != entries || oldDelegate.color != color;
+      oldDelegate.entries != entries ||
+      oldDelegate.color != color ||
+      oldDelegate.monthFormat.locale != monthFormat.locale;
 }
