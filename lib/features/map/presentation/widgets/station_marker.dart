@@ -9,6 +9,7 @@ import '../../../../core/theme/price_band_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_gradient.dart';
 import '../../../../core/utils/station_extensions.dart';
+import '../../../../core/widgets/animated_price_text.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 
@@ -115,9 +116,16 @@ class StationMarkerBuilder {
     final Widget badge = showCompact
         ? _dot(color, pastel)
         : selected
+            // #2973 — the SELECTED marker (and ONLY the selected marker) wraps
+            // its price in AnimatedPriceText so a refresh that drops the
+            // chosen station's price flashes on the map. Un-selected bubbles,
+            // compact dots and the cluster badge stay inert — the flash never
+            // runs per-frame across the whole marker layer. Reduced motion is
+            // honoured inside AnimatedPriceText.
             ? Builder(
                 builder: (ctx) => _priceBubble(color, pastel, priceText,
-                    ringColor: Theme.of(ctx).colorScheme.primary),
+                    ringColor: Theme.of(ctx).colorScheme.primary,
+                    flashPrice: price),
               )
             : _priceBubble(color, pastel, priceText);
 
@@ -153,8 +161,25 @@ class StationMarkerBuilder {
   /// #2939 — [ringColor] (the selected-station case) overrides the default
   /// white hairline with a thicker brand-primary ring so the chosen marker
   /// stands out from its neighbours.
+  ///
+  /// #2973 — [flashPrice] (selected case only) wraps the price text in an
+  /// [AnimatedPriceText] so the chosen station's marker flashes when its
+  /// price changes. Null on every non-selected bubble → no flash, so the
+  /// animation can never run across the whole marker layer.
   static Widget _priceBubble(Color color, bool pastel, String priceText,
-      {Color? ringColor}) {
+      {Color? ringColor, double? flashPrice}) {
+    final Widget priceLabel = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        priceText,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+          height: 1.0,
+          color: pastel ? Colors.black38 : Colors.black87,
+        ),
+      ),
+    );
     return Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -177,18 +202,9 @@ class StationMarkerBuilder {
                 ),
               ],
       ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          priceText,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-            height: 1.0,
-            color: pastel ? Colors.black38 : Colors.black87,
-          ),
-        ),
-      ),
+      child: flashPrice == null
+          ? priceLabel
+          : AnimatedPriceText(price: flashPrice, child: priceLabel),
     );
   }
 

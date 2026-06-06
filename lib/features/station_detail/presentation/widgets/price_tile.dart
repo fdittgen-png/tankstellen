@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/widgets/animated_price_text.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 
 /// A single fuel price row with colored icon and formatted price.
@@ -30,12 +31,18 @@ class PriceTile extends StatelessWidget {
           Icon(Icons.local_gas_station, color: color, size: 20),
           const SizedBox(width: 8),
           Expanded(child: Text(label, style: Theme.of(context).textTheme.bodyMedium)),
-          Text(
-            PriceFormatter.formatPrice(price),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+          // #2973 — flash on price change. The same AnimatedPriceText the
+          // search card uses, so a refresh that drops a price is noticeable
+          // here too. Gated on the OS reduced-motion flag inside the widget.
+          AnimatedPriceText(
+            price: price,
+            child: Text(
+              PriceFormatter.formatPrice(price),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+            ),
           ),
         ],
       ),

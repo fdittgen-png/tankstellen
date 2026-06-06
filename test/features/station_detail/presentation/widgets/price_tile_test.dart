@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/widgets/animated_price_text.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/price_tile.dart';
 
@@ -43,6 +44,39 @@ void main() {
       expect(find.byType(ListTile), findsNothing);
       // Should use a Row-based layout with gas station icon
       expect(find.byIcon(Icons.local_gas_station), findsOneWidget);
+    });
+
+    testWidgets('#2973 — wraps the price in an AnimatedPriceText',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const PriceTile(
+            label: 'Diesel', price: 1.459, fuelType: FuelType.diesel),
+      );
+      expect(find.byType(AnimatedPriceText), findsOneWidget);
+    });
+
+    testWidgets('#2973 — a price change flashes (controller runs)',
+        (tester) async {
+      Widget host(double price) => MaterialApp(
+            home: Scaffold(
+              body: PriceTile(
+                label: 'Diesel',
+                price: price,
+                fuelType: FuelType.diesel,
+              ),
+            ),
+          );
+
+      await tester.pumpWidget(host(1.699));
+      await tester.pumpAndSettle();
+
+      // A real drop must kick the flash controller.
+      await tester.pumpWidget(host(1.499));
+      await tester.pump();
+      expect(tester.hasRunningAnimations, isTrue,
+          reason: 'a price drop on the detail tile must flash');
+      await tester.pumpAndSettle();
     });
 
     testWidgets('vertical padding is compact (4dp)', (tester) async {
