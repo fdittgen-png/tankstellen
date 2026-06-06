@@ -3,11 +3,16 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/background/provider_request_budget.dart';
 import '../../../core/country/country_provider.dart';
 import '../../../core/services/country_service_registry.dart';
+import '../../../core/services/diagnostics/data_access_event.dart';
+import '../../../core/services/diagnostics/data_access_recorder_provider.dart';
 import '../../../core/services/radar/corridor_location_cache.dart';
 import '../../../core/services/radar/jit_price_cache.dart';
 import '../../../core/services/service_providers.dart';
+import '../../../core/services/service_result.dart';
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
 import '../../../core/utils/station_extensions.dart';
 import '../../search/data/models/search_params.dart';
@@ -167,8 +172,38 @@ FuelStationRadar fuelStationRadar(Ref ref) {
   final policy = CountryServiceRegistry.policyFor(country.code);
   final isBulk = policy?.isBulkFile ?? false;
 
+  // #2932 — the shared foreground+background per-provider request budget and
+  // the dev-only data-access tracer, so a corruption-forced corridor refetch
+  // (the proximity validator inside the cache) still honours the provider's
+  // minInterval and is distinguishable from a plain TTL refetch in the trace.
+  final budget = ProviderRequestBudget(ref.read(storageRepositoryProvider));
+  final recorder = ref.read(dataAccessRecorderProvider);
+  final minInterval = policy?.minInterval;
+  final errorSource =
+      CountryServiceRegistry.entryFor(country.code)?.errorSource;
+
   final corridorCache = CorridorLocationCache(
     isBulk: isBulk,
+    // Rate-gate the staleness/corruption-forced refetch ONLY (a first-entry or
+    // TTL refetch is never gated) on the shared budget, so a poisoned/far
+    // cache is replaced without breaching the provider's published cadence.
+    canRefetch: () => budget.canFire(country.code, minInterval),
+    onRefetch: () {
+      // Stamp the shared budget (so a background scan sees this hit) and emit a
+      // staleness-tagged DataAccessEvent (#2824) the moment a corruption-forced
+      // refetch fires — `isStale: true` is what tells a forced refetch apart
+      // from a normal TTL-expiry one in the exported trace.
+      budget.recordRequest(country.code);
+      recorder?.add(DataAccessEvent(
+        at: DateTime.now(),
+        monotonicMicros: recorder.monotonicMicros,
+        country: country.code,
+        source: (errorSource ?? ServiceSource.cache).name,
+        endpoint: DataAccessEndpoint.corridorPrefetch,
+        hit: DataAccessHit.networkApi,
+        isStale: true,
+      ));
+    },
     fetchCorridor: (lat, lng, radiusKm) async {
       try {
         final result = await svc.searchStations(

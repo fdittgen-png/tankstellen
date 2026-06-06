@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import '../../../features/search/domain/entities/station.dart';
-import '../../utils/geo_utils.dart' as geo;
+import 'corridor_geo.dart';
 import 'geo_tile.dart';
 
 /// One wide-area station fetch the [CorridorLocationCache] performs — the
@@ -16,6 +15,21 @@ typedef CorridorFetch = Future<List<Station>> Function(
   double lng,
   double radiusKm,
 );
+
+/// Gate the cache asks before it forces a *staleness/corruption* refetch
+/// (#2932). The provider wires this to `ProviderRequestBudget.canFire` so a
+/// corrupted-cache invalidation still honours each provider's published
+/// frequency/volume rules; when it returns `false` the cache serves the
+/// (validated) set rather than hammer the feed. A normal TTL-expiry or
+/// first-entry fetch is NOT gated by this — only the forced refetch is.
+typedef CorridorRefetchGate = bool Function();
+
+/// Side-effect the cache fires the instant it decides to force a refetch
+/// (#2932). The provider wires it to `ProviderRequestBudget.recordRequest`
+/// (stamp the shared budget) AND to a staleness-tagged `DataAccessEvent` so the
+/// #2824 tracer can tell a corruption-forced refetch apart from a plain TTL
+/// refetch.
+typedef CorridorRefetchSink = void Function();
 
 /// Tier-1 of the Fuel Station Radar (#2283): a long-TTL cache of station
 /// LISTS + geolocations for a wide corridor around the driver.
@@ -66,11 +80,20 @@ class CorridorLocationCache {
   /// handled separately by the JIT price cache (tier-3).
   static const Duration defaultTtl = Duration(hours: 1);
 
+  /// How far beyond the corridor radius the nearest cached station may sit
+  /// before the cache treats the set as corrupted (#2932). 1.2 → a 20 % grace
+  /// over the fetch radius, covering GPS jitter + the fetch-centre-vs-live-GPS
+  /// offset without false-positiving a genuinely-near station near the edge.
+  static const double defaultProximityToleranceFactor = 1.2;
+
   final CorridorFetch _fetchCorridor;
   final double _corridorRadiusKm;
   final double _tileStepDegrees;
   final Duration _ttl;
   final bool _isBulk;
+  final double _proximityToleranceFactor;
+  final CorridorRefetchGate? _canRefetch;
+  final CorridorRefetchSink? _onRefetch;
   final DateTime Function() _now;
 
   /// The currently cached wide-area station set. Replaced wholesale on each
@@ -85,6 +108,14 @@ class CorridorLocationCache {
   /// When [_stations] was last fetched — drives the [ttl] expiry.
   DateTime? _fetchedAt;
 
+  /// The centre of the most recent *replacing* corridor fetch (#2932). The
+  /// proximity validator measures the live GPS against the cached stations
+  /// directly (GPS-truth distance), but the centre is kept so a degenerate
+  /// fetch (empty set) still has a reference for the staleness check and the
+  /// tracer. Null until the first successful non-empty replace.
+  double? _fetchCenterLat;
+  double? _fetchCenterLng;
+
   /// Coalesces concurrent refreshes for the same target so a burst of GPS
   /// samples crossing a tile boundary issues a single fetch.
   Future<void>? _inFlight;
@@ -96,12 +127,18 @@ class CorridorLocationCache {
     double tileStepDegrees = GeoTile.defaultStepDegrees,
     Duration ttl = defaultTtl,
     bool isBulk = false,
+    double proximityToleranceFactor = defaultProximityToleranceFactor,
+    CorridorRefetchGate? canRefetch,
+    CorridorRefetchSink? onRefetch,
     DateTime Function()? now,
   })  : _fetchCorridor = fetchCorridor,
         _corridorRadiusKm = corridorRadiusKm,
         _tileStepDegrees = tileStepDegrees,
         _ttl = ttl,
         _isBulk = isBulk,
+        _proximityToleranceFactor = proximityToleranceFactor,
+        _canRefetch = canRefetch,
+        _onRefetch = onRefetch,
         _now = now ?? DateTime.now;
 
   /// The tiles the cache currently covers (read-only view for bookkeeping /
@@ -110,6 +147,18 @@ class CorridorLocationCache {
 
   /// The cached wide-area station set (read-only view).
   List<Station> get cachedStations => List.unmodifiable(_stations);
+
+  /// Centre of the most recent replacing corridor fetch (#2932), or null
+  /// before the first non-empty fetch. The proximity validator measures the
+  /// live GPS against the cached stations directly, but exposing the fetch
+  /// centre lets the radar provider tag a staleness-forced `DataAccessEvent`
+  /// (#2824) with where the suspect corridor was originally fetched.
+  ({double lat, double lng})? get fetchCenter {
+    final lat = _fetchCenterLat;
+    final lng = _fetchCenterLng;
+    if (lat == null || lng == null) return null;
+    return (lat: lat, lng: lng);
+  }
 
   /// `true` when a position at [lat]/[lng] would be answered from cache with
   /// no fetch — its tile is covered and the cache has not aged past [ttl].
@@ -129,13 +178,35 @@ class CorridorLocationCache {
   /// Never throws: a failed fetch leaves the previous cache in place (so the
   /// geofence keeps working on the last-known corridor) and returns whatever
   /// is cached.
+  ///
+  /// ### Corrupted-cache detection (#2932)
+  ///
+  /// A coarse 0.5° tile spans ~55 km, so tile membership alone would serve a
+  /// set fetched at one end of the tile to a driver at the other end. On a
+  /// cache *hit* the cache therefore re-validates the cached set against the
+  /// LIVE GPS [lat]/[lng] ([_isCorrupted]): if the nearest cached station sits
+  /// beyond the corridor radius (× the tolerance factor), the set is empty, or
+  /// any cached coordinate is the (0,0) null island, the entry is treated as
+  /// INVALID — not merely TTL-expired — and a fresh fetch is forced. That
+  /// forced refetch is rate-gated ([_canRefetch], wired to the shared provider
+  /// budget): if the min-interval has not elapsed, the validated cache is
+  /// served rather than the feed hammered.
   Future<List<Station>> stationsNear(
     double lat,
     double lng, {
     double? headingDegrees,
   }) async {
     if (!isFresh(lat, lng)) {
+      // Cache miss / TTL expiry — a NORMAL refetch (never rate-gated; the
+      // gate only governs the corruption-forced path so the geofence is never
+      // starved on a legitimate first entry into an area).
       await _refreshFor(lat, lng);
+    } else if (_isCorrupted(lat, lng)) {
+      // Cache HIT by tile + TTL, but the set is stale/degenerate for THIS GPS
+      // fix. Force a fresh fetch, but only if the shared provider budget
+      // allows it — otherwise keep serving the (validated-as-best-available)
+      // cache rather than breach the provider's rate limit.
+      await _refreshIfBudgetAllows(lat, lng);
     } else if (headingDegrees != null &&
         headingDegrees.isFinite &&
         !_isBulk &&
@@ -147,6 +218,45 @@ class CorridorLocationCache {
       unawaited(_prefetchAhead(lat, lng, headingDegrees));
     }
     return _stations;
+  }
+
+  /// `true` when the cached set must be treated as INVALID for a driver at the
+  /// live [lat]/[lng] (#2932) — distinct from a plain TTL expiry. Delegates to
+  /// the pure [isCorridorCorrupt] validator (GPS-truth distance over the cached
+  /// set vs the corridor radius × tolerance).
+  bool _isCorrupted(double lat, double lng) => isCorridorCorrupt(
+        _stations,
+        lat,
+        lng,
+        _corridorRadiusKm,
+        _proximityToleranceFactor,
+      );
+
+  /// Force a fresh corridor fetch for a corruption-invalidated cache (#2932),
+  /// but ONLY when the injected rate gate ([_canRefetch], wired to the shared
+  /// provider budget) allows it — otherwise serve the cache rather than breach
+  /// the provider's published cadence. On a refetch the [_onRefetch] sink
+  /// stamps the budget + emits the staleness-tagged tracer event.
+  ///
+  /// Honours [stationsNear]'s never-throws contract: a faulty injected gate or
+  /// sink (e.g. a closed Hive box behind `canFire`) must never break the
+  /// geofence — any throw degrades to "serve the validated cache, no refetch".
+  Future<void> _refreshIfBudgetAllows(double lat, double lng) async {
+    final bool allowed;
+    try {
+      final gate = _canRefetch;
+      allowed = gate == null || gate();
+    } on Object {
+      return; // Gate faulted — keep serving the cache (geofence survives).
+    }
+    if (!allowed) return;
+    try {
+      _onRefetch?.call();
+    } on Object {
+      // A faulty sink (budget stamp / tracer) must not block the refetch the
+      // gate just authorised, nor break the contract — swallow and proceed.
+    }
+    await _refreshFor(lat, lng);
   }
 
   /// Blocking refresh centred on [lat]/[lng]; coalesced per target tile.
@@ -193,7 +303,17 @@ class CorridorLocationCache {
       return;
     }
 
-    final box = _boundingBox(lat, lng, _corridorRadiusKm);
+    // #2932 — a degenerate (empty) fetch must NOT mark the tile covered and
+    // must NOT replace a good corridor: mirror `station_service_chain`'s
+    // `isValid: stations.isNotEmpty`. A failed fetch already returned `const []`
+    // upstream (the provider catches and returns empty) AND an exception is
+    // caught above; both land here as an empty list. Keeping the prior coverage
+    // means the next access retries instead of serving a poisoned empty set
+    // "covered + fresh" for a full TTL. The geofence keeps the last good
+    // corridor in the meantime.
+    if (fetched.isEmpty) return;
+
+    final box = corridorBoundingBox(lat, lng, _corridorRadiusKm);
     final tiles = GeoTile.tilesForBox(
       minLat: box.minLat,
       minLng: box.minLng,
@@ -207,6 +327,10 @@ class CorridorLocationCache {
       _coveredTiles
         ..clear()
         ..addAll(tiles);
+      // Record the centre of this replacing fetch as the corridor's GPS-truth
+      // reference (#2932) for the proximity validator + the tracer.
+      _fetchCenterLat = lat;
+      _fetchCenterLng = lng;
     } else {
       // Merge by id so an overlapping prefetch doesn't duplicate stations.
       final byId = {for (final s in _stations) s.id: s};
@@ -243,26 +367,4 @@ class CorridorLocationCache {
   /// How close (as a fraction of tile size) to a tile edge the driver must be
   /// before the edge prefetch fires. 0.25 → the outer quarter on each side.
   static const double _edgeFraction = 0.25;
-
-  /// Axis-aligned bounding box covering a [radiusKm] circle around
-  /// [lat]/[lng], in degree-space. Latitude is uniform (~111.32 km/°);
-  /// longitude shrinks with cos(lat). Used purely for tile bookkeeping, so a
-  /// slight over-cover is harmless.
-  ({double minLat, double minLng, double maxLat, double maxLng}) _boundingBox(
-    double lat,
-    double lng,
-    double radiusKm,
-  ) {
-    const kmPerDegLat = geo.earthRadiusMeters / 1000.0 * math.pi / 180.0;
-    final latDelta = radiusKm / kmPerDegLat;
-    final cosLat = math.cos(lat * math.pi / 180.0);
-    final clampedCos = cosLat.abs() < 1e-6 ? 1e-6 : cosLat.abs();
-    final lngDelta = radiusKm / (kmPerDegLat * clampedCos);
-    return (
-      minLat: lat - latDelta,
-      minLng: lng - lngDelta,
-      maxLat: lat + latDelta,
-      maxLng: lng + lngDelta,
-    );
-  }
 }
