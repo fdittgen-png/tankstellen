@@ -174,9 +174,14 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
             WizardSchemaStep(
               schemaStatus: wizard.schemaStatus,
               migrationSql: wizard.migrationSql,
+              schemaOutdated: wizard.schemaOutdated,
               onRecheck: () async {
                 final status = await SchemaVerifier.checkSchema();
-                if (mounted) _notifier.updateSchemaStatus(status);
+                final outdated = await SchemaVerifier.isSchemaOutdated();
+                if (mounted) {
+                  _notifier.updateSchemaStatus(status,
+                      schemaOutdated: outdated);
+                }
               },
               onDone: () {
                 SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
@@ -248,15 +253,20 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
 
       if (!mounted) return;
       final schema = await SchemaVerifier.checkSchema();
+      // #2929 — even when every table exists, a self-hoster on an older
+      // schema version needs to re-run the setup SQL (silent per-feature
+      // breakage otherwise). Surface the schema step in that case too.
+      final outdated = await SchemaVerifier.isSchemaOutdated();
       if (schema != null && mounted) {
         final allReady = SchemaVerifier.requiredTables.every((t) => schema[t] == true);
-        if (allReady) {
+        if (allReady && !outdated) {
           SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
           Navigator.pop(context);
         } else {
           _notifier.showSchemaStep(
             schema: schema,
             migrationSql: SchemaVerifier.getMigrationSql(schema),
+            schemaOutdated: outdated,
           );
         }
       }

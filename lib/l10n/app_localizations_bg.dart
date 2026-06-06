@@ -2986,6 +2986,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncRecheckSchemaButton => 'Провери схемата отново';
 
   @override
+  String get syncSchemaOutdated =>
+      'Your TankSync schema is outdated — re-run the setup SQL below to enable the latest synced features.';
+
+  @override
   String get syncDoneButton => 'Готово';
 
   @override

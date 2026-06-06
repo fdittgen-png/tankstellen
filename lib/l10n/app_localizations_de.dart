@@ -1441,7 +1441,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get gdprCloudSyncDescription =>
-      'Favoriten und Preisalarme geräteübergreifend über TankSync synchronisieren. Verwendet anonyme Authentifizierung. Ihre Daten werden verschlüsselt übertragen.';
+      'Favoriten, Bewertungen, Preisalarme, ausgeblendete Stationen, gespeicherte Routen, Fahrzeuge, Tankprotokolle und Fahrten geräteübergreifend über TankSync synchronisieren. Verwendet anonyme Authentifizierung. Ihre Daten werden verschlüsselt übertragen.';
 
   @override
   String get gdprCloudSyncShort =>
@@ -1679,7 +1679,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get privacySyncDescription =>
-      'Bei aktiviertem Sync werden Favoriten, Alarme, ausgeblendete Stationen und Bewertungen auch auf dem TankSync-Server gespeichert.';
+      'Bei aktiviertem Sync werden Favoriten, Bewertungen, Alarme, ausgeblendete Stationen, gespeicherte Routen, Fahrzeuge, Tankprotokolle und Fahrten auch auf dem TankSync-Server gespeichert.';
 
   @override
   String get privacyViewServerData => 'Serverdaten anzeigen';
@@ -2904,7 +2904,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncOptionalDescription =>
-      'Die App funktioniert auch ohne Cloud-Sync. Mit TankSync synchronisieren Sie Favoriten, Alarme und Bewertungen geräteübergreifend über Supabase (kostenloses Kontingent verfügbar).';
+      'Die App funktioniert auch ohne Cloud-Sync. Mit TankSync synchronisieren Sie Favoriten, Bewertungen, Alarme, ausgeblendete Stationen, gespeicherte Routen, Fahrzeuge, Tankprotokolle und Fahrten geräteübergreifend über Supabase (kostenloses Kontingent verfügbar).';
 
   @override
   String get syncHowToConnectQuestion => 'Wie möchten Sie verbinden?';
@@ -2979,6 +2979,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get syncRecheckSchemaButton => 'Schema erneut prüfen';
+
+  @override
+  String get syncSchemaOutdated =>
+      'Ihr TankSync-Schema ist veraltet — führen Sie das untenstehende Setup-SQL erneut aus, um die neuesten synchronisierten Funktionen zu aktivieren.';
 
   @override
   String get syncDoneButton => 'Fertig';
@@ -5823,7 +5827,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get authInfoBenefit1 =>
-      '• Favoriten, Alarme und Routen geräteübergreifend synchronisieren';
+      '• Favoriten, Bewertungen, Alarme, ausgeblendete Stationen, gespeicherte Routen, Fahrzeuge, Tankprotokolle und Fahrten geräteübergreifend synchronisieren';
 
   @override
   String get authInfoBenefit2 => '• Route am Handy planen, im Auto nutzen';
