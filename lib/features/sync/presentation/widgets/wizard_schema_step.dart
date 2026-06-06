@@ -13,6 +13,11 @@ import '../../../../l10n/app_localizations.dart';
 class WizardSchemaStep extends StatelessWidget {
   final Map<String, bool>? schemaStatus;
   final String? migrationSql;
+
+  /// #2929 — every required table exists, but the database's recorded
+  /// schema version is older than this build expects. The self-hoster must
+  /// re-run the setup SQL or newer synced features break silently.
+  final bool schemaOutdated;
   final VoidCallback onRecheck;
   final VoidCallback onDone;
 
@@ -22,6 +27,7 @@ class WizardSchemaStep extends StatelessWidget {
     required this.migrationSql,
     required this.onRecheck,
     required this.onDone,
+    this.schemaOutdated = false,
   });
 
   @override
@@ -33,7 +39,11 @@ class WizardSchemaStep extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final allReady = SchemaVerifier.requiredTables.every((t) => schemaStatus![t] == true);
+    final tablesReady =
+        SchemaVerifier.requiredTables.every((t) => schemaStatus![t] == true);
+    // Outdated schema must be treated like "not ready": the wizard still
+    // needs the self-hoster to re-run the SQL before sync is safe.
+    final allReady = tablesReady && !schemaOutdated;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -53,6 +63,17 @@ class WizardSchemaStep extends StatelessWidget {
           style: theme.textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
+        if (tablesReady && schemaOutdated) ...[
+          const SizedBox(height: 8),
+          Text(
+            l10n?.syncSchemaOutdated ??
+                'Your TankSync schema is outdated — re-run the setup SQL '
+                    'below to enable the latest synced features.',
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: DarkModeColors.warning(context)),
+            textAlign: TextAlign.center,
+          ),
+        ],
         const SizedBox(height: 16),
 
         // Table status list

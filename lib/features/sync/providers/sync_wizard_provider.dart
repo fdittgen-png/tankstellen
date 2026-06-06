@@ -22,6 +22,12 @@ class SyncWizardState {
   final String? migrationSql;
   final bool showKey;
 
+  /// #2929 — true when every required table exists but the database's
+  /// recorded schema version is older than the build expects (a self-hoster
+  /// who hasn't re-run the latest setup SQL). Drives the "schema outdated —
+  /// re-run the setup SQL" banner instead of a silent per-feature break.
+  final bool schemaOutdated;
+
   const SyncWizardState({
     this.mode = SyncWizardMode.choose,
     this.createStep = 0,
@@ -34,6 +40,7 @@ class SyncWizardState {
     this.schemaStatus,
     this.migrationSql,
     this.showKey = false,
+    this.schemaOutdated = false,
   });
 
   SyncWizardState copyWith({
@@ -51,6 +58,7 @@ class SyncWizardState {
     String? migrationSql,
     bool clearMigrationSql = false,
     bool? showKey,
+    bool? schemaOutdated,
   }) {
     return SyncWizardState(
       mode: mode ?? this.mode,
@@ -66,6 +74,7 @@ class SyncWizardState {
       migrationSql:
           clearMigrationSql ? null : (migrationSql ?? this.migrationSql),
       showKey: showKey ?? this.showKey,
+      schemaOutdated: schemaOutdated ?? this.schemaOutdated,
     );
   }
 }
@@ -137,18 +146,22 @@ class SyncWizardController extends _$SyncWizardController {
   void showSchemaStep({
     required Map<String, bool> schema,
     required String migrationSql,
+    bool schemaOutdated = false,
   }) {
     state = state.copyWith(
       mode: SyncWizardMode.schema,
       schemaStatus: schema,
       migrationSql: migrationSql,
+      schemaOutdated: schemaOutdated,
     );
   }
 
-  void updateSchemaStatus(Map<String, bool>? schema) {
+  void updateSchemaStatus(Map<String, bool>? schema,
+      {bool schemaOutdated = false}) {
     state = state.copyWith(
       schemaStatus: schema,
       clearSchemaStatus: schema == null,
+      schemaOutdated: schemaOutdated,
     );
   }
 

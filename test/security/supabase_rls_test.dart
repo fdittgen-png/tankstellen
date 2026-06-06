@@ -129,6 +129,10 @@ void main() {
     'wait_time_aggregates': {
       'wait_aggregates_read': 'SELECT',
     },
+    // #2929 — schema-version marker; world-readable, no user data.
+    'tanksync_meta': {
+      'tanksync_meta_read': 'SELECT',
+    },
   };
 
   group('Supabase RLS matrix (#1110)', () {

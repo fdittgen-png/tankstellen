@@ -4491,5 +4491,10 @@
   "@voiceAnnouncementPriceLimit": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "syncSchemaOutdated": "Your TankSync schema is outdated — re-run the setup SQL below to enable the latest synced features.",
+  "@syncSchemaOutdated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

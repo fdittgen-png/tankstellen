@@ -2,38 +2,49 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/sync/schema_sql.dart';
 import 'package:tankstellen/core/sync/schema_verifier.dart';
 
 void main() {
   group('SchemaVerifier - table lists', () {
-    test('requiredTables contains exactly 5 expected tables', () {
-      expect(SchemaVerifier.requiredTables, hasLength(5));
+    test('requiredTables covers the core synced tables', () {
       expect(SchemaVerifier.requiredTables, containsAll([
         'users',
         'favorites',
         'alerts',
         'price_snapshots',
         'sync_settings',
+        'vehicles',
+        'fill_ups',
       ]));
     });
 
-    test('optionalTables contains exactly 5 expected tables', () {
-      expect(SchemaVerifier.optionalTables, hasLength(5));
+    test('optionalTables covers the opt-in synced tables', () {
       expect(SchemaVerifier.optionalTables, containsAll([
-        'price_reports',
         'itineraries',
         'ignored_stations',
         'station_ratings',
-        'database_owner',
+        'price_reports',
+        'push_tokens',
+        'obd2_baselines',
+        'trip_summaries',
+        'trip_details',
+        'trip_shares',
       ]));
+    });
+
+    test('database_owner is NOT listed — the app never reads it', () {
+      // #2929 — it is only read by the is_database_owner() SQL function /
+      // trigger, never `.from()`d by the client, so listing it made the
+      // verifier flag a "missing" table the app does not use.
+      expect(SchemaVerifier.allTables, isNot(contains('database_owner')));
     });
   });
 
-  /// #2310 — checkSchema now fires its per-table existence probes in
-  /// parallel via Future.wait with `select('id').limit(0)` (was a
-  /// sequential `select('*')` loop). The live probes need a Supabase
-  /// client, so the only pure surface is the unconnected guard — these
-  /// pin that the parallel rewrite preserves the do-no-harm contract.
+  /// #2310/#2929 — checkSchema fires its per-table existence probes in
+  /// parallel via Future.wait, now via a column-agnostic `count()` HEAD
+  /// request. The live probes need a Supabase client, so the only pure
+  /// surface is the unconnected guard — these pin the do-no-harm contract.
   group('SchemaVerifier.checkSchema — unconnected guard (#2310)', () {
     test('returns null when no client is connected', () async {
       final schema = await SchemaVerifier.checkSchema();
@@ -45,44 +56,46 @@ void main() {
     test('isSchemaReady returns false when unconnected', () async {
       expect(await SchemaVerifier.isSchemaReady(), isFalse);
     });
+
+    // #2929 never-throws contract: the schema-version probes must never
+    // throw — a failed/unconnected probe degrades to a safe value rather
+    // than crashing the wizard's connect path.
+    test('recordedSchemaVersion completes (null) when unconnected', () async {
+      await expectLater(SchemaVerifier.recordedSchemaVersion(), completes);
+      expect(await SchemaVerifier.recordedSchemaVersion(), isNull);
+    });
+
+    test('isSchemaOutdated returns normally (false) when unconnected', () async {
+      await expectLater(SchemaVerifier.isSchemaOutdated(), completes);
+      expect(await SchemaVerifier.isSchemaOutdated(), isFalse);
+    });
   });
 
   group('SchemaVerifier.getMigrationSql', () {
-    test('returns only RLS SQL when all tables exist', () {
-      final schema = <String, bool>{
-        'users': true,
-        'favorites': true,
-        'alerts': true,
-        'price_snapshots': true,
-        'sync_settings': true,
-        'price_reports': true,
-        'itineraries': true,
-        'ignored_stations': true,
-        'station_ratings': true,
-      };
+    test('omits CREATE TABLE for existing tables but keeps RLS/RPCs', () {
+      final schema = {for (final t in SchemaVerifier.allTables) t: true};
 
       final sql = SchemaVerifier.getMigrationSql(schema);
 
-      // Should not contain CREATE TABLE for existing tables
-      expect(sql, isNot(contains('CREATE TABLE IF NOT EXISTS users')));
-      expect(sql, isNot(contains('CREATE TABLE IF NOT EXISTS favorites')));
-      // Should still contain RLS policies
-      expect(sql.toLowerCase(), contains('rls'));
+      // No CREATE TABLE for already-present tables.
+      expect(sql, isNot(contains('CREATE TABLE IF NOT EXISTS public.users')));
+      expect(
+          sql, isNot(contains('CREATE TABLE IF NOT EXISTS public.favorites')));
+      // RLS + RPCs are always (idempotently) re-asserted.
+      expect(sql.toLowerCase(), contains('row level security'));
+      expect(sql, contains('public.resolve_share_recipient'));
+      expect(sql, contains('public.claim_trip_share'));
     });
 
     test('includes CREATE TABLE for missing users table', () {
       final schema = <String, bool>{
         'users': false,
         'favorites': true,
-        'alerts': true,
-        'price_snapshots': true,
-        'sync_settings': true,
       };
 
       final sql = SchemaVerifier.getMigrationSql(schema);
 
-      expect(sql, contains('CREATE TABLE IF NOT EXISTS'));
-      expect(sql, contains('users'));
+      expect(sql, contains('CREATE TABLE IF NOT EXISTS public.users'));
     });
 
     test('includes CREATE TABLE for all missing tables', () {
@@ -91,56 +104,38 @@ void main() {
         'favorites': false,
         'alerts': false,
         'price_snapshots': true,
-        'sync_settings': true,
       };
 
       final sql = SchemaVerifier.getMigrationSql(schema);
 
-      expect(sql, contains('users'));
-      expect(sql, contains('favorites'));
-      expect(sql, contains('alerts'));
-      // Existing tables should not get CREATE statements
-      expect(sql, isNot(contains('CREATE TABLE IF NOT EXISTS price_snapshots')));
+      expect(sql, contains('CREATE TABLE IF NOT EXISTS public.users'));
+      expect(sql, contains('CREATE TABLE IF NOT EXISTS public.favorites'));
+      expect(sql, contains('CREATE TABLE IF NOT EXISTS public.alerts'));
+      // Existing table gets no CREATE statement.
+      expect(sql,
+          isNot(contains('CREATE TABLE IF NOT EXISTS public.price_snapshots')));
+    });
+
+    test('records the schema version into tanksync_meta', () {
+      final sql = SchemaVerifier.getMigrationSql(const {});
+      expect(sql, contains('public.tanksync_meta'));
+      expect(sql, contains("'schema_version', '$kSupabaseSchemaVersion'"));
     });
 
     test('always includes RLS policies in output', () {
       // All tables present
-      final schemaAllPresent = <String, bool>{
-        'users': true,
-        'favorites': true,
-        'alerts': true,
-        'price_snapshots': true,
-        'sync_settings': true,
-      };
-
-      final sqlAllPresent = SchemaVerifier.getMigrationSql(schemaAllPresent);
-      expect(sqlAllPresent.toLowerCase(), contains('rls'));
+      final sqlAllPresent = SchemaVerifier.getMigrationSql(
+          {for (final t in SchemaVerifier.allTables) t: true});
+      expect(sqlAllPresent.toLowerCase(), contains('row level security'));
 
       // Some tables missing
-      final schemaMissing = <String, bool>{
-        'users': false,
-        'favorites': true,
-        'alerts': true,
-        'price_snapshots': true,
-        'sync_settings': true,
-      };
-
-      final sqlMissing = SchemaVerifier.getMigrationSql(schemaMissing);
-      expect(sqlMissing.toLowerCase(), contains('rls'));
+      final sqlMissing =
+          SchemaVerifier.getMigrationSql(const {'users': false});
+      expect(sqlMissing.toLowerCase(), contains('row level security'));
     });
 
     test('SQL output uses CREATE TABLE IF NOT EXISTS syntax', () {
-      final schema = <String, bool>{
-        'users': false,
-        'favorites': false,
-        'alerts': true,
-        'price_snapshots': true,
-        'sync_settings': true,
-      };
-
-      final sql = SchemaVerifier.getMigrationSql(schema);
-
-      // Verify proper CREATE TABLE IF NOT EXISTS syntax
+      final sql = SchemaVerifier.getMigrationSql(const {});
       expect(sql, contains('CREATE TABLE IF NOT EXISTS'));
     });
 

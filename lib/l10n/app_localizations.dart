@@ -2736,7 +2736,7 @@ abstract class AppLocalizations {
   /// No description provided for @gdprCloudSyncDescription.
   ///
   /// In en, this message translates to:
-  /// **'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.'**
+  /// **'Sync favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.'**
   String get gdprCloudSyncDescription;
 
   /// No description provided for @gdprCloudSyncShort.
@@ -3144,7 +3144,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacySyncDescription.
   ///
   /// In en, this message translates to:
-  /// **'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.'**
+  /// **'When sync is enabled, favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips are also stored on the TankSync server.'**
   String get privacySyncDescription;
 
   /// No description provided for @privacyViewServerData.
@@ -5351,7 +5351,7 @@ abstract class AppLocalizations {
   /// No description provided for @syncOptionalDescription.
   ///
   /// In en, this message translates to:
-  /// **'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).'**
+  /// **'Your app works fully without cloud sync. TankSync lets you sync favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips across devices using Supabase (free tier available).'**
   String get syncOptionalDescription;
 
   /// No description provided for @syncHowToConnectQuestion.
@@ -5491,6 +5491,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Re-check schema'**
   String get syncRecheckSchemaButton;
+
+  /// No description provided for @syncSchemaOutdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Your TankSync schema is outdated — re-run the setup SQL below to enable the latest synced features.'**
+  String get syncSchemaOutdated;
 
   /// No description provided for @syncDoneButton.
   ///
@@ -10132,7 +10138,7 @@ abstract class AppLocalizations {
   /// No description provided for @authInfoBenefit1.
   ///
   /// In en, this message translates to:
-  /// **'• Sync favorites, alerts, and saved routes across devices'**
+  /// **'• Sync favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips across devices'**
   String get authInfoBenefit1;
 
   /// No description provided for @authInfoBenefit2.

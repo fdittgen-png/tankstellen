@@ -2974,6 +2974,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get syncRecheckSchemaButton => 'Znovu skontrolovať schému';
 
   @override
+  String get syncSchemaOutdated =>
+      'Your TankSync schema is outdated — re-run the setup SQL below to enable the latest synced features.';
+
+  @override
   String get syncDoneButton => 'Hotovo';
 
   @override

@@ -3,38 +3,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/sync/schema_verifier.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/wizard_schema_step.dart';
 
 import '../../../../helpers/pump_app.dart';
 
 void main() {
-  // Provide all required + optional tables from SchemaVerifier
-  final allTablesReady = <String, bool>{
-    'users': true,
-    'favorites': true,
-    'alerts': true,
-    'price_snapshots': true,
-    'push_tokens': true,
-    'sync_settings': true,
-    'price_reports': true,
-    'itineraries': true,
-    'ignored_stations': true,
-    'station_ratings': true,
-    'database_owner': true,
+  // Drive the widget straight off SchemaVerifier's lists so the maps can't
+  // drift as the synced-table set grows (#2929).
+  final allTablesReady = {
+    for (final t in SchemaVerifier.allTables) t: true,
   };
 
-  final allTablesMissing = <String, bool>{
-    'users': false,
-    'favorites': false,
-    'alerts': false,
-    'price_snapshots': false,
-    'push_tokens': false,
-    'sync_settings': false,
-    'price_reports': false,
-    'itineraries': false,
-    'ignored_stations': false,
-    'station_ratings': false,
-    'database_owner': false,
+  final allTablesMissing = {
+    for (final t in SchemaVerifier.allTables) t: false,
   };
 
   group('WizardSchemaStep', () {
@@ -69,6 +51,27 @@ void main() {
       );
 
       expect(find.text('Database needs setup'), findsOneWidget);
+      expect(find.text('Copy SQL to clipboard'), findsOneWidget);
+      expect(find.text('Re-check schema'), findsOneWidget);
+    });
+
+    testWidgets('outdated schema gates Done + shows the re-run SQL block', (tester) async {
+      await pumpApp(
+        tester,
+        SingleChildScrollView(
+          child: WizardSchemaStep(
+            schemaStatus: allTablesReady,
+            migrationSql: 'CREATE TABLE users...',
+            schemaOutdated: true,
+            onRecheck: () {},
+            onDone: () {},
+          ),
+        ),
+      );
+
+      // Tables all present, but the schema version is stale → the wizard
+      // must not let the user finish; it surfaces the re-run SQL controls.
+      expect(find.text('Done'), findsNothing);
       expect(find.text('Copy SQL to clipboard'), findsOneWidget);
       expect(find.text('Re-check schema'), findsOneWidget);
     });

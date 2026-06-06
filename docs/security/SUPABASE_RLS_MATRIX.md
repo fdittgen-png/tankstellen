@@ -73,6 +73,7 @@ Legend:
 | `trip_details`     | own          | own             | own        | own                | Single `trip_details_own` `FOR ALL`.   |
 | `wait_time_pings`  | own          | own             | own        | own                | Single `wait_time_pings_own` `FOR ALL`. Aggregator runs as service_role and bypasses RLS. |
 | `wait_time_aggregates` | all      | (svc)           | (svc)      | (svc)              | Single `wait_aggregates_read` SELECT-only policy. Anonymized rolling-median rows are visible to every authenticated client; only Edge Functions write. |
+| `tanksync_meta`    | all          | (svc)           | (svc)      | (svc)              | Single `tanksync_meta_read` SELECT-only policy. Carries only the schema-version marker (#2929) the verifier probes; world-readable, written via the SQL editor / service_role. |
 
 The migration source-of-truth lives in `supabase/migrations/`:
 
@@ -95,6 +96,8 @@ The migration source-of-truth lives in `supabase/migrations/`:
 - `20260506000002_wait_time_aggregator_schedule.sql` — schedule only,
   service-role-driven, no public-table RLS change.
 - `20260507000001_trip_summaries_and_details.sql` — `trip_summaries`, `trip_details`.
+- `20260605000001_tanksync_meta.sql` — `tanksync_meta` schema-version marker
+  (#2929), `tanksync_meta_read` SELECT-only policy.
 
 If a migration not listed above is found in `supabase/migrations/`,
 this matrix is stale. See "How to update" below.

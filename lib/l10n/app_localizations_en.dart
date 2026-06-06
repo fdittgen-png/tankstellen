@@ -1426,7 +1426,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gdprCloudSyncDescription =>
-      'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
+      'Sync favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.';
 
   @override
   String get gdprCloudSyncShort => 'Sync favorites and alerts across devices';
@@ -1659,7 +1659,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacySyncDescription =>
-      'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.';
+      'When sync is enabled, favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips are also stored on the TankSync server.';
 
   @override
   String get privacyViewServerData => 'View server data';
@@ -2874,7 +2874,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncOptionalDescription =>
-      'Your app works fully without cloud sync. TankSync lets you sync favorites, alerts, and ratings across devices using Supabase (free tier available).';
+      'Your app works fully without cloud sync. TankSync lets you sync favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips across devices using Supabase (free tier available).';
 
   @override
   String get syncHowToConnectQuestion => 'How would you like to connect?';
@@ -2949,6 +2949,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncRecheckSchemaButton => 'Re-check schema';
+
+  @override
+  String get syncSchemaOutdated =>
+      'Your TankSync schema is outdated — re-run the setup SQL below to enable the latest synced features.';
 
   @override
   String get syncDoneButton => 'Done';
@@ -5743,7 +5747,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authInfoBenefit1 =>
-      '• Sync favorites, alerts, and saved routes across devices';
+      '• Sync favorites, ratings, alerts, ignored stations, saved routes, vehicles, fuel logs and trips across devices';
 
   @override
   String get authInfoBenefit2 =>
@@ -9004,7 +9008,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get gdprCloudSyncDescription =>
-      '⟦Šýñç ƒáṽóřîŧéš áñđ áłéřŧš áçřóšš đéṽîçéš ṽîá ŦáñķŠýñç. Úšéš áñóñýɱóúš áúŧĥéñŧîçáŧîóñ. Ýóúř đáŧá îš éñçřýƥŧéđ îñ ŧřáñšîŧ. ·············································⟧';
+      '⟦Šýñç ƒáṽóřîŧéš, řáŧîñǧš, áłéřŧš, îǧñóřéđ šŧáŧîóñš, šáṽéđ řóúŧéš, ṽéĥîçłéš, ƒúéł łóǧš áñđ ŧřîƥš áçřóšš đéṽîçéš ṽîá ŦáñķŠýñç. Úšéš áñóñýɱóúš áúŧĥéñŧîçáŧîóñ. Ýóúř đáŧá îš éñçřýƥŧéđ îñ ŧřáñšîŧ. ······································································⟧';
 
   @override
   String get gdprCloudSyncShort =>
@@ -9244,7 +9248,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get privacySyncDescription =>
-      '⟦Ŵĥéñ šýñç îš éñáƀłéđ, ƒáṽóřîŧéš, áłéřŧš, îǧñóřéđ šŧáŧîóñš, áñđ řáŧîñǧš ářé áłšó šŧóřéđ óñ ŧĥé ŦáñķŠýñç šéřṽéř. ········································⟧';
+      '⟦Ŵĥéñ šýñç îš éñáƀłéđ, ƒáṽóřîŧéš, řáŧîñǧš, áłéřŧš, îǧñóřéđ šŧáŧîóñš, šáṽéđ řóúŧéš, ṽéĥîçłéš, ƒúéł łóǧš áñđ ŧřîƥš ářé áłšó šŧóřéđ óñ ŧĥé ŦáñķŠýñç šéřṽéř. ······················································⟧';
 
   @override
   String get privacyViewServerData => '⟦Ṽîéŵ šéřṽéř đáŧá ······⟧';
@@ -10486,7 +10490,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get syncOptionalDescription =>
-      '⟦Ýóúř áƥƥ ŵóřķš ƒúłłý ŵîŧĥóúŧ çłóúđ šýñç. ŦáñķŠýñç łéŧš ýóú šýñç ƒáṽóřîŧéš, áłéřŧš, áñđ řáŧîñǧš áçřóšš đéṽîçéš úšîñǧ Šúƥáƀášé (ƒřéé ŧîéř áṽáîłáƀłé). ······················································⟧';
+      '⟦Ýóúř áƥƥ ŵóřķš ƒúłłý ŵîŧĥóúŧ çłóúđ šýñç. ŦáñķŠýñç łéŧš ýóú šýñç ƒáṽóřîŧéš, řáŧîñǧš, áłéřŧš, îǧñóřéđ šŧáŧîóñš, šáṽéđ řóúŧéš, ṽéĥîçłéš, ƒúéł łóǧš áñđ ŧřîƥš áçřóšš đéṽîçéš úšîñǧ Šúƥáƀášé (ƒřéé ŧîéř áṽáîłáƀłé). ···········································································⟧';
 
   @override
   String get syncHowToConnectQuestion =>
@@ -10563,6 +10567,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get syncRecheckSchemaButton => '⟦Řé-çĥéçķ šçĥéɱá ······⟧';
+
+  @override
+  String get syncSchemaOutdated =>
+      '⟦Ýóúř ŦáñķŠýñç šçĥéɱá îš óúŧđáŧéđ — řé-řúñ ŧĥé šéŧúƥ ŠɊŁ ƀéłóŵ ŧó éñáƀłé ŧĥé łáŧéšŧ šýñçéđ ƒéáŧúřéš. ····································⟧';
 
   @override
   String get syncDoneButton => '⟦Đóñé ··⟧';
@@ -13444,7 +13452,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get authInfoBenefit1 =>
-      '⟦• Šýñç ƒáṽóřîŧéš, áłéřŧš, áñđ šáṽéđ řóúŧéš áçřóšš đéṽîçéš ·····················⟧';
+      '⟦• Šýñç ƒáṽóřîŧéš, řáŧîñǧš, áłéřŧš, îǧñóřéđ šŧáŧîóñš, šáṽéđ řóúŧéš, ṽéĥîçłéš, ƒúéł łóǧš áñđ ŧřîƥš áçřóšš đéṽîçéš ········································⟧';
 
   @override
   String get authInfoBenefit2 =>
