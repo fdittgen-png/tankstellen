@@ -414,12 +414,23 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     SnackBarHelper.show(context, message);
   }
 
+  /// #2960 — adapter pair / forget handler. Persists the new adapter
+  /// state **in place** and rebuilds the adapter section WITHOUT
+  /// popping the Edit-vehicle route. Earlier this routed through
+  /// [_save], whose trailing `Navigator.pop()` closed the whole form
+  /// on every add/remove (the user was bounced out and had to reopen
+  /// it). The pair picker (a modal sheet) closes itself; the parent
+  /// screen must stay open so the user can keep editing.
   void _onAdapterChanged(String? name, String? mac) {
     setState(() {
       _adapterName = name;
       _adapterMac = mac;
     });
-    _save();
+    // Persist the adapter change without tearing down the form. Unsaved
+    // form edits (tank capacity, preferred fuel, the multi-fuel toggle,
+    // name, VIN, …) are carried through because [_persistAdapterChange]
+    // builds the profile from the live controllers — same as Save would.
+    unawaited(_persistAdapterChange());
     // #1399 — fire-and-forget VIN-driven auto-population. Only runs
     // when an adapter was just PAIRED (not unpaired) and we have an
     // existing profile id to write the detected fields onto. The
@@ -428,6 +439,45 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     // decoded values disagree with values the user has entered.
     if (mac != null && mac.isNotEmpty) {
       unawaited(_runAutoPopulationAfterPair(mac));
+    }
+  }
+
+  /// #2960 — persist the current form state (including the just-changed
+  /// adapter MAC / name) to the vehicle provider WITHOUT popping the
+  /// route. This is the adapter-section counterpart to [_save] minus
+  /// the form-validation gate and the trailing `Navigator.pop()`: a
+  /// pair / forget should always land even while another field is
+  /// mid-edit, and it must never close the screen. New-vehicle path
+  /// (no `_existingId`) no-ops — the adapter section isn't shown until
+  /// a vehicle has been saved. Never throws.
+  Future<void> _persistAdapterChange() async {
+    final id = _existingId;
+    if (id == null) return;
+    try {
+      final existing = ref
+          .read(vehicleProfileListProvider)
+          .where((v) => v.id == id)
+          .firstOrNull;
+      if (existing == null) return;
+      final profile = _ctrl.buildProfile(
+        existing: existing,
+        type: _type,
+        connectors: _connectors,
+        adapterMac: _adapterMac,
+        adapterName: _adapterName,
+        engineDisplacementCc: _engineDisplacementCc,
+        engineCylinders: _engineCylinders,
+        curbWeightKg: _curbWeightKg,
+        multiFuelCapable: _multiFuelCapable,
+        referenceVehicle: _pickedReferenceVehicle,
+      );
+      await ref.read(vehicleProfileListProvider.notifier).save(profile);
+      if (!mounted) return;
+      await ref.syncActiveProfile(profile);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'EditVehicleScreen: adapter-change persist failed',
+      }));
     }
   }
 
