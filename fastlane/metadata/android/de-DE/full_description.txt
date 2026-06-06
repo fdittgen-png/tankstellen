@@ -28,7 +28,7 @@ FAHRTENBUCH & ECO-COACHING
 • Eco-Coaching markiert Spritfresser mit Drosselklappen- und Drehzahl-Histogrammen und Monatsvergleich.
 
 MEHR
-• Live-Preis-Overlay bei Annäherung, Homescreen-Widget und Sprachansagen während der Fahrt.
+• Live-Preis-Overlay bei Annäherung, Homescreen-Widget, Android Auto und Sprachansagen während der Fahrt.
 • Presets Basic / Medium / Voll passen die App an; mehrere Profile möglich.
 • Privacy-Dashboard zum Ansehen, Exportieren oder vollständigen Löschen aller Daten. Optionale TankSync-Synchronisation.
 
