@@ -334,19 +334,21 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
     );
     final stationRating = ref.watch(stationRatingProvider(station.id));
 
-    // #2956 — when the on-search Fuel Station Radar owns the result list, each
+    // #2984 — when the on-search Fuel Station Radar owns the result list, each
     // card carries the green→accent closeness bar (the SAME [ProximityFillBar]
-    // / [RadarCloseness] as the trip card + PiP). The bar scales to the SPAN of
-    // the surfaced results — the farthest station's distance — NOT the static
-    // `searchRadiusProvider` slider. The slider (up to 25 km) is decoupled from
-    // where the stations actually are, so scaling to it compressed every fill
-    // toward 1.0 and made all bars look the same length (the recurring #2956
-    // field report). Scaling to the result span makes closeness read RELATIVE
-    // across the list: the nearest forecourt near-full, the farthest near-empty.
-    // Null off radar mode (or an unlocated/empty set) → regular cards unchanged.
+    // / [RadarCloseness] as the trip card + PiP). The bar uses an ABSOLUTE,
+    // fixed scale: `min(searchRadiusMeters, kRadarClosenessScaleCapMeters)` —
+    // the user's configured radar radius (km → m), clamped to the tunable cap.
+    // So the fill means "how close is THIS station on a stable scale": a 2.5 km
+    // forecourt reads the same fill regardless of what else is in the list, and
+    // the farthest row is never force-emptied just for being last. This REPLACES
+    // the relative-to-span model (#2956/#2959), which made each fill depend on
+    // the result set and pinned the farthest station to 0% — rejected by the
+    // maintainer. Null off radar mode (or a degenerate radius) → regular cards.
     final radar = ref.watch(radarSearchProvider);
     final closenessRadiusMeters = radar.active
-        ? RadarCloseness.spanRadiusMeters(radar.stations.value ?? const [])
+        ? RadarCloseness.listScaleMeters(
+            ref.watch(searchRadiusProvider) * 1000.0)
         : null;
 
     return SwipeableStationCard(

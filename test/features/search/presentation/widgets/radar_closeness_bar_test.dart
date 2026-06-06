@@ -15,19 +15,25 @@ import 'package:tankstellen/features/search/providers/radar_search_provider.dart
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
-/// #2956 — root-cause pinning regression for the Fuel Station Radar "closeness"
-/// bar. The recurring field bug: the distance TEXT is correct but the closeness
-/// BAR under every station is ~the same length (it does not scale with
-/// distance) — because the bar scaled to the static `searchRadiusProvider`
-/// slider (up to 25 km), which is decoupled from where the stations actually
-/// are, so every fill compressed toward 1.0.
+/// #2956/#2984 — root-cause pinning regression for the Fuel Station Radar
+/// "closeness" bar. The recurring field bug: the distance TEXT is correct but
+/// the closeness BAR under every station is ~the same length (it does not scale
+/// with distance) — because the bar scaled to the static `searchRadiusProvider`
+/// slider (up to 25 km), which lets a wide radius compress every fill toward
+/// 1.0.
+///
+/// The fix (#2984) is an ABSOLUTE, fixed scale: `min(searchRadius, 15 km cap)`,
+/// so a wide radius no longer stretches the scale — the bars stay visibly
+/// different AND a near station's fill is stable across result-set changes (the
+/// stability lock lives in `radar_closeness_absolute_test.dart`).
 ///
 /// These tests drive the REAL radar list-card path (`SearchResultsContent` →
 /// `SearchResultsList` → `StationCard` → `ProximityFillBar`) with the exact
 /// screenshot distances (265 m, 9.3 km, 9.9 km, 10.0 km) and the field's 25 km
 /// slider, then read the fill the rendered bar would paint. RED on master (the
 /// far bars cluster at ~0.60–0.63, indistinguishable); green after the fix
-/// (scaled to the result span: nearest ~0.97, farthest 0.0).
+/// (scaled to the 15 km cap: nearest ~0.98, the far cluster spread around the
+/// 0.33–0.38 band — visibly different, none force-emptied).
 
 /// The four radar results from the field screenshot, distance-ranked.
 /// `dist` is kilometres (the same value the card distance text shows).
@@ -148,8 +154,9 @@ void main() {
   // invariant across all three radar surfaces.
   group('radar list-card closeness bar — the real surface (#2956)', () {
     testWidgets(
-        'scales to the result span: nearest near-full, farthest empty '
-        '(NOT the 25 km slider that compressed every bar)', (tester) async {
+        'scales to the ABSOLUTE 15 km cap: nearest near-full, the far cluster '
+        'visibly spread (NOT the 25 km slider that compressed every bar)',
+        (tester) async {
       await _pumpRadar(
         tester,
         stations: _screenshotStations(),
@@ -162,20 +169,22 @@ void main() {
       final farish = _renderedFillFor(tester, stations[2]); // 9.9 km
       final far = _renderedFillFor(tester, stations[3]); // 10.0 km
 
-      // Pinned to the result-span scale (farthest = 10 km), NOT the 25 km
-      // slider. These are the values the bar actually paints.
-      expect(near, closeTo(0.9735, 1e-3),
-          reason: '265 m of a 10 km span → ~0.97 (nearly full)');
-      expect(mid, closeTo(0.07, 1e-3), reason: '9.3 km of 10 km → ~0.07');
-      expect(farish, closeTo(0.01, 1e-3), reason: '9.9 km of 10 km → ~0.01');
-      expect(far, closeTo(0.0, 1e-6), reason: '10.0 km = the span edge → empty');
+      // Pinned to the ABSOLUTE scale = min(25 km, 15 km cap) = 15 km, NOT the
+      // 25 km slider. These are the values the bar actually paints. The far
+      // rows are NOT force-emptied — they sit around the 0.33–0.38 band.
+      expect(near, closeTo(0.9823, 1e-3),
+          reason: '265 m of a 15 km scale → ~0.98 (nearly full)');
+      expect(mid, closeTo(0.38, 1e-3), reason: '9.3 km of 15 km → ~0.38');
+      expect(farish, closeTo(0.34, 1e-3), reason: '9.9 km of 15 km → ~0.34');
+      expect(far, closeTo(0.3333, 1e-3),
+          reason: '10.0 km of 15 km → ~0.33 (NOT empty — never force-emptied)');
 
       // The core regression lock: the bars must be VISIBLY DIFFERENT down the
       // list. On master (scaled to the 25 km slider) the three far rows all sat
       // at ~0.60–0.63 — indistinguishable — which is the reported symptom.
-      expect(near - far, greaterThan(0.9),
-          reason: 'closest vs farthest must differ by nearly a full bar');
-      expect(mid - far, greaterThan(0.05),
+      expect(near - far, greaterThan(0.6),
+          reason: 'closest vs farthest must differ by most of the bar');
+      expect(mid - far, greaterThan(0.04),
           reason: 'mid vs far must be clearly distinct, not a compressed band');
       // Strictly monotonic: closer ⇒ fuller.
       expect(near, greaterThan(mid));

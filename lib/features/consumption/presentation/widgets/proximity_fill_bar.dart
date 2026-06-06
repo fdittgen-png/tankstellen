@@ -12,7 +12,8 @@ import '../../../../l10n/app_localizations.dart';
 /// Corporate-green, battery-style proximity FILL BAR for the Fuel Station
 /// Radar card + PiP price layouts (#2661).
 ///
-/// The fill encodes how close the driver is to the radar station:
+/// The fill encodes how close the driver is to the radar station against an
+/// ABSOLUTE, fixed scale ([radiusMeters]) — fuller = closer (#2984):
 ///
 /// ```
 /// fill = clamp(1 - distanceMeters / radiusMeters, 0, 1)
@@ -35,8 +36,11 @@ class ProximityFillBar extends StatelessWidget {
   /// Distance from the driver to the radar station, in metres.
   final double distanceMeters;
 
-  /// The radar's indicated radius in metres (`profile.approachRadiusKm *
-  /// 1000`). The fill hits 0% here and 100% at the station.
+  /// The ABSOLUTE scale in metres the fill divides against — fixed per surface,
+  /// never derived from the result set (#2984). The trip card + PiP pass the
+  /// approach radius (`profile.approachRadiusKm * 1000`); the search list passes
+  /// `min(searchRadius, kRadarClosenessScaleCapMeters)`. The fill hits 0% here
+  /// and 100% at the station.
   final double? radiusMeters;
 
   /// Bar height — thinner in the dense PiP price column, taller on the card.
