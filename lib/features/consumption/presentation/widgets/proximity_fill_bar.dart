@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/radar_closeness.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Corporate-green, battery-style proximity FILL BAR for the Fuel Station
@@ -54,11 +55,12 @@ class ProximityFillBar extends StatelessWidget {
   });
 
   /// The clamped fill fraction (0..1). 1 at the station, 0 at/beyond radius.
-  static double fillFor(double distanceMeters, double radiusMeters) {
-    if (radiusMeters <= 0) return 0;
-    final raw = 1.0 - (distanceMeters / radiusMeters);
-    return raw.clamp(0.0, 1.0);
-  }
+  ///
+  /// Delegates to [RadarCloseness.fillFor] — the single source of truth shared
+  /// by all three radar surfaces (list card, PiP, trip card) so they can never
+  /// desync (#2956). Kept as a static here for the existing call sites/tests.
+  static double fillFor(double distanceMeters, double radiusMeters) =>
+      RadarCloseness.fillFor(distanceMeters, radiusMeters);
 
   @override
   Widget build(BuildContext context) {
