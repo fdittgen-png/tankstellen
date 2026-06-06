@@ -269,7 +269,16 @@ class GpsDrivingFeatures {
       // for the fit). The accel/brake EVENT counts come from the shared
       // gate above, not from this per-sample derivative.
       final accelMps2 = (cur.speedKmh - prev.speedKmh) / 3.6 / dt;
-      final absG = accelMps2.abs() / 9.81;
+      // #2940 — clamp the SIGNED derivative to the same physically-plausible
+      // band the event gate uses (≈0.9 g forward, ≈1.12 g braking) BEFORE
+      // taking the magnitude, so a GPS Doppler-speed noise spike can never
+      // surface an impossible peak. #2895 already stops such a spike from
+      // being COUNTED as an event; this stops it from being REPORTED as a
+      // peak too (the export logged maxAccelG 1.036 — a 68 hp Peugeot 107
+      // cannot exceed ~0.4 g), so the count and the displayed figure agree on
+      // what is physically possible. Only the reported peak is clamped; the
+      // raw derivative still feeds the energy KPIs (RPA/PKE/VAPOS) below.
+      final absG = clampPlausibleAccelMps2(accelMps2).abs() / 9.81;
       if (absG > maxAccelG) maxAccelG = absG;
 
       // #2695 C9 speed-only energy KPIs (all derived from speed alone, so

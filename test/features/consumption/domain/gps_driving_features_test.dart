@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/domain/accel_event_gate.dart';
 import 'package:tankstellen/features/consumption/domain/gps_driving_features.dart';
 import 'package:tankstellen/features/consumption/domain/gps_driving_features_shares.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
@@ -166,6 +167,75 @@ void main() {
         final f = GpsDrivingFeatures.from(samples)!;
         expect(f.accelEvents, 0);
         expect(f.brakeEvents, 0);
+      });
+    });
+
+    // #2940 — the REPORTED maxAccelG (not just the event GATE that #2895
+    // clamped) must be pinned to the physically-plausible band so a GPS
+    // Doppler-speed noise spike can never surface an impossible peak. These
+    // drive the REAL `GpsDrivingFeatures.from` path with the exact failure
+    // mode the Peugeot-107 export logged (maxAccelG 1.036 — a 68 hp car
+    // cannot exceed ~0.4 g). RED before the clamp, green after.
+    group('maxAccelG physical-plausibility clamp (#2940)', () {
+      // The reported peak ceilings in g, derived from the shared m/s² band.
+      const maxAccelGCeiling = kMaxPlausibleAccelMps2 / 9.81; // ≈0.9001 g
+      const maxBrakeGCeiling = kMaxPlausibleBrakeMps2 / 9.81; // ≈1.1213 g
+
+      test('a forward speed spike beyond ~0.9 g reports the clamped ceiling, '
+          'not the raw value, and is not counted as an event', () {
+        // 0 → 40 km/h in ONE second = 11.11 m/s² ≈ 1.13 g — impossible for a
+        // real car, past the ≈0.9 g forward ceiling. Then cruise so the rest
+        // of the trip is calm.
+        final samples = <TripSample>[
+          _s(t0, 0),
+          _s(t0.add(const Duration(seconds: 1)), 40),
+        ];
+        for (var i = 1; i <= 10; i++) {
+          samples.add(_s(t0.add(Duration(seconds: 1 + i)), 40.0));
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        // RED before the fix: maxAccelG ≈ 1.13 (the raw impossible spike).
+        expect(f.maxAccelG, lessThanOrEqualTo(maxAccelGCeiling + 1e-9));
+        expect(f.maxAccelG, closeTo(maxAccelGCeiling, 1e-6));
+        // The same out-of-band spike is also refused by the event gate
+        // (#2895) — it breaks the episode rather than counting.
+        expect(f.accelEvents, 0);
+      });
+
+      test('a braking spike beyond ~1.12 g reports the clamped brake ceiling',
+          () {
+        // 50 → 0 km/h in ONE second = -13.89 m/s² ≈ 1.42 g — past the ≈1.12 g
+        // braking ceiling, so the magnitude is reported clamped.
+        final samples = <TripSample>[
+          _s(t0, 50),
+          _s(t0.add(const Duration(seconds: 1)), 0),
+        ];
+        for (var i = 1; i <= 10; i++) {
+          samples.add(_s(t0.add(Duration(seconds: 1 + i)), 0.0));
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        // RED before the fix: maxAccelG ≈ 1.42 (the raw impossible spike).
+        expect(f.maxAccelG, lessThanOrEqualTo(maxBrakeGCeiling + 1e-9));
+        expect(f.maxAccelG, closeTo(maxBrakeGCeiling, 1e-6));
+      });
+
+      test('a genuine in-band hard accel (~0.7 g) is reported verbatim, '
+          'not over-clamped', () {
+        // 0 → 50 km/h in 2 s = 6.94 m/s² ≈ 0.71 g — a real hard launch, BELOW
+        // the ≈0.9 g ceiling. It must pass through unchanged so the clamp
+        // introduces no false negatives for genuinely brisk driving.
+        final samples = <TripSample>[
+          _s(t0, 0),
+          _s(t0.add(const Duration(seconds: 1)), 25),
+          _s(t0.add(const Duration(seconds: 2)), 50),
+        ];
+        for (var i = 1; i <= 10; i++) {
+          samples.add(_s(t0.add(Duration(seconds: 2 + i)), 50.0));
+        }
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.maxAccelG, closeTo(6.944 / 9.81, 0.01)); // ≈0.708 g
+        expect(f.maxAccelG, lessThan(maxAccelGCeiling));
+        expect(f.accelEvents, 1); // a real, in-band event still counts
       });
     });
 
