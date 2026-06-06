@@ -47,6 +47,13 @@ class Obd2ConnectTraceLog {
 
   static final List<Obd2ConnectTrace> _ring = <Obd2ConnectTrace>[];
 
+  /// Notify hook fired AFTER a trace is finalised into the ring (#2969). The
+  /// `Obd2ConnectTraceRevision` provider registers it so the dev health screen
+  /// rebuilds when a trace lands while it is open — including a LIVE reconnect
+  /// failure the user never triggered from the screen. Null in production until
+  /// the screen's provider registers it; best-effort + never throws.
+  static void Function()? onTraceAdded;
+
   /// The trace currently being built, exposed so [Obd2CommDiagnostics] can tee
   /// each AT handshake line into it (#2969 correction 4 — the AT-transcript tee
   /// at the chokepoint) without instrumenting `obd2_service` directly. Null
@@ -169,6 +176,11 @@ class Obd2ConnectTraceLog {
         _ring.removeAt(0);
       }
       if (identical(_active, handle)) _active = null;
+      // Notify the dev health screen (best-effort; a throwing listener must
+      // never derail a connect's finally block).
+      try {
+        onTraceAdded?.call();
+      } catch (_) {}
     } catch (_) {
       // Never let trace bookkeeping derail a connect's finally block.
       if (identical(_active, handle)) _active = null;
@@ -187,6 +199,8 @@ class Obd2ConnectTraceLog {
       List.unmodifiable(_ring.reversed.toList());
 
   /// Test reset — drops every trace + the active handle + the seq counter.
+  /// Leaves [onTraceAdded] registered (the provider owns its lifecycle); tests
+  /// that need it cleared null it explicitly.
   static void clear() {
     _ring.clear();
     _active = null;
