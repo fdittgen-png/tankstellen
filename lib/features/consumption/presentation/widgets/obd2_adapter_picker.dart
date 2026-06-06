@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/adapter_registry.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
@@ -238,16 +239,28 @@ class _Obd2AdapterPickerSheetState
       return;
     }
     setState(() => _phase = _Phase.connecting);
+    // errorlog_30 — capture the post-connect persist's provider reads BEFORE
+    // the first `await`. `connect()` is async and the sheet can be dismissed/
+    // unmounted while it runs; reading `ref` AFTER unmount throws `Bad state:
+    // Using "ref" when a widget is about to or has been unmounted is unsafe`.
+    // Both providers are `keepAlive: true`, so the captures stay valid and the
+    // best-effort persist still completes on the unmounted path (the connect
+    // succeeded — the pinned MAC must be written either way).
+    final activeProfile = ref.read(activeVehicleProfileProvider);
+    final vehicleListNotifier = ref.read(vehicleProfileListProvider.notifier);
     try {
       final service = await ref
           .read(obd2ConnectionProvider)
           .connect(candidate);
-      // #1188 — persist MAC + display name back onto the active
-      // vehicle profile so the next session takes the pinned-MAC fast
-      // path and skips the picker entirely. Best-effort: a missing
-      // active vehicle, or a failed save, must not block the connect
-      // path the user just completed.
-      await _persistPickedAdapterToActiveVehicle(candidate);
+      // #1188 — persist MAC + display name back onto the active vehicle
+      // profile so the next session takes the pinned-MAC fast path and skips
+      // the picker. Best-effort; uses the pre-await captures (errorlog_30) so
+      // it never touches `ref` after unmount.
+      await _persistPickedAdapterToActiveVehicle(
+        candidate,
+        activeProfile,
+        vehicleListNotifier,
+      );
       if (!mounted) return;
       if (widget.returnPickedConnection) {
         // #1310 — onboarding flow needs the MAC alongside the service
@@ -285,11 +298,17 @@ class _Obd2AdapterPickerSheetState
   /// successfully pairs — without this, the auto-record toggle silently
   /// dropped users who picked an adapter outside the OBD2 onboarding
   /// wizard.
+  ///
+  /// [active] and [listNotifier] are captured by the caller BEFORE its first
+  /// `await` (errorlog_30): this runs post-connect, when the sheet may already
+  /// be unmounted, so reading them off `ref` here would throw the "ref used
+  /// after unmount" [StateError]. Both source providers are `keepAlive: true`.
   Future<void> _persistPickedAdapterToActiveVehicle(
     ResolvedObd2Candidate candidate,
+    VehicleProfile? active,
+    VehicleProfileList listNotifier,
   ) async {
     try {
-      final active = ref.read(activeVehicleProfileProvider);
       if (active == null) return;
       final mac = candidate.candidate.deviceId;
       final name = candidate.candidate.deviceName.isEmpty
@@ -312,7 +331,7 @@ class _Obd2AdapterPickerSheetState
         obd2AdapterName: name,
         pairedAdapterUuidIos: uuidIos,
       );
-      await ref.read(vehicleProfileListProvider.notifier).save(updated);
+      await listNotifier.save(updated);
     } catch (e, st) {
       // #2308 — this write is the ONLY path that pre-populates the
       // pinned-MAC fast-connect; a HiveError here silently drops the
