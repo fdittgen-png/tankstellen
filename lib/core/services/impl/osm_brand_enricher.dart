@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/storage_repository.dart';
 import '../../storage/storage_providers.dart';
@@ -87,14 +88,14 @@ class OsmBrandEnricher {
       final results = response.data;
       if (results is! List) return;
 
-      final pois = <_Poi>[];
+      final pois = <OsmPoi>[];
       for (final r in results) {
         if (r is! Map) continue;
         final name = r['name']?.toString();
         final lat = double.tryParse(r['lat']?.toString() ?? '');
         final lng = double.tryParse(r['lon']?.toString() ?? '');
         if (name != null && name.isNotEmpty && lat != null && lng != null) {
-          pois.add(_Poi(name, lat, lng));
+          pois.add(OsmPoi(name, lat, lng));
         }
       }
 
@@ -102,16 +103,12 @@ class OsmBrandEnricher {
       // instead of N sequential awaits (#2315).
       final writes = <Future<void>>[];
       for (final s in stations) {
+        // #2922 — defence-in-depth: never attribute a POI brand to a station
+        // that already carries a real upstream brand (the loop is already
+        // gated by _needsBrand, but a future caller must not be able to
+        // overwrite a real brand from a neighbouring POI).
         if (!_needsBrand(s)) continue;
-        _Poi? nearest;
-        double nearestDist = 0.2;
-        for (final poi in pois) {
-          final d = _distKm(s.lat, s.lng, poi.lat, poi.lng);
-          if (d < nearestDist) {
-            nearestDist = d;
-            nearest = poi;
-          }
-        }
+        final nearest = attributeBrandPoi(s.lat, s.lng, pois);
         if (nearest != null) {
           final sanitized = sanitizeOsmBrand(nearest.name);
           if (sanitized != null) {
@@ -195,6 +192,52 @@ class OsmBrandEnricher {
     return trimmed;
   }
 
+  /// Maximum distance (km) a fuel POI may sit from a station to be accepted as
+  /// that station's brand source (#2922). Tightened from the historical 0.2 km
+  /// to 0.08 km (~80 m): a real co-located fuel POI for a given station is
+  /// within tens of metres, whereas 0.2 km routinely reached a *different*
+  /// nearby station's POI (e.g. the adjacent "Super U" supermarket fuel point),
+  /// stamping a phantom brand that then persisted in the cache.
+  @visibleForTesting
+  static const double maxAttributionKm = 0.08;
+
+  /// Minimum separation (km) the nearest POI must have over the second-nearest
+  /// for the attribution to be unambiguous (#2922). If two fuel POIs are within
+  /// this margin of each other (both close to the station), there is no
+  /// confident winner — attributing either risks the wrong brand, so the
+  /// station is left for a later, clearer signal rather than guessed.
+  @visibleForTesting
+  static const double ambiguityMarginKm = 0.03;
+
+  /// Picks the fuel [pois] entry that confidently belongs to the station at
+  /// ([lat], [lng]), or null when no POI is close + unambiguous enough (#2922).
+  ///
+  /// A POI is accepted only when it is within [maxAttributionKm] AND the
+  /// next-closest POI is at least [ambiguityMarginKm] farther away. This
+  /// prevents a neighbouring supermarket's fuel POI from being stamped onto a
+  /// different station — the regression that produced the phantom "Super U"
+  /// brand. Pure + static so the regression test can drive it directly.
+  @visibleForTesting
+  static OsmPoi? attributeBrandPoi(double lat, double lng, List<OsmPoi> pois) {
+    OsmPoi? nearest;
+    var nearestDist = double.infinity;
+    var secondDist = double.infinity;
+    for (final poi in pois) {
+      final d = _distKm(lat, lng, poi.lat, poi.lng);
+      if (d < nearestDist) {
+        secondDist = nearestDist;
+        nearestDist = d;
+        nearest = poi;
+      } else if (d < secondDist) {
+        secondDist = d;
+      }
+    }
+    if (nearest == null || nearestDist > maxAttributionKm) return null;
+    // Ambiguous: a second fuel POI sits within the margin → don't guess.
+    if (secondDist - nearestDist < ambiguityMarginKm) return null;
+    return nearest;
+  }
+
   // #2169 — delegate to the canonical geo_utils.distanceKm rather than a
   // hand-rolled haversine. Real POI/station coords only, so the (0,0)
   // null-island short-circuit never triggers here.
@@ -202,9 +245,12 @@ class OsmBrandEnricher {
       geo.distanceKm(lat1, lng1, lat2, lng2);
 }
 
-class _Poi {
+/// A Nominatim fuel POI (name + coords) used to attribute a brand to a
+/// station. Public so the #2922 attribution regression test can construct
+/// fixtures and drive [OsmBrandEnricher.attributeBrandPoi] directly.
+class OsmPoi {
   final String name;
   final double lat;
   final double lng;
-  _Poi(this.name, this.lat, this.lng);
+  OsmPoi(this.name, this.lat, this.lng);
 }
