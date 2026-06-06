@@ -1,9 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+// `intl` re-exports a `TextDirection` symbol; this provider has no painter
+// so there's no dart:ui clash, but we hide it to match the repo-wide guard
+// against the #2976 ambiguous-import gotcha.
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/country/country_config.dart';
+import '../../../core/language/language_provider.dart';
 import '../../../core/utils/num_extensions.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
@@ -18,16 +23,29 @@ import 'tflite_price_predictor_provider.dart';
 
 part 'price_prediction_provider.g.dart';
 
-/// Day-of-week names used for recommendation text.
-const _dayNames = {
-  1: 'Monday',
-  2: 'Tuesday',
-  3: 'Wednesday',
-  4: 'Thursday',
-  5: 'Friday',
-  6: 'Saturday',
-  7: 'Sunday',
-};
+/// Localizes a `DateTime.weekday` index (1 = Monday … 7 = Sunday) to the
+/// full weekday name in [localeCode] via `intl`'s `DateFormat.EEEE` — the
+/// same locale-DATA path the price chart uses (#2976), so French/German/…
+/// users no longer see hard-coded English weekdays (#2978). Weekday names
+/// are locale data, not translatable ARB strings, so there's no ARB key.
+///
+/// Never throws: falls back to the English weekday when `intl` rejects the
+/// locale — either a `LocaleDataException` (date symbols not yet loaded; the
+/// app initializes them at startup, but the very first home-widget refresh
+/// tick can run before the Material localization delegate has) or an
+/// `ArgumentError` (an unexpected/unknown locale code). A formatting hiccup
+/// must never break the prediction, so a broad catch is intentional here.
+/// (Fault path is covered by `price_prediction_provider_test.dart`.)
+String _localizedWeekday(int weekday, String localeCode) {
+  // A reference date whose weekday equals [weekday]; 2026-03-02 is a Monday,
+  // so adding (weekday - 1) days lands on the requested weekday.
+  final date = DateTime(2026, 3, 2).add(Duration(days: weekday - 1));
+  try {
+    return DateFormat.EEEE(localeCode).format(date);
+  } catch (_) {
+    return DateFormat.EEEE('en').format(date);
+  }
+}
 
 /// Computes "best time to fill" predictions from locally stored price history.
 ///
@@ -116,7 +134,12 @@ PricePrediction? pricePrediction(
   final holidayPremium = _computeHolidayPremium(vectors);
 
   // --- Recommendation text ---
-  final dayName = _dayNames[cheapestDay.dayOfWeek] ?? 'Unknown';
+  // Localize the weekday via the active app locale (#2978). The provider is
+  // context-free, so it reads the locale from `activeLanguageProvider`
+  // rather than a `BuildContext`; `intl` then formats the weekday as locale
+  // data. The surrounding frame text is a separate #1117 follow-up.
+  final localeCode = ref.watch(activeLanguageProvider).code;
+  final dayName = _localizedWeekday(cheapestDay.dayOfWeek, localeCode);
   final hourLabel = _formatHourRange(cheapestHour.hour);
   final base = 'Prices typically drop $dayName $hourLabel';
   final recommendation =

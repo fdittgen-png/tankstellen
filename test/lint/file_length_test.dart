@@ -50,7 +50,10 @@ void main() {
     // lines next to the adjacent country/language backfill migration).
     // #2772 — 957 → 961: the isBenignStreamCancel de-noise helper + its
     // services import + the two global-handler filter calls. Bootstrap file.
-    'lib/app/app_initializer.dart': 961,
+    // #2978 — 961 → 964: `initializeDateFormatting()` + its import + comment,
+    // so `intl` locale date-symbols are loaded once at startup and the
+    // localized price-prediction weekday renders for non-`en_US` locales.
+    'lib/app/app_initializer.dart': 964,
     // #2415 — background_service.dart graduated: the scan body moved into
     // BackgroundAlertScanCoordinator + BackgroundScanRunners +
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
