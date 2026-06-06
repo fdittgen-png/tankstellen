@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/charging_efficiency_chart.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -15,6 +16,46 @@ import '../../../../helpers/pump_app.dart';
 /// line chart added in #582 phase 3 (lib/features/consumption/presentation/
 /// widgets/charging_efficiency_chart.dart).
 void main() {
+  group('ChargingEfficiencyChart month-axis i18n (#2971)', () {
+    DateFormat monthFormatFor(WidgetTester tester) {
+      final painter = tester
+          .widgetList<CustomPaint>(find.byType(CustomPaint))
+          .map((p) => p.painter)
+          .firstWhere(
+            (p) => p != null && p.runtimeType.toString().contains('Efficiency'),
+          );
+      // ignore: avoid_dynamic_calls
+      return (painter as dynamic).monthFormat as DateFormat;
+    }
+
+    final monthly = <DateTime, double?>{
+      DateTime(2026, 1): 14.2,
+      DateTime(2026, 2): 15.8,
+    };
+
+    testWidgets('axis month abbreviations localize under French', (tester) async {
+      await pumpApp(
+        tester,
+        ChargingEfficiencyChart(monthlyEfficiency: monthly),
+        locale: const Locale('fr'),
+      );
+
+      final label = monthFormatFor(tester).format(DateTime(2026, 1));
+      expect(label.toLowerCase(), startsWith('janv'));
+      expect(label, isNot('Jan'));
+    });
+
+    testWidgets('axis month abbreviations stay English under English',
+        (tester) async {
+      await pumpApp(
+        tester,
+        ChargingEfficiencyChart(monthlyEfficiency: monthly),
+      );
+
+      expect(monthFormatFor(tester).format(DateTime(2026, 1)), 'Jan');
+    });
+  });
+
   group('ChargingEfficiencyChart', () {
     testWidgets(
       'renders the localized empty caption when monthlyEfficiency is empty',
