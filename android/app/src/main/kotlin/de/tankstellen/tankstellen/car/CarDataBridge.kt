@@ -14,17 +14,17 @@ import io.flutter.plugin.common.MethodChannel
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Android Auto v2 — SLICE 1 (#2947 / epic #2946): the LIVE data bridge between
+ * Android Auto v2 — PHASE-1 (#2947 / epic #2946): the LIVE data bridge between
  * the native car screens and a headless Flutter engine.
  *
- * v1 rendered a stale SharedPreferences snapshot the last in-app search wrote
- * ([CarStation.read]). Slice 1 swaps the SEARCH data source for an on-demand
- * live fetch: this object spins up a dedicated, CACHED headless [FlutterEngine]
- * and runs the Dart `carDataMain` entry point (`lib/features/car/
- * car_data_service.dart`) through it, then asks Dart — over the
- * `tankstellen/car_data` [MethodChannel] — for the freshest nearby stations.
- *
- * The Radar screen STAYS on the v1 snapshot this slice (Radar = slice 2).
+ * v1 rendered a stale SharedPreferences snapshot the last in-app search/radar
+ * wrote ([CarStation.read]). Phase-1 swaps BOTH the SEARCH (slice 1, #2987) and
+ * the RADAR (slice 2) data sources for an on-demand live fetch: this object
+ * spins up a dedicated, CACHED headless [FlutterEngine] and runs the Dart
+ * `carDataMain` entry point (`lib/features/car/car_data_service.dart`) through
+ * it, then asks Dart — over the `tankstellen/car_data` [MethodChannel] — for
+ * the freshest nearby stations (Search and Radar share one live producer,
+ * differing only in the snapshot fallback key).
  *
  * ## Why this preserves the #1498 FGS-avoidance
  * The engine lives in the BOUND [androidx.car.app.CarAppService]/Session the
@@ -90,6 +90,10 @@ object CarDataBridge : CarLiveSource {
     /** Dart method that returns the live Search JSON. */
     // i18n-ignore: protocol token, not user-facing text.
     private const val METHOD_FETCH_SEARCH = "fetchSearch"
+
+    /** Dart method that returns the live Radar JSON (v2 phase-1 slice 2). */
+    // i18n-ignore: protocol token, not user-facing text.
+    private const val METHOD_FETCH_RADAR = "fetchRadar"
 
     /** Dart sentinel for "no usable persisted GPS fix". */
     // i18n-ignore: protocol sentinel, not user-facing text.
@@ -173,17 +177,21 @@ object CarDataBridge : CarLiveSource {
     /**
      * Fetch the live list for [kind], invoking [callback] exactly once with the
      * JSON string, or `null` to keep the snapshot. Honours [FETCH_TIMEOUT_MS]
-     * and the per-kind re-entrancy guard. Slice 1 only wires
-     * [CarFetchKind.SEARCH]; a [CarFetchKind.RADAR] request returns `null`
-     * (Radar still renders the v1 snapshot).
+     * and the per-kind re-entrancy guard. Phase-1 wires BOTH
+     * [CarFetchKind.SEARCH] (slice 1) and [CarFetchKind.RADAR] (slice 2) to
+     * their respective Dart fetch methods.
      *
      * The callback is always delivered on the main thread.
      */
     override fun fetch(kind: CarFetchKind, callback: FetchCallback) {
         val ch = channel
-        if (ch == null || kind != CarFetchKind.SEARCH) {
+        if (ch == null) {
             callback.onResult(null)
             return
+        }
+        val method = when (kind) {
+            CarFetchKind.SEARCH -> METHOD_FETCH_SEARCH
+            CarFetchKind.RADAR -> METHOD_FETCH_RADAR
         }
 
         val guard = inFlight.getOrPut(kind) { AtomicBoolean(false) }
@@ -204,7 +212,7 @@ object CarDataBridge : CarLiveSource {
         val timeout = Runnable { finish(null) }
         mainHandler.postDelayed(timeout, FETCH_TIMEOUT_MS)
 
-        ch.invokeMethod(METHOD_FETCH_SEARCH, null, object : MethodChannel.Result {
+        ch.invokeMethod(method, null, object : MethodChannel.Result {
             override fun success(result: Any?) {
                 mainHandler.removeCallbacks(timeout)
                 val json = result as? String
@@ -226,8 +234,8 @@ object CarDataBridge : CarLiveSource {
 }
 
 /**
- * Which car list a [CarDataBridge.fetch] targets. SLICE 1 (#2947) wires only
- * [SEARCH] to the live bridge; [RADAR] stays on the v1 snapshot (slice 2).
+ * Which car list a [CarDataBridge.fetch] targets. Phase-1 (#2947) wires BOTH
+ * [SEARCH] (slice 1, #2987) and [RADAR] (slice 2) to the live bridge.
  */
 enum class CarFetchKind {
     SEARCH,

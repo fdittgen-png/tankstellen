@@ -244,7 +244,186 @@ void main() {
           reason: 'an empty list must not clobber the last good snapshot');
     });
   });
+
+  // ── v2 PHASE-1 SLICE 2 (#2947) — LIVE Radar via the SAME producer ──────────
+
+  group('Radar (DE polled) — live list round-trips + writes car_radar_json', () {
+    test('priced E10 radar list from the real PolledAlertStrategy', () async {
+      final storage = FakeStorageRepository();
+      await storage.putSetting(StorageKeys.userPositionLat, 52.52);
+      await storage.putSetting(StorageKeys.userPositionLng, 13.405);
+      await _seedProfile(storage, radiusKm: 8, fuel: 'e10');
+
+      final deDataset = _RecordedDataset(
+        ServiceSource.tankerkoenigApi,
+        [
+          _row('de-1', 'Aral', 52.521, 13.401, e10: 1.799, e5: 1.859,
+              diesel: 1.699),
+          _row('de-2', 'Shell', 52.516, 13.420, e10: 1.829, e5: 1.889,
+              diesel: 1.719),
+        ],
+      );
+
+      String? wroteKey;
+      String? wroteValue;
+      final service = CarDataService(
+        strategyFactory: _polledFactory('DE', deDataset),
+        writeSnapshot: (k, v) async {
+          wroteKey = k;
+          wroteValue = v;
+        },
+      );
+
+      final json = await service.resolveRadarJson(storage, apiKey: 'k');
+      final rows = (jsonDecode(json) as List).cast<Map<String, dynamic>>();
+
+      expect(rows, hasLength(2));
+      final byId = {for (final r in rows) r['id']: r};
+      expect(byId['de-1']!['priceText'], '1.799');
+      expect(byId['de-1']!['fuelLabel'], 'E10');
+      // Distance-sorted: the nearer station (de-1) comes first.
+      expect(rows.first['id'], 'de-1');
+
+      // The Radar fetch refreshes the RADAR snapshot key (not the search key).
+      expect(wroteKey, 'car_radar_json');
+      expect(wroteValue, json);
+    });
+  });
+
+  group('Radar (ES BULK) — bulk coverage, priced E5 (not empty)', () {
+    test('real BulkDatasetAlertStrategy + recorded E5 fixture → priced E5 list',
+        () async {
+      final storage = FakeStorageRepository();
+      await storage.putSetting(StorageKeys.userPositionLat, 40.4168);
+      await storage.putSetting(StorageKeys.userPositionLng, -3.7038);
+      await _seedProfile(storage, radiusKm: 6, fuel: 'e5');
+
+      final esDataset = _RecordedDataset(
+        ServiceSource.mitecoApi,
+        [
+          _row('es-1', 'Repsol', 40.4170, -3.7040, e5: 1.529, diesel: 1.419),
+          _row('es-2', 'Cepsa', 40.4150, -3.7010, e5: 1.549, diesel: 1.439),
+          _row('es-9', 'BP', 41.3874, 2.1686, e5: 1.999, diesel: 1.999),
+        ],
+      );
+
+      String? wroteKey;
+      final service = CarDataService(
+        strategyFactory: _bulkFactory('ES', esDataset, esBulkPolicy),
+        writeSnapshot: (k, _) async => wroteKey = k,
+      );
+
+      final json = await service.resolveRadarJson(storage, apiKey: null);
+      final rows = (jsonDecode(json) as List).cast<Map<String, dynamic>>();
+
+      // The bulk path returns the two in-radius ES stations PRICED — a polled-
+      // only source would be empty here. Barcelona is geo-filtered out.
+      expect(rows.map((r) => r['id']).toSet(), {'es-1', 'es-2'},
+          reason: 'Barcelona is outside a 6 km Madrid radius');
+      final byId = {for (final r in rows) r['id']: r};
+      expect(byId['es-1']!['fuelLabel'], 'E5');
+      expect(byId['es-1']!['priceText'], '1.529');
+      expect(wroteKey, 'car_radar_json');
+    });
+  });
+
+  group('Radar — no_gps / fault degrade exactly like Search', () {
+    test('absent fix → no_gps marker, never throws', () async {
+      final storage = FakeStorageRepository();
+      await _seedProfile(storage, radiusKm: 8, fuel: 'e10');
+      final service = CarDataService(
+        strategyFactory: _polledFactory('DE', _RecordedDataset(
+          ServiceSource.tankerkoenigApi, const [])),
+        writeSnapshot: (_, _) async {},
+      );
+      expect(await service.resolveRadarJson(storage), kNoGpsMarker);
+    });
+
+    test('a throwing strategy → empty [] (keeps the snapshot), never throws',
+        () async {
+      final storage = FakeStorageRepository();
+      await storage.putSetting(StorageKeys.userPositionLat, 52.52);
+      await storage.putSetting(StorageKeys.userPositionLng, 13.405);
+      await _seedProfile(storage, radiusKm: 8, fuel: 'e10');
+
+      var wrote = false;
+      final service = CarDataService(
+        strategyFactory: _bulkFactory('DE', _ThrowingDataset(), esBulkPolicy),
+        writeSnapshot: (_, _) async => wrote = true,
+      );
+
+      await expectLater(service.resolveRadarJson(storage), completes);
+      expect(await service.resolveRadarJson(storage), '[]');
+      expect(wrote, isFalse,
+          reason: 'a faulted radar must not clobber the last good snapshot');
+    });
+  });
+
+  // ── v2 PHASE-1 SLICE 3 (#2947) — the address subtitle, lock-step ───────────
+
+  group('address subtitle — present in the encoded row + survives round-trip',
+      () {
+    test('street + city address is encoded for each station', () async {
+      final storage = FakeStorageRepository();
+      await storage.putSetting(StorageKeys.userPositionLat, 52.52);
+      await storage.putSetting(StorageKeys.userPositionLng, 13.405);
+      await _seedProfile(storage, radiusKm: 8, fuel: 'e10');
+
+      // A station WITH a full address + one with NO street (only city).
+      final dataset = _RecordedDataset(
+        ServiceSource.tankerkoenigApi,
+        [
+          _rowWithAddress('de-1', 'Aral', 52.521, 13.401,
+              street: 'Hauptstr. 1', postCode: '10115', place: 'Berlin',
+              e10: 1.799),
+          _rowWithAddress('de-2', 'Shell', 52.516, 13.420,
+              street: '', postCode: '10117', place: 'Berlin', e10: 1.829),
+        ],
+      );
+
+      final service = CarDataService(
+        strategyFactory: _polledFactory('DE', dataset),
+        writeSnapshot: (_, _) async {},
+      );
+
+      final json = await service.resolveSearchJson(storage, apiKey: 'k');
+      final rows = (jsonDecode(json) as List).cast<Map<String, dynamic>>();
+      final byId = {for (final r in rows) r['id']: r};
+
+      // Every row carries the address key (the Kotlin DTO reads it).
+      for (final r in rows) {
+        expect(r.containsKey('address'), isTrue);
+      }
+      // Full address: "street, postCode place".
+      expect(byId['de-1']!['address'], 'Hauptstr. 1, 10115 Berlin');
+      // No street → city only, no orphan comma (#2704 collapsing).
+      expect(byId['de-2']!['address'], '10117 Berlin');
+    });
+  });
 }
+
+Station _rowWithAddress(
+  String id,
+  String brand,
+  double lat,
+  double lng, {
+  required String street,
+  required String postCode,
+  required String place,
+  double? e10,
+}) =>
+    Station(
+      id: id,
+      name: '$brand forecourt',
+      brand: brand,
+      street: street,
+      postCode: postCode,
+      place: place,
+      lat: lat,
+      lng: lng,
+      e10: e10,
+      isOpen: true,
+    );
 
 // ── recorded-fixture services + strategy factories ──────────────────────────
 

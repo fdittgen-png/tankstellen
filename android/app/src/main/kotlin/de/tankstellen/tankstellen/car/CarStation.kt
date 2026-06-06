@@ -22,6 +22,13 @@ data class CarStation(
     val id: String,
     val name: String,
     val brand: String,
+    /**
+     * Street + city subtitle (e.g. "Hauptstr. 1, 10115 Berlin"), or "" when the
+     * station carries no address. Added in v2 phase-1 slice 3 (#2947) — old
+     * address-less snapshots default it to "" (see [fromJson]), so they never
+     * crash.
+     */
+    val address: String,
     val lat: Double,
     val lng: Double,
     /** Formatted selected-fuel price (3 dp), or "" when the fuel is unpriced. */
@@ -83,6 +90,9 @@ data class CarStation(
             id = o.optString("id", ""),
             name = o.optString("name", o.optString("brand", "Station")),
             brand = o.optString("brand", ""),
+            // Back-compat: an old snapshot written before slice 3 has no
+            // "address" key → optString returns "" (no subtitle), never throws.
+            address = o.optString("address", ""),
             lat = o.optDouble("lat", 0.0),
             lng = o.optDouble("lng", 0.0),
             priceText = o.optString("priceText", ""),
