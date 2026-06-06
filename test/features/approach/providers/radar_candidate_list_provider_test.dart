@@ -1,20 +1,28 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
+import 'package:tankstellen/core/services/service_providers.dart';
+import 'package:tankstellen/core/services/service_result.dart';
+import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
 import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
+import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+
+import '../../../helpers/mock_providers.dart';
 
 /// #2664 — the swipe-to-page candidate list routes through the cache-first
 /// [FuelStationRadar] at the user's **default radar radius**
@@ -107,6 +115,34 @@ class _CapturingRadar extends FuelStationRadar {
   }
 }
 
+/// Empty in-radius station service — the default for tests that exercise only
+/// the corridor (`_CapturingRadar`) path. The #2965 in-radius merge contributes
+/// nothing, so the existing corridor-only assertions stay valid.
+class _EmptyService implements StationService {
+  const _EmptyService();
+
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async =>
+      ServiceResult(
+        data: const <Station>[],
+        source: ServiceSource.cache,
+        fetchedAt: DateTime(2026),
+      );
+
+  @override
+  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+    List<String> ids,
+  ) =>
+      throw UnimplementedError();
+}
+
 ProviderContainer _container({
   required FuelStationRadar radar,
   FuelType fuel = FuelType.e10,
@@ -115,6 +151,9 @@ ProviderContainer _container({
   // `null`) to override it — `null` can't be the default or it would be
   // indistinguishable from "not passed".
   Object? approach = _unset,
+  // The direct in-radius station service the #2965 superset merge calls.
+  // Defaults to an empty service so corridor-only tests are unaffected.
+  StationService stationService = const _EmptyService(),
 }) {
   final state = identical(approach, _unset)
       ? ApproachPolling(
@@ -128,6 +167,7 @@ ProviderContainer _container({
       effectiveFuelTypeProvider.overrideWithValue(fuel),
       activeProfileProvider.overrideWith(() => _FakeActiveProfile(profile)),
       fuelStationRadarProvider.overrideWithValue(radar),
+      stationServiceProvider.overrideWithValue(stationService),
     ],
   );
 }
@@ -285,4 +325,179 @@ void main() {
     expect(out, isEmpty);
     expect(radar.radiusCalls, isEmpty);
   });
+
+  group('in-radius superset merge — dense-corridor truncation (#2965)', () {
+    // The FR corridor fetch (`within_distance(60km)` + `limit:50`, no distance
+    // order_by) AND the 15 km near-merge BOTH return a far-only slice WITHOUT
+    // the genuinely-nearest station (modelling the dense-area row cap truncating
+    // it out). A DIRECT in-radius `searchStations` at the default radar radius
+    // (1 km) returns a priced station 269 m away. The candidate list must merge
+    // that in so it can never be empty while a priced station is in range.
+    //
+    // Driven through the REAL `fuelStationRadarProvider` on FR (polled →
+    // wide+near-merge corridor, #2813) + the REAL radar_candidate_list_provider,
+    // with a radius-keyed service (NOT an echoing fake).
+    //
+    // RED on master (corridor-only → []); GREEN after the in-radius merge.
+    test('lists the 269 m priced station the corridor row-cap truncated out',
+        () async {
+      // FR = polled corridor (within_distance + limit:50), so the real
+      // fuelStationRadarProvider runs the wide+near-merge searches; the
+      // candidate list then adds its own in-radius search (#2965). No radar
+      // value-override — the production provider resolves from the FR country +
+      // the radius-keyed station service.
+      final container = ProviderContainer(
+        overrides: [
+          activeCountryOverride(Countries.byCode('FR')!),
+          stationServiceProvider.overrideWithValue(_RadiusKeyedService()),
+          effectiveApproachStateProvider.overrideWithValue(
+            ApproachPolling(
+              gps: _pos(lat: 48.0, lng: 2.0),
+              nextPollIn: const Duration(seconds: 5),
+            ),
+          ),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+          activeProfileProvider.overrideWith(
+            () => _FakeActiveProfile(const UserProfile(
+              id: 'p1',
+              name: 'Test Driver',
+              approachRadiusKm: 1.0,
+              approachMinPollSeconds: 5,
+            )),
+          ),
+        ].cast(),
+      );
+      addTearDown(container.dispose);
+
+      final out = await container.read(radarCandidateListProvider.future);
+
+      expect(out, isNotEmpty,
+          reason: '#2965 — the in-radius merge rescues the truncated nearest');
+      expect(out.map((s) => s.id), contains('NEAR_269M'),
+          reason: 'the 269 m priced station the wide corridor cap dropped '
+              'must be in the candidate list');
+    });
+
+    // Never-throws contract on the in-radius merge (#2965 / #1103): a failing
+    // in-radius `searchStations` must NOT break the card — it degrades to the
+    // cached corridor set rather than throwing or emptying the list.
+    test('in-radius search failure degrades to corridor-only (never throws)',
+        () async {
+      final radar = _CapturingRadar([_station('CORRIDOR', e10: 1.55)]);
+      final container = _container(
+        radar: radar,
+        stationService: _ThrowingService(),
+      );
+      addTearDown(container.dispose);
+
+      // #2349 fault-idiom assertion: with the in-radius `searchStations`
+      // dependency throwing, resolving the provider future must NOT throw — it
+      // degrades to corridor-only rather than surfacing the fault. This is the
+      // syntactic never-throws contract the static scanner
+      // (`test/lint/never_throws_contract_test.dart`) greps the sibling test
+      // for (`, completes)`).
+      await expectLater(
+        container.read(radarCandidateListProvider.future),
+        completes,
+        reason: '#2349 — a throwing in-radius fetch must not break the card; '
+            'the provider future completes normally (corridor-only fallback)',
+      );
+
+      final out = await container.read(radarCandidateListProvider.future);
+
+      // The corridor's priced station survives; the throwing in-radius fetch is
+      // swallowed (no exception, no empty list).
+      expect(out.map((s) => s.id), ['CORRIDOR'],
+          reason: 'corridor-only fallback when the in-radius fetch throws');
+    });
+  });
+}
+
+/// In-radius service that always throws — the fault seam for the #2965 /
+/// #1103 never-throws contract on the candidate list's in-radius merge.
+class _ThrowingService implements StationService {
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async =>
+      throw Exception('boom');
+
+  @override
+  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+    List<String> ids,
+  ) =>
+      throw UnimplementedError();
+}
+
+/// Radius-keyed in-radius/corridor service (NOT an echoing fake):
+///  - wide corridor (radiusKm >= [kCorridorNearMergeRadiusKm]) → a single FAR
+///    station, location-only (no price) — exactly what a polled FR source
+///    returns for a non-imminent corridor row before JIT-pricing,
+///  - direct in-radius (radiusKm < near-merge, i.e. the 1 km candidate-list
+///    search) → the genuinely-nearest 269 m station, priced.
+///
+/// Models the FR dense-area `limit:50` cap truncating the nearest out of the
+/// corridor: the far corridor row is never imminent so never gets priced, the
+/// candidate-list priced filter drops it → master yields `[]` (the reported
+/// empty card) while a tight in-radius search still returns the priced nearest.
+class _RadiusKeyedService implements StationService {
+  // Location-only (no price for ANY fuel) — a non-imminent corridor row a
+  // polled FR source returns before JIT-pricing. The candidate list's priced
+  // filter drops it, so corridor-only → [].
+  static Station _far() => const Station(
+        id: 'FAR_55KM',
+        name: 'Station FAR',
+        brand: 'TEST',
+        street: '',
+        postCode: '',
+        place: '',
+        lat: 48.5, // ~55 km north of the fix
+        lng: 2.0,
+        isOpen: true,
+      );
+
+  static Station _near() => const Station(
+        id: 'NEAR_269M',
+        name: 'Station NEAR',
+        brand: 'TEST',
+        street: '',
+        postCode: '',
+        place: '',
+        lat: 48.002416, // ~269 m north of the fix
+        lng: 2.0,
+        e10: 1.60,
+        isOpen: true,
+      );
+
+  @override
+  Future<ServiceResult<List<Station>>> searchStations(
+    SearchParams params, {
+    CancelToken? cancelToken,
+  }) async {
+    // Anything at or above the near-merge radius is the dense-corridor slice the
+    // row cap truncated to a far, location-only row. A tight (< near-merge)
+    // fetch is the direct in-radius search, which carries the 269 m priced
+    // station back.
+    final corridorSlice = params.radiusKm >= kCorridorNearMergeRadiusKm;
+    return ServiceResult(
+      data: corridorSlice ? [_far()] : [_near()],
+      source: ServiceSource.cache,
+      fetchedAt: DateTime(2026),
+    );
+  }
+
+  @override
+  Future<ServiceResult<StationDetail>> getStationDetail(String stationId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<ServiceResult<Map<String, StationPrices>>> getPrices(
+    List<String> ids,
+  ) =>
+      throw UnimplementedError();
 }

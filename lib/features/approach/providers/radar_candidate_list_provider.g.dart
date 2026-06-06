@@ -47,6 +47,21 @@ part of 'radar_candidate_list_provider.dart';
 /// JIT price per imminent station instead of re-pricing a whole 10 km set
 /// on every poll. The ranked page-set therefore matches exactly what the
 /// in-radius layout would surface.
+///
+/// ### In-radius superset merge (#2965)
+///
+/// The cached corridor is built from a polled-source `searchStations` that is
+/// row-capped with **no distance ordering** (e.g. FR `within_distance(60km)` +
+/// `limit:50`). In a dense area the un-ordered slice can truncate out the
+/// genuinely-nearest forecourt — leaving this card showing **"no station
+/// nearby"** while a priced station sits a few hundred metres away. To guarantee
+/// the candidate set is a SUPERSET of the in-radius search (exactly the #2806
+/// rescue the on-search radar already applies), we also issue a DIRECT in-radius
+/// `searchStations` at `profile.approachRadiusKm` and merge it into the corridor
+/// set (dedup by id, the in-radius row winning — it carries the freshest
+/// per-fuel price/distance). A failed in-radius fetch degrades to corridor-only,
+/// never breaking the card. The deeper cure (a distance `order_by` on the FR
+/// corridor query) is tracked separately (#2966).
 
 @ProviderFor(radarCandidateList)
 final radarCandidateListProvider = RadarCandidateListProvider._();
@@ -90,6 +105,21 @@ final radarCandidateListProvider = RadarCandidateListProvider._();
 /// JIT price per imminent station instead of re-pricing a whole 10 km set
 /// on every poll. The ranked page-set therefore matches exactly what the
 /// in-radius layout would surface.
+///
+/// ### In-radius superset merge (#2965)
+///
+/// The cached corridor is built from a polled-source `searchStations` that is
+/// row-capped with **no distance ordering** (e.g. FR `within_distance(60km)` +
+/// `limit:50`). In a dense area the un-ordered slice can truncate out the
+/// genuinely-nearest forecourt — leaving this card showing **"no station
+/// nearby"** while a priced station sits a few hundred metres away. To guarantee
+/// the candidate set is a SUPERSET of the in-radius search (exactly the #2806
+/// rescue the on-search radar already applies), we also issue a DIRECT in-radius
+/// `searchStations` at `profile.approachRadiusKm` and merge it into the corridor
+/// set (dedup by id, the in-radius row winning — it carries the freshest
+/// per-fuel price/distance). A failed in-radius fetch degrades to corridor-only,
+/// never breaking the card. The deeper cure (a distance `order_by` on the FR
+/// corridor query) is tracked separately (#2966).
 
 final class RadarCandidateListProvider
     extends
@@ -138,6 +168,21 @@ final class RadarCandidateListProvider
   /// JIT price per imminent station instead of re-pricing a whole 10 km set
   /// on every poll. The ranked page-set therefore matches exactly what the
   /// in-radius layout would surface.
+  ///
+  /// ### In-radius superset merge (#2965)
+  ///
+  /// The cached corridor is built from a polled-source `searchStations` that is
+  /// row-capped with **no distance ordering** (e.g. FR `within_distance(60km)` +
+  /// `limit:50`). In a dense area the un-ordered slice can truncate out the
+  /// genuinely-nearest forecourt — leaving this card showing **"no station
+  /// nearby"** while a priced station sits a few hundred metres away. To guarantee
+  /// the candidate set is a SUPERSET of the in-radius search (exactly the #2806
+  /// rescue the on-search radar already applies), we also issue a DIRECT in-radius
+  /// `searchStations` at `profile.approachRadiusKm` and merge it into the corridor
+  /// set (dedup by id, the in-radius row winning — it carries the freshest
+  /// per-fuel price/distance). A failed in-radius fetch degrades to corridor-only,
+  /// never breaking the card. The deeper cure (a distance `order_by` on the FR
+  /// corridor query) is tracked separately (#2966).
   RadarCandidateListProvider._()
     : super(
         from: null,
@@ -165,4 +210,4 @@ final class RadarCandidateListProvider
 }
 
 String _$radarCandidateListHash() =>
-    r'7b5f774e01d1aae94503d074103c6853067bb955';
+    r'ba7871184e8eca320d6ffd2949658d0e707c51f1';
