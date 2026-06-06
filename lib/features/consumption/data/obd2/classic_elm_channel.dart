@@ -81,14 +81,8 @@ class ClassicElmChannel implements ElmByteChannel {
       // #2969 — stamp the RFCOMM-open outcome on the active connect trace
       // (first-wins) so a thrown Classic-open failure is captured even with
       // developer mode off.
-      Obd2ConnectTraceLog.active
-        ?..addStep(
-          label: 'channel-open',
-          status: Obd2ConnectStepStatus.fail,
-          detail: e.toString(),
-        )
-        ..setOutcome(Obd2ConnectOutcome.rfcommOpenFail,
-            failureDetail: e.toString());
+      Obd2ConnectTraceLog.stampOpenFailure(
+          Obd2ConnectOutcome.rfcommOpenFail, e.toString());
       rethrow;
     }
     if (!connectResult.ok) {
@@ -104,13 +98,8 @@ class ClassicElmChannel implements ElmByteChannel {
       final detail = 'rfcomm open failed '
           '(strategy: ${connectResult.strategy ?? 'unknown'}'
           '${connectResult.error != null ? ', error: ${connectResult.error}' : ''})';
-      Obd2ConnectTraceLog.active
-        ?..addStep(
-          label: 'channel-open',
-          status: Obd2ConnectStepStatus.fail,
-          detail: detail,
-        )
-        ..setOutcome(Obd2ConnectOutcome.rfcommOpenFail, failureDetail: detail);
+      Obd2ConnectTraceLog.stampOpenFailure(
+          Obd2ConnectOutcome.rfcommOpenFail, detail);
       // #2745 — this was a raw `StateError`, which the connect flow logged as
       // an `[unknown]` ERROR trace (field trace #6) even though it is an
       // EXPECTED, user-surfaced "adapter not reachable" condition (the dongle

@@ -18,12 +18,12 @@ import '../../../../consumption/data/obd2/obd2_comm_diagnostics.dart';
 import '../../../../consumption/data/obd2/obd2_connect_trace.dart';
 import '../../../../consumption/data/obd2/obd2_connect_trace_log.dart';
 import '../../../../consumption/data/obd2/obd2_session_diagnostic.dart';
+import '../../../../consumption/presentation/widgets/obd2_connect_trace_card.dart';
 import '../../../../consumption/presentation/widgets/obd2_diagnostics_card.dart';
 import '../../../../consumption/providers/obd2_connect_trace_revision_provider.dart';
 import '../../../../consumption/providers/obd2_self_test_controller.dart';
 import '../../../../feature_management/application/feature_flags_provider.dart';
 import '../../../../feature_management/domain/feature.dart';
-import 'obd2_connect_trace_card.dart';
 import 'obd2_self_test_panel.dart';
 
 /// 'OBD2 Communication Health' developer-tools screen (#2471, TAIL of

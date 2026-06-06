@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,6 +16,7 @@ import 'elm_byte_channel.dart';
 import 'negotiated_protocol_cache.dart';
 import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
+import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
@@ -209,10 +211,11 @@ class Obd2ConnectionService {
       final svc = await _connectResolved(candidate);
       trace.setOutcome(Obd2ConnectOutcome.success);
       return svc;
+      // rethrow preserves the stack; the (e) binding only classifies the trace.
+      // ignore: catch_no_st
     } catch (e) {
       trace.setOutcomeFromError(e);
-      // ignore: use_rethrow_when_possible
-      throw e;
+      rethrow;
     } finally {
       Obd2ConnectTraceLog.endTrace(trace);
     }
@@ -355,10 +358,10 @@ class Obd2ConnectionService {
       final svc = await _connectBestInner();
       trace.setOutcome(Obd2ConnectOutcome.success);
       return svc;
+      // rethrow preserves the stack; the (e) binding only classifies the trace
+      // (permission / BT-off throw before registry.rank, so recordScan misses).
+      // ignore: catch_no_st
     } catch (e) {
-      // #2969 correction 2 — classify into the connect-trace outcome at the
-      // catch arm (the permission / BT-off family throws before registry.rank,
-      // so recordScan never sees them).
       trace.setOutcomeFromError(e);
       rethrow;
     } finally {
@@ -500,6 +503,8 @@ class Obd2ConnectionService {
         trace.setOutcome(Obd2ConnectOutcome.scanEmpty);
       }
       return svc;
+      // rethrow preserves the stack; the (e) binding only classifies the trace.
+      // ignore: catch_no_st
     } catch (e) {
       trace.setOutcomeFromError(e);
       rethrow;

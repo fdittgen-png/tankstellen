@@ -11,7 +11,7 @@ import 'ble_link_tuner.dart';
 import 'connection_drop_debouncer.dart';
 import 'elm_byte_channel.dart';
 import 'obd2_comm_diagnostics.dart';
-import 'obd2_connect_trace.dart';
+import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -52,8 +52,7 @@ class Elm327BleUuids {
 /// app starts supporting them.
 class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
   /// #2969 — bound the scan-path `connect()` (the `connectTimeout == null`
-  /// branch) instead of letting FBP block ~35 s on a vanished candidate.
-  /// Generous (the scan just saw the adapter) but bounded.
+  /// branch) so FBP can't block ~35 s on a vanished candidate.
   static const Duration _scanPathConnectTimeout = Duration(seconds: 10);
 
   final BluetoothDevice _device;
@@ -143,18 +142,11 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
         );
       }
       // #2969 correction 3 — stamp the channel-open outcome on the active
-      // connect trace HERE, where the REAL FBP/StateError is still in hand
-      // (Obd2Service.connect swallows it into a generic Obd2AdapterUnresponsive
-      // false return). FIRST-TERMINAL-WINS, so the wrong-transport gattTimeout
-      // can never be overwritten by the scan fallback's scanEmpty. Ungated by
-      // debugMode (the connect-trace ring is, deliberately).
-      Obd2ConnectTraceLog.active
-        ?..addStep(
-          label: 'channel-open',
-          status: Obd2ConnectStepStatus.fail,
-          detail: e.toString(),
-        )
-        ..setOutcome(classifyBleOpenOutcome(e), failureDetail: e.toString());
+      // connect trace where the REAL FBP/StateError is in hand
+      // (Obd2Service.connect swallows it into a generic false). FIRST-wins, so
+      // the wrong-transport gattTimeout outlives the scan fallback's scanEmpty.
+      Obd2ConnectTraceLog.stampOpenFailure(
+          classifyBleOpenOutcome(e), e.toString());
       rethrow;
     }
     if (connectSw != null) {
@@ -178,13 +170,10 @@ class FlutterBluePlusElmChannel implements ElmByteChannel, Obd2LinkTuner {
       // autoConnect:true, so `mtu: null`.
       await _device.connect(autoConnect: true, mtu: null);
     } else if (timeout == null) {
-      // #2969 — the scan-path open. Previously UNBOUNDED: FBP's
-      // `autoConnect:false` connect can block ~35 s on a candidate the scan saw
-      // but that has since gone out of range / standby, freezing the connect
-      // attempt (and any self-test / first-connect riding it) for half a
-      // minute. Bound it with the direct path's precedent — the scan JUST saw
-      // this adapter, so a generous-but-bounded window is enough; a miss now
-      // fails fast instead of hanging.
+      // #2969 — bound the scan-path open (was UNBOUNDED): FBP's
+      // `autoConnect:false` connect can otherwise block ~35 s on a candidate the
+      // scan saw but that has since vanished, freezing the connect (and any
+      // self-test / first-connect riding it). A miss now fails fast.
       await _device.connect(
           autoConnect: false, mtu: null, timeout: _scanPathConnectTimeout);
     } else {

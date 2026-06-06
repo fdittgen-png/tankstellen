@@ -3,9 +3,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../core/theme/app_radius.dart';
-import '../../../../../l10n/app_localizations.dart';
-import '../../../../consumption/data/obd2/obd2_connect_trace.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../data/obd2/obd2_connect_trace.dart';
 
 /// One connect-attempt trace rendered on the OBD2 health screen (#2969).
 ///

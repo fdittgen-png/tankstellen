@@ -70,7 +70,7 @@ Future<Obd2Service?> _connectByMacDirect(
       name: generic.displayName,
       logFailureAsError: false, // #2379 — recoverable (scan fallback)
     );
-  } on Object catch (e) {
+  } on Object catch (e, st) {
     // #2969 correction 3 — the channel-open outcome is normally stamped FIRST
     // (first-wins) at the channel-open catch (FlutterBluePlusElmChannel), where
     // the REAL FBP error is in hand; an init failure is classified in
@@ -95,9 +95,15 @@ Future<Obd2Service?> _connectByMacDirect(
         );
       }
     }
-    // #2379 — a RECOVERABLE attempt (scan fallback below routinely
-    // succeeds): NOT an error trace. Inner connect already suppressed
-    // its trace; the outcome is owned by the orchestrator + breadcrumbs.
+    // #2379 — a RECOVERABLE attempt (scan fallback below routinely succeeds):
+    // NOT an error trace, so the stack stays debug-only (#1103 — st bound +
+    // piped to debugPrint). Inner connect already suppressed its trace; the
+    // outcome is owned by the orchestrator + breadcrumbs.
+    assert(() {
+      debugPrint('_connectByMacDirect: recoverable direct-connect failure, '
+          'falling back to scan: $e\n$st');
+      return true;
+    }());
     await svc._teardownLastDirectChannel();
     if (!fallbackToScan) return null;
     return svc.connectByMac(mac);
@@ -147,7 +153,7 @@ Future<Obd2Service?> _connectByMacClassicDirect(
       linkKind: 'classic',
       logFailureAsError: false, // #2379 — recoverable (scanner re-arms)
     );
-  } on Object catch (e) {
+  } on Object catch (e, st) {
     // #2969 — the rfcomm-open outcome was already stamped FIRST at the Classic
     // channel-open catch; the init-failure outcome inside _openAndInit. Record
     // the direct-path step here for the timeline.
@@ -156,8 +162,13 @@ Future<Obd2Service?> _connectByMacClassicDirect(
       status: Obd2ConnectStepStatus.fail,
       detail: e.toString(),
     );
-    // #2565 — RECOVERABLE: the scanner owns its transport-aware scan
-    // fallback + re-arm. Inner connect already suppressed its trace.
+    // #2565 — RECOVERABLE: the scanner owns its transport-aware scan fallback +
+    // re-arm. Inner connect already suppressed its trace, so the stack stays
+    // debug-only (#1103 — st bound + piped to debugPrint).
+    assert(() {
+      debugPrint('_connectByMacClassicDirect: recoverable failure: $e\n$st');
+      return true;
+    }());
     await svc._teardownLastDirectChannel();
     return null;
   }

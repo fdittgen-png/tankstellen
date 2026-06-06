@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
+import 'package:flutter/foundation.dart' show debugPrint;
 
 import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
+import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
-import 'obd2_connection_errors.dart';
 
 /// In-memory ring of the last [maxTraces] connect ATTEMPTS (#2969).
 ///
@@ -180,10 +180,14 @@ class Obd2ConnectTraceLog {
       // never derail a connect's finally block).
       try {
         onTraceAdded?.call();
-      } catch (_) {}
-    } catch (_) {
-      // Never let trace bookkeeping derail a connect's finally block.
+      } catch (e, st) {
+        debugPrint('Obd2ConnectTraceLog: onTraceAdded listener threw '
+            '(ignored): $e\n$st');
+      }
+    } catch (e, st) {
+      // Never let trace bookkeeping derail a connect's finally block (#1103).
       if (identical(_active, handle)) _active = null;
+      debugPrint('Obd2ConnectTraceLog.endTrace failed (ignored): $e\n$st');
     }
   }
 
@@ -193,6 +197,21 @@ class Obd2ConnectTraceLog {
   /// [Obd2ConnectTraceHandle.setOrigin] (#2969 correction 1 — runObd2SelfTest
   /// just stamps `origin:selfTest` on the trace the service already opened).
   static Obd2ConnectTraceHandle? get active => _active;
+
+  /// Stamp a channel-open failure (#2969) onto the active trace as ONE step +
+  /// the FIRST-wins terminal outcome, carrying [detail]. The shared one-liner
+  /// the BLE + Classic channel-open catches call where the REAL error is in
+  /// hand (Obd2Service.connect swallows it into a generic false return). A
+  /// no-op when no trace is active.
+  static void stampOpenFailure(Obd2ConnectOutcome outcome, String detail) {
+    active
+      ?..addStep(
+        label: 'channel-open',
+        status: Obd2ConnectStepStatus.fail,
+        detail: detail,
+      )
+      ..setOutcome(outcome, failureDetail: detail);
+  }
 
   /// Read-only snapshot, newest-first, for the health screen.
   static List<Obd2ConnectTrace> snapshot() =>
@@ -379,65 +398,4 @@ class Obd2ConnectTraceHandle {
         steps: List.unmodifiable(_steps),
         scanned: List.unmodifiable(_scanned),
       );
-}
-
-/// Central classifier (#2969 correction 2) mapping any thrown connect error
-/// onto an [Obd2ConnectOutcome]. Covers the sealed [Obd2ConnectionError] set +
-/// a raw [TimeoutException]; everything else degrades to
-/// [Obd2ConnectOutcome.unknown] (the raw `toString()` is kept as failureDetail
-/// for triage).
-///
-/// CALLED in every self-test driver catch arm AND `connectBest()`'s catch, so
-/// the permission / BT-off / scan-timeout family — which throw BEFORE
-/// `registry.rank()` runs, so `recordScan` never sees them — still produce the
-/// right outcome.
-Obd2ConnectOutcome classifyObd2ConnectError(Object error) {
-  if (error is Obd2PermissionDenied) return Obd2ConnectOutcome.permissionDenied;
-  if (error is Obd2BluetoothOff) return Obd2ConnectOutcome.bluetoothOff;
-  if (error is Obd2ScanTimeout) return Obd2ConnectOutcome.scanEmpty;
-  if (error is Obd2ProtocolInitFailed) {
-    return Obd2ConnectOutcome.protocolInitFailed;
-  }
-  // Obd2AdapterUnresponsive covers BOTH a Classic rfcomm-open `false` (the
-  // channel never opened) and a post-open silent-bus probe. The channel layers
-  // raise it for the rfcomm-open-fail case with a distinct message; default it
-  // to ignitionOff (the #1 real condition — a parked car) so the actionable
-  // "turn the ignition on" guidance is the headline, and let a more specific
-  // step/outcome stamped earlier (first-wins) override when the channel-open
-  // classifier already ran.
-  if (error is Obd2AdapterUnresponsive) {
-    final msg = error.message.toUpperCase();
-    if (msg.contains('CLASSIC') || msg.contains('RFCOMM')) {
-      return Obd2ConnectOutcome.rfcommOpenFail;
-    }
-    return Obd2ConnectOutcome.ignitionOff;
-  }
-  if (error is Obd2DisconnectedException) return Obd2ConnectOutcome.unknown;
-  if (error is TimeoutException) return Obd2ConnectOutcome.initTimeout;
-  return Obd2ConnectOutcome.unknown;
-}
-
-/// Classify a BLE `channel.open()` failure (#2969 correction 3) onto an
-/// [Obd2ConnectOutcome]. Distinct from [classifyObd2ConnectError] because a
-/// raw BLE open failure is NOT an [Obd2ConnectionError] — it is an FBP
-/// exception / StateError. Recorded INSIDE the channel-open catch BEFORE the
-/// scan fallback re-runs, so the real wrong-transport timeout wins (first-wins)
-/// over the fallback's scanEmpty.
-Obd2ConnectOutcome classifyBleOpenOutcome(Object error) {
-  final msg = error.toString().toUpperCase();
-  if (msg.contains('133') || msg.contains('GATT_ERROR')) {
-    return Obd2ConnectOutcome.gatt133;
-  }
-  if (msg.contains('TIMED OUT') ||
-      msg.contains('TIMEOUT') ||
-      error is TimeoutException) {
-    return Obd2ConnectOutcome.gattTimeout;
-  }
-  if (error is StateError &&
-      (msg.contains('ELM327 SERVICE') ||
-          msg.contains('WRITE CHARACTERISTIC') ||
-          msg.contains('NOTIFY CHARACTERISTIC'))) {
-    return Obd2ConnectOutcome.serviceNotFound;
-  }
-  return Obd2ConnectOutcome.unknown;
 }

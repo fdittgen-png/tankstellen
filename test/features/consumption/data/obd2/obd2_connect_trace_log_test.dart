@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_classifier.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
@@ -176,6 +177,25 @@ void main() {
     test('teeHandshakeLine is a no-op when no trace is active', () {
       Obd2ConnectTraceLog.teeHandshakeLine('ATZ', 'ELM327 v1.5', 95);
       expect(Obd2ConnectTraceLog.snapshot(), isEmpty);
+    });
+  });
+
+  group('endTrace never-throws contract (#2349 / #2969)', () {
+    tearDown(() => Obd2ConnectTraceLog.onTraceAdded = null);
+
+    test('endTrace returns normally even when the onTraceAdded listener throws',
+        () {
+      // Fault injection: a throwing notify listener (the dev health screen's
+      // revision provider). endTrace is called from connect `finally` blocks on
+      // the critical path, so it MUST swallow this and return normally.
+      Obd2ConnectTraceLog.onTraceAdded = () => throw StateError('boom');
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      h.setOutcome(Obd2ConnectOutcome.scanEmpty);
+
+      expect(() => Obd2ConnectTraceLog.endTrace(h), returnsNormally);
+      // The trace still landed in the ring despite the throwing listener.
+      expect(Obd2ConnectTraceLog.snapshot(), hasLength(1));
     });
   });
 
