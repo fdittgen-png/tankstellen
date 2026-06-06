@@ -216,9 +216,13 @@ class _RealClassicFacade implements ClassicBluetoothFacade {
 
 class _FalseConnectPlugin extends Obd2ClassicMethodChannel {
   _FalseConnectPlugin();
+  // #2969 — the real ClassicElmChannel.open calls connectDetailed.
   @override
-  Future<bool> connect({required String address, required String uuid}) async =>
-      false;
+  Future<ClassicConnectResult> connectDetailed({
+    required String address,
+    required String uuid,
+  }) async =>
+      (ok: false, strategy: 'exhausted', error: 'read failed, socket closed');
   @override
   Future<void> disconnect() async {}
   @override
@@ -228,7 +232,10 @@ class _FalseConnectPlugin extends Obd2ClassicMethodChannel {
 class _ThrowingConnectPlugin extends Obd2ClassicMethodChannel {
   _ThrowingConnectPlugin();
   @override
-  Future<bool> connect({required String address, required String uuid}) async =>
+  Future<ClassicConnectResult> connectDetailed({
+    required String address,
+    required String uuid,
+  }) async =>
       throw Exception('RFCOMM socket open failed');
   @override
   Future<void> disconnect() async {}

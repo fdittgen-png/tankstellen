@@ -38,15 +38,29 @@ class Obd2ClassicMethodChannel {
         .toList();
   }
 
-  /// Open an RFCOMM socket to [address] on the Serial Port Profile
-  /// UUID. Returns `true` on success. Must be called once per
-  /// connection — subsequent calls close the prior socket first.
-  Future<bool> connect({required String address, required String uuid}) async {
-    final ok = await _methodChannel.invokeMethod<bool>(
+  /// Open an RFCOMM socket to [address] on the Serial Port Profile UUID.
+  /// Returns `true` on success. Must be called once per connection —
+  /// subsequent calls close the prior socket first.
+  ///
+  /// #2969 — accepts BOTH the new Map return shape `{ok, strategy, error}` and
+  /// the legacy bare `bool` (bidirectional back-compat: an old native side ↔ a
+  /// new Dart side, and vice-versa, both work). Use [connectDetailed] when the
+  /// strategy / native error are wanted for the connect trace.
+  Future<bool> connect({required String address, required String uuid}) async =>
+      (await connectDetailed(address: address, uuid: uuid)).ok;
+
+  /// As [connect] but returning the parsed native result so the connect-trace
+  /// can surface WHICH RFCOMM strategy won / the terminal failure mode + the
+  /// last native IOException (#2969 correction 5).
+  Future<ClassicConnectResult> connectDetailed({
+    required String address,
+    required String uuid,
+  }) async {
+    final raw = await _methodChannel.invokeMethod<dynamic>(
       'connect',
       {'address': address, 'uuid': uuid},
     );
-    return ok ?? false;
+    return parseClassicConnectResult(raw);
   }
 
   /// Write [bytes] to the currently-open socket. Throws
@@ -84,4 +98,30 @@ class ClassicBondedDevice {
   final String address;
   final String name;
   const ClassicBondedDevice({required this.address, required this.name});
+}
+
+/// Parsed native RFCOMM connect result (#2969). [strategy] names which socket
+/// variant won (`secure` / `insecure` / `reflection`) or the terminal failure
+/// mode (`exhausted` / `no-adapter` / `bad-address` / `interrupted`); [error]
+/// carries the last native IOException message. Both null when the native side
+/// returned the legacy bare `bool`.
+typedef ClassicConnectResult = ({bool ok, String? strategy, String? error});
+
+/// Parse the native `connect` reply, accepting BOTH the #2969 Map shape
+/// `{ok, strategy, error}` AND the legacy bare `bool` (bidirectional
+/// back-compat). A null reply (channel returned nothing) is treated as a clean
+/// failure. Tolerant of a `Map<dynamic, dynamic>` (the platform-channel codec
+/// hands maps back loosely typed).
+ClassicConnectResult parseClassicConnectResult(Object? raw) {
+  if (raw is bool) return (ok: raw, strategy: null, error: null);
+  if (raw is Map) {
+    final ok = raw['ok'];
+    return (
+      ok: ok is bool ? ok : false,
+      strategy: raw['strategy'] as String?,
+      error: raw['error'] as String?,
+    );
+  }
+  // null / unexpected shape → clean failure.
+  return (ok: false, strategy: null, error: null);
 }

@@ -41,10 +41,19 @@ class _FakeClassicPlugin extends Obd2ClassicMethodChannel {
   bool connectResult = true;
   Object? connectThrows;
 
+  // #2969 — ClassicElmChannel.open now calls connectDetailed; override THAT so
+  // the fake's connectResult/throws still drive the SUT.
   @override
-  Future<bool> connect({required String address, required String uuid}) async {
+  Future<ClassicConnectResult> connectDetailed({
+    required String address,
+    required String uuid,
+  }) async {
     if (connectThrows != null) throw connectThrows!;
-    return connectResult;
+    return (
+      ok: connectResult,
+      strategy: connectResult ? 'secure' : 'exhausted',
+      error: connectResult ? null : 'rfcomm open failed',
+    );
   }
 
   @override

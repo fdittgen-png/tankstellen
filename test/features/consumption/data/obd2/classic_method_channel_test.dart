@@ -84,6 +84,50 @@ void main() {
       );
     });
 
+    // #2969 — bidirectional back-compat: the binding accepts BOTH the new Map
+    // return shape {ok, strategy, error} AND the legacy bare bool.
+    test('connectDetailed parses the new Map shape {ok, strategy, error}',
+        () async {
+      messenger.setMockMethodCallHandler(methodChannel, (_) async => {
+            'ok': false,
+            'strategy': 'exhausted',
+            'error': 'read failed, socket might closed',
+          });
+      const plugin = Obd2ClassicMethodChannel();
+      final r = await plugin.connectDetailed(address: 'AA', uuid: 'UUID');
+      expect(r.ok, isFalse);
+      expect(r.strategy, 'exhausted');
+      expect(r.error, contains('socket'));
+      // connect() still returns the bool from the same Map.
+    });
+
+    test('connectDetailed accepts the legacy bare bool (back-compat)',
+        () async {
+      messenger.setMockMethodCallHandler(methodChannel, (_) async => true);
+      const plugin = Obd2ClassicMethodChannel();
+      final r = await plugin.connectDetailed(address: 'AA', uuid: 'UUID');
+      expect(r.ok, isTrue);
+      expect(r.strategy, isNull);
+      expect(r.error, isNull);
+    });
+
+    test('parseClassicConnectResult handles both shapes + null', () {
+      expect(parseClassicConnectResult(true).ok, isTrue);
+      expect(parseClassicConnectResult(false).ok, isFalse);
+      final m = parseClassicConnectResult(
+          {'ok': true, 'strategy': 'insecure', 'error': null});
+      expect(m.ok, isTrue);
+      expect(m.strategy, 'insecure');
+      // A loosely-typed Map<dynamic,dynamic> (the codec shape) parses too.
+      final loose = parseClassicConnectResult(
+          <dynamic, dynamic>{'ok': false, 'strategy': 'bad-address'});
+      expect(loose.ok, isFalse);
+      expect(loose.strategy, 'bad-address');
+      // null / unexpected → clean failure.
+      expect(parseClassicConnectResult(null).ok, isFalse);
+      expect(parseClassicConnectResult(42).ok, isFalse);
+    });
+
     test('write forwards bytes as a Uint8List', () async {
       Object? capturedBytes;
       messenger.setMockMethodCallHandler(methodChannel, (call) async {

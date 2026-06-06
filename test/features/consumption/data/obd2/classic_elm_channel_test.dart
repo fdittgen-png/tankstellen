@@ -27,10 +27,19 @@ class _FakeObd2ClassicMethodChannel extends Obd2ClassicMethodChannel {
   bool connectResult = true;
   final List<_ConnectCall> connectCalls = [];
 
+  // #2969 — ClassicElmChannel.open now calls connectDetailed; override it so
+  // the fake's connectResult still drives the SUT + records the call.
   @override
-  Future<bool> connect({required String address, required String uuid}) async {
+  Future<ClassicConnectResult> connectDetailed({
+    required String address,
+    required String uuid,
+  }) async {
     connectCalls.add(_ConnectCall(address, uuid));
-    return connectResult;
+    return (
+      ok: connectResult,
+      strategy: connectResult ? 'secure' : 'exhausted',
+      error: connectResult ? null : 'rfcomm open failed',
+    );
   }
 
   // --- write -------------------------------------------------------------
@@ -83,9 +92,13 @@ class _LateByteFakePlugin extends Obd2ClassicMethodChannel {
 
   final sink = _LateByteSink();
 
+  // #2969 — ClassicElmChannel.open now calls connectDetailed.
   @override
-  Future<bool> connect({required String address, required String uuid}) async =>
-      true;
+  Future<ClassicConnectResult> connectDetailed({
+    required String address,
+    required String uuid,
+  }) async =>
+      (ok: true, strategy: 'secure', error: null);
 
   @override
   Future<void> write(List<int> bytes) async {}
