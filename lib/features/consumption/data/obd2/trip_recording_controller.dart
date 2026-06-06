@@ -329,6 +329,11 @@ class TripRecordingController {
   /// momentarily absent. OBD2 speed always wins when present.
   double? _latestGpsSpeedKmh;
 
+  /// #2963 — last OBD2 speed persisted onto a [TripSample]; lets a later
+  /// RPM-only tick hold-last instead of crashing to `0`. Null until the
+  /// first real speed lands. See [_emit].
+  double? _lastPersistedSpeedKmh;
+
   /// #2506 — latest GPS coaching hint from the shared folder on a
   /// no-fuel-PID tick. `Obd2RecordingPipeline` publishes it onto
   /// `state.gpsCoachingHint`, which `MinimalDriveSummary` already renders.
@@ -1233,10 +1238,24 @@ class TripRecordingController {
     // 250 ms emit cadence that's 4 Hz into the recorder, matching
     // the pre-#814 1 Hz loop's behavior closely enough that the
     // distance/fuelLitersConsumed integration is unchanged.
-    if (speedKmh != null || rpm != null) {
+    // #2963 — never persist `speedKmh ?? 0`. A fabricated leading `0`
+    // (RPM PID 0x0C acquired before the speed PID 0x0D parses), followed by
+    // the car's actual non-zero speed once 0x0D answers, manufactures a
+    // `0 → real` step the accel gate scores as a phantom hard-accel (a 22 s
+    // idle OBD2 trip surfaced `hardAccelPenalty = 3.0`). Guard:
+    //   1. Until the FIRST real speed lands, an RPM-only tick has no usable
+    //      speed (idle needs `speed≤0.5`, accel needs the derivative), so
+    //      skip persisting it rather than invent a `0`. A measured idle
+    //      (`41 0D 00`) is a real `0` and starts the series cleanly.
+    //   2. After that, hold-last for a later RPM-only tick (defence-in-depth;
+    //      the live snapshot already holds-last).
+    final hasEverReadSpeed = speedKmh != null || _lastPersistedSpeedKmh != null;
+    if ((speedKmh != null || rpm != null) && hasEverReadSpeed) {
+      final persistedSpeedKmh = speedKmh ?? _lastPersistedSpeedKmh!;
+      if (speedKmh != null) _lastPersistedSpeedKmh = speedKmh;
       final sample = TripSample(
         timestamp: nowTs,
-        speedKmh: speedKmh ?? 0,
+        speedKmh: persistedSpeedKmh,
         rpm: rpm, // #2692 C4-G — keep null (gate above still admits on speed).
         fuelRateLPerHour: fuelRate,
         throttlePercent: throttlePercent,
