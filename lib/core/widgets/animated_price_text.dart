@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_motion.dart';
 import '../theme/dark_mode_colors.dart';
 
 /// Wraps an arbitrary price widget (usually the card/detail RichText) in a
@@ -94,6 +95,12 @@ class _AnimatedPriceTextState extends State<AnimatedPriceText>
     final newPrice = widget.price;
     if (oldPrice == null || newPrice == null) return;
     if (oldPrice == newPrice) return;
+    // #2972 — reduced-motion guard. When the OS "remove animations" flag is
+    // on, skip the flash entirely: no scale bounce, no tint overlay. The
+    // child already renders the new price, so the end-state is identical;
+    // we just never kick the controller, so `hasRunningAnimations` stays
+    // false for a motion-sensitive user.
+    if (!AppMotion.enabled(context)) return;
     setState(() {
       _flashIsDrop = newPrice < oldPrice;
     });

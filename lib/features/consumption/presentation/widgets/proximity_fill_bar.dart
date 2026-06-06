@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_motion.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/radar_closeness.dart';
@@ -86,7 +87,12 @@ class ProximityFillBar extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: fill),
-            duration: const Duration(milliseconds: 300),
+            // #2972 — reduced-motion guard: snap the fill to its end-state
+            // with a zero-duration "animation" instead of the 300 ms ease,
+            // so a motion-sensitive user gets the same fill with no movement.
+            duration: AppMotion.enabled(context)
+                ? const Duration(milliseconds: 300)
+                : Duration.zero,
             curve: Curves.easeOut,
             builder: (context, value, _) => FractionallySizedBox(
               widthFactor: value,

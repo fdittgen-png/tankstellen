@@ -88,6 +88,35 @@ void main() {
       await tester.pumpAndSettle();
     });
 
+    testWidgets(
+        '#2972 — reduced motion: a price change does NOT kick the controller; '
+        'child renders at end-state', (tester) async {
+      Widget host(double price) => MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: MaterialApp(
+              home: Scaffold(
+                body: AnimatedPriceText(
+                  price: price,
+                  child: Text(price.toStringAsFixed(3)),
+                ),
+              ),
+            ),
+          );
+
+      await tester.pumpWidget(host(1.699));
+      await tester.pumpAndSettle();
+
+      // A real price DROP that would normally fire the 500 ms bounce.
+      await tester.pumpWidget(host(1.499));
+      await tester.pump();
+
+      expect(tester.hasRunningAnimations, isFalse,
+          reason: 'With OS reduced-motion on, the flash must be skipped — no '
+              'running controller.');
+      // The new price is still shown (end-state), just without the flash.
+      expect(find.text('1.499'), findsOneWidget);
+    });
+
     testWidgets('does not animate when old or new price is null',
         (tester) async {
       await tester.pumpWidget(const MaterialApp(

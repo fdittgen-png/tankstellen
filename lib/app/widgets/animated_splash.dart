@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_motion.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Animated Flutter splash shown between the native splash drawable and the
@@ -82,7 +83,28 @@ class _AnimatedSplashState extends State<AnimatedSplash>
       parent: _controller,
       curve: const Interval(0.28, 1.0, curve: Curves.easeOut),
     );
-    _controller.forward();
+    // The forward()/jump-to-end decision is deferred to
+    // [didChangeDependencies] (first call) so it can read the reduced-motion
+    // MediaQuery flag — `initState` has no usable MediaQuery context.
+  }
+
+  /// Guards [_controller] so it only kicks once. Without this a MediaQuery
+  /// change (e.g. brightness toggle) would re-run the reveal.
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    // #2972 — reduced-motion guard. With the OS "remove animations" flag on,
+    // jump the controller straight to its end (logo full-size, fully opaque)
+    // instead of running the 650 ms scale+fade reveal.
+    if (AppMotion.enabled(context)) {
+      _controller.forward();
+    } else {
+      _controller.value = 1.0;
+    }
   }
 
   @override

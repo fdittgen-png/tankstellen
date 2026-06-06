@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_motion.dart';
+
 /// Per-index start-delay step. 50 ms matches the #595 spec.
 const int _kStepMs = 50;
 
@@ -93,6 +95,11 @@ class _StaggeredFadeInState extends State<StaggeredFadeIn> {
 
   @override
   Widget build(BuildContext context) {
+    // #2972 — reduced-motion guard. With the OS "remove animations" flag on
+    // we skip the fade timeline entirely and render the row at its end-state
+    // (fully opaque) immediately, so a motion-sensitive user sees the full
+    // results list with no cascade and no running ticker slice.
+    if (!AppMotion.enabled(context)) return widget.child;
     return FadeTransition(opacity: _opacity, child: widget.child);
   }
 }
