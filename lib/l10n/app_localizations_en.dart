@@ -7363,6 +7363,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get stationUnbrandedTitle => 'Unbranded station';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'I may fill up with different fuel types';
 
@@ -15105,6 +15108,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String routeDataSourceMulti(String sources) {
     return '⟦$sources⟧';
   }
+
+  @override
+  String get stationUnbrandedTitle => '⟦Úñƀřáñđéđ šŧáŧîóñ ·······⟧';
 
   @override
   String get vehicleMultiFuelCapableLabel =>

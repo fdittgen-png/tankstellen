@@ -173,6 +173,18 @@ const _params = SearchParams(
   fuelType: FuelType.e10,
 );
 
+// #2926 — `FuelType.all` bypasses the chain's hard-fuel-filter, so a test
+// asserting the codec round-trips partial-price stations (a data-shape
+// concern, NOT fuel filtering) must search "all" or the unpriced rows are
+// correctly dropped. The hard filter itself is covered by
+// station_service_chain_new_test.dart.
+const _allParams = SearchParams(
+  lat: 52.52,
+  lng: 13.41,
+  radiusKm: 10,
+  fuelType: FuelType.all,
+);
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -397,7 +409,10 @@ void main() {
             // All prices null
           ),
         ];
-        final result = await chain.searchStations(_params);
+        // Search "all" — the #2926 hard-fuel-filter would (correctly) drop an
+        // all-null-price station for a SPECIFIC fuel; here we assert the codec
+        // round-trips it, which is fuel-agnostic.
+        final result = await chain.searchStations(_allParams);
         expect(result.data, hasLength(1));
         expect(result.data.first.e10, isNull);
         expect(result.data.first.e5, isNull);
@@ -423,7 +438,9 @@ void main() {
             diesel: 1.659,
           ),
         ];
-        final result = await chain.searchStations(_params);
+        // Search "all": the codec must preserve e5 + diesel and leave e10 null.
+        // (For a SPECIFIC e10 search the #2926 hard-filter would drop this row.)
+        final result = await chain.searchStations(_allParams);
         expect(result.data, hasLength(1));
         final station = result.data.first;
         expect(station.e5, 1.899);

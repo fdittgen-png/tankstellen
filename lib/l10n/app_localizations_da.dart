@@ -7401,6 +7401,9 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String get stationUnbrandedTitle => 'Unbranded station';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'I may fill up with different fuel types';
 

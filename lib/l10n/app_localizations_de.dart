@@ -7442,6 +7442,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get stationUnbrandedTitle => 'Tankstelle ohne Marke';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'Ich tanke eventuell verschiedene Kraftstoffarten';
 

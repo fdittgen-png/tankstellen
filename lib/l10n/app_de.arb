@@ -3397,6 +3397,7 @@
   "favoriteRemove": "Aus Favoriten entfernen",
   "loyaltyRawPriceTooltip": "Roh: {price}",
   "routeDataSourceMulti": "{sources}",
+  "stationUnbrandedTitle": "Tankstelle ohne Marke",
   "vehicleMultiFuelCapableLabel": "Ich tanke eventuell verschiedene Kraftstoffarten",
   "vehicleMultiFuelCapableHelper": "Ermittelt, welcher Kraftstoff pro Kilometer am günstigsten ist",
   "vinLabel": "FIN (optional)",
