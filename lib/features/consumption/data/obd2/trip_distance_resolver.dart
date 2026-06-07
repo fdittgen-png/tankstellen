@@ -238,6 +238,16 @@ class TripDistanceResolver {
         if (at != null) lastKeptAt = at;
       }
     }
+    // Always retain the final raw fix. A time-compressed burst — a device
+    // that coalesces a batch of fixes onto one sub-second timestamp, or a
+    // synchronous test feed — otherwise decimates to the single first point
+    // and haversine-sums to 0 km, silently dropping a real drive (the #3004
+    // regression the #2509 journey invariant catches). Keeping the endpoint
+    // never re-inflates jitter: the tail segment spans <1 s of real motion
+    // (or ~0 m when the car is parked at trip end).
+    if (_gpsTrack.isNotEmpty && !identical(kept.last, _gpsTrack.last)) {
+      kept.add(_gpsTrack.last);
+    }
     return kept;
   }
 

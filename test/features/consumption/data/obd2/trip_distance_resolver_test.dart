@@ -506,5 +506,36 @@ void main() {
         closeTo(1.223, 0.03),
       );
     });
+
+    test('a time-compressed burst keeps its endpoints (not 0 km) (#2509)', () {
+      // The decimation thins fixes that are < 950 ms after the last KEPT
+      // fix. If a whole moving track arrives time-compressed — every fix a
+      // few microseconds after the previous (a synchronous feed, or a device
+      // that batches fixes onto near-identical timestamps) — every fix after
+      // the first is "after the last kept but < 950 ms", so the naive loop
+      // keeps ONLY the first point and haversine-sums to 0 km, silently
+      // discarding a real drive. The endpoint-retention guard keeps the
+      // final fix, so the track still integrates to its real end position.
+      // This is the #2509 journey invariant at the unit level: RED without
+      // the guard (0.0 km), GREEN with it.
+      final r = build();
+      const n = 20; // ≥ kMinGpsFixesForDistanceSource (10)
+      for (var i = 0; i < n; i++) {
+        r.debugAddGpsFix(
+          latitude: lat0 + i * 0.0005, // ~55 m per step → ~1.05 km total
+          longitude: lon0,
+          hAccuracyM: 6.0,
+          at: base.add(Duration(microseconds: i)), // sub-ms, strictly rising
+        );
+      }
+      final km = r.distanceKm(odometerStartKm: null, odometerLatestKm: null);
+      expect(km, greaterThan(0.9),
+          reason: 'a moving track must not decimate to 0 km');
+      expect(km, lessThan(1.2));
+      expect(
+        r.distanceSource(odometerStartKm: null, odometerLatestKm: null),
+        kDistanceSourceGps,
+      );
+    });
   });
 }
