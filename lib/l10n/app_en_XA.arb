@@ -740,6 +740,8 @@
   "vehicleMinSocLabel": "⟦Ṁîñ ŠóÇ % ···⟧",
   "vehicleMaxSocLabel": "⟦Ṁáẋ ŠóÇ % ···⟧",
   "vehicleTankLabel": "⟦Ŧáñķ çáƥáçîŧý (Ł) ······⟧",
+  "vehiclePowerLabel": "⟦Éñǧîñé ƥóŵéř (ķŴ) ······⟧",
+  "vehiclePowerHelper": "⟦≈ {ps} ƤŠ ·⟧",
   "vehiclePreferredFuelLabel": "⟦Ƥřéƒéřřéđ ƒúéł ······⟧",
   "connectorType2": "⟦Ŧýƥé 2 ··⟧",
   "connectorCcs": "⟦ÇÇŠ ·⟧",

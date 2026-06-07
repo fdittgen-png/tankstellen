@@ -2483,6 +2483,14 @@ class AppLocalizationsEl extends AppLocalizations {
   String get vehicleTankLabel => 'Χωρητικότητα ντεπόζιτου (L)';
 
   @override
+  String get vehiclePowerLabel => 'Engine power (kW)';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '≈ $ps PS';
+  }
+
+  @override
   String get vehiclePreferredFuelLabel => 'Προτιμώμενο καύσιμο';
 
   @override

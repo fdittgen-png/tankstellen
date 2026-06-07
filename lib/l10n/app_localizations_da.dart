@@ -2467,6 +2467,14 @@ class AppLocalizationsDa extends AppLocalizations {
   String get vehicleTankLabel => 'Tankkapacitet (L)';
 
   @override
+  String get vehiclePowerLabel => 'Engine power (kW)';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '≈ $ps PS';
+  }
+
+  @override
   String get vehiclePreferredFuelLabel => 'Foretrukket brændstof';
 
   @override

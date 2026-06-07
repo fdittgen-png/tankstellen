@@ -4611,6 +4611,21 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
+  "vehiclePowerLabel": "Engine power (kW)",
+  "@vehiclePowerLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehiclePowerHelper": "≈ {ps} PS",
+  "@vehiclePowerHelper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "ps": {
+        "type": "String"
+      }
+    }
+  },
   "obd2ReconnectInProgress": "Reconnecting to your OBD2 adapter…",
   "@obd2ReconnectInProgress": {
     "x-mt": "needs-native-review",

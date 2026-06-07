@@ -1573,10 +1573,23 @@ class TripRecordingController {
   /// Exposed for tests: append a GPS fix to the #1979 track buffer
   /// without a live Geolocator stream, so tests can drive the
   /// GPS-distance path of [currentDistanceKm] / [distanceSource]
-  /// deterministically.
+  /// deterministically. Optional [hAccuracyM] / [at] are forwarded onto the
+  /// buffered point (matching production [updateGpsFix]) so a test can drive
+  /// the #2963 gates and the #3004 ~1 Hz decimation; null `at` = controller
+  /// clock.
   @visibleForTesting
-  void debugAppendGpsFix({required double latitude, required double longitude}) {
-    _distance.debugAddGpsFix(latitude: latitude, longitude: longitude);
+  void debugAppendGpsFix({
+    required double latitude,
+    required double longitude,
+    double? hAccuracyM,
+    DateTime? at,
+  }) {
+    _distance.debugAddGpsFix(
+      latitude: latitude,
+      longitude: longitude,
+      hAccuracyM: hAccuracyM,
+      at: at,
+    );
   }
 }
 

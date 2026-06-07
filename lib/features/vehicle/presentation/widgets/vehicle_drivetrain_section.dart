@@ -33,6 +33,8 @@ class VehicleDrivetrainSection extends StatelessWidget {
   // Combustion controllers — used when type != ev.
   final TextEditingController tankController;
   final TextEditingController fuelTypeController;
+  // Epic #3015 — rated engine power (kW).
+  final TextEditingController powerKwController;
 
   // #2885 — multi-fuel capability flag + its change/refresh callbacks,
   // forwarded to the combustion sub-section.
@@ -55,6 +57,7 @@ class VehicleDrivetrainSection extends StatelessWidget {
     required this.onToggleConnector,
     required this.tankController,
     required this.fuelTypeController,
+    required this.powerKwController,
     required this.multiFuelCapable,
     required this.onMultiFuelCapableChanged,
     required this.onFuelTypeChanged,
@@ -91,6 +94,7 @@ class VehicleDrivetrainSection extends StatelessWidget {
           VehicleCombustionSection(
             tankController: tankController,
             fuelTypeController: fuelTypeController,
+            powerKwController: powerKwController,
             multiFuelCapable: multiFuelCapable,
             onMultiFuelCapableChanged: onMultiFuelCapableChanged,
             onFuelTypeChanged: onFuelTypeChanged,

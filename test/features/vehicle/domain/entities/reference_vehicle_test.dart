@@ -56,6 +56,71 @@ void main() {
       expect(restored.atkinsonCycle, isFalse);
     });
 
+    group('powerKw schema (Epic #3015)', () {
+      test('fromJson parses powerKw when present', () {
+        final json = <String, dynamic>{
+          'make': 'Volkswagen',
+          'model': 'Golf',
+          'generation': 'VIII (2019-)',
+          'yearStart': 2019,
+          'displacementCc': 1498,
+          'powerKw': 110,
+          'fuelType': 'petrol',
+          'transmission': 'manual',
+        };
+        final parsed = ReferenceVehicle.fromJson(json);
+        expect(parsed.powerKw, 110);
+      });
+
+      test('powerKw round-trips through toJson/fromJson', () {
+        const original = ReferenceVehicle(
+          make: 'Peugeot',
+          model: '208',
+          generation: 'II (2019-)',
+          yearStart: 2019,
+          displacementCc: 1199,
+          powerKw: 74,
+          fuelType: 'petrol',
+          transmission: 'manual',
+        );
+        final json = original.toJson();
+        expect(json['powerKw'], 74);
+        final restored = ReferenceVehicle.fromJson(json);
+        expect(restored, equals(original));
+        expect(restored.powerKw, 74);
+      });
+
+      test('legacy JSON without powerKw deserializes to null (EV / '
+          'placeholder rows + pre-#3015 entries)', () {
+        final legacyJson = <String, dynamic>{
+          'make': 'Tesla',
+          'model': 'Model 3',
+          'generation': 'I (2017-)',
+          'yearStart': 2017,
+          'displacementCc': 1,
+          'fuelType': 'electric',
+          'transmission': 'automatic',
+        };
+        final parsed = ReferenceVehicle.fromJson(legacyJson);
+        expect(parsed.powerKw, isNull);
+      });
+    });
+
+    group('powerKwToPs helper (Epic #3015)', () {
+      test('converts kW to PS rounded to the nearest whole PS', () {
+        // 74 kW × 1.35962 = 100.6 → 101 PS.
+        expect(powerKwToPs(74), 101);
+        // 110 kW × 1.35962 = 149.6 → 150 PS.
+        expect(powerKwToPs(110), 150);
+        // 63 kW (Fiat Panda TwinAir) → 86 PS.
+        expect(powerKwToPs(63), 86);
+      });
+
+      test('returns null for a null kW (unknown power threads through)', () {
+        expect(powerKwToPs(null), isNull);
+      });
+    });
+
     group('engine-tech schema (#1422 phase 1)', () {
       test('legacy JSON without new fields deserializes with defaults', () {
         // Mirrors a row that pre-dates #1422: no inductionType, no
