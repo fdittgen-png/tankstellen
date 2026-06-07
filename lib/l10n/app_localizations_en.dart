@@ -2458,6 +2458,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vehicleTankLabel => 'Tank capacity (L)';
 
   @override
+  String get vehiclePowerLabel => 'Engine power (kW)';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '≈ $ps PS';
+  }
+
+  @override
   String get vehiclePreferredFuelLabel => 'Preferred fuel';
 
   @override
@@ -10178,6 +10186,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get vehicleTankLabel => '⟦Ŧáñķ çáƥáçîŧý (Ł) ······⟧';
+
+  @override
+  String get vehiclePowerLabel => '⟦Éñǧîñé ƥóŵéř (ķŴ) ······⟧';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '⟦≈ $ps ƤŠ ·⟧';
+  }
 
   @override
   String get vehiclePreferredFuelLabel => '⟦Ƥřéƒéřřéđ ƒúéł ······⟧';

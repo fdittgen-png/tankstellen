@@ -741,6 +741,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
               }),
               tankController: _ctrl.tankController,
               fuelTypeController: _ctrl.fuelTypeController,
+              powerKwController: _ctrl.powerKwController,
               multiFuelCapable: _multiFuelCapable,
               onMultiFuelCapableChanged: (v) =>
                   setState(() => _multiFuelCapable = v),

@@ -134,6 +134,85 @@ void main() {
       );
     });
 
+    test(
+        'every non-EV entry carries a plausible powerKw (kW/L 30–150, '
+        'Epic #3015)', () async {
+      final raw = await rootBundle
+          .loadString('assets/reference_vehicles/vehicles.json');
+      final entries = (json.decode(raw) as List<dynamic>)
+          .cast<Map<String, dynamic>>()
+          .map(ReferenceVehicle.fromJson)
+          .toList();
+
+      var checked = 0;
+      for (final v in entries) {
+        // The 5 EV / placeholder rows (`displacementCc == 1`) carry no
+        // powerKw — electric motor power is out of scope for the
+        // combustion power-aware features that consume this field.
+        if (v.displacementCc <= 1) {
+          expect(
+            v.powerKw,
+            isNull,
+            reason: '${v.make} ${v.model} ${v.generation} is an EV / '
+                'placeholder row and must NOT carry powerKw',
+          );
+          continue;
+        }
+
+        expect(
+          v.powerKw,
+          isNotNull,
+          reason: '${v.make} ${v.model} ${v.generation} (non-EV) must '
+              'carry a researched powerKw (Epic #3015)',
+        );
+        expect(
+          v.powerKw,
+          greaterThan(0),
+          reason: '${v.make} ${v.model} ${v.generation} powerKw must be > 0',
+        );
+
+        // Specific power (kW per litre) sanity band: a modern petrol /
+        // diesel passenger-car engine runs roughly 30–150 kW/L. A value
+        // outside this almost certainly means a unit mix-up (PS stored
+        // as kW) or a transcription error.
+        final kwPerL = v.powerKw! / (v.displacementCc / 1000.0);
+        expect(
+          kwPerL,
+          inInclusiveRange(30.0, 150.0),
+          reason: '${v.make} ${v.model} ${v.generation} has implausible '
+              'specific power ${kwPerL.toStringAsFixed(1)} kW/L '
+              '(${v.powerKw} kW / ${v.displacementCc} cc)',
+        );
+        checked++;
+      }
+
+      // Guard against a future refactor silently skipping every entry.
+      expect(
+        checked,
+        greaterThanOrEqualTo(300),
+        reason: 'Expected the bulk of the catalog to be non-EV with powerKw',
+      );
+    });
+
+    test(
+        'idx 28 (Fiat Panda 0.9 TwinAir) is turbocharged (Epic #3015 '
+        'data-quality fix)', () async {
+      final raw = await rootBundle
+          .loadString('assets/reference_vehicles/vehicles.json');
+      final entries = json.decode(raw) as List<dynamic>;
+      final panda = ReferenceVehicle.fromJson(
+        entries[28] as Map<String, dynamic>,
+      );
+      expect(panda.make, 'Fiat');
+      expect(panda.model, 'Panda');
+      expect(
+        panda.inductionType,
+        InductionType.turbocharged,
+        reason: 'The 0.9 TwinAir is a turbocharged twin-cylinder',
+      );
+      expect(panda.powerKw, 63);
+    });
+
     test('every odometerPidStrategy is a known enum value', () async {
       final raw = await rootBundle
           .loadString('assets/reference_vehicles/vehicles.json');

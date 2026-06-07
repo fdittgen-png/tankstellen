@@ -4595,5 +4595,20 @@
   "@obd2HealthConnectSteps": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "vehiclePowerLabel": "Engine power (kW)",
+  "@vehiclePowerLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehiclePowerHelper": "≈ {ps} PS",
+  "@vehiclePowerHelper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "ps": {
+        "type": "String"
+      }
+    }
   }
 }

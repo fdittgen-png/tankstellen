@@ -1101,6 +1101,15 @@
   "vehicleMinSocLabel": "Min. SoC %",
   "vehicleMaxSocLabel": "Max. SoC %",
   "vehicleTankLabel": "Tankvolumen (L)",
+  "vehiclePowerLabel": "Motorleistung (kW)",
+  "vehiclePowerHelper": "≈ {ps} PS",
+  "@vehiclePowerHelper": {
+    "placeholders": {
+      "ps": {
+        "type": "String"
+      }
+    }
+  },
   "vehiclePreferredFuelLabel": "Bevorzugter Kraftstoff",
   "connectorType2": "Typ 2",
   "connectorCcs": "CCS",

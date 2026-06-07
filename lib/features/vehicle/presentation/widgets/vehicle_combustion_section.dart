@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
+import 'engine_power_field.dart';
 
 /// Combustion-engine portion of the [EditVehicleScreen] form. Owns the tank
 /// capacity and preferred fuel inputs.
@@ -24,6 +25,12 @@ import '../../../search/domain/entities/fuel_type.dart';
 class VehicleCombustionSection extends StatelessWidget {
   final TextEditingController tankController;
   final TextEditingController fuelTypeController;
+
+  /// Epic #3015 — rated engine power in kW. Pre-filled from the catalog
+  /// pick, user-overridable. The PS equivalent is derived live in
+  /// [EnginePowerField] and shown as the field's helper text.
+  final TextEditingController powerKwController;
+
   final String? Function(String?) numberValidator;
 
   /// #2885 — current value of [VehicleProfile.multiFuelCapable]. Only
@@ -41,6 +48,7 @@ class VehicleCombustionSection extends StatelessWidget {
     super.key,
     required this.tankController,
     required this.fuelTypeController,
+    required this.powerKwController,
     required this.numberValidator,
     required this.multiFuelCapable,
     required this.onMultiFuelCapableChanged,
@@ -89,6 +97,13 @@ class VehicleCombustionSection extends StatelessWidget {
             labelText: l?.vehicleTankLabel ?? 'Tank capacity (L)',
           ),
           validator: numberValidator,
+        ),
+        const SizedBox(height: 8),
+        // Epic #3015 — rated engine power (kW), pre-filled from the
+        // catalog pick, user-overridable. Helper text shows the live PS
+        // equivalent.
+        EnginePowerField(
+          controller: powerKwController,
         ),
         const SizedBox(height: 8),
         NullableFuelTypeDropdown(

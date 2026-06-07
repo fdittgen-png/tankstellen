@@ -4586,6 +4586,18 @@ abstract class AppLocalizations {
   /// **'Tank capacity (L)'**
   String get vehicleTankLabel;
 
+  /// No description provided for @vehiclePowerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine power (kW)'**
+  String get vehiclePowerLabel;
+
+  /// No description provided for @vehiclePowerHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {ps} PS'**
+  String vehiclePowerHelper(String ps);
+
   /// No description provided for @vehiclePreferredFuelLabel.
   ///
   /// In en, this message translates to:

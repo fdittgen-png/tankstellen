@@ -17,6 +17,7 @@ Future<void> _pump(
   final maxSocCtrl = TextEditingController(text: '80');
   final tankCtrl = TextEditingController();
   final fuelTypeCtrl = TextEditingController(text: 'e10');
+  final powerCtrl = TextEditingController();
   addTearDown(() {
     batteryCtrl.dispose();
     maxKwCtrl.dispose();
@@ -24,6 +25,7 @@ Future<void> _pump(
     maxSocCtrl.dispose();
     tankCtrl.dispose();
     fuelTypeCtrl.dispose();
+    powerCtrl.dispose();
   });
 
   await tester.pumpWidget(
@@ -45,6 +47,7 @@ Future<void> _pump(
               onToggleConnector: (_) {},
               tankController: tankCtrl,
               fuelTypeController: fuelTypeCtrl,
+              powerKwController: powerCtrl,
               multiFuelCapable: false,
               onMultiFuelCapableChanged: (_) {},
               onFuelTypeChanged: (_) {},

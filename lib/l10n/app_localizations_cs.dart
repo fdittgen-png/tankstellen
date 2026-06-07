@@ -2472,6 +2472,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get vehicleTankLabel => 'Objem nádrže (L)';
 
   @override
+  String get vehiclePowerLabel => 'Engine power (kW)';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '≈ $ps PS';
+  }
+
+  @override
   String get vehiclePreferredFuelLabel => 'Preferované palivo';
 
   @override

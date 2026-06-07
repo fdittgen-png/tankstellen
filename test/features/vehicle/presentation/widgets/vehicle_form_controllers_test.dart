@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/vehicle_form_controllers.dart';
 
@@ -635,6 +636,176 @@ void main() {
       );
       final snap = c.load(profile);
       expect(snap.multiFuelCapable, isTrue);
+    });
+  });
+
+  group('VehicleFormControllers — enginePowerKw pre-fill (Epic #3015)', () {
+    const golf = ReferenceVehicle(
+      make: 'Volkswagen',
+      model: 'Golf',
+      generation: 'VIII (2019-)',
+      yearStart: 2019,
+      displacementCc: 1498,
+      powerKw: 110,
+      fuelType: 'petrol',
+      transmission: 'manual',
+    );
+
+    test('load() populates the power controller from the profile', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      const profile = VehicleProfile(
+        id: 'p-power',
+        name: 'Golf',
+        enginePowerKw: 110,
+      );
+      c.load(profile);
+      expect(c.powerKwController.text, '110');
+    });
+
+    test('load() leaves the power controller blank when profile has none', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      const profile = VehicleProfile(id: 'p-nopower', name: 'X');
+      c.load(profile);
+      expect(c.powerKwController.text, '');
+    });
+
+    test('applyReferenceVehicle pre-fills the power controller from the '
+        'catalog row', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.applyReferenceVehicle(golf);
+      expect(c.powerKwController.text, '110');
+    });
+
+    test('applyReferenceVehicle does NOT clobber a user-typed power value',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      // User typed an override before picking a catalog row.
+      c.powerKwController.text = '125';
+      c.applyReferenceVehicle(golf);
+      expect(c.powerKwController.text, '125',
+          reason: 'a user-set power must survive a catalog pick');
+    });
+
+    test('applyReferenceVehicle leaves the field blank for an EV/placeholder '
+        'row (null powerKw)', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      const ev = ReferenceVehicle(
+        make: 'Tesla',
+        model: 'Model 3',
+        generation: 'I (2017-)',
+        yearStart: 2017,
+        displacementCc: 1,
+        fuelType: 'electric',
+        transmission: 'automatic',
+      );
+      c.applyReferenceVehicle(ev);
+      expect(c.powerKwController.text, '');
+    });
+
+    test('new-vehicle buildProfile persists power from the catalog pick', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.applyReferenceVehicle(golf); // pre-fills the power controller
+      final profile = c.buildProfile(
+        existing: null,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        referenceVehicle: golf,
+      );
+      expect(profile.enginePowerKw, 110);
+    });
+
+    test('new-vehicle buildProfile honours a user override over the catalog '
+        'powerKw', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.powerKwController.text = '140'; // user override
+      final profile = c.buildProfile(
+        existing: null,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        referenceVehicle: golf, // catalog says 110
+      );
+      expect(profile.enginePowerKw, 140);
+    });
+
+    test('edit buildProfile persists an edited power value', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      const existing = VehicleProfile(
+        id: 'e-power',
+        name: 'old',
+        enginePowerKw: 110,
+      );
+      c.load(existing);
+      c.powerKwController.text = '96'; // user edits power down
+      final profile = c.buildProfile(
+        existing: existing,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+      );
+      expect(profile.enginePowerKw, 96);
+    });
+
+    test('clearing the power field persists a null enginePowerKw', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      const existing = VehicleProfile(
+        id: 'e-clear',
+        name: 'old',
+        enginePowerKw: 110,
+      );
+      c.load(existing);
+      c.powerKwController.text = ''; // user clears it
+      final profile = c.buildProfile(
+        existing: existing,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+      );
+      expect(profile.enginePowerKw, isNull);
+    });
+
+    test('EV vehicles never persist enginePowerKw', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.powerKwController.text = '220'; // even if somehow set
+      const existing = VehicleProfile(id: 'ev-power', name: 'old');
+      final profile = c.buildProfile(
+        existing: existing,
+        type: VehicleType.ev,
+        connectors: const {ConnectorType.type2},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+      );
+      expect(profile.enginePowerKw, isNull);
     });
   });
 

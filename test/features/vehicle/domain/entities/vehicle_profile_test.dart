@@ -146,6 +146,7 @@ void main() {
         // Engine parameters
         engineDisplacementCc: 1598,
         engineCylinders: 4,
+        enginePowerKw: 110,
         volumetricEfficiency: 0.87,
         volumetricEfficiencySamples: 12,
         curbWeightKg: 1450,
@@ -187,6 +188,34 @@ void main() {
       );
       expect(restored.chargingPreferences.preferredNetworks,
           ['Ionity', 'Fastned']);
+      // Epic #3015 — enginePowerKw survives the round-trip.
+      expect(restored.enginePowerKw, 110);
+    });
+
+    test('enginePowerKw round-trips through toJson/fromJson (Epic #3015)',
+        () {
+      const original = VehicleProfile(
+        id: 'power-profile',
+        name: 'Power',
+        enginePowerKw: 81,
+      );
+      final json = original.toJson();
+      expect(json['enginePowerKw'], 81);
+      final restored = VehicleProfile.fromJson(json);
+      expect(restored, equals(original));
+      expect(restored.enginePowerKw, 81);
+    });
+
+    test('legacy JSON without enginePowerKw deserializes to null '
+        '(field-add is sync-transparent, Epic #3015)', () {
+      // A pre-#3015 profile payload simply omits the key.
+      final legacyJson = <String, dynamic>{
+        'id': 'legacy',
+        'name': 'Legacy',
+        'type': 'combustion',
+      };
+      final restored = VehicleProfile.fromJson(legacyJson);
+      expect(restored.enginePowerKw, isNull);
     });
 
     test('toJson stores type as string key (not enum index)', () {

@@ -2462,6 +2462,14 @@ class AppLocalizationsEt extends AppLocalizations {
   String get vehicleTankLabel => 'Paagi mahtuvus (L)';
 
   @override
+  String get vehiclePowerLabel => 'Engine power (kW)';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '≈ $ps PS';
+  }
+
+  @override
   String get vehiclePreferredFuelLabel => 'Eelistatud kütus';
 
   @override

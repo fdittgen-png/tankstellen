@@ -49,6 +49,7 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
       multiFuelCapable: json['multiFuelCapable'] as bool? ?? false,
       engineDisplacementCc: (json['engineDisplacementCc'] as num?)?.toInt(),
       engineCylinders: (json['engineCylinders'] as num?)?.toInt(),
+      enginePowerKw: (json['enginePowerKw'] as num?)?.toInt(),
       volumetricEfficiency:
           (json['volumetricEfficiency'] as num?)?.toDouble() ?? 0.85,
       volumetricEfficiencySamples:
@@ -136,6 +137,7 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'multiFuelCapable': instance.multiFuelCapable,
   'engineDisplacementCc': instance.engineDisplacementCc,
   'engineCylinders': instance.engineCylinders,
+  'enginePowerKw': instance.enginePowerKw,
   'volumetricEfficiency': instance.volumetricEfficiency,
   'volumetricEfficiencySamples': instance.volumetricEfficiencySamples,
   'manualEngineDisplacementCcOverride':

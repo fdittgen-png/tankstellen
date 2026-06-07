@@ -173,6 +173,16 @@ abstract class VehicleProfile with _$VehicleProfile {
     //     samples.
     int? engineDisplacementCc,
     int? engineCylinders,
+
+    // Rated engine power in kilowatts (kW) (Epic #3015). Pre-filled from
+    // the matched [ReferenceVehicle.powerKw] when the user picks a
+    // catalog row, but fully user-overridable from the edit-vehicle
+    // form's Combustion section. Canonical unit is kW; PS is derived for
+    // display via [powerKwToPs], never stored. Null when unknown — the
+    // power-aware features that consume it (Epic #3015 follow-up) fall
+    // back to a power-agnostic path. JSONB-stored field-add, so it is
+    // sync-transparent (no Supabase schema change).
+    int? enginePowerKw,
     @Default(0.85) double volumetricEfficiency,
     @Default(0) int volumetricEfficiencySamples,
 

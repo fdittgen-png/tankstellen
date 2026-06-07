@@ -2478,6 +2478,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get vehicleTankLabel => 'Tartálykapacitás (L)';
 
   @override
+  String get vehiclePowerLabel => 'Engine power (kW)';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '≈ $ps PS';
+  }
+
+  @override
   String get vehiclePreferredFuelLabel => 'Előnyben részesített üzemanyag';
 
   @override
