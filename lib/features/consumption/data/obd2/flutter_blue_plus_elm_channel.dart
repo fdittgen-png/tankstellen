@@ -16,6 +16,7 @@ import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
+import 'obd2_link_drop_signal.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Standard SPP-over-BLE UUIDs exposed by Vgate vLinker and most
@@ -100,6 +101,15 @@ class FlutterBluePlusElmChannel
       StreamController<List<int>>.broadcast();
   bool _open = false;
 
+  /// #3019 — set while a DELIBERATE [close] tears the channel down, so the
+  /// resulting disconnect edge is NOT misread as an unexpected drop (which
+  /// would spuriously kick the reconnect loop after a normal disconnect).
+  bool _closing = false;
+
+  /// #3019 — fires the proactive link-drop signal at most once per UNEXPECTED
+  /// drop (the debounce-confirmed edge), suppressed during a deliberate close.
+  bool _dropSignalled = false;
+
   /// #2261 concern 1 — debounces a raw `connectionState == disconnected` edge
   /// into a confirmed drop so a self-healing RF blip within the supervision
   /// timeout doesn't tear down a recoverable session, while a genuine
@@ -154,6 +164,17 @@ class FlutterBluePlusElmChannel
     // are binned separately below as `raw-edge-drop`.
     final diag = Obd2CommDiagnostics.instance;
     if (diag.enabled) diag.noteConnectionEvent(drop: true);
+    // #3019 / Epic #3013 phase 3 — PROACTIVE drop signal. A debounce-confirmed
+    // BLE drop is a real link loss; emit the transport-agnostic link-drop
+    // signal so the trip-INDEPENDENT reconnect controller starts its bounded
+    // backoff loop immediately (even when idle / no command in flight).
+    // Suppressed during a deliberate [close] (`_closing`) so a normal
+    // disconnect is never misread as a drop.
+    if (!_closing && !_dropSignalled) {
+      _dropSignalled = true;
+      Obd2LinkDropSignal.instance
+          .notifyDrop(transportKind: 'ble', mac: _device.remoteId.str);
+    }
     if (_incoming.isClosed) return;
     _incoming.addError(const Obd2DisconnectedException());
   }
@@ -638,6 +659,7 @@ class FlutterBluePlusElmChannel
 
   @override
   Future<void> close() async {
+    _closing = true;
     _open = false;
     _dropDebouncer.dispose();
     await _connStateSubscription?.cancel();

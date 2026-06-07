@@ -13,6 +13,7 @@ import 'bluetooth_facade.dart';
 import 'classic_bluetooth_facade.dart';
 import 'elm327_adapter.dart';
 import 'elm_byte_channel.dart';
+import 'last_good_adapter_store.dart';
 import 'negotiated_protocol_cache.dart';
 import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
@@ -98,6 +99,14 @@ class Obd2ConnectionService {
   /// can change between trips. Null ⇒ adapterMac-only keying.
   final Obd2VehicleKeyFields Function()? activeVehicleKeyFields;
 
+  /// #3019 / Epic #3013 phase 3 — auto-pin store for the last-good
+  /// adapter. Every SUCCESSFUL connect (the single [_openAndInit]
+  /// chokepoint) records the MAC + transport + name here so the
+  /// trip-independent reconnect controller can try the fast pinned path
+  /// first on the next drop. Local-only (Hive `settings` box), NOT synced.
+  /// Null in tests / configs that don't wire it — pinning is then skipped.
+  final LastGoodAdapterStore? lastGoodAdapterStore;
+
   /// #2906 — settle pause after [_stopScanBeforeConnect] stops the radio and
   /// before a `channel.open()` fires. Android BLE is fragile if a `connect()`
   /// races an active scan still winding down on the radio — a stale scan can
@@ -116,6 +125,7 @@ class Obd2ConnectionService {
     this.negotiatedProtocolCache,
     this.adapterWakeCache,
     this.activeVehicleKeyFields,
+    this.lastGoodAdapterStore,
     this.scanSettleDelay = const Duration(milliseconds: 120),
   });
 
@@ -344,6 +354,19 @@ class Obd2ConnectionService {
     if (!service.busAnswered) {
       Obd2ConnectTraceLog.active?.setOutcome(Obd2ConnectOutcome.ignitionOff);
     }
+    // #3019 / Epic #3013 phase 3 — auto-pin the last-good adapter on EVERY
+    // successful connect (this is the single chokepoint every connect path
+    // funnels through). The trip-INDEPENDENT reconnect controller reads this
+    // to try the fast pinned path first on the next drop. Best-effort +
+    // local-only (the store swallows + logs a write failure), so it never
+    // derails a connect that just succeeded. Pinned even when the bus was
+    // silent — the HARDWARE link is good; that is exactly what reconnect
+    // wants to re-establish.
+    await lastGoodAdapterStore?.recordFrom(
+      mac: service.adapterMac,
+      transportKind: service.linkKind,
+      name: service.adapterName,
+    );
     return service;
   }
 
@@ -591,6 +614,11 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     // the shared `settings` box (same pattern as the broken-MAP blocklist).
     adapterWakeCache:
         Obd2AdapterWakeCache(ref.watch(settingsStorageProvider)),
+    // #3019 / Epic #3013 phase 3 — auto-pin the last-good adapter on every
+    // successful connect, backed by the same local `settings` box. Read by
+    // the trip-independent reconnect controller for the fast pinned path.
+    lastGoodAdapterStore:
+        LastGoodAdapterStore(ref.watch(settingsStorageProvider)),
     activeVehicleKeyFields: () {
       // Defensive: the vehicle provider must never make a connect throw.
       try {

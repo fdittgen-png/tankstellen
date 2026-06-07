@@ -15,13 +15,16 @@ import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
 import '../../../search/providers/radar_search_provider.dart';
 import '../../../search/providers/search_filters_provider.dart';
+import '../../data/obd2/obd2_reconnect_controller.dart';
 import '../../domain/driving_coaching.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/obd2_connection_state_provider.dart';
+import '../../providers/obd2_reconnect_provider.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'gps_degraded_banner.dart';
 import 'obd2_pause_banner.dart';
+import 'obd2_reconnect_retry_banner.dart';
 import 'obd2_status_dot.dart';
 import 'trip_recording_banner_content.dart';
 import 'trip_recording_banner_palette.dart';
@@ -107,12 +110,23 @@ class TripRecordingBanner extends ConsumerWidget {
       );
     }
 
+    // #3019 / Epic #3013 phase 3 — the trip-INDEPENDENT auto-reconnect
+    // controller. Watching it here keeps the keepAlive provider alive (so it
+    // subscribes to the proactive link-drop signal) and surfaces its
+    // "reconnecting…" / terminal "tap to retry" banner ABOVE every screen,
+    // decoupled from any live trip — a drop while idle still recovers.
+    final reconnectState = ref.watch(obd2ReconnectProvider);
+    final reconnectVisible = reconnectState == Obd2ReconnectState.reconnecting ||
+        reconnectState == Obd2ReconnectState.terminalFailed;
+
     // When no trip is active: show a thin strip carrying only the
     // OBD2 status dot — and only when there's an adapter remembered
     // (otherwise the dot itself collapses to zero size). First-run
     // users with nothing configured see no chrome at all.
     if (!state.isActive) {
-      if (!obd2.hasVisibleIndicator) return child;
+      // #3019 — a drop while idle still surfaces the auto-reconnect banner,
+      // even when no status dot would show (no paired-adapter indicator).
+      if (!obd2.hasVisibleIndicator && !reconnectVisible) return child;
       return Column(
         children: [
           const SafeArea(
@@ -128,6 +142,8 @@ class TripRecordingBanner extends ConsumerWidget {
               ),
             ),
           ),
+          // #3019 — trip-independent reconnect surface (reconnecting / retry).
+          const Obd2ReconnectRetryBanner(),
           Expanded(child: child),
         ],
       );

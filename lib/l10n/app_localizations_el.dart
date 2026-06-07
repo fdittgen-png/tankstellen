@@ -6542,6 +6542,24 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
+
+  @override
+  String obd2ReconnectInProgressNamed(String adapter) {
+    return 'Reconnecting to $adapter…';
+  }
+
+  @override
+  String get obd2ReconnectFailedTitle => 'Couldn’t reconnect to your adapter';
+
+  @override
+  String get obd2ReconnectFailedBody =>
+      'The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.';
+
+  @override
+  String get obd2ReconnectRetry => 'Tap to retry';
+
+  @override
   String get ocrTesterTitle => 'Δοκιμαστής OCR';
 
   @override

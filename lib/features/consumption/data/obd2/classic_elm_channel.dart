@@ -9,6 +9,7 @@ import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
 import 'event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_link_drop_signal.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
@@ -36,6 +37,17 @@ class ClassicElmChannel implements ElmByteChannel {
   final StreamController<List<int>> _incoming =
       StreamController<List<int>>.broadcast();
   bool _open = false;
+
+  /// #3019 — set while a DELIBERATE [close] is tearing the channel down, so
+  /// the resulting socket `done` / `error` edge is NOT misread as an
+  /// unexpected drop (which would spuriously kick the reconnect loop after a
+  /// normal disconnect).
+  bool _closing = false;
+
+  /// #3019 — fire the proactive link-drop signal exactly once per UNEXPECTED
+  /// drop. Suppressed during a deliberate [close] (a normal teardown is not a
+  /// drop).
+  bool _dropSignalled = false;
 
   ClassicElmChannel({
     required this.address,
@@ -144,6 +156,14 @@ class ClassicElmChannel implements ElmByteChannel {
         // `PlatformException(state, not connected)` the PidScheduler then
         // logged as an ERROR (4× in the field log).
         _open = false;
+        // #3019 / Epic #3013 phase 3 — PROACTIVE Classic-drop detection. The
+        // socket error fires HERE the instant the link dies; emit the
+        // transport-agnostic link-drop signal so the trip-INDEPENDENT
+        // reconnect controller starts its bounded backoff loop immediately
+        // rather than the drop being discovered only LAZILY on the next
+        // `write()` (which never comes when idle / between trips). The in-trip
+        // typed-disconnect handling below is unchanged.
+        _signalDrop();
         // #2295 — forward the socket error onto the byte stream so the
         // transport's pending `sendCommand` completer fails IMMEDIATELY
         // (via `_failPending`) instead of waiting out the read timeout,
@@ -158,6 +178,9 @@ class ClassicElmChannel implements ElmByteChannel {
       },
       onDone: () {
         _open = false;
+        // #3019 — a clean socket `done` is also a drop (some stacks close the
+        // reader instead of erroring it). Same proactive signal.
+        _signalDrop();
       },
     );
     _open = true;
@@ -207,8 +230,19 @@ class ClassicElmChannel implements ElmByteChannel {
     return 'other';
   }
 
+  /// #3019 — emit the proactive Classic link-drop signal once per unexpected
+  /// drop. A deliberate [close] (the `_closing` guard) is a normal teardown,
+  /// not a drop, so it never reaches here.
+  void _signalDrop() {
+    if (_closing || _dropSignalled) return;
+    _dropSignalled = true;
+    Obd2LinkDropSignal.instance
+        .notifyDrop(transportKind: 'classic', mac: address);
+  }
+
   @override
   Future<void> close() async {
+    _closing = true;
     _open = false;
     await _subscription?.safeCancel();
     _subscription = null;
