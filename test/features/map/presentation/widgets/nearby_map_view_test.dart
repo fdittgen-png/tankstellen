@@ -207,6 +207,43 @@ void main() {
     );
 
     testWidgets(
+      '#2998 — Nearby adopts the radar clustered+cheapest-labelled grammar: '
+      'StationMapLayers.clusterAlways == true, onStationTap stays null '
+      '(push-to-detail), showSearchRadius stays true (radius circle kept)',
+      (tester) async {
+        final controller = _CountingMapController();
+        addTearDown(controller.dispose);
+
+        await pumpApp(
+          tester,
+          _Rebuildable(
+            controller: controller,
+            viewFor: viewFor,
+            initial: resultFor(parisStations),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final layers =
+            tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+        // #2998 — the canonical radar grammar (#2939) is adopted on the
+        // full-screen nearby map: EVERY result set is proximity-clustered
+        // with the cheapest-price badge, instead of the legacy
+        // emphasis(top-4 pills)+compact-dots scheme.
+        expect(layers.clusterAlways, isTrue,
+            reason: 'nearby must adopt the radar clusterAlways grammar');
+        // The full-screen map has no co-visible list, so a marker tap must
+        // keep its default behaviour: GoRouter push to /station/{id}. A
+        // non-null onStationTap would suppress that navigation (#2939).
+        expect(layers.onStationTap, isNull,
+            reason: 'marker tap must stay push-to-detail (no onStationTap)');
+        // The radius circle is meaningful on the nearby map and stays drawn.
+        expect(layers.showSearchRadius, isTrue,
+            reason: 'the search-radius circle must be preserved');
+      },
+    );
+
+    testWidgets(
       'exactly one re-fit per distinct search bounds (no fit loop)',
       (tester) async {
         final controller = _CountingMapController();
