@@ -60,6 +60,55 @@ Widget cheapestLabelledClusterLayer({
   );
 }
 
+/// #3000 (Epic #2997) — selection-aware clustering for the ROUTE map.
+///
+/// PARTITIONS [markers] into the SELECTED stations (those whose [metaOf] id is
+/// in [selectedIds]) and the REST, then returns two layers:
+///   1. a [cheapestLabelledClusterLayer] over the UNSELECTED markers (the
+///      radar grammar — proximity clusters with a cheapest badge), and
+///   2. a plain [MarkerLayer] over the SELECTED markers, painted ON TOP so the
+///      Best/All vivid full price pills are never hidden behind a cluster.
+///
+/// This keeps the route map's multi-select highlighting and its
+/// `RouteBestStopsList`↔marker 1:1 mapping intact — a blanket cluster would
+/// otherwise collapse several selected stations into one ringed cheapest badge.
+/// The selected markers retain whatever styling [StationMapLayers] built for
+/// them (the vivid selected ring + full pill); this only re-homes the
+/// already-built [Marker]s into the un-clustered layer.
+///
+/// Extracted here (rather than inlined into [StationMapLayers]) so that widget
+/// stays under its file-length snapshot.
+List<Widget> selectionPartitionedClusterLayers({
+  required List<Marker> markers,
+  required MarkerMeta? Function(Marker) metaOf,
+  required (double, double) priceRange,
+  required Set<String> selectedIds,
+}) {
+  final unselected = <Marker>[];
+  final selected = <Marker>[];
+  for (final m in markers) {
+    final meta = metaOf(m);
+    if (meta != null && selectedIds.contains(meta.id)) {
+      selected.add(m);
+    } else {
+      unselected.add(m);
+    }
+  }
+  return [
+    if (unselected.isNotEmpty)
+      cheapestLabelledClusterLayer(
+        markers: unselected,
+        metaOf: metaOf,
+        priceRange: priceRange,
+        // The selected stations are NOT in this layer, so no cluster here can
+        // contain one — pass an empty set so no badge is spuriously ringed.
+        selectedIds: const <String>{},
+      ),
+    // Selected pills paint ON TOP of the clusters so they are never hidden.
+    if (selected.isNotEmpty) MarkerLayer(markers: selected),
+  ];
+}
+
 /// The count-cluster layer — the #2510 fallback for a genuinely huge non-radar
 /// result set, where painting hundreds of overlapping dots would itself be
 /// illegible.

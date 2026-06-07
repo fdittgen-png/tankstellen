@@ -436,6 +436,93 @@ void main() {
     );
   });
 
+  // #3000 (Epic #2997) — the route map adopts the radar clustered+
+  // cheapest-labelled grammar, but SELECTION-AWARE: cluster the non-selected
+  // stations while the Best/All SELECTED stations stay as full un-clustered
+  // pills. RouteMapView must hand StationMapLayers BOTH `clusterAlways` and
+  // `excludeSelectedFromClustering`, and keep the cross-border resolver,
+  // route polyline, the Best/All selection set, and the suppressed radius.
+  group('RouteMapView selection-aware clustering wiring (#3000)', () {
+    testWidgets(
+      'passes clusterAlways AND excludeSelectedFromClustering to '
+      'StationMapLayers, while keeping fuelResolver, routePolyline and '
+      'showSearchRadius=false',
+      (tester) async {
+        final controller = MapController();
+        addTearDown(controller.dispose);
+
+        final overrides = standardTestOverrides();
+        when(() => overrides.mockStorage.getActiveProfileId())
+            .thenReturn(null);
+
+        await pumpApp(
+          tester,
+          buildHost(buildResult(stations: testStationList), controller),
+          overrides: overrides.overrides,
+        );
+
+        final layers =
+            tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+        // Selection-aware clustering: cluster the non-selected, keep selected
+        // as full pills.
+        expect(layers.clusterAlways, isTrue,
+            reason: 'route map adopts the radar clustered grammar');
+        expect(layers.excludeSelectedFromClustering, isTrue,
+            reason: 'Best/All selected stations stay OUT of clustering as full '
+                'pills so the multi-select + list↔map 1:1 mapping survive');
+        // #2631 — the cross-border resolver must still be supplied so a
+        // Spanish station's cheapest rollup uses the resolved E10 price.
+        expect(layers.fuelResolver, isNotNull,
+            reason: 'cross-border fuel resolution (#2631) must be preserved');
+        // Route polyline + suppressed radius are unchanged.
+        expect(layers.routePolyline, isNotNull);
+        expect(layers.showSearchRadius, isFalse);
+        // Route map uses its OWN selection model — no map-row-select tap.
+        expect(layers.onStationTap, isNull,
+            reason: 'route map selects via its Best/All model, not map taps');
+      },
+    );
+
+    testWidgets(
+      'forwards the Best/All selected set as selectedStationIds once a Best '
+      'station is chosen',
+      (tester) async {
+        final controller = MapController();
+        addTearDown(controller.dispose);
+
+        final overrides = standardTestOverrides();
+        when(() => overrides.mockStorage.getActiveProfileId())
+            .thenReturn(null);
+
+        await pumpApp(
+          tester,
+          buildHost(
+            buildResult(
+              stations: testStationList,
+              cheapestId: testStationList.first.id,
+            ),
+            controller,
+          ),
+          overrides: overrides.overrides,
+        );
+
+        // Switch to Best stops → the selected set is populated and forwarded.
+        await tester.tap(find.text('Best stops'));
+        await tester.pumpAndSettle();
+
+        final layers =
+            tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+        expect(layers.selectedStationIds, isNotNull);
+        expect(layers.selectedStationIds, contains(testStationList.first.id),
+            reason: 'the Best-stops selection set drives which markers stay '
+                'un-clustered');
+        // The two clustering flags hold across the toggle.
+        expect(layers.clusterAlways, isTrue);
+        expect(layers.excludeSelectedFromClustering, isTrue);
+      },
+    );
+  });
+
   group('RouteMapView save-route dialog', () {
     testWidgets('opening the dialog shows a TextField and Cancel/Save buttons',
         (tester) async {
