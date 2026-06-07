@@ -892,6 +892,13 @@ class TripRecordingController {
     // keeps the recorder's authoritative timestamps untouched.
     final startedAt = base.startedAt ?? _gpsStartedAt;
     final endedAt = base.endedAt ?? _gpsEndedAt;
+    // #2895 / #3029 — harsh-count parity with the GPS-only pipeline (which
+    // runs an IMU detector + the #2895 `imuActive ? imuCount : recorder`
+    // veto). This OBD2 path runs NO inertial detector, so the veto collapses
+    // to "use the recorder value": after #3029 the recorder suppresses harsh
+    // scoring on the `gps`/`virtual` source in `onSample`, so base.harsh* is
+    // 0 for a no-speed-PID GPS trip (no phantom) and reflects the direct OBD2
+    // speed PID on a `real` trip (preserved). Pass-through is correct here.
     return TripSummary(
       distanceKm: distanceKm,
       maxRpm: base.maxRpm,

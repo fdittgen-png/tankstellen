@@ -91,6 +91,15 @@ class DrivingAnalysisTrace {
         'score': {
           'overall': score.score,
           'styleClass': score.styleClass.name,
+          // #3029 — the harsh counts that ACTUALLY drive the penalties
+          // (`summary.harshAccelerations`/`harshBrakes` — IMU when it ran,
+          // else the now-suppressed direct-speed value), so a non-zero
+          // penalty always has a visible matching count. The `imu.*Count`
+          // block above stays the inertial-sensor truth; before this, a
+          // GPS-sourced trip could show a penalty>0 while `imu.*Count==0`,
+          // reading as a phantom with no source.
+          'hardAccelCount': summary.harshAccelerations,
+          'hardBrakeCount': summary.harshBrakes,
           'hardAccelPenalty': _round(score.hardAccelPenalty, 2),
           'hardBrakePenalty': _round(score.hardBrakePenalty, 2),
           'idlingPenalty': _round(score.idlingPenalty, 2),

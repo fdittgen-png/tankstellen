@@ -358,7 +358,12 @@ void main() {
     // matching production `updateGpsFix`) so a test can drive the new ~1 Hz
     // GPS-track decimation deterministically. Test-only surface; decomposition
     // stays tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1707,
+    // #3029 — re-grandfathered 1707 → 1717: a 9-line parity-rationale comment
+    // at `_finaliseSummary` documenting why this OBD2 path (no IMU detector)
+    // is already correct after the recorder suppresses GPS-derived harsh
+    // scoring — i.e. why no #2895 IMU-veto wiring is needed here. Doc-only;
+    // decomposition stays tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1717,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The
