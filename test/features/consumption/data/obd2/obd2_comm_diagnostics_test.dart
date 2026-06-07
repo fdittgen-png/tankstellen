@@ -53,6 +53,29 @@ void main() {
       expect(row.error, 1);
     });
 
+    test('PID stats are keyed by the CLEAN command — a trailing CR ("010C\\r") '
+        'is stripped so dispatch + result share one row', () {
+      // Real connect traces showed per-PID rows keyed "010C\r", "010D\r", …
+      // because the raw poll command carries its line terminator. The key
+      // must be the clean PID so the trace is readable and a command polled
+      // with and without the CR does not split into two rows.
+      final c = Obd2CommDiagnostics(enabled: true);
+      c.beginSession();
+      c.noteDispatch('010C\r');
+      c.noteResult('010C\r', ResponseClass.ok, rttMs: 40);
+      // Same PID without the terminator must fold into the same clean row.
+      c.noteResult('010C', ResponseClass.noData);
+
+      final stats = c.snapshot().pidStats;
+      expect(stats.keys, contains('010C'));
+      expect(stats.keys, isNot(contains('010C\r')),
+          reason: 'the trailing carriage-return must be stripped from the key');
+      final row = stats['010C']!;
+      expect(row.polled, 1);
+      expect(row.ok, 1);
+      expect(row.noData, 1);
+    });
+
     test('every error-class folds into the single error counter', () {
       final c = Obd2CommDiagnostics(enabled: true);
       c.beginSession();

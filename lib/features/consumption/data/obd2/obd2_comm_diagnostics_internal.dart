@@ -178,8 +178,15 @@ class _LiveSession {
   // Discovered-supported tri-state (#2469): command → state string.
   final Map<String, String> discoveredSupported = <String, String>{};
 
+  /// Keys the per-PID stat map by the **clean** PID command. The raw poll
+  /// command carries a trailing carriage-return line terminator (e.g.
+  /// `"010C\r"`), so we `trim()` it off before keying — otherwise the
+  /// diagnostics trace shows noisy `"010C\r"` rows and a command polled both
+  /// with and without the terminator would split into two rows. Purely a
+  /// diagnostics-cleanliness normalisation: it never touches what is sent on
+  /// the wire.
   _PidAccumulator pidRow(String pid) =>
-      _pids.putIfAbsent(pid, _PidAccumulator.new);
+      _pids.putIfAbsent(pid.trim(), _PidAccumulator.new);
 
   Obd2SessionDiagnostic toDiagnostic(int activeSeconds) =>
       Obd2SessionDiagnostic(
