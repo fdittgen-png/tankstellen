@@ -141,6 +141,16 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
                     searchRadiusKm: searchRadiusKm,
                     selectedFuel: selectedFuel,
                     sortMode: sortMode,
+                    // #2998 — adopt the maintainer-loved radar grammar
+                    // (#2939): proximity-cluster EVERY result set with the
+                    // cheapest-price badge, identical to the landscape
+                    // split-screen radar map (InlineMap), instead of the
+                    // legacy emphasis(top-4 pills)+compact-dots scheme. No
+                    // `onStationTap` is passed, so a marker tap keeps its
+                    // default GoRouter push to /station/{id} (the full-screen
+                    // map has no co-visible list to select into); the radius
+                    // circle (`showSearchRadius`, default true) stays drawn.
+                    clusterAlways: true,
                     showRecenterButton: true,
                     onRecenter: () => mapController.fitCamera(
                       CameraFit.bounds(
