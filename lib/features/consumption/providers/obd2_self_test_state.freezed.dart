@@ -284,7 +284,11 @@ as bool,
 /// @nodoc
 mixin _$Obd2SelfTestState {
 
- Obd2SelfTestPhase get phase; List<Obd2SelfTestStep> get steps; bool get passed; int? get elapsedMs;
+ Obd2SelfTestPhase get phase; List<Obd2SelfTestStep> get steps;/// The tri-state verdict of the completed run (#3009): passed /
+/// engineOff (adapter OK, engine off) / failed. `failed` until a run
+/// finishes. Drives the summary banner's colour + headline so the
+/// engine-off case shows a non-alarming amber notice, not a red failure.
+ Obd2SelfTestVerdict get verdict; int? get elapsedMs;
 /// Create a copy of Obd2SelfTestState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -295,16 +299,16 @@ $Obd2SelfTestStateCopyWith<Obd2SelfTestState> get copyWith => _$Obd2SelfTestStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SelfTestState&&(identical(other.phase, phase) || other.phase == phase)&&const DeepCollectionEquality().equals(other.steps, steps)&&(identical(other.passed, passed) || other.passed == passed)&&(identical(other.elapsedMs, elapsedMs) || other.elapsedMs == elapsedMs));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SelfTestState&&(identical(other.phase, phase) || other.phase == phase)&&const DeepCollectionEquality().equals(other.steps, steps)&&(identical(other.verdict, verdict) || other.verdict == verdict)&&(identical(other.elapsedMs, elapsedMs) || other.elapsedMs == elapsedMs));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,phase,const DeepCollectionEquality().hash(steps),passed,elapsedMs);
+int get hashCode => Object.hash(runtimeType,phase,const DeepCollectionEquality().hash(steps),verdict,elapsedMs);
 
 @override
 String toString() {
-  return 'Obd2SelfTestState(phase: $phase, steps: $steps, passed: $passed, elapsedMs: $elapsedMs)';
+  return 'Obd2SelfTestState(phase: $phase, steps: $steps, verdict: $verdict, elapsedMs: $elapsedMs)';
 }
 
 
@@ -315,7 +319,7 @@ abstract mixin class $Obd2SelfTestStateCopyWith<$Res>  {
   factory $Obd2SelfTestStateCopyWith(Obd2SelfTestState value, $Res Function(Obd2SelfTestState) _then) = _$Obd2SelfTestStateCopyWithImpl;
 @useResult
 $Res call({
- Obd2SelfTestPhase phase, List<Obd2SelfTestStep> steps, bool passed, int? elapsedMs
+ Obd2SelfTestPhase phase, List<Obd2SelfTestStep> steps, Obd2SelfTestVerdict verdict, int? elapsedMs
 });
 
 
@@ -332,12 +336,12 @@ class _$Obd2SelfTestStateCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SelfTestState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? phase = null,Object? steps = null,Object? passed = null,Object? elapsedMs = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? phase = null,Object? steps = null,Object? verdict = null,Object? elapsedMs = freezed,}) {
   return _then(_self.copyWith(
 phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
 as Obd2SelfTestPhase,steps: null == steps ? _self.steps : steps // ignore: cast_nullable_to_non_nullable
-as List<Obd2SelfTestStep>,passed: null == passed ? _self.passed : passed // ignore: cast_nullable_to_non_nullable
-as bool,elapsedMs: freezed == elapsedMs ? _self.elapsedMs : elapsedMs // ignore: cast_nullable_to_non_nullable
+as List<Obd2SelfTestStep>,verdict: null == verdict ? _self.verdict : verdict // ignore: cast_nullable_to_non_nullable
+as Obd2SelfTestVerdict,elapsedMs: freezed == elapsedMs ? _self.elapsedMs : elapsedMs // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }
@@ -423,10 +427,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Obd2SelfTestPhase phase,  List<Obd2SelfTestStep> steps,  bool passed,  int? elapsedMs)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Obd2SelfTestPhase phase,  List<Obd2SelfTestStep> steps,  Obd2SelfTestVerdict verdict,  int? elapsedMs)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Obd2SelfTestState() when $default != null:
-return $default(_that.phase,_that.steps,_that.passed,_that.elapsedMs);case _:
+return $default(_that.phase,_that.steps,_that.verdict,_that.elapsedMs);case _:
   return orElse();
 
 }
@@ -444,10 +448,10 @@ return $default(_that.phase,_that.steps,_that.passed,_that.elapsedMs);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Obd2SelfTestPhase phase,  List<Obd2SelfTestStep> steps,  bool passed,  int? elapsedMs)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Obd2SelfTestPhase phase,  List<Obd2SelfTestStep> steps,  Obd2SelfTestVerdict verdict,  int? elapsedMs)  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SelfTestState():
-return $default(_that.phase,_that.steps,_that.passed,_that.elapsedMs);case _:
+return $default(_that.phase,_that.steps,_that.verdict,_that.elapsedMs);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -464,10 +468,10 @@ return $default(_that.phase,_that.steps,_that.passed,_that.elapsedMs);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Obd2SelfTestPhase phase,  List<Obd2SelfTestStep> steps,  bool passed,  int? elapsedMs)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Obd2SelfTestPhase phase,  List<Obd2SelfTestStep> steps,  Obd2SelfTestVerdict verdict,  int? elapsedMs)?  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SelfTestState() when $default != null:
-return $default(_that.phase,_that.steps,_that.passed,_that.elapsedMs);case _:
+return $default(_that.phase,_that.steps,_that.verdict,_that.elapsedMs);case _:
   return null;
 
 }
@@ -479,7 +483,7 @@ return $default(_that.phase,_that.steps,_that.passed,_that.elapsedMs);case _:
 
 
 class _Obd2SelfTestState extends Obd2SelfTestState {
-  const _Obd2SelfTestState({this.phase = Obd2SelfTestPhase.idle, final  List<Obd2SelfTestStep> steps = const <Obd2SelfTestStep>[], this.passed = false, this.elapsedMs}): _steps = steps,super._();
+  const _Obd2SelfTestState({this.phase = Obd2SelfTestPhase.idle, final  List<Obd2SelfTestStep> steps = const <Obd2SelfTestStep>[], this.verdict = Obd2SelfTestVerdict.failed, this.elapsedMs}): _steps = steps,super._();
   
 
 @override@JsonKey() final  Obd2SelfTestPhase phase;
@@ -490,7 +494,11 @@ class _Obd2SelfTestState extends Obd2SelfTestState {
   return EqualUnmodifiableListView(_steps);
 }
 
-@override@JsonKey() final  bool passed;
+/// The tri-state verdict of the completed run (#3009): passed /
+/// engineOff (adapter OK, engine off) / failed. `failed` until a run
+/// finishes. Drives the summary banner's colour + headline so the
+/// engine-off case shows a non-alarming amber notice, not a red failure.
+@override@JsonKey() final  Obd2SelfTestVerdict verdict;
 @override final  int? elapsedMs;
 
 /// Create a copy of Obd2SelfTestState
@@ -503,16 +511,16 @@ _$Obd2SelfTestStateCopyWith<_Obd2SelfTestState> get copyWith => __$Obd2SelfTestS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SelfTestState&&(identical(other.phase, phase) || other.phase == phase)&&const DeepCollectionEquality().equals(other._steps, _steps)&&(identical(other.passed, passed) || other.passed == passed)&&(identical(other.elapsedMs, elapsedMs) || other.elapsedMs == elapsedMs));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SelfTestState&&(identical(other.phase, phase) || other.phase == phase)&&const DeepCollectionEquality().equals(other._steps, _steps)&&(identical(other.verdict, verdict) || other.verdict == verdict)&&(identical(other.elapsedMs, elapsedMs) || other.elapsedMs == elapsedMs));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,phase,const DeepCollectionEquality().hash(_steps),passed,elapsedMs);
+int get hashCode => Object.hash(runtimeType,phase,const DeepCollectionEquality().hash(_steps),verdict,elapsedMs);
 
 @override
 String toString() {
-  return 'Obd2SelfTestState(phase: $phase, steps: $steps, passed: $passed, elapsedMs: $elapsedMs)';
+  return 'Obd2SelfTestState(phase: $phase, steps: $steps, verdict: $verdict, elapsedMs: $elapsedMs)';
 }
 
 
@@ -523,7 +531,7 @@ abstract mixin class _$Obd2SelfTestStateCopyWith<$Res> implements $Obd2SelfTestS
   factory _$Obd2SelfTestStateCopyWith(_Obd2SelfTestState value, $Res Function(_Obd2SelfTestState) _then) = __$Obd2SelfTestStateCopyWithImpl;
 @override @useResult
 $Res call({
- Obd2SelfTestPhase phase, List<Obd2SelfTestStep> steps, bool passed, int? elapsedMs
+ Obd2SelfTestPhase phase, List<Obd2SelfTestStep> steps, Obd2SelfTestVerdict verdict, int? elapsedMs
 });
 
 
@@ -540,12 +548,12 @@ class __$Obd2SelfTestStateCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SelfTestState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? phase = null,Object? steps = null,Object? passed = null,Object? elapsedMs = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? phase = null,Object? steps = null,Object? verdict = null,Object? elapsedMs = freezed,}) {
   return _then(_Obd2SelfTestState(
 phase: null == phase ? _self.phase : phase // ignore: cast_nullable_to_non_nullable
 as Obd2SelfTestPhase,steps: null == steps ? _self._steps : steps // ignore: cast_nullable_to_non_nullable
-as List<Obd2SelfTestStep>,passed: null == passed ? _self.passed : passed // ignore: cast_nullable_to_non_nullable
-as bool,elapsedMs: freezed == elapsedMs ? _self.elapsedMs : elapsedMs // ignore: cast_nullable_to_non_nullable
+as List<Obd2SelfTestStep>,verdict: null == verdict ? _self.verdict : verdict // ignore: cast_nullable_to_non_nullable
+as Obd2SelfTestVerdict,elapsedMs: freezed == elapsedMs ? _self.elapsedMs : elapsedMs // ignore: cast_nullable_to_non_nullable
 as int?,
   ));
 }

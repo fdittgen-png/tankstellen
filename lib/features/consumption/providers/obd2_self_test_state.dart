@@ -48,7 +48,12 @@ abstract class Obd2SelfTestState with _$Obd2SelfTestState {
   const factory Obd2SelfTestState({
     @Default(Obd2SelfTestPhase.idle) Obd2SelfTestPhase phase,
     @Default(<Obd2SelfTestStep>[]) List<Obd2SelfTestStep> steps,
-    @Default(false) bool passed,
+
+    /// The tri-state verdict of the completed run (#3009): passed /
+    /// engineOff (adapter OK, engine off) / failed. `failed` until a run
+    /// finishes. Drives the summary banner's colour + headline so the
+    /// engine-off case shows a non-alarming amber notice, not a red failure.
+    @Default(Obd2SelfTestVerdict.failed) Obd2SelfTestVerdict verdict,
     int? elapsedMs,
   }) = _Obd2SelfTestState;
 
@@ -56,6 +61,10 @@ abstract class Obd2SelfTestState with _$Obd2SelfTestState {
 
   /// The idle starting state.
   factory Obd2SelfTestState.idle() => const Obd2SelfTestState();
+
+  /// Back-compat: `true` only on a full pass (every step ok). An engine-off
+  /// verdict is NOT a pass; consumers that distinguish it read [verdict].
+  bool get passed => verdict == Obd2SelfTestVerdict.passed;
 
   /// Number of steps that ended ok — the numerator of the summary line.
   int get passCount =>

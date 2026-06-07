@@ -264,14 +264,14 @@ Obd2SelfTestReport _buildReport(
   Stopwatch overall,
 ) {
   overall.stop();
-  // The run passes when every step that the driver attempted ended ok —
-  // skipped steps (after an abort) are failures, so an aborted run never
-  // reports passed.
-  final passed = results.isNotEmpty &&
-      results.every((r) => r.status == Obd2SelfTestStepStatus.ok);
+  // The verdict (#3009) is tri-state: passed (every step ok), engineOff (the
+  // adapter-capability steps all passed and only the live-data steps came back
+  // ECU-silent — a healthy adapter on an engine-off bus), or failed (any
+  // genuine fault / abort). An aborted run leaves skipped steps, which
+  // [obd2SelfTestVerdict] treats as a hard fault, so it never reports passed.
   return Obd2SelfTestReport(
     steps: List.unmodifiable(results),
-    passed: passed,
+    verdict: obd2SelfTestVerdict(results),
     elapsedMs: overall.elapsedMilliseconds,
   );
 }

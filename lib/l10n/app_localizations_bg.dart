@@ -3608,6 +3608,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'OBD2 адаптерът не отговори. Включете запалването и опитайте отново.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'OBD2 адаптерът изпрати неразпознат отговор. Възможно е да е несъвместим — опитайте друг адаптер.';
 
@@ -6442,6 +6446,10 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Тестът на адаптера е неуспешен';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {

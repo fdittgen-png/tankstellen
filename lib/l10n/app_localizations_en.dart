@@ -3560,7 +3560,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get obd2ErrorAdapterUnresponsive =>
-      'The OBD2 adapter did not respond. Turn the ignition on and try again.';
+      'The OBD2 adapter did not respond. Check the connection and try again.';
+
+  @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
 
   @override
   String get obd2ErrorProtocolInitFailed =>
@@ -6353,6 +6357,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Adapter test failed';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
@@ -11328,7 +11336,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2ErrorAdapterUnresponsive =>
-      '⟦Ŧĥé ÓƁĐ2 áđáƥŧéř đîđ ñóŧ řéšƥóñđ. Ŧúřñ ŧĥé îǧñîŧîóñ óñ áñđ ŧřý áǧáîñ. ························⟧';
+      '⟦Ŧĥé ÓƁĐ2 áđáƥŧéř đîđ ñóŧ řéšƥóñđ. Çĥéçķ ŧĥé çóññéçŧîóñ áñđ ŧřý áǧáîñ. ·························⟧';
+
+  @override
+  String get obd2ErrorEngineOff =>
+      '⟦Ñó đáŧá ƒřóɱ ŧĥé ṽéĥîçłé — šŧářŧ ŧĥé éñǧîñé áñđ ŧřý áǧáîñ. ····················⟧';
 
   @override
   String get obd2ErrorProtocolInitFailed =>
@@ -14201,6 +14213,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2TestRunFailed => '⟦Áđáƥŧéř ŧéšŧ ƒáîłéđ ········⟧';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      '⟦Áđáƥŧéř ÓĶ — éñǧîñé óƒƒ; šŧářŧ ŧĥé éñǧîñé ŧó řéáđ łîṽé đáŧá ·····················⟧';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {

@@ -3581,6 +3581,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'OBD2-sovitin ei vastannut. Kytke virta päälle ja yritä uudelleen.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'OBD2-sovitin lähetti tunnistamattoman vastauksen. Se voi olla yhteensopimaton — kokeile toista sovitinta.';
 
@@ -6385,6 +6389,10 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Sovitintesti epäonnistui';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {

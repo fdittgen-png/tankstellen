@@ -3577,6 +3577,10 @@ class AppLocalizationsNb extends AppLocalizations {
       'OBD2-adapteren svarte ikke. Slå på tenningen og prøv igjen.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'OBD2-adapteren sendte et ukjent svar. Den er kanskje ikke kompatibel — prøv en annen adapter.';
 
@@ -6386,6 +6390,10 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Adaptertest mislyktes';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
