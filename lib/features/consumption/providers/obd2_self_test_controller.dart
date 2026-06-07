@@ -92,7 +92,7 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
         for (final s in report.steps)
           Obd2SelfTestStep(id: s.id, status: s.status, latencyMs: s.latencyMs),
       ],
-      passed: report.passed,
+      verdict: report.verdict,
       elapsedMs: report.elapsedMs,
     );
   }

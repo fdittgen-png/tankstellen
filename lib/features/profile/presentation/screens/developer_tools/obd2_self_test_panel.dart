@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_radius.dart';
+import '../../../../../core/theme/dark_mode_colors.dart';
 import '../../../../../core/widgets/section_header.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../consumption/data/obd2/adapter_registry.dart';
@@ -290,7 +291,15 @@ class _StepRow extends StatelessWidget {
   }
 }
 
-/// The pass/fail summary banner shown once a run completes.
+/// The tri-state summary banner shown once a run completes (#3009).
+///
+/// Three distinct verdicts, never conflated:
+///   * passed   — green check, "Adapter test passed".
+///   * engineOff — AMBER info, "Adapter OK — engine off; start the engine to
+///     read live data". The adapter answered every capability step; only the
+///     live-data steps were ECU-silent because the engine is off. NOT a red
+///     failure — the hardware is fine.
+///   * failed   — red error, "Adapter test failed" (a genuine fault).
 class _SummaryBanner extends StatelessWidget {
   const _SummaryBanner({super.key, required this.state});
 
@@ -301,9 +310,27 @@ class _SummaryBanner extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final passed = state.passed;
-    final bg = passed ? cs.primaryContainer : cs.errorContainer;
-    final fg = passed ? cs.onPrimaryContainer : cs.onErrorContainer;
+    final (bg, fg, icon, headline) = switch (state.verdict) {
+      Obd2SelfTestVerdict.passed => (
+          cs.primaryContainer,
+          cs.onPrimaryContainer,
+          Icons.check_circle,
+          l?.obd2TestRunPassed ?? 'Adapter test passed',
+        ),
+      Obd2SelfTestVerdict.engineOff => (
+          DarkModeColors.warningSurface(context),
+          DarkModeColors.warning(context),
+          Icons.info_outline,
+          l?.obd2TestRunEngineOff ??
+              'Adapter OK — engine off; start the engine to read live data',
+        ),
+      Obd2SelfTestVerdict.failed => (
+          cs.errorContainer,
+          cs.onErrorContainer,
+          Icons.error,
+          l?.obd2TestRunFailed ?? 'Adapter test failed',
+        ),
+    };
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(12),
@@ -316,13 +343,11 @@ class _SummaryBanner extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(passed ? Icons.check_circle : Icons.error, color: fg),
+              Icon(icon, color: fg),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  passed
-                      ? (l?.obd2TestRunPassed ?? 'Adapter test passed')
-                      : (l?.obd2TestRunFailed ?? 'Adapter test failed'),
+                  headline,
                   style: theme.textTheme.titleSmall?.copyWith(color: fg),
                 ),
               ),
