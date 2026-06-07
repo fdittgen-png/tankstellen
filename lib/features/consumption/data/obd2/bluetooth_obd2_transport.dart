@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:math' show Random;
 
 import 'package:flutter/foundation.dart';
 
@@ -23,6 +24,27 @@ bool _isRecoverableOpenFailure(Object e) =>
     e is TimeoutException ||
     (e is Obd2ConnectionError && e.isExpectedUserCondition) ||
     isBleAdapterDisconnect(e);
+
+/// #3014 — true when a channel-open failure carries Android GATT_ERROR 133.
+/// Only a 133 warrants the (Android-only, OEM-variable) GATT-cache refresh
+/// between retries; a plain timeout / typed disconnect just backs off + retries.
+bool _isGatt133(Object e) {
+  final msg = e.toString().toUpperCase();
+  return msg.contains('133') || msg.contains('GATT_ERROR');
+}
+
+/// #3014 — shared RNG for the backoff jitter tail. One static instance so the
+/// jitter doesn't reseed per call.
+final Random _backoffJitter = Random();
+
+/// #3014 — jittered exponential backoff for the channel-open retry: 250 ms on
+/// attempt 1, 500 ms on attempt 2, 1000 ms on attempt 3, …, each plus a 0–125 ms
+/// random tail. Capped at 2 s so a high attempt index can't stall the connect.
+Duration _backoffForAttempt(int attempt) {
+  final base = 250 * (1 << (attempt - 1)); // 250, 500, 1000, 2000, …
+  final capped = base > 2000 ? 2000 : base;
+  return Duration(milliseconds: capped + _backoffJitter.nextInt(126));
+}
 
 /// [Obd2Transport] that moves bytes over a generic [ElmByteChannel]
 /// (#716 step 1).
@@ -120,12 +142,36 @@ class BluetoothObd2Transport implements Obd2Transport {
         debugPrint('BluetoothObd2Transport: channel.open attempt $attempt/'
             '$maxOpenAttempts failed ($e), tearing down + retrying after '
             'backoff\n$st');
+        // #3014 — ensure the half-open client is TRULY closed before retrying.
+        // FBP's `disconnect()` inside `close()` may not fully release a
+        // half-open GATT client, so a stale client survives into the next
+        // connect → repeat-133. close() is best-effort here.
         try {
           await _channel.close();
         } catch (_) {
           // best-effort teardown of a half-open link before retrying
         }
-        await Future<void>.delayed(Duration(milliseconds: 150 * attempt));
+        // #3014 — GATT-133 recovery: on a 133 (cache-poisoned device — a clone
+        // whose GATT table mutated, or a stale cache from the aborted attempt),
+        // drop the native service cache before the next try so a fresh
+        // discovery runs against the real table. Best-effort + Android-only +
+        // never throws; a no-op for Classic / non-recoverable channels.
+        if (_isGatt133(e)) {
+          final ch = _channel;
+          if (ch is Obd2GattRecoverable) {
+            try {
+              await (ch as Obd2GattRecoverable).refreshGattCache();
+            } catch (_) {
+              // OEM-variable reflection; swallow — the retry proceeds anyway.
+            }
+          }
+        }
+        // #3014 — jittered exponential backoff (250 → 500 → 1000 ms + a small
+        // random tail) instead of the old flat 150·attempt. The exponential
+        // step gives a flaky Android BLE stack progressively more room to
+        // settle between retries; the jitter de-syncs a repeat-133 retry storm
+        // from the device's own advertising cadence (van Welie / Punch Through).
+        await Future<void>.delayed(_backoffForAttempt(attempt));
       }
     }
     _subscription = _channel.incoming.listen(

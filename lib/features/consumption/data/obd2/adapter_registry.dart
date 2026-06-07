@@ -214,6 +214,43 @@ class Obd2AdapterRegistry {
     return null;
   }
 
+  /// #3014 — the DISTINCT transports a stored [name] name-matches. A name like
+  /// `SmartOBD` matches BOTH `smartobd-ble` and `smartobd-classic`, so the
+  /// hardware ships in two transports under one name — the dual-transport
+  /// ambiguity [transportForName] silently resolves BLE-first. Empty when no
+  /// profile matches.
+  Set<BluetoothTransport> transportsForName(String? name) {
+    if (name == null || name.isEmpty) return const {};
+    return {
+      for (final p in profiles)
+        if (p.matchesName(name)) p.transport,
+    };
+  }
+
+  /// #3014 — dual-transport disambiguation for a by-MAC / self-test connect.
+  /// When [name] name-matches BOTH a BLE and a Classic profile (e.g. SmartOBD,
+  /// vLinker), prefer the bonded-Classic path when [macIsBonded] (a bonded
+  /// RFCOMM socket is the most reliable link for a dual-transport adapter that
+  /// is paired in OS settings), else BLE. A single-transport match returns that
+  /// transport unchanged; no match returns null. The runtime cross-transport
+  /// fallback (#2908) still corrects a wrong guess, so this is a best-FIRST
+  /// pick, not a hard commitment.
+  BluetoothTransport? disambiguateTransport({
+    required String? name,
+    required bool macIsBonded,
+  }) {
+    final matched = transportsForName(name);
+    if (matched.isEmpty) return null;
+    final dualMatch = matched.contains(BluetoothTransport.ble) &&
+        matched.contains(BluetoothTransport.classic);
+    if (dualMatch) {
+      return macIsBonded
+          ? BluetoothTransport.classic
+          : BluetoothTransport.ble;
+    }
+    return matched.first;
+  }
+
   /// Rank a list of candidates for display in the picker. Primary
   /// key: resolved-profile-matched first (unresolved dropped). Secondary
   /// key: stronger RSSI (closer adapter) first.

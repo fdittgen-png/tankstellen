@@ -172,6 +172,7 @@ class _ThrowingConnection extends Obd2ConnectionService {
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
+    String? adapterName,
   }) async {
     throw directError;
   }

@@ -364,6 +364,7 @@ class _FakeConnection extends Obd2ConnectionService {
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
+    String? adapterName,
   }) async {
     reconnectCalls++;
     if (reconnectCalls > 1 && reconnectReturnsNull) return null;
@@ -374,7 +375,8 @@ class _FakeConnection extends Obd2ConnectionService {
   }
 
   @override
-  Future<Obd2Service?> connectByMacClassicDirect(String mac) async {
+  Future<Obd2Service?> connectByMacClassicDirect(String mac,
+      {String? adapterName}) async {
     reconnectCalls++;
     if (reconnectCalls > 1 && reconnectReturnsNull) return null;
     // The RFCOMM path only works for a Classic adapter (mirrors the facade

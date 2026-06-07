@@ -97,7 +97,11 @@ void main() {
     // transport-aware self-test takes RFCOMM for a Classic-SPP adapter instead
     // of a doomed BLE 4 s-timeout) + its dartdoc. A pure-data lookup append to
     // the existing catalog class.
-    'lib/features/consumption/data/obd2/adapter_registry.dart': 522,
+    // #3014 — re-grandfathered 522 → 556: the dual-transport disambiguation
+    // (`transportsForName` + `disambiguateTransport`) — when a name matches BOTH
+    // a BLE and Classic profile (SmartOBD / vLinker), prefer bonded-Classic when
+    // bonded else BLE — plus dartdoc. Two pure lookup methods on the catalog.
+    'lib/features/consumption/data/obd2/adapter_registry.dart': 556,
     // #2969 — grandfathered at 563 (was 389, under-cap before). The #2969
     // connect-trace instrumentation opens/finalises a trace at the FIVE public
     // connect entry points (the single virtual-dispatch chokepoint every live
@@ -108,14 +112,30 @@ void main() {
     // obd2_connect_trace_log.dart, both < 400); the remaining bulk is the
     // per-method trace wrappers on this already-near-cap connect service.
     // Further decomposition of this god-class is tracked by #2190.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 563,
+    // #3014 — re-grandfathered 563 → 591: the adapterName param threaded through
+    // every by-MAC connect entry (`connectByMac`/`connectByMacDirect`/
+    // `connectByMacClassicDirect`/`connectByMacPassive`/`_traced`) so a connect
+    // trace names the adapter, plus the `_inferTransport` registry-hint helper.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 591,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
     // place the REAL FBP/StateError is in hand before Obd2Service.connect
     // swallows it). The stamp was already factored to the shared
     // Obd2ConnectTraceLog.stampOpenFailure one-liner.
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 419,
+    // #3014 — re-grandfathered 419 → 655: the Phase-2 reliable-BLE-connect core
+    // (Epic #3013). Dart cannot split a single class body across `part` files,
+    // so this cohesive BLE channel necessarily carries: scan-before-connect (the
+    // SmartOBD GATT-133 fix) behind the injected `scanSeed`; property-based GATT
+    // discovery via the pure `resolveElmGatt` (registry UUID hint → family
+    // property-match → any-property), with the FAILED-open layout dump; per-step
+    // bounded timeouts (discoverServices / setNotifyValue) for distinct
+    // gattTimeout vs serviceNotFound outcomes; MTU-in-connect; the
+    // `Obd2GattRecoverable.refreshGattCache` (Android clearGattCache) for the
+    // 133 retry; and the `connectDevice`/`rawConnect`/`discoverAndBind`/
+    // `bindConnectionState` test seams that make all of it unit-testable without
+    // a BLE stack. The pure matcher already lives in elm_gatt_profiles.dart.
+    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 656,
     // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
     // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
     // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off

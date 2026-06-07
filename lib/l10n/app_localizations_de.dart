@@ -6497,6 +6497,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get obd2HealthConnectSteps => 'Schritte';
 
   @override
+  String get obd2HealthConnectUnknownAdapter => 'Unbekannter Adapter';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

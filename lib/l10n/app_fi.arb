@@ -4595,5 +4595,10 @@
   "@obd2HealthConnectSteps": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2HealthConnectUnknownAdapter": "Unknown adapter",
+  "@obd2HealthConnectUnknownAdapter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

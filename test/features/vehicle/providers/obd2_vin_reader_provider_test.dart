@@ -266,6 +266,7 @@ class _FakeObd2ConnectionService extends Obd2ConnectionService {
   Future<Obd2Service?> connectByMac(
     String mac, {
     Duration timeout = const Duration(seconds: 5),
+    String? adapterName,
   }) async {
     connectByMacCalls++;
     lastConnectByMacArg = mac;

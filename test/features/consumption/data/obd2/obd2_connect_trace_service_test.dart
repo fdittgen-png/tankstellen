@@ -148,6 +148,68 @@ void main() {
     expect(trace.requestedMac, endsWith('E:F1'));
     expect(trace.requestedMac, isNot(contains('AA:BB')));
   });
+
+  // ---- #3014 (Epic #3013, Phase 1) — every attempt traced WITH the name -----
+
+  test(
+      'a BLE by-MAC attempt PRODUCES a trace entry carrying the adapter NAME '
+      '(RED on master: by-MAC path dropped the name → only a redacted MAC)',
+      () async {
+    // The maintainer's #1 trace-tool complaint: the SmartOBD BLE by-MAC attempt
+    // showed only "···F:31" with no name. The name IS known at the connect
+    // entry — it must reach the trace headline.
+    final service = svc(
+      bluetooth: _Facade(
+        batches: const [],
+        directOpenError: StateError('android: GATT_ERROR 133'),
+      ),
+    );
+    final result = await service.connectByMacDirect(
+      'AA:BB:CC:DD:EE:F1',
+      fallbackToScan: false,
+      adapterName: 'SmartOBD',
+    );
+    expect(result, isNull);
+    final trace = lastTrace();
+    expect(trace.adapterName, 'SmartOBD',
+        reason: 'the resolved human name must reach the trace headline, not '
+            'just the redacted MAC');
+    // And the by-MAC attempt still produces a non-empty trace.
+    expect(trace.outcome, isNotNull);
+    expect(trace.requestedTransport, Obd2ConnectTransport.ble);
+  });
+
+  test(
+      'a Classic by-MAC trace carries adapterName == the human name '
+      '(extends the false-green MAC-only assertion #2969)', () async {
+    final plugin = _FalseConnectPlugin();
+    final service = svc(classic: _RealClassicFacade(plugin));
+    await service.connectByMacClassicDirect('AA:BB:CC:DD:EE:F1',
+        adapterName: 'vLinker FS 1234');
+    final trace = lastTrace();
+    // The PII redaction still holds…
+    expect(trace.requestedMac, endsWith('E:F1'));
+    // …AND the human name is now carried (the assertion the prior test only
+    // checked the MAC for — false-green on the name).
+    expect(trace.adapterName, 'vLinker FS 1234');
+  });
+
+  test(
+      'connectByMac() infers the requestedTransport from the name via the '
+      'registry (was hard-coded unknown) (#3014)', () async {
+    // A vLinker FS name name-matches the Classic profile → the trace records
+    // `classic`, not the old honest-but-blind `unknown`. The scan errors out
+    // (no adapter) so the trace finalises with the inferred transport intact.
+    final service = svc(
+      bluetooth: _Facade(batches: const [], scanError: const Obd2ScanTimeout()),
+    );
+    final result = await service.connectByMac('AA:BB:CC:DD:EE:F1',
+        adapterName: 'vLinker FS 9000');
+    expect(result, isNull);
+    final trace = lastTrace();
+    expect(trace.requestedTransport, Obd2ConnectTransport.classic);
+    expect(trace.adapterName, 'vLinker FS 9000');
+  });
 }
 
 class _FakePerm implements Obd2Permissions {
