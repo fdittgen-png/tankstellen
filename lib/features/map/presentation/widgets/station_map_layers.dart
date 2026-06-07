@@ -111,6 +111,17 @@ class StationMapLayers extends StatefulWidget {
   /// matching list row (the inverse of a row tap) and keep the map visible.
   final void Function(String stationId)? onStationTap;
 
+  /// #3000 (Epic #2997) — selection-aware clustering for the ROUTE map. Only
+  /// meaningful with [clusterAlways]. When true, stations in
+  /// [selectedStationIds] are partitioned OUT of the cheapest-labelled cluster
+  /// and rendered as their own un-clustered full price pills (painted on top),
+  /// while the rest fold into the cluster. Keeps the route map's Best/All
+  /// multi-select highlighting and its `RouteBestStopsList`↔marker 1:1 mapping
+  /// intact — a blanket cluster would otherwise collapse several selected
+  /// stations into one ringed badge. Default false → the radar / Nearby
+  /// blanket-cluster behaviour (#2939 / #2999) is unchanged.
+  final bool excludeSelectedFromClustering;
+
   const StationMapLayers({
     super.key,
     required this.mapController,
@@ -130,6 +141,7 @@ class StationMapLayers extends StatefulWidget {
     this.fuelResolver,
     this.clusterAlways = false,
     this.onStationTap,
+    this.excludeSelectedFromClustering = false,
   });
 
   @override
@@ -284,6 +296,12 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// cluster badge can roll a cluster up to its cheapest member + spot the
   /// selected one (the builder only gets the [Marker]s). Rebuilt with [_markers].
   final Map<Marker, MarkerMeta> _markerMeta = {};
+
+  /// #3000 — the per-marker meta map, exposed so a test can assert a clustered
+  /// cross-border station carries its [fuelResolver]-derived price (not '--').
+  @visibleForTesting
+  Map<Marker, MarkerMeta> get markerMetaForTesting =>
+      Map.unmodifiable(_markerMeta);
 
   /// True once FlutterMap has laid out and emitted `onMapReady`. The
   /// guarded `didUpdateWidget` fit waits on this so a `fitCamera` call
@@ -544,15 +562,26 @@ class _StationMapLayersState extends State<StationMapLayers> {
                 ),
               ],
             ),
-            // Station markers (#1774 — `_markers` is memoised). Three modes:
-            //  - #2939 `clusterAlways` (radar split pane): proximity-cluster
-            //    EVERY set with the cheapest-labelled badge so the narrow
-            //    pane never overlaps; un-clustered singletons keep their pill;
+            // Station markers (#1774 — `_markers` is memoised). Modes:
+            //  - #3000 `clusterAlways` + `excludeSelectedFromClustering`
+            //    (route map): SELECTED stations stay un-clustered as full
+            //    pills on top, the rest fold into the cheapest cluster — so
+            //    the Best/All multi-select + list↔map 1:1 survive;
+            //  - #2939 `clusterAlways` (radar / Nearby): proximity-cluster
+            //    EVERY set with the cheapest-labelled badge;
             //  - legacy huge set (≥ clusterThreshold): bare count cluster;
-            //  - legacy bounded set (#2510): plain [MarkerLayer], de-overlap
-            //    by emphasis (top-ranked keep the pill, rest are dots).
+            //  - legacy bounded set (#2510): plain [MarkerLayer], emphasis.
             if (_markers.isNotEmpty)
-              if (widget.clusterAlways)
+              if (widget.clusterAlways &&
+                  widget.excludeSelectedFromClustering)
+                ...selectionPartitionedClusterLayers(
+                  markers: _markers,
+                  metaOf: (m) => _markerMeta[m],
+                  priceRange: _priceRange,
+                  selectedIds:
+                      widget.selectedStationIds ?? const <String>{},
+                )
+              else if (widget.clusterAlways)
                 cheapestLabelledClusterLayer(
                   markers: _markers,
                   metaOf: (m) => _markerMeta[m],

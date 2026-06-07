@@ -7,6 +7,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/map/data/sparkilo_tile_layer.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_cluster_layers.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
@@ -455,6 +456,296 @@ void main() {
       await pumpWith(tester, const []);
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
+  });
+
+  // #3000 (Epic #2997) — selection-aware clustering for the ROUTE map. With
+  // `clusterAlways` the radar grammar collapses EVERY station into the
+  // cheapest-labelled cluster — which would fold several Best/All SELECTED
+  // stations into one ringed badge, destroying the per-station vivid/pastel
+  // distinction and the RouteBestStopsList↔marker 1:1 mapping. The opt-in
+  // `excludeSelectedFromClustering` PARTITIONS the markers: SELECTED stations
+  // render as their own un-clustered full price pills (a plain MarkerLayer on
+  // top); the REST fold into the cheapest-labelled cluster.
+  group('StationMapLayers selection-aware clustering (#3000)', () {
+    // Two SELECTED + three UNSELECTED, all tightly packed so a blanket
+    // cluster (the bug) would swallow ALL FIVE into one badge.
+    const selected = <Station>[
+      Station(
+        id: 'sel-a',
+        name: 'Selected A',
+        brand: 'Brand',
+        street: 'Street',
+        postCode: '10178',
+        place: 'Berlin',
+        lat: 52.5210,
+        lng: 13.4100,
+        dist: 0.5,
+        e10: 1.55,
+        isOpen: true,
+      ),
+      Station(
+        id: 'sel-b',
+        name: 'Selected B',
+        brand: 'Brand',
+        street: 'Street',
+        postCode: '10178',
+        place: 'Berlin',
+        lat: 52.5212,
+        lng: 13.4102,
+        dist: 0.6,
+        e10: 1.60,
+        isOpen: true,
+      ),
+    ];
+    const unselected = <Station>[
+      Station(
+        id: 'un-a',
+        name: 'Unselected A',
+        brand: 'Brand',
+        street: 'Street',
+        postCode: '10178',
+        place: 'Berlin',
+        lat: 52.5214,
+        lng: 13.4104,
+        dist: 0.7,
+        e10: 1.70,
+        isOpen: true,
+      ),
+      Station(
+        id: 'un-b',
+        name: 'Unselected B',
+        brand: 'Brand',
+        street: 'Street',
+        postCode: '10178',
+        place: 'Berlin',
+        lat: 52.5216,
+        lng: 13.4106,
+        dist: 0.8,
+        e10: 1.75,
+        isOpen: true,
+      ),
+      Station(
+        id: 'un-c',
+        name: 'Unselected C',
+        brand: 'Brand',
+        street: 'Street',
+        postCode: '10178',
+        place: 'Berlin',
+        lat: 52.5218,
+        lng: 13.4108,
+        dist: 0.9,
+        e10: 1.80,
+        isOpen: true,
+      ),
+    ];
+
+    Future<void> pumpSelectionAware(
+      WidgetTester tester, {
+      required List<Station> stations,
+      required Set<String> selectedIds,
+      required bool excludeSelectedFromClustering,
+      FuelType Function(Station)? fuelResolver,
+    }) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final mapController = MapController();
+      addTearDown(mapController.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StationMapLayers(
+              mapController: mapController,
+              stations: stations,
+              center: const LatLng(52.5214, 13.4104),
+              zoom: 12,
+              searchRadiusKm: 5,
+              selectedFuel: FuelType.e10,
+              clusterAlways: true,
+              excludeSelectedFromClustering: excludeSelectedFromClustering,
+              selectedStationIds: selectedIds,
+              fuelResolver: fuelResolver,
+              showSearchRadius: false,
+            ),
+          ),
+        ),
+      );
+    }
+
+    /// Markers from the NON-centre [MarkerLayer]s (the centre dot is a
+    /// single-marker layer with width 20). These are the un-clustered pills.
+    List<Marker> stationMarkerLayerMarkers(WidgetTester tester) => tester
+        .widgetList<MarkerLayer>(find.byType(MarkerLayer))
+        .expand((l) => l.markers)
+        .where((m) => m.width != 20)
+        .toList();
+
+    /// Match a marker back to its station by lat/lng (Marker carries no id).
+    Station? stationForMarker(Marker m, List<Station> all) {
+      for (final s in all) {
+        if ((s.lat - m.point.latitude).abs() < 1e-9 &&
+            (s.lng - m.point.longitude).abs() < 1e-9) {
+          return s;
+        }
+      }
+      return null;
+    }
+
+    testWidgets(
+      'RED-on-master: a BLANKET clusterAlways (excludeSelected=false) folds '
+      'ALL five — including the two selected — into the cluster layer, leaving '
+      'no un-clustered selected pills (the bug this feature fixes)',
+      (tester) async {
+        await pumpSelectionAware(
+          tester,
+          stations: [...selected, ...unselected],
+          selectedIds: {'sel-a', 'sel-b'},
+          excludeSelectedFromClustering: false,
+        );
+
+        // The legacy blanket path: every station goes through the cluster
+        // layer, and there is NO separate un-clustered selected pill layer.
+        final cluster = tester.widget<MarkerClusterLayerWidget>(
+            find.byType(MarkerClusterLayerWidget));
+        expect(cluster.options.markers.length, 5,
+            reason: 'blanket clusterAlways routes ALL stations through the '
+                'cluster layer');
+        expect(stationMarkerLayerMarkers(tester), isEmpty,
+            reason: 'no station MarkerLayer when everything is clustered');
+      },
+    );
+
+    testWidgets(
+      'GREEN: with excludeSelectedFromClustering the 2 SELECTED stations '
+      'render as their OWN un-clustered markers while the 3 unselected fold '
+      'into the cheapest-labelled cluster',
+      (tester) async {
+        await pumpSelectionAware(
+          tester,
+          stations: [...selected, ...unselected],
+          selectedIds: {'sel-a', 'sel-b'},
+          excludeSelectedFromClustering: true,
+        );
+
+        // The cluster layer receives ONLY the 3 unselected markers.
+        final cluster = tester.widget<MarkerClusterLayerWidget>(
+            find.byType(MarkerClusterLayerWidget));
+        expect(cluster.options.markers.length, 3,
+            reason: 'only the unselected stations are clustered');
+        final clusteredIds = cluster.options.markers
+            .map((m) => stationForMarker(m, unselected)?.id)
+            .toSet();
+        expect(clusteredIds, {'un-a', 'un-b', 'un-c'});
+
+        // The 2 selected stations render as their OWN un-clustered markers in
+        // a plain MarkerLayer (1:1 list↔map mapping survives).
+        final pills = stationMarkerLayerMarkers(tester);
+        final allStations = [...selected, ...unselected];
+        final pillIds =
+            pills.map((m) => stationForMarker(m, allStations)?.id).toSet();
+        expect(pillIds, {'sel-a', 'sel-b'},
+            reason: 'exactly the selected stations stay un-clustered');
+      },
+    );
+
+    testWidgets(
+      'GREEN: the un-clustered selected markers keep their FULL price pill '
+      '(never a compact dot) with the vivid selected ring',
+      (tester) async {
+        await pumpSelectionAware(
+          tester,
+          stations: [...selected, ...unselected],
+          selectedIds: {'sel-a', 'sel-b'},
+          excludeSelectedFromClustering: true,
+        );
+
+        final pills = stationMarkerLayerMarkers(tester);
+        expect(pills, hasLength(2));
+        // A selected station is ALWAYS the full pill (kStationMarkerWidth),
+        // never a compact dot — the vivid selected styling is preserved.
+        for (final m in pills) {
+          expect(m.width, kStationMarkerWidth,
+              reason: 'selected markers keep the full price pill, not a dot');
+        }
+      },
+    );
+
+    testWidgets(
+      'GREEN: a cross-border UNSELECTED station clusters with its '
+      'fuelResolver-derived price (not "--") — cheapest rollup composes with '
+      'the resolved MarkerMeta.price (#2631)',
+      (tester) async {
+        // `crossBorder` has NO e10 but DOES have e5; the resolver maps it to
+        // e5 (its country fuel) so its cluster contributes a real price.
+        const crossBorder = Station(
+          id: 'un-cross',
+          name: 'Cross-border ES',
+          brand: 'Brand',
+          street: 'Street',
+          postCode: '00000',
+          place: 'Girona',
+          lat: 52.5215,
+          lng: 13.4105,
+          dist: 0.75,
+          e5: 1.42, // its real price is in e5, NOT e10
+          isOpen: true,
+        );
+        FuelType resolve(Station s) =>
+            s.id == 'un-cross' ? FuelType.e5 : FuelType.e10;
+
+        await pumpSelectionAware(
+          tester,
+          stations: [...selected, crossBorder, ...unselected],
+          selectedIds: {'sel-a', 'sel-b'},
+          excludeSelectedFromClustering: true,
+          fuelResolver: resolve,
+        );
+
+        // The cross-border station is unselected → it goes to the cluster.
+        final cluster = tester.widget<MarkerClusterLayerWidget>(
+            find.byType(MarkerClusterLayerWidget));
+        final crossMarker = cluster.options.markers.firstWhere(
+          (m) =>
+              (m.point.latitude - crossBorder.lat).abs() < 1e-9 &&
+              (m.point.longitude - crossBorder.lng).abs() < 1e-9,
+        );
+
+        // The per-marker meta the cluster builder rolls up from. The clustered
+        // cross-border station carries its RESOLVED e5 price (1.42), not the
+        // strict-e10 '--' (null) it would otherwise have — so the cheapest
+        // rollup uses a real value, not '--' (#2631).
+        final state = tester.state(find.byType(StationMapLayers));
+        final metaMap = (state as dynamic).markerMetaForTesting
+            as Map<Marker, MarkerMeta>;
+        final meta = metaMap[crossMarker];
+        expect(meta, isNotNull);
+        expect(meta!.price, 1.42,
+            reason: 'cluster rollup uses the fuelResolver-derived price so a '
+                'cross-border station contributes a real value, not "--"');
+      },
+    );
+
+    testWidgets(
+      'with NO selection, excludeSelectedFromClustering folds everything into '
+      'the cluster (no stray un-clustered pills) — matches the radar grammar',
+      (tester) async {
+        await pumpSelectionAware(
+          tester,
+          stations: [...selected, ...unselected],
+          selectedIds: const {},
+          excludeSelectedFromClustering: true,
+        );
+
+        final cluster = tester.widget<MarkerClusterLayerWidget>(
+            find.byType(MarkerClusterLayerWidget));
+        expect(cluster.options.markers.length, 5,
+            reason: 'with no selection, every station clusters as normal');
+        expect(stationMarkerLayerMarkers(tester), isEmpty);
+      },
+    );
   });
 }
 

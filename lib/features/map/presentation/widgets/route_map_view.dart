@@ -180,6 +180,13 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             selectedStationIds:
                 _selectedStationIds.isNotEmpty ? _selectedStationIds : null,
             fuelResolver: resolveFuel,
+            // #3000 (Epic #2997) — adopt the radar clustered+cheapest-labelled
+            // grammar, but SELECTION-AWARE: cluster the non-selected stations
+            // while the Best/All SELECTED stations stay as full, un-clustered
+            // price pills so the multi-select highlighting + the
+            // RouteBestStopsList↔marker 1:1 mapping survive at every zoom.
+            clusterAlways: true,
+            excludeSelectedFromClustering: true,
           ),
         ),
         if (_viewMode == RouteViewMode.bestStops && displayStations.isNotEmpty)

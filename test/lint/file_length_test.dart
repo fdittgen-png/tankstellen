@@ -501,7 +501,17 @@ void main() {
     // the onStationTap callback once (3 lines: the selectionClick + the
     // delegate + its dartdoc) so a marker tap that selects a list row buzzes
     // like the other everyday tap surfaces. Decomposition still #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 625,
+    // #3000 — re-grandfathered 625 → 654 (Epic #2997): selection-aware
+    // clustering for the route map. The partition LOGIC was extracted to
+    // `selectionPartitionedClusterLayers` in station_cluster_layers.dart (per
+    // the file-length rule, a helper over grandfathering); the residual growth
+    // here is the widget's own irreducible API — the `excludeSelectedFromClustering`
+    // flag + its dartdoc, its constructor param, the build-tree branch that
+    // spreads the partitioned layers, and the `markerMetaForTesting` seam that
+    // lets a test assert a clustered cross-border station carries its resolved
+    // price. None of these can move off the widget. Decomposition of this
+    // god-class is still tracked by #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 654,
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,
