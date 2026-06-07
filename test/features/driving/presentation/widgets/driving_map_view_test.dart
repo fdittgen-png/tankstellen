@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_map_view.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 
@@ -105,52 +107,120 @@ void main() {
     });
   });
 
-  group('DrivingMapView memoisation (#2176)', () {
-    testWidgets('reuses the marker list across rebuilds when stations '
-        'are unchanged', (tester) async {
-      final controller = MapController();
-      addTearDown(controller.dispose);
-      final stations = [
-        _station(id: 'a', lat: 52.0, lng: 13.0),
-        _station(id: 'b', lat: 52.1, lng: 13.1),
-      ];
-      final rebuild = ValueNotifier<int>(0);
-      addTearDown(rebuild.dispose);
-
+  group('DrivingMapView adopts the shared stack (#3002, Epic #2997)', () {
+    Future<void> pumpView(
+      WidgetTester tester, {
+      required MapController controller,
+      required List<Station> stations,
+      void Function(Station)? onMarkerTap,
+      VoidCallback? onInteraction,
+    }) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: SizedBox(
               width: 400,
               height: 600,
-              child: ValueListenableBuilder<int>(
-                valueListenable: rebuild,
-                // Fresh callbacks each rebuild — must NOT force a recompute.
-                builder: (_, _, _) => DrivingMapView(
-                  mapController: controller,
-                  stations: stations,
-                  selectedFuel: FuelType.e10,
-                  onMarkerTap: (_) {},
-                  onInteraction: () {},
-                ),
+              child: DrivingMapView(
+                mapController: controller,
+                stations: stations,
+                selectedFuel: FuelType.e10,
+                onMarkerTap: onMarkerTap ?? (_) {},
+                onInteraction: onInteraction ?? () {},
               ),
             ),
           ),
         ),
       );
       await tester.pump();
+    }
 
-      final first = tester.widget<MarkerLayer>(find.byType(MarkerLayer)).markers;
-      rebuild.value++;
-      await tester.pump();
-      final second =
-          tester.widget<MarkerLayer>(find.byType(MarkerLayer)).markers;
-
-      expect(
-        identical(first, second),
-        isTrue,
-        reason: 'markers must be memoised when the station list is unchanged',
+    testWidgets('renders the shared StationMapLayers, not a bespoke MarkerLayer',
+        (tester) async {
+      final controller = MapController();
+      addTearDown(controller.dispose);
+      await pumpView(
+        tester,
+        controller: controller,
+        stations: [
+          _station(id: 'a', lat: 52.0, lng: 13.0),
+          _station(id: 'b', lat: 52.1, lng: 13.1),
+        ],
       );
+
+      // Driving now consumes the ONE shared map stack.
+      expect(find.byType(StationMapLayers), findsOneWidget);
+    });
+
+    testWidgets('passes the driving marker variant + NO clustering',
+        (tester) async {
+      final controller = MapController();
+      addTearDown(controller.dispose);
+      await pumpView(
+        tester,
+        controller: controller,
+        stations: [
+          _station(id: 'a', lat: 52.0, lng: 13.0),
+          _station(id: 'b', lat: 52.1, lng: 13.1),
+        ],
+      );
+
+      final layers =
+          tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+      // The big driver-legible marker variant.
+      expect(layers.markerVariant, StationMarkerVariant.driving);
+      // Driving shows few stations and needs immediate tap-to-open-sheet —
+      // never clustered.
+      expect(layers.clusterAlways, isFalse);
+    });
+
+    testWidgets('a marker tap dispatches onMarkerTap (opens the sheet), '
+        'NOT a navigation push', (tester) async {
+      final controller = MapController();
+      addTearDown(controller.dispose);
+      Station? tappedStation;
+      var interacted = false;
+      final stations = [
+        _station(id: 'a', lat: 52.0, lng: 13.0),
+        _station(id: 'b', lat: 52.1, lng: 13.1),
+      ];
+      await pumpView(
+        tester,
+        controller: controller,
+        stations: stations,
+        onMarkerTap: (s) => tappedStation = s,
+        onInteraction: () => interacted = true,
+      );
+
+      final layers =
+          tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+      // The shared layer surfaces a station-id tap hook; driving wires it to
+      // its onMarkerTap (which shows DrivingStationSheet), not a GoRouter push.
+      expect(layers.onStationTap, isNotNull);
+      layers.onStationTap!('a');
+      expect(tappedStation?.id, 'a');
+      // The same tap also keeps the auto-lock timer alive.
+      expect(interacted, isTrue);
+    });
+
+    testWidgets('keeps the restricted driving interaction (no pinch zoom)',
+        (tester) async {
+      final controller = MapController();
+      addTearDown(controller.dispose);
+      await pumpView(
+        tester,
+        controller: controller,
+        stations: [_station(id: 'a', lat: 52.0, lng: 13.0)],
+      );
+
+      final layers =
+          tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+      final flags = layers.interactionOptions!.flags;
+      // Drag + fling + double-tap-zoom are allowed; pinch/rotate are not.
+      expect(flags & InteractiveFlag.drag, isNot(0));
+      expect(flags & InteractiveFlag.flingAnimation, isNot(0));
+      expect(flags & InteractiveFlag.doubleTapZoom, isNot(0));
+      expect(flags & InteractiveFlag.pinchZoom, 0);
     });
   });
 }

@@ -10,10 +10,8 @@ import 'package:tankstellen/features/driving/presentation/screens/driving_mode_s
 import 'package:tankstellen/features/driving/presentation/widgets/driving_bottom_bar.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_station_sheet.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/safety_disclaimer_dialog.dart';
-import 'package:tankstellen/features/driving/presentation/widgets/driving_marker_builder.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../fixtures/stations.dart';
@@ -249,72 +247,11 @@ void main() {
     });
   });
 
-  group('DrivingMarkerBuilder', () {
-    test('builds marker with correct dimensions', () {
-      final marker = DrivingMarkerBuilder.build(
-        testStation,
-        FuelType.e10,
-        1.5,
-        2.0,
-        onTap: () {},
-      );
-
-      expect(marker.width, 150);
-      expect(marker.height, 62);
-      expect(marker.point.latitude, testStation.lat);
-      expect(marker.point.longitude, testStation.lng);
-    });
-
-    test('builds markers for stations with different prices', () {
-      final cheap = testStationList[0]; // cheapest
-      final expensive = testStationList[2]; // most expensive
-
-      final cheapMarker = DrivingMarkerBuilder.build(
-        cheap,
-        FuelType.e10,
-        1.739,
-        1.859,
-        onTap: () {},
-      );
-
-      final expensiveMarker = DrivingMarkerBuilder.build(
-        expensive,
-        FuelType.e10,
-        1.739,
-        1.859,
-        onTap: () {},
-      );
-
-      // Both markers should have correct positions
-      expect(cheapMarker.point.latitude, cheap.lat);
-      expect(expensiveMarker.point.latitude, expensive.lat);
-    });
-
-    test('handles null price station', () {
-      const noPriceStation = Station(
-        id: 'no-price',
-        name: 'No Price',
-        brand: 'TEST',
-        street: 'Test St',
-        postCode: '12345',
-        place: 'Test',
-        lat: 52.0,
-        lng: 13.0,
-        isOpen: true,
-      );
-
-      final marker = DrivingMarkerBuilder.build(
-        noPriceStation,
-        FuelType.e10,
-        1.5,
-        2.0,
-        onTap: () {},
-      );
-
-      expect(marker.width, 150);
-      expect(marker.height, 62);
-    });
-  });
+  // #3002 (Epic #2997) — the bespoke `DrivingMarkerBuilder` was deleted when
+  // driving adopted the shared `StationMapLayers` stack with the
+  // `StationMarkerVariant.driving` content variant. Its marker-shape coverage
+  // now lives in `station_marker_test.dart` (the driving-variant group) and
+  // `driving_map_view_test.dart` (the wiring).
 
   group('DrivingModeScreen fullscreen', () {
     testWidgets('enters immersive mode on init', (tester) async {

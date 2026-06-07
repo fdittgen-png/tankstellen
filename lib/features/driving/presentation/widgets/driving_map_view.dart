@@ -5,18 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/utils/price_utils.dart';
-import '../../../../core/widgets/osm_attribution.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
+import '../../../map/presentation/widgets/station_map_layers.dart';
+import '../../../map/presentation/widgets/station_marker.dart';
 import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/station.dart';
-import 'driving_marker_builder.dart';
 
-/// Full-screen map for driving mode. Renders the station markers with the
-/// oversized driving-mode style and forwards user gestures to [onInteraction].
+/// Full-screen map for driving mode. #3002 (Epic #2997) — driving now renders
+/// on the SHARED [StationMapLayers] stack (the same price-band colours +
+/// marker grammar as every other map), but with the big, driver-legible
+/// marker variant ([StationMarkerVariant.driving]) and NO clustering: driving
+/// shows few stations and needs an immediate tap-to-open-sheet with restricted
+/// gestures. The bespoke `DrivingMarkerBuilder` + its `_drivingStops` palette
+/// are gone — driving folds onto the ONE canonical `PriceBandColors.ramp`.
 ///
-/// When [stations] is empty the map falls back to a default Berlin view so
-/// the screen still has a tile background while the search loads.
-class DrivingMapView extends StatefulWidget {
+/// Driving keeps its restricted gestures (drag | fling | double-tap-zoom, no
+/// pinch), its [onInteraction] auto-lock reset (on a background tap), and maps
+/// a marker tap to [onMarkerTap] (which opens the `DrivingStationSheet`) — not
+/// a navigation push. The zoom controls + price legend are suppressed because
+/// driving owns its own oversized bottom bar.
+///
+/// When [stations] is empty the map falls back to a default Berlin view so the
+/// screen still has a tile background while the search loads.
+class DrivingMapView extends StatelessWidget {
   final MapController mapController;
   final List<Station> stations;
   final FuelType selectedFuel;
@@ -34,8 +45,13 @@ class DrivingMapView extends StatefulWidget {
 
   static const _defaultCenter = LatLng(52.52, 13.405);
 
-  @override
-  State<DrivingMapView> createState() => _DrivingMapViewState();
+  /// Restricted driving gestures: pan + fling + double-tap-zoom, but never the
+  /// two-finger pinch/rotate a driver can't safely perform at the wheel.
+  static const _drivingInteraction = InteractionOptions(
+    flags: InteractiveFlag.drag |
+        InteractiveFlag.flingAnimation |
+        InteractiveFlag.doubleTapZoom,
+  );
 
   /// Geographic centroid of the given stations.
   static LatLng computeCenter(List<Station> stations) {
@@ -55,101 +71,67 @@ class DrivingMapView extends StatefulWidget {
     FuelType fuel,
   ) =>
       priceRange(stations, fuel);
-}
 
-class _DrivingMapViewState extends State<DrivingMapView> {
-  // #2176 — centroid, price range and the oversized markers are memoised
-  // here and recomputed only when the station list identity or the
-  // selected fuel changes (mirrors StationMapLayers #1774). The driving
-  // screen rebuilds on a 30 s auto-lock setState; without this it
-  // re-ran two O(n) passes + re-allocated every marker each time.
-  LatLng? _center;
-  List<Marker> _markers = const [];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // #2526 — recompute here (not initState) so the markers can read the
-    // theme via `context` (the null-price badge resolves a theme hint
-    // colour) and re-run if the brightness changes mid-session.
-    _recompute();
-  }
-
-  @override
-  void didUpdateWidget(DrivingMapView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!identical(oldWidget.stations, widget.stations) ||
-        oldWidget.selectedFuel != widget.selectedFuel) {
-      _recompute();
+  /// The [LatLngBounds] framing all [stations]. A single station gets a tiny
+  /// epsilon box so `CameraFit.bounds` cannot divide-by-zero (mirrors
+  /// `InlineMap._boundsOf` / `RouteMapView._computeRouteBounds`).
+  static LatLngBounds _boundsOf(List<Station> stations) {
+    final points = [for (final s in stations) LatLng(s.lat, s.lng)];
+    if (points.length == 1) {
+      final p = points.first;
+      const eps = 0.0005; // ~50 m; fine for any latitude.
+      return LatLngBounds(
+        LatLng(p.latitude - eps, p.longitude - eps),
+        LatLng(p.latitude + eps, p.longitude + eps),
+      );
     }
-  }
-
-  void _recompute() {
-    final stations = widget.stations;
-    if (stations.isEmpty) {
-      _center = null;
-      _markers = const [];
-      return;
-    }
-    _center = DrivingMapView.computeCenter(stations);
-    final range = DrivingMapView.computePriceRange(stations, widget.selectedFuel);
-    _markers = stations
-        .map(
-          (station) => DrivingMarkerBuilder.build(
-            station,
-            widget.selectedFuel,
-            range.$1,
-            range.$2,
-            // #2526 — thread context so the null-price badge picks the
-            // theme hint colour instead of a hardcoded grey.
-            context: context,
-            // Read the callbacks off `widget` at tap time so a memoised
-            // marker still dispatches to the current handlers.
-            onTap: () {
-              widget.onInteraction();
-              widget.onMarkerTap(station);
-            },
-          ),
-        )
-        .toList();
+    return LatLngBounds.fromPoints(points);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.stations.isEmpty) {
+    if (stations.isEmpty) {
       return FlutterMap(
-        mapController: widget.mapController,
+        mapController: mapController,
         options: const MapOptions(
-          initialCenter: DrivingMapView._defaultCenter,
+          initialCenter: _defaultCenter,
           initialZoom: 12,
+          interactionOptions: _drivingInteraction,
         ),
-        children: const [
-          // #2096 — was a raw TileLayer; routed through the
-          // hardened wrapper.
-          SparkiloTileLayer(),
-        ],
+        // #2096 — the hardened tile wrapper, not a raw TileLayer.
+        children: const [SparkiloTileLayer()],
       );
     }
 
-    return FlutterMap(
-      mapController: widget.mapController,
-      options: MapOptions(
-        initialCenter: _center!,
-        initialZoom: 13,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.drag |
-              InteractiveFlag.flingAnimation |
-              InteractiveFlag.doubleTapZoom,
-        ),
-        onTap: (_, _) => widget.onInteraction(),
-      ),
-      children: [
-        // #2096 — was a raw TileLayer; routed through the hardened
-        // wrapper.
-        const SparkiloTileLayer(),
-        MarkerLayer(markers: _markers),
-        const OsmAttribution(),
-      ],
+    final center = computeCenter(stations);
+    return StationMapLayers(
+      mapController: mapController,
+      stations: stations,
+      center: center,
+      zoom: 13,
+      // Driving has no search-radius circle; frame the actual station bounds.
+      searchRadiusKm: 0,
+      showSearchRadius: false,
+      cameraFitBounds: _boundsOf(stations),
+      selectedFuel: selectedFuel,
+      // The big, driver-legible card (brand + tier icon + large price).
+      markerVariant: StationMarkerVariant.driving,
+      // Driving shows few stations and needs immediate tap-to-open-sheet.
+      clusterAlways: false,
+      // Restricted gestures + the auto-lock reset on a background tap.
+      interactionOptions: _drivingInteraction,
+      onMapTap: onInteraction,
+      // Driving owns its own oversized bottom bar, so suppress the overlay
+      // chrome the other maps carry.
+      showZoomControls: false,
+      showLegend: false,
+      // A marker tap resets the lock timer and opens the DrivingStationSheet —
+      // never a navigation push.
+      onStationTap: (id) {
+        onInteraction();
+        final station = stations.firstWhere((s) => s.id == id);
+        onMarkerTap(station);
+      },
     );
   }
 }

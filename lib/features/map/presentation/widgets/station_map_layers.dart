@@ -122,6 +122,36 @@ class StationMapLayers extends StatefulWidget {
   /// blanket-cluster behaviour (#2939 / #2999) is unchanged.
   final bool excludeSelectedFromClustering;
 
+  /// #3002 (Epic #2997) — how the station markers are RENDERED.
+  /// [StationMarkerVariant.driving] makes the DRIVING map paint the big,
+  /// driver-legible card (brand + tier icon + large price) instead of the
+  /// small price-only pill, while still colouring from the shared
+  /// [PriceBandColors.ramp]. Defaults to the pill, so nearby / radar / route
+  /// are unchanged.
+  final StationMarkerVariant markerVariant;
+
+  /// #3002 (Epic #2997) — overrides the map's gesture flags. The DRIVING map
+  /// passes its restricted set (drag | fling | double-tap-zoom, no pinch) so a
+  /// glance-and-tap stays safe at the wheel. Null → the default
+  /// [InteractiveFlag.all] (nearby / radar / route), unchanged.
+  final InteractionOptions? interactionOptions;
+
+  /// #3002 (Epic #2997) — fired on any background tap (not a marker). The
+  /// DRIVING map wires this to its auto-lock reset so touching the map keeps
+  /// the lock overlay away. Null → no map-tap callback (every other map).
+  final void Function()? onMapTap;
+
+  /// #3002 (Epic #2997) — when false, the +/− zoom (+ recenter) controls are
+  /// hidden. The DRIVING map owns its own oversized bottom bar, so it suppresses
+  /// the small overlay buttons. Defaults to true → nearby / radar / route keep
+  /// their controls, unchanged.
+  final bool showZoomControls;
+
+  /// #3002 (Epic #2997) — when false, the bottom-left [PriceLegend] is hidden.
+  /// The DRIVING map suppresses it so the legend never sits under the oversized
+  /// driving bottom bar. Defaults to true → unchanged for every other map.
+  final bool showLegend;
+
   const StationMapLayers({
     super.key,
     required this.mapController,
@@ -142,6 +172,11 @@ class StationMapLayers extends StatefulWidget {
     this.clusterAlways = false,
     this.onStationTap,
     this.excludeSelectedFromClustering = false,
+    this.markerVariant = StationMarkerVariant.pill,
+    this.interactionOptions,
+    this.onMapTap,
+    this.showZoomControls = true,
+    this.showLegend = true,
   });
 
   @override
@@ -392,6 +427,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
         selected: isSelected,
         onTap: onTap == null ? null : () => onTap(station.id),
         fuelResolver: resolver,
+        variant: widget.markerVariant,
       );
       _markerMeta[marker] = (
         id: station.id,
@@ -500,9 +536,14 @@ class _StationMapLayersState extends State<StationMapLayers> {
             // beyond the world wrap.
             minZoom: _kMinZoom,
             maxZoom: _kMaxZoom,
-            interactionOptions: const InteractionOptions(
-              flags: InteractiveFlag.all,
-            ),
+            // #3002 — the DRIVING map passes its restricted gesture set (no
+            // pinch); every other map keeps the default all-gestures option.
+            interactionOptions: widget.interactionOptions ??
+                const InteractionOptions(flags: InteractiveFlag.all),
+            // #3002 — driving wires a background-tap to its auto-lock reset.
+            onTap: widget.onMapTap == null
+                ? null
+                : (_, _) => widget.onMapTap!(),
           ),
           children: [
             // #2398 — the SINGLE hardened tile path. No inline TileLayer,
@@ -600,57 +641,61 @@ class _StationMapLayersState extends State<StationMapLayers> {
             const OsmAttribution(),
           ],
         ),
-        // Zoom controls
-        Positioned(
-          right: 16,
-          top: 16,
-          child: Column(
-            children: [
-              ZoomButton(
-                icon: Icons.add,
-                onPressed: () {
-                  // #1457 — clamp to [_kMinZoom, _kMaxZoom]. Without
-                  // the clamp, a + tap at the cap silently no-ops AND
-                  // pushes the camera to a zoom level with no tiles
-                  // (the user sees a grey screen and assumes the button
-                  // is broken). The clamp turns it into a graceful
-                  // no-op AT the cap — the visible feedback is "I'm
-                  // already at max zoom" instead of "the button is
-                  // dead".
-                  final z = (widget.mapController.camera.zoom + 1)
-                      .clamp(_kMinZoom, _kMaxZoom);
-                  widget.mapController
-                      .move(widget.mapController.camera.center, z);
-                },
-              ),
-              const SizedBox(height: 8),
-              ZoomButton(
-                icon: Icons.remove,
-                onPressed: () {
-                  final z = (widget.mapController.camera.zoom - 1)
-                      .clamp(_kMinZoom, _kMaxZoom);
-                  widget.mapController
-                      .move(widget.mapController.camera.center, z);
-                },
-              ),
-              if (widget.showRecenterButton) ...[
+        // Zoom controls — #3002: hidden on the driving map, which has its own
+        // oversized bottom bar.
+        if (widget.showZoomControls)
+          Positioned(
+            right: 16,
+            top: 16,
+            child: Column(
+              children: [
+                ZoomButton(
+                  icon: Icons.add,
+                  onPressed: () {
+                    // #1457 — clamp to [_kMinZoom, _kMaxZoom]. Without
+                    // the clamp, a + tap at the cap silently no-ops AND
+                    // pushes the camera to a zoom level with no tiles
+                    // (the user sees a grey screen and assumes the button
+                    // is broken). The clamp turns it into a graceful
+                    // no-op AT the cap — the visible feedback is "I'm
+                    // already at max zoom" instead of "the button is
+                    // dead".
+                    final z = (widget.mapController.camera.zoom + 1)
+                        .clamp(_kMinZoom, _kMaxZoom);
+                    widget.mapController
+                        .move(widget.mapController.camera.center, z);
+                  },
+                ),
                 const SizedBox(height: 8),
                 ZoomButton(
-                  icon: Icons.my_location,
-                  onPressed: widget.onRecenter ??
-                      () => widget.mapController
-                          .move(widget.center, widget.zoom),
+                  icon: Icons.remove,
+                  onPressed: () {
+                    final z = (widget.mapController.camera.zoom - 1)
+                        .clamp(_kMinZoom, _kMaxZoom);
+                    widget.mapController
+                        .move(widget.mapController.camera.center, z);
+                  },
                 ),
+                if (widget.showRecenterButton) ...[
+                  const SizedBox(height: 8),
+                  ZoomButton(
+                    icon: Icons.my_location,
+                    onPressed: widget.onRecenter ??
+                        () => widget.mapController
+                            .move(widget.center, widget.zoom),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
-        // Price legend
-        const Positioned(
-          left: 16,
-          bottom: 16,
-          child: PriceLegend(),
-        ),
+        // Price legend — #3002: hidden on the driving map so it never sits
+        // under the oversized driving bottom bar.
+        if (widget.showLegend)
+          const Positioned(
+            left: 16,
+            bottom: 16,
+            child: PriceLegend(),
+          ),
       ],
     );
   }

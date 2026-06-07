@@ -513,6 +513,173 @@ void main() {
     });
   });
 
+  group('StationMarkerBuilder driving variant (#3002, Epic #2997)', () {
+    // The DRIVING map adopts the shared price-band colours + pill grammar but
+    // keeps a big, driver-legible CONTENT variant: brand on top + a price-tier
+    // icon + a LARGE price, at ~150x62. It is a real content variant, NOT a
+    // size scale of the default price-only pill (whose brand lives in a
+    // tooltip that's useless while driving).
+
+    testWidgets('the driving variant is the large 150x62 driver card',
+        (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation,
+        FuelType.e10,
+        1.50,
+        2.00,
+        variant: StationMarkerVariant.driving,
+      );
+      // Big driver-legible dimensions, NOT the compact pill.
+      expect(marker.width, kDrivingMarkerWidth);
+      expect(marker.height, kDrivingMarkerHeight);
+      expect(marker.width, greaterThan(kStationMarkerWidth));
+      expect(marker.height, greaterThan(kStationMarkerHeight));
+    });
+
+    testWidgets('the driving variant PAINTS the brand line (not just a tooltip)',
+        (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation, // brand STAR, e10 1.799
+        FuelType.e10,
+        1.50,
+        2.00,
+        variant: StationMarkerVariant.driving,
+      );
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
+        ),
+      );
+
+      // The brand is RENDERED as text on the card — the whole point of the
+      // driver-legible variant (the default pill hides it in a tooltip).
+      expect(find.text('STAR'), findsOneWidget);
+      // The large price is rendered too.
+      expect(find.text('1,799'), findsOneWidget);
+    });
+
+    testWidgets('the driving variant renders the price-tier icon',
+        (tester) async {
+      // A cheapest station → downward (cheap) tier arrow.
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStationList[0], // cheap, e10 1.739
+        FuelType.e10,
+        1.739,
+        1.859,
+        variant: StationMarkerVariant.driving,
+      );
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
+        ),
+      );
+
+      expect(find.byIcon(Icons.arrow_downward), findsOneWidget);
+    });
+
+    testWidgets('the driving variant colours from the shared PriceBandColors '
+        'ramp (cheapest = the canonical cheap stop)', (tester) async {
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStationList[0], // cheapest in the range below
+        FuelType.e10,
+        1.739,
+        1.859,
+        variant: StationMarkerVariant.driving,
+      );
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
+        ),
+      );
+
+      final container = tester.widget<Container>(find.byType(Container).first);
+      final decoration = container.decoration! as BoxDecoration;
+      // The fill is the shared ramp's cheap stop (with the variant's alpha),
+      // proving driving folds onto the ONE canonical ramp — not its old
+      // bespoke _drivingStops palette.
+      expectSameColor(
+        decoration.color!.withValues(alpha: 1.0),
+        PriceBandColors.cheap,
+      );
+    });
+
+    testWidgets('the driving variant keeps the RepaintBoundary + onTap hook',
+        (tester) async {
+      var tapped = false;
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation,
+        FuelType.e10,
+        1.50,
+        2.00,
+        variant: StationMarkerVariant.driving,
+        onTap: () => tapped = true,
+      );
+      // Same wrapping contract as the default marker (#1772).
+      expect(marker.child, isA<RepaintBoundary>());
+
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: marker.child,
+        ),
+      );
+      await tester.tap(find.byType(GestureDetector).first);
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('the DEFAULT variant is unchanged — small price-only pill, '
+        'brand only in the tooltip', (tester) async {
+      // Locks that adding the driving variant did NOT alter the default
+      // marker the nearby/radar/route maps render.
+      final marker = StationMarkerBuilder.build(
+        tester.element(find.byType(Container).first),
+        testStation,
+        FuelType.e10,
+        1.50,
+        2.00,
+      );
+      expect(marker.width, kStationMarkerWidth);
+      expect(marker.height, kStationMarkerHeight);
+
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: marker.width,
+          height: marker.height,
+          child: (((marker.child as RepaintBoundary).child as Semantics)
+                  .child as GestureDetector)
+              .child,
+        ),
+      );
+
+      // The brand is NOT painted on the default pill (tooltip only).
+      expect(find.text('STAR'), findsNothing);
+      expect(find.text('1,799'), findsOneWidget);
+    });
+  });
+
   group('StationMarkerBuilder price-flash — selected only (#2973)', () {
     Future<void> pumpMarker(WidgetTester tester, Marker marker) =>
         pumpApp(
