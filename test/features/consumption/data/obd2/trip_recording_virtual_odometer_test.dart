@@ -146,8 +146,18 @@ void main() {
       await ctl.start();
 
       // 12 fixes, 0.001 deg latitude apart (~111 m) → 11 legs ~1.223 km.
+      // Stamp each fix 10 s apart (a real ~40 km/h drive): plausible speed
+      // (under the #2963 200 km/h teleport gate) and ≥950 ms apart so the
+      // #3004 ~1 Hz decimation keeps every one. Without explicit timestamps
+      // a tight in-test loop buffers all 12 within a sub-millisecond window,
+      // which the decimator would (correctly) collapse to a single vertex.
+      final t0 = DateTime.utc(2026, 5, 19, 10);
       for (var i = 0; i < 12; i++) {
-        ctl.debugAppendGpsFix(latitude: 45.0 + i * 0.001, longitude: 5.0);
+        ctl.debugAppendGpsFix(
+          latitude: 45.0 + i * 0.001,
+          longitude: 5.0,
+          at: t0.add(Duration(seconds: i * 10)),
+        );
       }
 
       final summary = await ctl.stop();

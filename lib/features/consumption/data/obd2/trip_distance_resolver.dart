@@ -179,11 +179,66 @@ class TripDistanceResolver {
   /// track is too sparse to trust (#1979): fewer than
   /// [kMinGpsFixesForDistanceSource] fixes, or a sub-50 m total (a parked
   /// car's GPS scatter). Callers then fall back to the virtual odometer.
+  ///
+  /// The track is decimated to ~1 Hz BEFORE haversine-summing (#3004). The
+  /// trip GPS stream runs at `LocationAccuracy.high` with no `distanceFilter`
+  /// (= every OS fix), so on a SLOW drive the OS delivers ~4-5 fixes/s. The
+  /// per-fix lateral GPS wander (~5-12 m, good accuracy) clears the 3 m
+  /// jitter floor and is well under the #2963 accuracy / teleport gates, so
+  /// the full-rate sum accumulates every sub-second zig-zag vertex — a true
+  /// ~1.72 km drive inflates to ~3.5 km (~2×). Those in-between vertices add
+  /// only jitter, not net displacement, so dropping them down to one fix per
+  /// ~second collapses the inflation while leaving the true road distance.
+  /// A genuine 1 Hz track (highway, where the OS thins fast motion) keeps
+  /// every fix, so it is unaffected — no under-count.
+  ///
+  /// The [kMinGpsFixesForDistanceSource] gate is intentionally checked on the
+  /// RAW buffer (a real drive always has plenty of raw fixes); decimation
+  /// only changes which vertices the haversine sums.
   double? _gpsTrackDistanceKm() {
     if (_gpsTrack.length < kMinGpsFixesForDistanceSource) return null;
-    final km = GpsTrackDistance.haversineKm(_gpsTrack);
+    final km = GpsTrackDistance.haversineKm(_decimatedTrack());
     if (km < 0.05) return null;
     return km;
+  }
+
+  /// Minimum gap (ms) between two KEPT GPS fixes when decimating the track
+  /// to ~1 Hz before haversine-summing (#3004). Mirrors the 950 ms gate
+  /// [TripSampleBuffer.maybeCapture] uses for the trip-detail charts — the
+  /// slack below 1000 ms lets a slightly-jittered 1 Hz fix (998 ms) still
+  /// count, so a genuine 1 Hz track is never thinned.
+  static const int _gpsDecimationGapMs = 950;
+
+  /// [_gpsTrack] thinned to ~1 Hz: a fix is kept only when its timestamp is
+  /// at least [_gpsDecimationGapMs] after the last KEPT fix (#3004). Two
+  /// timestamp cases keep the full legacy haversine behaviour
+  /// (backward-compatible) — the fix is always kept and the gate is NOT
+  /// advanced:
+  ///
+  ///   * a null timestamp ([GpsTrackPoint.at] == null) — a pre-#2970 /
+  ///     coordinate-only caller carries no fix time to decimate by;
+  ///   * a non-advancing clock (Δt ≤ 0 vs the last kept fix) — the
+  ///     timestamps carry no thinning information (a frozen test clock, or a
+  ///     same-instant duplicate burst), so they cannot be decimated.
+  ///
+  /// In production the injected clock is the real wall clock (`DateTime.now`,
+  /// strictly increasing), so a ~4-5 Hz slow drive yields ~200 ms gaps
+  /// (0 < Δt < 950 ⇒ thinned) while a genuine 1 Hz track keeps every fix.
+  List<GpsTrackPoint> _decimatedTrack() {
+    final kept = <GpsTrackPoint>[];
+    DateTime? lastKeptAt;
+    for (final p in _gpsTrack) {
+      final at = p.at;
+      final keep = at == null ||
+          lastKeptAt == null ||
+          at.difference(lastKeptAt).inMilliseconds >= _gpsDecimationGapMs ||
+          !at.isAfter(lastKeptAt);
+      if (keep) {
+        kept.add(p);
+        if (at != null) lastKeptAt = at;
+      }
+    }
+    return kept;
   }
 
   /// Test seam: append a speed sample to the virtual-odometer buffer

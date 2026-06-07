@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_distance_resolver.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_distance_source.dart';
@@ -353,6 +355,155 @@ void main() {
       expect(
         r.distanceKm(odometerStartKm: null, odometerLatestKm: null),
         greaterThan(1.0),
+      );
+    });
+  });
+
+  group('TripDistanceResolver — slow-drive jitter inflation (#3004)', () {
+    // The trip GPS stream runs at LocationAccuracy.high with NO
+    // distanceFilter (= 0 → every OS fix), so on a SLOW drive the OS
+    // delivers fixes at ~4-5 Hz. Each raw fix is buffered one-per-fix and
+    // the resolver haversine-sums the WHOLE buffer. On a slow drive the
+    // per-fix lateral GPS wander (~5-12 m, good 8 m accuracy) is summed at
+    // every sub-second vertex — none of the #2963 gates catch it: accuracy
+    // is good (< 25 m), the implied speed is well under 200 km/h, and the
+    // sub-0.5 s Δt skips the teleport gate, while the wander clears the 3 m
+    // jitter floor. Higher cadence ⇒ more zig-zag vertices ⇒ more
+    // inflation. Result: a true ~1.72 km drive persists as ~3.5 km (~2×).
+    //
+    // The fix decimates the buffer to ~1 Hz (mirroring TripSampleBuffer's
+    // 950 ms gate) BEFORE haversine: the sub-second in-between vertices add
+    // only jitter, not net displacement, so they are dropped and the true
+    // road distance dominates.
+    //
+    // Driven through the REAL resolver via `debugAddGpsFix` carrying real
+    // accuracy + per-fix timestamps — no fake echoing the answer.
+    final base = DateTime.utc(2026, 4, 22, 12);
+    const lat0 = 45.0, lon0 = 5.0;
+    // Metres per degree at lat 45° (WGS-84 local scale used to lay out the
+    // synthetic path; the resolver computes its own haversine independently).
+    const metersPerDegLon = 78710.0;
+    const metersPerDegLat = 111320.0;
+
+    /// A straight ~1.72 km east-west path driven slow (30.5 km/h, ~203 s)
+    /// at [hz] fixes/s, with realistic GPS lateral jitter modelled as an
+    /// AR(1) slow drift plus a fast white scintillation term — the same
+    /// shape a real phone produces (the error is autocorrelated within a
+    /// second, not pure white noise). Good 8 m accuracy so the 25 m gate
+    /// keeps every fix; per-fix timestamps so the 1 Hz decimation has the
+    /// data it needs.
+    void feedSlowJitteryDrive(
+      TripDistanceResolver r, {
+      double hz = 5.0,
+      int seed = 7,
+    }) {
+      final rng = math.Random(seed);
+      double gauss() {
+        final u1 = rng.nextDouble().clamp(1e-9, 1.0);
+        final u2 = rng.nextDouble();
+        return math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2);
+      }
+
+      const totalSec = 203.0;
+      const totalMeters = 1720.0;
+      const driftSigma = 1.6; // slow multipath drift (m)
+      const whiteSigma = 3.2; // fast scintillation (m)
+      const rho = 0.9; // AR(1) drift autocorrelation
+      final n = (totalSec * hz).round();
+      var drift = 0.0;
+      for (var i = 0; i < n; i++) {
+        final frac = i / (n - 1);
+        final alongM = totalMeters * frac;
+        drift = rho * drift + driftSigma * gauss();
+        final lateralM = drift + whiteSigma * gauss();
+        r.debugAddGpsFix(
+          latitude: lat0 + lateralM / metersPerDegLat,
+          longitude: lon0 + alongM / metersPerDegLon,
+          hAccuracyM: 8.0,
+          at: base.add(Duration(milliseconds: (i / hz * 1000).round())),
+        );
+      }
+    }
+
+    test('a ~1.72 km slow drive sampled at ~5 Hz is not inflated to ~2×', () {
+      final r = build();
+      feedSlowJitteryDrive(r);
+      final km = r.distanceKm(odometerStartKm: null, odometerLatestKm: null);
+      // RED on master: ~3.5 km (the full-rate haversine sums every
+      // sub-second jitter vertex). GREEN after 1 Hz decimation: ~2 km,
+      // within tolerance of the true ~1.72 km (the residual is the
+      // legitimate slow GPS drift a real noisy track carries — NOT the
+      // sub-second zig-zag, which decimation removes).
+      expect(km, closeTo(1.85, 0.45),
+          reason: 'decimated distance must approach the true ~1.72 km, '
+              'not the ~3.5 km full-rate jitter sum');
+      // And it must be a large, unambiguous reduction from the inflated
+      // full-rate figure — never within rounding of ~3.5 km.
+      expect(km, lessThan(2.6));
+      // The GPS track is still the chosen source (we did NOT swap to the
+      // virtual / speed-integral fallback).
+      expect(
+        r.distanceSource(odometerStartKm: null, odometerLatestKm: null),
+        kDistanceSourceGps,
+      );
+    });
+
+    test('decimation does NOT under-count a 1 Hz highway track', () {
+      // A genuine highway drive: 110 km/h for 120 s ≈ 3.67 km, delivered at
+      // 1 Hz already (the OS thins fast motion), large real per-fix
+      // displacement (~30.6 m), good accuracy. The 950 ms decimation keeps
+      // EVERY fix (they are ≥ 1 s apart), so the distance is unchanged — no
+      // under-count.
+      final r = build();
+      final rng = math.Random(3);
+      double gauss() {
+        final u1 = rng.nextDouble().clamp(1e-9, 1.0);
+        final u2 = rng.nextDouble();
+        return math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2);
+      }
+
+      const n = 121; // 0..120 s inclusive
+      const totalMeters = 3667.0;
+      for (var i = 0; i < n; i++) {
+        final frac = i / (n - 1);
+        final alongM = totalMeters * frac;
+        final lateralM = 3.0 * gauss();
+        r.debugAddGpsFix(
+          latitude: lat0 + lateralM / metersPerDegLat,
+          longitude: lon0 + alongM / metersPerDegLon,
+          hAccuracyM: 6.0,
+          at: base.add(Duration(seconds: i)),
+        );
+      }
+      final km = r.distanceKm(odometerStartKm: null, odometerLatestKm: null);
+      // Unchanged by decimation: ~3.67 km true road distance (+ a little
+      // from the small white jitter that any 1 Hz track legitimately
+      // carries). The assertion that matters is no UNDER-count below the
+      // true distance.
+      expect(km, greaterThan(3.5));
+      expect(km, closeTo(3.7, 0.3));
+      expect(
+        r.distanceSource(odometerStartKm: null, odometerLatestKm: null),
+        kDistanceSourceGps,
+      );
+    });
+
+    test('timestamp-less fixes are all kept (backward-compatible)', () {
+      // Pre-#2970 fixtures / callers passed lat/lon only (null `at`). With
+      // no timestamp the decimation cannot thin them, so every fix is kept
+      // and the legacy haversine behaviour is preserved exactly. 12 fixes
+      // ~111 m apart → 11 legs ~1.22 km, source gps.
+      final r = build();
+      for (var i = 0; i < 12; i++) {
+        r.debugAddGpsFix(latitude: 45.0 + i * 0.001, longitude: 5.0);
+      }
+      expect(
+        r.distanceSource(odometerStartKm: null, odometerLatestKm: null),
+        kDistanceSourceGps,
+      );
+      expect(
+        r.distanceKm(odometerStartKm: null, odometerLatestKm: null),
+        closeTo(1.223, 0.03),
       );
     });
   });
