@@ -4713,5 +4713,35 @@
   "@obd2TestRunEngineOff": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2ReconnectInProgress": "Reconnecting to your OBD2 adapter…",
+  "@obd2ReconnectInProgress": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ReconnectInProgressNamed": "Reconnecting to {adapter}…",
+  "@obd2ReconnectInProgressNamed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "adapter": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReconnectFailedTitle": "Couldn’t reconnect to your adapter",
+  "@obd2ReconnectFailedTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ReconnectFailedBody": "The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.",
+  "@obd2ReconnectFailedBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ReconnectRetry": "Tap to retry",
+  "@obd2ReconnectRetry": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

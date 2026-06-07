@@ -6446,6 +6446,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
+
+  @override
+  String obd2ReconnectInProgressNamed(String adapter) {
+    return 'Reconnecting to $adapter…';
+  }
+
+  @override
+  String get obd2ReconnectFailedTitle => 'Couldn’t reconnect to your adapter';
+
+  @override
+  String get obd2ReconnectFailedBody =>
+      'The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.';
+
+  @override
+  String get obd2ReconnectRetry => 'Tap to retry';
+
+  @override
   String get ocrTesterTitle => 'OCR tester';
 
   @override
@@ -14298,6 +14316,26 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String obd2PickerPinnedFallback(String adapterName) {
     return '⟦Çóúłđñ\'ŧ řéáçĥ \'$adapterName\' — ƥîçķ áñóŧĥéř áđáƥŧéř ··············⟧';
   }
+
+  @override
+  String get obd2ReconnectInProgress =>
+      '⟦Řéçóññéçŧîñǧ ŧó ýóúř ÓƁĐ2 áđáƥŧéř… ·············⟧';
+
+  @override
+  String obd2ReconnectInProgressNamed(String adapter) {
+    return '⟦Řéçóññéçŧîñǧ ŧó $adapter… ······⟧';
+  }
+
+  @override
+  String get obd2ReconnectFailedTitle =>
+      '⟦Çóúłđñ’ŧ řéçóññéçŧ ŧó ýóúř áđáƥŧéř ·············⟧';
+
+  @override
+  String get obd2ReconnectFailedBody =>
+      '⟦Ŧĥé ÓƁĐ2 çóññéçŧîóñ ŵáš łóšŧ áñđ áúŧóɱáŧîç řéçóññéçŧîóñ đîđñ’ŧ šúççééđ. Çĥéçķ ŧĥé áđáƥŧéř îš ƥóŵéřéđ áñđ îñ řáñǧé, ŧĥéñ ŧáƥ řéŧřý. ···············································⟧';
+
+  @override
+  String get obd2ReconnectRetry => '⟦Ŧáƥ ŧó řéŧřý ·····⟧';
 
   @override
   String get ocrTesterTitle => '⟦ÓÇŘ ŧéšŧéř ····⟧';

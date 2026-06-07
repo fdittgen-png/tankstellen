@@ -1,0 +1,27 @@
+{
+  "obd2ReconnectInProgress": "Reconnecting to your OBD2 adapter…",
+  "@obd2ReconnectInProgress": {
+    "description": "Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight."
+  },
+  "obd2ReconnectInProgressNamed": "Reconnecting to {adapter}…",
+  "@obd2ReconnectInProgressNamed": {
+    "description": "Shown while auto-reconnect is trying to re-establish a named OBD2 adapter link (Epic #3013 phase 3). adapter is the friendly device name, e.g. 'vLinker FS'.",
+    "placeholders": {
+      "adapter": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReconnectFailedTitle": "Couldn’t reconnect to your adapter",
+  "@obd2ReconnectFailedTitle": {
+    "description": "Title of the terminal auto-reconnect-failure surface, shown after the bounded reconnect attempts were exhausted (Epic #3013 phase 3, #3019). The auto-loop has stopped; the user can tap to retry."
+  },
+  "obd2ReconnectFailedBody": "The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.",
+  "@obd2ReconnectFailedBody": {
+    "description": "Body text of the terminal auto-reconnect-failure surface (Epic #3013 phase 3). Explains the auto-reconnect gave up after bounded attempts and how to recover."
+  },
+  "obd2ReconnectRetry": "Tap to retry",
+  "@obd2ReconnectRetry": {
+    "description": "Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires."
+  }
+}

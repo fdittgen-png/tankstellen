@@ -121,7 +121,13 @@ void main() {
     // `connectByMacClassicDirect`/`connectByMacPassive`/`_traced`) so a connect
     // trace names the adapter, plus the `_inferTransport` registry-hint helper
     // (atop #3009's engine-off classification, both kept on the merge).
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 601,
+    // #3019 — re-grandfathered 601 → 629: Epic #3013 phase 3 auto-pins the
+    // last-good adapter on EVERY successful connect at the single `_openAndInit`
+    // chokepoint (the `lastGoodAdapterStore` field + ctor param + the
+    // best-effort `recordFrom` call + the production-provider wiring). Local-only
+    // (Hive settings box), so it stays a small additive thread on the existing
+    // connect path rather than warranting a separate connect class.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 629,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
@@ -140,7 +146,15 @@ void main() {
     // 133 retry; and the `connectDevice`/`rawConnect`/`discoverAndBind`/
     // `bindConnectionState` test seams that make all of it unit-testable without
     // a BLE stack. The pure matcher already lives in elm_gatt_profiles.dart.
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 656,
+    // #3019 — re-grandfathered 656 → 678: Epic #3013 phase 3 PROACTIVE BLE-drop
+    // detection. The debounce-confirmed disconnect edge (`_onDropConfirmed`) now
+    // ALSO emits the transport-agnostic `Obd2LinkDropSignal` (with the `_closing`
+    // / `_dropSignalled` guards so a deliberate `close()` is not misread as a
+    // drop), so the trip-INDEPENDENT reconnect controller starts immediately
+    // rather than waiting for the next failed command. The drop edge already
+    // lives here (it cannot leave this cohesive channel body), so the signal is
+    // a few additive lines on it, not a new file.
+    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 678,
     // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
     // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
     // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off

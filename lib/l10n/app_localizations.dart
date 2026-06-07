@@ -11262,6 +11262,36 @@ abstract class AppLocalizations {
   /// **'Couldn\'t reach \'{adapterName}\' — pick another adapter'**
   String obd2PickerPinnedFallback(String adapterName);
 
+  /// Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting to your OBD2 adapter…'**
+  String get obd2ReconnectInProgress;
+
+  /// Shown while auto-reconnect is trying to re-establish a named OBD2 adapter link (Epic #3013 phase 3). adapter is the friendly device name, e.g. 'vLinker FS'.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting to {adapter}…'**
+  String obd2ReconnectInProgressNamed(String adapter);
+
+  /// Title of the terminal auto-reconnect-failure surface, shown after the bounded reconnect attempts were exhausted (Epic #3013 phase 3, #3019). The auto-loop has stopped; the user can tap to retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t reconnect to your adapter'**
+  String get obd2ReconnectFailedTitle;
+
+  /// Body text of the terminal auto-reconnect-failure surface (Epic #3013 phase 3). Explains the auto-reconnect gave up after bounded attempts and how to recover.
+  ///
+  /// In en, this message translates to:
+  /// **'The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.'**
+  String get obd2ReconnectFailedBody;
+
+  /// Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to retry'**
+  String get obd2ReconnectRetry;
+
   /// Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode.
   ///
   /// In en, this message translates to:
