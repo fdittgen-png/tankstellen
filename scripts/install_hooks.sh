@@ -57,6 +57,17 @@ fi
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
+# git invokes this hook with GIT_DIR / GIT_WORK_TREE / GIT_INDEX_FILE exported
+# into the environment, and they leak into every child process — including
+# `flutter`, whose version probe runs `git describe` against the SDK checkout.
+# With GIT_DIR pointing at THIS repo (most visibly from a worktree push), that
+# probe resolves against this repo instead of the SDK, so flutter reports its
+# version as `0.0.0-unknown` and `flutter pub get` fails dependency solving —
+# which aborted the whole gate and pushed everyone onto SKIP_PREPUSH (#3027).
+# Unset them so flutter resolves its own SDK version; the git commands below
+# rediscover the repo from $REPO_ROOT (cwd) just fine.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_PREFIX
+
 # Flutter/Dart are not on the default PATH in this environment.
 export PATH="/Users/floriandittgen/development/flutter/bin:/opt/homebrew/bin:$PATH"
 
