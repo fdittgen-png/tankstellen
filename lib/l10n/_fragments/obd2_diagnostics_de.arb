@@ -252,5 +252,6 @@
   "obd2HealthConnectTransport": "Transport",
   "obd2HealthConnectOutcome": "Ergebnis",
   "obd2HealthConnectScanList": "Gefundene Geräte",
-  "obd2HealthConnectSteps": "Schritte"
+  "obd2HealthConnectSteps": "Schritte",
+  "obd2HealthConnectUnknownAdapter": "Unbekannter Adapter"
 }

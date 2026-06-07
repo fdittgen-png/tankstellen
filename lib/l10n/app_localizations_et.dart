@@ -6468,6 +6468,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2HealthConnectSteps => 'Steps';
 
   @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ei suutnud jõuda \'$adapterName\' — vali teine adapter';
   }

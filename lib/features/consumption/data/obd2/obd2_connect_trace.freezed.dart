@@ -565,7 +565,15 @@ as String?,
 /// @nodoc
 mixin _$Obd2ConnectTrace {
 
-@JsonKey(name: 'id') String get attemptId;@JsonKey(name: 'st') int get startedAtMs;@JsonKey(name: 'et') int? get endedAtMs;@JsonKey(name: 'tm') int? get totalMs;@JsonKey(name: 'or') Obd2ConnectOrigin get origin;@JsonKey(name: 'mac') String? get requestedMac;@JsonKey(name: 'rtx') Obd2ConnectTransport get requestedTransport;@JsonKey(name: 'ztx') Obd2ConnectTransport? get resolvedTransport;@JsonKey(name: 'tdr') String? get transportDecisionReason;@JsonKey(name: 'oc') Obd2ConnectOutcome? get outcome;@JsonKey(name: 'fd') String? get failureDetail;@JsonKey(name: 'steps') List<Obd2ConnectStep> get steps;@JsonKey(name: 'scan') List<Obd2ScannedDevice> get scanned;
+@JsonKey(name: 'id') String get attemptId;@JsonKey(name: 'st') int get startedAtMs;@JsonKey(name: 'et') int? get endedAtMs;@JsonKey(name: 'tm') int? get totalMs;@JsonKey(name: 'or') Obd2ConnectOrigin get origin;@JsonKey(name: 'mac') String? get requestedMac;// #3014 (Epic #3013, Phase 1) — the human adapter NAME (e.g. `SmartOBD`,
+// `vLinker FS 1234`). The maintainer's #1 complaint about the trace tool:
+// a by-MAC / self-test attempt showed only the redacted MAC (`···F:31`),
+// so there was no way to tell WHICH adapter failed. The name IS known at
+// every connect entry (the paired-adapter name, or the resolved scan
+// candidate's advertised name) — it was simply dropped before the trace.
+// Null when no name could be resolved (a cold scan with an anonymous
+// advertiser); the card then falls back to the redacted MAC.
+@JsonKey(name: 'nm') String? get adapterName;@JsonKey(name: 'rtx') Obd2ConnectTransport get requestedTransport;@JsonKey(name: 'ztx') Obd2ConnectTransport? get resolvedTransport;@JsonKey(name: 'tdr') String? get transportDecisionReason;@JsonKey(name: 'oc') Obd2ConnectOutcome? get outcome;@JsonKey(name: 'fd') String? get failureDetail;@JsonKey(name: 'steps') List<Obd2ConnectStep> get steps;@JsonKey(name: 'scan') List<Obd2ScannedDevice> get scanned;
 /// Create a copy of Obd2ConnectTrace
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -578,16 +586,16 @@ $Obd2ConnectTraceCopyWith<Obd2ConnectTrace> get copyWith => _$Obd2ConnectTraceCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2ConnectTrace&&(identical(other.attemptId, attemptId) || other.attemptId == attemptId)&&(identical(other.startedAtMs, startedAtMs) || other.startedAtMs == startedAtMs)&&(identical(other.endedAtMs, endedAtMs) || other.endedAtMs == endedAtMs)&&(identical(other.totalMs, totalMs) || other.totalMs == totalMs)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.requestedMac, requestedMac) || other.requestedMac == requestedMac)&&(identical(other.requestedTransport, requestedTransport) || other.requestedTransport == requestedTransport)&&(identical(other.resolvedTransport, resolvedTransport) || other.resolvedTransport == resolvedTransport)&&(identical(other.transportDecisionReason, transportDecisionReason) || other.transportDecisionReason == transportDecisionReason)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.failureDetail, failureDetail) || other.failureDetail == failureDetail)&&const DeepCollectionEquality().equals(other.steps, steps)&&const DeepCollectionEquality().equals(other.scanned, scanned));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2ConnectTrace&&(identical(other.attemptId, attemptId) || other.attemptId == attemptId)&&(identical(other.startedAtMs, startedAtMs) || other.startedAtMs == startedAtMs)&&(identical(other.endedAtMs, endedAtMs) || other.endedAtMs == endedAtMs)&&(identical(other.totalMs, totalMs) || other.totalMs == totalMs)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.requestedMac, requestedMac) || other.requestedMac == requestedMac)&&(identical(other.adapterName, adapterName) || other.adapterName == adapterName)&&(identical(other.requestedTransport, requestedTransport) || other.requestedTransport == requestedTransport)&&(identical(other.resolvedTransport, resolvedTransport) || other.resolvedTransport == resolvedTransport)&&(identical(other.transportDecisionReason, transportDecisionReason) || other.transportDecisionReason == transportDecisionReason)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.failureDetail, failureDetail) || other.failureDetail == failureDetail)&&const DeepCollectionEquality().equals(other.steps, steps)&&const DeepCollectionEquality().equals(other.scanned, scanned));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,attemptId,startedAtMs,endedAtMs,totalMs,origin,requestedMac,requestedTransport,resolvedTransport,transportDecisionReason,outcome,failureDetail,const DeepCollectionEquality().hash(steps),const DeepCollectionEquality().hash(scanned));
+int get hashCode => Object.hash(runtimeType,attemptId,startedAtMs,endedAtMs,totalMs,origin,requestedMac,adapterName,requestedTransport,resolvedTransport,transportDecisionReason,outcome,failureDetail,const DeepCollectionEquality().hash(steps),const DeepCollectionEquality().hash(scanned));
 
 @override
 String toString() {
-  return 'Obd2ConnectTrace(attemptId: $attemptId, startedAtMs: $startedAtMs, endedAtMs: $endedAtMs, totalMs: $totalMs, origin: $origin, requestedMac: $requestedMac, requestedTransport: $requestedTransport, resolvedTransport: $resolvedTransport, transportDecisionReason: $transportDecisionReason, outcome: $outcome, failureDetail: $failureDetail, steps: $steps, scanned: $scanned)';
+  return 'Obd2ConnectTrace(attemptId: $attemptId, startedAtMs: $startedAtMs, endedAtMs: $endedAtMs, totalMs: $totalMs, origin: $origin, requestedMac: $requestedMac, adapterName: $adapterName, requestedTransport: $requestedTransport, resolvedTransport: $resolvedTransport, transportDecisionReason: $transportDecisionReason, outcome: $outcome, failureDetail: $failureDetail, steps: $steps, scanned: $scanned)';
 }
 
 
@@ -598,7 +606,7 @@ abstract mixin class $Obd2ConnectTraceCopyWith<$Res>  {
   factory $Obd2ConnectTraceCopyWith(Obd2ConnectTrace value, $Res Function(Obd2ConnectTrace) _then) = _$Obd2ConnectTraceCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'id') String attemptId,@JsonKey(name: 'st') int startedAtMs,@JsonKey(name: 'et') int? endedAtMs,@JsonKey(name: 'tm') int? totalMs,@JsonKey(name: 'or') Obd2ConnectOrigin origin,@JsonKey(name: 'mac') String? requestedMac,@JsonKey(name: 'rtx') Obd2ConnectTransport requestedTransport,@JsonKey(name: 'ztx') Obd2ConnectTransport? resolvedTransport,@JsonKey(name: 'tdr') String? transportDecisionReason,@JsonKey(name: 'oc') Obd2ConnectOutcome? outcome,@JsonKey(name: 'fd') String? failureDetail,@JsonKey(name: 'steps') List<Obd2ConnectStep> steps,@JsonKey(name: 'scan') List<Obd2ScannedDevice> scanned
+@JsonKey(name: 'id') String attemptId,@JsonKey(name: 'st') int startedAtMs,@JsonKey(name: 'et') int? endedAtMs,@JsonKey(name: 'tm') int? totalMs,@JsonKey(name: 'or') Obd2ConnectOrigin origin,@JsonKey(name: 'mac') String? requestedMac,@JsonKey(name: 'nm') String? adapterName,@JsonKey(name: 'rtx') Obd2ConnectTransport requestedTransport,@JsonKey(name: 'ztx') Obd2ConnectTransport? resolvedTransport,@JsonKey(name: 'tdr') String? transportDecisionReason,@JsonKey(name: 'oc') Obd2ConnectOutcome? outcome,@JsonKey(name: 'fd') String? failureDetail,@JsonKey(name: 'steps') List<Obd2ConnectStep> steps,@JsonKey(name: 'scan') List<Obd2ScannedDevice> scanned
 });
 
 
@@ -615,7 +623,7 @@ class _$Obd2ConnectTraceCopyWithImpl<$Res>
 
 /// Create a copy of Obd2ConnectTrace
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? attemptId = null,Object? startedAtMs = null,Object? endedAtMs = freezed,Object? totalMs = freezed,Object? origin = null,Object? requestedMac = freezed,Object? requestedTransport = null,Object? resolvedTransport = freezed,Object? transportDecisionReason = freezed,Object? outcome = freezed,Object? failureDetail = freezed,Object? steps = null,Object? scanned = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? attemptId = null,Object? startedAtMs = null,Object? endedAtMs = freezed,Object? totalMs = freezed,Object? origin = null,Object? requestedMac = freezed,Object? adapterName = freezed,Object? requestedTransport = null,Object? resolvedTransport = freezed,Object? transportDecisionReason = freezed,Object? outcome = freezed,Object? failureDetail = freezed,Object? steps = null,Object? scanned = null,}) {
   return _then(_self.copyWith(
 attemptId: null == attemptId ? _self.attemptId : attemptId // ignore: cast_nullable_to_non_nullable
 as String,startedAtMs: null == startedAtMs ? _self.startedAtMs : startedAtMs // ignore: cast_nullable_to_non_nullable
@@ -623,6 +631,7 @@ as int,endedAtMs: freezed == endedAtMs ? _self.endedAtMs : endedAtMs // ignore: 
 as int?,totalMs: freezed == totalMs ? _self.totalMs : totalMs // ignore: cast_nullable_to_non_nullable
 as int?,origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
 as Obd2ConnectOrigin,requestedMac: freezed == requestedMac ? _self.requestedMac : requestedMac // ignore: cast_nullable_to_non_nullable
+as String?,adapterName: freezed == adapterName ? _self.adapterName : adapterName // ignore: cast_nullable_to_non_nullable
 as String?,requestedTransport: null == requestedTransport ? _self.requestedTransport : requestedTransport // ignore: cast_nullable_to_non_nullable
 as Obd2ConnectTransport,resolvedTransport: freezed == resolvedTransport ? _self.resolvedTransport : resolvedTransport // ignore: cast_nullable_to_non_nullable
 as Obd2ConnectTransport?,transportDecisionReason: freezed == transportDecisionReason ? _self.transportDecisionReason : transportDecisionReason // ignore: cast_nullable_to_non_nullable
@@ -715,10 +724,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String attemptId, @JsonKey(name: 'st')  int startedAtMs, @JsonKey(name: 'et')  int? endedAtMs, @JsonKey(name: 'tm')  int? totalMs, @JsonKey(name: 'or')  Obd2ConnectOrigin origin, @JsonKey(name: 'mac')  String? requestedMac, @JsonKey(name: 'rtx')  Obd2ConnectTransport requestedTransport, @JsonKey(name: 'ztx')  Obd2ConnectTransport? resolvedTransport, @JsonKey(name: 'tdr')  String? transportDecisionReason, @JsonKey(name: 'oc')  Obd2ConnectOutcome? outcome, @JsonKey(name: 'fd')  String? failureDetail, @JsonKey(name: 'steps')  List<Obd2ConnectStep> steps, @JsonKey(name: 'scan')  List<Obd2ScannedDevice> scanned)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String attemptId, @JsonKey(name: 'st')  int startedAtMs, @JsonKey(name: 'et')  int? endedAtMs, @JsonKey(name: 'tm')  int? totalMs, @JsonKey(name: 'or')  Obd2ConnectOrigin origin, @JsonKey(name: 'mac')  String? requestedMac, @JsonKey(name: 'nm')  String? adapterName, @JsonKey(name: 'rtx')  Obd2ConnectTransport requestedTransport, @JsonKey(name: 'ztx')  Obd2ConnectTransport? resolvedTransport, @JsonKey(name: 'tdr')  String? transportDecisionReason, @JsonKey(name: 'oc')  Obd2ConnectOutcome? outcome, @JsonKey(name: 'fd')  String? failureDetail, @JsonKey(name: 'steps')  List<Obd2ConnectStep> steps, @JsonKey(name: 'scan')  List<Obd2ScannedDevice> scanned)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Obd2ConnectTrace() when $default != null:
-return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,_that.origin,_that.requestedMac,_that.requestedTransport,_that.resolvedTransport,_that.transportDecisionReason,_that.outcome,_that.failureDetail,_that.steps,_that.scanned);case _:
+return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,_that.origin,_that.requestedMac,_that.adapterName,_that.requestedTransport,_that.resolvedTransport,_that.transportDecisionReason,_that.outcome,_that.failureDetail,_that.steps,_that.scanned);case _:
   return orElse();
 
 }
@@ -736,10 +745,10 @@ return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String attemptId, @JsonKey(name: 'st')  int startedAtMs, @JsonKey(name: 'et')  int? endedAtMs, @JsonKey(name: 'tm')  int? totalMs, @JsonKey(name: 'or')  Obd2ConnectOrigin origin, @JsonKey(name: 'mac')  String? requestedMac, @JsonKey(name: 'rtx')  Obd2ConnectTransport requestedTransport, @JsonKey(name: 'ztx')  Obd2ConnectTransport? resolvedTransport, @JsonKey(name: 'tdr')  String? transportDecisionReason, @JsonKey(name: 'oc')  Obd2ConnectOutcome? outcome, @JsonKey(name: 'fd')  String? failureDetail, @JsonKey(name: 'steps')  List<Obd2ConnectStep> steps, @JsonKey(name: 'scan')  List<Obd2ScannedDevice> scanned)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String attemptId, @JsonKey(name: 'st')  int startedAtMs, @JsonKey(name: 'et')  int? endedAtMs, @JsonKey(name: 'tm')  int? totalMs, @JsonKey(name: 'or')  Obd2ConnectOrigin origin, @JsonKey(name: 'mac')  String? requestedMac, @JsonKey(name: 'nm')  String? adapterName, @JsonKey(name: 'rtx')  Obd2ConnectTransport requestedTransport, @JsonKey(name: 'ztx')  Obd2ConnectTransport? resolvedTransport, @JsonKey(name: 'tdr')  String? transportDecisionReason, @JsonKey(name: 'oc')  Obd2ConnectOutcome? outcome, @JsonKey(name: 'fd')  String? failureDetail, @JsonKey(name: 'steps')  List<Obd2ConnectStep> steps, @JsonKey(name: 'scan')  List<Obd2ScannedDevice> scanned)  $default,) {final _that = this;
 switch (_that) {
 case _Obd2ConnectTrace():
-return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,_that.origin,_that.requestedMac,_that.requestedTransport,_that.resolvedTransport,_that.transportDecisionReason,_that.outcome,_that.failureDetail,_that.steps,_that.scanned);case _:
+return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,_that.origin,_that.requestedMac,_that.adapterName,_that.requestedTransport,_that.resolvedTransport,_that.transportDecisionReason,_that.outcome,_that.failureDetail,_that.steps,_that.scanned);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -756,10 +765,10 @@ return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String attemptId, @JsonKey(name: 'st')  int startedAtMs, @JsonKey(name: 'et')  int? endedAtMs, @JsonKey(name: 'tm')  int? totalMs, @JsonKey(name: 'or')  Obd2ConnectOrigin origin, @JsonKey(name: 'mac')  String? requestedMac, @JsonKey(name: 'rtx')  Obd2ConnectTransport requestedTransport, @JsonKey(name: 'ztx')  Obd2ConnectTransport? resolvedTransport, @JsonKey(name: 'tdr')  String? transportDecisionReason, @JsonKey(name: 'oc')  Obd2ConnectOutcome? outcome, @JsonKey(name: 'fd')  String? failureDetail, @JsonKey(name: 'steps')  List<Obd2ConnectStep> steps, @JsonKey(name: 'scan')  List<Obd2ScannedDevice> scanned)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String attemptId, @JsonKey(name: 'st')  int startedAtMs, @JsonKey(name: 'et')  int? endedAtMs, @JsonKey(name: 'tm')  int? totalMs, @JsonKey(name: 'or')  Obd2ConnectOrigin origin, @JsonKey(name: 'mac')  String? requestedMac, @JsonKey(name: 'nm')  String? adapterName, @JsonKey(name: 'rtx')  Obd2ConnectTransport requestedTransport, @JsonKey(name: 'ztx')  Obd2ConnectTransport? resolvedTransport, @JsonKey(name: 'tdr')  String? transportDecisionReason, @JsonKey(name: 'oc')  Obd2ConnectOutcome? outcome, @JsonKey(name: 'fd')  String? failureDetail, @JsonKey(name: 'steps')  List<Obd2ConnectStep> steps, @JsonKey(name: 'scan')  List<Obd2ScannedDevice> scanned)?  $default,) {final _that = this;
 switch (_that) {
 case _Obd2ConnectTrace() when $default != null:
-return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,_that.origin,_that.requestedMac,_that.requestedTransport,_that.resolvedTransport,_that.transportDecisionReason,_that.outcome,_that.failureDetail,_that.steps,_that.scanned);case _:
+return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,_that.origin,_that.requestedMac,_that.adapterName,_that.requestedTransport,_that.resolvedTransport,_that.transportDecisionReason,_that.outcome,_that.failureDetail,_that.steps,_that.scanned);case _:
   return null;
 
 }
@@ -771,7 +780,7 @@ return $default(_that.attemptId,_that.startedAtMs,_that.endedAtMs,_that.totalMs,
 @JsonSerializable()
 
 class _Obd2ConnectTrace implements Obd2ConnectTrace {
-  const _Obd2ConnectTrace({@JsonKey(name: 'id') required this.attemptId, @JsonKey(name: 'st') required this.startedAtMs, @JsonKey(name: 'et') this.endedAtMs, @JsonKey(name: 'tm') this.totalMs, @JsonKey(name: 'or') required this.origin, @JsonKey(name: 'mac') this.requestedMac, @JsonKey(name: 'rtx') required this.requestedTransport, @JsonKey(name: 'ztx') this.resolvedTransport, @JsonKey(name: 'tdr') this.transportDecisionReason, @JsonKey(name: 'oc') this.outcome, @JsonKey(name: 'fd') this.failureDetail, @JsonKey(name: 'steps') final  List<Obd2ConnectStep> steps = const <Obd2ConnectStep>[], @JsonKey(name: 'scan') final  List<Obd2ScannedDevice> scanned = const <Obd2ScannedDevice>[]}): _steps = steps,_scanned = scanned;
+  const _Obd2ConnectTrace({@JsonKey(name: 'id') required this.attemptId, @JsonKey(name: 'st') required this.startedAtMs, @JsonKey(name: 'et') this.endedAtMs, @JsonKey(name: 'tm') this.totalMs, @JsonKey(name: 'or') required this.origin, @JsonKey(name: 'mac') this.requestedMac, @JsonKey(name: 'nm') this.adapterName, @JsonKey(name: 'rtx') required this.requestedTransport, @JsonKey(name: 'ztx') this.resolvedTransport, @JsonKey(name: 'tdr') this.transportDecisionReason, @JsonKey(name: 'oc') this.outcome, @JsonKey(name: 'fd') this.failureDetail, @JsonKey(name: 'steps') final  List<Obd2ConnectStep> steps = const <Obd2ConnectStep>[], @JsonKey(name: 'scan') final  List<Obd2ScannedDevice> scanned = const <Obd2ScannedDevice>[]}): _steps = steps,_scanned = scanned;
   factory _Obd2ConnectTrace.fromJson(Map<String, dynamic> json) => _$Obd2ConnectTraceFromJson(json);
 
 @override@JsonKey(name: 'id') final  String attemptId;
@@ -780,6 +789,15 @@ class _Obd2ConnectTrace implements Obd2ConnectTrace {
 @override@JsonKey(name: 'tm') final  int? totalMs;
 @override@JsonKey(name: 'or') final  Obd2ConnectOrigin origin;
 @override@JsonKey(name: 'mac') final  String? requestedMac;
+// #3014 (Epic #3013, Phase 1) — the human adapter NAME (e.g. `SmartOBD`,
+// `vLinker FS 1234`). The maintainer's #1 complaint about the trace tool:
+// a by-MAC / self-test attempt showed only the redacted MAC (`···F:31`),
+// so there was no way to tell WHICH adapter failed. The name IS known at
+// every connect entry (the paired-adapter name, or the resolved scan
+// candidate's advertised name) — it was simply dropped before the trace.
+// Null when no name could be resolved (a cold scan with an anonymous
+// advertiser); the card then falls back to the redacted MAC.
+@override@JsonKey(name: 'nm') final  String? adapterName;
 @override@JsonKey(name: 'rtx') final  Obd2ConnectTransport requestedTransport;
 @override@JsonKey(name: 'ztx') final  Obd2ConnectTransport? resolvedTransport;
 @override@JsonKey(name: 'tdr') final  String? transportDecisionReason;
@@ -813,16 +831,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2ConnectTrace&&(identical(other.attemptId, attemptId) || other.attemptId == attemptId)&&(identical(other.startedAtMs, startedAtMs) || other.startedAtMs == startedAtMs)&&(identical(other.endedAtMs, endedAtMs) || other.endedAtMs == endedAtMs)&&(identical(other.totalMs, totalMs) || other.totalMs == totalMs)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.requestedMac, requestedMac) || other.requestedMac == requestedMac)&&(identical(other.requestedTransport, requestedTransport) || other.requestedTransport == requestedTransport)&&(identical(other.resolvedTransport, resolvedTransport) || other.resolvedTransport == resolvedTransport)&&(identical(other.transportDecisionReason, transportDecisionReason) || other.transportDecisionReason == transportDecisionReason)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.failureDetail, failureDetail) || other.failureDetail == failureDetail)&&const DeepCollectionEquality().equals(other._steps, _steps)&&const DeepCollectionEquality().equals(other._scanned, _scanned));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2ConnectTrace&&(identical(other.attemptId, attemptId) || other.attemptId == attemptId)&&(identical(other.startedAtMs, startedAtMs) || other.startedAtMs == startedAtMs)&&(identical(other.endedAtMs, endedAtMs) || other.endedAtMs == endedAtMs)&&(identical(other.totalMs, totalMs) || other.totalMs == totalMs)&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.requestedMac, requestedMac) || other.requestedMac == requestedMac)&&(identical(other.adapterName, adapterName) || other.adapterName == adapterName)&&(identical(other.requestedTransport, requestedTransport) || other.requestedTransport == requestedTransport)&&(identical(other.resolvedTransport, resolvedTransport) || other.resolvedTransport == resolvedTransport)&&(identical(other.transportDecisionReason, transportDecisionReason) || other.transportDecisionReason == transportDecisionReason)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.failureDetail, failureDetail) || other.failureDetail == failureDetail)&&const DeepCollectionEquality().equals(other._steps, _steps)&&const DeepCollectionEquality().equals(other._scanned, _scanned));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,attemptId,startedAtMs,endedAtMs,totalMs,origin,requestedMac,requestedTransport,resolvedTransport,transportDecisionReason,outcome,failureDetail,const DeepCollectionEquality().hash(_steps),const DeepCollectionEquality().hash(_scanned));
+int get hashCode => Object.hash(runtimeType,attemptId,startedAtMs,endedAtMs,totalMs,origin,requestedMac,adapterName,requestedTransport,resolvedTransport,transportDecisionReason,outcome,failureDetail,const DeepCollectionEquality().hash(_steps),const DeepCollectionEquality().hash(_scanned));
 
 @override
 String toString() {
-  return 'Obd2ConnectTrace(attemptId: $attemptId, startedAtMs: $startedAtMs, endedAtMs: $endedAtMs, totalMs: $totalMs, origin: $origin, requestedMac: $requestedMac, requestedTransport: $requestedTransport, resolvedTransport: $resolvedTransport, transportDecisionReason: $transportDecisionReason, outcome: $outcome, failureDetail: $failureDetail, steps: $steps, scanned: $scanned)';
+  return 'Obd2ConnectTrace(attemptId: $attemptId, startedAtMs: $startedAtMs, endedAtMs: $endedAtMs, totalMs: $totalMs, origin: $origin, requestedMac: $requestedMac, adapterName: $adapterName, requestedTransport: $requestedTransport, resolvedTransport: $resolvedTransport, transportDecisionReason: $transportDecisionReason, outcome: $outcome, failureDetail: $failureDetail, steps: $steps, scanned: $scanned)';
 }
 
 
@@ -833,7 +851,7 @@ abstract mixin class _$Obd2ConnectTraceCopyWith<$Res> implements $Obd2ConnectTra
   factory _$Obd2ConnectTraceCopyWith(_Obd2ConnectTrace value, $Res Function(_Obd2ConnectTrace) _then) = __$Obd2ConnectTraceCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'id') String attemptId,@JsonKey(name: 'st') int startedAtMs,@JsonKey(name: 'et') int? endedAtMs,@JsonKey(name: 'tm') int? totalMs,@JsonKey(name: 'or') Obd2ConnectOrigin origin,@JsonKey(name: 'mac') String? requestedMac,@JsonKey(name: 'rtx') Obd2ConnectTransport requestedTransport,@JsonKey(name: 'ztx') Obd2ConnectTransport? resolvedTransport,@JsonKey(name: 'tdr') String? transportDecisionReason,@JsonKey(name: 'oc') Obd2ConnectOutcome? outcome,@JsonKey(name: 'fd') String? failureDetail,@JsonKey(name: 'steps') List<Obd2ConnectStep> steps,@JsonKey(name: 'scan') List<Obd2ScannedDevice> scanned
+@JsonKey(name: 'id') String attemptId,@JsonKey(name: 'st') int startedAtMs,@JsonKey(name: 'et') int? endedAtMs,@JsonKey(name: 'tm') int? totalMs,@JsonKey(name: 'or') Obd2ConnectOrigin origin,@JsonKey(name: 'mac') String? requestedMac,@JsonKey(name: 'nm') String? adapterName,@JsonKey(name: 'rtx') Obd2ConnectTransport requestedTransport,@JsonKey(name: 'ztx') Obd2ConnectTransport? resolvedTransport,@JsonKey(name: 'tdr') String? transportDecisionReason,@JsonKey(name: 'oc') Obd2ConnectOutcome? outcome,@JsonKey(name: 'fd') String? failureDetail,@JsonKey(name: 'steps') List<Obd2ConnectStep> steps,@JsonKey(name: 'scan') List<Obd2ScannedDevice> scanned
 });
 
 
@@ -850,7 +868,7 @@ class __$Obd2ConnectTraceCopyWithImpl<$Res>
 
 /// Create a copy of Obd2ConnectTrace
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? attemptId = null,Object? startedAtMs = null,Object? endedAtMs = freezed,Object? totalMs = freezed,Object? origin = null,Object? requestedMac = freezed,Object? requestedTransport = null,Object? resolvedTransport = freezed,Object? transportDecisionReason = freezed,Object? outcome = freezed,Object? failureDetail = freezed,Object? steps = null,Object? scanned = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? attemptId = null,Object? startedAtMs = null,Object? endedAtMs = freezed,Object? totalMs = freezed,Object? origin = null,Object? requestedMac = freezed,Object? adapterName = freezed,Object? requestedTransport = null,Object? resolvedTransport = freezed,Object? transportDecisionReason = freezed,Object? outcome = freezed,Object? failureDetail = freezed,Object? steps = null,Object? scanned = null,}) {
   return _then(_Obd2ConnectTrace(
 attemptId: null == attemptId ? _self.attemptId : attemptId // ignore: cast_nullable_to_non_nullable
 as String,startedAtMs: null == startedAtMs ? _self.startedAtMs : startedAtMs // ignore: cast_nullable_to_non_nullable
@@ -858,6 +876,7 @@ as int,endedAtMs: freezed == endedAtMs ? _self.endedAtMs : endedAtMs // ignore: 
 as int?,totalMs: freezed == totalMs ? _self.totalMs : totalMs // ignore: cast_nullable_to_non_nullable
 as int?,origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
 as Obd2ConnectOrigin,requestedMac: freezed == requestedMac ? _self.requestedMac : requestedMac // ignore: cast_nullable_to_non_nullable
+as String?,adapterName: freezed == adapterName ? _self.adapterName : adapterName // ignore: cast_nullable_to_non_nullable
 as String?,requestedTransport: null == requestedTransport ? _self.requestedTransport : requestedTransport // ignore: cast_nullable_to_non_nullable
 as Obd2ConnectTransport,resolvedTransport: freezed == resolvedTransport ? _self.resolvedTransport : resolvedTransport // ignore: cast_nullable_to_non_nullable
 as Obd2ConnectTransport?,transportDecisionReason: freezed == transportDecisionReason ? _self.transportDecisionReason : transportDecisionReason // ignore: cast_nullable_to_non_nullable

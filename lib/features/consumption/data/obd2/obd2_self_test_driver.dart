@@ -231,6 +231,7 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
   Duration connectDeadline = const Duration(seconds: 15),
   String? pinnedMac,
   Obd2ConnectTransport? transportHint,
+  String? adapterName,
 }) async {
   final isClassic = transportHint == Obd2ConnectTransport.classic;
   final decisionReason = switch (transportHint) {
@@ -271,7 +272,9 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
       // connect step gets its OWN longer budget ([connectDeadline]).
       service = pinnedMac != null
           ? await _selfTestConnect(connection, pinnedMac,
-                  isClassic: isClassic, decisionReason: decisionReason)
+                  isClassic: isClassic,
+                  decisionReason: decisionReason,
+                  adapterName: adapterName)
               .timeout(connectDeadline)
           : await connection.connectBest().timeout(connectDeadline);
     } on TimeoutException {
@@ -339,6 +342,7 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
           connection, service, diag, mac, stepDeadline,
           isClassic: isClassic,
           decisionReason: decisionReason,
+          adapterName: adapterName,
           connectDeadline: connectDeadline);
       emit(reconnected.result);
       if (reconnected.service != null) {

@@ -6518,6 +6518,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obd2HealthConnectSteps => 'Steps';
 
   @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nu s-a putut accesa \'$adapterName\' — alegeți alt adaptor';
   }

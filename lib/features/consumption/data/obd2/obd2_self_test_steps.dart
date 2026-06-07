@@ -26,13 +26,18 @@ Future<Obd2Service?> _selfTestConnect(
   String pinnedMac, {
   required bool isClassic,
   required String decisionReason,
+  String? adapterName,
 }) =>
     Obd2ConnectTraceLog.runWithOrigin(
       Obd2ConnectOrigin.selfTest,
       transportDecisionReason: decisionReason,
+      // #3014 — thread the resolved adapter NAME down so the self-test trace
+      // headline reads the human name (e.g. `SmartOBD`) instead of just the
+      // redacted MAC — the maintainer's #1 trace-tool complaint.
       () => isClassic
-          ? connection.connectByMacClassicDirect(pinnedMac)
-          : connection.connectByMacDirect(pinnedMac),
+          ? connection.connectByMacClassicDirect(pinnedMac,
+              adapterName: adapterName)
+          : connection.connectByMacDirect(pinnedMac, adapterName: adapterName),
     );
 
 /// Info step: AT@1 (device description) + ATRV (battery voltage) are sent
@@ -167,6 +172,7 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
   Duration deadline, {
   bool isClassic = false,
   String decisionReason = 'no-hint-defaulted-ble',
+  String? adapterName,
   Duration connectDeadline = const Duration(seconds: 15),
 }) async {
   try {
@@ -187,7 +193,9 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
     // #2969 — transport-aware reconnect (Classic → RFCOMM) on its OWN connect
     // budget, mirroring the initial connect step.
     final reconnected = await _selfTestConnect(connection, mac,
-            isClassic: isClassic, decisionReason: decisionReason)
+            isClassic: isClassic,
+            decisionReason: decisionReason,
+            adapterName: adapterName)
         .timeout(connectDeadline);
     final elapsed = DateTime.now().difference(start).inMilliseconds;
     if (reconnected == null) {
