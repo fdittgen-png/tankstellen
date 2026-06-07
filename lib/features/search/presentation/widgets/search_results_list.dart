@@ -9,7 +9,6 @@ import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
-import '../../../../core/utils/radar_closeness.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/services/widgets/freshness_badge.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
@@ -334,21 +333,22 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
     );
     final stationRating = ref.watch(stationRatingProvider(station.id));
 
-    // #2984 — when the on-search Fuel Station Radar owns the result list, each
+    // #2995 — when the on-search Fuel Station Radar owns the result list, each
     // card carries the green→accent closeness bar (the SAME [ProximityFillBar]
-    // / [RadarCloseness] as the trip card + PiP). The bar uses an ABSOLUTE,
-    // fixed scale: `min(searchRadiusMeters, kRadarClosenessScaleCapMeters)` —
-    // the user's configured radar radius (km → m), clamped to the tunable cap.
-    // So the fill means "how close is THIS station on a stable scale": a 2.5 km
-    // forecourt reads the same fill regardless of what else is in the list, and
-    // the farthest row is never force-emptied just for being last. This REPLACES
-    // the relative-to-span model (#2956/#2959), which made each fill depend on
-    // the result set and pinned the farthest station to 0% — rejected by the
-    // maintainer. Null off radar mode (or a degenerate radius) → regular cards.
+    // / [RadarCloseness] as the trip card + PiP). The bar scales to the user's
+    // APPROACH RADIUS (`profile.approachRadiusKm * 1000`) — the EXACT same base
+    // the recording radar card (`trip_radar_card.dart`) and the PiP use, so all
+    // three surfaces are consistent on the user's approach-radius base. A 2.5 km
+    // forecourt reads `1 - 2.5/3 ≈ 0.17` (matching the recording radar), and a
+    // station beyond the approach radius reads ~0 — by design, only stations
+    // within reach show a fill. This REVERSES #2984/#2985, which scaled the list
+    // to `min(searchRadius, 15 km cap)`; the maintainer decided the recording
+    // radar's approach-radius base is correct and the list was wrong. Null off
+    // radar mode (or with no active profile) → regular cards.
     final radar = ref.watch(radarSearchProvider);
-    final closenessRadiusMeters = radar.active
-        ? RadarCloseness.listScaleMeters(
-            ref.watch(searchRadiusProvider) * 1000.0)
+    final profile = ref.watch(activeProfileProvider);
+    final closenessRadiusMeters = (radar.active && profile != null)
+        ? profile.approachRadiusKm * 1000.0
         : null;
 
     return SwipeableStationCard(

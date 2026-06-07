@@ -48,11 +48,12 @@ class _StationDetails extends StatelessWidget {
   final Station station;
   final bool hasBrand;
 
-  /// #2899/#2984 — when non-null, the Fuel Station Radar "closeness" bar is
-  /// rendered under the distance row, scaled to this ABSOLUTE radius in metres
-  /// (`min(searchRadius, kRadarClosenessScaleCapMeters)` — a fixed scale that
-  /// does not depend on the result set, so a near station's fill is stable).
-  /// Null on the regular search list, so the card is unchanged there.
+  /// #2899/#2995 — when non-null, the Fuel Station Radar "closeness" bar is
+  /// rendered under the distance row, scaled to this radius in metres. The radar
+  /// list passes the user's APPROACH RADIUS (`profile.approachRadiusKm * 1000`),
+  /// the SAME base the recording radar card + PiP use, so all three surfaces are
+  /// consistent on the user's approach-radius base. Null on the regular search
+  /// list, so the card is unchanged there.
   final double? closenessRadiusMeters;
 
   const _StationDetails({
