@@ -4698,5 +4698,15 @@
   "@obd2HealthConnectSteps": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2ErrorEngineOff": "No data from the vehicle — start the engine and try again.",
+  "@obd2ErrorEngineOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestRunEngineOff": "Adapter OK — engine off; start the engine to read live data",
+  "@obd2TestRunEngineOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

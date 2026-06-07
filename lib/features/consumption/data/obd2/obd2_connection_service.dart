@@ -328,6 +328,16 @@ class Obd2ConnectionService {
       await service.disconnect();
       throw const Obd2AdapterUnresponsive();
     }
+    // #3009 — init SUCCEEDED (every AT answered) but the vehicle bus may be
+    // SILENT (parked car / ignition off): no protocol cached + zero supported
+    // PIDs because `0100` came back ECU-silent. That is engine-off, not a
+    // telemetry-bearing success — stamp `ignitionOff` (first-wins) so the trace
+    // reads "engine off", not a misleading green "success". The connect still
+    // returns the service (the caller gates on [busAnswered] for the banner);
+    // we only correct the CLASSIFICATION here, never the working connect path.
+    if (!service.busAnswered) {
+      Obd2ConnectTraceLog.active?.setOutcome(Obd2ConnectOutcome.ignitionOff);
+    }
     return service;
   }
 

@@ -3590,7 +3590,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2ErrorAdapterUnresponsive =>
-      'Der OBD2-Adapter hat nicht geantwortet. Schalte die Zündung ein und versuche es erneut.';
+      'Der OBD2-Adapter hat nicht geantwortet. Prüfe die Verbindung und versuche es erneut.';
+
+  @override
+  String get obd2ErrorEngineOff =>
+      'Keine Daten vom Fahrzeug — starte den Motor und versuche es erneut.';
 
   @override
   String get obd2ErrorProtocolInitFailed =>
@@ -6411,6 +6415,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Adaptertest fehlgeschlagen';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — Motor aus; starte den Motor, um Live-Daten zu lesen';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {

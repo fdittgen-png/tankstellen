@@ -371,6 +371,10 @@
   "@obd2TestRunFailed": {
     "description": "Fail banner shown when one or more steps of the OBD2 adapter self-test did not succeed (#2645)."
   },
+  "obd2TestRunEngineOff": "Adapter OK — engine off; start the engine to read live data",
+  "@obd2TestRunEngineOff": {
+    "description": "Non-alarming amber banner shown when the OBD2 adapter self-test passed every adapter-capability step but the live-data steps were ECU-silent because the engine is off (#3009). The adapter is fine; only the engine is off."
+  },
   "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
   "@obd2TestRunSummary": {
     "description": "Summary line under the OBD2 adapter self-test pass/fail banner: passed-step count, total steps, and total elapsed milliseconds (#2645).",

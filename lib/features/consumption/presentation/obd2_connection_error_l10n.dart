@@ -22,6 +22,9 @@ extension Obd2ConnectionErrorL10n on Obd2ConnectionError {
         Obd2ScanTimeout() => l10n?.obd2ErrorScanTimeout ?? message,
         Obd2AdapterUnresponsive() =>
           l10n?.obd2ErrorAdapterUnresponsive ?? message,
+        // #3009 — the adapter answered; the engine is off. Accurate
+        // "start the engine" message, not the adapter-blaming one.
+        Obd2EngineOff() => l10n?.obd2ErrorEngineOff ?? message,
         Obd2ProtocolInitFailed() =>
           l10n?.obd2ErrorProtocolInitFailed ?? message,
         Obd2DisconnectedException() =>

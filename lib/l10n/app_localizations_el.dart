@@ -3597,6 +3597,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ο προσαρμογέας OBD2 δεν απάντησε. Ανοίξτε το διακόπτη ανάφλεξης και δοκιμάστε ξανά.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'Ο προσαρμογέας OBD2 έστειλε μη αναγνωρίσιμη απάντηση. Ίσως δεν είναι συμβατός — δοκιμάστε άλλον προσαρμογέα.';
 
@@ -6433,6 +6437,10 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Η δοκιμή αντάπτορα απέτυχε';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
