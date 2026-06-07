@@ -3,7 +3,8 @@
 
 import 'dart:math' as math;
 
-import '../data/obd2/trip_distance_source.dart' show kDistanceSourceVirtual;
+import '../data/obd2/trip_distance_source.dart'
+    show kDistanceSourceGps, kDistanceSourceVirtual;
 import 'harsh_event_detector.dart';
 import 'services/trip_consumption_reliability.dart';
 import 'trip_sample.dart';
@@ -100,11 +101,27 @@ class TripRecorder {
   ///
   /// [distanceSource] is the trip's live distance provenance
   /// (`kDistanceSourceReal` / `kDistanceSourceGps` /
-  /// `kDistanceSourceVirtual`, #2653). On a `virtual` (dead-reckoning)
-  /// source the speed signal is unfit for differentiation, so harsh
-  /// scoring is suppressed for that sample. Null leaves harsh scoring
-  /// enabled — the safe default for legacy / test call sites and the
-  /// OBD speed path.
+  /// `kDistanceSourceVirtual`, #2653). Harsh scoring is suppressed for
+  /// the sample when its speed signal is unfit for differentiation:
+  ///
+  ///   * `kDistanceSourceVirtual` (dead-reckoning odometer, #2653) — a
+  ///     1 km/h-quantised integrated speed produces median 4.78 / peak
+  ///     43.4 phantom events/km in the field backup.
+  ///   * `kDistanceSourceGps` (#2895 / #3029) — GPS Doppler ground speed
+  ///     is ~1 Hz, noisy, and differentiating it manufactures impossible
+  ///     >1 g spikes (the #2895 Peugeot 107: a live IMU counted 0 harsh
+  ///     while the GPS derivative counted 16, maxAccelG 1.086). #2895 made
+  ///     a live IMU *veto* that over-count, but a GPS-sourced trip with no
+  ///     IMU (no inertial hardware / OBD2-from-the-start, no speed PID) had
+  ///     nothing to veto it, so the clamped-GPS count still drove the
+  ///     score — a hard-accel/brake penalty with no visible source
+  ///     (#3029). GPS-derived speed is therefore unfit for harsh
+  ///     differentiation full stop: harsh events may come ONLY from a
+  ///     trustworthy source — a live IMU, or a real OBD2 speed PID.
+  ///
+  /// `kDistanceSourceReal` (direct OBD2 speed PID) and `null` (legacy /
+  /// test call sites and the canonical OBD speed path) leave harsh scoring
+  /// ENABLED — those speed signals are direct, not derived.
   void onSample(TripSample sample, {String? distanceSource}) {
     _startedAt ??= sample.timestamp;
     _endedAt = sample.timestamp;
@@ -117,14 +134,18 @@ class TripRecorder {
     // inflate the count (#1922), then de-noises with a sustained-window
     // + accuracy + min-speed + source-aware gate (#2653). Fed every
     // sample, including the first, so its anchor is seeded from trip
-    // start. On the `virtual` dead-reckoning source the detector
-    // suppresses scoring entirely (median 4.78 / peak 43.4 phantom
-    // events/km in the field backup).
+    // start. On any DERIVED-speed source (the `virtual` dead-reckoning
+    // odometer, #2653; and `gps` Doppler ground speed, #2895 / #3029) the
+    // detector suppresses scoring entirely — both manufacture phantom
+    // events the score has no trustworthy way to distinguish from real
+    // manoeuvres. Direct speed (`real` OBD2 PID, or null legacy/OBD path)
+    // stays scored.
     _harshDetector.onSample(
       sample.speedKmh,
       sample.timestamp,
       hAccuracyM: sample.hAccuracyM,
-      suppress: distanceSource == kDistanceSourceVirtual,
+      suppress: distanceSource == kDistanceSourceVirtual ||
+          distanceSource == kDistanceSourceGps,
     );
 
     // Track coolant samples for the cold-start surcharge heuristic

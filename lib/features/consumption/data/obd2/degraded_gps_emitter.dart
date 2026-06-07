@@ -3,6 +3,7 @@
 
 import '../../domain/trip_recorder.dart';
 import 'gps_only_sample_builder.dart';
+import 'trip_distance_source.dart' show kDistanceSourceGps;
 import 'trip_live_reading.dart';
 import 'trip_sample_buffer.dart';
 
@@ -100,7 +101,14 @@ class DegradedGpsEmitter {
         hAccuracyM: hAccuracyM,
         bearingDeg: bearingDeg,
       );
-      _recorder.onSample(sample);
+      // #3029 — this feed is pure GPS Doppler ground speed (OBD2 dropped),
+      // so tag the source `gps` to suppress harsh scoring on it: the
+      // ~1 Hz noisy derivative manufactures phantom hard-accel/brake
+      // events the score cannot tell from real manoeuvres. Mirrors the
+      // GPS-only pipeline (`recorder.onSample(sample, distanceSource:
+      // kDistanceSourceGps)`); without the tag this degraded feed scored
+      // ungated and produced penalties with no visible IMU source.
+      _recorder.onSample(sample, distanceSource: kDistanceSourceGps);
       _onSampleAt(nowTs);
       _sampleBuffer.maybeCapture(sample);
     }

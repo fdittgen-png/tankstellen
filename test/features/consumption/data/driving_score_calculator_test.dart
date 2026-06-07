@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/driving_score_calculator.dart';
+import 'package:tankstellen/features/consumption/data/obd2/trip_distance_source.dart';
 import 'package:tankstellen/features/consumption/domain/driving_score.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 
@@ -603,6 +604,96 @@ void main() {
         ),
       );
       expect(s.luggingPenalty, greaterThan(0));
+    });
+  });
+
+  group('#3029 — GPS-sourced harsh penalty has no phantom source', () {
+    // End-to-end: drive the REAL recorder with the kind of noisy GPS
+    // ground-speed stream that over-counted on master, then score the
+    // resulting summary through the SAME summary path the trip-detail
+    // screen uses. The penalty must be 0 (count 0 ⟺ penalty 0), and the
+    // export-visible count (summary.harshBrakes/harshAccelerations) must
+    // agree with it. On master this produced harshBrakes > 0 →
+    // hardBrakePenalty > 0 while imu.hardBrakeCount = 0.
+    const bounce = <double>[45, 60, 45, 30];
+
+    TripSummary recordNoisyGps({required String distanceSource}) {
+      final r = TripRecorder();
+      final start = DateTime.utc(2026);
+      var latched = bounce[0];
+      var stepIdx = 0;
+      var lastStepSec = 0;
+      for (var i = 0; i < 1200; i++) {
+        if (i - lastStepSec >= 6) {
+          stepIdx++;
+          latched = bounce[stepIdx % bounce.length];
+          lastStepSec = i;
+        }
+        r.onSample(
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: latched,
+            // rpm 0 (GPS-only, no engine signal) so the engine-derived
+            // penalties don't muddy the harsh-penalty assertion.
+            rpm: 0,
+          ),
+          distanceSource: distanceSource,
+        );
+      }
+      return r.buildSummary();
+    }
+
+    test(
+        'gps source: noisy stream → harsh counts 0 → hard-accel/brake '
+        'penalties 0 (phantom eliminated)', () {
+      final s = recordNoisyGps(distanceSource: kDistanceSourceGps);
+      expect(s.distanceKm, greaterThan(10), reason: 'sanity: ~15 km');
+      // The score-driving counts (what the export now surfaces).
+      expect(s.harshBrakes, 0);
+      expect(s.harshAccelerations, 0);
+      final score = computeDrivingScoreFromSummary(s);
+      expect(score.hardBrakePenalty, 0,
+          reason: 'count 0 ⟺ penalty 0 — no phantom (#3029)');
+      expect(score.hardAccelPenalty, 0,
+          reason: 'count 0 ⟺ penalty 0 — no phantom (#3029)');
+    });
+
+    test(
+        'real OBD2-speed source: a genuine hard brake still penalises '
+        '(#3029 did not kill direct-speed scoring)', () {
+      // Direct OBD2 speed PID: a single clean 90→30 km/h decel must still
+      // count and penalise — proves the fix is scoped to derived speed.
+      final r = TripRecorder();
+      final start = DateTime.utc(2026);
+      r.onSample(
+        TripSample(timestamp: start, speedKmh: 90, rpm: 3000),
+        distanceSource: kDistanceSourceReal,
+      );
+      r.onSample(
+        TripSample(
+          timestamp: start.add(const Duration(seconds: 2)),
+          speedKmh: 30,
+          rpm: 1500,
+        ),
+        distanceSource: kDistanceSourceReal,
+      );
+      // Pad with steady cruise so durationSec is well over the 1-min floor.
+      for (var i = 1; i <= 120; i++) {
+        r.onSample(
+          TripSample(
+            timestamp: start.add(Duration(seconds: 2 + i)),
+            speedKmh: 50,
+            rpm: 2000,
+          ),
+          distanceSource: kDistanceSourceReal,
+        );
+      }
+      final s = r.buildSummary();
+      expect(s.harshBrakes, greaterThan(0),
+          reason: 'direct OBD2 speed stays scored');
+      final score = computeDrivingScoreFromSummary(s);
+      expect(score.hardBrakePenalty, greaterThan(0),
+          reason: 'count > 0 ⟺ penalty > 0 on the real-speed path');
     });
   });
 

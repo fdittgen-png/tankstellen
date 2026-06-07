@@ -127,11 +127,70 @@ void main() {
       expect(score['styleClass'], _score.styleClass.name);
       expect(score['hardAccelPenalty'], 6);
       expect(score['hardBrakePenalty'], 4);
+      // #3029 — the score block now exports the counts that DRIVE the
+      // penalties (summary.harshAccelerations/harshBrakes), so a penalty
+      // always has a visible matching count.
+      expect(score['hardAccelCount'], 0);
+      expect(score['hardBrakeCount'], 0);
 
       final lessons = json['lessons'] as List<dynamic>;
       expect(lessons, hasLength(1));
       expect((lessons.first as Map)['id'], 'smoothDriving');
       expect((lessons.first as Map)['polarity'], 'positive');
+    });
+
+    test(
+        '#3029 — the score block\'s harsh counts are the penalty drivers '
+        '(non-zero penalty ⟺ non-zero count)', () {
+      // A real-OBD2-speed trip with genuine harsh events: the exported
+      // score-block counts must match summary.harshAccelerations/harshBrakes
+      // (what the penalty is computed from), NOT the imu.*Count scalars —
+      // so the export is internally consistent (penalty>0 has a count>0).
+      final summary = TripSummary(
+        distanceKm: 20,
+        maxRpm: 3000,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 2,
+        harshAccelerations: 3,
+        startedAt: DateTime.utc(2026, 6, 3, 10),
+        endedAt: DateTime.utc(2026, 6, 3, 10, 25),
+        distanceSource: 'real',
+        kind: TripKind.gpsPlusObd2,
+        // IMU never ran — its scalars are 0 and would CONTRADICT the
+        // penalty if the export used them as the count.
+        imuActive: false,
+        imuHardAccelCount: 0,
+        imuHardBrakeCount: 0,
+      );
+      const score = DrivingScore(
+        score: 70,
+        idlingPenalty: 0,
+        hardAccelPenalty: 9,
+        hardBrakePenalty: 6,
+        highRpmPenalty: 0,
+        fullThrottlePenalty: 0,
+      );
+      final json = DrivingAnalysisTrace(
+        capturedAt: DateTime.utc(2026, 6, 3, 11),
+        summary: summary,
+        score: score,
+        lessons: const [],
+      ).toJson();
+
+      final scoreBlock = json['score'] as Map<String, dynamic>;
+      final imu = json['imu'] as Map<String, dynamic>;
+      // The penalty drivers are the harsh counts, not the IMU scalars.
+      expect(scoreBlock['hardAccelCount'], 3);
+      expect(scoreBlock['hardBrakeCount'], 2);
+      expect(scoreBlock['hardAccelPenalty'], 9);
+      expect(scoreBlock['hardBrakePenalty'], 6);
+      // The IMU truth block is unchanged (still the inertial scalars).
+      expect(imu['hardAccelCount'], 0);
+      expect(imu['hardBrakeCount'], 0);
+      // Invariant: a non-zero penalty has a non-zero score-block count.
+      expect(scoreBlock['hardAccelCount'], greaterThan(0));
+      expect(scoreBlock['hardBrakeCount'], greaterThan(0));
     });
 
     test('gpsFeatures is null when no GPS KPIs were computed', () {

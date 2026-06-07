@@ -672,13 +672,20 @@ void main() {
       });
 
       test(
-          'GPS source: the SAME staircase is gated, not suppressed, and '
-          'a genuine GPS-fed signal still scores', () {
-        // The 6 s-step staircase is an artefact of a coarse virtual
-        // odometer; a real GPS Doppler signal does not look like this.
-        // We still assert the gps path is NOT wholesale-suppressed by
-        // feeding a genuine, well-spaced hard brake on the gps source
-        // and confirming it counts.
+          'GPS source: even a clean, well-spaced hard brake is suppressed '
+          '(#3029 — GPS Doppler speed is unfit for harsh differentiation)',
+          () {
+        // #3029 supersedes the #2653 "enabled-but-gated" policy: GPS
+        // ground speed is ~1 Hz Doppler noise, and #2895 proved a live IMU
+        // counts 0 where the GPS derivative counts 16 phantom events at an
+        // impossible 1.086 g. A GPS-sourced trip with no IMU (no inertial
+        // hardware / OBD2-from-the-start, no speed PID) has nothing to veto
+        // that over-count, so the score showed a hard-accel/brake penalty
+        // with no visible source. Harsh events may now come ONLY from a
+        // trustworthy source (live IMU, or a real OBD2 speed PID), so the
+        // recorder suppresses the GPS source wholesale — exactly as it does
+        // the `virtual` source. Even a clean, accuracy-good, well-spaced
+        // 90→30 km/h brake on the gps source must NOT score.
         final r = TripRecorder();
         final start = DateTime.utc(2026);
         r.onSample(
@@ -694,28 +701,53 @@ void main() {
           ),
           distanceSource: kDistanceSourceGps,
         );
-        expect(r.buildSummary().harshBrakes, 1,
-            reason: 'gps source must stay enabled-but-gated');
+        expect(r.buildSummary().harshBrakes, 0,
+            reason: 'gps source is suppressed wholesale (#3029)');
+        expect(r.buildSummary().harshAccelerations, 0,
+            reason: 'gps source is suppressed wholesale (#3029)');
       });
 
-      test('a bad-accuracy GPS fix (> 10 m) is rejected end-to-end', () {
+      test(
+          'GPS phantom regression (#3029): a noisy GPS staircase that '
+          'over-counted on master yields 0 harsh — penalty has no phantom '
+          'source', () {
+        // The exact #3029 field shape: distanceSource=gps, no IMU, a noisy
+        // ground-speed staircase the old code differentiated into harsh
+        // events. After the fix the count — and hence the
+        // hardBrake/hardAccel penalty derived from it — is 0.
+        final r = TripRecorder();
+        feedBounce(r, distanceSource: kDistanceSourceGps);
+        final s = r.buildSummary();
+        expect(s.distanceKm, greaterThan(10), reason: 'sanity: ~15 km');
+        expect(s.harshBrakes, 0,
+            reason: 'GPS-derived harsh scoring is suppressed (#3029)');
+        expect(s.harshAccelerations, 0,
+            reason: 'GPS-derived harsh scoring is suppressed (#3029)');
+      });
+
+      test(
+          'REAL OBD2-speed source keeps a genuine hard brake (#3029 did not '
+          'kill direct-speed scoring)', () {
+        // Proves the fix is source-scoped: kDistanceSourceReal is the
+        // direct OBD2 speed PID — a genuine 90→30 km/h decel must STILL
+        // score, unchanged. This is the no-regression guard for the real
+        // OBD2-speed path.
         final r = TripRecorder();
         final start = DateTime.utc(2026);
         r.onSample(
-          TripSample(timestamp: start, speedKmh: 90, rpm: 0, hAccuracyM: 4),
-          distanceSource: kDistanceSourceGps,
+          TripSample(timestamp: start, speedKmh: 90, rpm: 3000),
+          distanceSource: kDistanceSourceReal,
         );
         r.onSample(
           TripSample(
             timestamp: start.add(const Duration(seconds: 2)),
             speedKmh: 30,
-            rpm: 0,
-            hAccuracyM: 30, // jittery urban-canyon fix
+            rpm: 1500,
           ),
-          distanceSource: kDistanceSourceGps,
+          distanceSource: kDistanceSourceReal,
         );
-        expect(r.buildSummary().harshBrakes, 0,
-            reason: 'a bad fix is worse than no fix — not differentiated');
+        expect(r.buildSummary().harshBrakes, 1,
+            reason: 'real OBD2 speed is direct, not derived — stays scored');
       });
 
       test('no distanceSource keeps harsh scoring enabled (legacy default)',
