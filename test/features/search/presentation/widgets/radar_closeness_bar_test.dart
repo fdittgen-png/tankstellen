@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
+import 'package:tankstellen/features/profile/data/models/user_profile.dart';
+import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_content.dart';
 import 'package:tankstellen/features/search/providers/radar_search_provider.dart';
@@ -15,29 +17,25 @@ import 'package:tankstellen/features/search/providers/radar_search_provider.dart
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
-/// #2956/#2984 — root-cause pinning regression for the Fuel Station Radar
+/// #2956/#2995 — root-cause pinning regression for the Fuel Station Radar
 /// "closeness" bar. The recurring field bug: the distance TEXT is correct but
 /// the closeness BAR under every station is ~the same length (it does not scale
-/// with distance) — because the bar scaled to the static `searchRadiusProvider`
-/// slider (up to 25 km), which lets a wide radius compress every fill toward
-/// 1.0.
+/// with distance).
 ///
-/// The fix (#2984) is an ABSOLUTE, fixed scale: `min(searchRadius, 15 km cap)`,
-/// so a wide radius no longer stretches the scale — the bars stay visibly
-/// different AND a near station's fill is stable across result-set changes (the
-/// stability lock lives in `radar_closeness_absolute_test.dart`).
+/// The bar scales to the user's APPROACH RADIUS (`profile.approachRadiusKm *
+/// 1000`) — the SAME base the recording radar card + PiP use (#2995 brought the
+/// list onto this base, reversing the `min(searchRadius, 15 km cap)` list scale
+/// of #2984/#2985). So a wide search slider no longer stretches the list scale,
+/// the bars stay visibly different down the list, and a near station reads the
+/// SAME fill it would on the recording radar.
 ///
 /// These tests drive the REAL radar list-card path (`SearchResultsContent` →
-/// `SearchResultsList` → `StationCard` → `ProximityFillBar`) with the exact
-/// screenshot distances (265 m, 9.3 km, 9.9 km, 10.0 km) and the field's 25 km
-/// slider, then read the fill the rendered bar would paint. RED on master (the
-/// far bars cluster at ~0.60–0.63, indistinguishable); green after the fix
-/// (scaled to the 15 km cap: nearest ~0.98, the far cluster spread around the
-/// 0.33–0.38 band — visibly different, none force-emptied).
+/// `SearchResultsList` → `StationCard` → `ProximityFillBar`) with stations
+/// inside the approach radius, then read the fill the rendered bar would paint.
 
-/// The four radar results from the field screenshot, distance-ranked.
-/// `dist` is kilometres (the same value the card distance text shows).
-List<Station> _screenshotStations() => const [
+/// Four radar results within a 3 km approach radius, distance-ranked. `dist` is
+/// kilometres (the same value the card distance text shows).
+List<Station> _stations() => const [
       Station(
         id: 'fr-pezenas',
         name: 'Pézenas Carburant',
@@ -60,7 +58,7 @@ List<Station> _screenshotStations() => const [
         place: 'Pézenas',
         lat: 43.49,
         lng: 3.45,
-        dist: 9.3,
+        dist: 1.2,
         e85: 0.799,
         isOpen: true,
       ),
@@ -73,7 +71,7 @@ List<Station> _screenshotStations() => const [
         place: 'Saint-Thibéry',
         lat: 43.50,
         lng: 3.41,
-        dist: 9.9,
+        dist: 2.0,
         e85: 0.805,
         isOpen: true,
       ),
@@ -86,7 +84,7 @@ List<Station> _screenshotStations() => const [
         place: 'Saint-Thibéry',
         lat: 43.51,
         lng: 3.40,
-        dist: 10.0,
+        dist: 2.7,
         e85: 0.809,
         isOpen: true,
       ),
@@ -101,6 +99,16 @@ class _ActiveRadar extends RadarSearch {
         active: true,
         stations: AsyncData<List<Station>>(_stations),
       );
+}
+
+/// Feeds a fixed profile into [activeProfileProvider] so the list bar's
+/// approach-radius scale is deterministic — the SAME stub shape the recording
+/// card test uses.
+class _StubActiveProfile extends ActiveProfile {
+  _StubActiveProfile(this._profile);
+  final UserProfile? _profile;
+  @override
+  UserProfile? build() => _profile;
 }
 
 /// The fill the rendered [ProximityFillBar] for [station] would paint — read
@@ -125,7 +133,7 @@ double _renderedFillFor(WidgetTester tester, Station station) {
 Future<void> _pumpRadar(
   WidgetTester tester, {
   required List<Station> stations,
-  required double radiusKm,
+  required double approachRadiusKm,
 }) async {
   final test = standardTestOverrides();
   when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -139,9 +147,15 @@ Future<void> _pumpRadar(
       ...test.overrides,
       userPositionNullOverride(),
       radarSearchProvider.overrideWith(() => _ActiveRadar(stations)),
-      // The field's WIDE slider (25 km) relative to the 10 km result span —
-      // the condition under which the old code compressed every bar.
-      searchRadiusOverride(radiusKm),
+      activeProfileProvider.overrideWith(
+        () => _StubActiveProfile(
+          UserProfile(
+            id: 'p1',
+            name: 'Test',
+            approachRadiusKm: approachRadiusKm,
+          ),
+        ),
+      ),
     ].cast(),
   );
   await tester.pump();
@@ -152,36 +166,33 @@ void main() {
   // test/core/utils/radar_closeness_test.dart. This file pins the REAL radar
   // list-card surface end-to-end (the regression lock) + the shared-helper
   // invariant across all three radar surfaces.
-  group('radar list-card closeness bar — the real surface (#2956)', () {
+  group('radar list-card closeness bar — the real surface (#2995)', () {
     testWidgets(
-        'scales to the ABSOLUTE 15 km cap: nearest near-full, the far cluster '
-        'visibly spread (NOT the 25 km slider that compressed every bar)',
-        (tester) async {
+        'scales to the APPROACH radius (3 km): nearest near-full, the rows '
+        'visibly spread down the list (closer = fuller)', (tester) async {
       await _pumpRadar(
         tester,
-        stations: _screenshotStations(),
-        radiusKm: 25.0, // the field's WIDE slider
+        stations: _stations(),
+        approachRadiusKm: 3.0,
       );
 
-      final stations = _screenshotStations();
+      final stations = _stations();
       final near = _renderedFillFor(tester, stations[0]); // 265 m
-      final mid = _renderedFillFor(tester, stations[1]); // 9.3 km
-      final farish = _renderedFillFor(tester, stations[2]); // 9.9 km
-      final far = _renderedFillFor(tester, stations[3]); // 10.0 km
+      final mid = _renderedFillFor(tester, stations[1]); // 1.2 km
+      final farish = _renderedFillFor(tester, stations[2]); // 2.0 km
+      final far = _renderedFillFor(tester, stations[3]); // 2.7 km
 
-      // Pinned to the ABSOLUTE scale = min(25 km, 15 km cap) = 15 km, NOT the
-      // 25 km slider. These are the values the bar actually paints. The far
-      // rows are NOT force-emptied — they sit around the 0.33–0.38 band.
-      expect(near, closeTo(0.9823, 1e-3),
-          reason: '265 m of a 15 km scale → ~0.98 (nearly full)');
-      expect(mid, closeTo(0.38, 1e-3), reason: '9.3 km of 15 km → ~0.38');
-      expect(farish, closeTo(0.34, 1e-3), reason: '9.9 km of 15 km → ~0.34');
-      expect(far, closeTo(0.3333, 1e-3),
-          reason: '10.0 km of 15 km → ~0.33 (NOT empty — never force-emptied)');
+      // Pinned to the 3 km approach radius — the SAME base the recording radar
+      // uses. These are the values the bar actually paints; none force-emptied.
+      expect(near, closeTo(0.9117, 1e-3),
+          reason: '265 m of a 3 km scale → ~0.91 (nearly full)');
+      expect(mid, closeTo(0.6, 1e-3), reason: '1.2 km of 3 km → 0.6');
+      expect(farish, closeTo(0.3333, 1e-3), reason: '2.0 km of 3 km → ~0.33');
+      expect(far, closeTo(0.1, 1e-3),
+          reason: '2.7 km of 3 km → 0.1 (NOT empty — within reach)');
 
       // The core regression lock: the bars must be VISIBLY DIFFERENT down the
-      // list. On master (scaled to the 25 km slider) the three far rows all sat
-      // at ~0.60–0.63 — indistinguishable — which is the reported symptom.
+      // list, not a compressed band clustered near 1.0.
       expect(near - far, greaterThan(0.6),
           reason: 'closest vs farthest must differ by most of the bar');
       expect(mid - far, greaterThan(0.04),
@@ -196,12 +207,12 @@ void main() {
         (tester) async {
       await _pumpRadar(
         tester,
-        stations: _screenshotStations(),
-        radiusKm: 25.0,
+        stations: _stations(),
+        approachRadiusKm: 3.0,
       );
       expect(
         find.byType(ProximityFillBar),
-        findsNWidgets(_screenshotStations().length),
+        findsNWidgets(_stations().length),
       );
     });
   });
