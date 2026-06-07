@@ -3,7 +3,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/driving_insights_analyzer.dart';
-import 'package:tankstellen/features/consumption/data/driving_score_calculator.dart';
 import 'package:tankstellen/features/consumption/domain/accel_event_gate.dart';
 import 'package:tankstellen/features/consumption/domain/gps_driving_features.dart';
 import 'package:tankstellen/features/consumption/domain/harsh_event_detector.dart';
