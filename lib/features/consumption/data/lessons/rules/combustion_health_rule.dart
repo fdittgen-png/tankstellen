@@ -67,9 +67,10 @@ enum CombustionHealthKind {
 /// [fired] is false for every honest "no signal" case — too few warm
 /// closed-loop samples, a cold engine, unknown coolant, or normal trims.
 /// When it fires, [kind] says which signal dominated and [magnitudePct]
-/// carries the representative number (mean |STFT+LTFT| for the trim kinds;
-/// the percent of the warm window spent enriched for the enrichment kind)
-/// so the UI can render an honest figure.
+/// carries the representative number (mean |LTFT|, the *sustained* trim, for
+/// the trim kinds; the percent of the warm window spent enriched for the
+/// enrichment kind) so the UI can render an honest figure. The firing gate
+/// still uses the total trim (STFT + LTFT) — see [combustionHealthSignal].
 class CombustionHealthSignal {
   const CombustionHealthSignal({
     required this.fired,
@@ -120,11 +121,14 @@ class CombustionHealthSignal {
 ///   * The signal must be **sustained** over at least
 ///     [kCombustionMinSustainedSamples] qualifying samples — a brief spike
 ///     never fires it.
-///   * **Trim signal** (primary, the most reliable): mean total trim
-///     |STFT + LTFT| over the warm window. ≥ [kCombustionTrimBorderlinePct]
-///     → the mixture looks a little off; ≥ [kCombustionTrimMarkedPct] →
-///     escalated wording. Positive total = compensating for a lean read,
-///     negative = compensating for a rich read.
+///   * **Trim signal** (primary, the most reliable): a sample counts as
+///     "compensating" when total trim |STFT + LTFT| ≥
+///     [kCombustionTrimBorderlinePct] (the active mixture fight). Positive
+///     total = compensating for a lean read, negative = for a rich read. The
+///     *reported* magnitude, though, is the mean SUSTAINED trim (|LTFT|) over
+///     those samples — STFT oscillates ± so summing it overstated the
+///     "sustained fuel addition" figure; ≥ [kCombustionTrimMarkedPct] |LTFT|
+///     escalates the wording.
 ///   * **Enrichment signal** (secondary, always available because λ is
 ///     stamped on every sample): a large share of the warm window spent
 ///     with commanded λ < [kCombustionRichLambda] = sustained deliberate
@@ -204,7 +208,15 @@ CombustionHealthSignal combustionHealthSignal(List<TripSample> samples) {
   var trimSamples = 0; // warm samples that carried both STFT + LTFT
   var compensatingSamples = 0; // |total trim| ≥ borderline
   var signedTrimSum = 0.0; // mean signed total trim over compensating
-  var absTrimSum = 0.0; // mean |total trim| over compensating
+  // The user-facing "X% sustained fuel addition" magnitude is built from the
+  // LONG-term trim (LTFT) alone — the SUSTAINED correction the copy speaks of
+  // — NOT |STFT + LTFT|. The short-term trim (STFT) oscillates ±, so adding it
+  // to LTFT overstated the reported "sustained" figure ~1.5–2× vs the
+  // P0171/P0172 (~±10% LTFT) convention the wording evokes (#2931). STFT still
+  // gates firing via the total below; only the reported number is LTFT-based.
+  // Lean-vs-rich stays classified from the signed TOTAL trim (signedTrimSum),
+  // so the firing direction is unchanged.
+  var absLtftSum = 0.0; // mean |LTFT| over compensating
 
   // Enrichment accumulators.
   var lambdaSamples = 0; // warm samples that carried λ
@@ -223,11 +235,15 @@ CombustionHealthSignal combustionHealthSignal(List<TripSample> samples) {
     final ltft = s.ltft;
     if (stft != null && ltft != null) {
       trimSamples++;
+      // Firing gate stays on the TOTAL trim (STFT + LTFT) so which trips
+      // surface is unchanged — STFT legitimately signals the engine is
+      // actively compensating right now.
       final total = stft + ltft;
       if (total.abs() >= kCombustionTrimBorderlinePct) {
         compensatingSamples++;
         signedTrimSum += total;
-        absTrimSum += total.abs();
+        // …but the REPORTED magnitude is the sustained (LTFT) correction only.
+        absLtftSum += ltft.abs();
       }
     }
 
@@ -249,15 +265,19 @@ CombustionHealthSignal combustionHealthSignal(List<TripSample> samples) {
   if (trimSamples >= kCombustionMinSustainedSamples &&
       compensatingSamples >= kCombustionMinSustainedSamples &&
       compensatingSamples * 2 >= trimSamples) {
-    final meanAbs = absTrimSum / compensatingSamples;
+    // Reported magnitude + the marked escalation reflect the SUSTAINED
+    // correction (mean |LTFT|), matching the "sustained fuel addition" copy
+    // and the P0171/P0172 LTFT convention (#2931). Lean-vs-rich is still
+    // classified from the signed TOTAL trim (the active mixture direction).
+    final meanAbsLtft = absLtftSum / compensatingSamples;
     final meanSigned = signedTrimSum / compensatingSamples;
-    final marked = meanAbs >= kCombustionTrimMarkedPct;
+    final marked = meanAbsLtft >= kCombustionTrimMarkedPct;
     return CombustionHealthSignal(
       fired: true,
       kind: meanSigned >= 0
           ? CombustionHealthKind.leanCompensation
           : CombustionHealthKind.richCompensation,
-      magnitudePct: meanAbs,
+      magnitudePct: meanAbsLtft,
       marked: marked,
       sustainedSamples: compensatingSamples,
     );
