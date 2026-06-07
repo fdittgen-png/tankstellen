@@ -23,14 +23,24 @@ class SupportedPidsResolver {
   SupportedPidsResolver({
     required Future<String> Function(String command) send,
     required bool Function() isConnected,
+    Future<String> Function(String command)? searchSend,
     SupportedPidsCache? cache,
     String? vehicleFallbackKey,
   })  : _send = send,
+        // #3037 — the first `0100` probe sends through [searchSend] (the
+        // host's GENEROUS protocol-search window, ~15 s) instead of [_send]'s
+        // ~5 s steady-state ceiling, so the ELM327 auto-search resolves within
+        // ONE read rather than being re-sent (which restarts the search).
+        // Defaults to [_send] for callers / tests that don't supply a separate
+        // long-window send (the plain send still applies its own first-command
+        // search class).
+        _searchSend = searchSend ?? send,
         _isConnected = isConnected,
         _cache = cache,
         _vehicleFallbackKey = vehicleFallbackKey;
 
   final Future<String> Function(String command) _send;
+  final Future<String> Function(String command) _searchSend;
   final bool Function() _isConnected;
 
   /// Optional persistent supported-PID cache (#811). When present and
@@ -187,12 +197,25 @@ class SupportedPidsResolver {
     final firstGroupBase = int.parse(firstCommand.substring(2, 4), radix: 16);
 
     // First `0100` — the only command that actually contacts the ECU and
-    // triggers the protocol search, so it gets the retry + SEARCHING grace.
+    // triggers the protocol search, so it gets the GENEROUS single-shot search
+    // window (#3037) via [_searchSend] (re-read, not re-send mid-search) and
+    // is teed into the active connect trace for observability.
+    final probeSw = Stopwatch()..start();
     final firstProbe = await probeFirstSupportedPids(
-      send: _send,
+      searchSend: _searchSend,
       isConnected: _isConnected,
       command: firstCommand,
       groupBase: firstGroupBase,
+      recordTrace: (raw, timedOut) {
+        // #3037 root cause 3 — record the `0100` probe read into the active
+        // connect trace (via the chokepoint that tees handshake lines), so a
+        // future trace shows EXACTLY what the ECU returned (`SEARCHING…` /
+        // `41 00 …` / `NO DATA` / `UNABLE TO CONNECT`) + the timing. A no-op
+        // when no trace is active. The collector gate is irrelevant here: the
+        // tee writes to the (always-on) connect-trace ring.
+        Obd2CommDiagnostics.instance.recordHandshakeLine(
+            firstCommand, raw, probeSw.elapsedMilliseconds);
+      },
     );
     _lastProbeResult = firstProbe.result;
     if (firstProbe.bitmap == null) {

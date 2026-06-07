@@ -54,6 +54,36 @@ abstract class Obd2ListenModeTransport {
   Future<void> sendListenModeStop(String command);
 }
 
+/// Opt-in capability mixin (#3037) — transports that can give ONE command a
+/// dedicated, generous read window that OVERRIDES the steady-state read
+/// timeout ceiling.
+///
+/// Why this is necessary: the `0100` supported-PIDs probe is the FIRST OBD
+/// request on the bus, so it triggers the ELM327 protocol auto-search
+/// (`SEARCHING…`). On a slow link that search can outlast the steady-state
+/// ~5 s read ceiling — and RE-SENDING `0100` mid-search RESTARTS the search,
+/// so the late `41 00` frame is never caught (the #3035/#3037 false
+/// engine-off). The correct ELM327 practice is to send `0100` ONCE and
+/// RE-READ the in-progress search within a single generous window (~12–15 s),
+/// which this method exposes. Steady-state PID reads keep their ~5 s class.
+///
+/// Like [Obd2ListenModeTransport] this is a SEPARATE opt-in interface, not an
+/// extra abstract method on [Obd2Transport], so the ten-plus existing fakes
+/// that `implements Obd2Transport` don't need boilerplate. Callers type-check
+/// for it and fall back to the plain [Obd2Transport.sendCommand] otherwise.
+abstract class Obd2ProtocolSearchTransport {
+  /// Send [command] and wait up to [readTimeout] for the `>`-terminated
+  /// reply, OVERRIDING the transport's steady-state read-timeout ceiling for
+  /// this one command only. Used by the `0100` protocol-search probe to give
+  /// the ELM327 auto-search a single generous window instead of re-sending
+  /// (which would restart the search). All other serialisation /
+  /// half-duplex-queue guarantees of [Obd2Transport.sendCommand] still hold.
+  Future<String> sendCommandWithReadTimeout(
+    String command,
+    Duration readTimeout,
+  );
+}
+
 /// A fake transport for testing that returns pre-configured responses.
 ///
 /// Listen-mode (#1418) is opt-in: tests that need

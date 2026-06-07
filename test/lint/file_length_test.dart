@@ -255,7 +255,15 @@ void main() {
     // case only and a slow-but-live car is never wrongly told "engine off".
     // The resilient first-`0100` probe itself lives in the new (under-cap)
     // supported_pids_probe.dart. Decomposition still tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1644,
+    // #3037 — re-grandfathered 1644 → 1673: the `_sendWithProtocolSearchWindow`
+    // helper (sends the `0100` probe through the transport's GENEROUS
+    // protocol-search read window via Obd2ProtocolSearchTransport so the ELM327
+    // auto-search resolves within ONE read instead of being re-sent — the root
+    // fix for the false engine-off on a slow link) + its dartdoc + the
+    // resolver's `searchSend:` wiring + the probe-constant import. The probe
+    // logic itself stays in the under-cap supported_pids_probe.dart;
+    // decomposition of this god-class still tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1673,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb

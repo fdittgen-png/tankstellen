@@ -59,7 +59,8 @@ Duration _backoffForAttempt(int attempt) {
 /// chunks, so reads accumulate a buffer until the prompt is seen, then
 /// return the accumulated string minus the prompt. A hard timeout
 /// guards against a stuck adapter.
-class BluetoothObd2Transport implements Obd2Transport {
+class BluetoothObd2Transport
+    implements Obd2Transport, Obd2ProtocolSearchTransport {
   final ElmByteChannel _channel;
   final Duration _readTimeout;
   StreamSubscription<List<int>>? _subscription;
@@ -196,18 +197,33 @@ class BluetoothObd2Transport implements Obd2Transport {
   }
 
   @override
-  Future<String> sendCommand(String command) async {
+  Future<String> sendCommand(String command) => _enqueue(command, null);
+
+  /// #3037 — send [command] on the half-duplex queue with a GENEROUS one-shot
+  /// read window ([readTimeout]) that OVERRIDES the steady-state read-timeout
+  /// ceiling for this single command. The `0100` protocol-search probe uses
+  /// this to give the ELM327 auto-search a single long read (~15 s) instead of
+  /// re-sending mid-search (which would restart the search). Every other
+  /// serialisation guarantee of [sendCommand] still holds — this chains onto
+  /// the SAME `_queueTail` so it never collides with an in-flight command.
+  @override
+  Future<String> sendCommandWithReadTimeout(
+          String command, Duration readTimeout) =>
+      _enqueue(command, readTimeout);
+
+  /// #1972 — serialise every caller onto a single queue. The ELM327 is
+  /// half-duplex; without this a second consumer's command collided with one
+  /// already in flight and threw a concurrent-sendCommand StateError. A
+  /// non-null [readTimeoutOverride] (#3037) gives this one command the generous
+  /// protocol-search window instead of the steady-state class.
+  Future<String> _enqueue(String command, Duration? readTimeoutOverride) {
     if (!_connected) {
       throw StateError('BluetoothObd2Transport not connected');
     }
-    // #1972 — serialise every caller onto a single queue. The ELM327 is
-    // half-duplex; without this a second consumer's command collided
-    // with one already in flight and threw a concurrent-sendCommand
-    // StateError.
     final completer = Completer<String>();
     _queueTail = _queueTail.then((_) async {
-      // The transport may have been torn down while this command waited
-      // its turn — fail it cleanly rather than writing to a closed link.
+      // The transport may have been torn down while this command waited its
+      // turn — fail it cleanly rather than writing to a closed link.
       if (!_connected) {
         completer.completeError(
           StateError('BluetoothObd2Transport not connected'),
@@ -215,7 +231,8 @@ class BluetoothObd2Transport implements Obd2Transport {
         return;
       }
       try {
-        completer.complete(await _sendRaw(command));
+        completer.complete(
+            await _sendRaw(command, readTimeoutOverride: readTimeoutOverride));
       } catch (e, st) {
         completer.completeError(e, st);
       }
@@ -255,7 +272,7 @@ class BluetoothObd2Transport implements Obd2Transport {
     _swallowNextFrame = false; // #2889 — never carry a latch across links.
   }
 
-  Future<String> _sendRaw(String command) async {
+  Future<String> _sendRaw(String command, {Duration? readTimeoutOverride}) async {
     // One in-flight command at a time — the ELM327 is half-duplex.
     // [sendCommand] serialises every caller onto `_queueTail`, so this
     // guard is now a defensive invariant: tripping it means a code path
@@ -286,7 +303,13 @@ class BluetoothObd2Transport implements Obd2Transport {
     );
     _firstCommandPending = false;
     if (_isAtCommand(command)) _atCommandsSinceOpen++;
-    final timeout = cls.timeout > _readTimeout ? _readTimeout : cls.timeout;
+    // #3037 — an explicit [readTimeoutOverride] (the `0100` protocol-search
+    // probe's ~15 s generous window) bypasses the steady-state [_readTimeout]
+    // ceiling: the auto-search legitimately outlasts the 5 s class on a slow
+    // link, and re-sending mid-search would restart it. Without an override
+    // the per-class budget is still clamped to [_readTimeout] as before.
+    final timeout = readTimeoutOverride ??
+        (cls.timeout > _readTimeout ? _readTimeout : cls.timeout);
 
     _buffer.clear();
     final completer = Completer<String>();
