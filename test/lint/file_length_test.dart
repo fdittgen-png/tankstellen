@@ -332,7 +332,12 @@ void main() {
     // `speedKmh ?? 0` fabricating a leading `0` that scored a phantom
     // hard-accel. Both are hot-path recording logic that can't move out of
     // the controller. Decomposition stays tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1694,
+    // #3004 — re-grandfathered 1694 → 1707: the `debugAppendGpsFix` test seam
+    // gains optional `hAccuracyM` / `at` params (forwarded to the resolver,
+    // matching production `updateGpsFix`) so a test can drive the new ~1 Hz
+    // GPS-track decimation deterministically. Test-only surface; decomposition
+    // stays tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1707,
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The
