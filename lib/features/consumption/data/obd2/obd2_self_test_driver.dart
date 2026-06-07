@@ -228,6 +228,13 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
   void Function(Obd2SelfTestStepResult step)? onStep,
   bool Function()? isCancelled,
   Duration stepDeadline = const Duration(seconds: 6),
+  // #3035 — the `0100` step is the FIRST OBD request on the bus, so it can
+  // trigger the ELM327 protocol search (`SEARCHING…`), whose real answer can
+  // arrive several seconds later. Give it a search-aware deadline ABOVE the
+  // transport's 4.5 s `protocolSearch` read class so the self-test doesn't
+  // itself false-timeout a search that was about to succeed. Consistent with
+  // the resolver's resilient first-`0100` probe.
+  Duration supportedPidsDeadline = const Duration(seconds: 8),
   Duration connectDeadline = const Duration(seconds: 15),
   String? pinnedMac,
   Obd2ConnectTransport? transportHint,
@@ -319,8 +326,10 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
     }
 
     // --- 4. supportedPids — 0100 bitmask -------------------------------
+    // #3035 — uses the search-aware [supportedPidsDeadline] (not the generic
+    // [stepDeadline]) so a protocol-searching ECU isn't false-timed-out.
     if (!cancelled()) {
-      emit(await _supportedPidsStep(service, diag, stepDeadline));
+      emit(await _supportedPidsStep(service, diag, supportedPidsDeadline));
     }
 
     // --- 5. sampleReads — 010C / 010D / 0105 ---------------------------

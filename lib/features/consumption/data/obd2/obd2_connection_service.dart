@@ -344,29 +344,38 @@ class Obd2ConnectionService {
       await service.disconnect();
       throw const Obd2AdapterUnresponsive();
     }
-    // #3009 — init SUCCEEDED (every AT answered) but the vehicle bus may be
-    // SILENT (parked car / ignition off): no protocol cached + zero supported
-    // PIDs because `0100` came back ECU-silent. That is engine-off, not a
-    // telemetry-bearing success — stamp `ignitionOff` (first-wins) so the trace
-    // reads "engine off", not a misleading green "success". The connect still
-    // returns the service (the caller gates on [busAnswered] for the banner);
-    // we only correct the CLASSIFICATION here, never the working connect path.
-    if (!service.busAnswered) {
+    // #3009/#3035 — init SUCCEEDED (every AT answered) but the vehicle bus
+    // may be SILENT. CRITICAL distinction (#3035): the `0100` probe is now
+    // tri-state ([Obd2Service.busProbe]). Stamp `ignitionOff` ONLY on
+    // [Obd2BusProbeResult.probedSilent] — the ECU stayed silent through every
+    // retry, the real engine-off signature. A [Obd2BusProbeResult.transient]
+    // (the first `0100` merely TIMED OUT during the protocol search on a slow
+    // clone) must NOT be classified engine-off — that was the false positive
+    // that told a live car "turn the ignition on" and spun reconnects. The
+    // connect still returns the service either way (first-wins on the trace);
+    // we only correct the CLASSIFICATION, never the working connect path.
+    if (service.busProbe == Obd2BusProbeResult.probedSilent) {
       Obd2ConnectTraceLog.active?.setOutcome(Obd2ConnectOutcome.ignitionOff);
     }
-    // #3019 / Epic #3013 phase 3 — auto-pin the last-good adapter on EVERY
-    // successful connect (this is the single chokepoint every connect path
-    // funnels through). The trip-INDEPENDENT reconnect controller reads this
-    // to try the fast pinned path first on the next drop. Best-effort +
-    // local-only (the store swallows + logs a write failure), so it never
-    // derails a connect that just succeeded. Pinned even when the bus was
-    // silent — the HARDWARE link is good; that is exactly what reconnect
-    // wants to re-establish.
-    await lastGoodAdapterStore?.recordFrom(
-      mac: service.adapterMac,
-      transportKind: service.linkKind,
-      name: service.adapterName,
-    );
+    // #3019 / Epic #3013 phase 3 — auto-pin the last-good adapter so the
+    // trip-INDEPENDENT reconnect controller can try the fast pinned path on
+    // the next drop. #3035 — but do NOT pin on a confirmed engine-off
+    // (`probedSilent`): pinning a silent-bus connect is exactly what fed the
+    // teardown→reconnect→engine-off loop. The HARDWARE link is good on a
+    // [Obd2BusProbeResult.answered] OR [Obd2BusProbeResult.transient] connect
+    // (a slow-but-live car) and on a warm cache-hit (`busAnswered`), so pin in
+    // those cases. Best-effort + local-only (the store swallows + logs a write
+    // failure), so it never derails a connect that just succeeded.
+    final pinnable = service.busProbe != Obd2BusProbeResult.probedSilent &&
+        (service.busAnswered ||
+            service.busProbe == Obd2BusProbeResult.transient);
+    if (pinnable) {
+      await lastGoodAdapterStore?.recordFrom(
+        mac: service.adapterMac,
+        transportKind: service.linkKind,
+        name: service.adapterName,
+      );
+    }
     return service;
   }
 

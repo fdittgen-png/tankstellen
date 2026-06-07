@@ -134,7 +134,13 @@ void main() {
     // (346, under cap); only the dispatch stub + rationale land here. The class
     // is already split across two `part` files; further decomposition is tracked
     // under #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 668,
+    // #3035 — re-grandfathered 668 → 674: the `ignitionOff` classification +
+    // auto-pin now gate on the tri-state `Obd2Service.busProbe` (only a
+    // CONFIRMED engine-off `probedSilent` stamps `ignitionOff` / skips the
+    // pin), so a transient `0100` timeout during the protocol search no longer
+    // false-classifies a live car. Net +6 is the rationale + the pinnable
+    // guard. Decomposition still tracked under #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 674,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
@@ -242,7 +248,14 @@ void main() {
     // the recording coordinator can surface "turn the ignition on" instead of
     // a silent green connect into a degraded GPS-only trip. Decomposition of
     // this god-class still tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1618,
+    // #3035 — re-grandfathered 1618 → 1644: the `busProbe` getter (the
+    // tri-state `0100` probe outcome — answered / probedSilent / transient /
+    // notProbed) + its 18-line dartdoc + the re-export of Obd2BusProbeResult,
+    // so the connection layer gates `ignitionOff` on the CONFIRMED-silent
+    // case only and a slow-but-live car is never wrongly told "engine off".
+    // The resilient first-`0100` probe itself lives in the new (under-cap)
+    // supported_pids_probe.dart. Decomposition still tracked by #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1644,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb

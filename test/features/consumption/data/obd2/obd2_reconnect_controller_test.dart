@@ -296,4 +296,81 @@ void main() {
       c.stop();
     });
   });
+
+  group('#3035 — a STABLE engine-off stops the loop (no reconnect burst)', () {
+    test(
+        'pinned path returns engineOff → terminalEngineOff, NO rescan, NO loop',
+        () async {
+      await pinStore.record(
+          const LastGoodAdapter(mac: 'AA', transportKind: 'ble'));
+      // The adapter re-connects fine but the ECU is silent (parked car).
+      transport.pinnedResult = Obd2ReconnectAttemptResult.engineOff;
+      final c = build(maxAttempts: 6);
+
+      c.notifyDropped();
+      await _waitFor(() => c.state == Obd2ReconnectState.terminalEngineOff);
+
+      expect(c.state, Obd2ReconnectState.terminalEngineOff);
+      expect(c.hasStoppedOnEngineOff, isTrue);
+      // The defining no-loop assertions: ONE pinned attempt, ZERO rescans,
+      // the attempt counter never advanced into a backoff burst.
+      expect(transport.pinnedCalls, 1,
+          reason: 'a confirmed engine-off is terminal on the first probe');
+      expect(transport.rescanCalls, 0,
+          reason: 're-scanning cannot wake a parked car');
+      expect(c.attempts, 0,
+          reason: 'no backoff burst — the loop stopped immediately');
+      c.stop();
+    });
+
+    test('the engine-off terminal does not auto-retry over time', () async {
+      await pinStore.record(
+          const LastGoodAdapter(mac: 'AA', transportKind: 'ble'));
+      transport.pinnedResult = Obd2ReconnectAttemptResult.engineOff;
+      final c = build(maxAttempts: 6);
+
+      c.notifyDropped();
+      await _waitFor(() => c.state == Obd2ReconnectState.terminalEngineOff);
+      final callsAtTerminal = transport.pinnedCalls;
+
+      // Let several backoff windows pass — a buggy loop would fire more probes.
+      await Future<void>.delayed(_fast * 8);
+      expect(transport.pinnedCalls, callsAtTerminal,
+          reason: 'no hidden retry burst after engine-off terminal');
+      expect(transport.rescanCalls, 0);
+      c.stop();
+    });
+
+    test('rescan path returns engineOff → terminalEngineOff', () async {
+      // No pin: pinned path is skipped, the rescan lands an engine-off connect.
+      transport.rescanResult = Obd2ReconnectAttemptResult.engineOff;
+      final c = build(maxAttempts: 6);
+
+      c.notifyDropped();
+      await _waitFor(() => c.state == Obd2ReconnectState.terminalEngineOff);
+
+      expect(c.state, Obd2ReconnectState.terminalEngineOff);
+      expect(transport.rescanCalls, 1, reason: 'one rescan, then terminal');
+      c.stop();
+    });
+
+    test('retry() restarts from the engine-off terminal (ignition turned on)',
+        () async {
+      await pinStore.record(
+          const LastGoodAdapter(mac: 'AA', transportKind: 'ble'));
+      transport.pinnedResult = Obd2ReconnectAttemptResult.engineOff;
+      final c = build(maxAttempts: 6);
+
+      c.notifyDropped();
+      await _waitFor(() => c.state == Obd2ReconnectState.terminalEngineOff);
+
+      // The user turned the ignition on; the next probe now answers.
+      transport.pinnedResult = Obd2ReconnectAttemptResult.connected;
+      c.retry();
+      await _waitFor(() => c.state == Obd2ReconnectState.connected);
+
+      expect(c.state, Obd2ReconnectState.connected);
+      c.stop();
+    });
+  });
 }

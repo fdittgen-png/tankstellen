@@ -81,6 +81,39 @@ void main() {
           find.byKey(const Key('obd2ReconnectRetryButton')), findsOneWidget);
     });
 
+    testWidgets(
+        '#3035 — shows the engine-off banner (turn the ignition on) when '
+        'terminalEngineOff, with its own retry button', (tester) async {
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [
+          obd2ReconnectProvider.overrideWith(
+              () => _FakeObd2Reconnect(Obd2ReconnectState.terminalEngineOff)),
+        ],
+      );
+      expect(find.byKey(const Key('obd2ReconnectEngineOffBanner')),
+          findsOneWidget);
+      expect(find.byKey(const Key('obd2ReconnectEngineOffRetryButton')),
+          findsOneWidget);
+      // NOT the generic hardware-failure banner.
+      expect(find.byKey(const Key('obd2ReconnectFailedBanner')), findsNothing);
+    });
+
+    testWidgets('#3035 — tapping the engine-off retry calls notifier.retry()',
+        (tester) async {
+      final fake = _FakeObd2Reconnect(Obd2ReconnectState.terminalEngineOff);
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [obd2ReconnectProvider.overrideWith(() => fake)],
+      );
+      await tester
+          .tap(find.byKey(const Key('obd2ReconnectEngineOffRetryButton')));
+      await tester.pumpAndSettle();
+      expect(fake.retryCalls, 1);
+    });
+
     testWidgets('tapping retry calls notifier.retry()', (tester) async {
       final fake = _FakeObd2Reconnect(Obd2ReconnectState.terminalFailed);
       await pumpApp(

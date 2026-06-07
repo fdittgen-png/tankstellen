@@ -29,14 +29,29 @@ enum Obd2ReconnectState {
   /// The bounded attempts were exhausted. The auto-loop has STOPPED; the
   /// UI shows a "tap to retry" affordance whose action calls [retry].
   terminalFailed,
+
+  /// The adapter RE-connected fine but the vehicle bus is confirmed SILENT
+  /// (#3035) — a parked car with the ignition off. The auto-loop has STOPPED
+  /// (no hidden retry burst); the UI shows the localized "turn the ignition
+  /// on and retry" affordance whose action calls [retry]. Distinct from
+  /// [terminalFailed] (a hardware/scan failure) so the UI can render the
+  /// accurate engine-off message instead of "adapter not found".
+  terminalEngineOff,
 }
 
-/// Outcome of one reconnect attempt the controller drives. The two
-/// non-success cases stay distinct so the controller can keep its backoff
-/// schedule (`failed`) vs. note that the pinned adapter simply wasn't
-/// reachable this cycle (`notFound`) — both advance the attempt counter,
-/// but the distinction is surfaced in tracing.
-enum Obd2ReconnectAttemptResult { connected, notFound, failed }
+/// Outcome of one reconnect attempt the controller drives. The non-success
+/// cases stay distinct so the controller can keep its backoff schedule
+/// (`failed`) vs. note that the pinned adapter simply wasn't reachable this
+/// cycle (`notFound`) — both advance the attempt counter, while [engineOff]
+/// is terminal.
+///
+/// [engineOff] (#3035): the adapter connected and initialised fine but the
+/// `0100` probe confirmed the ECU is SILENT through every retry (a parked car
+/// with the ignition off). Re-trying that on a backoff schedule is pointless
+/// noise — the controller STOPS into [Obd2ReconnectState.terminalEngineOff]
+/// so the user gets the accurate "turn the ignition on" prompt instead of an
+/// endless reconnect→engine-off→teardown loop.
+enum Obd2ReconnectAttemptResult { connected, notFound, failed, engineOff }
 
 /// "Try the pinned adapter on its known transport, no scan." Returns
 /// [Obd2ReconnectAttemptResult.connected] once a session is established,
@@ -139,6 +154,11 @@ class Obd2ReconnectController {
   /// `true` once the bound was exhausted — the UI shows "tap to retry".
   bool get hasFailedTerminally => _state == Obd2ReconnectState.terminalFailed;
 
+  /// `true` once the loop STOPPED on a confirmed engine-off (#3035) — the UI
+  /// shows the "turn the ignition on and retry" affordance.
+  bool get hasStoppedOnEngineOff =>
+      _state == Obd2ReconnectState.terminalEngineOff;
+
   /// Attempts made so far in the CURRENT episode (reset by [retry] and by a
   /// fresh [notifyDropped]). Exposed for tests + diagnostics.
   @visibleForTesting
@@ -177,8 +197,13 @@ class Obd2ReconnectController {
   /// attempt counter + backoff and restarts the bounded loop. A no-op
   /// unless the controller is in [Obd2ReconnectState.terminalFailed] (a
   /// retry while a loop is still running would just double-schedule).
+  /// #3035 — also restarts from [Obd2ReconnectState.terminalEngineOff] (the
+  /// user turned the ignition on and tapped "retry").
   void retry() {
-    if (_state != Obd2ReconnectState.terminalFailed) return;
+    if (_state != Obd2ReconnectState.terminalFailed &&
+        _state != Obd2ReconnectState.terminalEngineOff) {
+      return;
+    }
     _attempts = 0;
     _currentBackoff = _initialBackoff;
     _transition(Obd2ReconnectState.reconnecting);
@@ -215,6 +240,14 @@ class Obd2ReconnectController {
           ? Obd2ReconnectAttemptResult.notFound
           : await _safely(() => _pinnedConnect(pinned));
       if (_state != Obd2ReconnectState.reconnecting) return; // stop() raced
+      // #3035 — a CONFIRMED engine-off on the pinned path is terminal: the
+      // adapter re-connected fine, the ECU is just silent. Re-scanning can't
+      // wake a parked car, so STOP here (no rescan, no backoff burst) rather
+      // than looping reconnect→engine-off→teardown.
+      if (result == Obd2ReconnectAttemptResult.engineOff) {
+        _transition(Obd2ReconnectState.terminalEngineOff);
+        return;
+      }
       // 2) RE-SCAN FALLBACK — only when the pinned path didn't land.
       if (result != Obd2ReconnectAttemptResult.connected) {
         result = await _safely(() => _rescanConnect(pinned));
@@ -222,6 +255,11 @@ class Obd2ReconnectController {
       }
       if (result == Obd2ReconnectAttemptResult.connected) {
         notifyConnected();
+        return;
+      }
+      // #3035 — the re-scan path can also land on a confirmed engine-off.
+      if (result == Obd2ReconnectAttemptResult.engineOff) {
+        _transition(Obd2ReconnectState.terminalEngineOff);
         return;
       }
       _onAttemptFailed();

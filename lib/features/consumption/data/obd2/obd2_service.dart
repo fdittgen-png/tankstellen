@@ -25,6 +25,11 @@ import 'supported_pids_cache.dart';
 import 'supported_pids_resolver.dart';
 import '../../../../core/logging/error_logger.dart';
 
+// #3035 — re-export the tri-state `0100` probe outcome so the connection
+// layer (which imports this service) gates `ignitionOff` on [busProbe]
+// without reaching into the resolver directly.
+export 'supported_pids_probe.dart' show Obd2BusProbeResult;
+
 // Re-export the pure-math estimator + stoichiometric constants so
 // callers that only need the math (e.g. [TripRecordingController]'s
 // cached live sampler) can import one file instead of chasing statics
@@ -437,6 +442,27 @@ class Obd2Service implements Obd2RawCommandPort {
   /// the no-answer signal so it never trips when discovery returned PIDs.
   bool get busAnswered =>
       _cachedProtocolDigit() != null || debugSupportedPids.isNotEmpty;
+
+  /// Tri-state outcome of the last `0100` supported-PIDs probe (#3035).
+  ///
+  /// [busAnswered] is a boolean ("did the bus reply at all?"), which the
+  /// false-engine-off bug (#3035) over-loaded: a `0100` that merely TIMED
+  /// OUT during the ELM327 protocol search left it `false` and the connect
+  /// path wrongly stamped `ignitionOff`. This getter is the finer signal the
+  /// connection layer gates on instead:
+  ///
+  ///   - [Obd2BusProbeResult.answered] — the ECU returned a `41 00` bitmap;
+  ///   - [Obd2BusProbeResult.probedSilent] — the ECU stayed silent through
+  ///     every retry (genuine engine-off — the ONLY case that may classify
+  ///     `ignitionOff`);
+  ///   - [Obd2BusProbeResult.transient] — every retry hit a timeout / blip
+  ///     (indeterminate, NOT engine-off — keep the session usable);
+  ///   - [Obd2BusProbeResult.notProbed] — discovery didn't run (a warm
+  ///     cache-hit connect, where [busAnswered] already trips on the cached
+  ///     protocol / PID set).
+  ///
+  /// Cheap (reads the already-resolved resolver field, no I/O).
+  Obd2BusProbeResult get busProbe => _pids.lastProbeResult;
 
   /// Send a raw command to the ELM327 adapter and return the raw
   /// response. Exposed for the [PidScheduler]-based trip recording

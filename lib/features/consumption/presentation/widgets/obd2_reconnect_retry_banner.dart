@@ -23,6 +23,11 @@ import '../../providers/obd2_reconnect_provider.dart';
 ///     user-actionable "tap to retry" button the Epic requires, instead
 ///     of spinning forever or silently giving up. Tapping restarts the
 ///     loop via [Obd2Reconnect.retry].
+///   * [Obd2ReconnectState.terminalEngineOff] (#3035) — the adapter
+///     re-connected fine but the `0100` probe confirmed the ECU is silent
+///     (a parked car / ignition off). The loop STOPS (no backoff burst) and
+///     this banner shows the accurate "turn the ignition on and retry"
+///     prompt, again wired to [Obd2Reconnect.retry].
 ///
 /// Renders zero-height in every other state (idle / connected), so it is
 /// safe to drop into any always-on chrome.
@@ -42,6 +47,8 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
         return _reconnectingBanner(theme, l, adapterName);
       case Obd2ReconnectState.terminalFailed:
         return _failedBanner(context, ref, theme, l);
+      case Obd2ReconnectState.terminalEngineOff:
+        return _engineOffBanner(context, ref, theme, l);
       case Obd2ReconnectState.idle:
       case Obd2ReconnectState.connected:
         return const SizedBox.shrink();
@@ -100,6 +107,42 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
       actions: [
         TextButton(
           key: const Key('obd2ReconnectRetryButton'),
+          onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
+          child: Text(l?.obd2ReconnectRetry ?? 'Tap to retry'),
+        ),
+      ],
+    );
+  }
+
+  /// #3035 — terminal "the adapter re-connected but the engine is off"
+  /// surface. The auto-loop STOPPED on a confirmed engine-off (the `0100`
+  /// probe stayed silent through every retry), so re-trying on a backoff
+  /// would just spin. We reuse the existing localized engine-off string
+  /// (`obdAdapterUnresponsive` — "turn the ignition on and retry") and the
+  /// same manual [Obd2Reconnect.retry] action so the user re-checks once the
+  /// ignition is on, instead of being told "adapter not found".
+  Widget _engineOffBanner(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+    AppLocalizations? l,
+  ) {
+    return MaterialBanner(
+      key: const Key('obd2ReconnectEngineOffBanner'),
+      backgroundColor: theme.colorScheme.tertiaryContainer,
+      contentTextStyle:
+          TextStyle(color: theme.colorScheme.onTertiaryContainer),
+      leading: Icon(
+        Icons.power_settings_new,
+        color: theme.colorScheme.onTertiaryContainer,
+      ),
+      content: Text(
+        l?.obdAdapterUnresponsive ??
+            'Adapter didn’t answer — turn the ignition on and retry',
+      ),
+      actions: [
+        TextButton(
+          key: const Key('obd2ReconnectEngineOffRetryButton'),
           onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
           child: Text(l?.obd2ReconnectRetry ?? 'Tap to retry'),
         ),
