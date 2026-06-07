@@ -117,7 +117,9 @@ class TripRecordingBanner extends ConsumerWidget {
     // decoupled from any live trip — a drop while idle still recovers.
     final reconnectState = ref.watch(obd2ReconnectProvider);
     final reconnectVisible = reconnectState == Obd2ReconnectState.reconnecting ||
-        reconnectState == Obd2ReconnectState.terminalFailed;
+        reconnectState == Obd2ReconnectState.terminalFailed ||
+        // #3035 — the terminal engine-off banner is user-actionable too.
+        reconnectState == Obd2ReconnectState.terminalEngineOff;
 
     // When no trip is active: show a thin strip carrying only the
     // OBD2 status dot — and only when there's an adapter remembered

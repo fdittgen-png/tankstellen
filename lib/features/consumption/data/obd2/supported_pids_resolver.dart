@@ -6,6 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'elm327_protocol.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'supported_pids_cache.dart';
+import 'supported_pids_probe.dart';
+
+export 'supported_pids_probe.dart' show Obd2BusProbeResult;
 
 /// Owns the #811 supported-PID concern, extracted from [Obd2Service]
 /// (#1679): the per-connection set of Mode 01 PIDs the car implements,
@@ -45,11 +48,25 @@ class SupportedPidsResolver {
   /// don't trust this cache to reject PIDs" (see [isPidSupported]).
   Set<int>? _supportedPids;
 
+  /// Tri-state outcome of the most recent `0100` probe this session
+  /// (#3035). Drives the host's [Obd2Service.busProbe] so the connection
+  /// layer can tell a genuine engine-off ([Obd2BusProbeResult.probedSilent])
+  /// apart from a slow/flaky link ([Obd2BusProbeResult.transient]) — only
+  /// the former may classify ignition-off. [Obd2BusProbeResult.notProbed]
+  /// until [discoverSupportedPids] runs (a cache-hit [prime] leaves it).
+  Obd2BusProbeResult _lastProbeResult = Obd2BusProbeResult.notProbed;
+
+  /// Tri-state outcome of the most recent `0100` probe (#3035). See
+  /// [Obd2BusProbeResult]. [Obd2BusProbeResult.notProbed] before discovery
+  /// runs (incl. when [prime] served the set straight from the cache).
+  Obd2BusProbeResult get lastProbeResult => _lastProbeResult;
+
   /// Clear the per-connection supported-PIDs cache. A new session may
   /// be a different car / different adapter firmware. Call at the top
   /// of the host's `connect`.
   void resetForNewConnection() {
     _supportedPids = null;
+    _lastProbeResult = Obd2BusProbeResult.notProbed;
   }
 
   /// Attempt to load the supported-PID set from the persistent cache
@@ -152,37 +169,63 @@ class SupportedPidsResolver {
   /// Returns an empty set when the adapter isn't connected or the
   /// first bitmap can't be read — the caller should fall back to
   /// blind querying. Also populates the internal per-connection
-  /// cache so subsequent [isPidSupported] calls short-circuit.
+  /// cache so subsequent [isPidSupported] calls short-circuit, and
+  /// records the tri-state [lastProbeResult] of the first `0100` probe.
+  ///
+  /// #3035 — the first `0100` is made resilient to the ELM327 protocol
+  /// search: it retries [_probeAttempts] times with [_probeBackoffs]
+  /// backoff, treats a `SEARCHING…` reply (and any empty/partial reply
+  /// during the search) as "search still in progress → re-read", and only
+  /// declares the bus silent ([Obd2BusProbeResult.probedSilent]) when the
+  /// ECU returns a genuine NO DATA / `UNABLE TO CONNECT` through every
+  /// retry. Timeouts / thrown sends through every retry are
+  /// [Obd2BusProbeResult.transient] — never a confirmed engine-off.
   Future<Set<int>> discoverSupportedPids() async {
     if (!_isConnected()) return const <int>{};
     final supported = <int>{};
-    for (final command in Elm327Protocol.supportedPidsCommands) {
-      // Derive the 32-PID group base from the command (e.g. "0140\r"
-      // → 0x40). The commands list is in lockstep with the group
-      // bases, so we just hex-parse the middle two chars.
-      final groupBase = int.parse(command.substring(2, 4), radix: 16);
-      try {
-        final response = await _send(command);
-        final bitmap =
-            Elm327Protocol.parseSupportedPidsBitmap(response, groupBase);
-        if (bitmap == null) break;
-        supported.addAll(bitmap);
-        // "Bit 32" of the bitmap — i.e. PID (groupBase + 32) — is
-        // conventionally the "are PIDs in the next range supported?"
-        // flag. If it's not in the set we just parsed, stop walking.
-        final nextRangeFlag = groupBase + 32;
-        if (!bitmap.contains(nextRangeFlag)) break;
-      } catch (_) {
-        // #2424 (follow-up to #2379) — the supported-PID scan is best-
-        // effort: a transient on a flaky/slow ELM327 (TimeoutException,
-        // the legacy concurrent-sendCommand StateError, device-not-
-        // connected) is EXPECTED and recoverable — we break and return
-        // whatever we've gathered (possibly empty → blind query). The
-        // graceful degradation IS the signal, so it must NOT pollute the
-        // user error log.
-        debugPrint('OBD2 discoverSupportedPids failed on $command — '
-            'returning ${supported.length} PIDs gathered so far');
-        break;
+    final firstCommand = Elm327Protocol.supportedPidsCommands.first;
+    final firstGroupBase = int.parse(firstCommand.substring(2, 4), radix: 16);
+
+    // First `0100` — the only command that actually contacts the ECU and
+    // triggers the protocol search, so it gets the retry + SEARCHING grace.
+    final firstProbe = await probeFirstSupportedPids(
+      send: _send,
+      isConnected: _isConnected,
+      command: firstCommand,
+      groupBase: firstGroupBase,
+    );
+    _lastProbeResult = firstProbe.result;
+    if (firstProbe.bitmap == null) {
+      // No bitmap — either genuine engine-off (probedSilent) or a transient.
+      // Either way there is nothing to walk; record the (empty) set so the
+      // session falls back to blind querying.
+      _supportedPids = supported;
+      return supported;
+    }
+    supported.addAll(firstProbe.bitmap!);
+
+    // Walk the remaining 32-PID groups (`0120`…`01C0`) only while the
+    // previous bitmap's next-range flag is set. These never re-contact the
+    // ECU's protocol search (it has already locked), so they keep the
+    // cheaper single-shot read with the legacy best-effort break.
+    if (firstProbe.bitmap!.contains(firstGroupBase + 32)) {
+      for (final command in Elm327Protocol.supportedPidsCommands.skip(1)) {
+        final groupBase = int.parse(command.substring(2, 4), radix: 16);
+        try {
+          final response = await _send(command);
+          final bitmap =
+              Elm327Protocol.parseSupportedPidsBitmap(response, groupBase);
+          if (bitmap == null) break;
+          supported.addAll(bitmap);
+          if (!bitmap.contains(groupBase + 32)) break;
+        } catch (_) {
+          // #2424 — best-effort tail: a transient on a flaky/slow ELM327 is
+          // EXPECTED; break and keep whatever we gathered. The first probe
+          // already answered, so the bus state is settled here.
+          debugPrint('OBD2 discoverSupportedPids failed on $command — '
+              'returning ${supported.length} PIDs gathered so far');
+          break;
+        }
       }
     }
     _supportedPids = supported;

@@ -147,10 +147,21 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     }
   }
 
-  /// Translate a connect result into the controller's tri-state outcome and,
-  /// on success, republish the recovered link into the app-wide status dot.
+  /// Translate a connect result into the controller's outcome and, on
+  /// success, republish the recovered link into the app-wide status dot.
+  ///
+  /// #3035 — a non-null service whose `0100` probe came back
+  /// [Obd2BusProbeResult.probedSilent] is a CONFIRMED engine-off: the adapter
+  /// re-connected fine, the ECU is just silent (parked car). Surface
+  /// [Obd2ReconnectAttemptResult.engineOff] so the controller STOPS into its
+  /// terminal "turn the ignition on" state instead of looping
+  /// reconnect→engine-off→teardown. A [Obd2BusProbeResult.transient] (slow
+  /// live car / flaky link) is NOT engine-off — it counts as `connected`.
   Obd2ReconnectAttemptResult _onResult(Obd2Service? svc) {
     if (svc == null) return Obd2ReconnectAttemptResult.notFound;
+    if (svc.busProbe == Obd2BusProbeResult.probedSilent) {
+      return Obd2ReconnectAttemptResult.engineOff;
+    }
     try {
       ref.read(obd2ConnectionStatusProvider.notifier).markConnected(
             adapterName: svc.adapterName,
