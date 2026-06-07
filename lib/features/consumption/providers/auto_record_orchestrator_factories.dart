@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/android_background_adapter_listener.dart';
 import '../data/obd2/auto_trip_coordinator.dart';
 import '../data/obd2/background_adapter_listener.dart';
@@ -51,18 +52,34 @@ Obd2SessionOpener autoRecordSessionOpenerFactory(Ref ref) {
   };
 }
 
-/// Foreground-active opener (#2282 concern 1): a DIRECT connect
-/// ([Obd2ConnectionService.connectByMacDirect]) — `BluetoothDevice.fromId`
-/// + `autoConnect`, NO active scan — so it wakes ELM327 clones that stop
-/// advertising in standby. Used by the coordinator's
-/// [AutoTripCoordinator.armForegroundActive] on every app resume to start
-/// engine-detection while the app is in front, independent of the
-/// disabled foreground service. `fallbackToScan: true` keeps behaviour no
-/// worse than the scan opener when the direct attempt fails. Tests
-/// override this provider to inject a fake direct opener.
+/// Foreground-active opener (#2282 concern 1): a DIRECT connect — NO active
+/// scan — so it wakes ELM327 clones that stop advertising in standby. Used by
+/// the coordinator's [AutoTripCoordinator.armForegroundActive] on every app
+/// resume to start engine-detection while the app is in front, independent of
+/// the disabled foreground service.
+///
+/// #3025 — now TRANSPORT-AWARE via
+/// [Obd2ConnectionService.connectByMacTransportAware]. The old call hard-wired
+/// the BLE [Obd2ConnectionService.connectByMacDirect], so a Classic-SPP adapter
+/// (vLinker BM-Android) could only 4 s-timeout AND the doomed BLE GATT to its
+/// MAC poisoned the RFCOMM socket — the same firstConnect defect this opener
+/// shared. Transport is inferred from the paired adapter NAME (read defensively
+/// off the active vehicle so a provider hiccup never makes the connect throw).
+/// `fallbackToScan: true` keeps behaviour no worse than the scan opener when the
+/// direct attempt fails. Tests override this provider to inject a fake opener.
 @Riverpod(keepAlive: true)
 Obd2ForegroundSessionOpener autoRecordForegroundSessionOpenerFactory(Ref ref) {
   return (String mac) async {
-    return ref.read(obd2ConnectionProvider).connectByMacDirect(mac);
+    String? adapterName;
+    try {
+      adapterName = ref.read(activeVehicleProfileProvider)?.obd2AdapterName;
+    } catch (_) {
+      // The vehicle provider must never make an auto-record connect throw —
+      // fall back to a name-less (unknown-transport) connect.
+      adapterName = null;
+    }
+    return ref
+        .read(obd2ConnectionProvider)
+        .connectByMacTransportAware(mac, adapterName: adapterName);
   };
 }

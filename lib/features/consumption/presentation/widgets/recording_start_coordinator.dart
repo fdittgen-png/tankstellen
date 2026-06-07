@@ -53,7 +53,8 @@ class RecordingStartCoordinator {
     if (!flags.contains(Feature.obd2Optional)) return;
     final recordingState = ref.read(tripRecordingProvider);
     if (recordingState.isActive || recordingState.isConnecting) return;
-    final mac = ref.read(activeVehicleProfileProvider)?.obd2AdapterMac;
+    final activeVehicle = ref.read(activeVehicleProfileProvider);
+    final mac = activeVehicle?.obd2AdapterMac;
     if (mac == null || mac.isEmpty) return;
     final Obd2ConnectionService connection;
     try {
@@ -63,11 +64,21 @@ class RecordingStartCoordinator {
       // pre-warm is a best-effort optimisation, so skip silently.
       return;
     }
-    // `fallbackToScan: false` — the pre-warm is a fast best-effort warm
-    // of the GATT link, not a guaranteed connect; a miss just means the
-    // start flow connects normally. A successful warm is held for the
-    // start flow to consume; a null result tears nothing down.
-    final future = connection.connectByMacDirect(mac, fallbackToScan: false);
+    // #3025 — TRANSPORT-AWARE pre-warm. The old call hard-wired the BLE
+    // `connectByMacDirect`, so a Classic-SPP adapter (vLinker BM-Android) could
+    // only 4 s-timeout AND the doomed BLE GATT to its MAC then poisoned the
+    // RFCOMM socket the start flow's Classic fallback used (`read ret: -1`),
+    // breaking firstConnect entirely. Routing through the transport-aware entry
+    // (transport inferred from the paired adapter NAME via the registry) takes
+    // the RFCOMM path for a Classic adapter and never opens the poisoning BLE
+    // GATT. `fallbackToScan: false` — the pre-warm is a fast best-effort warm,
+    // not a guaranteed connect; a miss just means the start flow connects
+    // normally. A successful warm is held for the start flow to consume.
+    final future = connection.connectByMacTransportAware(
+      mac,
+      adapterName: activeVehicle?.obd2AdapterName,
+      fallbackToScan: false,
+    );
     _prewarm = future;
     unawaited(future.then((svc) {
       if (!_alive) {

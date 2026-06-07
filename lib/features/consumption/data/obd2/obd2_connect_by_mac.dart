@@ -174,6 +174,77 @@ Future<Obd2Service?> _connectByMacClassicDirect(
   }
 }
 
+/// Body of [Obd2ConnectionService.connectByMacTransportAware] (#3025 / Epic
+/// #3013). Routes a FIRST-connect / pinned by-MAC connect to the transport the
+/// paired [adapterName] name-matches in the registry, so a Classic adapter is
+/// NEVER reached on the doomed BLE GATT path.
+///
+///   * CLASSIC name → [Obd2ConnectionService.connectByMacClassicDirect] only
+///     (RFCOMM; no `channelForDirect`, no 4 s BLE timeout). On a clean miss
+///     (null) it falls through to the transport-aware scan via
+///     [Obd2ConnectionService.connectByMac] when [fallbackToScan] — the merged
+///     BLE+Classic scan reaches the bonded Classic candidate WITHOUT a prior
+///     BLE GATT to poison the socket.
+///   * BLE name → [Obd2ConnectionService.connectByMacDirect] (its own scan
+///     fallback honoured via [fallbackToScan]).
+///   * UNKNOWN / nameless → the historical BLE-direct-first, then a Classic
+///     direct attempt for the same MAC. The BLE [Obd2ConnectionService.bluetooth]
+///     channel is FULLY torn down (GATT disconnected — `channel.close()` ⇒
+///     `device.disconnect()`) by `connectByMacDirect`/the Classic path's own
+///     `_teardownLastDirectChannel` between the two, so no half-open GATT can
+///     poison the RFCOMM socket (the #3025 dual-mode conflict).
+///
+/// `requestedTransport` is stamped to match the chosen path (Classic adapter ⇒
+/// `rtx: classic`) by the per-transport `_traced` wrappers each branch delegates
+/// to — so a field trace is truthful (a Classic adapter no longer shows the
+/// misleading `rtx: ble`). A single transport-determined attempt is one trace.
+Future<Obd2Service?> _connectByMacTransportAware(
+  Obd2ConnectionService svc,
+  String mac, {
+  String? adapterName,
+  bool fallbackToScan = true,
+}) async {
+  final transport = svc.registry.transportForName(adapterName);
+  switch (transport) {
+    case BluetoothTransport.classic:
+      // Classic-classified: ONLY the RFCOMM direct path — never the BLE GATT
+      // path that 4 s-times-out and poisons the socket. The Classic facade is
+      // required; with none wired (BLE-only test config), fall through to the
+      // transport-aware scan instead of silently doing nothing.
+      if (svc.classicBluetooth != null) {
+        final direct =
+            await svc.connectByMacClassicDirect(mac, adapterName: adapterName);
+        if (direct != null) return direct;
+      }
+      return fallbackToScan
+          ? svc.connectByMac(mac, adapterName: adapterName)
+          : null;
+    case BluetoothTransport.ble:
+      return svc.connectByMacDirect(mac,
+          fallbackToScan: fallbackToScan, adapterName: adapterName);
+    case null:
+      // UNKNOWN transport (an unfamiliar / nameless adapter). Preserve the
+      // historical BLE-direct-first behaviour, then try the Classic direct path
+      // for the SAME MAC. `connectByMacDirect` self-tears-down its GATT on
+      // failure (close ⇒ device.disconnect), and `connectByMacClassicDirect`
+      // also tears down any prior direct channel before opening — so the BLE
+      // GATT is fully gone before the RFCOMM open (no socket poisoning).
+      // `fallbackToScan:false` here so the doomed-BLE attempt fails fast to the
+      // Classic attempt; the final scan fallback runs once at the end.
+      final ble = await svc.connectByMacDirect(mac,
+          fallbackToScan: false, adapterName: adapterName);
+      if (ble != null) return ble;
+      if (svc.classicBluetooth != null) {
+        final classic =
+            await svc.connectByMacClassicDirect(mac, adapterName: adapterName);
+        if (classic != null) return classic;
+      }
+      return fallbackToScan
+          ? svc.connectByMac(mac, adapterName: adapterName)
+          : null;
+  }
+}
+
 /// Body of [Obd2ConnectionService.connectByMacPassive] (#2261 concern 2).
 /// Opens a channel with `autoConnect:true` and NO bounded timeout, so the OS
 /// holds a low-power background GATT request that resolves the instant the

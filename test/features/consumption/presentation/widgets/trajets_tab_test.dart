@@ -122,6 +122,13 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
   final List<String> connectByMacCalls = [];
   final List<String> connectByMacDirectCalls = [];
 
+  /// #3025 — records the transport-aware pre-warm / pinned connect entry the
+  /// firstConnect orchestrators now route through (instead of the BLE-only
+  /// `connectByMacDirect`). The fake returns [connectByMacDirectResult] so the
+  /// existing pre-warm-hit assertions still hold, while the recorded list lets a
+  /// test assert the adapter NAME drove the routing.
+  final List<String> connectByMacTransportAwareCalls = [];
+
   @override
   Future<Obd2Service?> connectByMac(
     String mac, {
@@ -140,6 +147,16 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
     String? adapterName,
   }) async {
     connectByMacDirectCalls.add(mac);
+    return connectByMacDirectResult;
+  }
+
+  @override
+  Future<Obd2Service?> connectByMacTransportAware(
+    String mac, {
+    String? adapterName,
+    bool fallbackToScan = true,
+  }) async {
+    connectByMacTransportAwareCalls.add(mac);
     return connectByMacDirectResult;
   }
 
@@ -520,8 +537,9 @@ void main() {
       // Let the post-frame pre-warm fire + resolve.
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 10));
-      expect(connection.connectByMacDirectCalls, ['AA:BB:CC:DD:EE:FF'],
-          reason: 'pre-warm (concern 3) fires the direct connect on open');
+      // #3025 — pre-warm (concern 3) fires the TRANSPORT-AWARE connect on open.
+      expect(connection.connectByMacTransportAwareCalls, ['AA:BB:CC:DD:EE:FF'],
+          reason: 'pre-warm (concern 3) fires the transport-aware connect');
 
       await tester.tap(
         find.byKey(const Key('trajets_start_recording_button')),
@@ -726,12 +744,13 @@ void main() {
     });
   });
 
-  // #2274 concern 3 — pre-warm BLE connect on the trajets/start screen
-  // open. For a pinned/bonded adapter the tab kicks `connectByMacDirect`
-  // the moment it opens, and the start flow consumes that warm link
-  // (skipping the picker). An unpaired vehicle warms nothing and falls
-  // back to the picker on Start.
-  group('TrajetsTab — pre-warm BLE connect (#2274 concern 3)', () {
+  // #2274 concern 3 — pre-warm connect on the trajets/start screen open. For a
+  // pinned/bonded adapter the tab kicks the TRANSPORT-AWARE direct connect
+  // (#3025 — `connectByMacTransportAware`, not the BLE-only `connectByMacDirect`
+  // which 4 s-timed-out + poisoned the RFCOMM socket for a Classic adapter) the
+  // moment it opens, and the start flow consumes that warm link (skipping the
+  // picker). An unpaired vehicle warms nothing and falls back to the picker.
+  group('TrajetsTab — pre-warm connect (#2274 concern 3 / #3025)', () {
     const pairedVehicle = VehicleProfile(
       id: 'v1',
       name: 'Daily Driver',
@@ -746,8 +765,8 @@ void main() {
     );
 
     testWidgets(
-        'paired vehicle pre-warms connectByMacDirect on open and starts '
-        'with the warm service (no picker)', (tester) async {
+        'paired vehicle pre-warms via the transport-aware connect on open and '
+        'starts with the warm service (no picker) — #3025', (tester) async {
       final fakeService = _NoopObd2Service();
       final connection = _RecordingFakeConnection(
         connectByMacDirectResult: fakeService,
@@ -765,7 +784,12 @@ void main() {
       // Post-frame pre-warm fires + resolves before any tap.
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 10));
-      expect(connection.connectByMacDirectCalls, ['AA:BB:CC:DD:EE:FF']);
+      // #3025 — the pre-warm goes through the TRANSPORT-AWARE entry (which routes
+      // 'vLinker FS' — a Classic adapter — to RFCOMM), NOT the BLE-only
+      // connectByMacDirect that 4 s-timed-out + poisoned the socket.
+      expect(connection.connectByMacTransportAwareCalls, ['AA:BB:CC:DD:EE:FF']);
+      expect(connection.connectByMacDirectCalls, isEmpty,
+          reason: 'a Classic adapter must NEVER pre-warm over the BLE path');
 
       await tester.tap(
         find.byKey(const Key('trajets_start_recording_button')),
@@ -795,8 +819,9 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 10));
-      // No pinned MAC → nothing pre-warmed.
+      // No pinned MAC → nothing pre-warmed (neither path is touched).
       expect(connection.connectByMacDirectCalls, isEmpty);
+      expect(connection.connectByMacTransportAwareCalls, isEmpty);
 
       await tester.tap(
         find.byKey(const Key('trajets_start_recording_button')),
