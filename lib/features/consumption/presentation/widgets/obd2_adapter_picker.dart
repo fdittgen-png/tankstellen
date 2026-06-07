@@ -51,8 +51,17 @@ Future<Obd2Service?> showObd2AdapterPicker(
     final container = ProviderScope.containerOf(context, listen: false);
     Obd2Service? service;
     try {
-      service =
-          await container.read(obd2ConnectionProvider).connectByMac(pinnedMac);
+      // #3025 — TRANSPORT-AWARE pinned connect. The old call hard-wired the
+      // scan-based `connectByMac`, but coming off the (now transport-aware,
+      // #3025) pre-warm — or as the sole entry — the transport-aware direct
+      // path routes a Classic adapter (vLinker BM-Android) straight to RFCOMM
+      // and NEVER opens the BLE GATT that 4 s-times-out + poisons the socket. It
+      // still falls back to the merged BLE+Classic scan via `connectByMac`
+      // internally for a direct miss, so the existing behaviour is preserved.
+      service = await container.read(obd2ConnectionProvider).connectByMacTransportAware(
+            pinnedMac,
+            adapterName: pinnedAdapterName,
+          );
     } on Obd2ConnectionError catch (e, st) {
       // Drop through to the sheet so the user can pick another adapter; the
       // fall-through snackbar surfaces it. #2745 — an expected, user-surfaced
