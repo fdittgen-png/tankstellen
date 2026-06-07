@@ -3581,6 +3581,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Adapter OBD2 nie odpowiedział. Włącz zapłon i spróbuj ponownie.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'Adapter OBD2 wysłał nierozpoznaną odpowiedź. Może być niekompatybilny — wypróbuj inny adapter.';
 
@@ -6406,6 +6410,10 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Test adaptera zakończony niepowodzeniem';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {

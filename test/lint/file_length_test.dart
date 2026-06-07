@@ -112,11 +112,16 @@ void main() {
     // obd2_connect_trace_log.dart, both < 400); the remaining bulk is the
     // per-method trace wrappers on this already-near-cap connect service.
     // Further decomposition of this god-class is tracked by #2190.
-    // #3014 — re-grandfathered 563 → 591: the adapterName param threaded through
+    // #3009 — re-grandfathered 563 → 570: `_openAndInit` now classifies the
+    // engine-off / ECU-silent case (init succeeded but the vehicle bus never
+    // answered → busAnswered false) as `ignitionOff` instead of a misleading
+    // green `success` (7 lines: the first-wins stamp + its rationale comment).
+    // #3014 — re-grandfathered 570 → 601: the adapterName param threaded through
     // every by-MAC connect entry (`connectByMac`/`connectByMacDirect`/
     // `connectByMacClassicDirect`/`connectByMacPassive`/`_traced`) so a connect
-    // trace names the adapter, plus the `_inferTransport` registry-hint helper.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 591,
+    // trace names the adapter, plus the `_inferTransport` registry-hint helper
+    // (atop #3009's engine-off classification, both kept on the merge).
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 601,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one

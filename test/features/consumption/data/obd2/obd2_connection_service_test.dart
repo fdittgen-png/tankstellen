@@ -14,6 +14,9 @@ import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart
 import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_bluetooth_facade.dart';
 import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_comm_diagnostics.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace_log.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
@@ -884,6 +887,75 @@ void main() {
       expect(ready.supportsPid(0x5E), isTrue);
       expect(box.length, 0);
       await ready.disconnect();
+    });
+  });
+
+  // #3009 — engine-off / ECU-silent classification. The channel + ELM init
+  // SUCCEED (every AT answers), but the vehicle bus is silent: `0100` returns
+  // the ECU-silent signature so PID discovery finds zero PIDs and the protocol
+  // cache stays empty. The connect-trace outcome must be `ignitionOff` — NOT a
+  // misleading green `success` — even though the adapter itself is fine.
+  group('engine-off connect-trace classification (#3009)', () {
+    late Directory tmpDir;
+    late Box<String> box;
+
+    setUp(() async {
+      Obd2ConnectTraceLog.clear();
+      Obd2CommDiagnostics.instance.reset();
+      tmpDir = Directory.systemTemp.createTempSync('conn_svc_engineoff_');
+      Hive.init(tmpDir.path);
+      box = await Hive.openBox<String>(
+        'engineoff_${DateTime.now().microsecondsSinceEpoch}',
+      );
+    });
+
+    tearDown(() async {
+      Obd2ConnectTraceLog.clear();
+      Obd2CommDiagnostics.instance.reset();
+      await box.deleteFromDisk();
+      await Hive.close();
+      tmpDir.deleteSync(recursive: true);
+    });
+
+    Future<Obd2ConnectOutcome?> connectWith0100Reply(String reply) async {
+      final svc = _build(
+        permState: Obd2PermissionState.granted,
+        bt: _FakeFacade(
+          batches: const [[]],
+          directChannel: _FakeChannel(respondTo: {
+            ..._elmOkResponses(),
+            // The ECU never answers the protocol probe — the engine is off.
+            '0100': reply,
+          }),
+        ),
+        supportedPidsCache: SupportedPidsCache(box),
+        activeVehicleKeyFields: () =>
+            (make: 'Peugeot', model: '107', year: 2008, vin: null),
+      );
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+      // The adapter+init succeeded → a live service still comes back.
+      expect(ready, isNotNull);
+      expect(ready!.isConnected, isTrue);
+      // But the bus never answered → this is engine-off, not a real connect.
+      expect(ready.busAnswered, isFalse);
+      await ready.disconnect();
+      return Obd2ConnectTraceLog.snapshot().first.outcome;
+    }
+
+    test('init OK + 0100 → SEARCHING...STOPPED classifies as ignitionOff, '
+        'NOT success', () async {
+      final outcome = await connectWith0100Reply('SEARCHING...STOPPED>');
+      // RED on master: the trace is stamped `success` because init succeeded.
+      expect(outcome, Obd2ConnectOutcome.ignitionOff);
+      expect(outcome, isNot(Obd2ConnectOutcome.success));
+    });
+
+    test('init OK + 0100 → NO DATA classifies as ignitionOff, NOT success',
+        () async {
+      final outcome = await connectWith0100Reply('NO DATA>');
+      expect(outcome, Obd2ConnectOutcome.ignitionOff);
+      expect(outcome, isNot(Obd2ConnectOutcome.success));
     });
   });
 }

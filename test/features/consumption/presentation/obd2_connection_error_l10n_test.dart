@@ -19,6 +19,9 @@ void main() {
       const Obd2BluetoothOff(): l10n.obd2ErrorBluetoothOff,
       const Obd2ScanTimeout(): l10n.obd2ErrorScanTimeout,
       const Obd2AdapterUnresponsive(): l10n.obd2ErrorAdapterUnresponsive,
+      // #3009 — the engine-off condition maps to its OWN message, distinct
+      // from the adapter-unresponsive one (the adapter DID respond).
+      const Obd2EngineOff(): l10n.obd2ErrorEngineOff,
       const Obd2ProtocolInitFailed('ELM-garbage'):
           l10n.obd2ErrorProtocolInitFailed,
       const Obd2DisconnectedException(): l10n.obd2ErrorDisconnected,
@@ -28,6 +31,17 @@ void main() {
       // The localized message must not leak the raw diagnostic.
       expect(error.localizedMessage(l10n), isNot(error.message));
     });
+  });
+
+  test('the engine-off message does NOT blame the adapter (#3009)', () async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    final engineOff = const Obd2EngineOff().localizedMessage(l10n);
+    // It must read as engine-off, not adapter-failure.
+    expect(engineOff.toLowerCase(), contains('engine'));
+    expect(engineOff, isNot(l10n.obd2ErrorAdapterUnresponsive));
+    // The reworded adapter-unresponsive string no longer says "ignition".
+    expect(l10n.obd2ErrorAdapterUnresponsive.toLowerCase(),
+        isNot(contains('ignition')));
   });
 
   test('falls back to the English diagnostic when l10n is null', () {

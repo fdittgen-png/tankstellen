@@ -6579,11 +6579,17 @@ abstract class AppLocalizations {
   /// **'No OBD2 adapter found nearby. Make sure it is plugged in and powered on.'**
   String get obd2ErrorScanTimeout;
 
-  /// User-facing OBD2 connection error: the adapter never answered the init sequence (#1663).
+  /// User-facing OBD2 connection error: the adapter itself never answered the init sequence (#1663). Distinct from obd2ErrorEngineOff, where the adapter answered but the engine was off (#3009).
   ///
   /// In en, this message translates to:
-  /// **'The OBD2 adapter did not respond. Turn the ignition on and try again.'**
+  /// **'The OBD2 adapter did not respond. Check the connection and try again.'**
   String get obd2ErrorAdapterUnresponsive;
+
+  /// User-facing OBD2 condition (#3009): the adapter connected and initialised fine, but the vehicle bus was silent (engine off / ECU asleep) so no live data could be read. Does NOT blame the adapter.
+  ///
+  /// In en, this message translates to:
+  /// **'No data from the vehicle — start the engine and try again.'**
+  String get obd2ErrorEngineOff;
 
   /// User-facing OBD2 connection error: the adapter's init string was unrecognised (#1663).
   ///
@@ -11081,6 +11087,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Adapter test failed'**
   String get obd2TestRunFailed;
+
+  /// Non-alarming amber banner shown when the OBD2 adapter self-test passed every adapter-capability step but the live-data steps were ECU-silent because the engine is off (#3009). The adapter is fine; only the engine is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter OK — engine off; start the engine to read live data'**
+  String get obd2TestRunEngineOff;
 
   /// Summary line under the OBD2 adapter self-test pass/fail banner: passed-step count, total steps, and total elapsed milliseconds (#2645).
   ///

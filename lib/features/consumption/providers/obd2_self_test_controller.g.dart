@@ -99,7 +99,7 @@ final class Obd2SelfTestControllerProvider
 }
 
 String _$obd2SelfTestControllerHash() =>
-    r'b62379b272ad7fe3dfbf585cf38518c706d68a92';
+    r'e8091797f77d15417aaca9f5c8cf18247067f2dc';
 
 /// Orchestrates the #2645 active adapter self-test and exposes live
 /// per-step progress for the OBD2 health screen.

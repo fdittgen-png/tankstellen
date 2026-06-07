@@ -1884,9 +1884,13 @@
   "@obd2ErrorScanTimeout": {
     "description": "User-facing OBD2 connection error: scan found no adapter (#1663)."
   },
-  "obd2ErrorAdapterUnresponsive": "The OBD2 adapter did not respond. Turn the ignition on and try again.",
+  "obd2ErrorAdapterUnresponsive": "The OBD2 adapter did not respond. Check the connection and try again.",
   "@obd2ErrorAdapterUnresponsive": {
-    "description": "User-facing OBD2 connection error: the adapter never answered the init sequence (#1663)."
+    "description": "User-facing OBD2 connection error: the adapter itself never answered the init sequence (#1663). Distinct from obd2ErrorEngineOff, where the adapter answered but the engine was off (#3009)."
+  },
+  "obd2ErrorEngineOff": "No data from the vehicle — start the engine and try again.",
+  "@obd2ErrorEngineOff": {
+    "description": "User-facing OBD2 condition (#3009): the adapter connected and initialised fine, but the vehicle bus was silent (engine off / ECU asleep) so no live data could be read. Does NOT blame the adapter."
   },
   "obd2ErrorProtocolInitFailed": "The OBD2 adapter sent an unrecognized response. It may be incompatible — try a different adapter.",
   "@obd2ErrorProtocolInitFailed": {
@@ -5585,6 +5589,10 @@
   "obd2TestRunFailed": "Adapter test failed",
   "@obd2TestRunFailed": {
     "description": "Fail banner shown when one or more steps of the OBD2 adapter self-test did not succeed (#2645)."
+  },
+  "obd2TestRunEngineOff": "Adapter OK — engine off; start the engine to read live data",
+  "@obd2TestRunEngineOff": {
+    "description": "Non-alarming amber banner shown when the OBD2 adapter self-test passed every adapter-capability step but the live-data steps were ECU-silent because the engine is off (#3009). The adapter is fine; only the engine is off."
   },
   "obd2TestRunSummary": "{passed} of {total} steps OK · {elapsed} ms",
   "@obd2TestRunSummary": {

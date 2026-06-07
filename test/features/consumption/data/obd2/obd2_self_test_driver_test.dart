@@ -204,6 +204,149 @@ void main() {
     });
   });
 
+  group('engine-off verdict (#3009)', () {
+    test(
+        'adapter-capability steps PASS but the live-data steps are ECU-silent '
+        '→ verdict engineOff (adapter OK), NOT a red failure', () async {
+      // Every AT command answers (connect / info / reconnect / disconnect all
+      // pass), but the vehicle bus is silent: 0100 → SEARCHING...STOPPED and
+      // the sample reads → NO DATA. This is the engine-off field condition.
+      final conn = _FakeConnection(
+        transportFor: () => FakeObd2Transport({
+          ..._initResponses,
+          'AT@1': 'OBDII to RS232 Interpreter>',
+          'ATRV': '12.4V>',
+          '0100': 'SEARCHING...STOPPED>',
+          '010C': 'NO DATA>',
+          '010D': 'NO DATA>',
+          '0105': 'NO DATA>',
+        }),
+      );
+
+      final report = await runObd2SelfTest(conn, pinnedMac: 'AA:BB:CC:DD:EE:FF');
+
+      // RED on master: the report only had passed=false → a red failure.
+      expect(report.verdict, Obd2SelfTestVerdict.engineOff);
+      expect(report.passed, isFalse);
+      // The adapter-capability steps all passed.
+      for (final id in const [
+        Obd2SelfTestStepId.scan,
+        Obd2SelfTestStepId.connect,
+        Obd2SelfTestStepId.info,
+        Obd2SelfTestStepId.reconnect,
+        Obd2SelfTestStepId.disconnect,
+      ]) {
+        expect(report.steps.firstWhere((s) => s.id == id).status,
+            Obd2SelfTestStepStatus.ok,
+            reason: '$id is an adapter-capability step and must pass');
+      }
+      // The live-data steps show the engine-off signature, not a hard fault.
+      final pids = report.steps
+          .firstWhere((s) => s.id == Obd2SelfTestStepId.supportedPids);
+      final sample = report.steps
+          .firstWhere((s) => s.id == Obd2SelfTestStepId.sampleReads);
+      expect(kObd2EngineOffStatuses, contains(pids.status));
+      expect(kObd2EngineOffStatuses, contains(sample.status));
+    });
+
+    test('a genuine connect failure still yields verdict failed (stays RED)',
+        () async {
+      final conn = _FakeConnection(transportFor: () => FakeObd2Transport())
+        ..connectReturnsNull = true;
+
+      final report = await runObd2SelfTest(conn, pinnedMac: 'M');
+
+      expect(report.verdict, Obd2SelfTestVerdict.failed);
+    });
+
+    test('a live-data TIMEOUT (adapter went silent) is failed, NOT engineOff',
+        () async {
+      // A timeout is the adapter itself stopping — a real fault, not engine-off.
+      final conn = _FakeConnection(
+        transportFor: () => _DelayingTransport(
+          {
+            ..._happyPathResponses,
+            '0100': 'SEARCHING...STOPPED>',
+          },
+          delayFor: {'010C': const Duration(milliseconds: 600)},
+        ),
+      );
+
+      final report = await runObd2SelfTest(
+        conn,
+        pinnedMac: 'M',
+        stepDeadline: const Duration(milliseconds: 250),
+      );
+
+      // sampleReads timed out → a hard fault → the run stays RED.
+      expect(report.verdict, Obd2SelfTestVerdict.failed);
+    });
+
+    test('a full happy path is verdict passed (not engineOff)', () async {
+      final conn = _FakeConnection(
+        transportFor: () => FakeObd2Transport(Map.of(_happyPathResponses)),
+      );
+
+      final report = await runObd2SelfTest(conn, pinnedMac: 'M');
+
+      expect(report.verdict, Obd2SelfTestVerdict.passed);
+      expect(report.passed, isTrue);
+    });
+  });
+
+  group('obd2SelfTestVerdict pure classifier (#3009)', () {
+    Obd2SelfTestStepResult s(
+            Obd2SelfTestStepId id, Obd2SelfTestStepStatus status) =>
+        Obd2SelfTestStepResult(id: id, status: status);
+
+    List<Obd2SelfTestStepResult> withLiveData(
+            Obd2SelfTestStepStatus pids, Obd2SelfTestStepStatus sample) =>
+        [
+          s(Obd2SelfTestStepId.scan, Obd2SelfTestStepStatus.ok),
+          s(Obd2SelfTestStepId.connect, Obd2SelfTestStepStatus.ok),
+          s(Obd2SelfTestStepId.info, Obd2SelfTestStepStatus.ok),
+          s(Obd2SelfTestStepId.supportedPids, pids),
+          s(Obd2SelfTestStepId.sampleReads, sample),
+          s(Obd2SelfTestStepId.reconnect, Obd2SelfTestStepStatus.ok),
+          s(Obd2SelfTestStepId.disconnect, Obd2SelfTestStepStatus.ok),
+        ];
+
+    test('all ok → passed', () {
+      expect(
+        obd2SelfTestVerdict(withLiveData(
+            Obd2SelfTestStepStatus.ok, Obd2SelfTestStepStatus.ok)),
+        Obd2SelfTestVerdict.passed,
+      );
+    });
+
+    test('live-data noResponse/garbage with adapter steps OK → engineOff', () {
+      expect(
+        obd2SelfTestVerdict(withLiveData(Obd2SelfTestStepStatus.garbage,
+            Obd2SelfTestStepStatus.noResponse)),
+        Obd2SelfTestVerdict.engineOff,
+      );
+    });
+
+    test('an adapter-capability step failing → failed (not engineOff)', () {
+      final steps = withLiveData(
+          Obd2SelfTestStepStatus.garbage, Obd2SelfTestStepStatus.noResponse)
+        ..[1] = s(Obd2SelfTestStepId.connect, Obd2SelfTestStepStatus.fail);
+      expect(obd2SelfTestVerdict(steps), Obd2SelfTestVerdict.failed);
+    });
+
+    test('a live-data timeout → failed (a real fault, not engineOff)', () {
+      expect(
+        obd2SelfTestVerdict(withLiveData(Obd2SelfTestStepStatus.timeout,
+            Obd2SelfTestStepStatus.noResponse)),
+        Obd2SelfTestVerdict.failed,
+      );
+    });
+
+    test('empty steps → failed', () {
+      expect(obd2SelfTestVerdict(const []), Obd2SelfTestVerdict.failed);
+    });
+  });
+
   group('transport-aware self-test (#2969 — the reliability fix)', () {
     setUp(Obd2ConnectTraceLog.clear);
     tearDown(Obd2ConnectTraceLog.clear);

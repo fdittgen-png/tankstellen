@@ -3593,6 +3593,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'OBD2 adapteris neatsakė. Įjunkite degimą ir bandykite dar kartą.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'OBD2 adapteris išsiuntė neatpažintą atsakymą. Jis gali būti nesuderinamas — pabandykite kitą adapterį.';
 
@@ -6414,6 +6418,10 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get obd2TestRunFailed => 'Adapterio testas nepavyko';
+
+  @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
 
   @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {

@@ -136,13 +136,17 @@ class RecordingStartCoordinator {
       // vehicle bus is silent (ignition off / ECU asleep): ATDPN→NO DATA
       // caches no protocol and 0100→NO DATA leaves zero supported PIDs, yet
       // `connect()` still returned true. Starting here would yield a degraded
-      // GPS-only trip with no telemetry and no explanation. Surface the
-      // EXISTING localized "turn the ignition on" condition instead, roll the
-      // connecting phase back, and tear down the dead link. Gated STRICTLY on
+      // GPS-only trip with no telemetry and no explanation.
+      //
+      // #3009 — surface the ENGINE-OFF condition with an accurate
+      // "start the engine" message ([Obd2EngineOff]), NOT the old
+      // adapter-blaming [Obd2AdapterUnresponsive] ("the adapter did not
+      // respond" — but it DID respond; only the engine is off). Roll the
+      // connecting phase back and tear down the dead link. Gated STRICTLY on
       // the no-answer signal so it never trips when discovery found PIDs.
       if (!service.busAnswered) {
         notifier.cancelConnecting();
-        onConnectionError(const Obd2AdapterUnresponsive());
+        onConnectionError(const Obd2EngineOff());
         unawaited(service.disconnect());
         return;
       }
