@@ -3,7 +3,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
 
 // #2692 C4-G — GPS-only samples now carry rpm null (no engine signal),
 // formerly the `rpm: 0` placeholder. `TripKind.fromSamples` maps null → 0
