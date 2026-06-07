@@ -141,29 +141,41 @@ final class AutoRecordSessionOpenerFactoryProvider
 String _$autoRecordSessionOpenerFactoryHash() =>
     r'bb6af1c2c633c61722cb5329e5ea038cb7c0e33f';
 
-/// Foreground-active opener (#2282 concern 1): a DIRECT connect
-/// ([Obd2ConnectionService.connectByMacDirect]) — `BluetoothDevice.fromId`
-/// + `autoConnect`, NO active scan — so it wakes ELM327 clones that stop
-/// advertising in standby. Used by the coordinator's
-/// [AutoTripCoordinator.armForegroundActive] on every app resume to start
-/// engine-detection while the app is in front, independent of the
-/// disabled foreground service. `fallbackToScan: true` keeps behaviour no
-/// worse than the scan opener when the direct attempt fails. Tests
-/// override this provider to inject a fake direct opener.
+/// Foreground-active opener (#2282 concern 1): a DIRECT connect — NO active
+/// scan — so it wakes ELM327 clones that stop advertising in standby. Used by
+/// the coordinator's [AutoTripCoordinator.armForegroundActive] on every app
+/// resume to start engine-detection while the app is in front, independent of
+/// the disabled foreground service.
+///
+/// #3025 — now TRANSPORT-AWARE via
+/// [Obd2ConnectionService.connectByMacTransportAware]. The old call hard-wired
+/// the BLE [Obd2ConnectionService.connectByMacDirect], so a Classic-SPP adapter
+/// (vLinker BM-Android) could only 4 s-timeout AND the doomed BLE GATT to its
+/// MAC poisoned the RFCOMM socket — the same firstConnect defect this opener
+/// shared. Transport is inferred from the paired adapter NAME (read defensively
+/// off the active vehicle so a provider hiccup never makes the connect throw).
+/// `fallbackToScan: true` keeps behaviour no worse than the scan opener when the
+/// direct attempt fails. Tests override this provider to inject a fake opener.
 
 @ProviderFor(autoRecordForegroundSessionOpenerFactory)
 final autoRecordForegroundSessionOpenerFactoryProvider =
     AutoRecordForegroundSessionOpenerFactoryProvider._();
 
-/// Foreground-active opener (#2282 concern 1): a DIRECT connect
-/// ([Obd2ConnectionService.connectByMacDirect]) — `BluetoothDevice.fromId`
-/// + `autoConnect`, NO active scan — so it wakes ELM327 clones that stop
-/// advertising in standby. Used by the coordinator's
-/// [AutoTripCoordinator.armForegroundActive] on every app resume to start
-/// engine-detection while the app is in front, independent of the
-/// disabled foreground service. `fallbackToScan: true` keeps behaviour no
-/// worse than the scan opener when the direct attempt fails. Tests
-/// override this provider to inject a fake direct opener.
+/// Foreground-active opener (#2282 concern 1): a DIRECT connect — NO active
+/// scan — so it wakes ELM327 clones that stop advertising in standby. Used by
+/// the coordinator's [AutoTripCoordinator.armForegroundActive] on every app
+/// resume to start engine-detection while the app is in front, independent of
+/// the disabled foreground service.
+///
+/// #3025 — now TRANSPORT-AWARE via
+/// [Obd2ConnectionService.connectByMacTransportAware]. The old call hard-wired
+/// the BLE [Obd2ConnectionService.connectByMacDirect], so a Classic-SPP adapter
+/// (vLinker BM-Android) could only 4 s-timeout AND the doomed BLE GATT to its
+/// MAC poisoned the RFCOMM socket — the same firstConnect defect this opener
+/// shared. Transport is inferred from the paired adapter NAME (read defensively
+/// off the active vehicle so a provider hiccup never makes the connect throw).
+/// `fallbackToScan: true` keeps behaviour no worse than the scan opener when the
+/// direct attempt fails. Tests override this provider to inject a fake opener.
 
 final class AutoRecordForegroundSessionOpenerFactoryProvider
     extends
@@ -173,15 +185,21 @@ final class AutoRecordForegroundSessionOpenerFactoryProvider
           Obd2ForegroundSessionOpener
         >
     with $Provider<Obd2ForegroundSessionOpener> {
-  /// Foreground-active opener (#2282 concern 1): a DIRECT connect
-  /// ([Obd2ConnectionService.connectByMacDirect]) — `BluetoothDevice.fromId`
-  /// + `autoConnect`, NO active scan — so it wakes ELM327 clones that stop
-  /// advertising in standby. Used by the coordinator's
-  /// [AutoTripCoordinator.armForegroundActive] on every app resume to start
-  /// engine-detection while the app is in front, independent of the
-  /// disabled foreground service. `fallbackToScan: true` keeps behaviour no
-  /// worse than the scan opener when the direct attempt fails. Tests
-  /// override this provider to inject a fake direct opener.
+  /// Foreground-active opener (#2282 concern 1): a DIRECT connect — NO active
+  /// scan — so it wakes ELM327 clones that stop advertising in standby. Used by
+  /// the coordinator's [AutoTripCoordinator.armForegroundActive] on every app
+  /// resume to start engine-detection while the app is in front, independent of
+  /// the disabled foreground service.
+  ///
+  /// #3025 — now TRANSPORT-AWARE via
+  /// [Obd2ConnectionService.connectByMacTransportAware]. The old call hard-wired
+  /// the BLE [Obd2ConnectionService.connectByMacDirect], so a Classic-SPP adapter
+  /// (vLinker BM-Android) could only 4 s-timeout AND the doomed BLE GATT to its
+  /// MAC poisoned the RFCOMM socket — the same firstConnect defect this opener
+  /// shared. Transport is inferred from the paired adapter NAME (read defensively
+  /// off the active vehicle so a provider hiccup never makes the connect throw).
+  /// `fallbackToScan: true` keeps behaviour no worse than the scan opener when the
+  /// direct attempt fails. Tests override this provider to inject a fake opener.
   AutoRecordForegroundSessionOpenerFactoryProvider._()
     : super(
         from: null,
@@ -218,4 +236,4 @@ final class AutoRecordForegroundSessionOpenerFactoryProvider
 }
 
 String _$autoRecordForegroundSessionOpenerFactoryHash() =>
-    r'997e4119c5ab7a8487110e041e5f93a7fe1946d5';
+    r'2767dfb1262c9bd41e561d1fef3210daa04a3362';

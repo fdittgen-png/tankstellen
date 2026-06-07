@@ -127,7 +127,14 @@ void main() {
     // best-effort `recordFrom` call + the production-provider wiring). Local-only
     // (Hive settings box), so it stays a small additive thread on the existing
     // connect path rather than warranting a separate connect class.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 629,
+    // #3025 — re-grandfathered 629 → 668: the transport-aware firstConnect
+    // entry (`connectByMacTransportAware` — the thin overridable instance
+    // method + its ~30-line dartdoc explaining the vLinker BM-Android root
+    // cause). The actual routing body lives in the `obd2_connect_by_mac` part
+    // (346, under cap); only the dispatch stub + rationale land here. The class
+    // is already split across two `part` files; further decomposition is tracked
+    // under #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 668,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
@@ -449,8 +456,14 @@ void main() {
     // real Open-Testing "ref used after unmount" StateError). The growth is the
     // two captures + the two extra params + the rationale comments; it cannot
     // move out of the State. Decomposition stays tracked under #2187/#2188.
+    // #3025 — re-grandfathered 458 → 470: the pinned-MAC fast path now routes
+    // through the TRANSPORT-AWARE `connectByMacTransportAware` (a Classic
+    // adapter — vLinker BM-Android — must never take the BLE GATT path that
+    // 4 s-times-out + poisons the RFCOMM socket) instead of the BLE-leaning
+    // scan-based `connectByMac`. The growth is the swapped call + its rationale
+    // comment. Decomposition stays tracked under #2187/#2188.
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
-        458,
+        470,
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.

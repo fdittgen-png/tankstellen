@@ -517,6 +517,42 @@ class Obd2ConnectionService {
         body: () => _connectByMacClassicDirect(this, mac),
       );
 
+  /// #3025 / Epic #3013 — TRANSPORT-AWARE direct-connect-by-MAC for the
+  /// FIRST-connect / pinned-adapter path. The single entry the cold connect
+  /// orchestrators (the trajets pre-warm, the picker's pinned fast path) thread
+  /// through so a Classic adapter is NEVER reached on the doomed BLE GATT path.
+  ///
+  /// The bug this fixes: the pre-warm / pinned connect called the BLE
+  /// [connectByMacDirect] UNCONDITIONALLY, so a Classic-SPP adapter (vLinker
+  /// BM-Android) could only ever 4 s-timeout (`FlutterBluePlusException |
+  /// connect | fbp-code:1 | Timed out after 4s`) — and that doomed BLE GATT to
+  /// the same MAC then POISONED the subsequent RFCOMM socket (`read ret: -1` /
+  /// "socket might closed"), so the Classic fallback ALSO failed. The in-trip
+  /// reconnect (#2565), the trip-independent reconnect (#3016) and the self-test
+  /// (#2969) were already transport-aware; this brings firstConnect in line.
+  ///
+  /// Transport is inferred from the paired [adapterName] via the registry name
+  /// matchers (the same recovery the self-test uses): a name like
+  /// `vLinker BM-Android` resolves to [BluetoothTransport.classic] →
+  /// [connectByMacClassicDirect] (RFCOMM, no 4 s BLE timeout, NEVER touches
+  /// `channelForDirect`). A BLE name → [connectByMacDirect]. An UNKNOWN /
+  /// nameless adapter keeps the historical BLE-direct-first behaviour with the
+  /// Classic facade as a fallback — and the BLE channel is fully torn down
+  /// (GATT disconnected) between the two so no half-open GATT can poison the
+  /// RFCOMM socket. The decision is stamped on the trace's `requestedTransport`
+  /// so a future field trace is truthful (a Classic adapter shows `rtx:
+  /// classic`, not `ble`).
+  ///
+  /// Body lives in `obd2_connect_by_mac` (a `part`); this thin overridable
+  /// instance method keeps test fakes able to `@override` it.
+  Future<Obd2Service?> connectByMacTransportAware(
+    String mac, {
+    String? adapterName,
+    bool fallbackToScan = true,
+  }) =>
+      _connectByMacTransportAware(this, mac,
+          adapterName: adapterName, fallbackToScan: fallbackToScan);
+
   /// Passive autoConnect reconnect (#2261 concern 2). See
   /// [_connectByMacPassive]. Thin overridable instance method.
   Future<Obd2Service?> connectByMacPassive(String mac, {String? adapterName}) =>
