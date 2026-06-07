@@ -228,13 +228,16 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
   void Function(Obd2SelfTestStepResult step)? onStep,
   bool Function()? isCancelled,
   Duration stepDeadline = const Duration(seconds: 6),
-  // #3035 — the `0100` step is the FIRST OBD request on the bus, so it can
-  // trigger the ELM327 protocol search (`SEARCHING…`), whose real answer can
-  // arrive several seconds later. Give it a search-aware deadline ABOVE the
-  // transport's 4.5 s `protocolSearch` read class so the self-test doesn't
-  // itself false-timeout a search that was about to succeed. Consistent with
-  // the resolver's resilient first-`0100` probe.
-  Duration supportedPidsDeadline = const Duration(seconds: 8),
+  // #3035/#3037 — the `0100` step is the FIRST OBD request on the bus, so it
+  // triggers the ELM327 protocol search (`SEARCHING…`), whose real answer can
+  // arrive several seconds later. The step now drives the SAME robust probe as
+  // production ([Obd2Service.discoverSupportedPids] → `probeFirstSupportedPids`),
+  // whose generous single-shot search window is [kObd2ProtocolSearchTimeout]
+  // (~15 s). This whole-step deadline must therefore sit ABOVE that window so
+  // the self-test never false-cuts a search the probe was about to WIN (which
+  // would mis-report a live-but-slow ECU as a hard `timeout` fault instead of
+  // the correct engine-on pass / engine-off verdict).
+  Duration supportedPidsDeadline = const Duration(seconds: 18),
   Duration connectDeadline = const Duration(seconds: 15),
   String? pinnedMac,
   Obd2ConnectTransport? transportHint,

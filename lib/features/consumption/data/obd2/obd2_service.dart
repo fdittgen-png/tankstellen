@@ -22,6 +22,7 @@ import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
 import 'supported_pids_cache.dart';
+import 'supported_pids_probe.dart' show kObd2ProtocolSearchTimeout;
 import 'supported_pids_resolver.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -219,6 +220,16 @@ class Obd2Service implements Obd2RawCommandPort {
     // sites pick up the wrapper.
     _pids = SupportedPidsResolver(
       send: (cmd) => _withConnectRetry(cmd, _send),
+      // #3037 — the first `0100` probe uses the GENEROUS protocol-search read
+      // window (~15 s) so the ELM327 auto-search resolves within ONE read,
+      // instead of re-sending mid-search (which restarts the search).
+      // Deliberately NOT wrapped in [_withConnectRetry]: that wrapper re-sends
+      // on ANY throw INCLUDING a read TimeoutException, which for `0100` would
+      // restart the protocol search — the exact #3037 bug. The probe itself
+      // owns the bounded re-send, and ONLY on a genuine transport throw (a
+      // failed write, where the command never reached the adapter so the
+      // search never started), never on a timeout.
+      searchSend: _sendWithProtocolSearchWindow,
       isConnected: () => _transport.isConnected,
       cache: pidsCache,
       vehicleFallbackKey: vehicleFallbackKey,
@@ -1609,6 +1620,24 @@ class Obd2Service implements Obd2RawCommandPort {
   /// later phases can strip stray prompts / echoes here.
   Future<String> _send(String command) async {
     final raw = await _transport.sendCommand(command);
+    return _adapter.preParse(raw);
+  }
+
+  /// #3037 — send [command] (the first `0100` probe) with the GENEROUS
+  /// protocol-search read window ([kObd2ProtocolSearchTimeout], ~15 s) when
+  /// the transport supports a per-command timeout override
+  /// ([Obd2ProtocolSearchTransport]); otherwise fall back to the plain
+  /// [_send] (whose own first-command class still applies). This is the
+  /// SINGLE long read that lets the ELM327 auto-search resolve to `41 00`
+  /// without re-sending mid-search (which would restart the search) — the
+  /// root fix for the false engine-off on a slow link. The adapter
+  /// `preParse` hook is applied to the raw reply exactly as in [_send].
+  Future<String> _sendWithProtocolSearchWindow(String command) async {
+    final transport = _transport;
+    final raw = transport is Obd2ProtocolSearchTransport
+        ? await (transport as Obd2ProtocolSearchTransport)
+            .sendCommandWithReadTimeout(command, kObd2ProtocolSearchTimeout)
+        : await transport.sendCommand(command);
     return _adapter.preParse(raw);
   }
 }

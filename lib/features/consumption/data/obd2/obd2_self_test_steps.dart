@@ -96,8 +96,20 @@ bool _looksLikeInfoReply(String raw) {
   return true;
 }
 
-/// Supported-PID step: `0100` request + bitmask classification. Records
-/// the supported tri-state for `0100` so the trace + Copy-as-JSON show it.
+/// Supported-PID step (#3037): drive the SAME robust first-`0100` probe the
+/// production connect path uses ([Obd2Service.discoverSupportedPids] →
+/// `probeFirstSupportedPids`), instead of a single-shot `0100` that
+/// false-failed on a slow link. The probe sends `0100` ONCE with the generous
+/// protocol-search window (re-read, not re-send mid-search), tees the raw
+/// reply into the connect trace + session transcript for observability, and
+/// settles a tri-state ([Obd2Service.busProbe]) that maps onto the step:
+///   - answered     → ok (a live ECU answered `41 00`);
+///   - probedSilent → noResponse (the ECU is genuinely silent = engine-off,
+///     which the #3009 verdict treats as the non-alarming engineOff, NOT a
+///     hard fault);
+///   - transient    → garbage (an indeterminate slow/flaky search — surfaced
+///     but not a hard fault, so the #3009 verdict can still read engine-off).
+/// [deadline] caps the WHOLE probe so a dead adapter can't freeze the step.
 Future<Obd2SelfTestStepResult> _supportedPidsStep(
   Obd2Service service,
   Obd2CommDiagnostics diag,
@@ -105,14 +117,20 @@ Future<Obd2SelfTestStepResult> _supportedPidsStep(
 ) async {
   final sw = Stopwatch()..start();
   try {
-    final raw = await service.sendCommand('0100\r').timeout(deadline);
+    // The probe records the raw `0100` reply (trace + transcript) itself via
+    // its recordTrace tee, so we only map the tri-state result here.
+    await service.discoverSupportedPids().timeout(deadline);
     sw.stop();
-    final cls = classifyObd2Response(raw);
-    diag.recordHandshakeLine('0100', raw, sw.elapsedMilliseconds);
-    diag.recordSupportedTriState(
-        '0100', cls == ResponseClass.ok ? 'supported' : 'unsupported');
-    return _step(Obd2SelfTestStepId.supportedPids,
-        statusForResponseClass(cls), sw.elapsedMilliseconds);
+    final status = switch (service.busProbe) {
+      Obd2BusProbeResult.answered => Obd2SelfTestStepStatus.ok,
+      Obd2BusProbeResult.probedSilent => Obd2SelfTestStepStatus.noResponse,
+      Obd2BusProbeResult.transient => Obd2SelfTestStepStatus.garbage,
+      Obd2BusProbeResult.notProbed => Obd2SelfTestStepStatus.noResponse,
+    };
+    diag.recordSupportedTriState('0100',
+        status == Obd2SelfTestStepStatus.ok ? 'supported' : 'unsupported');
+    return _step(
+        Obd2SelfTestStepId.supportedPids, status, sw.elapsedMilliseconds);
   } on TimeoutException {
     sw.stop();
     diag.recordSupportedTriState('0100', 'unknown');
