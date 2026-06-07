@@ -56,7 +56,11 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
   /// name matchers — for a Classic-SPP adapter (vLinker FS) the BLE path can
   /// ONLY 4 s-timeout, so this is the reliability fix. A null hint defaults to
   /// BLE but records `no-hint-defaulted-ble` on the trace.
-  Future<void> run({String? targetMac, Obd2ConnectTransport? transportHint}) async {
+  Future<void> run({
+    String? targetMac,
+    Obd2ConnectTransport? transportHint,
+    String? adapterName,
+  }) async {
     if (state.phase == Obd2SelfTestPhase.running) return;
 
     // Guard the single-link adapter: a self-test connect during a live
@@ -82,6 +86,7 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
       connection,
       pinnedMac: pinnedMac,
       transportHint: transportHint,
+      adapterName: adapterName, // #3014 — name the trace headline
       isCancelled: () => _cancelled,
       onStep: _onStep,
     );
@@ -92,7 +97,7 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
         for (final s in report.steps)
           Obd2SelfTestStep(id: s.id, status: s.status, latencyMs: s.latencyMs),
       ],
-      passed: report.passed,
+      verdict: report.verdict,
       elapsedMs: report.elapsedMs,
     );
   }

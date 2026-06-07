@@ -247,6 +247,7 @@ class _FakeConnection extends Obd2ConnectionService {
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
+    String? adapterName,
   }) async {
     macsConnected.add(mac);
     // A Classic adapter cannot answer the BLE direct path.
@@ -255,7 +256,8 @@ class _FakeConnection extends Obd2ConnectionService {
   }
 
   @override
-  Future<Obd2Service?> connectByMacClassicDirect(String mac) async {
+  Future<Obd2Service?> connectByMacClassicDirect(String mac,
+      {String? adapterName}) async {
     classicMacsConnected.add(mac);
     if (!adapterIsClassic) return null;
     return _open();

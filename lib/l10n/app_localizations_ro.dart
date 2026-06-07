@@ -3595,6 +3595,10 @@ class AppLocalizationsRo extends AppLocalizations {
       'Adaptorul OBD2 nu a răspuns. Porniți contactul și încercați din nou.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'Adaptorul OBD2 a trimis un răspuns nerecunoscut. Poate fi incompatibil — încercați alt adaptor.';
 
@@ -6427,6 +6431,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get obd2TestRunFailed => 'Testul adaptorului a eșuat';
 
   @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
+
+  @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
     return '$passed din $total pași OK · $elapsed ms';
   }
@@ -6508,6 +6516,9 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get obd2HealthConnectSteps => 'Steps';
+
+  @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

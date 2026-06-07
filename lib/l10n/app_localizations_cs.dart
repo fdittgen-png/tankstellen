@@ -3583,6 +3583,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Adaptér OBD2 neodpověděl. Zapněte zapalování a zkuste to znovu.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'Adaptér OBD2 odeslal nerozpoznanou odpověď. Možná není kompatibilní — zkuste jiný adaptér.';
 
@@ -6391,6 +6395,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2TestRunFailed => 'Test adaptéru selhal';
 
   @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
+
+  @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
     return '$passed z $total kroků OK · $elapsed ms';
   }
@@ -6472,6 +6480,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get obd2HealthConnectSteps => 'Steps';
+
+  @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

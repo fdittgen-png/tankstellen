@@ -64,6 +64,7 @@ _Obd2ConnectTrace _$Obd2ConnectTraceFromJson(
   totalMs: (json['tm'] as num?)?.toInt(),
   origin: $enumDecode(_$Obd2ConnectOriginEnumMap, json['or']),
   requestedMac: json['mac'] as String?,
+  adapterName: json['nm'] as String?,
   requestedTransport: $enumDecode(_$Obd2ConnectTransportEnumMap, json['rtx']),
   resolvedTransport: $enumDecodeNullable(
     _$Obd2ConnectTransportEnumMap,
@@ -92,6 +93,7 @@ Map<String, dynamic> _$Obd2ConnectTraceToJson(_Obd2ConnectTrace instance) =>
       'tm': instance.totalMs,
       'or': _$Obd2ConnectOriginEnumMap[instance.origin]!,
       'mac': instance.requestedMac,
+      'nm': instance.adapterName,
       'rtx': _$Obd2ConnectTransportEnumMap[instance.requestedTransport]!,
       'ztx': _$Obd2ConnectTransportEnumMap[instance.resolvedTransport],
       'tdr': instance.transportDecisionReason,

@@ -3577,6 +3577,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'OBD2 adapter nije odgovorio. Uključite paljenje i pokušajte ponovno.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'OBD2 adapter poslao je neprepoznat odgovor. Možda nije kompatibilan — pokušajte s drugim adapterom.';
 
@@ -6403,6 +6407,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get obd2TestRunFailed => 'Test adaptera nije prošao';
 
   @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
+
+  @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
     return '$passed od $total koraka uspješno · $elapsed ms';
   }
@@ -6484,6 +6492,9 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get obd2HealthConnectSteps => 'Steps';
+
+  @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

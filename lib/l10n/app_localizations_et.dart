@@ -3570,6 +3570,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'OBD2-adapter ei vastanud. Lülitage süüde sisse ja proovige uuesti.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'OBD2-adapter saatis tundmatu vastuse. See võib olla ühildumatu — proovige teist adapterit.';
 
@@ -6377,6 +6381,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2TestRunFailed => 'Adapteri test ebaõnnestus';
 
   @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
+
+  @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
     return '$passed / $total sammust OK · $elapsed ms';
   }
@@ -6458,6 +6466,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get obd2HealthConnectSteps => 'Steps';
+
+  @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

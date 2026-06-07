@@ -503,6 +503,49 @@ void _transportForNameTests(Obd2AdapterRegistry registry) {
       expect(registry.transportForName(''), isNull);
     });
   });
+
+  group('Obd2AdapterRegistry dual-transport disambiguation (#3014)', () {
+    test('SmartOBD name-matches BOTH transports (the ambiguity)', () {
+      final matched = registry.transportsForName('SmartOBD');
+      expect(matched, contains(BluetoothTransport.ble));
+      expect(matched, contains(BluetoothTransport.classic));
+    });
+
+    test('a dual-match prefers bonded-Classic when the MAC is bonded', () {
+      expect(
+        registry.disambiguateTransport(name: 'SmartOBD', macIsBonded: true),
+        BluetoothTransport.classic,
+      );
+    });
+
+    test('a dual-match defaults to BLE when the MAC is NOT bonded', () {
+      expect(
+        registry.disambiguateTransport(name: 'SmartOBD', macIsBonded: false),
+        BluetoothTransport.ble,
+      );
+    });
+
+    test('a single-transport match returns that transport unchanged', () {
+      // vLinker FD is BLE-only; bonded flag is irrelevant.
+      expect(
+        registry.disambiguateTransport(name: 'vLinker FD', macIsBonded: true),
+        BluetoothTransport.ble,
+      );
+      expect(
+        registry.disambiguateTransport(
+            name: 'vLinker FS 1', macIsBonded: false),
+        BluetoothTransport.classic,
+      );
+    });
+
+    test('no name match returns null regardless of bonding', () {
+      expect(
+        registry.disambiguateTransport(
+            name: 'SomeRandomDongle', macIsBonded: true),
+        isNull,
+      );
+    });
+  });
 }
 
 Obd2AdapterCandidate _candidate({

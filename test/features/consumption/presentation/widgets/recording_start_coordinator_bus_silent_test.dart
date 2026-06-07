@@ -15,9 +15,11 @@ import '../../../../helpers/silence_error_logger.dart';
 
 /// #2892 — the coordinator must NOT start a degraded GPS-only trip when the
 /// service connected but the vehicle bus never answered (`busAnswered ==
-/// false`). It must instead surface the existing localized "turn the ignition
-/// on" condition ([Obd2AdapterUnresponsive]), roll the connecting phase back,
-/// and tear down the dead link — never calling `notifier.start(service)`.
+/// false`). It must instead surface the engine-off condition — #3009 reclassed
+/// this from the adapter-blaming [Obd2AdapterUnresponsive] to the accurate
+/// "start the engine" [Obd2EngineOff] (the adapter DID answer every AT; only
+/// the engine is off) — roll the connecting phase back, and tear down the dead
+/// link — never calling `notifier.start(service)`.
 void main() {
   silenceErrorLoggerSpool();
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -52,8 +54,8 @@ void main() {
   }
 
   testWidgets(
-      'a silent-bus connect surfaces Obd2AdapterUnresponsive, disconnects, '
-      'and never calls notifier.start (#2892)', (tester) async {
+      'a silent-bus connect surfaces Obd2EngineOff, disconnects, '
+      'and never calls notifier.start (#2892, #3009)', (tester) async {
     final service = _FakeObd2Service(busAnswered: false);
     final coordinator = RecordingStartCoordinator();
     final errors = <Object>[];
@@ -72,10 +74,11 @@ void main() {
       );
     });
 
-    // The EXISTING localized "turn the ignition on" condition is surfaced.
+    // #3009 — the engine-off condition is surfaced with the accurate
+    // "start the engine" exception, NOT the adapter-blaming one.
     expect(errors, hasLength(1));
-    expect(errors.single, isA<Obd2AdapterUnresponsive>(),
-        reason: 'silent bus must surface the ignition-off condition');
+    expect(errors.single, isA<Obd2EngineOff>(),
+        reason: 'silent bus must surface the engine-off condition');
 
     // A degraded GPS-only trip is NOT started.
     expect(recording.startCallCount, 0,

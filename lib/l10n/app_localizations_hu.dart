@@ -3595,6 +3595,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az OBD2-adapter nem válaszolt. Kapcsolja be a gyújtást, és próbálja újra.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'Az OBD2-adapter ismeretlen választ küldött. Lehet, hogy nem kompatibilis — próbáljon meg másik adaptert.';
 
@@ -6423,6 +6427,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obd2TestRunFailed => 'Adapterteszt sikertelen';
 
   @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
+
+  @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
     return '$passed / $total lépés OK · $elapsed ms';
   }
@@ -6504,6 +6512,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get obd2HealthConnectSteps => 'Steps';
+
+  @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

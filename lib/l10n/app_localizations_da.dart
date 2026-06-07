@@ -3570,6 +3570,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'OBD2-adapteren svarede ikke. Slå tændingen til, og prøv igen.';
 
   @override
+  String get obd2ErrorEngineOff =>
+      'No data from the vehicle — start the engine and try again.';
+
+  @override
   String get obd2ErrorProtocolInitFailed =>
       'OBD2-adapteren sendte et ukendt svar. Den er muligvis inkompatibel — prøv en anden adapter.';
 
@@ -6380,6 +6384,10 @@ class AppLocalizationsDa extends AppLocalizations {
   String get obd2TestRunFailed => 'Adaptertest mislykkedes';
 
   @override
+  String get obd2TestRunEngineOff =>
+      'Adapter OK — engine off; start the engine to read live data';
+
+  @override
   String obd2TestRunSummary(int passed, int total, int elapsed) {
     return '$passed af $total trin OK · $elapsed ms';
   }
@@ -6461,6 +6469,9 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get obd2HealthConnectSteps => 'Steps';
+
+  @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

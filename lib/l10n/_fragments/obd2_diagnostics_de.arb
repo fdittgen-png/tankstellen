@@ -226,6 +226,7 @@
   "obd2TestRunButton": "Adaptertest ausführen",
   "obd2TestRunPassed": "Adaptertest bestanden",
   "obd2TestRunFailed": "Adaptertest fehlgeschlagen",
+  "obd2TestRunEngineOff": "Adapter OK — Motor aus; starte den Motor, um Live-Daten zu lesen",
   "obd2TestRunSummary": "{passed} von {total} Schritten OK · {elapsed} ms",
   "obd2TestRunCannotWhileRecording": "Beende die laufende Aufzeichnung, bevor du den Adaptertest startest.",
   "obd2TestStepScan": "Adapter suchen",
@@ -251,5 +252,6 @@
   "obd2HealthConnectTransport": "Transport",
   "obd2HealthConnectOutcome": "Ergebnis",
   "obd2HealthConnectScanList": "Gefundene Geräte",
-  "obd2HealthConnectSteps": "Schritte"
+  "obd2HealthConnectSteps": "Schritte",
+  "obd2HealthConnectUnknownAdapter": "Unbekannter Adapter"
 }

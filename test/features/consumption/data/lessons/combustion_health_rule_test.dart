@@ -63,34 +63,69 @@ void main() {
       ];
 
   group('combustionHealthSignal scan (#2931)', () {
-    test('sustained high LEAN trim (+18% total) over many warm samples → '
-        'fires lean, marked', () {
-      // STFT +6, LTFT +12 = +18% total on every warm sample.
+    test('sustained high LEAN trim (LTFT +16%) over many warm samples → '
+        'fires lean, marked, magnitude is the SUSTAINED (LTFT) trim', () {
+      // STFT +6, LTFT +16 = +22% total → clears the firing gate; the REPORTED
+      // magnitude is the sustained LTFT (16%), NOT the +22% sum (#2931).
       final signal =
-          combustionHealthSignal(warmSamples(count: 14, stft: 6, ltft: 12));
+          combustionHealthSignal(warmSamples(count: 14, stft: 6, ltft: 16));
       expect(signal.fired, isTrue);
       expect(signal.kind, CombustionHealthKind.leanCompensation);
-      expect(signal.marked, isTrue, reason: '18% >= marked threshold (15%)');
-      expect(signal.magnitudePct, closeTo(18.0, 1e-9));
+      expect(signal.marked, isTrue, reason: '16% >= marked threshold (15%)');
+      expect(signal.magnitudePct, closeTo(16.0, 1e-9),
+          reason: 'reported magnitude is mean |LTFT|, not |STFT + LTFT|');
     });
 
-    test('sustained NEGATIVE trim (-18% total) → fires rich, marked', () {
+    test('sustained NEGATIVE trim (LTFT -16%) → fires rich, marked, magnitude '
+        'is the sustained (LTFT) trim', () {
       final signal =
-          combustionHealthSignal(warmSamples(count: 14, stft: -6, ltft: -12));
+          combustionHealthSignal(warmSamples(count: 14, stft: -6, ltft: -16));
       expect(signal.fired, isTrue);
       expect(signal.kind, CombustionHealthKind.richCompensation);
       expect(signal.marked, isTrue);
-      // Magnitude is reported as the |mean total trim|.
-      expect(signal.magnitudePct, closeTo(18.0, 1e-9));
+      // Magnitude is reported as the sustained |mean LTFT|, not |total trim|.
+      expect(signal.magnitudePct, closeTo(16.0, 1e-9));
     });
 
-    test('borderline lean trim (+11%, below the marked threshold) → fires '
-        'lean but NOT marked', () {
+    test('borderline lean trim (LTFT +6%, total +11%) → fires lean but NOT '
+        'marked (sustained trim is below the marked threshold)', () {
+      // Total +11% clears the borderline gate; LTFT +6% is below marked (15%).
       final signal =
           combustionHealthSignal(warmSamples(count: 12, stft: 5, ltft: 6));
       expect(signal.fired, isTrue);
       expect(signal.kind, CombustionHealthKind.leanCompensation);
-      expect(signal.marked, isFalse, reason: '11% < marked threshold (15%)');
+      expect(signal.marked, isFalse,
+          reason: 'sustained LTFT 6% < marked threshold (15%)');
+      expect(signal.magnitudePct, closeTo(6.0, 1e-9));
+    });
+
+    test('STFT oscillates ± while LTFT is sustained +15% → reported magnitude '
+        'tracks the SUSTAINED trim (~15), not the STFT+LTFT sum (#2931)', () {
+      // The over-alarm bug: averaging |STFT + LTFT| reported ~30% (and "lean
+      // — 30% fuel addition") on a trip whose sustained correction was ~15%.
+      // With STFT swinging ±15 around a sustained LTFT of +15, the per-sample
+      // total alternates 0 / +30, so the old sum-based mean was ~15–30 and
+      // over-stated the sustained figure; the LTFT-based magnitude is ~15.
+      final samples = <TripSample>[
+        // 18 samples → 9 even ticks (total +30) clear the gate (≥ 8 needed),
+        // 9 odd ticks (total 0) do not; compensating*2 ≥ trimSamples holds.
+        for (var i = 0; i < 18; i++)
+          TripSample(
+            timestamp: start.add(Duration(seconds: i)),
+            speedKmh: 80,
+            rpm: 2200,
+            coolantTempC: 90,
+            // STFT oscillates +15 / -15; only the +15 ticks clear the gate.
+            stft: i.isEven ? 15.0 : -15.0,
+            ltft: 15.0, // sustained lean correction
+          ),
+      ];
+      final signal = combustionHealthSignal(samples);
+      expect(signal.fired, isTrue);
+      expect(signal.kind, CombustionHealthKind.leanCompensation);
+      expect(signal.magnitudePct, closeTo(15.0, 1e-9),
+          reason: 'reported magnitude reflects the sustained LTFT (~15), '
+              'NOT the STFT+LTFT sum (~30) the old rule reported');
     });
 
     test('normal trims (±3% total) → does NOT fire', () {
@@ -176,11 +211,12 @@ void main() {
 
     test('fires the lean-compensation lesson on sustained high LTFT', () {
       final lesson =
-          rule.evaluate(ctx(warmSamples(count: 14, stft: 6, ltft: 12)), l);
+          rule.evaluate(ctx(warmSamples(count: 14, stft: 6, ltft: 16)), l);
       expect(lesson, isNotNull);
       expect(lesson!.id, combustionHealthLessonId);
-      // Marked lean wording, with the 18% figure.
-      expect(lesson.title, l.lessonCombustionHealthLeanMarked('18'));
+      // Marked lean wording, with the SUSTAINED (LTFT) 16% figure — not the
+      // +22% STFT+LTFT sum (#2931).
+      expect(lesson.title, l.lessonCombustionHealthLeanMarked('16'));
       expect(lesson.advice, l.lessonAdviceCombustionHealthLean);
       // Honesty: subtitle explicitly labels it a heuristic, not a diagnosis.
       expect(lesson.subtitle, l.lessonCombustionHealthSubtitle);
@@ -192,9 +228,10 @@ void main() {
 
     test('fires the rich-compensation lesson on sustained negative trim', () {
       final lesson =
-          rule.evaluate(ctx(warmSamples(count: 14, stft: -6, ltft: -12)), l);
+          rule.evaluate(ctx(warmSamples(count: 14, stft: -6, ltft: -16)), l);
       expect(lesson, isNotNull);
-      expect(lesson!.title, l.lessonCombustionHealthRichMarked('18'));
+      // Sustained (LTFT) 16% figure, not the -22% STFT+LTFT sum (#2931).
+      expect(lesson!.title, l.lessonCombustionHealthRichMarked('16'));
       expect(lesson.advice, l.lessonAdviceCombustionHealthRich);
     });
 

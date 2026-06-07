@@ -538,6 +538,7 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
   Future<Obd2Service?> connectByMac(
     String mac, {
     Duration timeout = const Duration(seconds: 5),
+    String? adapterName,
   }) async {
     connectByMacCalls.add(mac);
     if (connectByMacError != null) throw connectByMacError!;

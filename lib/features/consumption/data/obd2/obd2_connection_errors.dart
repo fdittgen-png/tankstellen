@@ -20,13 +20,14 @@ sealed class Obd2ConnectionError implements Exception {
   /// trace #5 was an `[ui] Obd2AdapterUnresponsive` ERROR for exactly this).
   ///
   /// `true` for the "adapter off / out of range / ignition off / not bonded"
-  /// family ([Obd2AdapterUnresponsive], [Obd2ScanTimeout], [Obd2BluetoothOff],
-  /// [Obd2DisconnectedException]) — all of which the user can act on directly.
-  /// `false` for [Obd2PermissionDenied] (needs a settings deep-link) and
-  /// [Obd2ProtocolInitFailed] (a counterfeit-clone diagnostic worth keeping),
-  /// which still ERROR-log so a genuine, actionable fault stays visible.
+  /// family ([Obd2AdapterUnresponsive], [Obd2EngineOff], [Obd2ScanTimeout],
+  /// [Obd2BluetoothOff], [Obd2DisconnectedException]) — all of which the user
+  /// can act on directly. `false` for [Obd2PermissionDenied] (needs a settings
+  /// deep-link) and [Obd2ProtocolInitFailed] (a counterfeit-clone diagnostic
+  /// worth keeping), which still ERROR-log so a genuine fault stays visible.
   bool get isExpectedUserCondition => switch (this) {
         Obd2AdapterUnresponsive() => true,
+        Obd2EngineOff() => true,
         Obd2ScanTimeout() => true,
         Obd2BluetoothOff() => true,
         Obd2DisconnectedException() => true,
@@ -65,12 +66,28 @@ class Obd2ScanTimeout extends Obd2ConnectionError {
 }
 
 /// BLE GATT connection succeeded but the ELM327 init sequence
-/// (ATZ → ATE0 → ATSP0 → …) never completed. The adapter is
-/// paired at the OS level but unresponsive — usually because the
-/// vehicle ignition is off or the chip is in a bad state.
+/// (ATZ → ATE0 → ATSP0 → …) never completed. The adapter itself is
+/// genuinely unresponsive — the chip is in a bad state, the channel
+/// dropped mid-init, or the dongle is faulty. Distinct from
+/// [Obd2EngineOff] (#3009): there, the adapter DID answer every AT
+/// command and only the vehicle bus was silent.
 class Obd2AdapterUnresponsive extends Obd2ConnectionError {
   const Obd2AdapterUnresponsive([
-    super.message = 'Adapter did not answer — turn the ignition on and retry',
+    super.message = 'Adapter did not answer — check the connection and retry',
+  ]);
+}
+
+/// The adapter connected + initialised fine (every AT command answered)
+/// but the vehicle bus was SILENT (#3009): `ATDPN` cached no protocol and
+/// `0100` discovery found zero supported PIDs — the ECU never answered the
+/// protocol probe (`SEARCHING…STOPPED` / `NO DATA`). The #1 real field
+/// condition: a parked car with the ignition off. The ADAPTER is fine; the
+/// engine is off. Raised so the UI shows an accurate "start the engine"
+/// message instead of wrongly blaming the (working) adapter.
+class Obd2EngineOff extends Obd2ConnectionError {
+  const Obd2EngineOff([
+    super.message =
+        'No data from the vehicle — start the engine and retry',
   ]);
 }
 

@@ -237,13 +237,15 @@ class _FakeConnection extends Obd2ConnectionService {
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
+    String? adapterName,
   }) {
     macsConnected.add(mac);
     return _open('ble');
   }
 
   @override
-  Future<Obd2Service?> connectByMacClassicDirect(String mac) {
+  Future<Obd2Service?> connectByMacClassicDirect(String mac,
+      {String? adapterName}) {
     classicMacsConnected.add(mac);
     return _open('classic');
   }

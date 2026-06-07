@@ -74,10 +74,18 @@ class ReconnectConnector {
   /// miss, but don't let a wedged transport spin for long either.
   final int crossTransportThreshold;
 
+  /// #3014 — the human adapter NAME of the link that dropped, read off the
+  /// dead-but-typed live service at handle-drop time (symmetric to
+  /// [transportHint]). Threaded into each reconnect connect so the trace
+  /// headline names the adapter instead of showing only the redacted MAC. Null
+  /// when unknown ⇒ the trace falls back to the MAC, exactly as before.
+  final String? adapterName;
+
   ReconnectConnector({
     required this.connection,
     required this.onConnected,
     this.transportHint,
+    this.adapterName,
     this.attemptNumber,
     this.backoffMs,
     this.crossTransportThreshold = 2,
@@ -135,8 +143,10 @@ class ReconnectConnector {
     final directSw = Stopwatch()..start();
     try {
       final direct = _isClassicDrop
-          ? await connection.connectByMacClassicDirect(mac)
-          : await connection.connectByMacDirect(mac, fallbackToScan: false);
+          ? await connection.connectByMacClassicDirect(mac,
+              adapterName: adapterName)
+          : await connection.connectByMacDirect(mac,
+              fallbackToScan: false, adapterName: adapterName);
       if (direct != null) {
         // A direct connect carries no RSSI (it never scanned), so the
         // relative-RSSI baseline is left as-is — it is only ever set
@@ -288,8 +298,10 @@ class ReconnectConnector {
       // The dropped transport was Classic ⇒ try BLE direct; the dropped
       // transport was BLE/unknown ⇒ try Classic direct.
       final svc = isClassic
-          ? await connection.connectByMacClassicDirect(mac)
-          : await connection.connectByMacDirect(mac, fallbackToScan: false);
+          ? await connection.connectByMacClassicDirect(mac,
+              adapterName: adapterName)
+          : await connection.connectByMacDirect(mac,
+              fallbackToScan: false, adapterName: adapterName);
       if (svc != null) {
         _recordAttempt(
             succeeded: true, path: path, latencyMs: sw.elapsedMilliseconds);
@@ -349,8 +361,9 @@ class ReconnectConnector {
     final passiveSw = Stopwatch()..start();
     try {
       final svc = _isClassicDrop
-          ? await connection.connectByMacClassicDirect(mac)
-          : await connection.connectByMacPassive(mac);
+          ? await connection.connectByMacClassicDirect(mac,
+              adapterName: adapterName)
+          : await connection.connectByMacPassive(mac, adapterName: adapterName);
       if (svc != null) {
         _recordAttempt(
           succeeded: true,
