@@ -56,6 +56,18 @@ double defaultVolumetricEfficiency(ReferenceVehicle v) {
   return v.directInjection ? 0.88 : 0.85;
 }
 
+/// Conversion factor from kilowatts to metric horsepower (PS / cheval).
+/// 1 kW = 1.35962 PS. The catalog + profile store power in canonical kW
+/// (Epic #3015); PS is always derived for display via [powerKwToPs] so
+/// the two never drift.
+const double kKwToPs = 1.35962;
+
+/// Derives metric horsepower (PS) from kilowatts, rounded to the nearest
+/// whole PS (Epic #3015). Returns `null` when [kw] is null so callers can
+/// thread an unknown power straight through to a "—" UI.
+int? powerKwToPs(int? kw) =>
+    kw == null ? null : (kw * kKwToPs).round();
+
 /// A single point on a coarse volumetric-efficiency-vs-RPM curve
 /// (#1625): the engine's η_v at engine speed [rpm].
 @immutable
@@ -157,6 +169,17 @@ abstract class ReferenceVehicle with _$ReferenceVehicle {
 
     /// Engine displacement in cubic centimetres.
     required int displacementCc,
+
+    /// Rated engine power in kilowatts (kW) of the generation's
+    /// highest-volume engine variant (Epic #3015). Canonical unit — PS
+    /// is derived in code (`round(kW * 1.35962)`), never stored.
+    ///
+    /// Nullable: the 5 EV / placeholder rows (`displacementCc == 1`)
+    /// carry no value because electric motor power is out of scope for
+    /// the combustion power-aware features that consume this field. A
+    /// null here means "unknown power" — consumers fall back to a
+    /// power-agnostic path.
+    int? powerKw,
 
     /// One of "petrol", "diesel", "hybrid", "electric". Stored as a
     /// string (not enum) so adding a new fuel type is JSON-only.

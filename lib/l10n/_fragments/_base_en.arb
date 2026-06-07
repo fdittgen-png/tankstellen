@@ -1213,6 +1213,15 @@
   "vehicleMinSocLabel": "Min SoC %",
   "vehicleMaxSocLabel": "Max SoC %",
   "vehicleTankLabel": "Tank capacity (L)",
+  "vehiclePowerLabel": "Engine power (kW)",
+  "vehiclePowerHelper": "≈ {ps} PS",
+  "@vehiclePowerHelper": {
+    "placeholders": {
+      "ps": {
+        "type": "String"
+      }
+    }
+  },
   "vehiclePreferredFuelLabel": "Preferred fuel",
   "connectorType2": "Type 2",
   "connectorCcs": "CCS",

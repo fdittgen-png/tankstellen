@@ -27,6 +27,10 @@ class VehicleFormControllers {
   final batteryController = TextEditingController();
   final maxChargingKwController = TextEditingController();
   final tankController = TextEditingController();
+  // Epic #3015 — rated engine power in kW. Pre-filled from the catalog
+  // pick (no-clobber: only when the user hasn't typed a value), fully
+  // editable. PS is derived for display, never stored.
+  final powerKwController = TextEditingController();
   // #710 — pre-fill E10 so the Preferred-fuel dropdown isn't "Not set".
   final fuelTypeController = TextEditingController(text: 'e10');
   final minSocController = TextEditingController(text: '20');
@@ -43,6 +47,7 @@ class VehicleFormControllers {
     batteryController.text = profile.batteryKwh?.toString() ?? '';
     maxChargingKwController.text = profile.maxChargingKw?.toString() ?? '';
     tankController.text = profile.tankCapacityL?.toString() ?? '';
+    powerKwController.text = profile.enginePowerKw?.toString() ?? '';
     fuelTypeController.text = profile.preferredFuelType ?? '';
     minSocController.text =
         profile.chargingPreferences.minSocPercent.toString();
@@ -85,6 +90,13 @@ class VehicleFormControllers {
   void applyReferenceVehicle(ReferenceVehicle ref) {
     nameController.text = '${ref.make} ${ref.model}'.trim();
     fuelTypeController.text = _preferredFuelTypeFor(ref.fuelType);
+    // Epic #3015 — pre-fill rated power from the catalog row, but never
+    // clobber a value the user already typed (mirrors the
+    // displacement no-clobber). The 5 EV/placeholder rows carry a null
+    // `powerKw`, so they leave the field blank.
+    if (ref.powerKw != null && powerKwController.text.trim().isEmpty) {
+      powerKwController.text = ref.powerKw.toString();
+    }
   }
 
   /// Map the catalog's coarse fuel-type string onto a
@@ -159,6 +171,15 @@ class VehicleFormControllers {
         type == VehicleType.combustion ? <ConnectorType>{} : {...connectors};
     final tankCapacityL =
         type == VehicleType.ev ? null : _parseDouble(tankController.text);
+    // Epic #3015 — rated power in kW. EV power is out of scope, so EVs
+    // never persist it. The controller already carries either the
+    // catalog pre-fill (no-clobber) or the user's typed override, so
+    // parsing it honours both. `referenceVehicle?.powerKw` is the
+    // catalog fallback for the new-vehicle path when the controller was
+    // left blank (e.g. a programmatic build that skipped the picker UI).
+    final enginePowerKw = type == VehicleType.ev
+        ? null
+        : (_parseInt(powerKwController.text) ?? referenceVehicle?.powerKw);
     final preferredFuelType = type == VehicleType.ev
         ? null
         : (fuelTypeController.text.trim().isEmpty
@@ -213,6 +234,7 @@ class VehicleFormControllers {
         vin: vin,
         engineDisplacementCc: pickedDisplacement,
         engineCylinders: engineCylinders,
+        enginePowerKw: enginePowerKw,
         curbWeightKg: curbWeightKg,
         volumetricEfficiency: pickedVe,
         make: pickedMake,
@@ -241,6 +263,7 @@ class VehicleFormControllers {
       vin: vin,
       engineDisplacementCc: engineDisplacementCc,
       engineCylinders: engineCylinders,
+      enginePowerKw: enginePowerKw,
       curbWeightKg: curbWeightKg,
     );
   }
@@ -253,6 +276,7 @@ class VehicleFormControllers {
         'battery': batteryController.text,
         'maxKw': maxChargingKwController.text,
         'tank': tankController.text,
+        'powerKw': powerKwController.text,
         'fuel': fuelTypeController.text,
         'minSoc': minSocController.text,
         'maxSoc': maxSocController.text,
@@ -282,6 +306,7 @@ class VehicleFormControllers {
     batteryController.dispose();
     maxChargingKwController.dispose();
     tankController.dispose();
+    powerKwController.dispose();
     fuelTypeController.dispose();
     minSocController.dispose();
     maxSocController.dispose();
@@ -297,6 +322,15 @@ class VehicleFormControllers {
 
   static int _parseIntOr(String text, int fallback) =>
       int.tryParse(text.trim()) ?? fallback;
+
+  /// Parse an optional integer from a free-text controller. Returns
+  /// null for blank / non-numeric input so an empty power field
+  /// persists a null `enginePowerKw` rather than a bogus 0 (Epic #3015).
+  static int? _parseInt(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return null;
+    return int.tryParse(trimmed);
+  }
 }
 
 /// Snapshot of the non-controller fields on a loaded profile, so the

@@ -2484,6 +2484,14 @@ class AppLocalizationsBg extends AppLocalizations {
   String get vehicleTankLabel => 'Капацитет на резервоара (л)';
 
   @override
+  String get vehiclePowerLabel => 'Engine power (kW)';
+
+  @override
+  String vehiclePowerHelper(String ps) {
+    return '≈ $ps PS';
+  }
+
+  @override
   String get vehiclePreferredFuelLabel => 'Предпочитано гориво';
 
   @override

@@ -23,6 +23,7 @@ void main() {
   Widget buildSection({
     required TextEditingController tank,
     required TextEditingController fuel,
+    TextEditingController? power,
     bool multiFuelCapable = false,
     ValueChanged<bool>? onMultiFuel,
     ValueChanged<FuelType?>? onFuelChanged,
@@ -30,6 +31,10 @@ void main() {
       VehicleCombustionSection(
         tankController: tank,
         fuelTypeController: fuel,
+        // Epic #3015 — an empty power controller when the caller doesn't
+        // care about the field. Tests that exercise the power field pass
+        // their own.
+        powerKwController: power ?? TextEditingController(),
         multiFuelCapable: multiFuelCapable,
         onMultiFuelCapableChanged: onMultiFuel ?? (_) {},
         onFuelTypeChanged: onFuelChanged ?? (_) {},

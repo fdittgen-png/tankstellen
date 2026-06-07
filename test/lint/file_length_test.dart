@@ -562,7 +562,9 @@ void main() {
     // under 400.
     // #2885 — +17: the multiFuelCapable combustion field + its
     // documentation block (the per-fuel comparison flag, Epic #2881).
-    'lib/features/vehicle/domain/entities/vehicle_profile.dart': 470,
+    // #3015 — re-grandfathered 470 → 480: the enginePowerKw field + its
+    // documentation block (catalog-pre-filled rated power, Epic #3015).
+    'lib/features/vehicle/domain/entities/vehicle_profile.dart': 480,
     // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
     // receives a directFuelRateSupported flag computed from the vehicle's
     // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE
@@ -575,7 +577,10 @@ void main() {
     // wrapped never-throws) instead of routing through `_save`, whose
     // trailing `Navigator.pop()` closed the whole Edit-vehicle form on every
     // add/remove. Decomposition tracked under #2187/#2188.
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 878,
+    // #3015 — +1: thread the powerKwController into VehicleDrivetrainSection
+    // for the catalog-pre-filled engine-power field. Decomposition tracked
+    // under #2187/#2188.
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 879,
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,
     // #2837 — re-grandfathered 465 → 523: on a direct-fuel-rate (PID 5E)
     // car the η_v field + its "0 samples" learner readout + Reset learner
