@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/driving_insights_analyzer.dart';
 import '../../data/driving_score_calculator.dart';
 import '../../data/lessons/driving_lesson_registry.dart';
@@ -128,7 +129,25 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     final tripSamples = widget.samples.map(tripDetailToTripSample).toList(
           growable: false,
         );
-    return analyzeTrip(tripSamples);
+    // Epic #3015 — scale the hard-accel wasted-litres by the active
+    // vehicle's engine power (a small engine wastes proportionally more for
+    // the same hard pull). Trips aren't tagged with a vehicle, so the
+    // currently-active profile is the source; null power → unchanged.
+    return analyzeTrip(tripSamples, enginePowerKw: _activeEnginePowerKw());
+  }
+
+  /// The active vehicle's engine power (kW) for the power-aware hard-accel
+  /// weight (Epic #3015), or `null` when no vehicle is selected OR the
+  /// profile store is unavailable (e.g. the Hive box is not open in a
+  /// widget test). `null` is the safe identity (factor 1.0) — the score /
+  /// insights must never fail to render because the vehicle store is in an
+  /// error state, so the lookup is deliberately tolerant.
+  int? _activeEnginePowerKw() {
+    try {
+      return ref.read(activeVehicleProfileProvider)?.enginePowerKw;
+    } catch (_) {
+      return null;
+    }
   }
 
   DrivingScore _computeScore() {
@@ -151,11 +170,14 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // When no IMU ran, the (now physically-clamped, #2895) GPS-derived counts
     // remain the source.
     final useImu = summary.imuActive;
+    // Epic #3015 — weight the hard-accel penalty by the active vehicle's
+    // engine power; null power keeps the score byte-identical to before.
     return computeDrivingScore(
       tripSamples,
       secondsBelowOptimalGear: summary.secondsBelowOptimalGear,
       hardAccelEventsOverride: useImu ? summary.harshAccelerations : null,
       hardBrakeEventsOverride: useImu ? summary.harshBrakes : null,
+      enginePowerKw: _activeEnginePowerKw(),
     );
   }
 

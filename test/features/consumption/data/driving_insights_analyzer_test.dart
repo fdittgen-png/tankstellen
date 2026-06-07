@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/driving_insights_analyzer.dart';
+import 'package:tankstellen/features/consumption/data/driving_insights_hard_accel_indices.dart';
 import 'package:tankstellen/features/consumption/domain/driving_insight.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
@@ -629,6 +630,64 @@ void main() {
           ),
       ];
       expect(find(analyzeTrip(samples), 'insightRestartCost'), isNull);
+    });
+  });
+
+  // Epic #3015 — the hard-accel WASTED-LITRES estimate scales inversely with
+  // engine power (a small engine wastes proportionally more for the same hard
+  // pull), mirroring the score penalty. Only this cost line is power-aware.
+  group('power-aware hard-accel waste (Epic #3015)', () {
+    final start = DateTime.utc(2026);
+
+    // 5 strong accelerations (the existing #1041 pattern → exactly 5 events).
+    List<TripSample> fiveHardAccels() {
+      var t = start;
+      final samples = <TripSample>[];
+      for (var i = 0; i < 5; i++) {
+        samples.add(TripSample(timestamp: t, speedKmh: 0, rpm: 1000));
+        t = t.add(const Duration(seconds: 2));
+        samples.add(TripSample(timestamp: t, speedKmh: 50, rpm: 3000));
+        t = t.add(const Duration(seconds: 10));
+        samples.add(TripSample(timestamp: t, speedKmh: 50, rpm: 2000));
+        t = t.add(const Duration(seconds: 1));
+      }
+      return samples;
+    }
+
+    DrivingInsight hardAccelFor(int? kw) =>
+        analyzeTrip(fiveHardAccels(), enginePowerKw: kw).firstWhere(
+          (i) => i.labelKey == 'insightHardAccel',
+          orElse: () => throw StateError('expected hardAccel insight'),
+        );
+
+    test('null power → EXACT pre-change estimate (5 × 0.05 = 0.25 L)', () {
+      expect(hardAccelFor(null).litersWasted, closeTo(0.25, 1e-9));
+    });
+
+    test('low power wastes MORE (55 kW → 5 × 0.05 × 1.8 = 0.45 L)', () {
+      expect(hardAccelFor(55).litersWasted, closeTo(0.45, 1e-9));
+      expect(hardAccelFor(55).litersWasted,
+          greaterThan(hardAccelFor(100).litersWasted));
+    });
+
+    test('high power wastes LESS (230 kW → 5 × 0.05 × 0.6 = 0.15 L)', () {
+      expect(hardAccelFor(230).litersWasted, closeTo(0.15, 1e-9));
+      expect(hardAccelFor(230).litersWasted,
+          lessThan(hardAccelFor(100).litersWasted));
+    });
+
+    test('estimates strictly ordered low > reference > high', () {
+      final low = hardAccelFor(55).litersWasted;
+      final ref = hardAccelFor(100).litersWasted;
+      final high = hardAccelFor(230).litersWasted;
+      expect(low, greaterThan(ref));
+      expect(ref, greaterThan(high));
+    });
+
+    test('event count is unchanged by power (only the litres scale)', () {
+      // The DETECTION is power-blind; only the WEIGHT changes.
+      expect(hardAccelFor(55).metadata['eventCount'], 5);
+      expect(hardAccelFor(230).metadata['eventCount'], 5);
     });
   });
 }

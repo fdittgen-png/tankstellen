@@ -20,8 +20,8 @@ library;
 import '../domain/accel_event_gate.dart';
 import '../domain/climb_restart_detector.dart';
 import '../domain/driving_insight.dart';
+import '../domain/engine_power_factor.dart';
 import '../domain/trip_recorder.dart';
-import '../presentation/widgets/trip_detail_charts.dart';
 
 /// RPM above which a sample counts as "high RPM".
 const double _highRpmThreshold = 3000;
@@ -86,7 +86,13 @@ const int _topN = 3;
 /// The function is pure and synchronous — safe to call from a UI
 /// thread for trip durations the app realistically records (a 60-min
 /// trip at 1 Hz is 3 600 samples; the loop is O(n)).
-List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
+///
+/// [enginePowerKw] (Epic #3015) weights the hard-accel wasted-litres by
+/// [enginePowerAccelFactor]; `null` leaves it unchanged (factor 1.0).
+List<DrivingInsight> analyzeTrip(
+  List<TripSample> samples, {
+  int? enginePowerKw,
+}) {
   if (samples.length < 2) return const [];
 
   // Sort by timestamp so out-of-order persistence (#1040 race
@@ -235,9 +241,12 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
     }
   }
 
-  // Hard-acceleration cost line.
+  // Hard-acceleration cost line. Epic #3015 — scale the per-event waste
+  // inversely with engine power (factor 1.0 when power is unknown).
   if (hardAccelEvents > 0) {
-    final liters = hardAccelEvents * _wastedLitersPerHardAccelEvent;
+    final liters = hardAccelEvents *
+        _wastedLitersPerHardAccelEvent *
+        enginePowerAccelFactor(enginePowerKw);
     final pctTime = hardAccelTotalDt / totalDt * 100.0;
     // #2963 — strictly `>` (not `>=`): one event's 0.05 L exactly equals the
     // floor, clears `>=`, then renders "0.1 L" (a 2× overstatement).
@@ -352,40 +361,6 @@ List<DrivingInsight> analyzeTrip(List<TripSample> samples) {
   candidates.sort((a, b) => b.litersWasted.compareTo(a.litersWasted));
   if (candidates.length <= _topN) return candidates;
   return candidates.sublist(0, _topN);
-}
-
-/// Returns one index per hard-acceleration EPISODE (in the
-/// sorted-by-timestamp ordering): the end index of the interval at which
-/// the episode first crossed the canonical [kHardAccelThresholdMps2]
-/// sustained ≥ 1 s, via the ONE shared [countAccelEvents] gate (#2667).
-/// The trip-detail map drops a bolt marker at each (#1458 phase 1).
-///
-/// Reconciled (#2667): markers now come from the same gate the analyzer's
-/// hard-accel count uses, so a single physical hard accel yields ONE
-/// marker — not one per qualifying sample interval as the old raw
-/// per-interval logic produced on a multi-second pull.
-///
-/// Sorting + dt-guard contract (delegated to the gate):
-///   * input is copied + sorted by timestamp before iteration so an
-///     out-of-order list never spuriously reports an event;
-///   * intervals with `dt <= 0` are skipped (duplicate timestamps);
-///   * the first sample (index 0) is never an event because there's
-///     no previous sample to derive an acceleration from.
-///
-/// IMPORTANT: the returned indices reference positions in the
-/// INTERNALLY-SORTED list, NOT the caller's input order. The trip-detail
-/// map already passes timestamp-sorted samples, so it can use them
-/// directly.
-List<int> hardAccelSampleIndices(List<TripDetailSample> samples) {
-  if (samples.length < 2) return const <int>[];
-  return countAccelEvents([
-    for (final s in samples)
-      // TripDetailSample carries no horizontal accuracy — pass null
-      // ("unknown, accept") so the gate behaves exactly as before for the
-      // accuracy dimension while still applying the shared sustained-window
-      // + min-speed + canonical-threshold gate.
-      AccelSamplePoint(timestamp: s.timestamp, speedKmh: s.speedKmh),
-  ]).accelStartIndices;
 }
 
 /// Fallback when no fuel-rate samples are available during the

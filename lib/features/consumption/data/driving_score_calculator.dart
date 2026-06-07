@@ -45,6 +45,7 @@ import 'dart:math' as math;
 
 import '../domain/accel_event_gate.dart';
 import '../domain/driving_score.dart';
+import '../domain/engine_power_factor.dart';
 import '../domain/trip_recorder.dart';
 
 // #2667 — re-export the canonical accel/brake thresholds so existing
@@ -52,6 +53,17 @@ import '../domain/trip_recorder.dart';
 // SINGLE source of truth is `accel_event_gate.dart`.
 export '../domain/accel_event_gate.dart'
     show kHardAccelThresholdMps2, kHardBrakeThresholdMps2;
+
+// Epic #3015 — re-export the engine-power-factor surface so importers of this
+// file (lessons, tests) resolve the constants/helper from the one canonical
+// place alongside the score thresholds; the source of truth stays
+// `engine_power_factor.dart`.
+export '../domain/engine_power_factor.dart'
+    show
+        kReferenceEnginePowerKw,
+        kEnginePowerFactorMin,
+        kEnginePowerFactorMax,
+        enginePowerAccelFactor;
 
 // #2460 — the per-interval accumulator + the inline Welford helper live in
 // a part file so this orchestrator stays under the 400-line guard. They
@@ -132,11 +144,19 @@ const double _smoothnessPedalVarSaturation = 900.0;
 /// by `gear_inference.dart` and stored on [TripSummary]; pass it through
 /// so the over-rev family includes lugging. Null (no inference / EV /
 /// too few samples) contributes 0.
+///
+/// [enginePowerKw] is the active vehicle's engine power in kW (Epic #3015).
+/// The hard-acceleration penalty is weighted by [enginePowerAccelFactor] —
+/// a low-power car wastes proportionally more fuel for the same hard pull,
+/// so it is penalised more; a high-power car less. `null` (power unknown)
+/// leaves the penalty exactly as before (factor 1.0). NO other penalty is
+/// touched — only hard-accel depends on engine power.
 DrivingScore computeDrivingScore(
   List<TripSample> samples, {
   double? secondsBelowOptimalGear,
   int? hardAccelEventsOverride,
   int? hardBrakeEventsOverride,
+  int? enginePowerKw,
 }) {
   if (samples.length < 2) return DrivingScore.perfect;
 
@@ -187,6 +207,7 @@ DrivingScore computeDrivingScore(
     hardAccelEvents: hardAccelEventsOverride ?? accelCounts.accelEvents,
     hardBrakeEvents: hardBrakeEventsOverride ?? accelCounts.brakeEvents,
     gpsOnly: gpsOnly,
+    enginePowerKw: enginePowerKw,
   );
 }
 
@@ -198,7 +219,14 @@ DrivingScore computeDrivingScore(
 ///
 /// Trips under 1 minute, or without a start/end, return a perfect score
 /// — too little signal to attribute any penalty.
-DrivingScore computeDrivingScoreFromSummary(TripSummary summary) {
+///
+/// [enginePowerKw] applies the same hard-accel power weight as the
+/// per-sample path (Epic #3015); `null` (power unknown / legacy callers)
+/// keeps the penalty exactly as before.
+DrivingScore computeDrivingScoreFromSummary(
+  TripSummary summary, {
+  int? enginePowerKw,
+}) {
   final start = summary.startedAt;
   final end = summary.endedAt;
   final durationSec =
@@ -215,8 +243,13 @@ DrivingScore computeDrivingScoreFromSummary(TripSummary summary) {
     0,
     _highRpmCap,
   );
+  // Epic #3015 — weight the hard-accel penalty inversely with engine power,
+  // then clamp to the cap. A low-power car wastes proportionally more fuel
+  // for the same hard pull. `null` power → factor 1.0 → unchanged.
   final hardAccelPenalty = _clamp(
-    summary.harshAccelerations * _hardAccelPerEvent,
+    summary.harshAccelerations *
+        _hardAccelPerEvent *
+        enginePowerAccelFactor(enginePowerKw),
     0,
     _hardAccelCap,
   );
