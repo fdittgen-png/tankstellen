@@ -793,4 +793,138 @@ void main() {
           equals(computeDrivingScore(samples)));
     });
   });
+
+  // Epic #3015 — the hard-accel penalty scales INVERSELY with engine power:
+  // at the SAME hard-accel intensity a low-power car wastes proportionally
+  // more fuel than a high-power one, so it is penalised more. Driven through
+  // the REAL scorer via the deterministic event override; only the
+  // `enginePowerKw` argument varies, so any difference is the power model.
+  group('power-aware hard-accel penalty (Epic #3015)', () {
+    final start = DateTime(2026, 6, 7, 9);
+    // 30 s of gentle GPS-only motion; the override sets the event count so
+    // the penalty math is deterministic and isolated from the accel gate.
+    final samples = <TripSample>[
+      for (var i = 0; i < 30; i++)
+        TripSample(
+            timestamp: start.add(Duration(seconds: i)), speedKmh: 40.0 + i),
+    ];
+
+    // Two events keep every variant below the 15-pt cap (low: 2×3×1.8 = 10.8),
+    // so the ordering reflects the factor, not the clamp masking it.
+    DrivingScore scoreForPower(int? kw) => computeDrivingScore(
+          samples,
+          hardAccelEventsOverride: 2,
+          hardBrakeEventsOverride: 0,
+          enginePowerKw: kw,
+        );
+
+    test('null power → factor 1.0 → EXACT pre-change baseline (2×3.0 = 6.0)',
+        () {
+      // Locks the byte-for-byte legacy value: 2 events × 3.0 pts × 1.0.
+      // If this number changes, the backward-compat identity is broken.
+      expect(scoreForPower(null).hardAccelPenalty, 6.0);
+    });
+
+    test('low < reference: a 55 kW car is penalised MORE than null/reference',
+        () {
+      // f = clamp(100/55 = 1.818, 0.6, 1.8) = 1.8 → 2×3×1.8 = 10.8.
+      expect(scoreForPower(55).hardAccelPenalty, closeTo(10.8, 1e-9));
+      expect(scoreForPower(55).hardAccelPenalty,
+          greaterThan(scoreForPower(100).hardAccelPenalty));
+    });
+
+    test('reference power (100 kW) → identical to null (factor 1.0)', () {
+      expect(scoreForPower(kReferenceEnginePowerKw).hardAccelPenalty,
+          scoreForPower(null).hardAccelPenalty);
+    });
+
+    test('high > reference: a 230 kW car is penalised LESS than reference', () {
+      // f = clamp(100/230 = 0.435, 0.6, 1.8) = 0.6 → 2×3×0.6 = 3.6.
+      expect(scoreForPower(230).hardAccelPenalty, closeTo(3.6, 1e-9));
+      expect(scoreForPower(230).hardAccelPenalty,
+          lessThan(scoreForPower(100).hardAccelPenalty));
+    });
+
+    test('penalties are STRICTLY ordered low > reference > high', () {
+      final low = scoreForPower(55).hardAccelPenalty;
+      final ref = scoreForPower(100).hardAccelPenalty;
+      final high = scoreForPower(230).hardAccelPenalty;
+      expect(low, greaterThan(ref));
+      expect(ref, greaterThan(high));
+    });
+
+    test('only hard-accel scales — brake/idle/rpm penalties are power-blind',
+        () {
+      // A trip with idle + high-RPM + a brake event; verify those terms are
+      // identical across powers and only hard-accel moves.
+      final idleHighRpm = <TripSample>[
+        for (var i = 0; i <= 10; i++)
+          TripSample(
+              timestamp: start.add(Duration(seconds: i)),
+              speedKmh: 0,
+              rpm: 3500),
+      ];
+      DrivingScore s(int? kw) => computeDrivingScore(
+            idleHighRpm,
+            hardAccelEventsOverride: 2,
+            hardBrakeEventsOverride: 3,
+            enginePowerKw: kw,
+          );
+      final a = s(55);
+      final b = s(230);
+      expect(a.idlingPenalty, b.idlingPenalty);
+      expect(a.highRpmPenalty, b.highRpmPenalty);
+      expect(a.hardBrakePenalty, b.hardBrakePenalty);
+      // Hard-accel is the ONLY term that differs.
+      expect(a.hardAccelPenalty, greaterThan(b.hardAccelPenalty));
+    });
+
+    test('clamp bounds: extreme low/high power do not explode the penalty', () {
+      // 1 kW (absurd) clamps the factor to fMax, not 100×.
+      expect(scoreForPower(1).hardAccelPenalty, closeTo(2 * 3 * 1.8, 1e-9));
+      // 5000 kW clamps to fMin, not ~0.
+      expect(scoreForPower(5000).hardAccelPenalty, closeTo(2 * 3 * 0.6, 1e-9));
+    });
+
+    test('zero / negative power guards division → factor 1.0 (legacy value)',
+        () {
+      expect(scoreForPower(0).hardAccelPenalty, 6.0);
+      expect(scoreForPower(-50).hardAccelPenalty, 6.0);
+    });
+  });
+
+  // Epic #3015 — the same model on the cheap summary-only path that feeds the
+  // achievement engine (`TripMetrics.drivingScore`).
+  group('power-aware hard-accel penalty — summary path (Epic #3015)', () {
+    TripSummary summaryWith(int harshAccel) => TripSummary(
+          distanceKm: 20,
+          maxRpm: 2000,
+          highRpmSeconds: 0,
+          idleSeconds: 0,
+          harshBrakes: 0,
+          harshAccelerations: harshAccel,
+          startedAt: DateTime(2026, 6, 7, 9),
+          endedAt: DateTime(2026, 6, 7, 9, 30),
+        );
+
+    test('null power → factor 1.0 → EXACT baseline (2×3.0 = 6.0)', () {
+      expect(
+          computeDrivingScoreFromSummary(summaryWith(2)).hardAccelPenalty, 6.0);
+    });
+
+    test('low power penalised more, high less, strictly ordered', () {
+      final s = summaryWith(2);
+      final low =
+          computeDrivingScoreFromSummary(s, enginePowerKw: 55).hardAccelPenalty;
+      final ref = computeDrivingScoreFromSummary(s, enginePowerKw: 100)
+          .hardAccelPenalty;
+      final high = computeDrivingScoreFromSummary(s, enginePowerKw: 230)
+          .hardAccelPenalty;
+      expect(low, closeTo(10.8, 1e-9));
+      expect(ref, 6.0);
+      expect(high, closeTo(3.6, 1e-9));
+      expect(low, greaterThan(ref));
+      expect(ref, greaterThan(high));
+    });
+  });
 }

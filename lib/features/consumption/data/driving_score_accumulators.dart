@@ -119,6 +119,7 @@ class _Accumulators {
     required int hardAccelEvents,
     required int hardBrakeEvents,
     bool gpsOnly = false,
+    int? enginePowerKw,
   }) {
     final idlingPenalty =
         _clamp(idleSeconds / totalDt * _idlingCap, 0, _idlingCap);
@@ -131,8 +132,17 @@ class _Accumulators {
     final highRpmPenalty = gpsOnly
         ? 0.0
         : _clamp(highRpmSeconds / totalDt * _highRpmCap, 0, _highRpmCap);
-    final hardAccelPenalty =
-        _clamp(hardAccelEvents * _hardAccelPerEvent, 0, _hardAccelCap);
+    // Epic #3015 — weight the hard-accel penalty inversely with engine
+    // power, then clamp to the cap. At the SAME hard-accel intensity a
+    // low-power car runs at a higher load fraction (closer to WOT, worse
+    // BSFC, more enrichment) and wastes proportionally more fuel, so it is
+    // penalised more; a high-power car less. `null` power (unknown / legacy)
+    // → factor 1.0 → byte-identical to before. Only this term is power-aware.
+    final hardAccelPenalty = _clamp(
+      hardAccelEvents * _hardAccelPerEvent * enginePowerAccelFactor(enginePowerKw),
+      0,
+      _hardAccelCap,
+    );
     final hardBrakePenalty =
         _clamp(hardBrakeEvents * _hardBrakePerEvent, 0, _hardBrakeCap);
     final fullThrottlePenalty = _clamp(
