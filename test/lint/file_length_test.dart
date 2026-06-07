@@ -511,7 +511,17 @@ void main() {
     // lets a test assert a clustered cross-border station carries its resolved
     // price. None of these can move off the widget. Decomposition of this
     // god-class is still tracked by #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 654,
+    // #3002 — re-grandfathered 654 → 699 (Epic #2997, final child): the DRIVING
+    // map adopts the shared stack. The growth is the widget's own irreducible
+    // additive API — five new props + their dartdocs (`markerVariant`,
+    // `interactionOptions`, `onMapTap`, `showZoomControls`, `showLegend`), their
+    // constructor params, the variant threaded into the `StationMarkerBuilder`
+    // call, and the two `if (...)` guards that gate the zoom controls + legend
+    // off for driving. The big driver-legible marker BODY lives in
+    // `station_marker.dart` (the `_drivingMarker` content variant), not here, so
+    // nothing further can move off this widget. Decomposition of this god-class
+    // is still tracked by #2187/#2188.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 699,
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,

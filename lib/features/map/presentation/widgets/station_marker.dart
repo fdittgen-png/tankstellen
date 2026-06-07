@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/theme/price_band_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_gradient.dart';
+import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/animated_price_text.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -17,6 +18,26 @@ import '../../../search/domain/entities/station.dart';
 /// while keeping the price legible.
 const double kStationMarkerWidth = 50;
 const double kStationMarkerHeight = 24;
+
+/// Big, driver-legible marker dimensions for the DRIVING-mode map (#3002,
+/// Epic #2997). Driving shows few stations and is read at a glance from the
+/// driver's seat, so its variant is a large card carrying the brand + a
+/// price-tier icon + a LARGE price — not the small price-only pill.
+const double kDrivingMarkerWidth = 150;
+const double kDrivingMarkerHeight = 62;
+
+/// How a station marker is RENDERED. The default [pill] is the small
+/// price-only badge (brand in a tooltip) shared by the nearby / radar / route
+/// maps. [driving] is the big driver-legible card (brand + tier icon + large
+/// price) — a real CONTENT variant, not a size scale — for the driving map,
+/// which adopts the shared [PriceBandColors.ramp] colours but keeps glanceable
+/// markers (#3002, Epic #2997).
+enum StationMarkerVariant { pill, driving }
+
+/// Maximum characters for the brand label on the driving card before it is
+/// truncated. Wider than the tooltip cap because the driving card paints the
+/// brand on a 150dp-wide surface.
+const _maxDrivingBrandLength = 16;
 
 /// A small price-less dot used for lower-ranked stations so a bounded
 /// nearby-search result set stays fully visible (#2510) without the full
@@ -84,6 +105,7 @@ class StationMarkerBuilder {
     bool selected = false,
     VoidCallback? onTap,
     FuelType Function(Station)? fuelResolver,
+    StationMarkerVariant variant = StationMarkerVariant.pill,
   }) {
     // #2510 — strict selected-fuel price, exactly like the list card. No
     // within-country fallback: a station lacking the selected fuel shows
@@ -105,6 +127,26 @@ class StationMarkerBuilder {
     final priceText = price != null
         ? PriceFormatter.formatPriceCompact(price)
         : '--'; // i18n-ignore: language-neutral no-price placeholder
+
+    // #3002 (Epic #2997) — the DRIVING map renders a big driver-legible card
+    // (brand + price-tier icon + large price) coloured by the SAME shared
+    // [PriceBandColors.ramp] as every other map, instead of the small
+    // price-only pill. It folds the old bespoke `DrivingMarkerBuilder` +
+    // `_drivingStops` palette onto the one canonical ramp.
+    if (variant == StationMarkerVariant.driving) {
+      return _drivingMarker(
+        context,
+        station,
+        price,
+        minPrice,
+        maxPrice,
+        color,
+        semanticLabel,
+        priceText,
+        selected: selected,
+        onTap: onTap,
+      );
+    }
 
     // #2939 — a selected station is ALWAYS the full pill (never a compact
     // dot) and rings in brand-primary so a list-row tap visibly emphasises
@@ -149,6 +191,108 @@ class StationMarkerBuilder {
               message: brand,
               waitDuration: const Duration(milliseconds: 300),
               child: badge,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The big, driver-legible DRIVING-mode card (#3002, Epic #2997): the brand
+  /// on top (truncated), then a price-tier icon + a LARGE price, on a
+  /// [PriceBandColors.ramp]-coloured pill with a white outline + drop shadow so
+  /// it reads against the map tiles at a glance. Folds the old bespoke
+  /// `DrivingMarkerBuilder` (its own `_drivingStops` palette) onto the ONE
+  /// shared ramp every other map already uses.
+  ///
+  /// Keeps the same wrapping contract as the default marker — a
+  /// [RepaintBoundary] (#1772) + a labelled [Semantics] button (#566) — and the
+  /// driving caller's [onTap] (open the `DrivingStationSheet`); it never falls
+  /// back to a GoRouter push (the driving map has no detail route).
+  static Marker _drivingMarker(
+    BuildContext context,
+    Station station,
+    double? price,
+    double minPrice,
+    double maxPrice,
+    Color color,
+    String semanticLabel,
+    String priceText, {
+    required bool selected,
+    required VoidCallback? onTap,
+  }) {
+    final brand =
+        truncateBrand(station.displayName, maxLength: _maxDrivingBrandLength);
+    final tier = priceTierOf(price, minPrice, maxPrice);
+
+    return Marker(
+      point: LatLng(station.lat, station.lng),
+      width: kDrivingMarkerWidth,
+      height: kDrivingMarkerHeight,
+      child: RepaintBoundary(
+        child: Semantics(
+          label: semanticLabel,
+          button: true,
+          selected: selected,
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.95),
+                borderRadius: BorderRadius.circular(12),
+                // A selected driving card rings in brand-primary; otherwise the
+                // high-contrast white outline keeps it legible over tiles.
+                border: Border.all(
+                  color: selected
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.white,
+                  width: selected ? 3 : 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    brand,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                      letterSpacing: 0.3,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (tier != PriceTier.unknown)
+                        Icon(
+                          iconForPriceTier(tier),
+                          size: 14,
+                          color: Colors.black87,
+                        ),
+                      Text(
+                        priceText,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
