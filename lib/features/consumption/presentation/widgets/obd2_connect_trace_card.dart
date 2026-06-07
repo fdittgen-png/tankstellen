@@ -39,6 +39,18 @@ class Obd2ConnectTraceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // #3014 — ADAPTER NAME headline (the maintainer's #1 trace-tool ask:
+            // a by-MAC / self-test attempt showed only the redacted MAC, so you
+            // couldn't tell WHICH adapter failed). Falls back to the redacted
+            // MAC when the name couldn't be resolved (an anonymous advertiser).
+            Text(
+              trace.adapterName ??
+                  trace.requestedMac ??
+                  (l?.obd2HealthConnectUnknownAdapter ?? 'Unknown adapter'),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
             // Outcome headline (bold) — the answer to "why didn't it connect".
             Row(
               children: [

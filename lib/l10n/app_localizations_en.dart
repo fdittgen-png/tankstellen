@@ -6446,6 +6446,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2HealthConnectSteps => 'Steps';
 
   @override
+  String get obd2HealthConnectUnknownAdapter => 'Unknown adapter';
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
   }
@@ -14303,6 +14306,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2HealthConnectSteps => '⟦Šŧéƥš ··⟧';
+
+  @override
+  String get obd2HealthConnectUnknownAdapter => '⟦Úñķñóŵñ áđáƥŧéř ······⟧';
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

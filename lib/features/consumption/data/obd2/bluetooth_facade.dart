@@ -226,6 +226,73 @@ class PluginBluetoothFacade implements BluetoothFacade {
       uuids: Elm327BleUuids.vgate,
       connectTimeout: autoConnect ? null : connectTimeout,
       autoConnect: autoConnect,
+      // #3014 — scan-before-connect ONLY on the cold bounded direct path. The
+      // passive autoConnect path needs no seed (it IS the OS-held background
+      // request). The targeted scan gives Android a fresh scan-result handle
+      // for the raw MAC so the cold `connect()` doesn't fall into the GATT-133
+      // trap (the SmartOBD root cause).
+      scanSeed: autoConnect ? null : () => _seedScanForMac(mac),
     );
   }
+
+  /// #3014 — run a brief TARGETED scan for [mac] and resolve `true` the instant
+  /// it is seen, then `stopScan`. Bounded by [_seedScanTimeout]; a miss resolves
+  /// `false` at the timeout. `stopScan` is called on EVERY exit path — fbp
+  /// serializes all BLE ops behind a global mutex, so a scan still live on the
+  /// radio would deadlock the connect that follows.
+  static Future<bool> _seedScanForMac(String mac) async {
+    final completer = Completer<bool>();
+    StreamSubscription<List<ScanResult>>? sub;
+
+    Future<void> finish(bool sawMac) async {
+      if (completer.isCompleted) return;
+      await sub?.cancel();
+      try {
+        await FlutterBluePlus.stopScan();
+      } catch (_) {
+        // Best-effort — a stopScan that throws (no scan in flight, plugin
+        // quirk) must not block the connect that follows.
+      }
+      if (!completer.isCompleted) completer.complete(sawMac);
+    }
+
+    sub = FlutterBluePlus.scanResults.listen(
+      (results) {
+        for (final r in results) {
+          if (r.device.remoteId.str.toUpperCase() == mac.toUpperCase()) {
+            unawaited(finish(true));
+            return;
+          }
+        }
+      },
+      onError: (_) => unawaited(finish(false)),
+    );
+
+    try {
+      // withRemoteIds filters the scan to just this MAC (Android: 48-bit MAC,
+      // iOS: 128-bit GUID) so the OS surfaces a fresh handle quickly without
+      // sweeping the whole BLE neighbourhood.
+      await FlutterBluePlus.startScan(
+        withRemoteIds: [mac],
+        timeout: _seedScanTimeout,
+      );
+    } catch (_) {
+      // BT off / scan-start rejection — no seed possible; the bounded connect
+      // still runs and will fail-fast + be classified by the channel.
+      await finish(false);
+      return completer.future;
+    }
+
+    // Safety net: resolve at the scan timeout even if the result stream never
+    // delivers our MAC and the plugin's own timeout callback is delayed.
+    Timer(_seedScanTimeout + const Duration(milliseconds: 250),
+        () => unawaited(finish(false)));
+
+    return completer.future;
+  }
+
+  /// #3014 — the targeted scan-before-connect window. Short by design: a fresh
+  /// handle for a MAC that is actually present arrives in well under a second;
+  /// a longer window only delays the bounded connect for an absent adapter.
+  static const Duration _seedScanTimeout = Duration(seconds: 3);
 }

@@ -202,6 +202,12 @@ class Obd2ConnectionService {
     final trace = Obd2ConnectTraceLog.beginTrace(
       origin: Obd2ConnectOrigin.firstConnect,
       mac: candidate.candidate.deviceId,
+      // #3014 — the scan resolved a real candidate, so its name is known: the
+      // advertised name, or the registry display label when the advertisement
+      // was anonymous. Fills the trace headline for a scan-path connect.
+      adapterName: candidate.candidate.deviceName.isEmpty
+          ? candidate.profile.displayName
+          : candidate.candidate.deviceName,
       requestedTransport:
           candidate.profile.transport == BluetoothTransport.classic
               ? Obd2ConnectTransport.classic
@@ -416,11 +422,18 @@ class Obd2ConnectionService {
   Future<Obd2Service?> connectByMac(
     String mac, {
     Duration timeout = const Duration(seconds: 5),
+    String? adapterName,
   }) =>
       _traced(
         origin: Obd2ConnectOrigin.firstConnect,
         mac: mac,
-        requestedTransport: Obd2ConnectTransport.unknown,
+        adapterName: adapterName,
+        // #3014 — was hard-coded `unknown`. When the caller passes the paired
+        // name, infer the transport from the registry name matchers (the same
+        // recovery the self-test uses) so the trace records `ble`/`classic`
+        // instead of `unknown` for a scan-based pinned connect.
+        requestedTransport:
+            _inferTransport(registry.transportForName(adapterName)),
         body: () async {
           final stream = scan(timeout: timeout);
           ResolvedObd2Candidate? match;
@@ -458,10 +471,12 @@ class Obd2ConnectionService {
     String mac, {
     Duration timeout = const Duration(seconds: 4),
     bool fallbackToScan = true,
+    String? adapterName,
   }) =>
       _traced(
         origin: Obd2ConnectOrigin.firstConnect,
         mac: mac,
+        adapterName: adapterName, // #3014 — name the BLE by-MAC attempt
         requestedTransport: Obd2ConnectTransport.ble,
         body: () => _connectByMacDirect(this, mac,
             timeout: timeout, fallbackToScan: fallbackToScan),
@@ -469,21 +484,35 @@ class Obd2ConnectionService {
 
   /// Direct-connect-by-MAC over Bluetooth **CLASSIC** SPP, NO scan (#2565).
   /// See [_connectByMacClassicDirect]. Thin overridable instance method.
-  Future<Obd2Service?> connectByMacClassicDirect(String mac) => _traced(
+  Future<Obd2Service?> connectByMacClassicDirect(String mac,
+          {String? adapterName}) =>
+      _traced(
         origin: Obd2ConnectOrigin.firstConnect,
         mac: mac,
+        adapterName: adapterName, // #3014 — name the Classic by-MAC attempt
         requestedTransport: Obd2ConnectTransport.classic,
         body: () => _connectByMacClassicDirect(this, mac),
       );
 
   /// Passive autoConnect reconnect (#2261 concern 2). See
   /// [_connectByMacPassive]. Thin overridable instance method.
-  Future<Obd2Service?> connectByMacPassive(String mac) => _traced(
+  Future<Obd2Service?> connectByMacPassive(String mac, {String? adapterName}) =>
+      _traced(
         origin: Obd2ConnectOrigin.liveReconnect,
         mac: mac,
+        adapterName: adapterName, // #3014 — name the passive reconnect attempt
         requestedTransport: Obd2ConnectTransport.ble,
         body: () => _connectByMacPassive(this, mac),
       );
+
+  /// #3014 — map a nullable registry [BluetoothTransport] hint onto the trace's
+  /// [Obd2ConnectTransport] (null ⇒ `unknown`, the honest no-hint state).
+  static Obd2ConnectTransport _inferTransport(BluetoothTransport? t) =>
+      switch (t) {
+        BluetoothTransport.classic => Obd2ConnectTransport.classic,
+        BluetoothTransport.ble => Obd2ConnectTransport.ble,
+        null => Obd2ConnectTransport.unknown,
+      };
 
   /// #2969 — open (or join) a connect trace around [body], stamp the terminal
   /// outcome (success when a service comes back; the inner-stamped outcome — or
@@ -495,12 +524,14 @@ class Obd2ConnectionService {
   Future<Obd2Service?> _traced({
     required Obd2ConnectOrigin origin,
     String? mac,
+    String? adapterName,
     required Obd2ConnectTransport requestedTransport,
     required Future<Obd2Service?> Function() body,
   }) async {
     final trace = Obd2ConnectTraceLog.beginTrace(
       origin: origin,
       mac: mac,
+      adapterName: adapterName,
       requestedTransport: requestedTransport,
     );
     try {

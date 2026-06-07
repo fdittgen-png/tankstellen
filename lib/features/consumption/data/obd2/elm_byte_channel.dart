@@ -135,6 +135,20 @@ abstract class ElmByteChannel {
   bool get isOpen;
 }
 
+/// Optional capability (#3014) — a channel whose link can drop a poisoned
+/// native GATT service cache between connect attempts. Android caches a
+/// device's GATT table; a clone whose firmware mutated its table (or a stale
+/// cache from a prior aborted connect) can return GATT_ERROR 133 until the
+/// cache is cleared. The Android-only `BluetoothGatt.refresh()` is a hidden API
+/// reached by reflection, so the implementation MUST be best-effort and never
+/// throw (OEM-variable). No-op for Classic SPP and test fakes (they don't
+/// implement this), so the transport calls it conditionally after a 133.
+abstract class Obd2GattRecoverable {
+  /// Best-effort drop of the native GATT service cache for this device. Returns
+  /// normally whether or not the refresh actually ran — a failure is swallowed.
+  Future<void> refreshGattCache();
+}
+
 /// Optional capability mixin (#2261 concern 4) — channels backed by a
 /// BLE GATT link can tune the connection for throughput vs power. The
 /// trip recorder asks for high throughput while actively polling and

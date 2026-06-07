@@ -79,7 +79,11 @@ class Obd2SelfTestPanel extends ConsumerWidget {
                     .read(obd2SelfTestControllerProvider.notifier)
                     .run(
                         targetMac: selectedMac,
-                        transportHint: selectedTransport),
+                        transportHint: selectedTransport,
+                        // #3014 — name the trace headline with the chosen
+                        // adapter's human name (already resolved for the row
+                        // relabel), not just the redacted MAC.
+                        adapterName: selectedName),
             icon: running
                 ? const SizedBox(
                     width: 16,

@@ -11262,6 +11262,12 @@ abstract class AppLocalizations {
   /// **'Steps'**
   String get obd2HealthConnectSteps;
 
+  /// Headline fallback on a connect-attempt trace card when the adapter's human name could not be resolved (an anonymous BLE advertiser) and only the redacted MAC is known (#3014).
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown adapter'**
+  String get obd2HealthConnectUnknownAdapter;
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

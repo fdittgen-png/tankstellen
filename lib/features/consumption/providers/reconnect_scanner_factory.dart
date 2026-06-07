@@ -35,6 +35,11 @@ AdapterReconnectScanner? Function(
   required Ref ref,
   required void Function(Obd2Service service) onConnected,
   required String? Function() readLinkKind,
+  // #3014 — symmetric to [readLinkKind]: the live adapter NAME read off the
+  // dead-but-typed service at handle-drop time, so the reconnect trace headline
+  // names the adapter. Optional (defaults to a null reader) so existing test
+  // call sites and the back-compat path are unchanged.
+  String? Function()? readAdapterName,
 }) {
   final Obd2ConnectionService connection;
   try {
@@ -61,6 +66,9 @@ AdapterReconnectScanner? Function(
       // dropped, read off the dead service. Null when unknown ⇒ the legacy
       // BLE-direct-first path (behaviour unchanged for BLE adapters).
       transportHint: readLinkKind(),
+      // #3014 — the live adapter NAME, so the in-trip reconnect trace headline
+      // names the adapter instead of showing only the redacted MAC.
+      adapterName: readAdapterName?.call(),
     );
     final scanner = AdapterReconnectScanner(
       pinnedMac: pinnedMac,

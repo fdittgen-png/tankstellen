@@ -167,6 +167,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         // reconnect dispatches over the SAME transport that dropped. The
         // dead-but-typed service is still wired here.
         readLinkKind: () => _service?.linkKind,
+        // #3014 — read the live adapter NAME the same way so an in-trip
+        // reconnect trace carries the human name (e.g. `vLinker FS 1234`),
+        // not just the redacted MAC, in the health-screen trace headline.
+        readAdapterName: () => _service?.adapterName,
       ),
       breadcrumbCollector: breadcrumbs,
       gpsEstimateFolder: gpsEstimateFolder,

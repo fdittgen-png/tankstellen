@@ -1840,6 +1840,7 @@
   "obd2HealthConnectOutcome": "⟦Óúŧçóɱé ···⟧",
   "obd2HealthConnectScanList": "⟦Šçáññéđ đéṽîçéš ······⟧",
   "obd2HealthConnectSteps": "⟦Šŧéƥš ··⟧",
+  "obd2HealthConnectUnknownAdapter": "⟦Úñķñóŵñ áđáƥŧéř ······⟧",
   "obd2PickerPinnedFallback": "⟦Çóúłđñ'ŧ řéáçĥ '{adapterName}' — ƥîçķ áñóŧĥéř áđáƥŧéř ··············⟧",
   "ocrTesterTitle": "⟦ÓÇŘ ŧéšŧéř ····⟧",
   "ocrTesterNavLabel": "⟦ÓÇŘ ŧéšŧéř ····⟧",

@@ -148,6 +148,15 @@ abstract class Obd2ConnectTrace with _$Obd2ConnectTrace {
     @JsonKey(name: 'tm') int? totalMs,
     @JsonKey(name: 'or') required Obd2ConnectOrigin origin,
     @JsonKey(name: 'mac') String? requestedMac,
+    // #3014 (Epic #3013, Phase 1) — the human adapter NAME (e.g. `SmartOBD`,
+    // `vLinker FS 1234`). The maintainer's #1 complaint about the trace tool:
+    // a by-MAC / self-test attempt showed only the redacted MAC (`···F:31`),
+    // so there was no way to tell WHICH adapter failed. The name IS known at
+    // every connect entry (the paired-adapter name, or the resolved scan
+    // candidate's advertised name) — it was simply dropped before the trace.
+    // Null when no name could be resolved (a cold scan with an anonymous
+    // advertiser); the card then falls back to the redacted MAC.
+    @JsonKey(name: 'nm') String? adapterName,
     @JsonKey(name: 'rtx') required Obd2ConnectTransport requestedTransport,
     @JsonKey(name: 'ztx') Obd2ConnectTransport? resolvedTransport,
     @JsonKey(name: 'tdr') String? transportDecisionReason,
