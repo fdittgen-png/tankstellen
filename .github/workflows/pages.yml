@@ -50,7 +50,7 @@ jobs:
           mkdir -p _site/privacy-policy && cp -R docs/privacy-policy/. _site/privacy-policy/
           cp -f docs/icon.png _site/icon.png 2>/dev/null || true
           if [ -d fdroid/repo ]; then
-            cp -R fdroid/repo/. _site/fdroid/
+            mkdir -p _site/fdroid/repo && cp -R fdroid/repo/. _site/fdroid/repo/
           fi
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5

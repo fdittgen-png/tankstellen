@@ -12,7 +12,7 @@
 # (GitHub Secrets decode into these vars). The keystore file itself
 # (fdroid/keystore.p12 by default) is git-ignored — never commit it.
 
-repo_url: https://fdittgen-png.github.io/tankstellen/fdroid
+repo_url: https://fdittgen-png.github.io/tankstellen/fdroid/repo
 repo_name: Sparkilo
 repo_description: >-
   Free, privacy-first fuel & EV charging price comparison — the GMS-free

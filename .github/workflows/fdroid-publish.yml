@@ -121,8 +121,9 @@ jobs:
           # migration (root alone would 404 that path).
           mkdir -p _site/privacy-policy && cp -R docs/privacy-policy/. _site/privacy-policy/
           cp -f docs/icon.png _site/icon.png 2>/dev/null || true
-          # F-Droid repo index served directly at /fdroid.
-          cp -R fdroid/repo/. _site/fdroid/
+          # F-Droid repo index served at /fdroid/repo (fdroidserver requires
+          # repo_url to end in /repo).
+          mkdir -p _site/fdroid/repo && cp -R fdroid/repo/. _site/fdroid/repo/
 
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
