@@ -58,8 +58,32 @@ jobs:
           cp -f docs/icon.png _site/icon.png 2>/dev/null || true
           cp -f docs/play-store/metadata/android/en-US/images/featureGraphic.png _site/featureGraphic.png 2>/dev/null || true
           mkdir -p _site/screenshots && cp -R docs/screenshots/. _site/screenshots/ 2>/dev/null || true
+          # F-Droid repo (#3071): built + signed only by fdroid-publish.yml (on
+          # v* tags) and NOT committed (keeps large APKs out of git). This
+          # full-site deploy must re-include the currently-live repo or it 404s
+          # until the next release. Prefer a committed dir if one ever exists;
+          # otherwise MIRROR the live repo from the previous deployment so a
+          # docs-only deploy never wipes it.
           if [ -d fdroid/repo ]; then
             mkdir -p _site/fdroid/repo && cp -R fdroid/repo/. _site/fdroid/repo/
+          else
+            FDROID_BASE=https://fdittgen-png.github.io/tankstellen/fdroid/repo
+            mkdir -p _site/fdroid/repo
+            if curl -fsSL "$FDROID_BASE/index-v1.json" -o _site/fdroid/repo/index-v1.json; then
+              for f in index-v1.jar index-v2.json index.xml index.png entry.jar entry.json; do
+                curl -fsSL "$FDROID_BASE/$f" -o "_site/fdroid/repo/$f" 2>/dev/null || true
+              done
+              mkdir -p _site/fdroid/repo/icons
+              curl -fsSL "$FDROID_BASE/icons/icon.png" -o _site/fdroid/repo/icons/icon.png 2>/dev/null || true
+              # Mirror every APK the index advertises.
+              for apk in $(python3 -c "import json; d=json.load(open('_site/fdroid/repo/index-v1.json')); [print(p['apkName']) for v in d.get('packages',{}).values() for p in v]" 2>/dev/null); do
+                curl -fsSL "$FDROID_BASE/$apk" -o "_site/fdroid/repo/$apk" 2>/dev/null || true
+              done
+              echo "Preserved $(ls _site/fdroid/repo | wc -l) live F-Droid repo file(s)."
+            else
+              echo "::warning::Live F-Droid repo unreachable — skipping preserve; the next fdroid-publish (v* tag / dispatch) restores /fdroid."
+              rmdir _site/fdroid/repo 2>/dev/null || true
+            fi
           fi
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
