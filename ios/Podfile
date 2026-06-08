@@ -42,5 +42,25 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    # permission_handler gates each iOS permission behind a compile-time macro
+    # (`#if PERMISSION_BLUETOOTH … #endif`). WITHOUT the macro the permission's
+    # strategy is excluded from the build, so `.request()` returns `denied`
+    # immediately — no system prompt and no row under Settings → Sparkilo.
+    # Enable the permissions the app actually uses on iOS:
+    #   • BLUETOOTH — OBD2 adapter pairing (was the "can't grant Bluetooth" bug)
+    #   • CAMERA    — receipt / pump-display capture + QR scanner
+    # (Location uses geolocator and notifications use flutter_local_notifications,
+    # so they need no permission_handler macro here.)
+    target.build_configurations.each do |config|
+      # Robust against the setting being nil / a String / an Array so the
+      # macros are always actually appended (the canonical `||=` snippet
+      # silently no-ops when Flutter has already populated the setting).
+      defs = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']
+      defs = ['$(inherited)'] if defs.nil?
+      defs = [defs] if defs.is_a?(String)
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] =
+        defs + ['PERMISSION_BLUETOOTH=1', 'PERMISSION_CAMERA=1']
+    end
   end
 end
