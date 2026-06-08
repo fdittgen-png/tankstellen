@@ -432,8 +432,11 @@ void main() {
     // callback wiring. The dialog + parse-and-prefill body live in the
     // extracted handler file; only the thin delegation lands here.
     // Decomposition stays tracked under #2187.
+    // #3073 — +11 → 649: app-bar check action (save above the iOS keyboard,
+    // which covers the bottom save bar and has no system dismiss) + onDrag
+    // keyboard dismissal. Small iOS bug fix; decomposition still tracked (#2187).
     'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        638,
+        649,
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead

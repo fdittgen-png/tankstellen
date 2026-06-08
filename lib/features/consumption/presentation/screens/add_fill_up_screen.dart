@@ -571,11 +571,22 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
         tooltip: l?.tooltipBack ?? 'Back',
         onPressed: () => Navigator.maybePop(context),
       ),
+      // #3073 — app-bar save stays above the iOS keyboard, which covers the
+      // bottom save bar and has no system dismiss. Bottom bar kept otherwise.
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.check),
+          tooltip: l?.save ?? 'Save',
+          onPressed: _save,
+        ),
+      ],
       bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: ListView(
+          // #3073 — drag-to-dismiss the keyboard (iOS lacks a system dismiss).
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: EdgeInsets.fromLTRB(
             16,
             16,

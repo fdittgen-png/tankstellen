@@ -154,6 +154,29 @@ void main() {
       expect(find.widgetWithText(FilledButton, 'Save'), findsOneWidget);
     });
 
+    testWidgets(
+        '#3073 — exposes a check action in the app bar (reachable above the '
+        'iOS keyboard) alongside the pinned bottom Save', (tester) async {
+      await _pumpWithTallView(
+        tester,
+        const AddFillUpScreen(),
+        overrides: _withVehicle,
+      );
+
+      // The app-bar ✓ action stays visible above the keyboard, so the form
+      // is submittable on iOS where the keyboard covers the bottom save bar.
+      final checkAction = find.byWidgetPredicate(
+        (w) =>
+            w is IconButton &&
+            w.icon is Icon &&
+            (w.icon as Icon).icon == Icons.check &&
+            w.tooltip == 'Save',
+      );
+      expect(checkAction, findsOneWidget);
+      // The pinned bottom Save bar stays for the keyboard-closed case.
+      expect(find.widgetWithText(FilledButton, 'Save'), findsOneWidget);
+    });
+
     testWidgets('every ARB label referenced in the form still renders',
         (tester) async {
       await _pumpWithTallView(
