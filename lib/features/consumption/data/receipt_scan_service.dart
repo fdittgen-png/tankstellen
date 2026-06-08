@@ -7,7 +7,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
 import 'ocr/image_orientation.dart';
@@ -17,7 +16,10 @@ import 'ocr/pump_display_orchestrator.dart';
 import 'ocr/pump_ocr_config.dart';
 import 'ocr/pump_recognizer_source.dart';
 import 'ocr/pump_validation_gate.dart';
-import 'ocr/recognized_text_adapter.dart';
+import 'ocr/impl/ocr_engine_factory.dart';
+import 'ocr/mlkit_ocr_text_engine.dart';
+import 'ocr/ocr_text_engine.dart';
+import 'ocr/pump_glare_check.dart';
 import 'ocr/recognized_text_block.dart';
 import 'pump_display_parser.dart';
 import 'receipt_parser.dart';
@@ -47,7 +49,12 @@ export 'receipt_scan_outcomes.dart'
 ///     itself (Betrag / Abgabe / Preis/Liter).
 class ReceiptScanService {
   final ImagePicker _picker;
-  final TextRecognizer _recognizer;
+
+  /// #3052 — the OCR backend. iOS → Apple Vision, Android/host → ML Kit
+  /// (selected by [createDefaultOcrTextEngine]). Tests inject `recognizer:`
+  /// (wrapped in [MlKitOcrTextEngine]) so the ML Kit path stays covered.
+  final OcrTextEngine _engine;
+
   final ReceiptParser _parser;
   final PumpDisplayParser _pumpParser;
   final PumpValidationGate _pumpGate;
@@ -57,13 +64,19 @@ class ReceiptScanService {
   ReceiptScanService({
     ImagePicker? picker,
     TextRecognizer? recognizer,
+    OcrTextEngine? engine,
     ReceiptParser? parser,
     PumpDisplayParser? pumpParser,
     PumpValidationGate? pumpGate,
     PumpOcrConfig? ocrConfig,
     OcrImagePreprocessor? preprocessor,
   })  : _picker = picker ?? ImagePicker(),
-        _recognizer = recognizer ?? TextRecognizer(),
+        // An explicit [engine] wins; a legacy `recognizer:` (tests) keeps the
+        // ML Kit path; otherwise the platform default (iOS Vision / else ML Kit).
+        _engine = engine ??
+            (recognizer != null
+                ? MlKitOcrTextEngine(recognizer: recognizer)
+                : createDefaultOcrTextEngine()),
         _parser = parser ?? const ReceiptParser(),
         _pumpParser = pumpParser ?? const PumpDisplayParser(),
         _pumpGate = pumpGate ?? const PumpValidationGate(),
@@ -192,7 +205,7 @@ class ReceiptScanService {
     );
     // #2275 — auto-reject an over-glared frame BEFORE OCR so the caller
     // can prompt a re-angle rather than show a generic failure.
-    if (await _isOverGlared(path, roi, trace: trace)) {
+    if (await isPumpFrameOverGlared(path, roi, _preprocessor, trace: trace)) {
       return PumpDisplayScanOutcome(
         parse: const PumpDisplayParseResult(),
         ocrText: '',
@@ -248,34 +261,6 @@ class ReceiptScanService {
     );
   }
 
-  /// Decodes [path], crops to [roi], and returns `true` when the ROI is
-  /// over-glared per [GlarePolicy.standard]. Best-effort: a decode error
-  /// returns `false` so a quirky image still reaches OCR (#2275).
-  Future<bool> _isOverGlared(
-    String path,
-    OcrNormalizedRect? roi, {
-    OcrTraceRecorder? trace,
-  }) async {
-    try {
-      final bytes = await File(path).readAsBytes();
-      final decoded = img.decodeJpg(bytes);
-      if (decoded == null) return false;
-      final upright = img.bakeOrientation(decoded);
-      final region =
-          roi != null ? _preprocessor.cropToRoi(upright, roi) : upright;
-      final fraction = _preprocessor.glareFraction(region);
-      final threshold = GlarePolicy.standard.rejectAbove;
-      final rejected = fraction > threshold;
-      trace?.glare(
-          fraction: fraction, threshold: threshold, rejected: rejected);
-      return rejected;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
-          context: const {'where': 'pump glare check failed'}));
-      return false;
-    }
-  }
-
   Future<String?> _capture() async {
     final image = await _picker.pickImage(
       source: ImageSource.camera,
@@ -297,22 +282,21 @@ class ReceiptScanService {
   /// #1860 — when [enhanceContrast] is set (the pump-display path) the
   /// temp copy also gets a grayscale + histogram-normalise + contrast
   /// pass so 7-segment LCDs and washed-out displays become readable.
-  Future<({String text, List<RecognizedTextBlock> blocks})?> _recognise(
+  Future<OcrTextResult?> _recognise(
     String path, {
     bool enhanceContrast = false,
     OcrNormalizedRect? roi,
     OcrTraceRecorder? trace,
   }) async {
-    final recognized =
+    final recognised =
         await _recogniseRaw(path, enhanceContrast: enhanceContrast, roi: roi);
-    if (recognized == null) return null;
-    final text = recognized.text;
-    debugPrint('OCR text (${text.length} chars):\n$text');
-    // #2848 — keep ML Kit's block geometry so the receipt path can route a
-    // fuel-station receipt to the label-anchored extractor (was trace-only).
-    final blocks = mapRecognizedText(recognized);
-    trace?.blocks(text, blocks);
-    return (text: text, blocks: blocks);
+    if (recognised == null) return null;
+    debugPrint('OCR text (${recognised.text.length} chars):\n${recognised.text}');
+    // #2848 — the engine already carries the per-line block geometry so the
+    // receipt path can route a fuel-station receipt to the label-anchored
+    // extractor (ML Kit via mapRecognizedText, Vision via the channel).
+    trace?.blocks(recognised.text, recognised.blocks);
+    return recognised;
   }
 
   /// Runs ML Kit on the pump-display crop and returns BOTH the flat text
@@ -320,17 +304,22 @@ class ReceiptScanService {
   /// boxes to anchor the unit price to its label. Same EXIF-upright +
   /// #2275 Sauvola preprocessing as [_recognise]; the flat text is kept
   /// for the legacy fallback parser. Returns null when OCR reads nothing.
-  Future<({String text, List<RecognizedTextBlock> blocks})?> _recognisePump(
+  Future<OcrTextResult?> _recognisePump(
     String path, {
     OcrNormalizedRect? roi,
     bool binarize = true,
   }) async {
-    final recognized = await _recogniseRaw(path,
-        enhanceContrast: true, roi: roi, binarize: binarize);
-    if (recognized == null) return null;
-    final blocks = mapRecognizedText(recognized);
-    debugPrint('Pump OCR: ${recognized.text.length} chars, ${blocks.length} blocks');
-    return (text: recognized.text, blocks: blocks);
+    // #3052 — pump readouts are 7-segment digits, not prose: disable language
+    // correction so Vision/ML Kit don't "auto-correct" the numbers.
+    final recognised = await _recogniseRaw(path,
+        enhanceContrast: true,
+        roi: roi,
+        binarize: binarize,
+        languageCorrection: false);
+    if (recognised == null) return null;
+    debugPrint(
+        'Pump OCR: ${recognised.text.length} chars, ${recognised.blocks.length} blocks');
+    return recognised;
   }
 
   /// Core ML Kit pass shared by [_recognise] and [_recognisePump]: writes
@@ -338,18 +327,22 @@ class ReceiptScanService {
   /// the recognizer, and returns the raw [RecognizedText] so each caller
   /// can keep just the flat text or the full block geometry. Returns null
   /// on any decode/recognize error (logged).
-  Future<RecognizedText?> _recogniseRaw(
+  Future<OcrTextResult?> _recogniseRaw(
     String path, {
     bool enhanceContrast = false,
     OcrNormalizedRect? roi,
     bool binarize = true,
+    bool languageCorrection = true,
   }) async {
     String? uprightTemp;
     try {
       uprightTemp = await _writeUprightCopy(path,
           enhanceContrast: enhanceContrast, roi: roi, binarize: binarize);
-      final inputImage = InputImage.fromFilePath(uprightTemp ?? path);
-      return await _recognizer.processImage(inputImage);
+      // #3052 — recognition is delegated to the platform engine (iOS Vision /
+      // Android ML Kit); the EXIF-upright + Sauvola/ROI preprocessing above is
+      // engine-agnostic.
+      return await _engine.recognize(uprightTemp ?? path,
+          languageCorrection: languageCorrection);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: const {'where': 'OCR scan failed'}));
@@ -406,6 +399,6 @@ class ReceiptScanService {
   Future<void> deleteCapturedImage(String path) => _tryDelete(path);
 
   void dispose() {
-    _recognizer.close();
+    _engine.dispose();
   }
 }
