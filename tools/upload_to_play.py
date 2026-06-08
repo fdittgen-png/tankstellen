@@ -256,7 +256,15 @@ def main() -> int:
     print(f"Resolving release notes for versionCode {version_code}")
     release_notes = load_release_notes(changelog_dir, args.locales, version_code, fallback_notes)
 
-    print(f"Assigning to track '{args.track}'")
+    # The Play API can't bootstrap a FIRST production rollout's country
+    # availability (a first release must be 'completed', 'completed' rejects
+    # countryTargeting, and a fresh prod track targets no countries). So upload
+    # production as a DRAFT: the AAB lands on the production track as a draft the
+    # maintainer finalizes in the Console (set Countries/regions + publish). A
+    # draft isn't rolled out, so commit succeeds with no country requirement.
+    # Testing tracks (internal/alpha/beta) still roll out fully ('completed').
+    release_status = "draft" if args.track == "production" else "completed"
+    print(f"Assigning to track '{args.track}' (release status: {release_status})")
     try:
         _execute_with_retry(
             lambda: edits.tracks().update(
@@ -268,7 +276,7 @@ def main() -> int:
                     "releases": [{
                         "name": f"{version_code}",
                         "versionCodes": [str(version_code)],
-                        "status": "completed",
+                        "status": release_status,
                         "releaseNotes": release_notes,
                     }],
                 },
