@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/shell/settings_app_bar_action.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/theme_mode_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -73,6 +74,12 @@ class ProfileScreen extends ConsumerWidget {
 
     return PageScaffold(
       title: l?.settings ?? 'Settings',
+      // #3061 — Settings is a shell branch (no back-stack) → explicit back arrow.
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        onPressed: () => context.go(ref.read(settingsReturnLocationProvider)),
+      ),
       // #530 — compact vertical spacing. Was `EdgeInsets.all(16)` plus
       // `SizedBox(height: 32)` between every major section, which ate
       // ~180 dp of whitespace on a single screen. Tightened to 8 dp
