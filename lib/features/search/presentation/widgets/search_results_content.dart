@@ -63,6 +63,16 @@ class SearchResultsContent extends ConsumerWidget {
       // Settings path for denied location permission).
       return radar.stations.when(
         data: (stations) {
+          // #3058 — a genuinely-empty radar result is its OWN state, visually
+          // distinct from the loading shimmer and the error banner, so the
+          // user knows the scan FINISHED and found nothing — not that it's
+          // still searching (the old bare "0 stations" + blank was ambiguous).
+          if (stations.isEmpty) {
+            return _RadarEmptyState(
+              onRetry: () =>
+                  ref.read(radarSearchProvider.notifier).runRadar(),
+            );
+          }
           final radarResult = ServiceResult<List<SearchResultItem>>(
             data: [for (final s in stations) FuelStationResult(s)],
             source: ServiceSource.cache,
@@ -122,6 +132,54 @@ class SearchResultsContent extends ConsumerWidget {
             stackTrace: stackTrace,
             searchContext: 'Station search (${ref.read(selectedFuelTypeProvider).apiValue})',
           ),
+    );
+  }
+}
+
+/// #3058 — the radar's "scan finished, found nothing" state. Visually distinct
+/// from the loading shimmer (still searching) and the error banner (failed), so
+/// the user never has to guess which one they're looking at. Reuses the generic
+/// no-results strings — no new ARB keys.
+class _RadarEmptyState extends StatelessWidget {
+  const _RadarEmptyState({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.radar, size: 56, color: theme.colorScheme.onSurfaceVariant),
+            const SizedBox(height: 16),
+            Text(
+              l10n?.noResults ?? 'No stations found.',
+              style: theme.textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n?.errorHintNoStations ??
+                  'Try increasing the search radius or search a different location.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n?.retry ?? 'Try again'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

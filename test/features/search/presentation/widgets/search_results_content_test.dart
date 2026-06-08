@@ -11,6 +11,7 @@ import 'package:tankstellen/features/search/domain/entities/search_result_item.d
 import 'package:tankstellen/features/search/domain/entities/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_content.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_list.dart';
+import 'package:tankstellen/features/search/providers/radar_search_provider.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
@@ -99,7 +100,41 @@ void main() {
       expect(find.byType(SearchResultsList), findsOneWidget);
     });
 
+    testWidgets(
+        '#3058 — an empty radar result shows a clear empty-state (not a blank '
+        'SearchResultsList) so the user knows the scan finished', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        SearchResultsContent(onGpsRetry: noopRetry),
+        overrides: [
+          ...test.overrides,
+          radarSearchProvider.overrideWith(() => _EmptyRadarSearch()),
+        ].cast(),
+      );
+
+      // The radar owns the panel and found nothing → the dedicated empty-state
+      // (no-results message + radar icon + Try-again), NOT a blank list.
+      expect(find.text('No stations found.'), findsOneWidget);
+      expect(find.text('Try again'), findsOneWidget);
+      expect(find.byIcon(Icons.radar), findsOneWidget);
+      expect(find.byType(SearchResultsList), findsNothing);
+    });
   });
+}
+
+/// Radar active + zero stations — drives the #3058 empty-state branch.
+class _EmptyRadarSearch extends RadarSearch {
+  @override
+  RadarSearchState build() => const RadarSearchState(
+        active: true,
+        stations: AsyncData<List<Station>>(<Station>[]),
+      );
+
+  @override
+  Future<void> runRadar() async {/* no-op so a Try-again tap is inert */}
 }
 
 class _LoadingSearchState extends SearchState {
