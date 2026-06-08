@@ -357,7 +357,6 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
               // reached from the app bar) — no rail item highlighted.
               currentIndex: selectedSlot < 0 ? null : selectedSlot,
               iconControllers: _iconControllers,
-              extended: screenSize == ScreenSize.expanded,
               onTap: onSlotTap,
             ),
             const VerticalDivider(width: 1, thickness: 1),

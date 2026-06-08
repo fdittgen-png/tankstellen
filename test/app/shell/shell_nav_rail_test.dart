@@ -12,8 +12,8 @@ import 'package:tankstellen/app/shell/shell_nav_rail.dart';
 /// builds one [NavigationRailDestination] per `items[]` entry. Tests
 /// focus on the wiring rather than the rail's internal layout:
 ///   * one destination per item;
-///   * `extended: true` -> [NavigationRailLabelType.none];
-///   * `extended: false` -> [NavigationRailLabelType.selected];
+///   * a COMPACT rail: not extended, [NavigationRailLabelType.all] (label
+///     under every icon) — the #3056 width fix;
 ///   * tapping a destination fires `onTap(i)`;
 ///   * the selected slot uses the `filledIcon`, others use
 ///     `outlinedIcon`;
@@ -55,7 +55,6 @@ void main() {
     required List<int> branchForSlot,
     required int currentIndex,
     required List<AnimationController> iconControllers,
-    required bool extended,
     required ValueChanged<int> onTap,
   }) {
     return tester.pumpWidget(
@@ -68,7 +67,6 @@ void main() {
                 branchForSlot: branchForSlot,
                 currentIndex: currentIndex,
                 iconControllers: iconControllers,
-                extended: extended,
                 onTap: onTap,
               ),
               const Expanded(child: SizedBox.shrink()),
@@ -100,7 +98,6 @@ void main() {
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
         iconControllers: controllers,
-        extended: false,
         onTap: (_) {},
       );
 
@@ -123,7 +120,6 @@ void main() {
         branchForSlot: const [0, 1, 2],
         currentIndex: 1, // Search is selected
         iconControllers: controllers,
-        extended: false,
         onTap: (_) {},
       );
 
@@ -141,8 +137,9 @@ void main() {
     });
   });
 
-  group('ShellNavRail labelType', () {
-    testWidgets('extended: true -> labelType.none', (tester) async {
+  group('ShellNavRail labelType (#3056 compact rail)', () {
+    testWidgets('is a compact rail (not extended) with a label under every icon',
+        (tester) async {
       final controllers = [
         newController(),
         newController(),
@@ -155,35 +152,15 @@ void main() {
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
         iconControllers: controllers,
-        extended: true,
         onTap: (_) {},
       );
 
       final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      expect(rail.extended, isTrue);
-      expect(rail.labelType, NavigationRailLabelType.none);
-    });
-
-    testWidgets('extended: false -> labelType.selected', (tester) async {
-      final controllers = [
-        newController(),
-        newController(),
-        newController(),
-      ];
-
-      await pumpRail(
-        tester,
-        items: items,
-        branchForSlot: const [0, 1, 2],
-        currentIndex: 0,
-        iconControllers: controllers,
-        extended: false,
-        onTap: (_) {},
-      );
-
-      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      expect(rail.extended, isFalse);
-      expect(rail.labelType, NavigationRailLabelType.selected);
+      expect(rail.extended, isFalse,
+          reason: 'compact rail — the extended horizontal-label rail wasted '
+              'width the results column + map needed');
+      expect(rail.labelType, NavigationRailLabelType.all,
+          reason: 'every destination keeps its label, under the icon');
     });
   });
 
@@ -202,7 +179,6 @@ void main() {
         branchForSlot: const [0, 1, 2],
         currentIndex: 0,
         iconControllers: controllers,
-        extended: false,
         onTap: taps.add,
       );
 
@@ -237,7 +213,6 @@ void main() {
           branchForSlot: const [0, 2, 4],
           currentIndex: 0,
           iconControllers: controllers,
-          extended: false,
           onTap: (_) {},
         );
 
