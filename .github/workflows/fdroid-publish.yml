@@ -116,6 +116,10 @@ jobs:
           mkdir -p _site/fdroid
           # Privacy policy (its own index.html) IS the deployed site root.
           cp -R docs/privacy-policy/. _site/
+          # Also serve it at /privacy-policy/ so the legacy URL the Play
+          # listing links to keeps resolving after the legacy->Actions Pages
+          # migration (root alone would 404 that path).
+          mkdir -p _site/privacy-policy && cp -R docs/privacy-policy/. _site/privacy-policy/
           cp -f docs/icon.png _site/icon.png 2>/dev/null || true
           # F-Droid repo index served directly at /fdroid.
           cp -R fdroid/repo/. _site/fdroid/
