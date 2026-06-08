@@ -96,7 +96,6 @@ class SyncedDataCard extends StatelessWidget {
 /// Data action buttons: sync, view JSON, export, delete, disconnect.
 class DataActionButtons extends StatelessWidget {
   final bool loading;
-  final SyncMode mode;
   final VoidCallback onSync;
   final VoidCallback onViewRawJson;
   final VoidCallback onExportJson;
@@ -107,7 +106,6 @@ class DataActionButtons extends StatelessWidget {
   const DataActionButtons({
     super.key,
     required this.loading,
-    required this.mode,
     required this.onSync,
     required this.onViewRawJson,
     required this.onExportJson,
@@ -141,58 +139,38 @@ class DataActionButtons extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        // Destructive actions -- disabled for community mode
-        if (mode == SyncMode.community) ...[
-          Card(
-            color: DarkModeColors.warningSurface(context),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, color: DarkModeColors.warning(context)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l?.dataDeletionNotAvailableCommunity ??
-                          'Data deletion is not available in community '
-                              'mode. Disconnect first, or use a private database.',
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        // Destructive actions. Available in every mode, including community
+        // (#3081): each synced table's RLS is `FOR ALL USING (user_id =
+        // auth.uid())`, so a user can only ever delete their *own* rows —
+        // deleting your private data never touches the shared community DB's
+        // other users. A confirmation dialog still gates each action.
+        FilledButton.icon(
+          style: FilledButton.styleFrom(
+            backgroundColor: DarkModeColors.error(context),
           ),
-          const SizedBox(height: 8),
-        ] else ...[
-          FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: DarkModeColors.error(context),
-            ),
-            onPressed: onDeleteAll,
-            icon: const Icon(Icons.delete_forever),
-            label: Text(l?.deleteAllServerData ?? 'Delete all server data'),
+          onPressed: onDeleteAll,
+          icon: const Icon(Icons.delete_forever),
+          label: Text(l?.deleteAllServerData ?? 'Delete all server data'),
+        ),
+        const SizedBox(height: 8),
+        // #1541 — narrower destructive action: wipes only the
+        // synced trip history (both `trip_summaries` and
+        // `trip_details`) without touching the user's other
+        // server-side data. Outlined rather than filled so it
+        // visually defers to the broader "Delete all server data"
+        // above it.
+        OutlinedButton.icon(
+          key: const Key('forget_all_synced_trips_button'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: DarkModeColors.error(context),
           ),
-          const SizedBox(height: 8),
-          // #1541 — narrower destructive action: wipes only the
-          // synced trip history (both `trip_summaries` and
-          // `trip_details`) without touching the user's other
-          // server-side data. Outlined rather than filled so it
-          // visually defers to the broader "Delete all server data"
-          // above it.
-          OutlinedButton.icon(
-            key: const Key('forget_all_synced_trips_button'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: DarkModeColors.error(context),
-            ),
-            onPressed: onForgetAllTrips,
-            icon: const Icon(Icons.history_toggle_off),
-            label: Text(
-              l?.forgetAllSyncedTripsButton ?? 'Forget all synced trips',
-            ),
+          onPressed: onForgetAllTrips,
+          icon: const Icon(Icons.history_toggle_off),
+          label: Text(
+            l?.forgetAllSyncedTripsButton ?? 'Forget all synced trips',
           ),
-          const SizedBox(height: 8),
-        ],
+        ),
+        const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: onDisconnect,
           icon: const Icon(Icons.link_off),

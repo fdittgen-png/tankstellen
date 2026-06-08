@@ -15,7 +15,8 @@ import '../../fakes/fake_hive_storage.dart';
 /// - Anonymous → Email sign-up
 /// - Anonymous → Email sign-in (existing account)
 /// - Connected → Disconnect → Reconnect
-/// - Community mode → Delete account (blocked)
+/// - Community mode → Delete account (now allowed, #3081 — RLS scopes
+///   the wipe to the caller's own rows)
 ///
 /// The tests use a [FakeHiveStorage] to simulate local state and verify
 /// state changes via fake-state inspection (no mocktail needed for
@@ -103,7 +104,12 @@ void main() {
       expect(state.userId, isNull);
     });
 
-    test('deleteAccount is blocked in community mode', () async {
+    test('deleteAccount proceeds in community mode (#3081)', () async {
+      // Pre-seed local data — deleteAccount wipes *server* rows then
+      // disconnects; local data is untouched (only the sync config is
+      // cleared).
+      await fakeStorage.setFavoriteIds(['s1', 's2']);
+
       final container = createContainer(
         initialConfig: const SyncConfig(
           enabled: true,
@@ -117,12 +123,21 @@ void main() {
       container.read(syncStateProvider);
       await container.read(syncStateProvider.notifier).deleteAccount();
 
-      // In community mode, disconnect should NOT be called
-      // (deleteAccount returns early)
+      // The community early-return is gone: deleteAccount now reaches the
+      // delete + disconnect path. RLS (`FOR ALL USING (user_id =
+      // auth.uid())`) scopes the server wipe to the caller's own rows, so
+      // this can never touch other community users' data. With no live
+      // Supabase session in tests, the server calls are graceful no-ops
+      // and the path falls through to disconnect(), which clears the
+      // sync config.
+      expect(fakeStorage.getSetting('sync_enabled'), false,
+          reason: 'Community mode must no longer block deleteAccount');
       final state = container.read(syncStateProvider);
-      expect(state.enabled, isTrue,
-          reason: 'Community mode should block deleteAccount');
-      expect(state.mode, SyncMode.community);
+      expect(state.enabled, isFalse);
+      expect(state.userId, isNull);
+      expect(state.mode, SyncMode.none);
+      // Local data is preserved — only server data + sync config go.
+      expect(fakeStorage.getFavoriteIds(), ['s1', 's2']);
     });
 
     test('deleteAccount works in private mode', () async {

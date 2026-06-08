@@ -216,7 +216,6 @@ class DataTransparencyScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       DataActionButtons(
                         loading: uiState.loading,
-                        mode: syncConfig.mode,
                         onSync: () => _forceSyncAndReload(context, ref),
                         onViewRawJson: () =>
                             _showRawJson(context, uiState.data!),

@@ -254,13 +254,13 @@ class SyncState extends _$SyncState {
 
   /// Delete the user's account: wipe server data, sign out, clear local sync state.
   ///
-  /// Blocked in community mode to prevent accidental mass deletion
-  /// of the shared database. Users must disconnect first.
+  /// Works in every mode, including community (#3081). Every synced table's
+  /// RLS policy is `FOR ALL USING (user_id = auth.uid())`, so
+  /// [UserDataSync.deleteAll] can only ever remove the *caller's own* rows —
+  /// deleting your own data can never reach another community user's rows in
+  /// the shared database. The destructive UI action stays gated behind a
+  /// confirmation dialog before this runs.
   Future<void> deleteAccount() async {
-    if (state.mode == SyncMode.community) {
-      debugPrint('deleteAccount: blocked in community mode');
-      return;
-    }
     try {
       await UserDataSync.deleteAll();
       await TankSyncClient.signOut();
