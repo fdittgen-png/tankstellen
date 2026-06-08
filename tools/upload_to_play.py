@@ -54,6 +54,19 @@ DEFAULT_CHANGELOG_DIR = "fastlane/metadata/android"
 DEFAULT_LOCALES = ["de-DE", "en-US", "fr-FR"]
 SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 
+# Sparkilo's supported markets — one official government fuel-data provider per
+# country (lib/core/country/country_config.dart). The PRODUCTION release must
+# target an explicit country set: a brand-new production track targets NO
+# countries by default, so edits.commit() fails with "Release in track
+# targeting no countries". We target exactly the supported markets (NOT
+# rest-of-world) because a fuel app published in a country with no provider
+# would show empty data and draw 1-star reviews. Testing tracks
+# (internal/alpha/beta) are global by default and unaffected.
+SUPPORTED_PRODUCTION_COUNTRIES = [
+    "DE", "FR", "AT", "ES", "IT", "PT", "GB", "AU", "MX",
+    "AR", "DK", "LU", "SI", "KR", "CL", "GR", "RO",
+]
+
 # #1983 — every Android Publisher call is a network round-trip; a daily
 # CI build must not die on a single transient socket timeout / 5xx.
 # `num_retries` makes googleapiclient retry those with exponential
@@ -257,6 +270,23 @@ def main() -> int:
     release_notes = load_release_notes(changelog_dir, args.locales, version_code, fallback_notes)
 
     print(f"Assigning to track '{args.track}'")
+    release = {
+        "name": f"{version_code}",
+        "versionCodes": [str(version_code)],
+        "status": "completed",
+        "releaseNotes": release_notes,
+    }
+    # The production track needs an explicit country set or edits.commit() 403s
+    # with "Release in track targeting no countries" (a fresh prod track targets
+    # none). Testing tracks are global by default — only constrain production.
+    if args.track == "production":
+        release["countryTargeting"] = {
+            "countries": SUPPORTED_PRODUCTION_COUNTRIES,
+            "includeRestOfWorld": False,
+        }
+        print(f"  production countryTargeting: "
+              f"{len(SUPPORTED_PRODUCTION_COUNTRIES)} markets "
+              f"({', '.join(SUPPORTED_PRODUCTION_COUNTRIES)})")
     try:
         _execute_with_retry(
             lambda: edits.tracks().update(
@@ -265,12 +295,7 @@ def main() -> int:
                 track=args.track,
                 body={
                     "track": args.track,
-                    "releases": [{
-                        "name": f"{version_code}",
-                        "versionCodes": [str(version_code)],
-                        "status": "completed",
-                        "releaseNotes": release_notes,
-                    }],
+                    "releases": [release],
                 },
             ),
             label="tracks.update",
