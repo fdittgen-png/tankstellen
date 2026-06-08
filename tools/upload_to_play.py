@@ -54,19 +54,6 @@ DEFAULT_CHANGELOG_DIR = "fastlane/metadata/android"
 DEFAULT_LOCALES = ["de-DE", "en-US", "fr-FR"]
 SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 
-# Sparkilo's supported markets — one official government fuel-data provider per
-# country (lib/core/country/country_config.dart). The PRODUCTION release must
-# target an explicit country set: a brand-new production track targets NO
-# countries by default, so edits.commit() fails with "Release in track
-# targeting no countries". We target exactly the supported markets (NOT
-# rest-of-world) because a fuel app published in a country with no provider
-# would show empty data and draw 1-star reviews. Testing tracks
-# (internal/alpha/beta) are global by default and unaffected.
-SUPPORTED_PRODUCTION_COUNTRIES = [
-    "DE", "FR", "AT", "ES", "IT", "PT", "GB", "AU", "MX",
-    "AR", "DK", "LU", "SI", "KR", "CL", "GR", "RO",
-]
-
 # #1983 — every Android Publisher call is a network round-trip; a daily
 # CI build must not die on a single transient socket timeout / 5xx.
 # `num_retries` makes googleapiclient retry those with exponential
@@ -270,97 +257,54 @@ def main() -> int:
     release_notes = load_release_notes(changelog_dir, args.locales, version_code, fallback_notes)
 
     print(f"Assigning to track '{args.track}'")
-
-    def _assign_and_commit(target_edit_id, release_body):
-        """Assign one release to the track then validate (dry-run) or commit.
-        Raises the underlying API error on a hard failure."""
+    try:
         _execute_with_retry(
             lambda: edits.tracks().update(
                 packageName=args.package,
-                editId=target_edit_id,
+                editId=edit_id,
                 track=args.track,
-                body={"track": args.track, "releases": [release_body]},
+                body={
+                    "track": args.track,
+                    "releases": [{
+                        "name": f"{version_code}",
+                        "versionCodes": [str(version_code)],
+                        "status": "completed",
+                        "releaseNotes": release_notes,
+                    }],
+                },
             ),
             label="tracks.update",
         )
-        if args.dry_run:
+    except (HttpError, httplib2.HttpLib2Error, TimeoutError) as e:
+        print(f"ERROR: track update failed: {e}", file=sys.stderr)
+        return 5
+
+    if args.dry_run:
+        print("Dry-run: validating edit (no commit)")
+        try:
             _execute_with_retry(
                 lambda: edits.validate(
-                    packageName=args.package, editId=target_edit_id,
+                    packageName=args.package, editId=edit_id,
                 ),
                 label="edits.validate",
             )
             print("Validation OK — edit will NOT be committed (dry-run).")
-            return
+        except (HttpError, httplib2.HttpLib2Error, TimeoutError) as e:
+            print(f"ERROR: validation failed: {e}", file=sys.stderr)
+            return 6
+        return 0
+
+    print("Committing edit")
+    try:
         _execute_with_retry(
             lambda: edits.commit(
-                packageName=args.package, editId=target_edit_id,
+                packageName=args.package, editId=edit_id,
             ),
             label="edits.commit",
         )
-
-    base_release = {
-        "name": f"{version_code}",
-        "versionCodes": [str(version_code)],
-        "releaseNotes": release_notes,
-    }
-
-    try:
-        if args.track == "production":
-            # Play rejects countryTargeting on a 'completed' release, AND a
-            # never-published production track targets no countries — so a
-            # single 'completed' release 403s with "targeting no countries".
-            # Two-phase launch:
-            #   Phase 1 — a STAGED (inProgress) release WITH countryTargeting
-            #             establishes the production track's availability in the
-            #             supported markets and goes live to ~all users there.
-            #   Phase 2 — COMPLETE that release to 100% (countries are now
-            #             established, so countryTargeting is no longer
-            #             needed/allowed). This mirrors the Console "Go to 100%".
-            print(f"  production countryTargeting: "
-                  f"{len(SUPPORTED_PRODUCTION_COUNTRIES)} markets "
-                  f"({', '.join(SUPPORTED_PRODUCTION_COUNTRIES)})")
-            staged = {
-                **base_release,
-                "status": "inProgress",
-                "userFraction": 0.99,
-                "countryTargeting": {
-                    "countries": SUPPORTED_PRODUCTION_COUNTRIES,
-                    "includeRestOfWorld": False,
-                },
-            }
-            print("Phase 1/2: staged rollout to the supported markets")
-            _assign_and_commit(edit_id, staged)
-            if args.dry_run:
-                return 0
-            print("  phase 1 committed — production now available in the "
-                  "supported markets")
-            try:
-                edit2 = _execute_with_retry(
-                    lambda: edits.insert(packageName=args.package, body={}),
-                    label="edits.insert (phase 2)",
-                )["id"]
-                print("Phase 2/2: completing to 100% production")
-                _assign_and_commit(
-                    edit2, {**base_release, "status": "completed"})
-                print("  phase 2 committed — 100% production rollout")
-            except (HttpError, httplib2.HttpLib2Error, TimeoutError) as e2:
-                # Phase 1 already made the release LIVE in the supported markets
-                # (99% staged). Completing to 100% can fail transiently while
-                # Play processes phase 1 — recoverable (re-run, or "Go to 100%"
-                # in the Console), NOT a deploy failure.
-                print(f"WARNING: phase 2 (complete to 100%) deferred: {e2}",
-                      file=sys.stderr)
-                print("  release is LIVE in the supported markets (99%); "
-                      "complete to 100% via a re-run or the Play Console.")
-        else:
-            _assign_and_commit(
-                edit_id, {**base_release, "status": "completed"})
-            if args.dry_run:
-                return 0
     except (HttpError, httplib2.HttpLib2Error, TimeoutError) as e:
-        print(f"ERROR: track assign/commit failed: {e}", file=sys.stderr)
-        return 5
+        print(f"ERROR: edits.commit failed: {e}", file=sys.stderr)
+        return 7
 
     print(f"\nSUCCESS: versionCode {version_code} published to track '{args.track}'")
     print(f"https://play.google.com/console/u/0/developers/5325652654414690657/app/4973487066249778216/tracks/open-testing")
