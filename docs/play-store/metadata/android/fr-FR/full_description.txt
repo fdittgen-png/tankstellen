@@ -1,4 +1,4 @@
-Arrêtez de payer trop cher à la pompe. Sparkilo compare les prix carburant en temps réel et vous guide vers la station la moins chère près de vous — essence, gazole, GPL, GNV, E85 et recharge de voiture électrique. Dans 17 pays, gratuit, sans pub, sans compte, open source (MIT).
+Comparez les prix carburant en temps réel et trouvez l'essence ou le gazole les moins chers près de vous. Sparkilo vous guide vers la station-service la moins chère et compare le prix essence, gazole, GPL, GNV, E85 et la recharge de voiture électrique sur une même carte. Dans 17 pays, gratuit, sans pub, sans compte, open source (MIT).
 
 POURQUOI SPARKILO
 • Prix open-data officiels, pays par pays — pas d'estimations crowdsourcées.
@@ -7,10 +7,10 @@ POURQUOI SPARKILO
 • Vie privée d'abord : GPS et clés API ne quittent jamais l'appareil. Sans pub, sans pistage, sans compte.
 
 CARBURANT PAS CHER PRÈS DE VOUS
-• Recherche à proximité ou le long du trajet : filtres carburant, rayon, ouvert maintenant, services et autoroute uniquement.
-• Meilleur prix essence ou gazole en tête, avec un badge « Le moins cher » sur la carte.
+• Trouvez les stations d'essence et les stations-service les moins chères à proximité ou le long du trajet : filtres carburant, rayon, ouvert maintenant, services et autoroute uniquement.
+• Essence pas chère ou meilleur prix gazole en tête, avec un badge « Le moins cher » sur la carte.
 • Le mode trajet trouve les meilleurs arrêts du corridor pour que le détour soit toujours rentable.
-• Détail complet de la station : marque, horaires, paiement, distance, services.
+• Détail complet de la station essence : marque, horaires, paiement, distance, services.
 
 ALERTES PRIX & FAVORIS
 • Alertes par station et par rayon, exécutées sur l'appareil uniquement à proximité.
