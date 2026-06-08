@@ -13,7 +13,7 @@
 - **App collects or shares user data?** Yes
 - **All data encrypted in transit?** Yes (all network calls use HTTPS/TLS)
 - **Users can request data deletion?** Yes (local: Settings > Delete all data; server: TankSync > Data Transparency > Delete everything)
-- **Privacy policy URL:** https://fdittgen-png.github.io/tankstellen/
+- **Privacy policy URL:** https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
 ---
 
@@ -130,4 +130,4 @@ After deletion, the anonymous account is removed and cannot be recovered.
 4. All other data categories: select **"Not collected"**
 5. Confirm data is encrypted in transit
 6. Confirm users can request deletion
-7. Provide privacy policy URL: `https://fdittgen-png.github.io/tankstellen/`
+7. Provide privacy policy URL: `https://fdittgen-png.github.io/tankstellen/privacy-policy/`

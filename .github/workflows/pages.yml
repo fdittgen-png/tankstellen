@@ -1,19 +1,24 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-name: Deploy site (privacy policy + F-Droid repo) to GitHub Pages
+name: Deploy site (landing page + privacy policy + F-Droid repo) to GitHub Pages
 
-# Single Pages site (#2576): the privacy policy (its own index.html) is the
-# site root, the self-hosted F-Droid repo index is served at /fdroid. A push
-# that changes the privacy policy OR the committed F-Droid repo index redeploys
-# the combined site. (fdroid-publish.yml deploys the SAME combined layout on a
-# version tag, after rebuilding + re-signing the APK; both share the `pages`
-# concurrency group so they never race the single site.)
+# Single Pages site (#2576, #3066): the marketing landing page (docs/landing/
+# index.html) is the site root, the privacy policy is served at /privacy-policy/,
+# and the self-hosted F-Droid repo index is served at /fdroid. A push that
+# changes the landing page, its screenshots/feature graphic, the privacy policy
+# OR the committed F-Droid repo index redeploys the combined site.
+# (fdroid-publish.yml deploys the SAME combined layout on a version tag, after
+# rebuilding + re-signing the APK; both share the `pages` concurrency group so
+# they never race the single site.)
 
 on:
   push:
     branches: [master]
     paths:
+      - 'docs/landing/**'
+      - 'docs/screenshots/**'
+      - 'docs/play-store/metadata/android/en-US/images/featureGraphic.png'
       - 'docs/privacy-policy/**'
       - 'docs/icon.png'
       - 'fdroid/repo/**'
@@ -36,19 +41,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      # Combine: privacy policy at the root, the committed F-Droid repo index
-      # served directly at /fdroid (so the repo_url
-      # https://…/tankstellen/fdroid resolves /fdroid/index-v1.jar).
+      # Combine: marketing landing page at the root, privacy policy at
+      # /privacy-policy/, the committed F-Droid repo index served directly at
+      # /fdroid (so the repo_url https://…/tankstellen/fdroid resolves
+      # /fdroid/index-v1.jar).
       - name: Assemble _site
         run: |
           rm -rf _site
           mkdir -p _site/fdroid
-          cp -R docs/privacy-policy/. _site/
-          # Also serve the policy at /privacy-policy/ so the legacy URL the
-          # Play listing links to keeps resolving after the legacy->Actions
-          # Pages migration (root alone would 404 that path).
+          # Marketing landing page IS the deployed site root (#3066).
+          cp -R docs/landing/. _site/
+          # Privacy policy at its canonical /privacy-policy/ URL (the landing
+          # page took the root; store listings now cite this path).
           mkdir -p _site/privacy-policy && cp -R docs/privacy-policy/. _site/privacy-policy/
+          # Landing-page assets at the root paths index.html references.
           cp -f docs/icon.png _site/icon.png 2>/dev/null || true
+          cp -f docs/play-store/metadata/android/en-US/images/featureGraphic.png _site/featureGraphic.png 2>/dev/null || true
+          mkdir -p _site/screenshots && cp -R docs/screenshots/. _site/screenshots/ 2>/dev/null || true
           if [ -d fdroid/repo ]; then
             mkdir -p _site/fdroid/repo && cp -R fdroid/repo/. _site/fdroid/repo/
           fi

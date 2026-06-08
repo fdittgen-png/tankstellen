@@ -115,22 +115,24 @@ jobs:
           cd fdroid && fdroid update --create-metadata --pretty
 
       # --- Assemble the COMBINED Pages site ----------------------------------
-      # Privacy policy + index.html at the site root, and the F-Droid repo
-      # index served directly at /fdroid (so the repo_url
-      # https://…/tankstellen/fdroid resolves /fdroid/index-v1.jar). Same
-      # layout pages.yml stages, so whichever workflow deploys last is
-      # consistent.
+      # Marketing landing page at the site root, privacy policy at
+      # /privacy-policy/, and the F-Droid repo index served directly at /fdroid
+      # (so the repo_url https://…/tankstellen/fdroid resolves
+      # /fdroid/index-v1.jar). Same layout pages.yml stages, so whichever
+      # workflow deploys last is consistent (#3066).
       - name: Assemble _site
         run: |
           rm -rf _site
           mkdir -p _site/fdroid
-          # Privacy policy (its own index.html) IS the deployed site root.
-          cp -R docs/privacy-policy/. _site/
-          # Also serve it at /privacy-policy/ so the legacy URL the Play
-          # listing links to keeps resolving after the legacy->Actions Pages
-          # migration (root alone would 404 that path).
+          # Marketing landing page IS the deployed site root (#3066).
+          cp -R docs/landing/. _site/
+          # Privacy policy at its canonical /privacy-policy/ URL (the landing
+          # page took the root; store listings now cite this path).
           mkdir -p _site/privacy-policy && cp -R docs/privacy-policy/. _site/privacy-policy/
+          # Landing-page assets at the root paths index.html references.
           cp -f docs/icon.png _site/icon.png 2>/dev/null || true
+          cp -f docs/play-store/metadata/android/en-US/images/featureGraphic.png _site/featureGraphic.png 2>/dev/null || true
+          mkdir -p _site/screenshots && cp -R docs/screenshots/. _site/screenshots/ 2>/dev/null || true
           # F-Droid repo index served at /fdroid/repo (fdroidserver requires
           # repo_url to end in /repo).
           mkdir -p _site/fdroid/repo && cp -R fdroid/repo/. _site/fdroid/repo/

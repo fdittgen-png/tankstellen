@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sparkilo — Free fuel-price &amp; EV-charging comparison, 17 countries</title>
+  <meta name="description" content="Sparkilo: free, ad-free, open-source app for real-time official fuel prices, cheapest petrol/diesel/gas &amp; EV charging across 17 countries. Route to the cheapest station, price alerts, consumption tracker — privacy-first, no account." />
+  <meta name="theme-color" content="#2E7D32" />
+  <link rel="icon" href="./icon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="./icon.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Sparkilo — Free fuel-price &amp; EV-charging comparison" />
+  <meta property="og:description" content="Real-time official fuel prices &amp; EV charging across 17 countries. Route to the cheapest station, price alerts, consumption tracker. Free, ad-free, open-source, privacy-first." />
+  <meta property="og:image" content="./featureGraphic.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sparkilo — Free fuel-price &amp; EV-charging comparison" />
+  <meta name="twitter:description" content="Real-time official fuel prices &amp; EV charging across 17 countries. Free, ad-free, open-source, privacy-first." />
+  <meta name="twitter:image" content="./featureGraphic.png" />
+
+  <style>
+    :root {
+      --green: #2E7D32;
+      --green-dark: #1B5E20;
+      --green-light: #4CAF50;
+      --green-soft: #E8F5E9;
+      --ink: #14201a;
+      --body: #38463f;
+      --muted: #6b7a72;
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-2: #f5f8f6;
+      --border: #e2e9e4;
+      --shadow: 0 4px 14px rgba(20, 50, 30, 0.08);
+      --shadow-lg: 0 18px 50px rgba(20, 50, 30, 0.16);
+      --radius: 18px;
+      --maxw: 1120px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --green: #5BBF61;
+        --green-dark: #3a9a41;
+        --green-light: #7ed884;
+        --green-soft: #16291b;
+        --ink: #eef5ef;
+        --body: #c3d0c8;
+        --muted: #8fa298;
+        --bg: #0e1512;
+        --surface: #15201b;
+        --surface-2: #111a15;
+        --border: #243329;
+        --shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.5);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+      color: var(--body);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    img { max-width: 100%; display: block; }
+
+    h1, h2, h3 { color: var(--ink); line-height: 1.15; margin: 0 0 0.4em; letter-spacing: -0.02em; }
+
+    .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+    .skip-link {
+      position: absolute; left: -999px; top: 0;
+      background: var(--green); color: #fff; padding: 10px 16px; z-index: 1000; border-radius: 0 0 8px 0;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* ---------- Header ---------- */
+    header.site {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(1.4) blur(12px);
+      -webkit-backdrop-filter: saturate(1.4) blur(12px);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); font-size: 1.15rem; letter-spacing: -0.02em; }
+    .brand img { width: 32px; height: 32px; border-radius: 8px; }
+    .nav-links { display: flex; gap: 26px; align-items: center; }
+    .nav-links a { color: var(--body); font-weight: 500; font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--green); text-decoration: none; }
+    .nav-cta {
+      background: var(--green); color: #fff !important; padding: 8px 16px; border-radius: 999px;
+      font-weight: 600; font-size: 0.9rem;
+    }
+    .nav-cta:hover { background: var(--green-dark); text-decoration: none; }
+    @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      background:
+        radial-gradient(1100px 500px at 75% -10%, color-mix(in srgb, var(--green) 26%, transparent), transparent 60%),
+        linear-gradient(160deg, var(--surface-2) 0%, var(--bg) 70%);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .hero-inner { padding: 64px 20px 56px; text-align: center; }
+    .hero-logo { display: inline-flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+    .hero-logo img { width: 76px; height: 76px; border-radius: 20px; box-shadow: var(--shadow-lg); }
+    .hero-logo .word { font-size: 2.4rem; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
+    .hero h1 {
+      font-size: clamp(2rem, 5.5vw, 3.4rem);
+      max-width: 16ch; margin: 0 auto 0.5em;
+      background: linear-gradient(120deg, var(--ink), var(--green) 130%);
+      -webkit-background-clip: text; background-clip: text;
+    }
+    .hero .tagline { font-size: clamp(1.05rem, 2.4vw, 1.3rem); color: var(--body); max-width: 56ch; margin: 0 auto 8px; }
+    .hero .pill-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 22px auto 4px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-soft); color: var(--green-dark);
+      border: 1px solid color-mix(in srgb, var(--green) 30%, transparent);
+      padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+    }
+    @media (prefers-color-scheme: dark) { .pill { color: var(--green-light); } }
+
+    .feature-graphic { max-width: 760px; margin: 36px auto 0; }
+    .feature-graphic img { border-radius: var(--radius); box-shadow: var(--shadow-lg); border: 1px solid var(--border); width: 100%; }
+
+    /* ---------- Store buttons ---------- */
+    .stores { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; margin: 34px auto 6px; }
+    .store-badge img { height: 56px; width: auto; border-radius: 10px; }
+    .store-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      height: 56px; padding: 0 20px; border-radius: 10px;
+      background: var(--ink); color: var(--bg) !important; font-weight: 600;
+      border: 1px solid transparent; line-height: 1.1;
+    }
+    .store-btn:hover { text-decoration: none; opacity: 0.92; }
+    .store-btn small { display: block; font-size: 0.66rem; font-weight: 500; opacity: 0.8; letter-spacing: 0.02em; }
+    .store-btn strong { font-size: 1.05rem; font-weight: 700; }
+    .store-btn .ic { font-size: 1.5rem; line-height: 1; }
+    .store-btn.fdroid { background: var(--green); color: #fff !important; }
+    .store-btn.disabled { background: var(--surface-2); color: var(--muted) !important; border: 1px solid var(--border); cursor: not-allowed; }
+    .store-btn.disabled:hover { opacity: 1; }
+    .ghost-link {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+      color: var(--body); font-weight: 600; font-size: 0.95rem;
+    }
+
+    /* ---------- Trust strip ---------- */
+    .trust { background: var(--green); color: #fff; }
+    .trust .wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 48px; padding: 30px 20px; text-align: center; }
+    .trust .stat { min-width: 130px; }
+    .trust .num { font-size: 2rem; font-weight: 800; display: block; letter-spacing: -0.02em; }
+    .trust .lbl { font-size: 0.9rem; opacity: 0.92; }
+    @media (prefers-color-scheme: dark) { .trust { background: var(--green-dark); } }
+
+    /* ---------- Sections ---------- */
+    section { padding: 72px 0; }
+    .section-head { text-align: center; max-width: 64ch; margin: 0 auto 48px; }
+    .section-head h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+    .section-head p { color: var(--muted); font-size: 1.08rem; margin: 0; }
+    .eyebrow { color: var(--green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; display: block; margin-bottom: 10px; }
+
+    /* ---------- Differentiators ---------- */
+    .diffs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .diff {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 28px; box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .diff::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, var(--green), var(--green-light)); }
+    .diff .ic { font-size: 2rem; margin-bottom: 12px; }
+    .diff h3 { font-size: 1.2rem; }
+    .diff p { margin: 0; color: var(--body); }
+    @media (max-width: 860px) { .diffs { grid-template-columns: 1fr; } }
+
+    /* ---------- Feature grid ---------- */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .feature {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 26px; transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .feature:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .feature .badge {
+      width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
+      background: var(--green-soft); font-size: 1.4rem; margin-bottom: 14px;
+    }
+    .feature h3 { font-size: 1.15rem; }
+    .feature p { margin: 0; color: var(--body); font-size: 0.98rem; }
+    @media (max-width: 900px) { .features { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .features { grid-template-columns: 1fr; } }
+
+    /* ---------- Screenshots ---------- */
+    #screenshots { background: var(--surface-2); }
+    .shots {
+      display: flex; gap: 22px; overflow-x: auto; padding: 8px 20px 24px;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin; scrollbar-color: var(--green) transparent;
+    }
+    .shots::-webkit-scrollbar { height: 8px; }
+    .shots::-webkit-scrollbar-thumb { background: var(--green); border-radius: 999px; }
+    .shot { flex: 0 0 auto; width: 240px; scroll-snap-align: center; text-align: center; }
+    .shot img {
+      width: 100%; aspect-ratio: 9 / 16; object-fit: cover;
+      border-radius: 22px; border: 1px solid var(--border); box-shadow: var(--shadow-lg); background: var(--surface);
+    }
+    .shot figcaption { margin-top: 12px; font-size: 0.92rem; color: var(--body); font-weight: 600; }
+    .shots-hint { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+    /* ---------- CTA band ---------- */
+    .cta-band { text-align: center; }
+    .cta-band .box {
+      background: linear-gradient(150deg, var(--green-dark), var(--green));
+      color: #fff; border-radius: 26px; padding: 54px 28px; box-shadow: var(--shadow-lg);
+    }
+    .cta-band h2 { color: #fff; font-size: clamp(1.6rem, 4vw, 2.3rem); }
+    .cta-band p { color: rgba(255,255,255,0.92); max-width: 50ch; margin: 0 auto 26px; font-size: 1.08rem; }
+
+    /* ---------- Countries ---------- */
+    .countries { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 920px; margin: 0 auto; }
+    .country {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+      padding: 7px 16px; font-size: 0.9rem; font-weight: 500; color: var(--body);
+    }
+
+    /* ---------- Footer ---------- */
+    footer.site { background: var(--surface-2); border-top: 1px solid var(--border); padding: 48px 0 40px; }
+    .foot-grid { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 28px; }
+    .foot-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ink); }
+    .foot-brand img { width: 34px; height: 34px; border-radius: 9px; }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 22px; align-items: center; }
+    .foot-links a { color: var(--body); font-weight: 500; font-size: 0.95rem; }
+    .foot-note { margin-top: 28px; color: var(--muted); font-size: 0.88rem; text-align: center; }
+
+    .center { text-align: center; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="Sparkilo home">
+        <img src="./icon.png" alt="Sparkilo logo: a white droplet inside a shield on green" width="32" height="32" />
+        <span>Sparkilo</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#countries">Countries</a>
+        <a href="https://github.com/fdittgen-png/tankstellen" rel="noopener">Source</a>
+        <a class="nav-cta" href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices" rel="noopener">Get the app</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <div class="hero-logo">
+          <img src="./icon.png" alt="Sparkilo logo: a white droplet inside a shield on green" width="76" height="76" />
+          <span class="word">Sparkilo</span>
+        </div>
+
+        <h1 id="hero-title">Always pay the cheapest price for fuel &amp; charging</h1>
+        <p class="tagline">
+          Real-time <strong>official</strong> fuel prices and EV charging across 17 countries.
+          Free, ad-free, open-source — and everything stays on your device.
+        </p>
+
+        <div class="pill-row" aria-hidden="false">
+          <span class="pill">100% free &amp; ad-free</span>
+          <span class="pill">Official data, not crowdsourced</span>
+          <span class="pill">Privacy-first · no account</span>
+        </div>
+
+        <!-- STORE BUTTONS -->
+        <div class="stores">
+          <a class="store-badge" href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices" rel="noopener">
+            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_us/get_it_on_google_play.png" alt="Get it on Google Play" />
+          </a>
+
+          <a class="store-btn fdroid" href="https://fdittgen-png.github.io/tankstellen/fdroid" rel="noopener">
+            <span class="ic" aria-hidden="true">&#129505;</span>
+            <span><small>Libre build on</small><strong>F-Droid</strong></span>
+          </a>
+
+          <span class="store-btn disabled" role="note" aria-label="App Store coming soon">
+            <span class="ic" aria-hidden="true">&#63743;</span>
+            <span><small>Coming soon to the</small><strong>App&nbsp;Store</strong></span>
+          </span>
+        </div>
+
+        <div class="center">
+          <a class="ghost-link" href="https://github.com/fdittgen-png/tankstellen" rel="noopener">
+            <span aria-hidden="true">&#128279;</span> View source on GitHub
+          </a>
+        </div>
+
+        <!-- FEATURE GRAPHIC -->
+        <figure class="feature-graphic">
+          <img src="./featureGraphic.png" alt="Sparkilo app showing a map of nearby fuel stations with prices coloured cheapest to priciest" width="1024" height="500" loading="lazy" />
+        </figure>
+      </div>
+    </section>
+
+    <!-- TRUST STRIP -->
+    <div class="trust" aria-label="Coverage at a glance">
+      <div class="wrap">
+        <div class="stat"><span class="num">17</span><span class="lbl">countries with official prices</span></div>
+        <div class="stat"><span class="num">23</span><span class="lbl">UI languages</span></div>
+        <div class="stat"><span class="num">6</span><span class="lbl">fuel types + EV charging</span></div>
+        <div class="stat"><span class="num">€0</span><span class="lbl">forever · no ads, no account</span></div>
+      </div>
+    </div>
+
+    <!-- DIFFERENTIATORS -->
+    <section aria-labelledby="why-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Why Sparkilo</span>
+          <h2 id="why-title">Three things that make it different</h2>
+          <p>Not another crowdsourced, ad-funded tracker. Sparkilo is built on trustworthy data and on respect for your privacy.</p>
+        </div>
+        <div class="diffs">
+          <article class="diff">
+            <div class="ic" aria-hidden="true">&#9989;</div>
+            <h3>Official data, not guesses</h3>
+            <p>Prices come straight from government and open-data feeds — never crowdsourced. What you see is what stations are legally posting right now.</p>
+          </article>
+          <article class="diff">
+            <div class="ic" aria-hidden="true">&#127873;</div>
+            <h3>Free, ad-free, open-source</h3>
+            <p>No ads, no upsells, no premium tier. The full source is public under the MIT licence, with a libre build on F-Droid.</p>
+          </article>
+          <article class="diff">
+            <div class="ic" aria-hidden="true">&#128274;</div>
+            <h3>Privacy by design</h3>
+            <p>Your GPS location and API keys never leave the phone. No tracking, no analytics, no account required. Sync across devices only if you choose to.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURE GRID -->
+    <section id="features" aria-labelledby="feat-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Everything you need at the pump</span>
+          <h2 id="feat-title">Features</h2>
+          <p>From finding the cheapest litre to coaching your driving — all in one app.</p>
+        </div>
+        <div class="features">
+          <article class="feature">
+            <div class="badge" aria-hidden="true">&#9981;</div>
+            <h3>Cheapest-station search</h3>
+            <p>Find the lowest price nearby for petrol, diesel, LPG, CNG, E85 or electric. Pins are coloured cheapest to priciest, and the Fuel Station Radar live-scans around you.</p>
+          </article>
+          <article class="feature">
+            <div class="badge" aria-hidden="true">&#128506;</div>
+            <h3>Search along your route</h3>
+            <p>Heading somewhere? Sparkilo finds the best-value stations in your driving corridor. Filter by fuel type, radius, open-now, amenities or highway-only.</p>
+          </article>
+          <article class="feature">
+            <div class="badge" aria-hidden="true">&#128276;</div>
+            <h3>Smart price alerts</h3>
+            <p>Set on-device alerts that fire only when a great price is genuinely nearby. Keep favourites and open the full station detail — brand, hours, payment, amenities.</p>
+          </article>
+          <article class="feature">
+            <div class="badge" aria-hidden="true">&#128203;</div>
+            <h3>Consumption tracker + OCR</h3>
+            <p>Log fill-ups by snapping the pump display or receipt. Track L/100&nbsp;km, cost per km and history, with a built-in fuel-cost calculator and CO&#8322; dashboard.</p>
+          </article>
+          <article class="feature">
+            <div class="badge" aria-hidden="true">&#127942;</div>
+            <h3>Trip logbook + eco-coaching</h3>
+            <p>Record trips via OBD2 (ELM327) or GPS-only and see each route coloured by efficiency. Get an approach live-price overlay, a home-screen widget and voice announcements.</p>
+          </article>
+          <article class="feature">
+            <div class="badge" aria-hidden="true">&#9889;</div>
+            <h3>EV charging worldwide</h3>
+            <p>Compare charging points anywhere via Open Charge Map, right alongside fuel stations — perfect for mixed and electric fleets.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREENSHOTS -->
+    <section id="screenshots" aria-labelledby="shots-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">See it in action</span>
+          <h2 id="shots-title">Screenshots</h2>
+          <p>Swipe through Sparkilo on a real phone.</p>
+        </div>
+      </div>
+      <div class="shots" role="list" aria-label="App screenshots, scrollable">
+        <figure class="shot" role="listitem">
+          <img src="./screenshots/02-search-results.jpg" alt="Search results listing the cheapest fuel stations near the user" loading="lazy" />
+          <figcaption>Cheapest stations near you</figcaption>
+        </figure>
+        <figure class="shot" role="listitem">
+          <img src="./screenshots/04-map-route-corridor.jpg" alt="Map showing price pins along a planned driving route corridor" loading="lazy" />
+          <figcaption>Price map + route</figcaption>
+        </figure>
+        <figure class="shot" role="listitem">
+          <img src="./screenshots/06-price-alerts.jpg" alt="Price alert settings for nearby fuel deals" loading="lazy" />
+          <figcaption>Price alerts</figcaption>
+        </figure>
+        <figure class="shot" role="listitem">
+          <img src="./screenshots/05-favorites-fuel-and-ev.jpg" alt="Favourites list mixing fuel stations and EV charging points" loading="lazy" />
+          <figcaption>Favourites: fuel + EV</figcaption>
+        </figure>
+        <figure class="shot" role="listitem">
+          <img src="./screenshots/08-fuel-stats.jpg" alt="Consumption tracker statistics with litres per 100 km and cost per km" loading="lazy" />
+          <figcaption>Consumption tracker</figcaption>
+        </figure>
+        <figure class="shot" role="listitem">
+          <img src="./screenshots/10-trip-detail-gps-route.jpg" alt="Trip detail with a GPS route coloured by driving efficiency" loading="lazy" />
+          <figcaption>Trip eco-route</figcaption>
+        </figure>
+      </div>
+      <p class="shots-hint">Swipe or scroll to see more &rarr;</p>
+    </section>
+
+    <!-- COUNTRIES -->
+    <section id="countries" aria-labelledby="countries-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Coverage</span>
+          <h2 id="countries-title">Official prices in 17 countries</h2>
+          <p>Real-time government and open-data fuel prices — plus EV charging worldwide via Open Charge Map.</p>
+        </div>
+        <div class="countries">
+          <span class="country">Austria</span>
+          <span class="country">Argentina</span>
+          <span class="country">Australia</span>
+          <span class="country">Chile</span>
+          <span class="country">Denmark</span>
+          <span class="country">France</span>
+          <span class="country">Germany</span>
+          <span class="country">Greece</span>
+          <span class="country">Italy</span>
+          <span class="country">Luxembourg</span>
+          <span class="country">Mexico</span>
+          <span class="country">Portugal</span>
+          <span class="country">Romania</span>
+          <span class="country">Slovenia</span>
+          <span class="country">South Korea</span>
+          <span class="country">Spain</span>
+          <span class="country">United Kingdom</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BAND -->
+    <section class="cta-band" aria-labelledby="cta-title">
+      <div class="wrap">
+        <div class="box">
+          <h2 id="cta-title">Start saving on every fill-up</h2>
+          <p>Download Sparkilo today — free, ad-free and open-source. No account, no tracking, no catch.</p>
+          <div class="stores" style="margin-bottom:0;">
+            <a class="store-badge" href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices" rel="noopener">
+              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_us/get_it_on_google_play.png" alt="Get it on Google Play" />
+            </a>
+            <a class="store-btn fdroid" href="https://fdittgen-png.github.io/tankstellen/fdroid" rel="noopener" style="background:#fff;color:var(--green-dark)!important;">
+              <span class="ic" aria-hidden="true">&#129505;</span>
+              <span><small>Libre build on</small><strong>F-Droid</strong></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <img src="./icon.png" alt="" aria-hidden="true" width="34" height="34" />
+          <span>Sparkilo</span>
+        </div>
+        <nav class="foot-links" aria-label="Footer">
+          <a href="https://github.com/fdittgen-png/tankstellen" rel="noopener">GitHub</a>
+          <a href="./privacy-policy/">Privacy policy</a>
+          <a href="mailto:fdittgen@gmail.com">Contact</a>
+          <a href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices" rel="noopener">Google Play</a>
+          <a href="https://fdittgen-png.github.io/tankstellen/fdroid" rel="noopener">F-Droid</a>
+        </nav>
+      </div>
+      <p class="foot-note">© 2026 Florian DITTGEN · Released under the MIT licence · Made with care, no ads, no tracking.</p>
+    </div>
+  </footer>
+</body>
+</html>
