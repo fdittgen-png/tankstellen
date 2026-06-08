@@ -18,5 +18,26 @@
   "authErrorGeneric": "Sign-in failed. Please try again.",
   "@authErrorGeneric": {
     "description": "Auth error pill — generic fallback when no specific mapping matches the raw exception (#1186)."
+  },
+  "authLinkEmailTitle": "Link an email",
+  "@authLinkEmailTitle": {
+    "description": "Auth card heading shown to an anonymous user — framing the primary action as attaching an email to their CURRENT account (keeping their data) rather than creating a separate new account (#3079)."
+  },
+  "authLinkEmailSubtitle": "Link an email so your data syncs across devices. Your current favorites and trips stay on this account.",
+  "@authLinkEmailSubtitle": {
+    "description": "Auth card body for an anonymous user — reassures that linking an email upgrades the current anonymous identity in place, so existing favorites/trips are preserved and become reachable on other devices (#3079)."
+  },
+  "authGuestLinkPrompt": "You're using a guest account ({idPrefix}…). Link an email so your favorites and trips sync to your other devices.",
+  "@authGuestLinkPrompt": {
+    "description": "Status text for a connected anonymous (guest) user, prompting them to attach an email for cross-device sync (#3079).",
+    "placeholders": {
+      "idPrefix": {
+        "type": "String"
+      }
+    }
+  },
+  "authConfirmationPending": "Almost there — check your email and click the link to finish linking it. Your data is already saved on this account.",
+  "@authConfirmationPending": {
+    "description": "Shown after an anonymous account is upgraded to email when the server requires email confirmation: the email change is pending the confirmation link, but the user's UUID and data are already safe (#3079)."
   }
 }

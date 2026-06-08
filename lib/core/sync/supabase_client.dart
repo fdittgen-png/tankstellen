@@ -69,6 +69,47 @@ class TankSyncClient {
     return userId;
   }
 
+  /// Whether the current session belongs to an anonymous (UUID-only) user.
+  ///
+  /// `false` when not initialised, signed out, or already an email user —
+  /// so callers can branch "upgrade in place" vs "fresh sign-up" safely.
+  static bool get isAnonymous =>
+      client?.auth.currentUser?.isAnonymous ?? false;
+
+  /// Upgrade the CURRENT anonymous session to a permanent email account,
+  /// **keeping the same user id**.
+  ///
+  /// Supabase converts the anonymous `auth.users` row into an email user in
+  /// place via `auth.updateUser`, so every row already owned by that UUID
+  /// (favorites, trips, …) stays owned by the now-email account — RLS is
+  /// `FOR ALL USING (user_id = auth.uid())`, so nothing is re-keyed
+  /// server-side. This is the cross-device fix (#3079): the same identity
+  /// becomes reusable on every device instead of being orphaned behind a
+  /// brand-new UUID (the trap in [signUpWithEmail]).
+  ///
+  /// If the server has email confirmation enabled, the email change stays
+  /// pending until the user clicks the link — but the UUID is ALREADY
+  /// theirs, so data is never orphaned either way.
+  ///
+  /// Returns the (unchanged) user id, or `null` if there is no anonymous
+  /// session to upgrade (caller should fall back to sign-up/sign-in).
+  static Future<String?> upgradeAnonymousToEmail(
+    String email,
+    String password,
+  ) async {
+    final c = client;
+    if (c == null) return null;
+    if (c.auth.currentUser?.isAnonymous != true) return null;
+    await c.auth.updateUser(
+      UserAttributes(email: email, password: password),
+    );
+    final userId = c.auth.currentUser?.id;
+    if (userId != null) {
+      await _ensurePublicUser(c, userId);
+    }
+    return userId;
+  }
+
   /// Sign up with email and password. Creates both auth.users and public.users rows.
   static Future<String?> signUpWithEmail(String email, String password) async {
     final c = client;

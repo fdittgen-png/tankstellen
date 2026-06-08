@@ -18,5 +18,26 @@
   "authErrorGeneric": "Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
   "@authErrorGeneric": {
     "description": "Auth error pill — generic fallback when no specific mapping matches the raw exception (#1186)."
+  },
+  "authLinkEmailTitle": "E-Mail verknüpfen",
+  "@authLinkEmailTitle": {
+    "description": "Auth card heading shown to an anonymous user — framing the primary action as attaching an email to their CURRENT account (keeping their data) rather than creating a separate new account (#3079)."
+  },
+  "authLinkEmailSubtitle": "Verknüpfe eine E-Mail-Adresse, damit deine Daten geräteübergreifend synchronisiert werden. Deine aktuellen Favoriten und Fahrten bleiben auf diesem Konto erhalten.",
+  "@authLinkEmailSubtitle": {
+    "description": "Auth card body for an anonymous user — reassures that linking an email upgrades the current anonymous identity in place, so existing favorites/trips are preserved and become reachable on other devices (#3079)."
+  },
+  "authGuestLinkPrompt": "Du nutzt ein Gastkonto ({idPrefix}…). Verknüpfe eine E-Mail-Adresse, damit deine Favoriten und Fahrten auf deine anderen Geräte synchronisiert werden.",
+  "@authGuestLinkPrompt": {
+    "description": "Status text for a connected anonymous (guest) user, prompting them to attach an email for cross-device sync (#3079).",
+    "placeholders": {
+      "idPrefix": {
+        "type": "String"
+      }
+    }
+  },
+  "authConfirmationPending": "Fast geschafft – öffne deine E-Mails und klicke auf den Link, um die Verknüpfung abzuschließen. Deine Daten sind bereits auf diesem Konto gespeichert.",
+  "@authConfirmationPending": {
+    "description": "Shown after an anonymous account is upgraded to email when the server requires email confirmation: the email change is pending the confirmation link, but the user's UUID and data are already safe (#3079)."
   }
 }

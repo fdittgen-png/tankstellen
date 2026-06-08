@@ -129,6 +129,9 @@ class AnonymousStatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final idPrefix =
+        (userId != null && userId!.length >= 8) ? userId!.substring(0, 8) : '';
 
     return Column(
       children: [
@@ -142,9 +145,10 @@ class AnonymousStatusCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'You\'re connected as guest '
-                    '(${userId?.substring(0, 8) ?? ""}...). '
-                    'Add an email to sign in from other devices.',
+                    l10n?.authGuestLinkPrompt(idPrefix) ??
+                        "You're using a guest account ($idPrefix…). "
+                            'Link an email so your favorites and trips '
+                            'sync to your other devices.',
                     style: theme.textTheme.bodySmall,
                   ),
                 ),

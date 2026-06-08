@@ -3727,6 +3727,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authErrorGeneric => 'Sign-in failed. Please try again.';
 
   @override
+  String get authLinkEmailTitle => 'Link an email';
+
+  @override
+  String get authLinkEmailSubtitle =>
+      'Link an email so your data syncs across devices. Your current favorites and trips stay on this account.';
+
+  @override
+  String authGuestLinkPrompt(String idPrefix) {
+    return 'You\'re using a guest account ($idPrefix…). Link an email so your favorites and trips sync to your other devices.';
+  }
+
+  @override
+  String get authConfirmationPending =>
+      'Almost there — check your email and click the link to finish linking it. Your data is already saved on this account.';
+
+  @override
   String get autoRecordConsentBadgeLabel =>
       'Background location — for auto-record only';
 
@@ -11526,6 +11542,22 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get authErrorGeneric =>
       '⟦Šîǧñ-îñ ƒáîłéđ. Ƥłéášé ŧřý áǧáîñ. ············⟧';
+
+  @override
+  String get authLinkEmailTitle => '⟦Łîñķ áñ éɱáîł ·····⟧';
+
+  @override
+  String get authLinkEmailSubtitle =>
+      '⟦Łîñķ áñ éɱáîł šó ýóúř đáŧá šýñçš áçřóšš đéṽîçéš. Ýóúř çúřřéñŧ ƒáṽóřîŧéš áñđ ŧřîƥš šŧáý óñ ŧĥîš áççóúñŧ. ······································⟧';
+
+  @override
+  String authGuestLinkPrompt(String idPrefix) {
+    return '⟦Ýóú\'řé úšîñǧ á ǧúéšŧ áççóúñŧ ($idPrefix…). Łîñķ áñ éɱáîł šó ýóúř ƒáṽóřîŧéš áñđ ŧřîƥš šýñç ŧó ýóúř óŧĥéř đéṽîçéš. ····································⟧';
+  }
+
+  @override
+  String get authConfirmationPending =>
+      '⟦Áłɱóšŧ ŧĥéřé — çĥéçķ ýóúř éɱáîł áñđ çłîçķ ŧĥé łîñķ ŧó ƒîñîšĥ łîñķîñǧ îŧ. Ýóúř đáŧá îš áłřéáđý šáṽéđ óñ ŧĥîš áççóúñŧ. ·········································⟧';
 
   @override
   String get autoRecordConsentBadgeLabel =>

@@ -117,18 +117,30 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
     _formNotifier.setLoading(true);
     try {
-      await ref.read(syncStateProvider.notifier).signInWithEmail(
+      final result = await ref.read(syncStateProvider.notifier).signInWithEmail(
             email, password,
             isSignUp: isSignUp,
           );
 
       if (mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showSuccess(
-            context,
-            isSignUp
-                ? (l10n?.accountCreated ?? 'Account created!')
-                : (l10n?.signedIn ?? 'Signed in!'));
+        if (result == EmailAuthResult.confirmationPending) {
+          // Anonymous account upgraded in place but the server requires a
+          // confirmation click. The UUID + data are already safe — surface
+          // the pending state instead of treating it as success/failure.
+          SnackBarHelper.show(
+              context,
+              l10n?.authConfirmationPending ??
+                  'Almost there — check your email and click the link to '
+                      'finish linking it. Your data is already saved on '
+                      'this account.');
+        } else {
+          SnackBarHelper.showSuccess(
+              context,
+              isSignUp
+                  ? (l10n?.accountCreated ?? 'Account created!')
+                  : (l10n?.signedIn ?? 'Signed in!'));
+        }
         context.pop();
       }
     } catch (e, st) { // ignore: unused_catch_stack
@@ -197,6 +209,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               passwordController: _passwordController,
               confirmController: _confirmController,
               isSignUp: form.isSignUp,
+              // A connected anonymous session can be upgraded in place
+              // (UUID + data preserved, #3079) — frame sign-up as "link".
+              linkMode: TankSyncClient.isConnected && !isEmailUser,
               isLoading: form.isLoading,
               showPassword: form.showPassword,
               showConfirm: form.showConfirm,

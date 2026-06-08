@@ -3769,6 +3769,22 @@ class AppLocalizationsRo extends AppLocalizations {
       'Autentificarea a eșuat. Vă rugăm să încercați din nou.';
 
   @override
+  String get authLinkEmailTitle => 'Link an email';
+
+  @override
+  String get authLinkEmailSubtitle =>
+      'Link an email so your data syncs across devices. Your current favorites and trips stay on this account.';
+
+  @override
+  String authGuestLinkPrompt(String idPrefix) {
+    return 'You\'re using a guest account ($idPrefix…). Link an email so your favorites and trips sync to your other devices.';
+  }
+
+  @override
+  String get authConfirmationPending =>
+      'Almost there — check your email and click the link to finish linking it. Your data is already saved on this account.';
+
+  @override
   String get autoRecordConsentBadgeLabel =>
       'Locație în fundal — numai pentru înregistrare automată';
 

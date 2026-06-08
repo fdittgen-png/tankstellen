@@ -26,6 +26,30 @@ part 'sync_provider.g.dart';
 /// live Supabase session.
 typedef IdMergeFn = Future<List<String>> Function(List<String> localIds);
 
+/// Signature for an email auth call (sign-up / sign-in / anonymous-upgrade)
+/// returning the resulting user id (or `null`). Mirrors the static
+/// `TankSyncClient.*` methods so the auth-branch selection in
+/// [SyncState.signInWithEmail] is unit-testable without a live Supabase
+/// session — the same seam shape #3076 introduced with [IdMergeFn].
+typedef EmailAuthFn = Future<String?> Function(String email, String password);
+
+/// Outcome of an email auth attempt, so the UI can distinguish a completed
+/// sign-in from an anonymous upgrade whose email change is still
+/// **pending server-side confirmation** (#3079). The UUID is already the
+/// user's in every case, so data is never orphaned.
+enum EmailAuthResult {
+  /// Auth completed and the session now carries the email.
+  completed,
+
+  /// The anonymous account was upgraded in place but the server requires
+  /// the user to click a confirmation link before the email is active.
+  /// Their data is already safe under the unchanged UUID.
+  confirmationPending,
+
+  /// No user id came back (e.g. client not initialised) — nothing changed.
+  failed,
+}
+
 /// Manages the cloud sync connection state.
 ///
 /// ## Reusability
@@ -100,37 +124,88 @@ class SyncState extends _$SyncState {
     }
   }
 
-  /// Sign in with email (upgrade from anonymous or fresh sign-in).
+  /// Attach an email to the current account (cross-device identity, #3079).
   ///
-  /// After auth transition, triggers a full sync to upload local data
-  /// (favorites, ignored stations, ratings) to the new user account.
-  /// Without this, favorites added during the anonymous session would
-  /// be orphaned on the server under the old anonymous UUID.
-  Future<void> signInWithEmail(String email, String password, {bool isSignUp = true}) async {
-    String? userId;
-    if (isSignUp) {
-      userId = await TankSyncClient.signUpWithEmail(email, password);
+  /// Branch selection — the crux of the cross-device fix:
+  /// - **Anonymous session + sign-up** → [TankSyncClient.upgradeAnonymousToEmail]:
+  ///   the current UUID-only user is converted to a permanent email user
+  ///   **in place, keeping the same id**, so the 18 favorites / 80 trips
+  ///   already owned by that UUID stay owned by the now-email account and
+  ///   become reachable from every device. (The old [signUpWithEmail]
+  ///   minted a brand-new UUID, orphaning all of that.)
+  /// - **Sign-in (existing account, e.g. a second device)** →
+  ///   [TankSyncClient.signInWithEmail].
+  /// - **Sign-up with no anonymous session to upgrade** (fresh install,
+  ///   signed out) → fall back to [TankSyncClient.signUpWithEmail].
+  ///
+  /// After the auth transition, [_performInitialSync] uploads + pulls local
+  /// data (favorites/ignored via the #3076 [syncAndPersistIds], ratings)
+  /// under the now-email identity. Trips reconcile via
+  /// `AppInitializer._runTripsSyncMerge` on the next launch.
+  ///
+  /// Returns an [EmailAuthResult] so the UI can surface the
+  /// confirmation-pending state when the server requires the user to click
+  /// an email link before the upgrade activates — in which case the email
+  /// is not yet on the session, but the UUID (and its data) is already the
+  /// user's, so nothing is orphaned.
+  Future<EmailAuthResult> signInWithEmail(
+    String email,
+    String password, {
+    bool isSignUp = true,
+    bool? isAnonymous,
+    EmailAuthFn? upgrade,
+    EmailAuthFn? signUp,
+    EmailAuthFn? signIn,
+  }) async {
+    final anonymous = isAnonymous ?? TankSyncClient.isAnonymous;
+    final upgradeFn = upgrade ?? TankSyncClient.upgradeAnonymousToEmail;
+    final signUpFn = signUp ?? TankSyncClient.signUpWithEmail;
+    final signInFn = signIn ?? TankSyncClient.signInWithEmail;
+
+    final String? userId;
+    if (isSignUp && anonymous) {
+      // Preserve the UUID: upgrade the anonymous user in place.
+      userId = await upgradeFn(email, password);
+    } else if (isSignUp) {
+      // No anonymous session to upgrade → fresh sign-up.
+      userId = await signUpFn(email, password);
     } else {
-      userId = await TankSyncClient.signInWithEmail(email, password);
+      // Existing account (second device) → sign in.
+      userId = await signInFn(email, password);
     }
 
-    if (userId != null) {
-      final storage = ref.read(storageRepositoryProvider);
-      await storage.putSetting('sync_user_id', userId);
-      state = SyncConfig(
-        enabled: state.enabled,
-        supabaseUrl: state.supabaseUrl,
-        supabaseAnonKey: state.supabaseAnonKey,
-        userId: userId,
-        mode: state.mode,
-        userEmail: email,
-      );
+    if (userId == null) return EmailAuthResult.failed;
 
-      // Sync local data to the new user account (non-blocking).
-      // Critical: without this, favorites/ratings added during the
-      // anonymous session would never appear under the email account.
-      _performInitialSync(storage);
-    }
+    final storage = ref.read(storageRepositoryProvider);
+    await storage.putSetting('sync_user_id', userId);
+
+    // After an in-place upgrade the email is only live on the session once
+    // the server confirms it (when confirmation is enabled). Read it back
+    // rather than assuming the supplied address is active yet.
+    final activeEmail = TankSyncClient.currentEmail;
+    final pending = isSignUp &&
+        anonymous &&
+        (activeEmail == null || activeEmail.isEmpty);
+
+    state = SyncConfig(
+      enabled: state.enabled,
+      supabaseUrl: state.supabaseUrl,
+      supabaseAnonKey: state.supabaseAnonKey,
+      userId: userId,
+      mode: state.mode,
+      // Keep the address shown so the user knows what to confirm; once the
+      // session reports it, currentEmail rehydrates it on the next build.
+      userEmail: activeEmail ?? email,
+    );
+
+    // Sync local data under the (unchanged) identity — non-blocking.
+    // Critical: without this, favorites/ratings added during the anonymous
+    // session would never appear under the email account on other devices.
+    _performInitialSync(storage);
+
+    return pending
+        ? EmailAuthResult.confirmationPending
+        : EmailAuthResult.completed;
   }
 
   /// Switch from email account back to anonymous.

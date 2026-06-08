@@ -15,6 +15,11 @@ class EmailAuthCard extends StatelessWidget {
   final TextEditingController passwordController;
   final TextEditingController confirmController;
   final bool isSignUp;
+
+  /// `true` when the current session is anonymous, so a sign-up *links* an
+  /// email to the existing account (preserving its UUID + data) rather than
+  /// creating a separate new account (#3079). Reframes the sign-up copy.
+  final bool linkMode;
   final bool isLoading;
   final bool showPassword;
   final bool showConfirm;
@@ -31,6 +36,7 @@ class EmailAuthCard extends StatelessWidget {
     required this.passwordController,
     required this.confirmController,
     required this.isSignUp,
+    this.linkMode = false,
     required this.isLoading,
     required this.showPassword,
     required this.showConfirm,
@@ -47,6 +53,21 @@ class EmailAuthCard extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
+    // When the session is anonymous, a "sign-up" links an email to the
+    // current account (UUID + data preserved, #3079) — frame it that way.
+    final linking = isSignUp && linkMode;
+    final headingText = linking
+        ? (l10n?.authLinkEmailTitle ?? 'Link an email')
+        : (isSignUp
+            ? (l10n?.createAccount ?? 'Create account')
+            : (l10n?.signIn ?? 'Sign in'));
+    final subtitleText = linking
+        ? (l10n?.authLinkEmailSubtitle ??
+            'Link an email so your data syncs across devices. '
+                'Your current favorites and trips stay on this account.')
+        : (l10n?.authSyncAcrossDevices ??
+            'Sync data automatically across all your devices.');
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -55,21 +76,20 @@ class EmailAuthCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.email_outlined, size: 20),
+                Icon(linking ? Icons.link : Icons.email_outlined, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  isSignUp
-                      ? (l10n?.createAccount ?? 'Create account')
-                      : (l10n?.signIn ?? 'Sign in'),
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Text(
+                    headingText,
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 4),
             Text(
-              l10n?.authSyncAcrossDevices ??
-                  'Sync data automatically across all your devices.',
+              subtitleText,
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
@@ -153,10 +173,10 @@ class EmailAuthCard extends StatelessWidget {
                       height: 16,
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white))
-                  : Icon(isSignUp ? Icons.person_add : Icons.login),
-              label: Text(isSignUp
-                  ? (l10n?.createAccount ?? 'Create account')
-                  : (l10n?.signIn ?? 'Sign in')),
+                  : Icon(linking
+                      ? Icons.link
+                      : (isSignUp ? Icons.person_add : Icons.login)),
+              label: Text(headingText),
               style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(44)),
             ),
