@@ -4,7 +4,7 @@
 -->
 
 ﻿<p align="center">
-  <img src="assets/icon.png" alt="Sparkilo app icon" width="160" height="160" />
+  <img src="assets/play_store_icon_512.png" alt="Sparkilo app icon" width="160" height="160" />
 </p>
 
 # Sparkilo
@@ -19,17 +19,21 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41-blue.svg)](https://flutter.dev)
 
-<p>
+<p align="center">
   <a href="https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices">
-    <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="64"/>
+    <img alt="Get it on Google Play" src="https://img.shields.io/badge/Google%20Play-000000?style=for-the-badge&logo=googleplay&logoColor=white"/>
   </a>
-  &nbsp;
   <a href="https://apps.apple.com/app/id6766543414">
-    <img alt="Download on the App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" height="64"/>
+    <img alt="Download on the App Store" src="https://img.shields.io/badge/App%20Store-000000?style=for-the-badge&logo=apple&logoColor=white"/>
+  </a>
+  <a href="https://fdittgen-png.github.io/tankstellen/fdroid/repo">
+    <img alt="Get it on F-Droid" src="https://img.shields.io/badge/F--Droid-000000?style=for-the-badge&logo=fdroid&logoColor=white"/>
   </a>
 </p>
 
-<sub>iPhone listing currently in <strong>TestFlight beta</strong> — the App Store page will populate once Apple's first-build review clears.</sub>
+<sub>
+<strong>Google Play</strong> is the public <strong>production</strong> release. <strong>Already a beta tester?</strong> Open Testing keeps serving you beta builds (shown with a <em>(beta)</em> tag) — to switch to production, leave the testing programme on the Play listing and reinstall; or <strong>stay in beta</strong> to get new features first (every build reaches the beta channel before production). <strong>F-Droid:</strong> add the repo <code>https://fdittgen-png.github.io/tankstellen/fdroid/repo</code> for the fully Google-free build. <strong>iPhone</strong> is in <strong>TestFlight beta</strong> until Apple's first-build review clears. Full install guide: <a href="https://github.com/fdittgen-png/tankstellen/wiki/User-en-Getting-Started">wiki → Getting Started</a>.
+</sub>
 
 **A free, open-source companion app for cutting the running cost of your car.** 17 countries, 23 languages, privacy-first, no ads, no tracking.
 
