@@ -19,7 +19,16 @@ ios/fastlane/metadata/
 │   └── release_notes.txt         # "What's New" for the current version
 ```
 
-Locales present: `en-US`, `de-DE`, `fr-FR`, `es-ES`, `it-IT`.
+Locales present: `en-US`, `de-DE`, `fr-FR`, `es-ES`, `it`, `pt-PT`.
+
+> **Locale codes:** App Store Connect's code for Italian is `it`, **not**
+> `it-IT` — `deliver` skips an unrecognised code, so the folder must be `it`
+> (see `deliver/lib/deliver/languages.rb` and #2611). Portuguese (Portugal) is
+> `pt-PT`.
+
+There is also a global `primary_category.txt` at the root of this directory
+(App Store Connect category enum, `NAVIGATION`) that `deliver` applies to the
+listing.
 
 ### ASO notes
 

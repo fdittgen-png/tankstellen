@@ -1,0 +1,1 @@
+gasolina,gasóleo,diesel,preço,comparar,carregamento,viagem,consumo,custo,poupar,GPL,bomba,posto
