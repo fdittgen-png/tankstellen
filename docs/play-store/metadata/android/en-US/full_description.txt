@@ -1,19 +1,19 @@
-Stop overpaying at the pump. Sparkilo compares real-time fuel prices and EV charging across 17 countries and points you to the cheapest station near you — for petrol, diesel, LPG, CNG, E85 and electric. Free, ad-free, no account, open-source (MIT).
+Compare real-time fuel prices and find the cheapest petrol stations, gas stations and EV charging near you. Sparkilo pulls official prices across 17 countries and points you to the cheapest fuel station — for petrol, diesel, LPG, CNG, E85 and electric. Free, ad-free, no account, open-source (MIT).
 
 WHY SPARKILO
-• Official open-data prices, country by country — not crowdsourced guesses.
+• Official open-data fuel prices, country by country — not crowdsourced guesses.
 • One unified search mixes every fuel type and EV chargers on the same map.
 • Cheap pins first: price pins are coloured cheapest-to-priciest at a glance.
 • Privacy-first: your GPS and API keys never leave the device. No ads, no tracking, no account.
 
 FIND CHEAP FUEL NEAR YOU
-• Search nearby or along your route: filter by fuel type, radius, open-now, amenities and highway-only.
-• Best price for your fuel surfaced first, with a Cheapest badge on the map.
-• Route mode finds the best stops in your travel corridor so a detour always pays off.
+• A real fuel finder: search nearby or along your route for cheap gas and cheap diesel, and filter by fuel type, radius, open-now, amenities and highway-only.
+• The best petrol prices, diesel prices and gas prices near me surfaced first, with a Cheapest badge on the map.
+• Route mode finds the best fuel stations in your travel corridor so a detour always pays off.
 • Full station detail: brand, opening hours, payment, distance and amenities.
 
 PRICE ALERTS & FAVOURITES
-• Per-station price thresholds and radius alerts that run on-device only when you are nearby.
+• Per-station price thresholds and radius alerts that run on-device only when you are nearby — so you never miss a drop in petrol prices.
 • Favourites with multi-price fuel rows, plus EV chargers showing kW, connectors and live availability.
 
 TRACK FUEL COST & CONSUMPTION

@@ -1,16 +1,16 @@
-Deja de pagar de más en el surtidor. Sparkilo compara los precios del combustible en tiempo real y te lleva a la gasolinera más barata cerca de ti — gasolina, diésel, GLP, GNC, E85 y recarga de coche eléctrico. En 17 países, gratis, sin anuncios, sin cuenta, de código abierto (MIT).
+Compara precios de gasolina y diésel y encuentra la gasolinera más barata cerca de ti. Sparkilo reúne los precios oficiales de las estaciones de servicio en tiempo real y te lleva a la gasolinera barata que más te conviene — gasolina, gasoil, GLP, GNC, E85 y recarga de coche eléctrico. En 17 países, gratis, sin anuncios, sin cuenta, de código abierto (MIT).
 
 POR QUÉ SPARKILO
-• Precios oficiales de datos abiertos, país por país — no estimaciones colaborativas.
-• Un único comparador de precios para todos los combustibles y puntos de recarga, en el mismo mapa.
+• Precios de combustible oficiales de datos abiertos, país por país — no estimaciones colaborativas.
+• Un único comparador de precios para gasolina, diésel y puntos de recarga, en el mismo mapa.
 • Lo barato primero: chinchetas de precio coloreadas de más barato a más caro, de un vistazo.
 • Privacidad ante todo: tu GPS y tus claves API nunca salen del dispositivo. Sin anuncios, sin rastreo, sin cuenta.
 
-GASOLINA BARATA CERCA DE TI
-• Busca cerca o a lo largo de tu ruta: filtra por combustible, radio, abierto ahora, servicios y solo autopista.
+GASOLINERAS BARATAS CERCA DE TI
+• Busca gasolineras cerca o a lo largo de tu ruta: filtra por combustible, radio, abierto ahora, servicios y solo autopista.
 • El mejor precio de tu combustible primero, con una insignia "La más barata" en el mapa.
 • El modo ruta encuentra las mejores paradas del corredor para que el desvío siempre compense.
-• Detalle completo de la estación: marca, horario, pago, distancia y servicios.
+• Detalle completo de la estación de servicio: marca, horario, pago, distancia y servicios.
 
 ALERTAS DE PRECIO Y FAVORITOS
 • Alertas por estación y por radio que se ejecutan en el dispositivo solo cuando estás cerca.

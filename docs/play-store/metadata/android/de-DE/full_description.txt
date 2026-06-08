@@ -1,4 +1,4 @@
-Schluss mit zu teuer tanken. Sparkilo vergleicht Spritpreise in Echtzeit und führt dich zur günstigsten Tankstelle in der Nähe — für Benzin, Diesel, LPG, CNG, E85 und zum E-Auto laden. In 17 Ländern, kostenlos, werbefrei, ohne Konto, Open Source (MIT).
+Spritpreise vergleichen und billig tanken: Sparkilo zeigt Benzin- und Dieselpreise in Echtzeit und führt dich zur günstigsten Tankstelle in der Nähe — für Benzin, Diesel, LPG, CNG, E85 und zum E-Auto laden. Schluss mit zu teuer tanken: in 17 Ländern, kostenlos, werbefrei, ohne Konto, Open Source (MIT).
 
 WARUM SPARKILO
 • Offizielle Open-Data-Preise pro Land — keine Crowdsourcing-Schätzungen.
@@ -6,7 +6,7 @@ WARUM SPARKILO
 • Günstig zuerst: Preis-Pins von billig nach teuer eingefärbt, auf einen Blick.
 • Datenschutz zuerst: GPS und API-Schlüssel verlassen nie das Gerät. Keine Werbung, kein Tracking, kein Konto.
 
-BILLIG TANKEN IN DER NÄHE
+TANKSTELLEN IN DER NÄHE & BILLIG TANKEN
 • In der Nähe oder entlang der Route suchen: Filter nach Kraftstoff, Umkreis, jetzt geöffnet, Ausstattung und nur Autobahn.
 • Bester Benzinpreis oder Dieselpreis zuerst, mit „Günstigste"-Badge auf der Karte.
 • Routenmodus findet die besten Stopps im Reisekorridor, damit sich der Umweg lohnt.

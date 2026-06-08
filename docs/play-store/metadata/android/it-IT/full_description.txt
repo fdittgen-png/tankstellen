@@ -1,19 +1,19 @@
-Basta pagare troppo al distributore. Sparkilo confronta i prezzi del carburante in tempo reale e ti porta al distributore più economico vicino a te — benzina, diesel, GPL, metano, E85 e ricarica per auto elettrica. In 17 paesi, gratis, senza pubblicità, senza account, open source (MIT).
+Confronta i prezzi della benzina e trova i distributori più economici vicino a te, in tempo reale. Sparkilo mostra i prezzi del carburante ufficiali dei distributori di benzina e ti porta a quello più economico — benzina, gasolio (diesel), GPL, metano, E85 e ricarica per auto elettrica. In 17 paesi, gratis, senza pubblicità, senza account, open source (MIT).
 
 PERCHÉ SPARKILO
-• Prezzi ufficiali da dati aperti, paese per paese — non stime degli utenti.
-• Un unico confronto prezzi per tutti i carburanti e le colonnine, sulla stessa mappa.
+• Prezzi carburante ufficiali da dati aperti, paese per paese — non stime degli utenti.
+• Un unico confronto prezzi per benzina, gasolio e tutte le colonnine, sulla stessa mappa.
 • Prima l'economico: segnaposto colorati dal più economico al più caro, a colpo d'occhio.
 • Privacy prima di tutto: GPS e chiavi API non lasciano mai il dispositivo. Niente pubblicità, niente tracciamento, niente account.
 
-CARBURANTE ECONOMICO VICINO A TE
-• Cerca nelle vicinanze o lungo il percorso: filtri per carburante, raggio, aperto ora, servizi e solo autostrada.
+DISTRIBUTORI E CARBURANTE ECONOMICO VICINO A TE
+• Cerca i distributori di benzina nelle vicinanze o lungo il percorso: filtri per carburante, raggio, aperto ora, servizi e solo autostrada.
 • Il miglior prezzo del tuo carburante in cima, con un badge "Il più economico" sulla mappa.
 • La modalità percorso trova le soste migliori nel corridoio così la deviazione conviene sempre.
 • Dettaglio completo della stazione: marca, orari, pagamento, distanza e servizi.
 
 AVVISI PREZZO E PREFERITI
-• Avvisi per stazione e per raggio che girano sul dispositivo solo quando sei vicino.
+• Avvisi sui prezzi benzina per stazione e per raggio che girano sul dispositivo solo quando sei vicino.
 • Preferiti con più righe di prezzo, più colonnine con kW, connettori e disponibilità.
 
 COSTI E CONSUMI
