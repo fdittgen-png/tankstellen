@@ -3,6 +3,7 @@
 
 import Flutter
 import UIKit
+import Vision
 import workmanager_apple
 
 @main
@@ -71,6 +72,11 @@ import workmanager_apple
     // and immediately scan for a cold-launch share the extension left behind.
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "ShareIntentBridge") {
       shareIntent.register(messenger: registrar.messenger())
+    }
+    // #3052 — native Apple Vision text OCR for receipt + pump-display scans
+    // (replaces Google ML Kit on iOS; Android keeps ML Kit).
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "VisionOcrBridge") {
+      VisionOcrBridge.shared.register(messenger: registrar.messenger())
     }
   }
 
@@ -177,5 +183,117 @@ final class ShareIntentBridge: NSObject, FlutterStreamHandler {
       let items = json["items"] as? [Any], !items.isEmpty
     else { return nil }
     return json
+  }
+}
+
+/// #3052 — native Apple **Vision** text OCR, serving the `tankstellen/vision_ocr`
+/// MethodChannel. Replaces Google ML Kit on iOS (on-device, no Google
+/// dependency, builds on the simulator). Returns the flat text plus per-line
+/// boxes in source-image PIXEL coordinates with a TOP-LEFT origin — matching
+/// the `OcrBox` shape Android's ML Kit adapter produces — so the #2478
+/// label-anchored receipt/pump extractor stays engine-agnostic.
+///
+/// Inline in AppDelegate.swift (not a separate file) on purpose: a new file
+/// under ios/Runner/ is not in the Runner target's compile sources without a
+/// project.pbxproj edit (see the ShareIntentBridge note above), so defining it
+/// here keeps the build green with zero pbxproj change.
+final class VisionOcrBridge {
+  static let shared = VisionOcrBridge()
+  private static let channelName = "tankstellen/vision_ocr"
+
+  func register(messenger: FlutterBinaryMessenger) {
+    let channel = FlutterMethodChannel(name: Self.channelName, binaryMessenger: messenger)
+    channel.setMethodCallHandler { call, result in
+      switch call.method {
+      case "recognizeText":
+        guard
+          let args = call.arguments as? [String: Any],
+          let path = args["path"] as? String
+        else {
+          result(nil)
+          return
+        }
+        let languageCorrection = args["languageCorrection"] as? Bool ?? true
+        let languages = args["languages"] as? [String] ?? []
+        Self.recognize(
+          path: path,
+          languageCorrection: languageCorrection,
+          languages: languages,
+          result: result
+        )
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+  }
+
+  /// Runs `VNRecognizeTextRequest` on the image at [path] off the main thread
+  /// and returns `{ text: String, blocks: [{text,left,top,right,bottom}] }`
+  /// (pixel, top-left). Any failure resolves to nil so the Dart caller degrades
+  /// exactly as the ML Kit path did. `languageCorrection` is off for 7-segment
+  /// pump displays (digits, not prose).
+  private static func recognize(
+    path: String,
+    languageCorrection: Bool,
+    languages: [String],
+    result: @escaping FlutterResult
+  ) {
+    guard
+      let image = UIImage(contentsOfFile: path),
+      let cgImage = image.cgImage
+    else {
+      result(nil)
+      return
+    }
+    let width = CGFloat(cgImage.width)
+    let height = CGFloat(cgImage.height)
+
+    let request = VNRecognizeTextRequest { request, error in
+      func finish(_ value: Any?) {
+        DispatchQueue.main.async { result(value) }
+      }
+      if error != nil {
+        finish(nil)
+        return
+      }
+      let observations = request.results as? [VNRecognizedTextObservation] ?? []
+      var blocks: [[String: Any]] = []
+      var lines: [String] = []
+      for observation in observations {
+        guard let candidate = observation.topCandidates(1).first else { continue }
+        let text = candidate.string
+        if text.isEmpty { continue }
+        lines.append(text)
+        // Vision boundingBox: normalized [0,1], origin BOTTOM-LEFT. Convert to
+        // source-image PIXELS with a TOP-LEFT origin (flip Y) to match OcrBox.
+        let box = observation.boundingBox
+        let left = box.minX * width
+        let right = box.maxX * width
+        let top = (1.0 - box.maxY) * height
+        let bottom = (1.0 - box.minY) * height
+        blocks.append([
+          "text": text,
+          "left": Double(left),
+          "top": Double(top),
+          "right": Double(right),
+          "bottom": Double(bottom),
+        ])
+      }
+      finish(["text": lines.joined(separator: "\n"), "blocks": blocks])
+    }
+    request.recognitionLevel = .accurate
+    request.usesLanguageCorrection = languageCorrection
+    if !languages.isEmpty {
+      request.recognitionLanguages = languages
+    }
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+      do {
+        try handler.perform([request])
+      } catch {
+        DispatchQueue.main.async { result(nil) }
+      }
+    }
   }
 }
