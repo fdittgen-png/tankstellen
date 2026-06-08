@@ -108,7 +108,10 @@ jobs:
           mkdir -p fdroid/repo fdroid/metadata/de.tankstellen.fuelprices
           rsync -a fastlane/metadata/android/ fdroid/metadata/de.tankstellen.fuelprices/
           cp -f build/app/outputs/flutter-apk/app-fdroid-release.apk fdroid/repo/
-          cp -f docs/icon.png fdroid/repo/icon.png || true
+          # NOTE: never drop the repo icon (or any non-APK) loose in repo/ —
+          # `fdroid update` scans every file there and would index it as a
+          # phantom package (#3040). The repo icon is served from repo/icons/
+          # during _site assembly below, which fdroid update does NOT scan.
           cd fdroid && fdroid update --create-metadata --pretty
 
       # --- Assemble the COMBINED Pages site ----------------------------------
@@ -131,6 +134,11 @@ jobs:
           # F-Droid repo index served at /fdroid/repo (fdroidserver requires
           # repo_url to end in /repo).
           mkdir -p _site/fdroid/repo && cp -R fdroid/repo/. _site/fdroid/repo/
+          # Repo icon: the index's repo.icon ("icon.png") resolves at
+          # {repo_url}/icons/icon.png, so serve it from repo/icons/ — placed
+          # AFTER fdroid update so it is never scanned into a phantom package
+          # (#3040).
+          mkdir -p _site/fdroid/repo/icons && cp -f docs/icon.png _site/fdroid/repo/icons/icon.png
 
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
