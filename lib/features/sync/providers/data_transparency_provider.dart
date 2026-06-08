@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/alerts_sync.dart';
@@ -123,10 +124,18 @@ class DataTransparencyController extends _$DataTransparencyController {
         }
       }
 
-      await FavoritesSync.merge(favoriteIds);
+      // #3076 — persist the union (server ∪ local) back to local storage
+      // instead of discarding the merge result, so favorites added on
+      // another device are pulled down here. Then invalidate the favorites
+      // provider so the in-session UI reflects the newly-pulled ids; the
+      // `Favorites` notifier re-reads storage on rebuild.
+      final storage = ref.read(storageRepositoryProvider);
+      await storage.setFavoriteIds(await FavoritesSync.merge(favoriteIds));
+      ref.invalidate(favoritesProvider);
 
       final alerts = ref.read(alertProvider);
       debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
+      // Alerts pull is #3077 — leave merge as upload-only for now.
       await AlertsSync.merge(alerts);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'DataTransparency: force sync failed'}));

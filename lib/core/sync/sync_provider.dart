@@ -19,6 +19,13 @@ import '../../core/logging/error_logger.dart';
 
 part 'sync_provider.g.dart';
 
+/// Signature for a sync-merge that takes the device's local ids and
+/// returns the union (server ∪ local) — exactly the shape of
+/// [FavoritesSync.merge] / [IgnoredStationsSync.merge]. Injected as a
+/// seam so the pull-persist wiring (#3076) is unit-testable without a
+/// live Supabase session.
+typedef IdMergeFn = Future<List<String>> Function(List<String> localIds);
+
 /// Manages the cloud sync connection state.
 ///
 /// ## Reusability
@@ -209,18 +216,41 @@ class SyncState extends _$SyncState {
   void _performInitialSync(StorageRepository storage) {
     Future.microtask(() async {
       try {
-        final favIds = storage.getFavoriteIds();
-        if (favIds.isNotEmpty) await FavoritesSync.merge(favIds);
-        final ignoredIds = storage.getIgnoredIds();
-        if (ignoredIds.isNotEmpty) await IgnoredStationsSync.merge(ignoredIds);
+        await syncAndPersistIds(storage);
         // #2319 — batch every local rating into one upsert round-trip
-        // instead of N serial calls on connect.
+        // instead of N serial calls on connect. (Ratings pull is #3077.)
         await RatingsSync.upsertAll(storage.getRatings());
         debugPrint('InitialSync: complete');
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
       }
     });
+  }
+
+  /// Bidirectionally sync favorites + ignored stations and **persist the
+  /// union back to local storage** (#3076).
+  ///
+  /// Previously the [FavoritesSync.merge] / [IgnoredStationsSync.merge]
+  /// return values (server ∪ local) were discarded, so a device only
+  /// ever uploaded — server-side rows added on another device never
+  /// reached this one. We now write the merged superset back via
+  /// [StorageRepository.setFavoriteIds] / [StorageRepository.setIgnoredIds].
+  ///
+  /// The merges run unconditionally (no `isNotEmpty` guard): a fresh
+  /// device with no local favorites must still *pull* the server's set.
+  ///
+  /// [mergeFavorites] / [mergeIgnored] default to the real syncs and are
+  /// injectable so the pull-persist wiring is unit-testable without a
+  /// live Supabase session (the real merges return the input unchanged
+  /// when unauthenticated, masking the wiring under test).
+  @visibleForTesting
+  Future<void> syncAndPersistIds(
+    StorageRepository storage, {
+    IdMergeFn mergeFavorites = FavoritesSync.merge,
+    IdMergeFn mergeIgnored = IgnoredStationsSync.merge,
+  }) async {
+    await storage.setFavoriteIds(await mergeFavorites(storage.getFavoriteIds()));
+    await storage.setIgnoredIds(await mergeIgnored(storage.getIgnoredIds()));
   }
 
   static SyncMode _parseMode(String? value) => switch (value) {
