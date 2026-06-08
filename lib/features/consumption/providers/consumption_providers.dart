@@ -11,6 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/sync/fill_ups_sync.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
@@ -200,6 +201,12 @@ class LastVeLearnResult extends _$LastVeLearnResult {
     state = result;
   }
 }
+
+/// Signature of the bidirectional fill-ups merge. Defaults to
+/// [FillUpsSync.merge]; injectable so the #3077 pull-persist wiring is
+/// unit-testable without a live Supabase session (the real merge returns
+/// the input unchanged when unauthenticated, masking the wiring under test).
+typedef FillUpsMergeFn = Future<List<FillUp>> Function(List<FillUp> local);
 
 /// Mutable list of all fill-ups, newest first.
 @Riverpod(keepAlive: true)
@@ -912,6 +919,29 @@ class FillUpList extends _$FillUpList {
     }
     state = repo.getAll();
     return added;
+  }
+
+  /// Pull the user's server fill-ups and **persist the server-only ones
+  /// into local storage** (#3077).
+  ///
+  /// [FillUpsSync.merge] uploads local-only rows AND returns the union
+  /// (`[...local, ...downloaded]`). Previously the only caller was the
+  /// manual device-link flow, so a fill-up logged on another device never
+  /// reached this one on connect / launch. We now keep only the server-only
+  /// entries (local wins on id collision — an in-flight local edit is never
+  /// clobbered) and add them via [mergeFrom]. Returns the count of
+  /// newly-persisted (downloaded) fill-ups.
+  ///
+  /// The caller owns the consent gate — this is invoked behind the
+  /// trip-data sync gate (fill-ups are trip-data adjacent). [mergeFn]
+  /// defaults to the real sync and is injectable for unit tests.
+  Future<int> pullFromServer({FillUpsMergeFn mergeFn = FillUpsSync.merge}) async {
+    final repo = ref.read(fillUpRepositoryProvider);
+    final localIds = repo.getAll().map((f) => f.id).toSet();
+    final merged = await mergeFn(repo.getAll());
+    final serverOnly = merged.where((f) => !localIds.contains(f.id)).toList();
+    if (serverOnly.isEmpty) return 0;
+    return mergeFrom(serverOnly);
   }
 }
 

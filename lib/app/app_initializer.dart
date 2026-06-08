@@ -25,22 +25,26 @@ import '../core/telemetry/storage/trace_storage.dart';
 import '../core/telemetry/trace_recorder.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
+import '../core/data/storage_repository.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
 import '../core/storage/hive_boxes.dart';
 import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
+import '../core/sync/sync_provider.dart';
 import '../core/sync/trips_sync.dart';
 import '../core/sync/trips_sync_enabled_provider.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
+import '../features/alerts/providers/alert_provider.dart';
 import '../features/consumption/data/obd2/active_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/active_trip_repository.dart';
 import '../features/consumption/data/obd2/paused_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/paused_trip_repository.dart';
 import '../features/consumption/data/trip_history_repository.dart';
 import '../features/consumption/providers/auto_record_orchestrator.dart';
+import '../features/consumption/providers/consumption_providers.dart';
 import '../features/consumption/providers/obd2_comm_diagnostics_gate_provider.dart';
 import '../features/consumption/providers/obd2_debug_logging_provider.dart';
 import '../features/consumption/providers/trip_recording_provider.dart';
@@ -52,6 +56,7 @@ import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
 import '../features/vehicle/data/vehicle_profile_migrator.dart';
 import '../features/vehicle/providers/vehicle_aggregate_updater_provider.dart';
+import '../features/vehicle/providers/vehicle_providers.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
@@ -169,6 +174,11 @@ class AppInitializer {
       // once TankSync is up. No-ops cleanly when the user is signed
       // out or when the trip-history Hive box isn't open.
       await _runTripsSyncMerge(container);
+      // #3077 — pull the remaining server→local entities (ratings,
+      // alerts, fill-ups, vehicles) once TankSync is up, mirroring the
+      // trips merge above. No-ops cleanly when sync is off / unauthenticated
+      // and respects each entity's consent gate.
+      await _runEntitySyncMerge(container, storage);
     });
 
     // Cache runtime version so AppConstants.appVersion is accurate (#570).
@@ -584,6 +594,60 @@ class AppInitializer {
       await TripsSync.pruneOldDetails();
     } catch (e, st) {
       debugPrint('AppInitializer._runTripsSyncMerge failed: $e\n$st');
+    }
+  }
+
+  /// #3077 — on app launch, pull the remaining server→local entities into
+  /// local storage so cross-device rows land without a manual sync gesture,
+  /// mirroring [_runTripsSyncMerge]. TankSync was upload-only for these:
+  /// the download branch existed in each `*_sync.dart` but had no
+  /// connect/launch caller (fill-ups + vehicles), or its return was
+  /// discarded (ratings), or it only fired on a local edit (alerts). The
+  /// per-entity pull-persist seams (`*.pullFromServer` /
+  /// `syncAndPersistRatings`) are the unit-tested units; this method is
+  /// the launch-time glue, mirroring the untested `_runTripsSyncMerge`.
+  ///
+  /// Consent gates (conservative — never pull data the user hasn't
+  /// consented to):
+  /// - **ratings / alerts** ride the master TankSync consent — they pull
+  ///   whenever `sync_enabled` is set (the same gate the existing
+  ///   favorites/ignored pull and the alert-mutation pull already use).
+  /// - **fill-ups / vehicles** are trip-data adjacent (fill-ups carry
+  ///   linked trajet ids + OBD2-derived consumption; a vehicle profile is
+  ///   the anchor trips attach to), so they ride the stricter trip-sync
+  ///   gate (`tripsSyncEnabledProvider` = email ∧ cloudSync ∧ syncTrips).
+  ///
+  /// No-ops cleanly when TankSync isn't initialised or the user is signed
+  /// out (each `*Sync` method short-circuits on a null user id, returning
+  /// the input unchanged). Each entity is independently error-protected so
+  /// one failing pull never blocks the others.
+  static Future<void> _runEntitySyncMerge(
+    ProviderContainer container,
+    StorageRepository storage,
+  ) async {
+    if (TankSyncClient.client == null) return;
+    if (!container.read(syncStateProvider).enabled) return;
+
+    // ratings + alerts ride the master consent; fill-ups + vehicles are
+    // trip-data adjacent and ride the stricter trip-sync gate.
+    final tripData = container.read(tripsSyncEnabledProvider);
+    final pulls = <String, Future<void> Function()>{
+      'ratings': () =>
+          container.read(syncStateProvider.notifier).syncAndPersistRatings(storage),
+      'alerts': () => container.read(alertProvider.notifier).pullFromServer(),
+      if (tripData)
+        'vehicles': () =>
+            container.read(vehicleProfileListProvider.notifier).pullFromServer(),
+      if (tripData)
+        'fillUps': () => container.read(fillUpListProvider.notifier).pullFromServer(),
+    };
+    for (final entry in pulls.entries) {
+      try {
+        await entry.value();
+      } catch (e, st) {
+        debugPrint(
+            'AppInitializer._runEntitySyncMerge ${entry.key} failed: $e\n$st');
+      }
     }
   }
 

@@ -98,7 +98,7 @@ final class VehicleProfileListProvider
 }
 
 String _$vehicleProfileListHash() =>
-    r'073721ba48e664fcee7e78ce62c637c875ce0563';
+    r'9fd49bbc7559187c79f3f5a7b60b7214557b908e';
 
 /// Full list of stored vehicle profiles.
 
