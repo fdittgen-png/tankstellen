@@ -119,7 +119,7 @@ dependencies:
   workmanager: ^0.9.0
   shimmer: ^3.0.0
   flutter_tts: ^4.2.0
-  flutter_local_notifications: ^22.0.0-dev.3
+  flutter_local_notifications: ^22.0.0
   supabase_flutter: ^2.12.4
   wakelock_plus: ^1.2.8
   app_badge_plus: ^1.2.10
