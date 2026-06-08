@@ -54,15 +54,34 @@ class SearchResultsContent extends ConsumerWidget {
     // hands the list straight back to it.
     final radar = ref.watch(radarSearchProvider);
     if (radar.active) {
-      final stations = radar.stations.value ?? const [];
-      final radarResult = ServiceResult<List<SearchResultItem>>(
-        data: [for (final s in stations) FuelStationResult(s)],
-        source: ServiceSource.cache,
-        fetchedAt: DateTime.now(),
-      );
-      return SearchResultsList(
-        result: radarResult,
-        onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
+      // #3042 — render the radar's AsyncValue with the SAME data/loading/error
+      // branching the regular search uses below. Previously this read
+      // `radar.stations.value ?? const []`, which collapsed BOTH loading and
+      // error into an empty list — so a permission-denied radar run (no GPS
+      // fix, no persisted position) showed "no stations" with no explanation.
+      // The error branch now surfaces an actionable banner (with an Open
+      // Settings path for denied location permission).
+      return radar.stations.when(
+        data: (stations) {
+          final radarResult = ServiceResult<List<SearchResultItem>>(
+            data: [for (final s in stations) FuelStationResult(s)],
+            source: ServiceSource.cache,
+            fetchedAt: DateTime.now(),
+          );
+          return SearchResultsList(
+            result: radarResult,
+            onRefresh: () =>
+                ref.read(radarSearchProvider.notifier).runRadar(),
+          );
+        },
+        loading: () => const ShimmerStationList(),
+        error: (error, stackTrace) => ServiceChainErrorWidget(
+          error: error,
+          onRetry: () => ref.read(radarSearchProvider.notifier).runRadar(),
+          stackTrace: stackTrace,
+          searchContext:
+              'Fuel station radar (${ref.read(selectedFuelTypeProvider).apiValue})',
+        ),
       );
     }
 

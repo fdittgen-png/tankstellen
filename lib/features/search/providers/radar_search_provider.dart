@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/error/exceptions.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_providers.dart';
@@ -89,15 +90,41 @@ class RadarSearch extends _$RadarSearch {
     // band and dropping the nearby stations the in-radius search shows.
     // Best-effort: keep the persisted position if the fix is denied / times
     // out, so an offline / permission-less run still scans the last spot.
+    Object? gpsError;
+    StackTrace? gpsStack;
     try {
       await ref.read(userPositionProvider.notifier).updateFromGps();
-    } on Object {
-      // Fall back to whatever position was already persisted.
+    } catch (e, st) {
+      // #3042 — remember WHY the refresh failed. We still fall back to the
+      // persisted position below (offline resilience, #2806), but if there
+      // is no position at all the radar must surface this instead of
+      // silently going idle.
+      gpsError = e;
+      gpsStack = st;
     }
 
     final pos = ref.read(userPositionProvider);
     if (pos == null) {
-      state = RadarSearchState.idle;
+      // #3042 — no position to scan around (e.g. a fresh install where the
+      // user denied location). This used to set [RadarSearchState.idle] and
+      // return, so the radar flipped on then off with ZERO feedback. Surface
+      // the underlying location failure as an error state so
+      // SearchResultsContent renders an actionable banner (grant / open
+      // settings / search by postal code) instead of an empty list.
+      state = RadarSearchState(
+        active: true,
+        stations: AsyncError<List<Station>>(
+          // English diagnostic per the exceptions.dart contract (#2316) — NOT
+          // user-facing. ServiceChainErrorWidget renders LocationException via
+          // ErrorLocalizer → the translated `errorLocation` / `locationDenied`
+          // ARB strings, so the user always sees localized text, never this.
+          gpsError ??
+              const LocationException(
+                message: 'Location permission denied.',
+              ),
+          gpsStack ?? StackTrace.current,
+        ),
+      );
       return;
     }
 

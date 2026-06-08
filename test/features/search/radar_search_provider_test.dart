@@ -4,6 +4,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/mixins/station_service_helpers.dart';
 import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
@@ -97,6 +98,18 @@ class _NullUserPosition extends UserPosition {
   UserPositionData? build() => null;
 }
 
+/// #3042 — no persisted position AND the live GPS refresh is denied (the
+/// fresh-install permission-denied case). [updateFromGps] throws, [build]
+/// stays null, so `runRadar` has nowhere to scan and must surface the failure.
+class _DeniedUserPosition extends UserPosition {
+  @override
+  UserPositionData? build() => null;
+
+  @override
+  Future<void> updateFromGps() async =>
+      throw const LocationException(message: 'Location permission denied.');
+}
+
 class _FixedFuelType extends SelectedFuelType {
   _FixedFuelType(this._type);
   final FuelType _type;
@@ -149,6 +162,7 @@ ProviderContainer _container({
   required List<Station> corridor,
   List<Station> inRadius = const [],
   bool inRadiusThrows = false,
+  bool deniedRefresh = false,
   ({double lat, double lng})? refreshTo,
   FuelType fuel = FuelType.e10,
   double radiusKm = 10.0,
@@ -156,10 +170,12 @@ ProviderContainer _container({
     ProviderContainer(
       overrides: [
         userPositionProvider.overrideWith(
-          () => position == null
-              ? _NullUserPosition()
-              : _FixedUserPosition(position.lat, position.lng,
-                  refreshTo: refreshTo),
+          () => deniedRefresh
+              ? _DeniedUserPosition()
+              : position == null
+                  ? _NullUserPosition()
+                  : _FixedUserPosition(position.lat, position.lng,
+                      refreshTo: refreshTo),
         ),
         selectedFuelTypeProvider.overrideWith(() => _FixedFuelType(fuel)),
         searchRadiusProvider.overrideWith(() => _FixedRadius(radiusKm)),
@@ -226,18 +242,29 @@ void main() {
       expect(container.read(radarSearchNearestProvider), isNull);
     });
 
-    test('no-ops with active=false when the user position is unknown',
-        () async {
+    test(
+        'surfaces an actionable error (never silent) when no position is known '
+        'and the GPS refresh is denied (#3042)', () async {
       final container = _container(
         position: null,
+        deniedRefresh: true,
         corridor: [_station('NEAR', 48.0, 2.0, e10: 1.5)],
       );
       addTearDown(container.dispose);
 
       await container.read(radarSearchProvider.notifier).runRadar();
 
-      expect(container.read(radarSearchProvider).active, isFalse,
-          reason: 'no position → nothing to scan around');
+      final state = container.read(radarSearchProvider);
+      // #3042 — the fresh-install permission-denied case used to flip the
+      // radar to idle/empty with ZERO feedback. It must now OWN the results
+      // area (active) and surface the location failure as an error so
+      // SearchResultsContent renders an actionable banner (grant / open
+      // settings / search by postal code) instead of "no stations".
+      expect(state.active, isTrue,
+          reason: 'radar owns the results area to show the error');
+      expect(state.stations.hasError, isTrue,
+          reason: 'permission denial surfaces as an error, not empty silence');
+      expect(state.stations.error, isA<LocationException>());
       expect(container.read(radarSearchNearestProvider), isNull);
     });
 
