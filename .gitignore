@@ -86,6 +86,8 @@ docs/*
 !docs/design/
 !docs/security/
 !docs/feature-concepts/
+!docs/landing/
+!docs/marketing/
 # Quality / process audit reports — pattern-allowlisted (live at docs root,
 # not inside docs/decisions/ which is reserved for ADRs).
 !docs/test-audit-*.md
