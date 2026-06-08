@@ -7,8 +7,9 @@ import 'shell_nav_item.dart';
 
 /// NavigationRail for medium and expanded screen sizes.
 ///
-/// Shows labels and a wider rail on expanded screens (>= 840dp).
-/// Shows an icons-only rail on medium screens (600-840dp).
+/// A compact rail with each label UNDER its icon ([NavigationRailLabelType.all])
+/// at both sizes (#3056) — the old `extended` horizontal-label rail wasted
+/// ~100px of width the results column + map needed on wide/tablet layouts.
 ///
 /// Companion to [ShellBottomBar] — both consume the same
 /// `(items, branchForSlot, currentIndex, iconControllers)` quad so the
@@ -27,7 +28,6 @@ class ShellNavRail extends StatelessWidget {
   /// slot (the Settings/profile branch, reached from the app bar).
   final int? currentIndex;
   final List<AnimationController> iconControllers;
-  final bool extended;
   final ValueChanged<int> onTap;
 
   const ShellNavRail({
@@ -36,7 +36,6 @@ class ShellNavRail extends StatelessWidget {
     required this.branchForSlot,
     required this.currentIndex,
     required this.iconControllers,
-    required this.extended,
     required this.onTap,
   });
 
@@ -47,12 +46,12 @@ class ShellNavRail extends StatelessWidget {
     return NavigationRail(
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
-      extended: extended,
-      minWidth: 56,
-      minExtendedWidth: 180,
-      labelType: extended
-          ? NavigationRailLabelType.none
-          : NavigationRailLabelType.selected,
+      // #3056 — a COMPACT rail (every label UNDER its icon) on every wide
+      // layout, instead of the old `extended` horizontal-label rail (~180px)
+      // that wasted ~100px the results column + map needed. Keeps all labels
+      // (discoverable) at roughly half the width.
+      minWidth: 80,
+      labelType: NavigationRailLabelType.all,
       selectedIconTheme: IconThemeData(color: theme.colorScheme.primary),
       unselectedIconTheme: IconThemeData(
         color: theme.colorScheme.onSurfaceVariant,
