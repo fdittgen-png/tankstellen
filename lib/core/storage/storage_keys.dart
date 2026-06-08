@@ -143,4 +143,20 @@ class StorageKeys {
   /// missing override falls through to [recordingProfile].
   static const String recordingProfileVehicleOverridePrefix =
       'recording_profile_vehicle_';
+
+  /// #3069 — running count of "positive moments" (a successful station
+  /// search that returned results) since the last review prompt. The
+  /// in-app review service requests an OS-native rating dialog once this
+  /// reaches the threshold, then resets it to 0. Stored in plain Hive
+  /// settings (a counter, not PII).
+  static const String inAppReviewPositiveSignalCount =
+      'in_app_review_positive_signal_count';
+
+  /// #3069 — ISO-8601 timestamp of the last review-prompt attempt. Used
+  /// to enforce the 30-day throttle so we never re-ask a user inside the
+  /// cooldown window (the OS itself also rate-limits, but we never even
+  /// reach the platform channel before this gate passes). Absent ⇒ never
+  /// prompted.
+  static const String inAppReviewLastPromptIso =
+      'in_app_review_last_prompt_iso';
 }

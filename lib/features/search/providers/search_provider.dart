@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
+import '../../../core/feedback/in_app_review_service.dart';
 import '../../../core/location/location_service.dart';
 import '../../../core/telemetry/collectors/app_state_collector.dart';
 import '../../../core/location/user_position_provider.dart';
@@ -68,6 +69,20 @@ class SearchState extends _$SearchState {
   void _publishCarSearch(List<Station> stations, FuelType fuel) {
     if (fuel == FuelType.electric) return;
     unawaited(carWriter.writeSearch(stations, fuel));
+  }
+
+  /// #3069 — a successful search that returned results is a genuine
+  /// positive moment, so feed it to [InAppReviewService] (throttled there
+  /// by a count threshold + 30-day cooldown). Fire-and-forget: the service
+  /// never throws (it swallows even the libre build's missing-Play-Core
+  /// fault), and we deliberately don't await it so it never blocks the UI
+  /// from rendering the results. A genuinely empty result is NOT a positive
+  /// moment, so [finalState] with no items is skipped.
+  void _maybePromptReview(
+    AsyncValue<ServiceResult<List<SearchResultItem>>> finalState,
+  ) {
+    if (finalState.value?.data.isNotEmpty != true) return;
+    unawaited(ref.read(inAppReviewServiceProvider.notifier).recordPositiveSignal());
   }
 
   /// Cancel any in-flight search and create a fresh [CancelToken].
@@ -230,6 +245,7 @@ class SearchState extends _$SearchState {
       final finalState = await finalizeUnifiedResult(ref, result, evFuture);
       if (!ref.mounted) return;
       state = finalState;
+      _maybePromptReview(finalState);
     });
   }
 
@@ -310,6 +326,7 @@ class SearchState extends _$SearchState {
       final finalState = await finalizeUnifiedResult(ref, fuelResult, evFuture);
       if (!ref.mounted) return;
       state = finalState;
+      _maybePromptReview(finalState);
     });
   }
 
@@ -374,6 +391,7 @@ class SearchState extends _$SearchState {
       final finalState = await finalizeUnifiedResult(ref, fuelResult, evFuture);
       if (!ref.mounted) return;
       state = finalState;
+      _maybePromptReview(finalState);
     });
   }
 }

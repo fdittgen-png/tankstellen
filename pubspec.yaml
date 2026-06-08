@@ -137,6 +137,15 @@ dependencies:
   # `.tflite` artifact + heuristic→TFLite cutover come in a follow-up PR.
   tflite_flutter: ^0.12.1
 
+  # OS-native store-review prompt (#3069) — drives the Play In-App Review
+  # API on Android and SKStoreReviewController on iOS. The OS renders the
+  # dialog, so there are NO custom strings (zero ARB impact). Its Android
+  # side pulls Play Core (com.google.android.play:review), a proprietary
+  # group STRIPPED from the fdroid flavor (see android/app/build.gradle.kts
+  # gmsExcludeGroups + scripts/audit_no_gms.sh). The service therefore
+  # swallows every error so the libre build simply no-ops.
+  in_app_review: ^2.0.12
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

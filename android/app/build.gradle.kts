@@ -188,33 +188,39 @@ android {
 }
 
 // -----------------------------------------------------------------------------
-// F-Droid GMS/MLKit exclusion (#2574)
+// F-Droid GMS/MLKit/Play-Core exclusion (#2574, #3069)
 //
-// The `fdroid` flavor must ship ZERO proprietary Google Mobile Services. Two
-// transitive sources pull GMS in:
+// The `fdroid` flavor must ship ZERO proprietary Google libraries. Three
+// transitive sources pull proprietary Google code in:
 //   1. geolocator_android      -> com.google.android.gms:play-services-location
 //   2. google_mlkit_text_recognition (pump/receipt OCR)
 //                              -> com.google.mlkit:text-recognition
 //                              -> com.google.android.gms:play-services-base/basement
+//   3. in_app_review (#3069)   -> com.google.android.play:review (Play Core,
+//                                 the In-App Review API)
 //
-// We strip both groups from the fdroid `implementation` base configuration
+// We strip all three groups from the fdroid `implementation` base configuration
 // (geolocator's own documented F-Droid recipe) AND, belt-and-braces, from each
-// fdroid runtime classpath. The app module's own Kotlin never references GMS or
-// ML Kit directly — those deps come in transitively from the geolocator_android
-// and google_mlkit_text_recognition plugin modules — so removing them from the
-// app's fdroid graph does not break compilation; it only drops the classes from
-// the resolved APK. After that the OCR plugin channel simply isn't there and
-// ReceiptScanService degrades gracefully (MissingPluginException is caught in
-// _recogniseRaw -> returns null). Maps are already OSM (flutter_map), so after
-// these two excludes the fdroid APK is GMS-free. geolocator falls back to
-// Android's LocationManager — see GeolocatorWrapper.forceLocationManager.
+// fdroid runtime classpath. The app module's own Kotlin never references GMS,
+// ML Kit or Play Core directly — those deps come in transitively from the
+// geolocator_android, google_mlkit_text_recognition and in_app_review plugin
+// modules — so removing them from the app's fdroid graph does not break
+// compilation; it only drops the classes from the resolved APK. After that the
+// OCR plugin channel simply isn't there and ReceiptScanService degrades
+// gracefully (MissingPluginException is caught in _recogniseRaw -> returns
+// null); likewise the in-app review channel is absent and InAppReviewService
+// swallows the NoClassDefFoundError/MissingPluginException and no-ops. Maps are
+// already OSM (flutter_map), so after these excludes the fdroid APK is free of
+// proprietary Google code. geolocator falls back to Android's LocationManager —
+// see GeolocatorWrapper.forceLocationManager.
 //
-// Scope is the fdroid flavor ONLY: the play flavor keeps GMS+MLKit unchanged.
-// The exact configuration names below were confirmed against
+// Scope is the fdroid flavor ONLY: the play flavor keeps GMS+MLKit+Play Core
+// unchanged. The exact configuration names below were confirmed against
 // `./gradlew -p android app:dependencies`; the audit (scripts/audit_no_gms.sh +
 // .github/workflows/fdroid.yml) inspects `fdroidReleaseRuntimeClasspath` and
 // the built dex to prove the runtime classpath is clean.
-val gmsExcludeGroups = listOf("com.google.android.gms", "com.google.mlkit")
+val gmsExcludeGroups =
+    listOf("com.google.android.gms", "com.google.mlkit", "com.google.android.play")
 val fdroidExcludedConfigs = listOf(
     "fdroidImplementation",
     "fdroidReleaseRuntimeClasspath",
