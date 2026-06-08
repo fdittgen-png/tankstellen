@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/data_transparency_cards.dart';
@@ -38,6 +39,43 @@ void main() {
       expect(find.text('Account'), findsOneWidget);
       expect(find.text('test-uuid-123'), findsOneWidget);
       expect(find.text('https://test.supabase.co'), findsOneWidget);
+    });
+  });
+
+  group('DataActionButtons', () {
+    // #3081 — destructive actions used to be hidden behind a "data
+    // deletion is not available in community mode" warning Card. RLS
+    // scopes every delete to the caller's own rows (`FOR ALL USING
+    // (user_id = auth.uid())`), so the block was over-broad. The actions
+    // must now render unconditionally (the widget no longer takes a
+    // `mode` param) and the community warning text must be absent.
+    Widget buildButtons() => DataActionButtons(
+          loading: false,
+          onSync: () {},
+          onViewRawJson: () {},
+          onExportJson: () {},
+          onDeleteAll: () {},
+          onForgetAllTrips: () {},
+          onDisconnect: () {},
+        );
+
+    testWidgets('shows destructive actions and no community warning',
+        (tester) async {
+      await pumpApp(tester, buildButtons());
+
+      // The broad + narrow destructive actions are both present.
+      expect(find.text('Delete all server data'), findsOneWidget);
+      expect(
+        find.byKey(const Key('forget_all_synced_trips_button')),
+        findsOneWidget,
+      );
+      expect(find.text('Forget all synced trips'), findsOneWidget);
+
+      // The former community-mode warning must be gone entirely.
+      expect(
+        find.textContaining('Data deletion is not available in community'),
+        findsNothing,
+      );
     });
   });
 
