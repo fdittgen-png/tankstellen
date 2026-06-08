@@ -53,7 +53,14 @@ void main() {
     // #2978 — 961 → 964: `initializeDateFormatting()` + its import + comment,
     // so `intl` locale date-symbols are loaded once at startup and the
     // localized price-prediction weekday renders for non-`en_US` locales.
-    'lib/app/app_initializer.dart': 964,
+    // #3077 — re-grandfathered 964 → 1028: the launch-time
+    // `_runEntitySyncMerge` (+ its post-`_runTripsSyncMerge` call site +
+    // 5 provider imports) pulls the remaining server→local entities
+    // (ratings/alerts/fill-ups/vehicles) on cold start, mirroring the
+    // adjacent trips merge. The unit-tested logic lives in the per-entity
+    // provider seams; this is the (compacted) launch glue. Decomposition
+    // of this god-file is tracked separately.
+    'lib/app/app_initializer.dart': 1028,
     // #2415 — background_service.dart graduated: the scan body moved into
     // BackgroundAlertScanCoordinator + BackgroundScanRunners +
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
@@ -517,7 +524,12 @@ void main() {
     // drops a still-unresolved deferred gap (the decision is never lost).
     // Lives on `FillUpList` because it reads + mutates the pending-gap
     // provider in the same save path. Decomposition tracked #2187/#2188.
-    'lib/features/consumption/providers/consumption_providers.dart': 975,
+    // #3077 — re-grandfathered 975 → 1005: `FillUpList.pullFromServer`
+    // (the unit-tested server→local fill-ups pull-persist seam, local wins
+    // on id collision) + the `FillUpsMergeFn` typedef + the fill_ups_sync
+    // import. Sibling of the existing device-link `mergeFrom`. Decomposition
+    // of this god-class is tracked #2187/#2188.
+    'lib/features/consumption/providers/consumption_providers.dart': 1005,
     // #2509 — re-grandfathered 1180 → 1217: the persist guard in
     // `_saveToHistory` was tightened from the buggy disjunction
     // (`startedAt == null || distance < 0.01`, which silently discarded a

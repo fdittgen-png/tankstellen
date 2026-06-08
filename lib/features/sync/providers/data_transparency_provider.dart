@@ -9,11 +9,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/sync_provider.dart';
-import '../../../core/sync/alerts_sync.dart';
 import '../../../core/sync/favorites_sync.dart';
+import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../../core/sync/user_data_sync.dart';
 import '../../alerts/providers/alert_provider.dart';
+import '../../consumption/providers/consumption_providers.dart';
 import '../../favorites/providers/favorites_provider.dart';
+import '../../vehicle/providers/vehicle_providers.dart';
 import '../../../core/logging/error_logger.dart';
 
 part 'data_transparency_provider.g.dart';
@@ -133,10 +135,25 @@ class DataTransparencyController extends _$DataTransparencyController {
       await storage.setFavoriteIds(await FavoritesSync.merge(favoriteIds));
       ref.invalidate(favoritesProvider);
 
+      // #3077 — pull server-only ratings into local storage (local wins on
+      // collision). The station_rating provider re-reads storage on rebuild.
+      await ref.read(syncStateProvider.notifier).syncAndPersistRatings(storage);
+
+      // #3077 — alerts: an explicit upload + download pass. The
+      // add/toggle hooks already pull on every edit, but the "sync now"
+      // gesture must also pull alerts created on another device for a
+      // device that never edits one locally.
       final alerts = ref.read(alertProvider);
       debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
-      // Alerts pull is #3077 — leave merge as upload-only for now.
-      await AlertsSync.merge(alerts);
+      await ref.read(alertProvider.notifier).pullFromServer();
+
+      // #3077 — fill-ups + vehicles are trip-data adjacent, so they ride
+      // the same trip-sync consent gate (cloudSync ∧ syncTrips ∧ email).
+      // Off → upload-only stays the contract, nothing is pulled.
+      if (ref.read(tripsSyncEnabledProvider)) {
+        await ref.read(vehicleProfileListProvider.notifier).pullFromServer();
+        await ref.read(fillUpListProvider.notifier).pullFromServer();
+      }
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'DataTransparency: force sync failed'}));
     }

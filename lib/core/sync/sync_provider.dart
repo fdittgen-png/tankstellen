@@ -26,6 +26,13 @@ part 'sync_provider.g.dart';
 /// live Supabase session.
 typedef IdMergeFn = Future<List<String>> Function(List<String> localIds);
 
+/// Signature for a ratings fetch returning the server's
+/// `stationId → rating` map — the shape of [RatingsSync.fetchAll].
+/// Injected as a seam so the ratings pull-persist wiring (#3077) is
+/// unit-testable without a live Supabase session (the real fetch
+/// returns an empty map when unauthenticated, masking the wiring).
+typedef RatingsFetchFn = Future<Map<String, int>> Function();
+
 /// Signature for an email auth call (sign-up / sign-in / anonymous-upgrade)
 /// returning the resulting user id (or `null`). Mirrors the static
 /// `TankSyncClient.*` methods so the auth-branch selection in
@@ -293,8 +300,12 @@ class SyncState extends _$SyncState {
       try {
         await syncAndPersistIds(storage);
         // #2319 — batch every local rating into one upsert round-trip
-        // instead of N serial calls on connect. (Ratings pull is #3077.)
+        // instead of N serial calls on connect.
         await RatingsSync.upsertAll(storage.getRatings());
+        // #3077 — pull server-only ratings down too. The upsertAll above
+        // is upload-only; without this a rating created on another device
+        // never reached this one.
+        await syncAndPersistRatings(storage);
         debugPrint('InitialSync: complete');
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
@@ -326,6 +337,41 @@ class SyncState extends _$SyncState {
   }) async {
     await storage.setFavoriteIds(await mergeFavorites(storage.getFavoriteIds()));
     await storage.setIgnoredIds(await mergeIgnored(storage.getIgnoredIds()));
+  }
+
+  /// Pull the user's server ratings and **persist the server-only ones
+  /// back to local storage** (#3077).
+  ///
+  /// [RatingsSync.fetchAll] returns every `stationId → rating` the
+  /// authenticated user owns. Previously the return was never consumed —
+  /// `_performInitialSync` only ever *uploaded* via [RatingsSync.upsertAll],
+  /// so a rating made on another device never reached this one. We now
+  /// write any server station the device doesn't already rate locally via
+  /// [RatingStorage.setRating].
+  ///
+  /// Union-merge semantics: **local wins on id collision** — a station the
+  /// device already rates is left untouched (its in-flight edit may not yet
+  /// have reached the server). Only server-only stations are added. The
+  /// `station_rating_provider` re-reads storage on rebuild, so the in-session
+  /// UI reflects the pulled ratings.
+  ///
+  /// Called on the connect / "sync now" / app-launch triggers (see
+  /// `data_transparency_provider` + `AppInitializer`). [fetchRatings]
+  /// defaults to the real [RatingsSync.fetchAll] and is injectable so the
+  /// pull-persist wiring is unit-testable without a live Supabase session
+  /// (the real fetch returns an empty map when unauthenticated, masking the
+  /// wiring under test).
+  Future<void> syncAndPersistRatings(
+    StorageRepository storage, {
+    RatingsFetchFn fetchRatings = RatingsSync.fetchAll,
+  }) async {
+    final serverRatings = await fetchRatings();
+    if (serverRatings.isEmpty) return;
+    final localRatings = storage.getRatings();
+    for (final entry in serverRatings.entries) {
+      if (localRatings.containsKey(entry.key)) continue;
+      await storage.setRating(entry.key, entry.value);
+    }
   }
 
   static SyncMode _parseMode(String? value) => switch (value) {

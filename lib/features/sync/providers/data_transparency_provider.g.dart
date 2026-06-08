@@ -44,7 +44,7 @@ final class DataTransparencyControllerProvider
 }
 
 String _$dataTransparencyControllerHash() =>
-    r'674e5a5c9f4e8b0bb00e85f6b86abb5c4333d412';
+    r'6f7412b55b4b699795210784a8d93fc316b9c835';
 
 abstract class _$DataTransparencyController
     extends $Notifier<DataTransparencyState> {

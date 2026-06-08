@@ -136,6 +136,61 @@ void main() {
       expect(fakeStorage.getIgnoredIds(), ['keep-ign']);
     });
   });
+
+  // #3077 — ratings were upload-only: `_performInitialSync` called
+  // `RatingsSync.upsertAll` (push) but never consumed `RatingsSync.fetchAll`,
+  // so a rating made on another device never reached this one. These drive
+  // the new `syncAndPersistRatings` seam and assert the server-only rating
+  // is written to LOCAL storage. They FAIL on master (the method doesn't
+  // exist / nothing persisted the fetch) and PASS after.
+  group('SyncState.syncAndPersistRatings (#3077 ratings pull-persist)', () {
+    test('persists a server-only rating into LOCAL storage', () async {
+      await fakeStorage.setRating('st-local', 4);
+
+      final container = createContainer();
+      final notifier = container.read(syncStateProvider.notifier);
+
+      await notifier.syncAndPersistRatings(
+        fakeStorage,
+        fetchRatings: () async => {'st-local': 4, 'st-server': 5},
+      );
+
+      expect(fakeStorage.getRating('st-server'), 5,
+          reason: 'server-only rating must be written to local storage');
+      expect(fakeStorage.getRating('st-local'), 4);
+    });
+
+    test('local wins on id collision (in-flight edit not clobbered)',
+        () async {
+      await fakeStorage.setRating('st-1', 5); // local edit: 5 stars
+
+      final container = createContainer();
+      final notifier = container.read(syncStateProvider.notifier);
+
+      // server still has the stale 2-star value for the same station.
+      await notifier.syncAndPersistRatings(
+        fakeStorage,
+        fetchRatings: () async => {'st-1': 2},
+      );
+
+      expect(fakeStorage.getRating('st-1'), 5,
+          reason: 'local rating must win — server value must not overwrite it');
+    });
+
+    test('empty server fetch leaves local ratings unchanged', () async {
+      await fakeStorage.setRating('keep', 3);
+
+      final container = createContainer();
+      final notifier = container.read(syncStateProvider.notifier);
+
+      await notifier.syncAndPersistRatings(
+        fakeStorage,
+        fetchRatings: () async => const <String, int>{},
+      );
+
+      expect(fakeStorage.getRatings(), {'keep': 3});
+    });
+  });
 }
 
 /// Fake [SyncState] that returns a fixed [SyncConfig] without touching

@@ -81,26 +81,39 @@ class AlertNotifier extends _$AlertNotifier {
     await BackgroundService.reconcile();
   }
 
+  /// Explicitly upload local alerts AND pull server-only alerts into local
+  /// storage (#3077). Used by the connect / app-launch / "sync now"
+  /// triggers — the mutation hooks ([addAlert] / [toggleAlert]) already
+  /// pull on every edit, but a device that never edits an alert (a fresh
+  /// install signing in on a second device) needs an explicit pull pass to
+  /// see alerts created elsewhere. Returns the count of newly-persisted
+  /// (downloaded) alerts. No-op when TankSync is disabled.
+  Future<int> pullFromServer() =>
+      _syncAlertsIfConnected(applyDownloads: true);
+
   /// Push local alerts to the backend and, unless [applyDownloads] is
-  /// false, pull server-only alerts back into local storage.
+  /// false, pull server-only alerts back into local storage. Returns the
+  /// count of server-only alerts persisted this pass (0 when downloads are
+  /// suppressed, TankSync is off, or nothing new came down).
   ///
   /// #2246 — [AlertsSync.merge] returns the merged superset
   /// (`[local, ...server-only downloaded]`). The result used to be
   /// discarded, so an alert created on another device never reached this
   /// one. We now persist the server-only rows via [_applyMergedAlerts].
-  Future<void> _syncAlertsIfConnected({bool applyDownloads = true}) async {
+  Future<int> _syncAlertsIfConnected({bool applyDownloads = true}) async {
     try {
       final syncState = ref.read(syncStateProvider);
       if (syncState.enabled) {
         final merge = ref.read(alertsMergeFnProvider);
         final merged = await merge(state);
         if (applyDownloads) {
-          await _applyMergedAlerts(merged);
+          return _applyMergedAlerts(merged);
         }
       }
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'AlertProvider: sync failed'}));
     }
+    return 0;
   }
 
   /// Persist any [merged] alert whose id isn't already in local storage,

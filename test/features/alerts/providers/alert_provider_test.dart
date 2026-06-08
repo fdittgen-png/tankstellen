@@ -460,5 +460,28 @@ void main() {
       expect(stored, equals({'keep'}),
           reason: 'remove must not resurrect the deleted alert');
     });
+
+    // #3077 — before this, alerts only pulled on a LOCAL mutation
+    // (add/toggle). A device that signs in but never edits an alert
+    // (a fresh second device) needs an explicit pull on connect / launch /
+    // "sync now". `pullFromServer` is that trigger. This FAILS on master
+    // (no such method) and PASSES after.
+    test('pullFromServer applies a server-only alert WITHOUT a local edit',
+        () async {
+      final serverOnly = _makeAlert(id: 'server-only', stationId: 's-server');
+      // No local alert exists; the merge surfaces the server-only row.
+      mergeReturn = [serverOnly];
+
+      final added =
+          await container.read(alertProvider.notifier).pullFromServer();
+
+      expect(added, 1);
+      final stored = fakeStorage.getAlerts().map((a) => a['id']).toSet();
+      expect(stored, contains('server-only'),
+          reason: 'explicit pull must persist the server-only alert');
+      expect(container.read(alertProvider).map((a) => a.id),
+          contains('server-only'));
+      expect(mergeCalls, 1);
+    });
   });
 }
