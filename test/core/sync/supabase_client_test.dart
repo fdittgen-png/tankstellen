@@ -65,6 +65,22 @@ void main() {
         await TankSyncClient.signOut();
       }
     });
+
+    test('isAnonymous is false before init', () {
+      if (TankSyncClient.client == null) {
+        expect(TankSyncClient.isAnonymous, isFalse);
+      }
+    });
+
+    test('upgradeAnonymousToEmail returns null before init (#3079)', () async {
+      // No session to upgrade → null, so the caller falls back to
+      // sign-up/sign-in rather than orphaning data.
+      if (TankSyncClient.client == null) {
+        final result =
+            await TankSyncClient.upgradeAnonymousToEmail('a@b.c', 'pw');
+        expect(result, isNull);
+      }
+    });
   });
 
   group('TankSyncClient upsert retry constants', () {

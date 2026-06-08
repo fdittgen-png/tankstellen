@@ -3767,6 +3767,22 @@ class AppLocalizationsDe extends AppLocalizations {
       'Anmeldung fehlgeschlagen. Bitte erneut versuchen.';
 
   @override
+  String get authLinkEmailTitle => 'E-Mail verknüpfen';
+
+  @override
+  String get authLinkEmailSubtitle =>
+      'Verknüpfe eine E-Mail-Adresse, damit deine Daten geräteübergreifend synchronisiert werden. Deine aktuellen Favoriten und Fahrten bleiben auf diesem Konto erhalten.';
+
+  @override
+  String authGuestLinkPrompt(String idPrefix) {
+    return 'Du nutzt ein Gastkonto ($idPrefix…). Verknüpfe eine E-Mail-Adresse, damit deine Favoriten und Fahrten auf deine anderen Geräte synchronisiert werden.';
+  }
+
+  @override
+  String get authConfirmationPending =>
+      'Fast geschafft – öffne deine E-Mails und klicke auf den Link, um die Verknüpfung abzuschließen. Deine Daten sind bereits auf diesem Konto gespeichert.';
+
+  @override
   String get autoRecordConsentBadgeLabel =>
       'Hintergrund-Standort — nur für automatisches Aufzeichnen';
 

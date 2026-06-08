@@ -4758,5 +4758,30 @@
   "@obd2ReconnectRetry": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "authLinkEmailTitle": "Link an email",
+  "@authLinkEmailTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "authLinkEmailSubtitle": "Link an email so your data syncs across devices. Your current favorites and trips stay on this account.",
+  "@authLinkEmailSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "authGuestLinkPrompt": "You're using a guest account ({idPrefix}…). Link an email so your favorites and trips sync to your other devices.",
+  "@authGuestLinkPrompt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "idPrefix": {
+        "type": "String"
+      }
+    }
+  },
+  "authConfirmationPending": "Almost there — check your email and click the link to finish linking it. Your data is already saved on this account.",
+  "@authConfirmationPending": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -6840,6 +6840,30 @@ abstract class AppLocalizations {
   /// **'Sign-in failed. Please try again.'**
   String get authErrorGeneric;
 
+  /// Auth card heading shown to an anonymous user — framing the primary action as attaching an email to their CURRENT account (keeping their data) rather than creating a separate new account (#3079).
+  ///
+  /// In en, this message translates to:
+  /// **'Link an email'**
+  String get authLinkEmailTitle;
+
+  /// Auth card body for an anonymous user — reassures that linking an email upgrades the current anonymous identity in place, so existing favorites/trips are preserved and become reachable on other devices (#3079).
+  ///
+  /// In en, this message translates to:
+  /// **'Link an email so your data syncs across devices. Your current favorites and trips stay on this account.'**
+  String get authLinkEmailSubtitle;
+
+  /// Status text for a connected anonymous (guest) user, prompting them to attach an email for cross-device sync (#3079).
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re using a guest account ({idPrefix}…). Link an email so your favorites and trips sync to your other devices.'**
+  String authGuestLinkPrompt(String idPrefix);
+
+  /// Shown after an anonymous account is upgraded to email when the server requires email confirmation: the email change is pending the confirmation link, but the user's UUID and data are already safe (#3079).
+  ///
+  /// In en, this message translates to:
+  /// **'Almost there — check your email and click the link to finish linking it. Your data is already saved on this account.'**
+  String get authConfirmationPending;
+
   /// Scope-explicit label for the background-location consent badge on the auto-record card (#1439). Replaces the ambiguous pre-#1439 label that read as a profile-wide grant; clarifies that the consent is consumed exclusively by the auto-record service.
   ///
   /// In en, this message translates to:

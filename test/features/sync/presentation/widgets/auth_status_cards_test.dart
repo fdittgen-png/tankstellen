@@ -119,13 +119,15 @@ void main() {
       expect(find.textContaining('abcdef12'), findsOneWidget);
     });
 
-    testWidgets('shows upgrade prompt', (tester) async {
+    testWidgets('shows link-email prompt (#3079)', (tester) async {
       await pumpApp(
         tester,
         const AnonymousStatusCard(userId: 'abcdef1234567890'),
       );
 
-      expect(find.textContaining('Add an email'), findsOneWidget);
+      // The prompt now frames attaching an email as "linking" the current
+      // (data-owning) account rather than creating a separate one.
+      expect(find.textContaining('Link an email'), findsOneWidget);
     });
 
     testWidgets('shows person outline icon', (tester) async {
