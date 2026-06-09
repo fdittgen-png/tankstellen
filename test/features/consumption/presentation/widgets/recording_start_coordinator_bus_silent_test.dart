@@ -54,9 +54,16 @@ void main() {
   }
 
   testWidgets(
-      'a silent-bus connect surfaces Obd2EngineOff, disconnects, '
-      'and never calls notifier.start (#2892, #3009)', (tester) async {
-    final service = _FakeObd2Service(busAnswered: false);
+      'a CONFIRMED engine-off connect (probedSilent) surfaces Obd2EngineOff, '
+      'disconnects, and never calls notifier.start (#2892, #3009, #3101)',
+      (tester) async {
+    // #3101 — only a `probedSilent` probe (ECU silent through every retry) is
+    // a genuine engine-off. `busAnswered` is false here too, but the gate now
+    // keys off the finer tri-state, not the coarse boolean.
+    final service = _FakeObd2Service(
+      busAnswered: false,
+      busProbe: Obd2BusProbeResult.probedSilent,
+    );
     final coordinator = RecordingStartCoordinator();
     final errors = <Object>[];
     late _SpyTripRecording recording;
@@ -94,7 +101,10 @@ void main() {
   testWidgets(
       'a connect whose bus answered starts the trip as normal (#2892)',
       (tester) async {
-    final service = _FakeObd2Service(busAnswered: true);
+    final service = _FakeObd2Service(
+      busAnswered: true,
+      busProbe: Obd2BusProbeResult.answered,
+    );
     final coordinator = RecordingStartCoordinator();
     final errors = <Object>[];
     late _SpyTripRecording recording;
@@ -119,6 +129,74 @@ void main() {
     expect(recording.lastStartedService, same(service));
     expect(service.disconnectCallCount, 0,
         reason: 'the live recording now owns the link');
+  });
+
+  testWidgets(
+      '#3101 — a TRANSIENT probe (live-but-slow car, 0100 timed out: '
+      'busAnswered=false but NOT engine-off) STARTS the trip, not bails',
+      (tester) async {
+    // The regression: a cache-miss first connect to a LIVE car whose `0100`
+    // merely timed out during the protocol search. `busAnswered` is false
+    // (no protocol digit, no PIDs yet) but `busProbe` is `transient`, NOT
+    // `probedSilent`. The old gate bailed with Obd2EngineOff → "recording
+    // won't start at all". The trip must start and the recording must own the
+    // link so the scheduler picks up PIDs once the search converges.
+    final service = _FakeObd2Service(
+      busAnswered: false,
+      busProbe: Obd2BusProbeResult.transient,
+    );
+    final coordinator = RecordingStartCoordinator();
+    final errors = <Object>[];
+    late _SpyTripRecording recording;
+
+    await withRef(tester, _SpyTripRecording.new, (ref, notifier) async {
+      recording = notifier;
+      notifier.enterConnecting();
+      await coordinator.connectAndStart(
+        ref,
+        notifier: notifier,
+        openPicker: () async => service,
+        onConnectionError: errors.add,
+        isMounted: () => true,
+      );
+    });
+
+    expect(errors, isEmpty,
+        reason: 'a transient probe is NOT engine-off — no error');
+    expect(recording.startCallCount, 1,
+        reason: 'a live-but-slow car must start the trip (#3101)');
+    expect(recording.lastStartedService, same(service));
+    expect(service.disconnectCallCount, 0,
+        reason: 'the live recording now owns the link — do not tear it down');
+  });
+
+  testWidgets(
+      '#3101 — a warm cache-hit (notProbed, busAnswered=true) starts normally',
+      (tester) async {
+    // A pinned/paired adapter cache-hit skips discovery: `busProbe` is
+    // `notProbed` and `busAnswered` trips on the cached protocol/PID set.
+    final service = _FakeObd2Service(
+      busAnswered: true,
+      busProbe: Obd2BusProbeResult.notProbed,
+    );
+    final coordinator = RecordingStartCoordinator();
+    final errors = <Object>[];
+    late _SpyTripRecording recording;
+
+    await withRef(tester, _SpyTripRecording.new, (ref, notifier) async {
+      recording = notifier;
+      notifier.enterConnecting();
+      await coordinator.connectAndStart(
+        ref,
+        notifier: notifier,
+        openPicker: () async => service,
+        onConnectionError: errors.add,
+        isMounted: () => true,
+      );
+    });
+
+    expect(errors, isEmpty);
+    expect(recording.startCallCount, 1);
   });
 }
 
@@ -151,17 +229,24 @@ class _SpyTripRecording extends TripRecording {
   }
 }
 
-/// Fake [Obd2Service] whose `busAnswered` is fixed by the test and whose
-/// `disconnect` is counted. Everything else is unreachable in these tests.
+/// Fake [Obd2Service] whose `busAnswered` + `busProbe` are fixed by the test
+/// and whose `disconnect` is counted. Everything else is unreachable here.
 class _FakeObd2Service implements Obd2Service {
-  _FakeObd2Service({required bool busAnswered})
-      : busAnsweredValue = busAnswered;
+  _FakeObd2Service({
+    required bool busAnswered,
+    required Obd2BusProbeResult busProbe,
+  })  : busAnsweredValue = busAnswered,
+        busProbeValue = busProbe;
 
   final bool busAnsweredValue;
+  final Obd2BusProbeResult busProbeValue;
   int disconnectCallCount = 0;
 
   @override
   bool get busAnswered => busAnsweredValue;
+
+  @override
+  Obd2BusProbeResult get busProbe => busProbeValue;
 
   @override
   Future<void> disconnect() async {
