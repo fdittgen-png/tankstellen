@@ -11,52 +11,12 @@ import '../logging/error_logger.dart';
 import '../utils/geo_utils.dart' as geo;
 import '../utils/num_extensions.dart';
 import '../utils/station_extensions.dart';
+import 'approach_state.dart';
 
-/// State emitted by [ApproachDetector] (#2085 / ADR 0011).
-///
-/// Sealed hierarchy — the consumer (the PiP overlay in #2084) picks
-/// its UI on the runtime subtype:
-///
-/// - [ApproachIdle] — no GPS fix yet, or detector not running.
-/// - [ApproachPolling] — GPS available, no station in radius. The
-///   overlay shows the default "huge L/100 km" view from #2068.
-/// - [ApproachInRadius] — driver is inside the configured radius of
-///   a target station. The overlay flips to the huge-price view.
-/// - [ApproachLeaving] — radius exit was detected, but the 5 s
-///   grace window is still open. The overlay keeps showing the
-///   price until the grace expires or the radius is re-entered.
-sealed class ApproachState {
-  const ApproachState();
-}
-
-/// No GPS fix / detector not yet receiving samples.
-class ApproachIdle extends ApproachState {
-  const ApproachIdle();
-}
-
-/// GPS is producing samples but no station is in the radius right now.
-class ApproachPolling extends ApproachState {
-  final Position gps;
-  final Duration nextPollIn;
-  const ApproachPolling({required this.gps, required this.nextPollIn});
-}
-
-/// A target station is in the configured radius.
-class ApproachInRadius extends ApproachState {
-  final Station station;
-  final double distanceMeters;
-  const ApproachInRadius({
-    required this.station,
-    required this.distanceMeters,
-  });
-}
-
-/// Grace period after exit — the overlay keeps the price visible for
-/// [ApproachDetector.exitGrace] before falling back to [ApproachPolling].
-class ApproachLeaving extends ApproachState {
-  final Station lastStation;
-  const ApproachLeaving({required this.lastStation});
-}
+// The [ApproachState] sealed hierarchy lives in `approach_state.dart` (#3092
+// keeps this file under the line cap); re-export it so callers that import
+// `approach_detector.dart` still get ApproachIdle/Polling/InRadius/Leaving.
+export 'approach_state.dart';
 
 /// Which station the detector targets when more than one is inside
 /// the radius (#2067 profile setting drives this — see ADR 0011).
@@ -226,10 +186,11 @@ class ApproachDetector {
     final speedMps = p.speed.isFinite && p.speed >= 0 ? p.speed : 0.0;
     _recentSpeeds.add(speedMps);
     if (_recentSpeeds.length > 3) _recentSpeeds.removeAt(0);
+    final cur = _state;
     // First emit on first sample — fire a Polling state immediately
     // so the consumer doesn't sit on Idle through the first poll
     // window.
-    if (_state is ApproachIdle) {
+    if (cur is ApproachIdle) {
       _emit(ApproachPolling(
         gps: p,
         nextPollIn: computePollInterval(
@@ -239,6 +200,22 @@ class ApproachDetector {
         ),
       ));
       _schedulePoll();
+    } else if (cur is ApproachInRadius) {
+      // #3092 — LIVE, GPS-driven distance. While a station is in radius,
+      // recompute the distance to the ALREADY-targeted station on every GPS
+      // fix and re-emit, so the overlay's distance ticks down smoothly as the
+      // driver approaches — WITHOUT a data-service poll. The poll keeps doing
+      // enter/leave detection + cheapest re-evaluation at its own, slower
+      // cadence; this only refreshes the distance of the locked target.
+      _emit(ApproachInRadius(
+        station: cur.station,
+        distanceMeters: distanceMeters(
+          p.latitude,
+          p.longitude,
+          cur.station.lat,
+          cur.station.lng,
+        ),
+      ));
     }
   }
 
