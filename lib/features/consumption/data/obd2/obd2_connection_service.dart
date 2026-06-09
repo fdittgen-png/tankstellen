@@ -145,10 +145,9 @@ class Obd2ConnectionService {
     var sawAny = false;
     final accumulated = <String, Obd2AdapterCandidate>{};
 
-    final bleStream = bluetooth.scan(
-      serviceUuids: registry.allServiceUuids,
-      timeout: timeout,
-    );
+    // #3097 — scan UNFILTERED: a withServices filter starves iOS of name-only
+    // ELM327 clones; registry.rank still drops non-adapter noise post-scan.
+    final bleStream = bluetooth.scan(serviceUuids: const {}, timeout: timeout);
     final classicStream = classicBluetooth?.scan(timeout: timeout) ??
         const Stream<List<Obd2AdapterCandidate>>.empty();
 

@@ -52,6 +52,10 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
                 deviceName: d.name,
                 advertisedServiceUuids: const [],
                 rssi: 0,
+                // #3097 — bonded-device enumeration is the Classic transport,
+                // so resolve() keeps a generic-named clone on the Classic
+                // profile here (Android-only; this facade is null on iOS).
+                discoveryTransport: BluetoothTransport.classic,
               ))
           .toList();
     } on Exception catch (e, st) {

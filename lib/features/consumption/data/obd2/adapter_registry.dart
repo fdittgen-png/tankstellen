@@ -33,10 +33,11 @@ enum Obd2AdapterCompatibility {
   untested,
 }
 
-/// Thin value-object describing one BLE scan result. Kept
+/// Thin value-object describing one scan result. Kept
 /// flutter_blue_plus-free so the registry can be unit-tested without
 /// the platform plugin (the real connection service converts
-/// `ScanResult` into this shape at the edge). Step 1 of #733.
+/// `ScanResult` / a bonded-device entry into this shape at the edge).
+/// Step 1 of #733.
 class Obd2AdapterCandidate {
   /// Platform device id (MAC address on Android, UUID on iOS).
   final String deviceId;
@@ -53,11 +54,24 @@ class Obd2AdapterCandidate {
   /// values closer to 0 (e.g. -50 is stronger than -90).
   final int rssi;
 
+  /// Which transport actually discovered this candidate (#3097). The BLE
+  /// facade stamps [BluetoothTransport.ble]; the Classic (bonded-device)
+  /// facade stamps [BluetoothTransport.classic]. [resolve] reads it to
+  /// disambiguate a generic name (e.g. `OBDII`) that matches BOTH a BLE and
+  /// a Classic profile: a BLE-discovered hit must resolve to a BLE profile
+  /// (so it connects over BLE — the only transport iOS can use for a
+  /// non-MFi adapter), and a Classic-discovered hit on Android must still
+  /// resolve to Classic. Defaults to [BluetoothTransport.ble] — the
+  /// dominant over-the-air scan transport, and the historical assumption of
+  /// this BLE-first value object.
+  final BluetoothTransport discoveryTransport;
+
   Obd2AdapterCandidate({
     required this.deviceId,
     required this.deviceName,
     required Iterable<String> advertisedServiceUuids,
     required this.rssi,
+    this.discoveryTransport = BluetoothTransport.ble,
   }) : advertisedServiceUuids = advertisedServiceUuids
             .map((u) => u.trim().toLowerCase())
             .toSet();
@@ -160,11 +174,17 @@ class Obd2AdapterRegistry {
   factory Obd2AdapterRegistry.defaults() =>
       const Obd2AdapterRegistry(profiles: _defaultProfiles);
 
-  /// All BLE service UUIDs the registry knows about. Handed to
-  /// `FlutterBluePlus.startScan(withServices: ...)` so the scan
-  /// filters out consumer BLE noise (fitness trackers, headphones).
-  /// Classic profiles are excluded — SPP uses a single universal
-  /// UUID and Classic discovery doesn't filter by service anyway.
+  /// All BLE service UUIDs the registry knows about. Classic profiles are
+  /// excluded — SPP uses a single universal UUID and Classic discovery
+  /// doesn't filter by service anyway.
+  ///
+  /// #3097 — this is **no longer** handed to `startScan(withServices:)`. The
+  /// scan now runs UNFILTERED: on iOS, CoreBluetooth only returns peripherals
+  /// that ADVERTISE one of these UUIDs, but most ELM327 BLE clones advertise a
+  /// NAME and no service UUID, so a service-filtered scan returned nothing on
+  /// iPhone. [resolve] already drops non-adapter noise (returns null → the
+  /// picker hides it), so the scan-level filter was both redundant and
+  /// iOS-starving. Retained only for reference / tests.
   Set<String> get allServiceUuids => profiles
       .where((p) => p.transport == BluetoothTransport.ble)
       .map((p) => p.serviceUuid.toLowerCase())
@@ -176,8 +196,30 @@ class Obd2AdapterRegistry {
   Obd2AdapterProfile? resolve(Obd2AdapterCandidate candidate) {
     // Pass 1: named match. A named profile wins over a generic one
     // if the advertised name carries its signature.
-    for (final p in profiles) {
-      if (p.matchesName(candidate.deviceName)) return p;
+    //
+    // #3097 — when a name matches profiles of MORE THAN ONE transport (e.g. a
+    // generic `OBDII` matches both `generic-ble` and `generic-classic`, or a
+    // `SmartOBD` matches both `smartobd-ble` and `smartobd-classic`), prefer
+    // the profile whose transport == the candidate's discovery transport. A
+    // BLE-discovered generic adapter must resolve to a BLE profile so it
+    // connects over BLE (the only transport iOS can use for a non-MFi
+    // adapter); a Classic-discovered one on Android must still resolve to
+    // Classic (no regression). A single-transport name match is unaffected:
+    // the first matcher in catalog order wins, exactly as before.
+    final named = [
+      for (final p in profiles)
+        if (p.matchesName(candidate.deviceName)) p,
+    ];
+    if (named.isNotEmpty) {
+      final transports = named.map((p) => p.transport).toSet();
+      if (transports.length > 1) {
+        for (final p in named) {
+          if (p.transport == candidate.discoveryTransport) return p;
+        }
+      }
+      // Single transport, or no profile matched the discovery transport
+      // (defensive) — keep the historical first-in-catalog-order winner.
+      return named.first;
     }
     // Pass 2: service UUID match, but only against generic/nameless
     // profiles. Named profiles require their name to be seen —
@@ -540,6 +582,20 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
     notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
   ),
+  // Generic ELM327 BLE fallback by NAME (#3097). A clone that advertises a
+  // generic name (`OBDII`, `ELM327 v1.5`, …) but NO service UUID — the iOS
+  // case: CoreBluetooth surfaces it by name only. Listed BEFORE the
+  // generic-classic entry so a BLE-discovered generic name resolves to a BLE
+  // profile (resolve() prefers the discovery transport for this BLE+Classic
+  // name pair). NO pinned service UUID — the channel's dynamic GATT discovery
+  // (#3014, see elm_gatt_profiles.dart) finds the ELM service post-connect
+  // among FFE0/FFF0/18F0/Nordic-UART by characteristic property, so a
+  // name-only adapter still connects.
+  Obd2AdapterProfile(
+    id: 'generic-ble',
+    displayName: 'Generic ELM327 (BLE)',
+    nameMatchers: _genericElmNameMatchers,
+  ),
   // Generic ELM327 Classic SPP fallback (#761). Matches any bonded
   // device whose name contains "obd" or "elm327" — the common ones
   // on Amazon / AliExpress that predate BLE. Classic can't be
@@ -549,8 +605,21 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
     id: 'generic-classic',
     displayName: 'Generic ELM327 (Classic)',
     transport: BluetoothTransport.classic,
-    nameMatchers: ['obdii', 'obd-ii', 'obd ii', 'obd2', 'elm327'],
+    nameMatchers: _genericElmNameMatchers,
   ),
+];
+
+/// Shared generic-ELM327 name signature used by BOTH the `generic-ble` and
+/// `generic-classic` fallback profiles (#3097). One source of truth so the two
+/// transports always match the same set of names; [Obd2AdapterRegistry.resolve]
+/// disambiguates which transport a given hit lands on via its discovery
+/// transport.
+const List<String> _genericElmNameMatchers = [
+  'obdii',
+  'obd-ii',
+  'obd ii',
+  'obd2',
+  'elm327',
 ];
 
 /// Re-export so callers can still reach the protocol types via the

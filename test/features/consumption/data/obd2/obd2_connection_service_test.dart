@@ -136,6 +136,55 @@ void main() {
       expect(emitted.last.first.profile.id, 'obdlink-mx',
           reason: 'strongest RSSI must rank first');
     });
+
+    test(
+        'requests an UNFILTERED BLE scan (empty serviceUuids) so iOS sees '
+        'name-only ELM327 adapters (#3097)', () async {
+      // A service-UUID filter becomes startScan(withServices:), and on iOS
+      // CoreBluetooth only returns peripherals that ADVERTISE one of those
+      // UUIDs — but most ELM327 BLE clones advertise a NAME and no service,
+      // so the filtered scan returned nothing on iPhone. The service must
+      // request an empty (unfiltered) set; resolve()/rank still drop noise.
+      final fake = _FakeFacade(batches: const [[]]);
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+      // The empty batch yields no known adapter, so scan throws ScanTimeout;
+      // we only care that the facade was driven with an empty filter.
+      await expectLater(svc.scan().toList(), throwsA(isA<Obd2ScanTimeout>()));
+      expect(fake.lastScanServiceUuids, isNotNull,
+          reason: 'the BLE facade scan must have been invoked');
+      expect(fake.lastScanServiceUuids, isEmpty,
+          reason: 'the BLE scan must be UNFILTERED (#3097) — a non-empty '
+              'withServices filter starves iOS of name-only adapters');
+    });
+
+    test(
+        'a BLE-discovered generic "OBDII" resolves to a BLE profile, not '
+        'Classic (#3097)', () async {
+      // End-to-end through the real registry: a generic ELM327 advertising a
+      // name and NO service over BLE must rank as a BLE profile so it connects
+      // on iPhone (a Classic profile cannot — no MFi). Would FAIL on master:
+      // pre-#3097 the only generic matchers lived on generic-classic.
+      final svc = _build(
+        permState: Obd2PermissionState.granted,
+        bt: _FakeFacade(batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'ios-uuid-1',
+              deviceName: 'OBDII',
+              advertisedServiceUuids: const [],
+              rssi: -50,
+              discoveryTransport: BluetoothTransport.ble,
+            ),
+          ],
+        ]),
+      );
+      final emitted = await svc.scan().toList();
+      final resolved = emitted.single.single;
+      expect(resolved.profile.id, 'generic-ble');
+      expect(resolved.profile.transport, BluetoothTransport.ble,
+          reason: 'a BLE-discovered generic ELM327 must resolve to a BLE '
+              'profile so the BLE connect path runs on iPhone (#3097)');
+    });
   });
 
   group('Obd2ConnectionService.connect (#741)', () {
@@ -1099,6 +1148,11 @@ class _FakeFacade implements BluetoothFacade {
   /// happy-path test assert NO scan occurred.
   bool scanInvoked = false;
 
+  /// #3097 — captures the `serviceUuids` the connection service requested on
+  /// the most recent [scan] call, so a test can assert the scan is UNFILTERED
+  /// (empty set). A non-empty filter starved iOS of name-only ELM327 adapters.
+  Set<String>? lastScanServiceUuids;
+
   /// Args captured from the most recent [channelForDirect] call.
   String? directMac;
   Duration? directTimeout;
@@ -1118,6 +1172,7 @@ class _FakeFacade implements BluetoothFacade {
     Duration timeout = const Duration(seconds: 8),
   }) async* {
     scanInvoked = true;
+    lastScanServiceUuids = serviceUuids;
     for (final batch in batches) {
       yield batch;
     }

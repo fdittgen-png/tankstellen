@@ -108,7 +108,15 @@ void main() {
     // (`transportsForName` + `disambiguateTransport`) — when a name matches BOTH
     // a BLE and Classic profile (SmartOBD / vLinker), prefer bonded-Classic when
     // bonded else BLE — plus dartdoc. Two pure lookup methods on the catalog.
-    'lib/features/consumption/data/obd2/adapter_registry.dart': 556,
+    // #3097 — re-grandfathered 556 → 625: the iOS-BLE-scan fix adds (1) a
+    // `discoveryTransport` field on Obd2AdapterCandidate + its dartdoc, (2)
+    // resolve() now prefers the discovery transport when a name matches both a
+    // BLE and a Classic profile (so a BLE-discovered `OBDII` resolves to a BLE
+    // profile, the only transport iOS can use), and (3) a `generic-ble`
+    // fallback profile mirroring `generic-classic`'s matchers (shared const)
+    // that connects via dynamic GATT discovery. Pure data + lookup growth on
+    // the existing catalog class; decomposition tracked by #2190.
+    'lib/features/consumption/data/obd2/adapter_registry.dart': 625,
     // #2969 — grandfathered at 563 (was 389, under-cap before). The #2969
     // connect-trace instrumentation opens/finalises a trace at the FIVE public
     // connect entry points (the single virtual-dispatch chokepoint every live
