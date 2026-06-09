@@ -153,9 +153,21 @@ class RecordingStartCoordinator {
       // "start the engine" message ([Obd2EngineOff]), NOT the old
       // adapter-blaming [Obd2AdapterUnresponsive] ("the adapter did not
       // respond" — but it DID respond; only the engine is off). Roll the
-      // connecting phase back and tear down the dead link. Gated STRICTLY on
-      // the no-answer signal so it never trips when discovery found PIDs.
-      if (!service.busAnswered) {
+      // connecting phase back and tear down the dead link.
+      //
+      // #3101 — gate on the FINER [Obd2Service.busProbe] tri-state, NOT the
+      // coarse `busAnswered`. #3035 fixed this same false-engine-off in the
+      // CONNECTION layer but this start gate was never migrated: on a
+      // cache-miss first connect (post reset / reinstall) to a LIVE-but-slow
+      // car, the `0100` probe merely TIMES OUT during the ELM protocol search
+      // → no protocol digit, no PIDs → `busAnswered == false` though the
+      // engine is ON. The old gate then bailed with engine-off and the trip
+      // "won't start at all". Block ONLY a confirmed engine-off
+      // ([Obd2BusProbeResult.probedSilent] — the ECU stayed silent through
+      // EVERY retry); a `transient` / `answered` / `notProbed` (warm
+      // cache-hit) connect starts and lets the scheduler pick up PIDs once the
+      // protocol search converges.
+      if (service.busProbe == Obd2BusProbeResult.probedSilent) {
         notifier.cancelConnecting();
         onConnectionError(const Obd2EngineOff());
         unawaited(service.disconnect());
