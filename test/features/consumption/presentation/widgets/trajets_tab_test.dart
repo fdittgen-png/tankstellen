@@ -205,14 +205,19 @@ class _EmptyBluetoothFacade implements BluetoothFacade {
 }
 
 class _NoopObd2Service implements Obd2Service {
-  // #2892 — the recording coordinator gates on `busAnswered` before starting:
-  // a connected service whose vehicle bus never answered surfaces the
-  // "turn the ignition on" condition instead of starting a degraded trip.
-  // These tests exercise the healthy start/pre-warm flow, so the fake reports
-  // a live bus (the silent-bus gate has its own dedicated coverage in
+  // #2892 / #3101 — the recording coordinator gates on the vehicle-bus signal
+  // before starting: a connected service whose bus is confirmed silent
+  // (engine off) surfaces the "turn the ignition on" condition instead of
+  // starting a degraded trip. These tests exercise the healthy start/pre-warm
+  // flow, so the fake reports a live bus — #3101 the gate now keys off the
+  // finer `busProbe` tri-state (answered), not just the coarse `busAnswered`
+  // (the silent-bus / transient gate has its own dedicated coverage in
   // recording_start_coordinator_bus_silent_test.dart).
   @override
   bool get busAnswered => true;
+
+  @override
+  Obd2BusProbeResult get busProbe => Obd2BusProbeResult.answered;
 
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
