@@ -36,6 +36,11 @@ on:
         required: false
         type: string
         default: 'DEVELOPER'
+      resend:
+        description: 'Re-issue a FRESH invite to a tester who lost theirs (external: remove+re-add; internal: delete+recreate the pending ASC invitation).'
+        required: false
+        type: boolean
+        default: false
       first_name:
         description: 'Tester first name (optional)'
         required: false
@@ -93,6 +98,7 @@ jobs:
             email:"${{ inputs.email }}" \
             groups:"${{ inputs.groups }}" \
             role:"${{ inputs.role }}" \
+            resend:"${{ inputs.resend }}" \
             first_name:"${{ inputs.first_name }}" \
             last_name:"${{ inputs.last_name }}"
 
