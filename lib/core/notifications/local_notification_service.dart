@@ -13,8 +13,11 @@ import '../../core/logging/error_logger.dart';
 /// `flutter_local_notifications`.
 ///
 /// Uses the Android `price_alerts` channel for high-priority price drop
-/// notifications. On iOS the same plugin handles the UNUserNotificationCenter
-/// setup (not yet active — iOS build is disabled).
+/// notifications. On iOS (#3094) the Darwin init installs the
+/// UNUserNotificationCenter delegate (foreground presentation + tap routing)
+/// and each `show()` carries [DarwinNotificationDetails] so the banner
+/// actually surfaces — including in the foreground, which iOS otherwise
+/// suppresses.
 class LocalNotificationService implements NotificationService {
   /// Visible for testing — allows injecting a fake plugin.
   final FlutterLocalNotificationsPlugin plugin;
@@ -41,7 +44,21 @@ class LocalNotificationService implements NotificationService {
   Future<void> initialize() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
+    // #3094 — iOS (Darwin) init is REQUIRED for notifications on iPhone: it
+    // installs the UNUserNotificationCenter delegate that presents alerts in
+    // the foreground and routes taps. Permission is NOT requested here
+    // (request*Permission: false) — the app asks explicitly via
+    // [requestPermission] when the user creates an alert, so there is no
+    // double-prompt at launch.
+    const darwinSettings = DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: darwinSettings,
+    );
     // #1012 phase 3 — register the tap callback so the launch listener
     // (wired in lib/app/app.dart) can resolve payloads to deep-link
     // targets. The static dispatcher fans out so any number of warm
@@ -140,6 +157,14 @@ class LocalNotificationService implements NotificationService {
         importance: Importance.high,
         priority: Priority.high,
       ),
+      // #3094 — without DarwinNotificationDetails the alert never surfaces on
+      // iPhone (and iOS suppresses it entirely in the foreground). present*
+      // shows the banner/badge/sound like Android's high-importance channel.
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
     await plugin.show(
       id: id,
@@ -163,6 +188,12 @@ class LocalNotificationService implements NotificationService {
         channelDescription: _serviceChannelDescription,
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
+      ),
+      // #3094 — iOS presentation so service reminders surface on iPhone too.
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
       ),
     );
     await plugin.show(

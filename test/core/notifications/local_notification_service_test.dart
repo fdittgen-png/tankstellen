@@ -137,6 +137,19 @@ void main() {
       expect(android.priority, Priority.high);
     });
 
+    test('#3094 — carries iOS (Darwin) details so it surfaces on iPhone',
+        () async {
+      await service.showPriceAlert(id: 1, title: 't', body: 'b');
+
+      final ios = fakePlugin.showCalls.single.details?.iOS;
+      expect(ios, isNotNull,
+          reason: 'without DarwinNotificationDetails iOS shows nothing');
+      expect(ios!.presentAlert, isTrue,
+          reason: 'must present the banner (incl. foreground) on iOS');
+      expect(ios.presentBadge, isTrue);
+      expect(ios.presentSound, isTrue);
+    });
+
     test('payload defaults to null when caller omits it', () async {
       await service.showPriceAlert(id: 7, title: 't', body: 'b');
 
