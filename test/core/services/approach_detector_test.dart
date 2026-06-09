@@ -352,4 +352,65 @@ void main() {
       });
     });
   });
+
+  // #3092 — the in-radius distance must update LIVE off each GPS fix, NOT
+  // only on the (slower) data-service poll. The detector recomputes the
+  // distance to the already-locked station on every sample, with no extra
+  // fetch, so the overlay's distance ticks down smoothly as the driver nears.
+  group('ApproachDetector live GPS distance (#3092)', () {
+    test('in-radius distance ticks down on each GPS fix without re-polling',
+        () {
+      fakeAsync((async) {
+        var fetchCount = 0;
+        // Station ~500 m due north of the start (0.0045° lat ≈ 500 m).
+        final station = _station(id: 'A', lat: 48.0045, lng: 2.0, e10: 1.699);
+        final gps = StreamController<Position>.broadcast();
+        final det = ApproachDetector(
+          gpsStream: gps.stream,
+          fetchStations: (_, _, _, _) async {
+            fetchCount++;
+            return [station];
+          },
+          config: const ApproachDetectorConfig(
+            radiusMeters: 1000,
+            priceMode: ApproachPriceMode.nearest,
+            minPollSeconds: 5,
+            fuelTypeApiValue: 'e10',
+          ),
+        );
+        final emitted = <ApproachState>[];
+        final sub = det.state.listen(emitted.add);
+
+        // First fix → Polling; advance past the poll → fetch → InRadius (~500 m).
+        gps.add(_pos(48.0, 2.0, speedMps: 10));
+        async.flushMicrotasks();
+        async.elapse(const Duration(seconds: 30));
+        async.flushMicrotasks();
+
+        final initial = emitted.whereType<ApproachInRadius>().toList();
+        expect(initial, isNotEmpty,
+            reason: 'the poll must have produced an in-radius emit');
+        final dStart = initial.last.distanceMeters;
+        expect(dStart, closeTo(500, 60));
+        final fetchesAfterPoll = fetchCount;
+
+        // A CLOSER fix (~250 m from the station), WITHOUT advancing the poll
+        // timer: the live recompute must tick the distance down with NO fetch.
+        gps.add(_pos(48.00225, 2.0, speedMps: 10));
+        async.flushMicrotasks();
+
+        final after = emitted.whereType<ApproachInRadius>().last;
+        expect(after.station.id, 'A');
+        expect(after.distanceMeters, lessThan(dStart),
+            reason: 'distance must update LIVE (tick down) from the GPS fix');
+        expect(after.distanceMeters, closeTo(250, 60));
+        expect(fetchCount, fetchesAfterPoll,
+            reason: 'the live recompute must NOT poll the data service');
+
+        sub.cancel();
+        det.dispose();
+        gps.close();
+      });
+    });
+  });
 }
