@@ -279,6 +279,12 @@ platform :ios do
     # always scoped to THIS app only (no all-apps visibility, no provisioning).
     role = (options[:role] || ENV["TESTFLIGHT_TESTER_ROLE"] || "DEVELOPER").to_s.strip.upcase
 
+    # #3088 — resend mode: re-issue a FRESH invite to a tester who lost theirs
+    # (e.g. a phone reset). A current external member / a pending ASC invite
+    # can't otherwise be re-sent, so we remove+re-add (external) or
+    # delete+recreate the UserInvitation (internal) to trigger a new email.
+    resend = [true, "true", "1"].include?(options[:resend])
+
     # Authenticate Spaceship's ConnectAPI directly with the same key the
     # upload lane uses. `asc_api_key` returns the `app_store_connect_api_key`
     # hash; `Token.from(hash:)` is exactly how pilot's own Manager logs in
@@ -382,9 +388,19 @@ platform :ios do
                  "target #{kind} group '#{group.name}' (#{group.id}).")
 
       if existing && in_group.call(existing, group)
-        # Truly already a member of the target group → idempotent no-op.
-        UI.success("#{addr} is already in #{kind} beta group '#{group.name}' — nothing to do.")
-        return true
+        if resend
+          # #3088 resend: fully remove the tester from the app, then re-create
+          # below (create-new path), so App Store Connect issues a FRESH
+          # TestFlight invite email — re-adding a current member is a no-op, so
+          # a lost invite can't otherwise be re-sent.
+          UI.message("[manage_testers] resend — removing #{addr} from #{app.name} to re-issue the invite.")
+          existing.delete_from_apps(apps: [app])
+          existing = nil
+        else
+          # Truly already a member of the target group → idempotent no-op.
+          UI.success("#{addr} is already in #{kind} beta group '#{group.name}' — nothing to do.")
+          return true
+        end
       end
 
       begin
@@ -459,6 +475,22 @@ platform :ios do
             internal_targets.each do |group|
               failures << group.name unless assign_to.call(email, info, group, "internal")
             end
+          elsif !pending_invite.nil? && resend
+            # #3088 resend: a pending (un-accepted) invite can't be re-sent in
+            # place — delete it and create a fresh one so a NEW email goes out.
+            UI.message("#{email} has a PENDING invitation — deleting + re-creating it to re-send a fresh email.")
+            pending_invite.delete!
+            Spaceship::ConnectAPI::UserInvitation.create(
+              email: email,
+              first_name: (first_name && !first_name.empty?) ? first_name : email.split("@").first,
+              last_name: (last_name && !last_name.empty?) ? last_name : "Tester",
+              roles: [role],
+              provisioning_allowed: false,
+              all_apps_visible: false,
+              visible_app_ids: [app.id],
+            )
+            UI.success("Fresh App Store Connect invitation re-sent to #{email}. Once they accept the " \
+                       "email, re-run this workflow to place them in: #{internal_targets.map(&:name).join(', ')}.")
           elsif !pending_invite.nil?
             UI.important("#{email} already has a PENDING App Store Connect invitation. " \
                          "Ask them to accept it, then re-run this workflow to complete the " \
