@@ -97,6 +97,11 @@ class PluginBluetoothFacade implements BluetoothFacade {
             advertisedServiceUuids:
                 r.advertisementData.serviceUuids.map((g) => g.str).toList(),
             rssi: r.rssi,
+            // #3097 — this facade IS the BLE transport, so every hit it
+            // surfaces was discovered over BLE. resolve() uses this to send a
+            // generic-named clone to a BLE profile (which connects on iOS),
+            // not the Classic-only generic fallback.
+            discoveryTransport: BluetoothTransport.ble,
           );
           accumulated[candidate.deviceId] = candidate;
         }

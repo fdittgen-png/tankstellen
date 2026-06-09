@@ -55,17 +55,57 @@ void main() {
       expect(registry.resolve(hit)?.id, 'generic-fff0');
     });
 
-    test('Classic clone named "OBDII" → generic-classic fallback (#761)',
-        () {
+    test(
+        'Classic-discovered clone named "OBDII" → generic-classic fallback '
+        '(#761, #3097)', () {
       // Amazon's generic Classic-SPP dongles report themselves with
       // no FFF0 service (Classic has no advertised services) and a
-      // name like "OBDII" / "ELM327 v1.5". Must land on the
-      // generic-classic profile, not null.
-      final hit = _candidate(name: 'OBDII', services: []);
+      // name like "OBDII" / "ELM327 v1.5". A Classic-discovered hit
+      // (the Android bonded-device path) must land on the
+      // generic-classic profile, not null — and NOT be hijacked by
+      // the new generic-ble entry that shares the same matchers (#3097).
+      final hit = _candidate(
+        name: 'OBDII',
+        services: [],
+        discoveryTransport: BluetoothTransport.classic,
+      );
       final profile = registry.resolve(hit);
       expect(profile, isNotNull);
       expect(profile!.id, 'generic-classic');
       expect(profile.transport, BluetoothTransport.classic);
+    });
+
+    test(
+        'BLE-discovered clone named "OBDII" → generic-ble (NOT classic) '
+        '(#3097)', () {
+      // The iPhone bug: a generic ELM327 BLE adapter advertises a name
+      // ("OBDII", "ELM327 v1.5") and NO service UUID, so CoreBluetooth
+      // surfaces it over BLE with no advertised services. Before #3097
+      // the only generic name matchers lived on the Classic profile, so
+      // it resolved to generic-classic → a Classic connect iOS cannot
+      // make (no MFi). With the discovery transport stamped `ble`, it
+      // must resolve to a BLE profile so the BLE + dynamic-GATT path runs.
+      final hit = _candidate(
+        name: 'OBDII',
+        services: [],
+        discoveryTransport: BluetoothTransport.ble,
+      );
+      final profile = registry.resolve(hit);
+      expect(profile, isNotNull);
+      expect(profile!.id, 'generic-ble');
+      expect(profile.transport, BluetoothTransport.ble,
+          reason: 'a BLE-discovered generic ELM327 must resolve to a BLE '
+              'profile so it connects on iPhone (#3097)');
+    });
+
+    test('a name-only ELM327 v1.5 over BLE resolves to generic-ble (#3097)',
+        () {
+      final hit = _candidate(
+        name: 'ELM327 v1.5',
+        services: [],
+        discoveryTransport: BluetoothTransport.ble,
+      );
+      expect(registry.resolve(hit)?.id, 'generic-ble');
     });
 
     test('unknown name and unrelated service → null (hide from picker)',
@@ -245,8 +285,13 @@ void main() {
         '#949 additions', () {
       // Guard on the "last entry is the catch-all" contract. A
       // name that carries an OBD signature but matches none of the
-      // named profiles must land on the generic-classic fallback.
-      final hit = _candidate(name: 'OBD-II Random Clone', services: []);
+      // named profiles must land on the generic-classic fallback when
+      // discovered over Classic (the Android bonded path) (#3097).
+      final hit = _candidate(
+        name: 'OBD-II Random Clone',
+        services: [],
+        discoveryTransport: BluetoothTransport.classic,
+      );
       final profile = registry.resolve(hit);
       expect(profile, isNotNull);
       expect(profile!.id, 'generic-classic');
@@ -455,12 +500,33 @@ void main() {
 
     test('every BLE profile defines all three GATT UUIDs', () {
       for (final p in registry.profiles
-          .where((p) => p.transport == BluetoothTransport.ble)) {
+          .where((p) => p.transport == BluetoothTransport.ble)
+          // #3097 — the name-only generic-ble fallback INTENTIONALLY pins no
+          // service UUID: it connects via dynamic GATT discovery (#3014), which
+          // finds the ELM service post-connect among FFE0/FFF0/18F0/Nordic-UART
+          // by characteristic property. Every OTHER BLE profile keeps its exact
+          // UUIDs as the known-good hint.
+          .where((p) => p.id != 'generic-ble')) {
         expect(p.serviceUuid, isNotEmpty, reason: '${p.id} serviceUuid');
         expect(p.writeCharUuid, isNotEmpty, reason: '${p.id} writeCharUuid');
         expect(p.notifyCharUuid, isNotEmpty,
             reason: '${p.id} notifyCharUuid');
       }
+    });
+
+    test('generic-ble fallback pins NO service UUID — dynamic GATT (#3097)',
+        () {
+      final g = registry.profiles.firstWhere((p) => p.id == 'generic-ble');
+      expect(g.transport, BluetoothTransport.ble);
+      expect(g.serviceUuid, isEmpty,
+          reason: 'generic-ble relies on dynamic GATT discovery so it can '
+              'connect to a name-only adapter that advertises no service');
+      expect(g.adapter, isA<GenericElm327Adapter>());
+      // Shares the generic-classic name signature so the same generic names
+      // are recognised on both transports; resolve() splits them by the
+      // candidate discovery transport.
+      final c = registry.profiles.firstWhere((p) => p.id == 'generic-classic');
+      expect(g.nameMatchers, c.nameMatchers);
     });
 
     test('the #1641 best-seller additions resolve by name', () {
@@ -552,10 +618,12 @@ Obd2AdapterCandidate _candidate({
   required String name,
   required Iterable<String> services,
   int rssi = -60,
+  BluetoothTransport discoveryTransport = BluetoothTransport.ble,
 }) =>
     Obd2AdapterCandidate(
       deviceId: 'aa:bb:cc:dd:ee:ff',
       deviceName: name,
       advertisedServiceUuids: services,
       rssi: rssi,
+      discoveryTransport: discoveryTransport,
     );
