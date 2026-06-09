@@ -518,11 +518,19 @@ platform :ios do
           # a raw stack trace.
           message = ex.message.to_s
           if message =~ /forbid|permission|not.*(allowed|permitted)|403|unauthor/i
-            UI.user_error!(
-              "The App Store Connect API key lacks permission to manage Users and " \
-              "Access (needed to invite an INTERNAL tester). Re-issue the API key with " \
-              "the Admin role, or add #{email} as an internal tester manually in App " \
-              "Store Connect → Users and Access. (#{message})",
+            # #3090 — an App-Manager-scoped key CAN'T manage Users and Access by
+            # design, so the internal-tester flow is forbidden. That's a known
+            # config limitation, NOT a transient failure: WARN and continue
+            # rather than aborting the whole run RED — the external-group path
+            # (which this key CAN do) has already run for this tester. The
+            # maintainer completes the internal invite manually (App Store
+            # Connect → Users and Access) or re-issues the key with the Admin
+            # role. The end-of-lane summary still lists the internal target.
+            UI.important(
+              "SKIPPED internal-tester management for #{email}: the App Store " \
+              "Connect API key lacks Users-and-Access permission. Re-issue the key " \
+              "with the Admin role, or add #{email} manually in App Store Connect → " \
+              "Users and Access → #{internal_targets.map(&:name).join(', ')}. (#{message})",
             )
           else
             raise ex
