@@ -6,6 +6,7 @@ library;
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../helpers/network_retry.dart';
 import '../../helpers/silence_error_logger.dart';
 
 /// Integration tests that verify each country's fuel price API is reachable
@@ -24,7 +25,7 @@ void main() {
   late Dio dio;
 
   setUp(() {
-    dio = Dio(BaseOptions(
+    dio = retryingDio(BaseOptions(
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 30),
       headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
@@ -150,7 +151,7 @@ void main() {
     });
 
     test('Italy — MIMIT station CSV is reachable and parseable', () async {
-      final csvDio = Dio(BaseOptions(
+      final csvDio = retryingDio(BaseOptions(
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 60),
         headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
@@ -183,7 +184,7 @@ void main() {
     });
 
     test('Italy — MIMIT price CSV is reachable and parseable', () async {
-      final csvDio = Dio(BaseOptions(
+      final csvDio = retryingDio(BaseOptions(
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 60),
         headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
@@ -244,7 +245,7 @@ void main() {
     });
 
     test('Argentina — Energía CSV is reachable and has coordinates', () async {
-      final csvDio = Dio(BaseOptions(
+      final csvDio = retryingDio(BaseOptions(
         connectTimeout: const Duration(seconds: 20),
         receiveTimeout: const Duration(seconds: 60),
         headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
