@@ -7,7 +7,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../features/consumption/domain/entities/fill_up.dart';
 import '../utils/json_extensions.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_helper.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Per-fill-up consumption-log sync with Supabase (#713), pulled out
@@ -34,23 +36,34 @@ class FillUpsSync {
     }
 
     try {
-      final serverRows = await client
+      final serverRowsRaw = await client
           .from('fill_ups')
           .select('id, data')
           .eq('user_id', userId);
+
+      // #3078 — drop tombstoned rows from BOTH sides so a delete on another
+      // device can't resurrect through the union/re-upload below.
+      final tombstoned = await DeletionsSync.fetchTombstonedIds('fill_ups');
+      final serverRows = SyncHelper.removeTombstoned(
+        serverRowsRaw,
+        tombstoned,
+        key: (r) => r.getString('id'),
+      ).toList();
+      final liveLocal =
+          localFillUps.where((f) => !tombstoned.contains(f.id)).toList();
 
       final serverIds = serverRows
           .map((r) => r.getString('id'))
           .whereType<String>()
           .toSet();
-      final localIds = localFillUps.map((f) => f.id).toSet();
+      final localIds = liveLocal.map((f) => f.id).toSet();
 
       debugPrint('FillUpsSync.merge: local=${localIds.length}, '
           'server=${serverIds.length}');
 
       // Upload local-only fill-ups.
       final localOnly =
-          localFillUps.where((f) => !serverIds.contains(f.id)).toList();
+          liveLocal.where((f) => !serverIds.contains(f.id)).toList();
       if (localOnly.isNotEmpty) {
         final rows = localOnly
             .map((f) => {
@@ -85,7 +98,7 @@ class FillUpsSync {
         return null;
       }).whereType<FillUp>().toList();
 
-      return [...localFillUps, ...downloaded];
+      return [...liveLocal, ...downloaded];
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.merge FAILED'}));
       return localFillUps;
@@ -104,6 +117,7 @@ class FillUpsSync {
           .delete()
           .eq('user_id', userId)
           .eq('id', fillUpId);
+      await DeletionsSync.record('fill_ups', fillUpId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.delete FAILED'}));
     }

@@ -25,7 +25,7 @@ import 'schema_sql_policies.dart';
 /// and warns when a self-hoster's recorded version is older — turning what
 /// used to be silent per-table breakage into a clear "re-run the setup SQL"
 /// signal. See `SchemaVerifier.checkSchemaVersion`.
-const int kSupabaseSchemaVersion = 2;
+const int kSupabaseSchemaVersion = 3;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -243,6 +243,22 @@ CREATE INDEX IF NOT EXISTS trip_shares_recipient_idx
   ON public.trip_shares(shared_with_id);
 CREATE INDEX IF NOT EXISTS trip_shares_trip_recipient_idx
   ON public.trip_shares(trip_id, shared_with_id);
+''',
+  // #3078 — deletion tombstones. One row per deleted record so a delete on
+  // one device doesn't resurrect from another's still-local copy through the
+  // union merge. The owning sync class records a tombstone on delete and
+  // filters server rows against these ids before the union.
+  'deletions': '''
+CREATE TABLE IF NOT EXISTS public.deletions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  table_name TEXT NOT NULL,
+  record_id TEXT NOT NULL,
+  deleted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, table_name, record_id)
+);
+CREATE INDEX IF NOT EXISTS deletions_user_table_idx
+  ON public.deletions(user_id, table_name);
 ''',
 };
 

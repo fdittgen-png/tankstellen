@@ -7,7 +7,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../features/vehicle/domain/entities/vehicle_profile.dart';
 import '../utils/json_extensions.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_helper.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Per-vehicle profile sync with Supabase (#713), pulled out of
@@ -39,23 +41,34 @@ class VehiclesSync {
     }
 
     try {
-      final serverRows = await client
+      final serverRowsRaw = await client
           .from('vehicles')
           .select('id, data')
           .eq('user_id', userId);
+
+      // #3078 — drop tombstoned rows from BOTH sides so a delete on another
+      // device can't resurrect through the union/re-upload below.
+      final tombstoned = await DeletionsSync.fetchTombstonedIds('vehicles');
+      final serverRows = SyncHelper.removeTombstoned(
+        serverRowsRaw,
+        tombstoned,
+        key: (r) => r.getString('id'),
+      ).toList();
+      final liveLocal =
+          localVehicles.where((v) => !tombstoned.contains(v.id)).toList();
 
       final serverIds = serverRows
           .map((r) => r.getString('id'))
           .whereType<String>()
           .toSet();
-      final localIds = localVehicles.map((v) => v.id).toSet();
+      final localIds = liveLocal.map((v) => v.id).toSet();
 
       debugPrint('VehiclesSync.merge: local=${localIds.length}, '
           'server=${serverIds.length}');
 
       // Upload local-only vehicles.
       final localOnly =
-          localVehicles.where((v) => !serverIds.contains(v.id)).toList();
+          liveLocal.where((v) => !serverIds.contains(v.id)).toList();
       if (localOnly.isNotEmpty) {
         final rows = localOnly
             .map((v) => {
@@ -88,7 +101,7 @@ class VehiclesSync {
         return null;
       }).whereType<VehicleProfile>().toList();
 
-      return [...localVehicles, ...downloaded];
+      return [...liveLocal, ...downloaded];
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.merge FAILED'}));
       return localVehicles;
@@ -109,6 +122,7 @@ class VehiclesSync {
           .delete()
           .eq('user_id', userId)
           .eq('id', vehicleId);
+      await DeletionsSync.record('vehicles', vehicleId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.delete FAILED'}));
     }

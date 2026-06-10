@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -103,6 +104,9 @@ class RatingsSync {
           .delete()
           .eq('user_id', userId)
           .eq('station_id', stationId);
+      // #3078 — tombstone so another device's re-upload / fetch can't
+      // resurrect the deleted rating.
+      await DeletionsSync.record('station_ratings', stationId);
       debugPrint('RatingsSync.delete: $stationId removed');
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.delete FAILED'}));
@@ -122,11 +126,16 @@ class RatingsSync {
           .from('station_ratings')
           .select('station_id, rating')
           .eq('user_id', userId);
+      // #3078 — never re-hydrate a rating the user deleted on another device.
+      final tombstoned =
+          await DeletionsSync.fetchTombstonedIds('station_ratings');
       final result = <String, int>{};
       for (final r in rows) {
         final stationId = r.getString('station_id');
         final rating = r.getInt('rating');
-        if (stationId != null && rating != null) {
+        if (stationId != null &&
+            rating != null &&
+            !tombstoned.contains(stationId)) {
           result[stationId] = rating;
         }
       }

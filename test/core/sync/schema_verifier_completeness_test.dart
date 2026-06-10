@@ -44,6 +44,7 @@ void main() {
     'trip_summaries',
     'trip_details',
     'trip_shares',
+    'deletions',
   };
 
   // Tables read only by server-side SQL (functions / triggers / RPCs), never

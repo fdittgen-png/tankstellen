@@ -47,6 +47,7 @@ class SchemaVerifier {
     'trip_summaries',
     'trip_details',
     'trip_shares',
+    'deletions',
   ];
 
   /// Every table the wizard SQL creates / the verifier probes.

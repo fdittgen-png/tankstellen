@@ -7,7 +7,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../features/itinerary/domain/entities/saved_itinerary.dart';
 import '../utils/json_extensions.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_helper.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Saved-itinerary sync with Supabase, pulled out of [SyncService]
@@ -67,7 +69,13 @@ class ItinerariesSync {
           .eq('user_id', userId)
           .order('updated_at', ascending: false);
 
-      return rows.map((r) {
+      // #3078 — never re-hydrate an itinerary deleted on another device.
+      final tombstoned = await DeletionsSync.fetchTombstonedIds('itineraries');
+      return SyncHelper.removeTombstoned(
+        rows,
+        tombstoned,
+        key: (r) => r.getString('id'),
+      ).map((r) {
         final createdAtStr = r.getString('created_at');
         final updatedAtStr = r.getString('updated_at');
         return SavedItinerary(
@@ -106,6 +114,7 @@ class ItinerariesSync {
           .delete()
           .eq('id', itineraryId)
           .eq('user_id', userId);
+      await DeletionsSync.record('itineraries', itineraryId); // #3078
       return true;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ItinerariesSync.delete FAILED'}));

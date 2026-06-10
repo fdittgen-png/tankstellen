@@ -6,7 +6,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_helper.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Ignored-stations sync with Supabase, pulled out of [SyncService] (#727).
@@ -34,11 +36,17 @@ class IgnoredStationsSync {
           .from('ignored_stations')
           .select('station_id')
           .eq('user_id', userId);
-      final serverIds = serverRows
-          .map((r) => r.getString('station_id'))
-          .whereType<String>()
-          .toSet();
-      final localIds = localIgnoredIds.toSet();
+      // #3078 — drop tombstoned ids so an un-ignore on another device
+      // doesn't resurrect through the union below.
+      final tombstoned =
+          await DeletionsSync.fetchTombstonedIds('ignored_stations');
+      final serverIds = SyncHelper.removeTombstoned(
+        serverRows.map((r) => r.getString('station_id')),
+        tombstoned,
+        key: (id) => id,
+      ).whereType<String>().toSet();
+      final localIds =
+          localIgnoredIds.where((id) => !tombstoned.contains(id)).toSet();
 
       debugPrint('IgnoredStationsSync.merge: local=${localIds.length}, '
           'server=${serverIds.length}');
@@ -60,6 +68,27 @@ class IgnoredStationsSync {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'IgnoredStationsSync.merge FAILED'}));
       return localIgnoredIds;
+    }
+  }
+
+  /// Un-ignore a single station on the server (#3078). Before this existed
+  /// the un-ignore path only re-ran [merge], whose union re-added the still-
+  /// server row, so the station never actually un-hid. Now the server row is
+  /// deleted AND tombstoned, so neither side resurrects it. Silent on failure.
+  static Future<void> delete(String stationId) async {
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) return;
+    try {
+      await client
+          .from('ignored_stations')
+          .delete()
+          .eq('user_id', userId)
+          .eq('station_id', stationId);
+      await DeletionsSync.record('ignored_stations', stationId);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+          context: const {'where': 'IgnoredStationsSync.delete FAILED'}));
     }
   }
 }
