@@ -129,7 +129,10 @@ void main() {
     // `recognized` flag, and the two unrecognized placeholder profiles. Pure
     // data + lookup growth on the existing catalog class; decomposition still
     // tracked by #2190.
-    'lib/features/consumption/data/obd2/adapter_registry.dart': 693,
+    // #3180 — 693 → 697: comment-only growth documenting WHY the OBDLink CX
+    // profile is the FFF0/FFF2/FFF1 layout (not the MX+/LX 18F0 it was
+    // wrongly pinned to). Decomposition still tracked by #2190.
+    'lib/features/consumption/data/obd2/adapter_registry.dart': 697,
     // #2969 — grandfathered at 563 (was 389, under-cap before). The #2969
     // connect-trace instrumentation opens/finalises a trace at the FIVE public
     // connect entry points (the single virtual-dispatch chokepoint every live
@@ -204,7 +207,17 @@ void main() {
     // iOS-aware (const → platform-branching getters + dartdoc) so a slow iOS
     // CoreBluetooth CCCD write no longer clips the OBDLink CX at 4s, plus two
     // @visibleForTesting accessors to lock the budgets. Android byte-identical.
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 700,
+    // #3179/#3182 — 700 → 776: (1) the channel is now safely RE-openable
+    // (open() resets the `_closing`/`_dropSignalled` latches, recreates the
+    // closed `_incoming` controller + the disposed drop debouncer) so the
+    // transport's close()+open() retry no longer yields a zombie link, with
+    // the `handleNotifyBytes`/`debugNoteConnectionState` seams that make it
+    // testable; (2) the discover/setNotify budgets moved onto FBP's own
+    // `timeout:` parameters (mutex-releasing) and the #3182 poweredOn gate
+    // runs before connectDevice. Mostly dartdoc explaining the two field
+    // failure modes; the drop/reopen state cannot leave this cohesive channel
+    // body. Decomposition of the channel is tracked by #2190.
+    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 776,
     // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
     // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
     // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off

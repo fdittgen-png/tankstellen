@@ -37,7 +37,9 @@ class _Gatt133Channel implements ElmByteChannel, Obd2GattRecoverable {
   /// (recoverable but non-133) timeout — so the no-refresh case is provable.
   final bool transientIsGatt133;
 
-  final _controller = StreamController<List<int>>.broadcast();
+  // #3179 — models the FIXED re-openable channel contract: close() closes the
+  // controller, open() recreates it (the production channels now do the same).
+  var _controller = StreamController<List<int>>.broadcast();
   int openAttempts = 0;
   int closeCalls = 0;
   int refreshCalls = 0;
@@ -46,6 +48,9 @@ class _Gatt133Channel implements ElmByteChannel, Obd2GattRecoverable {
   @override
   Future<void> open() async {
     openAttempts++;
+    if (_controller.isClosed) {
+      _controller = StreamController<List<int>>.broadcast();
+    }
     if (openAttempts <= failuresBefore133Success) {
       if (transientIsGatt133) {
         throw FlutterBluePlusException(
@@ -77,6 +82,10 @@ class _Gatt133Channel implements ElmByteChannel, Obd2GattRecoverable {
 
   @override
   Stream<List<int>> get incoming => _controller.stream;
+
+  /// #3179 — deliver notify bytes the way the real channel does: onto the
+  /// live incoming controller.
+  void deliver(List<int> bytes) => _controller.add(bytes);
 
   @override
   Future<void> write(List<int> bytes) async {}
@@ -120,6 +129,29 @@ void main() {
       expect(channel.openAttempts, 2);
       expect(channel.refreshCalls, 0,
           reason: 'a timeout is not a cache-poisoning 133 — no refresh');
+    });
+
+    test(
+        '#3179 — after the 133-retry succeeds, BYTES FLOW end-to-end: a '
+        'command is written, notify bytes complete the reply (the attempt '
+        'counts above were the documented false-green)', () async {
+      final channel = _Gatt133Channel(failuresBefore133Success: 1);
+      final transport = BluetoothObd2Transport(
+        channel,
+        readTimeout: const Duration(milliseconds: 400),
+      );
+      addTearDown(transport.disconnect);
+
+      await transport.connect();
+
+      final reply = transport.sendCommand('010D');
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      channel.deliver('41 0D 00\r>'.codeUnits);
+
+      await expectLater(reply, completion(contains('41 0D 00')),
+          reason: 'the recovered channel must move bytes — a zombie channel '
+              'whose incoming controller stayed closed drops them and the '
+              'reply times out (#3179)');
     });
 
     test(

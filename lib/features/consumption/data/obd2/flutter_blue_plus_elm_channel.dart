@@ -119,7 +119,14 @@ class FlutterBluePlusElmChannel
   BluetoothCharacteristic? _notifyChar;
   StreamSubscription<List<int>>? _subscription;
   StreamSubscription<BluetoothConnectionState>? _connStateSubscription;
-  final StreamController<List<int>> _incoming =
+
+  /// #3179 — NOT final: [close] closes the broadcast controller, and the
+  /// transport's open-retry loop (plus any reconnect) calls `close()` +
+  /// `open()` on the SAME channel instance, so [open] must be able to
+  /// recreate it. With a `final` controller the "recovered" link was a
+  /// zombie: every notify byte hit a closed controller and the reply timed
+  /// out forever.
+  StreamController<List<int>> _incoming =
       StreamController<List<int>>.broadcast();
   bool _open = false;
 
@@ -138,7 +145,13 @@ class FlutterBluePlusElmChannel
   /// disconnect still surfaces in ~1–2 s (not the ~15 s read timeout). On
   /// confirmation it pushes a typed [Obd2DisconnectedException] onto the byte
   /// stream, which the transport re-throws so [TripDropDetector] sees a drop.
-  late final ConnectionDropDebouncer _dropDebouncer;
+  /// #3179 — NOT `late final`: [close] disposes it, so a reopen rebuilds it
+  /// (same debounce, same callback) instead of reviving a disposed one.
+  late ConnectionDropDebouncer _dropDebouncer;
+
+  /// #3179 — the configured debounce, kept so [open] can rebuild
+  /// [_dropDebouncer] after a close() → open() cycle.
+  final Duration _dropDebounce;
 
   /// #3014 — scan-before-connect seed (THE highest-leverage SmartOBD fix).
   /// Runs a brief TARGETED scan for this device's MAC before the cold
@@ -170,7 +183,8 @@ class FlutterBluePlusElmChannel
   })  : _uuids = uuids ?? Elm327BleUuids.vgate,
         _connectTimeout = connectTimeout,
         _autoConnect = autoConnect,
-        _scanSeed = scanSeed {
+        _scanSeed = scanSeed,
+        _dropDebounce = dropDebounce {
     _dropDebouncer = ConnectionDropDebouncer(
       debounce: dropDebounce,
       onConfirmed: _onDropConfirmed,
@@ -210,6 +224,23 @@ class FlutterBluePlusElmChannel
   @override
   Future<void> open() async {
     if (_open) return;
+    // #3179 — make the channel safely RE-openable. The transport's open-retry
+    // loop (#2906/#3014) and the reconnect path call close() + open() on the
+    // SAME instance; close() closed `_incoming` and latched `_closing`, and
+    // neither was ever undone — so the "recovered" link was a zombie (notify
+    // bytes silently dropped, the drop debouncer + drop-signal permanently
+    // dead). Reset the deliberate-close + drop-signal latches and, when a
+    // prior close() closed the controller, recreate it and rebuild the
+    // disposed debouncer before the GATT dance runs.
+    _closing = false;
+    _dropSignalled = false;
+    if (_incoming.isClosed) {
+      _incoming = StreamController<List<int>>.broadcast();
+      _dropDebouncer = ConnectionDropDebouncer(
+        debounce: _dropDebounce,
+        onConfirmed: _onDropConfirmed,
+      );
+    }
     // #2466 — gated comm-diagnostics connect-lifecycle tee. A no-op unless
     // `Feature.debugMode` armed the collector; each call early-returns on
     // `!enabled`, so production pays one cached-bool read per event.
@@ -456,12 +487,7 @@ class FlutterBluePlusElmChannel
     // #3014 — bound setNotifyValue on its own short budget too.
     await _notifyChar!.setNotifyValue(true).timeout(_setNotifyTimeout);
     _subscription = _notifyChar!.lastValueStream.listen(
-      (bytes) {
-        // #2467 — tee the raw chunk into the gated comm-diagnostics
-        // wire-framing counters (double-gated, so production pays nothing).
-        noteObd2Framing(bytes);
-        _incoming.add(bytes);
-      },
+      handleNotifyBytes,
       onError: (e, st) {
         // #2900 — a mid-session disconnect can surface here too (the GATT/ATT
         // stack errors the notify stream when the adapter drops). Clear the
@@ -494,6 +520,28 @@ class FlutterBluePlusElmChannel
       },
     );
   }
+
+  /// #3179 — the notify-stream DATA handler, extracted so a reopen test can
+  /// drive the EXACT production byte path without a real BLE stack (FBP's
+  /// `lastValueStream` is unfakeable). Tees the chunk into the gated
+  /// comm-diagnostics framing counters (#2467) and feeds the live incoming
+  /// controller. The `isClosed` guard mirrors [ClassicElmChannel]'s #2953
+  /// late-byte guard: a chunk already queued on the event loop can land
+  /// AFTER close() closed `_incoming` — drop it silently, never throw.
+  @protected
+  @visibleForTesting
+  void handleNotifyBytes(List<int> bytes) {
+    noteObd2Framing(bytes);
+    if (!_incoming.isClosed) _incoming.add(bytes);
+  }
+
+  /// #3179 test seam — feed a raw connection-state edge into the drop
+  /// debouncer exactly as the FBP `connectionState` listener does, so a test
+  /// can prove drop detection still works after a close() → open() cycle
+  /// (the real stream is unfakeable).
+  @visibleForTesting
+  void debugNoteConnectionState({required bool disconnected}) =>
+      _dropDebouncer.noteConnectionState(disconnected: disconnected);
 
   /// #2261 concern 1 — subscribe to the connection-state stream so a real
   /// disconnect is noticed in ~1–2 s. The first emission is the current state
