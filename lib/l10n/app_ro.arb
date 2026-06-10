@@ -4726,5 +4726,15 @@
   "@syncAdoptUseDifferentAccount": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2ErrorPairingRequired": "The adapter needs Bluetooth pairing. Unplug the adapter, plug it back in, then retry within 5 minutes.",
+  "@obd2ErrorPairingRequired": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2PairingConfirmHint": "Confirm the pairing request on your phone",
+  "@obd2PairingConfirmHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

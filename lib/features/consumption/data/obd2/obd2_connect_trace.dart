@@ -88,6 +88,14 @@ enum Obd2ConnectOutcome {
   /// with the ignition off.
   ignitionOff,
 
+  /// BLE pairing/bonding was required but did not complete (#3181): the
+  /// connect/setNotify failed with an authentication / encryption /
+  /// pairing / bond error, or the setNotify timed out on a FIRST-connect
+  /// deviceId (the OBDLink CX initiates pairing via the first CCCD
+  /// subscribe and only accepts new bonds ~5 min after power-on).
+  /// Actionable: power-cycle the adapter and retry within 5 minutes.
+  pairingRequired,
+
   /// An unclassified failure. The [Obd2ConnectTrace.failureDetail] carries
   /// the raw `toString()` so a maintainer can still triage it.
   unknown,

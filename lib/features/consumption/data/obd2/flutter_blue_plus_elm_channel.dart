@@ -18,6 +18,7 @@ import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_link_drop_signal.dart';
+import 'obd2_pairing_mode.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Standard SPP-over-BLE UUIDs exposed by Vgate vLinker and most
@@ -505,7 +506,9 @@ class FlutterBluePlusElmChannel
     // #3014 — bound setNotifyValue on its own short budget too.
     // #3182 — via FBP's own `timeout:` (mutex released at our budget; the
     // outer Dart `.timeout()` left it held up to 15 s — see above).
-    await _notifyChar!.setNotifyValue(true, timeout: _setNotifyTimeoutSecs);
+    // #3181 — through [enableNotify]: a FIRST-connect deviceId gets the
+    // generous pairing budget (the CX pairs via this very subscribe).
+    await enableNotify();
     _subscription = _notifyChar!.lastValueStream.listen(
       handleNotifyBytes,
       onError: (e, st) {
@@ -540,6 +543,78 @@ class FlutterBluePlusElmChannel
       },
     );
   }
+
+  /// #3181 — enable notifications on the resolved CCCD, with the
+  /// FIRST-CONNECT pairing budget. The OBDLink CX initiates BLE pairing
+  /// via this very subscribe: on a never-bonded phone `setNotifyValue`
+  /// blocks on the OS pairing dialog, and the steady-state budget (iOS
+  /// 7 s / Android 4 s) clipped the human tap. A deviceId in
+  /// [Obd2PairingMode] first-connect mode gets
+  /// [Obd2PairingMode.firstConnectSetNotifySecs] instead, the
+  /// `pairing-wait` trace step is stamped (#3184), and the
+  /// [Obd2PairingMode.pairingWaitPending] flag drives the "confirm the
+  /// pairing request" UI hint while the subscribe is in flight.
+  ///
+  /// A failure that classifies as pairing ([classifySetNotifyFailure] —
+  /// explicit auth/encryption/bond errors on any connect, or a timeout on
+  /// a first connect) is rethrown as the TYPED [Obd2PairingRequired] so
+  /// the transport's open-retry loop does NOT tear the link down and
+  /// re-dial mid-pairing, and the UI can show the power-cycle guidance.
+  ///
+  /// `@protected @visibleForTesting` so the budget selection + pairing
+  /// classification are drivable without a BLE stack (via [rawSetNotify]).
+  @protected
+  @visibleForTesting
+  Future<void> enableNotify() async {
+    final deviceId = _device.remoteId.str;
+    final firstConnect = Obd2PairingMode.isFirstConnect(deviceId);
+    final notifySecs = Obd2PairingMode.setNotifyBudgetSecsFor(
+      deviceId,
+      platformDefaultSecs: _setNotifyTimeoutSecs,
+    );
+    // #3184 — stage-tag the subscribe so a persisted trace shows WHERE a
+    // failed connect died (set-notify was previously invisible).
+    Obd2ConnectTraceLog.active?.addStep(
+      label: 'set-notify-start',
+      status: Obd2ConnectStepStatus.ok,
+      detail: 'budget ${notifySecs}s',
+    );
+    if (firstConnect) {
+      Obd2ConnectTraceLog.active?.addStep(
+        label: 'pairing-wait',
+        status: Obd2ConnectStepStatus.ok,
+        detail: 'first connect — OS pairing dialog may be pending; '
+            'budget ${notifySecs}s (#3181)',
+      );
+      Obd2PairingMode.notePairingWaitStarted();
+    }
+    try {
+      await rawSetNotify(notifySecs);
+      // classification-only binding; the original stack is preserved by
+      // rethrow and the typed wrap carries the raw toString.
+      // ignore: catch_no_st
+    } catch (e) {
+      final outcome = classifySetNotifyFailure(e, firstConnect: firstConnect);
+      if (outcome == Obd2ConnectOutcome.pairingRequired) {
+        throw Obd2PairingRequired(
+            'BLE pairing did not complete during setNotify '
+            '(firstConnect: $firstConnect) — power-cycle the adapter and '
+            'retry within 5 minutes: $e');
+      }
+      rethrow;
+    } finally {
+      if (firstConnect) Obd2PairingMode.notePairingWaitEnded();
+    }
+  }
+
+  /// The raw CCCD subscribe behind a `@protected @visibleForTesting` seam
+  /// (the [writeRaw] precedent) so [enableNotify]'s budget selection and
+  /// pairing classification are testable — FBP's
+  /// `BluetoothCharacteristic.setNotifyValue` hits the platform channel.
+  @protected
+  @visibleForTesting
+  Future<void> rawSetNotify(int timeoutSecs) =>
+      _notifyChar!.setNotifyValue(true, timeout: timeoutSecs);
 
   /// #3179 — the notify-stream DATA handler, extracted so a reopen test can
   /// drive the EXACT production byte path without a real BLE stack (FBP's

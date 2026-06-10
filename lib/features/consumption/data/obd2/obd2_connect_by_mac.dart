@@ -116,6 +116,12 @@ Future<Obd2Service?> _connectByMacDirect(
       return true;
     }());
     await svc._teardownLastDirectChannel();
+    // #3181 — a TYPED pairing failure must NOT be masked by the scan
+    // fallback: the scan would re-dial the same un-bonded adapter (burning
+    // its 5-minute bond-acceptance window) and its scanEmpty/timeout would
+    // bury the actionable "power-cycle and retry" guidance. Rethrow so the
+    // picker / coordinator surfaces it.
+    if (e is Obd2PairingRequired) rethrow;
     if (!fallbackToScan) return null;
     return svc.connectByMac(mac);
   }

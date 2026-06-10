@@ -22,6 +22,8 @@ import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
+import 'obd2_known_adapters_store.dart';
+import 'obd2_pairing_mode.dart';
 import 'obd2_permissions.dart';
 import 'obd2_read_telemetry.dart';
 import 'obd2_service.dart';
@@ -108,6 +110,13 @@ class Obd2ConnectionService {
   /// Null in tests / configs that don't wire it — pinning is then skipped.
   final LastGoodAdapterStore? lastGoodAdapterStore;
 
+  /// #3181 — set of deviceIds that have EVER completed a successful
+  /// connect on this phone. The "first connect" discriminator for pairing
+  /// mode: an unknown id gets the generous setNotify pairing budget (the
+  /// OBDLink CX pairs via the first CCCD subscribe). Null in tests /
+  /// configs that don't wire it — pairing mode is then never armed.
+  final KnownObd2AdaptersStore? knownAdaptersStore;
+
   /// #2906 — settle pause after [_stopScanBeforeConnect] stops the radio and
   /// before a `channel.open()` fires. Android BLE is fragile if a `connect()`
   /// races an active scan still winding down on the radio — a stale scan can
@@ -127,6 +136,7 @@ class Obd2ConnectionService {
     this.adapterWakeCache,
     this.activeVehicleKeyFields,
     this.lastGoodAdapterStore,
+    this.knownAdaptersStore,
     this.scanSettleDelay = const Duration(milliseconds: 120),
   });
 
@@ -332,27 +342,61 @@ class Obd2ConnectionService {
       vin: vehicle?.vin,
       linkKind: linkKind, // #2465 — gated comm-diagnostics session label
     );
-    // #2268 concern 3 — a no-op override suppresses the wake window for a
-    // MAC observed never to need it; null ⇒ honour the adapter policy.
-    final wakeOverride = await adapterWakeCache?.overrideFor(mac);
-    // #1330 init. #2379 — recoverable attempts suppress the fail trace.
-    final ok = await service.connect(adapter: adapter,
-        wakePolicyOverride: wakeOverride, logFailureAsError: logFailureAsError);
-    // #2268 concern 3 — persist the observed wake outcome (no-op unless the bounded window ran).
-    await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
-    if (!ok) {
-      // #2969 — `Obd2Service.connect` swallowed the real failure into a `false`,
-      // so classify the connect-trace outcome from the AT transcript teed so
-      // far (channel-open outcomes were already stamped FIRST at the channel
-      // layer, and first-wins keeps those): ATZ garbage → counterfeit clone,
-      // an AT timeout → init timeout, else a silent ECU / ignition off. A no-op
-      // when no trace is active (a non-connect-path caller).
-      final trace = Obd2ConnectTraceLog.active;
-      if (trace != null && !trace.hasOutcome) {
-        trace.setOutcome(trace.classifyInitFailureOutcome());
+    // #3181 — FIRST-connect detection: a deviceId with NO recorded
+    // successful connect (and that isn't the auto-pinned last-good
+    // adapter — the pre-#3181 migration case) gets pairing mode armed for
+    // the duration of this attempt, so the BLE channel widens the
+    // setNotify budget to the 30 s pairing window and the UI can show the
+    // "confirm the pairing request" hint. Cleared in `finally` so a
+    // failed attempt never leaks the mode.
+    final firstConnect = _isFirstConnectDevice(mac);
+    if (firstConnect) {
+      Obd2PairingMode.markFirstConnect(mac);
+      Obd2ConnectTraceLog.active?.addStep(
+        label: 'first-connect',
+        status: Obd2ConnectStepStatus.ok,
+        detail: 'deviceId has no prior successful connect — '
+            '${Obd2PairingMode.firstConnectSetNotifySecs}s pairing budget '
+            'armed (#3181)',
+      );
+    }
+    try {
+      // #2268 concern 3 — a no-op override suppresses the wake window for a
+      // MAC observed never to need it; null ⇒ honour the adapter policy.
+      final wakeOverride = await adapterWakeCache?.overrideFor(mac);
+      // #1330 init. #2379 — recoverable attempts suppress the fail trace.
+      final ok = await service.connect(adapter: adapter,
+          wakePolicyOverride: wakeOverride,
+          logFailureAsError: logFailureAsError);
+      // #2268 concern 3 — persist the observed wake outcome (no-op unless the bounded window ran).
+      await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
+      if (!ok) {
+        // #2969 — `Obd2Service.connect` swallowed the real failure into a `false`,
+        // so classify the connect-trace outcome from the AT transcript teed so
+        // far (channel-open outcomes were already stamped FIRST at the channel
+        // layer, and first-wins keeps those): ATZ garbage → counterfeit clone,
+        // an AT timeout → init timeout, else a silent ECU / ignition off. A no-op
+        // when no trace is active (a non-connect-path caller).
+        final trace = Obd2ConnectTraceLog.active;
+        if (trace != null && !trace.hasOutcome) {
+          trace.setOutcome(trace.classifyInitFailureOutcome());
+        }
+        await service.disconnect();
+        // #3181 — a pairing-classified failure (the channel-open catch /
+        // Obd2Service.connect stamped it, first-wins) surfaces TYPED so the
+        // by-MAC paths skip the masking scan fallback and the UI shows the
+        // "power-cycle and retry within 5 minutes" guidance — not the
+        // generic adapter-unresponsive message.
+        if (trace?.outcome == Obd2ConnectOutcome.pairingRequired) {
+          throw const Obd2PairingRequired();
+        }
+        throw const Obd2AdapterUnresponsive();
       }
-      await service.disconnect();
-      throw const Obd2AdapterUnresponsive();
+      // #3181 — ANY successful init (even an engine-off one) proves the
+      // BOND + link work, so the deviceId is no longer a first connect.
+      await knownAdaptersStore?.markKnownGood(mac);
+    } finally {
+      if (firstConnect) Obd2PairingMode.clearFirstConnect(mac);
     }
     // #3009/#3035 — init SUCCEEDED (every AT answered) but the vehicle bus
     // may be SILENT. CRITICAL distinction (#3035): the `0100` probe is now
@@ -387,6 +431,24 @@ class Obd2ConnectionService {
       );
     }
     return service;
+  }
+
+  /// #3181 — whether [mac] has NEVER completed a successful connect on
+  /// this phone. False when no [knownAdaptersStore] is wired (tests /
+  /// legacy configs — pairing mode is then never armed), when the store
+  /// knows the id, or when it matches the auto-pinned last-good adapter
+  /// (a pre-#3181 user who already connected must not re-enter pairing
+  /// mode before the store backfills on their next success).
+  bool _isFirstConnectDevice(String mac) {
+    final store = knownAdaptersStore;
+    if (store == null) return false;
+    if (store.isKnownGood(mac)) return false;
+    final pinned = lastGoodAdapterStore?.recall();
+    if (pinned != null &&
+        pinned.mac.trim().toUpperCase() == mac.trim().toUpperCase()) {
+      return false;
+    }
+    return true;
   }
 
   /// Convenience entry point — picks the highest-RSSI candidate from
@@ -687,6 +749,11 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     // the trip-independent reconnect controller for the fast pinned path.
     lastGoodAdapterStore:
         LastGoodAdapterStore(ref.watch(settingsStorageProvider)),
+    // #3181 — known-good deviceId set (same local `settings` box). The
+    // "first connect" discriminator that arms the generous setNotify
+    // pairing budget for a never-bonded adapter (OBDLink CX).
+    knownAdaptersStore:
+        KnownObd2AdaptersStore(ref.watch(settingsStorageProvider)),
     activeVehicleKeyFields: () {
       // Defensive: the vehicle provider must never make a connect throw.
       try {

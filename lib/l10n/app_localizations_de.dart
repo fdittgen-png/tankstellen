@@ -3613,6 +3613,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der OBD2-Adapter wurde getrennt. Stelle die Verbindung wieder her und versuche es erneut.';
 
   @override
+  String get obd2ErrorPairingRequired =>
+      'Der Adapter benötigt eine Bluetooth-Koppelung. Ziehe den Adapter ab, stecke ihn wieder ein und versuche es innerhalb von 5 Minuten erneut.';
+
+  @override
   String get onboardingExploreDemoData => 'Mit Demodaten erkunden';
 
   @override
@@ -6545,6 +6549,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get obd2PickerBleOnlyNotice =>
       'Das iPhone funktioniert nur mit Bluetooth-LE-Adaptern. Ein reiner Classic-Adapter (z. B. vLinker BM, Konnwei KW902) muss unter Android verwendet werden.';
+
+  @override
+  String get obd2PairingConfirmHint =>
+      'Bestätige die Koppelungsanfrage auf deinem Handy';
 
   @override
   String get obd2ReconnectInProgress =>

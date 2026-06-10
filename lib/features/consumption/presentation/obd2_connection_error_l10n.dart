@@ -27,6 +27,11 @@ extension Obd2ConnectionErrorL10n on Obd2ConnectionError {
         Obd2EngineOff() => l10n?.obd2ErrorEngineOff ?? message,
         Obd2ProtocolInitFailed() =>
           l10n?.obd2ErrorProtocolInitFailed ?? message,
+        // #3181 — pairing failed / was never confirmed. Actionable
+        // power-cycle guidance: the OBDLink CX only accepts new bonds in
+        // the first ~5 minutes after power-on.
+        Obd2PairingRequired() =>
+          l10n?.obd2ErrorPairingRequired ?? message,
         Obd2DisconnectedException() =>
           l10n?.obd2ErrorDisconnected ?? message,
       };

@@ -19,5 +19,9 @@
   "obd2PickerBleOnlyNotice": "iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.",
   "@obd2PickerBleOnlyNotice": {
     "description": "Explanatory note shown in the OBD2 adapter picker on iOS (#3103). iPhone cannot discover Bluetooth-Classic/SPP adapters (Apple MFi restriction), so this tells the user why a Classic-only adapter does not appear and that it must be used on Android instead."
+  },
+  "obd2PairingConfirmHint": "Confirm the pairing request on your phone",
+  "@obd2PairingConfirmHint": {
+    "description": "Hint shown under the connecting spinner while a FIRST-connect OBD2 adapter is waiting for the user to confirm the OS Bluetooth pairing dialog (#3181). Secure-BLE adapters like the OBDLink CX initiate pairing on the first connection; without this hint the spinner looks hung while the dialog waits."
   }
 }

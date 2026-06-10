@@ -151,6 +151,12 @@ class Obd2ConnectTraceHandle {
   /// Whether a terminal outcome has been stamped (success or any failure).
   bool get hasOutcome => _root._outcome != null;
 
+  /// The stamped terminal outcome, or null while undecided (#3181 — lets
+  /// `_openAndInit` surface a pairing-classified failure as the TYPED
+  /// `Obd2PairingRequired` after `Obd2Service.connect` flattened the real
+  /// error into a generic `false`).
+  Obd2ConnectOutcome? get outcome => _root._outcome;
+
   /// Classify an INIT failure (the channel opened, the ELM handshake failed)
   /// from the AT steps teed so far (#2969 correction 4): distinguish a
   /// counterfeit clone (ATZ returned garbage/`?`) from an init timeout (any AT

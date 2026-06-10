@@ -1909,6 +1909,10 @@
   "@obd2ErrorDisconnected": {
     "description": "User-facing OBD2 connection error: the transport dropped mid-session (#1663)."
   },
+  "obd2ErrorPairingRequired": "The adapter needs Bluetooth pairing. Unplug the adapter, plug it back in, then retry within 5 minutes.",
+  "@obd2ErrorPairingRequired": {
+    "description": "User-facing OBD2 connection error (#3181): BLE pairing was required but did not complete — the OBDLink CX family pairs on the first connection and only accepts new pairings in the first ~5 minutes after power-on, so the actionable fix is to power-cycle the adapter and retry promptly."
+  },
   "onboardingExploreDemoData": "Explore with demo data",
   "@onboardingExploreDemoData": {
     "description": "Onboarding API-key step — CTA to skip key entry and use demo data (#1691)."
@@ -5766,6 +5770,10 @@
   "obd2PickerBleOnlyNotice": "iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.",
   "@obd2PickerBleOnlyNotice": {
     "description": "Explanatory note shown in the OBD2 adapter picker on iOS (#3103). iPhone cannot discover Bluetooth-Classic/SPP adapters (Apple MFi restriction), so this tells the user why a Classic-only adapter does not appear and that it must be used on Android instead."
+  },
+  "obd2PairingConfirmHint": "Confirm the pairing request on your phone",
+  "@obd2PairingConfirmHint": {
+    "description": "Hint shown under the connecting spinner while a FIRST-connect OBD2 adapter is waiting for the user to confirm the OS Bluetooth pairing dialog (#3181). Secure-BLE adapters like the OBDLink CX initiate pairing on the first connection; without this hint the spinner looks hung while the dialog waits."
   },
   "obd2ReconnectInProgress": "Reconnecting to your OBD2 adapter…",
   "@obd2ReconnectInProgress": {

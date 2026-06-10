@@ -3575,6 +3575,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The OBD2 adapter disconnected. Reconnect and try again.';
 
   @override
+  String get obd2ErrorPairingRequired =>
+      'The adapter needs Bluetooth pairing. Unplug the adapter, plug it back in, then retry within 5 minutes.';
+
+  @override
   String get onboardingExploreDemoData => 'Explore with demo data';
 
   @override
@@ -6478,6 +6482,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get obd2PickerBleOnlyNotice =>
       'iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.';
+
+  @override
+  String get obd2PairingConfirmHint =>
+      'Confirm the pairing request on your phone';
 
   @override
   String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
@@ -11416,6 +11424,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ŧĥé ÓƁĐ2 áđáƥŧéř đîšçóññéçŧéđ. Řéçóññéçŧ áñđ ŧřý áǧáîñ. ····················⟧';
 
   @override
+  String get obd2ErrorPairingRequired =>
+      '⟦Ŧĥé áđáƥŧéř ñééđš Ɓłúéŧóóŧĥ ƥáîřîñǧ. Úñƥłúǧ ŧĥé áđáƥŧéř, ƥłúǧ îŧ ƀáçķ îñ, ŧĥéñ řéŧřý ŵîŧĥîñ 5 ɱîñúŧéš. ····································⟧';
+
+  @override
   String get onboardingExploreDemoData => '⟦Éẋƥłóřé ŵîŧĥ đéɱó đáŧá ·········⟧';
 
   @override
@@ -14402,6 +14414,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2PickerBleOnlyNotice =>
       '⟦îƤĥóñé ŵóřķš ŵîŧĥ Ɓłúéŧóóŧĥ-ŁÉ áđáƥŧéřš óñłý. Á Çłáššîç-óñłý áđáƥŧéř (é.ǧ. ṽŁîñķéř ƁṀ, Ķóññŵéî ĶŴ902) ɱúšŧ ƀé úšéđ óñ Áñđřóîđ. ···········································⟧';
+
+  @override
+  String get obd2PairingConfirmHint =>
+      '⟦Çóñƒîřɱ ŧĥé ƥáîřîñǧ řéɋúéšŧ óñ ýóúř ƥĥóñé ················⟧';
 
   @override
   String get obd2ReconnectInProgress =>

@@ -122,5 +122,6 @@ const _$Obd2ConnectOutcomeEnumMap = {
   Obd2ConnectOutcome.initTimeout: 'initTimeout',
   Obd2ConnectOutcome.protocolInitFailed: 'protocolInitFailed',
   Obd2ConnectOutcome.ignitionOff: 'ignitionOff',
+  Obd2ConnectOutcome.pairingRequired: 'pairingRequired',
   Obd2ConnectOutcome.unknown: 'unknown',
 };

@@ -20,10 +20,18 @@ import 'obd2_transport.dart';
 /// "device not connected" the classic/BLE channels surface
 /// ([isBleAdapterDisconnect]). A genuine fault (permission denied, protocol
 /// init) is NOT retried — it rethrows so the caller surfaces it.
+///
+/// #3181 — [Obd2PairingRequired] is EXPLICITLY excluded even though it is
+/// an expected user condition: the failure means the FIRST-connect pairing
+/// budget is already exhausted (or the adapter refused the bond), and the
+/// inter-attempt `close()` → re-`open()` would dismiss an OS pairing
+/// dialog still on screen / burn the adapter's 5-minute bond window on
+/// doomed re-dials. It rethrows so the user gets the power-cycle guidance.
 bool _isRecoverableOpenFailure(Object e) =>
-    e is TimeoutException ||
-    (e is Obd2ConnectionError && e.isExpectedUserCondition) ||
-    isBleAdapterDisconnect(e);
+    e is! Obd2PairingRequired &&
+    (e is TimeoutException ||
+        (e is Obd2ConnectionError && e.isExpectedUserCondition) ||
+        isBleAdapterDisconnect(e));
 
 /// #3014 — true when a channel-open failure carries Android GATT_ERROR 133.
 /// Only a 133 warrants the (Android-only, OEM-variable) GATT-cache refresh

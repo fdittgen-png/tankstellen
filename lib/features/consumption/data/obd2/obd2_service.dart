@@ -17,6 +17,9 @@ import 'fuel_rate_estimator.dart' as estimator;
 import 'negotiated_protocol_cache.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_connect_trace.dart';
+import 'obd2_connect_trace_log.dart';
+import 'obd2_connection_errors.dart';
 import 'obd2_read_telemetry.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
@@ -709,6 +712,18 @@ class Obd2Service implements Obd2RawCommandPort {
       );
       return true;
     } catch (e, st) {
+      // #3181 — a TYPED pairing failure from the channel's setNotify stage
+      // must not be flattened invisibly into the generic `false` below:
+      // stamp the active connect trace (first-wins; the FBP channel-open
+      // catch usually stamped it already, but a fake/non-FBP channel
+      // doesn't) so `_openAndInit` can rethrow the typed Obd2PairingRequired
+      // and the UI shows the power-cycle guidance.
+      if (e is Obd2PairingRequired) {
+        Obd2ConnectTraceLog.active?.setOutcome(
+          Obd2ConnectOutcome.pairingRequired,
+          failureDetail: e.toString(),
+        );
+      }
       // #2379 final-failure log → #2933 (error-log #25): an EXPECTED engine-off
       // condition (Obd2AdapterUnresponsive et al.) de-noises to a breadcrumb
       // instead of an ERROR every retry (42/44 of that log); a GENUINE fault

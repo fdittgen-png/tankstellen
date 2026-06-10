@@ -185,8 +185,15 @@ void main() {
     // Android-only Classic-facade platform gate at the provider seam (+ their
     // rationale comments). #3113 — 694 → 697: connectByMacDirect's timeout made
     // nullable so iOS gets a 7s cold-connect budget (+ rationale comment).
+    // #3181 — 697 → 764: first-connect pairing mode in `_openAndInit` (arm /
+    // clear Obd2PairingMode around the connect, the `_isFirstConnectDevice`
+    // discriminator over KnownObd2AdaptersStore + the last-good pin, the
+    // typed Obd2PairingRequired rethrow on a pairing-classified trace
+    // outcome) + the knownAdaptersStore field/ctor/provider wiring. The
+    // pairing-mode + store logic itself lives in NEW under-cap files
+    // (obd2_pairing_mode.dart / obd2_known_adapters_store.dart).
     // Decomposition still tracked under #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 697,
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 764,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
@@ -227,7 +234,14 @@ void main() {
     // runs before connectDevice. Mostly dartdoc explaining the two field
     // failure modes; the drop/reopen state cannot leave this cohesive channel
     // body. Decomposition of the channel is tracked by #2190.
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 776,
+    // #3181 — 776 → 851: the `enableNotify` / `rawSetNotify` seams (the CCCD
+    // subscribe is THE pairing trigger on the OBDLink CX): first-connect
+    // budget selection via Obd2PairingMode, the pairing-wait UI flag, and
+    // the typed Obd2PairingRequired wrap of a pairing-classified setNotify
+    // failure — plus their contract dartdoc. The policy itself lives in the
+    // NEW under-cap obd2_pairing_mode.dart; only the FBP-touching subscribe
+    // can live here.
+    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 851,
     // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
     // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
     // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off
@@ -323,7 +337,11 @@ void main() {
     // resolver's `searchSend:` wiring + the probe-constant import. The probe
     // logic itself stays in the under-cap supported_pids_probe.dart;
     // decomposition of this god-class still tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1673,
+    // #3181 — 1673 → 1688: the connect-catch now stamps a TYPED
+    // Obd2PairingRequired onto the active connect trace (first-wins) before
+    // the never-throws `false` return flattens it, so `_openAndInit` can
+    // rethrow the typed pairing error (+ the trace-log imports + rationale).
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1688,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb
@@ -554,9 +572,14 @@ void main() {
     // #3103 — 470 → 515: two-section selecting view (recognized adapters, then
     // a "other devices — tap to try" section for NAMED-unrecognized devices) +
     // the iOS "BLE adapters only" notice + the shared `_candidateTile` helper.
-    // Decomposition stays tracked under #2187/#2188.
+    // #3181 — 515 → 543: the pairing-wait hint under the connecting spinner
+    // (ValueListenableBuilder on Obd2PairingMode.pairingWaitPending — the OS
+    // pairing dialog otherwise makes the spinner look hung) + the pinned
+    // fall-through snackbar carrying the pairing guidance instead of the
+    // generic "couldn't reach" text. Decomposition stays tracked under
+    // #2187/#2188.
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
-        515,
+        543,
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
