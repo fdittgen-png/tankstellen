@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/foundation.dart' show compute;
+
 import '../cache/cache_manager.dart';
 import 'service_result.dart';
 
@@ -33,6 +35,13 @@ class PersistentDataset<T> {
 
   /// [countryCode] keys the dataset; [datasetName] disambiguates services that
   /// persist more than one dataset for the same country.
+  ///
+  /// #3154 — [serialize] and [deserialize] are run in a background isolate by
+  /// [write] / [readAsync] (a whole-country dataset is ~11k `Station.fromJson`
+  /// calls — far too heavy for the UI isolate). They must therefore be
+  /// **isolate-sendable**: top-level / static functions, or closures that
+  /// capture nothing non-sendable (every current call site passes a
+  /// capture-free closure or a top-level function).
   PersistentDataset({
     required CacheStrategy cache,
     required String countryCode,
@@ -58,15 +67,35 @@ class PersistentDataset<T> {
   /// Persist [value]. The Hive entry's own TTL is set to [hardTtl] so a
   /// generic expiry sweep never drops a dataset the caller still considers
   /// servable; freshness decisions are made by the caller via soft/hard age.
-  Future<void> write(T value, {required Duration hardTtl}) =>
-      _cache.put(_key, _serialize(value), ttl: hardTtl, source: _source);
+  ///
+  /// #3154 — the serialize closure runs through [compute] so mapping a whole
+  /// national dataset to JSON doesn't block the UI isolate.
+  Future<void> write(T value, {required Duration hardTtl}) async {
+    final json = await compute(_serialize, value);
+    await _cache.put(_key, json, ttl: hardTtl, source: _source);
+  }
 
   /// The persisted dataset and the age of the stored copy, or null when
   /// nothing is persisted / it fails to deserialize.
+  ///
+  /// Synchronous variant — deserializes **on the calling isolate**. Kept for
+  /// callers with small per-key payloads (the ES per-province rows); bulk
+  /// whole-country readers go through [readAsync] (#3154).
   ({T value, Duration age})? read() {
     final entry = _cache.get(_key);
     if (entry == null) return null;
     final value = _deserialize(entry.payload);
+    if (value == null) return null;
+    return (value: value, age: entry.age);
+  }
+
+  /// [read], with the deserialize closure run through [compute] (#3154) so a
+  /// cold-start rehydrate of a whole national dataset (~11k `fromJson`s)
+  /// happens off the UI isolate. Same result contract as [read].
+  Future<({T value, Duration age})?> readAsync() async {
+    final entry = _cache.get(_key);
+    if (entry == null) return null;
+    final value = await compute(_deserialize, entry.payload);
     if (value == null) return null;
     return (value: value, age: entry.age);
   }
