@@ -102,6 +102,7 @@ class UserDataSync {
     'itineraries': 'user_id',
     'obd2_baselines': 'user_id',
     'station_ratings': 'user_id',
+    'deletions': 'user_id', // #3078 — wipe the user's tombstones too
   };
 
   /// Delete every row the user owns across every sync table (GDPR

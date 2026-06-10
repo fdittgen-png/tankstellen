@@ -41,8 +41,11 @@ class IgnoredStations extends _$IgnoredStations {
     await storage.removeIgnored(stationId);
     state = storage.getIgnoredIds();
 
+    // #3078 — delete (+ tombstone) the server row instead of re-running the
+    // union merge, which used to re-add the still-server id so the station
+    // never actually un-hid across devices.
     await SyncHelper.syncIfEnabled(ref, 'IgnoredStations.remove',
-      () => IgnoredStationsSync.merge(state),
+      () => IgnoredStationsSync.delete(stationId),
     );
   }
 

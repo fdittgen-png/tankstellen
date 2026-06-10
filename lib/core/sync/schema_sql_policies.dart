@@ -28,6 +28,7 @@ ALTER TABLE public.obd2_baselines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_summaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_details ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trip_shares ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.deletions ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_own ON public.users;
 CREATE POLICY users_own ON public.users FOR ALL USING (id = auth.uid());
@@ -134,6 +135,11 @@ CREATE POLICY trip_details_shared_read ON public.trip_details
         AND s.shared_with_id = auth.uid()
     )
   );
+
+-- Deletion tombstones (#3078): a user only ever sees / writes their own.
+DROP POLICY IF EXISTS deletions_own ON public.deletions;
+CREATE POLICY deletions_own ON public.deletions
+  FOR ALL USING (user_id = auth.uid());
 ''';
 
 /// SECURITY DEFINER RPCs the trip-sharing sync code calls

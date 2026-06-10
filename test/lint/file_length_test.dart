@@ -61,6 +61,13 @@ void main() {
     // provider seams; this is the (compacted) launch glue. Decomposition
     // of this god-file is tracked separately.
     'lib/app/app_initializer.dart': 1028,
+    // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
+    // deletion-tombstone fix threads a tombstoned-id set through `merge` and
+    // `mergeRows` (fetch + dual-side filter so a delete on another device
+    // doesn't resurrect) plus the `deleteSummary` tombstone write — a real
+    // fix, not boilerplate. Decomposition of this near-cap file is its own
+    // future task.
+    'lib/core/sync/trips_sync.dart': 414,
     // #2415 — background_service.dart graduated: the scan body moved into
     // BackgroundAlertScanCoordinator + BackgroundScanRunners +
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246

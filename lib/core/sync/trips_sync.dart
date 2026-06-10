@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/consumption/data/trip_history_repository.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import 'trips_sync_json.dart';
 import '../../core/logging/error_logger.dart';
@@ -158,6 +159,7 @@ class TripsSync {
           .delete()
           .eq('user_id', userId)
           .eq('id', tripId);
+      await DeletionsSync.record('trip_summaries', tripId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'TripsSync.deleteSummary FAILED for $tripId'}));
     }
@@ -192,26 +194,32 @@ class TripsSync {
           .select('id, data')
           .eq('user_id', userId);
 
+      // #3078 — a trip deleted on another device must not resurrect. Drop
+      // tombstoned ids from BOTH the re-upload set and the downloaded union.
+      final tombstoned =
+          await DeletionsSync.fetchTombstonedIds('trip_summaries');
+      final liveLocal =
+          localEntries.where((e) => !tombstoned.contains(e.id)).toList();
       final serverIds = <String>{};
       for (final r in serverRows) {
         final id = r['id'];
-        if (id is String) serverIds.add(id);
+        if (id is String && !tombstoned.contains(id)) serverIds.add(id);
       }
 
       // Upload local-only entries (heals a missing server row from a
       // previous offline save). #2319 — batch the Nx2 round-trips into
       // one upsert each instead of a serial per-entry loop.
       final localOnly =
-          localEntries.where((e) => !serverIds.contains(e.id)).toList();
+          liveLocal.where((e) => !serverIds.contains(e.id)).toList();
       await _uploadBatch(client, userId, localOnly);
 
       // Decode server-only rows and return the union — the superset the
       // app-launch caller persists back to Hive (see
       // `AppInitializer._runTripsSyncMerge`; #2239 pins this seam).
-      final merged = mergeRows(localEntries, serverRows);
-      debugPrint('TripsSync.merge: local=${localEntries.length} '
+      final merged = mergeRows(liveLocal, serverRows, tombstoned: tombstoned);
+      debugPrint('TripsSync.merge: local=${liveLocal.length} '
           'server=${serverIds.length} '
-          'downloaded=${merged.length - localEntries.length}');
+          'downloaded=${merged.length - liveLocal.length}');
       return merged;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TripsSync.merge FAILED'}));
@@ -381,13 +389,19 @@ class TripsSync {
   @visibleForTesting
   static List<TripHistoryEntry> mergeRows(
     List<TripHistoryEntry> localEntries,
-    List<Map<String, dynamic>> serverRows,
-  ) {
+    List<Map<String, dynamic>> serverRows, {
+    Set<String> tombstoned = const {},
+  }) {
     final localIds = localEntries.map((e) => e.id).toSet();
     final downloaded = <TripHistoryEntry>[];
     for (final r in serverRows) {
       final id = r['id'];
-      if (id is! String || localIds.contains(id)) continue;
+      // #3078 — also skip a server row the user deleted on another device.
+      if (id is! String ||
+          localIds.contains(id) ||
+          tombstoned.contains(id)) {
+        continue;
+      }
       final data = r['data'];
       if (data is! Map) continue;
       try {

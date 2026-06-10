@@ -6,7 +6,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_helper.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Favorites sync with Supabase, pulled out of [SyncService] (#727).
@@ -36,11 +38,16 @@ class FavoritesSync {
           .from('favorites')
           .select('station_id')
           .eq('user_id', userId);
-      final serverIds = serverRows
-          .map((r) => r.getString('station_id'))
-          .whereType<String>()
-          .toSet();
-      final localIds = localFavoriteIds.toSet();
+      // #3078 — drop tombstoned ids from the server set so a delete on
+      // another device can't resurrect through the union below.
+      final tombstoned = await DeletionsSync.fetchTombstonedIds('favorites');
+      final serverIds = SyncHelper.removeTombstoned(
+        serverRows.map((r) => r.getString('station_id')),
+        tombstoned,
+        key: (id) => id,
+      ).whereType<String>().toSet();
+      final localIds =
+          localFavoriteIds.where((id) => !tombstoned.contains(id)).toSet();
 
       debugPrint('FavoritesSync.merge: local=${localIds.length}, '
           'server=${serverIds.length}, userId=$userId');
@@ -79,6 +86,8 @@ class FavoritesSync {
           .delete()
           .eq('user_id', userId)
           .eq('station_id', stationId);
+      // #3078 — tombstone the id so other devices' merge never re-adds it.
+      await DeletionsSync.record('favorites', stationId);
       debugPrint('FavoritesSync.delete: $stationId removed from server');
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FavoritesSync.delete FAILED'}));

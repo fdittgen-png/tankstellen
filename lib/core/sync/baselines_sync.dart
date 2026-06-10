@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../features/consumption/data/baseline_sync.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -46,6 +47,16 @@ class BaselinesSync {
     }
 
     try {
+      // #3078 — a baseline the user "forgot" on another device must not be
+      // re-uploaded here. If this vehicle's baseline is tombstoned, leave the
+      // local copy untouched and don't push it back to the server.
+      final tombstoned =
+          await DeletionsSync.fetchTombstonedIds('obd2_baselines');
+      if (tombstoned.contains(vehicleId)) {
+        debugPrint('BaselinesSync.merge: $vehicleId tombstoned — skipping');
+        return localJson;
+      }
+
       final serverRow = await client
           .from('obd2_baselines')
           .select('data')
@@ -99,6 +110,7 @@ class BaselinesSync {
           .delete()
           .eq('user_id', userId)
           .eq('vehicle_id', vehicleId);
+      await DeletionsSync.record('obd2_baselines', vehicleId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'BaselinesSync.delete FAILED'}));
     }
