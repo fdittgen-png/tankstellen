@@ -1,0 +1,83 @@
+{
+ "count": 3,
+ "next": null,
+ "previous": null,
+ "results": [
+  {
+   "pk": 2048,
+   "franchise": 1,
+   "name": "PETROL LJUBLJANA - TIVOLSKA",
+   "address": "TIVOLSKA CESTA 43",
+   "lat": 46.0580724,
+   "lng": 14.50344546,
+   "prices": {
+    "95": 1.592,
+    "dizel": 1.685,
+    "98": null,
+    "100": 1.902,
+    "dizel-premium": null,
+    "avtoplin-lpg": 1.029,
+    "KOEL": null,
+    "hvo": null,
+    "cng": null,
+    "lng": null
+   },
+   "distance": 223.61420196,
+   "direction": "",
+   "open_hours": "00:00-23:59\n",
+   "zip_code": "1000"
+  },
+  {
+   "pk": 2056,
+   "franchise": 1,
+   "name": "PETROL LJUBLJANA - DUNAJSKA 70",
+   "address": "DUNAJSKA CESTA 70",
+   "lat": 46.06882986,
+   "lng": 14.51074492,
+   "prices": {
+    "95": 1.592,
+    "dizel": 1.685,
+    "98": null,
+    "100": 1.902,
+    "dizel-premium": 2.105,
+    "avtoplin-lpg": null,
+    "KOEL": null,
+    "hvo": null,
+    "cng": null,
+    "lng": null
+   },
+   "distance": 1380.31652654,
+   "direction": "",
+   "open_hours": "Ponedeljek, Torek, Sreda, Četrtek, Petek\n06:00-22:00\n\nSobota\n07:00-21:00\n\nNedelja, Praznik\n07:00-21:00\n",
+   "zip_code": "1000"
+  },
+  {
+   "pk": 2049,
+   "franchise": 1,
+   "name": "PETROL LJUBLJANA - ŠMARTINSKA 150",
+   "address": "ŠMARTINSKA CESTA 150",
+   "lat": 46.06921194,
+   "lng": 14.54248084,
+   "prices": {
+    "95": 1.592,
+    "dizel": 1.685,
+    "98": null,
+    "100": 1.902,
+    "dizel-premium": null,
+    "avtoplin-lpg": null,
+    "KOEL": 1.312,
+    "hvo": null,
+    "cng": null,
+    "lng": null
+   },
+   "distance": 3143.82867217,
+   "direction": "",
+   "open_hours": "06:00-22:00\n",
+   "zip_code": "1000"
+  }
+ ],
+ "position": {
+  "lat": 46.0569,
+  "lng": 14.5058
+ }
+}

@@ -225,11 +225,25 @@ void main() {
       expect(superOnly.diesel, isNull);
     });
 
-    test('GAS-less payload yields no lpg (only DIE+SUP are queried)', () async {
+    test('GAS-less payload yields no cng/lpg (only DIE+SUP are queried)',
+        () async {
       final s = (await searchEcontrolStations([omvWien()]))
           .firstWhere((s) => s.id == 'at-123');
       // The real service only queries DIE + SUP, never GAS.
+      expect(s.cng, isNull);
       expect(s.lpg, isNull);
+    });
+
+    test('a GAS row maps to cng, never lpg — E-Control GAS is CNG (#3196)',
+        () {
+      final s = EControlStationService()
+          .parseStationForTest(omvWien(amount: 1.234), 48.2, 16.37, 'GAS');
+      expect(s, isNotNull);
+      expect(s!.cng, closeTo(1.234, 0.001),
+          reason: "E-Control's GAS fuel type is CNG (Erdgas), not LPG");
+      expect(s.lpg, isNull);
+      expect(s.e5, isNull);
+      expect(s.diesel, isNull);
     });
 
     test('search result carries the E-Control source', () async {

@@ -161,6 +161,12 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
     final name = raw['name']?.toString().trim() ?? '';
     final address = raw['address']?.toString().trim() ?? '';
     final zipCode = raw['zip_code']?.toString() ?? '';
+    // #3196 — goriva.si DOES publish hours: "00:00-23:59\n" for 24h sites,
+    // or per-day-group blocks like
+    // "Ponedeljek, Torek, …\n06:00-22:00\n\nSobota\n07:00-21:00\n".
+    // Surface them as the single-line `openingHoursText` instead of
+    // dropping them (block breaks → "; ", inner newlines → " ").
+    final openHoursText = _flattenOpenHours(raw['open_hours']?.toString());
 
     // `98` only wins when `100` is absent — higher-octane 100 is the
     // premium pump price consumers actually see on the forecourt.
@@ -204,8 +210,27 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
       dieselPremium: dizelPremium,
       lpg: lpg,
       cng: cng,
-      isOpen: true, // the API doesn't expose open/closed state reliably
+      // #3196 — open/closed is not reliably derivable here (Station.isOpen
+      // is non-nullable, so "unknown" cannot be expressed without a model
+      // change); keep the optimistic default the other no-signal countries
+      // use and carry the raw hours text alongside.
+      isOpen: true,
+      openingHoursText: openHoursText,
+      is24h: openHoursText != null && openHoursText.startsWith('00:00-23:59'),
     );
+  }
+
+  /// #3196 — flatten the goriva.si `open_hours` multi-line block into the
+  /// single-line text convention `openingHoursText` consumers expect.
+  /// Returns null for missing/blank input.
+  static String? _flattenOpenHours(String? raw) {
+    if (raw == null) return null;
+    final flattened = raw
+        .trim()
+        .replaceAll(RegExp(r'\n{2,}'), '; ')
+        .replaceAll('\n', ' ')
+        .trim();
+    return flattened.isEmpty ? null : flattened;
   }
 
   /// Convert one entry of the `prices` map into a double or null.

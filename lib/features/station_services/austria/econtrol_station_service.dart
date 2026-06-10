@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/services/dio_factory.dart';
@@ -113,6 +114,15 @@ class EControlStationService with StationServiceHelpers implements StationServic
     return stations;
   }
 
+  /// #3196 — test seam for the per-fuel-type slot mapping. [_parseStation]
+  /// is private and the live search only queries DIE/SUP, so the GAS→cng
+  /// branch is only reachable for tests through this.
+  @visibleForTesting
+  Station? parseStationForTest(
+    Map<String, dynamic> r, double searchLat, double searchLng, String fuelType,
+  ) =>
+      _parseStation(r, searchLat, searchLng, fuelType);
+
   Station? _parseStation(
     Map<String, dynamic> r, double searchLat, double searchLng, String fuelType,
   ) {
@@ -169,7 +179,8 @@ class EControlStationService with StationServiceHelpers implements StationServic
         e5: fuelType == 'SUP' ? price : null,
         e10: fuelType == 'SUP' ? price : null,
         diesel: fuelType == 'DIE' ? price : null,
-        lpg: fuelType == 'GAS' ? price : null,
+        // #3196 — E-Control's GAS fuel type is CNG (Erdgas/Methan), not LPG.
+        cng: fuelType == 'GAS' ? price : null,
         isOpen: isOpen,
         openingHoursText: hoursText.isNotEmpty ? hoursText : null,
         openingHours: weeklyHours.availability ==

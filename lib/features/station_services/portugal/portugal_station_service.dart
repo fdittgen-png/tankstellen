@@ -18,6 +18,7 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../station_detail/domain/opening_hours.dart';
 import 'portugal_detail_parser.dart';
+import 'portugal_merged_row.dart';
 import 'portugal_opening_hours_adapter.dart';
 
 /// DGEG (Direção-Geral de Energia e Geologia) Portuguese fuel price service.
@@ -97,18 +98,21 @@ class PortugalStationService
         _baseUrl = baseUrl,
         _fuelTypeIds = fuelTypeIds;
 
-  /// DGEG fuel type IDs we query — 95-octane petrol simples + gasóleo
-  /// (diesel) simples. Covers the two dominant fuels used by the app's
-  /// search UI.
+  /// DGEG fuel type IDs we query (#3196 — extended from the original
+  /// 95-simples + gasóleo-simples pair so the 98 / GPL merge branches in
+  /// [PortugalMergedRow.assignPrice] actually receive rows):
   ///
   /// - `3201` → Gasolina simples 95
   /// - `2101` → Gasóleo simples
+  /// - `3400` → Gasolina 98
+  /// - `3405` → Gasolina especial 98
+  /// - `3205` → Gasolina especial 95
+  /// - `1120` → GPL Auto
   ///
-  /// Other IDs exist (e.g. 3205 = Gasolina especial 95, 2105 = Gasóleo
-  /// especial, and various LPG/98/E85 variants) and can be added later
-  /// without changing the service's public shape — [_mergeInto] already
-  /// dispatches on the `Combustivel` label, not on the ID.
-  static const String defaultFuelTypeIds = '3201,2101';
+  /// (IDs confirmed against the live `GetTiposCombustiveis` listing,
+  /// 2026-06-10.) The merge dispatches on the `Combustivel` label, not on
+  /// the ID, and an "especial" grade never overwrites its plain sibling.
+  static const String defaultFuelTypeIds = '3201,2101,3400,3405,3205,1120';
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -192,7 +196,7 @@ class PortugalStationService
     required double lng,
     required double radiusKm,
   }) {
-    final byId = <int, _MergedRow>{};
+    final byId = <int, PortugalMergedRow>{};
 
     for (final item in resultado) {
       if (item is! Map) continue;
@@ -204,7 +208,7 @@ class PortugalStationService
 
         final existing = byId[id];
         final merged = existing ??
-            _MergedRow(
+            PortugalMergedRow(
               id: id,
               name: item['Nome']?.toString() ?? '',
               brand: item['Marca']?.toString() ?? '',
@@ -220,6 +224,10 @@ class PortugalStationService
         final price = _parsePriceEur(item['Preco']);
         final fuel = item['Combustivel']?.toString() ?? '';
         merged.assignPrice(fuel, price);
+        // #3196 — surface the DGEG per-row `DataAtualizacao`
+        // ("2026-06-08 10:30"); the freshest row wins (the format sorts
+        // lexicographically).
+        merged.noteUpdatedAt(item['DataAtualizacao']?.toString());
 
         byId[id] = merged;
       } catch (e, st) {
@@ -250,6 +258,7 @@ class PortugalStationService
         diesel: row.gasoleo,
         lpg: row.gpl,
         isOpen: true,
+        updatedAt: row.formattedUpdatedAt,
       ));
     }
 
@@ -351,51 +360,5 @@ class PortugalStationService
     List<String> ids,
   ) async {
     return emptyPricesResult(ServiceSource.portugalApi);
-  }
-}
-
-/// Mutable accumulator used while merging DGEG rows for the same
-/// station Id across fuel types.
-class _MergedRow {
-  final int id;
-  final String name;
-  final String brand;
-  final String street;
-  final String postCode;
-  final String place;
-  final double lat;
-  final double lng;
-
-  double? gasolina95;
-  double? gasolina98;
-  double? gasoleo;
-  double? gpl;
-
-  _MergedRow({
-    required this.id,
-    required this.name,
-    required this.brand,
-    required this.street,
-    required this.postCode,
-    required this.place,
-    required this.lat,
-    required this.lng,
-  });
-
-  void assignPrice(String fuelLabel, double? price) {
-    if (price == null) return;
-    final label = fuelLabel.toLowerCase();
-    // Order matters: check "98" before the generic "95" contains check.
-    if (label.contains('98')) {
-      gasolina98 = price;
-    } else if (label.contains('95')) {
-      gasolina95 = price;
-    } else if (label.contains('gasóleo') ||
-        label.contains('gasoleo') ||
-        label.contains('diesel')) {
-      gasoleo = price;
-    } else if (label.contains('gpl')) {
-      gpl = price;
-    }
   }
 }
