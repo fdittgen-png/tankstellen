@@ -1,0 +1,95 @@
+{
+ "last_updated": "10/06/2026 11:00:00",
+ "stations": [
+  {
+   "site_id": "gcw2q069jsyn",
+   "brand": "Asda",
+   "address": "ASDA Sportcity, Ashton New Road, Manchester",
+   "postcode": "M11 4BD",
+   "location": {
+    "latitude": 53.484036,
+    "longitude": -2.195119
+   },
+   "prices": {
+    "E10": 152.7,
+    "B7": 179.7
+   }
+  },
+  {
+   "site_id": "gcw2mtw4v991",
+   "brand": "Asda",
+   "address": "Harpurhey Shopping Centre, Manchester",
+   "postcode": "M9 4DJ",
+   "location": {
+    "latitude": 53.512129,
+    "longitude": -2.21045
+   },
+   "prices": {
+    "E10": 151.9,
+    "B7": 177.9
+   }
+  },
+  {
+   "site_id": "gcw2hukcer48",
+   "brand": "Asda",
+   "address": "100 Princess Road, Manchester",
+   "postcode": "M15 5AS",
+   "location": {
+    "latitude": 53.461141,
+    "longitude": -2.245531
+   },
+   "prices": {
+    "E10": 156.7,
+    "B7": 180.7
+   }
+  },
+  {
+   "site_id": "gcw2hn1fbpye",
+   "brand": "Esso",
+   "address": "Trafford Road, Salford",
+   "postcode": "M5 3AW",
+   "location": {
+    "latitude": 53.468884,
+    "longitude": -2.282588
+   },
+   "prices": {
+    "E10": 160.9,
+    "E5": 179.9,
+    "B7": 189.9,
+    "SDV": 208.9
+   }
+  },
+  {
+   "site_id": "gcw2m4fevefe",
+   "brand": "Esso",
+   "address": "490 Cheetham Hill Road, Manchester",
+   "postcode": "M8 0PL",
+   "location": {
+    "latitude": 53.507087,
+    "longitude": -2.239212
+   },
+   "prices": {
+    "E10": 163.9,
+    "E5": 182.9,
+    "B7": 189.9,
+    "SDV": 208.9
+   }
+  },
+  {
+   "site_id": "gcw2j31kpsdv",
+   "brand": "Esso",
+   "address": "32 Wilbraham Road, Fallowfield",
+   "postcode": "M14 7DW",
+   "location": {
+    "latitude": 53.443663,
+    "longitude": -2.228141
+   },
+   "prices": {
+    "E10": 155.9,
+    "E5": 174.9,
+    "B7": 185.9,
+    "SDV": 204.9
+   }
+  }
+ ]
+}

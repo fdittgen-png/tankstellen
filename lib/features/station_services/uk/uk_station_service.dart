@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -77,6 +78,12 @@ class UkStationService with StationServiceHelpers implements StationService {
     'https://www.rontec-servicestations.co.uk/fuel-prices/data/fuel_prices_data.json',
     'https://api.sainsburys.co.uk/v1/exports/latest/fuel_prices_data.json',
     'https://www.sgnretail.uk/files/data/SGN_daily_fuel_prices.json',
+    // #3191 — Shell's CMA entry point. The .html URL 302-redirects to a
+    // SAS-tokened Azure blob (prodpricinghubstrgacct.blob.core.windows.net)
+    // whose token rotates, so the stable page URL is listed and Dio's
+    // default followRedirects handles the hop. The blob answers
+    // `application/octet-stream`, which [_fetchFeed] decodes itself.
+    'https://www.shell.co.uk/fuel-prices-data.html',
     'https://www.tesco.com/fuel_prices/fuel_prices_data.json',
   ];
 
@@ -139,7 +146,13 @@ class UkStationService with StationServiceHelpers implements StationService {
         return null;
       }
 
-      final data = response.data;
+      // #3191 — Dio only auto-decodes JSON mime types; the Shell feed's
+      // Azure blob answers `application/octet-stream`, leaving a raw String
+      // body. Decode it ourselves before the shape checks.
+      var data = response.data;
+      if (data is String && data.trimLeft().startsWith(RegExp(r'[\[{]'))) {
+        data = jsonDecode(data);
+      }
       if (data is Map<String, dynamic>) {
         final list = data['stations'] as List<dynamic>? ??
             data['data'] as List<dynamic>? ??
@@ -219,8 +232,11 @@ class UkStationService with StationServiceHelpers implements StationService {
           dist: dist,
           e5: _parsePence(prices['E5'] ?? prices['unleaded']),
           e10: _parsePence(prices['E10']),
-          e98: _parsePence(prices['super_unleaded'] ?? prices['E5_97']),
+          // #3191 — the CMA schema's premium-diesel key is `SDV`. The old
+          // `super_unleaded` / `E5_97` keys exist in NO live feed and were
+          // wrongly mapped to e98 (no CMA feed publishes premium petrol).
           diesel: _parsePence(prices['B7'] ?? prices['diesel']),
+          dieselPremium: _parsePence(prices['SDV']),
           isOpen: true,
         ));
       } catch (e, st) {
