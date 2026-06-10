@@ -137,27 +137,6 @@ class _FoldableLayout extends StatelessWidget {
   }
 }
 
-/// Split layout: search on left, map on right.
-/// Falls back to single-column on narrow screens.
-class ResponsiveSearchLayout extends StatelessWidget {
-  final Widget searchPanel;
-  final Widget mapPanel;
-
-  const ResponsiveSearchLayout({
-    super.key,
-    required this.searchPanel,
-    required this.mapPanel,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ResponsiveLayoutWrapper(
-      compactBody: searchPanel,
-      detailBody: mapPanel,
-    );
-  }
-}
-
 /// Shared master/detail scaffold for the app's two-pane wide layouts.
 ///
 /// Delegates to [ResponsiveLayoutWrapper] so the breakpoint, the

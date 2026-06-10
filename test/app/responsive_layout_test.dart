@@ -242,50 +242,6 @@ void main() {
     });
   });
 
-  group('ResponsiveSearchLayout', () {
-    testWidgets('shows only search panel on phone', (tester) async {
-      tester.view.physicalSize = const Size(360, 640);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ResponsiveSearchLayout(
-              searchPanel: Text('Search'),
-              mapPanel: Text('Map'),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Search'), findsOneWidget);
-      expect(find.text('Map'), findsNothing);
-    });
-
-    testWidgets('shows both panels on tablet', (tester) async {
-      tester.view.physicalSize = const Size(768, 1024);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ResponsiveSearchLayout(
-              searchPanel: Text('Search'),
-              mapPanel: Text('Map'),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Search'), findsOneWidget);
-      expect(find.text('Map'), findsOneWidget);
-    });
-  });
-
   group('ResponsiveMasterDetail', () {
     // The two flex panes of the wrapper's Row are the only `Expanded`s in
     // these trees, in master-then-detail order.
