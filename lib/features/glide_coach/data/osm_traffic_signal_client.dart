@@ -4,6 +4,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/services/dio_factory.dart';
 import '../domain/entities/traffic_signal.dart';
 
 /// Thrown by [OsmTrafficSignalClient] when the Overpass query fails to
@@ -31,7 +32,10 @@ class OsmTrafficSignalException implements Exception {
 /// (`overpass-api.de`) doesn't rate-limit users on routine calls.
 ///
 /// The constructor accepts a [Dio] so tests can inject a mock; production
-/// callers can pass nothing and pick up a default [Dio] instance.
+/// callers can pass nothing and pick up a [DioFactory.create] instance —
+/// connect timeout, the app User-Agent, and the default rate limiter
+/// included, so routine glide-coach refreshes can't thundering-herd the
+/// public Overpass instance (#3175).
 ///
 /// All errors throw [OsmTrafficSignalException] — never silent. The
 /// `test/lint/no_silent_catch_test.dart` static scan enforces this and
@@ -44,7 +48,16 @@ class OsmTrafficSignalClient {
   /// when no base is configured — keeps test mocks straightforward.
   static const String endpoint = 'https://overpass-api.de/api/interpreter';
 
-  OsmTrafficSignalClient({Dio? dio}) : _dio = dio ?? Dio();
+  OsmTrafficSignalClient({Dio? dio})
+      : _dio = dio ??
+            // #3175 — was a bare Dio(), bypassing DioFactory: no connect
+            // timeout (a hung TCP connect stalled past the per-request
+            // send/receive caps), no User-Agent, and no rate limiter
+            // against overpass-api.de. The per-request 15s send/receive
+            // timeout in [fetchInBoundingBox] still applies on top.
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 10),
+            );
 
   /// Fetch every `highway=traffic_signals` node inside the bounding box
   /// described by [south] / [west] / [north] / [east].
