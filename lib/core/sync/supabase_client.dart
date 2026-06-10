@@ -42,7 +42,7 @@ class TankSyncClient {
       // (the existing client is still valid).
       return;
     }
-    await Supabase.initialize(url: cleanUrl, anonKey: cleanKey);
+    await Supabase.initialize(url: cleanUrl, publishableKey: cleanKey);
     _initialized = true;
   }
 
