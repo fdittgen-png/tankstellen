@@ -102,7 +102,7 @@ final class NearestWidgetRefreshProvider
 }
 
 String _$nearestWidgetRefreshHash() =>
-    r'47daafe8b3c4b738fd31735214fd9c195f16f649';
+    r'2f266f61976160afb58de2ba78898124e1aa79e8';
 
 /// Foreground heartbeat that rebuilds the home-screen widget — both the
 /// favorites and the nearest variants — every

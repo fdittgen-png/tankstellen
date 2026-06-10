@@ -104,13 +104,19 @@ class CacheTtl {
 class CacheKey {
   CacheKey._();
 
+  /// Search-key coordinate rounding: 3 decimals ≈ 110 m, so two nearby
+  /// queries share one cache entry. Public (#3157) so the widget
+  /// foreground heartbeat can apply the SAME "has the user actually moved
+  /// beyond the cache-key cell?" notion to its refresh gate.
+  static String roundedSearchCoord(double v) => v.toStringAsFixed(3);
+
   static String stationSearch(
     double lat, double lng, double radius, String fuelType, {
     String countryCode = '',
     String? postalCode,
     String? locationName,
   }) {
-    final base = 'search:$countryCode:${lat.toStringAsFixed(3)}:${lng.toStringAsFixed(3)}:$radius:$fuelType';
+    final base = 'search:$countryCode:${roundedSearchCoord(lat)}:${roundedSearchCoord(lng)}:$radius:$fuelType';
     // Include postal code / location name so different search inputs
     // always bypass cache even when coordinates round to the same key.
     if (postalCode != null && postalCode.isNotEmpty) return '$base:$postalCode';
