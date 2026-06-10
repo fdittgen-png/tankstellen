@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'adapter_registry.dart';
+import 'ble_adapter_state_gate.dart';
 import 'elm_byte_channel.dart';
 import 'flutter_blue_plus_elm_channel.dart';
 import 'obd2_connection_errors.dart';
@@ -74,11 +75,19 @@ class PluginBluetoothFacade implements BluetoothFacade {
     // onError. Route the rejection back through the controller so
     // the picker / VIN reader sees a typed `Obd2BluetoothOff` (or
     // the original plugin exception for any unrelated failure).
+    // #3182 — wait (bounded) for `adapterState == on` BEFORE dispatching the
+    // scan. FBP's darwin side creates the CBCentralManager lazily in the
+    // first method call and instantly rejects a scan issued while it still
+    // reports `unknown` — the first post-launch scan failed spuriously on
+    // iOS. On timeout the scan is dispatched anyway, so a genuinely-off
+    // adapter still surfaces the typed Obd2BluetoothOff via the mapping below.
     unawaited(
-      FlutterBluePlus.startScan(
-        withServices: serviceUuids.map(Guid.new).toList(),
-        timeout: timeout,
-      ).catchError((Object e, StackTrace st) {
+      waitForAdapterOn()
+          .then((_) => FlutterBluePlus.startScan(
+                withServices: serviceUuids.map(Guid.new).toList(),
+                timeout: timeout,
+              ))
+          .catchError((Object e, StackTrace st) {
         if (controller.isClosed) return;
         final mapped = _mapBluetoothError(e);
         controller.addError(mapped, st);
@@ -274,6 +283,10 @@ class PluginBluetoothFacade implements BluetoothFacade {
     );
 
     try {
+      // #3182 — same lazy-CBCentralManager gate as [scan]: the seed scan is
+      // often the FIRST BLE call of the session (the direct-by-MAC reconnect
+      // path), so it must not be rejected with state `unknown` on iOS.
+      await waitForAdapterOn();
       // withRemoteIds filters the scan to just this MAC (Android: 48-bit MAC,
       // iOS: 128-bit GUID) so the OS surfaces a fresh handle quickly without
       // sweeping the whole BLE neighbourhood.

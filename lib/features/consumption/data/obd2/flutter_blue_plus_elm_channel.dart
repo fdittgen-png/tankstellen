@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
+import 'ble_adapter_state_gate.dart';
 import 'ble_disconnect_classifier.dart';
 import 'ble_link_tuner.dart';
 import 'connection_drop_debouncer.dart';
@@ -66,10 +67,10 @@ class FlutterBluePlusElmChannel
   /// #3118 — iOS-aware. iOS CoreBluetooth's `discoverServices` is slower than
   /// Android's, so the OBDLink CX's GATT-table resolution can blow Android's
   /// tight 5 s on a cold iPhone connect. Android keeps 5 s (byte-identical).
-  static Duration get _discoverTimeout =>
-      defaultTargetPlatform == TargetPlatform.iOS
-          ? const Duration(seconds: 8)
-          : const Duration(seconds: 5);
+  /// #3182 — int SECONDS now, passed to FBP's own `timeout:` parameter (see
+  /// [discoverAndBind]) instead of an outer Dart `.timeout()`.
+  static int get _discoverTimeoutSecs =>
+      defaultTargetPlatform == TargetPlatform.iOS ? 8 : 5;
 
   /// #3014 — bound `setNotifyValue`, for the same reason: a clone that accepts
   /// the descriptor write but never ACKs would otherwise block 15 s.
@@ -80,16 +81,19 @@ class FlutterBluePlusElmChannel
   /// CoreBluetooth than Android's 4 s. #3113 only widened the `connect()` budget
   /// (iOS 7 s); this very next step still clipped at 4 s. iOS gets 7 s; Android
   /// keeps 4 s (byte-identical — the #2242/#3014 tight bound stays load-bearing).
-  static Duration get _setNotifyTimeout =>
-      defaultTargetPlatform == TargetPlatform.iOS
-          ? const Duration(seconds: 7)
-          : const Duration(seconds: 4);
+  /// #3182 — int SECONDS now, passed to FBP's own `timeout:` parameter.
+  static int get _setNotifyTimeoutSecs =>
+      defaultTargetPlatform == TargetPlatform.iOS ? 7 : 4;
 
-  /// #3118 — test seams to lock the iOS-aware post-connect budgets.
+  /// #3118 — test seams to lock the iOS-aware post-connect budgets. Kept as
+  /// [Duration]s (built from the int-seconds FBP budgets) so the existing
+  /// budget-pinning tests stay byte-identical.
   @visibleForTesting
-  static Duration get debugDiscoverTimeout => _discoverTimeout;
+  static Duration get debugDiscoverTimeout =>
+      Duration(seconds: _discoverTimeoutSecs);
   @visibleForTesting
-  static Duration get debugSetNotifyTimeout => _setNotifyTimeout;
+  static Duration get debugSetNotifyTimeout =>
+      Duration(seconds: _setNotifyTimeoutSecs);
 
   /// #3014 — best-effort MTU asked for during the bounded-connect path. Clones
   /// often reject it; the post-discovery `requestMtu` in [tuneForRecording]
@@ -310,6 +314,13 @@ class FlutterBluePlusElmChannel
   @protected
   @visibleForTesting
   Future<void> connectDevice() async {
+    // #3182 — wait (bounded, best-effort) for `adapterState == on` before ANY
+    // connect dispatch. FBP's darwin side creates the CBCentralManager lazily
+    // in the first method call and instantly rejects a connect issued while
+    // it still reports `unknown` — so a cold-launch direct connect failed
+    // spuriously on iOS. On timeout the connect proceeds, so a genuinely-off
+    // adapter still surfaces through the existing error classification.
+    await waitForAdapterOn();
     final timeout = _connectTimeout;
     if (_autoConnect) {
       // #2261 concern 2 — passive autoConnect GATT wait. No bounded timeout:
@@ -434,9 +445,16 @@ class FlutterBluePlusElmChannel
   Future<void> discoverAndBind() async {
     // #3014 — bound discoverServices on its own short budget (FBP default 15 s)
     // so a clone whose GATT table never resolves fails in ~5 s as `gattTimeout`,
-    // not a 15 s hang. The TimeoutException classifies to `gattTimeout`.
+    // not a 15 s hang.
+    // #3182 — the budget is now FBP's OWN `timeout:` parameter, not an outer
+    // Dart `.timeout()`: the outer form fired OUR TimeoutException at the
+    // budget but left FBP's GLOBAL per-device mutex held for the full 15 s
+    // default, serializing (deadlocking) every retry that followed. FBP's
+    // native timeout releases the mutex at our budget; its
+    // FlutterBluePlusException ("Timed out after Ns") still classifies as
+    // `gattTimeout` (see classifyBleOpenOutcome).
     final services =
-        await _device.discoverServices().timeout(_discoverTimeout);
+        await _device.discoverServices(timeout: _discoverTimeoutSecs);
     // #3014 — property-based discovery: adapt FBP services into the pure
     // descriptor shape, then resolve the write+notify pair by characteristic
     // PROPERTY across the known ELM families, with the registry UUIDs as a
@@ -485,7 +503,9 @@ class FlutterBluePlusElmChannel
       (c) => c.uuid.str.toLowerCase() == resolved.notifyCharUuid.toLowerCase(),
     );
     // #3014 — bound setNotifyValue on its own short budget too.
-    await _notifyChar!.setNotifyValue(true).timeout(_setNotifyTimeout);
+    // #3182 — via FBP's own `timeout:` (mutex released at our budget; the
+    // outer Dart `.timeout()` left it held up to 15 s — see above).
+    await _notifyChar!.setNotifyValue(true, timeout: _setNotifyTimeoutSecs);
     _subscription = _notifyChar!.lastValueStream.listen(
       handleNotifyBytes,
       onError: (e, st) {
@@ -680,11 +700,19 @@ class FlutterBluePlusElmChannel
   /// The raw characteristic write, behind a [protected] [visibleForTesting]
   /// seam so a fault-injection test can drive [write]'s #2900 reclassification
   /// without a real BLE stack (a real [BluetoothCharacteristic] is not
-  /// mockable). Production writes exactly as before.
+  /// mockable).
+  ///
+  /// #3182 — write mode follows the RESOLVED characteristic's properties
+  /// instead of a hardcoded `withoutResponse: true`: FBP fails loudly when
+  /// asked for a write mode the characteristic doesn't advertise, so a clone
+  /// whose write char only supports acknowledged writes could never receive a
+  /// single command. `writeWithoutResponse` is still preferred whenever the
+  /// adapter advertises it (fastest BLE write path).
   @protected
   @visibleForTesting
   Future<void> writeRaw(BluetoothCharacteristic char, List<int> bytes) =>
-      char.write(bytes, withoutResponse: true);
+      char.write(bytes,
+          withoutResponse: char.properties.writeWithoutResponse);
 
   /// #2900 test seam — prime an established session so a fault-injection test
   /// can drive [write] without the real connect path. #2907 — also wires
