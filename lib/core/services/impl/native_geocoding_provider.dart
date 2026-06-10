@@ -74,9 +74,11 @@ class NativeGeocodingProvider implements GeocodingProvider {
       // expected offline failure to a breadcrumb rather than an ERROR trace.
       // A genuine native-geocoder fault still ERROR-logs.
       if (isOfflineError(e)) {
+        // #3145 — coords bucketed to 1 decimal: triage never needs more.
         BreadcrumbCollector.add(
           'Native country detection skipped — offline',
-          detail: 'lat=$lat lng=$lng type=${e.runtimeType}',
+          detail: 'lat=${lat.toStringAsFixed(1)} '
+              'lng=${lng.toStringAsFixed(1)} type=${e.runtimeType}',
         );
         return null;
       }
@@ -102,9 +104,11 @@ class NativeGeocodingProvider implements GeocodingProvider {
       // failure is expected (falls back to "lat, lng"), so breadcrumb it
       // rather than ERROR-log. A genuine fault still persists.
       if (isOfflineError(e)) {
+        // #3145 — coords bucketed to 1 decimal: triage never needs more.
         BreadcrumbCollector.add(
           'Native reverse geocoding skipped — offline',
-          detail: 'lat=$lat lng=$lng type=${e.runtimeType}',
+          detail: 'lat=${lat.toStringAsFixed(1)} '
+              'lng=${lng.toStringAsFixed(1)} type=${e.runtimeType}',
         );
         return '$lat, $lng';
       }

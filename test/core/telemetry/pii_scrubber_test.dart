@@ -286,4 +286,59 @@ void main() {
       expect(scrubbed.serviceChainState, isNull);
     });
   });
+
+  group('key/value coordinate shapes (#3145)', () {
+    // The adjacency regex (`<num>,<num>`) misses the key/value shapes the
+    // geocoding + search call sites actually emit. These are the EXACT
+    // strings produced at those call sites — each previously survived
+    // the scrubber unredacted.
+
+    test('redacts the native-geocoding breadcrumb detail (lat=… lng=…)', () {
+      // native_geocoding_provider.dart breadcrumb detail shape.
+      const msg = 'lat=48.137154 lng=11.576124 type=PlatformException';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('48.137154')));
+      expect(out, isNot(contains('11.576124')));
+      expect(out, contains(PiiScrubber.coordMarker));
+      expect(out, contains('type=PlatformException'),
+          reason: 'the non-PII triage hint must survive');
+    });
+
+    test('redacts the nominatim breadcrumb detail (lat=… lng=… type=…)', () {
+      // nominatim_geocoding_provider.dart breadcrumb detail shape.
+      const msg =
+          'lat=48.137154 lng=11.576124 type=DioExceptionType.connectionError';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('48.137154')));
+      expect(out, isNot(contains('11.576124')));
+    });
+
+    test('redacts a map-rendered context ({lat: …, lng: …})', () {
+      // The ContextualError.toString() rendering of the search /
+      // route-search errorLogger context maps.
+      const msg = '[services] DioException [connection error] '
+          '[context={where: search_provider: tryReverseGeocode, '
+          'lat: 48.137154, lng: 11.576124}]';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('48.137154')));
+      expect(out, isNot(contains('11.576124')));
+      expect(out, contains('tryReverseGeocode'),
+          reason: 'the where hint must survive for triage');
+    });
+
+    test('redacts lon-keyed and latitude/longitude-keyed values too', () {
+      const msg = 'request lon=2.3522 latitude: 48.8566 Longitude=151.2093';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('2.3522')));
+      expect(out, isNot(contains('48.8566')));
+      expect(out, isNot(contains('151.2093')));
+    });
+
+    test('does not redact non-coordinate decimals near other words', () {
+      const msg = 'price for diesel: 1.789 at relativeError: 0.25';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, contains('1.789'));
+      expect(out, contains('0.25'));
+    });
+  });
 }

@@ -60,6 +60,17 @@ class PiiScrubber {
     r'-?\d{1,3}\.\d{2,}\s*,\s*-?\d{1,3}\.\d{2,}',
   );
 
+  /// #3145 — key/value coordinate shapes the adjacency rule above misses:
+  /// the breadcrumb details (`lat=48.13 lng=11.57`) and map-rendered
+  /// context maps (`{lat: 48.13, lng: 11.57}`) that the geocoding /
+  /// search call sites emit. Matches a lat/lng/lon(gitude) KEY followed
+  /// by `=` or `:` and a signed decimal, redacting key+value together.
+  /// Keyed so a plain price (`diesel: 1.789`) is never touched.
+  static final RegExp _coordKeyValueRegex = RegExp(
+    r'\b(?:lat|latitude|lng|lon|longitude)\s*[=:]\s*-?\d{1,3}\.\d+',
+    caseSensitive: false,
+  );
+
   /// Token-like string: at least 20 alphanumeric characters in a row,
   /// no spaces. Catches API keys, JWT segments, anonymous Supabase
   /// session ids, and station-id+coord composites. Anchored on word
@@ -82,6 +93,7 @@ class PiiScrubber {
     if (text.isEmpty) return text;
     var out = text.replaceAll(_emailRegex, emailMarker);
     out = out.replaceAll(_coordRegex, coordMarker);
+    out = out.replaceAll(_coordKeyValueRegex, coordMarker);
     out = out.replaceAll(_tokenRegex, tokenMarker);
     return out;
   }

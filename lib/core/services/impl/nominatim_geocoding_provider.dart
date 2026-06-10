@@ -137,9 +137,11 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       // to a breadcrumb rather than an ERROR trace (field traces #8/#9). A
       // genuine API error (4xx/5xx, parse) still ERROR-logs.
       if (isOfflineError(e)) {
+        // #3145 — coords bucketed to 1 decimal: triage never needs more.
         BreadcrumbCollector.add(
           'Nominatim reverse geocoding skipped — offline',
-          detail: 'lat=$lat lng=$lng type=${e.type}',
+          detail: 'lat=${lat.toStringAsFixed(1)} '
+              'lng=${lng.toStringAsFixed(1)} type=${e.type}',
         );
         return '$lat, $lng';
       }
@@ -172,9 +174,11 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       // already falls back to the next provider / null), so breadcrumb it
       // rather than ERROR-log (field traces #8/#9). Genuine errors persist.
       if (isOfflineError(e)) {
+        // #3145 — coords bucketed to 1 decimal: triage never needs more.
         BreadcrumbCollector.add(
           'Nominatim country detection skipped — offline',
-          detail: 'lat=$lat lng=$lng type=${e.type}',
+          detail: 'lat=${lat.toStringAsFixed(1)} '
+              'lng=${lng.toStringAsFixed(1)} type=${e.type}',
         );
         return null;
       }
