@@ -66,7 +66,7 @@ class PriceHistorySync {
 
     try {
       final cutoff =
-          DateTime.now().subtract(Duration(days: days)).toIso8601String();
+          DateTime.now().toUtc().subtract(Duration(days: days)).toIso8601String();
       final rows = await client
           .from('price_snapshots')
           .select()

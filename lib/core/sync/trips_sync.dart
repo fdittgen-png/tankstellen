@@ -107,7 +107,7 @@ class TripsSync {
         'id': entry.id,
         'user_id': userId,
         'data': tripDetailsJson(entry),
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       }, onConflict: 'user_id,id');
       debugPrint('TripsSync.uploadDetails: uploaded ${entry.id}');
     } catch (e, st) {
@@ -284,7 +284,7 @@ class TripsSync {
     String userId, {
     DateTime? now,
   }) {
-    final stamp = (now ?? DateTime.now()).toIso8601String();
+    final stamp = (now ?? DateTime.now()).toUtc().toIso8601String();
     final rows = <Map<String, dynamic>>[];
     for (final entry in entries) {
       if (entry.samples.isEmpty && entry.gpsSampleDiagnostics.isEmpty) {
@@ -372,7 +372,7 @@ class TripsSync {
       // (samples + gpsd) goes to `public.trip_details` in
       // [uploadDetails] right after.
       'data': compactSummaryJson(entry),
-      'updated_at': (now ?? DateTime.now()).toIso8601String(),
+      'updated_at': (now ?? DateTime.now()).toUtc().toIso8601String(),
     };
   }
 

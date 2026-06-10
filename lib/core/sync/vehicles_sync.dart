@@ -75,7 +75,7 @@ class VehiclesSync {
                   'id': v.id,
                   'user_id': userId,
                   'data': v.toJson(),
-                  'updated_at': DateTime.now().toIso8601String(),
+                  'updated_at': DateTime.now().toUtc().toIso8601String(),
                 })
             .toList();
         await client

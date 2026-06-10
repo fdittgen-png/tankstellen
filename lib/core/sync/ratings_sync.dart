@@ -46,7 +46,7 @@ class RatingsSync {
         'station_id': stationId,
         'rating': rating,
         'is_shared': shared,
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       }, onConflict: 'user_id,station_id');
       debugPrint(
           'RatingsSync.upsert: $stationId = $rating stars (shared=$shared)');
@@ -70,7 +70,7 @@ class RatingsSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
 
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
     final rows = ratings.entries
         .map((e) => {
               'user_id': userId,

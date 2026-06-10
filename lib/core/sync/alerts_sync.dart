@@ -71,7 +71,7 @@ class AlertsSync {
                   'fuel_type': a.fuelType.name,
                   'target_price': a.targetPrice,
                   'is_active': a.isActive,
-                  'created_at': a.createdAt.toIso8601String(),
+                  'created_at': a.createdAt.toUtc().toIso8601String(),
                 })
             .toList();
         await client.from('alerts').upsert(rows, onConflict: 'id');

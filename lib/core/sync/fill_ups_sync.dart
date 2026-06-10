@@ -72,7 +72,7 @@ class FillUpsSync {
                   'vehicle_id': f.vehicleId,
                   'recorded_at': f.date.toIso8601String(),
                   'data': f.toJson(),
-                  'updated_at': DateTime.now().toIso8601String(),
+                  'updated_at': DateTime.now().toUtc().toIso8601String(),
                 })
             .toList();
         await client

@@ -44,7 +44,7 @@ class ItinerariesSync {
         'avoid_highways': itinerary.avoidHighways,
         'fuel_type': itinerary.fuelType,
         'selected_station_ids': itinerary.selectedStationIds,
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       }, onConflict: 'id');
       debugPrint('ItinerariesSync.save: saved "${itinerary.name}"');
       return true;

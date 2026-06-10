@@ -47,7 +47,7 @@ class DeletionsSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
 
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
     final rows = ids
         .map((id) => {
               'user_id': userId,
