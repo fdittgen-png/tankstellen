@@ -178,8 +178,9 @@ void main() {
       expect(result.source, ServiceSource.portugalApi);
     });
 
-    test('defaultFuelTypeIds covers 95 simples + gasoleo simples', () {
-      expect(PortugalStationService.defaultFuelTypeIds, '3201,2101');
+    test('defaultFuelTypeIds covers the full known DGEG id set (#3196)', () {
+      expect(PortugalStationService.defaultFuelTypeIds,
+          '3201,2101,3400,3405,3205,1120');
     });
   });
 
@@ -206,7 +207,8 @@ void main() {
       expect(adapter.calls, hasLength(1));
       final call = adapter.calls.single;
       expect(call.uri.path, endsWith('/PesquisarPostos'));
-      expect(call.uri.queryParameters['idsTiposComb'], '3201,2101');
+      expect(call.uri.queryParameters['idsTiposComb'],
+          '3201,2101,3400,3405,3205,1120');
       expect(call.uri.queryParameters['pagina'], '1');
     });
 

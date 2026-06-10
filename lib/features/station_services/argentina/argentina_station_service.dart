@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'argentina_fuel_classifier.dart';
+import 'argentina_raw_station.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/cache/cache_manager.dart';
@@ -64,18 +65,18 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
   final String _csvUrl;
 
   /// #2264 — disk persistence (read-through), or null when no cache is wired.
-  final PersistentDataset<List<_RawStation>>? _persistent;
+  final PersistentDataset<List<ArgentinaRawStation>>? _persistent;
 
   /// #2264 — soft/hard dataset TTLs mirror the AR FuelServicePolicy (soft 6 h,
   /// hard 24 h); the legacy 6-hour in-memory TTL is the soft bound now.
   static const Duration _softTtl = Duration(hours: 6);
   static const Duration _hardTtl = Duration(hours: 24);
 
-  static PersistentDataset<List<_RawStation>>? _buildPersistent(
+  static PersistentDataset<List<ArgentinaRawStation>>? _buildPersistent(
     CacheStrategy? cache,
   ) {
     if (cache == null) return null;
-    return PersistentDataset<List<_RawStation>>(
+    return PersistentDataset<List<ArgentinaRawStation>>(
       cache: cache,
       countryCode: 'AR',
       datasetName: 'stations',
@@ -85,14 +86,14 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
         final list = json['rows'] as List<dynamic>?;
         if (list == null) return null;
         return list
-            .map((j) => _RawStation.fromJson(Map<String, dynamic>.from(j as Map)))
+            .map((j) => ArgentinaRawStation.fromJson(Map<String, dynamic>.from(j as Map)))
             .toList();
       },
     );
   }
 
   // Cache parsed stations
-  List<_RawStation>? _cachedStations;
+  List<ArgentinaRawStation>? _cachedStations;
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -104,10 +105,10 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
 
       final stations = <Station>[];
       // Group prices by station address (unique key: empresa+direccion+localidad)
-      final stationMap = <String, _MergedStation>{};
+      final stationMap = <String, ArgentinaMergedStation>{};
 
       // First pass: find all stations within radius
-      final nearbyRaw = <({_RawStation raw, double dist})>[];
+      final nearbyRaw = <({ArgentinaRawStation raw, double dist})>[];
       for (final raw in _cachedStations!) {
         if (raw.lat == 0 || raw.lng == 0) continue;
         final dist = distanceKm(params.lat, params.lng, raw.lat, raw.lng);
@@ -122,12 +123,21 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
         filtered = nearbyRaw.sortedBy<num>((e) => e.dist).take(200).toList();
       }
 
-      for (final entry in filtered) {
+      // #3196 — prefer DAYTIME (tipohorario=diurno) prices: stable-sort the
+      // diurno rows first so the first-wins `??=` merge below picks the
+      // diurno price whenever a station publishes both diurno and nocturno
+      // rows for the same product, regardless of CSV row order.
+      final mergeOrder = [
+        ...filtered.where((e) => e.raw.tipoHorario == 'diurno'),
+        ...filtered.where((e) => e.raw.tipoHorario != 'diurno'),
+      ];
+
+      for (final entry in mergeOrder) {
         final raw = entry.raw;
         final dist = entry.dist;
 
         final key = '${raw.empresa}|${raw.direccion}|${raw.localidad}';
-        final merged = stationMap.putIfAbsent(key, () => _MergedStation(
+        final merged = stationMap.putIfAbsent(key, () => ArgentinaMergedStation(
           raw: raw,
           dist: dist,
         ));
@@ -230,7 +240,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
         haystack.contains('HANDSHAKE');
   }
 
-  Future<List<_RawStation>> _fetchCsv({CancelToken? cancelToken}) async {
+  Future<List<ArgentinaRawStation>> _fetchCsv({CancelToken? cancelToken}) async {
     final response = await _dio.get<String>(_csvUrl, cancelToken: cancelToken);
     return compute(_parseCsv, response.data ?? '');
   }
@@ -239,7 +249,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
     final persistent = _persistent;
     if (persistent == null) {
       // No cache wired (unit tests) — preserve the legacy in-memory path.
-      return loadDataset<List<_RawStation>>(
+      return loadDataset<List<ArgentinaRawStation>>(
         cached: _cachedStations,
         ttl: const Duration(hours: 6),
         fetch: () => _fetchCsv(cancelToken: cancelToken),
@@ -247,7 +257,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
       );
     }
     // #2264 — disk read-through: survives cold start + offline.
-    return loadPersistentDataset<List<_RawStation>>(
+    return loadPersistentDataset<List<ArgentinaRawStation>>(
       cached: _cachedStations,
       softTtl: _softTtl,
       hardTtl: _hardTtl,
@@ -270,8 +280,8 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
     'longitud',
   ];
 
-  static List<_RawStation> _parseCsv(String csv) {
-    final stations = <_RawStation>[];
+  static List<ArgentinaRawStation> _parseCsv(String csv) {
+    final stations = <ArgentinaRawStation>[];
     final lines = const LineSplitter().convert(csv);
 
     // First line is header — validate structure as MITM protection
@@ -298,7 +308,7 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
       final precio = double.tryParse(parts[12]) ?? 0;
       if (precio <= 0) continue;
 
-      stations.add(_RawStation(
+      stations.add(ArgentinaRawStation(
         empresa: parts[3],
         direccion: parts[4],
         localidad: parts[5],
@@ -309,6 +319,8 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
         bandera: parts[15],
         lat: lat,
         lng: lng,
+        // #3196 — col 11 is `tipohorario` (Diurno/Nocturno).
+        tipoHorario: parts[11].trim().toLowerCase(),
       ));
     }
     return stations;
@@ -323,70 +335,4 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
   Future<ServiceResult<Map<String, StationPrices>>> getPrices(List<String> ids) async {
     return emptyPricesResult(ServiceSource.argentinaApi);
   }
-}
-
-class _RawStation {
-  final String empresa;
-  final String direccion;
-  final String localidad;
-  final String provincia;
-  final String producto;
-  final double precio;
-  final String fechaVigencia;
-  final String bandera;
-  final double lat;
-  final double lng;
-
-  const _RawStation({
-    required this.empresa,
-    required this.direccion,
-    required this.localidad,
-    required this.provincia,
-    required this.producto,
-    required this.precio,
-    required this.fechaVigencia,
-    required this.bandera,
-    required this.lat,
-    required this.lng,
-  });
-
-  /// #2264 — compact JSON for the persisted dataset (single-letter keys keep
-  /// the ~700 KB national CSV's Hive footprint down).
-  Map<String, dynamic> toJson() => {
-        'e': empresa,
-        'd': direccion,
-        'l': localidad,
-        'pv': provincia,
-        'pr': producto,
-        'p': precio,
-        'f': fechaVigencia,
-        'b': bandera,
-        'la': lat,
-        'lo': lng,
-      };
-
-  factory _RawStation.fromJson(Map<String, dynamic> j) => _RawStation(
-        empresa: j['e'] as String? ?? '',
-        direccion: j['d'] as String? ?? '',
-        localidad: j['l'] as String? ?? '',
-        provincia: j['pv'] as String? ?? '',
-        producto: j['pr'] as String? ?? '',
-        precio: (j['p'] as num?)?.toDouble() ?? 0,
-        fechaVigencia: j['f'] as String? ?? '',
-        bandera: j['b'] as String? ?? '',
-        lat: (j['la'] as num?)?.toDouble() ?? 0,
-        lng: (j['lo'] as num?)?.toDouble() ?? 0,
-      );
-}
-
-class _MergedStation {
-  final _RawStation raw;
-  final double dist;
-  double? naftaRegular;
-  double? naftaPremium;
-  double? dieselRegular;
-  double? dieselPremium;
-  double? gnc;
-
-  _MergedStation({required this.raw, required this.dist});
 }

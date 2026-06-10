@@ -61,10 +61,14 @@ Dio _dioWith(Map<String, Object> responses) {
 }
 
 /// Standard CMA-format feed payload for the given site.
+///
+/// #3191 — the schema mirrors the REAL feeds (see
+/// `test/fixtures/uk_asda_cma_slice.json`): there is NO `site_name` field
+/// (the old fixture invented one, making the name tests false-green); the
+/// display name falls back to `brand`.
 String _cmaFeed({
   required String siteId,
   required String brand,
-  required String name,
   required double lat,
   required double lng,
   double e5 = 155.9,
@@ -79,7 +83,6 @@ String _cmaFeed({
       {
         'site_id': siteId,
         'brand': brand,
-        'site_name': name,
         'address': address,
         'postcode': postcode,
         'town': 'London',
@@ -131,14 +134,12 @@ void main() {
         bpUrl: _cmaFeed(
           siteId: 'BP1',
           brand: 'BP',
-          name: 'BP Victoria',
           lat: 51.4975,
           lng: -0.1357,
         ),
         tescoUrl: _cmaFeed(
           siteId: 'TES1',
           brand: 'Tesco',
-          name: 'Tesco Extra',
           lat: 51.5001,
           lng: -0.12,
           e5: 150.0,
@@ -167,7 +168,6 @@ void main() {
         bpUrl: _cmaFeed(
           siteId: 'BP1',
           brand: 'BP',
-          name: 'BP Victoria',
           lat: 51.4975,
           lng: -0.1357,
         ),
@@ -208,7 +208,6 @@ void main() {
         good: _cmaFeed(
           siteId: 'G1',
           brand: 'Good',
-          name: 'Good Station',
           lat: 51.5,
           lng: -0.12,
         ),
@@ -234,7 +233,6 @@ void main() {
       final payload = _cmaFeed(
         siteId: 'DUPLICATE',
         brand: 'Shared',
-        name: 'Shared Station',
         lat: 51.5,
         lng: -0.12,
       );
@@ -258,14 +256,12 @@ void main() {
           {
             'site_id': 'LON',
             'brand': 'BP',
-            'site_name': 'London',
             'location': {'latitude': 51.5, 'longitude': -0.12},
             'prices': <String, dynamic>{},
           },
           {
             'site_id': 'EDI',
             'brand': 'BP',
-            'site_name': 'Edinburgh',
             'location': {'latitude': 55.9533, 'longitude': -3.1883},
             'prices': <String, dynamic>{},
           },
@@ -280,7 +276,7 @@ void main() {
         const SearchParams(lat: 51.5, lng: -0.12, radiusKm: 20),
       );
       expect(result.data, hasLength(1));
-      expect(result.data.first.name, 'London');
+      expect(result.data.first.id, 'uk-LON');
     });
 
     test('logs per-feed DioException failures (release breadcrumb #2301)',
@@ -306,7 +302,6 @@ void main() {
         good: _cmaFeed(
           siteId: 'G1',
           brand: 'Good',
-          name: 'Good Station',
           lat: 51.5,
           lng: -0.12,
         ),
@@ -350,7 +345,6 @@ void main() {
       final stations = parse([
         {
           'site_id': 'ABC123',
-          'site_name': 'BP Victoria Street',
           'brand': 'BP',
           'address': '123 Victoria Street',
           'postcode': 'SW1E 6DE',
@@ -363,7 +357,8 @@ void main() {
       expect(stations, hasLength(1));
       final s = stations.first;
       expect(s.id, 'uk-ABC123');
-      expect(s.name, 'BP Victoria Street');
+      // #3191 — no site_name in the real schema: the name is the brand.
+      expect(s.name, 'BP');
       expect(s.brand, 'BP');
       expect(s.street, '123 Victoria Street');
       expect(s.postCode, 'SW1E 6DE');
@@ -378,7 +373,6 @@ void main() {
       final stations = parse([
         {
           'site_id': 1,
-          'site_name': 'Already pounds',
           'brand': 'Shell',
           'location': {'latitude': 51.5, 'longitude': -0.12},
           'prices': {'E10': 1.459, 'B7': 1.529},
@@ -389,13 +383,12 @@ void main() {
       expect(stations.first.diesel, 1.529);
     });
 
-    test('supports alternate field names (lat/lng, unleaded, super_unleaded)',
-        () {
+    test('supports alternate field names (lat/lng, unleaded, diesel) and '
+        'maps SDV to dieselPremium (#3191)', () {
       final stations = parse(
         [
           {
             'site_id': 'SITE42',
-            'site_name': 'Tesco Extra',
             'brand': 'Tesco',
             'address': 'Retail Park',
             'postcode': 'M1 1AA',
@@ -406,7 +399,10 @@ void main() {
               'unleaded': 144.9,
               'E10': 142.9,
               'diesel': 151.9,
-              'super_unleaded': 158.9,
+              'SDV': 158.9,
+              // #3191 — `super_unleaded` exists in NO live CMA feed and must
+              // no longer be mapped (it used to land in e98).
+              'super_unleaded': 199.9,
             },
           },
         ],
@@ -421,41 +417,39 @@ void main() {
       expect(s.e5, closeTo(1.449, 0.0001));
       expect(s.e10, closeTo(1.429, 0.0001));
       expect(s.diesel, closeTo(1.519, 0.0001));
-      expect(s.e98, closeTo(1.589, 0.0001));
+      expect(s.dieselPremium, closeTo(1.589, 0.0001));
+      expect(s.e98, isNull);
     });
 
     test('skips stations with missing coordinates', () {
       final stations = parse([
-        {'site_id': 1, 'site_name': 'No coords', 'prices': <String, dynamic>{}},
+        {'site_id': 1, 'prices': <String, dynamic>{}},
         {
           'site_id': 2,
-          'site_name': 'With coords',
           'location': {'latitude': 51.5, 'longitude': -0.12},
           'prices': <String, dynamic>{},
         },
       ]);
       expect(stations, hasLength(1));
-      expect(stations.first.name, 'With coords');
+      expect(stations.first.id, 'uk-2');
     });
 
     test('sorts stations by distance ascending', () {
       final stations = parse([
         {
           'site_id': 'FAR',
-          'site_name': 'Far',
           'location': {'latitude': 51.52, 'longitude': -0.12},
           'prices': <String, dynamic>{},
         },
         {
           'site_id': 'NEAR',
-          'site_name': 'Near',
           'location': {'latitude': 51.5001, 'longitude': -0.12},
           'prices': <String, dynamic>{},
         },
       ]);
       expect(stations, hasLength(2));
-      expect(stations.first.name, 'Near');
-      expect(stations.last.name, 'Far');
+      expect(stations.first.id, 'uk-NEAR');
+      expect(stations.last.id, 'uk-FAR');
     });
 
     test('caps results at 50 stations', () {
@@ -463,7 +457,6 @@ void main() {
         120,
         (i) => {
           'site_id': 'S$i',
-          'site_name': 'S$i',
           'location': {'latitude': 51.5 + i * 0.0001, 'longitude': -0.12},
           'prices': <String, dynamic>{},
         },
@@ -473,23 +466,23 @@ void main() {
       expect(stations.length, 50);
     });
 
-    test('dedupes by site_id within a single payload', () {
+    test('dedupes by site_id within a single payload (first record wins)', () {
       final stations = parse([
         {
           'site_id': 'DUP',
-          'site_name': 'First',
+          'brand': 'First',
           'location': {'latitude': 51.5, 'longitude': -0.12},
           'prices': <String, dynamic>{},
         },
         {
           'site_id': 'DUP',
-          'site_name': 'Second',
+          'brand': 'Second',
           'location': {'latitude': 51.5, 'longitude': -0.12},
           'prices': <String, dynamic>{},
         },
       ]);
       expect(stations, hasLength(1));
-      expect(stations.first.name, 'First');
+      expect(stations.first.brand, 'First');
     });
 
     // #2199 — SafeJsonAccessors regression coverage. These pin the
@@ -503,7 +496,6 @@ void main() {
       final stations = parse([
         {
           'site_id': 'STR',
-          'site_name': 'String Coords',
           'brand': 'BP',
           'location': {'latitude': '51.5', 'longitude': '-0.12'},
           'prices': {'E5': 145.9},
@@ -519,7 +511,6 @@ void main() {
       final stations = parse([
         {
           'site_id': 'BAD',
-          'site_name': 'Bad Coords',
           'location': {'latitude': 'not-a-number', 'longitude': '-0.12'},
           'prices': <String, dynamic>{},
         },
@@ -533,7 +524,6 @@ void main() {
       final stations = parse([
         {
           'site_id': 'NOPRICE',
-          'site_name': 'No Prices',
           'location': {'latitude': 51.5, 'longitude': -0.12},
           'prices': 'not a map',
         },

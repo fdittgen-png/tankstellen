@@ -189,7 +189,12 @@ void main() {
   group('MITECO REAL search parse (via the real service + fixed Dio)', () {
     test('parses a full station record incl. the es- id prefix (#753)',
         () async {
-      final stations = await searchMitecoStations([repsolMadrid()]);
+      // #3189 — isOpen is schedule-derived now; fix the clock inside the
+      // L-D: 06:00-22:00 window so the assertion is deterministic.
+      final stations = await searchMitecoStations(
+        [repsolMadrid()],
+        now: () => DateTime(2026, 6, 10, 12, 0),
+      );
       final s = stations.firstWhere((s) => s.id == 'es-1234');
 
       // #753 — the real parse prefixes the bare IDEESS with `es-`; the divergent
@@ -212,7 +217,9 @@ void main() {
       expect(s.cng, closeTo(1.199, 0.001));
       expect(s.isOpen, isTrue);
       expect(s.openingHoursText, 'L-D: 06:00-22:00');
-      expect(s.stationType, 'D');
+      // #3189 — Margen (road side D/I/N) is no longer mapped: it violated
+      // the stationType R/A contract.
+      expect(s.stationType, isNull);
     });
 
     test('drops records with missing coordinates', () async {

@@ -195,11 +195,16 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
         if (lat == 0 || lng == 0) return null;
 
         final prices = r['prices'] as List<dynamic>? ?? [];
-        double? e5, diesel;
+        // #3187 — OK feed grades (live 2026-06-10): "Blyfri 95",
+        // "Svovlfri Diesel", "Oktan 100". The 100-octane grade gets its own
+        // exact match so it lands in e98, never in a regular slot.
+        double? e5, e98, diesel;
         for (final p in prices) {
-          final name = (p['product_name']?.toString() ?? '').toLowerCase();
+          final name = (p['product_name']?.toString() ?? '').trim().toLowerCase();
           final price = (p['price'] as num?)?.toDouble();
-          if (name.contains('95') || name.contains('blyfri')) {
+          if (name == 'oktan 100') {
+            e98 ??= price;
+          } else if (name.contains('95') || name.contains('blyfri')) {
             e5 ??= price;
           } else if (name.contains('diesel')) {
             diesel ??= price;
@@ -222,6 +227,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           dist: 0,
           e5: e5,
           e10: e5,
+          e98: e98,
           diesel: diesel,
           isOpen: true,
           updatedAt: _formatIsoTime(r['last_updated_time']?.toString()),
@@ -252,14 +258,26 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
         if (lat == 0 || lng == 0) return null;
 
         final prices = r['prices'] as List<dynamic>? ?? [];
-        double? e5, diesel;
+        // #3187 — exact product-name mapping. The live feed lists
+        // "V-Power Diesel" BEFORE "FuelSave Diesel" at ~76% of stations, so a
+        // `contains('diesel')` first-wins matcher stamped the PREMIUM price as
+        // regular diesel. Grades (live 2026-06-10): "V-Power Diesel"
+        // (premium diesel), "FuelSave Diesel" (regular), "V-Power" (octane-98
+        // petrol), "Blyfri 95". If a station only carries the premium grade,
+        // regular diesel stays null — never substitute premium.
+        double? e5, e98, diesel, dieselPremium;
         for (final p in prices) {
-          final name = (p['productName']?.toString() ?? '').toLowerCase();
+          final name = (p['productName']?.toString() ?? '').trim().toLowerCase();
           final price = double.tryParse(p['price']?.toString() ?? '');
-          if (name.contains('95') || name.contains('blyfri')) {
-            e5 ??= price;
-          } else if (name.contains('diesel')) {
-            diesel ??= price;
+          switch (name) {
+            case 'fuelsave diesel' || 'diesel':
+              diesel ??= price;
+            case 'v-power diesel':
+              dieselPremium ??= price;
+            case 'v-power':
+              e98 ??= price;
+            case 'blyfri 95':
+              e5 ??= price;
           }
         }
 
@@ -275,7 +293,9 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           dist: 0,
           e5: e5,
           e10: e5,
+          e98: e98,
           diesel: diesel,
+          dieselPremium: dieselPremium,
           isOpen: true,
           updatedAt: _formatIsoTime(
             (prices.isNotEmpty ? prices.first['lastUpdated'] : null)?.toString(),

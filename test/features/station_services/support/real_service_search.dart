@@ -80,14 +80,17 @@ String mitecoEnvelope(List<Map<String, dynamic>> records) => jsonEncode({
 ///
 /// [lat]/[lng] are the search centre; pick coordinates inside Spain so the
 /// per-province request actually fires (the adapter answers every province).
+/// [now] is the #3189 clock seam for the schedule-derived `isOpen`; defaults
+/// to the wall clock (pass a fixed instant when asserting on `isOpen`).
 Future<List<Station>> searchMitecoStations(
   List<Map<String, dynamic>> records, {
   double lat = 40.42,
   double lng = -3.70,
   double radiusKm = 50.0,
+  DateTime Function()? now,
 }) async {
   final dio = Dio()..httpClientAdapter = FixedJsonAdapter(mitecoEnvelope(records));
-  final service = MitecoStationService(dio: dio);
+  final service = MitecoStationService(dio: dio, now: now);
   final result = await service.searchStations(
     SearchParams(lat: lat, lng: lng, radiusKm: radiusKm),
   );

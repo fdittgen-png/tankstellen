@@ -1,0 +1,268 @@
+[
+ {
+  "stationId": "D001",
+  "brand": "Shell",
+  "owner": "Shell",
+  "street": "TESTVEJ 1",
+  "houseNumber": null,
+  "postalCode": "2500",
+  "city": "VALBY",
+  "coordinates": {
+   "latitude": "55.667926",
+   "longitude": "12.517055"
+  },
+  "prices": [
+   {
+    "fuelType": "Autobenzin",
+    "octane": "98",
+    "productName": "V-Power",
+    "price": "18.29",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   },
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "FuelSave Diesel",
+    "price": "15.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "95",
+    "productName": "Blyfri 95",
+    "price": "15.79",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   }
+  ]
+ },
+ {
+  "stationId": "D002",
+  "brand": "Shell",
+  "owner": "Shell",
+  "street": "TESTVEJ 2",
+  "houseNumber": null,
+  "postalCode": "2610",
+  "city": "RØDOVRE",
+  "coordinates": {
+   "latitude": "55.700899",
+   "longitude": "12.460803"
+  },
+  "prices": [
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "V-Power Diesel",
+    "price": "16.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "98",
+    "productName": "V-Power",
+    "price": "18.29",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "FuelSave Diesel",
+    "price": "15.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "95",
+    "productName": "Blyfri 95",
+    "price": "15.79",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   }
+  ]
+ },
+ {
+  "stationId": "D004",
+  "brand": "Shell",
+  "owner": "Shell",
+  "street": "TESTVEJ 3",
+  "houseNumber": null,
+  "postalCode": "2650",
+  "city": "HVIDOVRE",
+  "coordinates": {
+   "latitude": "55.626697",
+   "longitude": "12.476851"
+  },
+  "prices": [
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "V-Power Diesel",
+    "price": "16.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "98",
+    "productName": "V-Power",
+    "price": "18.29",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "FuelSave Diesel",
+    "price": "15.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "95",
+    "productName": "Blyfri 95",
+    "price": "15.79",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   }
+  ]
+ },
+ {
+  "stationId": "D007",
+  "brand": "Shell",
+  "owner": "Shell",
+  "street": "TESTVEJ 4",
+  "houseNumber": null,
+  "postalCode": "4700",
+  "city": "NÆSTVED",
+  "coordinates": {
+   "latitude": "55.248500",
+   "longitude": "11.764202"
+  },
+  "prices": [
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "V-Power Diesel",
+    "price": "16.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "98",
+    "productName": "V-Power",
+    "price": "18.29",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "FuelSave Diesel",
+    "price": "15.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "95",
+    "productName": "Blyfri 95",
+    "price": "15.79",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:06.090"
+   }
+  ]
+ },
+ {
+  "stationId": "D008",
+  "brand": "Shell",
+  "owner": "Shell",
+  "street": "TESTVEJ 5",
+  "houseNumber": null,
+  "postalCode": "4900",
+  "city": "NAKSKOV",
+  "coordinates": {
+   "latitude": "54.831261",
+   "longitude": "11.145784"
+  },
+  "prices": [
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "V-Power Diesel",
+    "price": "16.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "98",
+    "productName": "V-Power",
+    "price": "18.29",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   },
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "FuelSave Diesel",
+    "price": "15.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "95",
+    "productName": "Blyfri 95",
+    "price": "15.79",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   }
+  ]
+ },
+ {
+  "stationId": "D009",
+  "brand": "Shell",
+  "owner": "Shell",
+  "street": "TESTVEJ 6",
+  "houseNumber": null,
+  "postalCode": "5210",
+  "city": "ODENSE NV",
+  "coordinates": {
+   "latitude": "55.415025",
+   "longitude": "10.320543"
+  },
+  "prices": [
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "V-Power Diesel",
+    "price": "16.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   },
+   {
+    "fuelType": "Autodiesel",
+    "octane": null,
+    "productName": "FuelSave Diesel",
+    "price": "15.59",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   },
+   {
+    "fuelType": "Autobenzin",
+    "octane": "95",
+    "productName": "Blyfri 95",
+    "price": "15.79",
+    "currency": "DKK",
+    "lastUpdated": "2026-06-10T14:10:00.000"
+   }
+  ]
+ }
+]
