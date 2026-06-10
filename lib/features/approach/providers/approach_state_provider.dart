@@ -3,6 +3,10 @@
 
 import 'dart:async';
 
+// #3153 — for the `.select` rebuild-slicing modifier (riverpod_annotation's
+// internals export does not surface the extension).
+import 'package:flutter_riverpod/flutter_riverpod.dart'
+    show ProviderListenableSelect;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
@@ -45,7 +49,13 @@ part 'approach_state_provider.g.dart';
 /// screen) can override the real signal for testing.
 @Riverpod(keepAlive: true)
 Stream<ApproachState> approachState(Ref ref) {
-  final tripState = ref.watch(tripRecordingProvider);
+  // #3153 — watch ONLY the isActive slice. The trip-recording provider
+  // emits a full state ~4×/s while recording; watching the whole state
+  // tore the detector (GPS subscription + ≥1 s poll timer) down and
+  // recreated it on every emit, so the poll could never fire and
+  // approach detection was starved for the entire OBD2 trip.
+  final tripActive =
+      ref.watch(tripRecordingProvider.select((s) => s.isActive));
   final profile = ref.watch(activeProfileProvider);
 
   // #2382 — gate the live detector behind the approach-overlay feature
@@ -54,7 +64,7 @@ Stream<ApproachState> approachState(Ref ref) {
   // stream stays Idle so the PiP keeps its default L/100 km layout.
   final overlayEnabled = ref.watch(approachOverlayEnabledProvider);
 
-  if (!overlayEnabled || !tripState.isActive || profile == null) {
+  if (!overlayEnabled || !tripActive || profile == null) {
     return Stream.value(const ApproachIdle());
   }
 

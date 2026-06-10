@@ -142,12 +142,16 @@ class _TrajetsRecordFabState extends ConsumerState<TrajetsRecordFab> {
     // back into the live recording screen — but a different label + icon
     // so the user understands tapping returns them to the live trip
     // rather than starting a new one.
-    final recordingState = ref.watch(tripRecordingProvider);
-    final isRecordingActive = recordingState.isActive;
+    // #3153 — select the two booleans this FAB renders from instead of
+    // the whole trip state, so the 4 Hz live emits during a recording
+    // don't rebuild the FAB 4×/s.
+    final isRecordingActive =
+        ref.watch(tripRecordingProvider.select((s) => s.isActive));
     // #2274 concern 2 — while a start is connecting, the recording
     // screen is already foreground showing the inline progress; reflect
     // that on the CTA too so a glance at the tab matches.
-    final isConnecting = recordingState.isConnecting;
+    final isConnecting =
+        ref.watch(tripRecordingProvider.select((s) => s.isConnecting));
     return FloatingActionButton.extended(
       key: const Key('trajets_start_recording_button'),
       onPressed: isConnecting ? null : _onStartRecording,

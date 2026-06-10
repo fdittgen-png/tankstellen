@@ -199,7 +199,7 @@ final class HapticEcoCoachLifecycleProvider
 }
 
 String _$hapticEcoCoachLifecycleHash() =>
-    r'71655a3b166a44fe287914f68cab58f66aad70fd';
+    r'9d4641838f1297884dff3cde9478d3765e256a3d';
 
 /// Active subscription that bridges the trip-recording state stream
 /// to a [HapticEcoCoach]. Held by Riverpod for the duration of an
