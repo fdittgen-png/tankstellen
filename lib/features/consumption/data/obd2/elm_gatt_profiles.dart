@@ -94,7 +94,7 @@ class ResolvedElmGatt {
 ///     Veepeak, Carista, Vgate, BlueDriver, …).
 ///   * FFE0 — HM-10 / CC254x module family (SmartOBD + many cheap clones),
 ///     usually a single dual-mode FFE1 char.
-///   * 18F0 — Scantool STN (OBDLink MX+/LX/CX).
+///   * 18F0 — Scantool STN (OBDLink MX+/LX; the CX is FFF0-family, #3180).
 ///   * 6E40… — the canonical Nordic UART Service (some firmware exposes it).
 const List<String> kElmBleServiceFamilies = [
   '0000fff0-0000-1000-8000-00805f9b34fb',

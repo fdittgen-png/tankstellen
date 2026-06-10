@@ -413,12 +413,16 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
   ),
   // OBDLink CX — Scantool's newest STN-chip BLE adapter, CAN-FD
   // capable, popular with BMW owners (#1641).
+  // #3180 — the CX does NOT use the MX+/LX 18F0/2AF1/2AF0 layout it was
+  // originally pinned to: the vendor-documented CX GATT profile is service
+  // FFF0 with notify FFF1 / write FFF2 (the Nordic-UART-style family). The
+  // wrong hint made the exact-UUID first-priority match miss on every CX.
   Obd2AdapterProfile(
     id: 'obdlink-cx',
     displayName: 'OBDLink CX',
-    serviceUuid: '000018f0-0000-1000-8000-00805f9b34fb',
-    writeCharUuid: '00002af1-0000-1000-8000-00805f9b34fb',
-    notifyCharUuid: '00002af0-0000-1000-8000-00805f9b34fb',
+    serviceUuid: '0000fff0-0000-1000-8000-00805f9b34fb',
+    writeCharUuid: '0000fff2-0000-1000-8000-00805f9b34fb',
+    notifyCharUuid: '0000fff1-0000-1000-8000-00805f9b34fb',
     nameMatchers: ['obdlink cx'],
   ),
   // Carista OBD2 — Nordic UART like vLinker but advertises as

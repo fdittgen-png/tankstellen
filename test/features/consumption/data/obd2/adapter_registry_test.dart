@@ -603,6 +603,23 @@ void main() {
           registry.resolve(_candidate(name: 'OBDLink MX+', services: []))?.id,
           'obdlink-mx');
     });
+
+    test(
+        '#3180 — the OBDLink CX profile pins the vendor-documented FFF0 '
+        'service / FFF2 write / FFF1 notify layout (NOT the MX+/LX 18F0)',
+        () {
+      final cx = registry.profiles.firstWhere((p) => p.id == 'obdlink-cx');
+      expect(cx.serviceUuid, '0000fff0-0000-1000-8000-00805f9b34fb',
+          reason: 'the real CX exposes service FFF0 — the previous 18F0 was '
+              'the MX+/LX layout and made the exact-UUID hint miss');
+      expect(cx.writeCharUuid, '0000fff2-0000-1000-8000-00805f9b34fb');
+      expect(cx.notifyCharUuid, '0000fff1-0000-1000-8000-00805f9b34fb');
+      // The MX+/LX siblings keep their custom 18F0 family untouched.
+      final mx = registry.profiles.firstWhere((p) => p.id == 'obdlink-mx');
+      final lx = registry.profiles.firstWhere((p) => p.id == 'obdlink-lx');
+      expect(mx.serviceUuid, '000018f0-0000-1000-8000-00805f9b34fb');
+      expect(lx.serviceUuid, '000018f0-0000-1000-8000-00805f9b34fb');
+    });
   });
 
   _transportForNameTests(registry);
