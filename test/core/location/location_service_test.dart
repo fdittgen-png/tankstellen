@@ -25,10 +25,14 @@ class _FakeGeolocator extends GeolocatorWrapper {
   Future<LocationPermission> requestPermission() async =>
       requestResult ?? permission;
 
+  /// #3116 — captured so the test can assert the acquisition profile.
+  LocationSettings? lastLocationSettings;
+
   @override
   Future<Position> getCurrentPosition({
     LocationSettings? locationSettings,
   }) async {
+    lastLocationSettings = locationSettings;
     if (positionToReturn != null) return positionToReturn!;
     return Position(
       latitude: 52.52,
@@ -58,6 +62,17 @@ void main() {
     setUp(() {
       fakeGeolocator = _FakeGeolocator();
       service = LocationService(fakeGeolocator);
+    });
+
+    test(
+        '#3116 — first fix uses medium accuracy + a 30s safety net (a cold '
+        'high-accuracy A11/iPhone-8 lock blew the old 10s window, killing '
+        'search + radar)', () async {
+      await service.getCurrentPosition();
+      final settings = fakeGeolocator.lastLocationSettings;
+      expect(settings, isNotNull);
+      expect(settings!.accuracy, LocationAccuracy.medium);
+      expect(settings.timeLimit, const Duration(seconds: 30));
     });
 
     test('returns position when permission granted', () async {

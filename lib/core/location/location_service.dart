@@ -47,9 +47,16 @@ class LocationService {
     }
 
     final position = await _geolocator.getCurrentPosition(
+      // #3116 — a cold high-accuracy GPS lock on older hardware (iPhone 8 / A11)
+      // routinely exceeds 10s — it waits for a satellite fix — so search AND
+      // radar (both route through here) timed out and died on the 8 while the
+      // A15 iPhone 13 cleared it in 5-8s. Use `medium` so the FIRST fix is
+      // cell/wifi-assisted and locks near-instantly on every device (~100m is
+      // ample for km-scale station search + road-snapped route starts), and
+      // give a genuinely slow lock a 30s safety net instead of 10s.
       locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 10),
+        accuracy: LocationAccuracy.medium,
+        timeLimit: Duration(seconds: 30),
       ),
     );
 
