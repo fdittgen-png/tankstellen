@@ -3,12 +3,11 @@
 
 import 'dart:async';
 
-
+import '../../../../core/logging/error_logger.dart';
 import 'adapter_registry.dart';
 import 'classic_elm_channel.dart';
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
-import '../../../../core/logging/error_logger.dart';
 
 /// Facade over the Classic Bluetooth transport for OBD2 adapters
 /// (#761 abstraction, #763 real impl).
@@ -58,8 +57,19 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
                 discoveryTransport: BluetoothTransport.classic,
               ))
           .toList();
-    } on Exception catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'PluginClassicBluetoothFacade: bondedDevices failed'}));
+    } catch (e, st) {
+      // #3106 — catch ALL throwables, not just `Exception`. This stream is
+      // StreamGroup-merged with the BLE scan in Obd2ConnectionService, so an
+      // uncaught `Error` here (e.g. a platform `MissingPluginException` is an
+      // Error, or an OOM during bonded enumeration) would tear down the MERGED
+      // stream and take BLE discovery down with it — the user would find NO
+      // adapters at all, on Android, because the Classic side blipped. Degrade
+      // gracefully to "no Classic candidates" (log it; never yield a stream
+      // error that aborts the BLE results) so BLE discovery always survives.
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'PluginClassicBluetoothFacade: bondedDevices failed — '
+            'degraded to no Classic candidates (BLE scan unaffected)',
+      }));
     }
   }
 
