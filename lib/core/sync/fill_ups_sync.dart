@@ -72,7 +72,7 @@ class FillUpsSync {
                   'vehicle_id': f.vehicleId,
                   'recorded_at': f.date.toIso8601String(),
                   'data': f.toJson(),
-                  'updated_at': DateTime.now().toIso8601String(),
+                  'updated_at': DateTime.now().toUtc().toIso8601String(),
                 })
             .toList();
         await client
@@ -91,7 +91,7 @@ class FillUpsSync {
           try {
             return FillUp.fromJson(data);
           } catch (e, st) {
-            unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.merge decode failed'}));
+            unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FillUpsSync.merge decode failed'}));
             return null;
           }
         }
@@ -100,7 +100,7 @@ class FillUpsSync {
 
       return [...liveLocal, ...downloaded];
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.merge FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FillUpsSync.merge FAILED'}));
       return localFillUps;
     }
   }
@@ -119,7 +119,7 @@ class FillUpsSync {
           .eq('id', fillUpId);
       await DeletionsSync.record('fill_ups', fillUpId); // #3078
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FillUpsSync.delete FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FillUpsSync.delete FAILED'}));
     }
   }
 }

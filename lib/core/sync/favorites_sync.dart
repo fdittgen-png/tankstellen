@@ -67,7 +67,7 @@ class FavoritesSync {
 
       return localIds.union(serverIds).toList();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FavoritesSync.merge FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FavoritesSync.merge FAILED'}));
       return localFavoriteIds;
     }
   }
@@ -90,7 +90,7 @@ class FavoritesSync {
       await DeletionsSync.record('favorites', stationId);
       debugPrint('FavoritesSync.delete: $stationId removed from server');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FavoritesSync.delete FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FavoritesSync.delete FAILED'}));
     }
   }
 }

@@ -52,7 +52,7 @@ class SyncHelper {
         await syncFn();
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'SyncHelper[$context]: sync failed'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'SyncHelper[$context]: sync failed'}));
     }
   }
 

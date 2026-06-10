@@ -126,7 +126,7 @@ class SyncState extends _$SyncState {
       // Initial sync: upload local data to server (non-blocking)
       _performInitialSync(storage);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TankSync connect failed'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TankSync connect failed'}));
       rethrow;
     }
   }
@@ -254,7 +254,7 @@ class SyncState extends _$SyncState {
       // Sync local data to the new anonymous account
       _performInitialSync(storage);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'switchToAnonymous failed'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'switchToAnonymous failed'}));
       rethrow;
     }
   }
@@ -272,7 +272,7 @@ class SyncState extends _$SyncState {
       await UserDataSync.deleteAll();
       await TankSyncClient.signOut();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Delete account failed'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'Delete account failed'}));
     }
     await disconnect();
   }
@@ -283,7 +283,7 @@ class SyncState extends _$SyncState {
     try {
       await TankSyncClient.signOut();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TankSync signOut failed'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TankSync signOut failed'}));
     }
 
     await storage.putSetting('sync_enabled', false);
@@ -308,7 +308,7 @@ class SyncState extends _$SyncState {
         await syncAndPersistRatings(storage);
         debugPrint('InitialSync: complete');
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
       }
     });
   }

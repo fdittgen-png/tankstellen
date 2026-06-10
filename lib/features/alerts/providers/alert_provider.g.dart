@@ -100,6 +100,55 @@ final class AlertsMergeFnProvider
 
 String _$alertsMergeFnHash() => r'6ec72990e3b88e6041de3ae2ae7711c643aaf6ec';
 
+/// Injectable delete-propagation function. Production code uses the real
+/// [AlertsSync.delete]; tests override this provider with a fake.
+
+@ProviderFor(alertsDeleteFn)
+final alertsDeleteFnProvider = AlertsDeleteFnProvider._();
+
+/// Injectable delete-propagation function. Production code uses the real
+/// [AlertsSync.delete]; tests override this provider with a fake.
+
+final class AlertsDeleteFnProvider
+    extends $FunctionalProvider<AlertsDeleteFn, AlertsDeleteFn, AlertsDeleteFn>
+    with $Provider<AlertsDeleteFn> {
+  /// Injectable delete-propagation function. Production code uses the real
+  /// [AlertsSync.delete]; tests override this provider with a fake.
+  AlertsDeleteFnProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'alertsDeleteFnProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$alertsDeleteFnHash();
+
+  @$internal
+  @override
+  $ProviderElement<AlertsDeleteFn> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  AlertsDeleteFn create(Ref ref) {
+    return alertsDeleteFn(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AlertsDeleteFn value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AlertsDeleteFn>(value),
+    );
+  }
+}
+
+String _$alertsDeleteFnHash() => r'ce5095f5a836ad87c3a46924b647902e6c998bcd';
+
 @ProviderFor(AlertNotifier)
 final alertProvider = AlertNotifierProvider._();
 
@@ -132,7 +181,7 @@ final class AlertNotifierProvider
   }
 }
 
-String _$alertNotifierHash() => r'0f5704e93402174bd6244293687986dc85d1f8b8';
+String _$alertNotifierHash() => r'ffc95de425cd0dd670590cf1ebe85d4e55aa7763';
 
 abstract class _$AlertNotifier extends $Notifier<List<PriceAlert>> {
   List<PriceAlert> build();

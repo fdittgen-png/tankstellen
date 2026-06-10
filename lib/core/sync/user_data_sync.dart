@@ -75,7 +75,7 @@ class UserDataSync {
         'trip_details': tripDetails,
       };
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'UserDataSync.fetchAll FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'UserDataSync.fetchAll FAILED'}));
       return {'error': e.toString()};
     }
   }
@@ -121,7 +121,7 @@ class UserDataSync {
       try {
         await client.from(entry.key).delete().eq(entry.value, userId);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st,
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
             context: {'where': 'UserDataSync.deleteAll FAILED for ${entry.key}'}));
       }
     }

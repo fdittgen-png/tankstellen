@@ -44,12 +44,12 @@ class ItinerariesSync {
         'avoid_highways': itinerary.avoidHighways,
         'fuel_type': itinerary.fuelType,
         'selected_station_ids': itinerary.selectedStationIds,
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       }, onConflict: 'id');
       debugPrint('ItinerariesSync.save: saved "${itinerary.name}"');
       return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ItinerariesSync.save FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItinerariesSync.save FAILED'}));
       return false;
     }
   }
@@ -96,7 +96,7 @@ class ItinerariesSync {
         );
       }).toList();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ItinerariesSync.fetchAll FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItinerariesSync.fetchAll FAILED'}));
       return [];
     }
   }
@@ -117,7 +117,7 @@ class ItinerariesSync {
       await DeletionsSync.record('itineraries', itineraryId); // #3078
       return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ItinerariesSync.delete FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItinerariesSync.delete FAILED'}));
       return false;
     }
   }

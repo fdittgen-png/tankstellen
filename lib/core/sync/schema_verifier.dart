@@ -75,7 +75,7 @@ class SchemaVerifier {
             .count()
             .then((_) => MapEntry(table, true))
             .catchError((Object e, StackTrace st) {
-          unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'SchemaVerifier: table check failed'}));
+          unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'SchemaVerifier: table check failed'}));
           return MapEntry(table, false);
         }),
       ),
@@ -114,7 +114,7 @@ class SchemaVerifier {
       final value = row?['value'];
       return value == null ? 0 : (int.tryParse('$value') ?? 0);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'SchemaVerifier: schema-version probe failed'}));
       return 0;
     }

@@ -47,7 +47,7 @@ class DeletionsSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
 
-    final now = DateTime.now().toIso8601String();
+    final now = DateTime.now().toUtc().toIso8601String();
     final rows = ids
         .map((id) => {
               'user_id': userId,
@@ -64,7 +64,7 @@ class DeletionsSync {
       debugPrint('DeletionsSync.record: ${ids.length} tombstone(s) '
           'for "$tableName"');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'DeletionsSync.record FAILED'}));
     }
   }
@@ -88,7 +88,7 @@ class DeletionsSync {
           .whereType<String>()
           .toSet();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'DeletionsSync.fetchTombstonedIds FAILED'}));
       return {};
     }

@@ -7,7 +7,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../features/alerts/data/models/price_alert.dart';
 import '../utils/json_extensions.dart';
+import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_helper.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Price-alert sync with Supabase, pulled out of [SyncService] (#727).
@@ -36,18 +38,29 @@ class AlertsSync {
     try {
       final serverRows =
           await client.from('alerts').select().eq('user_id', userId);
-      final serverAlertIds = serverRows
+      // #3121 — drop tombstoned ids from BOTH sides before the union so a
+      // deleted alert can't resurrect through the launch pull or another
+      // device's still-local copy (same seam as favorites/ignored, #3078).
+      final tombstoned = await DeletionsSync.fetchTombstonedIds('alerts');
+      final liveServerRows = SyncHelper.removeTombstoned(
+        serverRows,
+        tombstoned,
+        key: (r) => r.getString('id'),
+      ).toList();
+      final liveLocalAlerts =
+          localAlerts.where((a) => !tombstoned.contains(a.id)).toList();
+      final serverAlertIds = liveServerRows
           .map((r) => r.getString('id'))
           .whereType<String>()
           .toSet();
-      final localAlertIds = localAlerts.map((a) => a.id).toSet();
+      final localAlertIds = liveLocalAlerts.map((a) => a.id).toSet();
 
       debugPrint('AlertsSync.merge: local=${localAlertIds.length}, '
           'server=${serverAlertIds.length}');
 
       // Upload local-only alerts.
       final localOnly =
-          localAlerts.where((a) => !serverAlertIds.contains(a.id)).toList();
+          liveLocalAlerts.where((a) => !serverAlertIds.contains(a.id)).toList();
       if (localOnly.isNotEmpty) {
         final rows = localOnly
             .map((a) => {
@@ -58,7 +71,7 @@ class AlertsSync {
                   'fuel_type': a.fuelType.name,
                   'target_price': a.targetPrice,
                   'is_active': a.isActive,
-                  'created_at': a.createdAt.toIso8601String(),
+                  'created_at': a.createdAt.toUtc().toIso8601String(),
                 })
             .toList();
         await client.from('alerts').upsert(rows, onConflict: 'id');
@@ -66,7 +79,7 @@ class AlertsSync {
       }
 
       // Download server-only alerts.
-      final serverOnly = serverRows
+      final serverOnly = liveServerRows
           .where((r) => !localAlertIds.contains(r.getString('id')));
       final downloaded = serverOnly.map((r) {
         return PriceAlert.fromJson({
@@ -80,10 +93,36 @@ class AlertsSync {
         });
       }).toList();
 
-      return [...localAlerts, ...downloaded];
+      return [...liveLocalAlerts, ...downloaded];
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'AlertsSync.merge FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'AlertsSync.merge FAILED'}));
       return localAlerts;
     }
+  }
+
+  /// Delete a single alert row from the server and tombstone the id
+  /// (#3121). Called only when the user explicitly removes an alert on
+  /// this device — the merge path doesn't delete. Mirrors the
+  /// `FavoritesSync.delete` pattern.
+  ///
+  /// Local-first: the caller's local delete has already happened, so a
+  /// server failure is logged, not rethrown — and the `deletions`
+  /// tombstone is recorded regardless, so every later [merge] filters the
+  /// id out even when the row delete failed transiently.
+  static Future<void> delete(String id) async {
+    final client = TankSyncClient.client;
+    final userId = client?.auth.currentUser?.id;
+    if (client == null || userId == null) return;
+
+    try {
+      await client.from('alerts').delete().eq('user_id', userId).eq('id', id);
+      debugPrint('AlertsSync.delete: $id removed from server');
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'AlertsSync.delete FAILED'}));
+    }
+    // #3121 — tombstone regardless of the row-delete outcome (record has
+    // its own internal guard), so the next merge filters the id either way.
+    await DeletionsSync.record('alerts', id);
   }
 }

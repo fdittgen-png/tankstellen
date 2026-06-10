@@ -598,14 +598,12 @@ class AppInitializer {
   }
 
   /// #3077 — on app launch, pull the remaining server→local entities into
-  /// local storage so cross-device rows land without a manual sync gesture,
-  /// mirroring [_runTripsSyncMerge]. TankSync was upload-only for these:
-  /// the download branch existed in each `*_sync.dart` but had no
-  /// connect/launch caller (fill-ups + vehicles), or its return was
-  /// discarded (ratings), or it only fired on a local edit (alerts). The
-  /// per-entity pull-persist seams (`*.pullFromServer` /
-  /// `syncAndPersistRatings`) are the unit-tested units; this method is
-  /// the launch-time glue, mirroring the untested `_runTripsSyncMerge`.
+  /// local storage so cross-device rows land without a manual sync
+  /// gesture. TankSync was upload-only for these: the download branch
+  /// existed in each `*_sync.dart` but had no connect/launch caller
+  /// (fill-ups + vehicles), its return was discarded (ratings), or it only
+  /// fired on a local edit (alerts). The per-entity pull-persist seams are
+  /// the unit-tested units; this method is the launch-time glue.
   ///
   /// Consent gates (conservative — never pull data the user hasn't
   /// consented to):
@@ -618,9 +616,8 @@ class AppInitializer {
   ///   gate (`tripsSyncEnabledProvider` = email ∧ cloudSync ∧ syncTrips).
   ///
   /// No-ops cleanly when TankSync isn't initialised or the user is signed
-  /// out (each `*Sync` method short-circuits on a null user id, returning
-  /// the input unchanged). Each entity is independently error-protected so
-  /// one failing pull never blocks the others.
+  /// out. Each entity is independently error-protected AND time-budgeted
+  /// (#3128) so one failing or hung pull never blocks the others.
   static Future<void> _runEntitySyncMerge(
     ProviderContainer container,
     StorageRepository storage,
@@ -643,10 +640,13 @@ class AppInitializer {
     };
     for (final entry in pulls.entries) {
       try {
-        await entry.value();
+        await entry.value().timeout(const Duration(seconds: 15));
+      } on TimeoutException catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+            context: {'where': 'entity pull timed out', 'entity': entry.key}));
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer._runEntitySyncMerge ${entry.key} failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+            context: {'where': 'entity pull FAILED', 'entity': entry.key}));
       }
     }
   }

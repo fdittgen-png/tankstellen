@@ -66,7 +66,7 @@ class PriceHistorySync {
 
     try {
       final cutoff =
-          DateTime.now().subtract(Duration(days: days)).toIso8601String();
+          DateTime.now().toUtc().subtract(Duration(days: days)).toIso8601String();
       final rows = await client
           .from('price_snapshots')
           .select()
@@ -75,7 +75,7 @@ class PriceHistorySync {
           .order('recorded_at', ascending: true);
       return List<Map<String, dynamic>>.from(rows);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'PriceHistorySync.fetch FAILED'}));
       return [];
     }

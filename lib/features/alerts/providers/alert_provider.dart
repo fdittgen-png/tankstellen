@@ -9,6 +9,7 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/alerts_sync.dart';
+import '../../../core/sync/sync_helper.dart';
 import '../data/models/price_alert.dart';
 import '../data/repositories/alert_repository.dart';
 import '../../../core/logging/error_logger.dart';
@@ -32,6 +33,16 @@ typedef AlertsMergeFn = Future<List<PriceAlert>> Function(
 /// [AlertsSync.merge]; tests override this provider with a fake.
 @Riverpod(keepAlive: true)
 AlertsMergeFn alertsMergeFn(Ref ref) => AlertsSync.merge;
+
+/// Signature of the alert delete propagation (#3121). Defaults to
+/// [AlertsSync.delete]; overridable in tests so the delete-resurrection
+/// regression test can model the server without standing up Supabase.
+typedef AlertsDeleteFn = Future<void> Function(String id);
+
+/// Injectable delete-propagation function. Production code uses the real
+/// [AlertsSync.delete]; tests override this provider with a fake.
+@Riverpod(keepAlive: true)
+AlertsDeleteFn alertsDeleteFn(Ref ref) => AlertsSync.delete;
 
 @Riverpod(keepAlive: true)
 class AlertNotifier extends _$AlertNotifier {
@@ -60,10 +71,21 @@ class AlertNotifier extends _$AlertNotifier {
     final repo = ref.read(alertRepositoryProvider);
     await repo.deleteAlert(id);
     state = repo.getAlerts();
-    // #2246 — do NOT apply downloads after a delete: the server still
-    // holds the just-deleted row (AlertsSync has no delete propagation
-    // yet), so re-downloading it would resurrect the alert the user just
-    // removed. Upload-only keeps the local delete sticky on this device.
+    // #3121 — propagate the delete: remove the server row and record a
+    // `deletions` tombstone so the launch pull (#3077) or another
+    // device's union merge can't resurrect the alert. Local-first: the
+    // local delete above already happened, and fireAndForget swallows a
+    // server failure (the tombstone still filters the id from every
+    // later merge).
+    await SyncHelper.fireAndForget(
+      ref,
+      'Alerts.remove',
+      () => ref.read(alertsDeleteFnProvider)(id),
+    );
+    // #2246 — keep downloads suppressed on the remove path: the server
+    // delete above may not have landed on a flaky link, and the
+    // tombstone filter inside AlertsSync.merge already guards the next
+    // pull. Upload-only keeps the local delete sticky on this device.
     await _syncAlertsIfConnected(applyDownloads: false);
     await BackgroundService.reconcile();
   }

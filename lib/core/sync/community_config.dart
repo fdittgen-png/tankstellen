@@ -47,7 +47,7 @@ class CommunityConfig {
       _cachedUrl = config['supabase_url'] as String?;
       _cachedKey = config['supabase_anon_key'] as String?;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'CommunityConfig: failed to load asset'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'CommunityConfig: failed to load asset'}));
     }
   }
 
