@@ -4783,5 +4783,20 @@
   "@authConfirmationPending": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2PickerOtherDevices": "Other Bluetooth devices",
+  "@obd2PickerOtherDevices": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2PickerTapToTry": "Unrecognized — tap to try",
+  "@obd2PickerTapToTry": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2PickerBleOnlyNotice": "iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.",
+  "@obd2PickerBleOnlyNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

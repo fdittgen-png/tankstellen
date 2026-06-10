@@ -202,6 +202,11 @@ class _Obd2AdapterPickerSheetState
   List<ResolvedObd2Candidate> _candidates = const [];
   Obd2ConnectionError? _error;
 
+  /// #3103 — false on iOS (no Classic facade wired): the picker then explains
+  /// that iPhone can only use Bluetooth-LE adapters, instead of silently
+  /// showing nothing when the user has a Classic-only adapter.
+  bool _supportsClassicDiscovery = true;
+
   @override
   void initState() {
     super.initState();
@@ -221,6 +226,7 @@ class _Obd2AdapterPickerSheetState
       _error = null;
     });
     final connection = ref.read(obd2ConnectionProvider);
+    _supportsClassicDiscovery = connection.supportsClassicDiscovery;
     _sub?.cancel();
     _sub = connection.scan().listen(
       (list) {
@@ -375,6 +381,28 @@ class _Obd2AdapterPickerSheetState
     );
   }
 
+  /// #3103 — one tile shape for both sections. A recognized candidate shows
+  /// its matched profile name; an unrecognized one (empty placeholder profile)
+  /// shows the device's own advertised name + a muted "tap to try" hint.
+  Widget _candidateTile(ResolvedObd2Candidate c, AppLocalizations? l) {
+    final subtitle = c.recognized
+        ? '${c.profile.displayName} · ${c.candidate.rssi} dBm'
+        : '${l?.obd2PickerTapToTry ?? 'Unrecognized — tap to try'} · '
+            '${c.candidate.rssi} dBm';
+    return ListTile(
+      key: Key('obdPickerItem_${c.candidate.deviceId}'),
+      leading: Icon(
+        c.recognized ? Icons.bluetooth : Icons.bluetooth_searching,
+      ),
+      title: Text(c.candidate.deviceName.isEmpty
+          ? c.profile.displayName
+          : c.candidate.deviceName),
+      subtitle: Text(subtitle),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => _connect(c),
+    );
+  }
+
   Widget _buildBody(AppLocalizations? l) {
     switch (_phase) {
       case _Phase.scanning:
@@ -387,21 +415,41 @@ class _Obd2AdapterPickerSheetState
           ],
         );
       case _Phase.selecting:
+        // #3103 — recognized adapters first, then NAMED-but-unrecognized
+        // devices under an "other devices" header so discovery surfaces ALL
+        // adapters, not just catalog-known ones.
+        final recognized = [for (final c in _candidates) if (c.recognized) c];
+        final unrecognized = [
+          for (final c in _candidates)
+            if (!c.recognized) c,
+        ];
         return Column(
           key: const Key('obdPickerSelecting'),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (final c in _candidates)
-              ListTile(
-                key: Key('obdPickerItem_${c.candidate.deviceId}'),
-                leading: const Icon(Icons.bluetooth),
-                title: Text(c.candidate.deviceName.isEmpty
-                    ? c.profile.displayName
-                    : c.candidate.deviceName),
-                subtitle: Text(
-                  '${c.profile.displayName} · ${c.candidate.rssi} dBm',
+            for (final c in recognized) _candidateTile(c, l),
+            if (unrecognized.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Text(
+                  l?.obd2PickerOtherDevices ?? 'Other Bluetooth devices',
+                  style: Theme.of(context).textTheme.labelMedium,
                 ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => _connect(c),
+              ),
+              for (final c in unrecognized) _candidateTile(c, l),
+            ],
+            if (!_supportsClassicDiscovery)
+              Padding(
+                key: const Key('obdPickerBleOnlyNotice'),
+                padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+                child: Text(
+                  l?.obd2PickerBleOnlyNotice ??
+                      'iPhone works with Bluetooth-LE adapters only. A '
+                          'Classic-only adapter (e.g. vLinker BM, Konnwei '
+                          'KW902) must be used on Android.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
               ),
           ],
         );

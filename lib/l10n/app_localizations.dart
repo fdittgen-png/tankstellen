@@ -11298,6 +11298,24 @@ abstract class AppLocalizations {
   /// **'Couldn\'t reach \'{adapterName}\' — pick another adapter'**
   String obd2PickerPinnedFallback(String adapterName);
 
+  /// Section header in the OBD2 adapter picker (#3103) above Bluetooth devices the catalog did not recognize as a known adapter but which the user can still try to connect to.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Bluetooth devices'**
+  String get obd2PickerOtherDevices;
+
+  /// Subtitle on an unrecognized device row in the OBD2 adapter picker (#3103). The device is named but not a known adapter; tapping attempts a connection anyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Unrecognized — tap to try'**
+  String get obd2PickerTapToTry;
+
+  /// Explanatory note shown in the OBD2 adapter picker on iOS (#3103). iPhone cannot discover Bluetooth-Classic/SPP adapters (Apple MFi restriction), so this tells the user why a Classic-only adapter does not appear and that it must be used on Android instead.
+  ///
+  /// In en, this message translates to:
+  /// **'iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.'**
+  String get obd2PickerBleOnlyNotice;
+
   /// Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight.
   ///
   /// In en, this message translates to:

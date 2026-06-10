@@ -50,6 +50,35 @@ void main() {
       expect(find.text('vLinker FD'), findsOneWidget);
     });
 
+    testWidgets(
+        '#3103 — recognized + NAMED-unrecognized render in two sections, with '
+        'the BLE-only notice when Classic discovery is unavailable',
+        (tester) async {
+      final svc = _buildService([
+        [
+          _scanHit(name: 'vLinker FD', rssi: -50), // recognized BLE profile
+          _scanHit(name: 'My Random Dongle', rssi: -70), // named, unknown
+        ],
+      ]);
+      await _pump(tester, svc);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      // The recognized adapter shows as before.
+      expect(find.text('vLinker FD'), findsOneWidget);
+      // The unrecognized device is SURFACED (not dropped) under the "other
+      // devices" header with a tap-to-try subtitle.
+      expect(find.text('My Random Dongle'), findsOneWidget);
+      expect(find.text('Other Bluetooth devices'), findsOneWidget);
+      expect(find.textContaining('Unrecognized — tap to try'), findsOneWidget);
+      // _buildService wires no Classic facade ⇒ supportsClassicDiscovery is
+      // false ⇒ the iOS-style "BLE adapters only" notice is shown.
+      expect(
+        find.byKey(const Key('obdPickerBleOnlyNotice')),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('tapping a candidate transitions to connecting state',
         (tester) async {
       final svc = _buildService([

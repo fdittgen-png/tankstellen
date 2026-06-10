@@ -6537,6 +6537,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get obd2PickerOtherDevices => 'Weitere Bluetooth-Geräte';
+
+  @override
+  String get obd2PickerTapToTry => 'Nicht erkannt — zum Verbinden tippen';
+
+  @override
+  String get obd2PickerBleOnlyNotice =>
+      'Das iPhone funktioniert nur mit Bluetooth-LE-Adaptern. Ein reiner Classic-Adapter (z. B. vLinker BM, Konnwei KW902) muss unter Android verwendet werden.';
+
+  @override
   String get obd2ReconnectInProgress =>
       'Verbindung zum OBD2-Adapter wird wiederhergestellt…';
 

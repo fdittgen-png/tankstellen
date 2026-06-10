@@ -310,16 +310,72 @@ void main() {
     });
   });
 
+  group('Obd2AdapterRegistry.resolve — broadened generic matchers (#3103)', () {
+    test('bare "obd"/"elm" stems now resolve clone names to a generic profile',
+        () {
+      // Names that contain the bare stems but match NO specific brand profile.
+      for (final n in ['OBD Mini', 'Super OBD', 'ELM 327', 'MyOBD']) {
+        final hit = registry.resolve(_candidate(name: n, services: []));
+        expect(hit?.isGeneric, isTrue, reason: '$n should resolve to generic');
+      }
+    });
+
+    test('a SPECIFIC profile still beats the broadened generic (KW902-OBD, '
+        'OBDLink MX+)', () {
+      expect(
+        registry.resolve(_candidate(name: 'KW902-OBD', services: []))?.id,
+        'konnwei-kw902',
+      );
+      expect(
+        registry.resolve(_candidate(name: 'OBDLink MX+', services: []))?.id,
+        'obdlink-mx',
+      );
+    });
+  });
+
   group('Obd2AdapterRegistry.rank', () {
-    test('drops unresolved candidates, sorts resolved by RSSI desc', () {
+    test(
+        '#3103 — recognized first (RSSI desc), then NAMED-unrecognized appended '
+        '(classify, not drop)', () {
       final cands = [
         _candidate(name: 'Apple Watch', services: [], rssi: -40),
         _candidate(name: 'vLinker FS 14884', services: [], rssi: -70),
         _candidate(name: 'OBDLink MX+', services: [], rssi: -55),
       ];
       final ranked = registry.rank(cands);
+      // Recognized adapters rank first by RSSI; the named-but-unknown
+      // 'Apple Watch' (a stronger signal) is CLASSIFIED, not dropped, and
+      // appended last so it never outranks a real adapter.
       expect(ranked.map((r) => r.profile.id).toList(),
-          ['obdlink-mx', 'vlinker-fs-classic']);
+          ['obdlink-mx', 'vlinker-fs-classic', 'unrecognized']);
+      expect(ranked.map((r) => r.recognized).toList(), [true, true, false]);
+      expect(ranked.last.candidate.deviceName, 'Apple Watch');
+    });
+
+    test('#3103 — a NAMELESS device is still dropped (BLE-beacon noise)', () {
+      final ranked = registry.rank([
+        _candidate(name: '', services: [], rssi: -50),
+        _candidate(name: 'OBDLink MX+', services: [], rssi: -55),
+      ]);
+      expect(ranked.map((r) => r.profile.id).toList(), ['obdlink-mx']);
+    });
+
+    test('#3103 — unrecognized placeholder carries the discovery transport', () {
+      final ble = registry.rank([
+        _candidate(name: 'MyCarThing', services: []),
+      ]).single;
+      expect(ble.recognized, isFalse);
+      expect(ble.profile.transport, BluetoothTransport.ble);
+
+      final classic = registry.rank([
+        _candidate(
+          name: 'MyCarThing',
+          services: const [],
+          discoveryTransport: BluetoothTransport.classic,
+        ),
+      ]).single;
+      expect(classic.recognized, isFalse);
+      expect(classic.profile.transport, BluetoothTransport.classic);
     });
 
     test('empty list → empty result', () {

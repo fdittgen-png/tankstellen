@@ -7,5 +7,17 @@
         "type": "String"
       }
     }
+  },
+  "obd2PickerOtherDevices": "Weitere Bluetooth-Geräte",
+  "@obd2PickerOtherDevices": {
+    "description": "Section header in the OBD2 adapter picker (#3103) above Bluetooth devices the catalog did not recognize as a known adapter but which the user can still try to connect to."
+  },
+  "obd2PickerTapToTry": "Nicht erkannt — zum Verbinden tippen",
+  "@obd2PickerTapToTry": {
+    "description": "Subtitle on an unrecognized device row in the OBD2 adapter picker (#3103). The device is named but not a known adapter; tapping attempts a connection anyway."
+  },
+  "obd2PickerBleOnlyNotice": "Das iPhone funktioniert nur mit Bluetooth-LE-Adaptern. Ein reiner Classic-Adapter (z. B. vLinker BM, Konnwei KW902) muss unter Android verwendet werden.",
+  "@obd2PickerBleOnlyNotice": {
+    "description": "Explanatory note shown in the OBD2 adapter picker on iOS (#3103). iPhone cannot discover Bluetooth-Classic/SPP adapters (Apple MFi restriction), so this tells the user why a Classic-only adapter does not appear and that it must be used on Android instead."
   }
 }

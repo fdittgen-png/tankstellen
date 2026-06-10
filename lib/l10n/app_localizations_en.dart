@@ -6470,6 +6470,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get obd2PickerOtherDevices => 'Other Bluetooth devices';
+
+  @override
+  String get obd2PickerTapToTry => 'Unrecognized — tap to try';
+
+  @override
+  String get obd2PickerBleOnlyNotice =>
+      'iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.';
+
+  @override
   String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
 
   @override
@@ -14364,6 +14374,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String obd2PickerPinnedFallback(String adapterName) {
     return '⟦Çóúłđñ\'ŧ řéáçĥ \'$adapterName\' — ƥîçķ áñóŧĥéř áđáƥŧéř ··············⟧';
   }
+
+  @override
+  String get obd2PickerOtherDevices => '⟦Óŧĥéř Ɓłúéŧóóŧĥ đéṽîçéš ·········⟧';
+
+  @override
+  String get obd2PickerTapToTry => '⟦Úñřéçóǧñîžéđ — ŧáƥ ŧó ŧřý ·········⟧';
+
+  @override
+  String get obd2PickerBleOnlyNotice =>
+      '⟦îƤĥóñé ŵóřķš ŵîŧĥ Ɓłúéŧóóŧĥ-ŁÉ áđáƥŧéřš óñłý. Á Çłáššîç-óñłý áđáƥŧéř (é.ǧ. ṽŁîñķéř ƁṀ, Ķóññŵéî ĶŴ902) ɱúšŧ ƀé úšéđ óñ Áñđřóîđ. ···········································⟧';
 
   @override
   String get obd2ReconnectInProgress =>

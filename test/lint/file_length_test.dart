@@ -116,7 +116,13 @@ void main() {
     // fallback profile mirroring `generic-classic`'s matchers (shared const)
     // that connects via dynamic GATT discovery. Pure data + lookup growth on
     // the existing catalog class; decomposition tracked by #2190.
-    'lib/features/consumption/data/obd2/adapter_registry.dart': 625,
+    // #3103 — 625 → 693: classify-not-filter (rank surfaces NAMED-unrecognized
+    // devices instead of dropping them), the specific-beats-generic resolve
+    // pool, broadened `obd`/`elm` generic matchers + `isGeneric`, the
+    // `recognized` flag, and the two unrecognized placeholder profiles. Pure
+    // data + lookup growth on the existing catalog class; decomposition still
+    // tracked by #2190.
+    'lib/features/consumption/data/obd2/adapter_registry.dart': 693,
     // #2969 — grandfathered at 563 (was 389, under-cap before). The #2969
     // connect-trace instrumentation opens/finalises a trace at the FIVE public
     // connect entry points (the single virtual-dispatch chokepoint every live
@@ -155,7 +161,10 @@ void main() {
     // pin), so a transient `0100` timeout during the protocol search no longer
     // false-classifies a live car. Net +6 is the rationale + the pinnable
     // guard. Decomposition still tracked under #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 674,
+    // #3103 — 674 → 694: the `supportsClassicDiscovery` getter + the
+    // Android-only Classic-facade platform gate at the provider seam (+ their
+    // rationale comments). Decomposition still tracked under #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 694,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
@@ -506,8 +515,12 @@ void main() {
     // 4 s-times-out + poisons the RFCOMM socket) instead of the BLE-leaning
     // scan-based `connectByMac`. The growth is the swapped call + its rationale
     // comment. Decomposition stays tracked under #2187/#2188.
+    // #3103 — 470 → 515: two-section selecting view (recognized adapters, then
+    // a "other devices — tap to try" section for NAMED-unrecognized devices) +
+    // the iOS "BLE adapters only" notice + the shared `_candidateTile` helper.
+    // Decomposition stays tracked under #2187/#2188.
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
-        470,
+        515,
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
