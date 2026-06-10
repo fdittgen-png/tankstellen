@@ -89,4 +89,37 @@ void main() {
       expect(settings.accuracy, LocationAccuracy.high);
     });
   });
+
+  group('approachLocationSettings (#3112) — radar / approach detector', () {
+    test('iOS → AppleSettings with pauseLocationUpdatesAutomatically:false '
+        '(or CoreLocation auto-pauses and the radar freezes)', () {
+      final settings = approachLocationSettings(platform: TargetPlatform.iOS);
+      expect(settings, isA<AppleSettings>());
+      final apple = settings as AppleSettings;
+      expect(apple.accuracy, LocationAccuracy.high);
+      expect(apple.activityType, ActivityType.automotiveNavigation);
+      expect(apple.pauseLocationUpdatesAutomatically, isFalse,
+          reason: 'the load-bearing flag: a fuel stop / red light must not '
+              'auto-pause the radar GPS stream on iPhone');
+      expect(apple.allowBackgroundLocationUpdates, isTrue);
+    });
+
+    test('Android → plain high-accuracy LocationSettings, UNCHANGED (no '
+        'AppleSettings, no prod-Android behaviour change)', () {
+      final settings =
+          approachLocationSettings(platform: TargetPlatform.android);
+      expect(settings, isA<LocationSettings>());
+      expect(settings, isNot(isA<AppleSettings>()));
+      expect(settings, isNot(isA<AndroidSettings>()));
+      expect(settings.accuracy, LocationAccuracy.high);
+    });
+
+    test('selection follows debugDefaultTargetPlatformOverride', () {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      expect(approachLocationSettings(), isA<AppleSettings>());
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      expect(approachLocationSettings(), isNot(isA<AppleSettings>()));
+    });
+  });
 }

@@ -73,6 +73,29 @@ final bool kGpsRecordingForegroundServiceEnabled = false;
 /// cancels on the last), so the wakelock + 1 s cadence apply only while a
 /// trip is actively recording. The interval is a self-bounded 1000 ms with
 /// `distanceFilter: 0` — never geolocator's unbounded "fastest".
+///
+/// #3112 — [approachLocationSettings] is the radar/approach-detector sibling:
+/// not foreground-service-promoted and no l10n, but it MUST still pass iOS the
+/// `pauseLocationUpdatesAutomatically: false` flag — a bare `LocationSettings`
+/// lets iOS CoreLocation auto-pause the stream when it thinks the user stopped
+/// (red light / fuel stop), freezing the radar after its first scan ("radar
+/// stuck on iPhone"). Android's bare high-accuracy stream does not auto-pause,
+/// so it is left unchanged. `automotiveNavigation` + `allowBackgroundLocationUpdates`
+/// mirror the recorder so the #2065 PiP approach keeps receiving fixes.
+LocationSettings approachLocationSettings({TargetPlatform? platform}) {
+  switch (platform ?? defaultTargetPlatform) {
+    case TargetPlatform.iOS:
+      return AppleSettings(
+        accuracy: LocationAccuracy.high,
+        activityType: ActivityType.automotiveNavigation,
+        allowBackgroundLocationUpdates: true,
+        pauseLocationUpdatesAutomatically: false,
+      );
+    default:
+      return const LocationSettings(accuracy: LocationAccuracy.high);
+  }
+}
+
 LocationSettings recordingLocationSettings({
   required AppLocalizations l10n,
   TargetPlatform? platform,

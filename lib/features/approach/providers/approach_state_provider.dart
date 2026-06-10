@@ -3,10 +3,11 @@
 
 import 'dart:async';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
+import '../../../core/location/recording_location_settings.dart'
+    show approachLocationSettings;
 import '../../../core/logging/error_logger.dart';
 import '../../../core/services/approach_detector.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
@@ -77,9 +78,11 @@ Stream<ApproachState> approachState(Ref ref) {
     // detector already treats its input as a hot/late-join stream — the shared
     // source replays the latest fix to late joiners, so no detector change.
     gpsStream: geo.sharedPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-      ),
+      // #3112 — iOS needs AppleSettings(pauseLocationUpdatesAutomatically:
+      // false) or CoreLocation auto-pauses the stream when it thinks the user
+      // stopped, freezing the radar after its first scan. Android keeps the
+      // bare high-accuracy settings (unchanged).
+      locationSettings: approachLocationSettings(),
     ),
     fetchStations: (lat, lng, radiusKm, fuelTypeApiValue) async {
       try {
