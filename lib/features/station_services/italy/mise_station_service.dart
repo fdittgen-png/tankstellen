@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:dio/dio.dart';
+import 'mise_dataset.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/cache/cache_manager.dart';
@@ -34,7 +35,7 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
   /// Persists the parsed registry+price dataset so IT survives a cold start +
   /// works offline, mirroring DK/AR/ES (#2264 deferred IT on-disk persistence
   /// because its private record types needed bespoke JSON codecs — added now).
-  final PersistentDataset<_MiseDataset>? _persistent;
+  final PersistentDataset<MiseDataset>? _persistent;
 
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
   /// #2270 — [cache] enables the disk read-through; omit it for the pure
@@ -48,13 +49,13 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
             ),
         _persistent = cache == null
             ? null
-            : PersistentDataset<_MiseDataset>(
+            : PersistentDataset<MiseDataset>(
                 cache: cache,
                 countryCode: 'IT',
                 datasetName: 'stations',
                 source: ServiceSource.miseApi,
-                serialize: _serializeDataset,
-                deserialize: _deserializeDataset,
+                serialize: serializeMiseDataset,
+                deserialize: deserializeMiseDataset,
               );
 
   // #2270 — soft/hard dataset TTLs mirror the IT FuelServicePolicy in the
@@ -64,8 +65,8 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
   static const Duration _hardTtl = Duration(hours: 24);
 
   // In-memory cache of parsed data
-  Map<String, _StationData>? _cachedStations;
-  Map<String, _PriceData>? _cachedPrices;
+  Map<String, MiseStationData>? _cachedStations;
+  Map<String, MisePriceData>? _cachedPrices;
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -101,7 +102,10 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
           dist: roundedDistance(params.lat, params.lng, s.lat, s.lng),
           e5: prices?.benzinaSelf ?? prices?.benzinaServed,
           e10: prices?.benzinaSelf ?? prices?.benzinaServed,
+          e98: prices?.benzinaPremiumSelf ?? prices?.benzinaPremiumServed,
           diesel: prices?.gasolioSelf ?? prices?.gasolioServed,
+          dieselPremium:
+              prices?.gasolioPremiumSelf ?? prices?.gasolioPremiumServed,
           lpg: prices?.gpl,
           cng: prices?.metano,
           isOpen: true,
@@ -125,7 +129,7 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
     final cached = (_cachedStations != null && _cachedPrices != null)
         ? (_cachedStations!, _cachedPrices!)
         : null;
-    Future<_MiseDataset> fetch() async {
+    Future<MiseDataset> fetch() async {
       // Download both files in parallel
       final results = await Future.wait([
         _dio.get<String>(_stationsUrl, cancelToken: cancelToken),
@@ -137,7 +141,7 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
       );
     }
 
-    void store(_MiseDataset value) {
+    void store(MiseDataset value) {
       _cachedStations = value.$1;
       _cachedPrices = value.$2;
     }
@@ -145,7 +149,7 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
     final persistent = _persistent;
     if (persistent == null) {
       // No cache wired (unit tests) — preserve the legacy in-memory path.
-      return loadDataset<_MiseDataset>(
+      return loadDataset<MiseDataset>(
         cached: cached,
         ttl: const Duration(hours: 2),
         fetch: fetch,
@@ -153,7 +157,7 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
       );
     }
     // #2270 — disk read-through: survives cold start + offline.
-    return loadPersistentDataset<_MiseDataset>(
+    return loadPersistentDataset<MiseDataset>(
       cached: cached,
       softTtl: _softTtl,
       hardTtl: _hardTtl,
@@ -163,8 +167,15 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
     );
   }
 
-  Map<String, _StationData> _parseStationsCsv(String csv) {
-    final stations = <String, _StationData>{};
+  /// #3188 — a code-like "Nome Impianto": an optional short letter prefix
+  /// followed by 3+ digits, optionally trailed by more text (live registry
+  /// examples: "03674", "AG021", "PV8380", "19829 AGRIGENTO",
+  /// "TM06058 BAGNOLO MELLA", "08011 - 959304"). These are internal plant
+  /// codes, not display names — treated as empty so the brand fallback fires.
+  static final RegExp _codeLikeName = RegExp(r'^[A-Z]{0,3}\d{3,}( .*)?$');
+
+  Map<String, MiseStationData> _parseStationsCsv(String csv) {
+    final stations = <String, MiseStationData>{};
     final rows = CsvParser.parseAll(csv, skipLines: 2, separator: '|');
 
     for (final parts in rows) {
@@ -175,10 +186,11 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
       final lng = double.tryParse(parts[9]) ?? 0;
       if (lat == 0 || lng == 0) continue;
 
-      stations[id] = _StationData(
+      final rawName = parts[4].trim();
+      stations[id] = MiseStationData(
         brand: parts[2],
         type: parts[3],
-        name: parts[4],
+        name: _codeLikeName.hasMatch(rawName) ? '' : rawName,
         address: parts[5],
         city: parts[6],
         province: parts[7],
@@ -189,8 +201,31 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
     return stations;
   }
 
-  Map<String, _PriceData> _parsePricesCsv(String csv) {
-    final prices = <String, _PriceData>{};
+  /// #3188 — known 98+-octane premium petrol grades (lowercase, exact) from
+  /// the live prezzo_alle_8.csv of 2026-06-10.
+  static const Set<String> _premiumBenzina = {
+    'blue super',
+    'benzina wr 100',
+    'benzina plus 98',
+    'benzina energy 98 ottani',
+    'benzina shell v power',
+    'v-power',
+  };
+
+  /// #3188 — known premium diesel grades (lowercase, exact) from the live
+  /// prezzo_alle_8.csv of 2026-06-10.
+  static const Set<String> _premiumGasolio = {
+    'blue diesel',
+    'supreme diesel',
+    'hi-q diesel',
+    'gasolio premium',
+    'gasolio speciale',
+    'diesel shell v power',
+    'v-power diesel',
+  };
+
+  Map<String, MisePriceData> _parsePricesCsv(String csv) {
+    final prices = <String, MisePriceData>{};
     final rows = CsvParser.parseAll(csv, skipLines: 2, separator: '|');
 
     for (final parts in rows) {
@@ -204,19 +239,37 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
 
       if (price == null) continue;
 
-      final existing = prices[id] ?? _PriceData();
+      final existing = prices[id] ?? MisePriceData();
 
-      if (fuel.contains('benzina')) {
+      // #3188 — exact matching for the regular grades and an explicit list
+      // for the known premium variants. The old contains('benzina') /
+      // contains('gasolio')||contains('diesel') matcher mis-slotted ~12k
+      // premium rows ("Blue Diesel", "Gasolio speciale", "Diesel Shell
+      // V Power", …) into the REGULAR price slots. Unknown names fall
+      // through unmapped — never into a regular slot.
+      if (fuel == 'benzina') {
         if (isSelf) {
           existing.benzinaSelf ??= price;
         } else {
           existing.benzinaServed ??= price;
         }
-      } else if (fuel.contains('gasolio') || fuel.contains('diesel')) {
+      } else if (fuel == 'gasolio') {
         if (isSelf) {
           existing.gasolioSelf ??= price;
         } else {
           existing.gasolioServed ??= price;
+        }
+      } else if (_premiumBenzina.contains(fuel)) {
+        if (isSelf) {
+          existing.benzinaPremiumSelf ??= price;
+        } else {
+          existing.benzinaPremiumServed ??= price;
+        }
+      } else if (_premiumGasolio.contains(fuel)) {
+        if (isSelf) {
+          existing.gasolioPremiumSelf ??= price;
+        } else {
+          existing.gasolioPremiumServed ??= price;
         }
       } else if (fuel.contains('gpl')) {
         existing.gpl ??= price;
@@ -255,108 +308,4 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
   ) async {
     return emptyPricesResult(ServiceSource.miseApi);
   }
-}
-
-/// #2270 — the parsed MISE dataset: the station registry joined-by-id with the
-/// current prices. Both maps come from a single (two-file) download, so they
-/// are persisted and rehydrated together as one record.
-typedef _MiseDataset = (Map<String, _StationData>, Map<String, _PriceData>);
-
-/// #2270 — JSON codec for the persisted IT dataset. Single-letter keys keep
-/// the Hive footprint of the ~25k-station registry + price table down.
-Map<String, dynamic> _serializeDataset(_MiseDataset value) => {
-      's': {for (final e in value.$1.entries) e.key: e.value.toJson()},
-      'p': {for (final e in value.$2.entries) e.key: e.value.toJson()},
-    };
-
-_MiseDataset? _deserializeDataset(Map<String, dynamic> json) {
-  final stationsJson = json['s'];
-  final pricesJson = json['p'];
-  if (stationsJson is! Map || pricesJson is! Map) return null;
-  final stations = <String, _StationData>{
-    for (final e in stationsJson.entries)
-      e.key as String:
-          _StationData.fromJson(Map<String, dynamic>.from(e.value as Map)),
-  };
-  final prices = <String, _PriceData>{
-    for (final e in pricesJson.entries)
-      e.key as String:
-          _PriceData.fromJson(Map<String, dynamic>.from(e.value as Map)),
-  };
-  return (stations, prices);
-}
-
-class _StationData {
-  final String brand;
-  final String type;
-  final String name;
-  final String address;
-  final String city;
-  final String province;
-  final double lat;
-  final double lng;
-
-  const _StationData({
-    required this.brand,
-    required this.type,
-    required this.name,
-    required this.address,
-    required this.city,
-    required this.province,
-    required this.lat,
-    required this.lng,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'b': brand,
-        't': type,
-        'n': name,
-        'a': address,
-        'c': city,
-        'pv': province,
-        'la': lat,
-        'lo': lng,
-      };
-
-  factory _StationData.fromJson(Map<String, dynamic> j) => _StationData(
-        brand: j['b'] as String? ?? '',
-        type: j['t'] as String? ?? '',
-        name: j['n'] as String? ?? '',
-        address: j['a'] as String? ?? '',
-        city: j['c'] as String? ?? '',
-        province: j['pv'] as String? ?? '',
-        lat: (j['la'] as num?)?.toDouble() ?? 0,
-        lng: (j['lo'] as num?)?.toDouble() ?? 0,
-      );
-}
-
-class _PriceData {
-  double? benzinaSelf;
-  double? benzinaServed;
-  double? gasolioSelf;
-  double? gasolioServed;
-  double? gpl;
-  double? metano;
-  String? updatedAt;
-
-  _PriceData();
-
-  Map<String, dynamic> toJson() => {
-        if (benzinaSelf != null) 'bs': benzinaSelf,
-        if (benzinaServed != null) 'bv': benzinaServed,
-        if (gasolioSelf != null) 'gs': gasolioSelf,
-        if (gasolioServed != null) 'gv': gasolioServed,
-        if (gpl != null) 'gp': gpl,
-        if (metano != null) 'me': metano,
-        if (updatedAt != null) 'u': updatedAt,
-      };
-
-  factory _PriceData.fromJson(Map<String, dynamic> j) => _PriceData()
-    ..benzinaSelf = (j['bs'] as num?)?.toDouble()
-    ..benzinaServed = (j['bv'] as num?)?.toDouble()
-    ..gasolioSelf = (j['gs'] as num?)?.toDouble()
-    ..gasolioServed = (j['gv'] as num?)?.toDouble()
-    ..gpl = (j['gp'] as num?)?.toDouble()
-    ..metano = (j['me'] as num?)?.toDouble()
-    ..updatedAt = j['u'] as String?;
 }
