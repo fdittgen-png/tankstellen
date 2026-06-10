@@ -192,7 +192,8 @@ class AppInitializer {
           '${packageInfo.version}+${packageInfo.buildNumber}',
         );
       } catch (e, st) {
-        debugPrint('PackageInfo resolution failed (#570): $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'resolveRuntimeVersion (#570)'}));
       }
     });
 
@@ -214,7 +215,8 @@ class AppInitializer {
         debugPrint(
             'VehicleProfileCatalogMigrator: matched $matched profile(s)');
       } catch (e, st) {
-        debugPrint('VehicleProfileCatalogMigrator: deferred run failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'vehicleProfileCatalogMigrator'}));
       }
     });
 
@@ -236,8 +238,8 @@ class AppInitializer {
       try {
         unawaited(container.read(legacyToggleMigrationProvider.future));
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: legacyToggleMigration kick-off failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'legacyToggleMigration kick-off'}));
       }
     });
 
@@ -250,8 +252,8 @@ class AppInitializer {
       try {
         container.read(tripVeRecomputeListenerProvider);
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: η_v recompute listener kick-off failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'tripVeRecomputeListener kick-off'}));
       }
     });
 
@@ -264,8 +266,8 @@ class AppInitializer {
       try {
         container.read(obd2DebugSessionLoggingProvider);
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: OBD2 debug-logging kick-off failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'obd2DebugSessionLogging kick-off'}));
       }
     });
 
@@ -278,9 +280,8 @@ class AppInitializer {
       try {
         container.read(obd2CommDiagnosticsGateProvider);
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: OBD2 comm-diagnostics gate kick-off failed: '
-            '$e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'obd2CommDiagnosticsGate kick-off'}));
       }
     });
 
@@ -453,7 +454,9 @@ class AppInitializer {
       try {
         await body();
       } catch (e, st) {
-        debugPrint('AppInitializer: deferred task failed: $e\n$st');
+        // #3143 — release-visible: debugPrint is no-opped in release.
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'deferPostFirstFrame'}));
       }
     }
 
@@ -498,7 +501,10 @@ class AppInitializer {
     try {
       await body();
     } catch (e, st) {
-      debugPrint('AppInitializer: $label init failed: $e\n$st');
+      // #3143 — pre-bind, so this spools via IsolateErrorSpool and is
+      // drained into the trace pipeline post-first-frame.
+      unawaited(errorLogger.log(ErrorLayer.background, e, st,
+          context: {'where': 'serviceInit', 'service': label}));
     }
   }
 
@@ -535,15 +541,20 @@ class AppInitializer {
               onConflict: 'id',
             );
           } catch (e, st) {
-            debugPrint('TankSync: users upsert failed: $e\n$st');
+            unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+                context: {'where': 'maybeInitTankSync users upsert'}));
           }
         }
         debugPrint('TankSync: ready');
       }).timeout(const Duration(seconds: 8));
-    } on TimeoutException {
-      debugPrint('TankSync: init timed out after 8s, proceeding without sync');
+    } on TimeoutException catch (e, st) {
+      // #3143 — proceeding without sync, but record it: a silent init
+      // timeout previously looked identical to "sync works" in the field.
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: {'where': 'maybeInitTankSync', 'timeoutSeconds': 8}));
     } catch (e, st) {
-      debugPrint('TankSync init failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: {'where': 'maybeInitTankSync'}));
     }
   }
 
@@ -593,7 +604,8 @@ class AppInitializer {
       // budget stays bounded.
       await TripsSync.pruneOldDetails();
     } catch (e, st) {
-      debugPrint('AppInitializer._runTripsSyncMerge failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: {'where': 'runTripsSyncMerge'}));
     }
   }
 
@@ -675,12 +687,13 @@ class AppInitializer {
       // discrimination was removed: every launch URI is a route to stash.
       container.read(pendingWidgetUriProvider.notifier).set(uri);
     } on TimeoutException {
-      debugPrint(
-        'AppInitializer: widget-launch probe timed out at 200 ms — '
-        'falling back to the warm-click stream',
-      );
+      // Expected benign race (stuck plugin / slow channel) — the warm-click
+      // stream still delivers the URI. Breadcrumb, not an ERROR trace.
+      BreadcrumbCollector.add('widget-launch-probe-timeout',
+          detail: '200ms — falling back to the warm-click stream');
     } catch (e, st) {
-      debugPrint('AppInitializer._stashWidgetLaunchUri failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+          context: {'where': 'stashWidgetLaunchUri'}));
     }
   }
 
@@ -722,8 +735,8 @@ class AppInitializer {
               await container.read(autoRecordBadgeServiceProvider.future);
           await badge.increment();
         } catch (e, st) {
-          debugPrint(
-              'AppInitializer: activeTripRecovery badge bump failed: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.background, e, st,
+              context: {'where': 'activeTripRecovery badge bump'}));
         }
       },
     );
@@ -750,8 +763,9 @@ class AppInitializer {
                   .read(autoRecordBadgeServiceProvider.future);
               await badge.increment();
             } catch (e, st) {
-              debugPrint(
-                  'AppInitializer: activeTripRecovery recovered badge bump failed: $e\n$st');
+              unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
+                'where': 'activeTripRecovery recovered badge bump'
+              }));
             }
           }
           // Auto-navigate to /trip-recording on the next frame so
@@ -766,13 +780,15 @@ class AppInitializer {
               final goRouter = container.read(routerProvider);
               goRouter.go('/trip-recording');
             } catch (e, st) {
-              debugPrint(
-                  'AppInitializer: activeTripRecovery go(/trip-recording) failed: $e\n$st');
+              unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
+                'where': 'activeTripRecovery go(/trip-recording)'
+              }));
             }
           });
         } catch (e, st) {
-          debugPrint(
-              'AppInitializer: activeTripRecovery restoreFromSnapshot failed: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
+            'where': 'activeTripRecovery restoreFromSnapshot'
+          }));
         }
     }
   }
@@ -809,8 +825,8 @@ class AppInitializer {
               await container.read(autoRecordBadgeServiceProvider.future);
           await badge.increment();
         } catch (e, st) {
-          debugPrint(
-              'AppInitializer: pausedTripRecovery badge bump failed: $e\n$st');
+          unawaited(errorLogger.log(ErrorLayer.background, e, st,
+              context: {'where': 'pausedTripRecovery badge bump'}));
         }
       },
     );
@@ -905,7 +921,8 @@ class AppInitializer {
     try {
       container.read(nearestWidgetRefreshProvider);
     } catch (e, st) {
-      debugPrint('AppInitializer: nearestWidgetRefresh start failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.background, e, st,
+          context: {'where': 'nearestWidgetRefresh start'}));
     }
 
     // #1004 phase 4-WAL — recover paused trips that were never
@@ -922,8 +939,8 @@ class AppInitializer {
       try {
         await _runPausedTripRecovery(container);
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: pausedTripRecovery failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'pausedTripRecovery'}));
       }
     });
 
@@ -939,8 +956,8 @@ class AppInitializer {
       try {
         await _runActiveTripRecovery(container);
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: activeTripRecovery failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'activeTripRecovery'}));
       }
     });
 
@@ -957,8 +974,8 @@ class AppInitializer {
       try {
         container.read(autoRecordOrchestratorProvider);
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: autoRecordOrchestrator init failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'autoRecordOrchestrator init'}));
       }
     });
 
@@ -983,8 +1000,8 @@ class AppInitializer {
               'trip-history box not open yet');
         }
       } catch (e, st) {
-        debugPrint(
-            'AppInitializer: vehicle aggregator wiring failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'vehicle aggregator wiring'}));
       }
     });
 
@@ -1005,7 +1022,8 @@ class AppInitializer {
               'AppInitializer: drained $replayed isolate error(s) into TraceRecorder');
         }
       } catch (e, st) {
-        debugPrint('AppInitializer: isolate spool drain failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'isolate spool drain'}));
       }
     });
 

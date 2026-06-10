@@ -60,7 +60,11 @@ void main() {
     // adjacent trips merge. The unit-tested logic lives in the per-entity
     // provider seams; this is the (compacted) launch glue. Decomposition
     // of this god-file is tracked separately.
-    'lib/app/app_initializer.dart': 1028,
+    // #3143 — re-grandfathered 1028 → 1046: ~20 release-silent
+    // debugPrint-only catch handlers converted to `errorLogger.log(...)`
+    // with a `where` context map (each conversion is +1 line); enforced
+    // at 0 by test/lint/no_debugprint_only_catch_test.dart.
+    'lib/app/app_initializer.dart': 1046,
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
     // deletion-tombstone fix threads a tombstoned-id set through `merge` and
     // `mergeRows` (fetch + dual-side filter so a delete on another device
