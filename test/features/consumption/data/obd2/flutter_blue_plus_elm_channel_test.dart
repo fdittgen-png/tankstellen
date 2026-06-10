@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/'
@@ -158,6 +160,27 @@ void main() {
       expect(ch.refreshGattCache(), completes,
           reason: 'a throwing clearGattCache must be swallowed so the '
               'GATT-133 retry proceeds and the real error is preserved');
+    });
+  });
+
+  group('#3118 — post-connect timeouts are iOS-aware', () {
+    tearDown(() => debugDefaultTargetPlatformOverride = null);
+
+    test('iOS gets longer setNotify + discover budgets (slow CoreBluetooth) — '
+        'the OBDLink CX 4s setNotify TimeoutException fix', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      expect(FlutterBluePlusElmChannel.debugSetNotifyTimeout,
+          const Duration(seconds: 7));
+      expect(FlutterBluePlusElmChannel.debugDiscoverTimeout,
+          const Duration(seconds: 8));
+    });
+
+    test('Android keeps the tight load-bearing budgets (#2242/#3014)', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      expect(FlutterBluePlusElmChannel.debugSetNotifyTimeout,
+          const Duration(seconds: 4));
+      expect(FlutterBluePlusElmChannel.debugDiscoverTimeout,
+          const Duration(seconds: 5));
     });
   });
 }
