@@ -4,7 +4,8 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart'
+    show debugPrint, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -128,6 +129,16 @@ class Obd2ConnectionService {
     this.lastGoodAdapterStore,
     this.scanSettleDelay = const Duration(milliseconds: 120),
   });
+
+  /// #3103 — whether this device can discover Bluetooth-CLASSIC (SPP)
+  /// adapters at all. True only when a Classic facade is wired, which the
+  /// provider does ONLY on Android. On iOS this is false: Apple restricts
+  /// Classic/SPP to MFi hardware, so a Classic-only adapter (vLinker BM,
+  /// Konnwei KW902, BAFX…) is invisible to any third-party app — a hard
+  /// platform limit, not a bug. The picker reads this to EXPLAIN the limit
+  /// ("iPhone uses Bluetooth-LE adapters only") instead of silently showing
+  /// nothing, without itself branching on the platform.
+  bool get supportsClassicDiscovery => classicBluetooth != null;
 
   /// Stream of ranked, profile-matched candidates for the picker UI.
   /// Emits the accumulated list on every scan-results change.
@@ -649,7 +660,17 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     registry: Obd2AdapterRegistry.defaults(),
     permissions: ref.watch(obd2PermissionsProvider),
     bluetooth: const PluginBluetoothFacade(),
-    classicBluetooth: const PluginClassicBluetoothFacade(),
+    // #3103 — wire the Classic/SPP facade ONLY on Android. iOS cannot use
+    // Bluetooth-Classic for non-MFi hardware (Apple restriction), and the
+    // facade's method channel has no iOS handler — leaving it wired would
+    // raise a spurious MissingPluginException on every iOS scan. Null on iOS
+    // ⇒ the scan's `?? Stream.empty()` yields zero Classic candidates by
+    // design, and `supportsClassicDiscovery` is false so the picker explains
+    // the BLE-only limit. The platform gate lives at this provider seam (the
+    // plugin-wiring layer), not in shared business logic.
+    classicBluetooth: defaultTargetPlatform == TargetPlatform.android
+        ? const PluginClassicBluetoothFacade()
+        : null,
     // #2253 — activate the #811 supported-PID cache in production.
     supportedPidsCache: openSupportedPidsCache(),
     // #2261 concern 3 — activate the negotiated-protocol warm cache.
