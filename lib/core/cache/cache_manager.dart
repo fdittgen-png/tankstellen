@@ -366,12 +366,21 @@ class CacheManager implements CacheStrategy {
     }
 
     // Pass 3 — global LRU byte ceiling (dataset: entries are protected).
-    var totalBytes = budgeted.fold<int>(0, (sum, e) => sum + _approxBytes(e.value));
+    //
+    // #3155 — `dataset:` entries are exempt from this sweep (they can never
+    // be evicted by it), so jsonEncode-ing their multi-MB national payloads
+    // into the byte estimate on EVERY pass was pure main-isolate waste — and
+    // counting unevictable bytes against the ceiling could only force out
+    // small per-search entries the budget was meant for. Only the evictable
+    // (non-`dataset:`) entries are sized and folded.
+    final evictable = budgeted
+        .where((e) => !e.key.startsWith('dataset:'))
+        .toList();
+    var totalBytes =
+        evictable.fold<int>(0, (sum, e) => sum + _approxBytes(e.value));
     if (totalBytes > policy.maxBytes) {
-      final evictable = budgeted
-          .where((e) => !e.key.startsWith('dataset:'))
-          .toList()
-        ..sort((a, b) => a.value.storedAt.compareTo(b.value.storedAt));
+      evictable
+          .sort((a, b) => a.value.storedAt.compareTo(b.value.storedAt));
       for (final e in evictable) {
         if (totalBytes <= policy.maxBytes) break;
         await _storage.deleteCacheEntry(e.key);
