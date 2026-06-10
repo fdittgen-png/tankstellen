@@ -124,7 +124,76 @@ void main() {
       await tester.pump();
       expect(captured, hasLength(1));
       final decoded = jsonDecode(captured.first);
+      // Anonymous account → no email key (legacy-compatible shape). #3080.
       expect(decoded, {'url': 'https://x.supabase.co', 'key': 'k'});
+    });
+
+    testWidgets(
+        'omits email for an anonymous account (legacy QR still parses) #3080',
+        (tester) async {
+      final captured = <String>[];
+      _mockClipboard(captured);
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null);
+      });
+
+      await pumpApp(
+        tester,
+        const QrShareWidget(),
+        overrides: [
+          syncStateProvider.overrideWith(
+            () => _FixedSyncState(const SyncConfig(
+              enabled: true,
+              supabaseUrl: 'https://x.supabase.co',
+              supabaseAnonKey: 'k',
+              // userEmail null → anonymous
+            )),
+          ),
+        ],
+      );
+
+      await tester.tap(find.text('Copy as text'));
+      await tester.pump();
+      final decoded = jsonDecode(captured.first) as Map<String, dynamic>;
+      expect(decoded.containsKey('email'), isFalse);
+      // An old (email-less) reader decodes the exact same two keys.
+      expect(decoded['url'], 'https://x.supabase.co');
+      expect(decoded['key'], 'k');
+    });
+
+    testWidgets('encodes email when the account has one #3080',
+        (tester) async {
+      final captured = <String>[];
+      _mockClipboard(captured);
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(SystemChannels.platform, null);
+      });
+
+      await pumpApp(
+        tester,
+        const QrShareWidget(),
+        overrides: [
+          syncStateProvider.overrideWith(
+            () => _FixedSyncState(const SyncConfig(
+              enabled: true,
+              supabaseUrl: 'https://x.supabase.co',
+              supabaseAnonKey: 'k',
+              userEmail: 'owner@example.com',
+            )),
+          ),
+        ],
+      );
+
+      await tester.tap(find.text('Copy as text'));
+      await tester.pump();
+      final decoded = jsonDecode(captured.first);
+      expect(decoded, {
+        'url': 'https://x.supabase.co',
+        'key': 'k',
+        'email': 'owner@example.com',
+      });
     });
 
     testWidgets('QR is wrapped in a white rounded container '

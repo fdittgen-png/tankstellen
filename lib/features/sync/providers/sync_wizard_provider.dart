@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'sync_wizard_provider.g.dart';
 
-enum SyncWizardMode { choose, createNew, joinExisting, auth, schema }
+enum SyncWizardMode { choose, createNew, joinExisting, auth, adopt, schema }
 
 /// UI-only state for the sync setup wizard. Text inputs live in
 /// [TextEditingController]s owned by the screen.
@@ -28,6 +28,15 @@ class SyncWizardState {
   /// re-run the setup SQL" banner instead of a silent per-feature break.
   final bool schemaOutdated;
 
+  /// Email read from a scanned share-QR that carried an `email` field
+  /// (#3080) — the QR owner's account this device should *adopt* (join via
+  /// sign-in, keeping the existing UUID). Non-null drives the wizard into
+  /// [SyncWizardMode.adopt] instead of the normal auth step.
+  final String? adoptEmail;
+
+  /// Show/hide toggle for the adoption-step password field (#3080).
+  final bool showPassword;
+
   const SyncWizardState({
     this.mode = SyncWizardMode.choose,
     this.createStep = 0,
@@ -41,6 +50,8 @@ class SyncWizardState {
     this.migrationSql,
     this.showKey = false,
     this.schemaOutdated = false,
+    this.adoptEmail,
+    this.showPassword = false,
   });
 
   SyncWizardState copyWith({
@@ -59,6 +70,9 @@ class SyncWizardState {
     bool clearMigrationSql = false,
     bool? showKey,
     bool? schemaOutdated,
+    String? adoptEmail,
+    bool clearAdoptEmail = false,
+    bool? showPassword,
   }) {
     return SyncWizardState(
       mode: mode ?? this.mode,
@@ -75,6 +89,8 @@ class SyncWizardState {
           clearMigrationSql ? null : (migrationSql ?? this.migrationSql),
       showKey: showKey ?? this.showKey,
       schemaOutdated: schemaOutdated ?? this.schemaOutdated,
+      adoptEmail: clearAdoptEmail ? null : (adoptEmail ?? this.adoptEmail),
+      showPassword: showPassword ?? this.showPassword,
     );
   }
 }
@@ -102,6 +118,38 @@ class SyncWizardController extends _$SyncWizardController {
 
   void toggleKeyVisibility() {
     state = state.copyWith(showKey: !state.showKey);
+  }
+
+  void togglePasswordVisibility() {
+    state = state.copyWith(showPassword: !state.showPassword);
+  }
+
+  /// Enter the QR-join adoption flow (#3080): a scanned share-QR carried an
+  /// `email`, so route to [SyncWizardMode.adopt] to sign into that account
+  /// instead of the normal auth step.
+  void startAdoption(String email) {
+    state = state.copyWith(
+      adoptEmail: email,
+      mode: SyncWizardMode.adopt,
+      clearTestResult: true,
+    );
+  }
+
+  /// Abandon the adoption flow and fall back to the normal auth step.
+  void cancelAdoption() {
+    state = state.copyWith(
+      clearAdoptEmail: true,
+      mode: SyncWizardMode.auth,
+      clearTestResult: true,
+    );
+  }
+
+  void adoptFailed(String message) {
+    state = state.copyWith(
+      connecting: false,
+      testResult: message,
+      testSuccess: false,
+    );
   }
 
   void setUseEmail(bool value) {

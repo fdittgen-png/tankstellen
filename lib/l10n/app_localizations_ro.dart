@@ -7077,6 +7077,24 @@ class AppLocalizationsRo extends AppLocalizations {
       'Pentru recuperare, șterge spațiul de stocare al aplicației din setările dispozitivului sau reinstalează aplicația. Favoritele și istoricul tău sunt salvate doar pe acest dispozitiv, așa că nu pot fi restaurate automat.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Nivel rezervor';
 
   @override

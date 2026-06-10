@@ -7051,6 +7051,24 @@ class AppLocalizationsHr extends AppLocalizations {
       'Za oporavak izbrišite pohranu aplikacije u postavkama uređaja ili ponovno instalirajte aplikaciju. Vaši favoriti i povijest pohranjeni su samo na ovom uređaju pa se ne mogu automatski vratiti.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Razina goriva';
 
   @override

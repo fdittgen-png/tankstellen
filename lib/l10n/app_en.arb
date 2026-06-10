@@ -6453,6 +6453,32 @@
   "@storageRecoveryGuidance": {
     "description": "Guidance text on the storage-corruption recovery screen telling the user how to recover — clear app storage or reinstall (#2294)."
   },
+  "syncAdoptTitle": "Join {email}'s account",
+  "@syncAdoptTitle": {
+    "description": "Title of the QR-join adoption step — the second device adopts the first device's email account (#3080).",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "alex@example.com"
+      }
+    }
+  },
+  "syncAdoptSubtitle": "Sign in with this account's password to share its data across both devices.",
+  "@syncAdoptSubtitle": {
+    "description": "Explanatory subtitle of the QR-join adoption step (#3080)."
+  },
+  "syncAdoptPasswordLabel": "Account password",
+  "@syncAdoptPasswordLabel": {
+    "description": "Label of the password field on the QR-join adoption step (#3080)."
+  },
+  "syncAdoptJoinButton": "Join account",
+  "@syncAdoptJoinButton": {
+    "description": "Primary button that signs the second device into the first device's account (#3080)."
+  },
+  "syncAdoptUseDifferentAccount": "Use a different account instead",
+  "@syncAdoptUseDifferentAccount": {
+    "description": "Link that leaves the QR-join adoption step and returns to the normal account-setup flow (#3080)."
+  },
   "tankLevelTitle": "Tank level",
   "@tankLevelTitle": {
     "description": "Title of the tank-level card on the Fuel tab — shows the current estimated litres in the tank above the consumption stats card (#1195)."

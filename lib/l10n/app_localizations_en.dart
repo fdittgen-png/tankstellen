@@ -6992,6 +6992,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Tank level';
 
   @override
@@ -14907,6 +14925,25 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get storageRecoveryGuidance =>
       '⟦Ŧó řéçóṽéř, çłéář ŧĥé áƥƥ\'š šŧóřáǧé îñ ýóúř đéṽîçé šéŧŧîñǧš, óř řéîñšŧáłł ŧĥé áƥƥ. Ýóúř ƒáṽóúřîŧéš áñđ ĥîšŧóřý ářé šŧóřéđ óñ ŧĥîš đéṽîçé óñłý, šó ŧĥéý çáññóŧ ƀé řéšŧóřéđ áúŧóɱáŧîçáłłý. ···································································⟧';
+
+  @override
+  String syncAdoptTitle(String email) {
+    return '⟦Ĵóîñ $email\'š áççóúñŧ ·····⟧';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      '⟦Šîǧñ îñ ŵîŧĥ ŧĥîš áççóúñŧ\'š ƥáššŵóřđ ŧó šĥářé îŧš đáŧá áçřóšš ƀóŧĥ đéṽîçéš. ···························⟧';
+
+  @override
+  String get syncAdoptPasswordLabel => '⟦Áççóúñŧ ƥáššŵóřđ ·······⟧';
+
+  @override
+  String get syncAdoptJoinButton => '⟦Ĵóîñ áççóúñŧ ·····⟧';
+
+  @override
+  String get syncAdoptUseDifferentAccount =>
+      '⟦Úšé á đîƒƒéřéñŧ áççóúñŧ îñšŧéáđ ············⟧';
 
   @override
   String get tankLevelTitle => '⟦Ŧáñķ łéṽéł ····⟧';

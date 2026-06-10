@@ -7073,6 +7073,24 @@ class AppLocalizationsHu extends AppLocalizations {
       'A helyreállításhoz töröld az alkalmazás tárhelyét a készülék beállításaiban, vagy telepítsd újra az alkalmazást. A kedvenceid és az előzményeid csak ezen az eszközön tárolódnak, ezért nem állíthatók helyre automatikusan.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Tartályszint';
 
   @override

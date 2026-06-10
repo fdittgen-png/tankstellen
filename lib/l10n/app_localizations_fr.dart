@@ -7095,6 +7095,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pour récupérer, videz le stockage de l\'application dans les réglages de l\'appareil ou réinstallez l\'application. Vos favoris et votre historique sont enregistrés uniquement sur cet appareil et ne peuvent pas être restaurés automatiquement.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Niveau du réservoir';
 
   @override

@@ -316,6 +316,57 @@ void main() {
       expect(s.schemaStatus, isNull);
       expect(s.migrationSql, isNull);
       expect(s.showKey, isFalse);
+      expect(s.adoptEmail, isNull);
+      expect(s.showPassword, isFalse);
+    });
+  });
+
+  group('QR-join adoption (#3080)', () {
+    test('startAdoption routes to the adopt mode and stores the email', () {
+      final c = makeContainer();
+      final n = c.read(syncWizardControllerProvider.notifier);
+      n.startAdoption('owner@example.com');
+      final s = c.read(syncWizardControllerProvider);
+      expect(s.mode, SyncWizardMode.adopt);
+      expect(s.adoptEmail, 'owner@example.com');
+    });
+
+    test('cancelAdoption drops the email and returns to auth', () {
+      final c = makeContainer();
+      final n = c.read(syncWizardControllerProvider.notifier);
+      n.startAdoption('owner@example.com');
+      n.cancelAdoption();
+      final s = c.read(syncWizardControllerProvider);
+      expect(s.mode, SyncWizardMode.auth);
+      expect(s.adoptEmail, isNull);
+    });
+
+    test('togglePasswordVisibility flips showPassword both ways', () {
+      final c = makeContainer();
+      final n = c.read(syncWizardControllerProvider.notifier);
+      expect(c.read(syncWizardControllerProvider).showPassword, isFalse);
+      n.togglePasswordVisibility();
+      expect(c.read(syncWizardControllerProvider).showPassword, isTrue);
+      n.togglePasswordVisibility();
+      expect(c.read(syncWizardControllerProvider).showPassword, isFalse);
+    });
+
+    test('adoptFailed records message + testSuccess=false + connecting=false',
+        () {
+      final c = makeContainer();
+      final n = c.read(syncWizardControllerProvider.notifier);
+      n.setConnecting(true);
+      n.adoptFailed('bad password');
+      final s = c.read(syncWizardControllerProvider);
+      expect(s.connecting, isFalse);
+      expect(s.testResult, 'bad password');
+      expect(s.testSuccess, isFalse);
+    });
+
+    test('clearAdoptEmail nulls adoptEmail', () {
+      const base = SyncWizardState(adoptEmail: 'a@b.com');
+      final cleared = base.copyWith(clearAdoptEmail: true);
+      expect(cleared.adoptEmail, isNull);
     });
   });
 }

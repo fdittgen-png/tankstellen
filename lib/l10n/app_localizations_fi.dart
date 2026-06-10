@@ -7026,6 +7026,24 @@ class AppLocalizationsFi extends AppLocalizations {
       'Palauta tilanne tyhjentämällä sovelluksen tallennustila laitteen asetuksista tai asentamalla sovellus uudelleen. Suosikkisi ja historiasi tallennetaan vain tähän laitteeseen, joten niitä ei voi palauttaa automaattisesti.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Tankin taso';
 
   @override

@@ -7075,6 +7075,24 @@ class AppLocalizationsEs extends AppLocalizations {
       'Para recuperarlo, borra el almacenamiento de la aplicación en los ajustes del dispositivo o reinstala la aplicación. Tus favoritos y tu historial se guardan solo en este dispositivo, por lo que no se pueden restaurar automáticamente.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Nivel del depósito';
 
   @override

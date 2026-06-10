@@ -17,6 +17,12 @@ import '../../../../l10n/app_localizations.dart';
 /// Used by database owners to let family/friends join their database.
 /// The QR contains `{"url":"...","key":"..."}` which is parsed by the
 /// setup screen's QR scanner.
+///
+/// When the sharing user has an **email account** (#3080), the payload also
+/// carries `"email":"..."` so the scanning device can *adopt* this identity
+/// (join the same account) instead of only connecting to the database. The
+/// email key is **omitted** for anonymous users, so a legacy (email-less) QR
+/// still parses on every reader and a new QR stays backward-compatible.
 class QrShareWidget extends ConsumerWidget {
   const QrShareWidget({super.key});
 
@@ -30,6 +36,9 @@ class QrShareWidget extends ConsumerWidget {
     final qrData = jsonEncode({
       'url': syncState.supabaseUrl,
       'key': syncState.supabaseAnonKey,
+      // Only present for an email account — anonymous users omit it so the
+      // payload stays identical to the legacy url+key shape (#3080).
+      if (syncState.hasEmail) 'email': syncState.userEmail,
     });
 
     final theme = Theme.of(context);

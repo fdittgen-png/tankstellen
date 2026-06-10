@@ -7086,6 +7086,24 @@ class AppLocalizationsBg extends AppLocalizations {
       'За възстановяване изчистете хранилището на приложението в настройките на устройството или преинсталирайте приложението. Любимите и историята ви се съхраняват само на това устройство и не могат да бъдат възстановени автоматично.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Ниво на резервоара';
 
   @override
