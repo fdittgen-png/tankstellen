@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 
@@ -49,6 +50,38 @@ void main() {
       );
       expect(await fake.current(), Obd2PermissionState.denied);
       expect(await fake.request(), Obd2PermissionState.granted);
+    });
+  });
+
+  group('PluginObd2Permissions — SDK-aware permission set (#3183)', () {
+    // The probe was hard-coded to 33, making the <31 legacy
+    // location-permission branch UNREACHABLE — on Android ≤ 11 a BLE scan
+    // without location permission silently returns zero results.
+    test('Android ≤ 11 (SDK < 31) asks for the legacy location permission',
+        () async {
+      final perms = PluginObd2Permissions(sdkIntProvider: () async => 30);
+      expect(await perms.debugRequiredPermissions(),
+          [Permission.locationWhenInUse]);
+    });
+
+    test('Android 12+ (SDK ≥ 31) asks for the split BLE permissions',
+        () async {
+      final perms31 = PluginObd2Permissions(sdkIntProvider: () async => 31);
+      final perms34 = PluginObd2Permissions(sdkIntProvider: () async => 34);
+      expect(await perms31.debugRequiredPermissions(),
+          [Permission.bluetoothScan, Permission.bluetoothConnect]);
+      expect(await perms34.debugRequiredPermissions(),
+          [Permission.bluetoothScan, Permission.bluetoothConnect]);
+    });
+
+    test(
+        'a failing probe falls back to 33 (the modern model) — an old native '
+        'side without the sdkInt method must never break the flow', () async {
+      final perms = PluginObd2Permissions(
+        sdkIntProvider: () async => throw StateError('no native method'),
+      );
+      expect(await perms.debugRequiredPermissions(),
+          [Permission.bluetoothScan, Permission.bluetoothConnect]);
     });
   });
 

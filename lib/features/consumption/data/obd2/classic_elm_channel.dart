@@ -227,6 +227,12 @@ class ClassicElmChannel implements ElmByteChannel {
       await _plugin.write(bytes);
     } catch (e, st) {
       _open = false;
+      // #3183 — the LAZY drop-discovery path: a drop noticed on write (no
+      // reader error/done edge fired, or the native side never surfaced one)
+      // must ALSO emit the #3019 proactive link-drop signal, or the
+      // trip-independent reconnect controller stays asleep until the next
+      // write that never comes. The reader onError/onDone paths already do.
+      _signalDrop();
       debugPrint('ClassicElmChannel: write failed — reclassifying as a '
           'recoverable disconnect (#2671): $e\n$st');
       throw const Obd2DisconnectedException(

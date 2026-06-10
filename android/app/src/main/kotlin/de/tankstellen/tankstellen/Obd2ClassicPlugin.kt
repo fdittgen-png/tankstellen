@@ -107,6 +107,11 @@ object Obd2ClassicPlugin {
                     disconnect()
                     result.success(true)
                 }
+                // #3183 — the Dart-side permission flow needs the REAL SDK
+                // level (it hard-coded 33 before, making the <31 legacy
+                // location-permission branch unreachable). Reuse this channel
+                // instead of pulling in device_info_plus.
+                "sdkInt" -> result.success(android.os.Build.VERSION.SDK_INT)
                 else -> result.notImplemented()
             }
         } catch (e: Exception) {
@@ -261,23 +266,51 @@ object Obd2ClassicPlugin {
         readerThread = thread(name = "obd2-classic-read") {
             val s = socket ?: return@thread
             val buffer = ByteArray(256)
+            var endedByEof = false
             try {
                 val input = s.inputStream
                 while (readerRunning.get()) {
                     val n = input.read(buffer)
-                    if (n < 0) break
+                    if (n < 0) {
+                        // #3183 — a clean remote EOF is a DROP (the adapter
+                        // closed the socket): signalled below so the Dart
+                        // onDone fires, instead of the thread dying silently.
+                        endedByEof = true
+                        break
+                    }
                     if (n == 0) continue
                     val slice = buffer.copyOfRange(0, n).toList()
-                    val sink = eventSink
-                    if (sink != null) {
-                        android.os.Handler(android.os.Looper.getMainLooper()).post {
-                            sink.success(slice)
-                        }
-                    }
+                    postToSink { sink -> sink.success(slice) }
                 }
             } catch (e: IOException) {
                 Log.w(TAG, "reader: $e")
+                // #3183 — the reader exiting on IOException was INVISIBLE to
+                // Dart (sink.success was the only sink call in this file), so
+                // ClassicElmChannel's onError never fired and a mid-session
+                // Classic drop was discovered only lazily on the next write.
+                // A DELIBERATE teardown (disconnect() flips readerRunning
+                // false, then closes the socket, which interrupts read() with
+                // an IOException) is NOT a drop — stay silent for it.
+                if (readerRunning.get()) {
+                    postToSink { sink ->
+                        sink.error("io", e.message ?: "read failed", null)
+                    }
+                }
+                return@thread
             }
+            if (endedByEof) {
+                postToSink { sink -> sink.endOfStream() }
+            }
+        }
+    }
+
+    /** #3183 — deliver one sink callback on the MAIN thread (EventChannel
+     *  sinks must only be touched from the platform thread). No-op when no
+     *  Dart listener is attached. */
+    private fun postToSink(block: (EventChannel.EventSink) -> Unit) {
+        val sink = eventSink ?: return
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            block(sink)
         }
     }
 
@@ -297,9 +330,18 @@ object Obd2ClassicPlugin {
 
     private fun disconnect() {
         readerRunning.set(false)
+        val hadConnection = socket != null
         try { socket?.close() } catch (_: IOException) {}
         socket = null
         readerThread = null
+        // #3183 — end the Dart-side byte stream on a deliberate teardown too,
+        // in case a listener is still attached (the normal Dart close()
+        // cancels its subscription first, making this a no-op). Guarded so
+        // the pre-connect "ensure any prior socket is closed" call never
+        // signals when there was nothing to tear down.
+        if (hadConnection) {
+            postToSink { sink -> sink.endOfStream() }
+        }
     }
 
     private fun adapterOrNull(context: Context): BluetoothAdapter? {

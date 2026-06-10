@@ -79,6 +79,18 @@ class Obd2ClassicMethodChannel {
     await _methodChannel.invokeMethod<void>('disconnect');
   }
 
+  /// #3183 — the device's `Build.VERSION.SDK_INT` from the native side.
+  /// Throws ([MissingPluginException] / [PlatformException] / [StateError])
+  /// when the native plugin predates the method or the probe fails — the
+  /// caller ([PluginObd2Permissions]) owns the fallback.
+  Future<int> sdkInt() async {
+    final v = await _methodChannel.invokeMethod<int>('sdkInt');
+    if (v == null) {
+      throw StateError('sdkInt: native side returned null');
+    }
+    return v;
+  }
+
   /// Incoming bytes from the socket's input stream, pushed by the
   /// reader thread on the native side. Subscribing starts the
   /// EventChannel; cancelling stops listening but the socket stays

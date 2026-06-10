@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_elm_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/classic_method_channel.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_errors.dart';
+import 'package:tankstellen/features/consumption/data/obd2/obd2_link_drop_signal.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// Captured call to [_FakeObd2ClassicMethodChannel.connect].
@@ -384,6 +385,37 @@ void main() {
         reason: 'the raw PlatformException must be reclassified as a '
             'recoverable typed disconnect (matching the #2524 precedent)',
       );
+
+      await channel.close();
+    });
+
+    test(
+        '#3183 — a write-time drop ALSO fires the proactive link-drop signal '
+        'so the trip-independent reconnect controller is kicked', () async {
+      // The lazy write-failure path was the ONLY drop discovery that never
+      // called _signalDrop(): a drop noticed on write (no reader error /
+      // done edge yet) left the reconnect controller asleep.
+      fake.writeError =
+          PlatformException(code: 'state', message: 'not connected');
+      final channel = ClassicElmChannel(address: 'AA:BB:CC:DD:EE:83',
+          plugin: fake);
+      await channel.open();
+
+      final drops = <Obd2LinkDropEvent>[];
+      final dropSub = Obd2LinkDropSignal.instance.drops.listen(drops.add);
+      addTearDown(dropSub.cancel);
+
+      await expectLater(
+        channel.write([0x41, 0x54]),
+        throwsA(isA<Obd2DisconnectedException>()),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(drops, hasLength(1),
+          reason: 'the write-failure drop path must emit the #3019 proactive '
+              'signal exactly like the reader onError/onDone paths');
+      expect(drops.single.transportKind, 'classic');
+      expect(drops.single.mac, 'AA:BB:CC:DD:EE:83');
 
       await channel.close();
     });

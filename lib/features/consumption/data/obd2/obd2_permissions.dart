@@ -3,8 +3,11 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import 'classic_method_channel.dart';
 
 part 'obd2_permissions.g.dart';
 
@@ -65,7 +68,14 @@ abstract class Obd2Permissions {
 /// re-prompt — the picker UI offers an "Open Settings" deep link in
 /// that branch.
 class PluginObd2Permissions implements Obd2Permissions {
-  const PluginObd2Permissions();
+  /// [sdkIntProvider] is the Android SDK-level probe (#3183) — injectable so
+  /// tests can drive the permission-set selection without a platform channel.
+  /// Defaults to the real native `Build.VERSION.SDK_INT` probe.
+  const PluginObd2Permissions({
+    Future<int> Function() sdkIntProvider = _probeAndroidSdkInt,
+  }) : _sdkIntProvider = sdkIntProvider;
+
+  final Future<int> Function() _sdkIntProvider;
 
   @override
   Future<Obd2PermissionState> request() async {
@@ -148,20 +158,36 @@ class PluginObd2Permissions implements Obd2Permissions {
     return Obd2PermissionState.denied;
   }
 
-  /// Read the device's SDK level via the `permission_handler` plugin's
-  /// DeviceInfo plugin would be cleaner, but that pulls another dep.
-  /// Instead we fall back to [Platform.version] parsing, which is
-  /// allowed by Flutter's Platform channel when missing, and default
-  /// to 33 (Android 13) when parsing fails — biasing toward the newer
-  /// permission model is safer than accidentally falling back to the
-  /// legacy location prompt.
-  static Future<int> _androidSdkInt() async {
-    // Platform.version looks like "3.5.0 (stable) ... (Android SDK 33)"
-    // in debug but not in release. Hard-code 33 as the default; callers
-    // that need a precise read can inject a fake `Obd2Permissions`.
-    return 33;
+  /// #3183 — the device's REAL SDK level via the injected probe. The old
+  /// implementation hard-coded 33, which made the `< 31` legacy
+  /// location-permission branch in [_permissionsFor] unreachable — on
+  /// Android ≤ 11 the BLE scan was "granted" without any location
+  /// permission and silently returned zero results. Falls back to 33
+  /// (the modern split-permission model) when the probe fails — e.g. an
+  /// old native side without the `sdkInt` method — because biasing newer
+  /// is safer than wrongly showing the legacy location prompt on a modern
+  /// device.
+  Future<int> _androidSdkInt() async {
+    try {
+      return await _sdkIntProvider();
+    } catch (_) {
+      // Best-effort probe with a documented bias: a missing/old native
+      // method must never break the permission flow.
+      return 33;
+    }
   }
+
+  /// #3183 test seam — the permission set [request]/[current] would ask for,
+  /// resolved through the (injectable) SDK probe + its 33 fallback.
+  @visibleForTesting
+  Future<List<Permission>> debugRequiredPermissions() async =>
+      _permissionsFor(await _androidSdkInt());
 }
+
+/// #3183 — default production probe: `Build.VERSION.SDK_INT` over the
+/// existing in-repo Classic plugin's MethodChannel (no extra dependency —
+/// the alternative, device_info_plus, is not in the dependency set).
+Future<int> _probeAndroidSdkInt() => const Obd2ClassicMethodChannel().sdkInt();
 
 @Riverpod(keepAlive: true)
 Obd2Permissions obd2Permissions(Ref ref) => const PluginObd2Permissions();
