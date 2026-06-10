@@ -131,7 +131,7 @@ class TripSharesSync {
       debugPrint('TripSharesSync.shareWithEmail: shared $tripId');
       return TripShareResult.shared;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: {'where': 'TripSharesSync.shareWithEmail FAILED for $tripId'}));
       return TripShareResult.failed;
     }
@@ -160,7 +160,7 @@ class TripSharesSync {
       debugPrint('TripSharesSync.createShareLink: minted token for $tripId');
       return token;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: {'where': 'TripSharesSync.createShareLink FAILED for $tripId'}));
       return null;
     }
@@ -184,7 +184,7 @@ class TripSharesSync {
       );
       return claimed is String && claimed.isNotEmpty;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'TripSharesSync.claimShareLink FAILED'}));
       return false;
     }
@@ -205,7 +205,7 @@ class TripSharesSync {
           .eq('trip_id', tripId);
       return parseShareRows(rows);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: {'where': 'TripSharesSync.listSharesForTrip FAILED for $tripId'}));
       return const [];
     }
@@ -226,7 +226,7 @@ class TripSharesSync {
           .eq('owner_id', userId);
       debugPrint('TripSharesSync.revoke: revoked $shareId');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: {'where': 'TripSharesSync.revoke FAILED for $shareId'}));
     }
   }
@@ -266,7 +266,7 @@ class TripSharesSync {
           .inFilter('id', tripIds.toList());
       return parseSharedSummaries(summaryRows);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'TripSharesSync.fetchSharedWithMe FAILED'}));
       return const [];
     }
@@ -301,7 +301,7 @@ class TripSharesSync {
       try {
         out.add(TripHistoryEntry.fromJson(data.cast<String, dynamic>()));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st,
+        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
             context: {'where': 'TripSharesSync.parseSharedSummaries decode failed for ${r['id']}'}));
       }
     }

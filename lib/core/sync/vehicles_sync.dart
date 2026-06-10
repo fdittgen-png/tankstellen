@@ -94,7 +94,7 @@ class VehiclesSync {
           try {
             return VehicleProfile.fromJson(data);
           } catch (e, st) {
-            unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.merge decode failed'}));
+            unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'VehiclesSync.merge decode failed'}));
             return null;
           }
         }
@@ -103,7 +103,7 @@ class VehiclesSync {
 
       return [...liveLocal, ...downloaded];
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.merge FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'VehiclesSync.merge FAILED'}));
       return localVehicles;
     }
   }
@@ -124,7 +124,7 @@ class VehiclesSync {
           .eq('id', vehicleId);
       await DeletionsSync.record('vehicles', vehicleId); // #3078
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'VehiclesSync.delete FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'VehiclesSync.delete FAILED'}));
     }
   }
 }

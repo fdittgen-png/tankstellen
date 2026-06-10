@@ -75,7 +75,7 @@ class PriceHistorySync {
           .order('recorded_at', ascending: true);
       return List<Map<String, dynamic>>.from(rows);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'PriceHistorySync.fetch FAILED'}));
       return [];
     }

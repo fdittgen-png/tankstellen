@@ -66,7 +66,7 @@ class IgnoredStationsSync {
 
       return localIds.union(serverIds).toList();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'IgnoredStationsSync.merge FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'IgnoredStationsSync.merge FAILED'}));
       return localIgnoredIds;
     }
   }
@@ -87,7 +87,7 @@ class IgnoredStationsSync {
           .eq('station_id', stationId);
       await DeletionsSync.record('ignored_stations', stationId);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'IgnoredStationsSync.delete FAILED'}));
     }
   }

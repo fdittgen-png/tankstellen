@@ -51,7 +51,7 @@ class RatingsSync {
       debugPrint(
           'RatingsSync.upsert: $stationId = $rating stars (shared=$shared)');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.upsert FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.upsert FAILED'}));
     }
   }
 
@@ -87,7 +87,7 @@ class RatingsSync {
           .upsert(rows, onConflict: 'user_id,station_id');
       debugPrint('RatingsSync.upsertAll: ${rows.length} ratings in 1 round-trip');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.upsertAll FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.upsertAll FAILED'}));
     }
   }
 
@@ -109,7 +109,7 @@ class RatingsSync {
       await DeletionsSync.record('station_ratings', stationId);
       debugPrint('RatingsSync.delete: $stationId removed');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.delete FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.delete FAILED'}));
     }
   }
 
@@ -141,7 +141,7 @@ class RatingsSync {
       }
       return result;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'RatingsSync.fetchAll FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.fetchAll FAILED'}));
       return {};
     }
   }

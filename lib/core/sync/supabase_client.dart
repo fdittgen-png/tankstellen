@@ -171,7 +171,7 @@ class TankSyncClient {
     try {
       await c.auth.signOut();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'TankSync: sign-out after upsert failure also failed'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'TankSync: sign-out after upsert failure also failed'}));
     }
     _initialized = false;
     throw StateError(
