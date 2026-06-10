@@ -14,6 +14,7 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../station_detail/domain/open_now.dart';
 import '../../station_detail/domain/opening_hours.dart';
 import 'spain_opening_hours_adapter.dart';
 import 'spain_provinces.dart';
@@ -32,20 +33,28 @@ class MitecoStationService with StationServiceHelpers implements StationService 
   final Dio _dio;
   final String _baseUrl;
   final CacheStrategy? _cache;
+  final DateTime Function() _now;
 
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
   /// #2193 — [baseUrl] injectable too, harmonising the override surface
   /// with Portugal / Slovenia / South Korea; defaults to [defaultBaseUrl].
   /// #2264 — [cache] enables per-province disk persistence (read-through);
   /// omit it for the pure in-memory behaviour the parser tests rely on.
-  MitecoStationService({Dio? dio, String? baseUrl, CacheStrategy? cache})
-      : _dio = dio ??
+  /// #3189 — [now] is the clock seam for the schedule-derived `isOpen`;
+  /// defaults to the wall clock.
+  MitecoStationService({
+    Dio? dio,
+    String? baseUrl,
+    CacheStrategy? cache,
+    DateTime Function()? now,
+  })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 20),
               receiveTimeout: const Duration(seconds: 30),
             ),
         _baseUrl = baseUrl ?? defaultBaseUrl,
-        _cache = cache;
+        _cache = cache,
+        _now = now ?? DateTime.now;
 
   // #2264 — soft/hard dataset TTLs mirror the ES FuelServicePolicy (soft 6 h,
   // hard 24 h). The legacy single-list 10-minute cache is replaced by a
@@ -193,15 +202,28 @@ class MitecoStationService with StationServiceHelpers implements StationService 
       final postalCode = r['C.P.']?.toString() ?? '';
       final horario = r['Horario']?.toString() ?? '';
 
-      // Determine if open based on schedule (simplistic: assume open if horario is not empty)
-      final isOpen = horario.isNotEmpty && horario != 'Cerrado';
-
       // #2713 — parse the MITECO `Horario` string (e.g. `L-D: 24H`,
       // `L-V: 06:00-23:00; S-D: 08:00-23:00`) into the common
       // [WeeklyOpeningHours]. The legacy `openingHoursText` / `isOpen` stay
       // for back-compat; the structured `weeklyHours` is the canonical
       // signal the #2706 detail-fallback threads into the detail screen.
       final weeklyHours = const SpainOpeningHoursAdapter().parse(horario);
+
+      // #3189 — derive isOpen from the parsed schedule when available (the
+      // old heuristic returned true for ANY non-empty horario, so a
+      // "L-V: 06:00-23:00" station showed open at 3 AM). When the schedule is
+      // unusable, fall back to the legacy non-empty heuristic.
+      final fallbackOpen = horario.isNotEmpty && horario != 'Cerrado';
+      final bool isOpen;
+      if (weeklyHours.availability == OpeningHoursAvailability.notProvided) {
+        isOpen = fallbackOpen;
+      } else {
+        isOpen = switch (computeOpenNow(weeklyHours, _now()).status) {
+          OpenStatus.open => true,
+          OpenStatus.closed => false,
+          OpenStatus.unknown => fallbackOpen,
+        };
+      }
 
       // #753 — `es-` prefix so a MITECO `IDEESS` (bare numeric) cannot
       // collide with another country's numeric id space.
@@ -223,7 +245,11 @@ class MitecoStationService with StationServiceHelpers implements StationService 
         e98: _parseCommaDouble(r['Precio Gasolina 98 E5']?.toString()),
         diesel: _parseCommaDouble(r['Precio Gasoleo A']?.toString()),
         dieselPremium: _parseCommaDouble(r['Precio Gasoleo Premium']?.toString()),
-        e85: _parseCommaDouble(r['Precio Gasolina 95 E85']?.toString()),
+        // #3189 — E85 lives in 'Precio Bioetanol' (the live row carries
+        // '% BioEtanol': '85,0'); the 'Precio Gasolina 95 E85' column is kept
+        // as a fallback (a couple of live stations still populate it).
+        e85: _parseCommaDouble(r['Precio Bioetanol']?.toString()) ??
+            _parseCommaDouble(r['Precio Gasolina 95 E85']?.toString()),
         lpg: _parseCommaDouble(r['Precio Gases licuados del petróleo']?.toString()),
         cng: _parseCommaDouble(r['Precio Gas Natural Comprimido']?.toString()),
         isOpen: isOpen,
@@ -232,7 +258,9 @@ class MitecoStationService with StationServiceHelpers implements StationService 
                 OpeningHoursAvailability.notProvided
             ? null
             : weeklyHours,
-        stationType: r['Margen']?.toString(),
+        // #3189 — MITECO `Margen` (D/I/N: road side the station sits on) was
+        // stuffed into `stationType`, whose contract is R(etail)/A(utoroute).
+        // It is intentionally NOT mapped.
       );
     } on FormatException catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'MITECO station parse failed'}));
