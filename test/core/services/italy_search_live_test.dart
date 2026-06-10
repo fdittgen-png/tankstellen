@@ -9,6 +9,8 @@ import 'package:tankstellen/features/station_services/italy/mise_station_service
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
+import '../../helpers/network_retry.dart';
+
 /// #695 — live end-to-end search against the Italian MISE provider.
 /// Hits `mimit.gov.it/images/exportCSV/anagrafica_impianti_attivi.csv`
 /// + the price CSV, asserts >0 stations for Rome and Milan.
@@ -21,13 +23,16 @@ void main() {
     'MISE returns stations within 10km of Rome (Roma Centro)',
     () async {
       final service = MiseStationService();
-      // Via del Corso, Roma (Piazza Venezia area)
-      final result = await service.searchStations(
-        const SearchParams(
-          lat: 41.8967,
-          lng: 12.4822,
-          radiusKm: 10,
-          fuelType: FuelType.e10,
+      // Via del Corso, Roma (Piazza Venezia area). #3096 — retry the live
+      // upstream fetch so a transient MIMIT timeout self-heals.
+      final result = await retryNetwork(
+        () => service.searchStations(
+          const SearchParams(
+            lat: 41.8967,
+            lng: 12.4822,
+            radiusKm: 10,
+            fuelType: FuelType.e10,
+          ),
         ),
       );
       expect(result.data, isNotEmpty,
@@ -49,12 +54,14 @@ void main() {
     'MISE returns stations within 5km of Milan (Duomo)',
     () async {
       final service = MiseStationService();
-      final result = await service.searchStations(
-        const SearchParams(
-          lat: 45.4642,
-          lng: 9.1900,
-          radiusKm: 5,
-          fuelType: FuelType.diesel,
+      final result = await retryNetwork(
+        () => service.searchStations(
+          const SearchParams(
+            lat: 45.4642,
+            lng: 9.1900,
+            radiusKm: 5,
+            fuelType: FuelType.diesel,
+          ),
         ),
       );
       expect(result.data, isNotEmpty,
