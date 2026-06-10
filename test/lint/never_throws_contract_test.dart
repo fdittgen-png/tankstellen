@@ -51,7 +51,6 @@ void main() {
   const grandfathered = <String>{
     'lib/core/services/radar/corridor_location_cache.dart',
     'lib/core/sync/trip_shares_sync.dart',
-    'lib/core/telemetry/pii_scrubber.dart',
     'lib/features/consumption/data/obd2/adapter_capability.dart',
     'lib/features/consumption/data/obd2/adapter_reconnect_scanner.dart',
     'lib/features/consumption/data/obd2/auto_trip_coordinator.dart',

@@ -1,12 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'hive_cipher_loader.dart';
 import 'hive_isolate_ownership.dart';
 import 'hive_legacy_migration.dart';
 import 'hive_schema_migration.dart';
@@ -127,7 +125,6 @@ class HiveBoxes {
     priceHistory,
     alerts,
   };
-  static const _hiveEncryptionKeyName = 'hive_encryption_key';
 
   /// Meta box recording the schema version of each persistent box
   /// (#1686). Unencrypted — it holds only small integers, no PII — and
@@ -147,20 +144,9 @@ class HiveBoxes {
   /// cached-`Station` key set here so a future change without a bump FAILS.
   static const int currentSchemaVersion = 2;
 
-  static Future<HiveAesCipher> _loadCipher() async {
-    const secureStorage = FlutterSecureStorage();
-    final existing = await secureStorage.read(key: _hiveEncryptionKeyName);
-    if (existing != null) {
-      final keyBytes = base64Url.decode(existing);
-      return HiveAesCipher(keyBytes);
-    }
-    final key = Hive.generateSecureKey();
-    await secureStorage.write(
-      key: _hiveEncryptionKeyName,
-      value: base64UrlEncode(key),
-    );
-    return HiveAesCipher(key);
-  }
+  // #3149 — the secure-storage cipher load (and its StorageInitException
+  // re-tag) lives in HiveCipherLoader so a keychain/keystore fault
+  // surfaces typed instead of bricking the splash untyped.
 
   /// Test hook for [HiveLegacyMigration.migrateToEncrypted] (#1686).
   @visibleForTesting
@@ -198,7 +184,7 @@ class HiveBoxes {
   /// `init()` opens is still open before it returns.
   static Future<void> init() async {
     await Hive.initFlutter();
-    final cipher = await _loadCipher();
+    final cipher = await HiveCipherLoader.loadGuarded();
 
     // Phase 1 — migrate any pre-encryption plaintext boxes. The probes
     // are independent, so they (and any migration) run in parallel.
@@ -285,7 +271,7 @@ class HiveBoxes {
   /// Initialize Hive in a background isolate with proper encryption.
   static Future<void> initInIsolate() async {
     await Hive.initFlutter();
-    final cipher = await _loadCipher();
+    final cipher = await HiveCipherLoader.loadGuarded();
     await Hive.openBox(settings, encryptionCipher: cipher);
     await Hive.openBox(favorites, encryptionCipher: cipher);
     await Hive.openBox(profiles, encryptionCipher: cipher); // #2205 BG widget

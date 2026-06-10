@@ -21,6 +21,7 @@ import '../core/cache/cache_manager.dart';
 import '../core/feedback/auto_record_badge_provider.dart';
 import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/storage/isolate_error_spool.dart';
+import '../core/telemetry/storage/startup_failure_store.dart';
 import '../core/telemetry/storage/trace_storage.dart';
 import '../core/telemetry/trace_recorder.dart';
 import '../core/logging/error_logger.dart';
@@ -122,7 +123,21 @@ class AppInitializer {
     try {
       await _initStorage();
     } on HiveCorruptionException catch (e, st) {
+      // #3149 — Hive is down, so errorLogger's spool can't write either;
+      // persist the cause to a plain file the NEXT launch replays.
+      await StartupFailureStore.persist(e, st);
       unawaited(errorLogger.log(ErrorLayer.storage, e, st));
+      runApp(const StorageRecoveryHost());
+      return;
+    } catch (e, st) {
+      // #3149 — any OTHER storage-phase failure (the secure-storage
+      // cipher StorageInitException, a TraceStorage/loadApiKey/
+      // ensureDefaultProfile fault) previously escaped uncaught: no Zone
+      // handler exists yet (handlers install in _launch), so the user
+      // froze on the splash with zero telemetry. Same recovery route.
+      await StartupFailureStore.persist(e, st);
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: {'where': 'initStorage'}));
       runApp(const StorageRecoveryHost());
       return;
     }
@@ -1025,6 +1040,22 @@ class AppInitializer {
         unawaited(errorLogger.log(ErrorLayer.background, e, st,
             context: {'where': 'isolate spool drain'}));
       }
+    });
+
+    // #3149 — replay the Hive-independent record of a previous BRICKED
+    // launch (storage phase failed before any telemetry channel was up;
+    // the cause was persisted to a plain file) into the trace pipeline,
+    // so the maintainer finally sees why the splash froze.
+    _deferPostFirstFrame(() async {
+      final failure = await StartupFailureStore.drain();
+      if (failure == null) return;
+      await errorLogger.log(
+        ErrorLayer.storage,
+        Exception('previous launch bricked during startup: '
+            '${failure['errorType']}: ${failure['error']}'),
+        StackTrace.fromString(failure['stack'] as String? ?? ''),
+        context: {'where': 'startupFailureReplay', 'at': failure['at']},
+      );
     });
 
     StartupTimer.instance.mark('first_frame');

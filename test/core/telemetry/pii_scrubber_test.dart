@@ -341,4 +341,25 @@ void main() {
       expect(out, contains('0.25'));
     });
   });
+
+  group('never-throws contract (#2349 fault injection)', () {
+    test('scrubText returns normally on adversarial inputs', () {
+      // Pathological strings that stress every regex branch at once:
+      // unbalanced braces, regex metacharacters, surrogate-heavy text,
+      // and a megastring of repeated near-matches.
+      final adversarial = <String?>[
+        null,
+        '',
+        r'lat=NaN lng={]\(*+?^$ 48. , .5',
+        'lat: ${'9' * 400}.${'9' * 400}',
+        '\u{1F600}' * 100,
+        'a@b lat=,, lng== 12.,34. ${'lat=1.1 ' * 5000}',
+      ];
+      for (final input in adversarial) {
+        expect(() => PiiScrubber.scrubText(input), returnsNormally);
+        expect(() => PiiScrubber.scrubBreadcrumbMessage(input),
+            returnsNormally);
+      }
+    });
+  });
 }
