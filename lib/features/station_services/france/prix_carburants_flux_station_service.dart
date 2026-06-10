@@ -112,15 +112,23 @@ class PrixCarburantsFluxStationService
     }
 
     final all = _cachedStations ?? const <Station>[];
-    final withDist = <Station>[
-      for (final s in all)
-        s.copyWith(dist: roundedDistance(params.lat, params.lng, s.lat, s.lng)),
-    ];
-
-    // Strict radius filter — unlike a top-N fallback, a far-from-France search
-    // correctly returns empty (the legacy path's #298/#315 radius contract).
-    final stations =
-        withDist.where((s) => s.dist <= params.radiusKm).toList();
+    // #3152 — compute the distance first and `copyWith` ONLY the in-radius
+    // survivors. The previous shape copied all ~11k national stations per
+    // search before discarding everything outside the radius — pure
+    // allocation churn on the UI isolate. Output is unchanged: the same
+    // rounded distance drives the same strict filter, and the survivors
+    // carry the identical `dist` they did before.
+    //
+    // Strict radius filter — unlike a top-N fallback, a far-from-France
+    // search correctly returns empty (the legacy path's #298/#315 radius
+    // contract).
+    final stations = <Station>[];
+    for (final s in all) {
+      final dist = roundedDistance(params.lat, params.lng, s.lat, s.lng);
+      if (dist <= params.radiusKm) {
+        stations.add(s.copyWith(dist: dist));
+      }
+    }
     sortStations(stations, params);
 
     return wrapStations(stations, ServiceSource.prixCarburantsApi);
@@ -159,7 +167,13 @@ class PrixCarburantsFluxStationService
     );
     final bytes = response.data;
     if (bytes == null || bytes.isEmpty) return const [];
-    return flux.parseFluxZip(Uint8List.fromList(bytes));
+    // #3152 — the whole-country ZIP+XML parse (~11k stations) runs in a
+    // background isolate via `compute` (same pattern as the Argentina CSV
+    // bulk parse) so a cold-start search doesn't jank the UI isolate.
+    // [flux.parseFluxZip] is a pure top-level function and [Station] is a
+    // plain immutable object graph, so both the message and the result are
+    // isolate-sendable.
+    return compute(flux.parseFluxZip, Uint8List.fromList(bytes));
   }
 
   /// Clears the in-memory dataset so the next search re-downloads. For tests.
