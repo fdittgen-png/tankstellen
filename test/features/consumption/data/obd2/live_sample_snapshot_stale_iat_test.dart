@@ -37,8 +37,6 @@ class _StubTransport implements Obd2Transport {
 class _AllSupportedService extends Obd2Service {
   _AllSupportedService() : super(_StubTransport());
   @override
-  bool supportsPid(int pid) => true;
-  @override
   bool isPidSupported(int pid) => true;
 }
 

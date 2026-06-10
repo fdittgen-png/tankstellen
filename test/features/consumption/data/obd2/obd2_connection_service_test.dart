@@ -928,8 +928,8 @@ void main() {
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
-      expect(ready.supportsPid(0x0B), isTrue);
-      expect(ready.supportsPid(0x5E), isFalse);
+      expect(ready.isPidSupported(0x0B), isTrue);
+      expect(ready.isPidSupported(0x5E), isFalse);
       // Persisted under the production key for the next session.
       expect(SupportedPidsCache(box).get(prodKey),
           containsAll([0x01, 0x0B, 0x0C, 0x0F]));
@@ -958,8 +958,8 @@ void main() {
 
       final ready = await svc.connect(_resolvedVlinker(registry));
       // Cached bitmap populated the in-memory set without a scan/VIN read.
-      expect(ready.supportsPid(0x0B), isTrue);
-      expect(ready.supportsPid(0x5E), isFalse);
+      expect(ready.isPidSupported(0x0B), isTrue);
+      expect(ready.isPidSupported(0x5E), isFalse);
       await ready.disconnect();
     });
 
@@ -976,7 +976,7 @@ void main() {
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
-      expect(ready.supportsPid(0x5E), isTrue);
+      expect(ready.isPidSupported(0x5E), isTrue);
       expect(box.length, 0);
       await ready.disconnect();
     });

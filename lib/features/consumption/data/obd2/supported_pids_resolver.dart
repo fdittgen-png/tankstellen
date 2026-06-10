@@ -266,10 +266,6 @@ class SupportedPidsResolver {
   bool isPidSupported(int pid) =>
       _supportedPids == null || _supportedPids!.contains(pid);
 
-  /// Alias for [isPidSupported] — matches the name used in the #811
-  /// issue.
-  bool supportsPid(int pid) => isPidSupported(pid);
-
   /// Direct view of the supported-PID set for tests and diagnostics.
   /// Returns an unmodifiable empty set when discovery hasn't run.
   Set<int> get debugSupportedPids => Set.unmodifiable(_supportedPids ?? {});

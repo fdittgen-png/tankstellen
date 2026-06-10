@@ -33,12 +33,12 @@ import 'trip_live_reading.dart';
 import 'trip_sample_buffer.dart';
 import 'virtual_odometer.dart';
 
-// Re-export the DTO + distance-source constants so existing callers
-// (providers, widget tests) that import this file keep working after
-// the #563 controller-split refactor. New callers should import the
-// individual files directly.
-export 'trip_distance_source.dart'
-    show kDistanceSourceReal, kDistanceSourceVirtual, kDistanceSourceGps;
+// Re-export the live-reading DTO so existing callers (providers,
+// widget tests) that import this file keep working after the #563
+// controller-split refactor. New callers should import the individual
+// files directly. The kDistanceSource* re-export was dropped in #3175
+// (every consumer already imports trip_distance_source.dart directly);
+// the two remaining re-exports stay — 12 importers still rely on them.
 export 'trip_live_reading.dart' show TripLiveReading;
 // #2188 — TripDropReason moved with the drop-RECOVERY state machine into
 // DroppedSessionManager. Re-export it here so the providers / widgets /

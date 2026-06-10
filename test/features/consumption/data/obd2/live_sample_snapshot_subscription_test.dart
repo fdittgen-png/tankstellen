@@ -35,9 +35,8 @@ class _SupportStubService extends Obd2Service {
   final Set<int>? _supported;
 
   @override
-  bool supportsPid(int pid) => _supported == null || _supported.contains(pid);
-  @override
-  bool isPidSupported(int pid) => supportsPid(pid);
+  bool isPidSupported(int pid) =>
+      _supported == null || _supported.contains(pid);
 }
 
 /// Drives subscribeAllTiers on a scheduler whose transport records each
