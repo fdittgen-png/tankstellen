@@ -223,7 +223,8 @@ class CacheManager implements CacheStrategy {
       await _storage.cacheData(key, {
         'payload': data,
         'storedAt': DateTime.now().millisecondsSinceEpoch,
-        'source': source.index,
+        // #3150 — the enum NAME, not the reorder-fragile index.
+        'source': source.name,
         'ttlMs': ttl.inMilliseconds,
       });
     } on FileSystemException catch (e, st) {
@@ -257,12 +258,21 @@ class CacheManager implements CacheStrategy {
       storedAt: DateTime.fromMillisecondsSinceEpoch(
         raw['storedAt'] as int? ?? 0,
       ),
-      originalSource: ServiceSource.values.elementAtOrNull(
-            raw['source'] as int? ?? 0,
-          ) ??
-          ServiceSource.cache,
+      originalSource: _sourceFrom(raw['source']),
       ttl: Duration(milliseconds: raw['ttlMs'] as int? ?? 300000),
     );
+  }
+
+  /// Resolves the persisted `source` — enum name (new) or index (legacy);
+  /// unknown values fall back to [ServiceSource.cache] (pre-#3150 behaviour).
+  static ServiceSource _sourceFrom(dynamic raw) {
+    if (raw is String) {
+      return ServiceSource.values.asNameMap()[raw] ?? ServiceSource.cache;
+    }
+    if (raw is int) {
+      return ServiceSource.values.elementAtOrNull(raw) ?? ServiceSource.cache;
+    }
+    return ServiceSource.cache;
   }
 
   /// Get data only if the cache entry is still valid (not expired).

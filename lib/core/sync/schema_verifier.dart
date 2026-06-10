@@ -75,7 +75,12 @@ class SchemaVerifier {
             .count()
             .then((_) => MapEntry(table, true))
             .catchError((Object e, StackTrace st) {
-          unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'SchemaVerifier: table check failed'}));
+          // #3150 — name the table: "table check failed" without it left
+          // the self-hoster's missing table unidentifiable.
+          unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
+            'where': 'SchemaVerifier: table check failed',
+            'table': table,
+          }));
           return MapEntry(table, false);
         }),
       ),

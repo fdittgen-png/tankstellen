@@ -123,18 +123,15 @@ class AppInitializer {
     try {
       await _initStorage();
     } on HiveCorruptionException catch (e, st) {
-      // #3149 — Hive is down, so errorLogger's spool can't write either;
-      // persist the cause to a plain file the NEXT launch replays.
+      // #3149 — Hive is down (spool can't write); plain-file the cause.
       await StartupFailureStore.persist(e, st);
       unawaited(errorLogger.log(ErrorLayer.storage, e, st));
       runApp(const StorageRecoveryHost());
       return;
     } catch (e, st) {
-      // #3149 — any OTHER storage-phase failure (the secure-storage
-      // cipher StorageInitException, a TraceStorage/loadApiKey/
-      // ensureDefaultProfile fault) previously escaped uncaught: no Zone
-      // handler exists yet (handlers install in _launch), so the user
-      // froze on the splash with zero telemetry. Same recovery route.
+      // #3149 — any OTHER storage-phase fault (secure-storage cipher,
+      // TraceStorage, loadApiKey…) previously escaped uncaught — no Zone
+      // handler exists yet — freezing the splash with zero telemetry.
       await StartupFailureStore.persist(e, st);
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: {'where': 'initStorage'}));
@@ -878,6 +875,7 @@ class AppInitializer {
         details.exception,
         details.stack ?? StackTrace.current,
         context: <String, Object?>{
+          'where': 'FlutterError.onError', // #3150 — name the handler
           'library': details.library,
           'context': details.context?.toString(),
         },
@@ -886,7 +884,10 @@ class AppInitializer {
     // Capture async / platform errors that escape the framework.
     PlatformDispatcher.instance.onError = (error, stack) {
       if (_isTileFetchNoise(error) || isBenignStreamCancel(error)) return true;
-      errorLogger.log(ErrorLayer.other, error, stack);
+      // #3150 — context so a dispatcher-caught trace is distinguishable
+      // from a bare errorLogger call site.
+      errorLogger.log(ErrorLayer.other, error, stack,
+          context: const {'where': 'PlatformDispatcher.onError'});
       return true;
     };
   }
@@ -1042,10 +1043,8 @@ class AppInitializer {
       }
     });
 
-    // #3149 — replay the Hive-independent record of a previous BRICKED
-    // launch (storage phase failed before any telemetry channel was up;
-    // the cause was persisted to a plain file) into the trace pipeline,
-    // so the maintainer finally sees why the splash froze.
+    // #3149 — replay a previous bricked launch's plain-file cause record
+    // into the trace pipeline, so the frozen splash finally has a why.
     _deferPostFirstFrame(() async {
       final failure = await StartupFailureStore.drain();
       if (failure == null) return;

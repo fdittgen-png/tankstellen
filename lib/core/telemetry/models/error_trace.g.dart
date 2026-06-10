@@ -86,6 +86,11 @@ _AppStateSnapshot _$AppStateSnapshotFromJson(Map<String, dynamic> json) =>
       activeProfileName: json['activeProfileName'] as String?,
       lastApiEndpoint: json['lastApiEndpoint'] as String?,
       lastSearchParams: json['lastSearchParams'] as String?,
+      enabledFeatures:
+          (json['enabledFeatures'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$AppStateSnapshotToJson(_AppStateSnapshot instance) =>
@@ -95,6 +100,7 @@ Map<String, dynamic> _$AppStateSnapshotToJson(_AppStateSnapshot instance) =>
       'activeProfileName': instance.activeProfileName,
       'lastApiEndpoint': instance.lastApiEndpoint,
       'lastSearchParams': instance.lastSearchParams,
+      'enabledFeatures': instance.enabledFeatures,
     };
 
 _ServiceChainSnapshot _$ServiceChainSnapshotFromJson(
