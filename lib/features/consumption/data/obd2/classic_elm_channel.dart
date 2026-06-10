@@ -34,7 +34,14 @@ class ClassicElmChannel implements ElmByteChannel {
   final Obd2ClassicMethodChannel _plugin;
 
   StreamSubscription<List<int>>? _subscription;
-  final StreamController<List<int>> _incoming =
+
+  /// #3179 — NOT final: [close] closes the broadcast controller, and the
+  /// transport's open-retry loop (plus any reconnect) calls `close()` +
+  /// `open()` on the SAME channel instance, so [open] must be able to
+  /// recreate it. With a `final` controller the "recovered" link was a
+  /// zombie: every socket byte hit the #2953 `isClosed` guard and was
+  /// silently dropped, so every reply timed out.
+  StreamController<List<int>> _incoming =
       StreamController<List<int>>.broadcast();
   bool _open = false;
 
@@ -64,6 +71,18 @@ class ClassicElmChannel implements ElmByteChannel {
   @override
   Future<void> open() async {
     if (_open) return;
+    // #3179 — make the channel safely RE-openable. The transport's open-retry
+    // loop (#2906) and the reconnect path call close() + open() on the SAME
+    // instance; close() closed `_incoming` and latched `_closing`, and
+    // neither was ever undone — so the "recovered" link was a zombie (bytes
+    // silently dropped by the #2953 guard, the proactive drop signal
+    // suppressed forever). Reset both latches and, when a prior close()
+    // closed the controller, recreate it before connecting.
+    _closing = false;
+    _dropSignalled = false;
+    if (_incoming.isClosed) {
+      _incoming = StreamController<List<int>>.broadcast();
+    }
     // #2466 — gated comm-diagnostics connect-lifecycle tee. A no-op
     // unless Feature.debugMode armed the collector; each call
     // early-returns on `!enabled`, so production pays one cached-bool
@@ -208,6 +227,12 @@ class ClassicElmChannel implements ElmByteChannel {
       await _plugin.write(bytes);
     } catch (e, st) {
       _open = false;
+      // #3183 — the LAZY drop-discovery path: a drop noticed on write (no
+      // reader error/done edge fired, or the native side never surfaced one)
+      // must ALSO emit the #3019 proactive link-drop signal, or the
+      // trip-independent reconnect controller stays asleep until the next
+      // write that never comes. The reader onError/onDone paths already do.
+      _signalDrop();
       debugPrint('ClassicElmChannel: write failed — reclassifying as a '
           'recoverable disconnect (#2671): $e\n$st');
       throw const Obd2DisconnectedException(

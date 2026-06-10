@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
+import 'ble_adapter_state_gate.dart';
 import 'ble_disconnect_classifier.dart';
 import 'ble_link_tuner.dart';
 import 'connection_drop_debouncer.dart';
@@ -66,10 +67,10 @@ class FlutterBluePlusElmChannel
   /// #3118 — iOS-aware. iOS CoreBluetooth's `discoverServices` is slower than
   /// Android's, so the OBDLink CX's GATT-table resolution can blow Android's
   /// tight 5 s on a cold iPhone connect. Android keeps 5 s (byte-identical).
-  static Duration get _discoverTimeout =>
-      defaultTargetPlatform == TargetPlatform.iOS
-          ? const Duration(seconds: 8)
-          : const Duration(seconds: 5);
+  /// #3182 — int SECONDS now, passed to FBP's own `timeout:` parameter (see
+  /// [discoverAndBind]) instead of an outer Dart `.timeout()`.
+  static int get _discoverTimeoutSecs =>
+      defaultTargetPlatform == TargetPlatform.iOS ? 8 : 5;
 
   /// #3014 — bound `setNotifyValue`, for the same reason: a clone that accepts
   /// the descriptor write but never ACKs would otherwise block 15 s.
@@ -80,16 +81,19 @@ class FlutterBluePlusElmChannel
   /// CoreBluetooth than Android's 4 s. #3113 only widened the `connect()` budget
   /// (iOS 7 s); this very next step still clipped at 4 s. iOS gets 7 s; Android
   /// keeps 4 s (byte-identical — the #2242/#3014 tight bound stays load-bearing).
-  static Duration get _setNotifyTimeout =>
-      defaultTargetPlatform == TargetPlatform.iOS
-          ? const Duration(seconds: 7)
-          : const Duration(seconds: 4);
+  /// #3182 — int SECONDS now, passed to FBP's own `timeout:` parameter.
+  static int get _setNotifyTimeoutSecs =>
+      defaultTargetPlatform == TargetPlatform.iOS ? 7 : 4;
 
-  /// #3118 — test seams to lock the iOS-aware post-connect budgets.
+  /// #3118 — test seams to lock the iOS-aware post-connect budgets. Kept as
+  /// [Duration]s (built from the int-seconds FBP budgets) so the existing
+  /// budget-pinning tests stay byte-identical.
   @visibleForTesting
-  static Duration get debugDiscoverTimeout => _discoverTimeout;
+  static Duration get debugDiscoverTimeout =>
+      Duration(seconds: _discoverTimeoutSecs);
   @visibleForTesting
-  static Duration get debugSetNotifyTimeout => _setNotifyTimeout;
+  static Duration get debugSetNotifyTimeout =>
+      Duration(seconds: _setNotifyTimeoutSecs);
 
   /// #3014 — best-effort MTU asked for during the bounded-connect path. Clones
   /// often reject it; the post-discovery `requestMtu` in [tuneForRecording]
@@ -119,7 +123,14 @@ class FlutterBluePlusElmChannel
   BluetoothCharacteristic? _notifyChar;
   StreamSubscription<List<int>>? _subscription;
   StreamSubscription<BluetoothConnectionState>? _connStateSubscription;
-  final StreamController<List<int>> _incoming =
+
+  /// #3179 — NOT final: [close] closes the broadcast controller, and the
+  /// transport's open-retry loop (plus any reconnect) calls `close()` +
+  /// `open()` on the SAME channel instance, so [open] must be able to
+  /// recreate it. With a `final` controller the "recovered" link was a
+  /// zombie: every notify byte hit a closed controller and the reply timed
+  /// out forever.
+  StreamController<List<int>> _incoming =
       StreamController<List<int>>.broadcast();
   bool _open = false;
 
@@ -138,7 +149,13 @@ class FlutterBluePlusElmChannel
   /// disconnect still surfaces in ~1–2 s (not the ~15 s read timeout). On
   /// confirmation it pushes a typed [Obd2DisconnectedException] onto the byte
   /// stream, which the transport re-throws so [TripDropDetector] sees a drop.
-  late final ConnectionDropDebouncer _dropDebouncer;
+  /// #3179 — NOT `late final`: [close] disposes it, so a reopen rebuilds it
+  /// (same debounce, same callback) instead of reviving a disposed one.
+  late ConnectionDropDebouncer _dropDebouncer;
+
+  /// #3179 — the configured debounce, kept so [open] can rebuild
+  /// [_dropDebouncer] after a close() → open() cycle.
+  final Duration _dropDebounce;
 
   /// #3014 — scan-before-connect seed (THE highest-leverage SmartOBD fix).
   /// Runs a brief TARGETED scan for this device's MAC before the cold
@@ -170,7 +187,8 @@ class FlutterBluePlusElmChannel
   })  : _uuids = uuids ?? Elm327BleUuids.vgate,
         _connectTimeout = connectTimeout,
         _autoConnect = autoConnect,
-        _scanSeed = scanSeed {
+        _scanSeed = scanSeed,
+        _dropDebounce = dropDebounce {
     _dropDebouncer = ConnectionDropDebouncer(
       debounce: dropDebounce,
       onConfirmed: _onDropConfirmed,
@@ -210,6 +228,23 @@ class FlutterBluePlusElmChannel
   @override
   Future<void> open() async {
     if (_open) return;
+    // #3179 — make the channel safely RE-openable. The transport's open-retry
+    // loop (#2906/#3014) and the reconnect path call close() + open() on the
+    // SAME instance; close() closed `_incoming` and latched `_closing`, and
+    // neither was ever undone — so the "recovered" link was a zombie (notify
+    // bytes silently dropped, the drop debouncer + drop-signal permanently
+    // dead). Reset the deliberate-close + drop-signal latches and, when a
+    // prior close() closed the controller, recreate it and rebuild the
+    // disposed debouncer before the GATT dance runs.
+    _closing = false;
+    _dropSignalled = false;
+    if (_incoming.isClosed) {
+      _incoming = StreamController<List<int>>.broadcast();
+      _dropDebouncer = ConnectionDropDebouncer(
+        debounce: _dropDebounce,
+        onConfirmed: _onDropConfirmed,
+      );
+    }
     // #2466 — gated comm-diagnostics connect-lifecycle tee. A no-op unless
     // `Feature.debugMode` armed the collector; each call early-returns on
     // `!enabled`, so production pays one cached-bool read per event.
@@ -279,6 +314,13 @@ class FlutterBluePlusElmChannel
   @protected
   @visibleForTesting
   Future<void> connectDevice() async {
+    // #3182 — wait (bounded, best-effort) for `adapterState == on` before ANY
+    // connect dispatch. FBP's darwin side creates the CBCentralManager lazily
+    // in the first method call and instantly rejects a connect issued while
+    // it still reports `unknown` — so a cold-launch direct connect failed
+    // spuriously on iOS. On timeout the connect proceeds, so a genuinely-off
+    // adapter still surfaces through the existing error classification.
+    await waitForAdapterOn();
     final timeout = _connectTimeout;
     if (_autoConnect) {
       // #2261 concern 2 — passive autoConnect GATT wait. No bounded timeout:
@@ -403,9 +445,16 @@ class FlutterBluePlusElmChannel
   Future<void> discoverAndBind() async {
     // #3014 — bound discoverServices on its own short budget (FBP default 15 s)
     // so a clone whose GATT table never resolves fails in ~5 s as `gattTimeout`,
-    // not a 15 s hang. The TimeoutException classifies to `gattTimeout`.
+    // not a 15 s hang.
+    // #3182 — the budget is now FBP's OWN `timeout:` parameter, not an outer
+    // Dart `.timeout()`: the outer form fired OUR TimeoutException at the
+    // budget but left FBP's GLOBAL per-device mutex held for the full 15 s
+    // default, serializing (deadlocking) every retry that followed. FBP's
+    // native timeout releases the mutex at our budget; its
+    // FlutterBluePlusException ("Timed out after Ns") still classifies as
+    // `gattTimeout` (see classifyBleOpenOutcome).
     final services =
-        await _device.discoverServices().timeout(_discoverTimeout);
+        await _device.discoverServices(timeout: _discoverTimeoutSecs);
     // #3014 — property-based discovery: adapt FBP services into the pure
     // descriptor shape, then resolve the write+notify pair by characteristic
     // PROPERTY across the known ELM families, with the registry UUIDs as a
@@ -454,14 +503,11 @@ class FlutterBluePlusElmChannel
       (c) => c.uuid.str.toLowerCase() == resolved.notifyCharUuid.toLowerCase(),
     );
     // #3014 — bound setNotifyValue on its own short budget too.
-    await _notifyChar!.setNotifyValue(true).timeout(_setNotifyTimeout);
+    // #3182 — via FBP's own `timeout:` (mutex released at our budget; the
+    // outer Dart `.timeout()` left it held up to 15 s — see above).
+    await _notifyChar!.setNotifyValue(true, timeout: _setNotifyTimeoutSecs);
     _subscription = _notifyChar!.lastValueStream.listen(
-      (bytes) {
-        // #2467 — tee the raw chunk into the gated comm-diagnostics
-        // wire-framing counters (double-gated, so production pays nothing).
-        noteObd2Framing(bytes);
-        _incoming.add(bytes);
-      },
+      handleNotifyBytes,
       onError: (e, st) {
         // #2900 — a mid-session disconnect can surface here too (the GATT/ATT
         // stack errors the notify stream when the adapter drops). Clear the
@@ -494,6 +540,28 @@ class FlutterBluePlusElmChannel
       },
     );
   }
+
+  /// #3179 — the notify-stream DATA handler, extracted so a reopen test can
+  /// drive the EXACT production byte path without a real BLE stack (FBP's
+  /// `lastValueStream` is unfakeable). Tees the chunk into the gated
+  /// comm-diagnostics framing counters (#2467) and feeds the live incoming
+  /// controller. The `isClosed` guard mirrors [ClassicElmChannel]'s #2953
+  /// late-byte guard: a chunk already queued on the event loop can land
+  /// AFTER close() closed `_incoming` — drop it silently, never throw.
+  @protected
+  @visibleForTesting
+  void handleNotifyBytes(List<int> bytes) {
+    noteObd2Framing(bytes);
+    if (!_incoming.isClosed) _incoming.add(bytes);
+  }
+
+  /// #3179 test seam — feed a raw connection-state edge into the drop
+  /// debouncer exactly as the FBP `connectionState` listener does, so a test
+  /// can prove drop detection still works after a close() → open() cycle
+  /// (the real stream is unfakeable).
+  @visibleForTesting
+  void debugNoteConnectionState({required bool disconnected}) =>
+      _dropDebouncer.noteConnectionState(disconnected: disconnected);
 
   /// #2261 concern 1 — subscribe to the connection-state stream so a real
   /// disconnect is noticed in ~1–2 s. The first emission is the current state
@@ -632,11 +700,19 @@ class FlutterBluePlusElmChannel
   /// The raw characteristic write, behind a [protected] [visibleForTesting]
   /// seam so a fault-injection test can drive [write]'s #2900 reclassification
   /// without a real BLE stack (a real [BluetoothCharacteristic] is not
-  /// mockable). Production writes exactly as before.
+  /// mockable).
+  ///
+  /// #3182 — write mode follows the RESOLVED characteristic's properties
+  /// instead of a hardcoded `withoutResponse: true`: FBP fails loudly when
+  /// asked for a write mode the characteristic doesn't advertise, so a clone
+  /// whose write char only supports acknowledged writes could never receive a
+  /// single command. `writeWithoutResponse` is still preferred whenever the
+  /// adapter advertises it (fastest BLE write path).
   @protected
   @visibleForTesting
   Future<void> writeRaw(BluetoothCharacteristic char, List<int> bytes) =>
-      char.write(bytes, withoutResponse: true);
+      char.write(bytes,
+          withoutResponse: char.properties.writeWithoutResponse);
 
   /// #2900 test seam — prime an established session so a fault-injection test
   /// can drive [write] without the real connect path. #2907 — also wires

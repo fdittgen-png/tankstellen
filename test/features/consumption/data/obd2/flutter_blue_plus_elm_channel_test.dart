@@ -1,12 +1,18 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart'
     show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/'
     'flutter_blue_plus_elm_channel.dart';
+import 'package:tankstellen/features/consumption/data/obd2/'
+    'obd2_connect_classifier.dart';
+import 'package:tankstellen/features/consumption/data/obd2/'
+    'obd2_connect_trace.dart';
 
 /// #3014 (Epic #3013, Phase 2) — SCAN-BEFORE-CONNECT, the single
 /// highest-leverage SmartOBD fix.
@@ -181,6 +187,41 @@ void main() {
           const Duration(seconds: 4));
       expect(FlutterBluePlusElmChannel.debugDiscoverTimeout,
           const Duration(seconds: 5));
+    });
+  });
+
+  group('#3182 — FBP-native timeout errors still classify as gattTimeout', () {
+    // The discover/setNotify budgets now ride FBP's OWN `timeout:` parameter
+    // (releasing FBP's global mutex at our budget) instead of an outer Dart
+    // `.timeout()`. The error SHAPE therefore changed from Dart's
+    // TimeoutException to FBP's FlutterBluePlusException with a "Timed out
+    // after Ns" description — the open-outcome classifier must keep mapping
+    // it onto gattTimeout, or the connect trace would degrade to `unknown`.
+    test('the FBP fbpTimeout exception shape maps to gattTimeout', () {
+      final discoverTimeout = FlutterBluePlusException(
+        ErrorPlatform.fbp,
+        'discoverServices',
+        FbpErrorCode.timeout.index,
+        'Timed out after 8s',
+      );
+      final setNotifyTimeout = FlutterBluePlusException(
+        ErrorPlatform.fbp,
+        'setNotifyValue',
+        FbpErrorCode.timeout.index,
+        'Timed out after 7s',
+      );
+      expect(classifyBleOpenOutcome(discoverTimeout),
+          Obd2ConnectOutcome.gattTimeout);
+      expect(classifyBleOpenOutcome(setNotifyTimeout),
+          Obd2ConnectOutcome.gattTimeout);
+    });
+
+    test('the legacy Dart TimeoutException still maps to gattTimeout', () {
+      expect(
+        classifyBleOpenOutcome(
+            TimeoutException('discoverServices', const Duration(seconds: 5))),
+        Obd2ConnectOutcome.gattTimeout,
+      );
     });
   });
 }

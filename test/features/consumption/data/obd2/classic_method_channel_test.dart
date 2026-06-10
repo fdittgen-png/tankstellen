@@ -154,5 +154,34 @@ void main() {
 
       expect(called, isTrue);
     });
+
+    test('#3183 — sdkInt returns the native Build.VERSION.SDK_INT', () async {
+      messenger.setMockMethodCallHandler(methodChannel, (call) async {
+        expect(call.method, 'sdkInt');
+        return 30;
+      });
+
+      const plugin = Obd2ClassicMethodChannel();
+      expect(await plugin.sdkInt(), 30);
+    });
+
+    test('#3183 — sdkInt throws on a null native reply (caller falls back)',
+        () async {
+      messenger.setMockMethodCallHandler(methodChannel, (_) async => null);
+      const plugin = Obd2ClassicMethodChannel();
+      await expectLater(plugin.sdkInt(), throwsStateError);
+    });
+
+    test(
+        '#3183 — sdkInt throws when the native side predates the method '
+        '(MissingPluginException — the permission flow falls back to 33)',
+        () async {
+      messenger.setMockMethodCallHandler(methodChannel, null);
+      const plugin = Obd2ClassicMethodChannel();
+      await expectLater(
+        plugin.sdkInt(),
+        throwsA(isA<MissingPluginException>()),
+      );
+    });
   });
 }
