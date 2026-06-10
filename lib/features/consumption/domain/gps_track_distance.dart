@@ -64,6 +64,15 @@ class GpsTrackDistance {
   GpsTrackDistance._();
 
   /// Mean Earth radius (km) — the WGS-84 IUGG mean radius.
+  ///
+  /// Deliberately NOT unified with `lib/core/utils/geo_utils.dart`'s
+  /// `6371` / `earthRadiusMeters` (#3175): track integration sums
+  /// thousands of tiny segments into a persisted trip distance that
+  /// feeds the consumption calculation, so it uses the more precise
+  /// mean radius — and switching it now would retroactively shift every
+  /// stored trip's km (and thus l/100km) by ~0.014%. The search/sort
+  /// callers in geo_utils only need comparative distances, where the
+  /// rounded radius is fine.
   static const double _earthRadiusKm = 6371.0088;
 
   /// Total polyline distance, in km, through [track].
