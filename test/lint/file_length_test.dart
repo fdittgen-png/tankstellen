@@ -200,7 +200,11 @@ void main() {
     // rather than waiting for the next failed command. The drop edge already
     // lives here (it cannot leave this cohesive channel body), so the signal is
     // a few additive lines on it, not a new file.
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 678,
+    // #3118 — 678 → 700: the post-connect discover + setNotify timeouts made
+    // iOS-aware (const → platform-branching getters + dartdoc) so a slow iOS
+    // CoreBluetooth CCCD write no longer clips the OBDLink CX at 4s, plus two
+    // @visibleForTesting accessors to lock the budgets. Android byte-identical.
+    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 700,
     // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
     // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
     // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off

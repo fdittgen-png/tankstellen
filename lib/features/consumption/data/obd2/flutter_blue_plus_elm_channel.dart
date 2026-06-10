@@ -63,11 +63,33 @@ class FlutterBluePlusElmChannel
   /// 15 s; a hung discovery (a clone whose GATT table never resolves) used to
   /// freeze the whole open for 15 s and read as a hang. A miss now fails in
   /// ~5 s with a distinct `gattTimeout` outcome.
-  static const Duration _discoverTimeout = Duration(seconds: 5);
+  /// #3118 — iOS-aware. iOS CoreBluetooth's `discoverServices` is slower than
+  /// Android's, so the OBDLink CX's GATT-table resolution can blow Android's
+  /// tight 5 s on a cold iPhone connect. Android keeps 5 s (byte-identical).
+  static Duration get _discoverTimeout =>
+      defaultTargetPlatform == TargetPlatform.iOS
+          ? const Duration(seconds: 8)
+          : const Duration(seconds: 5);
 
   /// #3014 — bound `setNotifyValue`, for the same reason: a clone that accepts
   /// the descriptor write but never ACKs would otherwise block 15 s.
-  static const Duration _setNotifyTimeout = Duration(seconds: 4);
+  ///
+  /// #3118 — iOS-aware. THIS is the OBDLink CX failure on iPhone
+  /// (`TimeoutException after 0:00:04 — Future not completed`): the post-connect
+  /// CCCD descriptor write (enabling notifications) is slower over iOS
+  /// CoreBluetooth than Android's 4 s. #3113 only widened the `connect()` budget
+  /// (iOS 7 s); this very next step still clipped at 4 s. iOS gets 7 s; Android
+  /// keeps 4 s (byte-identical — the #2242/#3014 tight bound stays load-bearing).
+  static Duration get _setNotifyTimeout =>
+      defaultTargetPlatform == TargetPlatform.iOS
+          ? const Duration(seconds: 7)
+          : const Duration(seconds: 4);
+
+  /// #3118 — test seams to lock the iOS-aware post-connect budgets.
+  @visibleForTesting
+  static Duration get debugDiscoverTimeout => _discoverTimeout;
+  @visibleForTesting
+  static Duration get debugSetNotifyTimeout => _setNotifyTimeout;
 
   /// #3014 — best-effort MTU asked for during the bounded-connect path. Clones
   /// often reject it; the post-discovery `requestMtu` in [tuneForRecording]
