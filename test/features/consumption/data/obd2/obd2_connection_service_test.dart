@@ -62,16 +62,18 @@ void main() {
       },
     );
 
-    test('throws Obd2ScanTimeout when no known adapter is seen', () async {
+    test('throws Obd2ScanTimeout when nothing rankable is seen (#741, #3103)',
+        () async {
       final svc = _build(
         permState: Obd2PermissionState.granted,
-        // A phone in range that isn't an OBD2 adapter — registry.resolve
-        // returns null, so ranked batches are empty.
+        // A NAMELESS beacon in range — not an adapter, and #3103 drops
+        // nameless devices, so ranked batches stay empty and the window
+        // times out as before.
         bt: _FakeFacade(batches: [
           [
             Obd2AdapterCandidate(
-              deviceId: 'phone',
-              deviceName: 'Pixel 9',
+              deviceId: 'beacon',
+              deviceName: '',
               advertisedServiceUuids: const [
                 '0000180f-0000-1000-8000-00805f9b34fb', // battery service
               ],
@@ -81,6 +83,28 @@ void main() {
         ]),
       );
       await expectLater(svc.scan().toList(), throwsA(isA<Obd2ScanTimeout>()));
+    });
+
+    test(
+        '#3103 — a NAMED but unrecognized device is SURFACED (not timed out) '
+        'so the user can still try it', () async {
+      final svc = _build(
+        permState: Obd2PermissionState.granted,
+        bt: _FakeFacade(batches: [
+          [
+            Obd2AdapterCandidate(
+              deviceId: 'phone',
+              deviceName: 'Pixel 9',
+              advertisedServiceUuids: const [],
+              rssi: -55,
+            ),
+          ],
+        ]),
+      );
+      final emitted = await svc.scan().toList();
+      expect(emitted, hasLength(1));
+      expect(emitted.single.single.recognized, isFalse);
+      expect(emitted.single.single.candidate.deviceName, 'Pixel 9');
     });
 
     test('emits ranked vLinker candidate + completes without throwing',

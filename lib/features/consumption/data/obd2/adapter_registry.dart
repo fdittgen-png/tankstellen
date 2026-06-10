@@ -144,6 +144,13 @@ class Obd2AdapterProfile {
   bool matchesAdvertisedServices(Set<String> advertised) =>
       advertised.contains(serviceUuid.toLowerCase());
 
+  /// #3103 — true for the broad `generic-*` fallback profiles (no specific
+  /// brand signature). A SPECIFIC profile always wins over a generic one in
+  /// [Obd2AdapterRegistry.resolve], so broadening the generic name-matchers to
+  /// the bare `obd`/`elm` stems can't steal a hit from a named profile whose
+  /// name happens to also contain those stems (e.g. `KW902-OBD`, `OBDLink`).
+  bool get isGeneric => id.startsWith('generic');
+
   /// Compares the device name against [nameMatchers].
   bool matchesName(String deviceName) {
     if (deviceName.isEmpty || nameMatchers.isEmpty) return false;
@@ -211,15 +218,25 @@ class Obd2AdapterRegistry {
         if (p.matchesName(candidate.deviceName)) p,
     ];
     if (named.isNotEmpty) {
-      final transports = named.map((p) => p.transport).toSet();
+      // #3103 — a SPECIFIC (branded) profile always beats a generic fallback,
+      // even when the broadened `obd`/`elm` generic matchers also hit the name
+      // (e.g. `KW902-OBD` matches konnwei-kw902 AND generic-*, `OBDLink MX+`
+      // matches obdlink-mx AND generic-*). Without this, the multi-transport
+      // disambiguation below could skip a specific profile whose transport ≠
+      // the discovery transport (Konnwei is Classic, discovered over BLE) and
+      // fall through to generic-ble. Only when NO specific profile matches do
+      // the generics compete among themselves.
+      final pool = [for (final p in named) if (!p.isGeneric) p];
+      final chooseFrom = pool.isNotEmpty ? pool : named;
+      final transports = chooseFrom.map((p) => p.transport).toSet();
       if (transports.length > 1) {
-        for (final p in named) {
+        for (final p in chooseFrom) {
           if (p.transport == candidate.discoveryTransport) return p;
         }
       }
       // Single transport, or no profile matched the discovery transport
       // (defensive) — keep the historical first-in-catalog-order winner.
-      return named.first;
+      return chooseFrom.first;
     }
     // Pass 2: service UUID match, but only against generic/nameless
     // profiles. Named profiles require their name to be seen —
@@ -293,18 +310,38 @@ class Obd2AdapterRegistry {
     return matched.first;
   }
 
-  /// Rank a list of candidates for display in the picker. Primary
-  /// key: resolved-profile-matched first (unresolved dropped). Secondary
-  /// key: stronger RSSI (closer adapter) first.
+  /// Rank a list of candidates for display in the picker.
+  ///
+  /// #3103 — CLASSIFY, don't filter. The old `rank()` dropped every candidate
+  /// `resolve()` couldn't map to a profile, so a real adapter with a novel /
+  /// user-renamed name and no recognized service UUID was scanned then silently
+  /// discarded before the UI — on BOTH platforms ("the app doesn't find my
+  /// adapter"). Now: recognized adapters come first (RSSI-sorted), then NAMED
+  /// but unrecognized devices (`recognized: false`, RSSI-sorted) which the
+  /// picker surfaces under an "other devices — tap to try" section. A device
+  /// with NO name is still dropped — it is almost always a nameless BLE beacon
+  /// (headphones / watch / fitness band), and surfacing it would flood the
+  /// list without helping the user identify their adapter.
   List<ResolvedObd2Candidate> rank(List<Obd2AdapterCandidate> candidates) {
-    final resolved = <ResolvedObd2Candidate>[];
+    final recognized = <ResolvedObd2Candidate>[];
+    final unrecognized = <ResolvedObd2Candidate>[];
     for (final c in candidates) {
       final profile = resolve(c);
-      if (profile == null) continue;
-      resolved.add(ResolvedObd2Candidate(candidate: c, profile: profile));
+      if (profile != null) {
+        recognized.add(ResolvedObd2Candidate(candidate: c, profile: profile));
+      } else if (c.deviceName.trim().isNotEmpty) {
+        unrecognized.add(ResolvedObd2Candidate(
+          candidate: c,
+          profile: c.discoveryTransport == BluetoothTransport.classic
+              ? _unrecognizedClassicProfile
+              : _unrecognizedBleProfile,
+          recognized: false,
+        ));
+      }
     }
-    resolved.sort((a, b) => b.candidate.rssi.compareTo(a.candidate.rssi));
-    return resolved;
+    recognized.sort((a, b) => b.candidate.rssi.compareTo(a.candidate.rssi));
+    unrecognized.sort((a, b) => b.candidate.rssi.compareTo(a.candidate.rssi));
+    return [...recognized, ...unrecognized];
   }
 }
 
@@ -313,9 +350,18 @@ class Obd2AdapterRegistry {
 class ResolvedObd2Candidate {
   final Obd2AdapterCandidate candidate;
   final Obd2AdapterProfile profile;
+
+  /// #3103 — false when the catalog did NOT recognize this device: it is a
+  /// named-but-unknown adapter the picker offers under "other devices — tap to
+  /// try". The attached [profile] is a synthetic `unrecognized` placeholder
+  /// carrying only the discovery transport, so a connect still routes over the
+  /// right facade. true for a catalog-matched profile (the normal case).
+  final bool recognized;
+
   const ResolvedObd2Candidate({
     required this.candidate,
     required this.profile,
+    this.recognized = true,
   });
 }
 
@@ -615,12 +661,34 @@ const List<Obd2AdapterProfile> _defaultProfiles = [
 /// disambiguates which transport a given hit lands on via its discovery
 /// transport.
 const List<String> _genericElmNameMatchers = [
-  'obdii',
-  'obd-ii',
-  'obd ii',
-  'obd2',
-  'elm327',
+  // #3103 — broadened from the exact `obdii/obd2/elm327` set to the bare `obd`
+  // / `elm` stems so common clone names (`Kiwi OBD`, `Vgate OBD`, `ELM 327`,
+  // `OBD Mini`) resolve to a real generic profile + transport instead of
+  // landing in the picker's "unrecognized" bucket. A rare false positive (a
+  // non-OBD device whose name contains `obd`/`elm`) only earns a recognized
+  // row whose connect then fails — strictly better than HIDING a real adapter;
+  // anything still unmatched is surfaced by the two-section picker (#3103).
+  'obd',
+  'elm',
 ];
+
+/// #3103 — synthetic profiles the registry attaches to a NAMED device it does
+/// NOT recognize, so [Obd2AdapterRegistry.rank] can CLASSIFY (not drop) it and
+/// the picker can offer it under "other devices — tap to try". Transport is the
+/// device's DISCOVERY transport so a connect routes over the right facade
+/// (BLE → dynamic GATT like `generic-ble`; bonded Classic → RFCOMM).
+/// `displayName` is empty — never shown; the picker renders the device's own
+/// advertised name for an unrecognized entry. `id: 'unrecognized'` is never
+/// persisted as a known profile (reconnect re-resolves by MAC + name).
+const Obd2AdapterProfile _unrecognizedBleProfile = Obd2AdapterProfile(
+  id: 'unrecognized',
+  displayName: '',
+);
+const Obd2AdapterProfile _unrecognizedClassicProfile = Obd2AdapterProfile(
+  id: 'unrecognized',
+  displayName: '',
+  transport: BluetoothTransport.classic,
+);
 
 /// Re-export so callers can still reach the protocol types via the
 /// registry module without having to cross-import.
