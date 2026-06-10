@@ -88,12 +88,9 @@ class AustriaOpeningHoursAdapter extends OpeningHoursAdapter {
         rawSource: rawProviderData is String ? rawProviderData : null,
       );
     } catch (e, st) {
-      // The adapter must never propagate a fault to the station-detail UI.
-      assert(() {
-        // ignore: avoid_print
-        print('AustriaOpeningHoursAdapter.parse failed: $e\n$st');
-        return true;
-      }());
+      // The adapter must never propagate a fault to the station-detail UI
+      // — degrade to no-data, release-visibly (#3148).
+      reportParseFailure('AT', e, st);
       return WeeklyOpeningHours.notAvailable;
     }
   }

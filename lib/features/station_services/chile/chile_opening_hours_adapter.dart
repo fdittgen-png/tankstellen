@@ -114,12 +114,9 @@ class ChileOpeningHoursAdapter extends OpeningHoursAdapter {
       return _parseSchedule(trimmed, folded);
     } catch (e, st) {
       // Contract: the adapter feeds user-facing UI and must never propagate a
-      // parse fault to the station-detail screen — degrade to no-data.
-      assert(() {
-        // ignore: avoid_print
-        print('ChileOpeningHoursAdapter.parse failed: $e\n$st');
-        return true;
-      }());
+      // parse fault to the station-detail screen — degrade to no-data,
+      // release-visibly (#3148).
+      reportParseFailure('CL', e, st);
       return WeeklyOpeningHours.notAvailable;
     }
   }

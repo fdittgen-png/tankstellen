@@ -147,12 +147,8 @@ class GermanyOpeningHoursAdapter extends OpeningHoursAdapter {
       );
     } catch (e, st) {
       // Contract: the adapter must never propagate a fault to the
-      // station-detail UI — degrade to no-data.
-      assert(() {
-        // ignore: avoid_print
-        print('GermanyOpeningHoursAdapter.parse failed: $e\n$st');
-        return true;
-      }());
+      // station-detail UI — degrade to no-data, release-visibly (#3148).
+      reportParseFailure('DE', e, st);
       return WeeklyOpeningHours.notAvailable;
     }
   }
