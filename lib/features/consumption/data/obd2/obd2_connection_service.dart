@@ -511,7 +511,10 @@ class Obd2ConnectionService {
   /// any scan fallback (first-wins).
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
-    Duration timeout = const Duration(seconds: 4),
+    // #3113 — null ⇒ the platform-aware cold-connect budget computed in
+    // [_connectByMacDirect] (iOS 7s / Android 4s). A caller may still pin an
+    // explicit timeout.
+    Duration? timeout,
     bool fallbackToScan = true,
     String? adapterName,
   }) =>

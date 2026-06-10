@@ -4,6 +4,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart'
+    show TargetPlatform, debugDefaultTargetPlatformOverride;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
@@ -369,8 +371,10 @@ void main() {
       await ready.disconnect();
     });
 
-    test('passes a 4 s connect timeout to the facade by default',
+    test('Android → a 4 s cold direct-connect timeout (LOAD-BEARING, #2242)',
         () async {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
       final fake = _FakeFacade(
         batches: const [[]],
         directChannel: _FakeChannel(respondTo: _elmOkResponses()),
@@ -379,6 +383,21 @@ void main() {
 
       final ready = await svc.connectByMacDirect('aa:bb');
       expect(fake.directTimeout, const Duration(seconds: 4));
+      await ready!.disconnect();
+    });
+
+    test('#3113 — iOS → a 7 s cold direct-connect timeout (a cold CoreBluetooth '
+        'GATT connect to an ELM clone exceeds 4s)', () async {
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      final fake = _FakeFacade(
+        batches: const [[]],
+        directChannel: _FakeChannel(respondTo: _elmOkResponses()),
+      );
+      final svc = _build(permState: Obd2PermissionState.granted, bt: fake);
+
+      final ready = await svc.connectByMacDirect('aa:bb');
+      expect(fake.directTimeout, const Duration(seconds: 7));
       await ready!.disconnect();
     });
 
