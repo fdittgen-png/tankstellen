@@ -104,15 +104,34 @@ void main() {
       expect(station.lng, closeTo(3.52, 0.01));
     });
 
-    test('still emits a station for minimal/null record', () {
+    test(
+        'drops the record when BOTH coordinate sources are missing — '
+        'no (0,0) phantom station (#3175)', () {
+      // No `geom` and no legacy `latitude`/`longitude`: the parser used
+      // to emit a Station at (0,0) — a phantom in the Gulf of Guinea
+      // that survived radius filtering only because distanceKm
+      // short-circuits (0,0) to 0, i.e. "closest station ever".
       final station = parsePrixCarburantsStation(<String, dynamic>{
         'id': null,
         'adresse': null,
         'ville': null,
         'cp': null,
-      }, 0, 0);
-      expect(station, isNotNull);
-      expect(station!.id, '');
+      }, 43.0, 3.0);
+      expect(station, isNull);
+    });
+
+    test('drops the record when geom and legacy lat/lng are all zero '
+        '(#3175)', () {
+      final station = parsePrixCarburantsStation({
+        'id': '99999',
+        'adresse': 'Test',
+        'ville': 'TestVille',
+        'cp': '75001',
+        'geom': <String, dynamic>{},
+        'latitude': '0',
+        'longitude': '0',
+      }, 43.0, 3.0);
+      expect(station, isNull);
     });
 
     test('coerces null prices to null Station fields', () {

@@ -84,6 +84,13 @@ Station? parsePrixCarburantsStation(
       lng = (double.tryParse(lngStr) ?? 0) / 100000;
     }
 
+    // #3175 — when BOTH coordinate sources (geom and the legacy
+    // latitude/longitude pair) are missing or zero, drop the record
+    // instead of emitting a phantom station at (0,0): distanceKm
+    // short-circuits a (0,0) endpoint to 0, so the phantom would
+    // bypass the radius post-filter and sort as the closest station.
+    if (lat == 0 && lng == 0) return null;
+
     // Use flat price fields (already in EUR, e.g., 2.129)
     final adresse = r['adresse'] as String? ?? '';
     final ville = r['ville'] as String? ?? '';
