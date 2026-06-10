@@ -7066,6 +7066,24 @@ class AppLocalizationsIt extends AppLocalizations {
       'Per recuperare, svuota l\'archivio dell\'app nelle impostazioni del dispositivo o reinstalla l\'app. I tuoi preferiti e la cronologia sono salvati solo su questo dispositivo, quindi non possono essere ripristinati automaticamente.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Livello serbatoio';
 
   @override

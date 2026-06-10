@@ -42,7 +42,7 @@ final class SyncWizardControllerProvider
 }
 
 String _$syncWizardControllerHash() =>
-    r'0d87d3e23b82cc058044170db2899dc30d2dcdb1';
+    r'79b480def437ce4be5cda8c3bea77cdf35188f7b';
 
 abstract class _$SyncWizardController extends $Notifier<SyncWizardState> {
   SyncWizardState build();

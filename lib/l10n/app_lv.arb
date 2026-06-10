@@ -4695,5 +4695,36 @@
   "@obd2PickerBleOnlyNotice": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "syncAdoptTitle": "Join {email}'s account",
+  "@syncAdoptTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "alex@example.com"
+      }
+    }
+  },
+  "syncAdoptSubtitle": "Sign in with this account's password to share its data across both devices.",
+  "@syncAdoptSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncAdoptPasswordLabel": "Account password",
+  "@syncAdoptPasswordLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncAdoptJoinButton": "Join account",
+  "@syncAdoptJoinButton": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncAdoptUseDifferentAccount": "Use a different account instead",
+  "@syncAdoptUseDifferentAccount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

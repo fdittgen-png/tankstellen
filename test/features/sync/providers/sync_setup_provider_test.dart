@@ -100,4 +100,43 @@ void main() {
       expect(c.read(syncSetupControllerProvider).createDbStep, 0);
     });
   });
+
+  group('QR-join adoption (#3080)', () {
+    test('startAdoption routes to the adopt step and stores the email', () {
+      final c = makeContainer();
+      final ctrl = c.read(syncSetupControllerProvider.notifier);
+      ctrl.startAdoption('owner@example.com');
+      final s = c.read(syncSetupControllerProvider);
+      expect(s.step, SyncSetupStep.adopt);
+      expect(s.adoptEmail, 'owner@example.com');
+      // Joining someone else's database → join-existing mode.
+      expect(s.selectedMode, SyncMode.joinExisting);
+    });
+
+    test('startAdoption clears any previous error', () {
+      final c = makeContainer();
+      final ctrl = c.read(syncSetupControllerProvider.notifier);
+      ctrl.setError('boom');
+      ctrl.startAdoption('owner@example.com');
+      expect(c.read(syncSetupControllerProvider).error, isNull);
+    });
+
+    test('cancelAdoption drops the email and returns to the auth step', () {
+      final c = makeContainer();
+      final ctrl = c.read(syncSetupControllerProvider.notifier);
+      ctrl.startAdoption('owner@example.com');
+      ctrl.cancelAdoption();
+      final s = c.read(syncSetupControllerProvider);
+      expect(s.step, SyncSetupStep.auth);
+      expect(s.adoptEmail, isNull);
+    });
+
+    test('togglePasswordVisibility flips showPassword', () {
+      final c = makeContainer();
+      final ctrl = c.read(syncSetupControllerProvider.notifier);
+      expect(c.read(syncSetupControllerProvider).showPassword, isFalse);
+      ctrl.togglePasswordVisibility();
+      expect(c.read(syncSetupControllerProvider).showPassword, isTrue);
+    });
+  });
 }

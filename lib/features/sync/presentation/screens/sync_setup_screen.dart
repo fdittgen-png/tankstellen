@@ -19,6 +19,7 @@ import '../widgets/sync_credentials_step.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../widgets/sync_adoption_step.dart';
 import '../widgets/sync_done_step.dart';
 import '../widgets/sync_mode_step.dart';
 import '../widgets/wizard_create_new.dart';
@@ -43,11 +44,13 @@ class SyncSetupScreen extends ConsumerStatefulWidget {
 class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
   final _urlController = TextEditingController();
   final _keyController = TextEditingController();
+  final _adoptPasswordController = TextEditingController();
 
   @override
   void dispose() {
     _urlController.dispose();
     _keyController.dispose();
+    _adoptPasswordController.dispose();
     super.dispose();
   }
 
@@ -59,6 +62,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
           ? (l10n?.syncSetupTitleYourDatabase ?? 'Your database')
           : (l10n?.syncSetupTitleJoinGroup ?? 'Join a group'),
       SyncSetupStep.auth => l10n?.syncSetupTitleAccount ?? 'Your account',
+      SyncSetupStep.adopt => l10n?.syncSetupTitleAccount ?? 'Your account',
       SyncSetupStep.done => l10n?.syncSuccessTitle ?? 'Successfully connected!',
     };
   }
@@ -77,6 +81,10 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
               ? SyncSetupStep.mode
               : SyncSetupStep.credentials,
         );
+      case SyncSetupStep.adopt:
+        // A QR-join adoption (#3080) only reaches this step from the
+        // credentials step (the scan happens there), so back returns there.
+        ctrl.goToStep(SyncSetupStep.credentials);
       case SyncSetupStep.done:
         Navigator.pop(context);
     }
@@ -121,6 +129,44 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
     }
   }
 
+  /// Adopt the QR owner's account (#3080): connect to their database and
+  /// sign in with the **existing** email (`isSignUp:false`) so this device
+  /// joins the same identity — keeping the first device's UUID, never
+  /// minting a new one.
+  Future<void> _onAdopt() async {
+    final ctrl = ref.read(syncSetupControllerProvider.notifier);
+    final setup = ref.read(syncSetupControllerProvider);
+    final email = setup.adoptEmail;
+    if (email == null) return;
+
+    ctrl.startLoading();
+    try {
+      final syncNotifier = ref.read(syncStateProvider.notifier);
+      await syncNotifier.connect(
+        _urlController.text.trim(),
+        _keyController.text.trim(),
+        mode: setup.selectedMode,
+      );
+      // Existing-account sign-in — adopt the first device's identity.
+      await syncNotifier.signInWithEmail(
+        email,
+        _adoptPasswordController.text,
+        isSignUp: false,
+      );
+
+      if (!mounted) return;
+      ctrl.goToStep(SyncSetupStep.done);
+      ctrl.stopLoading();
+
+      await Future<void>.delayed(const Duration(milliseconds: 1500));
+      if (mounted) Navigator.pop(context);
+    } catch (e, st) { // ignore: unused_catch_stack
+      if (mounted) {
+        ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
+      }
+    }
+  }
+
   Future<void> _scanQr() async {
     final result = await Navigator.push<String>(
       context,
@@ -131,6 +177,14 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
         final json = jsonDecode(result) as Map<String, dynamic>;
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
+        // #3080 — a share-QR from an email account also carries the owner's
+        // email. When present, route to the adoption step so this device
+        // joins that account instead of just connecting to the database.
+        // Absent (legacy/anonymous QR) → unchanged credentials flow.
+        final email = json['email']?.toString();
+        if (email != null && email.isNotEmpty) {
+          ref.read(syncSetupControllerProvider.notifier).startAdoption(email);
+        }
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'QR code parse failed'}));
         if (mounted) {
@@ -222,6 +276,18 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
               onSubmit: _onAuthSubmit,
               isLoading: setup.isLoading,
               error: setup.error,
+            ),
+          ],
+        SyncSetupStep.adopt => [
+            SyncAdoptionStep(
+              email: setup.adoptEmail ?? '',
+              passwordController: _adoptPasswordController,
+              isLoading: setup.isLoading,
+              error: setup.error,
+              showPassword: setup.showPassword,
+              onTogglePassword: ctrl.togglePasswordVisibility,
+              onJoin: _onAdopt,
+              onUseDifferentAccount: ctrl.cancelAdoption,
             ),
           ],
         SyncSetupStep.done => const [SyncDoneStep()],

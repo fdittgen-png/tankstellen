@@ -7086,6 +7086,24 @@ class AppLocalizationsEl extends AppLocalizations {
       'Για ανάκτηση, διαγράψτε τον αποθηκευτικό χώρο της εφαρμογής στις ρυθμίσεις της συσκευής ή επανεγκαταστήστε την εφαρμογή. Τα αγαπημένα και το ιστορικό σας αποθηκεύονται μόνο σε αυτήν τη συσκευή και δεν μπορούν να ανακτηθούν αυτόματα.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Στάθμη ντεπόζιτου';
 
   @override

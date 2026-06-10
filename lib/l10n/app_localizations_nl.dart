@@ -7049,6 +7049,24 @@ class AppLocalizationsNl extends AppLocalizations {
       'Wis voor herstel de opslag van de app in de apparaatinstellingen of installeer de app opnieuw. Je favorieten en geschiedenis worden alleen op dit apparaat opgeslagen en kunnen daarom niet automatisch worden hersteld.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Join $email\'s account';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Sign in with this account\'s password to share its data across both devices.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Account password';
+
+  @override
+  String get syncAdoptJoinButton => 'Join account';
+
+  @override
+  String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
   String get tankLevelTitle => 'Tankinhoud';
 
   @override

@@ -19,6 +19,7 @@ import '../../../../core/sync/sync_provider.dart';
 import '../../providers/sync_wizard_provider.dart';
 import '../widgets/anon_key_field.dart';
 import '../widgets/qr_scanner_screen.dart';
+import '../widgets/sync_adoption_step.dart';
 import '../widgets/wizard_auth_step.dart';
 import '../widgets/wizard_choose_mode.dart';
 import '../widgets/wizard_create_new.dart';
@@ -117,6 +118,10 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
             Navigator.pop(context);
           } else if (wizard.mode == SyncWizardMode.schema) {
             _notifier.setMode(SyncWizardMode.auth);
+          } else if (wizard.mode == SyncWizardMode.adopt) {
+            // QR-join adoption (#3080) is only reached from the join-existing
+            // scan, so back returns there.
+            _notifier.setMode(SyncWizardMode.joinExisting);
           } else {
             _notifier.setMode(SyncWizardMode.choose);
           }
@@ -170,6 +175,17 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
               onConnect: _connect,
               onPasswordChanged: _notifier.touch,
             ),
+          if (wizard.mode == SyncWizardMode.adopt)
+            SyncAdoptionStep(
+              email: wizard.adoptEmail ?? '',
+              passwordController: _passwordController,
+              isLoading: wizard.connecting,
+              error: wizard.testResult,
+              showPassword: wizard.showPassword,
+              onTogglePassword: _notifier.togglePasswordVisibility,
+              onJoin: _adopt,
+              onUseDifferentAccount: _notifier.cancelAdoption,
+            ),
           if (wizard.mode == SyncWizardMode.schema)
             WizardSchemaStep(
               schemaStatus: wizard.schemaStatus,
@@ -205,11 +221,48 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         final json = jsonDecode(result) as Map<String, dynamic>;
         _urlController.text = json['url']?.toString() ?? '';
         _keyController.text = json['key']?.toString() ?? '';
-        _notifier.setMode(SyncWizardMode.auth);
+        // #3080 — a share-QR from an email account also carries the owner's
+        // email. When present, route to the adoption step so this device
+        // joins that account (sign-in, same UUID) instead of just connecting.
+        // Absent (legacy/anonymous QR) → unchanged auth flow.
+        final email = json['email']?.toString();
+        if (email != null && email.isNotEmpty) {
+          _notifier.startAdoption(email);
+        } else {
+          _notifier.setMode(SyncWizardMode.auth);
+        }
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'QR code parse failed'}));
         SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCodeTankSync ?? 'Invalid QR code — expected TankSync format');
       }
+    }
+  }
+
+  /// Adopt the QR owner's account (#3080): connect to their database and sign
+  /// in with the **existing** email (`isSignUp:false`) so this device joins
+  /// the same identity — keeping the first device's UUID, never minting a new
+  /// one. Reuses the post-connect schema verification.
+  Future<void> _adopt() async {
+    final email = ref.read(syncWizardControllerProvider).adoptEmail;
+    if (email == null || _passwordController.text.isEmpty) return;
+    _notifier.setConnecting(true);
+    try {
+      final url = _sanitizeUrl(_urlController.text);
+      final key = _sanitizeKey(_keyController.text);
+      await ref.read(syncStateProvider.notifier).connect(url, key);
+      await ref.read(syncStateProvider.notifier).signInWithEmail(
+            email,
+            _passwordController.text,
+            isSignUp: false,
+          );
+      if (!mounted) return;
+      await _verifySchemaAfterConnect();
+    } catch (e, st) { // ignore: unused_catch_stack
+      if (mounted) {
+        _notifier.adoptFailed('Connection failed: $e');
+      }
+    } finally {
+      if (mounted) _notifier.setConnecting(false);
     }
   }
 
@@ -252,30 +305,36 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       }
 
       if (!mounted) return;
-      final schema = await SchemaVerifier.checkSchema();
-      // #2929 — even when every table exists, a self-hoster on an older
-      // schema version needs to re-run the setup SQL (silent per-feature
-      // breakage otherwise). Surface the schema step in that case too.
-      final outdated = await SchemaVerifier.isSchemaOutdated();
-      if (schema != null && mounted) {
-        final allReady = SchemaVerifier.requiredTables.every((t) => schema[t] == true);
-        if (allReady && !outdated) {
-          SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
-          Navigator.pop(context);
-        } else {
-          _notifier.showSchemaStep(
-            schema: schema,
-            migrationSql: SchemaVerifier.getMigrationSql(schema),
-            schemaOutdated: outdated,
-          );
-        }
-      }
+      await _verifySchemaAfterConnect();
     } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
         _notifier.connectFailed('Connection failed: $e');
       }
     } finally {
       if (mounted) _notifier.setConnecting(false);
+    }
+  }
+
+  /// After a successful connect/sign-in, verify the database schema and either
+  /// finish (all tables present, schema current) or surface the schema step.
+  Future<void> _verifySchemaAfterConnect() async {
+    final schema = await SchemaVerifier.checkSchema();
+    // #2929 — even when every table exists, a self-hoster on an older
+    // schema version needs to re-run the setup SQL (silent per-feature
+    // breakage otherwise). Surface the schema step in that case too.
+    final outdated = await SchemaVerifier.isSchemaOutdated();
+    if (schema != null && mounted) {
+      final allReady = SchemaVerifier.requiredTables.every((t) => schema[t] == true);
+      if (allReady && !outdated) {
+        SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
+        Navigator.pop(context);
+      } else {
+        _notifier.showSchemaStep(
+          schema: schema,
+          migrationSql: SchemaVerifier.getMigrationSql(schema),
+          schemaOutdated: outdated,
+        );
+      }
     }
   }
 }

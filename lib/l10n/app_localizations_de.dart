@@ -7065,6 +7065,25 @@ class AppLocalizationsDe extends AppLocalizations {
       'Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.';
 
   @override
+  String syncAdoptTitle(String email) {
+    return 'Konto von $email beitreten';
+  }
+
+  @override
+  String get syncAdoptSubtitle =>
+      'Melde dich mit dem Passwort dieses Kontos an, um seine Daten auf beiden Geräten zu teilen.';
+
+  @override
+  String get syncAdoptPasswordLabel => 'Konto-Passwort';
+
+  @override
+  String get syncAdoptJoinButton => 'Konto beitreten';
+
+  @override
+  String get syncAdoptUseDifferentAccount =>
+      'Stattdessen ein anderes Konto verwenden';
+
+  @override
   String get tankLevelTitle => 'Tankfüllstand';
 
   @override

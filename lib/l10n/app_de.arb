@@ -3249,6 +3249,32 @@
   "storageRecoveryTitle": "Speicherproblem",
   "storageRecoveryMessage": "Sparkilo konnte seinen lokalen Datenspeicher nicht öffnen. Die Speicherdatei scheint beschädigt zu sein.",
   "storageRecoveryGuidance": "Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.",
+  "syncAdoptTitle": "Konto von {email} beitreten",
+  "@syncAdoptTitle": {
+    "description": "Title of the QR-join adoption step — the second device adopts the first device's email account (#3080).",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "alex@example.com"
+      }
+    }
+  },
+  "syncAdoptSubtitle": "Melde dich mit dem Passwort dieses Kontos an, um seine Daten auf beiden Geräten zu teilen.",
+  "@syncAdoptSubtitle": {
+    "description": "Explanatory subtitle of the QR-join adoption step (#3080)."
+  },
+  "syncAdoptPasswordLabel": "Konto-Passwort",
+  "@syncAdoptPasswordLabel": {
+    "description": "Label of the password field on the QR-join adoption step (#3080)."
+  },
+  "syncAdoptJoinButton": "Konto beitreten",
+  "@syncAdoptJoinButton": {
+    "description": "Primary button that signs the second device into the first device's account (#3080)."
+  },
+  "syncAdoptUseDifferentAccount": "Stattdessen ein anderes Konto verwenden",
+  "@syncAdoptUseDifferentAccount": {
+    "description": "Link that leaves the QR-join adoption step and returns to the normal account-setup flow (#3080)."
+  },
   "tankLevelTitle": "Tankfüllstand",
   "tankLevelLitersFormat": "{litres} L",
   "tankLevelRangeFormat": "≈ {kilometres} km Reichweite",

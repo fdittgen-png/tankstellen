@@ -12238,6 +12238,36 @@ abstract class AppLocalizations {
   /// **'To recover, clear the app\'s storage in your device settings, or reinstall the app. Your favourites and history are stored on this device only, so they cannot be restored automatically.'**
   String get storageRecoveryGuidance;
 
+  /// Title of the QR-join adoption step — the second device adopts the first device's email account (#3080).
+  ///
+  /// In en, this message translates to:
+  /// **'Join {email}\'s account'**
+  String syncAdoptTitle(String email);
+
+  /// Explanatory subtitle of the QR-join adoption step (#3080).
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with this account\'s password to share its data across both devices.'**
+  String get syncAdoptSubtitle;
+
+  /// Label of the password field on the QR-join adoption step (#3080).
+  ///
+  /// In en, this message translates to:
+  /// **'Account password'**
+  String get syncAdoptPasswordLabel;
+
+  /// Primary button that signs the second device into the first device's account (#3080).
+  ///
+  /// In en, this message translates to:
+  /// **'Join account'**
+  String get syncAdoptJoinButton;
+
+  /// Link that leaves the QR-join adoption step and returns to the normal account-setup flow (#3080).
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different account instead'**
+  String get syncAdoptUseDifferentAccount;
+
   /// Title of the tank-level card on the Fuel tab — shows the current estimated litres in the tank above the consumption stats card (#1195).
   ///
   /// In en, this message translates to:
