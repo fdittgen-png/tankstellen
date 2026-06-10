@@ -142,7 +142,7 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
   @override
   Future<Obd2Service?> connectByMacDirect(
     String mac, {
-    Duration timeout = const Duration(seconds: 4),
+    Duration? timeout,
     bool fallbackToScan = true,
     String? adapterName,
   }) async {

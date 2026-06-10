@@ -170,8 +170,10 @@ void main() {
     // guard. Decomposition still tracked under #2187/#2188.
     // #3103 — 674 → 694: the `supportsClassicDiscovery` getter + the
     // Android-only Classic-facade platform gate at the provider seam (+ their
-    // rationale comments). Decomposition still tracked under #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 694,
+    // rationale comments). #3113 — 694 → 697: connectByMacDirect's timeout made
+    // nullable so iOS gets a 7s cold-connect budget (+ rationale comment).
+    // Decomposition still tracked under #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 697,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one

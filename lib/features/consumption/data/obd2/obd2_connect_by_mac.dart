@@ -39,9 +39,19 @@ part of 'obd2_connection_service.dart';
 Future<Obd2Service?> _connectByMacDirect(
   Obd2ConnectionService svc,
   String mac, {
-  Duration timeout = const Duration(seconds: 4),
+  Duration? timeout,
   bool fallbackToScan = true,
 }) async {
+  // #3113 — a cold iOS CoreBluetooth GATT connect to an ELM clone (OBDLink CX)
+  // routinely exceeds Android's 4s, so a live adapter was clipped mid-connect
+  // ("Timed out after 4s"). Give iOS a 7s budget; Android keeps the
+  // LOAD-BEARING 4s (#2242: autoConnect:false blocks ~35s on a sleeping
+  // adapter, so the bound must stay tight there). The scan-resolved path
+  // already uses 10s — only this direct path was too tight.
+  final connectTimeout = timeout ??
+      (defaultTargetPlatform == TargetPlatform.iOS
+          ? const Duration(seconds: 7)
+          : const Duration(seconds: 4));
   // #2906 — stop any active scan + settle before the direct GATT open. An
   // in-trip reconnect can reach here while the scanner's last active scan is
   // still winding down on the radio; an unstopped scan racing this connect()
@@ -60,7 +70,8 @@ Future<Obd2Service?> _connectByMacDirect(
   // wrong-transport attempt (a BLE direct connect against a Classic adapter)
   // shows resolvedTransport:ble in the trace.
   Obd2ConnectTraceLog.active?.setResolvedTransport(Obd2ConnectTransport.ble);
-  final channel = svc.bluetooth.channelForDirect(mac, connectTimeout: timeout);
+  final channel =
+      svc.bluetooth.channelForDirect(mac, connectTimeout: connectTimeout);
   svc._lastDirectChannel = channel;
   try {
     return await svc._openAndInit(
