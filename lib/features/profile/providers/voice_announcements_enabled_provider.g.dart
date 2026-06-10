@@ -86,4 +86,4 @@ final class VoiceAnnouncementsEnabledProvider
 }
 
 String _$voiceAnnouncementsEnabledHash() =>
-    r'b927d7d17bbf64becb7e7b9eda99b9e41160e7fc';
+    r'6ba0f063f6850ed138bf53d412379e0011c694d8';

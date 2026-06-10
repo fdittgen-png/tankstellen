@@ -111,7 +111,7 @@ final class ShowElectricEnabledProvider
 }
 
 String _$showElectricEnabledHash() =>
-    r'6b4bea61579545dc7d5f45bbd6ca34a57d554e80';
+    r'587c99c3b9f7f2bfbd1a85d50c13e018ded0dcc7';
 
 /// Visibility gate for EV charging-station results in search and on
 /// the map (#1373 phase 3c).

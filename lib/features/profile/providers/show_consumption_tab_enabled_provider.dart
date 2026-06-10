@@ -3,9 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'show_consumption_tab_enabled_provider.g.dart';
 
@@ -34,44 +33,16 @@ part 'show_consumption_tab_enabled_provider.g.dart';
 /// }
 /// ```
 @Riverpod(keepAlive: true)
-class ShowConsumptionTabEnabled extends _$ShowConsumptionTabEnabled {
+class ShowConsumptionTabEnabled extends _$ShowConsumptionTabEnabled
+    with FeatureToggleNotifier {
   @override
-  bool build() {
-    // Gates on the **effective** state (#1447): when `obd2TripRecording`
-    // (the parent) is off, the consumption tab is hidden from the
-    // bottom-nav regardless of the stored `showConsumptionTab` value.
-    // The user's tab-visibility preference is preserved so re-enabling
-    // trip recording restores the prior layout.
-    final enabled = ref.watch(enabledFeaturesProvider);
-    final manifest = ref.watch(featureManifestProvider);
-    return isEffectivelyEnabled(Feature.showConsumptionTab, manifest, enabled);
-  }
+  Feature get feature => Feature.showConsumptionTab;
 
-  /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The
-  /// central provider enforces the manifest dependency graph
-  /// ([Feature.showConsumptionTab] requires [Feature.obd2TripRecording])
-  /// and throws [StateError] when a prerequisite is missing.
-  ///
-  /// A [StateError] from a dependency-violation is intentionally
-  /// swallowed and the toggle stays at its prior state — see the
-  /// gamification shim's catch block for the full rationale.
-  Future<void> set(bool value) async {
-    final notifier = ref.read(featureFlagsProvider.notifier);
-    try {
-      if (value) {
-        await notifier.enable(Feature.showConsumptionTab);
-      } else {
-        await notifier.disable(Feature.showConsumptionTab);
-      }
-      // ignore: avoid_catching_errors
-    } on StateError {
-      // Phase 2 settings UI canEnable / blockingDisable pre-check
-      // already guards this setter at the UI layer, so a dependency-
-      // violation here is a defensive-only catch — the UI path can't
-      // currently reach it. We swallow rather than rethrow so a
-      // programmatic caller (e.g. a test or a future call site) sees
-      // the toggle stay at its prior state instead of crashing the
-      // widget tree.
-    }
-  }
+  /// When `obd2TripRecording` (the parent) is off, the consumption tab
+  /// is hidden from the bottom-nav regardless of the stored value; the
+  /// user's tab-visibility preference is preserved so re-enabling trip
+  /// recording restores the prior layout (#1447). Build + `set` live in
+  /// [FeatureToggleNotifier] (#3175).
+  @override
+  bool build() => buildFromFeatureFlags();
 }

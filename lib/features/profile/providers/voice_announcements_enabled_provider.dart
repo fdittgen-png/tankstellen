@@ -3,9 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'voice_announcements_enabled_provider.g.dart';
 
@@ -22,8 +21,5 @@ part 'voice_announcements_enabled_provider.g.dart';
 /// can never speak once the feature is disabled — the engine is fed only
 /// while the gate is true.
 @Riverpod(keepAlive: true)
-bool voiceAnnouncementsEnabled(Ref ref) {
-  final enabled = ref.watch(enabledFeaturesProvider);
-  final manifest = ref.watch(featureManifestProvider);
-  return isEffectivelyEnabled(Feature.voiceAnnouncements, manifest, enabled);
-}
+bool voiceAnnouncementsEnabled(Ref ref) =>
+    watchEffectiveFeature(ref, Feature.voiceAnnouncements);

@@ -3,9 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'approach_overlay_enabled_provider.g.dart';
 
@@ -21,8 +20,5 @@ part 'approach_overlay_enabled_provider.g.dart';
 /// view also watches it so a stale simulator/detector value can never
 /// flip the tile to the price layout once the feature is disabled.
 @Riverpod(keepAlive: true)
-bool approachOverlayEnabled(Ref ref) {
-  final enabled = ref.watch(enabledFeaturesProvider);
-  final manifest = ref.watch(featureManifestProvider);
-  return isEffectivelyEnabled(Feature.approachOverlay, manifest, enabled);
-}
+bool approachOverlayEnabled(Ref ref) =>
+    watchEffectiveFeature(ref, Feature.approachOverlay);

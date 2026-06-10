@@ -12,9 +12,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../consumption/data/obd2/trip_live_reading.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
-import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../feature_management/domain/feature_dependency_graph.dart';
 import '../haptic_eco_coach.dart';
 
 part 'haptic_eco_coach_provider.g.dart';
@@ -32,38 +31,25 @@ part 'haptic_eco_coach_provider.g.dart';
 /// [hapticEcoCoachLifecycleProvider] so the subscription is torn down
 /// or spun up immediately.
 @Riverpod(keepAlive: true)
-class HapticEcoCoachEnabled extends _$HapticEcoCoachEnabled {
+class HapticEcoCoachEnabled extends _$HapticEcoCoachEnabled
+    with FeatureToggleNotifier {
   @override
-  bool build() {
-    // Gates on the **effective** state (#1447): when `obd2TripRecording`
-    // (the parent) is off, this surfaces as `false` regardless of the
-    // stored haptic-coach value. The lifecycle provider re-runs and
-    // tears down its subscription on the next frame.
-    final enabled = ref.watch(enabledFeaturesProvider);
-    final manifest = ref.watch(featureManifestProvider);
-    return isEffectivelyEnabled(Feature.hapticEcoCoach, manifest, enabled);
-  }
+  Feature get feature => Feature.hapticEcoCoach;
 
-  /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The
-  /// lifecycle provider invalidates on any state flip, so a `set(true)`
-  /// while a trip is recording starts the coach immediately, and a
-  /// `set(false)` cancels its subscription on the next frame.
+  /// When `obd2TripRecording` (the parent) is off, this surfaces as
+  /// `false` regardless of the stored haptic-coach value (#1447); the
+  /// lifecycle provider re-runs and tears down its subscription on the
+  /// next frame. Build + `set` live in [FeatureToggleNotifier] (#3175).
   ///
-  /// Enabling `hapticEcoCoach` while its `obd2TripRecording` parent is
-  /// off is a dependency violation — `featureFlagsProvider.enable`
-  /// throws a [StateError] for it, and this setter lets that surface
-  /// (#1608). Callers MUST pre-check [canEnable] first; the only call
-  /// site, the driving-settings toggle, disables itself when the parent
-  /// is off. A swallow used to hide this (`TODO(1373)`) — removed once
-  /// the single call site was audited for pre-check coverage.
-  Future<void> set(bool value) async {
-    final notifier = ref.read(featureFlagsProvider.notifier);
-    if (value) {
-      await notifier.enable(Feature.hapticEcoCoach);
-    } else {
-      await notifier.disable(Feature.hapticEcoCoach);
-    }
-  }
+  /// NOTE: #1608 had this shim's setter *surface* the dependency-
+  /// violation StateError while every sibling swallowed it. #3175
+  /// unifies all shims on the swallow variant (the safest — see the
+  /// mixin doc); the #1608 guarantee that the violating enable never
+  /// takes effect is unchanged, and the only call site (the
+  /// driving-settings toggle) still pre-checks by disabling itself
+  /// when the parent is off.
+  @override
+  bool build() => buildFromFeatureFlags();
 }
 
 /// Active subscription that bridges the trip-recording state stream

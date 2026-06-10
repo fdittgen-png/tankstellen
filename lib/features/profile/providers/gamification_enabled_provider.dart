@@ -3,9 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'gamification_enabled_provider.g.dart';
 
@@ -36,52 +35,15 @@ part 'gamification_enabled_provider.g.dart';
 /// running so that toggling back on instantly restores any badges
 /// earned during the opt-out window.
 @Riverpod(keepAlive: true)
-class GamificationEnabled extends _$GamificationEnabled {
+class GamificationEnabled extends _$GamificationEnabled
+    with FeatureToggleNotifier {
   @override
-  bool build() {
-    // Gates on the **effective** state (#1447): if any ancestor on the
-    // `requires` chain is disabled, this surfaces as `false` regardless
-    // of the stored value. Disabling the parent (`obd2TripRecording`)
-    // therefore hides the gamification UI without touching the user's
-    // gamification preference; re-enabling the parent restores it.
-    final enabled = ref.watch(enabledFeaturesProvider);
-    final manifest = ref.watch(featureManifestProvider);
-    return isEffectivelyEnabled(Feature.gamification, manifest, enabled);
-  }
+  Feature get feature => Feature.gamification;
 
-  /// Delegate to [featureFlagsProvider]'s `enable` / `disable`. The
-  /// central provider enforces the manifest dependency graph
-  /// ([Feature.gamification] requires [Feature.obd2TripRecording]) and
-  /// throws [StateError] when a prerequisite is missing or a dependent
-  /// would block disabling.
-  ///
-  /// A [StateError] from a dependency-violation is intentionally
-  /// swallowed and the toggle stays at its prior state — see the
-  /// catch block below for why.
-  Future<void> set(bool value) async {
-    final notifier = ref.read(featureFlagsProvider.notifier);
-    try {
-      if (value) {
-        await notifier.enable(Feature.gamification);
-      } else {
-        await notifier.disable(Feature.gamification);
-      }
-      // The central provider throws a StateError specifically for
-      // dependency-violation; we want to swallow ONLY that — see the
-      // body comment for why. The lint deliberately discourages
-      // catching Error subclasses, but the central API's contract
-      // documents this exact StateError as the dependency-violation
-      // signal, so the catch is intentional and narrow.
-      // ignore: avoid_catching_errors
-    } on StateError {
-      // TODO(1373): Phase 2's settings UI canEnable / blockingDisable
-      // pre-check already guards this setter at the UI layer, so a
-      // dependency-violation here is a defensive-only catch — the UI
-      // path can't currently reach it. We swallow rather than rethrow
-      // so a programmatic caller (e.g. a test or a future call site)
-      // sees the toggle stay at its prior state instead of crashing
-      // the widget tree. Remove once every call site has been audited
-      // for `canEnable` pre-check coverage.
-    }
-  }
+  /// Disabling the parent (`obd2TripRecording`) hides the gamification
+  /// UI without touching the user's gamification preference;
+  /// re-enabling the parent restores it (#1447). Build + `set` live in
+  /// [FeatureToggleNotifier] (#3175).
+  @override
+  bool build() => buildFromFeatureFlags();
 }

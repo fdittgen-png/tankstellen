@@ -3,9 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../feature_management/application/feature_flags_provider.dart';
+import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../feature_management/domain/feature_dependency_graph.dart';
 
 part 'glide_coach_enabled_provider.g.dart';
 
@@ -26,8 +25,5 @@ part 'glide_coach_enabled_provider.g.dart';
 /// lifecycle. Reads route through `isEffectivelyEnabled` for symmetry
 /// with the other feature shims (`showFuelEnabledProvider` etc.).
 @Riverpod(keepAlive: true)
-bool glideCoachEnabled(Ref ref) {
-  final enabled = ref.watch(enabledFeaturesProvider);
-  final manifest = ref.watch(featureManifestProvider);
-  return isEffectivelyEnabled(Feature.glideCoach, manifest, enabled);
-}
+bool glideCoachEnabled(Ref ref) =>
+    watchEffectiveFeature(ref, Feature.glideCoach);
