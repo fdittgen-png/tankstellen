@@ -66,6 +66,7 @@ import '../features/vehicle/providers/vehicle_providers.dart';
 import '../features/widget/data/home_widget_service.dart';
 import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
+import 'profile_language_binding.dart';
 import 'router.dart';
 import 'widgets/storage_recovery_screen.dart';
 
@@ -148,7 +149,7 @@ class AppInitializer {
     await _initServicesInParallel();
     StartupTimer.instance.mark('services_init');
 
-    final container = ProviderContainer();
+    final container = ProviderContainer(overrides: profileLanguageOverrides());
 
     final storage = HiveStorage();
 
@@ -450,8 +451,7 @@ class AppInitializer {
     // used to run here too; both walk an entire Hive box and neither
     // result is needed to paint the first frame, so they are deferred
     // past it (see `run()`'s post-first-frame block).
-    final profileRepo = ProfileRepository(HiveStorage());
-    await profileRepo.ensureDefaultProfile();
+    await ProfileRepository(HiveStorage()).ensureDefaultProfile();
   }
 
   // ---------------------------------------------------------------------------

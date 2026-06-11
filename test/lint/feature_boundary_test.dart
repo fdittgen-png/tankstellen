@@ -347,7 +347,7 @@ const _coreImportBaseline = <String, int>{
   'feature_management': 3,
   'itinerary': 3,
   'map': 1,
-  'profile': 5,
+  'profile': 4,
   'search': 2,
   'station_services': 19,
 };
