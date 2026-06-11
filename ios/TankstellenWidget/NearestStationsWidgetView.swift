@@ -56,6 +56,7 @@ struct NearestStationsWidgetView: View {
             // landing without trying to open a station detail.
             URL(string: "tankstellenwidget://station?id=__widget_root__")
         )
+        .widgetBackgroundCompat()
     }
 
     private var header: some View {
@@ -119,6 +120,24 @@ private struct StationRowView: View {
                         .monospacedDigit()
                 }
             }
+        }
+    }
+}
+
+private extension View {
+    /// iOS 17 requires widgets to adopt `containerBackground(for: .widget)`
+    /// — without it WidgetKit renders a "Please adopt containerBackground
+    /// API" placeholder instead of the widget content. On iOS 16 (our
+    /// deployment target is 16.6) the in-view ZStack background above is
+    /// still the rendering path, so the shim is a no-op there.
+    @ViewBuilder
+    func widgetBackgroundCompat() -> some View {
+        if #available(iOSApplicationExtension 17.0, *) {
+            containerBackground(for: .widget) {
+                Color(.systemBackground)
+            }
+        } else {
+            self
         }
     }
 }

@@ -64,12 +64,23 @@ Dart side:
      `match appstore --force` and copy the new profile UUIDs into
      Xcode's "Signing & Capabilities" pane.
 
-## Required Xcode work
+## Required Xcode work — DONE (#3166)
 
-These steps cannot be scripted reliably from outside Xcode — the
-`project.pbxproj` schema for embedded extensions includes target
-dependencies, copy-files build phases, and code-sign settings that
-break the project file when hand-edited.
+> **Status:** the target wiring below shipped with #3166 —
+> `scripts/add_ios_widget_target.rb` (xcodeproj gem, idempotent)
+> performs Steps 1–4 reproducibly and has been applied to
+> `ios/Runner.xcodeproj`. The TankstellenWidget extension target now
+> builds and embeds in every `flutter build ios`. The steps are kept
+> below for reference / re-creation from scratch. What remains manual
+> is ONLY the Apple Developer Portal work above (App Group + widget
+> App ID + `match --force` re-provisioning) — until that is done, the
+> nightly TestFlight archive will fail signing, because both targets
+> now reference App Group entitlements and the widget's Release config
+> expects a `match AppStore de.tankstellen.tankstellen.TankstellenWidget`
+> profile. Add the widget bundle ID to `ios/fastlane/Matchfile`'s
+> `app_identifier` list and to `build_appstore`'s
+> `provisioningProfiles` map in `ios/fastlane/Fastfile` at the same
+> time (Step 5).
 
 ### Step 1 — Add the Widget Extension target
 
