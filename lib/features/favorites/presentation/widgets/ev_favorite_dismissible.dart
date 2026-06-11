@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -103,7 +103,7 @@ class EvFavoriteDismissible extends ConsumerWidget {
       child: EvFavoriteCard(
         key: ValueKey(station.id),
         station: station,
-        onTap: () => context.push('/ev-station', extra: station),
+        onTap: () => EvStationDetailRoute(station).push<void>(context),
         onFavoriteTap: () =>
             ref.read(evFavoritesProvider.notifier).remove(station.id),
       ),

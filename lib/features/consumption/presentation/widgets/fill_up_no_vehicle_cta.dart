@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -56,7 +57,7 @@ class FillUpNoVehicleCta extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => context.push('/vehicles/edit'),
+              onPressed: () => const EditVehicleRoute().push<void>(context),
               icon: const Icon(Icons.add),
               label: Text(l?.vehicleAdd ?? 'Add vehicle'),
             ),

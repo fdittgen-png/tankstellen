@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/gdpr_consent_form_provider.dart';
@@ -31,7 +32,7 @@ class GdprConsentScreen extends ConsumerWidget {
           cloudSync: form.cloudSyncConsent,
           vinOnlineDecode: form.vinOnlineDecodeConsent,
         );
-    if (context.mounted) context.go('/setup');
+    if (context.mounted) context.go(RoutePaths.setup);
   }
 
   Future<void> _acceptAll(BuildContext context, WidgetRef ref) async {
@@ -41,7 +42,7 @@ class GdprConsentScreen extends ConsumerWidget {
           cloudSync: true,
           vinOnlineDecode: true,
         );
-    if (context.mounted) context.go('/setup');
+    if (context.mounted) context.go(RoutePaths.setup);
   }
 
   @override

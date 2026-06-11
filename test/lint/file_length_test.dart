@@ -129,11 +129,15 @@ void main() {
     // (the cold-launch opportunistic alert scan, + rationale comment). The
     // gating/scheduling logic lives in the under-cap background_service.dart;
     // this is launch glue only.
-    // 13 bumps — decomposition forced (#3141), tracked by the OPEN #3139
+    // #3135 — re-grandfathered 1113 → 1114: the typed-route layer import
+    // (core/navigation/app_routes.dart) so the #3167 active-trip recovery
+    // navigates via RoutePaths.tripRecording instead of a banned string
+    // literal. Pure import line; no logic added.
+    // 14 bumps — decomposition forced (#3141), tracked by the OPEN #3139
     // (AppInitializer phase decomposition).
     'lib/app/app_initializer.dart': (
-      lines: 1113,
-      bumps: 13,
+      lines: 1114,
+      bumps: 14,
       decompositionIssue: 3139,
     ),
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
@@ -733,10 +737,14 @@ void main() {
     // trip_recording_landscape_body.dart (262 lines); only the
     // MediaQuery.orientation branch + its import remain here. Full
     // decomposition of this screen still tracked under #2187/#2188.
-    // 7 bumps — decomposition forced (#3141), tracked by the OPEN #3138
+    // #3135 — re-grandfathered 1106 → 1107: the typed-route layer import
+    // (core/navigation/app_routes.dart) so the exit navigation uses
+    // RoutePaths.search instead of a banned string literal. Pure import
+    // line; no logic added.
+    // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3138
     // (trips/fillups feature split; this screen is trips).
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        (lines: 1106, bumps: 7, decompositionIssue: 3138),
+        (lines: 1107, bumps: 8, decompositionIssue: 3138),
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart': (
       lines: 439,
       bumps: 0,

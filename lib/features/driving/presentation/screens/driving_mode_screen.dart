@@ -9,6 +9,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
@@ -111,7 +112,7 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
                 onRecenter: () => _recenter(stations),
                 onNearestStation: () =>
                     _navigateToNearest(context, stations, selectedFuel),
-                onExit: () => context.go('/map'),
+                onExit: () => context.go(RoutePaths.map),
               ),
             ),
             if (_isLocked) DrivingLockOverlay(onUnlock: _unlock),

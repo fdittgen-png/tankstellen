@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
@@ -335,7 +336,7 @@ class _PrivacyDashboardScreenState
       await box.clear();
     }
     if (mounted) {
-      context.go('/setup');
+      context.go(RoutePaths.setup);
     }
   }
 

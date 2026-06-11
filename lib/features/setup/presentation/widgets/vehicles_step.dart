@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 
@@ -106,7 +106,7 @@ class VehiclesStep extends ConsumerWidget {
                     ),
                     trailing: const Icon(Icons.edit_outlined),
                     onTap: () =>
-                        context.push<void>('/vehicles/edit', extra: v.id),
+                        EditVehicleRoute(vehicleId: v.id).push<void>(context),
                   );
                 }),
               ],
@@ -123,7 +123,7 @@ class VehiclesStep extends ConsumerWidget {
                 // saves/cancels the vehicle edit screen — without the
                 // await, the returned Future is dropped and the step
                 // never re-reads `vehicleProfileListProvider`.
-                await context.push<void>('/vehicles/edit');
+                await const EditVehicleRoute().push<void>(context);
               },
               icon: const Icon(Icons.add),
               label: Text(l10n?.vehicleAdd ?? 'Add vehicle'),

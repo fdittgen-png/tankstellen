@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/navigation/app_routes.dart';
 import '../../../../../l10n/app_localizations.dart';
 import '../../../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../../providers/privacy_data_provider.dart';
@@ -140,7 +141,7 @@ class _SyncEnabledBody extends ConsumerWidget {
           contentPadding: EdgeInsets.zero,
         ),
         OutlinedButton.icon(
-          onPressed: () => context.push('/data-transparency'),
+          onPressed: () => context.push(RoutePaths.dataTransparency),
           icon: const Icon(Icons.visibility, size: 18),
           label: Text(l?.privacyViewServerData ?? 'View server data'),
         ),

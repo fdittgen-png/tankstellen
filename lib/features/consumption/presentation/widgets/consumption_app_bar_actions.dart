@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
@@ -117,7 +118,7 @@ class ConsumptionAppBarActions extends ConsumerWidget {
   void _onSelected(BuildContext context, _OverflowAction action) {
     switch (action) {
       case _OverflowAction.settings:
-        context.go('/profile');
+        context.go(RoutePaths.profile);
     }
   }
 
@@ -180,7 +181,7 @@ class ConsumptionAppBarActions extends ConsumerWidget {
             if (carbonEnabled)
               PopupMenuItem<_OverflowAction>(
                 key: const Key('open_carbon_dashboard'),
-                onTap: () => context.push('/carbon'),
+                onTap: () => context.push(RoutePaths.carbon),
                 child: _MenuRow(
                   icon: Icons.eco_outlined,
                   label: l?.carbonDashboardMenuLabel ?? 'Carbon dashboard',

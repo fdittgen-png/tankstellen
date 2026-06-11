@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -88,7 +89,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         tooltip: l10n?.tooltipBack ?? 'Back',
-        onPressed: () => context.go('/'),
+        onPressed: () => context.go(RoutePaths.search),
       ),
       bodyPadding: EdgeInsets.zero,
       body: ListView(

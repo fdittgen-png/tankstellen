@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/shared_trips_provider.dart';
 import 'trajet_row.dart';
@@ -57,7 +57,7 @@ class SharedTripsSection extends ConsumerWidget {
             l: l,
             theme: theme,
             shared: true,
-            onTap: () => context.push('/trip/${entry.id}'),
+            onTap: () => TripDetailRoute(entry.id).push<void>(context),
           ),
         ),
       ],

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/shell/settings_app_bar_action.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/theme_mode_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -218,7 +219,7 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.palette_outlined,
             title: l?.themeCardTitle ?? 'Theme',
             subtitle: _themeSubtitle(ref, l),
-            onTap: () => context.push('/theme-settings'),
+            onTap: () => context.push(RoutePaths.themeSettings),
           ),
           const SizedBox(height: 8),
           // #1806 — home-screen widget help. The Android widget's
@@ -253,7 +254,7 @@ class ProfileScreen extends ConsumerWidget {
             title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
             subtitle: l?.privacyDashboardSubtitle ??
                 'View, export, or delete your data',
-            onTap: () => context.push('/privacy-dashboard'),
+            onTap: () => context.push(RoutePaths.privacyDashboard),
           ),
           const SizedBox(height: 8),
           // Storage & Cache
@@ -295,7 +296,7 @@ class ProfileScreen extends ConsumerWidget {
                 title: l?.developerToolsSectionTitle ?? 'Developer tools',
                 subtitle: l?.developerToolsMenuSubtitle ??
                     'Error log, test alerts, diagnostics',
-                onTap: () => context.push('/developer-tools'),
+                onTap: () => context.push(RoutePaths.developerTools),
               ),
               const SizedBox(height: 8),
             ],

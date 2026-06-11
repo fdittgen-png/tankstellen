@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/cache/cache_manager.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -305,7 +306,7 @@ class StorageSection extends ConsumerWidget {
       }
       if (!ctx.mounted) return; // #3159 — see _clearCache.
       ref.invalidate(storageManagementProvider);
-      ctx.go('/setup');
+      ctx.go(RoutePaths.setup);
     }
   }
 }

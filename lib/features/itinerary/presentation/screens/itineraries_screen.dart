@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/swipe_to_delete.dart';
@@ -114,7 +115,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     ));
 
     // Navigate to search screen
-    context.go('/');
+    context.go(RoutePaths.search);
 
     SnackBarHelper.show(context, AppLocalizations.of(context)?.loadingRoute(it.name as String) ?? 'Loading route: ${it.name}');
   }

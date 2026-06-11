@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -69,8 +69,8 @@ class VehicleListScreen extends ConsumerWidget {
                 return VehicleCard(
                   vehicle: v,
                   isActive: v.id == active?.id,
-                  onTap: () => context.push('/vehicles/edit', extra: v.id),
-                  onEdit: () => context.push('/vehicles/edit', extra: v.id),
+                  onTap: () => EditVehicleRoute(vehicleId: v.id).push<void>(context),
+                  onEdit: () => EditVehicleRoute(vehicleId: v.id).push<void>(context),
                   onSetActive: () => ref
                       .read(activeVehicleProfileProvider.notifier)
                       .setActive(v.id),
@@ -79,7 +79,7 @@ class VehicleListScreen extends ConsumerWidget {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/vehicles/edit'),
+        onPressed: () => const EditVehicleRoute().push<void>(context),
         icon: const Icon(Icons.add),
         label: Text(l?.vehicleAdd ?? 'Add vehicle'),
       ),

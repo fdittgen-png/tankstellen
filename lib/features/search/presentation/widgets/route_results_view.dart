@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/geo_utils.dart';
@@ -103,7 +103,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
                 return EVStationCard(
                   key: ValueKey('route-ev-${item.station.id}'),
                   result: item,
-                  onTap: () => context.push('/ev-station', extra: item.station),
+                  onTap: () => EvStationDetailRoute(item.station).push<void>(context),
                 );
               }
               return const SizedBox.shrink();
@@ -264,7 +264,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         ),
         isFavorite: ref.watch(isFavoriteProvider(item.id)),
         profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
-        onTap: () => context.push('/station/${item.id}'),
+        onTap: () => StationDetailRoute(item.id).push<void>(context),
         onFavoriteTap: () => ref.read(favoritesProvider.notifier)
             .toggle(item.id, stationData: item.station),
         isCheapest: item.id == result.cheapestId,

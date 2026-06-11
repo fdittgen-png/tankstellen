@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
@@ -63,7 +64,7 @@ class TankSyncSection extends ConsumerWidget {
           leading: const Icon(Icons.email_outlined),
           title: Text(l?.switchToEmail ?? 'Switch to email'),
           subtitle: Text(l?.switchToEmailSubtitle ?? 'Keep data, add sign-in from other devices'),
-          onTap: () => context.push('/auth'),
+          onTap: () => context.push(RoutePaths.auth),
         )
       else
         ListTile(
@@ -108,12 +109,12 @@ class TankSyncSection extends ConsumerWidget {
       ListTile(
         leading: const Icon(Icons.visibility_outlined),
         title: Text(l?.viewMyData ?? 'View my data'),
-        onTap: () => context.push('/data-transparency'),
+        onTap: () => context.push(RoutePaths.dataTransparency),
       ),
       ListTile(
         leading: const Icon(Icons.link),
         title: Text(l?.linkDevice ?? 'Link device'),
-        onTap: () => context.push('/link-device'),
+        onTap: () => context.push(RoutePaths.linkDevice),
       ),
       if (syncConfig.mode != SyncMode.community)
         ListTile(
@@ -150,7 +151,7 @@ class TankSyncSection extends ConsumerWidget {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: FilledButton.icon(
-          onPressed: () => context.push('/sync-setup'),
+          onPressed: () => context.push(RoutePaths.syncSetup),
           icon: const Icon(Icons.cloud_upload),
           label: Text(l?.setupCloudSync ?? 'Set up cloud sync'),
         ),

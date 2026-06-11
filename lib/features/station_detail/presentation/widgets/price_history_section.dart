@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/sync/price_history_sync.dart';
@@ -132,7 +132,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () => GoRouter.of(context).push('/station/${widget.stationId}/history'),
+            onPressed: () => PriceHistoryRoute(widget.stationId).push<void>(context),
             child: Text(AppLocalizations.of(context)?.showAllFuelTypes ?? 'Show all fuel types'),
           ),
         ),
