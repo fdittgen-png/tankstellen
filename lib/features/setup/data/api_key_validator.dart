@@ -44,6 +44,8 @@ class ApiKeyValidator {
         );
       }
       return const ApiKeyValidationResult(isValid: true);
+    // #3164 — kept: genuine user-input validation; the failure surfaces
+    // in the returned ApiKeyValidationResult.
     } on DioException catch (e, st) { // ignore: unused_catch_stack
       return ApiKeyValidationResult(
         isValid: false,

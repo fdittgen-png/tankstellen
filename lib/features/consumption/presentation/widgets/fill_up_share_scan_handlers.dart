@@ -135,7 +135,10 @@ Future<void> runSharedReceiptScan(
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
-  } catch (e, st) { // ignore: unused_catch_stack
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+      'where': 'runSharedReceiptScan: shared receipt scan failed'
+    }));
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.showError(
         context,

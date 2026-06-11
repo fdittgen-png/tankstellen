@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../search/providers/ev_search_provider.dart';
@@ -217,7 +220,10 @@ Future<List<ChargingStation>> evStations(
       radiusKm: viewport.radiusKm,
     );
     await repo.saveAll(stations);
-  } catch (e, st) { // ignore: unused_catch_stack
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.services, e, st, context: const {
+      'where': 'evStations: fetchStations failed, using cache'
+    }));
     // Fall back to whatever we have cached if the service fails.
     stations = repo.getAll();
   }

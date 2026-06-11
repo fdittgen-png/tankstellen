@@ -107,7 +107,11 @@ class RadiusAlertStore {
     if (raw is String) {
       try {
         return DateTime.parse(raw);
-      } catch (e, st) { // ignore: unused_catch_stack
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+          'where': 'RadiusAlertStore.getLastEvaluatedAt: bad timestamp '
+              'for $alertId'
+        }));
         debugPrint(
             'RadiusAlertStore.getLastEvaluatedAt: bad ISO timestamp '
             'for $alertId: $e');

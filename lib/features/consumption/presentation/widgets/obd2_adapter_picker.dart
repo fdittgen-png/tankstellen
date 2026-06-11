@@ -311,7 +311,10 @@ class _Obd2AdapterPickerSheetState
       } else {
         Navigator.of(context).pop(service);
       }
-    } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
+    } on Obd2ConnectionError catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': '_Obd2AdapterPicker._connect: adapter connect failed'
+      }));
       if (!mounted) return;
       setState(() {
         _error = e;

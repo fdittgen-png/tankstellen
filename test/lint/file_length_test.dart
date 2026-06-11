@@ -652,8 +652,10 @@ void main() {
     // connection read, so the connect opens its OWN trace (beginTrace
     // supersedes a live pickerScan trace) instead of the scan's absorbing
     // it. Decomposition stays tracked under #2187/#2188.
+    // #3164 — re-grandfathered 552 → 555: errorLogger routing adds 3 lines
+    // (the connect-failure catch now logs e/st before the mounted check).
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
-        552,
+        555,
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.

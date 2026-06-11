@@ -386,6 +386,7 @@ class CarDataService {
     if (key != null) {
       try {
         fuel = FuelType.fromString(key);
+      // #3164 — kept: preference validation; unknown fuel key falls back.
       } catch (e, st) { // ignore: unused_catch_stack
         debugPrint('CarDataService: unknown preferred fuel "$key": $e');
       }

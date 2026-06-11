@@ -100,6 +100,8 @@ class GeocodingChain {
         );
 
         return result;
+      // #3164 — kept: the error is captured into the chain's ServiceError
+      // aggregate and surfaces in the result.
       } catch (e, st) { // ignore: unused_catch_stack
         errors.add(ServiceError(
           source: provider.source,
@@ -163,6 +165,8 @@ class GeocodingChain {
           fetchedAt: DateTime.now(),
           errors: errors,
         );
+      // #3164 — kept: the error is captured into the chain's ServiceError
+      // aggregate and surfaces in the result.
       } catch (e, st) { // ignore: unused_catch_stack
         errors.add(ServiceError(
           source: provider.source,

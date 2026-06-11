@@ -182,7 +182,10 @@ class LinkDeviceController extends _$LinkDeviceController {
             'Linked! Imported $addedFavorites favorites, $addedAlerts alerts, '
             '$addedVehicles vehicles, $addedFillUps fill-ups.',
       );
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'LinkDeviceController: device link failed'
+      }));
       state = LinkDeviceState(result: 'Link failed: $e');
     }
   }

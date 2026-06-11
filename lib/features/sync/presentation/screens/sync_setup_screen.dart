@@ -122,7 +122,10 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
 
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'SyncSetupScreen._onAuthSubmit: connect/sign-in failed'
+      }));
       if (mounted) {
         ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
       }
@@ -160,7 +163,10 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
 
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'SyncSetupScreen._onAdopt: adopt connect/sign-in failed'
+      }));
       if (mounted) {
         ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
       }

@@ -121,10 +121,13 @@ class RoutingService {
         source: ServiceSource.osrmRouting,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e, st) { // ignore: unused_catch_stack
-      throw ApiException(
-        message: e.message ?? 'Route calculation failed',
-        statusCode: e.response?.statusCode,
+    } on DioException catch (e, st) {
+      Error.throwWithStackTrace(
+        ApiException(
+          message: e.message ?? 'Route calculation failed',
+          statusCode: e.response?.statusCode,
+        ),
+        st,
       );
     }
   }

@@ -312,7 +312,10 @@ class PumpOcrConfig {
     dynamic decoded;
     try {
       decoded = json.decode(raw);
-    } on FormatException catch (e, st) { // ignore: unused_catch_stack
+    } on FormatException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        'where': 'PumpOcrConfig._ingest: malformed JSON in $_assetPath'
+      }));
       debugPrint('PumpOcrConfig: malformed JSON in $_assetPath: $e');
       return;
     }

@@ -88,7 +88,10 @@ class DataTransparencyController extends _$DataTransparencyController {
       } else {
         state = DataTransparencyState(data: data, loading: false);
       }
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'DataTransparencyController.load: fetchAll failed'
+      }));
       state = state.copyWith(loading: false, error: e.toString());
     }
   }
@@ -169,7 +172,10 @@ class DataTransparencyController extends _$DataTransparencyController {
     try {
       await UserDataSync.deleteAll();
       await load();
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'DataTransparencyController.deleteAllData: delete failed'
+      }));
       state = state.copyWith(loading: false, error: e.toString());
     }
   }

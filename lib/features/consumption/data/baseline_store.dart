@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
+import '../../../core/logging/error_logger.dart';
 import '../domain/baseline_rolling_state.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
@@ -71,7 +72,10 @@ class BaselineStore {
         }
       });
       _cache[vehicleId] = m;
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        'where': 'BaselineStore.loadVehicle: corrupt payload for $vehicleId'
+      }));
       debugPrint('BaselineStore.loadVehicle: corrupt payload '
           'for $vehicleId — starting fresh: $e');
       _cache[vehicleId] = {};

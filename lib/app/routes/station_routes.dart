@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/data/storage_repository.dart';
+import '../../core/logging/error_logger.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../features/ev/data/repositories/ev_station_repository.dart';
 import '../../features/ev/domain/entities/charging_station.dart';
@@ -103,7 +106,10 @@ ChargingStation? hydrateEvStationById(
   if (raw != null) {
     try {
       return ChargingStation.fromJson(raw);
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'hydrateEvStationById: corrupt EV favorite payload'
+      }));
       // A corrupt favorites payload shouldn't block a valid cache hit.
     }
   }

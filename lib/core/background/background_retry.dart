@@ -1,8 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+
+import '../logging/error_logger.dart';
 
 /// Retry configuration for background network requests.
 class BackgroundRetryConfig {
@@ -33,9 +37,13 @@ Future<Map<String, dynamic>?> fetchWithRetry({
         return response.data as Map<String, dynamic>;
       }
       return null;
-    } on DioException catch (e, st) { // ignore: unused_catch_stack
+    } on DioException catch (e, st) {
       final isLastAttempt = attempt == config.maxAttempts - 1;
       if (isLastAttempt || !isRetryable(e)) {
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: const {
+              'where': 'fetchWithRetry: giving up after retries'
+            }));
         debugPrint(
           'BackgroundRetry: failed after ${attempt + 1} '
           'attempt(s): ${e.type} - ${e.message}',

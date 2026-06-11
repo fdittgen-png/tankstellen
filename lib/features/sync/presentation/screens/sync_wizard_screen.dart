@@ -262,7 +262,10 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
           );
       if (!mounted) return;
       await _verifySchemaAfterConnect();
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'SyncWizardScreen._adopt: adopt connect/sign-in failed'
+      }));
       if (mounted) {
         wizard.adoptFailed('Connection failed: $e');
       }
@@ -280,7 +283,10 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       final key = _sanitizeKey(_keyController.text);
       await TankSyncClient.init(url: url, anonKey: key);
       if (mounted) wizard.testSucceeded('Connection successful!');
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'SyncWizardScreen._testConnection: test failed'
+      }));
       if (mounted) wizard.testFailed('Connection failed:\n$e');
     }
   }
@@ -321,7 +327,10 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
 
       if (!mounted) return;
       await _verifySchemaAfterConnect();
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'SyncWizardScreen._connect: connect/sign-in failed'
+      }));
       if (mounted) {
         notifier.connectFailed('Connection failed: $e');
       }

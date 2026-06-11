@@ -89,6 +89,8 @@ class Favorites extends _$Favorites {
         StationService? stationService;
         try {
           stationService = ref.read(stationServiceProvider);
+        // #3164 — kept: expected fallback when the provider isn't
+        // initialized yet; degraded path is logged via debugPrint.
         } catch (e, st) { // ignore: unused_catch_stack
           debugPrint(
             'Favorites._refreshWidget: stationService unavailable, '
