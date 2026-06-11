@@ -3651,6 +3651,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Prices haven\'t been checked in the background yet';
 
   @override
+  String get alertsIosBestEffortNote =>
+      'On iPhone, alert checks are best effort: iOS decides when the app may check prices in the background, so an alert can arrive late or occasionally not at all. Opening the app always runs a fresh check.';
+
+  @override
   String alertTargetPriceWithCurrency(String currency) {
     return 'Target price ($currency)';
   }
@@ -11520,6 +11524,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get alertsLastCheckedNever =>
       '⟦Ƥřîçéš ĥáṽéñ\'ŧ ƀééñ çĥéçķéđ îñ ŧĥé ƀáçķǧřóúñđ ýéŧ ··················⟧';
+
+  @override
+  String get alertsIosBestEffortNote =>
+      '⟦Óñ îƤĥóñé, áłéřŧ çĥéçķš ářé ƀéšŧ éƒƒóřŧ: îÓŠ đéçîđéš ŵĥéñ ŧĥé áƥƥ ɱáý çĥéçķ ƥřîçéš îñ ŧĥé ƀáçķǧřóúñđ, šó áñ áłéřŧ çáñ ářřîṽé łáŧé óř óççášîóñáłłý ñóŧ áŧ áłł. Óƥéñîñǧ ŧĥé áƥƥ áłŵáýš řúñš á ƒřéšĥ çĥéçķ. ········································································⟧';
 
   @override
   String alertTargetPriceWithCurrency(String currency) {

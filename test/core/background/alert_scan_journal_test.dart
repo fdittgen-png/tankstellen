@@ -88,6 +88,32 @@ void main() {
       expect(rows.last['stations'], AlertScanJournal.maxEntries + 4);
     });
 
+    test(
+        'the #3169 mitigation triggers round-trip so the SLA is '
+        'field-verifiable per wake source', () async {
+      // bgProcessing / slcWake / opportunistic are the new iOS lanes; the
+      // journal must persist their tags verbatim so one export shows which
+      // wake source actually delivered scans in the field.
+      final journal = AlertScanJournal();
+      await journal.append(
+          at: t0, trigger: 'bgProcessing', stationsScanned: 4, alertsFired: 1);
+      await journal.append(
+          at: t0.add(const Duration(minutes: 5)),
+          trigger: 'slcWake',
+          skippedReason: 'cooldown');
+      await journal.append(
+          at: t0.add(const Duration(minutes: 30)),
+          trigger: 'opportunistic',
+          stationsScanned: 4,
+          alertsFired: 0);
+
+      final rows = journal.entries();
+      expect(rows.map((r) => r['trigger']),
+          ['bgProcessing', 'slcWake', 'opportunistic']);
+      expect(rows[0]['alertsFired'], 1);
+      expect(rows[1]['skipped'], 'cooldown');
+    });
+
     test('exportSection returns the rows newest-first', () async {
       final journal = AlertScanJournal();
       await journal.append(

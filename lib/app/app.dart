@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/country/country_switch_listener.dart';
 import '../core/logging/error_logger.dart';
@@ -77,6 +78,13 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
       // #3143 — release-visible: debugPrint is no-opped in release.
       unawaited(errorLogger.log(ErrorLayer.ui, e, st,
           context: {'where': 'onAppLifecycleStateChanged'}));
+    }
+    // #3169 — every foreground resume is a free execution window: fire an
+    // opportunistic alert scan (iOS headless one-off; Android no-op — its
+    // periodic Tier-1 already meets the SLA). Never throws; the
+    // coordinator's cross-trigger cooldown absorbs rapid resumes.
+    if (state == AppLifecycleState.resumed) {
+      unawaited(BackgroundService.onOpportunisticWake());
     }
     if (state != AppLifecycleState.paused &&
         state != AppLifecycleState.inactive) {

@@ -57,4 +57,11 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
   Future<void> cancelAll() async {
     await _workmanager.cancelAll();
   }
+
+  /// #3169 — deliberate no-op on Android. The twice-daily WorkManager
+  /// periodic task already meets the alert SLA (1-3x/day, ≤3-4h); an
+  /// extra scan on every app launch would only burn the per-provider
+  /// request budget the #2866 cadence protects.
+  @override
+  Future<void> scheduleOpportunisticScan() async {}
 }

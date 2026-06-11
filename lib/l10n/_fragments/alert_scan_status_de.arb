@@ -9,5 +9,9 @@
   "alertsLastCheckedNever": "Preise wurden im Hintergrund noch nicht geprüft",
   "@alertsLastCheckedNever": {
     "description": "Footer line on the alerts screen when no background alert scan has ever completed (#3147)."
+  },
+  "alertsIosBestEffortNote": "Auf dem iPhone sind Preisprüfungen Best-Effort: iOS entscheidet, wann die App im Hintergrund Preise prüfen darf — ein Alarm kann daher verspätet oder vereinzelt gar nicht eintreffen. Beim Öffnen der App wird immer sofort neu geprüft.",
+  "@alertsIosBestEffortNote": {
+    "description": "iOS-only honest disclosure on the alerts screen (#3169): background alert delivery on iPhone is OS-budgeted and best-effort — never promise Android-grade delivery. Mentions that opening the app always triggers a fresh check."
   }
 }

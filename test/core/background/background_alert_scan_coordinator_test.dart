@@ -31,10 +31,22 @@ void main() {
           'workmanager_periodic',
           'android_widget',
           'ios_bg_refresh',
+          // #3169 — the iOS alert-delivery mitigation lanes. These exact
+          // tags land in the #3147 journal rows, so the SLA is field-
+          // verifiable per wake source from one export.
+          'bgProcessing',
+          'slcWake',
+          'opportunistic',
         ]),
       );
       expect(tags, isNot(contains('workmanager_charging')),
           reason: 'the charging trigger was removed (#2866)');
+    });
+
+    test('the #3169 mitigation triggers map to their journal tags', () {
+      expect(BackgroundScanTrigger.iosBgProcessing.tag, 'bgProcessing');
+      expect(BackgroundScanTrigger.iosSlcWake.tag, 'slcWake');
+      expect(BackgroundScanTrigger.opportunistic.tag, 'opportunistic');
     });
   });
 

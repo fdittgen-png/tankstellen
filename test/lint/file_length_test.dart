@@ -93,7 +93,12 @@ void main() {
     // before the orchestrator's first FBP touch. The restoration logic
     // itself lives in the under-cap ios_state_restoration_service.dart /
     // NEW ios_background_adapter_listener.dart; this is launch glue only.
-    'lib/app/app_initializer.dart': 1104,
+    // #3169 — re-grandfathered 1104 → 1113: `_maybeInitBackground` now
+    // also fires `BackgroundService.onOpportunisticWake()` after reconcile
+    // (the cold-launch opportunistic alert scan, + rationale comment). The
+    // gating/scheduling logic lives in the under-cap background_service.dart;
+    // this is launch glue only.
+    'lib/app/app_initializer.dart': 1113,
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
     // deletion-tombstone fix threads a tombstoned-id set through `merge` and
     // `mergeRows` (fetch + dual-side filter so a delete on another device

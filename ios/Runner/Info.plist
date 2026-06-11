@@ -133,9 +133,18 @@
 	     IosBackgroundTaskIds.appRefresh. The `fetch` UIBackgroundMode above
 	     gates BGAppRefresh. iOS runs it opportunistically, OS-budgeted —
 	     best-effort, never real-time. -->
+	<!-- #3169 — `…tankstellen.processing` is the second BGTask lane: a
+	     BGProcessingTask iOS budgets separately from app refresh (typically
+	     run in overnight idle/charging windows). The `processing`
+	     UIBackgroundMode above gates it; it must match
+	     WorkmanagerPlugin.registerBGProcessingTask in AppDelegate.swift and
+	     IosBackgroundTaskIds.processing on the Dart side. The slcWake /
+	     opportunistic one-off tasks ride plain beginBackgroundTask windows
+	     and need NO identifier here. -->
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>de.tankstellen.tankstellen.background</string>
+		<string>de.tankstellen.tankstellen.processing</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

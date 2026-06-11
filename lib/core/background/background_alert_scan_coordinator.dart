@@ -12,6 +12,7 @@ import '../storage/hive_storage.dart';
 import '../cache/cache_manager.dart';
 import 'alert_scan_journal.dart';
 import 'background_price_history_writer.dart';
+import 'background_scan_trigger.dart';
 import 'background_price_source.dart';
 import 'background_scan_dedup_store.dart';
 import 'background_scan_runners.dart';
@@ -23,30 +24,9 @@ import 'hive_isolate_lock.dart';
 import 'notification_templates.dart';
 import 'provider_request_budget.dart';
 
-/// Where a background scan came from. Threaded through to the dedup store
-/// for diagnostics and used in debug logging so a maintainer can tell
-/// whether WorkManager, the home-widget refresh, or iOS BGAppRefresh drove
-/// a given scan.
-enum BackgroundScanTrigger {
-  /// WorkManager periodic task (`priceRefresh`) — the baseline Android path,
-  /// the twice-daily alert/price scan (#2866).
-  workManagerPeriodic,
-
-  /// Android home-widget refresh callback (#2412) — an opportunistic extra
-  /// wake while the widget is on the home screen, NOT a reliability
-  /// guarantee.
-  androidWidget,
-
-  /// iOS BGAppRefreshTask (#2414) — OS-budgeted, sparse, never real-time.
-  iosBackgroundRefresh;
-
-  /// Stable, log-friendly tag persisted alongside the last-scan timestamp.
-  String get tag => switch (this) {
-        BackgroundScanTrigger.workManagerPeriodic => 'workmanager_periodic',
-        BackgroundScanTrigger.androidWidget => 'android_widget',
-        BackgroundScanTrigger.iosBackgroundRefresh => 'ios_bg_refresh',
-      };
-}
+// The trigger taxonomy lives in its own file since #3169 (file-length cap);
+// re-exported here so every existing importer keeps working.
+export 'background_scan_trigger.dart';
 
 /// Platform-neutral entry point for an on-device background price scan
 /// (#2415).

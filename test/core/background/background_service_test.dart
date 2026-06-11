@@ -4,12 +4,39 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/background/background_alert_scan_coordinator.dart';
+import 'package:tankstellen/core/background/background_price_fetcher.dart';
 import 'package:tankstellen/core/background/background_service.dart';
 import 'package:tankstellen/core/background/hive_isolate_lock.dart';
 import 'package:tankstellen/core/notifications/local_notification_service.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/utils/json_extensions.dart';
+import 'package:workmanager/workmanager.dart';
+
+/// Recording [BackgroundPriceFetcher] for the #3169 opportunistic-wake
+/// decision table.
+class _RecordingFetcher implements BackgroundPriceFetcher {
+  int initCalls = 0;
+  int cancelCalls = 0;
+  int opportunisticCalls = 0;
+
+  @override
+  Future<void> init() async => initCalls++;
+
+  @override
+  Future<void> cancelAll() async => cancelCalls++;
+
+  @override
+  Future<void> scheduleOpportunisticScan() async => opportunisticCalls++;
+}
+
+/// Fault-injection fetcher: scheduling throws (#3169 never-throws check).
+class _ThrowingFetcher extends _RecordingFetcher {
+  @override
+  Future<void> scheduleOpportunisticScan() =>
+      throw StateError('scheduler backend unavailable');
+}
 
 void main() {
   group('BackgroundService', () {
@@ -567,6 +594,142 @@ void main() {
         manifest.contains('android.intent.action.BOOT_COMPLETED'),
         isTrue,
         reason: 'the receiver must filter the boot broadcast',
+      );
+    });
+  });
+
+  // #3169 — the task-name → trigger mapping every wake source funnels
+  // through. The full decision table, exercised directly via the
+  // @visibleForTesting seam.
+  group('task → trigger mapping (#3169)', () {
+    test('maps every scheduled task name onto its trigger', () {
+      expect(debugTriggerForTask(BackgroundService.priceRefreshTask),
+          BackgroundScanTrigger.workManagerPeriodic);
+      expect(debugTriggerForTask(BackgroundService.widgetRefreshScanTask),
+          BackgroundScanTrigger.androidWidget);
+      expect(debugTriggerForTask(Workmanager.iOSBackgroundTask),
+          BackgroundScanTrigger.iosBackgroundRefresh);
+      expect(debugTriggerForTask(IosBackgroundTaskIds.appRefresh),
+          BackgroundScanTrigger.iosBackgroundRefresh);
+      // The #3169 mitigation lanes.
+      expect(debugTriggerForTask(IosBackgroundTaskIds.processing),
+          BackgroundScanTrigger.iosBgProcessing);
+      expect(debugTriggerForTask(IosBackgroundTaskIds.slcWake),
+          BackgroundScanTrigger.iosSlcWake);
+      expect(debugTriggerForTask(IosBackgroundTaskIds.opportunistic),
+          BackgroundScanTrigger.opportunistic);
+    });
+
+    test('unknown and special-cased task names scan nothing', () {
+      expect(debugTriggerForTask('some-stray-task'), isNull);
+      // bootReregister is handled BEFORE the mapping (re-arms, no scan).
+      expect(debugTriggerForTask(BackgroundService.bootReregisterTask),
+          isNull);
+    });
+
+    test('dispatcher re-arms the one-shot BGProcessingTask after a run', () {
+      // A BGProcessingTask submission is one-shot (the plugin's native
+      // handler only re-submits the BGAppRefresh lane) — the dispatcher
+      // must re-arm it or the lane dies after one wake.
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+      final idx = source.indexOf('IosBackgroundTaskIds.processing)',
+          source.indexOf('void callbackDispatcher()'));
+      expect(idx, greaterThan(0),
+          reason: 'dispatcher must special-case the processing task');
+      expect(
+        source.contains('scheduleIosProcessingTask(Workmanager())'),
+        isTrue,
+        reason: 'dispatcher must re-submit the processing request after '
+            'the scan',
+      );
+    });
+  });
+
+  // #3169 — opportunistic foreground-wake scans.
+  group('onOpportunisticWake (#3169)', () {
+    test('schedules a scan when an alert is active', () async {
+      final fetcher = _RecordingFetcher();
+      await BackgroundService.onOpportunisticWake(
+        fetcher: fetcher,
+        alertsGate: () async => true,
+      );
+      expect(fetcher.opportunisticCalls, 1);
+      expect(fetcher.initCalls, 0,
+          reason: 'a foreground wake must not re-register periodic tasks');
+    });
+
+    test('schedules nothing without an active alert (ToS: no '
+        'non-user-consented polling)', () async {
+      final fetcher = _RecordingFetcher();
+      await BackgroundService.onOpportunisticWake(
+        fetcher: fetcher,
+        alertsGate: () async => false,
+      );
+      expect(fetcher.opportunisticCalls, 0);
+    });
+
+    test('never throws when the scheduler backend faults', () async {
+      await expectLater(
+        BackgroundService.onOpportunisticWake(
+          fetcher: _ThrowingFetcher(),
+          alertsGate: () async => true,
+        ),
+        completes,
+      );
+    });
+
+    test('never throws when the alerts gate faults (e.g. Hive unavailable)',
+        () async {
+      final fetcher = _RecordingFetcher();
+      await expectLater(
+        BackgroundService.onOpportunisticWake(
+          fetcher: fetcher,
+          alertsGate: () async => throw StateError('alerts box closed'),
+        ),
+        completes,
+      );
+      expect(fetcher.opportunisticCalls, 0,
+          reason: 'an unreadable gate must fail closed (no scan)');
+    });
+
+    test('lifecycle + cold-start call sites fire the opportunistic wake',
+        () {
+      // The two foreground execution windows: every resume (app.dart) and
+      // the cold launch (app_initializer.dart).
+      final app = File('lib/app/app.dart').readAsStringSync();
+      expect(
+        app.contains('BackgroundService.onOpportunisticWake()'),
+        isTrue,
+        reason: 'the lifecycle observer must fire the wake on resume',
+      );
+      expect(
+        app.contains('AppLifecycleState.resumed'),
+        isTrue,
+        reason: 'the wake must be gated on the resumed transition',
+      );
+      final initializer =
+          File('lib/app/app_initializer.dart').readAsStringSync();
+      expect(
+        initializer.contains('BackgroundService.onOpportunisticWake()'),
+        isTrue,
+        reason: 'cold launch must fire the wake after reconcile',
+      );
+    });
+  });
+
+  // #3169 — SLC wake monitoring follows the alert lifecycle.
+  group('SLC wake reconcile wiring (#3169)', () {
+    test('reconcile arms/disarms the SLC monitor with the alert state', () {
+      final source = File(
+        'lib/core/background/background_service.dart',
+      ).readAsStringSync();
+      expect(
+        source.contains('createSlcWakeMonitor().setEnabled(active)'),
+        isTrue,
+        reason: 'reconcile must mirror the alert-active state into the '
+            'SLC monitor (on with alerts, off without)',
       );
     });
   });

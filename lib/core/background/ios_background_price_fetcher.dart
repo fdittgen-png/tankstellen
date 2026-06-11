@@ -65,10 +65,32 @@ class IosBackgroundPriceFetcher implements BackgroundPriceFetcher {
     debugPrint(
         'IosBackgroundPriceFetcher: registered BGAppRefreshTask '
         '"${IosBackgroundTaskIds.appRefresh}" (OS-budgeted, best-effort)');
+
+    // #3169 — arm the SECOND BGTask lane: a BGProcessingTask, which iOS
+    // budgets separately from app refresh and typically runs during
+    // overnight idle/charging windows. A submission is one-shot — the
+    // dispatcher re-arms it after every run; arming here (every
+    // reconcile / app launch) replaces any pending request, so it is
+    // idempotent.
+    await scheduleIosProcessingTask(_workmanager);
   }
 
   @override
   Future<void> cancelAll() async {
     await _workmanager.cancelAll();
+  }
+
+  /// #3169 — enqueue an immediate one-off headless scan for a foreground
+  /// wake. Rides a plain `beginBackgroundTask` window (no BGTaskScheduler
+  /// involvement, no Info.plist identifier), funnelling into the same
+  /// coordinator lane as every scheduled trigger — the cross-trigger
+  /// cooldown dedups rapid resumes, and the #3147 journal records the
+  /// run under the 'opportunistic' tag.
+  @override
+  Future<void> scheduleOpportunisticScan() async {
+    await _workmanager.registerOneOffTask(
+      IosBackgroundTaskIds.opportunistic,
+      IosBackgroundTaskIds.opportunistic,
+    );
   }
 }

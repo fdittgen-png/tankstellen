@@ -19,6 +19,7 @@ import '../../providers/alert_provider.dart';
 import '../../providers/radius_alerts_provider.dart';
 import '../widgets/alert_station_picker_sheet.dart';
 import '../widgets/alert_statistics_card.dart';
+import '../widgets/alerts_best_effort_note.dart';
 import '../widgets/alerts_last_checked_footer.dart';
 import '../widgets/radius_alert_create_sheet.dart';
 
@@ -143,6 +144,10 @@ class _AlertsBody extends ConsumerWidget {
         // last-completed-scan stamp so a user can verify the background
         // scan actually runs (the alert-SLA field check).
         const AlertsLastCheckedFooter(),
+        // #3169 — iOS-only honest disclosure: background alert delivery
+        // on iPhone is best-effort (OS-budgeted), never Android-grade.
+        // Renders nothing on other platforms.
+        const AlertsBestEffortNote(),
       ],
     );
   }

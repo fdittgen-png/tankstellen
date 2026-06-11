@@ -523,7 +523,16 @@ class AppInitializer {
   /// regular non-user-initiated requests. #2210 — delegates to
   /// BackgroundService.reconcile so BOTH price and radius alerts gate
   /// the scheduler (radius-only users were previously never scheduled).
-  static Future<void> _maybeInitBackground() => BackgroundService.reconcile();
+  ///
+  /// #3169 — after reconciling the schedule, a cold launch also fires an
+  /// opportunistic scan: on iOS the app-open moment is one of the few
+  /// execution windows the OS reliably grants (Android implements it as
+  /// a no-op). The coordinator's cross-trigger cooldown keeps repeated
+  /// launches free.
+  static Future<void> _maybeInitBackground() async {
+    await BackgroundService.reconcile();
+    await BackgroundService.onOpportunisticWake();
+  }
 
   static Future<void> _safe(String label, Future<void> Function() body) async {
     try {
