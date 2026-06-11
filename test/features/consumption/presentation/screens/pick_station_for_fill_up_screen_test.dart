@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
+import 'package:tankstellen/core/navigation/app_routes.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/'
     'pick_station_for_fill_up_screen.dart';
@@ -41,10 +42,11 @@ void main() {
       await tester.tap(find.byKey(const Key('pick_station_tile_super-u-1')));
       await tester.pumpAndSettle();
       expect(_lastRoute, '/consumption/add');
-      expect(_lastExtra, isA<Map<dynamic, dynamic>>());
-      final extra = _lastExtra as Map;
-      expect(extra['stationId'], 'super-u-1');
-      expect(extra['stationName'], 'SUPER U');
+      // #3135 — the pre-fill crosses as the typed AddFillUpRoute payload.
+      expect(_lastExtra, isA<AddFillUpRoute>());
+      final extra = _lastExtra as AddFillUpRoute;
+      expect(extra.stationId, 'super-u-1');
+      expect(extra.stationName, 'SUPER U');
     });
 
     testWidgets('Skip button navigates to /consumption/add with no context',
@@ -53,7 +55,12 @@ void main() {
       await tester.tap(find.byKey(const Key('pick_station_skip')));
       await tester.pumpAndSettle();
       expect(_lastRoute, '/consumption/add');
-      expect(_lastExtra, isNull);
+      // #3135 — Skip pushes an empty typed payload (no station context).
+      final extra = _lastExtra as AddFillUpRoute;
+      expect(extra.stationId, isNull);
+      expect(extra.stationName, isNull);
+      expect(extra.fuelType, isNull);
+      expect(extra.pricePerLiter, isNull);
     });
   });
 }

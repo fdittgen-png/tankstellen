@@ -8,6 +8,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -114,7 +115,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         icon: Icons.route,
         title: l10n?.noStationsAlongRoute ?? 'No stations found along route',
         actionLabel: l10n?.search ?? 'Back to search',
-        onAction: () => context.go('/'),
+        onAction: () => context.go(RoutePaths.search),
       );
     }
 

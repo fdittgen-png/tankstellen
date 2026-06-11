@@ -3,9 +3,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../app/responsive_search_layout.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -128,7 +128,7 @@ class TrajetsTab extends ConsumerWidget {
                     isScrollControlled: true,
                     builder: (_) => EditVirtualTrajetSheet(entry: entry),
                   )
-              : () => context.push('/trip/${entry.id}'),
+              : () => TripDetailRoute(entry.id).push<void>(context),
         );
       },
     );

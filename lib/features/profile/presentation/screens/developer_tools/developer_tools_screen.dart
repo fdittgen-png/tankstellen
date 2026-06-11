@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/app_constants.dart';
+import '../../../../../core/navigation/app_routes.dart';
 import '../../../../../core/notifications/notification_providers.dart';
 import '../../../../../core/services/diagnostics/data_access_recorder_provider.dart';
 import '../../../../../core/services/diagnostics/data_access_trace_export.dart';
@@ -90,7 +91,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           ErrorLogExportRow(
-            onView: () => context.push('/developer-tools/error-log'),
+            onView: () => context.push(RoutePaths.developerToolsErrorLog),
           ),
           const SizedBox(height: 16),
 
@@ -131,7 +132,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const ValueKey('debug-feature-flag-dump'),
-            onPressed: () => context.push('/developer-tools/flags'),
+            onPressed: () => context.push(RoutePaths.developerToolsFlags),
             icon: const Icon(Icons.flag_outlined),
             label: Text(
               l?.developerToolsFeatureFlagDump ?? 'Feature flag inspector',
@@ -141,7 +142,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           // #2471 — OBD2 communication-health diagnostics (Epic #2463).
           OutlinedButton.icon(
             key: const ValueKey('debug-obd2-health'),
-            onPressed: () => context.push('/developer-tools/obd2-health'),
+            onPressed: () => context.push(RoutePaths.developerToolsObd2Health),
             icon: const Icon(Icons.bluetooth_searching_outlined),
             label: Text(
               l?.obd2HealthNavLabel ?? 'OBD2 communication health',
@@ -151,7 +152,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           // #2518 — in-app OCR tester (Epic #2516 Child 2).
           OutlinedButton.icon(
             key: const ValueKey('debug-ocr-tester'),
-            onPressed: () => context.push('/developer-tools/ocr-tester'),
+            onPressed: () => context.push(RoutePaths.developerToolsOcrTester),
             icon: const Icon(Icons.document_scanner_outlined),
             label: Text(l?.ocrTesterNavLabel ?? 'OCR tester'),
           ),

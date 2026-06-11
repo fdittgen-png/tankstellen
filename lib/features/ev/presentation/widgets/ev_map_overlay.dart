@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/ev/charging_station.dart';
@@ -44,7 +44,7 @@ class _EvMapLayerState extends ConsumerState<EvMapLayer> {
             // #3174 — route to the SAME rich detail screen every other EV
             // entry point uses (search list, favorites, route results),
             // instead of pushing the now-deleted legacy in-feature copy.
-            onTap: () => context.push('/ev-station', extra: s),
+            onTap: () => EvStationDetailRoute(s).push<void>(context),
           ),
         )
         .toList();

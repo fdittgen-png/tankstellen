@@ -7,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
+import '../../../../core/logging/error_logger.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../../../core/domain/station.dart';
-import '../../../../core/logging/error_logger.dart';
 
 /// Station-first entry point for the fill-up form (#715).
 ///
@@ -97,7 +99,7 @@ class PickStationForFillUpScreen extends ConsumerWidget {
               child: TextButton.icon(
                 key: const Key('pick_station_skip'),
                 onPressed: () =>
-                    context.pushReplacement('/consumption/add'),
+                    const AddFillUpRoute().pushReplacement(context),
                 icon: const Icon(Icons.skip_next_outlined),
                 label: Text(
                   l?.pickStationSkip ?? 'Skip — add without a station',
@@ -113,18 +115,17 @@ class PickStationForFillUpScreen extends ConsumerWidget {
   void _openFillUp(
     BuildContext context,
     Station station,
-    Object? profileFuel,
+    FuelType? profileFuel,
   ) {
     final price = _priceForFuel(station, profileFuel);
-    context.pushReplacement(
-      '/consumption/add',
-      extra: <String, Object?>{
-        'stationId': station.id,
-        'stationName': station.brand.isNotEmpty ? station.brand : station.name,
-        'fuelType': profileFuel,
-        'pricePerLiter': ?price,
-      },
-    );
+    // #3135 — the pre-fill crosses as a typed AddFillUpRoute instead of
+    // a stringly-keyed Map.
+    AddFillUpRoute(
+      stationId: station.id,
+      stationName: station.brand.isNotEmpty ? station.brand : station.name,
+      fuelType: profileFuel,
+      pricePerLiter: price,
+    ).pushReplacement(context);
   }
 
   double? _priceForFuel(Station s, Object? fuel) {

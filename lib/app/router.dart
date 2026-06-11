@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../core/data/storage_repository.dart';
+import '../core/navigation/app_routes.dart';
 import '../core/navigation/root_navigator_key.dart';
 import '../l10n/app_localizations.dart';
 import '../core/telemetry/integrations/navigation_trace_observer.dart';
@@ -60,9 +61,9 @@ String? _consumePendingWidgetPath(Ref ref) {
 /// by the screen, so without the guard the redirect would route to
 /// `/consumption/add` again on the very next evaluation).
 String? _resolvePendingSharedReceiptPath(Ref ref, GoRouterState state) {
-  if (state.matchedLocation == '/consumption/add') return null;
+  if (state.matchedLocation == RoutePaths.addFillUp) return null;
   final pending = ref.read(pendingSharedReceiptProvider);
-  return pending != null ? '/consumption/add' : null;
+  return pending != null ? RoutePaths.addFillUp : null;
 }
 
 /// Resolves the route to land on based on the active profile's
@@ -71,21 +72,21 @@ String? _resolvePendingSharedReceiptPath(Ref ref, GoRouterState state) {
 /// Exposed for unit tests.
 String resolveLandingLocation(StorageRepository storage) {
   final profileId = storage.getActiveProfileId();
-  if (profileId == null) return '/';
+  if (profileId == null) return RoutePaths.search;
   final landing = storage.getProfile(profileId)?['landingScreen']?.toString();
   switch (landing) {
     case 'favorites':
     case 'LandingScreen.favorites':
-      return '/favorites';
+      return RoutePaths.favorites;
     case 'map':
     case 'LandingScreen.map':
-      return '/map';
+      return RoutePaths.map;
     case 'cheapest':
     case 'LandingScreen.cheapest':
     case 'nearest':
     case 'LandingScreen.nearest':
     default:
-      return '/';
+      return RoutePaths.search;
   }
 }
 
@@ -98,7 +99,7 @@ GoRouter router(Ref ref) {
     // navigator (e.g. `CountrySwitchListener` in the MaterialApp
     // builder) can reach a navigator-bearing context for `showDialog`.
     navigatorKey: rootNavigatorKey,
-    initialLocation: '/consent',
+    initialLocation: RoutePaths.consent,
     observers: [NavigationTraceObserver()],
     errorBuilder: (context, state) {
       // #1690 — the 404 / page-not-found screen is localized so it
@@ -121,7 +122,7 @@ GoRouter router(Ref ref) {
               ),
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: () => context.go('/'),
+                onPressed: () => context.go(RoutePaths.search),
                 child: Text(l?.notFoundHomeButton ?? 'Home'),
               ),
             ],
@@ -132,15 +133,15 @@ GoRouter router(Ref ref) {
     redirect: (context, state) {
       // Read live from storage each redirect — not cached at provider creation
       final hasConsent = storage.getSetting(StorageKeys.gdprConsentGiven) == true;
-      final isConsent = state.matchedLocation == '/consent';
+      final isConsent = state.matchedLocation == RoutePaths.consent;
       final isReady = storage.isSetupComplete;
-      final isSetup = state.matchedLocation == '/setup';
+      final isSetup = state.matchedLocation == RoutePaths.setup;
       // Routes the user can visit FROM inside /setup without the redirect
       // kicking them back to the wizard (#695). Without this whitelist,
       // pushing /vehicles/edit during the wizard's Vehicles step rounded
       // straight back to /setup, making "Add vehicle" appear broken.
-      final isSetupAllowedChild = state.matchedLocation == '/vehicles' ||
-          state.matchedLocation == '/vehicles/edit';
+      final isSetupAllowedChild = state.matchedLocation == RoutePaths.vehicles ||
+          state.matchedLocation == RoutePaths.editVehicle;
 
       // Cold-start widget tap on an existing fully-setup user lands the
       // router at the configured `landingScreen` (typically '/'). The
@@ -166,9 +167,9 @@ GoRouter router(Ref ref) {
       }
 
       // Step 1: GDPR consent must be given before anything else
-      if (!hasConsent && !isConsent) return '/consent';
+      if (!hasConsent && !isConsent) return RoutePaths.consent;
       if (hasConsent && isConsent) {
-        if (!isReady) return '/setup';
+        if (!isReady) return RoutePaths.setup;
         // Past consent + past setup: prefer a pending widget cold-launch
         // URI over the user's configured landing screen so a home-widget
         // tap lands directly on the station detail. `consumeDeferred`
@@ -185,7 +186,7 @@ GoRouter router(Ref ref) {
 
       // Step 2: Setup (onboarding) must be complete before main app
       if (!isReady && !isSetup && !isConsent && !isSetupAllowedChild) {
-        return '/setup';
+        return RoutePaths.setup;
       }
       // Landing preference is only applied when leaving the setup flow — not
       // on every subsequent navigation back to '/', which would trap the

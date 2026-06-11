@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../current_shell_branch_provider.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -61,7 +62,7 @@ class SettingsAppBarAction extends ConsumerWidget {
         // branch switch below has no back-stack of its own.
         final from = routeForShellBranch(ref.read(currentShellBranchProvider));
         ref.read(settingsReturnLocationProvider.notifier).update(from);
-        context.go('/profile');
+        context.go(RoutePaths.profile);
       },
     );
   }

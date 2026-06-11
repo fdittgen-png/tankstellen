@@ -6,8 +6,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/catalog_reresolve_detector.dart';
@@ -98,8 +98,8 @@ class _CatalogReresolveSnackbarHostState
             // through to the global router. The vehicle-edit route
             // expects the vehicle id as `extra` (see profile_routes.dart).
             try {
-              unawaited(GoRouter.of(context)
-                  .push('/vehicles/edit', extra: candidate.vehicleId));
+              unawaited(EditVehicleRoute(vehicleId: candidate.vehicleId)
+                  .push<void>(context));
             } catch (_) {
               // ignore: silent_catch — Best-effort — if the router isn't available (widget
               // tests without a router) we still want the flag write

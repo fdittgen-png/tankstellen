@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/price_band_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/price_gradient.dart';
@@ -186,7 +186,7 @@ class StationMarkerBuilder {
           child: GestureDetector(
             // #2939 — [onTap] lets the radar split map select the row instead
             // of navigating; null keeps the default push-to-detail.
-            onTap: onTap ?? () => GoRouter.of(context).push('/station/${station.id}'),
+            onTap: onTap ?? () => StationDetailRoute(station.id).push<void>(context),
             child: Tooltip(
               message: brand,
               waitDuration: const Duration(milliseconds: 300),

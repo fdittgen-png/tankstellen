@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/responsive_search_layout.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_tier.dart';
@@ -131,7 +132,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                 label: l10n?.showOnMapSemanticLabel ?? 'Show stations on map',
                 button: true,
                 child: InkWell(
-                  onTap: () => context.go('/map'),
+                  onTap: () => context.go(RoutePaths.map),
                   borderRadius: BorderRadius.circular(12),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -167,10 +168,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                         fuel,
                         requirePositive: true,
                       );
-                      context.go(
-                        '/calculator',
-                        extra: minP > 0 ? minP : null,
-                      );
+                      CalculatorRoute(
+                        initialPrice: minP > 0 ? minP : null,
+                      ).go(context);
                     },
                     borderRadius: BorderRadius.circular(12),
                     child: Padding(
@@ -276,8 +276,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                                     .read(favoritesProvider.notifier)
                                     .toggle(item.id,
                                         rawJson: item.station.toJson()),
-                                onTap: () => context.push('/ev-station',
-                                    extra: item.station),
+                                onTap: () => EvStationDetailRoute(
+                                        item.station)
+                                    .push<void>(context),
                               ),
                           };
                         },
@@ -320,7 +321,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
           if (isWideScreen(context)) {
             ref.read(selectedStationProvider.notifier).select(station.id);
           } else {
-            unawaited(context.push('/station/${station.id}'));
+            unawaited(StationDetailRoute(station.id).push<void>(context));
           }
         },
         onFavoriteTap: () => ref
@@ -388,7 +389,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         if (isWideScreen(context)) {
           ref.read(selectedStationProvider.notifier).select(station.id);
         } else {
-          unawaited(context.push('/station/${station.id}'));
+          unawaited(StationDetailRoute(station.id).push<void>(context));
         }
       },
       onFavoriteTap: () => ref

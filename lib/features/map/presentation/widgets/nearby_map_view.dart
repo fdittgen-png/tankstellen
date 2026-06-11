@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -83,7 +84,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
             title: l10n?.startSearch ??
                 'Search for stations to see them on the map',
             actionLabel: l10n?.search ?? 'Search now',
-            onAction: () => context.go('/'),
+            onAction: () => context.go(RoutePaths.search),
             iconSize: 80,
           );
         }
@@ -183,7 +184,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) => ServiceChainErrorWidget(
         error: error,
-        onRetry: () => context.go('/'),
+        onRetry: () => context.go(RoutePaths.search),
       ),
     );
   }

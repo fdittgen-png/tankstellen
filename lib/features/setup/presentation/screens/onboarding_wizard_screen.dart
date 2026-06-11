@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -222,7 +223,7 @@ class _OnboardingWizardScreenState
       await profileRepo.updateProfile(updated);
       profileNotifier.refresh();
 
-      if (mounted) context.go('/');
+      if (mounted) context.go(RoutePaths.search);
     } finally {
       if (mounted) ctrl.setLoading(false);
     }

@@ -19,6 +19,7 @@ import '../features/alerts/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
 import '../core/feedback/auto_record_badge_provider.dart';
+import '../core/navigation/app_routes.dart';
 import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/health_counters.dart';
 import '../core/telemetry/storage/isolate_error_spool.dart';
@@ -815,7 +816,7 @@ class AppInitializer {
           SchedulerBinding.instance.addPostFrameCallback((_) {
             try {
               final goRouter = container.read(routerProvider);
-              goRouter.go('/trip-recording');
+              goRouter.go(RoutePaths.tripRecording);
             } catch (e, st) {
               unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
                 'where': 'activeTripRecovery go(/trip-recording)'

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/tab_switcher.dart';
@@ -118,7 +119,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
         key: const Key('open_vehicles'),
         tooltip: l?.vehiclesMenuTitle ?? 'My vehicles',
         icon: const Icon(Icons.directions_car_outlined),
-        onPressed: () => context.push('/vehicles'),
+        onPressed: () => context.push(RoutePaths.vehicles),
       );
 
   @override
@@ -249,7 +250,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   Widget _addFillUpFab(BuildContext context, AppLocalizations? l) =>
       FloatingActionButton.extended(
         key: const Key('fab_add_fillup'),
-        onPressed: () => unawaited(context.push('/consumption/pick-station')),
+        onPressed: () => unawaited(context.push(RoutePaths.pickStationForFillUp)),
         icon: const Icon(Icons.add),
         label: Text(l?.addFillUp ?? 'Add fill-up'),
       );

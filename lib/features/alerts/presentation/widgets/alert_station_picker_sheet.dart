@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -141,7 +142,7 @@ class AlertStationPickerSheet extends ConsumerWidget {
               searchLabel: l10n?.search ?? 'Search',
               onSearch: () {
                 Navigator.of(context).pop();
-                context.go('/');
+                context.go(RoutePaths.search);
               },
             )
           else

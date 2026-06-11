@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/labeled_value_slider.dart';
@@ -94,7 +95,7 @@ class DrivingSettingsSection extends ConsumerWidget {
           subtitle: l?.vehiclesMenuSubtitle ??
               'Your cars — fuel type, engine and tank size for accurate '
                   'consumption estimates',
-          onTap: () => context.push('/vehicles'),
+          onTap: () => context.push(RoutePaths.vehicles),
         ),
 
         // 2. Coaching while driving — the two haptic driving assists
@@ -155,7 +156,7 @@ class DrivingSettingsSection extends ConsumerWidget {
             title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
             subtitle: l?.loyaltyMenuSubtitle ??
                 'Apply per-litre discounts from Total, Aral, Shell, …',
-            onTap: () => context.push('/loyalty-settings'),
+            onTap: () => context.push(RoutePaths.loyaltySettings),
           ),
         const GamificationSettingsTile(),
 

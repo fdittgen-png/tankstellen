@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/router.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/approach_detector.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../approach/providers/effective_approach_state_provider.dart';
@@ -195,7 +196,7 @@ class TripRecordingBanner extends ConsumerWidget {
                   // active recording (the old context-lookup fell back
                   // to a snackbar naming the long-removed "Conso" tab).
                   onTap: () =>
-                      ref.read(routerProvider).push('/trip-recording'),
+                      ref.read(routerProvider).push(RoutePaths.tripRecording),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 6),

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -583,7 +584,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     } else {
-      GoRouter.of(context).go('/');
+      GoRouter.of(context).go(RoutePaths.search);
     }
   }
 

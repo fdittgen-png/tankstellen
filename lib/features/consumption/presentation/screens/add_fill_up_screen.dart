@@ -9,8 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/country/country_provider.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/discard_changes_dialog.dart';
-
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -633,7 +633,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
               fuelType: _fuelType,
               onFuelChanged: (next) => setState(() => _fuelType = next),
               onOpenVehicle: () =>
-                  context.push('/vehicles/edit', extra: _vehicleId!),
+                  EditVehicleRoute(vehicleId: _vehicleId!).push<void>(context),
               isFullTank: _isFullTank,
               onIsFullTankChanged: (v) => setState(() => _isFullTank = v),
               litersCtrl: _litersCtrl,

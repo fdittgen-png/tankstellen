@@ -5,9 +5,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -85,7 +85,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
           IconButton(
             key: const Key('report_price'),
             icon: const Icon(Icons.flag_outlined),
-            onPressed: () => context.push('/report/$stationId'),
+            onPressed: () => ReportRoute(stationId).push<void>(context),
             tooltip: l10n?.reportPrice ?? 'Report price',
           ),
         IconButton(

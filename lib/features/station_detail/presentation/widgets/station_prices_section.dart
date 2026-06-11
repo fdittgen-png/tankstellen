@@ -5,9 +5,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/country/country_config.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -109,13 +109,14 @@ class LogFillUpButton extends ConsumerWidget {
 
     return OutlinedButton.icon(
       onPressed: () {
-        final extra = <String, Object>{
-          'stationId': station.id,
-          'stationName': stationName,
-        };
-        if (pricedFuel != null) extra['fuelType'] = pricedFuel;
-        if (pricePerLiter != null) extra['pricePerLiter'] = pricePerLiter;
-        unawaited(context.push('/consumption/add', extra: extra));
+        // #3135 — the pre-fill crosses as a typed AddFillUpRoute instead
+        // of a stringly-keyed Map.
+        unawaited(AddFillUpRoute(
+          stationId: station.id,
+          stationName: stationName,
+          fuelType: pricedFuel,
+          pricePerLiter: pricePerLiter,
+        ).push<void>(context));
       },
       icon: const Icon(Icons.local_gas_station_outlined),
       label: Text(

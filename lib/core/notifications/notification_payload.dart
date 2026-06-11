@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import '../../core/logging/error_logger.dart';
+import '../navigation/app_routes.dart';
 
 /// Payload format embedded in price-alert notifications (#1012 phase 3).
 ///
@@ -96,7 +97,7 @@ class NotificationPayload {
   String? toRouterPath() {
     switch (kind) {
       case kindRadius:
-        return '/station/$stationId';
+        return RoutePaths.station(stationId);
     }
     return null;
   }

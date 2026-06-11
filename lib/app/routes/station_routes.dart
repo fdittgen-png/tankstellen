@@ -8,10 +8,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/data/storage_repository.dart';
+import '../../core/domain/ev/charging_station.dart';
 import '../../core/logging/error_logger.dart';
+import '../../core/navigation/app_routes.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../features/ev/data/repositories/ev_station_repository.dart';
-import '../../core/domain/ev/charging_station.dart';
 import '../../features/ev/providers/ev_providers.dart';
 import '../../features/price_history/presentation/screens/price_history_screen.dart';
 import '../../features/report/presentation/screens/report_screen.dart';
@@ -27,7 +28,7 @@ import 'invalid_id_screen.dart';
 /// list is parameterised with the router's [Ref].
 List<RouteBase> stationRoutes(Ref ref) => [
       GoRoute(
-        path: '/station/:id/history',
+        path: RoutePaths.stationHistoryPattern,
         builder: (context, state) {
           final id = state.pathParameters['id'];
           if (!isValidStationId(id)) {
@@ -37,7 +38,7 @@ List<RouteBase> stationRoutes(Ref ref) => [
         },
       ),
       GoRoute(
-        path: '/station/:id',
+        path: RoutePaths.stationPattern,
         builder: (context, state) {
           final id = state.pathParameters['id'];
           if (!isValidStationId(id)) {
@@ -47,7 +48,7 @@ List<RouteBase> stationRoutes(Ref ref) => [
         },
       ),
       GoRoute(
-        path: '/ev-station',
+        path: RoutePaths.evStation,
         builder: (context, state) {
           final station = state.extra as ChargingStation;
           return EVStationDetailScreen(station: station);
@@ -59,7 +60,7 @@ List<RouteBase> stationRoutes(Ref ref) => [
       // a home-screen widget tap or an external URL. Falls back to the
       // invalid-id screen only when the id is genuinely unknown.
       GoRoute(
-        path: '/ev-station/:id',
+        path: RoutePaths.evStationPattern,
         builder: (context, state) {
           final id = state.pathParameters['id'];
           if (!isValidStationId(id)) {
@@ -77,7 +78,7 @@ List<RouteBase> stationRoutes(Ref ref) => [
         },
       ),
       GoRoute(
-        path: '/report/:id',
+        path: RoutePaths.reportPattern,
         builder: (context, state) {
           final id = state.pathParameters['id'];
           if (!isValidStationId(id)) {

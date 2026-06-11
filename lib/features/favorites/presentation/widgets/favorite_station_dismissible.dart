@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
@@ -114,7 +114,7 @@ class FavoriteStationDismissible extends ConsumerWidget {
         selectedFuelType: FuelType.all,
         isFavorite: true,
         profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
-        onTap: () => context.push('/station/${station.id}'),
+        onTap: () => StationDetailRoute(station.id).push<void>(context),
         onFavoriteTap: () {
           unawaited(ref.read(favoritesProvider.notifier).remove(station.id));
         },

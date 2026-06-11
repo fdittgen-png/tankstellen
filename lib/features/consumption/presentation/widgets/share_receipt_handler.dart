@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/navigation/root_navigator_key.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -127,7 +128,7 @@ class ShareReceiptHandler {
   void _stashAndRoute(String path) {
     _ref.read(pendingSharedReceiptProvider.notifier).set(path);
     debugPrint('ShareReceiptHandler.handle stashed image $path');
-    _push('/consumption/add');
+    _push(RoutePaths.addFillUp);
   }
 
   /// Rasterises the shared PDF at [path] to a JPEG and, on success, takes the
@@ -163,7 +164,7 @@ class ShareReceiptHandler {
     }
     _ref.read(pendingSharedReceiptTextProvider.notifier).set(result);
     debugPrint('ShareReceiptHandler.handle stashed parsed text result');
-    _push('/consumption/add');
+    _push(RoutePaths.addFillUp);
   }
 
   bool _featureEnabled() {

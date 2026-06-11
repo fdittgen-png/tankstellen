@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/country/country_config.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -63,7 +64,7 @@ class DemoModeBanner extends ConsumerWidget {
         leading: const Icon(Icons.science_outlined),
         actions: [
           TextButton(
-            onPressed: () => context.go('/profile'),
+            onPressed: () => context.go(RoutePaths.profile),
             child: Text(l10n?.demoModeBannerAction ?? 'Get live prices'),
           ),
         ],

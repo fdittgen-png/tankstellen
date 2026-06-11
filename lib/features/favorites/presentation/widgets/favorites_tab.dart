@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -44,7 +45,7 @@ class FavoritesTab extends ConsumerWidget {
           subtitle: l10n?.noFavoritesHint ??
               'Tap the star on a station to save it here',
           actionLabel: l10n?.search ?? 'Search Stations',
-          onAction: () => context.go('/'),
+          onAction: () => context.go(RoutePaths.search),
           topBiased: true,
         ),
       );

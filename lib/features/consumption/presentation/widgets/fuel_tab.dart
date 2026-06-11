@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../app/responsive_search_layout.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -80,7 +81,7 @@ class FuelTab extends ConsumerWidget {
         // #2698 — tapping the summary card opens the full
         // consumption-statistics detail page (month-over-month
         // comparison + evolution charts).
-        onTap: () => context.push('/consumption-stats'),
+        onTap: () => context.push(RoutePaths.consumptionStats),
       ),
     ];
 

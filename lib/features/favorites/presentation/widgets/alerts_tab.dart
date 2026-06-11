@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -122,7 +123,7 @@ class AlertsTab extends StatelessWidget {
                     ref.read(alertProvider.notifier).toggleAlert(alert.id),
               ),
               // Tap to open station detail (shows price history)
-              onTap: () => context.push('/station/${alert.stationId}'),
+              onTap: () => StationDetailRoute(alert.stationId).push<void>(context),
             ),
           );
         },
@@ -152,7 +153,7 @@ class _RadiusAlertsEntry extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
       child: InkWell(
         key: const Key('radiusAlertsEntry'),
-        onTap: () => context.push('/alerts'),
+        onTap: () => context.push(RoutePaths.alerts),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
