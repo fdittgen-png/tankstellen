@@ -86,20 +86,32 @@ import '../../../core/logging/error_logger.dart';
 /// [`south_korea_response_parser.dart`](south_korea_response_parser.dart)
 /// for the merge accumulator + product-code map).
 ///
-/// **Endpoint verification**: the live OPINET developer docs change
-/// periodically (path segments like `searchByTid.do`, `searchByZcd.do`,
-/// `aroundAll.do` come and go). The [defaultBaseUrl] constant is the
-/// current best-guess path; the service is fully functional against the
-/// documented JSON response shape regardless of whether the exact path
-/// drifts. If a path change breaks the live call, the bug is one URL
-/// constant — the parser + fuel mapping + country wiring stay valid.
+/// **Endpoint verification (#3176, live-probed 2026-06-10)**: the
+/// [defaultBaseUrl] path is **confirmed live** — `GET aroundAll.do`
+/// answers HTTP 200 with the documented `RESULT → OIL` envelope, so the
+/// parser contract holds and the path is no longer a guess. Three live
+/// behaviour gaps remain, tracked in #3192 (under epic #3186):
+///
+///   1. **Coordinates**: the live API speaks KATEC (TM128) in and out;
+///      we send/parse WGS84, so a live query can never match a station.
+///   2. **Radius**: the live maximum is 5 000 m; we clamp to 50 km.
+///   3. **Auth param**: the portal documents `certkey`; we send `code` —
+///      and an unknown/invalid key is *silently* answered with an empty
+///      `OIL` array (verified live), never an HTTP 401/403.
+///
+/// Until #3192 lands, [searchStations] degrades gracefully instead of
+/// silently rendering an empty map: an all-products-empty live result
+/// raises an [ApiException] with [FailureKind.unsupported] plus an
+/// `errorLogger` trace, so the service chain surfaces the failure and
+/// field reports carry the real cause (same pattern as the GR fix).
 class SouthKoreaStationService
     with StationServiceHelpers
     implements StationService {
-  /// OPINET "around all" endpoint — radius search by WGS84 coordinate.
-  /// TODO: verify endpoint path against the live developer portal. The
-  /// JSON payload shape (RESULT → OIL → array) is stable across OPINET
-  /// endpoints and is the contract our parser depends on.
+  /// OPINET "around all" endpoint — radius search by coordinate.
+  /// Path live-verified 2026-06-10 (#3176): HTTP 200 + the documented
+  /// `RESULT → OIL` JSON envelope. The remaining live-behaviour gaps
+  /// (KATEC coordinates, 5 km radius cap, `certkey` auth param) are
+  /// tracked in #3192 — see the class doc.
   static const String defaultBaseUrl =
       'https://www.opinet.co.kr/api/aroundAll.do';
 
@@ -125,9 +137,16 @@ class SouthKoreaStationService
     CancelToken? cancelToken,
   }) async {
     if (_apiKey.isEmpty) {
-      throw const ApiException(
+      // #3176 — classify the missing key as an auth failure (the enum's
+      // documented home for "missing API key") and leave a trace, so the
+      // chain treats it as terminal instead of retrying a doomed call.
+      const e = ApiException(
         message: 'OPINET API key is not configured',
+        kind: FailureKind.auth,
       );
+      unawaited(errorLogger.log(ErrorLayer.other, e, StackTrace.current,
+          context: const {'where': 'KR search without API key'}));
+      throw e;
     }
 
     try {
@@ -177,6 +196,28 @@ class SouthKoreaStationService
       final byId = <String, OpinetStationAccumulator>{};
       for (var i = 0; i < entries.length; i++) {
         mergeOpinetProductResponse(responses[i].data, byId, entries[i].value);
+      }
+
+      // #3176 graceful degradation — until the KATEC coordinate fix
+      // (#3192) lands, the live API can never match a station for the
+      // WGS84 coordinates we send, and an invalid key is silently
+      // answered with the same empty envelope (verified live). An
+      // all-products-empty result is therefore indistinguishable from
+      // the known live breakage, so surface it as a classified failure
+      // with a trace instead of silently rendering an empty map. Remove
+      // this block when #3192 ships the verified coordinate transform.
+      if (byId.isEmpty) {
+        const e = ApiException(
+          message: 'OPINET returned zero stations for every product code — '
+              'expected live breakage: the API speaks KATEC (TM128) '
+              'coordinates and silently ignores invalid keys, so WGS84 '
+              'queries cannot match (#3176; coordinate fix tracked in '
+              '#3192)',
+          kind: FailureKind.unsupported,
+        );
+        unawaited(errorLogger.log(ErrorLayer.other, e, StackTrace.current,
+            context: const {'where': 'KR live search degraded (#3176)'}));
+        throw e;
       }
 
       final stations = byId.values

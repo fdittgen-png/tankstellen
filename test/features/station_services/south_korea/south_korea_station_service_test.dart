@@ -112,12 +112,14 @@ void main() {
     });
 
     group('searchStations', () {
-      test('throws when no API key is configured', () async {
+      test('throws auth-kind ApiException when no API key is configured (#3176)',
+          () async {
         final noKey = SouthKoreaStationService(apiKey: '', dio: mockDio);
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 5.0);
         await expectLater(
           () => noKey.searchStations(params),
-          throwsA(isA<ApiException>()),
+          throwsA(isA<ApiException>()
+              .having((e) => e.kind, 'kind', FailureKind.auth)),
         );
       });
 
@@ -229,7 +231,12 @@ void main() {
             )).thenAnswer((_) async => response(_envelope([])));
 
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 5.0);
-        await service.searchStations(params);
+        // An all-empty live result degrades to a classified failure
+        // (#3176) — this test only asserts on the outgoing parameters.
+        await expectLater(
+          () => service.searchStations(params),
+          throwsA(isA<ApiException>()),
+        );
 
         final captured = verify(() => mockDio.get(
               any(),
@@ -259,7 +266,12 @@ void main() {
             )).thenAnswer((_) async => response(_envelope([])));
 
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 10000);
-        await service.searchStations(params);
+        // An all-empty live result degrades to a classified failure
+        // (#3176) — this test only asserts on the outgoing parameters.
+        await expectLater(
+          () => service.searchStations(params),
+          throwsA(isA<ApiException>()),
+        );
 
         final captured = verify(() => mockDio.get(
               any(),
@@ -269,7 +281,14 @@ void main() {
         expect(captured['radius'], 5000);
       });
 
-      test('empty radius search → empty list, not an error', () async {
+      test(
+          'all-products-empty live result degrades to FailureKind.unsupported '
+          '(#3176 — KATEC coordinate gap, fix tracked in #3192)', () async {
+        // Live OPINET speaks KATEC (TM128) and silently answers invalid
+        // keys with an empty envelope, so an all-empty result is
+        // indistinguishable from the known live breakage. The service
+        // must surface a classified failure instead of silently
+        // rendering an empty map.
         when(() => mockDio.get(
               any(),
               queryParameters: any(named: 'queryParameters'),
@@ -277,9 +296,12 @@ void main() {
             )).thenAnswer((_) async => response(_envelope([])));
 
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 5.0);
-        final result = await service.searchStations(params);
-        expect(result.data, isEmpty);
-        expect(result.source, ServiceSource.openinetApi);
+        await expectLater(
+          () => service.searchStations(params),
+          throwsA(isA<ApiException>()
+              .having((e) => e.kind, 'kind', FailureKind.unsupported)
+              .having((e) => e.message, 'message', contains('#3192'))),
+        );
       });
 
       test('HTTP 401 is re-raised as ApiException with clear message',
