@@ -9,6 +9,7 @@ import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import 'sync_helper.dart';
+import 'sync_run_trace.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Ignored-stations sync with Supabase, pulled out of [SyncService] (#727).
@@ -63,6 +64,14 @@ class IgnoredStationsSync {
         debugPrint(
             'IgnoredStationsSync.merge: uploaded ${localOnly.length}');
       }
+
+      // #3126 — per-table counts into the exportable trace.
+      SyncRunTrace.table(
+        'ignored_stations',
+        uploaded: localOnly.length,
+        downloaded: serverIds.difference(localIds).length,
+        tombstoned: tombstoned.length,
+      );
 
       return localIds.union(serverIds).toList();
     } catch (e, st) {

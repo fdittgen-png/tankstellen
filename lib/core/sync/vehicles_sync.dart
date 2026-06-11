@@ -11,6 +11,7 @@ import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import 'sync_device_identity.dart';
 import 'sync_helper.dart';
+import 'sync_run_trace.dart';
 import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -135,6 +136,14 @@ class VehiclesSync {
             in lww.serverNewer.map(decode).whereType<VehicleProfile>())
           v.id: v,
       };
+
+      // #3126 — per-table counts into the exportable trace.
+      SyncRunTrace.table(
+        'vehicles',
+        uploaded: toUpload.length,
+        downloaded: downloaded.length + serverNewerById.length,
+        tombstoned: tombstoned.length,
+      );
 
       return [
         for (final v in liveLocal) serverNewerById[v.id] ?? v,

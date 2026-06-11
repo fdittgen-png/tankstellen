@@ -10,6 +10,7 @@ import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import 'sync_helper.dart';
+import 'sync_run_trace.dart';
 import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -105,6 +106,14 @@ class AlertsSync {
           'createdAt': r.getString('created_at') ?? '',
         });
       }).toList();
+
+      // #3126 — per-table counts into the exportable trace.
+      SyncRunTrace.table(
+        'alerts',
+        uploaded: localOnly.length,
+        downloaded: downloaded.length,
+        tombstoned: tombstoned.length,
+      );
 
       return [...liveLocalAlerts, ...downloaded];
     } catch (e, st) {
