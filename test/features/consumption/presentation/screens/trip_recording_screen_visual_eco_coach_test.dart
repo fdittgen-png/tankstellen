@@ -186,11 +186,11 @@ void main() {
           builder: (context) => ElevatedButton(
             key: const Key('openRecordingScreen'),
             onPressed: () {
-              Navigator.of(context).push(
+              unawaited(Navigator.of(context).push(
                 MaterialPageRoute<dynamic>(
                   builder: (_) => const TripRecordingScreen(),
                 ),
-              );
+              ));
             },
             child: const Text('Open'),
           ),
@@ -331,11 +331,11 @@ void main() {
           builder: (context) => ElevatedButton(
             key: const Key('openRecordingScreen'),
             onPressed: () {
-              Navigator.of(context).push(
+              unawaited(Navigator.of(context).push(
                 MaterialPageRoute<dynamic>(
                   builder: (_) => const TripRecordingScreen(),
                 ),
-              );
+              ));
             },
             child: const Text('Open'),
           ),
@@ -399,11 +399,11 @@ void main() {
           builder: (context) => ElevatedButton(
             key: const Key('openRecordingScreen'),
             onPressed: () {
-              Navigator.of(context).push(
+              unawaited(Navigator.of(context).push(
                 MaterialPageRoute<dynamic>(
                   builder: (_) => const TripRecordingScreen(),
                 ),
-              );
+              ));
             },
             child: const Text('Open'),
           ),

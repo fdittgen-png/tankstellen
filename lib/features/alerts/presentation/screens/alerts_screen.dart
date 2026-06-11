@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -234,7 +236,7 @@ class _AlertListTile extends ConsumerWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       onDismissed: (_) {
-        ref.read(alertProvider.notifier).removeAlert(alert.id);
+        unawaited(ref.read(alertProvider.notifier).removeAlert(alert.id));
         SnackBarHelper.show(context, l10n?.alertDeleted(alert.stationName) ?? 'Alert "${alert.stationName}" deleted');
       },
       child: ListTile(
@@ -255,7 +257,7 @@ class _AlertListTile extends ConsumerWidget {
         trailing: Switch.adaptive(
           value: alert.isActive,
           onChanged: (_) {
-            ref.read(alertProvider.notifier).toggleAlert(alert.id);
+            unawaited(ref.read(alertProvider.notifier).toggleAlert(alert.id));
           },
         ),
       ),
@@ -349,7 +351,7 @@ class _RadiusAlertListTile extends ConsumerWidget {
         // unusable; the Undo callback must close over the notifier, not
         // re-read it through the dead tile's `ref`.
         final notifier = ref.read(radiusAlertsProvider.notifier);
-        notifier.remove(alert.id);
+        unawaited(notifier.remove(alert.id));
         SnackBarHelper.showWithUndo(
           context,
           l10n?.radiusAlertDeleted(alert.label) ??
@@ -377,7 +379,7 @@ class _RadiusAlertListTile extends ConsumerWidget {
         trailing: Switch.adaptive(
           value: alert.enabled,
           onChanged: (_) {
-            ref.read(radiusAlertsProvider.notifier).toggle(alert.id);
+            unawaited(ref.read(radiusAlertsProvider.notifier).toggle(alert.id));
           },
         ),
       ),

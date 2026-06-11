@@ -65,7 +65,7 @@ class DroppedSessionRepoResolver {
     final repo = resolvePaused();
     final id = host.sessionId;
     if (repo == null || id == null) return;
-    repo.save(PausedTripEntry(
+    unawaited(repo.save(PausedTripEntry(
       id: id,
       vehicleId: host.vehicleId,
       vin: host.vin,
@@ -77,14 +77,14 @@ class DroppedSessionRepoResolver {
       // service knows whether to bump the launcher-icon badge if the app
       // is killed before the grace timer fires.
       automatic: host.automatic,
-    ));
+    )));
   }
 
   /// Delete this session's paused-trips row — best-effort, no-op when
   /// the session has no id.
   void deletePausedRow(String? sessionId) {
     if (sessionId == null) return;
-    resolvePaused()?.delete(sessionId);
+    unawaited(resolvePaused()?.delete(sessionId));
   }
 
   /// Grace-window finalisation persistence (#797): write the partial into

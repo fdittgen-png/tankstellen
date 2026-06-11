@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -20,7 +22,7 @@ void main() {
           home: Builder(
             builder: (context) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                showDialog<bool>(
+                unawaited(showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
                     icon: Icon(
@@ -51,7 +53,7 @@ void main() {
                       ),
                     ],
                   ),
-                );
+                ));
               });
               return const Scaffold(body: SizedBox.expand());
             },

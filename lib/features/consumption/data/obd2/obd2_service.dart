@@ -1497,7 +1497,7 @@ class Obd2Service implements Obd2RawCommandPort {
             if (!controller.isClosed) controller.addError(e, st);
           },
           onDone: () {
-            if (!controller.isClosed) controller.close();
+            if (!controller.isClosed) unawaited(controller.close());
           },
         );
       } catch (e, st) {

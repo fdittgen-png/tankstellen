@@ -41,7 +41,7 @@ class NotificationLaunchHandler {
     );
     if (path == null) return;
     try {
-      _router.push(path);
+      unawaited(_router.push(path));
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'NotificationLaunchHandler: push failed for $rawPayload → $path'}));
     }
@@ -95,14 +95,14 @@ class _NotificationLaunchListenerState
   @override
   void initState() {
     super.initState();
-    _handleColdLaunch();
+    unawaited(_handleColdLaunch());
     _subscription =
         NotificationTapDispatcher.instance.stream.listen(_dispatch);
   }
 
   @override
   void dispose() {
-    _subscription?.cancel();
+    unawaited(_subscription?.cancel());
     super.dispose();
   }
 

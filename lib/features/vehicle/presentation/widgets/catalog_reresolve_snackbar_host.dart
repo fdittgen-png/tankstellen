@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,8 +98,8 @@ class _CatalogReresolveSnackbarHostState
             // through to the global router. The vehicle-edit route
             // expects the vehicle id as `extra` (see profile_routes.dart).
             try {
-              GoRouter.of(context)
-                  .push('/vehicles/edit', extra: candidate.vehicleId);
+              unawaited(GoRouter.of(context)
+                  .push('/vehicles/edit', extra: candidate.vehicleId));
             } catch (_) {
               // ignore: silent_catch — Best-effort — if the router isn't available (widget
               // tests without a router) we still want the flag write
@@ -112,7 +114,7 @@ class _CatalogReresolveSnackbarHostState
     // again for this vehicle. Done after `showSnackBar` so a failure
     // in the messenger doesn't leave the user permanently un-
     // nudgeable.
-    Future<void>(() async {
+    unawaited(Future<void>(() async {
       // #3159 — this future is detached, so the host can unmount before it
       // runs; both the helper's ref.read and the invalidate below would
       // then throw a StateError. Skipping is safe: the candidate provider
@@ -126,7 +128,7 @@ class _CatalogReresolveSnackbarHostState
         // build.
         if (mounted) ref.invalidate(catalogReresolveCandidatesProvider);
       }
-    });
+    }));
   }
 }
 

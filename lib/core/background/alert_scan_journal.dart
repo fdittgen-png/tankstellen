@@ -41,10 +41,10 @@ class AlertScanJournal {
   /// week?" while staying tiny in the alerts box and the export.
   static const int maxEntries = 20;
 
-  Box? _boxOrNull() {
+  Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
-      return Hive.box(HiveBoxes.alerts);
+      return Hive.box<dynamic>(HiveBoxes.alerts);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
         'where': 'AlertScanJournal: alerts box unavailable',
@@ -98,7 +98,7 @@ class AlertScanJournal {
       final raw = _boxOrNull()?.get(journalKey);
       if (raw is! List) return <Map<String, Object?>>[];
       return raw
-          .whereType<Map>()
+          .whereType<Map<dynamic, dynamic>>()
           .map((row) => row.map((k, v) => MapEntry('$k', v as Object?)))
           .toList();
     } catch (e, st) {

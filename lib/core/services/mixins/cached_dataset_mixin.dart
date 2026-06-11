@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import '../persistent_dataset.dart';
 
 /// Mixin for services that download a full national dataset and cache it
@@ -308,7 +310,7 @@ mixin KeyedCachedDatasetMixin {
       // Only clear if it's still our future (a later refetch may have
       // replaced it).
       if (identical(_keyedPendingLoads[key], started)) {
-        _keyedPendingLoads.remove(key);
+        unawaited(_keyedPendingLoads.remove(key));
       }
     });
   }

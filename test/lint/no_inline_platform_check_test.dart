@@ -56,6 +56,12 @@ void main() {
     'lib/features/consumption/data/pip_controller.dart',
     'lib/features/consumption/providers/auto_record_orchestrator_factories.dart',
     'lib/features/setup/providers/onboarding_platform_steps_provider.dart',
+    // #3169 — the SLC-wake factory seam (no-op off-iOS by design) and the
+    // iOS-only best-effort disclosure render gate.
+    'lib/core/background/slc_wake_monitor.dart',
+    'lib/features/alerts/presentation/widgets/alerts_best_effort_note.dart',
+    // #3170 — the Live Activity capability gate (ActivityKit is iOS-only).
+    'lib/features/consumption/data/live_activity_controller.dart',
   };
 
   // Files already violating the rule when the guard landed (#2350).

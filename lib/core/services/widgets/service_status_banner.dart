@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../error/error_localizer.dart';
@@ -184,7 +186,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
       searchContext: searchContext,
       stackTrace: stackTrace,
     );
-    (reporter ?? const ErrorReporter()).reportError(context, payload);
+    unawaited((reporter ?? const ErrorReporter()).reportError(context, payload));
   }
 
   @override

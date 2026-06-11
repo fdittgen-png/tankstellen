@@ -81,12 +81,12 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
     _orientation = widget.initialOrientation;
     // #2477 — force landscape so the wide pump display fills the frame
     // with large, upright digits. Restored in dispose + every early-return.
-    SystemChrome.setPreferredOrientations(const [
+    unawaited(SystemChrome.setPreferredOrientations(const [
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
-    ]);
+    ]));
     WidgetsBinding.instance.addObserver(this);
-    _setUpCamera();
+    unawaited(_setUpCamera());
   }
 
   @override
@@ -95,19 +95,19 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
     _restoreOrientations();
     WidgetsBinding.instance.removeObserver(this);
     _stopStream();
-    _controller?.dispose();
+    unawaited(_controller?.dispose());
     super.dispose();
   }
 
   /// Restores the app's full orientation set after a forced-landscape
   /// session. Safe to call more than once and from any teardown path.
   void _restoreOrientations() {
-    SystemChrome.setPreferredOrientations(const [
+    unawaited(SystemChrome.setPreferredOrientations(const [
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
-    ]);
+    ]));
   }
 
   @override
@@ -116,9 +116,9 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
     if (ctrl == null || !ctrl.value.isInitialized) return;
     if (state == AppLifecycleState.inactive) {
       _stopStream();
-      ctrl.dispose();
+      unawaited(ctrl.dispose());
     } else if (state == AppLifecycleState.resumed) {
-      _setUpCamera();
+      unawaited(_setUpCamera());
     }
   }
 
@@ -191,7 +191,7 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
     if (_streamRunning) return;
     try {
       _streamRunning = true;
-      ctrl.startImageStream(_onCameraFrame);
+      unawaited(ctrl.startImageStream(_onCameraFrame));
     } catch (_) {
       _streamRunning = false;
     }

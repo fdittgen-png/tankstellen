@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,7 +50,7 @@ class GamificationSettingsTile extends ConsumerWidget {
         style: theme.textTheme.bodySmall,
       ),
       onChanged: (v) {
-        ref.read(gamificationEnabledProvider.notifier).set(v);
+        unawaited(ref.read(gamificationEnabledProvider.notifier).set(v));
       },
       contentPadding: EdgeInsets.zero,
     );

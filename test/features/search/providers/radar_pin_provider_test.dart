@@ -4,6 +4,8 @@
 // #2785 — the radar auto-pin preference defaults ON and persists across
 // controller builds; a stored explicit false (a deliberate opt-out) is
 // honoured.
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
@@ -31,7 +33,7 @@ void main() {
 
   test('a stored explicit false is honoured (deliberate opt-out)', () {
     final storage = FakeStorageRepository();
-    storage.putSetting(StorageKeys.radarAutoPin, false);
+    unawaited(storage.putSetting(StorageKeys.radarAutoPin, false));
     final c = _container(storage);
     expect(c.read(radarAutoPinProvider), isFalse);
   });

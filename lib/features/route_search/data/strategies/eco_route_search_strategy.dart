@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -163,14 +165,14 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
       return out;
     } catch (e, st) {
       // Never silent — route selection failing must surface.
-      errorLogger.log(
+      unawaited(errorLogger.log(
         ErrorLayer.services,
         e,
         st,
         context: <String, Object?>{
           'where': 'EcoRouteSearchStrategy.parseOsrmAlternatives',
         },
-      );
+      ));
       return const <EcoRouteCandidate>[];
     }
   }

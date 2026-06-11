@@ -136,7 +136,7 @@ class _SparkiloTileLayerState extends State<SparkiloTileLayer> {
 
   @override
   void dispose() {
-    _tileProvider.dispose();
+    unawaited(_tileProvider.dispose());
     super.dispose();
   }
 

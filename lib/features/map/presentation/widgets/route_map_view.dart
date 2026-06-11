@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -314,11 +316,11 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         return aIdx.compareTo(bIdx);
       });
 
-    NavigationUtils.openRouteInMaps(
+    unawaited(NavigationUtils.openRouteInMaps(
       origin: '${start.latitude},${start.longitude}',
       destination: '${end.latitude},${end.longitude}',
       waypoints: selectedStations.map((s) => '${s.lat},${s.lng}').toList(),
-    );
+    ));
   }
   int _nearestPolylineIndex(double lat, double lng, List<LatLng> polyline) {
     int bestIdx = 0;

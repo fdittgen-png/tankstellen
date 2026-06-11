@@ -147,7 +147,10 @@ jobs:
       # outputs are committed and kept honest by the `codegen-drift` job
       # below, so `analyze` trusts the checked-in generated files instead
       # of paying a redundant codegen pass.
-      - run: flutter analyze --no-fatal-infos
+      # #3161 — fatal infos: the lint phase-in is over, the tree is
+      # info-clean, and every deliberate exception carries an explicit
+      # `// ignore:` with a reason. A new info is a build failure.
+      - run: flutter analyze
       - name: Check feature-module boundaries
         run: bash scripts/check_module_boundaries.sh
 

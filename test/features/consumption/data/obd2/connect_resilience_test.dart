@@ -94,7 +94,7 @@ void main() {
         );
 
         var done = false;
-        svc.stopScanBeforeConnect().then((_) => done = true);
+        unawaited(svc.stopScanBeforeConnect().then((_) => done = true));
         async.flushMicrotasks();
 
         // FlutterBluePlus.isScanningNow is false in tests, so the settle is

@@ -59,7 +59,7 @@ class VoiceAnnouncementSettings extends _$VoiceAnnouncementSettings {
 
   @override
   AnnouncementConfig build() {
-    _load();
+    unawaited(_load());
     // Pre-load frame: the engine's own defaults, but gated off until the
     // feature flag + persisted toggle resolve.
     return const AnnouncementConfig();

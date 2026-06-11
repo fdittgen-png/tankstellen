@@ -43,7 +43,7 @@ class _FakeGeolocator extends GeolocatorWrapper {
 
   void dispose() {
     if (!controller.isClosed) {
-      controller.close();
+      unawaited(controller.close());
     }
   }
 }
@@ -501,7 +501,7 @@ class _ThrowingFakeGeolocator extends GeolocatorWrapper {
       // Detach the throwing onCancel before disposing — tearDown must
       // not be the path that triggers the test's expected throw.
       c.onCancel = null;
-      c.close();
+      unawaited(c.close());
     }
   }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -72,7 +74,7 @@ class LinkDeviceThisDeviceCard extends StatelessWidget {
                       tooltip:
                           l10n?.linkDeviceCopyCodeTooltip ?? 'Copy code',
                       onPressed: () {
-                        Clipboard.setData(ClipboardData(text: myId!));
+                        unawaited(Clipboard.setData(ClipboardData(text: myId!)));
                         SnackBarHelper.show(
                           context,
                           AppLocalizations.of(context)?.deviceCodeCopied ??

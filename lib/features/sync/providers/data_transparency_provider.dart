@@ -54,7 +54,7 @@ class DataTransparencyController extends _$DataTransparencyController {
   @override
   DataTransparencyState build() {
     // Kick off initial load.
-    Future.microtask(load);
+    unawaited(Future.microtask(load));
     return const DataTransparencyState();
   }
 

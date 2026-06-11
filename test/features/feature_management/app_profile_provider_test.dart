@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -86,7 +88,7 @@ void main() {
     });
 
     test('persisted profile is returned verbatim on subsequent boots', () {
-      profileBox.put('profile', AppProfile.medium.name);
+      unawaited(profileBox.put('profile', AppProfile.medium.name));
       final c = makeContainer();
       expect(c.read(activeAppProfileProvider), AppProfile.medium);
     });

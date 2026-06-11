@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -59,7 +61,7 @@ class ActiveAppProfile extends _$ActiveAppProfile {
     // them to `custom` so we never silently change their flag set.
     final flagsRepo = ref.read(featureFlagsRepositoryProvider);
     if (flagsRepo == null || flagsRepo.isEmpty) return null;
-    repo.save(AppProfile.custom);
+    unawaited(repo.save(AppProfile.custom));
     return AppProfile.custom;
   }
 

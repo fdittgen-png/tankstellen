@@ -96,6 +96,6 @@ class PipController {
     if (isSupported) {
       _channel.setMethodCallHandler(null);
     }
-    _modeController.close();
+    unawaited(_modeController.close());
   }
 }

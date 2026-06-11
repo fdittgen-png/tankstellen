@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
@@ -29,8 +31,8 @@ void main() {
     required bool syncTrips,
   }) {
     final storage = FakeHiveStorage();
-    storage.putSetting(StorageKeys.consentCloudSync, cloudSync);
-    storage.putSetting(StorageKeys.consentSyncTrips, syncTrips);
+    unawaited(storage.putSetting(StorageKeys.consentCloudSync, cloudSync));
+    unawaited(storage.putSetting(StorageKeys.consentSyncTrips, syncTrips));
     final c = ProviderContainer(overrides: [
       hiveStorageProvider.overrideWithValue(storage),
       syncStateProvider.overrideWith(

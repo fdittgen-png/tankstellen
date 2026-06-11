@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -73,7 +75,8 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
     _fadeController = AnimationController(
       vsync: this,
       duration: StaggeredFadeIn.timelineDuration,
-    )..forward();
+    );
+    unawaited(_fadeController.forward());
   }
 
   @override
@@ -81,7 +84,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
     super.didUpdateWidget(oldWidget);
     // A fresh search → replay the staggered cascade from the top.
     if (!identical(oldWidget.result, widget.result)) {
-      _fadeController.forward(from: 0);
+      unawaited(_fadeController.forward(from: 0));
     }
   }
 
@@ -317,7 +320,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
           if (isWideScreen(context)) {
             ref.read(selectedStationProvider.notifier).select(station.id);
           } else {
-            context.push('/station/${station.id}');
+            unawaited(context.push('/station/${station.id}'));
           }
         },
         onFavoriteTap: () => ref
@@ -372,7 +375,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         // captured reference is safe across that gap.
         final ignoredNotifier =
             ref.read(ignoredStationsProvider.notifier);
-        ignoredNotifier.add(station.id);
+        unawaited(ignoredNotifier.add(station.id));
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showWithUndo(
           context,
@@ -385,7 +388,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         if (isWideScreen(context)) {
           ref.read(selectedStationProvider.notifier).select(station.id);
         } else {
-          context.push('/station/${station.id}');
+          unawaited(context.push('/station/${station.id}'));
         }
       },
       onFavoriteTap: () => ref

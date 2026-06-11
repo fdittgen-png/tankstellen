@@ -91,13 +91,13 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       // #2139 — microtask fires before any frame; addPostFrameCallback
       // can be skipped if no frame is scheduled, leaving a stale
       // action that makes the FAB look enabled but no-op.
-      Future.microtask(() {
+      unawaited(Future.microtask(() {
         try {
           notifier.clearFor(this); // #2553 — clear by owner, not action.
         } catch (_) {
           // ignore: silent_catch — ProviderContainer torn down (e.g. test teardown) — no-op.
         }
-      });
+      }));
     }
     super.dispose();
   }
@@ -154,7 +154,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
 
   void _onFabRouteTap() {
     if (_bailIfStale()) return;
-    _routeInputKey.currentState?.resolveAndSearch();
+    unawaited(_routeInputKey.currentState?.resolveAndSearch());
   }
 
   void _onFabNearbyTap() {
@@ -200,11 +200,11 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    ref.read(searchStateProvider.notifier).searchByZipCode(
+    unawaited(ref.read(searchStateProvider.notifier).searchByZipCode(
           zipCode: zip,
           fuelType: fuelType,
           radiusKm: radius,
-        );
+        ));
     Navigator.of(context).pop();
   }
 
@@ -213,14 +213,14 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    ref.read(searchStateProvider.notifier).searchByCoordinates(
+    unawaited(ref.read(searchStateProvider.notifier).searchByCoordinates(
           lat: city.lat,
           lng: city.lng,
           postalCode: city.postcode,
           locationName: city.name,
           fuelType: fuelType,
           radiusKm: radius,
-        );
+        ));
     Navigator.of(context).pop();
   }
 
@@ -235,13 +235,13 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final segmentKm = ref.read(routeSegmentSearchParamProvider);
     final minSaving = ref.read(minRouteSavingSearchParamProvider);
     ref.read(activeSearchModeProvider.notifier).set(SearchMode.route);
-    ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
+    unawaited(ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
           waypoints: waypoints,
           fuelType: fuelType,
           searchRadiusKm: detourBudgetKm,
           segmentKm: segmentKm,
           minSavingPerLiter: minSaving,
-        );
+        ));
     Navigator.of(context).pop();
   }
 

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -78,7 +80,7 @@ class Achievements extends _$Achievements {
     );
     // Fire-and-forget persistence so the build is synchronous.
     // The repository merges idempotently — re-runs are cheap.
-    repo.mergeEarned(earnedIds, now: DateTime.now());
+    unawaited(repo.mergeEarned(earnedIds, now: DateTime.now()));
     return repo.loadAll();
   }
 

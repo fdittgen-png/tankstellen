@@ -65,7 +65,7 @@ class _ShareReceiptListenerState extends ConsumerState<ShareReceiptListener> {
   @override
   void initState() {
     super.initState();
-    _handleColdShare();
+    unawaited(_handleColdShare());
     _listenWarmShares();
   }
 

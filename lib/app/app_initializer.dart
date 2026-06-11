@@ -895,7 +895,7 @@ class AppInitializer {
           isBenignStreamCancel(details.exception)) {
         return;
       }
-      errorLogger.log(
+      unawaited(errorLogger.log(
         ErrorLayer.ui,
         details.exception,
         details.stack ?? StackTrace.current,
@@ -904,15 +904,15 @@ class AppInitializer {
           'library': details.library,
           'context': details.context?.toString(),
         },
-      );
+      ));
     };
     // Capture async / platform errors that escape the framework.
     PlatformDispatcher.instance.onError = (error, stack) {
       if (_isTileFetchNoise(error) || isBenignStreamCancel(error)) return true;
       // #3150 — context so a dispatcher-caught trace is distinguishable
       // from a bare errorLogger call site.
-      errorLogger.log(ErrorLayer.other, error, stack,
-          context: const {'where': 'PlatformDispatcher.onError'});
+      unawaited(errorLogger.log(ErrorLayer.other, error, stack,
+          context: const {'where': 'PlatformDispatcher.onError'}));
       return true;
     };
   }

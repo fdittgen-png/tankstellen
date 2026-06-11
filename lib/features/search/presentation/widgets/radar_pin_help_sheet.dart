@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -18,7 +20,7 @@ void showRadarPinHelp(
   required Future<void> Function() onEnableNow,
 }) {
   final l = AppLocalizations.of(context);
-  showModalBottomSheet<void>(
+  unawaited(showModalBottomSheet<void>(
     context: context,
     builder: (ctx) {
       return SafeArea(
@@ -86,5 +88,5 @@ void showRadarPinHelp(
         ),
       );
     },
-  );
+  ));
 }

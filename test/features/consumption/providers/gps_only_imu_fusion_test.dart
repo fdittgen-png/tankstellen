@@ -369,7 +369,7 @@ class _Harness {
 
   void dispose() {
     container.dispose();
-    geo.dispose();
+    unawaited(geo.dispose());
   }
 }
 
@@ -473,7 +473,7 @@ class _RecordingGeolocator extends GeolocatorWrapper {
     positionStreamCallCount++;
     lastAccuracy = locationSettings?.accuracy;
     final prev = _controller;
-    if (prev != null && !prev.isClosed) prev.close();
+    if (prev != null && !prev.isClosed) unawaited(prev.close());
     _controller = StreamController<Position>(
       onListen: () => activeListeners++,
       onCancel: () => activeListeners--,

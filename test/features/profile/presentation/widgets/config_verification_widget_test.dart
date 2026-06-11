@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
@@ -66,7 +68,7 @@ List<Object> _buildOverrides({
   // PLUS the actual key — `hasApiKey` here controls only the custom-key flag.
   final fake = FakeStorageRepository();
   if (hasApiKey) {
-    fake.setApiKey('custom-key');
+    unawaited(fake.setApiKey('custom-key'));
   }
   // The widget reads the bundled-default fingerprint when no custom key is
   // configured; mirror the legacy mock value so any UI that surfaces the

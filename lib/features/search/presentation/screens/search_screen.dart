@@ -100,7 +100,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   void _tryGpsSearchIfConsented() {
     final settings = ref.read(settingsStorageProvider);
     if (!LocationConsentDialog.hasConsent(settings)) return;
-    _performGpsSearch();
+    unawaited(_performGpsSearch());
   }
 
   Future<void> _performGpsSearch() async {

@@ -17,6 +17,8 @@
 // the `home_widget` plugin via platform channels; we mock the channel so
 // the call path completes instead of throwing.
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -142,15 +144,15 @@ void main() {
         // searchStations when online (otherwise the no-GPS path
         // short-circuits and the test proves nothing).
         final fake = FakeHiveStorage();
-        fake.putSetting(StorageKeys.userPositionLat, 43.44);
-        fake.putSetting(StorageKeys.userPositionLng, 3.44);
-        fake.saveProfile('p1', const {
+        unawaited(fake.putSetting(StorageKeys.userPositionLat, 43.44));
+        unawaited(fake.putSetting(StorageKeys.userPositionLng, 3.44));
+        unawaited(fake.saveProfile('p1', const {
           'id': 'p1',
           'name': 'Std',
           'preferredFuelType': 'e10',
           'defaultSearchRadius': 10.0,
-        });
-        fake.setActiveProfileId('p1');
+        }));
+        unawaited(fake.setActiveProfileId('p1'));
         final repo = FakeStorageRepository(inner: fake);
 
         return ProviderContainer(
@@ -198,15 +200,15 @@ void main() {
         countingService = _CountingStationService();
         final fake = FakeHiveStorage();
         fakeHive = fake;
-        fake.putSetting(StorageKeys.userPositionLat, 43.44);
-        fake.putSetting(StorageKeys.userPositionLng, 3.44);
-        fake.saveProfile('p1', const {
+        unawaited(fake.putSetting(StorageKeys.userPositionLat, 43.44));
+        unawaited(fake.putSetting(StorageKeys.userPositionLng, 3.44));
+        unawaited(fake.saveProfile('p1', const {
           'id': 'p1',
           'name': 'Std',
           'preferredFuelType': 'e10',
           'defaultSearchRadius': 10.0,
-        });
-        fake.setActiveProfileId('p1');
+        }));
+        unawaited(fake.setActiveProfileId('p1'));
         final repo = FakeStorageRepository(inner: fake);
 
         return ProviderContainer(

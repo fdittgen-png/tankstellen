@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:collection';
 
 import 'package:fake_async/fake_async.dart';
@@ -198,7 +200,7 @@ void main() {
       // Elapsing 4×shortPoll lands on the 4th periodic boundary
       // inclusively, so the 5th read completes before cancel.
       async.elapse(shortPoll * 4);
-      sub.cancel();
+      unawaited(sub.cancel());
       async.flushMicrotasks();
 
       expect(received, [20.0]);

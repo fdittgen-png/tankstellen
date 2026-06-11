@@ -61,7 +61,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       ref.read(routeInputControllerProvider.notifier).reset();
       if (!_autoGpsTriggered) {
         _autoGpsTriggered = true;
-        _useGpsForStart();
+        unawaited(_useGpsForStart());
       }
     });
   }

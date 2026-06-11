@@ -72,7 +72,7 @@ class _FakeGeolocatorWrapper extends GeolocatorWrapper {
   }
 
   void dispose() {
-    positionController.close();
+    unawaited(positionController.close());
   }
 }
 

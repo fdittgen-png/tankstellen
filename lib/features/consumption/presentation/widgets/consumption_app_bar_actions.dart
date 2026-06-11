@@ -141,11 +141,11 @@ class ConsumptionAppBarActions extends ConsumerWidget {
             tooltip: l?.trajetsViewAllOnMap ?? 'View all on map',
             icon: const Icon(Icons.map_outlined),
             onPressed: () {
-              Navigator.of(context).push(
+              unawaited(Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => TrajetsMapScreen(tripIds: ids),
                 ),
-              );
+              ));
             },
           ),
         PopupMenuButton<_OverflowAction>(

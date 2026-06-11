@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -61,7 +63,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                   return SwipeToDelete(
                     dismissKey: ValueKey(it.id),
                     onDismissed: () {
-                      ref.read(itineraryProvider.notifier).delete(it.id);
+                      unawaited(ref.read(itineraryProvider.notifier).delete(it.id));
                       SnackBarHelper.show(context, AppLocalizations.of(context)?.itineraryDeleted(it.name) ?? '${it.name} deleted');
                     },
                     child: ListTile(
@@ -105,11 +107,11 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     final fuelType = FuelType.fromString(it.fuelType as String);
     final detourBudgetKm =
         ref.read(activeProfileProvider)?.routeDetourBudgetKm ?? 5.0;
-    ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
+    unawaited(ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
       waypoints: waypoints,
       fuelType: fuelType,
       searchRadiusKm: detourBudgetKm,
-    );
+    ));
 
     // Navigate to search screen
     context.go('/');

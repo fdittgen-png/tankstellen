@@ -87,7 +87,7 @@ final class PendingSharedReceiptTextProvider
 }
 
 String _$pendingSharedReceiptTextHash() =>
-    r'b8e66951cc26c0ca44d1bd4624bc500a3127d212';
+    r'4f0e8897226e19299f3ca0a62ddb4944ab481b88';
 
 /// One-shot stash for the [ReceiptParseResult] of an e-receipt **text** an
 /// external app shared into Sparkilo (#2735 + #2838 / Epic #2687).

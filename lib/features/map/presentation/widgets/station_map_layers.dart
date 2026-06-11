@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
@@ -409,7 +410,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
     final onTap = widget.onStationTap == null
         ? null
         : (String id) {
-            HapticFeedback.selectionClick();
+            unawaited(HapticFeedback.selectionClick());
             widget.onStationTap!(id);
           };
     _markerMeta.clear();

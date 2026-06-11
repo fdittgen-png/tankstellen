@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
@@ -32,7 +34,7 @@ void main() {
   }) {
     if (savedCountryCode != null) {
       // Seed the persisted country setting so the provider can read it.
-      fakeStorage.putSetting('active_country_code', savedCountryCode);
+      unawaited(fakeStorage.putSetting('active_country_code', savedCountryCode));
     }
 
     final c = ProviderContainer(overrides: [

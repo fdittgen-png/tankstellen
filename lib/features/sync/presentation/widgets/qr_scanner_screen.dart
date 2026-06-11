@@ -78,7 +78,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       _controller = MobileScannerController();
       _ownsController = true;
     }
-    _probePermission();
+    unawaited(_probePermission());
   }
 
   Future<void> _probePermission() async {
@@ -124,7 +124,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   void dispose() {
     _timeoutTimer?.cancel();
     if (_ownsController) {
-      _controller.dispose();
+      unawaited(_controller.dispose());
     }
     super.dispose();
   }
@@ -205,7 +205,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     _timeoutTimer?.cancel();
     // Medium impact — noticeable but not startling. Gives the user
     // a tactile "yes, we got it" before the navigation animation.
-    HapticFeedback.mediumImpact();
+    unawaited(HapticFeedback.mediumImpact());
     Navigator.pop(context, value);
   }
 }

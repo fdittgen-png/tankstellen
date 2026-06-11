@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -83,12 +85,12 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
       SnackBarHelper.showError(context, error);
       return;
     }
-    widget.onSubmit(
+    unawaited(widget.onSubmit(
       isEmail: form.useEmail,
       email: form.useEmail ? _emailController.text.trim() : null,
       password: form.useEmail ? _passwordController.text : null,
       isSignUp: form.isSignUp,
-    );
+    ));
   }
 
   @override

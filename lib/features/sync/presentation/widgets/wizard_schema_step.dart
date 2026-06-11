@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -114,7 +116,7 @@ class WizardSchemaStep extends StatelessWidget {
           const SizedBox(height: 12),
           FilledButton.icon(
             onPressed: () {
-              Clipboard.setData(ClipboardData(text: migrationSql ?? ''));
+              unawaited(Clipboard.setData(ClipboardData(text: migrationSql ?? '')));
               SnackBarHelper.show(context,
                   l10n?.sqlCopied ?? 'SQL copied to clipboard');
             },

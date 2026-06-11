@@ -114,7 +114,7 @@ final class PendingSharedReceiptProvider
 }
 
 String _$pendingSharedReceiptHash() =>
-    r'a5e987b04e4827446e20bad9aae17d8e3c16a364';
+    r'e1546bc9b9dc120716f57cea15060976f154aaf8';
 
 /// One-shot stash for the file path of a receipt image an external app
 /// shared into Sparkilo via the OS share sheet (#2735 / Epic #2687).

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -87,7 +89,7 @@ class AlertsTab extends StatelessWidget {
               ),
             ),
             onDismissed: (_) {
-              ref.read(alertProvider.notifier).removeAlert(alert.id);
+              unawaited(ref.read(alertProvider.notifier).removeAlert(alert.id));
               SnackBarHelper.show(
                   context,
                   l10n?.alertDeleted(alert.stationName) ??

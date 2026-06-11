@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/utils/price_formatter.dart';
@@ -107,7 +109,7 @@ class DrivingStationSheet extends StatelessWidget {
     final uri = Uri.parse(
       'geo:${station.lat},${station.lng}?q=${station.lat},${station.lng}(${Uri.encodeComponent(station.displayName)})',
     );
-    launchUrl(uri);
+    unawaited(launchUrl(uri));
     if (context.mounted) {
       Navigator.of(context).pop();
     }

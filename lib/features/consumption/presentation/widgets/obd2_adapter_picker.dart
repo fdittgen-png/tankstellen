@@ -225,7 +225,7 @@ class _Obd2AdapterPickerSheetState
 
   @override
   void dispose() {
-    _sub?.cancel();
+    unawaited(_sub?.cancel());
     super.dispose();
   }
 
@@ -237,7 +237,7 @@ class _Obd2AdapterPickerSheetState
     });
     final connection = ref.read(obd2ConnectionProvider);
     _supportsClassicDiscovery = connection.supportsClassicDiscovery;
-    _sub?.cancel();
+    unawaited(_sub?.cancel());
     _sub = connection.scan().listen(
       (list) {
         if (!mounted) return;

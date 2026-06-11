@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -82,7 +84,7 @@ class Obd2StatusDot extends ConsumerWidget {
     final name = snapshot.adapterName ??
         (l?.obd2StatusNoAdapter ?? 'No adapter paired');
     final mac = snapshot.adapterMac;
-    showModalBottomSheet<void>(
+    unawaited(showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       builder: (ctx) {
@@ -129,7 +131,7 @@ class Obd2StatusDot extends ConsumerWidget {
           ),
         );
       },
-    );
+    ));
   }
 
   String _description(Obd2ConnectionState s, AppLocalizations? l) {

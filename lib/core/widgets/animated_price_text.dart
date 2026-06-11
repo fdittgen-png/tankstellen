@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../theme/app_motion.dart';
@@ -104,9 +106,8 @@ class _AnimatedPriceTextState extends State<AnimatedPriceText>
     setState(() {
       _flashIsDrop = newPrice < oldPrice;
     });
-    _controller
-      ..reset()
-      ..forward();
+    _controller.reset();
+    unawaited(_controller.forward());
   }
 
   @override

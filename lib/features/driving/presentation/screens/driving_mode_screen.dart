@@ -48,7 +48,7 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     _mapController = MapController();
     _resetInactivityTimer();
     // Enter immersive full-screen mode — hides status bar and nav bar
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky));
   }
 
   @override
@@ -56,10 +56,10 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     _inactivityTimer?.cancel();
     _mapController.dispose();
     // Restore normal system UI when leaving driving mode
-    SystemChrome.setEnabledSystemUIMode(
+    unawaited(SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
-    );
+    ));
     super.dispose();
   }
 
@@ -126,13 +126,13 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     Station station,
     FuelType fuelType,
   ) {
-    showModalBottomSheet<void>(
+    unawaited(showModalBottomSheet<void>(
       context: context,
       builder: (_) => DrivingStationSheet(
         station: station,
         fuelType: fuelType,
       ),
-    );
+    ));
   }
 
   void _recenter(List<Station> stations) {

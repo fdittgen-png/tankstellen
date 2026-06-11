@@ -70,7 +70,7 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
     if (type == LocationInputType.city) {
       _debounce?.cancel();
       _debounce = Timer(const Duration(milliseconds: 1000), () {
-        _fetchSuggestions(value);
+        unawaited(_fetchSuggestions(value));
       });
     }
   }

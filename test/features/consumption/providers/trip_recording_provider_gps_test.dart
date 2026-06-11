@@ -400,7 +400,7 @@ class _RecordingGeolocator extends GeolocatorWrapper {
     if (prev != null && !prev.isClosed) {
       // Fire-and-forget — tests only re-call getPositionStream when
       // the previous subscription is already gone.
-      prev.close();
+      unawaited(prev.close());
     }
     _controller = StreamController<Position>(
       onListen: () => activeListeners++,

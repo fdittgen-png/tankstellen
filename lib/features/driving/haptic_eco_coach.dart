@@ -239,18 +239,18 @@ class HapticEcoCoach {
   /// so a vibration-channel hiccup doesn't kill the trip subscription;
   /// the live-reading stream MUST keep flowing for the rest of the app.
   void _fireHaptic() {
-    // ignore: discarded_futures — fire-and-forget by design; we don't
-    // want to block the next reading on the platform channel reply.
-    haptic().catchError((Object e, StackTrace st) {
-      errorLogger.log(
+    // Fire-and-forget by design; we don't want to block the next
+    // reading on the platform channel reply.
+    unawaited(haptic().catchError((Object e, StackTrace st) {
+      unawaited(errorLogger.log(
         ErrorLayer.ui,
         e,
         st,
         context: <String, Object?>{
           'where': 'HapticEcoCoach.fire',
         },
-      );
-    });
+      ));
+    }));
   }
 
   /// Fire the visual / event-stream subscriber (#1273). The callback
@@ -265,14 +265,14 @@ class HapticEcoCoach {
     try {
       cb(CoachEvent(triggeredAt: triggeredAt));
     } catch (e, st) {
-      errorLogger.log(
+      unawaited(errorLogger.log(
         ErrorLayer.ui,
         e,
         st,
         context: <String, Object?>{
           'where': 'HapticEcoCoach.onFire',
         },
-      );
+      ));
     }
   }
 }

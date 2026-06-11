@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,7 +35,7 @@ class StationRatingSection extends StatelessWidget {
             StarRating(
               rating: rating,
               onRatingChanged: (stars) {
-                ref.read(stationRatingsProvider.notifier).rate(stationId, stars);
+                unawaited(ref.read(stationRatingsProvider.notifier).rate(stationId, stars));
               },
             ),
             if (rating != null) ...[

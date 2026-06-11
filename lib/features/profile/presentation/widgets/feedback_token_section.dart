@@ -47,7 +47,7 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
   @override
   void initState() {
     super.initState();
-    _refresh();
+    unawaited(_refresh());
   }
 
   Future<void> _refresh() async {

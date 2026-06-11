@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/profile/providers/profile_provider.dart';
@@ -51,9 +53,9 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
         case CountrySwitchAction.autoSwitch:
           _handleAutoSwitch(next);
         case CountrySwitchAction.suggest:
-          _handleSuggest(next);
+          unawaited(_handleSuggest(next));
         case CountrySwitchAction.noProfile:
-          _handleNoProfile(next);
+          unawaited(_handleNoProfile(next));
       }
     });
 
@@ -62,7 +64,7 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
 
   void _handleAutoSwitch(CountrySwitchEvent event) {
     final profile = event.matchingProfile!;
-    ref.read(activeProfileProvider.notifier).switchProfile(profile.id);
+    unawaited(ref.read(activeProfileProvider.notifier).switchProfile(profile.id));
 
     final l = AppLocalizations.of(context);
     final countryName =

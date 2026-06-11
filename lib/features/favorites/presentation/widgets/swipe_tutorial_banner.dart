@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/data/storage_repository.dart';
@@ -27,7 +29,7 @@ class _SwipeTutorialBannerState extends ConsumerState<SwipeTutorialBanner> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(_checkIfShouldShow);
+    unawaited(Future.microtask(_checkIfShouldShow));
   }
 
   void _checkIfShouldShow() {

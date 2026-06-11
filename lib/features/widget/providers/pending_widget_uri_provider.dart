@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'pending_widget_uri_provider.g.dart';
@@ -53,7 +55,7 @@ class PendingWidgetUri extends _$PendingWidgetUri {
   Uri? consumeDeferred() {
     final pending = state;
     if (pending != null) {
-      Future.microtask(() => state = null);
+      unawaited(Future.microtask(() => state = null));
     }
     return pending;
   }

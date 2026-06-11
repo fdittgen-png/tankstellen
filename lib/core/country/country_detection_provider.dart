@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../location/user_position_provider.dart';
 import '../services/service_providers.dart';
@@ -17,7 +19,7 @@ class DetectedCountry extends _$DetectedCountry {
   String? build() {
     final position = ref.watch(userPositionProvider);
     if (position != null) {
-      _detectCountry(position.lat, position.lng);
+      unawaited(_detectCountry(position.lat, position.lng));
     }
     return null;
   }

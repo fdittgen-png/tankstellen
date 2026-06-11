@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -92,11 +94,11 @@ class ServiceReminderSection extends ConsumerWidget {
       intervalKm: intervalKm,
       lastServiceOdometerKm: currentOdometerKm,
     );
-    ref.read(serviceReminderListProvider.notifier).save(reminder);
+    unawaited(ref.read(serviceReminderListProvider.notifier).save(reminder));
   }
 
   void _delete(WidgetRef ref, String id) {
-    ref.read(serviceReminderListProvider.notifier).remove(id);
+    unawaited(ref.read(serviceReminderListProvider.notifier).remove(id));
   }
 
   Future<void> _markDone(

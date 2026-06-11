@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
@@ -167,7 +169,7 @@ void main() {
       // Pin auto-switch OFF so the recompute lands on the deterministic
       // `suggest` action (the default is ON since #2597); this test is about
       // the watch-driven recompute, not the auto-switch policy.
-      fakeStorage.putSetting(StorageKeys.autoSwitchProfile, false);
+      unawaited(fakeStorage.putSetting(StorageKeys.autoSwitchProfile, false));
       // Backing store the overridden allProfilesProvider WATCHES, so a change
       // here must invalidate countrySwitchEvent without a new GPS fix.
       final c = ProviderContainer(overrides: [

@@ -276,15 +276,14 @@ Map<String, dynamic> parsePrixCarburantsHoursInput(Map<String, dynamic> r) {
   final automate24h = automateRaw == '1' || automateRaw == 'oui';
 
   final jourRaw = decoded['jour'];
-  final jours = jourRaw is List ? jourRaw : [if (jourRaw != null) jourRaw];
+  final jours = jourRaw is List ? jourRaw : [?jourRaw];
   final parts = <String>[];
   for (final jour in jours) {
     if (jour is! Map) continue;
     final nom = jour['@nom']?.toString().trim() ?? '';
     if (nom.isEmpty) continue;
     final horaireRaw = jour['horaire'];
-    final horaires =
-        horaireRaw is List ? horaireRaw : [if (horaireRaw != null) horaireRaw];
+    final horaires = horaireRaw is List ? horaireRaw : [?horaireRaw];
     for (final h in horaires) {
       if (h is! Map) continue;
       final open = h['@ouverture']?.toString().trim() ?? '';

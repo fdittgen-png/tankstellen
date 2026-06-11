@@ -154,7 +154,7 @@ class HapticEcoCoachLifecycle extends _$HapticEcoCoachLifecycle {
       // provider itself is being disposed permanently (e.g. test
       // ProviderContainer.dispose).
       if (!_coachEventsController.isClosed) {
-        _coachEventsController.close();
+        unawaited(_coachEventsController.close());
       }
     });
   }
@@ -165,9 +165,9 @@ class HapticEcoCoachLifecycle extends _$HapticEcoCoachLifecycle {
   }
 
   void _teardown() {
-    _coachSub?.cancel();
+    unawaited(_coachSub?.cancel());
     _coachSub = null;
-    _bridge?.close();
+    unawaited(_bridge?.close());
     _bridge = null;
     _lastForwardedReading = null;
   }

@@ -90,13 +90,13 @@ void _pushSearchCriteria(NavigatorState nav, int slot) {
     override(nav);
     return;
   }
-  nav.push<void>(
+  unawaited(nav.push<void>(
     MaterialPageRoute<void>(
       builder: (_) => const SearchCriteriaScreen(),
       fullscreenDialog: true,
       settings: const RouteSettings(name: kSearchCriteriaRouteName),
     ),
-  );
+  ));
 }
 
 /// Default centre-FAB behaviour (#2113), the three-branch matrix:

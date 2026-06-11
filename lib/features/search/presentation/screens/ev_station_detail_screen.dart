@@ -50,7 +50,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
     // tap (the only seam that was enriched before #2632), so the free /
     // paid badge surfaces wherever the detail screen is opened.
     _station = widget.station;
-    _enrichOnOpen();
+    unawaited(_enrichOnOpen());
   }
 
   /// One-shot enrich of the opened station with the country-authoritative
@@ -116,8 +116,8 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   }
 
   void _navigateToStation() {
-    NavigationUtils.openInMaps(_station.lat, _station.lng,
-        label: _station.name);
+    unawaited(NavigationUtils.openInMaps(_station.lat, _station.lng,
+        label: _station.name));
   }
 
   /// Open the add-charging-log form pre-filled with this station
@@ -312,9 +312,9 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
                     StarRating(
                       rating: rating,
                       onRatingChanged: (stars) {
-                        ref
+                        unawaited(ref
                             .read(stationRatingsProvider.notifier)
-                            .rate(station.id, stars);
+                            .rate(station.id, stars));
                       },
                     ),
                     if (rating != null) ...[

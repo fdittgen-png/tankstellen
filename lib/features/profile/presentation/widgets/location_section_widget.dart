@@ -126,7 +126,7 @@ class LocationSectionWidget extends ConsumerWidget {
         if (activeProfile != null) {
           final updated =
               activeProfile.copyWith(autoUpdatePosition: value);
-          ref.read(profileRepositoryProvider).updateProfile(updated);
+          unawaited(ref.read(profileRepositoryProvider).updateProfile(updated));
           ref.invalidate(allProfilesProvider);
           ref.invalidate(activeProfileProvider);
         }
@@ -153,7 +153,7 @@ class LocationSectionWidget extends ConsumerWidget {
       ),
       value: autoSwitch,
       onChanged: (value) {
-        ref.read(autoSwitchProfileProvider.notifier).set(value);
+        unawaited(ref.read(autoSwitchProfileProvider.notifier).set(value));
       },
     );
   }

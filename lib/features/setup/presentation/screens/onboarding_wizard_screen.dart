@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -112,11 +114,11 @@ class _OnboardingWizardScreenState
 
   void _goToStep(int step) {
     ref.read(onboardingWizardControllerProvider.notifier).setStep(step);
-    _pageController.animateToPage(
+    unawaited(_pageController.animateToPage(
       step,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-    );
+    ));
   }
 
   void _next(int currentStep) {
@@ -134,7 +136,7 @@ class _OnboardingWizardScreenState
       return;
     }
     if (_isLastStep(currentStep)) {
-      _finishOnboarding();
+      unawaited(_finishOnboarding());
     } else {
       _goToStep(currentStep + 1);
     }

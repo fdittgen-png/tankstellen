@@ -103,7 +103,7 @@ class Obd2SpeedStream {
     // sample within `pollPeriod` of subscribe rather than after.
     // `Timer.periodic` only fires AFTER its first interval, so we
     // bridge with an explicit kick.
-    _tick();
+    unawaited(_tick());
     _timer = Timer.periodic(pollPeriod, (_) => _tick());
   }
 
