@@ -6,8 +6,11 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/cache/cache_manager.dart' show CacheKey, CacheTtl;
+import '../../../core/data/storage_repository.dart';
 import '../../../core/network/connectivity_service.dart';
 import '../../../core/services/service_providers.dart';
+import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../price_history/providers/price_prediction_provider.dart';
 import '../data/home_widget_service.dart';
@@ -39,6 +42,26 @@ part 'nearest_widget_refresh_provider.g.dart';
 class NearestWidgetRefresh extends _$NearestWidgetRefresh {
   Timer? _timer;
   AppLifecycleListener? _lifecycle;
+
+  /// #3157 — when the last nearest-widget network refresh completed, and
+  /// the cache-key-rounded position it ran for. A periodic/resume tick is
+  /// skipped while the last refresh is younger than the search cache TTL
+  /// AND the stored position hasn't left its cache-key cell — the search
+  /// would only re-serve the same cached result, so the heartbeat was
+  /// burning a station search every 2 minutes for nothing. The first tick
+  /// after arming always runs (`_lastNearestRefreshAt == null`).
+  DateTime? _lastNearestRefreshAt;
+  String? _lastNearestRefreshPosKey;
+
+  /// #3157 — injectable clock so the freshness gate is testable without
+  /// waiting out the real TTL. Production never touches it.
+  @visibleForTesting
+  DateTime Function() debugNow = DateTime.now;
+
+  /// #3157 — drive one tick directly in tests (the periodic timer's
+  /// 2-minute cadence is impractical to wait for).
+  @visibleForTesting
+  Future<void> debugTick() => _tick();
 
   @override
   void build() {
@@ -85,6 +108,18 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
       // NearestWidgetDataBuilder remains the safety net once we DO refresh.
       final isOnline = await ref.read(currentConnectivityProvider.future);
       if (!isOnline) return;
+      // #3157 — freshness/movement gate: skip the network refresh while the
+      // last successful one is younger than the search cache TTL and the
+      // stored position is still inside the same cache-key cell (the same
+      // rounding `CacheKey.stationSearch` uses) — the search chain would
+      // only re-serve its cached result anyway.
+      final posKey = _positionCellKey(storage);
+      final last = _lastNearestRefreshAt;
+      if (last != null &&
+          debugNow().difference(last) < CacheTtl.stationSearch &&
+          posKey == _lastNearestRefreshPosKey) {
+        return;
+      }
       await HomeWidgetService.updateNearestWidget(
         storage,
         storage,
@@ -98,9 +133,25 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
           pricePredictionProvider(stationId, fuelType),
         ),
       );
+      // #3157 — record the completed refresh + the cell it ran for.
+      _lastNearestRefreshAt = debugNow();
+      _lastNearestRefreshPosKey = posKey;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'NearestWidgetRefresh: tick failed'}));
     }
+  }
+
+  /// The cache-key cell the stored user position falls into, using the
+  /// SAME 3-decimal rounding as [CacheKey.stationSearch] (#3157). Null when
+  /// no position is stored yet (the no-GPS empty state) — a null-to-null
+  /// comparison still counts as "not moved", which is correct: with no fix
+  /// the nearest builder can only re-render the same no-GPS placeholder.
+  String? _positionCellKey(StorageRepository storage) {
+    final lat = storage.getSetting(StorageKeys.userPositionLat) as double?;
+    final lng = storage.getSetting(StorageKeys.userPositionLng) as double?;
+    if (lat == null || lng == null) return null;
+    return '${CacheKey.roundedSearchCoord(lat)}'
+        ':${CacheKey.roundedSearchCoord(lng)}';
   }
 }
 

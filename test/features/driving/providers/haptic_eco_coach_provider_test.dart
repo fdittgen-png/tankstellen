@@ -254,6 +254,80 @@ void main() {
       addTearDown(b.cancel);
     });
   });
+
+  group('hapticEcoCoachLifecycleProvider — no per-emit churn (#3153)', () {
+    test(
+        '4 Hz live emits with unchanged isActive keep the SAME bridge/coach '
+        'and the readings still flow through it', () async {
+      // Enable the coach (prerequisite + dependent) so the lifecycle arms.
+      await repo.saveEnabled(<Feature>{
+        Feature.obd2TripRecording,
+        Feature.hapticEcoCoach,
+      });
+      final tripRecording = _ManualTripRecording();
+      final container = ProviderContainer(overrides: [
+        featureFlagsRepositoryProvider.overrideWithValue(repo),
+        tripRecordingProvider.overrideWith(() => tripRecording),
+      ]);
+      addTearDown(container.dispose);
+      await pumpLoad(container);
+
+      // A live listener so the keep-alive provider rebuilds EAGERLY on a
+      // dependency change (a bare read would only rebuild lazily).
+      final lifecycleSub =
+          container.listen(hapticEcoCoachLifecycleProvider, (_, _) {});
+      addTearDown(lifecycleSub.close);
+      final lifecycle =
+          container.read(hapticEcoCoachLifecycleProvider.notifier);
+
+      // Arm: the trip goes active (this rebuild is legitimate).
+      tripRecording.setActive(_recordingState());
+      await Future<void>.delayed(Duration.zero);
+      final bridge = lifecycle.debugBridge;
+      expect(bridge, isNotNull,
+          reason: 'enabled toggle + active trip must arm the coach');
+
+      final forwarded = <TripLiveReading>[];
+      final sub = bridge!.stream.listen(forwarded.add);
+      addTearDown(sub.cancel);
+
+      // Replay the OBD2 pipeline's recording cadence: live readings
+      // change, phase (and isActive) do not.
+      tripRecording.setActive(_recordingState().copyWith(
+        live: const TripLiveReading(
+          throttlePercent: 81,
+          speedKmh: 111,
+          distanceKmSoFar: 0.1,
+          elapsed: Duration(seconds: 2),
+        ),
+      ));
+      await Future<void>.delayed(Duration.zero);
+      tripRecording.setActive(_recordingState().copyWith(
+        live: const TripLiveReading(
+          throttlePercent: 82,
+          speedKmh: 112,
+          distanceKmSoFar: 0.2,
+          elapsed: Duration(seconds: 3),
+        ),
+      ));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        identical(lifecycle.debugBridge, bridge),
+        isTrue,
+        reason:
+            'a live-reading emit must NOT tear down + recreate the bridge '
+            'StreamController + HapticEcoCoach 4×/s (#3153) — only an '
+            'isActive / enabled flip may rebuild the lifecycle',
+      );
+      expect(
+        forwarded.map((r) => r.speedKmh).toList(),
+        [111, 112],
+        reason: 'live readings must keep flowing through the (stable) '
+            'bridge via the existing ref.listen path',
+      );
+    });
+  });
 }
 
 /// Manual `TripRecording` fake that lets the test flip phases without

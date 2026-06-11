@@ -12,6 +12,7 @@ import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
 import 'package:tankstellen/features/approach/providers/approach_state_provider.dart';
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
+import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/approach_overlay_enabled_provider.dart';
@@ -48,8 +49,14 @@ Position _pos({required double lat, required double lng, double speed = 10}) {
 /// Geolocator fake exposing a controllable broadcast stream so the test
 /// can observe subscription lifecycle (`hasListener`) and push fixes.
 class _FakeGeolocator extends GeolocatorWrapper {
-  final StreamController<Position> controller =
-      StreamController<Position>.broadcast();
+  /// #3153 — how many times the underlying platform stream went from
+  /// 0 → 1 listeners (i.e. a fresh detector subscribed after the
+  /// previous one was torn down). A churn-free provider keeps this at 1
+  /// for the whole recording.
+  int listenCount = 0;
+
+  late final StreamController<Position> controller =
+      StreamController<Position>.broadcast(onListen: () => listenCount++);
 
   @override
   Stream<Position> getPositionStream({LocationSettings? locationSettings}) =>
@@ -107,6 +114,10 @@ class _FakeTripRecording extends TripRecording {
 
   @override
   TripRecordingState build() => TripRecordingState(phase: holder.phase);
+
+  /// #3153 — push a full state emit the way the live OBD2 pipeline does
+  /// at 4 Hz, so the churn test can replay the recording cadence.
+  void emit(TripRecordingState next) => state = next;
 }
 
 /// Active-profile notifier stub returning a fixed profile (or null).
@@ -372,6 +383,63 @@ void main() {
         reason: 're-entering a recording trip must spin up a fresh detector '
             'and re-subscribe to the GPS stream',
       );
+    });
+
+    test(
+        '#3153 — 4 Hz live emits with unchanged isActive do NOT recreate '
+        'the detector (no GPS resubscribe, no provider rebuild)', () async {
+      final container = _container(
+        geo: geo,
+        radar: radar,
+        phase: TripRecordingPhase.recording,
+      );
+      addTearDown(container.dispose);
+
+      final sub = container.listen<AsyncValue<ApproachState>>(
+        approachStateProvider,
+        (_, _) {},
+        fireImmediately: true,
+      );
+      addTearDown(sub.close);
+      // The detector subscribes to the GPS stream synchronously on build.
+      await Future<void>.delayed(Duration.zero);
+
+      expect(geo.controller.hasListener, isTrue);
+      expect(geo.listenCount, 1,
+          reason: 'exactly one detector subscription after arming');
+
+      // Replay the OBD2 pipeline's recording cadence: state emits whose
+      // live reading changes but whose phase (and isActive) does not.
+      final trip = container.read(tripRecordingProvider.notifier)
+          as _FakeTripRecording;
+      trip.emit(const TripRecordingState(
+        phase: TripRecordingPhase.recording,
+        live: TripLiveReading(
+          speedKmh: 50,
+          rpm: 1800,
+          distanceKmSoFar: 0.1,
+          elapsed: Duration(seconds: 2),
+        ),
+      ));
+      await Future<void>.delayed(Duration.zero);
+      trip.emit(const TripRecordingState(
+        phase: TripRecordingPhase.recording,
+        live: TripLiveReading(
+          speedKmh: 51,
+          rpm: 1850,
+          distanceKmSoFar: 0.2,
+          elapsed: Duration(seconds: 3),
+        ),
+      ));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(geo.listenCount, 1,
+          reason: 'a live-reading emit must NOT tear down + recreate the '
+              'detector — that cancels its GPS subscription and restarts '
+              'its ≥1 s poll timer 4×/s, starving approach detection for '
+              'the whole trip (#3153)');
+      expect(geo.controller.hasListener, isTrue,
+          reason: 'the original detector subscription must still be live');
     });
   });
 }

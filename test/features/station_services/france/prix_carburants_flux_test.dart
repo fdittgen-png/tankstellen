@@ -357,6 +357,38 @@ void main() {
       );
     });
 
+    test(
+        '#3152 — search output is unchanged by the off-isolate parse + '
+        'filter-before-copy restructure (full characterization)', () async {
+      // Mixed fixture: two in-radius stations at distinct distances (so the
+      // distance-sort order is observable) + one far outside the radius.
+      final zip = _fluxZip(_fluxXml([
+        _pdv(id: 'NEAR-2', lat: 43.49, lng: 3.56, prices: {'Gazole': 1.70}),
+        _pdv(id: 'NEAR-1', lat: 43.451, lng: 3.521, prices: {'Gazole': 1.65}),
+        // Paris — ~600 km away, must never appear in the result.
+        _pdv(id: 'FAR', lat: 48.85, lng: 2.35, cp: '75001'),
+      ]));
+      final svc = PrixCarburantsFluxStationService(dio: dioWith(zip));
+
+      final result = await svc.searchStations(_castelnau);
+
+      // Exactly the in-radius survivors, distance-sorted (default sort).
+      expect(result.data.map((s) => s.id).toList(),
+          ['fr-NEAR-1', 'fr-NEAR-2']);
+      // Each survivor carries the SAME rounded Haversine distance the
+      // pre-#3152 copy-then-filter shape stamped (rounded to 1 decimal).
+      final near1 = result.data[0];
+      final near2 = result.data[1];
+      expect(near1.dist, closeTo(0.1, 0.051),
+          reason: 'rounded 1-decimal distance must be stamped on survivors');
+      expect(near2.dist, greaterThan(near1.dist));
+      expect(near2.dist, lessThanOrEqualTo(_castelnau.radiusKm));
+      // Prices / fields survive the isolate round-trip untouched.
+      expect(near1.diesel, closeTo(1.65, 0.0001));
+      expect(near2.diesel, closeTo(1.70, 0.0001));
+      expect(result.source, ServiceSource.prixCarburantsApi);
+    });
+
     test('a fresh in-memory dataset serves a later search with no re-download',
         () async {
       // After one successful load the dataset is fresh (within the soft TTL),

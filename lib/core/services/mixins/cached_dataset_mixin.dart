@@ -100,9 +100,11 @@ mixin CachedDatasetMixin {
   }) async {
     if (cached != null && isDatasetFresh(softTtl)) return cached;
 
-    // Disk read-through — survives cold start + offline.
+    // Disk read-through — survives cold start + offline. #3154 — the
+    // deserialize runs through compute() inside [PersistentDataset.readAsync]
+    // so the ~11k-fromJson rehydrate stays off the UI isolate.
     if (cached == null || !isDatasetFresh(hardTtl)) {
-      final disk = persistent.read();
+      final disk = await persistent.readAsync();
       if (disk != null && disk.age <= hardTtl) {
         store(disk.value);
         markDatasetRefreshedAt(disk.age);
@@ -125,7 +127,7 @@ mixin CachedDatasetMixin {
       return value;
     } on Object {
       // Network failed — serve any persisted copy rather than throw.
-      final disk = persistent.read();
+      final disk = await persistent.readAsync();
       if (disk != null) {
         store(disk.value);
         markDatasetRefreshedAt(disk.age);
@@ -167,7 +169,7 @@ mixin CachedDatasetMixin {
     if (cached != null && isDatasetFresh(softTtl)) return cached;
 
     if (cached == null || !isDatasetFresh(hardTtl)) {
-      final disk = persistent.read();
+      final disk = await persistent.readAsync(); // #3154 — off-isolate
       if (disk != null && disk.age <= hardTtl) {
         store(disk.value);
         markDatasetRefreshedAt(disk.age);
@@ -190,7 +192,7 @@ mixin CachedDatasetMixin {
       }
       return value;
     } on Object {
-      final disk = persistent.read();
+      final disk = await persistent.readAsync(); // #3154 — off-isolate
       if (disk != null) {
         store(disk.value);
         markDatasetRefreshedAt(disk.age);

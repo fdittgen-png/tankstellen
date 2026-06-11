@@ -13,6 +13,17 @@ import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 
 /// No-op recorder so the closed-box tests can drive `errorLogger.log`
 /// without a Hive-backed spool (which would need platform init).
+/// #3155 — embedded in a fake `dataset:` payload to count how many times
+/// `jsonEncode` walks it (jsonEncode calls `toJson()` on non-primitive
+/// values). The byte sweep must never encode a dataset payload.
+class _EncodeProbe {
+  int toJsonCalls = 0;
+  Map<String, dynamic> toJson() {
+    toJsonCalls++;
+    return const {'probe': true};
+  }
+}
+
 class _NoopRecorder implements TraceRecorder {
   @override
   Future<void> record(Object error, StackTrace stackTrace,
@@ -752,6 +763,36 @@ void main() {
           ttl: const Duration(hours: 1), source: ServiceSource.cache);
       final evicted = await cache.evictBounded();
       expect(evicted, equals(0));
+    });
+
+    test(
+        '#3155 — a dataset: payload is NEVER jsonEncode-d by the byte '
+        'sweep (it can never be evicted by it anyway)', () async {
+      final now = DateTime.now();
+      final probe = _EncodeProbe();
+      // A multi-MB-shaped dataset entry whose payload counts every encode.
+      await fakeStorage.cacheData('dataset:FR:stations', {
+        'payload': {'stations': probe},
+        'storedAt': now.millisecondsSinceEpoch,
+        'source': ServiceSource.cache.index,
+        'ttlMs': const Duration(hours: 6).inMilliseconds,
+      });
+      // Enough non-dataset bytes to exceed the ceiling so pass 3 runs its
+      // fold + eviction loop in full.
+      await store('search:a', now.subtract(const Duration(minutes: 2)),
+          padBytes: 2000);
+      await store('search:b', now, padBytes: 2000);
+
+      await cache.evictBounded(
+        policy: const CacheEvictionPolicy(prefixBudget: 100, maxBytes: 1000),
+      );
+
+      expect(probe.toJsonCalls, 0,
+          reason: 'evictBounded must not pay a jsonEncode of the multi-MB '
+              'dataset payload on every sweep — the dataset is exempt from '
+              'the byte ceiling, so sizing it is pure waste (#3155)');
+      expect(cache.get('dataset:FR:stations'), isNotNull,
+          reason: 'the dataset entry itself still survives the sweep');
     });
   });
 

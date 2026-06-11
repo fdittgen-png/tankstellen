@@ -185,6 +185,134 @@ void main() {
       });
     });
 
+    // #3157 — the 2-minute foreground heartbeat must not re-run the
+    // station search while the previous refresh is younger than the search
+    // cache TTL AND the stored position hasn't left its cache-key cell
+    // (3-decimal rounding, the same notion CacheKey.stationSearch uses).
+    group('freshness/movement gate (#3157)', () {
+      late _CountingStationService countingService;
+      late FakeHiveStorage fakeHive;
+
+      ProviderContainer makeContainer() {
+        countingService = _CountingStationService();
+        final fake = FakeHiveStorage();
+        fakeHive = fake;
+        fake.putSetting(StorageKeys.userPositionLat, 43.44);
+        fake.putSetting(StorageKeys.userPositionLng, 3.44);
+        fake.saveProfile('p1', const {
+          'id': 'p1',
+          'name': 'Std',
+          'preferredFuelType': 'e10',
+          'defaultSearchRadius': 10.0,
+        });
+        fake.setActiveProfileId('p1');
+        final repo = FakeStorageRepository(inner: fake);
+
+        return ProviderContainer(
+          overrides: [
+            storageRepositoryProvider.overrideWithValue(repo),
+            stationServiceProvider.overrideWithValue(countingService),
+            currentConnectivityProvider.overrideWith((ref) async => true),
+          ],
+        );
+      }
+
+      /// Arms the provider, lets the immediate first tick complete, and
+      /// returns the notifier with its clock pinned to [start].
+      Future<NearestWidgetRefresh> arm(
+        ProviderContainer c,
+        DateTime start,
+      ) async {
+        c.read(nearestWidgetRefreshProvider);
+        final notifier = c.read(nearestWidgetRefreshProvider.notifier);
+        notifier.debugNow = () => start;
+        // The build()-time immediate tick is already in flight; the clock
+        // is pinned before its first await resumes, so the refresh it
+        // records is stamped exactly [start]. Wait for it to complete.
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+        return notifier;
+      }
+
+      test('first tick on arming always refreshes (no last refresh yet)',
+          () async {
+        final c = makeContainer();
+        addTearDown(c.dispose);
+        await arm(c, DateTime(2026, 6, 10, 12, 0));
+        expect(countingService.searchCalls, 1,
+            reason: 'the immediate refresh on first arm is kept');
+      });
+
+      test('a tick inside the TTL with an unmoved position is SKIPPED',
+          () async {
+        final c = makeContainer();
+        addTearDown(c.dispose);
+        final start = DateTime(2026, 6, 10, 12, 0);
+        final notifier = await arm(c, start);
+        final after = countingService.searchCalls;
+
+        // +1 minute, same position (well inside the 5-minute search TTL).
+        notifier.debugNow = () => start.add(const Duration(minutes: 1));
+        await notifier.debugTick();
+
+        expect(countingService.searchCalls, after,
+            reason: 'a fresh result + unmoved position must skip the '
+                'network search — it would only re-serve the cache');
+      });
+
+      test('a movement WITHIN the cache-key rounding still skips', () async {
+        final c = makeContainer();
+        addTearDown(c.dispose);
+        final start = DateTime(2026, 6, 10, 12, 0);
+        final notifier = await arm(c, start);
+        final after = countingService.searchCalls;
+
+        // ~11 m — rounds to the same 3-decimal cell (43.440).
+        await fakeHive.putSetting(StorageKeys.userPositionLat, 43.4401);
+        notifier.debugNow = () => start.add(const Duration(minutes: 1));
+        await notifier.debugTick();
+
+        expect(countingService.searchCalls, after,
+            reason: 'sub-cell jitter must not defeat the gate — the search '
+                'cache key rounds to 3 decimals, so the chain would serve '
+                'the same entry');
+      });
+
+      test('a tick past the search-cache TTL refreshes again', () async {
+        final c = makeContainer();
+        addTearDown(c.dispose);
+        final start = DateTime(2026, 6, 10, 12, 0);
+        final notifier = await arm(c, start);
+        final after = countingService.searchCalls;
+
+        // +6 minutes — past CacheTtl.stationSearch (5 min).
+        notifier.debugNow = () => start.add(const Duration(minutes: 6));
+        await notifier.debugTick();
+
+        expect(countingService.searchCalls, after + 1,
+            reason: 'once the cached search result expires the heartbeat '
+                'must refresh so the widget stays fresh');
+      });
+
+      test('a position move beyond the cache-key cell refreshes again',
+          () async {
+        final c = makeContainer();
+        addTearDown(c.dispose);
+        final start = DateTime(2026, 6, 10, 12, 0);
+        final notifier = await arm(c, start);
+        final after = countingService.searchCalls;
+
+        // ~1.1 km — a different 3-decimal cell (43.450 vs 43.440).
+        await fakeHive.putSetting(StorageKeys.userPositionLat, 43.45);
+        notifier.debugNow = () => start.add(const Duration(minutes: 1));
+        await notifier.debugTick();
+
+        expect(countingService.searchCalls, after + 1,
+            reason: 'leaving the cache-key cell means the cached result no '
+                'longer answers the new position — refresh now even inside '
+                'the TTL');
+      });
+    });
+
     test('a tick whose storage layer throws does not bubble up', () async {
       // Wire a fake whose getSetting throws on every call. The provider's
       // try/catch must swallow it — `unawaited(_tick())` means an

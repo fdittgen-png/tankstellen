@@ -3,6 +3,11 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+// #3153 — for the `.select` rebuild-slicing modifier (riverpod_annotation's
+// internals export does not surface the extension).
+import 'package:flutter_riverpod/flutter_riverpod.dart'
+    show ProviderListenableSelect;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../consumption/data/obd2/trip_live_reading.dart';
@@ -105,19 +110,32 @@ class HapticEcoCoachLifecycle extends _$HapticEcoCoachLifecycle {
   /// surface only fires while the user is on the recording screen.
   Stream<CoachEvent> get coachEvents => _coachEventsController.stream;
 
+  /// #3153 — test seam: the live bridge controller instance. Lets the
+  /// churn regression test assert the coach + bridge are NOT torn down
+  /// and recreated on every 4 Hz live-reading emit (only on an actual
+  /// isActive / enabled flip). Null while no coach is armed.
+  @visibleForTesting
+  StreamController<TripLiveReading>? get debugBridge => _bridge;
+
   @override
   void build() {
     final enabled = ref.watch(hapticEcoCoachEnabledProvider);
-    final tripState = ref.watch(tripRecordingProvider);
+    // #3153 — watch ONLY the isActive slice. The trip-recording provider
+    // emits a full state ~4×/s while recording; watching the whole state
+    // closed + recreated the bridge StreamController, the coach, and the
+    // ref.listen forwarding on every emit. Live readings keep flowing
+    // through the ref.listen below (listening doesn't rebuild).
+    final tripActive =
+        ref.watch(tripRecordingProvider.select((s) => s.isActive));
 
     // Tear down any previous subscription on every rebuild — Riverpod
-    // re-runs `build` when either the enabled-toggle or the trip state
-    // changes, so we always start from a clean slate before deciding
-    // whether to spin up a fresh coach.
+    // re-runs `build` when either the enabled-toggle or the trip's
+    // isActive slice changes, so we always start from a clean slate
+    // before deciding whether to spin up a fresh coach.
     _teardown();
 
     if (!enabled) return;
-    if (!tripState.isActive) return;
+    if (!tripActive) return;
 
     // Closed in `_teardown` (called from ref.onDispose and from the
     // next `build` re-run before any new controller is opened).
