@@ -3,6 +3,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../storage/storage_providers.dart';
+import '../../../features/feature_management/application/feature_flags_provider.dart';
 import '../models/error_trace.dart';
 
 class AppStateCollector {
@@ -25,6 +26,20 @@ class AppStateCollector {
       activeProfileName: profile?['name'] as String?,
       lastApiEndpoint: _lastApiEndpoint,
       lastSearchParams: _lastSearchParams,
+      enabledFeatures: _enabledFeatures(ref),
     );
+  }
+
+  /// #3150 — the enabled feature-flag names at error time (sorted for a
+  /// stable rendering). Defensive: the collector runs inside the error
+  /// path, so a provider-graph fault here must degrade to an empty list
+  /// rather than losing the whole trace.
+  static List<String> _enabledFeatures(Ref ref) {
+    try {
+      return ref.read(enabledFeaturesProvider).map((f) => f.name).toList()
+        ..sort();
+    } catch (_) {
+      return const [];
+    }
   }
 }

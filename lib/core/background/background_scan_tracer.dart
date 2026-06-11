@@ -9,6 +9,7 @@ import 'package:flutter/services.dart'
 import 'package:hive/hive.dart';
 
 import '../logging/error_logger.dart';
+import '../telemetry/collectors/breadcrumb_collector.dart';
 import '../services/diagnostics/data_access_recorder.dart';
 import '../services/diagnostics/data_access_trace_export.dart';
 
@@ -93,7 +94,10 @@ class BackgroundScanTracer {
       await DataAccessTraceExport.export(trace);
     } on MissingPluginException {
       // Defensive: the channel was unavailable despite the root-isolate probe
-      // (e.g. an isolate without a registrant). Degrade to a skip, not ERROR.
+      // (e.g. an isolate without a registrant). Degrade to a skip, not ERROR
+      // — but leave a release-visible breadcrumb (#3143).
+      BreadcrumbCollector.add('bg-trace-export-skipped',
+          detail: 'public_files channel unavailable');
       debugPrint('BackgroundScanTracer.exportIfEnabled: public_files channel '
           'unavailable — skipping Downloads export.');
     } catch (e, st) {

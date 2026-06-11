@@ -676,7 +676,11 @@ as String,
 /// @nodoc
 mixin _$AppStateSnapshot {
 
- String? get activeRoute; String? get activeProfileId; String? get activeProfileName; String? get lastApiEndpoint; String? get lastSearchParams;
+ String? get activeRoute; String? get activeProfileId; String? get activeProfileName; String? get lastApiEndpoint; String? get lastSearchParams;/// #3150 — the enabled feature-flag names at error time. Most field
+/// reports hinge on which features were on (developer mode, OBD2,
+/// EV search…); without this the trace can't answer it. Defaulted
+/// so pre-#3150 persisted traces still parse.
+ List<String> get enabledFeatures;
 /// Create a copy of AppStateSnapshot
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -689,16 +693,16 @@ $AppStateSnapshotCopyWith<AppStateSnapshot> get copyWith => _$AppStateSnapshotCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppStateSnapshot&&(identical(other.activeRoute, activeRoute) || other.activeRoute == activeRoute)&&(identical(other.activeProfileId, activeProfileId) || other.activeProfileId == activeProfileId)&&(identical(other.activeProfileName, activeProfileName) || other.activeProfileName == activeProfileName)&&(identical(other.lastApiEndpoint, lastApiEndpoint) || other.lastApiEndpoint == lastApiEndpoint)&&(identical(other.lastSearchParams, lastSearchParams) || other.lastSearchParams == lastSearchParams));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppStateSnapshot&&(identical(other.activeRoute, activeRoute) || other.activeRoute == activeRoute)&&(identical(other.activeProfileId, activeProfileId) || other.activeProfileId == activeProfileId)&&(identical(other.activeProfileName, activeProfileName) || other.activeProfileName == activeProfileName)&&(identical(other.lastApiEndpoint, lastApiEndpoint) || other.lastApiEndpoint == lastApiEndpoint)&&(identical(other.lastSearchParams, lastSearchParams) || other.lastSearchParams == lastSearchParams)&&const DeepCollectionEquality().equals(other.enabledFeatures, enabledFeatures));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,activeRoute,activeProfileId,activeProfileName,lastApiEndpoint,lastSearchParams);
+int get hashCode => Object.hash(runtimeType,activeRoute,activeProfileId,activeProfileName,lastApiEndpoint,lastSearchParams,const DeepCollectionEquality().hash(enabledFeatures));
 
 @override
 String toString() {
-  return 'AppStateSnapshot(activeRoute: $activeRoute, activeProfileId: $activeProfileId, activeProfileName: $activeProfileName, lastApiEndpoint: $lastApiEndpoint, lastSearchParams: $lastSearchParams)';
+  return 'AppStateSnapshot(activeRoute: $activeRoute, activeProfileId: $activeProfileId, activeProfileName: $activeProfileName, lastApiEndpoint: $lastApiEndpoint, lastSearchParams: $lastSearchParams, enabledFeatures: $enabledFeatures)';
 }
 
 
@@ -709,7 +713,7 @@ abstract mixin class $AppStateSnapshotCopyWith<$Res>  {
   factory $AppStateSnapshotCopyWith(AppStateSnapshot value, $Res Function(AppStateSnapshot) _then) = _$AppStateSnapshotCopyWithImpl;
 @useResult
 $Res call({
- String? activeRoute, String? activeProfileId, String? activeProfileName, String? lastApiEndpoint, String? lastSearchParams
+ String? activeRoute, String? activeProfileId, String? activeProfileName, String? lastApiEndpoint, String? lastSearchParams, List<String> enabledFeatures
 });
 
 
@@ -726,14 +730,15 @@ class _$AppStateSnapshotCopyWithImpl<$Res>
 
 /// Create a copy of AppStateSnapshot
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? activeRoute = freezed,Object? activeProfileId = freezed,Object? activeProfileName = freezed,Object? lastApiEndpoint = freezed,Object? lastSearchParams = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? activeRoute = freezed,Object? activeProfileId = freezed,Object? activeProfileName = freezed,Object? lastApiEndpoint = freezed,Object? lastSearchParams = freezed,Object? enabledFeatures = null,}) {
   return _then(_self.copyWith(
 activeRoute: freezed == activeRoute ? _self.activeRoute : activeRoute // ignore: cast_nullable_to_non_nullable
 as String?,activeProfileId: freezed == activeProfileId ? _self.activeProfileId : activeProfileId // ignore: cast_nullable_to_non_nullable
 as String?,activeProfileName: freezed == activeProfileName ? _self.activeProfileName : activeProfileName // ignore: cast_nullable_to_non_nullable
 as String?,lastApiEndpoint: freezed == lastApiEndpoint ? _self.lastApiEndpoint : lastApiEndpoint // ignore: cast_nullable_to_non_nullable
 as String?,lastSearchParams: freezed == lastSearchParams ? _self.lastSearchParams : lastSearchParams // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,enabledFeatures: null == enabledFeatures ? _self.enabledFeatures : enabledFeatures // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
@@ -818,10 +823,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? activeRoute,  String? activeProfileId,  String? activeProfileName,  String? lastApiEndpoint,  String? lastSearchParams)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? activeRoute,  String? activeProfileId,  String? activeProfileName,  String? lastApiEndpoint,  String? lastSearchParams,  List<String> enabledFeatures)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppStateSnapshot() when $default != null:
-return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,_that.lastApiEndpoint,_that.lastSearchParams);case _:
+return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,_that.lastApiEndpoint,_that.lastSearchParams,_that.enabledFeatures);case _:
   return orElse();
 
 }
@@ -839,10 +844,10 @@ return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? activeRoute,  String? activeProfileId,  String? activeProfileName,  String? lastApiEndpoint,  String? lastSearchParams)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? activeRoute,  String? activeProfileId,  String? activeProfileName,  String? lastApiEndpoint,  String? lastSearchParams,  List<String> enabledFeatures)  $default,) {final _that = this;
 switch (_that) {
 case _AppStateSnapshot():
-return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,_that.lastApiEndpoint,_that.lastSearchParams);case _:
+return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,_that.lastApiEndpoint,_that.lastSearchParams,_that.enabledFeatures);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -859,10 +864,10 @@ return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? activeRoute,  String? activeProfileId,  String? activeProfileName,  String? lastApiEndpoint,  String? lastSearchParams)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? activeRoute,  String? activeProfileId,  String? activeProfileName,  String? lastApiEndpoint,  String? lastSearchParams,  List<String> enabledFeatures)?  $default,) {final _that = this;
 switch (_that) {
 case _AppStateSnapshot() when $default != null:
-return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,_that.lastApiEndpoint,_that.lastSearchParams);case _:
+return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,_that.lastApiEndpoint,_that.lastSearchParams,_that.enabledFeatures);case _:
   return null;
 
 }
@@ -874,7 +879,7 @@ return $default(_that.activeRoute,_that.activeProfileId,_that.activeProfileName,
 @JsonSerializable()
 
 class _AppStateSnapshot implements AppStateSnapshot {
-  const _AppStateSnapshot({this.activeRoute, this.activeProfileId, this.activeProfileName, this.lastApiEndpoint, this.lastSearchParams});
+  const _AppStateSnapshot({this.activeRoute, this.activeProfileId, this.activeProfileName, this.lastApiEndpoint, this.lastSearchParams, final  List<String> enabledFeatures = const []}): _enabledFeatures = enabledFeatures;
   factory _AppStateSnapshot.fromJson(Map<String, dynamic> json) => _$AppStateSnapshotFromJson(json);
 
 @override final  String? activeRoute;
@@ -882,6 +887,21 @@ class _AppStateSnapshot implements AppStateSnapshot {
 @override final  String? activeProfileName;
 @override final  String? lastApiEndpoint;
 @override final  String? lastSearchParams;
+/// #3150 — the enabled feature-flag names at error time. Most field
+/// reports hinge on which features were on (developer mode, OBD2,
+/// EV search…); without this the trace can't answer it. Defaulted
+/// so pre-#3150 persisted traces still parse.
+ final  List<String> _enabledFeatures;
+/// #3150 — the enabled feature-flag names at error time. Most field
+/// reports hinge on which features were on (developer mode, OBD2,
+/// EV search…); without this the trace can't answer it. Defaulted
+/// so pre-#3150 persisted traces still parse.
+@override@JsonKey() List<String> get enabledFeatures {
+  if (_enabledFeatures is EqualUnmodifiableListView) return _enabledFeatures;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_enabledFeatures);
+}
+
 
 /// Create a copy of AppStateSnapshot
 /// with the given fields replaced by the non-null parameter values.
@@ -896,16 +916,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppStateSnapshot&&(identical(other.activeRoute, activeRoute) || other.activeRoute == activeRoute)&&(identical(other.activeProfileId, activeProfileId) || other.activeProfileId == activeProfileId)&&(identical(other.activeProfileName, activeProfileName) || other.activeProfileName == activeProfileName)&&(identical(other.lastApiEndpoint, lastApiEndpoint) || other.lastApiEndpoint == lastApiEndpoint)&&(identical(other.lastSearchParams, lastSearchParams) || other.lastSearchParams == lastSearchParams));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppStateSnapshot&&(identical(other.activeRoute, activeRoute) || other.activeRoute == activeRoute)&&(identical(other.activeProfileId, activeProfileId) || other.activeProfileId == activeProfileId)&&(identical(other.activeProfileName, activeProfileName) || other.activeProfileName == activeProfileName)&&(identical(other.lastApiEndpoint, lastApiEndpoint) || other.lastApiEndpoint == lastApiEndpoint)&&(identical(other.lastSearchParams, lastSearchParams) || other.lastSearchParams == lastSearchParams)&&const DeepCollectionEquality().equals(other._enabledFeatures, _enabledFeatures));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,activeRoute,activeProfileId,activeProfileName,lastApiEndpoint,lastSearchParams);
+int get hashCode => Object.hash(runtimeType,activeRoute,activeProfileId,activeProfileName,lastApiEndpoint,lastSearchParams,const DeepCollectionEquality().hash(_enabledFeatures));
 
 @override
 String toString() {
-  return 'AppStateSnapshot(activeRoute: $activeRoute, activeProfileId: $activeProfileId, activeProfileName: $activeProfileName, lastApiEndpoint: $lastApiEndpoint, lastSearchParams: $lastSearchParams)';
+  return 'AppStateSnapshot(activeRoute: $activeRoute, activeProfileId: $activeProfileId, activeProfileName: $activeProfileName, lastApiEndpoint: $lastApiEndpoint, lastSearchParams: $lastSearchParams, enabledFeatures: $enabledFeatures)';
 }
 
 
@@ -916,7 +936,7 @@ abstract mixin class _$AppStateSnapshotCopyWith<$Res> implements $AppStateSnapsh
   factory _$AppStateSnapshotCopyWith(_AppStateSnapshot value, $Res Function(_AppStateSnapshot) _then) = __$AppStateSnapshotCopyWithImpl;
 @override @useResult
 $Res call({
- String? activeRoute, String? activeProfileId, String? activeProfileName, String? lastApiEndpoint, String? lastSearchParams
+ String? activeRoute, String? activeProfileId, String? activeProfileName, String? lastApiEndpoint, String? lastSearchParams, List<String> enabledFeatures
 });
 
 
@@ -933,14 +953,15 @@ class __$AppStateSnapshotCopyWithImpl<$Res>
 
 /// Create a copy of AppStateSnapshot
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? activeRoute = freezed,Object? activeProfileId = freezed,Object? activeProfileName = freezed,Object? lastApiEndpoint = freezed,Object? lastSearchParams = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? activeRoute = freezed,Object? activeProfileId = freezed,Object? activeProfileName = freezed,Object? lastApiEndpoint = freezed,Object? lastSearchParams = freezed,Object? enabledFeatures = null,}) {
   return _then(_AppStateSnapshot(
 activeRoute: freezed == activeRoute ? _self.activeRoute : activeRoute // ignore: cast_nullable_to_non_nullable
 as String?,activeProfileId: freezed == activeProfileId ? _self.activeProfileId : activeProfileId // ignore: cast_nullable_to_non_nullable
 as String?,activeProfileName: freezed == activeProfileName ? _self.activeProfileName : activeProfileName // ignore: cast_nullable_to_non_nullable
 as String?,lastApiEndpoint: freezed == lastApiEndpoint ? _self.lastApiEndpoint : lastApiEndpoint // ignore: cast_nullable_to_non_nullable
 as String?,lastSearchParams: freezed == lastSearchParams ? _self.lastSearchParams : lastSearchParams // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,enabledFeatures: null == enabledFeatures ? _self._enabledFeatures : enabledFeatures // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 

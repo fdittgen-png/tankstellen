@@ -87,10 +87,12 @@ Future<String?> tryReverseGeocode(
   } on Exception catch (e, st) {
     // #2146 — non-fatal, but route so silent failures surface in
     // the exportable log for bug-report triage.
+    // #3145 — coords are bucketed to 1 decimal (~11 km): enough for
+    // triage, no longer a precise user location in the exportable log.
     unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
       'where': 'search_provider: tryReverseGeocode',
-      'lat': lat,
-      'lng': lng,
+      'lat': lat.toStringAsFixed(1),
+      'lng': lng.toStringAsFixed(1),
     }));
     return null;
   }

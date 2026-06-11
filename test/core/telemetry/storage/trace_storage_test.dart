@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/pii_scrubber.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 
 /// Create a plain JSON map that Hive can serialize (no freezed objects).
@@ -508,6 +509,50 @@ void main() {
         // — i.e. it's already a plain Map<String, dynamic> tree, not a
         // Hive-shaped Map<dynamic, dynamic> that would blow up on encode.
         expect(() => jsonEncode(unparsed), returnsNormally);
+      });
+    });
+
+    group('exportAsJson PII scrub (#3145)', () {
+      test('a stored trace containing coordinates exports redacted', () async {
+        final json = _makePlainJson(id: 'coord-trace');
+        // Inject the coordinate shapes the geocoding / search call sites
+        // emit: a key/value breadcrumb detail, a map-rendered context in
+        // the error message, and an adjacency pair in the search params.
+        json['errorMessage'] =
+            '[services] DioException [context={where: tryReverseGeocode, '
+            'lat: 48.137154, lng: 11.576124}]';
+        json['appState'] = {
+          ...(json['appState'] as Map<String, dynamic>),
+          'lastSearchParams': 'around 48.137154, 11.576124 radius 5',
+        };
+        json['breadcrumbs'] = [
+          {
+            'timestamp': '2026-06-01T10:00:00.000',
+            'action': 'Native country detection skipped — offline',
+            'detail': 'lat=48.137154 lng=11.576124 type=PlatformException',
+          },
+        ];
+        await Hive.box('error_traces').put('coord-trace', json);
+
+        final raw = storage.exportAsJson();
+        expect(raw, isNot(contains('48.137154')),
+            reason: 'the local export leaves the device (email / GitHub '
+                'issue) and previously applied NO scrubbing');
+        expect(raw, isNot(contains('11.576124')));
+        expect(raw, contains(PiiScrubber.coordMarker));
+      });
+
+      test('unparsedRaw entries are deep-scrubbed too', () async {
+        // Schema-drifted entry (no id → fails fromJson) carrying coords.
+        final broken = _makePlainJson(id: 'drifted')..remove('id');
+        broken['errorMessage'] = 'failed at lat=48.137154 lng=11.576124';
+        await Hive.box('error_traces').put('drifted', broken);
+
+        final raw = storage.exportAsJson();
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        expect(decoded['unparsedCount'], 1);
+        expect(raw, isNot(contains('48.137154')));
+        expect(raw, isNot(contains('11.576124')));
       });
     });
   });

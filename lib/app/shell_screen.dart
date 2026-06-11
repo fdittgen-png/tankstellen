@@ -215,7 +215,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
         duration: const Duration(seconds: 5),
       );
     } catch (e, st) {
-      debugPrint('ShellScreen: swipe hint skipped: $e\n$st');
+      // #3143 — release-visible: debugPrint is no-opped in release.
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: {'where': 'ShellScreen swipe hint'}));
     }
   }
 

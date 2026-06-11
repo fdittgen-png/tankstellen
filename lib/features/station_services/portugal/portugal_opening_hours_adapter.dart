@@ -98,12 +98,9 @@ class PortugalOpeningHoursAdapter extends OpeningHoursAdapter {
             : OpeningHoursAvailability.partial,
       );
     } catch (e, st) {
-      // The adapter must never propagate a fault to the station-detail UI.
-      assert(() {
-        // ignore: avoid_print
-        print('PortugalOpeningHoursAdapter.parse failed: $e\n$st');
-        return true;
-      }());
+      // The adapter must never propagate a fault to the station-detail UI
+      // — degrade to no-data, release-visibly (#3148).
+      reportParseFailure('PT', e, st);
       return WeeklyOpeningHours.notAvailable;
     }
   }

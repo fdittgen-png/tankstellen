@@ -9,7 +9,6 @@ import '../../features/alerts/data/repositories/alert_repository.dart';
 import '../../features/widget/data/home_widget_service.dart';
 import '../logging/error_logger.dart';
 import '../storage/hive_storage.dart';
-import '../telemetry/storage/isolate_error_spool.dart';
 import '../cache/cache_manager.dart';
 import 'background_price_history_writer.dart';
 import 'background_price_source.dart';
@@ -118,7 +117,8 @@ class BackgroundAlertScanCoordinator {
   /// Returns `true` when a scan actually ran, `false` when it was skipped
   /// (lock contention or cooldown).
   ///
-  /// Every failure is caught and spooled through [IsolateErrorSpool] for the
+  /// Every failure is caught and routed through `errorLogger` (which spools
+  /// via the isolate error spool when unbound, #3150) for the
   /// foreground TraceRecorder; the call returns `false` rather than
   /// propagating, so a flaky network or storage fault can't crash the OS-
   /// spawned background isolate. The whole body is wrapped in
@@ -163,14 +163,14 @@ class BackgroundAlertScanCoordinator {
       await _dedup.recordScan(now: at, trigger: trigger.tag);
       return true;
     } catch (e, st) {
+      // #3150 — single log call. `errorLogger.log` already routes to the
+      // IsolateErrorSpool when unbound (background isolate), so the former
+      // explicit `IsolateErrorSpool.enqueue` double-logged every scan
+      // failure; the bg_scan tag now travels in the context map instead.
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
-        'where': 'BackgroundAlertScanCoordinator: scan failed (${trigger.tag})'
+        'where': 'BackgroundAlertScanCoordinator: scan failed (${trigger.tag})',
+        'isolateTaskName': 'bg_scan_${trigger.tag}',
       }));
-      await IsolateErrorSpool.enqueue(
-        isolateTaskName: 'bg_scan_${trigger.tag}',
-        error: e,
-        stack: st,
-      );
       return false;
     } finally {
       try {

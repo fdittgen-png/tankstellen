@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/error_trace.dart';
+import '../pii_scrubber.dart';
 
 part 'trace_storage.g.dart';
 
@@ -156,6 +157,12 @@ class TraceStorage {
   /// stable; `parsedCount` and `unparsedCount` were added in #1301 to
   /// surface schema-drift to the user (and to keep the unreadable
   /// payload available under `unparsedRaw` for offline debugging).
+  ///
+  /// #3145 — every exported entry runs through [PiiScrubber]: this
+  /// document leaves the device (email attachments, GitHub issues), so
+  /// it must honour the same redaction policy as the Sentry uploader.
+  /// Parsed traces use [PiiScrubber.scrubErrorTrace]; the unparsed raw
+  /// maps get a deep string scrub via [_scrubRawDeep].
   String exportAsJson() {
     // #2310 — single deserialise pass: partition the box into parsed
     // traces + unparsed raw maps once, instead of the former
@@ -168,9 +175,28 @@ class TraceStorage {
       'traceCount': traces.length + unparsed.length,
       'parsedCount': traces.length,
       'unparsedCount': unparsed.length,
-      'traces': traces.map((t) => t.toJson()).toList(),
-      'unparsedRaw': unparsed,
+      'traces': traces
+          .map((t) => PiiScrubber.scrubErrorTrace(t).toJson())
+          .toList(),
+      'unparsedRaw': unparsed.map(_scrubRawDeep).toList(),
     });
+  }
+
+  /// Recursively applies [PiiScrubber.scrubText] to every string value
+  /// in a raw (schema-drifted) trace map so the #1301 `unparsedRaw`
+  /// escape hatch honours the same redaction policy as parsed traces
+  /// (#3145). Keys are left intact — they are schema, not user data.
+  Map<String, dynamic> _scrubRawDeep(Map<String, dynamic> raw) {
+    dynamic scrubValue(dynamic value) {
+      if (value is String) return PiiScrubber.scrubText(value);
+      if (value is Map<String, dynamic>) {
+        return value.map((k, v) => MapEntry(k, scrubValue(v)));
+      }
+      if (value is List) return value.map(scrubValue).toList();
+      return value;
+    }
+
+    return raw.map((k, v) => MapEntry(k, scrubValue(v)));
   }
 
   /// Single walk over `_box.values` that splits every entry into the

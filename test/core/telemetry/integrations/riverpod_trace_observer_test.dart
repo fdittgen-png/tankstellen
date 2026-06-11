@@ -74,6 +74,11 @@ void main() {
         expect(fakeRecorder.capturedError.toString(), contains('boom'));
         expect(fakeRecorder.capturedError.toString(), contains('providers'));
         expect(fakeRecorder.capturedStack, isNotNull);
+        // #3150 — the failing provider's name travels in the context map:
+        // a bare `[providers]` trace was un-triageable without it.
+        final contextual = fakeRecorder.capturedError as ContextualError;
+        expect(contextual.context?['provider'], isNotNull);
+        expect(contextual.context!['provider'].toString(), isNotEmpty);
       },
     );
 

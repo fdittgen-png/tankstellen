@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/constants/app_constants.dart';
 import '../core/country/country_switch_listener.dart';
+import '../core/logging/error_logger.dart';
 import '../core/language/language_provider.dart';
 import '../core/notifications/notification_launch_listener.dart';
 import '../core/theme/theme_mode_provider.dart';
@@ -73,8 +74,9 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
           .read(tripRecordingProvider.notifier)
           .onAppLifecycleStateChanged(state);
     } catch (e, st) {
-      debugPrint(
-          'TankstellenApp: onAppLifecycleStateChanged failed: $e\n$st');
+      // #3143 — release-visible: debugPrint is no-opped in release.
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: {'where': 'onAppLifecycleStateChanged'}));
     }
     if (state != AppLifecycleState.paused &&
         state != AppLifecycleState.inactive) {
@@ -89,7 +91,8 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
       final notifier = ref.read(tripRecordingProvider.notifier);
       unawaited(notifier.onAppBackgrounded());
     } catch (e, st) {
-      debugPrint('TankstellenApp: onAppBackgrounded failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: {'where': 'onAppBackgrounded'}));
     }
   }
 

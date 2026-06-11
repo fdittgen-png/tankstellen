@@ -169,6 +169,54 @@ void main() {
     });
   });
 
+  group('CacheManager - source persisted by NAME (#3150)', () {
+    test('put writes source.name, not the reorder-fragile enum index',
+        () async {
+      await cache.put(
+        'named-source',
+        {'v': 1},
+        ttl: const Duration(minutes: 5),
+        source: ServiceSource.tankerkoenigApi,
+      );
+      final raw = fakeStorage.getCachedData('named-source');
+      expect(raw!['source'], ServiceSource.tankerkoenigApi.name,
+          reason: 'an enum reorder must not silently re-attribute every '
+              'cached entry\'s source');
+      expect(cache.get('named-source')!.originalSource,
+          ServiceSource.tankerkoenigApi);
+    });
+
+    test('legacy index-typed entry (pre-#3150) still resolves', () async {
+      await fakeStorage.cacheData('legacy-entry', {
+        'payload': {'v': 1},
+        'storedAt': DateTime.now().millisecondsSinceEpoch,
+        'source': ServiceSource.prixCarburantsApi.index,
+        'ttlMs': const Duration(minutes: 5).inMilliseconds,
+      });
+      expect(cache.get('legacy-entry')!.originalSource,
+          ServiceSource.prixCarburantsApi);
+    });
+
+    test('unknown source name / out-of-range index fall back to cache',
+        () async {
+      await fakeStorage.cacheData('unknown-name', {
+        'payload': {'v': 1},
+        'storedAt': DateTime.now().millisecondsSinceEpoch,
+        'source': 'someRetiredSource',
+        'ttlMs': const Duration(minutes: 5).inMilliseconds,
+      });
+      expect(cache.get('unknown-name')!.originalSource, ServiceSource.cache);
+
+      await fakeStorage.cacheData('bad-index', {
+        'payload': {'v': 1},
+        'storedAt': DateTime.now().millisecondsSinceEpoch,
+        'source': 9999,
+        'ttlMs': const Duration(minutes: 5).inMilliseconds,
+      });
+      expect(cache.get('bad-index')!.originalSource, ServiceSource.cache);
+    });
+  });
+
   group('CacheManager - getFresh', () {
     test('getFresh returns entry when not expired (fresh hit)', () async {
       await cache.put(

@@ -180,8 +180,14 @@ void main() {
       });
 
       test('_loadCipher uses FlutterSecureStorage', () {
+        // #3149 — the cipher load moved to HiveCipherLoader so a
+        // keychain/keystore fault surfaces as a typed StorageInitException
+        // (guarded path) instead of bricking the splash untyped. The
+        // contract — key in FlutterSecureStorage under the legacy name —
+        // is unchanged.
         final source =
-            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+            File('lib/core/storage/hive_cipher_loader.dart')
+                .readAsStringSync();
 
         expect(
           source.contains('FlutterSecureStorage'),

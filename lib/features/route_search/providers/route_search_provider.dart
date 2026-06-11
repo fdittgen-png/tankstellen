@@ -315,9 +315,11 @@ class RouteSearchState extends _$RouteSearchState {
         // #2146 — sample failures are tolerated (other points still
         // yield results), but route to the exportable log so
         // recurring blackouts of EV results are recoverable.
+        // #3145 — coords bucketed to 1 decimal: triage never needs more.
         unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
           'where': 'RouteSearch EV: sample point query',
-          'lat': point.latitude, 'lng': point.longitude,
+          'lat': point.latitude.toStringAsFixed(1),
+          'lng': point.longitude.toStringAsFixed(1),
         }));
       }
     }

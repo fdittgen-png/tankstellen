@@ -59,4 +59,25 @@ void main() {
       expect(ErrorCategory.unknown.displayName, 'Unknown');
     });
   });
+
+  group('AppStateSnapshot.enabledFeatures (#3150)', () {
+    test('round-trips through JSON', () {
+      const snapshot = AppStateSnapshot(
+        activeRoute: '/search',
+        enabledFeatures: ['debugMode', 'obd2'],
+      );
+      final restored = AppStateSnapshot.fromJson(snapshot.toJson());
+      expect(restored.enabledFeatures, ['debugMode', 'obd2']);
+    });
+
+    test('pre-#3150 persisted JSON (no enabledFeatures key) still parses, '
+        'defaulting to empty', () {
+      final restored = AppStateSnapshot.fromJson(const {
+        'activeRoute': '/search',
+        'activeProfileId': 'p1',
+      });
+      expect(restored.enabledFeatures, isEmpty);
+      expect(restored.activeRoute, '/search');
+    });
+  });
 }

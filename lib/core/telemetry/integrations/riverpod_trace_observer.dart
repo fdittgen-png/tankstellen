@@ -23,6 +23,10 @@ final class RiverpodTraceObserver extends ProviderObserver {
   ) {
     // Fire-and-forget: the observer's contract is synchronous. Dropping
     // the future is fine because `errorLogger.log` never throws.
-    errorLogger.log(ErrorLayer.providers, error, stackTrace);
+    // #3150 — name the failing provider: a bare `[providers]` trace was
+    // un-triageable without it.
+    errorLogger.log(ErrorLayer.providers, error, stackTrace, context: {
+      'provider': context.provider.toString(),
+    });
   }
 }

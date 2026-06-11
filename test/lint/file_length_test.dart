@@ -60,7 +60,17 @@ void main() {
     // adjacent trips merge. The unit-tested logic lives in the per-entity
     // provider seams; this is the (compacted) launch glue. Decomposition
     // of this god-file is tracked separately.
-    'lib/app/app_initializer.dart': 1028,
+    // #3143 — re-grandfathered 1028 → 1046: ~20 release-silent
+    // debugPrint-only catch handlers converted to `errorLogger.log(...)`
+    // with a `where` context map (each conversion is +1 line); enforced
+    // at 0 by test/lint/no_debugprint_only_catch_test.dart.
+    // #3149 — re-grandfathered 1046 → 1077: the startup-brick fix adds
+    // the catch-all after the HiveCorruptionException catch (route
+    // unknown storage failures to the same StorageRecoveryHost), the
+    // Hive-independent StartupFailureStore.persist in both brick paths,
+    // and the next-launch replay drain. The store itself is a new file;
+    // these lines are only the run()/_launch wiring.
+    'lib/app/app_initializer.dart': 1077,
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
     // deletion-tombstone fix threads a tombstoned-id set through `merge` and
     // `mergeRows` (fetch + dual-side filter so a delete on another device

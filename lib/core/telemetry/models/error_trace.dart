@@ -65,6 +65,12 @@ abstract class AppStateSnapshot with _$AppStateSnapshot {
     String? activeProfileName,
     String? lastApiEndpoint,
     String? lastSearchParams,
+
+    /// #3150 — the enabled feature-flag names at error time. Most field
+    /// reports hinge on which features were on (developer mode, OBD2,
+    /// EV search…); without this the trace can't answer it. Defaulted
+    /// so pre-#3150 persisted traces still parse.
+    @Default([]) List<String> enabledFeatures,
   }) = _AppStateSnapshot;
 
   factory AppStateSnapshot.fromJson(Map<String, dynamic> json) =>
