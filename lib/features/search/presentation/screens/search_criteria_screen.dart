@@ -95,7 +95,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
         try {
           notifier.clearFor(this); // #2553 — clear by owner, not action.
         } catch (_) {
-          // ProviderContainer torn down (e.g. test teardown) — no-op.
+          // ignore: silent_catch — ProviderContainer torn down (e.g. test teardown) — no-op.
         }
       });
     }

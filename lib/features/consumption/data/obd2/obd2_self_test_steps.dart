@@ -196,7 +196,7 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
   try {
     await service.disconnect();
   } catch (_) {
-    // A failed deliberate drop still proceeds to attempt reconnect.
+    // ignore: silent_catch — A failed deliberate drop still proceeds to attempt reconnect.
   }
   diag.noteConnectionEvent(drop: true);
   if (mac == null) {

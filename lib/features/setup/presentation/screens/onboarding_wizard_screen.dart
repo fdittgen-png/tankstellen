@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,6 +13,7 @@ import '../../../feature_management/application/app_profile_provider.dart';
 import '../../../feature_management/domain/app_profile.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../providers/api_key_validator_provider.dart';
+import '../../providers/onboarding_platform_steps_provider.dart';
 import '../../providers/onboarding_wizard_provider.dart';
 import '../widgets/api_key_step.dart';
 import '../widgets/completion_step.dart';
@@ -89,7 +89,7 @@ class _OnboardingWizardScreenState
     if (profile != AppProfile.full && profile != AppProfile.custom) return -1;
     // Welcome+Profile (0), Country (1), Vehicle (2), [iOS standby (3)],
     // OBD2 (3 or 4 depending on platform).
-    return defaultTargetPlatform == TargetPlatform.iOS ? 4 : 3;
+    return ref.read(onboardingIncludesIosStandbyStepProvider) ? 4 : 3;
   }
 
   /// Zero-based index of the optional API key step.
@@ -274,9 +274,11 @@ class _OnboardingWizardScreenState
     // compromises (open once after reboot, don't force-quit, grant
     // Always location). Same gating as `showObd2`: an iOS user who
     // skipped OBD2 doesn't need to be warned about a flow they're
-    // not setting up.
+    // not setting up. Platform resolution lives in the dedicated
+    // dispatch-seam provider (#3163) so this screen stays free of
+    // inline `defaultTargetPlatform` branching.
     final showIosStandby = showObd2 &&
-        defaultTargetPlatform == TargetPlatform.iOS;
+        ref.watch(onboardingIncludesIosStandbyStepProvider);
     return [
       ProfileChoiceStep(onProfilePicked: _onProfilePicked),
       const CountryLanguageStep(),

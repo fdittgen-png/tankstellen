@@ -40,7 +40,7 @@ VoiceAnnouncementService voiceAnnouncementService(Ref ref) {
   try {
     unawaited(service.setAppLocale(ref.read(activeLanguageProvider).code));
   } catch (_) {
-    // Profile store not ready yet; keep the device-default voice until the
+    // ignore: silent_catch — Profile store not ready yet; keep the device-default voice until the
     // listener below fires once the language resolves.
   }
 

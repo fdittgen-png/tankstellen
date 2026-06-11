@@ -99,7 +99,7 @@ class _CatalogReresolveSnackbarHostState
               GoRouter.of(context)
                   .push('/vehicles/edit', extra: candidate.vehicleId);
             } catch (_) {
-              // Best-effort — if the router isn't available (widget
+              // ignore: silent_catch — Best-effort — if the router isn't available (widget
               // tests without a router) we still want the flag write
               // below to fire so the nudge does not loop.
             }

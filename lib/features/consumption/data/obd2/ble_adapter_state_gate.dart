@@ -38,7 +38,7 @@ Future<void> waitForAdapterOn({
     // (the caller's dispatch surfaces the typed Obd2BluetoothOff) or a slow
     // platform; either way the caller proceeds.
   } catch (_) {
-    // Best-effort gate: a failing adapterState probe — a platform-channel
+    // ignore: silent_catch — Best-effort gate: a failing adapterState probe — a platform-channel
     // quirk, a missing plugin in a test harness, or the state stream ending
     // without an `on` (StateError from `.first`) — must never block or fail
     // the scan/connect that follows; the dispatch's own error mapping owns

@@ -266,7 +266,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       try {
         notifier.setSearching(false);
       } catch (_) {
-        // Provider disposed — state is gone anyway.
+        // ignore: silent_catch — Provider disposed — state is gone anyway.
       }
     }
   }

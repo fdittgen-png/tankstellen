@@ -370,7 +370,7 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
     try {
       await service?.disconnect();
     } catch (_) {
-      // Disconnect is best-effort; the session is finalised regardless.
+      // ignore: silent_catch — Disconnect is best-effort; the session is finalised regardless.
     }
     diag.endSession();
     diag.enabled = priorEnabled;

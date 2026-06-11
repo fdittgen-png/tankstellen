@@ -125,7 +125,7 @@ class ReceiptPdfRasterizer {
           'where': 'ReceiptPdfRasterizer.rasterize',
         }));
       } catch (_) {
-        // best-effort logging; swallow so `null` is always returned
+        // ignore: silent_catch — best-effort logging; swallow so `null` is always returned
       }
       return null;
     } finally {

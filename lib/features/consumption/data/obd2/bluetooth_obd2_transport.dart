@@ -158,7 +158,7 @@ class BluetoothObd2Transport
         try {
           await _channel.close();
         } catch (_) {
-          // best-effort teardown of a half-open link before retrying
+          // ignore: silent_catch — best-effort teardown of a half-open link before retrying
         }
         // #3014 — GATT-133 recovery: on a 133 (cache-poisoned device — a clone
         // whose GATT table mutated, or a stale cache from the aborted attempt),
@@ -171,7 +171,7 @@ class BluetoothObd2Transport
             try {
               await (ch as Obd2GattRecoverable).refreshGattCache();
             } catch (_) {
-              // OEM-variable reflection; swallow — the retry proceeds anyway.
+              // ignore: silent_catch — OEM-variable reflection; swallow — the retry proceeds anyway.
             }
           }
         }

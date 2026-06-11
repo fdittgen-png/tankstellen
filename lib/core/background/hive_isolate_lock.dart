@@ -146,7 +146,7 @@ class HiveIsolateLock {
       try {
         handle?.closeSync();
       } catch (_) {
-        // Best-effort close; nothing actionable if it fails.
+        // ignore: silent_catch — Best-effort close; nothing actionable if it fails.
       }
       return null;
     } catch (e, st) {
@@ -154,7 +154,7 @@ class HiveIsolateLock {
       try {
         handle?.closeSync();
       } catch (_) {
-        // Best-effort close.
+        // ignore: silent_catch — Best-effort close.
       }
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: lock attempt failed, retrying'}));
       return null;
@@ -208,7 +208,7 @@ class HiveIsolateLock {
       try {
         handle.unlockSync();
       } catch (_) {
-        // Best-effort unlock; closing the handle releases it anyway.
+        // ignore: silent_catch — Best-effort unlock; closing the handle releases it anyway.
       }
       try {
         handle.closeSync();

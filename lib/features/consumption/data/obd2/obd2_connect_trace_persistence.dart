@@ -116,7 +116,7 @@ class Obd2ConnectTracePersistence {
         try {
           started = (jsonDecode(raw) as Map<String, dynamic>)['st'] as int?;
         } catch (_) {
-          // unreadable — treated as aged-out below.
+          // ignore: silent_catch — unreadable — treated as aged-out below.
         }
       }
       if (started == null || started < cutoff) {

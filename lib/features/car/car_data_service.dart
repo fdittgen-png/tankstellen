@@ -240,7 +240,7 @@ class CarDataService {
       try {
         await HiveStorage.closeIsolateBoxes();
       } catch (_) {
-        // Best-effort close — a stray fault here is never actionable.
+        // ignore: silent_catch — Best-effort close — a stray fault here is never actionable.
       }
       lock?.release();
     }

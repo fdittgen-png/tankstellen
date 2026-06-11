@@ -32,7 +32,7 @@ class HiveLegacyMigration {
       await box.close();
       return; // Already encrypted, or a fresh install.
     } catch (_) {
-      // Fall through — the box may be a pre-encryption plaintext box.
+      // ignore: silent_catch — Fall through — the box may be a pre-encryption plaintext box.
     }
 
     Box<dynamic> plain;

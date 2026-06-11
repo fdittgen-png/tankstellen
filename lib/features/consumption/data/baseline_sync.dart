@@ -93,7 +93,7 @@ Map<String, dynamic>? _tryDecode(String? raw) {
     if (decoded is Map<String, dynamic>) return decoded;
     if (decoded is Map) return Map<String, dynamic>.from(decoded);
   } catch (_) {
-    // Fall through — caller treats as null.
+    // ignore: silent_catch — Fall through — caller treats as null.
   }
   return null;
 }
