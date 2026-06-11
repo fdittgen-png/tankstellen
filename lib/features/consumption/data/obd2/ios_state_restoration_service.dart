@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../../../../core/logging/error_logger.dart';
@@ -93,6 +94,28 @@ abstract class IosStateRestorationService {
   /// Single-broadcast: multiple listeners are supported.
   Stream<IosRestorationEvent> get events;
 
+  /// The restoration event captured during [initialize] when THIS app
+  /// launch was a Core Bluetooth background relaunch (#3167 — iOS
+  /// passes `UIApplication.LaunchOptionsKey.bluetoothCentrals` to
+  /// `didFinishLaunchingWithOptions`, surfaced through the
+  /// `tankstellen/ios_state_restoration` MethodChannel). Null on a
+  /// normal user launch and on every non-iOS platform.
+  ///
+  /// Cached as a getter (not only on [events]) because consumers wire
+  /// up AFTER app init has already run [initialize] — a broadcast
+  /// stream would have dropped the one-shot launch event by then.
+  IosRestorationWillRestore? get launchRestoration;
+
+  /// One-shot consumption of the [launchRestoration] signal for the
+  /// connect-trace origin stamp (#3167). Returns true exactly ONCE per
+  /// process when this launch was a Core Bluetooth restoration
+  /// relaunch; every later call — and every call on a normal launch or
+  /// a non-iOS platform — returns false. The auto-record session
+  /// opener uses it to tag the first post-relaunch connect with
+  /// `Obd2ConnectOrigin.stateRestoration` so field exports distinguish
+  /// hands-free background resumes from user-driven connects.
+  bool consumeLaunchRestorationTag();
+
   /// Release resources held by the service. Closes the [events]
   /// stream. Safe to call more than once.
   Future<void> dispose();
@@ -120,13 +143,38 @@ class FlutterBluePlusIosStateRestorationService
   @visibleForTesting
   final bool? debugIsIOSOverride;
 
+  /// Test seam: replaces the `FlutterBluePlus.setOptions` call so the
+  /// iOS branch is drivable on the Dart VM (the real call crosses an
+  /// unbound MethodChannel in `flutter_test`). Null in production.
+  @visibleForTesting
+  final Future<void> Function()? debugSetOptionsOverride;
+
+  /// Test seam: replaces the `tankstellen/ios_state_restoration`
+  /// MethodChannel query for the launch-time Bluetooth-central
+  /// restoration identifiers (#3167). Null in production.
+  @visibleForTesting
+  final Future<List<String>?> Function()? debugLaunchCentralIdsFetcher;
+
+  /// Host-side bridge registered inline in `ios/Runner/AppDelegate.swift`
+  /// (#3167). One method: `getLaunchBluetoothCentralIds` returns the
+  /// `UIApplicationLaunchOptionsBluetoothCentralsKey` array captured in
+  /// `didFinishLaunchingWithOptions` (null on a normal launch).
+  static const MethodChannel _restorationChannel =
+      MethodChannel('tankstellen/ios_state_restoration');
+
   final StreamController<IosRestorationEvent> _eventsController =
       StreamController<IosRestorationEvent>.broadcast();
 
   bool _initialized = false;
   bool _disposed = false;
+  IosRestorationWillRestore? _launchRestoration;
+  bool _launchTagConsumed = false;
 
-  FlutterBluePlusIosStateRestorationService({this.debugIsIOSOverride});
+  FlutterBluePlusIosStateRestorationService({
+    this.debugIsIOSOverride,
+    this.debugSetOptionsOverride,
+    this.debugLaunchCentralIdsFetcher,
+  });
 
   /// Resolved platform check. Production reads [Platform.isIOS];
   /// tests pass [debugIsIOSOverride] to drive both branches.
@@ -149,7 +197,8 @@ class FlutterBluePlusIosStateRestorationService
   /// native side. Must run before any scan/connect.
   Future<void> _initializeIOS() async {
     try {
-      await FlutterBluePlus.setOptions(restoreState: true);
+      await (debugSetOptionsOverride ??
+          () => FlutterBluePlus.setOptions(restoreState: true))();
       debugPrint(
         'IosStateRestorationService: setOptions(restoreState: true) ok',
       );
@@ -164,6 +213,57 @@ class FlutterBluePlusIosStateRestorationService
       );
       rethrow;
     }
+    await _captureLaunchRestoration();
+  }
+
+  /// #3167 — ask the host bridge whether THIS launch carried the
+  /// `bluetoothCentrals` launch-options key, i.e. iOS relaunched us in
+  /// the background for Core Bluetooth state restoration. On a hit the
+  /// one-shot [launchRestoration] is cached (for late consumers) and a
+  /// [IosRestorationWillRestore] is published on [events].
+  ///
+  /// Best-effort and NEVER throws: a missing host handler (an old
+  /// native build, a test binding) logs a breadcrumb and leaves the
+  /// launch untagged — exactly the pre-#3167 behaviour.
+  Future<void> _captureLaunchRestoration() async {
+    try {
+      final fetch = debugLaunchCentralIdsFetcher ??
+          () => _restorationChannel
+              .invokeListMethod<String>('getLaunchBluetoothCentralIds');
+      final ids = await fetch();
+      if (ids == null || ids.isEmpty) return;
+      debugPrint(
+        'IosStateRestorationService: launched via Core Bluetooth state '
+        'restoration (centrals: $ids)',
+      );
+      // The launch key carries CENTRAL MANAGER restore identifiers, not
+      // peripheral UUIDs — the paired peripheral UUID is persisted on
+      // the vehicle profile, so the event's peripheral list stays empty
+      // (documented as "restored, no peripheral detail").
+      _launchRestoration = const IosRestorationWillRestore(<String>[]);
+      if (!_eventsController.isClosed) {
+        _eventsController.add(_launchRestoration!);
+      }
+    } catch (e, st) {
+      await errorLogger.log(
+        ErrorLayer.services,
+        e,
+        st,
+        context: const {
+          'where': 'IosStateRestorationService.captureLaunchRestoration',
+        },
+      );
+    }
+  }
+
+  @override
+  IosRestorationWillRestore? get launchRestoration => _launchRestoration;
+
+  @override
+  bool consumeLaunchRestorationTag() {
+    if (_launchRestoration == null || _launchTagConsumed) return false;
+    _launchTagConsumed = true;
+    return true;
   }
 
   /// Non-iOS path: emit the "not supported" sentinel so listeners

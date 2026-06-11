@@ -8,7 +8,8 @@ part of 'auto_record_orchestrator_factories.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Default factory: Android in production, an unimplemented stub
+/// Default factory: Android's foreground-service bridge, iOS's Core
+/// Bluetooth state-restoration listener (#3167), an unimplemented stub
 /// elsewhere. Tests override this provider to inject a
 /// [FakeBackgroundAdapterListener] without touching platform-detection
 /// code.
@@ -16,7 +17,8 @@ part of 'auto_record_orchestrator_factories.dart';
 @ProviderFor(autoRecordListenerFactory)
 final autoRecordListenerFactoryProvider = AutoRecordListenerFactoryProvider._();
 
-/// Default factory: Android in production, an unimplemented stub
+/// Default factory: Android's foreground-service bridge, iOS's Core
+/// Bluetooth state-restoration listener (#3167), an unimplemented stub
 /// elsewhere. Tests override this provider to inject a
 /// [FakeBackgroundAdapterListener] without touching platform-detection
 /// code.
@@ -29,7 +31,8 @@ final class AutoRecordListenerFactoryProvider
           BackgroundAdapterListenerFactory
         >
     with $Provider<BackgroundAdapterListenerFactory> {
-  /// Default factory: Android in production, an unimplemented stub
+  /// Default factory: Android's foreground-service bridge, iOS's Core
+  /// Bluetooth state-restoration listener (#3167), an unimplemented stub
   /// elsewhere. Tests override this provider to inject a
   /// [FakeBackgroundAdapterListener] without touching platform-detection
   /// code.
@@ -70,7 +73,7 @@ final class AutoRecordListenerFactoryProvider
 }
 
 String _$autoRecordListenerFactoryHash() =>
-    r'3ac9db8a2ce1a0919d0fb75fc9b9906b736d40af';
+    r'5679d42e1a8c6f9453334fab9c982863798be3a3';
 
 /// Default opener: opens a fresh [Obd2Service] for the configured MAC
 /// via [Obd2ConnectionService.connectByMac] (#1004 phase 2b-3).
@@ -78,6 +81,11 @@ String _$autoRecordListenerFactoryHash() =>
 /// out — the coordinator stays idle for that connect cycle and waits
 /// for the next `AdapterConnected`. Tests override this provider to
 /// inject a fake opener that returns a stub service.
+///
+/// #3167 — wrapped in [wrapStateRestorationOrigin] so the FIRST
+/// auto-record connect after a Core Bluetooth background relaunch is
+/// trace-stamped `Obd2ConnectOrigin.stateRestoration`. A no-op on a
+/// normal launch and on Android (the tag is never set there).
 
 @ProviderFor(autoRecordSessionOpenerFactory)
 final autoRecordSessionOpenerFactoryProvider =
@@ -89,6 +97,11 @@ final autoRecordSessionOpenerFactoryProvider =
 /// out — the coordinator stays idle for that connect cycle and waits
 /// for the next `AdapterConnected`. Tests override this provider to
 /// inject a fake opener that returns a stub service.
+///
+/// #3167 — wrapped in [wrapStateRestorationOrigin] so the FIRST
+/// auto-record connect after a Core Bluetooth background relaunch is
+/// trace-stamped `Obd2ConnectOrigin.stateRestoration`. A no-op on a
+/// normal launch and on Android (the tag is never set there).
 
 final class AutoRecordSessionOpenerFactoryProvider
     extends
@@ -104,6 +117,11 @@ final class AutoRecordSessionOpenerFactoryProvider
   /// out — the coordinator stays idle for that connect cycle and waits
   /// for the next `AdapterConnected`. Tests override this provider to
   /// inject a fake opener that returns a stub service.
+  ///
+  /// #3167 — wrapped in [wrapStateRestorationOrigin] so the FIRST
+  /// auto-record connect after a Core Bluetooth background relaunch is
+  /// trace-stamped `Obd2ConnectOrigin.stateRestoration`. A no-op on a
+  /// normal launch and on Android (the tag is never set there).
   AutoRecordSessionOpenerFactoryProvider._()
     : super(
         from: null,
@@ -139,7 +157,7 @@ final class AutoRecordSessionOpenerFactoryProvider
 }
 
 String _$autoRecordSessionOpenerFactoryHash() =>
-    r'bb6af1c2c633c61722cb5329e5ea038cb7c0e33f';
+    r'79e2b0443759a4b43c80c4d32129b2a4d18e7272';
 
 /// Foreground-active opener (#2282 concern 1): a DIRECT connect — NO active
 /// scan — so it wakes ELM327 clones that stop advertising in standby. Used by

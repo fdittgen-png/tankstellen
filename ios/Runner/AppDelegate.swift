@@ -35,6 +35,15 @@ import workmanager_apple
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // #3167 — capture the Core Bluetooth state-restoration launch signal
+    // FIRST: when iOS relaunches the app in the background because the
+    // paired OBD2 adapter completed a pending connect, `launchOptions`
+    // carries `.bluetoothCentrals` with the restore identifiers of the
+    // central managers being restored. The Dart side queries this via the
+    // `tankstellen/ios_state_restoration` channel to resume hands-free
+    // auto-recording and tag the connect trace origin.
+    StateRestorationBridge.shared.captureLaunchOptions(launchOptions)
+
     // #2414 — Tier-1 background scan on iOS via the workmanager iOS backend
     // (BGTaskScheduler / BGAppRefreshTask).
     //
@@ -77,6 +86,11 @@ import workmanager_apple
     // (replaces Google ML Kit on iOS; Android keeps ML Kit).
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "VisionOcrBridge") {
       VisionOcrBridge.shared.register(messenger: registrar.messenger())
+    }
+    // #3167 — Core Bluetooth state-restoration launch bridge (hands-free
+    // auto-record Phase 3).
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "StateRestorationBridge") {
+      StateRestorationBridge.shared.register(messenger: registrar.messenger())
     }
   }
 
@@ -293,6 +307,59 @@ final class VisionOcrBridge {
         try handler.perform([request])
       } catch {
         DispatchQueue.main.async { result(nil) }
+      }
+    }
+  }
+}
+
+/// #3167 — host-side half of the Core Bluetooth state-restoration wiring
+/// (hands-free auto-record Phase 3, Epic #3165), serving the
+/// `tankstellen/ios_state_restoration` MethodChannel.
+///
+/// When the paired ELM327/OBDLink adapter powers up while the app is
+/// terminated, iOS completes the pending connect flutter_blue_plus queued
+/// (`CBCentralManagerOptionRestoreIdentifierKey` is set via
+/// `setOptions(restoreState: true)` on the Dart side) and relaunches the
+/// app into the background with `.bluetoothCentrals` in `launchOptions` —
+/// the array of central-manager restore identifiers being restored. The
+/// FBP plugin handles `centralManager:willRestoreState:` natively; what it
+/// does NOT surface to Dart is the LAUNCH signal itself. This bridge
+/// captures it so the Dart `IosStateRestorationService` can (a) resume the
+/// auto-record coordinator and (b) stamp `stateRestoration` as the connect
+/// trace origin for field exports.
+///
+/// Inline in AppDelegate.swift (not a separate file) on purpose: a new file
+/// under ios/Runner/ is not in the Runner target's compile sources without
+/// a project.pbxproj edit (see the ShareIntentBridge note above), so
+/// defining it here keeps the build green with zero pbxproj change.
+final class StateRestorationBridge {
+  static let shared = StateRestorationBridge()
+  private static let channelName = "tankstellen/ios_state_restoration"
+
+  /// Restore identifiers from `UIApplication.LaunchOptionsKey.bluetoothCentrals`,
+  /// captured in `didFinishLaunchingWithOptions`. Nil on a normal user launch.
+  /// NOT consumed on read — the Dart service caches + one-shots it itself, and
+  /// an idempotent getter keeps a hot-restart from losing the signal.
+  private var launchBluetoothCentralIds: [String]?
+
+  /// Called first thing in `didFinishLaunchingWithOptions` so the signal is
+  /// stored before any Flutter engine (foreground or headless) spins up.
+  func captureLaunchOptions(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
+    if let centrals = launchOptions?[.bluetoothCentrals] as? [String] {
+      launchBluetoothCentralIds = centrals
+    }
+  }
+
+  /// Wires the method channel onto `messenger`. Called once when the Flutter
+  /// engine is ready (see `didInitializeImplicitFlutterEngine`).
+  func register(messenger: FlutterBinaryMessenger) {
+    let channel = FlutterMethodChannel(name: Self.channelName, binaryMessenger: messenger)
+    channel.setMethodCallHandler { [weak self] call, result in
+      switch call.method {
+      case "getLaunchBluetoothCentralIds":
+        result(self?.launchBluetoothCentralIds)
+      default:
+        result(FlutterMethodNotImplemented)
       }
     }
   }

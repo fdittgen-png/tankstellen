@@ -44,6 +44,7 @@ import '../core/utils/edge_to_edge.dart';
 import '../features/alerts/providers/alert_provider.dart';
 import '../features/consumption/data/obd2/active_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/active_trip_repository.dart';
+import '../features/consumption/data/obd2/ios_state_restoration_provider.dart';
 import '../features/consumption/data/obd2/obd2_connect_trace_persistence.dart';
 import '../features/consumption/data/obd2/paused_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/paused_trip_repository.dart';
@@ -1002,6 +1003,19 @@ class AppInitializer {
     // bug in `defaultTargetPlatform` resolution or in the listener
     // factory would otherwise crash the whole launch path.
     _deferPostFirstFrame(() async {
+      // #3167 — opt the shared FBP central manager into Core Bluetooth
+      // state restoration BEFORE the orchestrator's first Bluetooth
+      // touch, sequenced in the SAME deferred block so the ordering is
+      // guaranteed. This also drains the host bridge's launch signal
+      // ("relaunched by Core Bluetooth?") that tags the first
+      // auto-record connect trace. No-op off iOS; a failure never
+      // blocks the orchestrator below.
+      try {
+        await container.read(iosStateRestorationServiceProvider).initialize();
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: {'where': 'iosStateRestoration init'}));
+      }
       try {
         container.read(autoRecordOrchestratorProvider);
       } catch (e, st) {

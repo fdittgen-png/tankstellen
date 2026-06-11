@@ -3,9 +3,12 @@
 
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/ios_restoration_event.dart';
 import 'package:tankstellen/features/consumption/data/obd2/ios_state_restoration_service.dart';
+
+import '../../../../helpers/silence_error_logger.dart';
 
 /// Unit tests for [FlutterBluePlusIosStateRestorationService] (#1295
 /// phase 2).
@@ -25,6 +28,112 @@ import 'package:tankstellen/features/consumption/data/obd2/ios_state_restoration
 /// expected sentinel. Phase 5 (device-test acceptance) covers the
 /// real iOS path on hardware.
 void main() {
+  silenceErrorLoggerSpool();
+
+  group(
+      'FlutterBluePlusIosStateRestorationService — launch restoration '
+      'capture (#3167)', () {
+    test(
+        'iOS launch WITH bluetoothCentrals launch options caches '
+        'launchRestoration and emits willRestore', () async {
+      final service = FlutterBluePlusIosStateRestorationService(
+        debugIsIOSOverride: true,
+        debugSetOptionsOverride: () async {},
+        debugLaunchCentralIdsFetcher: () async =>
+            <String>['flutterBluePlusRestoreIdentifier'],
+      );
+      final received = <IosRestorationEvent>[];
+      final sub = service.events.listen(received.add);
+
+      await service.initialize();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(service.launchRestoration, isNotNull,
+          reason: 'the cached getter is what late consumers (the iOS '
+              'listener arms after app init) read');
+      expect(received, [const IosRestorationEvent.willRestore(<String>[])]);
+
+      await sub.cancel();
+      await service.dispose();
+    });
+
+    test('iOS launch WITHOUT the key leaves launchRestoration null',
+        () async {
+      final service = FlutterBluePlusIosStateRestorationService(
+        debugIsIOSOverride: true,
+        debugSetOptionsOverride: () async {},
+        debugLaunchCentralIdsFetcher: () async => null,
+      );
+      await service.initialize();
+      expect(service.launchRestoration, isNull);
+      expect(service.consumeLaunchRestorationTag(), isFalse);
+      await service.dispose();
+    });
+
+    test('empty central-id list counts as a normal launch', () async {
+      final service = FlutterBluePlusIosStateRestorationService(
+        debugIsIOSOverride: true,
+        debugSetOptionsOverride: () async {},
+        debugLaunchCentralIdsFetcher: () async => const <String>[],
+      );
+      await service.initialize();
+      expect(service.launchRestoration, isNull);
+      await service.dispose();
+    });
+
+    test('consumeLaunchRestorationTag is one-shot', () async {
+      final service = FlutterBluePlusIosStateRestorationService(
+        debugIsIOSOverride: true,
+        debugSetOptionsOverride: () async {},
+        debugLaunchCentralIdsFetcher: () async => <String>['fbp'],
+      );
+      await service.initialize();
+      expect(service.consumeLaunchRestorationTag(), isTrue,
+          reason: 'first consumer gets the stateRestoration origin tag');
+      expect(service.consumeLaunchRestorationTag(), isFalse,
+          reason: 'every later connect of this launch is untagged');
+      // The cached event itself survives consumption — only the trace
+      // tag is one-shot.
+      expect(service.launchRestoration, isNotNull);
+      await service.dispose();
+    });
+
+    test(
+        'fault injection: a throwing channel fetch never throws out of '
+        'initialize() (#2349 never-throws contract)', () async {
+      final service = FlutterBluePlusIosStateRestorationService(
+        debugIsIOSOverride: true,
+        debugSetOptionsOverride: () async {},
+        debugLaunchCentralIdsFetcher: () async =>
+            throw MissingPluginException('no host handler'),
+      );
+      await expectLater(service.initialize(), completes);
+      expect(service.launchRestoration, isNull,
+          reason: 'a failed fetch leaves the launch untagged — exactly '
+              'the pre-#3167 behaviour');
+      expect(service.consumeLaunchRestorationTag(), isFalse);
+      await service.dispose();
+    });
+
+    test('non-iOS never queries the launch channel', () async {
+      var fetched = false;
+      final service = FlutterBluePlusIosStateRestorationService(
+        debugIsIOSOverride: false,
+        debugLaunchCentralIdsFetcher: () async {
+          fetched = true;
+          return <String>['x'];
+        },
+      );
+      await service.initialize();
+      expect(fetched, isFalse,
+          reason: 'Android resolves the platform gate before any '
+              'restoration plumbing runs');
+      expect(service.launchRestoration, isNull);
+      expect(service.consumeLaunchRestorationTag(), isFalse);
+      await service.dispose();
+    });
+  });
+
   group('FlutterBluePlusIosStateRestorationService — non-iOS branch', () {
     test('initialize() returns without throwing on non-iOS', () async {
       final service = FlutterBluePlusIosStateRestorationService(
