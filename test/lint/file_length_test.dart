@@ -223,6 +223,12 @@ void main() {
     // iOS UUID-vs-MAC identity-drift discriminator), and the provider
     // registers the adapter-state step-0 probe. The persistence layer
     // lives in the NEW under-cap obd2_connect_trace_persistence.dart.
+    // #3168 — re-grandfathered 826 → 865: the iOS UUID-rotation rematch
+    // wiring (the `onAdapterIdentityRotated` re-persist seam field + its
+    // dartdoc, the `connectByMac` scan-loop handoff to the rematch, and
+    // the provider's repersist wiring). The rematch decision table +
+    // identity capture + re-persist logic all live in the NEW under-cap
+    // obd2_adapter_identity.dart; only the seam plumbing lands here.
     // Decomposition still tracked under #2187/#2188.
     // #3185 — re-grandfathered 826 → 899: the single-flight connect
     // SUPERVISOR + scan GOVERNOR are wired at this chokepoint (the whole
@@ -234,7 +240,9 @@ void main() {
     // themselves live in the NEW under-cap obd2_connect_supervisor.dart /
     // obd2_scan_governor.dart. Decomposition still tracked under
     // #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 899,
+    // (#3168's rematch seam, listed above, adds its 39 lines ON TOP of the
+    // #3185 wiring — combined snapshot below.)
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 938,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one

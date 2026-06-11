@@ -46,7 +46,9 @@ void main() {
     'lib/core/feedback/github_issue_reporter/error_reporter_context.dart',
     'lib/core/sharing/public_file_exporter.dart',
     'lib/core/telemetry/collectors/device_info_collector.dart',
-    'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart',
+    // #3168 — obd2_adapter_picker.dart removed: its identity capture moved
+    // to the data-layer Obd2AdapterIdentity seam (UUID-shape discriminator,
+    // no Platform check).
     'lib/features/widget/data/home_widget_service.dart',
   };
 
