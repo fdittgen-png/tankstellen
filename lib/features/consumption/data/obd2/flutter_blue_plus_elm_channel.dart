@@ -19,6 +19,7 @@ import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_link_drop_signal.dart';
 import 'obd2_pairing_mode.dart';
+import 'obd2_platform_budgets.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Standard SPP-over-BLE UUIDs exposed by Vgate vLinker and most
@@ -65,26 +66,20 @@ class FlutterBluePlusElmChannel
   /// 15 s; a hung discovery (a clone whose GATT table never resolves) used to
   /// freeze the whole open for 15 s and read as a hang. A miss now fails in
   /// ~5 s with a distinct `gattTimeout` outcome.
-  /// #3118 — iOS-aware. iOS CoreBluetooth's `discoverServices` is slower than
-  /// Android's, so the OBDLink CX's GATT-table resolution can blow Android's
-  /// tight 5 s on a cold iPhone connect. Android keeps 5 s (byte-identical).
-  /// #3182 — int SECONDS now, passed to FBP's own `timeout:` parameter (see
+  /// #3182 — int SECONDS, passed to FBP's own `timeout:` parameter (see
   /// [discoverAndBind]) instead of an outer Dart `.timeout()`.
+  /// #3172 — the iOS/Android values + the #3118 rationale live in the
+  /// consolidated [Obd2PlatformBudgets] (same values, single audited home).
   static int get _discoverTimeoutSecs =>
-      defaultTargetPlatform == TargetPlatform.iOS ? 8 : 5;
+      Obd2PlatformBudgets.resolved.discoverTimeoutSecs;
 
   /// #3014 — bound `setNotifyValue`, for the same reason: a clone that accepts
   /// the descriptor write but never ACKs would otherwise block 15 s.
-  ///
-  /// #3118 — iOS-aware. THIS is the OBDLink CX failure on iPhone
-  /// (`TimeoutException after 0:00:04 — Future not completed`): the post-connect
-  /// CCCD descriptor write (enabling notifications) is slower over iOS
-  /// CoreBluetooth than Android's 4 s. #3113 only widened the `connect()` budget
-  /// (iOS 7 s); this very next step still clipped at 4 s. iOS gets 7 s; Android
-  /// keeps 4 s (byte-identical — the #2242/#3014 tight bound stays load-bearing).
-  /// #3182 — int SECONDS now, passed to FBP's own `timeout:` parameter.
+  /// #3182 — int SECONDS, passed to FBP's own `timeout:` parameter.
+  /// #3172 — the iOS/Android values + the #3118 OBDLink-CX rationale live in
+  /// the consolidated [Obd2PlatformBudgets] (same values, single audited home).
   static int get _setNotifyTimeoutSecs =>
-      defaultTargetPlatform == TargetPlatform.iOS ? 7 : 4;
+      Obd2PlatformBudgets.resolved.setNotifyTimeoutSecs;
 
   /// #3118 — test seams to lock the iOS-aware post-connect budgets. Kept as
   /// [Duration]s (built from the int-seconds FBP budgets) so the existing
