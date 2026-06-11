@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' show WidgetsFlutterBinding;
 import 'package:home_widget/home_widget.dart';
 
-import '../../core/background/country_alert_strategy.dart';
+import '../alerts/api.dart';
 import '../../core/background/hive_isolate_lock.dart';
 import '../../core/background/provider_request_budget.dart';
 import '../../core/cache/cache_manager.dart';

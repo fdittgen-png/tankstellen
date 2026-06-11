@@ -4,7 +4,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../core/background/background_service.dart';
+import '../background/background_service.dart';
 import '../../../core/notifications/notification_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';

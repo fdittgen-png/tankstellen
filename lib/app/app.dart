@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/background/background_service.dart';
+import '../features/alerts/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/country/country_switch_listener.dart';
 import '../core/logging/error_logger.dart';

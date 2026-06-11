@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
-import '../../../../core/background/fuel_price_fields.dart';
+import '../../background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';

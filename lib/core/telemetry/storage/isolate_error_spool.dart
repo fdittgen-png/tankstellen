@@ -15,7 +15,7 @@ import 'isolate_error_spool_entry.dart';
 /// Sentry pipeline (#1105).
 ///
 /// ## Why
-/// `lib/core/background/background_service.dart` runs in a separate
+/// `lib/features/alerts/background/background_service.dart` runs in a separate
 /// Dart isolate (WorkManager) so it cannot reach Riverpod and the
 /// keep-alive `traceRecorderProvider`. Until this spool existed every
 /// failure in radius alerts, velocity detection, price fetching, and

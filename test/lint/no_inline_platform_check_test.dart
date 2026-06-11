@@ -60,7 +60,7 @@ void main() {
     'lib/features/setup/providers/onboarding_platform_steps_provider.dart',
     // #3169 — the SLC-wake factory seam (no-op off-iOS by design) and the
     // iOS-only best-effort disclosure render gate.
-    'lib/core/background/slc_wake_monitor.dart',
+    'lib/features/alerts/background/slc_wake_monitor.dart',
     'lib/features/alerts/presentation/widgets/alerts_best_effort_note.dart',
     // #3170 — the Live Activity capability gate (ActivityKit is iOS-only).
     'lib/features/consumption/data/live_activity_controller.dart',
@@ -70,7 +70,7 @@ void main() {
   // Debt — remove each once the inline Platform check is refactored.
   // This set may only SHRINK; target is 0. NEVER add an entry here.
   const grandfathered = <String>{
-    'lib/core/background/background_price_fetcher_provider.dart',
+    'lib/features/alerts/background/background_price_fetcher_provider.dart',
     'lib/core/feedback/github_issue_reporter/error_reporter_context.dart',
     // #3168 — obd2_adapter_picker.dart removed: its identity capture moved
     // to the data-layer Obd2AdapterIdentity seam (UUID-shape discriminator,

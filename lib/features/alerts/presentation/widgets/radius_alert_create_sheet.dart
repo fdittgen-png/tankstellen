@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/background/fuel_price_fields.dart';
+import '../../background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/country_service_registry.dart';

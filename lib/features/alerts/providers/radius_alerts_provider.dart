@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/radius_alert_dedup.dart';
 import '../data/radius_alert_store.dart';
 import '../domain/entities/radius_alert.dart';
-import '../../../core/background/background_service.dart';
+import '../background/background_service.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/notifications/notification_providers.dart';
 

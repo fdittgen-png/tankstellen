@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/background/background_scan_dedup_store.dart';
+import '../../background/background_scan_dedup_store.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Footer line showing when the last background alert scan completed
