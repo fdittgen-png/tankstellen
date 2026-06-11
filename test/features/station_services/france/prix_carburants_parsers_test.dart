@@ -297,4 +297,56 @@ void main() {
       expect(out, isNotNull);
     });
   });
+
+  group('parsePrixCarburantsHoursInput never throws (#3219 fault injection)',
+      () {
+    test('malformed structured horaires shapes all return normally and '
+        'degrade to a null schedule', () {
+      // Broken JSON string.
+      expect(() => parsePrixCarburantsHoursInput({'horaires': '{not json'}),
+          returnsNormally);
+      // Non-string, non-map column value.
+      expect(() => parsePrixCarburantsHoursInput({'horaires': 42}),
+          returnsNormally);
+      // `jour` is a scalar instead of list/map.
+      expect(
+          () => parsePrixCarburantsHoursInput(
+              {'horaires': '{"jour": "weird"}'}),
+          returnsNormally);
+      // `horaire` entries are scalars.
+      expect(
+          () => parsePrixCarburantsHoursInput({
+                'horaires':
+                    '{"jour": [{"@nom": "Lundi", "horaire": ["x", 1]}]}',
+              }),
+          returnsNormally);
+
+      final out = parsePrixCarburantsHoursInput({'horaires': '{not json'});
+      expect(out['horaires_jour'], isNull);
+      expect(out['horaires_automate_24_24'], 'Non');
+    });
+
+    test('a structured column with usable ranges resolves when the derived '
+        'column is null', () {
+      final out = parsePrixCarburantsHoursInput({
+        'horaires_jour': null,
+        'horaires':
+            '{"@automate-24-24": "", "jour": [{"@nom": "Lundi", "@ferme": "", '
+                '"horaire": {"@ouverture": "07.00", "@fermeture": "18.30"}}]}',
+      });
+      expect(out['horaires_jour'], 'Lundi07.00-18.30');
+      expect(out['horaires_automate_24_24'], 'Non');
+    });
+
+    test('the derived column wins when both are present (byte-for-byte '
+        'back-compat)', () {
+      final out = parsePrixCarburantsHoursInput({
+        'horaires_jour': 'Lundi 06.30-14.00 et 14.00-21.30',
+        'horaires':
+            '{"jour": [{"@nom": "Mardi", "horaire": {"@ouverture": "01.00", '
+                '"@fermeture": "02.00"}}]}',
+      });
+      expect(out['horaires_jour'], 'Lundi 06.30-14.00 et 14.00-21.30');
+    });
+  });
 }

@@ -292,15 +292,14 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
         ? (await _enricher.enrich([station])).first
         : station;
 
-    final is24h = r['horaires_automate_24_24'] == 'Oui';
-
-    // #2710 — populate the structured weekly schedule from the FR adapter
-    // (Epic C3). The adapter is pure + total: a missing / unparseable
-    // `horaires_jour` yields `notAvailable`, so the display layer falls back
-    // through `legacyOpeningHoursBridge` exactly as before. Legacy
-    // `Station.is24h` / `openingHoursText` stay populated for back-compat.
+    // #2710/#3219 — structured weekly schedule from the FR adapter (Epic C3),
+    // fed the SAME resolved hours input the search parse uses (derived
+    // `horaires_jour` column with the structured-`horaires` fallback), so the
+    // detail path can never disagree with the search path about a schedule.
+    final hoursInput = parser.parsePrixCarburantsHoursInput(r);
+    final is24h = hoursInput['horaires_automate_24_24'] == 'Oui';
     const openingHoursAdapter = FranceOpeningHoursAdapter();
-    final openingHours = openingHoursAdapter.parse(r);
+    final openingHours = openingHoursAdapter.parse(hoursInput);
 
     return ServiceResult(
       data: StationDetail(
