@@ -88,14 +88,10 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 16),
-          Icon(
-            Icons.key,
-            size: 48,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(Icons.key, size: 48, color: theme.colorScheme.primary),
           const SizedBox(height: 16),
           Text(
-            l10n?.apiKeySetup ?? 'API key setup',
+            l10n.apiKeySetup,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -103,8 +99,7 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n?.onboardingApiKeyDescription ??
-                'Register for a free API key, or skip to explore the app with demo data.',
+            l10n.onboardingApiKeyDescription,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -118,10 +113,7 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
                 onPressed: () async {
                   final uri = Uri.parse(country.apiKeyRegistrationUrl!);
                   if (await canLaunchUrl(uri)) {
-                    await launchUrl(
-                      uri,
-                      mode: LaunchMode.externalApplication,
-                    );
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
                   }
                 },
                 icon: const Icon(Icons.open_in_new),
@@ -131,21 +123,19 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
           TextField(
             controller: widget.apiKeyController,
             decoration: InputDecoration(
-              labelText: l10n?.apiKeyLabel ?? 'API Key',
+              labelText: l10n.apiKeyLabel,
               hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
               prefixIcon: const Icon(Icons.key),
               border: const OutlineInputBorder(),
               suffixIcon: _buildFormatIndicator(context),
               errorText: _isFormatValid == false
-                  ? (l10n?.apiKeyFormatError ??
-                      'Invalid format — expected UUID (8-4-4-4-12)')
+                  ? (l10n.apiKeyFormatError)
                   : null,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            l10n?.apiKeyNote ??
-                'Free registration. Data from government price transparency agencies.',
+            l10n.apiKeyNote,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -156,8 +146,7 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
           OutlinedButton.icon(
             onPressed: widget.onUseDemoData,
             icon: const Icon(Icons.explore_outlined),
-            label: Text(l10n?.onboardingExploreDemoData ??
-                'Explore with demo data'),
+            label: Text(l10n.onboardingExploreDemoData),
           ),
           const SizedBox(height: 16),
           if (country.attribution != null)

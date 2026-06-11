@@ -22,6 +22,7 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for [TrajetsTab] (#561 zero-coverage backlog).
 ///
@@ -108,13 +109,12 @@ class _ConnectLaterTripRecording extends TripRecording {
 /// Bluetooth stack. The constructor uses the existing fake permissions
 /// + bluetooth facades so the underlying scan path also stays inert.
 class _RecordingFakeConnection extends Obd2ConnectionService {
-  _RecordingFakeConnection({
-    this.connectByMacDirectResult,
-  }) : super(
-          registry: Obd2AdapterRegistry.defaults(),
-          permissions: _AlwaysGrantedPermissions(),
-          bluetooth: _EmptyBluetoothFacade(),
-        );
+  _RecordingFakeConnection({this.connectByMacDirectResult})
+    : super(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _AlwaysGrantedPermissions(),
+        bluetooth: _EmptyBluetoothFacade(),
+      );
 
   /// #2274 concern 3 — what the pre-warm direct-connect resolves to.
   /// Null ⇒ pre-warm misses and the start flow falls back to the picker.
@@ -291,15 +291,22 @@ Future<void> _pumpTab(
 
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       tripHistoryListProvider.overrideWith(() => _FixedTripHistoryList(trips)),
-      vehicleProfileListProvider
-          .overrideWith(() => _FixedVehicleProfileList(vehicles)),
-      activeVehicleProfileProvider
-          .overrideWith(() => _FixedActiveVehicle(activeVehicle)),
-      tripRecordingProvider
-          .overrideWith(recordingFactory ?? () => _IdleTripRecording()),
+      vehicleProfileListProvider.overrideWith(
+        () => _FixedVehicleProfileList(vehicles),
+      ),
+      activeVehicleProfileProvider.overrideWith(
+        () => _FixedActiveVehicle(activeVehicle),
+      ),
+      tripRecordingProvider.overrideWith(
+        recordingFactory ?? () => _IdleTripRecording(),
+      ),
       if (obd2Connection != null)
         obd2ConnectionProvider.overrideWith((_) => obd2Connection),
     ],
@@ -315,11 +322,7 @@ void main() {
     name: 'Daily Driver',
     type: VehicleType.combustion,
   );
-  const evVehicle = VehicleProfile(
-    id: 'ev1',
-    name: 'EV',
-    type: VehicleType.ev,
-  );
+  const evVehicle = VehicleProfile(id: 'ev1', name: 'EV', type: VehicleType.ev);
 
   group('TrajetsTab — empty list', () {
     testWidgets('renders the EmptyState with localized copy', (tester) async {
@@ -341,16 +344,14 @@ void main() {
       expect(find.byKey(const Key('trajets_list')), findsNothing);
       // Phase-4 monthly card is gated behind "trips exist" — empty
       // state shows the CTA only, not the card.
-      expect(
-        find.byKey(const ValueKey('monthly_insights_card')),
-        findsNothing,
-      );
+      expect(find.byKey(const ValueKey('monthly_insights_card')), findsNothing);
     });
   });
 
   group('TrajetsTab — monthly insights card slot (#1041 phase 4)', () {
-    testWidgets('renders the card above the trip list when trips exist',
-        (tester) async {
+    testWidgets('renders the card above the trip list when trips exist', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(900, 1600);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -386,8 +387,9 @@ void main() {
   });
 
   group('TrajetsTab — populated list', () {
-    testWidgets('renders one row per trip when no vehicleId is set',
-        (tester) async {
+    testWidgets('renders one row per trip when no vehicleId is set', (
+      tester,
+    ) async {
       final trips = [
         _entry(
           id: 'trip-a',
@@ -425,8 +427,9 @@ void main() {
       expect(find.byKey(const ValueKey('trajet-trip-c')), findsOneWidget);
     });
 
-    testWidgets('newest-first sort is applied even on un-sorted input',
-        (tester) async {
+    testWidgets('newest-first sort is applied even on un-sorted input', (
+      tester,
+    ) async {
       // Seed in oldest-first order — the tab must sort by startedAt
       // descending itself.
       final trips = [
@@ -462,14 +465,18 @@ void main() {
       final oldestY = tester
           .getTopLeft(find.byKey(const ValueKey('trajet-trip-old')))
           .dy;
-      expect(newestY, lessThan(oldestY),
-          reason: 'Newest trip should appear above the oldest');
+      expect(
+        newestY,
+        lessThan(oldestY),
+        reason: 'Newest trip should appear above the oldest',
+      );
     });
   });
 
   group('TrajetsTab — vehicle filtering', () {
-    testWidgets('drops trips whose vehicleId differs from widget.vehicleId',
-        (tester) async {
+    testWidgets('drops trips whose vehicleId differs from widget.vehicleId', (
+      tester,
+    ) async {
       final trips = [
         // Matching vehicle — must show.
         _entry(
@@ -517,86 +524,94 @@ void main() {
     });
 
     testWidgets(
-        '#2274 concern 2 — tapping the CTA enters the connecting phase and '
-        'consumes a pre-warmed service via start()', (tester) async {
-      final fakeService = _NoopObd2Service();
-      final connection = _RecordingFakeConnection(
-        connectByMacDirectResult: fakeService,
-      );
-      final notifier = _ConnectLaterTripRecording();
-      await _pumpTab(
-        tester,
-        vehicleId: null,
-        // A pinned MAC so the pre-warm fires the direct connect on open.
-        activeVehicle: const VehicleProfile(
-          id: 'v1',
-          name: 'Daily Driver',
-          type: VehicleType.combustion,
-          obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
-          obd2AdapterName: 'vLinker FS',
-        ),
-        trips: const [],
-        recordingFactory: () => notifier,
-        obd2Connection: connection,
-      );
-      // Let the post-frame pre-warm fire + resolve.
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 10));
-      // #3025 — pre-warm (concern 3) fires the TRANSPORT-AWARE connect on open.
-      expect(connection.connectByMacTransportAwareCalls, ['AA:BB:CC:DD:EE:FF'],
-          reason: 'pre-warm (concern 3) fires the transport-aware connect');
+      '#2274 concern 2 — tapping the CTA enters the connecting phase and '
+      'consumes a pre-warmed service via start()',
+      (tester) async {
+        final fakeService = _NoopObd2Service();
+        final connection = _RecordingFakeConnection(
+          connectByMacDirectResult: fakeService,
+        );
+        final notifier = _ConnectLaterTripRecording();
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          // A pinned MAC so the pre-warm fires the direct connect on open.
+          activeVehicle: const VehicleProfile(
+            id: 'v1',
+            name: 'Daily Driver',
+            type: VehicleType.combustion,
+            obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
+            obd2AdapterName: 'vLinker FS',
+          ),
+          trips: const [],
+          recordingFactory: () => notifier,
+          obd2Connection: connection,
+        );
+        // Let the post-frame pre-warm fire + resolve.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 10));
+        // #3025 — pre-warm (concern 3) fires the TRANSPORT-AWARE connect on open.
+        expect(
+          connection.connectByMacTransportAwareCalls,
+          ['AA:BB:CC:DD:EE:FF'],
+          reason: 'pre-warm (concern 3) fires the transport-aware connect',
+        );
 
-      await tester.tap(
-        find.byKey(const Key('trajets_start_recording_button')),
-      );
-      // Don't pumpAndSettle — the recording-screen push would build the
-      // full screen. A bounded pump lets the connect future chain.
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+        await tester.tap(
+          find.byKey(const Key('trajets_start_recording_button')),
+        );
+        // Don't pumpAndSettle — the recording-screen push would build the
+        // full screen. A bounded pump lets the connect future chain.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
 
-      // The pre-warmed service was consumed via start() — no second
-      // connect, no picker sheet.
-      expect(notifier.startServiceCallCount, 1);
-      expect(notifier.lastStartedService, same(fakeService));
-      expect(find.text('Pick an OBD2 adapter'), findsNothing);
-    });
+        // The pre-warmed service was consumed via start() — no second
+        // connect, no picker sheet.
+        expect(notifier.startServiceCallCount, 1);
+        expect(notifier.lastStartedService, same(fakeService));
+        expect(find.text('Pick an OBD2 adapter'), findsNothing);
+      },
+    );
 
     testWidgets(
-        '#2274 concern 2 — an unpaired vehicle (pre-warm miss) still opens '
-        'the picker sheet from the connecting flow', (tester) async {
-      final notifier = _ConnectLaterTripRecording();
-      // No pinned MAC ⇒ pre-warm misses ⇒ the start flow falls back to
-      // the picker, which opens its modal sheet.
-      await _pumpTab(
-        tester,
-        vehicleId: null,
-        activeVehicle: const VehicleProfile(
-          id: 'v2',
-          name: 'Daily Driver',
-          type: VehicleType.combustion,
-        ),
-        trips: const [],
-        recordingFactory: () => notifier,
-        obd2Connection: _RecordingFakeConnection(),
-      );
-      await tester.pump();
+      '#2274 concern 2 — an unpaired vehicle (pre-warm miss) still opens '
+      'the picker sheet from the connecting flow',
+      (tester) async {
+        final notifier = _ConnectLaterTripRecording();
+        // No pinned MAC ⇒ pre-warm misses ⇒ the start flow falls back to
+        // the picker, which opens its modal sheet.
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          activeVehicle: const VehicleProfile(
+            id: 'v2',
+            name: 'Daily Driver',
+            type: VehicleType.combustion,
+          ),
+          trips: const [],
+          recordingFactory: () => notifier,
+          obd2Connection: _RecordingFakeConnection(),
+        );
+        await tester.pump();
 
-      await tester.tap(
-        find.byKey(const Key('trajets_start_recording_button')),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+        await tester.tap(
+          find.byKey(const Key('trajets_start_recording_button')),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
 
-      // No pre-warm hit (no pinned MAC) → the picker sheet opens and no
-      // service reached start().
-      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
-      expect(notifier.startServiceCallCount, 0);
-    });
+        // No pre-warm hit (no pinned MAC) → the picker sheet opens and no
+        // service reached start().
+        expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+        expect(notifier.startServiceCallCount, 0);
+      },
+    );
   });
 
   group('TrajetsTab — row tap navigation', () {
-    testWidgets('tapping a trip row pushes /trip/:id with the row id',
-        (tester) async {
+    testWidgets('tapping a trip row pushes /trip/:id with the row id', (
+      tester,
+    ) async {
       final trips = [
         _entry(
           id: '2026-04-22T09:00:00.000Z',
@@ -680,46 +695,47 @@ void main() {
   // 0x05 — keep the flag false and the chip stays hidden.
   group('TrajetsTab — cold-start chip (#1262 phase 3)', () {
     testWidgets(
-        'renders the chip with localized label and tooltip when the flag is true',
-        (tester) async {
-      final trips = [
-        _entry(
-          id: 'trip-cold',
-          vehicleId: 'v1',
-          startedAt: DateTime(2026, 4, 22, 9),
-          endedAt: DateTime(2026, 4, 22, 9, 5),
-          distanceKm: 1.8,
-          coldStartSurcharge: true,
-        ),
-      ];
+      'renders the chip with localized label and tooltip when the flag is true',
+      (tester) async {
+        final trips = [
+          _entry(
+            id: 'trip-cold',
+            vehicleId: 'v1',
+            startedAt: DateTime(2026, 4, 22, 9),
+            endedAt: DateTime(2026, 4, 22, 9, 5),
+            distanceKm: 1.8,
+            coldStartSurcharge: true,
+          ),
+        ];
 
-      await _pumpTab(
-        tester,
-        vehicleId: null,
-        trips: trips,
-        vehicles: [combustionVehicle],
-        activeVehicle: combustionVehicle,
-      );
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          trips: trips,
+          vehicles: [combustionVehicle],
+          activeVehicle: combustionVehicle,
+        );
 
-      // Chip label is the localized "Cold start" string.
-      expect(find.text('Cold start'), findsOneWidget);
-      // Tooltip widget wraps the chip with the localized explanation
-      // (find.byTooltip matches the message string against the
-      // surrounding Tooltip / RawTooltip — this asserts the tooltip
-      // is wired up regardless of which concrete class Flutter
-      // instantiates internally).
-      expect(
-        find.byTooltip(
-          "Engine didn't reach operating temperature during this trip — "
-          'fuel consumption was higher than usual.',
-        ),
-        findsOneWidget,
-      );
-    });
+        // Chip label is the localized "Cold start" string.
+        expect(find.text('Cold start'), findsOneWidget);
+        // Tooltip widget wraps the chip with the localized explanation
+        // (find.byTooltip matches the message string against the
+        // surrounding Tooltip / RawTooltip — this asserts the tooltip
+        // is wired up regardless of which concrete class Flutter
+        // instantiates internally).
+        expect(
+          find.byTooltip(
+            "Engine didn't reach operating temperature during this trip — "
+            'fuel consumption was higher than usual.',
+          ),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets(
-        "does NOT render the chip when the trip's flag is false",
-        (tester) async {
+    testWidgets("does NOT render the chip when the trip's flag is false", (
+      tester,
+    ) async {
       final trips = [
         _entry(
           id: 'trip-warm',
@@ -770,92 +786,99 @@ void main() {
     );
 
     testWidgets(
-        'paired vehicle pre-warms via the transport-aware connect on open and '
-        'starts with the warm service (no picker) — #3025', (tester) async {
-      final fakeService = _NoopObd2Service();
-      final connection = _RecordingFakeConnection(
-        connectByMacDirectResult: fakeService,
-      );
-      final notifier = _ConnectLaterTripRecording();
+      'paired vehicle pre-warms via the transport-aware connect on open and '
+      'starts with the warm service (no picker) — #3025',
+      (tester) async {
+        final fakeService = _NoopObd2Service();
+        final connection = _RecordingFakeConnection(
+          connectByMacDirectResult: fakeService,
+        );
+        final notifier = _ConnectLaterTripRecording();
 
-      await _pumpTab(
-        tester,
-        vehicleId: null,
-        trips: const [],
-        activeVehicle: pairedVehicle,
-        recordingFactory: () => notifier,
-        obd2Connection: connection,
-      );
-      // Post-frame pre-warm fires + resolves before any tap.
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 10));
-      // #3025 — the pre-warm goes through the TRANSPORT-AWARE entry (which routes
-      // 'vLinker FS' — a Classic adapter — to RFCOMM), NOT the BLE-only
-      // connectByMacDirect that 4 s-timed-out + poisoned the socket.
-      expect(connection.connectByMacTransportAwareCalls, ['AA:BB:CC:DD:EE:FF']);
-      expect(connection.connectByMacDirectCalls, isEmpty,
-          reason: 'a Classic adapter must NEVER pre-warm over the BLE path');
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          trips: const [],
+          activeVehicle: pairedVehicle,
+          recordingFactory: () => notifier,
+          obd2Connection: connection,
+        );
+        // Post-frame pre-warm fires + resolves before any tap.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 10));
+        // #3025 — the pre-warm goes through the TRANSPORT-AWARE entry (which routes
+        // 'vLinker FS' — a Classic adapter — to RFCOMM), NOT the BLE-only
+        // connectByMacDirect that 4 s-timed-out + poisoned the socket.
+        expect(connection.connectByMacTransportAwareCalls, [
+          'AA:BB:CC:DD:EE:FF',
+        ]);
+        expect(
+          connection.connectByMacDirectCalls,
+          isEmpty,
+          reason: 'a Classic adapter must NEVER pre-warm over the BLE path',
+        );
 
-      await tester.tap(
-        find.byKey(const Key('trajets_start_recording_button')),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+        await tester.tap(
+          find.byKey(const Key('trajets_start_recording_button')),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
 
-      // Warm link consumed via start(); picker never opens.
-      expect(notifier.startServiceCallCount, 1);
-      expect(notifier.lastStartedService, same(fakeService));
-      expect(find.text('Pick an OBD2 adapter'), findsNothing);
-    });
+        // Warm link consumed via start(); picker never opens.
+        expect(notifier.startServiceCallCount, 1);
+        expect(notifier.lastStartedService, same(fakeService));
+        expect(find.text('Pick an OBD2 adapter'), findsNothing);
+      },
+    );
 
     testWidgets(
-        'unpaired vehicle warms nothing on open and opens the picker on Start',
-        (tester) async {
-      final connection = _RecordingFakeConnection();
-      final notifier = _ConnectLaterTripRecording();
+      'unpaired vehicle warms nothing on open and opens the picker on Start',
+      (tester) async {
+        final connection = _RecordingFakeConnection();
+        final notifier = _ConnectLaterTripRecording();
 
-      await _pumpTab(
-        tester,
-        vehicleId: null,
-        trips: const [],
-        activeVehicle: unpairedVehicle,
-        recordingFactory: () => notifier,
-        obd2Connection: connection,
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 10));
-      // No pinned MAC → nothing pre-warmed (neither path is touched).
-      expect(connection.connectByMacDirectCalls, isEmpty);
-      expect(connection.connectByMacTransportAwareCalls, isEmpty);
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          trips: const [],
+          activeVehicle: unpairedVehicle,
+          recordingFactory: () => notifier,
+          obd2Connection: connection,
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 10));
+        // No pinned MAC → nothing pre-warmed (neither path is touched).
+        expect(connection.connectByMacDirectCalls, isEmpty);
+        expect(connection.connectByMacTransportAwareCalls, isEmpty);
 
-      await tester.tap(
-        find.byKey(const Key('trajets_start_recording_button')),
-      );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+        await tester.tap(
+          find.byKey(const Key('trajets_start_recording_button')),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
 
-      // Falls back to the picker sheet; no service reached start().
-      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
-      expect(notifier.startServiceCallCount, 0);
-    });
+        // Falls back to the picker sheet; no service reached start().
+        expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+        expect(notifier.startServiceCallCount, 0);
+      },
+    );
   });
 
   group('TrajetsTab — active recording CTA discoverability (#1237)', () {
-    testWidgets(
-      'idle state shows "Start recording" with the record-dot icon',
-      (tester) async {
-        await _pumpTab(tester, vehicleId: null, trips: const []);
+    testWidgets('idle state shows "Start recording" with the record-dot icon', (
+      tester,
+    ) async {
+      await _pumpTab(tester, vehicleId: null, trips: const []);
 
-        expect(find.text('Start recording'), findsOneWidget);
-        expect(find.text('Resume recording'), findsNothing);
-        // #1889 — the CTA is an extended FAB (matching the fuel tab's
-        // "add" button) and is enabled when no trip is active.
-        final button = tester.widget<FloatingActionButton>(
-          find.byKey(const Key('trajets_start_recording_button')),
-        );
-        expect(button.onPressed, isNotNull);
-      },
-    );
+      expect(find.text('Start recording'), findsOneWidget);
+      expect(find.text('Resume recording'), findsNothing);
+      // #1889 — the CTA is an extended FAB (matching the fuel tab's
+      // "add" button) and is enabled when no trip is active.
+      final button = tester.widget<FloatingActionButton>(
+        find.byKey(const Key('trajets_start_recording_button')),
+      );
+      expect(button.onPressed, isNotNull);
+    });
 
     testWidgets(
       'active recording switches CTA to "Resume recording" + visibility icon',
@@ -893,26 +916,30 @@ void main() {
   // disabling + relabelling so a glance at the tab matches.
   group('TrajetsTab — connecting-phase CTA (#2274 concern 2)', () {
     testWidgets(
-        'a connecting trip disables the CTA and shows the connecting label',
-        (tester) async {
-      await _pumpTab(
-        tester,
-        vehicleId: null,
-        trips: const [],
-        recordingFactory: () => _ConnectingTrip(),
-      );
-      await tester.pump();
+      'a connecting trip disables the CTA and shows the connecting label',
+      (tester) async {
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          trips: const [],
+          recordingFactory: () => _ConnectingTrip(),
+        );
+        await tester.pump();
 
-      // The inline progress card no longer exists on the tab.
-      expect(find.byKey(const Key('trajets_start_progress')), findsNothing);
-      // CTA relabelled + disabled while connecting.
-      expect(find.text('Connecting to OBD2 adapter…'), findsOneWidget);
-      final button = tester.widget<FloatingActionButton>(
-        find.byKey(const Key('trajets_start_recording_button')),
-      );
-      expect(button.onPressed, isNull,
-          reason: 'CTA is disabled while a start is connecting');
-    });
+        // The inline progress card no longer exists on the tab.
+        expect(find.byKey(const Key('trajets_start_progress')), findsNothing);
+        // CTA relabelled + disabled while connecting.
+        expect(find.text('Connecting to OBD2 adapter…'), findsOneWidget);
+        final button = tester.widget<FloatingActionButton>(
+          find.byKey(const Key('trajets_start_recording_button')),
+        );
+        expect(
+          button.onPressed,
+          isNull,
+          reason: 'CTA is disabled while a start is connecting',
+        );
+      },
+    );
   });
 
   // #2530 — the wide-screen split now goes through the shared
@@ -927,8 +954,9 @@ void main() {
       ),
     ];
 
-    testWidgets('compact width renders a single pane (no VerticalDivider)',
-        (tester) async {
+    testWidgets('compact width renders a single pane (no VerticalDivider)', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -946,8 +974,9 @@ void main() {
       expect(find.byKey(const Key('trajets_list')), findsOneWidget);
     });
 
-    testWidgets('expanded width renders two panes with the 2:3 ratio',
-        (tester) async {
+    testWidgets('expanded width renders two panes with the 2:3 ratio', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1024, 768);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -977,9 +1006,9 @@ void main() {
 class _ConnectingTrip extends TripRecording {
   @override
   TripRecordingState build() => const TripRecordingState(
-        phase: TripRecordingPhase.connecting,
-        connectStage: TripStartStage.connectingAdapter,
-      );
+    phase: TripRecordingPhase.connecting,
+    connectStage: TripStartStage.connectingAdapter,
+  );
 }
 
 /// Returns an [TripRecordingState] whose [TripRecordingState.isActive] is
@@ -987,9 +1016,8 @@ class _ConnectingTrip extends TripRecording {
 /// without having to spin up the OBD2 service stack.
 class _ActiveRecordingTrip extends TripRecording {
   @override
-  TripRecordingState build() => const TripRecordingState(
-        phase: TripRecordingPhase.recording,
-      );
+  TripRecordingState build() =>
+      const TripRecordingState(phase: TripRecordingPhase.recording);
 
   @override
   Future<StartTripOutcome> startTrip({
@@ -997,6 +1025,5 @@ class _ActiveRecordingTrip extends TripRecording {
     String? adapterMac,
     Obd2Service? service,
     bool automatic = false,
-  }) async =>
-      StartTripOutcome.alreadyActive;
+  }) async => StartTripOutcome.alreadyActive;
 }

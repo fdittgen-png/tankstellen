@@ -11,6 +11,7 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #702 originally surfaced an "edit vehicle" shortcut in the
 /// ConsumptionScreen AppBar. #1313 removed it (alongside the
@@ -26,10 +27,10 @@ class _FixedFillUpList extends FillUpList {
 class _OneActiveVehicle extends ActiveVehicleProfile {
   @override
   VehicleProfile? build() => const VehicleProfile(
-        id: 'daily-driver',
-        name: 'Daily Driver',
-        type: VehicleType.combustion,
-      );
+    id: 'daily-driver',
+    name: 'Daily Driver',
+    type: VehicleType.combustion,
+  );
 }
 
 class _NoActiveVehicle extends ActiveVehicleProfile {
@@ -49,14 +50,20 @@ Future<void> _pump(
         builder: (_, _) => const ConsumptionScreen(),
       ),
       GoRoute(path: '/consumption/add', builder: (_, _) => const SizedBox()),
-      GoRoute(path: '/consumption/pick-station',
-          builder: (_, _) => const SizedBox()),
+      GoRoute(
+        path: '/consumption/pick-station',
+        builder: (_, _) => const SizedBox(),
+      ),
       GoRoute(path: '/carbon', builder: (_, _) => const SizedBox()),
     ],
   );
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList()),
       activeVehicleProfileProvider.overrideWith(
@@ -70,20 +77,23 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('ConsumptionScreen vehicle shortcut removed (#1313)', () {
-    testWidgets('no Edit-vehicle IconButton when a vehicle is active',
-        (tester) async {
+    testWidgets('no Edit-vehicle IconButton when a vehicle is active', (
+      tester,
+    ) async {
       await _pump(tester, withActiveVehicle: true);
       expect(find.byKey(const Key('open_active_vehicle')), findsNothing);
     });
 
-    testWidgets('no Edit-vehicle IconButton when no vehicle is active',
-        (tester) async {
+    testWidgets('no Edit-vehicle IconButton when no vehicle is active', (
+      tester,
+    ) async {
       await _pump(tester, withActiveVehicle: false);
       expect(find.byKey(const Key('open_active_vehicle')), findsNothing);
     });
 
-    testWidgets('no trip-history IconButton (the Trajets sub-tab covers it)',
-        (tester) async {
+    testWidgets('no trip-history IconButton (the Trajets sub-tab covers it)', (
+      tester,
+    ) async {
       await _pump(tester, withActiveVehicle: true);
       expect(find.byKey(const Key('open_trip_history')), findsNothing);
     });

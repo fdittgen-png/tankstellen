@@ -13,21 +13,18 @@ import '../../l10n/app_localizations.dart';
 Widget invalidIdScreen(BuildContext context, String path) {
   final l = AppLocalizations.of(context);
   return Scaffold(
-    appBar: AppBar(title: Text(l?.invalidLinkTitle ?? 'Invalid link')),
+    appBar: AppBar(title: Text(l.invalidLinkTitle)),
     body: Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.link_off, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
-          Text(
-            l?.invalidLinkBody(path) ?? 'The link "$path" is not valid.',
-            textAlign: TextAlign.center,
-          ),
+          Text(l.invalidLinkBody(path), textAlign: TextAlign.center),
           const SizedBox(height: 16),
           FilledButton(
             onPressed: () => context.go(RoutePaths.search),
-            child: Text(l?.home ?? 'Home'),
+            child: Text(l.home),
           ),
         ],
       ),

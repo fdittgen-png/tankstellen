@@ -34,9 +34,8 @@ class LoyaltySettingsScreen extends ConsumerWidget {
     final cards = ref.watch(loyaltyCardsProvider);
 
     return PageScaffold(
-      title: l?.loyaltySettingsTitle ?? 'Fuel club cards',
-      subtitle: l?.loyaltySettingsSubtitle ??
-          'Apply your loyalty discount to displayed prices',
+      title: l.loyaltySettingsTitle,
+      subtitle: l.loyaltySettingsSubtitle,
       bannerIcon: Icons.card_membership,
       body: cards.isEmpty
           ? const LoyaltyEmptyState()
@@ -52,15 +51,16 @@ class LoyaltySettingsScreen extends ConsumerWidget {
                   onToggle: (enabled) => ref
                       .read(loyaltyCardsProvider.notifier)
                       .setEnabled(card.id, enabled: enabled),
-                  onDeleteRequested: () => _confirmAndDelete(context, ref, card),
+                  onDeleteRequested: () =>
+                      _confirmAndDelete(context, ref, card),
                 );
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openAddSheet(context, ref),
         icon: const Icon(Icons.add),
-        label: Text(l?.loyaltyAddCard ?? 'Add card'),
-        tooltip: l?.loyaltyAddCard ?? 'Add card',
+        label: Text(l.loyaltyAddCard),
+        tooltip: l.loyaltyAddCard,
       ),
     );
   }
@@ -90,19 +90,16 @@ class LoyaltySettingsScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l?.loyaltyDeleteConfirmTitle ?? 'Delete card?'),
-        content: Text(
-          l?.loyaltyDeleteConfirmBody ??
-              'This card will stop applying its discount.',
-        ),
+        title: Text(l.loyaltyDeleteConfirmTitle),
+        content: Text(l.loyaltyDeleteConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l?.delete ?? 'Delete'),
+            child: Text(l.delete),
           ),
         ],
       ),

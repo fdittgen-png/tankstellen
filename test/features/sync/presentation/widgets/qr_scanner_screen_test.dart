@@ -7,17 +7,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:tankstellen/core/permissions/camera_permissions.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/qr_scanner_screen.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('QrScannerTorchButton (#721 subset)', () {
-    testWidgets('hidden when the platform reports torch unavailable',
-        (tester) async {
+    testWidgets('hidden when the platform reports torch unavailable', (
+      tester,
+    ) async {
       await _pumpButton(tester, TorchState.unavailable);
       expect(find.byKey(const Key('qrScannerTorchToggle')), findsNothing);
     });
 
-    testWidgets('off state: flash_off icon + "Turn flash on" tooltip',
-        (tester) async {
+    testWidgets('off state: flash_off icon + "Turn flash on" tooltip', (
+      tester,
+    ) async {
       await _pumpButton(tester, TorchState.off);
       final btn = find.byKey(const Key('qrScannerTorchToggle'));
       expect(btn, findsOneWidget);
@@ -25,8 +28,9 @@ void main() {
       expect(find.byIcon(Icons.flash_off), findsOneWidget);
     });
 
-    testWidgets('on state: flash_on icon + "Turn flash off" tooltip',
-        (tester) async {
+    testWidgets('on state: flash_on icon + "Turn flash off" tooltip', (
+      tester,
+    ) async {
       await _pumpButton(tester, TorchState.on);
       final btn = find.byKey(const Key('qrScannerTorchToggle'));
       expect(tester.widget<IconButton>(btn).tooltip, 'Turn flash off');
@@ -35,26 +39,22 @@ void main() {
 
     testWidgets('tapping the button calls onToggle', (tester) async {
       var calls = 0;
-      await _pumpButton(
-        tester,
-        TorchState.off,
-        onToggle: () async => calls++,
-      );
+      await _pumpButton(tester, TorchState.off, onToggle: () async => calls++);
       await tester.tap(find.byKey(const Key('qrScannerTorchToggle')));
       await tester.pump();
       expect(calls, 1);
     });
 
-    testWidgets('rebuilds when the notifier emits a new torch state',
-        (tester) async {
+    testWidgets('rebuilds when the notifier emits a new torch state', (
+      tester,
+    ) async {
       final notifier = _TorchStateNotifier(TorchState.off);
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
-            body: QrScannerTorchButton(
-              state: notifier,
-              onToggle: () async {},
-            ),
+            body: QrScannerTorchButton(state: notifier, onToggle: () async {}),
           ),
         ),
       );
@@ -77,6 +77,8 @@ Future<void> _pumpButton(
   final notifier = _TorchStateNotifier(torch);
   await tester.pumpWidget(
     MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: QrScannerTorchButton(
           state: notifier,
@@ -121,9 +123,13 @@ void _registerQrScannerFlowTests() {
       final perms = _FakeCameraPermissions(
         currentState: CameraPermissionState.permanentlyDenied,
       );
-      await tester.pumpWidget(MaterialApp(
-        home: QrScannerScreen(permissions: perms),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: QrScannerScreen(permissions: perms),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(
@@ -142,9 +148,13 @@ void _registerQrScannerFlowTests() {
         currentState: CameraPermissionState.denied,
         requestResult: CameraPermissionState.denied,
       );
-      await tester.pumpWidget(MaterialApp(
-        home: QrScannerScreen(permissions: perms),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: QrScannerScreen(permissions: perms),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('qrScannerDenied')), findsOneWidget);
@@ -157,15 +167,20 @@ void _registerQrScannerFlowTests() {
 
     testWidgets('denied + re-prompt granted clears the error state — '
         'the user who changes their mind and grants on the second '
-        'ask should land on the scanner, not get stuck on the CTA',
-        (tester) async {
+        'ask should land on the scanner, not get stuck on the CTA', (
+      tester,
+    ) async {
       final perms = _FakeCameraPermissions(
         currentState: CameraPermissionState.denied,
         requestResult: CameraPermissionState.granted,
       );
-      await tester.pumpWidget(MaterialApp(
-        home: QrScannerScreen(permissions: perms),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: QrScannerScreen(permissions: perms),
+        ),
+      );
       // Intentionally don't settle — MobileScanner will start
       // initialising and fail in the test harness. We only want
       // to verify the denied CTA is no longer shown.
@@ -185,16 +200,16 @@ class _TorchStateNotifier extends ValueNotifier<MobileScannerState> {
   }
 
   static MobileScannerState _state(TorchState torch) => MobileScannerState(
-        availableCameras: 1,
-        cameraDirection: CameraFacing.back,
-        cameraLensType: CameraLensType.wide,
-        deviceOrientation: DeviceOrientation.portraitUp,
-        isInitialized: true,
-        isStarting: false,
-        isRunning: true,
-        size: Size.zero,
-        torchState: torch,
-        zoomScale: 1,
-        error: null,
-      );
+    availableCameras: 1,
+    cameraDirection: CameraFacing.back,
+    cameraLensType: CameraLensType.wide,
+    deviceOrientation: DeviceOrientation.portraitUp,
+    isInitialized: true,
+    isStarting: false,
+    isRunning: true,
+    size: Size.zero,
+    torchState: torch,
+    zoomScale: 1,
+    error: null,
+  );
 }

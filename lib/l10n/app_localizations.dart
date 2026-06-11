@@ -6218,6 +6218,12 @@ abstract class AppLocalizations {
   /// **'{label} is due — {kmOver} km past the interval.'**
   String serviceReminderDueBody(String label, int kmOver);
 
+  /// No description provided for @serviceReminderDueNowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} is due now.'**
+  String serviceReminderDueNowBody(String label);
+
   /// No description provided for @southKoreaApiKeyRequired.
   ///
   /// In en, this message translates to:

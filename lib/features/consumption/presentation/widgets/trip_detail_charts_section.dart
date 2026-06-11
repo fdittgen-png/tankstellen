@@ -31,7 +31,9 @@ class TripDetailChartsSection extends StatelessWidget {
     final hasFuelRateSamples = samples.any(
       (s) => s.fuelRateLPerHour != null || s.estimatedFuelRateLPerHour != null,
     );
-    final hasEngineLoadSamples = samples.any((s) => s.engineLoadPercent != null);
+    final hasEngineLoadSamples = samples.any(
+      (s) => s.engineLoadPercent != null,
+    );
     final hasThrottleSamples = samples.any(
       (s) => s.pedalPercent != null || s.throttlePercent != null,
     );
@@ -43,7 +45,7 @@ class TripDetailChartsSection extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
-        title: Text(l?.trajetDetailChartsSection ?? 'Charts'),
+        title: Text(l.trajetDetailChartsSection),
         initiallyExpanded: false,
         maintainState: true,
         shape: const Border(),
@@ -51,44 +53,44 @@ class TripDetailChartsSection extends StatelessWidget {
         childrenPadding: const EdgeInsets.only(bottom: 4),
         children: [
           TripChartSection(
-            title: l?.trajetDetailChartSpeed ?? 'Speed (km/h)',
+            title: l.trajetDetailChartSpeed,
             chart: TripDetailSpeedChart(samples: samples),
           ),
           if (hasFuelRateSamples)
             TripChartSection(
-              title: l?.trajetDetailChartFuelRate ?? 'Fuel rate (L/h)',
+              title: l.trajetDetailChartFuelRate,
               chart: TripDetailFuelRateChart(samples: samples),
             ),
           if (hasRpmSamples)
             TripChartSection(
-              title: l?.trajetDetailChartRpm ?? 'RPM',
+              title: l.trajetDetailChartRpm,
               chart: TripDetailRpmChart(samples: samples),
             ),
           if (hasEngineLoadSamples)
             TripChartSection(
-              title: l?.trajetDetailChartEngineLoad ?? 'Engine load (%)',
+              title: l.trajetDetailChartEngineLoad,
               chart: TripDetailEngineLoadChart(samples: samples),
             ),
           // #2461 — driving-signal charts, each gated on its own
           // if-any-non-null signal (mirrors RPM / engine-load).
           if (hasThrottleSamples)
             TripChartSection(
-              title: l?.trajetDetailChartThrottle ?? 'Throttle / pedal (%)',
+              title: l.trajetDetailChartThrottle,
               chart: TripDetailThrottleChart(samples: samples),
             ),
           if (hasCoolantSamples)
             TripChartSection(
-              title: l?.trajetDetailChartCoolant ?? 'Coolant (°C)',
+              title: l.trajetDetailChartCoolant,
               chart: TripDetailCoolantChart(samples: samples),
             ),
           if (hasAltitudeSamples)
             TripChartSection(
-              title: l?.trajetDetailChartAltitude ?? 'Altitude (m)',
+              title: l.trajetDetailChartAltitude,
               chart: TripDetailAltitudeChart(samples: samples),
             ),
           if (hasLambdaSamples)
             TripChartSection(
-              title: l?.trajetDetailChartLambda ?? 'Commanded λ',
+              title: l.trajetDetailChartLambda,
               chart: TripDetailLambdaChart(samples: samples),
             ),
         ],

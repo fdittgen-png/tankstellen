@@ -38,9 +38,7 @@ class ProfileListSection extends ConsumerWidget {
               // theme default.
               textColor: isActive ? cs.onPrimaryContainer : null,
               iconColor: isActive ? cs.onPrimaryContainer : null,
-              leading: Icon(
-                isActive ? Icons.person : Icons.person_outline,
-              ),
+              leading: Icon(isActive ? Icons.person : Icons.person_outline),
               title: Text(profile.name),
               subtitle: Text(
                 '${profile.countryCode != null ? (Countries.byCode(profile.countryCode!)?.flag ?? "") : ""} '
@@ -54,12 +52,11 @@ class ProfileListSection extends ConsumerWidget {
                   if (!isActive)
                     TextButton(
                       onPressed: () => _activateProfile(context, ref, profile),
-                      child: Text(AppLocalizations.of(context)?.activate ?? 'Activate'),
+                      child: Text(AppLocalizations.of(context).activate),
                     ),
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    tooltip: AppLocalizations.of(context)?.editProfile ??
-                        'Edit profile',
+                    tooltip: AppLocalizations.of(context).editProfile,
                     onPressed: () => _editProfile(context, ref, profile),
                   ),
                 ],
@@ -71,8 +68,7 @@ class ProfileListSection extends ConsumerWidget {
         OutlinedButton.icon(
           onPressed: () => _createProfile(context, ref),
           icon: const Icon(Icons.add),
-          label: Text(
-              AppLocalizations.of(context)?.newProfile ?? 'New profile'),
+          label: Text(AppLocalizations.of(context).newProfile),
         ),
       ],
     );
@@ -84,7 +80,10 @@ class ProfileListSection extends ConsumerWidget {
   /// once that mutation has completed, so we await it, then refresh the
   /// active provider and invalidate the list before surfacing feedback.
   Future<void> _activateProfile(
-      BuildContext context, WidgetRef ref, UserProfile profile) async {
+    BuildContext context,
+    WidgetRef ref,
+    UserProfile profile,
+  ) async {
     // #3159 — capture the notifier BEFORE the await: Riverpod 3 throws a
     // StateError when a WidgetRef is used after the element unmounted, and
     // the user can leave the screen while switchProfile persists.
@@ -94,11 +93,7 @@ class ProfileListSection extends ConsumerWidget {
     if (!context.mounted) return;
     ref.invalidate(allProfilesProvider);
     final l10n = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l10n?.profileSwitchedTo(profile.name) ??
-          'Switched to ${profile.name}',
-    );
+    SnackBarHelper.showSuccess(context, l10n.profileSwitchedTo(profile.name));
   }
 
   Future<void> _createProfile(BuildContext context, WidgetRef ref) async {
@@ -111,7 +106,7 @@ class ProfileListSection extends ConsumerWidget {
 
     final name = await _showNameDialog(
       context,
-      AppLocalizations.of(context)?.newProfile ?? 'New profile',
+      AppLocalizations.of(context).newProfile,
       '',
     );
     if (name == null || name.isEmpty) return;
@@ -135,14 +130,14 @@ class ProfileListSection extends ConsumerWidget {
     if (!context.mounted) return;
     ref.invalidate(allProfilesProvider);
     final l10n = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l10n?.profileCreatedNamed(name) ?? 'Profile $name created',
-    );
+    SnackBarHelper.showSuccess(context, l10n.profileCreatedNamed(name));
   }
 
   Future<void> _editProfile(
-      BuildContext context, WidgetRef ref, UserProfile profile) async {
+    BuildContext context,
+    WidgetRef ref,
+    UserProfile profile,
+  ) async {
     // Check how many profiles exist — the last one cannot be deleted
     final allProfiles = ref.read(allProfilesProvider);
     final canDelete = allProfiles.length > 1;
@@ -168,17 +163,22 @@ class ProfileListSection extends ConsumerWidget {
           if (context.mounted) ref.invalidate(allProfilesProvider);
         },
         // Default profile (last remaining) cannot be deleted
-        onDelete: canDelete ? () async {
-          await repo.deleteProfile(profile.id);
-          profileNotifier.refresh();
-          if (context.mounted) ref.invalidate(allProfilesProvider);
-        } : null,
+        onDelete: canDelete
+            ? () async {
+                await repo.deleteProfile(profile.id);
+                profileNotifier.refresh();
+                if (context.mounted) ref.invalidate(allProfilesProvider);
+              }
+            : null,
       ),
     );
   }
 
   Future<String?> _showNameDialog(
-      BuildContext context, String title, String initial) async {
+    BuildContext context,
+    String title,
+    String initial,
+  ) async {
     final controller = TextEditingController(text: initial);
     final result = await showDialog<String>(
       context: context,
@@ -188,18 +188,18 @@ class ProfileListSection extends ConsumerWidget {
           controller: controller,
           autofocus: true,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.nameLabel ?? 'Name',
+            labelText: AppLocalizations.of(context).nameLabel,
             border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(AppLocalizations.of(context)?.save ?? 'Save'),
+            child: Text(AppLocalizations.of(context).save),
           ),
         ],
       ),

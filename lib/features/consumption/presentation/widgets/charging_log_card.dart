@@ -29,7 +29,7 @@ class ChargingLogCard extends StatelessWidget {
         '${log.date.year}-${_pad(log.date.month)}-${_pad(log.date.day)}';
     final title = log.stationName?.trim().isNotEmpty == true
         ? log.stationName!
-        : (l?.chargingStationName ?? 'Station');
+        : (l.chargingStationName);
     final kwhStr = log.kWh.toStringAsFixed(1);
     // #2491 — a charging-session cost is a TOTAL: route it through
     // formatTotal (locale-aware 2 dp + the active currency symbol)

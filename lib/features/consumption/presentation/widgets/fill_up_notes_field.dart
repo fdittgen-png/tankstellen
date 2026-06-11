@@ -27,7 +27,7 @@ class FillUpNotesField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: l?.notesOptional ?? 'Notes (optional)',
+        labelText: l.notesOptional,
         prefixIcon: const Icon(Icons.edit_note),
         alignLabelWithHint: true,
         border: const OutlineInputBorder(),

@@ -66,8 +66,8 @@ class RadarSwipeWrapper extends ConsumerWidget {
     final swipeable = candidates.length > 1;
     final maxIndex = candidates.length - 1;
 
-    final nearerLabel = l?.fuelStationRadarNearer ?? 'Nearer station';
-    final fartherLabel = l?.fuelStationRadarFarther ?? 'Farther station';
+    final nearerLabel = l.fuelStationRadarNearer;
+    final fartherLabel = l.fuelStationRadarFarther;
 
     final card = RadarCard(
       title: title,
@@ -131,10 +131,7 @@ class RadarSwipeWrapper extends ConsumerWidget {
         // Fade the new station in as the page advances.
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
-          child: KeyedSubtree(
-            key: ValueKey(station.id),
-            child: card,
-          ),
+          child: KeyedSubtree(key: ValueKey(station.id), child: card),
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_filter_wrap.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('AmenityFilterWrap', () {
@@ -15,11 +16,10 @@ void main() {
     }) {
       return tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
-            body: AmenityFilterWrap(
-              selected: selected,
-              onToggle: onToggle,
-            ),
+            body: AmenityFilterWrap(selected: selected, onToggle: onToggle),
           ),
         ),
       );
@@ -44,14 +44,11 @@ void main() {
       expect(selectedCount, 2);
     });
 
-    testWidgets('tapping a chip invokes onToggle with that amenity',
-        (tester) async {
+    testWidgets('tapping a chip invokes onToggle with that amenity', (
+      tester,
+    ) async {
       StationAmenity? captured;
-      await pumpWrap(
-        tester,
-        selected: const {},
-        onToggle: (a) => captured = a,
-      );
+      await pumpWrap(tester, selected: const {}, onToggle: (a) => captured = a);
       await tester.tap(find.text('Shop'));
       await tester.pump();
       expect(captured, StationAmenity.shop);

@@ -52,15 +52,14 @@ class EvFavoriteDismissible extends ConsumerWidget {
         final l10nSnack = AppLocalizations.of(context);
         SnackBarHelper.showWithUndo(
           context,
-          l10nSnack?.removedFromFavoritesName(label) ??
-              '$label removed from favorites',
-          undoLabel: l10nSnack?.undo ?? 'Undo',
+          l10nSnack.removedFromFavoritesName(label),
+          undoLabel: l10nSnack.undo,
           onUndo: () => favorites.add(station.id, stationData: station),
         );
         return true;
       },
       background: Semantics(
-        label: l10n?.semanticsNavigateTo(label) ?? 'Navigate to $label',
+        label: l10n.semanticsNavigateTo(label),
         child: Container(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.only(left: 24),
@@ -71,17 +70,18 @@ class EvFavoriteDismissible extends ConsumerWidget {
               const Icon(Icons.navigation, color: Colors.white, size: 20),
               const SizedBox(width: 8),
               Text(
-                l10n?.navigate ?? 'Navigate',
+                l10n.navigate,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
         ),
       ),
       secondaryBackground: Semantics(
-        label: l10n?.semanticsRemoveFromFavorites(label) ??
-            'Remove $label from favorites',
+        label: l10n.semanticsRemoveFromFavorites(label),
         child: Container(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 24),
@@ -90,9 +90,11 @@ class EvFavoriteDismissible extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                l10n?.remove ?? 'Remove',
+                l10n.remove,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(width: 8),
               const Icon(Icons.delete, color: Colors.white, size: 20),

@@ -134,8 +134,7 @@ class _EditCorrectionFillUpSheetState
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final correctionColor = DarkModeColors.warning(context);
-    final dateStr =
-        '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
+    final dateStr = '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
 
     return Padding(
       // The sheet is summoned with `isScrollControlled: true` so it can
@@ -154,14 +153,11 @@ class _EditCorrectionFillUpSheetState
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.auto_fix_high,
-                    color: correctionColor,
-                  ),
+                  Icon(Icons.auto_fix_high, color: correctionColor),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      l?.fillUpCorrectionEditTitle ?? 'Edit auto-correction',
+                      l.fillUpCorrectionEditTitle,
                       style: theme.textTheme.titleLarge,
                     ),
                   ),
@@ -169,41 +165,38 @@ class _EditCorrectionFillUpSheetState
               ),
               const SizedBox(height: 12),
               Text(
-                l?.fillUpCorrectionEditExplainer ??
-                    'This entry was auto-generated to close the gap '
-                        'between recorded trips and pumped fuel. Adjust '
-                        'the values if you know the actual figures.',
+                l.fillUpCorrectionEditExplainer,
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.calendar_today),
-                title: Text(l?.fillUpDate ?? 'Date'),
+                title: Text(l.fillUpDate),
                 subtitle: Text(dateStr),
                 onTap: _pickDate,
               ),
               const SizedBox(height: 8),
               FillUpNumericField(
                 controller: _litersCtrl,
-                label: l?.liters ?? 'Liters',
+                label: l.liters,
                 icon: Icons.local_drink,
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
               const SizedBox(height: 8),
               FillUpNumericField(
                 controller: _costCtrl,
-                label: l?.totalCost ?? 'Total cost',
+                label: l.totalCost,
                 icon: Icons.attach_money,
                 // Cost may legitimately be 0 for a correction (no
                 // receipt, synthesised entry); accept >= 0 here.
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) {
-                    return l?.fieldRequired ?? 'Required';
+                    return l.fieldRequired;
                   }
                   final parsed = double.tryParse(v.replaceAll(',', '.'));
                   if (parsed == null || parsed < 0) {
-                    return l?.fieldInvalidNumber ?? 'Invalid number';
+                    return l.fieldInvalidNumber;
                   }
                   return null;
                 },
@@ -211,7 +204,7 @@ class _EditCorrectionFillUpSheetState
               const SizedBox(height: 8),
               FillUpNumericField(
                 controller: _odoCtrl,
-                label: l?.odometerKm ?? 'Odometer (km)',
+                label: l.odometerKm,
                 icon: Icons.speed,
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
@@ -219,8 +212,7 @@ class _EditCorrectionFillUpSheetState
               TextFormField(
                 controller: _stationCtrl,
                 decoration: InputDecoration(
-                  labelText:
-                      l?.fillUpCorrectionStation ?? 'Station name (optional)',
+                  labelText: l.fillUpCorrectionStation,
                   prefixIcon: const Icon(Icons.local_gas_station),
                 ),
               ),
@@ -228,7 +220,7 @@ class _EditCorrectionFillUpSheetState
               TextFormField(
                 controller: _notesCtrl,
                 decoration: InputDecoration(
-                  labelText: l?.notesOptional ?? 'Notes (optional)',
+                  labelText: l.notesOptional,
                   prefixIcon: const Icon(Icons.notes),
                 ),
                 maxLines: 2,
@@ -243,9 +235,7 @@ class _EditCorrectionFillUpSheetState
                         foregroundColor: theme.colorScheme.error,
                       ),
                       icon: const Icon(Icons.delete_outline),
-                      label: Text(
-                        l?.fillUpCorrectionDelete ?? 'Delete correction',
-                      ),
+                      label: Text(l.fillUpCorrectionDelete),
                     ),
                   ),
                 ],
@@ -256,15 +246,12 @@ class _EditCorrectionFillUpSheetState
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text(l?.cancel ?? 'Cancel'),
+                      child: Text(l.cancel),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: FilledButton(
-                      onPressed: _save,
-                      child: Text(l?.save ?? 'Save'),
-                    ),
+                    child: FilledButton(onPressed: _save, child: Text(l.save)),
                   ),
                 ],
               ),

@@ -46,9 +46,14 @@ class EvConnectorChips extends StatelessWidget {
   /// AA, preserving per-connector identity. Callers that omit [brightness]
   /// keep the canonical light identity hue (the value the chip-colour API
   /// and its tests document).
-  static Color colorFor(String type, {Brightness brightness = Brightness.light}) {
+  static Color colorFor(
+    String type, {
+    Brightness brightness = Brightness.light,
+  }) {
     final dark = brightness == Brightness.dark;
-    if (type.contains('CCS')) return FuelColors.evAccent; // Crystal-blue (already light)
+    if (type.contains('CCS')) {
+      return FuelColors.evAccent; // Crystal-blue (already light)
+    }
     if (type.contains('Type 2')) {
       return dark ? const Color(0xFF81C784) : const Color(0xFF4CAF50); // Green
     }
@@ -68,8 +73,8 @@ class EvConnectorChips extends StatelessWidget {
     final brightness = Theme.of(context).brightness;
     final isDark = brightness == Brightness.dark;
     final semanticLabel = visible.isEmpty
-        ? (l10n?.evConnectorsNone ?? 'No connector information')
-        : '${l10n?.evConnectorsLabel ?? "Available connectors"}: '
+        ? (l10n.evConnectorsNone)
+        : '${l10n.evConnectorsLabel}: '
               '${visible.join(", ")}';
 
     return Semantics(

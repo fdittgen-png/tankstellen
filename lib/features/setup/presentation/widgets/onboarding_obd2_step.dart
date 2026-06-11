@@ -58,8 +58,7 @@ class OnboardingObd2Step extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<OnboardingObd2Step> createState() =>
-      _OnboardingObd2StepState();
+  ConsumerState<OnboardingObd2Step> createState() => _OnboardingObd2StepState();
 }
 
 enum _Phase { initial, connecting, readingVin }
@@ -97,11 +96,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
       // later" button — the skip path is still available below the
       // scaffold body.
       setState(() => _phase = _Phase.initial);
-      SnackBarHelper.show(
-        context,
-        l10n?.onboardingObd2ConnectFailed ??
-            "Couldn't connect to the adapter. You can retry or skip.",
-      );
+      SnackBarHelper.show(context, l10n.onboardingObd2ConnectFailed);
       return;
     }
 
@@ -142,7 +137,14 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     try {
       decoded = await ref.read(decodedVinProvider(vin).future);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'OnboardingObd2Step: VIN decode failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'OnboardingObd2Step: VIN decode failed'},
+        ),
+      );
       decoded = null;
     }
 
@@ -154,9 +156,9 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
       // anything with it. Fall through to manual entry with the VIN
       // stashed so the following step can still pre-fill the VIN text
       // field if it wants to.
-      ref.read(onboardingWizardControllerProvider.notifier).setObd2VinData(
-            VinData(vin: vin, source: VinDataSource.invalid),
-          );
+      ref
+          .read(onboardingWizardControllerProvider.notifier)
+          .setObd2VinData(VinData(vin: vin, source: VinDataSource.invalid));
       widget.onProceed();
       return;
     }
@@ -185,7 +187,16 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     try {
       await _saveDecodedProfile(decoded);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'OnboardingObd2Step: save decoded profile failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'OnboardingObd2Step: save decoded profile failed',
+          },
+        ),
+      );
     }
     if (!mounted) return;
     widget.onAutoFillSuccess();
@@ -266,8 +277,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
           Semantics(
             header: true,
             child: Text(
-              l10n?.onboardingObd2StepTitle ??
-                  'Connect your OBD2 adapter',
+              l10n.onboardingObd2StepTitle,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -276,10 +286,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
           ),
           const SizedBox(height: 12),
           Text(
-            l10n?.onboardingObd2StepBody ??
-                "Plug your OBD2 adapter into the car's port and turn the "
-                    "ignition on. We'll read the VIN and fill in engine "
-                    'details for you.',
+            l10n.onboardingObd2StepBody,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -293,7 +300,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
                 const CircularProgressIndicator(),
                 const SizedBox(height: 12),
                 Text(
-                  l10n?.onboardingObd2ReadingVin ?? 'Reading VIN…',
+                  l10n.onboardingObd2ReadingVin,
                   style: theme.textTheme.bodyMedium,
                 ),
               ],
@@ -313,19 +320,16 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.bluetooth),
-                    label: Text(
-                      l10n?.onboardingObd2ConnectButton ?? 'Connect adapter',
-                    ),
+                    label: Text(l10n.onboardingObd2ConnectButton),
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextButton(
                   key: const Key('onboardingObd2SkipButton'),
-                  onPressed:
-                      _phase == _Phase.connecting ? null : widget.onProceed,
-                  child: Text(
-                    l10n?.onboardingObd2SkipButton ?? 'Maybe later',
-                  ),
+                  onPressed: _phase == _Phase.connecting
+                      ? null
+                      : widget.onProceed,
+                  child: Text(l10n.onboardingObd2SkipButton),
                 ),
               ],
             ),

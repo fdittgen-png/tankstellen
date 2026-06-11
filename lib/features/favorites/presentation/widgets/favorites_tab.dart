@@ -36,15 +36,13 @@ class FavoritesTab extends ConsumerWidget {
 
     if (favoriteIds.isEmpty) {
       return Semantics(
-        label: l10n?.noFavoritesSemanticLabel ??
-            'No favorites yet. Tap the star on a station to save it as a favorite.',
+        label: l10n.noFavoritesSemanticLabel,
         child: EmptyState(
           icon: Icons.star_outline,
           iconSize: 80,
-          title: l10n?.noFavorites ?? 'No favorites yet',
-          subtitle: l10n?.noFavoritesHint ??
-              'Tap the star on a station to save it here',
-          actionLabel: l10n?.search ?? 'Search Stations',
+          title: l10n.noFavorites,
+          subtitle: l10n.noFavoritesHint,
+          actionLabel: l10n.search,
           onAction: () => context.go(RoutePaths.search),
           topBiased: true,
         ),
@@ -68,8 +66,7 @@ class FavoritesTab extends ConsumerWidget {
           },
           child: Column(
             children: [
-              if (result.data.isNotEmpty)
-                ServiceStatusBanner(result: result),
+              if (result.data.isNotEmpty) ServiceStatusBanner(result: result),
               const SwipeTutorialBanner(),
               Expanded(
                 child: ListView.builder(
@@ -81,8 +78,9 @@ class FavoritesTab extends ConsumerWidget {
                         FavoriteStationDismissible(station: station),
                       // #1958 — EV favorites now swipe just like
                       // fuel-station favorites (navigate / remove).
-                      EVStationResult(:final station) =>
-                        EvFavoriteDismissible(station: station),
+                      EVStationResult(:final station) => EvFavoriteDismissible(
+                        station: station,
+                      ),
                     };
                   },
                 ),

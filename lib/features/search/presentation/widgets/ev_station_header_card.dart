@@ -45,8 +45,8 @@ class EVStationHeaderCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   station.isOperational == true
-                      ? (l10n?.evOperational ?? 'Operational')
-                      : (l10n?.evStatusUnknown ?? 'Status unknown'),
+                      ? (l10n.evOperational)
+                      : (l10n.evStatusUnknown),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: station.isOperational == true
                         ? DarkModeColors.success(context)
@@ -61,10 +61,15 @@ class EVStationHeaderCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               station.name,
-              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             if (operatorName.isNotEmpty && operatorName != station.name)
-              Text(operatorName, style: theme.textTheme.titleMedium?.copyWith(color: evColor)),
+              Text(
+                operatorName,
+                style: theme.textTheme.titleMedium?.copyWith(color: evColor),
+              ),
           ],
         ),
       ),

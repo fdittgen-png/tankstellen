@@ -33,6 +33,7 @@ import 'eco_score_badge.dart';
 class FillUpCard extends StatelessWidget {
   final FillUp fillUp;
   final EcoScore? ecoScore;
+
   /// Raw per-fill-up L/100 km without the comparison-to-baseline
   /// chip (#2060). Rendered only when [ecoScore] is null AND this
   /// value is non-null — entries that have enough data to compute
@@ -74,8 +75,10 @@ class FillUpCard extends StatelessWidget {
     final costStr = PriceFormatter.formatTotal(fillUp.totalCost);
     // #3198 — thread the fill-up's fuel so a per-fuel suffix override
     // applies (AR GNC is priced per m³, not per litre).
-    final ppl = UnitFormatter.formatPricePerUnit(fillUp.pricePerLiter,
-        fuelType: fillUp.fuelType);
+    final ppl = UnitFormatter.formatPricePerUnit(
+      fillUp.pricePerLiter,
+      fuelType: fillUp.fuelType,
+    );
     // #1401 phase 7b — only render the verified-by-adapter chip when
     // both fuel-level captures are present. Either missing → no chip.
     final isVerifiedByAdapter = FillUpVariance.hasAdapterCapture(fillUp);
@@ -97,17 +100,15 @@ class FillUpCard extends StatelessWidget {
           fillUp.stationName ?? fillUp.fuelType.apiValue.toUpperCase(),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.titleSmall
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('$dateStr · $distance'),
-            Text(
-              '$volume · $costStr · $ppl',
-              style: theme.textTheme.bodySmall,
-            ),
+            Text('$volume · $costStr · $ppl', style: theme.textTheme.bodySmall),
             if (isVerifiedByAdapter) ...[
               const SizedBox(height: 4),
               // #1401 phase 7b — small "Verified by adapter" chip. Uses
@@ -135,8 +136,7 @@ class FillUpCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        l?.fillUpReconciliationVerifiedBadgeLabel ??
-                            'Verified by adapter',
+                        l.fillUpReconciliationVerifiedBadgeLabel,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.w600,
@@ -156,13 +156,7 @@ class FillUpCard extends StatelessWidget {
               // enough preceding same-fuel history for an EcoScoreBadge
               // trend chip. Plain text, no arrow, no comparison.
               Text(
-                l?.ecoScoreConsumption(
-                      rawLPer100Km!.toStringAsFixed(1),
-                    ) ??
-                    UnitFormatter.formatConsumption(
-                      rawLPer100Km!,
-                      isEv: false,
-                    ),
+                l.ecoScoreConsumption(rawLPer100Km!.toStringAsFixed(1)),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w600,
@@ -174,7 +168,7 @@ class FillUpCard extends StatelessWidget {
         trailing: Text(
           fillUp.fuelType.apiValue.toUpperCase(),
           style: theme.textTheme.labelSmall,
-          semanticsLabel: l?.fuelType ?? 'Fuel type',
+          semanticsLabel: l.fuelType,
         ),
       ),
     );
@@ -228,8 +222,7 @@ class _CorrectionRow extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  l?.fillUpCorrectionLabel ??
-                      'Auto-correction — tap to edit',
+                  l.fillUpCorrectionLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelMedium?.copyWith(

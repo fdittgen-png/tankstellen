@@ -22,7 +22,8 @@ Future<void> Function({
   required String text,
   required String fileName,
   required String mimeType,
-})? debugTripDetailDownloadOverride;
+})?
+debugTripDetailDownloadOverride;
 
 /// Save the trip's full telemetry sample stream as a CSV file to the
 /// device's public Downloads folder (#2652). Mirrors [shareTripGpx]:
@@ -34,38 +35,36 @@ Future<void> Function({
 /// is never handed a header-only file.
 Future<void> downloadTripCsv(
   BuildContext context,
-  AppLocalizations? l,
+  AppLocalizations l,
   TripHistoryEntry entry,
-) =>
-    _downloadTripText(
-      context,
-      l,
-      entry,
-      text: () => buildTripDetailCsv(entry),
-      fileName: _fileNameFor(entry, 'csv'),
-      mimeType: 'text/csv',
-    );
+) => _downloadTripText(
+  context,
+  l,
+  entry,
+  text: () => buildTripDetailCsv(entry),
+  fileName: _fileNameFor(entry, 'csv'),
+  mimeType: 'text/csv',
+);
 
 /// Save the trip as its persisted, re-importable JSON wire form to the
 /// device's public Downloads folder (#2652). Same delivery + error +
 /// empty-trip semantics as [downloadTripCsv].
 Future<void> downloadTripJson(
   BuildContext context,
-  AppLocalizations? l,
+  AppLocalizations l,
   TripHistoryEntry entry,
-) =>
-    _downloadTripText(
-      context,
-      l,
-      entry,
-      text: () => buildTripDetailJson(entry),
-      fileName: _fileNameFor(entry, 'json'),
-      mimeType: 'application/json',
-    );
+) => _downloadTripText(
+  context,
+  l,
+  entry,
+  text: () => buildTripDetailJson(entry),
+  fileName: _fileNameFor(entry, 'json'),
+  mimeType: 'application/json',
+);
 
 Future<void> _downloadTripText(
   BuildContext context,
-  AppLocalizations? l,
+  AppLocalizations l,
   TripHistoryEntry entry, {
   required String Function() text,
   required String fileName,
@@ -74,7 +73,7 @@ Future<void> _downloadTripText(
   final messenger = ScaffoldMessenger.maybeOf(context);
   final scheme = Theme.of(context).colorScheme;
   if (entry.samples.isEmpty) {
-    final msg = l?.trajetDetailShareGpxEmpty ?? 'No GPS samples in this trip';
+    final msg = l.trajetDetailShareGpxEmpty;
     messenger?.showSnackBar(SnackBarHelper.errorSnackBar(scheme, msg));
     return;
   }
@@ -91,13 +90,19 @@ Future<void> _downloadTripText(
       mimeType: mimeType,
     );
     if (messenger == null) return;
-    final ok = l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
+    final ok = l.savedToDownloadsFolder;
     messenger.showSnackBar(SnackBarHelper.successSnackBar(scheme, ok));
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-        context: const {'where': 'TripDetailScreen download'}));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {'where': 'TripDetailScreen download'},
+      ),
+    );
     if (messenger == null) return;
-    final errorMsg = l?.trajetDetailDownloadError ?? "Couldn't save the file";
+    final errorMsg = l.trajetDetailDownloadError;
     messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
   }
 }
@@ -112,7 +117,7 @@ Future<void> _downloadTripText(
 /// sync is on). The GPX row doubles as the GPS-track download — it is
 /// disabled (with an explanatory subtitle) when the trip has no GPS fix.
 List<PopupMenuEntry<String>> buildTripDetailShareMenuItems(
-  AppLocalizations? l,
+  AppLocalizations l,
   TripHistoryEntry entry, {
   required bool showCrossAccount,
 }) {
@@ -123,7 +128,7 @@ List<PopupMenuEntry<String>> buildTripDetailShareMenuItems(
       value: 'image',
       child: ListTile(
         leading: const Icon(Icons.image_outlined),
-        title: Text(l?.trajetDetailShareImageOption ?? 'Share image'),
+        title: Text(l.trajetDetailShareImageOption),
       ),
     ),
     PopupMenuItem<String>(
@@ -132,14 +137,8 @@ List<PopupMenuEntry<String>> buildTripDetailShareMenuItems(
       enabled: hasGps,
       child: ListTile(
         leading: const Icon(Icons.route_outlined),
-        title: Text(
-          l?.trajetDetailShareGpxOption ?? 'Share GPS track (GPX)',
-        ),
-        subtitle: hasGps
-            ? null
-            : Text(
-                l?.trajetDetailShareGpxEmpty ?? 'No GPS samples in this trip',
-              ),
+        title: Text(l.trajetDetailShareGpxOption),
+        subtitle: hasGps ? null : Text(l.trajetDetailShareGpxEmpty),
       ),
     ),
     // #2652 — download the full telemetry sample stream (OBD2 + GPS)
@@ -150,9 +149,7 @@ List<PopupMenuEntry<String>> buildTripDetailShareMenuItems(
       value: 'download_csv',
       child: ListTile(
         leading: const Icon(Icons.table_chart_outlined),
-        title: Text(
-          l?.trajetDetailDownloadCsvOption ?? 'Download telemetry (CSV)',
-        ),
+        title: Text(l.trajetDetailDownloadCsvOption),
       ),
     ),
     PopupMenuItem<String>(
@@ -160,9 +157,7 @@ List<PopupMenuEntry<String>> buildTripDetailShareMenuItems(
       value: 'download_json',
       child: ListTile(
         leading: const Icon(Icons.data_object),
-        title: Text(
-          l?.trajetDetailDownloadJsonOption ?? 'Download telemetry (JSON)',
-        ),
+        title: Text(l.trajetDetailDownloadJsonOption),
       ),
     ),
     // #2240 — cross-account share, only when trip sync is on (you can't
@@ -173,9 +168,7 @@ List<PopupMenuEntry<String>> buildTripDetailShareMenuItems(
         value: 'cross_account',
         child: ListTile(
           leading: const Icon(Icons.group_add_outlined),
-          title: Text(
-            l?.tripShareAction ?? 'Share with another account',
-          ),
+          title: Text(l.tripShareAction),
         ),
       ),
   ];

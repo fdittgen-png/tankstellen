@@ -114,10 +114,7 @@ class TripAvgConsumptionCard extends ConsumerWidget {
       if (isEstimate)
         Tooltip(
           key: const Key('tripAvgEstimateTooltip'),
-          message: l?.tripAvgGpsEstimateTooltip ??
-              'GPS estimate (~) — no fuel sensor on this trip. The figure '
-                  'is modelled from speed + your vehicle\'s calibration; '
-                  'accuracy improves as the matrix matures.',
+          message: l.tripAvgGpsEstimateTooltip,
           child: Icon(
             Icons.info_outline,
             size: 16,
@@ -132,8 +129,9 @@ class TripAvgConsumptionCard extends ConsumerWidget {
       Text(
         value,
         key: const Key('tripAvgConsumptionValue'),
-        style: theme.textTheme.titleLarge
-            ?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
+        style: theme.textTheme.titleLarge?.copyWith(
+          fontFeatures: const [FontFeature.tabularFigures()],
+        ),
       ),
     ];
 
@@ -153,16 +151,13 @@ class TripAvgConsumptionCard extends ConsumerWidget {
             const SizedBox(width: 16),
             Expanded(
               child: Text(
-                l?.tripMetricAvgConsumption ?? 'Avg',
+                l.tripMetricAvgConsumption,
                 style: theme.textTheme.bodySmall,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: trailing,
-            ),
+            Row(mainAxisSize: MainAxisSize.min, children: trailing),
           ],
         ),
       ),

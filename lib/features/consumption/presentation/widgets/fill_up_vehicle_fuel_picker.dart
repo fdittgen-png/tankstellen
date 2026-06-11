@@ -46,8 +46,7 @@ class FillUpVehicleFuelPicker extends StatelessWidget {
     final vehicleFuel =
         AddFillUpFuelResolver.fuelForVehicle(vehicle) ?? FuelType.e10;
     final compatible = compatibleFuelsFor(vehicleFuel);
-    final value =
-        compatible.contains(fuelType) ? fuelType : compatible.first;
+    final value = compatible.contains(fuelType) ? fuelType : compatible.first;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -59,13 +58,13 @@ class FillUpVehicleFuelPicker extends StatelessWidget {
                 value: value,
                 options: compatible,
                 prefixIcon: const Icon(Icons.local_gas_station),
-                labelText: '${l?.fuelType ?? 'Fuel type'} • ${vehicle.name}',
+                labelText: '${l.fuelType} • ${vehicle.name}',
                 onChanged: onChanged,
               ),
             ),
             IconButton(
               icon: const Icon(Icons.open_in_new),
-              tooltip: l?.vehicleEditTitle ?? 'Edit vehicle',
+              tooltip: l.vehicleEditTitle,
               onPressed: onOpenVehicle,
               style: IconButton.styleFrom(
                 foregroundColor: theme.colorScheme.primary,
@@ -89,9 +88,7 @@ class FillUpVehicleFuelPicker extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  l?.fillUpMultiFuelHint ??
-                      'This vehicle can use different fuels — log the one '
-                          'you actually pumped',
+                  l.fillUpMultiFuelHint,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),

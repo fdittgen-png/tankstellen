@@ -58,8 +58,9 @@ class LoyaltyCardTile extends StatelessWidget {
           ),
           title: Text(
             card.label.isEmpty ? card.brand.canonicalBrand : card.label,
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           subtitle: Text(
             '${card.brand.canonicalBrand} · −$discountText',
@@ -68,13 +69,10 @@ class LoyaltyCardTile extends StatelessWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Switch(
-                value: card.enabled,
-                onChanged: onToggle,
-              ),
+              Switch(value: card.enabled, onChanged: onToggle),
               IconButton(
                 icon: const Icon(Icons.delete_outline),
-                tooltip: l?.delete ?? 'Delete',
+                tooltip: l.delete,
                 onPressed: onDeleteRequested,
               ),
             ],

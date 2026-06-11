@@ -10,12 +10,7 @@ import '../../../../core/domain/vehicle_profile.dart';
 
 /// One of the four manual-override calibration fields surfaced by
 /// [CalibrationSection] (#1397).
-enum _CalibrationField {
-  displacement,
-  volumetricEfficiency,
-  afr,
-  fuelDensity,
-}
+enum _CalibrationField { displacement, volumetricEfficiency, afr, fuelDensity }
 
 /// Source-of-truth indicator for a single resolved calibration value
 /// (#1397). Drives both the helper-text suffix on each input row and
@@ -135,9 +130,7 @@ class _CalibrationSectionState extends State<CalibrationSection> {
     _veCtrl = TextEditingController(
       text: _initialText(_CalibrationField.volumetricEfficiency),
     );
-    _afrCtrl = TextEditingController(
-      text: _initialText(_CalibrationField.afr),
-    );
+    _afrCtrl = TextEditingController(text: _initialText(_CalibrationField.afr));
     _fuelDensityCtrl = TextEditingController(
       text: _initialText(_CalibrationField.fuelDensity),
     );
@@ -152,7 +145,10 @@ class _CalibrationSectionState extends State<CalibrationSection> {
     // policy is to keep the on-screen text and let the source helper
     // re-render).
     if (oldWidget.profile != widget.profile) {
-      _maybeSync(_displacementCtrl, _initialText(_CalibrationField.displacement));
+      _maybeSync(
+        _displacementCtrl,
+        _initialText(_CalibrationField.displacement),
+      );
       _maybeSync(_veCtrl, _initialText(_CalibrationField.volumetricEfficiency));
       _maybeSync(_afrCtrl, _initialText(_CalibrationField.afr));
       _maybeSync(_fuelDensityCtrl, _initialText(_CalibrationField.fuelDensity));
@@ -245,16 +241,16 @@ class _CalibrationSectionState extends State<CalibrationSection> {
   }
 
   String _sourceLabel(
-    AppLocalizations? l,
+    AppLocalizations l,
     CalibrationValueSource source,
     _CalibrationField field,
   ) {
     final p = widget.profile;
     switch (source) {
       case CalibrationValueSource.manual:
-        return l?.calibrationSourceManual ?? '(manual)';
+        return l.calibrationSourceManual;
       case CalibrationValueSource.detected:
-        return l?.calibrationSourceDetected ?? '(detected from VIN)';
+        return l.calibrationSourceDetected;
       case CalibrationValueSource.catalog:
         final makeModel = [
           if (p.make != null && p.make!.isNotEmpty) p.make,
@@ -271,13 +267,12 @@ class _CalibrationSectionState extends State<CalibrationSection> {
           final basisKey = volumetricEfficiencyBasisKey(ref);
           final basisLabel = _basisLabel(l, basisKey);
           if (basisLabel != null) {
-            return l?.calibrationSourceCatalogWithBasis(label, basisLabel) ??
-                '(catalog: $label — $basisLabel default)';
+            return l.calibrationSourceCatalogWithBasis(label, basisLabel);
           }
         }
-        return l?.calibrationSourceCatalog(label) ?? '(catalog: $label)';
+        return l.calibrationSourceCatalog(label);
       case CalibrationValueSource.defaultConstant:
-        return l?.calibrationSourceDefault ?? '(default)';
+        return l.calibrationSourceDefault;
     }
   }
 
@@ -285,19 +280,19 @@ class _CalibrationSectionState extends State<CalibrationSection> {
   /// or `null` when the helper returned `null` (NA + no-DI baseline —
   /// no enrichment needed). Falls back to the English literal if
   /// localizations are unavailable, matching the rest of this widget.
-  String? _basisLabel(AppLocalizations? l, String? basisKey) {
+  String? _basisLabel(AppLocalizations l, String? basisKey) {
     if (basisKey == null) return null;
     switch (basisKey) {
       case 'calibrationBasisAtkinson':
-        return l?.calibrationBasisAtkinson ?? 'Atkinson cycle';
+        return l.calibrationBasisAtkinson;
       case 'calibrationBasisVnt':
-        return l?.calibrationBasisVnt ?? 'VNT diesel + DI';
+        return l.calibrationBasisVnt;
       case 'calibrationBasisTurboDi':
-        return l?.calibrationBasisTurboDi ?? 'Turbocharged + DI';
+        return l.calibrationBasisTurboDi;
       case 'calibrationBasisTurbo':
-        return l?.calibrationBasisTurbo ?? 'Turbocharged';
+        return l.calibrationBasisTurbo;
       case 'calibrationBasisNaDi':
-        return l?.calibrationBasisNaDi ?? 'Naturally aspirated + DI';
+        return l.calibrationBasisNaDi;
     }
     return null;
   }
@@ -372,11 +367,10 @@ class _CalibrationSectionState extends State<CalibrationSection> {
     }
   }
 
-  String _learnerStatus(AppLocalizations? l) {
+  String _learnerStatus(AppLocalizations l) {
     final samples = widget.profile.volumetricEfficiencySamples;
     if (samples == 0) {
-      return l?.calibrationLearnerStatusNoSamples ??
-          'η_v: 0.85 (default — no plein-complet yet)';
+      return l.calibrationLearnerStatusNoSamples;
     }
     // #1626 — show the ± convergence band so the user sees how settled
     // the learned η_v is. Folded into the `eta` placeholder so the
@@ -385,11 +379,9 @@ class _CalibrationSectionState extends State<CalibrationSection> {
     final band = _formatDouble(veConvergenceHalfWidth(samples));
     final eta = '$etaValue ± $band';
     if (samples < 3) {
-      return l?.calibrationLearnerStatusLearning(eta, samples) ??
-          'η_v: $eta (learning, $samples samples)';
+      return l.calibrationLearnerStatusLearning(eta, samples);
     }
-    return l?.calibrationLearnerStatusCalibrated(eta, samples) ??
-        'η_v: $eta (calibrated, $samples samples)';
+    return l.calibrationLearnerStatusCalibrated(eta, samples);
   }
 
   @override
@@ -397,15 +389,14 @@ class _CalibrationSectionState extends State<CalibrationSection> {
     final l = AppLocalizations.of(context);
     return Card(
       child: ExpansionTile(
-        title: Text(l?.calibrationAdvancedTitle ?? 'Advanced calibration'),
+        title: Text(l.calibrationAdvancedTitle),
         initiallyExpanded: false,
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
           _buildField(
             field: _CalibrationField.displacement,
             controller: _displacementCtrl,
-            labelText: l?.calibrationDisplacementLabel ??
-                'Engine displacement (cc)',
+            labelText: l.calibrationDisplacementLabel,
             l: l,
           ),
           const SizedBox(height: 12),
@@ -418,22 +409,21 @@ class _CalibrationSectionState extends State<CalibrationSection> {
             _buildField(
               field: _CalibrationField.volumetricEfficiency,
               controller: _veCtrl,
-              labelText: l?.calibrationVolumetricEfficiencyLabel ??
-                  'Volumetric efficiency (η_v)',
+              labelText: l.calibrationVolumetricEfficiencyLabel,
               l: l,
             ),
           const SizedBox(height: 12),
           _buildField(
             field: _CalibrationField.afr,
             controller: _afrCtrl,
-            labelText: l?.calibrationAfrLabel ?? 'Air-to-fuel ratio (AFR)',
+            labelText: l.calibrationAfrLabel,
             l: l,
           ),
           const SizedBox(height: 12),
           _buildField(
             field: _CalibrationField.fuelDensity,
             controller: _fuelDensityCtrl,
-            labelText: l?.calibrationFuelDensityLabel ?? 'Fuel density (g/L)',
+            labelText: l.calibrationFuelDensityLabel,
             l: l,
           ),
           // #2837 — the live η_v readout + Reset learner only matter for
@@ -453,7 +443,7 @@ class _CalibrationSectionState extends State<CalibrationSection> {
                 const SizedBox(width: 8),
                 OutlinedButton(
                   onPressed: widget.onResetLearner,
-                  child: Text(l?.calibrationResetLearner ?? 'Reset learner'),
+                  child: Text(l.calibrationResetLearner),
                 ),
               ],
             ),
@@ -467,19 +457,21 @@ class _CalibrationSectionState extends State<CalibrationSection> {
     required _CalibrationField field,
     required TextEditingController controller,
     required String labelText,
-    required AppLocalizations? l,
+    required AppLocalizations l,
   }) {
     final source = _sourceFor(field);
     return TextFormField(
       controller: controller,
-      keyboardType:
-          const TextInputType.numberWithOptions(decimal: true, signed: false),
+      keyboardType: const TextInputType.numberWithOptions(
+        decimal: true,
+        signed: false,
+      ),
       decoration: InputDecoration(
         labelText: labelText,
         helperText: _sourceLabel(l, source, field),
         suffixIcon: IconButton(
           icon: const Icon(Icons.restart_alt),
-          tooltip: l?.calibrationResetToDetected ?? 'Reset to detected value',
+          tooltip: l.calibrationResetToDetected,
           onPressed: () => _resetField(field),
         ),
       ),
@@ -495,7 +487,7 @@ class _CalibrationSectionState extends State<CalibrationSection> {
 class _DirectFuelRateNote extends StatelessWidget {
   const _DirectFuelRateNote({required this.l});
 
-  final AppLocalizations? l;
+  final AppLocalizations l;
 
   @override
   Widget build(BuildContext context) {
@@ -511,10 +503,7 @@ class _DirectFuelRateNote extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            l?.calibrationDirectFuelRateNote ??
-                'This vehicle reports its fuel rate directly (PID 5E), so '
-                    'volumetric-efficiency calibration is not used — your '
-                    'consumption is measured, not modelled.',
+            l.calibrationDirectFuelRateNote,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

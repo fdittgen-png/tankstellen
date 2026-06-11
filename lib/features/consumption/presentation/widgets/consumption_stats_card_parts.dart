@@ -106,15 +106,11 @@ class _CalibrationChip extends StatelessWidget {
     final eta = volumetricEfficiency.toStringAsFixed(2);
     final String label;
     if (samples == 0) {
-      label =
-          l?.calibrationLearnerStatusNoSamples ??
-          'η_v: ?? — no plein-complet yet';
+      label = l.calibrationLearnerStatusNoSamples;
     } else {
       // #2112 — single label shape across learning + calibrated;
       // confidence tier carries the maturity colour.
-      label =
-          l?.calibrationLearnerEtaCompact(eta, samples) ??
-          'η_v: $eta · $samples samples';
+      label = l.calibrationLearnerEtaCompact(eta, samples);
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

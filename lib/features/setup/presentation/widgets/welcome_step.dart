@@ -22,7 +22,7 @@ class WelcomeStep extends StatelessWidget {
           const FuelPumpIllustration(size: 160),
           const SizedBox(height: 24),
           Text(
-            l10n?.welcome ?? 'Sparkilo', // i18n-ignore: brand name
+            l10n.welcome, // i18n-ignore: brand name
             style: theme.textTheme.headlineLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -30,7 +30,7 @@ class WelcomeStep extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            l10n?.welcomeSubtitle ?? 'Find the cheapest fuel near you.',
+            l10n.welcomeSubtitle,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -38,8 +38,7 @@ class WelcomeStep extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           Text(
-            l10n?.onboardingWelcomeHint ??
-                'Set up the app in a few quick steps.',
+            l10n.onboardingWelcomeHint,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

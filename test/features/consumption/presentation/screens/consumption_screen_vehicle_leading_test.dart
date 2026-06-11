@@ -17,6 +17,7 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #2223 — the vehicles (car) entry point moved from the trailing
 /// AppBar actions to the leading slot, so the car icon reads as part
@@ -28,9 +29,9 @@ import '../../../../helpers/pump_app.dart';
 class _ObdEnabledFlags extends FeatureFlags {
   @override
   Set<Feature> build() => <Feature>{
-        Feature.showConsumptionTab,
-        Feature.obd2TripRecording,
-      };
+    Feature.showConsumptionTab,
+    Feature.obd2TripRecording,
+  };
 }
 
 class _FixedFillUpList extends FillUpList {
@@ -46,10 +47,10 @@ class _FixedChargingLogs extends ChargingLogs {
 class _FixedActiveVehicle extends ActiveVehicleProfile {
   @override
   VehicleProfile? build() => const VehicleProfile(
-        id: 'daily-driver',
-        name: 'Daily Driver',
-        type: VehicleType.combustion,
-      );
+    id: 'daily-driver',
+    name: 'Daily Driver',
+    type: VehicleType.combustion,
+  );
 }
 
 class _FixedVehicleProfileList extends VehicleProfileList {
@@ -71,9 +72,8 @@ Future<void> _pumpTrajets(WidgetTester tester) async {
     routes: [
       GoRoute(
         path: '/trajets-tab',
-        builder: (_, _) => const ConsumptionScreen(
-          section: ConsumptionSection.trajets,
-        ),
+        builder: (_, _) =>
+            const ConsumptionScreen(section: ConsumptionSection.trajets),
       ),
       GoRoute(
         path: '/consumption/pick-station',
@@ -92,7 +92,11 @@ Future<void> _pumpTrajets(WidgetTester tester) async {
 
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList()),
       chargingLogsProvider.overrideWith(() => _FixedChargingLogs()),
@@ -129,11 +133,11 @@ void main() {
       );
     });
 
-    testWidgets('car icon sits to the left of the trailing actions',
-        (tester) async {
+    testWidgets('car icon sits to the left of the trailing actions', (
+      tester,
+    ) async {
       await _pumpTrajets(tester);
-      final iconX =
-          tester.getCenter(find.byKey(const Key('open_vehicles'))).dx;
+      final iconX = tester.getCenter(find.byKey(const Key('open_vehicles'))).dx;
       // #2756 — export moved into the overflow kebab; the kebab is now
       // the right-most trailing action. The car icon must still sit
       // left of it.
@@ -143,8 +147,9 @@ void main() {
       expect(iconX, lessThan(kebabX));
     });
 
-    testWidgets('the overflow kebab carries the export action (#2756)',
-        (tester) async {
+    testWidgets('the overflow kebab carries the export action (#2756)', (
+      tester,
+    ) async {
       await _pumpTrajets(tester);
       // Export is no longer a visible trailing button — it lives in the
       // overflow kebab and appears once the menu is opened.
@@ -154,8 +159,9 @@ void main() {
       expect(find.byKey(const Key('export_backup')), findsOneWidget);
     });
 
-    testWidgets('tapping the car icon still navigates to /vehicles',
-        (tester) async {
+    testWidgets('tapping the car icon still navigates to /vehicles', (
+      tester,
+    ) async {
       await _pumpTrajets(tester);
       await tester.tap(find.byKey(const Key('open_vehicles')));
       await tester.pumpAndSettle();

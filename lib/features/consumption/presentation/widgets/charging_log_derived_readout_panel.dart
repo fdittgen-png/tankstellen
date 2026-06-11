@@ -36,7 +36,7 @@ class ChargingLogDerivedReadoutPanel extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(top: 6, left: 12),
         child: Text(
-          l?.chargingDerivedHelper ?? 'Need a previous log to compare',
+          l.chargingDerivedHelper,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -51,14 +51,17 @@ class ChargingLogDerivedReadoutPanel extends StatelessWidget {
       child: Row(
         key: const Key('charging_derived_readout'),
         children: [
-          Icon(Icons.insights_outlined,
-              size: 16, color: theme.colorScheme.primary),
+          Icon(
+            Icons.insights_outlined,
+            size: 16,
+            color: theme.colorScheme.primary,
+          ),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
-              '${l?.chargingEurPer100km(eurStr) ?? '$eurStr EUR / 100 km'}'
+              '${l.chargingEurPer100km(eurStr)}'
               '  •  '
-              '${l?.chargingKwhPer100km(kwhStr) ?? '$kwhStr kWh / 100 km'}',
+              '${l.chargingKwhPer100km(kwhStr)}',
               style: style,
             ),
           ),

@@ -112,7 +112,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       title: 'Connect TankSync',
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
+        tooltip: AppLocalizations.of(context).tooltipBack,
         onPressed: () {
           if (wizard.mode == SyncWizardMode.choose) {
             Navigator.pop(context);
@@ -200,7 +200,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
                 }
               },
               onDone: () {
-                SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
+                SnackBarHelper.showSuccess(context, AppLocalizations.of(context).tankSyncConnected);
                 Navigator.pop(context);
               },
             ),
@@ -233,7 +233,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         }
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'QR code parse failed'}));
-        SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCodeTankSync ?? 'Invalid QR code — expected TankSync format');
+        SnackBarHelper.showError(context, AppLocalizations.of(context).invalidQrCodeTankSync);
       }
     }
   }
@@ -350,7 +350,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
     if (schema != null && mounted) {
       final allReady = SchemaVerifier.requiredTables.every((t) => schema[t] == true);
       if (allReady && !outdated) {
-        SnackBarHelper.showSuccess(context, AppLocalizations.of(context)?.tankSyncConnected ?? 'TankSync connected!');
+        SnackBarHelper.showSuccess(context, AppLocalizations.of(context).tankSyncConnected);
         Navigator.pop(context);
       } else {
         _notifier.showSchemaStep(

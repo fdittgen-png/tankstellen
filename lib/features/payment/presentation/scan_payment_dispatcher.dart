@@ -106,9 +106,7 @@ class ScanPaymentDispatcher {
   static Future<ScanPaymentOutcome> _tryLaunch(Uri uri) async {
     try {
       final ok = await launcher(uri, mode: LaunchMode.externalApplication);
-      return ok
-          ? ScanPaymentOutcome.launched
-          : ScanPaymentOutcome.launchFailed;
+      return ok ? ScanPaymentOutcome.launched : ScanPaymentOutcome.launchFailed;
     } on Exception catch (e, st) {
       debugPrint('ScanPaymentDispatcher launch failed: $e\n$st');
       return ScanPaymentOutcome.launchFailed;
@@ -139,11 +137,17 @@ class ScanPaymentDispatcher {
     };
 
     for (final scheme in const ['sepa', 'iban']) {
-      final uri = Uri(scheme: scheme, host: 'transfer', queryParameters: params);
+      final uri = Uri(
+        scheme: scheme,
+        host: 'transfer',
+        queryParameters: params,
+      );
       try {
         if (await probe(uri)) {
-          final launched = await launcher(uri,
-              mode: LaunchMode.externalApplication);
+          final launched = await launcher(
+            uri,
+            mode: LaunchMode.externalApplication,
+          );
           if (launched) return EpcLaunchOutcome.launched;
         }
       } on Exception catch (e, st) {
@@ -175,38 +179,36 @@ class ScanPaymentDispatcher {
       if (epc.beneficiary != null && epc.beneficiary!.isNotEmpty)
         ListTile(
           dense: true,
-          title: Text(l10n?.qrPaymentBeneficiary ?? 'Beneficiary'),
+          title: Text(l10n.qrPaymentBeneficiary),
           subtitle: Text(epc.beneficiary!),
         ),
       if (epc.iban != null && epc.iban!.isNotEmpty)
         ListTile(
           dense: true,
-          title: const Text('IBAN'), // i18n-ignore: standardised banking acronym (language-neutral)
+          title: const Text('IBAN'), // i18n-ignore: banking acronym
           subtitle: Text(epc.iban!),
         ),
       if (epc.amountEur != null)
         ListTile(
           dense: true,
-          title: Text(l10n?.qrPaymentAmount ?? 'Amount'),
+          title: Text(l10n.qrPaymentAmount),
           subtitle: Text('${epc.amountEur!.toStringAsFixed(2)} €'),
         ),
     ];
     return AlertDialog(
-      title: Text(l10n?.qrPaymentEpcTitle ?? 'SEPA payment'),
+      title: Text(l10n.qrPaymentEpcTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        children: items.isEmpty
-            ? [Text(l10n?.qrPaymentEpcEmpty ?? 'No fields decoded')]
-            : items,
+        children: items.isEmpty ? [Text(l10n.qrPaymentEpcEmpty)] : items,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(l10n?.cancel ?? 'Cancel'),
+          child: Text(l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text(l10n?.qrPaymentOpenInBank ?? 'Open in bank app'),
+          child: Text(l10n.qrPaymentOpenInBank),
         ),
       ],
     );

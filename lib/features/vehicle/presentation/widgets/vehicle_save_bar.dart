@@ -33,7 +33,7 @@ class VehicleSaveBar extends StatelessWidget {
               minimumSize: const Size.fromHeight(52),
             ),
             icon: const Icon(Icons.save),
-            label: Text(l?.save ?? 'Save'),
+            label: Text(l.save),
           ),
         ),
       ),

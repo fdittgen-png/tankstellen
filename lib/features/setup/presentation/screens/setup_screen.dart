@@ -98,9 +98,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         if (mounted) {
           final l10n = AppLocalizations.of(context);
           SnackBarHelper.showError(
-              context,
-              l10n?.invalidApiKey(result.errorMessage ?? '') ??
-                  'Invalid API key: ${result.errorMessage}');
+            context,
+            l10n.invalidApiKey(result.errorMessage ?? ''),
+          );
         }
         return;
       }

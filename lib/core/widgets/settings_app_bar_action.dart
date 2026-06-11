@@ -17,12 +17,12 @@ part 'settings_app_bar_action.g.dart';
 /// branch the user came from. Branch 4 is Settings itself, so it is never an
 /// origin; anything unmapped falls back to home (`/`).
 String routeForShellBranch(int branch) => switch (branch) {
-      1 => '/map',
-      2 => '/favorites',
-      3 => '/consumption-tab',
-      5 => '/trajets-tab',
-      _ => '/', // 0 = Search / home
-    };
+  1 => '/map',
+  2 => '/favorites',
+  3 => '/consumption-tab',
+  5 => '/trajets-tab',
+  _ => '/', // 0 = Search / home
+};
 
 /// Where the Settings (Profile) branch returns to when its top-left back arrow
 /// is tapped (#3061). [SettingsAppBarAction] records it from the app's reliable
@@ -54,7 +54,7 @@ class SettingsAppBarAction extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     return IconButton(
       icon: const Icon(Icons.settings_outlined),
-      tooltip: l10n?.settings ?? 'Settings',
+      tooltip: l10n.settings,
       onPressed: () {
         // #3061 — record the branch the user is on (the shell keeps this
         // current) BEFORE switching to Settings, so the Settings back arrow

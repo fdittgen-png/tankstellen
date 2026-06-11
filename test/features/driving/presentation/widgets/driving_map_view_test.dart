@@ -9,6 +9,7 @@ import 'package:tankstellen/features/map/presentation/widgets/station_map_layers
 import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 Station _station({
   required String id,
@@ -117,6 +118,8 @@ void main() {
     }) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SizedBox(
               width: 400,
@@ -135,8 +138,28 @@ void main() {
       await tester.pump();
     }
 
-    testWidgets('renders the shared StationMapLayers, not a bespoke MarkerLayer',
-        (tester) async {
+    testWidgets(
+      'renders the shared StationMapLayers, not a bespoke MarkerLayer',
+      (tester) async {
+        final controller = MapController();
+        addTearDown(controller.dispose);
+        await pumpView(
+          tester,
+          controller: controller,
+          stations: [
+            _station(id: 'a', lat: 52.0, lng: 13.0),
+            _station(id: 'b', lat: 52.1, lng: 13.1),
+          ],
+        );
+
+        // Driving now consumes the ONE shared map stack.
+        expect(find.byType(StationMapLayers), findsOneWidget);
+      },
+    );
+
+    testWidgets('passes the driving marker variant + NO clustering', (
+      tester,
+    ) async {
       final controller = MapController();
       addTearDown(controller.dispose);
       await pumpView(
@@ -148,25 +171,9 @@ void main() {
         ],
       );
 
-      // Driving now consumes the ONE shared map stack.
-      expect(find.byType(StationMapLayers), findsOneWidget);
-    });
-
-    testWidgets('passes the driving marker variant + NO clustering',
-        (tester) async {
-      final controller = MapController();
-      addTearDown(controller.dispose);
-      await pumpView(
-        tester,
-        controller: controller,
-        stations: [
-          _station(id: 'a', lat: 52.0, lng: 13.0),
-          _station(id: 'b', lat: 52.1, lng: 13.1),
-        ],
+      final layers = tester.widget<StationMapLayers>(
+        find.byType(StationMapLayers),
       );
-
-      final layers =
-          tester.widget<StationMapLayers>(find.byType(StationMapLayers));
       // The big driver-legible marker variant.
       expect(layers.markerVariant, StationMarkerVariant.driving);
       // Driving shows few stations and needs immediate tap-to-open-sheet —
@@ -192,8 +199,9 @@ void main() {
         onInteraction: () => interacted = true,
       );
 
-      final layers =
-          tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+      final layers = tester.widget<StationMapLayers>(
+        find.byType(StationMapLayers),
+      );
       // The shared layer surfaces a station-id tap hook; driving wires it to
       // its onMarkerTap (which shows DrivingStationSheet), not a GoRouter push.
       expect(layers.onStationTap, isNotNull);
@@ -203,8 +211,9 @@ void main() {
       expect(interacted, isTrue);
     });
 
-    testWidgets('keeps the restricted driving interaction (no pinch zoom)',
-        (tester) async {
+    testWidgets('keeps the restricted driving interaction (no pinch zoom)', (
+      tester,
+    ) async {
       final controller = MapController();
       addTearDown(controller.dispose);
       await pumpView(
@@ -213,8 +222,9 @@ void main() {
         stations: [_station(id: 'a', lat: 52.0, lng: 13.0)],
       );
 
-      final layers =
-          tester.widget<StationMapLayers>(find.byType(StationMapLayers));
+      final layers = tester.widget<StationMapLayers>(
+        find.byType(StationMapLayers),
+      );
       final flags = layers.interactionOptions!.flags;
       // Drag + fling + double-tap-zoom are allowed; pinch/rotate are not.
       expect(flags & InteractiveFlag.drag, isNot(0));

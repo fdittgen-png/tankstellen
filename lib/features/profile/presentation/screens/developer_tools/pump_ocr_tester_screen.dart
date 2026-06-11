@@ -99,9 +99,10 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final debugOn =
-        ref.watch(enabledFeaturesProvider).contains(Feature.debugMode);
-    final title = l?.ocrTesterTitle ?? 'OCR tester';
+    final debugOn = ref
+        .watch(enabledFeaturesProvider)
+        .contains(Feature.debugMode);
+    final title = l.ocrTesterTitle;
 
     if (!debugOn) {
       // Defensive: a stale deep-link must never expose dev tools.
@@ -114,11 +115,10 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
       body: ListView(
         children: [
           Text(
-            l?.ocrTesterExplain ??
-                'Run the pump / receipt OCR pipeline on a chosen photo and '
-                    'inspect every step — only available in Developer mode.',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            l.ocrTesterExplain,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 12),
           _modeToggle(l),
@@ -130,32 +130,29 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
           _runButton(l),
           const SizedBox(height: 16),
           if (_running)
-            _RunningRow(label: l?.ocrTesterRunning ?? 'Running OCR…')
+            _RunningRow(label: l.ocrTesterRunning)
           else if (_package != null)
             ..._results(context, l, _package!)
           else
-            Text(
-              l?.ocrTesterNoImage ?? 'Pick or capture an image, then Run.',
-              style: theme.textTheme.bodyMedium,
-            ),
+            Text(l.ocrTesterNoImage, style: theme.textTheme.bodyMedium),
           SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
         ],
       ),
     );
   }
 
-  Widget _modeToggle(AppLocalizations? l) {
+  Widget _modeToggle(AppLocalizations l) {
     return SegmentedButton<_OcrTesterMode>(
       key: const Key('ocr_tester_mode'),
       segments: [
         ButtonSegment(
           value: _OcrTesterMode.pump,
-          label: Text(l?.ocrTesterModePump ?? 'Pump'),
+          label: Text(l.ocrTesterModePump),
           icon: const Icon(Icons.local_gas_station_outlined),
         ),
         ButtonSegment(
           value: _OcrTesterMode.receipt,
-          label: Text(l?.ocrTesterModeReceipt ?? 'Receipt'),
+          label: Text(l.ocrTesterModeReceipt),
           icon: const Icon(Icons.receipt_long_outlined),
         ),
       ],
@@ -169,19 +166,19 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
     );
   }
 
-  Widget _countryDropdown(AppLocalizations? l) {
+  Widget _countryDropdown(AppLocalizations l) {
     return DropdownButtonFormField<String?>(
       key: const Key('ocr_tester_country'),
       initialValue: _country,
       decoration: InputDecoration(
-        labelText: l?.ocrTesterCountry ?? 'Country',
+        labelText: l.ocrTesterCountry,
         border: const OutlineInputBorder(),
         isDense: true,
       ),
       items: [
         DropdownMenuItem<String?>(
           value: null,
-          child: Text(l?.ocrTesterCountryNone ?? 'Default (no profile)'),
+          child: Text(l.ocrTesterCountryNone),
         ),
         for (final c in Countries.all)
           DropdownMenuItem<String?>(
@@ -194,7 +191,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
     );
   }
 
-  Widget _sourceRow(AppLocalizations? l) {
+  Widget _sourceRow(AppLocalizations l) {
     return Row(
       children: [
         Expanded(
@@ -202,7 +199,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
             key: const Key('ocr_tester_capture'),
             onPressed: _running ? null : _capture,
             icon: const Icon(Icons.photo_camera_outlined),
-            label: Text(l?.ocrTesterCapture ?? 'Capture'),
+            label: Text(l.ocrTesterCapture),
           ),
         ),
         const SizedBox(width: 8),
@@ -211,31 +208,31 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
             key: const Key('ocr_tester_pick'),
             onPressed: _running ? null : _pickImage,
             icon: const Icon(Icons.image_outlined),
-            label: Text(l?.ocrTesterPickImage ?? 'Pick image'),
+            label: Text(l.ocrTesterPickImage),
           ),
         ),
       ],
     );
   }
 
-  Widget _runButton(AppLocalizations? l) {
+  Widget _runButton(AppLocalizations l) {
     return FilledButton.icon(
       key: const Key('ocr_tester_run'),
       onPressed: (_running || _imagePath == null) ? null : _run,
       icon: const Icon(Icons.play_arrow_outlined),
-      label: Text(l?.ocrTesterRun ?? 'Run'),
+      label: Text(l.ocrTesterRun),
     );
   }
 
   List<Widget> _results(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     OcrTracePackage package,
   ) {
     return [
       SectionHeader(
         leadingIcon: Icons.grid_on_outlined,
-        title: l?.ocrTesterOverlaySection ?? 'Block overlay',
+        title: l.ocrTesterOverlaySection,
         padding: EdgeInsets.zero,
       ),
       const SizedBox(height: 8),
@@ -251,7 +248,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
       const SizedBox(height: 16),
       SectionHeader(
         leadingIcon: Icons.list_alt_outlined,
-        title: l?.ocrTesterStepsSection ?? 'Pipeline steps',
+        title: l.ocrTesterStepsSection,
         padding: EdgeInsets.zero,
       ),
       const SizedBox(height: 8),
@@ -263,7 +260,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
     ];
   }
 
-  Widget _exportRow(AppLocalizations? l, OcrTracePackage package) {
+  Widget _exportRow(AppLocalizations l, OcrTracePackage package) {
     return Row(
       children: [
         Expanded(
@@ -271,7 +268,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
             key: const Key('ocr_tester_copy_json'),
             onPressed: () => _copyAsJson(package),
             icon: const Icon(Icons.copy_all_outlined),
-            label: Text(l?.ocrTesterCopyJson ?? 'Copy as JSON'),
+            label: Text(l.ocrTesterCopyJson),
           ),
         ),
         const SizedBox(width: 8),
@@ -280,7 +277,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
             key: const Key('ocr_tester_export'),
             onPressed: () => _exportPackage(package),
             icon: const Icon(Icons.ios_share_outlined),
-            label: Text(l?.ocrTesterExportPackage ?? 'Export package'),
+            label: Text(l.ocrTesterExportPackage),
           ),
         ),
       ],
@@ -291,7 +288,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
   /// regression fixture (#2519): the source image + a `.ocrpkg.json` with
   /// `expected` seeded from the read. Only pump-mode reads with a captured
   /// image can promote (the replay harness drives the pump path).
-  Widget _saveFixtureButton(AppLocalizations? l, OcrTracePackage package) {
+  Widget _saveFixtureButton(AppLocalizations l, OcrTracePackage package) {
     final promotable =
         package.kind == OcrTraceKind.pump && package.image != null;
     return SizedBox(
@@ -300,7 +297,7 @@ class _PumpOcrTesterScreenState extends ConsumerState<PumpOcrTesterScreen> {
         key: const Key('ocr_tester_save_fixture'),
         onPressed: promotable ? () => _saveAsFixture(package) : null,
         icon: const Icon(Icons.bookmark_add_outlined),
-        label: Text(l?.ocrTesterSaveFixture ?? 'Save as fixture'),
+        label: Text(l.ocrTesterSaveFixture),
       ),
     );
   }

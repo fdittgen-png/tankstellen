@@ -91,13 +91,15 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
       // #2139 — microtask fires before any frame; addPostFrameCallback
       // can be skipped if no frame is scheduled, leaving a stale
       // action that makes the FAB look enabled but no-op.
-      unawaited(Future.microtask(() {
-        try {
-          notifier.clearFor(this); // #2553 — clear by owner, not action.
-        } catch (_) {
-          // ignore: silent_catch — ProviderContainer torn down (e.g. test teardown) — no-op.
-        }
-      }));
+      unawaited(
+        Future.microtask(() {
+          try {
+            notifier.clearFor(this); // #2553 — clear by owner, not action.
+          } catch (_) {
+            // ignore: silent_catch — ProviderContainer torn down (e.g. test teardown) — no-op.
+          }
+        }),
+      );
     }
     super.dispose();
   }
@@ -134,7 +136,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
 
     final action = SearchFabAction(
       icon: Icons.search,
-      tooltip: l10n?.fabRunSearch ?? 'Run search',
+      tooltip: l10n.fabRunSearch,
       enabled: enabled,
       onTap: onTap,
     );
@@ -179,8 +181,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
         if (mounted) {
           SnackBarHelper.show(
             context,
-            AppLocalizations.of(context)?.locationDenied ??
-                'Location permission denied.',
+            AppLocalizations.of(context).locationDenied,
           );
         }
         return;
@@ -190,8 +191,11 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     if (_searchFired || !mounted) return;
     _searchFired = true;
     // SearchState dispatches to EV or fuel service based on fuelType.
-    unawaited(ref.read(searchStateProvider.notifier).searchByGps(
-        fuelType: fuelType, radiusKm: radius));
+    unawaited(
+      ref
+          .read(searchStateProvider.notifier)
+          .searchByGps(fuelType: fuelType, radiusKm: radius),
+    );
     Navigator.of(context).pop();
   }
 
@@ -200,11 +204,11 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    unawaited(ref.read(searchStateProvider.notifier).searchByZipCode(
-          zipCode: zip,
-          fuelType: fuelType,
-          radiusKm: radius,
-        ));
+    unawaited(
+      ref
+          .read(searchStateProvider.notifier)
+          .searchByZipCode(zipCode: zip, fuelType: fuelType, radiusKm: radius),
+    );
     Navigator.of(context).pop();
   }
 
@@ -213,14 +217,18 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     _searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    unawaited(ref.read(searchStateProvider.notifier).searchByCoordinates(
-          lat: city.lat,
-          lng: city.lng,
-          postalCode: city.postcode,
-          locationName: city.name,
-          fuelType: fuelType,
-          radiusKm: radius,
-        ));
+    unawaited(
+      ref
+          .read(searchStateProvider.notifier)
+          .searchByCoordinates(
+            lat: city.lat,
+            lng: city.lng,
+            postalCode: city.postcode,
+            locationName: city.name,
+            fuelType: fuelType,
+            radiusKm: radius,
+          ),
+    );
     Navigator.of(context).pop();
   }
 
@@ -235,13 +243,17 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final segmentKm = ref.read(routeSegmentSearchParamProvider);
     final minSaving = ref.read(minRouteSavingSearchParamProvider);
     ref.read(activeSearchModeProvider.notifier).set(SearchMode.route);
-    unawaited(ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
-          waypoints: waypoints,
-          fuelType: fuelType,
-          searchRadiusKm: detourBudgetKm,
-          segmentKm: segmentKm,
-          minSavingPerLiter: minSaving,
-        ));
+    unawaited(
+      ref
+          .read(routeSearchStateProvider.notifier)
+          .searchAlongRoute(
+            waypoints: waypoints,
+            fuelType: fuelType,
+            searchRadiusKm: detourBudgetKm,
+            segmentKm: segmentKm,
+            minSavingPerLiter: minSaving,
+          ),
+    );
     Navigator.of(context).pop();
   }
 
@@ -271,8 +283,7 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     // the *whole* default set round-trips, not just the profile
     // subset. This runs regardless of whether a profile is active.
     await storage.putSetting(StorageKeys.defaultOpenOnly, openOnly);
-    await storage.putSetting(
-        StorageKeys.defaultExcludeHighway, excludeHighway);
+    await storage.putSetting(StorageKeys.defaultExcludeHighway, excludeHighway);
     await storage.putSetting(
       StorageKeys.defaultAmenities,
       amenities.map((a) => a.name).toList(),
@@ -285,27 +296,22 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     // per-search overrides become the new profile defaults.
     if (profile != null) {
       await profileNotifier.updateProfile(
-            profile.copyWith(
-              preferredFuelType: fuelType,
-              defaultSearchRadius: radius,
-              routeSegmentKm: inRoute
-                  ? routeSegmentKm
-                  : profile.routeSegmentKm,
-              routeDetourBudgetKm: inRoute
-                  ? routeDetourBudgetKm
-                  : profile.routeDetourBudgetKm,
-              minRouteSavingPerLiter: inRoute
-                  ? minRouteSavingPerLiter
-                  : profile.minRouteSavingPerLiter,
-            ),
-          );
+        profile.copyWith(
+          preferredFuelType: fuelType,
+          defaultSearchRadius: radius,
+          routeSegmentKm: inRoute ? routeSegmentKm : profile.routeSegmentKm,
+          routeDetourBudgetKm: inRoute
+              ? routeDetourBudgetKm
+              : profile.routeDetourBudgetKm,
+          minRouteSavingPerLiter: inRoute
+              ? minRouteSavingPerLiter
+              : profile.minRouteSavingPerLiter,
+        ),
+      );
     }
 
     if (!mounted) return;
-    SnackBarHelper.show(
-      context,
-      l10n?.criteriaSavedToProfile ?? 'Saved as defaults',
-    );
+    SnackBarHelper.show(context, l10n.criteriaSavedToProfile);
   }
 
   @override
@@ -314,7 +320,10 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final storedMode = ref.watch(activeSearchModeProvider);
 
     // #2131 — re-register the FAB when mode or canSearch flip.
-    ref.listen<SearchMode>(activeSearchModeProvider, (_, _) => _updateFabAction());
+    ref.listen<SearchMode>(
+      activeSearchModeProvider,
+      (_, _) => _updateFabAction(),
+    );
     ref.listen<RouteInputState>(routeInputControllerProvider, (p, n) {
       if (p?.canSearch != n.canSearch) _updateFabAction();
     });
@@ -331,10 +340,10 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final mode = routePlanningOn ? storedMode : SearchMode.nearby;
 
     return PageScaffold(
-      title: l10n?.searchCriteriaTitle ?? 'Search criteria',
+      title: l10n.searchCriteriaTitle,
       leading: IconButton(
         icon: const Icon(Icons.close),
-        tooltip: AppLocalizations.of(context)?.tooltipClose ?? 'Close',
+        tooltip: AppLocalizations.of(context).tooltipClose,
         onPressed: () => Navigator.of(context).pop(),
       ),
       bodyPadding: EdgeInsets.zero,
@@ -357,4 +366,3 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     );
   }
 }
-

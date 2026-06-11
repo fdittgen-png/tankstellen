@@ -57,14 +57,16 @@ class BackupRestoreFlow {
     try {
       bytes = await (debugFilePickerOverride ?? _pickZipBytes)();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'BackupRestoreFlow: file pick failed'}));
-      if (!context.mounted) return;
-      SnackBarHelper.showError(
-        context,
-        l?.restoreBackupFailed ??
-            'Restore failed — the file could not be read',
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'BackupRestoreFlow: file pick failed'},
+        ),
       );
+      if (!context.mounted) return;
+      SnackBarHelper.showError(context, l.restoreBackupFailed);
       return;
     }
     if (bytes == null) return; // user cancelled the picker
@@ -83,7 +85,7 @@ class BackupRestoreFlow {
       // stack on that dialog.
       final result = await runWithBackupProgress(
         context,
-        label: l?.backupImportProgress ?? 'Restoring your backup…',
+        label: l.backupImportProgress,
         icon: Icons.settings_backup_restore,
         // bytes is non-null here (early-returned above); the `!` is needed
         // because promotion doesn't cross the closure boundary.
@@ -108,48 +110,56 @@ class BackupRestoreFlow {
       // carries the counts + mode).
       final String msg;
       if (result.total == 0) {
-        msg = l?.restoreBackupEmpty ??
-            'Backup restored — it contained no records';
+        msg = l.restoreBackupEmpty;
       } else if (result.mode == BackupImportMode.replace) {
-        msg = l?.restoreBackupReplacedSummary(result.vehicles, result.fillUps,
-                result.trips, result.chargingLogs) ??
-            'Replaced all data with ${result.vehicles} vehicles, '
-                '${result.fillUps} fill-ups, ${result.trips} trips, '
-                '${result.chargingLogs} charging logs';
+        msg = l.restoreBackupReplacedSummary(
+          result.vehicles,
+          result.fillUps,
+          result.trips,
+          result.chargingLogs,
+        );
       } else {
-        msg = l?.restoreBackupMergedSummary(result.vehicles, result.fillUps,
-                result.trips, result.chargingLogs) ??
-            'Merged ${result.vehicles} vehicles, ${result.fillUps} fill-ups, '
-                '${result.trips} trips, ${result.chargingLogs} charging logs';
+        msg = l.restoreBackupMergedSummary(
+          result.vehicles,
+          result.fillUps,
+          result.trips,
+          result.chargingLogs,
+        );
       }
       SnackBarHelper.showSuccess(context, msg);
     } on BackupZipReadException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'BackupRestoreFlow: corrupt zip'}));
-      if (!context.mounted) return;
-      SnackBarHelper.showError(
-        context,
-        l?.restoreBackupCorrupt ??
-            'Restore failed — this file is not a valid Tankstellen backup',
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'BackupRestoreFlow: corrupt zip'},
+        ),
       );
+      if (!context.mounted) return;
+      SnackBarHelper.showError(context, l.restoreBackupCorrupt);
     } on BackupXmlReadException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'BackupRestoreFlow: bad XML/version'}));
-      if (!context.mounted) return;
-      SnackBarHelper.showError(
-        context,
-        l?.restoreBackupCorrupt ??
-            'Restore failed — this file is not a valid Tankstellen backup',
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'BackupRestoreFlow: bad XML/version'},
+        ),
       );
+      if (!context.mounted) return;
+      SnackBarHelper.showError(context, l.restoreBackupCorrupt);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'BackupRestoreFlow: import failed'}));
-      if (!context.mounted) return;
-      SnackBarHelper.showError(
-        context,
-        l?.restoreBackupFailed ??
-            'Restore failed — the file could not be read',
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'BackupRestoreFlow: import failed'},
+        ),
       );
+      if (!context.mounted) return;
+      SnackBarHelper.showError(context, l.restoreBackupFailed);
     }
   }
 
@@ -182,33 +192,27 @@ class BackupRestoreFlow {
   /// styling and an explicit warning line in the body.
   static Future<BackupImportMode?> _confirmMode(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
   ) {
     return showDialog<BackupImportMode>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l?.restoreBackupDialogTitle ?? 'Restore backup'),
-        content: Text(
-          l?.restoreBackupDialogBody ??
-              'Merge adds and updates records from the backup and keeps '
-                  'everything already on this device. Replace deletes all '
-                  'current data first, then restores only the backup — this '
-                  'cannot be undone.',
-        ),
+        title: Text(l.restoreBackupDialogTitle),
+        content: Text(l.restoreBackupDialogBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () =>
                 Navigator.of(dialogContext).pop(BackupImportMode.replace),
-            child: Text(l?.restoreBackupReplaceAction ?? 'Replace all'),
+            child: Text(l.restoreBackupReplaceAction),
           ),
           FilledButton(
             onPressed: () =>
                 Navigator.of(dialogContext).pop(BackupImportMode.merge),
-            child: Text(l?.restoreBackupMergeAction ?? 'Merge'),
+            child: Text(l.restoreBackupMergeAction),
           ),
         ],
       ),

@@ -40,7 +40,10 @@ import 'fill_up_scan_handlers.dart';
 /// Caller contract: only invoke when `outcome.parse.hasData` is true —
 /// the snackbar mapping (`scanReceiptNoData` vs `scanReceiptSuccess`)
 /// stays with the flow entry-points so each can drive its own UI.
-void applyReceiptOutcome(FillUpScanHostState state, ReceiptScanOutcome outcome) {
+void applyReceiptOutcome(
+  FillUpScanHostState state,
+  ReceiptScanOutcome outcome,
+) {
   final result = outcome.parse;
   if (result.liters != null) {
     state.litersCtrl.text = result.liters!.toStringAsFixed(2);
@@ -73,12 +76,10 @@ void applyReceiptOutcome(FillUpScanHostState state, ReceiptScanOutcome outcome) 
 /// prefill. Both [runReceiptScan] and [runSharedReceiptScan] route their
 /// success snackbar through this so the station hint reaches both flows.
 String receiptScanSuccessMessage(
-  AppLocalizations? l,
+  AppLocalizations l,
   ReceiptScanOutcome outcome,
 ) {
-  final base = l?.scanReceiptSuccess ??
-      'Receipt scanned — verify values. Tap "Report scan error" '
-          'below if anything is off.';
+  final base = l.scanReceiptSuccess;
   final station = outcome.parse.stationName?.trim();
   if (station == null || station.isEmpty) return base;
   // i18n-ignore: station name is a proper noun / brand surfaced inline (#2734)
@@ -122,10 +123,7 @@ Future<void> runSharedReceiptScan(
 
     if (!outcome.parse.hasData) {
       if (context.mounted) {
-        SnackBarHelper.show(
-          context,
-          l?.scanReceiptNoData ?? 'No receipt data found — try again',
-        );
+        SnackBarHelper.show(context, l.scanReceiptNoData);
       }
       return;
     }
@@ -136,14 +134,18 @@ Future<void> runSharedReceiptScan(
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-      'where': 'runSharedReceiptScan: shared receipt scan failed'
-    }));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {
+          'where': 'runSharedReceiptScan: shared receipt scan failed',
+        },
+      ),
+    );
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.showError(
-        context,
-        l?.scanReceiptFailed(e.toString()) ?? 'Scan failed: $e',
-      );
+      SnackBarHelper.showError(context, l.scanReceiptFailed(e.toString()));
     }
   } finally {
     if (state.isMounted()) state.setScanning(false);
@@ -188,12 +190,18 @@ void scheduleSharedReceiptScanIfPending(
 ) {
   String? path;
   try {
-    path =
-        ref.read(pendingSharedReceiptProvider.notifier).consumeDeferred();
+    path = ref.read(pendingSharedReceiptProvider.notifier).consumeDeferred();
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-      'where': 'AddFillUp: pending shared-receipt read failed',
-    }));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {
+          'where': 'AddFillUp: pending shared-receipt read failed',
+        },
+      ),
+    );
     return;
   }
   if (path == null) return;
@@ -224,12 +232,20 @@ void scheduleSharedReceiptTextIfPending(
 ) {
   ReceiptParseResult? result;
   try {
-    result =
-        ref.read(pendingSharedReceiptTextProvider.notifier).consumeDeferred();
+    result = ref
+        .read(pendingSharedReceiptTextProvider.notifier)
+        .consumeDeferred();
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-      'where': 'AddFillUp: pending shared-receipt text read failed',
-    }));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {
+          'where': 'AddFillUp: pending shared-receipt text read failed',
+        },
+      ),
+    );
     return;
   }
   if (result == null || !result.hasData) return;
@@ -248,9 +264,16 @@ void scheduleSharedReceiptTextIfPending(
         SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'AddFillUp: shared-receipt text prefill failed',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'AddFillUp: shared-receipt text prefill failed',
+          },
+        ),
+      );
     }
   });
 }

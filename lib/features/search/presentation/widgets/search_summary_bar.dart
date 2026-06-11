@@ -45,7 +45,7 @@ class SearchSummaryBar extends ConsumerWidget {
 
   String _fuelLabel(BuildContext context, FuelType type) {
     if (type == FuelType.all) {
-      return AppLocalizations.of(context)?.allFuels ?? 'All';
+      return AppLocalizations.of(context).allFuels;
     }
     return type.displayName;
   }
@@ -57,7 +57,7 @@ class SearchSummaryBar extends ConsumerWidget {
   Widget _secondChip(
     BuildContext context,
     WidgetRef ref,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     SearchMode mode,
   ) {
     // #2676 — while the on-search Fuel Station Radar owns the results, the
@@ -67,14 +67,14 @@ class SearchSummaryBar extends ConsumerWidget {
     if (ref.watch(radarSearchProvider).active) {
       return _SummaryChip(
         icon: const Icon(Icons.radar, size: 16),
-        label: l10n?.fuelStationRadarResultBadge ?? 'Fuel Station Radar result',
+        label: l10n.fuelStationRadarResultBadge,
       );
     }
     if (mode != SearchMode.route) {
       final kmText = ref.watch(searchRadiusProvider).round().toString();
       return _SummaryChip(
         icon: const Icon(Icons.radar, size: 16),
-        label: l10n?.searchCriteriaRadiusBadge(kmText) ?? 'Within $kmText km',
+        label: l10n.searchCriteriaRadiusBadge(kmText),
       );
     }
     final routeState = ref.watch(routeSearchStateProvider);
@@ -90,15 +90,16 @@ class SearchSummaryBar extends ConsumerWidget {
           height: 14,
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
-        label: l10n?.routeSearchingChip ?? 'Searching the route…',
+        label: l10n.routeSearchingChip,
       );
     }
-    final segmentText =
-        ref.watch(routeSegmentSearchParamProvider).round().toString();
+    final segmentText = ref
+        .watch(routeSegmentSearchParamProvider)
+        .round()
+        .toString();
     return _SummaryChip(
       icon: const Icon(Icons.route, size: 16),
-      label: l10n?.routeSegmentSummaryBadge(segmentText) ??
-          'Every $segmentText km',
+      label: l10n.routeSegmentSummaryBadge(segmentText),
     );
   }
 
@@ -114,16 +115,15 @@ class SearchSummaryBar extends ConsumerWidget {
     final storedMode = ref.watch(activeSearchModeProvider);
     final manifest = ref.watch(featureManifestProvider);
     final enabledFlags = ref.watch(enabledFeaturesProvider);
-    final mode = isEffectivelyEnabled(
-            Feature.routePlanning, manifest, enabledFlags)
+    final mode =
+        isEffectivelyEnabled(Feature.routePlanning, manifest, enabledFlags)
         ? storedMode
         : SearchMode.nearby;
 
     final fuelColor = FuelColors.forType(fuelType);
 
     return Semantics(
-      label: l10n?.searchCriteriaSemanticLabel ??
-          'Search criteria summary. Tap to edit.',
+      label: l10n.searchCriteriaSemanticLabel,
       button: true,
       child: Material(
         color: theme.colorScheme.surfaceContainerHighest,
@@ -141,8 +141,7 @@ class SearchSummaryBar extends ConsumerWidget {
                       children: [
                         // Fuel type chip
                         _SummaryChip(
-                          icon: Icon(fuelType.icon,
-                              size: 16, color: fuelColor),
+                          icon: Icon(fuelType.icon, size: 16, color: fuelColor),
                           label: _fuelLabel(context, fuelType),
                         ),
                         const SizedBox(width: 6),

@@ -36,82 +36,79 @@ class ConfigVerificationWidget extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionTitle(theme, l?.configProfileSection ?? 'Profile'),
+            _sectionTitle(theme, l.configProfileSection),
             const SizedBox(height: 8),
             _ConfigRow(
               icon: Icons.person,
-              label: l?.configActiveProfile ?? 'Active profile',
-              value: profile?.name ?? (l?.configNone ?? 'None'),
+              label: l.configActiveProfile,
+              value: profile?.name ?? (l.configNone),
               status: profile != null ? _Status.ok : _Status.warning,
             ),
             _ConfigRow(
               icon: Icons.local_gas_station,
-              label: l?.configPreferredFuel ?? 'Preferred fuel',
+              label: l.configPreferredFuel,
               value: profile?.preferredFuelType.displayName ?? '\u2014',
               status: _Status.ok,
             ),
             _ConfigRow(
               icon: Icons.language,
-              label: l?.configCountry ?? 'Country',
+              label: l.configCountry,
               value: profile?.countryCode?.toUpperCase() ?? 'Auto',
               status: _Status.ok,
             ),
             _ConfigRow(
               icon: Icons.route,
-              label: l?.configRouteSegment ?? 'Route segment',
+              label: l.configRouteSegment,
               value: '${profile?.routeSegmentKm.round() ?? 50} km',
               status: _Status.ok,
             ),
 
             const Divider(height: 24),
-            _sectionTitle(theme, l?.configApiKeysSection ?? 'API keys'),
+            _sectionTitle(theme, l.configApiKeysSection),
             const SizedBox(height: 8),
             _ConfigRow(
               icon: Icons.key,
-              label: l?.configTankerkoenigKey ?? 'Tankerkoenig API key',
+              label: l.configTankerkoenigKey,
               // #521 — never render "Not set (demo mode)": the bundled
               // community key means the app always has a working key.
               // The row now distinguishes user-set (Configurée / green)
               // from the community default (same status — real data,
               // just not the user's own key).
               value: hasCustomApiKey
-                  ? (l?.configApiKeyConfigured ?? 'Configured')
-                  : (l?.configApiKeyCommunity ?? 'Default (community key)'),
+                  ? (l.configApiKeyConfigured)
+                  : (l.configApiKeyCommunity),
               status: _Status.ok,
             ),
             _ConfigRow(
               icon: Icons.ev_station,
-              label: l?.configEvKey ?? 'EV charging API key',
+              label: l.configEvKey,
               value: apiKeys.hasCustomEvApiKey()
-                  ? (l?.configEvKeyCustom ?? 'Custom key')
-                  : (l?.configEvKeyShared ?? 'Default (shared)'),
+                  ? (l.configEvKeyCustom)
+                  : (l.configEvKeyShared),
               status: _Status.ok,
             ),
 
             const Divider(height: 24),
-            _sectionTitle(theme, l?.configCloudSyncSection ?? 'Cloud Sync'),
+            _sectionTitle(theme, l.configCloudSyncSection),
             const SizedBox(height: 8),
             _ConfigRow(
               icon: Icons.cloud,
               label: 'TankSync',
               value: syncConfig.isConfigured
-                  ? (l?.configTankSyncConnected ?? 'Connected')
-                  : (l?.configTankSyncDisabled ?? 'Disabled'),
-              status:
-                  syncConfig.isConfigured ? _Status.ok : _Status.neutral,
+                  ? (l.configTankSyncConnected)
+                  : (l.configTankSyncDisabled),
+              status: syncConfig.isConfigured ? _Status.ok : _Status.neutral,
             ),
             if (syncConfig.isConfigured) ...[
               _ConfigRow(
                 icon: Icons.security,
-                label: l?.configAuthMode ?? 'Auth mode',
-                value: isEmail
-                    ? (l?.configAuthEmail ?? 'Email (persistent)')
-                    : (l?.configAuthAnonymous ?? 'Anonymous (device-only)'),
+                label: l.configAuthMode,
+                value: isEmail ? (l.configAuthEmail) : (l.configAuthAnonymous),
                 status: isEmail ? _Status.ok : _Status.warning,
               ),
               _ConfigRow(
                 icon: Icons.dns,
-                label: l?.configDatabase ?? 'Database',
+                label: l.configDatabase,
                 value: syncConfig.supabaseUrl ?? '\u2014',
                 status: _Status.ok,
                 // A Supabase URL is long enough to wrap "Database" onto two
@@ -130,9 +127,10 @@ class ConfigVerificationWidget extends ConsumerWidget {
   }
 
   Widget _sectionTitle(ThemeData theme, String title) {
-    return Text(title,
-        style: theme.textTheme.titleSmall
-            ?.copyWith(fontWeight: FontWeight.bold));
+    return Text(
+      title,
+      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+    );
   }
 
   Widget _buildPrivacySummary(
@@ -143,20 +141,11 @@ class ConfigVerificationWidget extends ConsumerWidget {
   ) {
     final l = AppLocalizations.of(context);
     final authNote = isEmail
-        ? (l?.configAuthNoteEmail ??
-            'Email account enables cross-device access')
-        : (l?.configAuthNoteAnonymous ??
-            'Anonymous account — data tied to this device');
+        ? (l.configAuthNoteEmail)
+        : (l.configAuthNoteAnonymous);
     final summaryBody = syncConfig.isConfigured as bool
-        ? (l?.configPrivacySummarySynced(authNote) ??
-            '• Favorites, alerts, and ignored stations are synced to your '
-                'private database\n'
-                '• GPS position and API keys never leave your device\n'
-                '• $authNote')
-        : (l?.configPrivacySummaryLocal ??
-            '• All data is stored locally on this device only\n'
-                '• No data is sent to any server\n'
-                '• API keys encrypted in device secure storage');
+        ? (l.configPrivacySummarySynced(authNote))
+        : (l.configPrivacySummaryLocal);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -172,7 +161,7 @@ class ConfigVerificationWidget extends ConsumerWidget {
               Icon(Icons.shield, size: 16, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
-                l?.configPrivacySummary ?? 'Privacy summary',
+                l.configPrivacySummary,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -244,9 +233,7 @@ class _ConfigRow extends StatelessWidget {
               children: [
                 Icon(icon, size: 14, color: statusColor),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: Text(label, style: theme.textTheme.bodySmall),
-                ),
+                Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
               ],
             ),
             Padding(

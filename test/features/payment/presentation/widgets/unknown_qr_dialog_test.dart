@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/payment/presentation/widgets/unknown_qr_dialog.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('UnknownQrDialog (#725)', () {
@@ -12,8 +13,9 @@ void main() {
       expect(find.text('weird://gibberish/xyz?a=1&b=2'), findsOneWidget);
     });
 
-    testWidgets('Copy button writes raw to clipboard and pops dialog',
-        (tester) async {
+    testWidgets('Copy button writes raw to clipboard and pops dialog', (
+      tester,
+    ) async {
       final writes = <String>[];
       await _pump(
         tester,
@@ -26,28 +28,29 @@ void main() {
       expect(find.byType(UnknownQrDialog), findsNothing);
     });
 
-    testWidgets('Report button calls onShare with a report body including the raw text',
-        (tester) async {
-      String? capturedText;
-      String? capturedSubject;
-      await _pump(
-        tester,
-        raw: 'mystery://pay/abc',
-        onShare: (text, subject) async {
-          capturedText = text;
-          capturedSubject = subject;
-        },
-      );
-      await tester.tap(find.byKey(const Key('unknownQrReport')));
-      await tester.pumpAndSettle();
-      expect(capturedText, contains('mystery://pay/abc'));
-      expect(capturedText, contains('App version:'));
-      expect(capturedSubject, contains('unrecognised payment QR'));
-      expect(find.byType(UnknownQrDialog), findsNothing);
-    });
+    testWidgets(
+      'Report button calls onShare with a report body including the raw text',
+      (tester) async {
+        String? capturedText;
+        String? capturedSubject;
+        await _pump(
+          tester,
+          raw: 'mystery://pay/abc',
+          onShare: (text, subject) async {
+            capturedText = text;
+            capturedSubject = subject;
+          },
+        );
+        await tester.tap(find.byKey(const Key('unknownQrReport')));
+        await tester.pumpAndSettle();
+        expect(capturedText, contains('mystery://pay/abc'));
+        expect(capturedText, contains('App version:'));
+        expect(capturedSubject, contains('unrecognised payment QR'));
+        expect(find.byType(UnknownQrDialog), findsNothing);
+      },
+    );
 
-    testWidgets('Cancel button pops without any side effects',
-        (tester) async {
+    testWidgets('Cancel button pops without any side effects', (tester) async {
       final writes = <String>[];
       var shareCalled = false;
       await _pump(
@@ -73,6 +76,8 @@ Future<void> _pump(
 }) async {
   await tester.pumpWidget(
     MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(
         builder: (ctx) => Scaffold(
           body: Center(

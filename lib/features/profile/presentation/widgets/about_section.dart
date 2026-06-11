@@ -27,21 +27,14 @@ class AboutSection extends StatelessWidget {
             leading: const Icon(Icons.person),
             title: const Text(AppConstants.developerName),
             subtitle: const Text(AppConstants.developerEmail),
-            onTap: () => launchUrl(
-              Uri.parse('mailto:${AppConstants.developerEmail}'),
-            ),
+            onTap: () =>
+                launchUrl(Uri.parse('mailto:${AppConstants.developerEmail}')),
           ),
           const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.code),
-            title: Text(
-              AppLocalizations.of(context)?.openSource ??
-                  'Open Source (MIT License)',
-            ),
-            subtitle: Text(
-              AppLocalizations.of(context)?.sourceCode ??
-                  'Source code on GitHub',
-            ),
+            title: Text(AppLocalizations.of(context).openSource),
+            subtitle: Text(AppLocalizations.of(context).sourceCode),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.developerWebsite),
               mode: LaunchMode.externalApplication,
@@ -49,10 +42,7 @@ class AboutSection extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
-            title: Text(
-              AppLocalizations.of(context)?.privacyPolicy ??
-                  'Privacy Policy',
-            ),
+            title: Text(AppLocalizations.of(context).privacyPolicy),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.privacyPolicyUrl),
               mode: LaunchMode.externalApplication,
@@ -70,8 +60,7 @@ class AboutSection extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.bug_report),
-            title: Text(AppLocalizations.of(context)?.aboutReportBug ??
-                'Report a bug / Suggest a feature'),
+            title: Text(AppLocalizations.of(context).aboutReportBug),
             onTap: () => launchUrl(
               Uri.parse(AppConstants.githubIssuesUrl),
               mode: LaunchMode.externalApplication,
@@ -82,8 +71,7 @@ class AboutSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Text(
-              AppLocalizations.of(context)?.aboutSupportProject ??
-                  'Support this project',
+              AppLocalizations.of(context).aboutSupportProject,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -92,9 +80,7 @@ class AboutSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              AppLocalizations.of(context)?.aboutSupportDescription ??
-                  'This app is free, open source, and has no ads. '
-                      'If you find it useful, consider supporting the developer.',
+              AppLocalizations.of(context).aboutSupportDescription,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -102,8 +88,7 @@ class AboutSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           ListTile(
-            leading:
-                const Icon(Icons.payment, color: Color(0xFF003087)),
+            leading: const Icon(Icons.payment, color: Color(0xFF003087)),
             title: const Text('PayPal'), // i18n-ignore: brand / proper noun
             subtitle: const Text('paypal.me/FlorianDITTGEN'),
             onTap: () => launchUrl(
@@ -112,8 +97,10 @@ class AboutSection extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.account_balance_wallet,
-                color: Color(0xFF0075EB)),
+            leading: const Icon(
+              Icons.account_balance_wallet,
+              color: Color(0xFF0075EB),
+            ),
             title: const Text('Revolut'), // i18n-ignore: brand / proper noun
             subtitle: const Text('revolut.me/floriamcep'),
             onTap: () => launchUrl(

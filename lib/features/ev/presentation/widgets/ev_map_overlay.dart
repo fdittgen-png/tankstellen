@@ -111,7 +111,7 @@ class EvToggleButton extends ConsumerWidget {
         customBorder: const CircleBorder(),
         onTap: () => ref.read(evShowOnMapProvider.notifier).toggle(),
         child: Tooltip(
-          message: l10n?.evShowOnMap ?? 'Show EV stations',
+          message: l10n.evShowOnMap,
           child: Padding(
             padding: const EdgeInsets.all(8),
             child: Icon(

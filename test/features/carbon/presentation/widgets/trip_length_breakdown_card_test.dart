@@ -21,8 +21,9 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 ///     bucket has >=5 trips AND the bucket avg differs from overall
 void main() {
   group('TripLengthBreakdownCard — labels + tile presence', () {
-    testWidgets('renders the localised title + three bucket labels',
-        (tester) async {
+    testWidgets('renders the localised title + three bucket labels', (
+      tester,
+    ) async {
       await _pumpCard(
         tester,
         breakdown: const TripLengthBreakdown(
@@ -56,8 +57,9 @@ void main() {
       expect(find.byKey(const Key('trip_length_tile_long')), findsOneWidget);
     });
 
-    testWidgets('renders the average L/100 km on tiles with >=5 trips',
-        (tester) async {
+    testWidgets('renders the average L/100 km on tiles with >=5 trips', (
+      tester,
+    ) async {
       await _pumpCard(
         tester,
         breakdown: const TripLengthBreakdown(
@@ -85,24 +87,23 @@ void main() {
   });
 
   group('TripLengthBreakdownCard — empty + "need more data"', () {
-    testWidgets(
-      'renders SizedBox.shrink (no card) when all buckets are zero',
-      (tester) async {
-        await _pumpCard(
-          tester,
-          breakdown: TripLengthBreakdown.empty,
-          overallAvgLPer100Km: null,
-        );
+    testWidgets('renders SizedBox.shrink (no card) when all buckets are zero', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        breakdown: TripLengthBreakdown.empty,
+        overallAvgLPer100Km: null,
+      );
 
-        // The title must NOT render when the card is hidden.
-        expect(find.text('Consumption by trip length'), findsNothing);
-        // The internal Card root key must not be in the tree either.
-        expect(
-          find.byKey(const ValueKey('trip_length_breakdown_card')),
-          findsNothing,
-        );
-      },
-    );
+      // The title must NOT render when the card is hidden.
+      expect(find.text('Consumption by trip length'), findsNothing);
+      // The internal Card root key must not be in the tree either.
+      expect(
+        find.byKey(const ValueKey('trip_length_breakdown_card')),
+        findsNothing,
+      );
+    });
 
     testWidgets(
       'shows "Need more data" on the medium tile when count is between 1 and 4',
@@ -139,29 +140,28 @@ void main() {
   });
 
   group('TripLengthBreakdownCard — above/below arrows', () {
-    testWidgets(
-      'renders red up arrow when bucket avg is above overall avg',
-      (tester) async {
-        await _pumpCard(
-          tester,
-          breakdown: const TripLengthBreakdown(
-            short: TripLengthBucketStats(
-              tripCount: 6,
-              totalDistanceKm: 18.0,
-              totalLitres: 2.0,
-              avgLPer100Km: 11.1, // above overall (7.5)
-            ),
-            medium: TripLengthBucketStats.empty,
-            long: TripLengthBucketStats.empty,
+    testWidgets('renders red up arrow when bucket avg is above overall avg', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        breakdown: const TripLengthBreakdown(
+          short: TripLengthBucketStats(
+            tripCount: 6,
+            totalDistanceKm: 18.0,
+            totalLitres: 2.0,
+            avgLPer100Km: 11.1, // above overall (7.5)
           ),
-          overallAvgLPer100Km: 7.5,
-        );
+          medium: TripLengthBucketStats.empty,
+          long: TripLengthBucketStats.empty,
+        ),
+        overallAvgLPer100Km: 7.5,
+      );
 
-        // Up arrow for the worse-than-overall short bucket.
-        expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
-        expect(find.byIcon(Icons.arrow_downward), findsNothing);
-      },
-    );
+      // Up arrow for the worse-than-overall short bucket.
+      expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_downward), findsNothing);
+    });
 
     testWidgets(
       'renders green down arrow when bucket avg is below overall avg',
@@ -186,28 +186,27 @@ void main() {
       },
     );
 
-    testWidgets(
-      'no arrows render when overallAvgLPer100Km is null',
-      (tester) async {
-        await _pumpCard(
-          tester,
-          breakdown: const TripLengthBreakdown(
-            short: TripLengthBucketStats.empty,
-            medium: TripLengthBucketStats(
-              tripCount: 6,
-              totalDistanceKm: 60.0,
-              totalLitres: 4.0,
-              avgLPer100Km: 6.667,
-            ),
-            long: TripLengthBucketStats.empty,
+    testWidgets('no arrows render when overallAvgLPer100Km is null', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        breakdown: const TripLengthBreakdown(
+          short: TripLengthBucketStats.empty,
+          medium: TripLengthBucketStats(
+            tripCount: 6,
+            totalDistanceKm: 60.0,
+            totalLitres: 4.0,
+            avgLPer100Km: 6.667,
           ),
-          overallAvgLPer100Km: null,
-        );
+          long: TripLengthBucketStats.empty,
+        ),
+        overallAvgLPer100Km: null,
+      );
 
-        expect(find.byIcon(Icons.arrow_upward), findsNothing);
-        expect(find.byIcon(Icons.arrow_downward), findsNothing);
-      },
-    );
+      expect(find.byIcon(Icons.arrow_upward), findsNothing);
+      expect(find.byIcon(Icons.arrow_downward), findsNothing);
+    });
   });
 }
 
@@ -235,9 +234,6 @@ Future<void> _pumpCard(
           builder: (context) {
             final l = AppLocalizations.of(context);
             final theme = Theme.of(context);
-            // pumpApp would have loaded the delegate by the next pump,
-            // so AppLocalizations.of must resolve before we hand it in.
-            if (l == null) return const SizedBox.shrink();
             return TripLengthBreakdownCard(
               breakdown: breakdown,
               overallAvgLPer100Km: overallAvgLPer100Km,

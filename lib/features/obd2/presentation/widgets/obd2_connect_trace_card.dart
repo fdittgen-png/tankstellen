@@ -46,50 +46,60 @@ class Obd2ConnectTraceCard extends StatelessWidget {
             Text(
               trace.adapterName ??
                   trace.requestedMac ??
-                  (l?.obd2HealthConnectUnknownAdapter ?? 'Unknown adapter'),
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+                  (l.obd2HealthConnectUnknownAdapter),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 4),
             // Outcome headline (bold) — the answer to "why didn't it connect".
             Row(
               children: [
-                Icon(failed ? Icons.error_outline : Icons.check_circle_outline,
-                    size: 18, color: accent),
+                Icon(
+                  failed ? Icons.error_outline : Icons.check_circle_outline,
+                  size: 18,
+                  color: accent,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${l?.obd2HealthConnectOutcome ?? 'Outcome'}: '
+                    '${l.obd2HealthConnectOutcome}: '
                     '${trace.outcome?.name ?? 'in progress'}',
-                    style: theme.textTheme.titleSmall
-                        ?.copyWith(color: accent, fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: accent,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 if (trace.totalMs != null)
-                  Text('${trace.totalMs} ms', // i18n-ignore: ms unit format mask
-                      style: theme.textTheme.bodySmall?.copyWith(
-                          color: cs.onSurfaceVariant)),
+                  Text(
+                    '${trace.totalMs} ms', // i18n-ignore: ms unit format mask
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
               ],
             ),
             if (trace.failureDetail != null) ...[
               const SizedBox(height: 4),
-              Text(trace.failureDetail!,
-                  style: theme.textTheme.bodySmall
-                      ?.copyWith(color: cs.onSurfaceVariant)),
+              Text(
+                trace.failureDetail!,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
             ],
             const SizedBox(height: 6),
-            _kv(theme, l?.obd2HealthConnectOrigin ?? 'Origin', trace.origin.name),
-            _kv(
-              theme,
-              l?.obd2HealthConnectTransport ?? 'Transport',
-              _transportLine(trace),
-            ),
+            _kv(theme, l.obd2HealthConnectOrigin, trace.origin.name),
+            _kv(theme, l.obd2HealthConnectTransport, _transportLine(trace)),
             if (trace.requestedMac != null)
               _kv(theme, 'MAC', trace.requestedMac!), // i18n-ignore: MAC label
             if (trace.scanned.isNotEmpty) ...[
               const SizedBox(height: 6),
-              Text(l?.obd2HealthConnectScanList ?? 'Scanned devices',
-                  style: theme.textTheme.labelMedium),
+              Text(
+                l.obd2HealthConnectScanList,
+                style: theme.textTheme.labelMedium,
+              ),
               for (final d in trace.scanned)
                 Text(
                   '· ${d.name ?? d.redactedMac ?? '?'}'
@@ -100,8 +110,10 @@ class Obd2ConnectTraceCard extends StatelessWidget {
             ],
             if (trace.steps.isNotEmpty) ...[
               const SizedBox(height: 6),
-              Text(l?.obd2HealthConnectSteps ?? 'Steps',
-                  style: theme.textTheme.labelMedium),
+              Text(
+                l.obd2HealthConnectSteps,
+                style: theme.textTheme.labelMedium,
+              ),
               for (final s in trace.steps)
                 Text(
                   '· ${s.label} — ${s.status.name}'
@@ -129,16 +141,19 @@ class Obd2ConnectTraceCard extends StatelessWidget {
   }
 
   Widget _kv(ThemeData theme, String k, String v) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 1),
-        child: Text.rich(
-          TextSpan(children: [
-            TextSpan(
-              text: '$k: ',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+    padding: const EdgeInsets.symmetric(vertical: 1),
+    child: Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$k: ',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
-            TextSpan(text: v, style: theme.textTheme.bodySmall),
-          ]),
-        ),
-      );
+          ),
+          TextSpan(text: v, style: theme.textTheme.bodySmall),
+        ],
+      ),
+    ),
+  );
 }

@@ -60,7 +60,7 @@ class OnboardingNavigationButtons extends StatelessWidget {
             TextButton.icon(
               onPressed: isLoading ? null : onBack,
               icon: const Icon(Icons.arrow_back),
-              label: Text(l10n?.onboardingBack ?? 'Back'),
+              label: Text(l10n.onboardingBack),
             )
           else
             const SizedBox(width: 80),
@@ -70,7 +70,7 @@ class OnboardingNavigationButtons extends StatelessWidget {
               padding: const EdgeInsets.only(right: 8),
               child: TextButton(
                 onPressed: isLoading ? null : onSkip,
-                child: Text(l10n?.onboardingSkip ?? 'Skip'),
+                child: Text(l10n.onboardingSkip),
               ),
             ),
           FilledButton.icon(
@@ -83,9 +83,7 @@ class OnboardingNavigationButtons extends StatelessWidget {
                   )
                 : Icon(isLastStep ? Icons.check : Icons.arrow_forward),
             label: Text(
-              isLastStep
-                  ? (l10n?.onboardingFinish ?? 'Get started')
-                  : (l10n?.onboardingNext ?? 'Next'),
+              isLastStep ? (l10n.onboardingFinish) : (l10n.onboardingNext),
             ),
           ),
         ],

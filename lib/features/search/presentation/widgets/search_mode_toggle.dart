@@ -27,12 +27,12 @@ class SearchModeToggle extends StatelessWidget {
       segments: [
         ButtonSegment(
           value: SearchMode.nearby,
-          label: Text(l10n?.searchNearby ?? 'Nearby'),
+          label: Text(l10n.searchNearby),
           icon: const Icon(Icons.near_me),
         ),
         ButtonSegment(
           value: SearchMode.route,
-          label: Text(l10n?.searchAlongRoute ?? 'Along route'),
+          label: Text(l10n.searchAlongRoute),
           icon: const Icon(Icons.route),
         ),
       ],

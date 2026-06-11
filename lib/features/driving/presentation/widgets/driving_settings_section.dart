@@ -61,7 +61,8 @@ class DrivingSettingsSection extends ConsumerWidget {
     // in the central provider. When the parent is off (and the toggle
     // isn't already on) the switch is disabled rather than letting the
     // tap fail.
-    final canToggleEco = ecoEnabled ||
+    final canToggleEco =
+        ecoEnabled ||
         canEnable(
           Feature.hapticEcoCoach,
           ref.watch(featureManifestProvider),
@@ -84,17 +85,15 @@ class DrivingSettingsSection extends ConsumerWidget {
         //    clear header; the tile carries an accurate subtitle that
         //    describes what /vehicles manages for both fuel + EV cars.
         SectionHeader(
-          title: l?.consoGroupVehicles ?? 'Vehicles',
+          title: l.consoGroupVehicles,
           leadingIcon: Icons.directions_car,
           padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
         ),
         SettingsMenuTile(
           key: const Key('consoleVehiclesTile'),
           icon: Icons.directions_car,
-          title: l?.vehiclesMenuTitle ?? 'My vehicles',
-          subtitle: l?.vehiclesMenuSubtitle ??
-              'Your cars — fuel type, engine and tank size for accurate '
-                  'consumption estimates',
+          title: l.vehiclesMenuTitle,
+          subtitle: l.vehiclesMenuSubtitle,
           onTap: () => context.push(RoutePaths.vehicles),
         ),
 
@@ -104,25 +103,20 @@ class DrivingSettingsSection extends ConsumerWidget {
         //    beta keeps its `glideCoachEnabledProvider` visibility gate.
         const SizedBox(height: Spacing.md),
         SectionHeader(
-          title: l?.consoGroupCoaching ?? 'Coaching while driving',
+          title: l.consoGroupCoaching,
           leadingIcon: Icons.self_improvement,
           padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
         ),
         SwitchListTile(
           key: const Key('hapticEcoCoachToggle'),
           value: ecoEnabled,
-          title: Text(
-            l?.hapticEcoCoachSettingTitle ?? 'Real-time eco coaching',
-          ),
+          title: Text(l.hapticEcoCoachSettingTitle),
           subtitle: Text(
-            l?.hapticEcoCoachSettingSubtitle ??
-                'Gentle haptic + on-screen tip when you floor it '
-                    'during cruise',
+            l.hapticEcoCoachSettingSubtitle,
             style: theme.textTheme.bodySmall,
           ),
           onChanged: canToggleEco
-              ? (v) =>
-                  ref.read(hapticEcoCoachEnabledProvider.notifier).set(v)
+              ? (v) => ref.read(hapticEcoCoachEnabledProvider.notifier).set(v)
               : null,
           contentPadding: EdgeInsets.zero,
         ),
@@ -131,8 +125,7 @@ class DrivingSettingsSection extends ConsumerWidget {
         // in OBD2 *and* GPS-only trips and is unrelated to the station
         // overlay. Always visible so the user can mute it.
         const _VoiceCoachingToggleTile(),
-        if (ref.watch(glideCoachEnabledProvider))
-          const _GlideCoachToggleTile(),
+        if (ref.watch(glideCoachEnabledProvider)) const _GlideCoachToggleTile(),
         // #2569 — spoken nearby-cheap-fuel announcements. Visible only
         // when the `Feature.voiceAnnouncements` flag is effectively on
         // (it requires the approach overlay, so the gate is false unless
@@ -145,7 +138,7 @@ class DrivingSettingsSection extends ConsumerWidget {
         //    [Feature.loyaltyCards] is on) and the gamification opt-out.
         const SizedBox(height: Spacing.md),
         SectionHeader(
-          title: l?.consoGroupRewards ?? 'Rewards & savings',
+          title: l.consoGroupRewards,
           leadingIcon: Icons.emoji_events_outlined,
           padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
         ),
@@ -153,9 +146,8 @@ class DrivingSettingsSection extends ConsumerWidget {
           SettingsMenuTile(
             key: const Key('consoleFuelClubCardsTile'),
             icon: Icons.card_membership,
-            title: l?.loyaltyMenuTitle ?? 'Fuel club cards',
-            subtitle: l?.loyaltyMenuSubtitle ??
-                'Apply per-litre discounts from Total, Aral, Shell, …',
+            title: l.loyaltyMenuTitle,
+            subtitle: l.loyaltyMenuSubtitle,
             onTap: () => context.push(RoutePaths.loyaltySettings),
           ),
         const GamificationSettingsTile(),
@@ -167,7 +159,7 @@ class DrivingSettingsSection extends ConsumerWidget {
         if (mode == ConsoMode.fuelAndTrips) ...[
           const SizedBox(height: Spacing.md),
           SectionHeader(
-            title: l?.consoGroupTroubleshooting ?? 'Troubleshooting',
+            title: l.consoGroupTroubleshooting,
             leadingIcon: Icons.bug_report_outlined,
             padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
           ),
@@ -194,16 +186,13 @@ class _GlideCoachToggleTile extends ConsumerWidget {
     return SwitchListTile(
       key: const Key('glideCoachToggle'),
       value: settings.enabled,
-      title: Text(l?.glideCoachBetaTitle ?? 'Glide-coach beta (experimental)'),
+      title: Text(l.glideCoachBetaTitle),
       subtitle: Text(
-        l?.glideCoachBetaSubtitle ??
-            'Subtle haptic when slowing down ahead of a red light. '
-                'Off by default — distraction risk.',
+        l.glideCoachBetaSubtitle,
         style: theme.textTheme.bodySmall,
       ),
-      onChanged: (v) => ref
-          .read(glideCoachSettingsProvider.notifier)
-          .setEnabled(v),
+      onChanged: (v) =>
+          ref.read(glideCoachSettingsProvider.notifier).setEnabled(v),
       contentPadding: EdgeInsets.zero,
     );
   }
@@ -226,11 +215,9 @@ class _VoiceCoachingToggleTile extends ConsumerWidget {
     return SwitchListTile(
       key: const Key('voiceCoachingToggle'),
       value: enabled,
-      title: Text(l?.voiceCoachingSettingTitle ?? 'Spoken driving coaching'),
+      title: Text(l.voiceCoachingSettingTitle),
       subtitle: Text(
-        l?.voiceCoachingSettingSubtitle ??
-            'Hear spoken tips while you drive — hard acceleration, harsh '
-                'braking and gear hints',
+        l.voiceCoachingSettingSubtitle,
         style: theme.textTheme.bodySmall,
       ),
       onChanged: (v) =>
@@ -271,10 +258,9 @@ class _VoiceAnnouncementsTile extends ConsumerWidget {
         SwitchListTile(
           key: const Key('voiceAnnouncementsToggle'),
           value: config.enabled,
-          title: Text(l?.voiceAnnouncementsTitle ?? 'Voice Announcements'),
+          title: Text(l.voiceAnnouncementsTitle),
           subtitle: Text(
-            l?.voiceAnnouncementsDescription ??
-                'Announce nearby cheap stations while driving',
+            l.voiceAnnouncementsDescription,
             style: theme.textTheme.bodySmall,
           ),
           onChanged: (v) => notifier.setEnabled(v),
@@ -286,7 +272,7 @@ class _VoiceAnnouncementsTile extends ConsumerWidget {
           // bare `Slider.label` is only visible while dragging.
           LabeledValueSlider(
             sliderKey: const Key('voiceAnnouncementRadiusSlider'),
-            label: l?.voiceAnnouncementProximityRadius ?? 'Announcement radius',
+            label: l.voiceAnnouncementProximityRadius,
             // i18n-ignore: " km" is a language-neutral unit suffix (matches
             // ProfileRadiusSlider + the {km} ARB masks).
             valueLabel: '${radiusKm.toStringAsFixed(1)} km',
@@ -300,7 +286,7 @@ class _VoiceAnnouncementsTile extends ConsumerWidget {
           // Repeat cooldown — 5 … 60 minutes in 5-minute steps.
           LabeledValueSlider(
             sliderKey: const Key('voiceAnnouncementCooldownSlider'),
-            label: l?.voiceAnnouncementCooldown ?? 'Repeat interval',
+            label: l.voiceAnnouncementCooldown,
             // i18n-ignore: " min" is a language-neutral unit abbreviation.
             valueLabel: '$cooldownMin min',
             labelStyle: theme.textTheme.bodyMedium,
@@ -318,7 +304,7 @@ class _VoiceAnnouncementsTile extends ConsumerWidget {
           LabeledValueSlider(
             key: const Key('voiceAnnouncementThresholdTile'),
             sliderKey: const Key('voiceAnnouncementThresholdSlider'),
-            label: l?.voiceAnnouncementPriceLimit ?? 'Maximum price',
+            label: l.voiceAnnouncementPriceLimit,
             valueLabel: PriceFormatter.formatPrice(thresholdEur),
             labelStyle: theme.textTheme.bodyMedium,
             value: thresholdEur,
@@ -351,12 +337,9 @@ class _Obd2DebugLoggingToggleTile extends ConsumerWidget {
     return SwitchListTile(
       key: const Key('obd2DebugLoggingToggle'),
       value: enabled,
-      title: Text(l?.obd2DebugLoggingTitle ?? 'OBD2 debug logging'),
+      title: Text(l.obd2DebugLoggingTitle),
       subtitle: Text(
-        l?.obd2DebugLoggingSubtitle ??
-            'Record each OBD2 session — connection, handshake, data '
-                'gaps and reconnects — to an exportable XML log. Off by '
-                'default.',
+        l.obd2DebugLoggingSubtitle,
         style: theme.textTheme.bodySmall,
       ),
       onChanged: (v) =>

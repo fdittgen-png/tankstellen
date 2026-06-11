@@ -24,7 +24,7 @@ class ThemeSettingsScreen extends ConsumerWidget {
     final choice = ref.watch(themeModeSettingProvider);
 
     return PageScaffold(
-      title: l?.themeSettingsScreenTitle ?? 'Theme',
+      title: l.themeSettingsScreenTitle,
       bodyPadding: EdgeInsets.zero,
       body: RadioGroup<AppThemeChoice>(
         groupValue: choice,
@@ -35,9 +35,8 @@ class ThemeSettingsScreen extends ConsumerWidget {
             _ThemeChoiceOption(
               choice: AppThemeChoice.system,
               icon: Icons.smartphone,
-              label: l?.themeSettingsSystemLabel ?? 'Follow system',
-              description: l?.themeSettingsSystemDescription ??
-                  'Match the current device appearance.',
+              label: l.themeSettingsSystemLabel,
+              description: l.themeSettingsSystemDescription,
               selected: choice == AppThemeChoice.system,
               onTap: () => _select(ref, AppThemeChoice.system),
               keyValue: 'themeSettingsOptionSystem',
@@ -46,9 +45,8 @@ class ThemeSettingsScreen extends ConsumerWidget {
             _ThemeChoiceOption(
               choice: AppThemeChoice.light,
               icon: Icons.light_mode,
-              label: l?.themeSettingsLightLabel ?? 'Light',
-              description: l?.themeSettingsLightDescription ??
-                  'Bright backgrounds — best for daytime use.',
+              label: l.themeSettingsLightLabel,
+              description: l.themeSettingsLightDescription,
               selected: choice == AppThemeChoice.light,
               onTap: () => _select(ref, AppThemeChoice.light),
               keyValue: 'themeSettingsOptionLight',
@@ -57,10 +55,8 @@ class ThemeSettingsScreen extends ConsumerWidget {
             _ThemeChoiceOption(
               choice: AppThemeChoice.dark,
               icon: Icons.dark_mode,
-              label: l?.themeSettingsDarkLabel ?? 'Dark',
-              description: l?.themeSettingsDarkDescription ??
-                  'Dark backgrounds — easier on the eyes at night and '
-                      'saves battery on OLED screens.',
+              label: l.themeSettingsDarkLabel,
+              description: l.themeSettingsDarkDescription,
               selected: choice == AppThemeChoice.dark,
               onTap: () => _select(ref, AppThemeChoice.dark),
               keyValue: 'themeSettingsOptionDark',
@@ -69,10 +65,8 @@ class ThemeSettingsScreen extends ConsumerWidget {
             _ThemeChoiceOption(
               choice: AppThemeChoice.eco,
               icon: Icons.energy_savings_leaf,
-              label: l?.themeSettingsEcoLabel ?? 'Eco',
-              description: l?.themeSettingsEcoDescription ??
-                  "The app's signature green look — bright and easy "
-                      'to read, with softly green-tinted backgrounds.',
+              label: l.themeSettingsEcoLabel,
+              description: l.themeSettingsEcoDescription,
               selected: choice == AppThemeChoice.eco,
               onTap: () => _select(ref, AppThemeChoice.eco),
               keyValue: 'themeSettingsOptionEco',
@@ -137,15 +131,13 @@ class _ThemeChoiceOption extends StatelessWidget {
                     Text(
                       label,
                       style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight:
-                            selected ? FontWeight.bold : FontWeight.w500,
+                        fontWeight: selected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: theme.textTheme.bodySmall,
-                    ),
+                    Text(description, style: theme.textTheme.bodySmall),
                   ],
                 ),
               ),

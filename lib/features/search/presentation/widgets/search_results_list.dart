@@ -117,8 +117,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                   return Text(
                     location.isNotEmpty
                         ? '$location · ${result.data.length}'
-                        : l10n?.stationsFound(result.data.length) ??
-                            '${result.data.length} stations',
+                        : l10n.stationsFound(result.data.length),
                     style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -129,7 +128,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
               _ViewToggleButton(),
               const SizedBox(width: 4),
               Semantics(
-                label: l10n?.showOnMapSemanticLabel ?? 'Show stations on map',
+                label: l10n.showOnMapSemanticLabel,
                 button: true,
                 child: InkWell(
                   onTap: () => context.go(RoutePaths.map),
@@ -155,7 +154,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
                   .watch(enabledFeaturesProvider)
                   .contains(Feature.fuelCalculator)) ...[
                 Semantics(
-                  label: l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator',
+                  label: l10n.fuelCostCalculator,
                   button: true,
                   child: InkWell(
                     // #2543 — carry the cheapest visible price for the
@@ -380,8 +379,8 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showWithUndo(
           context,
-          l10n?.stationHidden(station.displayName) ?? '${station.displayName} hidden',
-          undoLabel: l10n?.undo ?? 'Undo',
+          l10n.stationHidden(station.displayName),
+          undoLabel: l10n.undo,
           onUndo: () => ignoredNotifier.remove(station.id),
         );
       },

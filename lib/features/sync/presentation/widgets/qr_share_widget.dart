@@ -31,7 +31,9 @@ class QrShareWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final syncState = ref.watch(syncStateProvider);
-    if (!syncState.isConfigured || syncState.supabaseUrl == null || syncState.supabaseAnonKey == null) {
+    if (!syncState.isConfigured ||
+        syncState.supabaseUrl == null ||
+        syncState.supabaseAnonKey == null) {
       return const SizedBox.shrink();
     }
 
@@ -48,12 +50,13 @@ class QrShareWidget extends ConsumerWidget {
 
     return Column(
       children: [
-        Text(l?.qrShareTitle ?? 'Share your database',
-            style: theme.textTheme.titleSmall),
+        Text(l.qrShareTitle, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
         Text(
-          l?.qrShareSubtitle ?? 'Others can scan this QR code to connect',
-          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          l.qrShareSubtitle,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 16),
@@ -69,10 +72,13 @@ class QrShareWidget extends ConsumerWidget {
         OutlinedButton.icon(
           onPressed: () {
             unawaited(Clipboard.setData(ClipboardData(text: qrData)));
-            SnackBarHelper.show(context, AppLocalizations.of(context)?.connectionDataCopied ?? 'Connection data copied');
+            SnackBarHelper.show(
+              context,
+              AppLocalizations.of(context).connectionDataCopied,
+            );
           },
           icon: const Icon(Icons.copy, size: 16),
-          label: Text(l?.qrShareCopyAsText ?? 'Copy as text'),
+          label: Text(l.qrShareCopyAsText),
         ),
       ],
     );

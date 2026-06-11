@@ -67,13 +67,10 @@ class StationDetailWideLayout extends StatelessWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () => context.pop(),
-        tooltip: l10n?.tooltipBack ?? 'Back',
+        tooltip: l10n.tooltipBack,
       ),
       actions: [
-        StationDetailAppBarActions(
-          stationId: stationId,
-          station: station,
-        ),
+        StationDetailAppBarActions(stationId: stationId, station: station),
       ],
       bodyPadding: EdgeInsets.zero,
       body: Row(

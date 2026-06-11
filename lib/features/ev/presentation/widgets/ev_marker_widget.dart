@@ -20,11 +20,7 @@ class EvMarkerWidget extends StatelessWidget {
   final ChargingStation station;
   final VoidCallback? onTap;
 
-  const EvMarkerWidget({
-    super.key,
-    required this.station,
-    this.onTap,
-  });
+  const EvMarkerWidget({super.key, required this.station, this.onTap});
 
   static Color colorFor(BuildContext context, ChargingStation station) {
     if (station.connectors.isEmpty) return Colors.grey;
@@ -37,10 +33,7 @@ class EvMarkerWidget extends StatelessWidget {
   }
 
   /// Build a flutter_map [Marker] for this station.
-  static Marker buildMarker(
-    ChargingStation station, {
-    VoidCallback? onTap,
-  }) {
+  static Marker buildMarker(ChargingStation station, {VoidCallback? onTap}) {
     return Marker(
       point: LatLng(station.latitude, station.longitude),
       width: 44,
@@ -62,8 +55,7 @@ class EvMarkerWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Semantics(
-          label: l10n?.evChargingStationSemantic(station.name, maxPower) ??
-              'EV charging station ${station.name}, $maxPower kW',
+          label: l10n.evChargingStationSemantic(station.name, maxPower),
           button: true,
           child: Container(
             decoration: BoxDecoration(
@@ -77,11 +69,7 @@ class EvMarkerWidget extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.ev_station,
-              color: Colors.white,
-              size: 24,
-            ),
+            child: const Icon(Icons.ev_station, color: Colors.white, size: 24),
           ),
         ),
       ),

@@ -47,9 +47,11 @@ class FuelTypeSelector extends ConsumerWidget {
 
     // If selected type isn't available in this country, reset to 'all'
     if (!types.contains(selected)) {
-      unawaited(Future.microtask(() {
-        ref.read(selectedFuelTypeProvider.notifier).select(FuelType.all);
-      }));
+      unawaited(
+        Future.microtask(() {
+          ref.read(selectedFuelTypeProvider.notifier).select(FuelType.all);
+        }),
+      );
     }
 
     return SingleChildScrollView(
@@ -58,14 +60,14 @@ class FuelTypeSelector extends ConsumerWidget {
         children: types.map((type) {
           // Localize "All" for display — other types use their canonical names
           final label = type == FuelType.all
-              ? (AppLocalizations.of(context)?.allFuels ?? 'All')
+              ? (AppLocalizations.of(context).allFuels)
               : type.displayName;
           return Padding(
             padding: const EdgeInsets.only(right: 6),
             child: Semantics(
-              label: AppLocalizations.of(context)
-                      ?.fuelTypeSemantic(label, '${selected == type}') ??
-                  'Fuel type $label',
+              label: AppLocalizations.of(
+                context,
+              ).fuelTypeSemantic(label, '${selected == type}'),
               child: ChoiceChip(
                 avatar: selected == type
                     ? null

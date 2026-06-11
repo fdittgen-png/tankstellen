@@ -41,7 +41,7 @@ class _StageTile extends StatelessWidget {
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: Text(
-                  l?.ocrTesterStageNoData ?? 'Stage did not run.',
+                  l.ocrTesterStageNoData,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -69,13 +69,14 @@ class _KvRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label,
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
-          Expanded(
-            child: Text(value, style: theme.textTheme.bodySmall),
-          ),
+          Expanded(child: Text(value, style: theme.textTheme.bodySmall)),
         ],
       ),
     );
@@ -96,7 +97,8 @@ class _ClassifyRow extends StatelessWidget {
       'numeric' => OcrBlockOverlayColors.numeric,
       _ => OcrBlockOverlayColors.noise,
     };
-    final detail = classification.field ??
+    final detail =
+        classification.field ??
         (classification.value != null ? '${classification.value}' : '');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -163,8 +165,8 @@ class _ResultRow extends StatelessWidget {
     if (value == null) return const SizedBox.shrink();
     final isDerived = derived.contains(field);
     final chipText = isDerived
-        ? (l?.ocrTesterChipDerived ?? 'DERIVED')
-        : (l?.ocrTesterChipRead ?? 'READ');
+        ? (l.ocrTesterChipDerived)
+        : (l.ocrTesterChipRead);
     final chipColor = isDerived
         ? OcrBlockOverlayColors.derived
         : OcrBlockOverlayColors.numeric;
@@ -174,9 +176,12 @@ class _ResultRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 120,
-            child: Text(label,
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
           Text('$value', style: theme.textTheme.bodyMedium),
           const SizedBox(width: 8),
@@ -220,8 +225,11 @@ class _FallbackBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.warning_amber_outlined,
-              color: OcrBlockOverlayColors.derived, size: 18),
+          const Icon(
+            Icons.warning_amber_outlined,
+            color: OcrBlockOverlayColors.derived,
+            size: 18,
+          ),
           const SizedBox(width: 8),
           Expanded(child: Text(text, style: theme.textTheme.bodySmall)),
         ],

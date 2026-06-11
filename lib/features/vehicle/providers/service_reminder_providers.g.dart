@@ -127,7 +127,7 @@ final class ServiceReminderEvaluatorProvider
 }
 
 String _$serviceReminderEvaluatorHash() =>
-    r'b46da525c9cea889a8a7c0c6f9ee484cc0c88835';
+    r'a64dbf1e9c68ba3fd9b018a2abe0d2b886566dcf';
 
 /// Mutable list of every stored reminder. Individual screens watch
 /// [serviceRemindersForVehicle] — this provider is the source of

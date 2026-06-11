@@ -57,12 +57,17 @@ class VinConfirmDialog extends StatelessWidget {
     final cylinders = data.cylinderCount?.toString() ?? '—';
     final fuel = data.fuelTypePrimary ?? '—';
 
-    final body = l?.vinConfirmBody(year, make, model, displacement,
-            cylinders, fuel) ??
-        '$year $make $model — ${displacement}L, $cylinders-cyl, $fuel';
+    final body = l.vinConfirmBody(
+      year,
+      make,
+      model,
+      displacement,
+      cylinders,
+      fuel,
+    );
 
     return AlertDialog(
-      title: Text(l?.vinConfirmTitle ?? 'Is this your car?'),
+      title: Text(l.vinConfirmTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,37 +77,32 @@ class VinConfirmDialog extends StatelessWidget {
           // free, public database, the VIN never leaves their device
           // for Tankstellen purposes.
           Text(
-            l?.vinConfirmPrivacyNote ??
-                "We looked up your VIN on NHTSA's free vehicle "
-                    'database — nothing sent to Sparkilo servers.',
+            l.vinConfirmPrivacyNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           const SizedBox(height: 12),
           Text(body),
           if (isPartial) ...[
             const SizedBox(height: 12),
             Text(
-              l?.vinPartialInfoNote ??
-                  'Partial info (offline). You can edit below.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontStyle: FontStyle.italic,
-                  ),
+              l.vinPartialInfoNote,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
             ),
           ],
         ],
       ),
       actions: [
         TextButton(
-          onPressed: () =>
-              Navigator.of(context).pop(VinConfirmOutcome.modify),
-          child: Text(l?.vinModifyAction ?? 'Modify manually'),
+          onPressed: () => Navigator.of(context).pop(VinConfirmOutcome.modify),
+          child: Text(l.vinModifyAction),
         ),
         FilledButton(
-          onPressed: () =>
-              Navigator.of(context).pop(VinConfirmOutcome.confirm),
-          child: Text(l?.vinConfirmAction ?? 'Yes, auto-fill'),
+          onPressed: () => Navigator.of(context).pop(VinConfirmOutcome.confirm),
+          child: Text(l.vinConfirmAction),
         ),
       ],
     );

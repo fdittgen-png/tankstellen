@@ -89,7 +89,9 @@ class _EditVirtualTrajetSheetState
     final color = DarkModeColors.warning(context);
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
         child: Form(
@@ -104,7 +106,7 @@ class _EditVirtualTrajetSheetState
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      l?.reconcileVirtualTrajetEditTitle ?? 'Edit virtual trip',
+                      l.reconcileVirtualTrajetEditTitle,
                       style: theme.textTheme.titleLarge,
                     ),
                   ),
@@ -112,24 +114,20 @@ class _EditVirtualTrajetSheetState
               ),
               const SizedBox(height: 12),
               Text(
-                l?.reconcileVirtualTrajetEditExplainer ??
-                    'This trip was added to account for fuel you used while '
-                        'driving without recording. Adjust the distance or '
-                        'fuel, or delete it.',
+                l.reconcileVirtualTrajetEditExplainer,
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
               FillUpNumericField(
                 controller: _distanceCtrl,
-                label: l?.reconcileWorkflowVirtualDistanceLabel ??
-                    'How far was the unrecorded drive? (km)',
+                label: l.reconcileWorkflowVirtualDistanceLabel,
                 icon: Icons.straighten,
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
               const SizedBox(height: 8),
               FillUpNumericField(
                 controller: _fuelCtrl,
-                label: l?.liters ?? 'Liters',
+                label: l.liters,
                 icon: Icons.local_drink,
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
@@ -140,9 +138,7 @@ class _EditVirtualTrajetSheetState
                   foregroundColor: theme.colorScheme.error,
                 ),
                 icon: const Icon(Icons.delete_outline),
-                label: Text(
-                  l?.reconcileVirtualTrajetDelete ?? 'Delete virtual trip',
-                ),
+                label: Text(l.reconcileVirtualTrajetDelete),
               ),
               const SizedBox(height: 8),
               Row(
@@ -150,15 +146,12 @@ class _EditVirtualTrajetSheetState
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: Text(l?.cancel ?? 'Cancel'),
+                      child: Text(l.cancel),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: FilledButton(
-                      onPressed: _save,
-                      child: Text(l?.save ?? 'Save'),
-                    ),
+                    child: FilledButton(onPressed: _save, child: Text(l.save)),
                   ),
                 ],
               ),

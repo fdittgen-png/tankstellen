@@ -47,7 +47,7 @@ class BrandFilterChips extends ConsumerWidget {
             // "All" chip
             ChoiceChip(
               avatar: const Icon(Icons.select_all, size: 16),
-              label: Text(l10n?.brandFilterAll ?? 'All'),
+              label: Text(l10n.brandFilterAll),
               selected: isAllSelected,
               onSelected: (_) =>
                   ref.read(selectedBrandsProvider.notifier).clear(),
@@ -58,11 +58,10 @@ class BrandFilterChips extends ConsumerWidget {
               const SizedBox(width: 6),
               FilterChip(
                 avatar: const Icon(Icons.no_crash, size: 16),
-                label: Text(l10n?.brandFilterNoHighway ?? 'No highway'),
+                label: Text(l10n.brandFilterNoHighway),
                 selected: excludeHighway,
-                onSelected: (_) => ref
-                    .read(excludeHighwayStationsProvider.notifier)
-                    .toggle(),
+                onSelected: (_) =>
+                    ref.read(excludeHighwayStationsProvider.notifier).toggle(),
                 visualDensity: VisualDensity.compact,
               ),
             ],
@@ -70,10 +69,11 @@ class BrandFilterChips extends ConsumerWidget {
             if (hasHighwayStations) ...[
               const SizedBox(width: 6),
               FilterChip(
-                label: Text(l10n?.brandFilterHighway ?? 'Autoroute'),
+                label: Text(l10n.brandFilterHighway),
                 selected: selectedBrands.contains('Autoroute'),
-                onSelected: (_) =>
-                    ref.read(selectedBrandsProvider.notifier).toggle('Autoroute'),
+                onSelected: (_) => ref
+                    .read(selectedBrandsProvider.notifier)
+                    .toggle('Autoroute'),
                 visualDensity: VisualDensity.compact,
               ),
             ],

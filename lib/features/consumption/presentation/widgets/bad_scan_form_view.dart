@@ -46,14 +46,13 @@ class BadScanFormView extends StatelessWidget {
       children: [
         Text(
           resolveBadScanTitle(kind, l),
-          style: theme.textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
-          l?.badScanReportHint ??
-              "We'll share the receipt photo and both sets of values so "
-                  'the next build can learn this layout.',
+          l.badScanReportHint,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -79,14 +78,12 @@ class BadScanFormView extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.bug_report_outlined),
-          label: Text(
-            l?.badScanReportCreateTicket ?? 'Create issue',
-          ),
+          label: Text(l.badScanReportCreateTicket),
         ),
         const SizedBox(height: 8),
         TextButton(
           onPressed: submitting ? null : onCancel,
-          child: Text(l?.cancel ?? 'Cancel'),
+          child: Text(l.cancel),
         ),
       ],
     );

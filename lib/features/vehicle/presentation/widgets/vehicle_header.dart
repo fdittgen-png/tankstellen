@@ -28,12 +28,12 @@ class VehicleHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final displayName = name.trim().isEmpty
-        ? (l?.vehicleHeaderUntitled ?? 'New vehicle')
+        ? (l.vehicleHeaderUntitled)
         : name.trim();
     final typeLabel = switch (type) {
-      VehicleType.ev => l?.vehicleTypeEv ?? 'Electric',
-      VehicleType.hybrid => l?.vehicleTypeHybrid ?? 'Hybrid',
-      VehicleType.combustion => l?.vehicleTypeCombustion ?? 'Combustion',
+      VehicleType.ev => l.vehicleTypeEv,
+      VehicleType.hybrid => l.vehicleTypeHybrid,
+      VehicleType.combustion => l.vehicleTypeCombustion,
     };
     final typeIcon = switch (type) {
       VehicleType.ev => Icons.electric_car,

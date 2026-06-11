@@ -79,13 +79,14 @@ void main() {
       // tests Hive isn't initialised so the spool's default path
       // throws — point the override at a no-op recorder so log() is
       // genuinely silent here.
-      errorLogger.spoolEnqueueOverride = ({
-        required String isolateTaskName,
-        required Object error,
-        StackTrace? stack,
-        Map<String, dynamic>? contextMap,
-        DateTime? timestamp,
-      }) async {};
+      errorLogger.spoolEnqueueOverride =
+          ({
+            required String isolateTaskName,
+            required Object error,
+            StackTrace? stack,
+            Map<String, dynamic>? contextMap,
+            DateTime? timestamp,
+          }) async {};
       addTearDown(errorLogger.resetForTest);
 
       mockStorage = MockStorageRepository();
@@ -97,7 +98,9 @@ void main() {
       when(() => mockStorage.getPriceHistoryKeys()).thenReturn(['k1', 'k2']);
       when(() => mockStorage.profileCount).thenReturn(1);
       when(() => mockStorage.cacheEntryCount).thenReturn(15);
-      when(() => mockStorage.getItineraries()).thenReturn([{'id': 'r1'}]);
+      when(() => mockStorage.getItineraries()).thenReturn([
+        {'id': 'r1'},
+      ]);
       when(() => mockStorage.hasApiKey()).thenReturn(true);
       when(() => mockStorage.hasCustomApiKey()).thenReturn(true);
       when(() => mockStorage.getApiKey()).thenReturn('key');
@@ -115,10 +118,10 @@ void main() {
     });
 
     List<Object> overrides() => [
-          storageRepositoryProvider.overrideWithValue(mockStorage),
-          syncStateProvider.overrideWith(() => _DisabledSyncState()),
-          traceStorageProvider.overrideWithValue(_StubTraceStorage()),
-        ];
+      storageRepositoryProvider.overrideWithValue(mockStorage),
+      syncStateProvider.overrideWith(() => _DisabledSyncState()),
+      traceStorageProvider.overrideWithValue(_StubTraceStorage()),
+    ];
 
     testWidgets('shows local data counts', (tester) async {
       await _setTallSurface(tester);
@@ -129,8 +132,14 @@ void main() {
       );
 
       expect(find.text('5'), findsOneWidget); // favorites
-      expect(find.text('2'), findsAtLeast(1)); // ignored or alerts or price history
-      expect(find.text('1'), findsAtLeast(1)); // ratings or profiles or itineraries
+      expect(
+        find.text('2'),
+        findsAtLeast(1),
+      ); // ignored or alerts or price history
+      expect(
+        find.text('1'),
+        findsAtLeast(1),
+      ); // ratings or profiles or itineraries
       expect(find.text('15'), findsOneWidget); // cache entries
     });
 
@@ -147,8 +156,7 @@ void main() {
       // hasEvApiKey=false → No row hidden behind the #1530
       // 'Show N empty rows' toggle. Reveal it to verify the No row
       // is still present in the rendered tree.
-      await tester
-          .tap(find.byKey(const Key('privacyShowAllRowsToggle')));
+      await tester.tap(find.byKey(const Key('privacyShowAllRowsToggle')));
       await tester.pumpAndSettle();
       expect(find.text('No'), findsOneWidget);
     });
@@ -161,10 +169,7 @@ void main() {
         overrides: overrides(),
       );
 
-      expect(
-        find.textContaining('Cloud sync is disabled'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Cloud sync is disabled'), findsOneWidget);
     });
 
     testWidgets('shows sync info when sync is enabled', (tester) async {
@@ -184,8 +189,7 @@ void main() {
       expect(find.text('View server data'), findsOneWidget);
     });
 
-    testWidgets(
-        'shows the "Save error log" button labelled with the current '
+    testWidgets('shows the "Save error log" button labelled with the current '
         'trace count (#476, #2145)', (tester) async {
       await _setTallSurface(tester);
       await pumpApp(
@@ -208,15 +212,12 @@ void main() {
         find.byKey(const ValueKey('privacy-export-error-log-button')),
         findsOneWidget,
       );
-      expect(
-        find.textContaining('Save error log (0)'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Save error log (0)'), findsOneWidget);
     });
 
-    testWidgets(
-        'clear error-log button is disabled when the log is empty',
-        (tester) async {
+    testWidgets('clear error-log button is disabled when the log is empty', (
+      tester,
+    ) async {
       await _setTallSurface(tester);
       await pumpApp(
         tester,
@@ -232,37 +233,41 @@ void main() {
       final button = tester.widget<IconButton>(
         find.byKey(const ValueKey('privacy-clear-error-log-button')),
       );
-      expect(button.onPressed, isNull,
-          reason: 'nothing to clear → the reset button is disabled');
+      expect(
+        button.onPressed,
+        isNull,
+        reason: 'nothing to clear → the reset button is disabled',
+      );
     });
 
     testWidgets(
-        'tapping clear error-log clears the traces and confirms (#1971)',
-        (tester) async {
-      await _setTallSurface(tester);
-      final stub = _StubTraceStorage(stubCount: 7);
-      await pumpApp(
-        tester,
-        const PrivacyDashboardScreen(),
-        overrides: [
-          storageRepositoryProvider.overrideWithValue(mockStorage),
-          syncStateProvider.overrideWith(() => _DisabledSyncState()),
-          traceStorageProvider.overrideWithValue(stub),
-        ],
-      );
+      'tapping clear error-log clears the traces and confirms (#1971)',
+      (tester) async {
+        await _setTallSurface(tester);
+        final stub = _StubTraceStorage(stubCount: 7);
+        await pumpApp(
+          tester,
+          const PrivacyDashboardScreen(),
+          overrides: [
+            storageRepositoryProvider.overrideWithValue(mockStorage),
+            syncStateProvider.overrideWith(() => _DisabledSyncState()),
+            traceStorageProvider.overrideWithValue(stub),
+          ],
+        );
 
-      await tester.scrollUntilVisible(
-        find.byKey(const ValueKey('privacy-clear-error-log-button')),
-        50.0,
-      );
-      await tester.tap(
-        find.byKey(const ValueKey('privacy-clear-error-log-button')),
-      );
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(const ValueKey('privacy-clear-error-log-button')),
+          50.0,
+        );
+        await tester.tap(
+          find.byKey(const ValueKey('privacy-clear-error-log-button')),
+        );
+        await tester.pumpAndSettle();
 
-      expect(stub.clearAllCalled, isTrue);
-      expect(find.text('Error log cleared'), findsOneWidget);
-    });
+        expect(stub.clearAllCalled, isTrue);
+        expect(find.text('Error log cleared'), findsOneWidget);
+      },
+    );
 
     testWidgets('shows export button', (tester) async {
       await _setTallSurface(tester);
@@ -287,10 +292,7 @@ void main() {
         overrides: overrides(),
       );
 
-      await tester.scrollUntilVisible(
-        find.text('Delete all data'),
-        200,
-      );
+      await tester.scrollUntilVisible(find.text('Delete all data'), 200);
       expect(find.text('Delete all data'), findsOneWidget);
     });
 
@@ -302,10 +304,7 @@ void main() {
         overrides: overrides(),
       );
 
-      await tester.scrollUntilVisible(
-        find.text('Delete all data'),
-        200,
-      );
+      await tester.scrollUntilVisible(find.text('Delete all data'), 200);
       await tester.tap(find.text('Delete all data'));
       await tester.pumpAndSettle();
 
@@ -324,10 +323,7 @@ void main() {
         overrides: overrides(),
       );
 
-      await tester.scrollUntilVisible(
-        find.text('Delete all data'),
-        200,
-      );
+      await tester.scrollUntilVisible(find.text('Delete all data'), 200);
       await tester.tap(find.text('Delete all data'));
       await tester.pumpAndSettle();
 
@@ -346,10 +342,7 @@ void main() {
         overrides: overrides(),
       );
 
-      expect(
-        find.textContaining('Your data belongs to you'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Your data belongs to you'), findsOneWidget);
     });
 
     testWidgets('shows estimated storage size', (tester) async {
@@ -380,16 +373,18 @@ void main() {
 
       void wireClipboardCapture(WidgetTester tester) {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(SystemChannels.platform,
-                (MethodCall call) async {
-          if (call.method == 'Clipboard.setData') {
-            capturedClipboard = Map<String, dynamic>.from(call.arguments as Map);
-          }
-          return null;
-        });
+            .setMockMethodCallHandler(SystemChannels.platform, (
+              MethodCall call,
+            ) async {
+              if (call.method == 'Clipboard.setData') {
+                capturedClipboard = Map<String, dynamic>.from(
+                  call.arguments as Map,
+                );
+              }
+              return null;
+            });
         addTearDown(() {
-          TestDefaultBinaryMessengerBinding
-              .instance.defaultBinaryMessenger
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
               .setMockMethodCallHandler(SystemChannels.platform, null);
         });
       }
@@ -428,89 +423,105 @@ void main() {
       }
 
       testWidgets(
-          'small JSON path writes to Clipboard.setData and skips share_plus',
-          (tester) async {
-        wireClipboardCapture(tester);
-        wireShareCapture();
-        await _setTallSurface(tester);
+        'small JSON path writes to Clipboard.setData and skips share_plus',
+        (tester) async {
+          wireClipboardCapture(tester);
+          wireShareCapture();
+          await _setTallSurface(tester);
 
-        const smallJson = '{"traceCount":1,"traces":[{"id":"a"}]}';
-        final stub = _StubTraceStorage(
-          stubCount: 1,
-          stubParsedCount: 1,
-          stubExport: smallJson,
-        );
-        await pumpApp(
-          tester,
-          const PrivacyDashboardScreen(),
-          overrides: [
-            storageRepositoryProvider.overrideWithValue(mockStorage),
-            syncStateProvider.overrideWith(() => _DisabledSyncState()),
-            traceStorageProvider.overrideWithValue(stub),
-          ],
-        );
+          const smallJson = '{"traceCount":1,"traces":[{"id":"a"}]}';
+          final stub = _StubTraceStorage(
+            stubCount: 1,
+            stubParsedCount: 1,
+            stubExport: smallJson,
+          );
+          await pumpApp(
+            tester,
+            const PrivacyDashboardScreen(),
+            overrides: [
+              storageRepositoryProvider.overrideWithValue(mockStorage),
+              syncStateProvider.overrideWith(() => _DisabledSyncState()),
+              traceStorageProvider.overrideWithValue(stub),
+            ],
+          );
 
-        await tapExportButton(tester);
+          await tapExportButton(tester);
 
-        expect(capturedClipboard, isNotNull,
-            reason: 'small payload should reach the clipboard channel');
-        expect(capturedClipboard!['text'], smallJson);
-        expect(capturedShareParams, isNull,
-            reason: 'small payload should NOT trigger share_plus');
-        // Snackbar reports byte size + entry count.
-        expect(find.textContaining('Error log copied to clipboard'),
-            findsOneWidget);
-        expect(find.textContaining('1 entries'), findsOneWidget);
-      });
-
-      testWidgets(
-          'large JSON path hands off to share_plus with a JSON file attachment',
-          (tester) async {
-        wireClipboardCapture(tester);
-        wireShareCapture();
-        await _setTallSurface(tester);
-
-        // 80 KB > 64 KB threshold.
-        final bigPayload = '{"traceCount":1,"big":"${'x' * (80 * 1024)}"}';
-        final stub = _StubTraceStorage(
-          stubCount: 1,
-          stubParsedCount: 1,
-          stubExport: bigPayload,
-        );
-        await pumpApp(
-          tester,
-          const PrivacyDashboardScreen(),
-          overrides: [
-            storageRepositoryProvider.overrideWithValue(mockStorage),
-            syncStateProvider.overrideWith(() => _DisabledSyncState()),
-            traceStorageProvider.overrideWithValue(stub),
-          ],
-        );
-
-        await tapExportButton(tester);
-
-        expect(capturedShareParams, isNotNull,
-            reason: 'payload above 64 KB threshold must use share sheet');
-        expect(capturedShareParams!.files, isNotNull);
-        expect(capturedShareParams!.files!, hasLength(1));
-        expect(
-          capturedShareParams!.files!.first.path,
-          endsWith('tankstellen-error-log.json'),
-        );
-        expect(capturedClipboard, isNull,
-            reason: 'large payload skips clipboard');
-        // Snackbar mentions "shared".
-        expect(find.textContaining('Error log shared'), findsOneWidget);
-      });
+          expect(
+            capturedClipboard,
+            isNotNull,
+            reason: 'small payload should reach the clipboard channel',
+          );
+          expect(capturedClipboard!['text'], smallJson);
+          expect(
+            capturedShareParams,
+            isNull,
+            reason: 'small payload should NOT trigger share_plus',
+          );
+          // Snackbar reports byte size + entry count.
+          expect(
+            find.textContaining('Error log copied to clipboard'),
+            findsOneWidget,
+          );
+          expect(find.textContaining('1 entries'), findsOneWidget);
+        },
+      );
 
       testWidgets(
-          'snackbar surfaces parsed-vs-unparsed split when Hive has '
+        'large JSON path hands off to share_plus with a JSON file attachment',
+        (tester) async {
+          wireClipboardCapture(tester);
+          wireShareCapture();
+          await _setTallSurface(tester);
+
+          // 80 KB > 64 KB threshold.
+          final bigPayload = '{"traceCount":1,"big":"${'x' * (80 * 1024)}"}';
+          final stub = _StubTraceStorage(
+            stubCount: 1,
+            stubParsedCount: 1,
+            stubExport: bigPayload,
+          );
+          await pumpApp(
+            tester,
+            const PrivacyDashboardScreen(),
+            overrides: [
+              storageRepositoryProvider.overrideWithValue(mockStorage),
+              syncStateProvider.overrideWith(() => _DisabledSyncState()),
+              traceStorageProvider.overrideWithValue(stub),
+            ],
+          );
+
+          await tapExportButton(tester);
+
+          expect(
+            capturedShareParams,
+            isNotNull,
+            reason: 'payload above 64 KB threshold must use share sheet',
+          );
+          expect(capturedShareParams!.files, isNotNull);
+          expect(capturedShareParams!.files!, hasLength(1));
+          expect(
+            capturedShareParams!.files!.first.path,
+            endsWith('tankstellen-error-log.json'),
+          );
+          expect(
+            capturedClipboard,
+            isNull,
+            reason: 'large payload skips clipboard',
+          );
+          // Snackbar mentions "shared".
+          expect(find.textContaining('Error log shared'), findsOneWidget);
+        },
+      );
+
+      testWidgets('snackbar surfaces parsed-vs-unparsed split when Hive has '
           'schema drift', (tester) async {
         wireClipboardCapture(tester);
         wireShareCapture();
         await _setTallSurface(tester);
 
-        const mixedJson = '{"traceCount":3,"parsedCount":1,'
+        const mixedJson =
+            '{"traceCount":3,"parsedCount":1,'
             '"unparsedCount":2,"traces":[],"unparsedRaw":[{"id":"x"}]}';
         final stub = _StubTraceStorage(
           stubCount: 3,
@@ -533,8 +544,7 @@ void main() {
         expect(capturedClipboard, isNotNull);
         // Snackbar tells the user the breakdown explicitly.
         expect(
-          find.textContaining(
-              'Error log copied (1 parsed + 2 raw entries'),
+          find.textContaining('Error log copied (1 parsed + 2 raw entries'),
           findsOneWidget,
         );
         expect(
@@ -549,49 +559,52 @@ void main() {
       // `… (1).json`. With NO share sink wired (production behaviour), the
       // file must be written exactly ONCE.
       testWidgets(
-          'large JSON path writes to Downloads exactly once (no duplicate '
-          'file — BUG 1)', (tester) async {
-        wireClipboardCapture(tester);
-        // Deliberately do NOT wire the share sink: production has none, so
-        // this exercises the real single-write path.
-        await _setTallSurface(tester);
+        'large JSON path writes to Downloads exactly once (no duplicate '
+        'file — BUG 1)',
+        (tester) async {
+          wireClipboardCapture(tester);
+          // Deliberately do NOT wire the share sink: production has none, so
+          // this exercises the real single-write path.
+          await _setTallSurface(tester);
 
-        var saveCalls = 0;
-        final savedNames = <String>[];
-        debugPublicFileExporterOverride = ({
-          required bytes,
-          required fileName,
-          required mimeType,
-        }) async {
-          saveCalls++;
-          savedNames.add(fileName);
-          return '/Downloads/$fileName';
-        };
-        addTearDown(() => debugPublicFileExporterOverride = null);
+          var saveCalls = 0;
+          final savedNames = <String>[];
+          debugPublicFileExporterOverride =
+              ({required bytes, required fileName, required mimeType}) async {
+                saveCalls++;
+                savedNames.add(fileName);
+                return '/Downloads/$fileName';
+              };
+          addTearDown(() => debugPublicFileExporterOverride = null);
 
-        final bigPayload = '{"traceCount":1,"big":"${'x' * (80 * 1024)}"}';
-        final stub = _StubTraceStorage(
-          stubCount: 1,
-          stubParsedCount: 1,
-          stubExport: bigPayload,
-        );
-        await pumpApp(
-          tester,
-          const PrivacyDashboardScreen(),
-          overrides: [
-            storageRepositoryProvider.overrideWithValue(mockStorage),
-            syncStateProvider.overrideWith(() => _DisabledSyncState()),
-            traceStorageProvider.overrideWithValue(stub),
-          ],
-        );
+          final bigPayload = '{"traceCount":1,"big":"${'x' * (80 * 1024)}"}';
+          final stub = _StubTraceStorage(
+            stubCount: 1,
+            stubParsedCount: 1,
+            stubExport: bigPayload,
+          );
+          await pumpApp(
+            tester,
+            const PrivacyDashboardScreen(),
+            overrides: [
+              storageRepositoryProvider.overrideWithValue(mockStorage),
+              syncStateProvider.overrideWith(() => _DisabledSyncState()),
+              traceStorageProvider.overrideWithValue(stub),
+            ],
+          );
 
-        await tapExportButton(tester);
+          await tapExportButton(tester);
 
-        expect(saveCalls, 1,
-            reason: 'the large error-log export must write the Downloads '
-                'file exactly once, not twice');
-        expect(savedNames, ['tankstellen-error-log.json']);
-      });
+          expect(
+            saveCalls,
+            1,
+            reason:
+                'the large error-log export must write the Downloads '
+                'file exactly once, not twice',
+          );
+          expect(savedNames, ['tankstellen-error-log.json']);
+        },
+      );
     });
   });
 }
@@ -604,10 +617,10 @@ class _DisabledSyncState extends SyncState {
 class _EnabledSyncState extends SyncState {
   @override
   SyncConfig build() => const SyncConfig(
-        enabled: true,
-        supabaseUrl: 'https://test.supabase.co',
-        supabaseAnonKey: 'test-key',
-        userId: 'user-abcdef12-3456-7890',
-        mode: SyncMode.community,
-      );
+    enabled: true,
+    supabaseUrl: 'https://test.supabase.co',
+    supabaseAnonKey: 'test-key',
+    userId: 'user-abcdef12-3456-7890',
+    mode: SyncMode.community,
+  );
 }

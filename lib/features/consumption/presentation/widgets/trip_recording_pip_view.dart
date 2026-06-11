@@ -94,8 +94,9 @@ class TripRecordingPipView extends StatelessWidget {
       final station = approach is ApproachInRadius
           ? approach.station
           : (approach as ApproachLeaving).lastStation;
-      final dist =
-          approach is ApproachInRadius ? approach.distanceMeters : null;
+      final dist = approach is ApproachInRadius
+          ? approach.distanceMeters
+          : null;
       return TripRecordingPipPriceLayout(
         station: station,
         fuel: fuel,
@@ -188,7 +189,7 @@ class TripRecordingPipView extends StatelessWidget {
       // (#2393) so the value reads distinctly from the OBD2-measured
       // "L/100 km"; the leading `~` carries the same meaning visually.
       bigFigure = '~${gpsEstimate.toStringAsFixed(1)}';
-      bigCaption = l?.tripRecordingPipEstConsumptionCaption ?? 'est. L/100 km';
+      bigCaption = l.tripRecordingPipEstConsumptionCaption;
       isEstimate = true;
       secondaryRow = [
         if (distance != null) '${distance.toStringAsFixed(1)} km',
@@ -201,7 +202,7 @@ class TripRecordingPipView extends StatelessWidget {
       // L/100 km" caption; demote distance + elapsed to the secondary
       // row like the measured branches.
       bigFigure = '~';
-      bigCaption = l?.tripRecordingPipEstConsumptionCaption ?? 'est. L/100 km';
+      bigCaption = l.tripRecordingPipEstConsumptionCaption;
       isEstimate = true;
       secondaryRow = [
         if (distance != null && distance >= 0.1)
@@ -212,7 +213,7 @@ class TripRecordingPipView extends StatelessWidget {
       // No data at all (shouldn't happen during an active recording,
       // but render a sane fallback rather than crashing).
       bigFigure = '0:00';
-      bigCaption = l?.tripRecordingPipElapsedCaption ?? 'elapsed';
+      bigCaption = l.tripRecordingPipElapsedCaption;
       secondaryRow = const <String>[];
     }
 
@@ -220,10 +221,7 @@ class TripRecordingPipView extends StatelessWidget {
     // approximate-explanation tooltip (long-press) and accessibility
     // label; OBD2-measured branches render the bare figure (real value,
     // no estimate disclaimer).
-    final estimateInfo = isEstimate
-        ? (l?.tripRecordingEstimatedInfo ??
-              'Estimated value (~) — modelled from GPS speed, not measured.')
-        : null;
+    final estimateInfo = isEstimate ? (l.tripRecordingEstimatedInfo) : null;
     Widget figureBlock = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -297,7 +295,7 @@ class TripRecordingPipView extends StatelessWidget {
           if (paused) ...[
             const SizedBox(height: 4),
             Text(
-              l?.tripBannerPaused ?? 'Paused',
+              l.tripBannerPaused,
               style: TextStyle(
                 color: foregroundColor.withValues(alpha: 0.8),
                 fontSize: 11,
@@ -320,7 +318,7 @@ class TripRecordingPipView extends StatelessWidget {
   /// that brings the app back to the foreground in full screen (the user
   /// expects a tap on the floating window to restore full screen). Null
   /// leaves the body non-tappable (previews / widget tests without a host).
-  Widget _pipStack({required Widget child, AppLocalizations? l}) {
+  Widget _pipStack({required Widget child, required AppLocalizations l}) {
     final body = Material(
       color: backgroundColor,
       child: SafeArea(
@@ -334,7 +332,7 @@ class TripRecordingPipView extends StatelessWidget {
     );
     final onTap = onBodyTap;
     if (onTap == null) return body;
-    final label = l?.pipTapToRestore ?? 'Tap to open the full app';
+    final label = l.pipTapToRestore;
     return Tooltip(
       message: label,
       child: Semantics(

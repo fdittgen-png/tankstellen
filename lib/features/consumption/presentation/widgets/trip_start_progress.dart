@@ -55,17 +55,14 @@ class _TripStartProgressState extends State<TripStartProgress>
     }
   }
 
-  String _labelFor(AppLocalizations? l, TripStartStage stage) {
+  String _labelFor(AppLocalizations l, TripStartStage stage) {
     switch (stage) {
       case TripStartStage.connectingAdapter:
-        return l?.tripStartProgressConnectingAdapter ??
-            'Connecting to OBD2 adapter…';
+        return l.tripStartProgressConnectingAdapter;
       case TripStartStage.readingVehicleData:
-        return l?.tripStartProgressReadingVehicleData ??
-            'Reading vehicle data…';
+        return l.tripStartProgressReadingVehicleData;
       case TripStartStage.startingRecording:
-        return l?.tripStartProgressStartingRecording ??
-            'Starting recording…';
+        return l.tripStartProgressStartingRecording;
     }
   }
 
@@ -118,8 +115,8 @@ class _TripStartProgressState extends State<TripStartProgress>
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 minHeight: 6,
-                backgroundColor:
-                    theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.15),
+                backgroundColor: theme.colorScheme.onPrimaryContainer
+                    .withValues(alpha: 0.15),
                 color: theme.colorScheme.onPrimaryContainer,
               ),
             ),

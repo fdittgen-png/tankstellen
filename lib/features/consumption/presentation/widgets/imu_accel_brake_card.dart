@@ -27,7 +27,8 @@ class ImuAccelBrakeCard extends StatelessWidget {
   /// sensor-absent). OBD2 / legacy trips (no IMU signal) are skipped.
   static TripSummary? summaryFor(TripSummary summary) {
     if (summary.kind != TripKind.gpsOnly) return null;
-    final hasEvents = summary.imuHardAccelCount > 0 ||
+    final hasEvents =
+        summary.imuHardAccelCount > 0 ||
         summary.imuHardBrakeCount > 0 ||
         summary.sharpCornerCount > 0;
     return hasEvents ? summary : null;
@@ -49,29 +50,36 @@ class ImuAccelBrakeCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.accelBrakeCardTitle ?? 'Acceleration & braking',
+              l.accelBrakeCardTitle,
               key: const Key('accel_brake_card_title'),
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            _row(theme,
-                key: const Key('accel_brake_hard_accel'),
-                label: l?.accelBrakeHardAccel ?? 'Hard accelerations',
-                value: fmt(summary.imuHardAccelCount, summary.imuHardAccelPerKm)),
-            _row(theme,
-                key: const Key('accel_brake_hard_brake'),
-                label: l?.accelBrakeHardBrake ?? 'Hard braking',
-                value: fmt(summary.imuHardBrakeCount, summary.imuHardBrakePerKm)),
-            _row(theme,
-                key: const Key('accel_brake_sharp_corner'),
-                label: l?.accelBrakeSharpCorner ?? 'Sharp corners',
-                value: fmt(summary.sharpCornerCount, summary.sharpCornersPerKm)),
+            _row(
+              theme,
+              key: const Key('accel_brake_hard_accel'),
+              label: l.accelBrakeHardAccel,
+              value: fmt(summary.imuHardAccelCount, summary.imuHardAccelPerKm),
+            ),
+            _row(
+              theme,
+              key: const Key('accel_brake_hard_brake'),
+              label: l.accelBrakeHardBrake,
+              value: fmt(summary.imuHardBrakeCount, summary.imuHardBrakePerKm),
+            ),
+            _row(
+              theme,
+              key: const Key('accel_brake_sharp_corner'),
+              label: l.accelBrakeSharpCorner,
+              value: fmt(summary.sharpCornerCount, summary.sharpCornersPerKm),
+            ),
             const SizedBox(height: 8),
             Text(
-              l?.accelBrakeSource ?? "From the phone's motion sensors",
+              l.accelBrakeSource,
               key: const Key('accel_brake_source'),
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

@@ -18,6 +18,7 @@ class AnonKeyField extends StatelessWidget {
 
   /// Minimum expected length of a Supabase anon key (JWT token).
   static const minExpectedKeyLength = 200;
+
   /// Safe upper bound for key length validation.
   static const maxKeyLength = 512;
 
@@ -41,27 +42,23 @@ class AnonKeyField extends StatelessWidget {
     Color helperColor = DarkModeColors.warning(context);
     if (keyLen > 0) {
       if (isTooLong) {
-        helperText = l?.anonKeyTooLong(keyLen) ??
-            'Key is too long ($keyLen chars) — check for extra text';
+        helperText = l.anonKeyTooLong(keyLen);
         helperColor = DarkModeColors.error(context);
       } else if (isComplete && isJwtFormat) {
-        helperText = l?.anonKeyLooksCorrect(keyLen) ??
-            'Key looks correct ($keyLen chars)';
+        helperText = l.anonKeyLooksCorrect(keyLen);
         helperColor = DarkModeColors.success(context);
       } else if (!isJwtFormat && keyLen > 10) {
-        helperText = l?.anonKeyShouldBeJwt ??
-            'Key should be a JWT (header.payload.signature)';
+        helperText = l.anonKeyShouldBeJwt;
         helperColor = DarkModeColors.error(context);
       } else {
-        helperText = l?.anonKeyMayBeTruncated(keyLen) ??
-            'Key may be truncated ($keyLen of ~208 expected chars)';
+        helperText = l.anonKeyMayBeTruncated(keyLen);
       }
     }
 
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: l?.anonKeyLabel ?? 'Anon Key',
+        labelText: l.anonKeyLabel,
         hintText: 'eyJhbGciOiJIUzI1NiIs...',
         border: const OutlineInputBorder(),
         prefixIcon: const Icon(Icons.key),
@@ -82,20 +79,21 @@ class AnonKeyField extends StatelessWidget {
                 ),
               ),
             IconButton(
-              icon: Icon(showKey ? Icons.visibility_off : Icons.visibility, size: 20),
+              icon: Icon(
+                showKey ? Icons.visibility_off : Icons.visibility,
+                size: 20,
+              ),
               onPressed: onToggleVisibility,
               tooltip: showKey
-                  ? (l?.anonKeyHideTooltip ?? 'Hide key')
-                  : (l?.anonKeyShowTooltip ?? 'Show key to verify'),
+                  ? (l.anonKeyHideTooltip)
+                  : (l.anonKeyShowTooltip),
             ),
           ],
         ),
         helperText: helperText,
         helperMaxLines: 2,
         helperStyle: TextStyle(color: helperColor, fontSize: 11),
-        errorText: isTooLong
-            ? (l?.anonKeyExceedsMax ?? 'Key exceeds maximum length')
-            : null,
+        errorText: isTooLong ? (l.anonKeyExceedsMax) : null,
       ),
       obscureText: !showKey,
       maxLines: showKey ? 3 : 1,

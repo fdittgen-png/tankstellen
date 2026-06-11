@@ -1012,6 +1012,7 @@
   "serviceReminderMarkDone": "⟦Ṁářķ áš đóñé ·····⟧",
   "serviceReminderDueTitle": "⟦Šéřṽîçé đúé ·····⟧",
   "serviceReminderDueBody": "⟦{label} îš đúé — {kmOver} ķɱ ƥášŧ ŧĥé îñŧéřṽáł. ··········⟧",
+  "serviceReminderDueNowBody": "⟦{label} îš đúé ñóŵ. ····⟧",
   "southKoreaApiKeyRequired": "⟦Řéǧîšŧéř áŧ ÓƤÎÑÉŦ ŧó ǧéŧ á ƒřéé ÁƤÎ ķéý ··············⟧",
   "southKoreaApiProvider": "⟦ÓƤÎÑÉŦ (ĶÑÓÇ) ·····⟧",
   "chileApiKeyRequired": "⟦Řéǧîšŧéř áŧ ÇÑÉ ŧó ǧéŧ á ƒřéé ÁƤÎ ķéý ·············⟧",

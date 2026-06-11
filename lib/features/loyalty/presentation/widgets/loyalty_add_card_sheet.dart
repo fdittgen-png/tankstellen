@@ -51,14 +51,14 @@ class _LoyaltyAddCardSheetState extends State<LoyaltyAddCardSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l?.loyaltyAddCardSheetTitle ?? 'Add fuel club card',
+              l.loyaltyAddCardSheetTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<LoyaltyBrand>(
               initialValue: _brand,
               decoration: InputDecoration(
-                labelText: l?.loyaltyBrandLabel ?? 'Brand',
+                labelText: l.loyaltyBrandLabel,
                 border: const OutlineInputBorder(),
               ),
               items: [
@@ -76,7 +76,7 @@ class _LoyaltyAddCardSheetState extends State<LoyaltyAddCardSheet> {
             TextFormField(
               controller: _labelController,
               decoration: InputDecoration(
-                labelText: l?.loyaltyCardLabelLabel ?? 'Label (optional)',
+                labelText: l.loyaltyCardLabelLabel,
                 border: const OutlineInputBorder(),
               ),
               textInputAction: TextInputAction.next,
@@ -84,21 +84,21 @@ class _LoyaltyAddCardSheetState extends State<LoyaltyAddCardSheet> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _discountController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: [
                 // Accept either '.' or ',' so a French keyboard works.
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
               ],
               decoration: InputDecoration(
-                labelText: l?.loyaltyDiscountLabel ?? 'Discount (per litre)',
+                labelText: l.loyaltyDiscountLabel,
                 hintText: '0.05',
                 border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 if (!isValidDiscountInput(value)) {
-                  return l?.loyaltyDiscountInvalid ??
-                      'Enter a positive number';
+                  return l.loyaltyDiscountInvalid;
                 }
                 return null;
               },
@@ -109,15 +109,12 @@ class _LoyaltyAddCardSheetState extends State<LoyaltyAddCardSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text(l?.cancel ?? 'Cancel'),
+                    child: Text(l.cancel),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: FilledButton(
-                    onPressed: _onSave,
-                    child: Text(l?.save ?? 'Save'),
-                  ),
+                  child: FilledButton(onPressed: _onSave, child: Text(l.save)),
                 ),
               ],
             ),

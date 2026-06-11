@@ -82,21 +82,29 @@ class _MapScreenState extends ConsumerState<MapScreen>
 
   /// Boundary around the map body — `shareWidgetAsImage` renders the
   /// widget under this key to a PNG for the Share action (#1959).
-  final GlobalKey _shareBoundaryKey =
-      GlobalKey(debugLabel: 'map_share_boundary');
+  final GlobalKey _shareBoundaryKey = GlobalKey(
+    debugLabel: 'map_share_boundary',
+  );
 
   /// Render the current map view to an image and hand it to the OS
   /// share sheet (#1959). Best-effort — a share failure is logged and
   /// swallowed so the action never crashes the map screen.
-  Future<void> _onShare(AppLocalizations? l10n) async {
+  Future<void> _onShare(AppLocalizations l10n) async {
     try {
       await shareWidgetAsImage(
         boundaryKey: _shareBoundaryKey,
-        subject: l10n?.map ?? 'Map',
+        subject: l10n.map,
         fileNameStem: 'tankstellen_map',
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'MapScreen share image'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'MapScreen share image'},
+        ),
+      );
     }
   }
 
@@ -177,7 +185,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
     }
 
     return PageScaffold(
-      title: l10n?.map ?? 'Map',
+      title: l10n.map,
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
@@ -186,13 +194,13 @@ class _MapScreenState extends ConsumerState<MapScreen>
               ref.read(searchStateProvider.notifier).repeatLastSearch(),
             );
           },
-          tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+          tooltip: l10n.refreshPrices,
         ),
         const EvToggleButton(),
         IconButton(
           icon: const Icon(Icons.share),
           onPressed: () => _onShare(l10n),
-          tooltip: l10n?.favoritesShareAction ?? 'Share',
+          tooltip: l10n.favoritesShareAction,
         ),
         const SettingsAppBarAction(),
       ],

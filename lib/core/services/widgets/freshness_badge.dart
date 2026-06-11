@@ -30,16 +30,15 @@ class FreshnessBadge extends StatelessWidget {
 
     final String label;
     if (result.isStale) {
-      final stalePrefix = l10n?.freshnessStale ?? 'Stale';
+      final stalePrefix = l10n.freshnessStale;
       label = '$stalePrefix — ${result.freshnessLabel}';
     } else {
-      final agoSuffix = l10n?.freshnessAgo ?? 'ago';
+      final agoSuffix = l10n.freshnessAgo;
       label = '${result.freshnessLabel} $agoSuffix';
     }
 
     return Semantics(
-      label: l10n?.freshnessBadgeSemantics(result.freshnessLabel) ??
-          'Data freshness: ${result.freshnessLabel}',
+      label: l10n.freshnessBadgeSemantics(result.freshnessLabel),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
@@ -69,7 +68,10 @@ class FreshnessBadge extends StatelessWidget {
   }
 
   static _BadgeStyle _styleForAge(
-      BuildContext context, Duration age, bool isStale) {
+    BuildContext context,
+    Duration age,
+    bool isStale,
+  ) {
     if (isStale || age.inMinutes > 15) {
       // #2492 — very-stale stays amber (warning family), NOT error red.
       // Staleness is an attention state matching the warning_amber_rounded

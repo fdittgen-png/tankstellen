@@ -82,18 +82,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         if (!mounted) return;
         ref.invalidate(syncStateProvider);
         SnackBarHelper.showSuccess(
-            context,
-            AppLocalizations.of(context)?.connectedAsGuest ??
-                'Connected as guest');
+          context,
+          AppLocalizations.of(context).connectedAsGuest,
+        );
         context.pop();
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
-        'where': 'AuthScreen._continueAsGuest: guest sign-in failed'
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.sync,
+          e,
+          st,
+          context: const {
+            'where': 'AuthScreen._continueAsGuest: guest sign-in failed',
+          },
+        ),
+      );
       if (mounted) {
-        form.setError(
-            friendlyAuthError(e, AppLocalizations.of(context)));
+        form.setError(friendlyAuthError(e, AppLocalizations.of(context)));
       }
     } finally {
       if (mounted) form.setLoading(false);
@@ -117,8 +123,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
     if (isSignUp && !PasswordValidator.isValid(password)) {
       final l10n = AppLocalizations.of(context);
-      form.setError(
-          l10n?.passwordTooWeak ?? 'Password does not meet all requirements');
+      form.setError(l10n.passwordTooWeak);
       return;
     }
     if (isSignUp && password != _confirmController.text) {
@@ -128,10 +133,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
     form.setLoading(true);
     try {
-      final result = await ref.read(syncStateProvider.notifier).signInWithEmail(
-            email, password,
-            isSignUp: isSignUp,
-          );
+      final result = await ref
+          .read(syncStateProvider.notifier)
+          .signInWithEmail(email, password, isSignUp: isSignUp);
 
       if (mounted) {
         final l10n = AppLocalizations.of(context);
@@ -139,28 +143,28 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           // Anonymous account upgraded in place but the server requires a
           // confirmation click. The UUID + data are already safe — surface
           // the pending state instead of treating it as success/failure.
-          SnackBarHelper.show(
-              context,
-              l10n?.authConfirmationPending ??
-                  'Almost there — check your email and click the link to '
-                      'finish linking it. Your data is already saved on '
-                      'this account.');
+          SnackBarHelper.show(context, l10n.authConfirmationPending);
         } else {
           SnackBarHelper.showSuccess(
-              context,
-              isSignUp
-                  ? (l10n?.accountCreated ?? 'Account created!')
-                  : (l10n?.signedIn ?? 'Signed in!'));
+            context,
+            isSignUp ? (l10n.accountCreated) : (l10n.signedIn),
+          );
         }
         context.pop();
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
-        'where': 'AuthScreen._submitEmail: email auth failed'
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.sync,
+          e,
+          st,
+          context: const {
+            'where': 'AuthScreen._submitEmail: email auth failed',
+          },
+        ),
+      );
       if (mounted) {
-        form.setError(
-            friendlyAuthError(e, AppLocalizations.of(context)));
+        form.setError(friendlyAuthError(e, AppLocalizations.of(context)));
       }
     } finally {
       if (mounted) form.setLoading(false);
@@ -175,18 +179,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       await ref.read(syncStateProvider.notifier).switchToAnonymous();
       if (mounted) {
         SnackBarHelper.show(
-            context,
-            AppLocalizations.of(context)?.switchedToAnonymous ??
-                'Switched to anonymous session');
+          context,
+          AppLocalizations.of(context).switchedToAnonymous,
+        );
         context.pop();
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
-        'where': 'AuthScreen._switchToAnonymous: switch failed'
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.sync,
+          e,
+          st,
+          context: const {
+            'where': 'AuthScreen._switchToAnonymous: switch failed',
+          },
+        ),
+      );
       if (mounted) {
-        form.setError(
-            friendlyAuthError(e, AppLocalizations.of(context)));
+        form.setError(friendlyAuthError(e, AppLocalizations.of(context)));
       }
     } finally {
       if (mounted) form.setLoading(false);
@@ -202,11 +212,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final isEmailUser = syncConfig.hasEmail;
 
     return PageScaffold(
-      title: l10n?.account ?? 'Account',
+      title: l10n.account,
       bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: EdgeInsets.fromLTRB(
-            16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom),
+          16,
+          16,
+          16,
+          16 + MediaQuery.of(context).viewPadding.bottom,
+        ),
         children: [
           if (isEmailUser)
             EmailUserStatusCard(
@@ -253,13 +267,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline,
-                        size: 16, color: theme.colorScheme.error),
+                    Icon(
+                      Icons.error_outline,
+                      size: 16,
+                      color: theme.colorScheme.error,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
-                        child: Text(form.error!,
-                            style: TextStyle(
-                                color: theme.colorScheme.error, fontSize: 12))),
+                      child: Text(
+                        form.error!,
+                        style: TextStyle(
+                          color: theme.colorScheme.error,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

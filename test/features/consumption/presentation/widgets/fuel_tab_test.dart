@@ -18,6 +18,7 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for the gamification opt-out gate on [FuelTab] (#1194).
 ///
@@ -26,6 +27,8 @@ import '../../../../helpers/pump_app.dart';
 /// widget tree entirely (not merely hidden) so the consumption screen
 /// shows nothing achievement-related.
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   silenceErrorLoggerSpool();
   final fillUps = <FillUp>[
     FillUp(
@@ -51,17 +54,16 @@ void main() {
   ];
 
   List<Object> overrides({required bool gamification}) => [
-        achievementsProvider.overrideWithValue(earned),
-        gamificationEnabledProvider.overrideWithValue(gamification),
-        activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
-        fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
-      ];
+    achievementsProvider.overrideWithValue(earned),
+    gamificationEnabledProvider.overrideWithValue(gamification),
+    activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+    fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
+  ];
 
-  testWidgets('mounts BadgeShelf when gamification is enabled',
-      (tester) async {
+  testWidgets('mounts BadgeShelf when gamification is enabled', (tester) async {
     await pumpApp(
       tester,
-      FuelTab(fillUps: fillUps, stats: stats, l: null),
+      FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
       overrides: overrides(gamification: true),
     );
 
@@ -70,11 +72,10 @@ void main() {
     expect(find.text('Achievements'), findsOneWidget);
   });
 
-  testWidgets('omits BadgeShelf when gamification is disabled',
-      (tester) async {
+  testWidgets('omits BadgeShelf when gamification is disabled', (tester) async {
     await pumpApp(
       tester,
-      FuelTab(fillUps: fillUps, stats: stats, l: null),
+      FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
       overrides: overrides(gamification: false),
     );
 
@@ -87,53 +88,55 @@ void main() {
 
   // #1361 phase 2b — tapping a correction card opens the editor sheet.
   testWidgets(
-      'tapping a correction fill-up card opens EditCorrectionFillUpSheet',
-      (tester) async {
-    final correctionFills = <FillUp>[
-      FillUp(
-        id: 'correction_p1',
-        date: DateTime(2026, 4, 15),
-        liters: 3.4,
-        totalCost: 0,
-        odometerKm: 12500,
-        fuelType: FuelType.e10,
-        isCorrection: true,
-      ),
-    ];
-    await pumpApp(
-      tester,
-      FuelTab(fillUps: correctionFills, stats: stats, l: null),
-      overrides: [
-        achievementsProvider.overrideWithValue(const <EarnedAchievement>[]),
-        gamificationEnabledProvider.overrideWithValue(false),
-        activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
-        fillUpListProvider
-            .overrideWith(() => _FixedFillUpList(correctionFills)),
-      ],
-    );
+    'tapping a correction fill-up card opens EditCorrectionFillUpSheet',
+    (tester) async {
+      final correctionFills = <FillUp>[
+        FillUp(
+          id: 'correction_p1',
+          date: DateTime(2026, 4, 15),
+          liters: 3.4,
+          totalCost: 0,
+          odometerKm: 12500,
+          fuelType: FuelType.e10,
+          isCorrection: true,
+        ),
+      ];
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: correctionFills, stats: stats, l: l10nEn),
+        overrides: [
+          achievementsProvider.overrideWithValue(const <EarnedAchievement>[]),
+          gamificationEnabledProvider.overrideWithValue(false),
+          activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+          fillUpListProvider.overrideWith(
+            () => _FixedFillUpList(correctionFills),
+          ),
+        ],
+      );
 
-    expect(find.byType(EditCorrectionFillUpSheet), findsNothing);
+      expect(find.byType(EditCorrectionFillUpSheet), findsNothing);
 
-    // Tap the correction card. The card lives inside a Dismissible so
-    // we target the auto_fix_high icon (only present on corrections)
-    // to disambiguate from the header column items.
-    await tester.tap(find.byIcon(Icons.auto_fix_high));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+      // Tap the correction card. The card lives inside a Dismissible so
+      // we target the auto_fix_high icon (only present on corrections)
+      // to disambiguate from the header column items.
+      await tester.tap(find.byIcon(Icons.auto_fix_high));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
-    expect(
-      find.byType(EditCorrectionFillUpSheet),
-      findsOneWidget,
-      reason:
-          'Tapping a correction card must open the bottom-sheet editor.',
-    );
-  });
+      expect(
+        find.byType(EditCorrectionFillUpSheet),
+        findsOneWidget,
+        reason: 'Tapping a correction card must open the bottom-sheet editor.',
+      );
+    },
+  );
 
   // #2530 — the wide-screen split now goes through the shared
   // ResponsiveMasterDetail scaffold. Structural pane-count assertions.
   group('#2530 responsive panes', () {
-    testWidgets('compact width renders a single pane (no VerticalDivider)',
-        (tester) async {
+    testWidgets('compact width renders a single pane (no VerticalDivider)', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -141,15 +144,16 @@ void main() {
 
       await pumpApp(
         tester,
-        FuelTab(fillUps: fillUps, stats: stats, l: null),
+        FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
         overrides: overrides(gamification: false),
       );
 
       expect(find.byType(VerticalDivider), findsNothing);
     });
 
-    testWidgets('expanded width renders two panes with the 2:3 ratio',
-        (tester) async {
+    testWidgets('expanded width renders two panes with the 2:3 ratio', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1024, 768);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -157,7 +161,7 @@ void main() {
 
       await pumpApp(
         tester,
-        FuelTab(fillUps: fillUps, stats: stats, l: null),
+        FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
         overrides: overrides(gamification: false),
       );
 

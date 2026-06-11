@@ -38,7 +38,7 @@ class FillUpPinnedSaveBar extends StatelessWidget {
               minimumSize: const Size.fromHeight(52),
             ),
             icon: const Icon(Icons.save_outlined),
-            label: Text(l?.save ?? 'Save'),
+            label: Text(l.save),
           ),
         ),
       ),

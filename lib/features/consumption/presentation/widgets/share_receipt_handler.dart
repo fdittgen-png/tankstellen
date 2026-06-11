@@ -64,8 +64,8 @@ class ShareReceiptHandler {
     this._ref, {
     ReceiptPdfRasterizer? pdfRasterizer,
     EReceiptTextParser textParser = const EReceiptTextParser(),
-  })  : _pdfRasterizer = pdfRasterizer ?? const ReceiptPdfRasterizer(),
-        _textParser = textParser;
+  }) : _pdfRasterizer = pdfRasterizer ?? const ReceiptPdfRasterizer(),
+       _textParser = textParser;
 
   /// Handle one inbound [intent]. No-op for a null intent, an empty item
   /// list, or — defensively — when the feature is gated off.
@@ -97,8 +97,9 @@ class ShareReceiptHandler {
       // No image — a shared PDF (#2737) is rasterised to a bitmap and then
       // takes the same path. The render is async, so `handle` stays
       // synchronous + never-throws by fire-and-forgetting it.
-      final pdf =
-          items.where((i) => i.kind == SharedReceiptItemKind.pdf).firstOrNull;
+      final pdf = items
+          .where((i) => i.kind == SharedReceiptItemKind.pdf)
+          .firstOrNull;
       if (pdf?.path != null) {
         unawaited(_rasterizeAndRoute(pdf!.path!));
         return;
@@ -106,8 +107,9 @@ class ShareReceiptHandler {
 
       // No image / PDF — a shared text e-receipt (#2838) is parsed on the
       // spot and the result stashed for the form to apply.
-      final text =
-          items.where((i) => i.kind == SharedReceiptItemKind.text).firstOrNull;
+      final text = items
+          .where((i) => i.kind == SharedReceiptItemKind.text)
+          .firstOrNull;
       if (text?.text != null) {
         _parseTextAndRoute(text!.text!, intent.countryCode);
         return;
@@ -116,9 +118,14 @@ class ShareReceiptHandler {
       // Any other type (video / arbitrary file) is genuinely unsupported.
       _showUnsupportedFormat();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'ShareReceiptHandler.handle',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'ShareReceiptHandler.handle'},
+        ),
+      );
     }
   }
 
@@ -143,9 +150,14 @@ class ShareReceiptHandler {
       }
       _stashAndRoute(jpegPath);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'ShareReceiptHandler._rasterizeAndRoute',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'ShareReceiptHandler._rasterizeAndRoute'},
+        ),
+      );
       _showReadFailed();
     }
   }
@@ -173,9 +185,14 @@ class ShareReceiptHandler {
           .read(enabledFeaturesProvider)
           .contains(Feature.addFillUpShareIntentReceipt);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'ShareReceiptHandler._featureEnabled',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'ShareReceiptHandler._featureEnabled'},
+        ),
+      );
       return false;
     }
   }
@@ -184,9 +201,14 @@ class ShareReceiptHandler {
     try {
       unawaited(_ref.read(routerProvider).push(path));
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: {
-        'where': 'ShareReceiptHandler: push failed for $path',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: {'where': 'ShareReceiptHandler: push failed for $path'},
+        ),
+      );
     }
   }
 
@@ -197,12 +219,7 @@ class ShareReceiptHandler {
     final context = rootNavigatorKey.currentContext;
     if (context == null || !context.mounted) return;
     final l = AppLocalizations.of(context);
-    SnackBarHelper.show(
-      context,
-      l?.shareReceiptUnsupportedFormat ??
-          'That file type can\'t be imported yet — share a photo of the '
-              'receipt instead.',
-    );
+    SnackBarHelper.show(context, l.shareReceiptUnsupportedFormat);
   }
 
   /// Surfaces the localized "couldn't read the receipt" snackbar for a PDF
@@ -213,12 +230,7 @@ class ShareReceiptHandler {
     final context = rootNavigatorKey.currentContext;
     if (context == null || !context.mounted) return;
     final l = AppLocalizations.of(context);
-    SnackBarHelper.show(
-      context,
-      l?.shareReceiptFailed ??
-          'Couldn\'t read the shared receipt — try sharing it again or add '
-              'the fill-up manually.',
-    );
+    SnackBarHelper.show(context, l.shareReceiptFailed);
   }
 }
 
@@ -231,6 +243,6 @@ ReceiptPdfRasterizer receiptPdfRasterizer(Ref ref) =>
 
 @riverpod
 ShareReceiptHandler shareReceiptHandler(Ref ref) => ShareReceiptHandler(
-      ref,
-      pdfRasterizer: ref.read(receiptPdfRasterizerProvider),
-    );
+  ref,
+  pdfRasterizer: ref.read(receiptPdfRasterizerProvider),
+);

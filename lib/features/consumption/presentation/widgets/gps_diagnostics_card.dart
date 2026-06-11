@@ -39,20 +39,14 @@ class GpsDiagnosticsCard extends StatelessWidget {
     final theme = Theme.of(context);
     final summary = computeGpsDiagnosticsSummary(diagnostics);
 
-    final title = l?.gpsDiagnosticsTitle ?? 'GPS sampling diagnostics';
-    final headerLine = l?.gpsDiagnosticsHeader(
-          summary.sampleCount.toString(),
-          _formatDuration(summary.timeSpan),
-          summary.gapCount,
-        ) ??
-        '${summary.sampleCount} samples · ${_formatDuration(summary.timeSpan)} · '
-            '${_pluralizeGaps(summary.gapCount)}';
-    final cadenceLine = l?.gpsDiagnosticsCadence(
-          summary.medianIntervalMs,
-        ) ??
-        'Median interval: ${summary.medianIntervalMs} ms';
-    final explainLine = l?.gpsDiagnosticsExplain ??
-        'Captured during recording to verify GPS cadence under phone-sleep.';
+    final title = l.gpsDiagnosticsTitle;
+    final headerLine = l.gpsDiagnosticsHeader(
+      summary.sampleCount.toString(),
+      _formatDuration(summary.timeSpan),
+      summary.gapCount,
+    );
+    final cadenceLine = l.gpsDiagnosticsCadence(summary.medianIntervalMs);
+    final explainLine = l.gpsDiagnosticsExplain;
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -73,10 +67,7 @@ class GpsDiagnosticsCard extends StatelessWidget {
         children: [
           Align(
             alignment: AlignmentDirectional.centerStart,
-            child: Text(
-              cadenceLine,
-              style: theme.textTheme.bodyMedium,
-            ),
+            child: Text(cadenceLine, style: theme.textTheme.bodyMedium),
           ),
           const SizedBox(height: 8),
           Align(
@@ -90,8 +81,7 @@ class GpsDiagnosticsCard extends StatelessWidget {
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              l?.gpsDiagnosticsLargestGap(summary.largestGap.inSeconds) ??
-                  'Largest gap: ${summary.largestGap.inSeconds} s',
+              l.gpsDiagnosticsLargestGap(summary.largestGap.inSeconds),
               style: theme.textTheme.bodyMedium,
             ),
           ),
@@ -180,15 +170,15 @@ class GpsDiagnosticsSummary {
 
   @override
   int get hashCode => Object.hash(
-        sampleCount,
-        timeSpan,
-        medianIntervalMs,
-        gapCount,
-        largestGap,
-        Object.hashAllUnordered(lifecyclePercent.entries.map(
-          (e) => Object.hash(e.key, e.value),
-        )),
-      );
+    sampleCount,
+    timeSpan,
+    medianIntervalMs,
+    gapCount,
+    largestGap,
+    Object.hashAllUnordered(
+      lifecyclePercent.entries.map((e) => Object.hash(e.key, e.value)),
+    ),
+  );
 }
 
 /// Compute the read-only diagnostic summary for a list of GPS sample
@@ -221,9 +211,7 @@ GpsDiagnosticsSummary computeGpsDiagnosticsSummary(
       sampleCount: 1,
       timeSpan: Duration.zero,
       medianIntervalMs: 0,
-      lifecyclePercent: <String, int>{
-        diagnostics.first.lifecycleState: 100,
-      },
+      lifecyclePercent: <String, int>{diagnostics.first.lifecycleState: 100},
       gapCount: 0,
       largestGap: Duration.zero,
     );
@@ -241,7 +229,9 @@ GpsDiagnosticsSummary computeGpsDiagnosticsSummary(
   // Per-interval deltas in milliseconds.
   final intervals = <int>[];
   for (var i = 1; i < sorted.length; i++) {
-    final ms = sorted[i].timestamp.difference(sorted[i - 1].timestamp).inMilliseconds;
+    final ms = sorted[i].timestamp
+        .difference(sorted[i - 1].timestamp)
+        .inMilliseconds;
     // Defensive clamp: backwards-clock anomalies become 0 rather than
     // contaminating the median.
     intervals.add(ms < 0 ? 0 : ms);
@@ -265,8 +255,9 @@ GpsDiagnosticsSummary computeGpsDiagnosticsSummary(
   final gapThreshold = medianRaw * 3;
   // When the median is 0 (all samples on the same millisecond — degenerate
   // input), gaps are not a meaningful signal, so report 0.
-  final gapCount =
-      medianRaw == 0 ? 0 : intervals.where((d) => d >= gapThreshold).length;
+  final gapCount = medianRaw == 0
+      ? 0
+      : intervals.where((d) => d >= gapThreshold).length;
 
   // Lifecycle breakdown.
   final lifecycleCounts = <String, int>{};
@@ -303,15 +294,6 @@ String _formatDuration(Duration d) {
   return '${hours}h ${minutes}min';
 }
 
-/// Tiny English-only fallback used when [AppLocalizations] is not
-/// available (defensive — pumpApp tests always provide it). Never
-/// reached in production on non-English locales.
-String _pluralizeGaps(int gapCount) {
-  if (gapCount == 0) return 'no gaps';
-  if (gapCount == 1) return '1 gap';
-  return '$gapCount gaps';
-}
-
 /// Format the lifecycle-percent map into a "Resumed 92% · Paused 5% · …"
 /// line. The map is already sorted by count desc by the helper. Each
 /// lifecycle key is mapped to a localized label via [_lifecycleLabel];
@@ -319,7 +301,7 @@ String _pluralizeGaps(int gapCount) {
 /// onto every non-English locale (#2765).
 String _formatLifecycleBreakdown(
   Map<String, int> lifecyclePercent,
-  AppLocalizations? l,
+  AppLocalizations l,
 ) {
   if (lifecyclePercent.isEmpty) return '';
   return lifecyclePercent.entries
@@ -332,14 +314,14 @@ String _formatLifecycleBreakdown(
 /// keys fall back to the raw key so a future lifecycle value never
 /// renders as a blank — but the three states the recorder actually
 /// captures are all covered.
-String _lifecycleLabel(String key, AppLocalizations? l) {
+String _lifecycleLabel(String key, AppLocalizations l) {
   switch (key) {
     case 'resumed':
-      return l?.gpsLifecycleResumed ?? 'Resumed';
+      return l.gpsLifecycleResumed;
     case 'paused':
-      return l?.gpsLifecyclePaused ?? 'Paused';
+      return l.gpsLifecyclePaused;
     case 'inactive':
-      return l?.gpsLifecycleInactive ?? 'Inactive';
+      return l.gpsLifecycleInactive;
     default:
       return key;
   }

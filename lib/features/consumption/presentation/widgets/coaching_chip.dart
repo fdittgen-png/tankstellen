@@ -14,11 +14,7 @@ import '../../domain/driving_coaching.dart';
 /// with no dependencies on the banner's situation / palette logic
 /// beyond the foreground / background colours it's handed.
 class CoachingChip extends StatelessWidget {
-  const CoachingChip({
-    super.key,
-    required this.hint,
-    required this.foreground,
-  });
+  const CoachingChip({super.key, required this.hint, required this.foreground});
 
   final DrivingCoachingHint hint;
 
@@ -31,30 +27,21 @@ class CoachingChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final (icon, label) = switch (hint) {
-      DrivingCoachingHint.shiftUp => (
-          Icons.arrow_upward,
-          l?.coachingShiftUp ?? 'Shift up',
-        ),
+      DrivingCoachingHint.shiftUp => (Icons.arrow_upward, l.coachingShiftUp),
       DrivingCoachingHint.shiftDown => (
-          Icons.arrow_downward,
-          l?.coachingShiftDown ?? 'Shift down',
-        ),
-      DrivingCoachingHint.easePedal => (
-          Icons.eco,
-          l?.coachingEasePedal ?? 'Ease off',
-        ),
-      DrivingCoachingHint.gpsLiftOffCoast => (
-          Icons.eco,
-          l?.coachingGpsLiftOff ?? 'Lift off',
-        ),
+        Icons.arrow_downward,
+        l.coachingShiftDown,
+      ),
+      DrivingCoachingHint.easePedal => (Icons.eco, l.coachingEasePedal),
+      DrivingCoachingHint.gpsLiftOffCoast => (Icons.eco, l.coachingGpsLiftOff),
       DrivingCoachingHint.gpsAnticipateBrake => (
-          Icons.visibility,
-          l?.coachingGpsAnticipateBrake ?? 'Anticipate',
-        ),
+        Icons.visibility,
+        l.coachingGpsAnticipateBrake,
+      ),
       DrivingCoachingHint.gpsSmoothAccel => (
-          Icons.swipe_up,
-          l?.coachingGpsSmoothAccel ?? 'Smooth accel',
-        ),
+        Icons.swipe_up,
+        l.coachingGpsSmoothAccel,
+      ),
     };
     return Semantics(
       label: label,

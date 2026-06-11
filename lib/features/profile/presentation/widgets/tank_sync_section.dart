@@ -62,15 +62,15 @@ class TankSyncSection extends ConsumerWidget {
       if (!syncConfig.hasEmail)
         ListTile(
           leading: const Icon(Icons.email_outlined),
-          title: Text(l?.switchToEmail ?? 'Switch to email'),
-          subtitle: Text(l?.switchToEmailSubtitle ?? 'Keep data, add sign-in from other devices'),
+          title: Text(l.switchToEmail),
+          subtitle: Text(l.switchToEmailSubtitle),
           onTap: () => context.push(RoutePaths.auth),
         )
       else
         ListTile(
           leading: const Icon(Icons.person_outline),
-          title: Text(l?.switchToAnonymousAction ?? 'Switch to anonymous'),
-          subtitle: Text(l?.switchToAnonymousSubtitle ?? 'Keep local data, use new anonymous session'),
+          title: Text(l.switchToAnonymousAction),
+          subtitle: Text(l.switchToAnonymousSubtitle),
           onTap: () => _confirmSwitchToAnonymous(context, ref),
         ),
       const Divider(indent: 16, endIndent: 16),
@@ -81,79 +81,77 @@ class TankSyncSection extends ConsumerWidget {
       SwitchListTile(
         key: const Key('tripsSyncToggle'),
         secondary: const Icon(Icons.route_outlined),
-        title: Text(l?.consentSyncTripsTitle ?? 'Sync trip recordings'),
+        title: Text(l.consentSyncTripsTitle),
         subtitle: Text(
           !consent.cloudSync
-              ? (l?.consentSyncTripsDisabledHint ??
-                  'Enable Cloud Sync to back up trips.')
+              ? (l.consentSyncTripsDisabledHint)
               : !syncConfig.hasEmail
-                  ? (l?.consentSyncTripsNeedsEmailHint ??
-                      'Sign in with an email account to sync trips '
-                          'across devices.')
-                  : (l?.consentSyncTripsSubtitle ??
-                      'Back up OBD2 + GPS trips to TankSync. '
-                          'Cross-device, opt-in.'),
+              ? (l.consentSyncTripsNeedsEmailHint)
+              : (l.consentSyncTripsSubtitle),
         ),
         value: consent.syncTrips,
         onChanged: (consent.cloudSync && syncConfig.hasEmail)
-            ? (v) => ref.read(gdprConsentProvider.notifier).save(
-                  location: consent.location,
-                  errorReporting: consent.errorReporting,
-                  cloudSync: consent.cloudSync,
-                  vinOnlineDecode: consent.vinOnlineDecode,
-                  syncTrips: v,
-                )
+            ? (v) => ref
+                  .read(gdprConsentProvider.notifier)
+                  .save(
+                    location: consent.location,
+                    errorReporting: consent.errorReporting,
+                    cloudSync: consent.cloudSync,
+                    vinOnlineDecode: consent.vinOnlineDecode,
+                    syncTrips: v,
+                  )
             : null,
       ),
       const Divider(indent: 16, endIndent: 16),
       ListTile(
         leading: const Icon(Icons.visibility_outlined),
-        title: Text(l?.viewMyData ?? 'View my data'),
+        title: Text(l.viewMyData),
         onTap: () => context.push(RoutePaths.dataTransparency),
       ),
       ListTile(
         leading: const Icon(Icons.link),
-        title: Text(l?.linkDevice ?? 'Link device'),
+        title: Text(l.linkDevice),
         onTap: () => context.push(RoutePaths.linkDevice),
       ),
       if (syncConfig.mode != SyncMode.community)
         ListTile(
           leading: const Icon(Icons.qr_code),
-          title: Text(l?.shareDatabase ?? 'Share database'),
+          title: Text(l.shareDatabase),
           onTap: () => _showQrShare(context),
         ),
       const Divider(indent: 16, endIndent: 16),
       ListTile(
         leading: const Icon(Icons.logout),
-        title: Text(l?.disconnectAction ?? 'Disconnect'),
-        subtitle: Text(l?.disconnectSubtitle ?? 'Stop syncing (local data kept)'),
+        title: Text(l.disconnectAction),
+        subtitle: Text(l.disconnectSubtitle),
         onTap: () => _confirmDisconnect(context, ref),
       ),
       if (syncConfig.mode != SyncMode.community)
         ListTile(
           leading: Icon(Icons.delete_forever, color: theme.colorScheme.error),
-          title: Text(l?.deleteAccountAction ?? 'Delete account',
-              style: TextStyle(color: theme.colorScheme.error)),
-          subtitle: Text(l?.deleteAccountSubtitle ?? 'Remove all server data permanently'),
+          title: Text(
+            l.deleteAccountAction,
+            style: TextStyle(color: theme.colorScheme.error),
+          ),
+          subtitle: Text(l.deleteAccountSubtitle),
           onTap: () => _confirmDeleteAccount(context, ref),
         ),
     ];
   }
 
-  List<Widget> _buildDisconnected(BuildContext context, AppLocalizations? l) {
+  List<Widget> _buildDisconnected(BuildContext context, AppLocalizations l) {
     return [
       ListTile(
         leading: const Icon(Icons.cloud_off),
-        title: Text(l?.localOnly ?? 'Local only'),
-        subtitle: Text(l?.localOnlySubtitle ??
-            'Optional: sync favorites, alerts, and ratings across devices'),
+        title: Text(l.localOnly),
+        subtitle: Text(l.localOnlySubtitle),
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: FilledButton.icon(
           onPressed: () => context.push(RoutePaths.syncSetup),
           icon: const Icon(Icons.cloud_upload),
-          label: Text(l?.setupCloudSync ?? 'Set up cloud sync'),
+          label: Text(l.setupCloudSync),
         ),
       ),
     ];
@@ -164,21 +162,20 @@ class TankSyncSection extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: Icon(Icons.warning_amber,
-            color: Theme.of(ctx).colorScheme.error),
-        title: Text(l?.disconnectTitle ?? 'Disconnect TankSync?'),
-        content: Text(l?.disconnectBody ??
-          'Cloud sync will be disabled. Your local data (favorites, alerts, history) '
-          'is preserved on this device. Server data is not deleted.'),
+        icon: Icon(Icons.warning_amber, color: Theme.of(ctx).colorScheme.error),
+        title: Text(l.disconnectTitle),
+        content: Text(l.disconnectBody),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l?.cancel ?? 'Cancel')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l.cancel),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(ctx).colorScheme.error),
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l?.disconnectAction ?? 'Disconnect'),
+            child: Text(l.disconnectAction),
           ),
         ],
       ),
@@ -193,28 +190,31 @@ class TankSyncSection extends ConsumerWidget {
   }
 
   Future<void> _confirmDeleteAccount(
-      BuildContext context, WidgetRef ref) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: Icon(Icons.warning_amber,
-            color: Theme.of(ctx).colorScheme.error, size: 48),
-        title: Text(l?.deleteAccountTitle ?? 'Delete account?'),
-        content: Text(l?.deleteAccountBody ??
-          'This permanently deletes all your data from the server '
-          '(favorites, alerts, ratings, routes). '
-          'Local data on this device is preserved.\n\n'
-          'This cannot be undone.'),
+        icon: Icon(
+          Icons.warning_amber,
+          color: Theme.of(ctx).colorScheme.error,
+          size: 48,
+        ),
+        title: Text(l.deleteAccountTitle),
+        content: Text(l.deleteAccountBody),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l?.cancel ?? 'Cancel')),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l.cancel),
+          ),
           FilledButton(
             style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(ctx).colorScheme.error),
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l?.deleteEverything ?? 'Delete everything'),
+            child: Text(l.deleteEverything),
           ),
         ],
       ),
@@ -222,32 +222,33 @@ class TankSyncSection extends ConsumerWidget {
     if (confirmed == true && context.mounted) {
       await ref.read(syncStateProvider.notifier).deleteAccount();
       if (context.mounted) {
-        SnackBarHelper.show(context, AppLocalizations.of(context)?.accountDeleted ?? 'Account deleted. Local data preserved.');
+        SnackBarHelper.show(
+          context,
+          AppLocalizations.of(context).accountDeleted,
+        );
       }
     }
   }
 
   Future<void> _confirmSwitchToAnonymous(
-      BuildContext context, WidgetRef ref) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         icon: const Icon(Icons.swap_horiz, size: 48),
-        title: Text(l?.switchToAnonymousTitle ?? 'Switch to anonymous?'),
-        content: Text(l?.switchToAnonymousBody ??
-          'You will be signed out of your email account and continue '
-          'with a new anonymous session.\n\n'
-          'Your local data (favorites, alerts) is kept on this device '
-          'and will be synced to the new anonymous account.'),
+        title: Text(l.switchToAnonymousTitle),
+        content: Text(l.switchToAnonymousBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l?.switchAction ?? 'Switch'),
+            child: Text(l.switchAction),
           ),
         ],
       ),
@@ -257,40 +258,53 @@ class TankSyncSection extends ConsumerWidget {
       try {
         await ref.read(syncStateProvider.notifier).switchToAnonymous();
         if (context.mounted) {
-          SnackBarHelper.show(context, AppLocalizations.of(context)?.switchedToAnonymous ?? 'Switched to anonymous session');
+          SnackBarHelper.show(
+            context,
+            AppLocalizations.of(context).switchedToAnonymous,
+          );
         }
       } catch (e, st) {
         // #2146 — route to errorLogger so the failure lands on the
         // exportable log (the snackbar is transient).
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
-          'where': 'TankSyncSection: switchToAnonymous',
-        }));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.sync,
+            e,
+            st,
+            context: const {'where': 'TankSyncSection: switchToAnonymous'},
+          ),
+        );
         if (context.mounted) {
-          SnackBarHelper.showError(context, AppLocalizations.of(context)?.failedToSwitch(e.toString()) ?? 'Failed to switch: $e');
+          SnackBarHelper.showError(
+            context,
+            AppLocalizations.of(context).failedToSwitch(e.toString()),
+          );
         }
       }
     }
   }
 
   void _showQrShare(BuildContext context) {
-    unawaited(showDialog<void>(
-      context: context,
-      builder: (ctx) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const QrShareWidget(),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(AppLocalizations.of(ctx)?.close ?? 'Close'),
-              ),
-            ],
+    unawaited(
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const QrShareWidget(),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text(AppLocalizations.of(ctx).close),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 }

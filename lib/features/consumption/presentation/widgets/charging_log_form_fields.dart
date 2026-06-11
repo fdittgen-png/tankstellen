@@ -75,7 +75,7 @@ class ChargingLogFormFields extends StatelessWidget {
         FillUpNumericField(
           key: const Key('charging_kwh_field'),
           controller: kwhCtrl,
-          label: l?.chargingKwh ?? 'Energy (kWh)',
+          label: l.chargingKwh,
           icon: Icons.bolt_outlined,
           validator: (v) => ChargingLogValidators.positiveNumber(v, l),
         ),
@@ -83,7 +83,7 @@ class ChargingLogFormFields extends StatelessWidget {
         FillUpNumericField(
           key: const Key('charging_cost_field'),
           controller: costCtrl,
-          label: l?.chargingCost ?? 'Total cost',
+          label: l.chargingCost,
           icon: Icons.euro,
           validator: (v) => ChargingLogValidators.positiveNumber(v, l),
         ),
@@ -92,7 +92,7 @@ class ChargingLogFormFields extends StatelessWidget {
         FillUpNumericField(
           key: const Key('charging_time_field'),
           controller: timeMinCtrl,
-          label: l?.chargingTimeMin ?? 'Charge time (min)',
+          label: l.chargingTimeMin,
           icon: Icons.timer_outlined,
           validator: (v) => ChargingLogValidators.nonNegativeInt(v, l),
         ),
@@ -100,7 +100,7 @@ class ChargingLogFormFields extends StatelessWidget {
         FillUpNumericField(
           key: const Key('charging_odo_field'),
           controller: odoCtrl,
-          label: l?.odometerKm ?? 'Odometer (km)',
+          label: l.odometerKm,
           icon: Icons.speed,
           validator: (v) => ChargingLogValidators.positiveNumber(v, l),
         ),
@@ -109,11 +109,9 @@ class ChargingLogFormFields extends StatelessWidget {
           key: const Key('charging_station_field'),
           controller: stationCtrl,
           textCapitalization: TextCapitalization.words,
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(80),
-          ],
+          inputFormatters: [LengthLimitingTextInputFormatter(80)],
           decoration: InputDecoration(
-            labelText: l?.chargingStationName ?? 'Station (optional)',
+            labelText: l.chargingStationName,
             prefixIcon: const Icon(Icons.place_outlined),
           ),
         ),
@@ -128,7 +126,7 @@ class ChargingLogFormFields extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save),
-          label: Text(l?.save ?? 'Save'),
+          label: Text(l.save),
         ),
         SizedBox(height: MediaQuery.of(context).viewPadding.bottom + 16),
       ],

@@ -115,11 +115,13 @@ class _OnboardingWizardScreenState
 
   void _goToStep(int step) {
     ref.read(onboardingWizardControllerProvider.notifier).setStep(step);
-    unawaited(_pageController.animateToPage(
-      step,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    ));
+    unawaited(
+      _pageController.animateToPage(
+        step,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   void _next(int currentStep) {
@@ -127,12 +129,10 @@ class _OnboardingWizardScreenState
     // once the user taps a card. If they hit the wizard's "Next" button
     // without picking, refuse with a hint — otherwise the wizard would
     // enter the next step with a null `activeAppProfileProvider`.
-    if (currentStep == 0 &&
-        ref.read(activeAppProfileProvider) == null) {
+    if (currentStep == 0 && ref.read(activeAppProfileProvider) == null) {
       SnackBarHelper.showError(
         context,
-        AppLocalizations.of(context)?.onboardingPickUseMode ??
-            'Pick a use mode to continue.',
+        AppLocalizations.of(context).onboardingPickUseMode,
       );
       return;
     }
@@ -183,7 +183,10 @@ class _OnboardingWizardScreenState
       if (!result.isValid) {
         if (mounted) {
           final l10n = AppLocalizations.of(context);
-          SnackBarHelper.showError(context, l10n?.invalidApiKey(result.errorMessage ?? '') ?? 'Invalid API key: ${result.errorMessage}');
+          SnackBarHelper.showError(
+            context,
+            l10n.invalidApiKey(result.errorMessage ?? ''),
+          );
         }
         return false;
       }
@@ -269,8 +272,8 @@ class _OnboardingWizardScreenState
     final profile = ref.watch(activeAppProfileProvider);
     final showVehicle =
         profile == AppProfile.medium ||
-            profile == AppProfile.full ||
-            profile == AppProfile.custom;
+        profile == AppProfile.full ||
+        profile == AppProfile.custom;
     final showObd2 = profile == AppProfile.full || profile == AppProfile.custom;
     // #1542 phase 6 — on iOS, prepend an explainer step before the
     // OBD2 pairing so the user understands the three iOS-only
@@ -280,8 +283,8 @@ class _OnboardingWizardScreenState
     // not setting up. Platform resolution lives in the dedicated
     // dispatch-seam provider (#3163) so this screen stays free of
     // inline `defaultTargetPlatform` branching.
-    final showIosStandby = showObd2 &&
-        ref.watch(onboardingIncludesIosStandbyStepProvider);
+    final showIosStandby =
+        showObd2 && ref.watch(onboardingIncludesIosStandbyStepProvider);
     return [
       ProfileChoiceStep(onProfilePicked: _onProfilePicked),
       const CountryLanguageStep(),

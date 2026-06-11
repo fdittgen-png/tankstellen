@@ -65,15 +65,15 @@ class ConsoFeatureCard extends ConsumerWidget {
               segments: <ButtonSegment<ConsoMode>>[
                 ButtonSegment<ConsoMode>(
                   value: ConsoMode.off,
-                  label: Text(l?.consoModeOff ?? 'Off'),
+                  label: Text(l.consoModeOff),
                 ),
                 ButtonSegment<ConsoMode>(
                   value: ConsoMode.fuel,
-                  label: Text(l?.consoModeFuel ?? 'Fuel'),
+                  label: Text(l.consoModeFuel),
                 ),
                 ButtonSegment<ConsoMode>(
                   value: ConsoMode.fuelAndTrips,
-                  label: Text(l?.consoModeFuelAndTrips ?? 'Fuel + Trips'),
+                  label: Text(l.consoModeFuelAndTrips),
                 ),
               ],
               selected: <ConsoMode>{mode},
@@ -125,17 +125,14 @@ class ConsoFeatureCard extends ConsumerWidget {
     );
   }
 
-  String _modeDescription(AppLocalizations? l, ConsoMode m) {
+  String _modeDescription(AppLocalizations l, ConsoMode m) {
     switch (m) {
       case ConsoMode.off:
-        return l?.consoModeOffDescription ??
-            'No Conso tab and no Conso settings section.';
+        return l.consoModeOffDescription;
       case ConsoMode.fuel:
-        return l?.consoModeFuelDescription ??
-            'Manual fill-ups only. Useful without an OBD2 adapter.';
+        return l.consoModeFuelDescription;
       case ConsoMode.fuelAndTrips:
-        return l?.consoModeFuelAndTripsDescription ??
-            'Adds automatic OBD2 trip recording. Requires a paired adapter.';
+        return l.consoModeFuelAndTripsDescription;
     }
   }
 

@@ -30,20 +30,15 @@ Future<bool> showFillUpWarningDialog({
   final lines = <String>[
     for (final w in warnings)
       switch (w) {
-        FillUpWarning.fuelEngineMismatch => l?.fillUpWarningFuelMismatch(
-              chosenFuel.displayName,
-              vehicleFuel?.displayName ?? chosenFuel.displayName,
-            ) ??
-            'You picked ${chosenFuel.displayName}, but this vehicle runs on '
-                '${vehicleFuel?.displayName ?? chosenFuel.displayName}.',
+        FillUpWarning.fuelEngineMismatch => l.fillUpWarningFuelMismatch(
+          chosenFuel.displayName,
+          vehicleFuel?.displayName ?? chosenFuel.displayName,
+        ),
         FillUpWarning.odometerBelowPrevious =>
-          l?.fillUpWarningOdometerBelowPrevious(
-                enteredOdoKm,
-                previousOdoKm ?? enteredOdoKm,
-              ) ??
-              'Odometer $enteredOdoKm km is below the previous fill-up\'s '
-                  '${previousOdoKm ?? enteredOdoKm} km — distance can\'t go '
-                  'backwards.',
+          l.fillUpWarningOdometerBelowPrevious(
+            enteredOdoKm,
+            previousOdoKm ?? enteredOdoKm,
+          ),
       },
   ];
 
@@ -51,7 +46,7 @@ Future<bool> showFillUpWarningDialog({
     context: context,
     barrierDismissible: true,
     builder: (dialogContext) => AlertDialog(
-      title: Text(l?.fillUpWarningDialogTitle ?? 'Check this fill-up'),
+      title: Text(l.fillUpWarningDialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,11 +68,11 @@ Future<bool> showFillUpWarningDialog({
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: Text(l?.fillUpWarningGoBack ?? 'Go back and fix'),
+          child: Text(l.fillUpWarningGoBack),
         ),
         FilledButton(
           onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: Text(l?.fillUpWarningSaveAnyway ?? 'Save anyway'),
+          child: Text(l.fillUpWarningSaveAnyway),
         ),
       ],
     ),

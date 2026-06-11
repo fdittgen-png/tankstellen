@@ -81,8 +81,8 @@ class _StationDetails extends StatelessWidget {
     final titleText = hasBrand
         ? station.brand
         : useName
-            ? station.name
-            : (l10n?.stationUnbrandedTitle ?? 'Unbranded station');
+        ? station.name
+        : (l10n.stationUnbrandedTitle);
     // The street is shown on the address line whenever it is NOT the title —
     // i.e. for a branded station (it was already), and now also for the
     // unbranded label case (the street is no longer hoisted to the title).
@@ -135,8 +135,7 @@ class _StationDetails extends StatelessWidget {
                   // "Updated {time}" so it reads as freshness, not a bare
                   // code. (No relative "2h ago": updatedAt is a lossy,
                   // per-country pre-formatted String.)
-                  l10n?.stationUpdatedLabel(station.updatedAt!) ??
-                      'Updated ${station.updatedAt!}',
+                  l10n.stationUpdatedLabel(station.updatedAt!),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

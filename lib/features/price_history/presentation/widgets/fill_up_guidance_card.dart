@@ -29,8 +29,7 @@ class FillUpGuidanceCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final guidance =
-        ref.watch(fillUpGuidanceProvider(stationId, fuelType));
+    final guidance = ref.watch(fillUpGuidanceProvider(stationId, fuelType));
     if (guidance == null) return const SizedBox.shrink();
 
     final l = AppLocalizations.of(context);
@@ -55,7 +54,7 @@ class FillUpGuidanceCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l?.fillUpGuidanceTitle ?? 'Best time to fill up',
+                    l.fillUpGuidanceTitle,
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: accent,
@@ -75,8 +74,7 @@ class FillUpGuidanceCard extends ConsumerWidget {
                   ],
                   const SizedBox(height: 2),
                   Text(
-                    l?.fillUpGuidanceSampleNote(guidance.sampleCount) ??
-                        'Based on ${guidance.sampleCount} readings',
+                    l.fillUpGuidanceSampleNote(guidance.sampleCount),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -93,50 +91,42 @@ class FillUpGuidanceCard extends ConsumerWidget {
   (IconData, Color) _iconFor(BuildContext context, FillUpGuidanceKind kind) {
     return switch (kind) {
       FillUpGuidanceKind.goodTimeNow => (
-          Icons.local_gas_station,
-          DarkModeColors.success(context),
-        ),
+        Icons.local_gas_station,
+        DarkModeColors.success(context),
+      ),
       FillUpGuidanceKind.waitCheaperWindow => (
-          Icons.schedule,
-          DarkModeColors.warning(context),
-        ),
+        Icons.schedule,
+        DarkModeColors.warning(context),
+      ),
       FillUpGuidanceKind.fillSoonRising => (
-          Icons.trending_up,
-          DarkModeColors.error(context),
-        ),
-      FillUpGuidanceKind.neutral ||
-      FillUpGuidanceKind.insufficientData =>
-        (
-          Icons.info_outline,
-          Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
+        Icons.trending_up,
+        DarkModeColors.error(context),
+      ),
+      FillUpGuidanceKind.neutral || FillUpGuidanceKind.insufficientData => (
+        Icons.info_outline,
+        Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     };
   }
 
-  String _message(AppLocalizations? l, FillUpGuidance g) {
+  String _message(AppLocalizations l, FillUpGuidance g) {
     switch (g.kind) {
       case FillUpGuidanceKind.goodTimeNow:
-        return l?.fillUpGuidanceGoodTimeNow(g.windowDays) ??
-            'The current price is in the cheapest part of the last '
-                '${g.windowDays} days — a good time to fill up.';
+        return l.fillUpGuidanceGoodTimeNow(g.windowDays);
       case FillUpGuidanceKind.waitCheaperWindow:
         final window = _windowPhrase(l, g);
-        return l?.fillUpGuidanceWaitCheaper(g.windowDays, window) ??
-            'Prices are near their ${g.windowDays}-day high. They are '
-                'typically cheaper $window — consider waiting.';
+        return l.fillUpGuidanceWaitCheaper(g.windowDays, window);
       case FillUpGuidanceKind.fillSoonRising:
-        return l?.fillUpGuidanceFillSoon ??
-            'Prices are trending up — consider filling up soon.';
+        return l.fillUpGuidanceFillSoon;
       case FillUpGuidanceKind.neutral:
       case FillUpGuidanceKind.insufficientData:
-        return l?.fillUpGuidanceNeutral(g.windowDays) ??
-            "Today's price is around the ${g.windowDays}-day average.";
+        return l.fillUpGuidanceNeutral(g.windowDays);
     }
   }
 
   /// Builds the localized "when it's cheaper" phrase from whichever
   /// of day-of-week / day-part the heuristic surfaced.
-  String _windowPhrase(AppLocalizations? l, FillUpGuidance g) {
+  String _windowPhrase(AppLocalizations l, FillUpGuidance g) {
     final day = g.cheapestDayOfWeek == null
         ? null
         : _weekdayName(l, g.cheapestDayOfWeek!);
@@ -145,26 +135,25 @@ class FillUpGuidanceCard extends ConsumerWidget {
         : _dayPartName(l, g.cheapestDayPart!);
 
     if (day != null && part != null) {
-      return l?.fillUpGuidanceWindowDayAndPart(day, part) ?? '$day $part';
+      return l.fillUpGuidanceWindowDayAndPart(day, part);
     }
     if (day != null) {
-      return l?.fillUpGuidanceWindowDayOnly(day) ?? 'on $day';
+      return l.fillUpGuidanceWindowDayOnly(day);
     }
     if (part != null) {
-      return l?.fillUpGuidanceWindowPartOnly(part) ?? 'in the $part';
+      return l.fillUpGuidanceWindowPartOnly(part);
     }
-    return l?.fillUpGuidanceWindowGeneric ?? 'at other times';
+    return l.fillUpGuidanceWindowGeneric;
   }
 
-  String? _savingLine(AppLocalizations? l, FillUpGuidance g) {
+  String? _savingLine(AppLocalizations l, FillUpGuidance g) {
     final saving = g.potentialSavingPerLitre;
     if (saving == null) return null;
     final amount = PriceFormatter.formatPrice(saving);
-    return l?.fillUpGuidanceSaving(amount) ?? 'Could save about $amount/L';
+    return l.fillUpGuidanceSaving(amount);
   }
 
-  String _weekdayName(AppLocalizations? l, int weekday) {
-    if (l == null) return _fallbackWeekday(weekday);
+  String _weekdayName(AppLocalizations l, int weekday) {
     return switch (weekday) {
       1 => l.fillUpGuidanceWeekday1,
       2 => l.fillUpGuidanceWeekday2,
@@ -176,8 +165,7 @@ class FillUpGuidanceCard extends ConsumerWidget {
     };
   }
 
-  String _dayPartName(AppLocalizations? l, DayPart part) {
-    if (l == null) return part.name;
+  String _dayPartName(AppLocalizations l, DayPart part) {
     return switch (part) {
       DayPart.earlyMorning => l.fillUpGuidancePartEarlyMorning,
       DayPart.morning => l.fillUpGuidancePartMorning,
@@ -186,14 +174,4 @@ class FillUpGuidanceCard extends ConsumerWidget {
       DayPart.night => l.fillUpGuidancePartNight,
     };
   }
-
-  String _fallbackWeekday(int weekday) => const {
-        1: 'Monday',
-        2: 'Tuesday',
-        3: 'Wednesday',
-        4: 'Thursday',
-        5: 'Friday',
-        6: 'Saturday',
-        7: 'Sunday',
-      }[weekday]!;
 }

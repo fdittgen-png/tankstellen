@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/link_device_import_card.dart';
 import 'package:tankstellen/features/sync/providers/link_device_provider.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 class _FakeLinkDeviceController extends LinkDeviceController {
   _FakeLinkDeviceController(this._initial);
@@ -33,10 +34,13 @@ void main() {
       return tester.pumpWidget(
         ProviderScope(
           overrides: [
-            linkDeviceControllerProvider
-                .overrideWith(() => _FakeLinkDeviceController(state)),
+            linkDeviceControllerProvider.overrideWith(
+              () => _FakeLinkDeviceController(state),
+            ),
           ],
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: LinkDeviceImportCard(codeController: codeController),
             ),
@@ -54,15 +58,17 @@ void main() {
       );
     });
 
-    testWidgets('Import button is disabled when the code field is empty',
-        (tester) async {
+    testWidgets('Import button is disabled when the code field is empty', (
+      tester,
+    ) async {
       await pumpCard(tester);
       final button = tester.widget<FilledButton>(find.byType(FilledButton));
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('Import button enables once the code field has text',
-        (tester) async {
+    testWidgets('Import button enables once the code field has text', (
+      tester,
+    ) async {
       await pumpCard(tester);
       codeController.text = 'abc-123';
       await tester.pump();
@@ -70,23 +76,19 @@ void main() {
       expect(button.onPressed, isNotNull);
     });
 
-    testWidgets('Shows a spinner inside the button while linking',
-        (tester) async {
-      await pumpCard(
-        tester,
-        state: const LinkDeviceState(isLinking: true),
-      );
+    testWidgets('Shows a spinner inside the button while linking', (
+      tester,
+    ) async {
+      await pumpCard(tester, state: const LinkDeviceState(isLinking: true));
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.byIcon(Icons.sync), findsNothing);
     });
 
-    testWidgets('Disables the button while linking even when text is present',
-        (tester) async {
+    testWidgets('Disables the button while linking even when text is present', (
+      tester,
+    ) async {
       codeController.text = 'abc-123';
-      await pumpCard(
-        tester,
-        state: const LinkDeviceState(isLinking: true),
-      );
+      await pumpCard(tester, state: const LinkDeviceState(isLinking: true));
       final button = tester.widget<FilledButton>(find.byType(FilledButton));
       expect(button.onPressed, isNull);
     });
@@ -102,9 +104,7 @@ void main() {
     testWidgets('Renders a red result message on error', (tester) async {
       await pumpCard(
         tester,
-        state: const LinkDeviceState(
-          result: 'Link failed',
-        ),
+        state: const LinkDeviceState(result: 'Link failed'),
       );
       expect(find.text('Link failed'), findsOneWidget);
     });

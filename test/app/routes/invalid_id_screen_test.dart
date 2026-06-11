@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/app/routes/invalid_id_screen.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 Widget _wrap(String path) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     home: Builder(builder: (ctx) => invalidIdScreen(ctx, path)),
   );
 }
@@ -72,7 +75,13 @@ void main() {
       );
       addTearDown(router.dispose);
 
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpWidget(
+        MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      );
       await tester.pump();
 
       // Sanity: started on the invalid screen.
@@ -83,10 +92,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
 
       expect(find.byKey(const Key('homeScreen')), findsOneWidget);
-      expect(
-        router.routerDelegate.currentConfiguration.uri.toString(),
-        '/',
-      );
+      expect(router.routerDelegate.currentConfiguration.uri.toString(), '/');
     });
   });
 }

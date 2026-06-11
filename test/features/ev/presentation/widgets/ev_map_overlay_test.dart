@@ -20,6 +20,7 @@ import 'package:tankstellen/features/search/presentation/screens/ev_station_deta
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for [EvMapLayer] and [EvToggleButton] from
 /// `lib/features/ev/presentation/widgets/ev_map_overlay.dart`.
@@ -33,7 +34,11 @@ void main() {
 
   /// Builds a single [ChargingStation] with the supplied [id] so we can
   /// quickly spin up large lists for the cluster threshold (>20).
-  ChargingStation buildStation(String id, {double lat = 0.1, double lng = 0.1}) {
+  ChargingStation buildStation(
+    String id, {
+    double lat = 0.1,
+    double lng = 0.1,
+  }) {
     return ChargingStation(
       id: 'ocm-$id',
       name: 'Station $id',
@@ -50,10 +55,7 @@ void main() {
       width: 400,
       height: 600,
       child: FlutterMap(
-        options: const MapOptions(
-          initialCenter: LatLng(0, 0),
-          initialZoom: 5,
-        ),
+        options: const MapOptions(initialCenter: LatLng(0, 0), initialZoom: 5),
         children: [child],
       ),
     );
@@ -64,29 +66,32 @@ void main() {
       await pumpApp(
         tester,
         const EvToggleButton(),
-        overrides: [
-          evShowOnMapProvider.overrideWith(_FakeEvShowOnMap.new),
-        ],
+        overrides: [evShowOnMapProvider.overrideWith(_FakeEvShowOnMap.new)],
       );
 
       expect(find.byIcon(Icons.ev_station), findsOneWidget);
     });
 
-    testWidgets('off state shows white background and dark icon',
-        (tester) async {
+    testWidgets('off state shows white background and dark icon', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const EvToggleButton(),
         overrides: [
-          evShowOnMapProvider.overrideWith(() => _FakeEvShowOnMap(initial: false)),
+          evShowOnMapProvider.overrideWith(
+            () => _FakeEvShowOnMap(initial: false),
+          ),
         ],
       );
 
       final material = tester.widget<Material>(
-        find.ancestor(
-          of: find.byIcon(Icons.ev_station),
-          matching: find.byType(Material),
-        ).first,
+        find
+            .ancestor(
+              of: find.byIcon(Icons.ev_station),
+              matching: find.byType(Material),
+            )
+            .first,
       );
       expect(material.color, Colors.white);
 
@@ -94,21 +99,26 @@ void main() {
       expect(icon.color, Colors.black54);
     });
 
-    testWidgets('on state flips background to green and icon to white',
-        (tester) async {
+    testWidgets('on state flips background to green and icon to white', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const EvToggleButton(),
         overrides: [
-          evShowOnMapProvider.overrideWith(() => _FakeEvShowOnMap(initial: true)),
+          evShowOnMapProvider.overrideWith(
+            () => _FakeEvShowOnMap(initial: true),
+          ),
         ],
       );
 
       final material = tester.widget<Material>(
-        find.ancestor(
-          of: find.byIcon(Icons.ev_station),
-          matching: find.byType(Material),
-        ).first,
+        find
+            .ancestor(
+              of: find.byIcon(Icons.ev_station),
+              matching: find.byType(Material),
+            )
+            .first,
       );
       expect(
         material.color,
@@ -119,15 +129,14 @@ void main() {
       expect(icon.color, Colors.white);
     });
 
-    testWidgets('tap calls notifier.toggle() and flips the state',
-        (tester) async {
+    testWidgets('tap calls notifier.toggle() and flips the state', (
+      tester,
+    ) async {
       final fake = _FakeEvShowOnMap(initial: false);
       await pumpApp(
         tester,
         const EvToggleButton(),
-        overrides: [
-          evShowOnMapProvider.overrideWith(() => fake),
-        ],
+        overrides: [evShowOnMapProvider.overrideWith(() => fake)],
       );
 
       await tester.tap(find.byIcon(Icons.ev_station));
@@ -141,8 +150,9 @@ void main() {
   });
 
   group('EvMapLayer', () {
-    testWidgets('loading state renders SizedBox.shrink (no marker layer)',
-        (tester) async {
+    testWidgets('loading state renders SizedBox.shrink (no marker layer)', (
+      tester,
+    ) async {
       // Never-completing future keeps the AsyncValue in the loading state.
       final completer = Completer<List<ChargingStation>>();
       addTearDown(() {
@@ -155,6 +165,8 @@ void main() {
             evStationsProvider(viewport).overrideWith((_) => completer.future),
           ],
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: hostInMap(const EvMapLayer(viewport: viewport)),
             ),
@@ -169,14 +181,16 @@ void main() {
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
 
-    testWidgets('error state renders SizedBox.shrink (no marker layer)',
-        (tester) async {
+    testWidgets('error state renders SizedBox.shrink (no marker layer)', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         hostInMap(const EvMapLayer(viewport: viewport)),
         overrides: [
-          evStationsProvider(viewport)
-              .overrideWith((_) async => throw Exception('boom')),
+          evStationsProvider(
+            viewport,
+          ).overrideWith((_) async => throw Exception('boom')),
         ],
       );
 
@@ -184,8 +198,9 @@ void main() {
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
 
-    testWidgets('empty data renders SizedBox.shrink (no marker layer)',
-        (tester) async {
+    testWidgets('empty data renders SizedBox.shrink (no marker layer)', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         hostInMap(const EvMapLayer(viewport: viewport)),
@@ -198,8 +213,9 @@ void main() {
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
 
-    testWidgets('non-empty data with <=20 stations renders MarkerLayer',
-        (tester) async {
+    testWidgets('non-empty data with <=20 stations renders MarkerLayer', (
+      tester,
+    ) async {
       final stations = List.generate(
         5,
         (i) => buildStation('s$i', lat: i * 0.001, lng: i * 0.001),
@@ -217,8 +233,9 @@ void main() {
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
 
-    testWidgets('non-empty data with >20 stations renders cluster layer',
-        (tester) async {
+    testWidgets('non-empty data with >20 stations renders cluster layer', (
+      tester,
+    ) async {
       final stations = List.generate(
         25,
         (i) => buildStation('s$i', lat: i * 0.001, lng: i * 0.001),
@@ -238,8 +255,7 @@ void main() {
       expect(find.byType(MarkerLayer), findsNothing);
     });
 
-    testWidgets(
-        'marker tap navigates to the routed rich EVStationDetailScreen '
+    testWidgets('marker tap navigates to the routed rich EVStationDetailScreen '
         'via /ev-station (#3174)', (tester) async {
       // #3174 — the overlay used to push a diverged 238-line legacy copy
       // (lib/features/ev/.../ev_station_detail_screen.dart) directly,
@@ -264,17 +280,15 @@ void main() {
         routes: [
           GoRoute(
             path: '/',
-            builder: (_, _) => Scaffold(
-              body: hostInMap(const EvMapLayer(viewport: viewport)),
-            ),
+            builder: (_, _) =>
+                Scaffold(body: hostInMap(const EvMapLayer(viewport: viewport))),
           ),
           // Mirrors the production `/ev-station` route in
           // `lib/app/routes/station_routes.dart` (extra-hydrated).
           GoRoute(
             path: '/ev-station',
-            builder: (_, state) => EVStationDetailScreen(
-              station: state.extra as ChargingStation,
-            ),
+            builder: (_, state) =>
+                EVStationDetailScreen(station: state.extra as ChargingStation),
           ),
         ],
       );
@@ -286,7 +300,11 @@ void main() {
             ...test.overrides,
             evStationsProvider(viewport).overrideWith((_) async => [station]),
           ].cast(),
-          child: MaterialApp.router(routerConfig: router),
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -298,13 +316,15 @@ void main() {
       expect(
         find.byType(EVStationDetailScreen),
         findsOneWidget,
-        reason: 'the marker tap must open the routed rich detail screen, '
+        reason:
+            'the marker tap must open the routed rich detail screen, '
             'not a private legacy copy',
       );
     });
 
-    testWidgets('memoises the marker list across host rebuilds (#2175)',
-        (tester) async {
+    testWidgets('memoises the marker list across host rebuilds (#2175)', (
+      tester,
+    ) async {
       final stations = List.generate(
         5,
         (i) => buildStation('s$i', lat: i * 0.001, lng: i * 0.001),
@@ -327,16 +347,21 @@ void main() {
         ],
       );
 
-      final first = tester.widget<MarkerLayer>(find.byType(MarkerLayer)).markers;
+      final first = tester
+          .widget<MarkerLayer>(find.byType(MarkerLayer))
+          .markers;
       // Force a host rebuild WITHOUT changing the station list identity.
       rebuild.value++;
       await tester.pump();
-      final second = tester.widget<MarkerLayer>(find.byType(MarkerLayer)).markers;
+      final second = tester
+          .widget<MarkerLayer>(find.byType(MarkerLayer))
+          .markers;
 
       expect(
         identical(first, second),
         isTrue,
-        reason: 'marker list must be memoised, not re-allocated, when the '
+        reason:
+            'marker list must be memoised, not re-allocated, when the '
             'station list is unchanged',
       );
     });

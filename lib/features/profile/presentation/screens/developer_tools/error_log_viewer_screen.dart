@@ -27,13 +27,12 @@ class ErrorLogViewerScreen extends ConsumerWidget {
     final traces = ref.watch(traceStorageProvider).getAll();
 
     return PageScaffold(
-      title: l?.developerToolsViewErrorLog ?? 'View error log',
+      title: l.developerToolsViewErrorLog,
       bodyPadding: EdgeInsets.zero,
       body: traces.isEmpty
           ? Center(
               child: Text(
-                l?.developerToolsErrorLogEmpty ??
-                    'No error traces recorded.',
+                l.developerToolsErrorLogEmpty,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -42,10 +41,8 @@ class ErrorLogViewerScreen extends ConsumerWidget {
           : ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: traces.length,
-              separatorBuilder: (context, index) =>
-                  const Divider(height: 1),
-              itemBuilder: (context, index) =>
-                  _TraceTile(trace: traces[index]),
+              separatorBuilder: (context, index) => const Divider(height: 1),
+              itemBuilder: (context, index) => _TraceTile(trace: traces[index]),
             ),
     );
   }
@@ -65,8 +62,9 @@ class _TraceTile extends StatelessWidget {
       leading: const Icon(Icons.error_outline, size: 20),
       title: Text(
         trace.errorType,
-        style: theme.textTheme.bodyMedium
-            ?.copyWith(fontWeight: FontWeight.bold),
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+        ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),

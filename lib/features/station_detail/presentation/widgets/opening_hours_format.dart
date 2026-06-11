@@ -28,69 +28,69 @@ String formatRange(TimeRange r) =>
 /// The localized full weekday name (e.g. "Monday"), falling back to English
 /// when [l10n] is null. [OpeningDay.publicHoliday] maps to the holidays
 /// label.
-String fullDayName(OpeningDay day, AppLocalizations? l10n) {
+String fullDayName(OpeningDay day, AppLocalizations l10n) {
   switch (day) {
     case OpeningDay.mon:
-      return l10n?.dayMon ?? 'Monday';
+      return l10n.dayMon;
     case OpeningDay.tue:
-      return l10n?.dayTue ?? 'Tuesday';
+      return l10n.dayTue;
     case OpeningDay.wed:
-      return l10n?.dayWed ?? 'Wednesday';
+      return l10n.dayWed;
     case OpeningDay.thu:
-      return l10n?.dayThu ?? 'Thursday';
+      return l10n.dayThu;
     case OpeningDay.fri:
-      return l10n?.dayFri ?? 'Friday';
+      return l10n.dayFri;
     case OpeningDay.sat:
-      return l10n?.daySat ?? 'Saturday';
+      return l10n.daySat;
     case OpeningDay.sun:
-      return l10n?.daySun ?? 'Sunday';
+      return l10n.daySun;
     case OpeningDay.publicHoliday:
-      return l10n?.publicHolidays ?? 'Public holidays';
+      return l10n.publicHolidays;
   }
 }
 
 /// The localized abbreviated weekday name (e.g. "Mon"), falling back to
 /// English when [l10n] is null.
-String shortDayName(OpeningDay day, AppLocalizations? l10n) {
+String shortDayName(OpeningDay day, AppLocalizations l10n) {
   switch (day) {
     case OpeningDay.mon:
-      return l10n?.dayShortMon ?? 'Mon';
+      return l10n.dayShortMon;
     case OpeningDay.tue:
-      return l10n?.dayShortTue ?? 'Tue';
+      return l10n.dayShortTue;
     case OpeningDay.wed:
-      return l10n?.dayShortWed ?? 'Wed';
+      return l10n.dayShortWed;
     case OpeningDay.thu:
-      return l10n?.dayShortThu ?? 'Thu';
+      return l10n.dayShortThu;
     case OpeningDay.fri:
-      return l10n?.dayShortFri ?? 'Fri';
+      return l10n.dayShortFri;
     case OpeningDay.sat:
-      return l10n?.dayShortSat ?? 'Sat';
+      return l10n.dayShortSat;
     case OpeningDay.sun:
-      return l10n?.dayShortSun ?? 'Sun';
+      return l10n.dayShortSun;
     case OpeningDay.publicHoliday:
-      return l10n?.publicHolidays ?? 'Public holidays';
+      return l10n.publicHolidays;
   }
 }
 
 /// One day's hours as a single display string: "Closed" / "Open 24 hours" /
 /// the joined intervals (split-shift days joined with " · "), or "Hours
 /// unknown" for a missing/empty/unknown day.
-String dayValueText(DayHours? day, AppLocalizations? l10n) {
+String dayValueText(DayHours? day, AppLocalizations l10n) {
   if (day == null || day.state == DayState.unknown) {
-    return l10n?.openHoursUnknown ?? 'Hours unknown';
+    return l10n.openHoursUnknown;
   }
   switch (day.state) {
     case DayState.closed:
-      return l10n?.closedLabel ?? 'Closed';
+      return l10n.closedLabel;
     case DayState.open24h:
-      return l10n?.open24Hours ?? 'Open 24 hours';
+      return l10n.open24Hours;
     case DayState.openRanges:
       final usable = day.ranges.where((r) => !r.isDegenerate).toList();
       if (usable.isEmpty) {
-        return l10n?.openHoursUnknown ?? 'Hours unknown';
+        return l10n.openHoursUnknown;
       }
       return usable.map(formatRange).join(' · ');
     case DayState.unknown:
-      return l10n?.openHoursUnknown ?? 'Hours unknown';
+      return l10n.openHoursUnknown;
   }
 }

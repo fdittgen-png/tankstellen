@@ -10,6 +10,7 @@ import 'package:tankstellen/features/search/presentation/widgets/brand_filter_ch
 import 'package:tankstellen/features/search/providers/brand_filter_provider.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for [BrandFilterChips] that pin the gaps the existing
 /// `brand_filter_test.dart` and `brand_filter_chip_counts_test.dart`
@@ -17,7 +18,7 @@ import '../../../../helpers/pump_app.dart';
 ///
 /// - tap on "All" calls `selectedBrandsProvider.notifier.clear()`,
 /// - tap on "No highway" toggles `excludeHighwayStationsProvider`,
-/// - tap on "Autoroute" toggles `'Autoroute'` in `selectedBrandsProvider`,
+/// - tap on the "Highway" chip toggles `'Autoroute'` in `selectedBrandsProvider`,
 /// - the "All" chip is selected by default when `selectedBrands` is empty,
 /// - a chip whose label matches a selected brand renders `selected: true`,
 /// - sort order: major brands by count descending, then `Others` last,
@@ -28,25 +29,20 @@ import '../../../../helpers/pump_app.dart';
 /// 100% — every `onSelected` branch is exercised, plus the static
 /// `extractGroupedBrands` ordering contract.
 
-Station _s(
-  String id,
-  String brand, {
-  String stationType = 'R',
-}) =>
-    Station(
-      id: id,
-      name: id,
-      brand: brand,
-      street: 'Rue Test',
-      houseNumber: '1',
-      postCode: '34120',
-      place: 'Test',
-      lat: 43.0,
-      lng: 3.0,
-      dist: 1.0,
-      isOpen: true,
-      stationType: stationType,
-    );
+Station _s(String id, String brand, {String stationType = 'R'}) => Station(
+  id: id,
+  name: id,
+  brand: brand,
+  street: 'Rue Test',
+  houseNumber: '1',
+  postCode: '34120',
+  place: 'Test',
+  lat: 43.0,
+  lng: 3.0,
+  dist: 1.0,
+  isOpen: true,
+  stationType: stationType,
+);
 
 void main() {
   group('BrandFilterChips — empty / minimal renders', () {
@@ -61,30 +57,28 @@ void main() {
     testWidgets(
       'no highway stations → No highway and Autoroute chips are absent',
       (tester) async {
-        final stations = [
-          _s('a', 'Total'),
-          _s('b', 'Esso'),
-        ];
+        final stations = [_s('a', 'Total'), _s('b', 'Esso')];
         await pumpApp(tester, BrandFilterChips(stations: stations));
         expect(find.text('No highway'), findsNothing);
-        expect(find.text('Autoroute'), findsNothing);
+        expect(find.text('Highway'), findsNothing);
       },
     );
   });
 
   group('BrandFilterChips — initial state', () {
-    testWidgets(
-      'All chip is selected by default (selectedBrands is empty)',
-      (tester) async {
-        final stations = [_s('a', 'Total'), _s('b', 'Esso')];
-        await pumpApp(tester, BrandFilterChips(stations: stations));
+    testWidgets('All chip is selected by default (selectedBrands is empty)', (
+      tester,
+    ) async {
+      final stations = [_s('a', 'Total'), _s('b', 'Esso')];
+      await pumpApp(tester, BrandFilterChips(stations: stations));
 
-        final allChip = tester.widget<ChoiceChip>(find.byType(ChoiceChip));
-        expect(allChip.selected, isTrue,
-            reason:
-                'When selectedBrands is empty the All chip is the active state');
-      },
-    );
+      final allChip = tester.widget<ChoiceChip>(find.byType(ChoiceChip));
+      expect(
+        allChip.selected,
+        isTrue,
+        reason: 'When selectedBrands is empty the All chip is the active state',
+      );
+    });
 
     testWidgets(
       'a brand chip whose label is selected renders with selected: true',
@@ -99,6 +93,8 @@ void main() {
               ),
             ],
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(body: BrandFilterChips(stations: stations)),
             ),
           ),
@@ -107,8 +103,11 @@ void main() {
 
         // The "TotalEnergies (1)" chip should be selected; "All" should NOT.
         final allChip = tester.widget<ChoiceChip>(find.byType(ChoiceChip));
-        expect(allChip.selected, isFalse,
-            reason: 'All chip is unselected once a brand is chosen');
+        expect(
+          allChip.selected,
+          isFalse,
+          reason: 'All chip is unselected once a brand is chosen',
+        );
 
         final totalChip = tester.widget<FilterChip>(
           find.ancestor(
@@ -122,68 +121,76 @@ void main() {
   });
 
   group('BrandFilterChips — tap interactions', () {
-    testWidgets(
-      'tapping All calls selectedBrandsProvider.notifier.clear()',
-      (tester) async {
-        final stations = [_s('a', 'Total'), _s('b', 'Esso')];
-        final container = ProviderContainer();
-        addTearDown(container.dispose);
+    testWidgets('tapping All calls selectedBrandsProvider.notifier.clear()', (
+      tester,
+    ) async {
+      final stations = [_s('a', 'Total'), _s('b', 'Esso')];
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
-        // Start with a non-empty selection so clear() is observable.
-        container.read(selectedBrandsProvider.notifier).toggle('TotalEnergies');
-        expect(container.read(selectedBrandsProvider), {'TotalEnergies'});
+      // Start with a non-empty selection so clear() is observable.
+      container.read(selectedBrandsProvider.notifier).toggle('TotalEnergies');
+      expect(container.read(selectedBrandsProvider), {'TotalEnergies'});
 
-        await tester.pumpWidget(
-          UncontrolledProviderScope(
-            container: container,
-            child: MaterialApp(
-              home: Scaffold(body: BrandFilterChips(stations: stations)),
-            ),
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: BrandFilterChips(stations: stations)),
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        await tester.tap(find.text('All'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
 
-        expect(container.read(selectedBrandsProvider), isEmpty,
-            reason: 'Tapping All must clear the selection');
-      },
-    );
+      expect(
+        container.read(selectedBrandsProvider),
+        isEmpty,
+        reason: 'Tapping All must clear the selection',
+      );
+    });
 
-    testWidgets(
-      'tapping No highway toggles excludeHighwayStationsProvider',
-      (tester) async {
-        final stations = [
-          _s('a', 'Total'),
-          _s('hwy', 'Total', stationType: 'A'),
-        ];
-        final container = ProviderContainer();
-        addTearDown(container.dispose);
+    testWidgets('tapping No highway toggles excludeHighwayStationsProvider', (
+      tester,
+    ) async {
+      final stations = [_s('a', 'Total'), _s('hwy', 'Total', stationType: 'A')];
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
-        expect(container.read(excludeHighwayStationsProvider), isFalse);
+      expect(container.read(excludeHighwayStationsProvider), isFalse);
 
-        await tester.pumpWidget(
-          UncontrolledProviderScope(
-            container: container,
-            child: MaterialApp(
-              home: Scaffold(body: BrandFilterChips(stations: stations)),
-            ),
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: BrandFilterChips(stations: stations)),
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        await tester.tap(find.text('No highway'));
-        await tester.pumpAndSettle();
-        expect(container.read(excludeHighwayStationsProvider), isTrue,
-            reason: 'First tap on No highway flips the flag on');
+      await tester.tap(find.text('No highway'));
+      await tester.pumpAndSettle();
+      expect(
+        container.read(excludeHighwayStationsProvider),
+        isTrue,
+        reason: 'First tap on No highway flips the flag on',
+      );
 
-        await tester.tap(find.text('No highway'));
-        await tester.pumpAndSettle();
-        expect(container.read(excludeHighwayStationsProvider), isFalse,
-            reason: 'Second tap toggles back off');
-      },
-    );
+      await tester.tap(find.text('No highway'));
+      await tester.pumpAndSettle();
+      expect(
+        container.read(excludeHighwayStationsProvider),
+        isFalse,
+        reason: 'Second tap toggles back off',
+      );
+    });
 
     testWidgets(
       'tapping Autoroute toggles "Autoroute" membership in selectedBrands',
@@ -199,6 +206,8 @@ void main() {
           UncontrolledProviderScope(
             container: container,
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(body: BrandFilterChips(stations: stations)),
             ),
           ),
@@ -207,15 +216,21 @@ void main() {
 
         expect(container.read(selectedBrandsProvider), isEmpty);
 
-        await tester.tap(find.text('Autoroute'));
+        await tester.tap(find.text('Highway'));
         await tester.pumpAndSettle();
-        expect(container.read(selectedBrandsProvider), {'Autoroute'},
-            reason: 'First tap adds Autoroute to the selection');
+        expect(
+          container.read(selectedBrandsProvider),
+          {'Autoroute'},
+          reason: 'First tap adds Autoroute to the selection',
+        );
 
-        await tester.tap(find.text('Autoroute'));
+        await tester.tap(find.text('Highway'));
         await tester.pumpAndSettle();
-        expect(container.read(selectedBrandsProvider), isEmpty,
-            reason: 'Second tap removes Autoroute again');
+        expect(
+          container.read(selectedBrandsProvider),
+          isEmpty,
+          reason: 'Second tap removes Autoroute again',
+        );
       },
     );
 
@@ -230,6 +245,8 @@ void main() {
           UncontrolledProviderScope(
             container: container,
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(body: BrandFilterChips(stations: stations)),
             ),
           ),
@@ -260,18 +277,24 @@ void main() {
           UncontrolledProviderScope(
             container: container,
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(body: BrandFilterChips(stations: stations)),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
-        await tester.tap(find.text('Autoroute'));
+        await tester.tap(find.text('Highway'));
         await tester.pumpAndSettle();
 
-        expect(container.read(excludeHighwayStationsProvider), isFalse,
-            reason: 'Autoroute chip writes to selectedBrands, not the highway '
-                'exclusion flag — the two filters live on different providers');
+        expect(
+          container.read(excludeHighwayStationsProvider),
+          isFalse,
+          reason:
+              'Autoroute chip writes to selectedBrands, not the highway '
+              'exclusion flag — the two filters live on different providers',
+        );
       },
     );
   });
@@ -304,13 +327,21 @@ void main() {
             return (counts[b] ?? 0).compareTo(counts[a] ?? 0);
           });
 
-        expect(sorted.last, BrandRegistry.othersLabel,
-            reason: 'Others is always last, even when its count is highest');
-        expect(sorted.first, 'TotalEnergies',
-            reason: 'Major brands sorted by count desc — TotalEnergies has 3');
-        expect(sorted.indexOf('TotalEnergies'),
-            lessThan(sorted.indexOf('Esso')),
-            reason: 'count 3 must rank before count 2');
+        expect(
+          sorted.last,
+          BrandRegistry.othersLabel,
+          reason: 'Others is always last, even when its count is highest',
+        );
+        expect(
+          sorted.first,
+          'TotalEnergies',
+          reason: 'Major brands sorted by count desc — TotalEnergies has 3',
+        );
+        expect(
+          sorted.indexOf('TotalEnergies'),
+          lessThan(sorted.indexOf('Esso')),
+          reason: 'count 3 must rank before count 2',
+        );
       },
     );
   });

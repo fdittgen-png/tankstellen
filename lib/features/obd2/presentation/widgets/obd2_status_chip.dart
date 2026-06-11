@@ -38,8 +38,7 @@ class Obd2StatusChip extends ConsumerWidget {
 
     if (snapshot.state == Obd2ConnectionState.connected) {
       final name = snapshot.adapterName ?? '';
-      final tooltip = l?.obd2ConnectedTooltip(name) ??
-          'OBD2 connected: $name';
+      final tooltip = l.obd2ConnectedTooltip(name);
       return IconButton(
         key: const Key('obd2StatusChip'),
         tooltip: tooltip,
@@ -51,10 +50,7 @@ class Obd2StatusChip extends ConsumerWidget {
         // Shrink the hit region to keep the icon visually compact but
         // leave the real tap target at 48 dp so
         // androidTapTargetGuideline still passes.
-        constraints: const BoxConstraints(
-          minWidth: 48,
-          minHeight: 48,
-        ),
+        constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         padding: EdgeInsets.zero,
         onPressed: () => showObd2AdapterPicker(context),
       );
@@ -70,16 +66,13 @@ class Obd2StatusChip extends ConsumerWidget {
     }
     return IconButton(
       key: const Key('obd2PairChip'),
-      tooltip: l?.obd2PairChipTooltip ?? 'Pair an OBD2 adapter',
+      tooltip: l.obd2PairChipTooltip,
       icon: Icon(
         Icons.bluetooth_searching,
         size: 16,
         color: theme.colorScheme.onSurfaceVariant,
       ),
-      constraints: const BoxConstraints(
-        minWidth: 48,
-        minHeight: 48,
-      ),
+      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
       padding: EdgeInsets.zero,
       onPressed: () => showObd2AdapterPicker(context),
     );

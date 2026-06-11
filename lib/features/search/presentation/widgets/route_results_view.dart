@@ -58,7 +58,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           return SliverFillRemaining(
             child: Center(
               child: Text(
-                l10n?.startSearch ?? 'Enter start and destination to search along route.',
+                l10n.startSearch,
                 style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
@@ -69,8 +69,11 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           return SliverFillRemaining(
             child: Center(
               child: Text(
-                l10n?.noStationsAlongThisRoute ?? 'No stations found along this route.',
-                style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                l10n.noStationsAlongThisRoute,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -85,7 +88,9 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         // Sort stations by position along the route (drive order)
         _sortByRoutePosition(visibleStations, result.route.geometry);
 
-        final allFuelStations = visibleStations.whereType<FuelStationResult>().toList();
+        final allFuelStations = visibleStations
+            .whereType<FuelStationResult>()
+            .toList();
         final displayItems = _resultMode == RouteResultMode.bestStops
             ? _filterBestStops(allFuelStations, result)
             : visibleStations;
@@ -125,7 +130,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
   /// Route info header with distance/duration and all/best-stops toggle.
   Widget _buildHeader(
     BuildContext context,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     RouteSearchResult result,
   ) {
     final theme = Theme.of(context);
@@ -153,7 +158,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
                   Text(
                     '${result.route.distanceKm.round()} km · '
                     '${result.route.durationMinutes.round()} min · '
-                    '${l10n?.routeStationCount(result.stations.length) ?? '${result.stations.length} stations'}',
+                    '${l10n.routeStationCount(result.stations.length)}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -164,19 +169,20 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SelectablePill(
-                    label: l10n?.allStations ?? 'All stations',
+                    label: l10n.allStations,
                     icon: Icons.local_gas_station,
                     selected: _resultMode == RouteResultMode.allStations,
                     onTap: () => setState(
-                        () => _resultMode = RouteResultMode.allStations),
+                      () => _resultMode = RouteResultMode.allStations,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   SelectablePill(
-                    label: l10n?.bestStops ?? 'Best stops',
+                    label: l10n.bestStops,
                     icon: Icons.star,
                     selected: _resultMode == RouteResultMode.bestStops,
-                    onTap: () => setState(
-                        () => _resultMode = RouteResultMode.bestStops),
+                    onTap: () =>
+                        setState(() => _resultMode = RouteResultMode.bestStops),
                   ),
                 ],
               ),
@@ -190,7 +196,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
   /// A single station card wrapped in a Dismissible for swipe actions.
   Widget _buildDismissibleCard(
     BuildContext context,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     FuelStationResult item,
     FuelType fuelType,
     RouteSearchResult result,
@@ -204,19 +210,22 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         final ignored = ref.read(ignoredStationsProvider.notifier);
         if (direction == DismissDirection.startToEnd) {
           await NavigationUtils.openInMaps(
-            item.station.lat, item.station.lng,
+            item.station.lat,
+            item.station.lng,
             label: item.station.displayName,
           );
           return false;
         } else {
           await ignored.add(item.id);
           if (context.mounted) {
-            final stationLabel = item.station.brand.isNotEmpty ? item.station.brand : item.station.name;
+            final stationLabel = item.station.brand.isNotEmpty
+                ? item.station.brand
+                : item.station.name;
             final l10n = AppLocalizations.of(context);
             SnackBarHelper.showWithUndo(
               context,
-              l10n?.stationHidden(stationLabel) ?? '$stationLabel hidden',
-              undoLabel: l10n?.undo ?? 'Undo',
+              l10n.stationHidden(stationLabel),
+              undoLabel: l10n.undo,
               onUndo: () => ignored.remove(item.id),
             );
           }
@@ -232,8 +241,13 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           children: [
             const Icon(Icons.navigation, color: Colors.white, size: 20),
             const SizedBox(width: 8),
-            Text(l10n?.navigate ?? 'Navigate',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              l10n.navigate,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -244,8 +258,13 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n?.swipeHide ?? 'Hide',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              l10n.swipeHide,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(width: 8),
             const Icon(Icons.visibility_off, color: Colors.white, size: 20),
           ],
@@ -290,7 +309,12 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
       double minDist = double.infinity;
       int bestIdx = 0;
       for (int i = 0; i < polyline.length; i += step) {
-        final d = distanceKm(lat, lng, polyline[i].latitude, polyline[i].longitude);
+        final d = distanceKm(
+          lat,
+          lng,
+          polyline[i].latitude,
+          polyline[i].longitude,
+        );
         if (d < minDist) {
           minDist = d;
           bestIdx = i;
@@ -314,11 +338,17 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     final segmentMap = result.cheapestPerSegment;
     if (segmentMap == null || segmentMap.isEmpty) {
       if (result.cheapestId != null) {
-        return allStations.where((s) => s.id == result.cheapestId).cast<SearchResultItem>().toList();
+        return allStations
+            .where((s) => s.id == result.cheapestId)
+            .cast<SearchResultItem>()
+            .toList();
       }
       return allStations.take(5).cast<SearchResultItem>().toList();
     }
     final bestIds = segmentMap.values.toSet();
-    return allStations.where((s) => bestIds.contains(s.id)).cast<SearchResultItem>().toList();
+    return allStations
+        .where((s) => bestIds.contains(s.id))
+        .cast<SearchResultItem>()
+        .toList();
   }
 }

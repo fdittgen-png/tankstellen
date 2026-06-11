@@ -26,7 +26,7 @@ class LocationConsentDialog {
   /// locales and silently fell back to English for the rest, which is
   /// unacceptable on a consent surface.
   static Future<bool> show(BuildContext context) async {
-    final l = AppLocalizations.of(context)!;
+    final l = AppLocalizations.of(context);
     final bullets = <String>[
       l.locationConsentBulletApi,
       l.locationConsentBulletNoServer,
@@ -43,32 +43,40 @@ class LocationConsentDialog {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(l.locationConsentSubtitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                l.locationConsentSubtitle,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               Text(l.locationConsentWhatHappens),
               const SizedBox(height: 8),
-              ...bullets.map((b) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('  •  ', style: TextStyle(fontSize: 14)),
-                        Expanded(
-                          child:
-                              Text(b, style: const TextStyle(fontSize: 13)),
-                        ),
-                      ],
-                    ),
-                  )),
+              ...bullets.map(
+                (b) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('  •  ', style: TextStyle(fontSize: 14)),
+                      Expanded(
+                        child: Text(b, style: const TextStyle(fontSize: 13)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
-              Text(l.locationConsentRevoke,
-                  style: const TextStyle(fontSize: 13)),
+              Text(
+                l.locationConsentRevoke,
+                style: const TextStyle(fontSize: 13),
+              ),
               const SizedBox(height: 12),
-              Text(l.locationConsentLegalBasis,
-                  style: TextStyle(
-                      fontSize: 11,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              Text(
+                l.locationConsentLegalBasis,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
         ),

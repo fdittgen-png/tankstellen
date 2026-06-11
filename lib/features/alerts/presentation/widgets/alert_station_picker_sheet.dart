@@ -74,10 +74,7 @@ class AlertStationPickerSheet extends ConsumerWidget {
     await ref.read(alertProvider.notifier).addAlert(alert);
     if (!context.mounted) return;
     final l10n = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l10n?.alertCreated ?? 'Price alert created',
-    );
+    SnackBarHelper.showSuccess(context, l10n.alertCreated);
   }
 
   /// Brand → name → street fallback for the dialog title (#2161): French
@@ -102,12 +99,16 @@ class AlertStationPickerSheet extends ConsumerWidget {
       try {
         stations.add(Station.fromJson(raw));
       } catch (e, st) {
-        unawaited(errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: {'where': 'AlertStationPicker: skipping malformed fav $id'},
-        ));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: {
+              'where': 'AlertStationPicker: skipping malformed fav $id',
+            },
+          ),
+        );
       }
     }
 
@@ -119,16 +120,14 @@ class AlertStationPickerSheet extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
-              l10n?.pickStationTitle ?? 'Pick a station',
+              l10n.pickStationTitle,
               style: theme.textTheme.titleLarge,
             ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(
-              l10n?.pickStationHelper ??
-                  'Start the fill-up from a known station so prices, brand '
-                      'and fuel type fill themselves in.',
+              l10n.pickStationHelper,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -136,10 +135,8 @@ class AlertStationPickerSheet extends ConsumerWidget {
           ),
           if (stations.isEmpty)
             _PickerEmptyState(
-              message: l10n?.pickStationEmpty ??
-                  'No favorite stations yet — add some from Search or '
-                      'Favorites, or skip and fill in manually.',
-              searchLabel: l10n?.search ?? 'Search',
+              message: l10n.pickStationEmpty,
+              searchLabel: l10n.search,
               onSearch: () {
                 Navigator.of(context).pop();
                 context.go(RoutePaths.search);

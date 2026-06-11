@@ -24,8 +24,8 @@ import '../../../../core/logging/error_logger.dart';
 
 /// Test seams: widget tests substitute these for the real
 /// platform-channel / secure-storage backed implementations.
-typedef ConsentPrompter = Future<FeedbackConsentChoice> Function(
-    BuildContext context);
+typedef ConsentPrompter =
+    Future<FeedbackConsentChoice> Function(BuildContext context);
 typedef ConsentReader = Future<FeedbackConsentState> Function();
 typedef ConsentWriter = Future<void> Function(FeedbackConsentState state);
 typedef ShareFallback = Future<void> Function(ShareParams params);
@@ -95,13 +95,11 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
     this.consentPrompter,
     this.consentReader,
     this.consentWriter,
-  })  : assert(
-          kind == ScanKind.receipt
-              ? scan != null
-              : pumpScan != null,
-          'BadScanReportSheet: scan must be set for ScanKind.receipt, '
-          'pumpScan must be set for ScanKind.pumpDisplay.',
-        );
+  }) : assert(
+         kind == ScanKind.receipt ? scan != null : pumpScan != null,
+         'BadScanReportSheet: scan must be set for ScanKind.receipt, '
+         'pumpScan must be set for ScanKind.pumpDisplay.',
+       );
 
   /// Path of the scanned image on disk. Resolves to either the receipt
   /// or the pump-display capture depending on [kind].
@@ -113,8 +111,7 @@ class BadScanReportSheet extends ConsumerStatefulWidget {
       kind == ScanKind.receipt ? scan!.ocrText : pumpScan!.ocrText;
 
   @override
-  ConsumerState<BadScanReportSheet> createState() =>
-      _BadScanReportSheetState();
+  ConsumerState<BadScanReportSheet> createState() => _BadScanReportSheetState();
 }
 
 class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
@@ -162,8 +159,7 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
   Future<void> _handleCreateTicket() async {
     setState(() => _submitting = true);
     try {
-      final reporter =
-          await ref.read(githubIssueReporterProvider.future);
+      final reporter = await ref.read(githubIssueReporterProvider.future);
       if (reporter == null) {
         // No token configured — fall back silently to the system share
         // sheet. The settings screen exposes a token-entry UI
@@ -179,8 +175,7 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
       var consent = await reader();
       if (consent == FeedbackConsentState.unset) {
         if (!mounted) return;
-        final prompter =
-            widget.consentPrompter ?? FeedbackConsentDialog.show;
+        final prompter = widget.consentPrompter ?? FeedbackConsentDialog.show;
         final choice = await prompter(context);
         switch (choice) {
           case FeedbackConsentChoice.granted:
@@ -221,12 +216,28 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
       if (!mounted) return;
       setState(() => _createdIssueUrl = url);
     } on GithubReporterException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'BadScanReportSheet: GitHub submission failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'BadScanReportSheet: GitHub submission failed',
+          },
+        ),
+      );
       await _runShareFallback(showSnackbar: true);
     } catch (e, st) {
       // Secure-storage / image-read / unexpected errors — still fall
       // back so the user can always ship a report.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'BadScanReportSheet: unexpected failure'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'BadScanReportSheet: unexpected failure'},
+        ),
+      );
       await _runShareFallback(showSnackbar: true);
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -260,17 +271,23 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     // outlives this modal sheet.
     if (showSnackbar) {
       messenger?.showSnackBar(
-        SnackBarHelper.infoSnackBar(
-          l?.badScanReportFallbackToShare ??
-              'Submission failed — manual share',
-        ),
+        SnackBarHelper.infoSnackBar(l.badScanReportFallbackToShare),
       );
     }
 
     try {
       await share(params);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'BadScanReportSheet: share fallback itself failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'BadScanReportSheet: share fallback itself failed',
+          },
+        ),
+      );
     }
   }
 
@@ -281,7 +298,14 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     try {
       await launcher(url);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'BadScanReportSheet: launchUrl failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'BadScanReportSheet: launchUrl failed'},
+        ),
+      );
     }
   }
 
@@ -289,7 +313,16 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     try {
       return await File(path).readAsBytes();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'BadScanReportSheet: could not read scan image'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'BadScanReportSheet: could not read scan image',
+          },
+        ),
+      );
       return Uint8List(0);
     }
   }

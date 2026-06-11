@@ -49,9 +49,7 @@ class StationDetailScreen extends ConsumerWidget {
         detail: result.data,
         serviceResult: result,
       ),
-      loading: () => const _StationDetailPlain(
-        body: ShimmerStationDetail(),
-      ),
+      loading: () => const _StationDetailPlain(body: ShimmerStationDetail()),
       error: (error, _) => _StationDetailPlain(
         body: ServiceChainErrorWidget(
           error: error,
@@ -78,7 +76,7 @@ class _StationDetailPlain extends StatelessWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: () => context.pop(),
-        tooltip: l10n?.tooltipBack ?? 'Back',
+        tooltip: l10n.tooltipBack,
       ),
       bodyPadding: EdgeInsets.zero,
       body: body,
@@ -137,7 +135,7 @@ class _StationDetailLoaded extends StatelessWidget {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.pop(),
-              tooltip: l10n?.tooltipBack ?? 'Back',
+              tooltip: l10n.tooltipBack,
             ),
             actions: [
               StationDetailAppBarActions(
@@ -176,9 +174,7 @@ class _StationDetailLoaded extends StatelessWidget {
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: ServiceStatusBanner(result: serviceResult),
-          ),
+          SliverToBoxAdapter(child: ServiceStatusBanner(result: serviceResult)),
           SliverPadding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding + 24),
             sliver: SliverList(
@@ -201,4 +197,3 @@ class _StationDetailLoaded extends StatelessWidget {
     );
   }
 }
-

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/vehicle_ev_section.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('VehicleEvSection', () {
@@ -36,6 +37,8 @@ void main() {
     }) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SingleChildScrollView(
               child: VehicleEvSection(
@@ -53,8 +56,9 @@ void main() {
       );
     }
 
-    testWidgets('renders all four numeric inputs + connector chips',
-        (tester) async {
+    testWidgets('renders all four numeric inputs + connector chips', (
+      tester,
+    ) async {
       await pumpSection(tester);
       // 4 numeric fields: battery, max kw, min soc, max soc
       expect(find.byType(TextFormField), findsNWidgets(4));
@@ -65,8 +69,9 @@ void main() {
       );
     });
 
-    testWidgets('initial controller values populate the fields',
-        (tester) async {
+    testWidgets('initial controller values populate the fields', (
+      tester,
+    ) async {
       await pumpSection(tester);
       expect(find.text('75'), findsOneWidget);
       expect(find.text('250'), findsOneWidget);
@@ -74,20 +79,23 @@ void main() {
       expect(find.text('80'), findsOneWidget);
     });
 
-    testWidgets('tapping an unselected connector chip invokes onToggleConnector',
-        (tester) async {
-      ConnectorType? captured;
-      // Pick a connector that is NOT preselected.
-      final unselected = ConnectorType.values
-          .firstWhere((c) => !connectors.contains(c));
+    testWidgets(
+      'tapping an unselected connector chip invokes onToggleConnector',
+      (tester) async {
+        ConnectorType? captured;
+        // Pick a connector that is NOT preselected.
+        final unselected = ConnectorType.values.firstWhere(
+          (c) => !connectors.contains(c),
+        );
 
-      await pumpSection(tester, onToggle: (c) => captured = c);
+        await pumpSection(tester, onToggle: (c) => captured = c);
 
-      await tester.tap(find.text(unselected.label));
-      await tester.pump();
+        await tester.tap(find.text(unselected.label));
+        await tester.pump();
 
-      expect(captured, unselected);
-    });
+        expect(captured, unselected);
+      },
+    );
 
     testWidgets('selected connectors render in selected state', (tester) async {
       await pumpSection(tester);
@@ -101,8 +109,9 @@ void main() {
       expect(chip.selected, isTrue);
     });
 
-    testWidgets('numberValidator is wired to the battery + max kw fields',
-        (tester) async {
+    testWidgets('numberValidator is wired to the battery + max kw fields', (
+      tester,
+    ) async {
       var calls = 0;
       await pumpSection(
         tester,
@@ -117,8 +126,11 @@ void main() {
           .widgetList<TextFormField>(find.byType(TextFormField))
           .where((f) => f.validator != null)
           .toList();
-      expect(fields, hasLength(2),
-          reason: 'battery + max charging power should both be validated');
+      expect(
+        fields,
+        hasLength(2),
+        reason: 'battery + max charging power should both be validated',
+      );
       for (final f in fields) {
         f.validator!('1.5');
       }

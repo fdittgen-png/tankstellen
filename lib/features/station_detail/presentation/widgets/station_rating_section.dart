@@ -27,24 +27,30 @@ class StationRatingSection extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: l10n?.yourRating ?? 'Your rating',
-      child: Consumer(builder: (context, ref, _) {
-        final rating = ref.watch(stationRatingProvider(stationId));
-        return Row(
-          children: [
-            StarRating(
-              rating: rating,
-              onRatingChanged: (stars) {
-                unawaited(ref.read(stationRatingsProvider.notifier).rate(stationId, stars));
-              },
-            ),
-            if (rating != null) ...[
-              const SizedBox(width: 12),
-              Text('$rating/5', style: theme.textTheme.bodyMedium),
+      title: l10n.yourRating,
+      child: Consumer(
+        builder: (context, ref, _) {
+          final rating = ref.watch(stationRatingProvider(stationId));
+          return Row(
+            children: [
+              StarRating(
+                rating: rating,
+                onRatingChanged: (stars) {
+                  unawaited(
+                    ref
+                        .read(stationRatingsProvider.notifier)
+                        .rate(stationId, stars),
+                  );
+                },
+              ),
+              if (rating != null) ...[
+                const SizedBox(width: 12),
+                Text('$rating/5', style: theme.textTheme.bodyMedium),
+              ],
             ],
-          ],
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

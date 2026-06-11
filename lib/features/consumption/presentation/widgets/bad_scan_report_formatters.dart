@@ -25,43 +25,39 @@ List<BadScanDiffRow> buildBadScanDiffRows({
   required PumpDisplayScanOutcome? pumpScan,
   required double? enteredLiters,
   required double? enteredTotalCost,
-  required AppLocalizations? l,
+  required AppLocalizations l,
 }) {
   if (kind == ScanKind.receipt) {
     final p = receiptScan!.parse;
     return [
       BadScanDiffRow(
-        l?.badScanReportFieldBrandLayout ?? 'Brand layout',
+        l.badScanReportFieldBrandLayout,
         p.brandLayout,
         p.brandLayout,
       ),
       BadScanDiffRow(
-        l?.liters ?? 'Liters',
+        l.liters,
         p.liters?.toStringAsFixed(2) ?? '—',
         enteredLiters?.toStringAsFixed(2) ?? '—',
       ),
       BadScanDiffRow(
-        l?.badScanReportFieldTotal ?? 'Total',
+        l.badScanReportFieldTotal,
         p.totalCost?.toStringAsFixed(2) ?? '—',
         enteredTotalCost?.toStringAsFixed(2) ?? '—',
       ),
       BadScanDiffRow(
-        l?.badScanReportFieldPricePerLiter ?? 'Price/L',
+        l.badScanReportFieldPricePerLiter,
         p.pricePerLiter?.toStringAsFixed(3) ?? '—',
         '—',
       ),
+      BadScanDiffRow(l.badScanReportFieldStation, p.stationName ?? '—', '—'),
       BadScanDiffRow(
-        l?.badScanReportFieldStation ?? 'Station',
-        p.stationName ?? '—',
-        '—',
-      ),
-      BadScanDiffRow(
-        l?.badScanReportFieldFuel ?? 'Fuel',
+        l.badScanReportFieldFuel,
         p.fuelType?.displayName ?? '—',
         '—',
       ),
       BadScanDiffRow(
-        l?.badScanReportFieldDate ?? 'Date',
+        l.badScanReportFieldDate,
         p.date?.toIso8601String().split('T').first ?? '—',
         '—',
       ),
@@ -70,17 +66,17 @@ List<BadScanDiffRow> buildBadScanDiffRows({
   final p = pumpScan!.parse;
   return [
     BadScanDiffRow(
-      l?.liters ?? 'Liters',
+      l.liters,
       p.liters?.toStringAsFixed(2) ?? '—',
       enteredLiters?.toStringAsFixed(2) ?? '—',
     ),
     BadScanDiffRow(
-      l?.badScanReportFieldTotal ?? 'Total',
+      l.badScanReportFieldTotal,
       p.totalCost?.toStringAsFixed(2) ?? '—',
       enteredTotalCost?.toStringAsFixed(2) ?? '—',
     ),
     BadScanDiffRow(
-      l?.badScanReportFieldPricePerLiter ?? 'Price/L',
+      l.badScanReportFieldPricePerLiter,
       p.pricePerLiter?.toStringAsFixed(3) ?? '—',
       '—',
     ),
@@ -111,10 +107,14 @@ String buildBadScanShareBody({
       ..writeln()
       ..writeln('Scanned → Corrected')
       ..writeln('-------------------')
-      ..writeln('Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
-          '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}')
-      ..writeln('Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
-          '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}')
+      ..writeln(
+        'Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
+        '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}',
+      )
+      ..writeln(
+        'Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
+        '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}',
+      )
       ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
       ..writeln('Station:  ${p.stationName ?? '—'}')
       ..writeln('Fuel:     ${p.fuelType?.apiValue ?? '—'}')
@@ -128,10 +128,14 @@ String buildBadScanShareBody({
       ..writeln()
       ..writeln('Scanned → Corrected')
       ..writeln('-------------------')
-      ..writeln('Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
-          '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}')
-      ..writeln('Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
-          '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}')
+      ..writeln(
+        'Liters:   ${p.liters?.toStringAsFixed(2) ?? '—'}'
+        '   →   ${enteredLiters?.toStringAsFixed(2) ?? '(please fill)'}',
+      )
+      ..writeln(
+        'Total:    ${p.totalCost?.toStringAsFixed(2) ?? '—'}'
+        '   →   ${enteredTotalCost?.toStringAsFixed(2) ?? '(please fill)'}',
+      )
       ..writeln('Price/L:  ${p.pricePerLiter?.toStringAsFixed(3) ?? '—'}')
       ..writeln('Pump #:   ${p.pumpNumber?.toString() ?? '—'}')
       ..writeln('Confidence: ${p.confidence.toStringAsFixed(2)}');
@@ -192,14 +196,11 @@ Map<String, String?> buildBadScanUserCorrections({
 /// "Report a scan error" string for both kinds when localization is
 /// not available, then layers per-kind suffixes on top via the
 /// kind-specific keys (#953).
-String resolveBadScanTitle(ScanKind kind, AppLocalizations? l) {
+String resolveBadScanTitle(ScanKind kind, AppLocalizations l) {
   switch (kind) {
     case ScanKind.receipt:
-      return l?.badScanReportTitleReceipt ??
-          l?.badScanReportTitle ??
-          'Report a scan error — Receipt';
+      return l.badScanReportTitleReceipt;
     case ScanKind.pumpDisplay:
-      return l?.badScanReportTitlePumpDisplay ??
-          'Report a scan error — Pump display';
+      return l.badScanReportTitlePumpDisplay;
   }
 }

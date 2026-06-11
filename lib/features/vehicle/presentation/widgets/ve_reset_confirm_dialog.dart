@@ -19,25 +19,16 @@ class VeResetConfirmDialog {
     return showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(
-          l?.veResetConfirmTitle ?? 'Reset volumetric efficiency?',
-        ),
-        content: Text(
-          l?.veResetConfirmBody ??
-              'This will discard the learned volumetric efficiency '
-                  '(η_v) and restore the default value (0.85). Trip-level '
-                  'fuel-flow estimates will fall back to the manufacturer '
-                  'constant until the calibrator collects new samples '
-                  'from upcoming trips.',
-        ),
+        title: Text(l.veResetConfirmTitle),
+        content: Text(l.veResetConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l?.veResetAction ?? 'Reset volumetric efficiency'),
+            child: Text(l.veResetAction),
           ),
         ],
       ),

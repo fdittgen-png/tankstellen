@@ -25,10 +25,16 @@ class AccountInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l?.account ?? 'Account', style: theme.textTheme.titleMedium),
+            Text(l.account, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
-            InfoRow(label: l?.anonymousUuid ?? 'Anonymous UUID', value: syncConfig.userId ?? 'Unknown'),
-            InfoRow(label: l?.server ?? 'Server', value: syncConfig.supabaseUrl ?? 'Unknown'),
+            InfoRow(
+              label: l.anonymousUuid,
+              value: syncConfig.userId ?? 'Unknown',
+            ),
+            InfoRow(
+              label: l.server,
+              value: syncConfig.supabaseUrl ?? 'Unknown',
+            ),
           ],
         ),
       ),
@@ -68,24 +74,36 @@ class SyncedDataCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l?.syncedData ?? 'Synced data', style: theme.textTheme.titleMedium),
+            Text(l.syncedData, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
-            InfoRow(label: l?.favorites ?? 'Favorites', value: '${(data['favorites'] as List?)?.length ?? 0}'),
-            InfoRow(label: l?.priceAlerts ?? 'Alerts', value: '${(data['alerts'] as List?)?.length ?? 0}'),
-            InfoRow(label: l?.pushTokens ?? 'Push tokens', value: '${(data['push_tokens'] as List?)?.length ?? 0}'),
-            InfoRow(label: l?.priceReports ?? 'Price reports', value: '${(data['reports'] as List?)?.length ?? 0}'),
+            InfoRow(
+              label: l.favorites,
+              value: '${(data['favorites'] as List?)?.length ?? 0}',
+            ),
+            InfoRow(
+              label: l.priceAlerts,
+              value: '${(data['alerts'] as List?)?.length ?? 0}',
+            ),
+            InfoRow(
+              label: l.pushTokens,
+              value: '${(data['push_tokens'] as List?)?.length ?? 0}',
+            ),
+            InfoRow(
+              label: l.priceReports,
+              value: '${(data['reports'] as List?)?.length ?? 0}',
+            ),
             // #2107 — `trip_summaries` is the canonical row-per-trip
             // count; `trip_details` rolls into Total items / Estimated
             // size below via the generic `_countItems` / `_estimateSize`
             // walk over `data.values`, but the user-facing Trips row
             // only shows the summary count (one per trip).
             InfoRow(
-              label: l?.syncedTrips ?? 'Trips',
+              label: l.syncedTrips,
               value: '${(data['trip_summaries'] as List?)?.length ?? 0}',
             ),
             const Divider(height: 24),
-            InfoRow(label: l?.totalItems ?? 'Total items', value: '${_countItems()}'),
-            InfoRow(label: l?.estimatedSize ?? 'Estimated size', value: _estimateSize()),
+            InfoRow(label: l.totalItems, value: '${_countItems()}'),
+            InfoRow(label: l.estimatedSize, value: _estimateSize()),
           ],
         ),
       ),
@@ -123,19 +141,19 @@ class DataActionButtons extends StatelessWidget {
         FilledButton.icon(
           onPressed: loading ? null : onSync,
           icon: const Icon(Icons.sync),
-          label: Text(l?.syncNow ?? 'Sync now'),
+          label: Text(l.syncNow),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: onViewRawJson,
           icon: const Icon(Icons.code),
-          label: Text(l?.viewRawJson ?? 'View raw data as JSON'),
+          label: Text(l.viewRawJson),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: onExportJson,
           icon: const Icon(Icons.copy),
-          label: Text(l?.exportJson ?? 'Export as JSON (clipboard)'),
+          label: Text(l.exportJson),
         ),
         const SizedBox(height: 24),
 
@@ -150,7 +168,7 @@ class DataActionButtons extends StatelessWidget {
           ),
           onPressed: onDeleteAll,
           icon: const Icon(Icons.delete_forever),
-          label: Text(l?.deleteAllServerData ?? 'Delete all server data'),
+          label: Text(l.deleteAllServerData),
         ),
         const SizedBox(height: 8),
         // #1541 — narrower destructive action: wipes only the
@@ -166,15 +184,13 @@ class DataActionButtons extends StatelessWidget {
           ),
           onPressed: onForgetAllTrips,
           icon: const Icon(Icons.history_toggle_off),
-          label: Text(
-            l?.forgetAllSyncedTripsButton ?? 'Forget all synced trips',
-          ),
+          label: Text(l.forgetAllSyncedTripsButton),
         ),
         const SizedBox(height: 8),
         OutlinedButton.icon(
           onPressed: onDisconnect,
           icon: const Icon(Icons.link_off),
-          label: Text(l?.disconnectTankSync ?? 'Disconnect TankSync'),
+          label: Text(l.disconnectTankSync),
         ),
       ],
     );
@@ -199,7 +215,9 @@ class InfoRow extends StatelessWidget {
           Flexible(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               textAlign: TextAlign.end,
               overflow: TextOverflow.ellipsis,
             ),

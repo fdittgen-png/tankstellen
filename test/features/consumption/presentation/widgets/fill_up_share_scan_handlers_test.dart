@@ -83,31 +83,31 @@ class _CapturedState {
   ReceiptScanService? service;
 
   FillUpScanHostState host({String? country}) => FillUpScanHostState(
-        litersCtrl: litersCtrl,
-        costCtrl: costCtrl,
-        vehicleId: vehicleId,
-        readService: () => service,
-        writeService: (s) => service = s,
-        setScanning: (v) => scanning = v,
-        setScanningPump: (_) {},
-        setDate: (d) => date = d,
-        setFuelType: (f) => fuelType = f,
-        setScannedPricePerLiter: (p) => scannedPricePerLiter = p,
-        setLastScan: (o) => lastScan = o,
-        isMounted: () => true,
-        capturePumpImage: (_) async => null,
-        activeCountry: country,
-      );
+    litersCtrl: litersCtrl,
+    costCtrl: costCtrl,
+    vehicleId: vehicleId,
+    readService: () => service,
+    writeService: (s) => service = s,
+    setScanning: (v) => scanning = v,
+    setScanningPump: (_) {},
+    setDate: (d) => date = d,
+    setFuelType: (f) => fuelType = f,
+    setScannedPricePerLiter: (p) => scannedPricePerLiter = p,
+    setLastScan: (o) => lastScan = o,
+    isMounted: () => true,
+    capturePumpImage: (_) async => null,
+    activeCountry: country,
+  );
 
   /// A serialisable snapshot of the form fields the prefill touches,
   /// so two flows can be compared with a single `equals`.
   Map<String, Object?> snapshot() => {
-        'liters': litersCtrl.text,
-        'cost': costCtrl.text,
-        'date': date?.toIso8601String(),
-        'fuelType': fuelType?.name,
-        'scannedPricePerLiter': scannedPricePerLiter,
-      };
+    'liters': litersCtrl.text,
+    'cost': costCtrl.text,
+    'date': date?.toIso8601String(),
+    'fuelType': fuelType?.name,
+    'scannedPricePerLiter': scannedPricePerLiter,
+  };
 
   void dispose() {
     litersCtrl.dispose();
@@ -120,17 +120,16 @@ class _CapturedState {
 ReceiptScanService _realParserService({
   required _FakePicker picker,
   required _FakeRecognizer recognizer,
-}) =>
-    ReceiptScanService(
-      picker: picker,
-      recognizer: recognizer,
-      parser: const ReceiptParser(),
-    );
+}) => ReceiptScanService(
+  picker: picker,
+  recognizer: recognizer,
+  parser: const ReceiptParser(),
+);
 
 /// Reads a shipped receipt OCR fixture's raw text.
 String _fixture(String name) => File(
-      'test/features/consumption/data/receipt_parser/fixtures/$name',
-    ).readAsStringSync();
+  'test/features/consumption/data/receipt_parser/fixtures/$name',
+).readAsStringSync();
 
 /// Writes a throwaway capture file (minimal JPEG bytes) and returns its
 /// path. `bakeImageOrientation` can't decode it, so the recognizer reads
@@ -152,10 +151,12 @@ Future<BuildContext> _localizedContext(WidgetTester tester) async {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
-      home: Builder(builder: (context) {
-        captured = context;
-        return const Scaffold(body: SizedBox());
-      }),
+      home: Builder(
+        builder: (context) {
+          captured = context;
+          return const Scaffold(body: SizedBox());
+        },
+      ),
     ),
   );
   return captured;
@@ -189,14 +190,16 @@ void main() {
         expect(state.costCtrl.text, '10.47');
         expect(state.date, DateTime(2026, 4, 19));
         expect(state.scannedPricePerLiter, closeTo(1.999, 0.005));
-        expect(state.fuelType, FuelType.e10,
-            reason: 'no vehicle bound → the receipt fuel pre-selects');
+        expect(
+          state.fuelType,
+          FuelType.e10,
+          reason: 'no vehicle bound → the receipt fuel pre-selects',
+        );
         expect(state.lastScan, same(outcome));
       },
     );
 
-    test('does NOT pre-select fuel when a vehicle is already bound (#698)',
-        () {
+    test('does NOT pre-select fuel when a vehicle is already bound (#698)', () {
       final parse = const ReceiptParser().parse(_fixture(_fixtureName));
       final outcome = ReceiptScanOutcome(
         parse: parse,
@@ -208,17 +211,22 @@ void main() {
 
       applyReceiptOutcome(state.host(), outcome);
 
-      expect(state.fuelType, isNull,
-          reason: 'the bound vehicle owns the fuel — receipt must not '
-              'override it');
+      expect(
+        state.fuelType,
+        isNull,
+        reason:
+            'the bound vehicle owns the fuel — receipt must not '
+            'override it',
+      );
       // The numeric prefill still happens.
       expect(state.litersCtrl.text, '5.24');
     });
   });
 
   group('receiptScanSuccessMessage (#2734 station banner)', () {
-    testWidgets('prepends the detected station name when present',
-        (tester) async {
+    testWidgets('prepends the detected station name when present', (
+      tester,
+    ) async {
       final context = await _localizedContext(tester);
       final l = AppLocalizations.of(context);
       const outcome = ReceiptScanOutcome(
@@ -233,14 +241,21 @@ void main() {
 
       final msg = receiptScanSuccessMessage(l, outcome);
 
-      expect(msg, startsWith('SUPER U'),
-          reason: 'the station hint is surfaced inline, non-blocking');
-      expect(msg, contains(l!.scanReceiptSuccess),
-          reason: 'the existing success copy is reused verbatim');
+      expect(
+        msg,
+        startsWith('SUPER U'),
+        reason: 'the station hint is surfaced inline, non-blocking',
+      );
+      expect(
+        msg,
+        contains(l.scanReceiptSuccess),
+        reason: 'the existing success copy is reused verbatim',
+      );
     });
 
-    testWidgets('falls back to the plain success copy with no station',
-        (tester) async {
+    testWidgets('falls back to the plain success copy with no station', (
+      tester,
+    ) async {
       final context = await _localizedContext(tester);
       final l = AppLocalizations.of(context);
       const outcome = ReceiptScanOutcome(
@@ -249,7 +264,7 @@ void main() {
         imagePath: '/tmp/x.jpg',
       );
 
-      expect(receiptScanSuccessMessage(l, outcome), l!.scanReceiptSuccess);
+      expect(receiptScanSuccessMessage(l, outcome), l.scanReceiptSuccess);
     });
   });
 
@@ -271,7 +286,8 @@ void main() {
           final cameraCapture = await _tempCapture();
           cameraState.service = _realParserService(
             picker: _FakePicker(cameraCapture.path),
-            recognizer: _FakeRecognizer()..textToReturn = _fixture(_fixtureName),
+            recognizer: _FakeRecognizer()
+              ..textToReturn = _fixture(_fixtureName),
           );
           await runReceiptScan(context, cameraState.host());
 
@@ -279,10 +295,14 @@ void main() {
           final shareCapture = await _tempCapture();
           shareState.service = _realParserService(
             picker: _FakePicker(null),
-            recognizer: _FakeRecognizer()..textToReturn = _fixture(_fixtureName),
+            recognizer: _FakeRecognizer()
+              ..textToReturn = _fixture(_fixtureName),
           );
           await runSharedReceiptScan(
-              context, shareState.host(), shareCapture.path);
+            context,
+            shareState.host(),
+            shareCapture.path,
+          );
 
           await cameraCapture.dir.delete(recursive: true);
           await shareCapture.dir.delete(recursive: true);
@@ -303,8 +323,9 @@ void main() {
   });
 
   group('runSharedReceiptScan — never throws (#2349 fault injection)', () {
-    testWidgets('completes normally when the recognizer throws',
-        (tester) async {
+    testWidgets('completes normally when the recognizer throws', (
+      tester,
+    ) async {
       final context = await _localizedContext(tester);
       final state = _CapturedState();
       addTearDown(state.dispose);
@@ -327,12 +348,16 @@ void main() {
       // A thrown OCR error must leave the form untouched, not half-filled.
       expect(state.litersCtrl.text, isEmpty);
       expect(state.lastScan, isNull);
-      expect(state.scanning, isFalse,
-          reason: 'the finally-block must always clear the loading flag');
+      expect(
+        state.scanning,
+        isFalse,
+        reason: 'the finally-block must always clear the loading flag',
+      );
     });
 
-    testWidgets('shows no-data (not success) when OCR yields nothing usable',
-        (tester) async {
+    testWidgets('shows no-data (not success) when OCR yields nothing usable', (
+      tester,
+    ) async {
       final context = await _localizedContext(tester);
       final state = _CapturedState();
       addTearDown(state.dispose);
@@ -353,8 +378,11 @@ void main() {
         }
       });
 
-      expect(state.lastScan, isNull,
-          reason: 'no usable data → no prefill, no cached scan');
+      expect(
+        state.lastScan,
+        isNull,
+        reason: 'no usable data → no prefill, no cached scan',
+      );
       expect(state.litersCtrl.text, isEmpty);
     });
   });

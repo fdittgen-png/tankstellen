@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../../core/domain/vehicle_profile.dart'
-    show ConnectorType;
+import '../../../../core/domain/vehicle_profile.dart' show ConnectorType;
 import '../../../../core/domain/search_result_item.dart';
 import '../../providers/mixed_results_filter_provider.dart';
 import '../../providers/search_provider.dart';
@@ -37,7 +36,8 @@ class MixedResultsFilterChips extends ConsumerWidget {
     // Connector types present across the raw (unfiltered) result set,
     // so the offered chips stay stable as the user toggles filters.
     final rawItems =
-        ref.watch(searchStateProvider).value?.data ?? const <SearchResultItem>[];
+        ref.watch(searchStateProvider).value?.data ??
+        const <SearchResultItem>[];
 
     final availableConnectors = <ConnectorType>{
       for (final item in rawItems)
@@ -57,13 +57,11 @@ class MixedResultsFilterChips extends ConsumerWidget {
           for (final preset in _powerPresets) ...[
             _chip(
               label: preset == 0
-                  ? (l10n?.evPowerAny ?? 'Any')
-                  : (l10n?.evPowerKw(preset.round()) ??
-                      '${preset.round()} kW+'),
+                  ? (l10n.evPowerAny)
+                  : (l10n.evPowerKw(preset.round())),
               selected: minPower == preset,
-              onSelected: () => ref
-                  .read(evMinPowerFilterProvider.notifier)
-                  .set(preset),
+              onSelected: () =>
+                  ref.read(evMinPowerFilterProvider.notifier).set(preset),
             ),
             const SizedBox(width: 6),
           ],
@@ -72,9 +70,8 @@ class MixedResultsFilterChips extends ConsumerWidget {
               _chip(
                 label: _connectorLabel(type, l10n),
                 selected: connectorFilter.contains(type),
-                onSelected: () => ref
-                    .read(evConnectorFilterProvider.notifier)
-                    .toggle(type),
+                onSelected: () =>
+                    ref.read(evConnectorFilterProvider.notifier).toggle(type),
               ),
               const SizedBox(width: 6),
             ],
@@ -97,15 +94,15 @@ class MixedResultsFilterChips extends ConsumerWidget {
     );
   }
 
-  static String _connectorLabel(ConnectorType type, AppLocalizations? l10n) {
+  static String _connectorLabel(ConnectorType type, AppLocalizations l10n) {
     return switch (type) {
-      ConnectorType.type2 => l10n?.connectorType2 ?? 'Type 2',
-      ConnectorType.ccs => l10n?.connectorCcs ?? 'CCS',
-      ConnectorType.chademo => l10n?.connectorChademo ?? 'CHAdeMO',
-      ConnectorType.tesla => l10n?.connectorTesla ?? 'Tesla',
-      ConnectorType.schuko => l10n?.connectorSchuko ?? 'Schuko',
-      ConnectorType.type1 => l10n?.connectorType1 ?? 'Type 1',
-      ConnectorType.threePin => l10n?.connectorThreePin ?? '3-pin',
+      ConnectorType.type2 => l10n.connectorType2,
+      ConnectorType.ccs => l10n.connectorCcs,
+      ConnectorType.chademo => l10n.connectorChademo,
+      ConnectorType.tesla => l10n.connectorTesla,
+      ConnectorType.schuko => l10n.connectorSchuko,
+      ConnectorType.type1 => l10n.connectorType1,
+      ConnectorType.threePin => l10n.connectorThreePin,
     };
   }
 }

@@ -87,7 +87,7 @@ class Obd2SelfTestAdapterChoice extends StatelessWidget {
       // No paired adapter to choose — the run falls back to the blind scan.
       return const SizedBox.shrink();
     }
-    final scanLabel = l?.obd2TestAdapterScanOption ?? 'Scan for adapter';
+    final scanLabel = l.obd2TestAdapterScanOption;
     return Padding(
       key: const ValueKey('obd2-self-test-adapter-choice'),
       padding: const EdgeInsets.only(top: 4),
@@ -95,7 +95,7 @@ class Obd2SelfTestAdapterChoice extends StatelessWidget {
         key: const ValueKey('obd2-self-test-adapter-dropdown'),
         initialValue: selectedMac ?? _scanSentinel,
         decoration: InputDecoration(
-          labelText: l?.obd2TestAdapterLabel ?? 'Adapter to test',
+          labelText: l.obd2TestAdapterLabel,
           prefixIcon: const Icon(Icons.bluetooth),
         ),
         items: [
@@ -116,8 +116,7 @@ class Obd2SelfTestAdapterChoice extends StatelessWidget {
           ),
         ],
         onChanged: enabled
-            ? (value) =>
-                onChanged(value == _scanSentinel ? null : value)
+            ? (value) => onChanged(value == _scanSentinel ? null : value)
             : null,
       ),
     );
@@ -125,15 +124,16 @@ class Obd2SelfTestAdapterChoice extends StatelessWidget {
 
   /// Localised transport tag shown next to each paired adapter (#2969).
   static String _transportLabel(
-      AppLocalizations? l, BluetoothTransport? transport) {
+    AppLocalizations l,
+    BluetoothTransport? transport,
+  ) {
     switch (transport) {
       case BluetoothTransport.classic:
-        return l?.obd2TestAdapterTransportClassic ?? 'Classic (SPP)';
+        return l.obd2TestAdapterTransportClassic;
       case BluetoothTransport.ble:
-        return l?.obd2TestAdapterTransportBle ?? 'Bluetooth LE';
+        return l.obd2TestAdapterTransportBle;
       case null:
-        return l?.obd2TestAdapterTransportUnknown ??
-            'unknown — defaulting to BLE';
+        return l.obd2TestAdapterTransportUnknown;
     }
   }
 }

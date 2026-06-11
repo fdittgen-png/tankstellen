@@ -22,11 +22,10 @@ class LandingScreenStep extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         children: [
-          Icon(Icons.home_outlined, size: 48,
-              color: theme.colorScheme.primary),
+          Icon(Icons.home_outlined, size: 48, color: theme.colorScheme.primary),
           const SizedBox(height: 16),
           Text(
-            l10n?.onboardingLandingTitle ?? 'Home screen',
+            l10n.onboardingLandingTitle,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -34,8 +33,7 @@ class LandingScreenStep extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n?.onboardingLandingHint ??
-                'Choose which screen opens when you launch the app.',
+            l10n.onboardingLandingHint,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -46,9 +44,9 @@ class LandingScreenStep extends ConsumerWidget {
           // sheet's dropdown (profile_landing_screen_dropdown.dart), so the
           // wizard and the profile agree on the same 3 options. Picking a
           // preference the profile cannot display/edit was confusing.
-          ...LandingScreen.values
-              .where((s) => s != LandingScreen.map)
-              .map((screen) {
+          ...LandingScreen.values.where((s) => s != LandingScreen.map).map((
+            screen,
+          ) {
             final selected = wizardState.landingScreen == screen;
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -67,7 +65,7 @@ class LandingScreenStep extends ConsumerWidget {
                   color: selected ? theme.colorScheme.primary : null,
                 ),
                 title: Text(
-                  screen.localizedName(l10n?.localeName ?? 'en'),
+                  screen.localizedName(l10n.localeName),
                   style: TextStyle(
                     fontWeight: selected ? FontWeight.bold : null,
                     color: selected ? theme.colorScheme.primary : null,

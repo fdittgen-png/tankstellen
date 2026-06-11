@@ -38,7 +38,7 @@ class PumpShutterButton extends StatelessWidget {
     return FilledButton.icon(
       onPressed: enabled ? onCapture : null,
       icon: const Icon(Icons.camera_alt),
-      label: Text(l10n?.pumpCameraCapture ?? 'Capture'),
+      label: Text(l10n.pumpCameraCapture),
     );
   }
 }

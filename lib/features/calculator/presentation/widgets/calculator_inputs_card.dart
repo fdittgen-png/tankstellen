@@ -53,25 +53,24 @@ class CalculatorInputsCard extends ConsumerWidget {
     final consumptionUnit = prefill.isEv ? 'kWh/100 km' : 'L/100 km';
 
     return SectionCard(
-      title: l10n?.tripDetails ?? 'Trip details',
+      title: l10n.tripDetails,
       leadingIcon: Icons.tune,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CalculatorInputField(
             controller: distanceController,
-            labelText:
-                l10n?.calculatorDistanceLabel(distanceUnit) ??
-                    'Distance ($distanceUnit)',
-            hintText: l10n?.calculatorDistanceHint ?? 'e.g. 150',
+            labelText: l10n.calculatorDistanceLabel(distanceUnit),
+            hintText: l10n.calculatorDistanceHint,
             icon: Icons.straighten,
             onParsed: notifier.setDistance,
             action: prefill.distanceKm == null
                 ? null
                 : UseMineChip(
-                    prefix: l10n?.calculatorUseMine ?? 'Use',
-                    valueLabel:
-                        UnitFormatter.formatDistance(prefill.distanceKm),
+                    prefix: l10n.calculatorUseMine,
+                    valueLabel: UnitFormatter.formatDistance(
+                      prefill.distanceKm,
+                    ),
                     onApply: () => _apply(
                       notifier.setDistance,
                       distanceController,
@@ -83,19 +82,18 @@ class CalculatorInputsCard extends ConsumerWidget {
           const SizedBox(height: Spacing.xl),
           CalculatorInputField(
             controller: consumptionController,
-            labelText:
-                l10n?.calculatorConsumptionLabel(consumptionUnit) ??
-                    'Consumption ($consumptionUnit)',
-            hintText: l10n?.calculatorConsumptionHint ?? 'e.g. 7.0',
+            labelText: l10n.calculatorConsumptionLabel(consumptionUnit),
+            hintText: l10n.calculatorConsumptionHint,
             icon: Icons.local_gas_station,
             onParsed: notifier.setConsumption,
             action: prefill.consumptionPer100Km == null
                 ? null
                 : UseMineChip(
-                    prefix: l10n?.calculatorUseMine ?? 'Use',
+                    prefix: l10n.calculatorUseMine,
                     valueLabel: UnitFormatter.formatConsumption(
-                        prefill.consumptionPer100Km!,
-                        isEv: prefill.isEv),
+                      prefill.consumptionPer100Km!,
+                      isEv: prefill.isEv,
+                    ),
                     onApply: () => _apply(
                       notifier.setConsumption,
                       consumptionController,
@@ -107,10 +105,8 @@ class CalculatorInputsCard extends ConsumerWidget {
           const SizedBox(height: Spacing.xl),
           CalculatorInputField(
             controller: priceController,
-            labelText:
-                l10n?.calculatorPriceLabel(priceSuffix) ??
-                    'Fuel price ($priceSuffix)',
-            hintText: l10n?.calculatorPriceHint ?? 'e.g. 1.899',
+            labelText: l10n.calculatorPriceLabel(priceSuffix),
+            hintText: l10n.calculatorPriceHint,
             icon: Icons.local_offer,
             onParsed: notifier.setPrice,
             action: prefill.pricePerLiter == null && !priceApplied
@@ -118,8 +114,8 @@ class CalculatorInputsCard extends ConsumerWidget {
                 : UseMineChip(
                     applied: priceApplied,
                     prefix: priceApplied
-                        ? (l10n?.calculatorApplied ?? 'Applied')
-                        : (l10n?.calculatorUseMine ?? 'Use'),
+                        ? (l10n.calculatorApplied)
+                        : (l10n.calculatorUseMine),
                     valueLabel: PriceFormatter.formatPrice(
                       priceApplied
                           ? state.pricePerLiter
@@ -136,7 +132,7 @@ class CalculatorInputsCard extends ConsumerWidget {
           const SizedBox(height: Spacing.sm),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text(l10n?.calculatorRoundTrip ?? 'Round trip'),
+            title: Text(l10n.calculatorRoundTrip),
             value: state.roundTrip,
             onChanged: notifier.setRoundTrip,
           ),
@@ -178,13 +174,13 @@ class _MonthlyEstimate extends StatelessWidget {
     return ExpansionTile(
       tilePadding: EdgeInsets.zero,
       childrenPadding: const EdgeInsets.only(bottom: Spacing.md),
-      title: Text(l10n?.calculatorEstimateMonthly ?? 'Estimate monthly cost'),
+      title: Text(l10n.calculatorEstimateMonthly),
       children: [
         TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: l10n?.calculatorTripsPerMonth ?? 'Trips per month',
-            hintText: l10n?.calculatorTripsPerMonthHint ?? 'e.g. 20',
+            labelText: l10n.calculatorTripsPerMonth,
+            hintText: l10n.calculatorTripsPerMonthHint,
             prefixIcon: const Icon(Icons.event_repeat),
             border: const OutlineInputBorder(),
           ),

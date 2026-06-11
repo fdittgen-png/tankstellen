@@ -34,7 +34,7 @@ import 'tank_level_card.dart';
 class FuelTab extends ConsumerWidget {
   final List<FillUp> fillUps;
   final ConsumptionStats stats;
-  final AppLocalizations? l;
+  final AppLocalizations l;
 
   const FuelTab({
     super.key,
@@ -48,10 +48,8 @@ class FuelTab extends ConsumerWidget {
     if (fillUps.isEmpty) {
       return EmptyState(
         icon: Icons.local_gas_station_outlined,
-        title: l?.noFillUpsTitle ?? 'No fill-ups yet',
-        subtitle:
-            l?.noFillUpsSubtitle ??
-            'Log your first fill-up to start tracking consumption.',
+        title: l.noFillUpsTitle,
+        subtitle: l.noFillUpsSubtitle,
         topBiased: true,
       );
     }
@@ -66,11 +64,7 @@ class FuelTab extends ConsumerWidget {
       HelpBanner(
         storageKey: StorageKeys.helpBannerConsumption,
         icon: Icons.tips_and_updates_outlined,
-        message:
-            l?.helpBannerConsumption ??
-            'Log every fill-up to track your real-world '
-                'consumption and CO₂ footprint. Swipe left '
-                'to delete an entry.',
+        message: l.helpBannerConsumption,
       ),
       if (showGamification) const BadgeShelf(),
       const TankLevelCard(),
@@ -149,11 +143,13 @@ class FuelTab extends ConsumerWidget {
   }
 
   void _openCorrectionEditor(BuildContext context, FillUp fillUp) {
-    unawaited(showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (_) => EditCorrectionFillUpSheet(fillUp: fillUp),
-    ));
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (_) => EditCorrectionFillUpSheet(fillUp: fillUp),
+      ),
+    );
   }
 }

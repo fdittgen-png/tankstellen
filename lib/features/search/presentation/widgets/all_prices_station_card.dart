@@ -57,10 +57,10 @@ class AllPricesStationCard extends StatelessWidget {
   /// #3198 — tri-state status colour: green when known-open, red when
   /// known-closed, neutral muted when the source gave no signal.
   Color _statusColor(BuildContext context) => switch (station.isOpen) {
-        true => DarkModeColors.success(context),
-        false => DarkModeColors.error(context),
-        null => DarkModeColors.mutedText(context),
-      };
+    true => DarkModeColors.success(context),
+    false => DarkModeColors.error(context),
+    null => DarkModeColors.mutedText(context),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +115,9 @@ class AllPricesStationCard extends StatelessWidget {
                   ),
                   child: Text(
                     switch (station.isOpen) {
-                      true => l10n?.open ?? 'Open',
-                      false => l10n?.closed ?? 'Closed',
-                      null => l10n?.openStateUnknown ?? 'Unknown',
+                      true => l10n.open,
+                      false => l10n.closed,
+                      null => l10n.openStateUnknown,
                     },
                     style: TextStyle(
                       fontSize: 10,
@@ -148,8 +148,8 @@ class AllPricesStationCard extends StatelessWidget {
                             onFavoriteTap!();
                           },
                     tooltip: isFavorite
-                        ? (l10n?.removeFavorite ?? 'Remove from favorites')
-                        : (l10n?.addFavorite ?? 'Add to favorites'),
+                        ? (l10n.removeFavorite)
+                        : (l10n.addFavorite),
                   ),
                 ),
               ],
@@ -203,20 +203,41 @@ class AllPricesStationCard extends StatelessWidget {
 
     final fuelEntries = <(FuelType, double?, String)>[
       (FuelType.e5, station.e5, fuelDisplayLabel(FuelType.e5, countryCode: cc)),
-      (FuelType.e10, station.e10,
-          fuelDisplayLabel(FuelType.e10, countryCode: cc)),
-      (FuelType.e98, station.e98,
-          fuelDisplayLabel(FuelType.e98, countryCode: cc)),
-      (FuelType.diesel, station.diesel,
-          fuelDisplayLabel(FuelType.diesel, countryCode: cc)),
-      (FuelType.dieselPremium, station.dieselPremium,
-          fuelDisplayLabel(FuelType.dieselPremium, countryCode: cc)),
-      (FuelType.e85, station.e85,
-          fuelDisplayLabel(FuelType.e85, countryCode: cc)),
-      (FuelType.lpg, station.lpg,
-          fuelDisplayLabel(FuelType.lpg, countryCode: cc)),
-      (FuelType.cng, station.cng,
-          fuelDisplayLabel(FuelType.cng, countryCode: cc)),
+      (
+        FuelType.e10,
+        station.e10,
+        fuelDisplayLabel(FuelType.e10, countryCode: cc),
+      ),
+      (
+        FuelType.e98,
+        station.e98,
+        fuelDisplayLabel(FuelType.e98, countryCode: cc),
+      ),
+      (
+        FuelType.diesel,
+        station.diesel,
+        fuelDisplayLabel(FuelType.diesel, countryCode: cc),
+      ),
+      (
+        FuelType.dieselPremium,
+        station.dieselPremium,
+        fuelDisplayLabel(FuelType.dieselPremium, countryCode: cc),
+      ),
+      (
+        FuelType.e85,
+        station.e85,
+        fuelDisplayLabel(FuelType.e85, countryCode: cc),
+      ),
+      (
+        FuelType.lpg,
+        station.lpg,
+        fuelDisplayLabel(FuelType.lpg, countryCode: cc),
+      ),
+      (
+        FuelType.cng,
+        station.cng,
+        fuelDisplayLabel(FuelType.cng, countryCode: cc),
+      ),
     ];
 
     for (final (fuelType, price, label) in fuelEntries) {

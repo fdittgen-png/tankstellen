@@ -104,11 +104,16 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
 
   void _setupAnimations({required bool goingRight}) {
     final direction = goingRight ? 1.0 : -1.0;
-    _slideInAnim = Tween<Offset>(
-      begin: Offset(0.3 * direction, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-        parent: _transitionController, curve: Curves.easeOutCubic));
+    _slideInAnim =
+        Tween<Offset>(
+          begin: Offset(0.3 * direction, 0),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(
+            parent: _transitionController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _transitionController, curve: Curves.easeOut),
     );
@@ -136,9 +141,11 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     _iconControllers[index].reset();
     unawaited(_iconControllers[index].forward());
 
-    unawaited(_transitionController.forward().then((_) {
-      _isTransitioning = false;
-    }));
+    unawaited(
+      _transitionController.forward().then((_) {
+        _isTransitioning = false;
+      }),
+    );
 
     setState(() => _currentIndex = index);
     // Publish the new branch index so observers (e.g. MapScreen for its
@@ -162,16 +169,18 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
         initialLocation: index == widget.navigationShell.currentIndex,
       );
     } catch (e, st) {
-      unawaited(errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: {
-          'source': 'ShellScreen.goBranch',
-          'index': index,
-          'currentIndex': widget.navigationShell.currentIndex,
-        },
-      ));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: {
+            'source': 'ShellScreen.goBranch',
+            'index': index,
+            'currentIndex': widget.navigationShell.currentIndex,
+          },
+        ),
+      );
     }
   }
 
@@ -209,14 +218,19 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       // (#1692) isn't bypassed; plain info, no visual change.
       SnackBarHelper.show(
         context,
-        l10n?.swipeBetweenTabsHint ??
-            'Tip: swipe left or right to switch between tabs.',
+        l10n.swipeBetweenTabsHint,
         duration: const Duration(seconds: 5),
       );
     } catch (e, st) {
       // #3143 — release-visible: debugPrint is no-opped in release.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: {'where': 'ShellScreen swipe hint'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: {'where': 'ShellScreen swipe hint'},
+        ),
+      );
     }
   }
 
@@ -269,13 +283,13 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     // snap the selection to Search (branch 0) — the Carburant/Trajets
     // slots are gone and leaving `_currentIndex` on one would leave no
     // item highlighted.
-    final onConsumptionBranch = _currentIndex == kConsumptionBranchIndex ||
+    final onConsumptionBranch =
+        _currentIndex == kConsumptionBranchIndex ||
         _currentIndex == kTrajetsBranchIndex;
     if (!showConsumption && onConsumptionBranch) {
       // #1690 — the tab vanishing + the selection jumping is silent
       // and confusing; tell the user a profile change hid the tab.
-      final tabHiddenNotice = l10n?.consumptionTabHiddenNotice ??
-          'The Consumption tab was hidden by your profile settings.';
+      final tabHiddenNotice = l10n.consumptionTabHiddenNotice;
       safePostFrame(() {
         if (!mounted) return;
         if (_currentIndex != kConsumptionBranchIndex &&
@@ -311,8 +325,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     final body = CatalogReresolveSnackbarHost(
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onHorizontalDragEnd:
-            screenSize == ScreenSize.compact ? _onHorizontalDragEnd : null,
+        onHorizontalDragEnd: screenSize == ScreenSize.compact
+            ? _onHorizontalDragEnd
+            : null,
         child: AnimatedBuilder(
           animation: _transitionController,
           builder: (context, _) {

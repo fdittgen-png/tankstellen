@@ -22,20 +22,17 @@ class CountryInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final dataSource =
-        country.apiProvider ?? (l10n?.countryInfoDemoSource ?? 'Demo');
+    final dataSource = country.apiProvider ?? (l10n.countryInfoDemoSource);
     final keyRequirement = country.requiresApiKey
-        ? (l10n?.countryInfoApiKeyRequired ?? 'API key required')
-        : (l10n?.countryInfoNoKeyNeeded ?? 'Free, no key needed');
+        ? (l10n.countryInfoApiKeyRequired)
+        : (l10n.countryInfoNoKeyNeeded);
     final fuelTypesList = country.fuelTypes.join(', ');
-    final semanticLabel = l10n?.countryInfoSemantic(
-          country.name,
-          dataSource,
-          keyRequirement,
-          fuelTypesList,
-        ) ??
-        '${country.name}, data source: $dataSource, $keyRequirement, '
-            'fuel types: $fuelTypesList';
+    final semanticLabel = l10n.countryInfoSemantic(
+      country.name,
+      dataSource,
+      keyRequirement,
+      fuelTypesList,
+    );
     return Semantics(
       label: semanticLabel,
       child: Card(
@@ -65,8 +62,7 @@ class CountryInfoCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            l10n?.countryInfoDataSource(dataSource) ??
-                                'Data: $dataSource',
+                            l10n.countryInfoDataSource(dataSource),
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
@@ -79,8 +75,7 @@ class CountryInfoCard extends StatelessWidget {
               const SizedBox(height: 8),
               ExcludeSemantics(
                 child: Text(
-                  l10n?.countryInfoFuelTypes(fuelTypesList) ??
-                      'Fuel types: $fuelTypesList',
+                  l10n.countryInfoFuelTypes(fuelTypesList),
                   style: theme.textTheme.bodySmall,
                 ),
               ),

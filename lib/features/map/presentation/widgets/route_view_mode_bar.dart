@@ -42,14 +42,14 @@ class RouteViewModeBar extends StatelessWidget {
       child: Row(
         children: [
           SelectablePill(
-            label: l10n?.allStations ?? 'All stations',
+            label: l10n.allStations,
             icon: Icons.local_gas_station,
             selected: allStationsSelected,
             onTap: onTapAllStations,
           ),
           const SizedBox(width: 8),
           SelectablePill(
-            label: l10n?.bestStops ?? 'Best stops',
+            label: l10n.bestStops,
             icon: Icons.star,
             selected: bestStopsSelected,
             onTap: onTapBestStops,
@@ -65,9 +65,12 @@ class RouteViewModeBar extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             IconButton(
-              icon: Icon(Icons.navigation,
-                  size: 18, color: theme.colorScheme.primary),
-              tooltip: l10n?.openInMaps ?? 'Open in Maps',
+              icon: Icon(
+                Icons.navigation,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+              tooltip: l10n.openInMaps,
               onPressed: onOpenSelectedInMaps,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),

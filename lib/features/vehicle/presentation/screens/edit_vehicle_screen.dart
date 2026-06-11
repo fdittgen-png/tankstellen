@@ -262,7 +262,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     if (v == null || v.trim().isEmpty) return null;
     final parsed = double.tryParse(v.trim().replaceAll(',', '.'));
     if (parsed != null) return null;
-    return AppLocalizations.of(context)?.fieldInvalidNumber ?? 'Invalid number';
+    return AppLocalizations.of(context).fieldInvalidNumber;
   }
 
   Future<void> _save() async {
@@ -335,7 +335,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     final vin = _ctrl.vinController.text.trim();
     if (vin.isEmpty) {
       SnackBarHelper.show(
-          context, l?.vinInvalidFormat ?? 'Invalid VIN format');
+          context, l.vinInvalidFormat);
       return;
     }
 
@@ -354,8 +354,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       SnackBarHelper.showError(
         context,
         decoded == null
-            ? (l?.vinDecodeError ?? "Couldn't decode this VIN")
-            : (l?.vinInvalidFormat ?? 'Invalid VIN format'),
+            ? (l.vinDecodeError)
+            : (l.vinInvalidFormat),
       );
       return;
     }
@@ -407,10 +407,8 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     }
 
     final message = result.failure == ObdVinFailureReason.unsupported
-        ? (l?.vehicleReadVinFailedUnsupportedSnackbar ??
-            'VIN not available (Mode 09 PID 02 unsupported on pre-2005 vehicles)')
-        : (l?.vehicleReadVinFailedGenericSnackbar ??
-            'VIN read failed — please enter manually');
+        ? (l.vehicleReadVinFailedUnsupportedSnackbar)
+        : (l.vehicleReadVinFailedGenericSnackbar);
     SnackBarHelper.show(context, message);
   }
 
@@ -524,10 +522,9 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     final l = AppLocalizations.of(context);
     SnackBarHelper.show(
       context,
-      l?.vehicleDetectedFromVinSnackbar(summary) ??
-          'Detected from VIN: $summary. Apply?',
+      l.vehicleDetectedFromVinSnackbar(summary),
       action: SnackBarAction(
-        label: l?.vehicleDetectedFromVinApply ?? 'Apply',
+        label: l.vehicleDetectedFromVinApply,
         onPressed: () => _applyDetectedConflicts(updated),
       ),
     );
@@ -647,12 +644,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
       onPopInvokedWithResult: _onPopInvoked,
       child: PageScaffold(
       title: isEdit
-          ? (l?.vehicleEditTitle ?? 'Edit vehicle')
-          : (l?.vehicleAddTitle ?? 'Add vehicle'),
+          ? (l.vehicleEditTitle)
+          : (l.vehicleAddTitle),
       actions: [
         IconButton(
           icon: const Icon(Icons.check),
-          tooltip: l?.save ?? 'Save',
+          tooltip: l.save,
           onPressed: _save,
         ),
       ],
@@ -682,13 +679,12 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
                 onPressed: _openCatalogPicker,
                 icon: const Icon(Icons.directions_car_outlined),
                 label: Text(
-                  l?.pickerButtonLabel ?? 'Pick from catalog',
+                  l.pickerButtonLabel,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                l?.pickerHelpText ??
-                    'Pre-fill from 50+ supported vehicles',
+                l.pickerHelpText,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context)
                           .colorScheme

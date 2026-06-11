@@ -29,7 +29,7 @@ class StorageSection extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.storageUsage ?? 'Storage',
+              l.storageUsage,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -38,23 +38,23 @@ class StorageSection extends ConsumerWidget {
             StorageBar(
               segments: [
                 StorageSegment(
-                  l?.settingsLabel ?? 'Settings',
+                  l.settingsLabel,
                   stats.settings,
                   theme.colorScheme.primary,
                 ),
                 StorageSegment(
-                  '${l?.profile ?? "Profile"} (${storageMgmt.profileCount})',
+                  '${l.profile} (${storageMgmt.profileCount})',
                   stats.profiles,
                   theme.colorScheme.secondary,
                 ),
                 StorageSegment(
-                  '${l?.favorites ?? "Favorites"} (${storageMgmt.favoriteCount})',
+                  '${l.favorites} (${storageMgmt.favoriteCount})',
                   stats.favorites,
                   theme.colorScheme.tertiary,
                 ),
                 StorageSegment(
                   // i18n-ignore: "Cache" is a brand-neutral technical term.
-                  'Cache (${storageMgmt.cacheEntryCount} ${l?.entries ?? "entries"})',
+                  'Cache (${storageMgmt.cacheEntryCount} ${l.entries})',
                   stats.cache,
                   // #2490 — cache is benign data, not data-loss. It maps to
                   // a NEUTRAL categorical tone rather than error-red (which
@@ -63,7 +63,7 @@ class StorageSection extends ConsumerWidget {
                   theme.colorScheme.surfaceContainerHighest,
                 ),
                 StorageSegment(
-                  '${l?.priceHistory ?? "Price History"} '
+                  '${l.priceHistory} '
                   '(${storageMgmt.priceHistoryEntryCount})',
                   stats.priceHistory,
                   // #2490 — neutral categorical tone, not warning-orange.
@@ -75,22 +75,20 @@ class StorageSection extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             StorageDetailRow(
-              label: l?.settingsLabel ?? 'Settings',
-              detail: l?.settingsStorageDetail ?? 'API key, active profile',
+              label: l.settingsLabel,
+              detail: l.settingsStorageDetail,
               bytes: stats.settings,
               color: theme.colorScheme.primary,
             ),
             StorageDetailRow(
-              label: l?.profile ?? 'Profile',
-              detail:
-                  '${storageMgmt.profileCount} ${l?.profilesStored ?? 'profiles'}',
+              label: l.profile,
+              detail: '${storageMgmt.profileCount} ${l.profilesStored}',
               bytes: stats.profiles,
               color: theme.colorScheme.secondary,
             ),
             StorageDetailRow(
-              label: l?.favorites ?? 'Favorites',
-              detail:
-                  '${storageMgmt.favoriteCount} ${l?.stationsMarked ?? 'stations'}',
+              label: l.favorites,
+              detail: '${storageMgmt.favoriteCount} ${l.stationsMarked}',
               bytes: stats.favorites,
               color: theme.colorScheme.tertiary,
             ),
@@ -98,44 +96,40 @@ class StorageSection extends ConsumerWidget {
               // i18n-ignore: "Cache" is a brand-neutral technical term
               // commonly left untranslated across European locales.
               label: 'Cache',
-              detail:
-                  '${storageMgmt.cacheEntryCount} ${l?.cachedResponses ?? 'cached'}',
+              detail: '${storageMgmt.cacheEntryCount} ${l.cachedResponses}',
               bytes: stats.cache,
               // #2490 — neutral categorical tone (matches the bar segment),
               // not error-red; cache is benign data, not data-loss.
               color: theme.colorScheme.surfaceContainerHighest,
             ),
             StorageDetailRow(
-              label: l?.priceHistory ?? 'Price History',
-              detail: l?.priceHistoryStationsTracked(
-                      storageMgmt.priceHistoryEntryCount) ??
-                  '${storageMgmt.priceHistoryEntryCount} stations tracked',
+              label: l.priceHistory,
+              detail: l.priceHistoryStationsTracked(
+                storageMgmt.priceHistoryEntryCount,
+              ),
               bytes: stats.priceHistory,
               // #2490 — neutral categorical tone, not warning-orange.
               color: theme.colorScheme.secondaryContainer,
             ),
             StorageDetailRow(
-              label: l?.priceAlerts ?? 'Alerts',
-              detail: l?.alertsConfiguredCount(storageMgmt.alertCount) ??
-                  '${storageMgmt.alertCount} configured',
+              label: l.priceAlerts,
+              detail: l.alertsConfiguredCount(storageMgmt.alertCount),
               bytes: stats.alerts,
               // #2490 — neutral categorical tone, not warning-orange.
               color: theme.colorScheme.tertiaryContainer,
             ),
             StorageDetailRow(
-              label: l?.ignoredStationsLabel ?? 'Ignored',
-              detail: l?.ignoredStationsHidden(
-                      storageMgmt.getIgnoredIds().length) ??
-                  '${storageMgmt.getIgnoredIds().length} stations hidden',
+              label: l.ignoredStationsLabel,
+              detail: l.ignoredStationsHidden(
+                storageMgmt.getIgnoredIds().length,
+              ),
               bytes: storageMgmt.getIgnoredIds().length * 64,
               // #2490 — theme outline token instead of a hard-coded grey.
               color: theme.colorScheme.outlineVariant,
             ),
             StorageDetailRow(
-              label: l?.ratingsLabel ?? 'Ratings',
-              detail: l?.ratingsStationsRated(
-                      storageMgmt.getRatings().length) ??
-                  '${storageMgmt.getRatings().length} stations rated',
+              label: l.ratingsLabel,
+              detail: l.ratingsStationsRated(storageMgmt.getRatings().length),
               bytes: storageMgmt.getRatings().length * 64,
               // #2490 — neutral categorical tone instead of hard-coded amber.
               color: theme.colorScheme.tertiary,
@@ -145,7 +139,7 @@ class StorageSection extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  l?.total ?? 'Total',
+                  l.total,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -160,17 +154,13 @@ class StorageSection extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              l?.cacheManagement ?? 'Cache management',
+              l.cacheManagement,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              l?.cacheDescription ??
-                  'The cache stores API responses for faster loading and offline access.',
-              style: theme.textTheme.bodySmall,
-            ),
+            Text(l.cacheDescription, style: theme.textTheme.bodySmall),
             const SizedBox(height: 4),
             CacheTtlInfo(theme: theme),
             const SizedBox(height: 16),
@@ -184,8 +174,8 @@ class StorageSection extends ConsumerWidget {
                     icon: const Icon(Icons.delete_sweep),
                     label: Text(
                       storageMgmt.cacheEntryCount > 0
-                          ? '${l?.clearCacheButton ?? "Clear cache"} (${storageMgmt.cacheEntryCount} ${l?.entries ?? "entries"})'
-                          : l?.cacheEmpty ?? 'Cache is empty',
+                          ? '${l.clearCacheButton} (${storageMgmt.cacheEntryCount} ${l.entries})'
+                          : l.cacheEmpty,
                     ),
                   ),
                 ),
@@ -201,7 +191,7 @@ class StorageSection extends ConsumerWidget {
                       foregroundColor: theme.colorScheme.error,
                     ),
                     icon: const Icon(Icons.delete_forever),
-                    label: Text(l?.deleteAllButton ?? 'Delete all'),
+                    label: Text(l.deleteAllButton),
                   ),
                 ),
               ],
@@ -216,22 +206,16 @@ class StorageSection extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: ctx,
       builder: (context) => AlertDialog(
-        title: Text(
-            AppLocalizations.of(context)?.clearCacheTitle ?? 'Clear cache?'),
-        content: Text(
-          AppLocalizations.of(context)?.clearCacheBody ??
-              'Cached data will be deleted. Settings preserved.',
-        ),
+        title: Text(AppLocalizations.of(context).clearCacheTitle),
+        content: Text(AppLocalizations.of(context).clearCacheBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child:
-                Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(AppLocalizations.of(context)?.clearCacheButton ??
-                'Clear cache'),
+            child: Text(AppLocalizations.of(context).clearCacheButton),
           ),
         ],
       ),
@@ -251,8 +235,7 @@ class StorageSection extends ConsumerWidget {
       if (!ctx.mounted) return;
       ref.invalidate(storageManagementProvider);
       if (ctx.mounted) {
-        SnackBarHelper.show(
-            ctx, AppLocalizations.of(ctx)?.cacheCleared ?? 'Cache cleared.');
+        SnackBarHelper.show(ctx, AppLocalizations.of(ctx).cacheCleared);
       }
     }
   }
@@ -266,25 +249,19 @@ class StorageSection extends ConsumerWidget {
           color: Theme.of(context).colorScheme.error,
           size: 48,
         ),
-        title: Text(AppLocalizations.of(context)?.deleteAllTitle ??
-            'Delete all data?'),
-        content: Text(
-          AppLocalizations.of(context)?.deleteAllBody ??
-              'Permanently deletes all data. App will reset.',
-        ),
+        title: Text(AppLocalizations.of(context).deleteAllTitle),
+        content: Text(AppLocalizations.of(context).deleteAllBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child:
-                Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(AppLocalizations.of(context)?.deleteAllButton ??
-                'Delete all'),
+            child: Text(AppLocalizations.of(context).deleteAllButton),
           ),
         ],
       ),

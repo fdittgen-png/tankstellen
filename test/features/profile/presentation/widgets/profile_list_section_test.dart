@@ -113,8 +113,9 @@ void main() {
   });
 
   group('ProfileListSection rendering', () {
-    testWidgets('empty profiles list renders only the New Profile button',
-        (tester) async {
+    testWidgets('empty profiles list renders only the New Profile button', (
+      tester,
+    ) async {
       when(() => mockRepo.getActiveProfile()).thenReturn(null);
       when(() => mockRepo.getAllProfiles()).thenReturn(const []);
 
@@ -136,8 +137,9 @@ void main() {
       expect(find.text('New profile'), findsOneWidget);
     });
 
-    testWidgets('single active profile renders one Card with active icon',
-        (tester) async {
+    testWidgets('single active profile renders one Card with active icon', (
+      tester,
+    ) async {
       when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
       when(() => mockRepo.getAllProfiles()).thenReturn(const [_activeProfile]);
 
@@ -166,8 +168,9 @@ void main() {
       'on the inactive one',
       (tester) async {
         when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
-        when(() => mockRepo.getAllProfiles())
-            .thenReturn(const [_activeProfile, _otherProfile]);
+        when(
+          () => mockRepo.getAllProfiles(),
+        ).thenReturn(const [_activeProfile, _otherProfile]);
 
         final std = standardTestOverrides();
 
@@ -192,44 +195,55 @@ void main() {
         final ctx = tester.element(find.text('Home'));
         final theme = Theme.of(ctx);
         final cards = tester.widgetList<Card>(find.byType(Card)).toList();
-        expect(cards[0].color, theme.colorScheme.primaryContainer,
-            reason: 'Active profile card uses primaryContainer color');
-        expect(cards[1].color, isNull,
-            reason: 'Inactive profile card has no override color');
+        expect(
+          cards[0].color,
+          theme.colorScheme.primaryContainer,
+          reason: 'Active profile card uses primaryContainer color',
+        );
+        expect(
+          cards[1].color,
+          isNull,
+          reason: 'Inactive profile card has no override color',
+        );
       },
     );
 
     testWidgets(
-        'subtitle composes flag, fuel display name, radius (km), and landing screen',
-        (tester) async {
-      when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
-      when(() => mockRepo.getAllProfiles()).thenReturn(const [_activeProfile]);
+      'subtitle composes flag, fuel display name, radius (km), and landing screen',
+      (tester) async {
+        when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
+        when(
+          () => mockRepo.getAllProfiles(),
+        ).thenReturn(const [_activeProfile]);
 
-      final std = standardTestOverrides();
+        final std = standardTestOverrides();
 
-      await pumpApp(
-        tester,
-        const ProfileListSection(),
-        overrides: [
-          ...std.overrides,
-          profileRepositoryProvider.overrideWithValue(mockRepo),
-        ],
-      );
+        await pumpApp(
+          tester,
+          const ProfileListSection(),
+          overrides: [
+            ...std.overrides,
+            profileRepositoryProvider.overrideWithValue(mockRepo),
+          ],
+        );
 
-      // German flag emoji + Super E10 + 10 km + landing screen "Nearest stations".
-      expect(find.textContaining('Super E10'), findsOneWidget);
-      expect(find.textContaining('10 km'), findsOneWidget);
-      // Landing screen English label, since locale is en.
-      expect(find.textContaining('Nearest stations'), findsOneWidget);
-      // German flag is part of the subtitle for a profile with countryCode DE.
-      expect(find.textContaining('\u{1F1E9}\u{1F1EA}'), findsOneWidget);
-    });
+        // German flag emoji + Super E10 + 10 km + landing screen "Nearest stations".
+        expect(find.textContaining('Super E10'), findsOneWidget);
+        expect(find.textContaining('10 km'), findsOneWidget);
+        // Landing screen English label, since locale is en.
+        expect(find.textContaining('Nearest stations'), findsOneWidget);
+        // German flag is part of the subtitle for a profile with countryCode DE.
+        expect(find.textContaining('\u{1F1E9}\u{1F1EA}'), findsOneWidget);
+      },
+    );
 
-    testWidgets('subtitle omits the flag when countryCode is null',
-        (tester) async {
+    testWidgets('subtitle omits the flag when countryCode is null', (
+      tester,
+    ) async {
       when(() => mockRepo.getActiveProfile()).thenReturn(_profileNoCountry);
-      when(() => mockRepo.getAllProfiles())
-          .thenReturn(const [_profileNoCountry]);
+      when(
+        () => mockRepo.getAllProfiles(),
+      ).thenReturn(const [_profileNoCountry]);
 
       final std = standardTestOverrides();
 
@@ -251,7 +265,9 @@ void main() {
       expect(find.textContaining('Map'), findsOneWidget);
     });
 
-    testWidgets('edit IconButton has a non-null tooltip (a11y)', (tester) async {
+    testWidgets('edit IconButton has a non-null tooltip (a11y)', (
+      tester,
+    ) async {
       when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
       when(() => mockRepo.getAllProfiles()).thenReturn(const [_activeProfile]);
 
@@ -280,11 +296,13 @@ void main() {
   });
 
   group('ProfileListSection actions', () {
-    testWidgets('tapping Activate calls switchProfile with the inactive id',
-        (tester) async {
+    testWidgets('tapping Activate calls switchProfile with the inactive id', (
+      tester,
+    ) async {
       when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
-      when(() => mockRepo.getAllProfiles())
-          .thenReturn(const [_activeProfile, _otherProfile]);
+      when(
+        () => mockRepo.getAllProfiles(),
+      ).thenReturn(const [_activeProfile, _otherProfile]);
 
       final std = standardTestOverrides();
       final switchCalls = <String>[];
@@ -312,8 +330,9 @@ void main() {
       'Cancel and Save actions',
       (tester) async {
         when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
-        when(() => mockRepo.getAllProfiles())
-            .thenReturn(const [_activeProfile]);
+        when(
+          () => mockRepo.getAllProfiles(),
+        ).thenReturn(const [_activeProfile]);
 
         final std = standardTestOverrides();
 
@@ -323,8 +342,9 @@ void main() {
           overrides: [
             ...std.overrides,
             profileRepositoryProvider.overrideWithValue(mockRepo),
-            activeLanguageProvider
-                .overrideWith(() => _FixedActiveLanguage(AppLanguages.all.first)),
+            activeLanguageProvider.overrideWith(
+              () => _FixedActiveLanguage(AppLanguages.all.first),
+            ),
           ],
         );
 
@@ -355,43 +375,50 @@ void main() {
     // `ref.invalidate` on a dead ref. The notifier is now captured BEFORE
     // the await and the invalidate is mounted-guarded.
     testWidgets(
-        'disposing the section while switchProfile is in flight does not '
-        'throw a dead-ref StateError (#3159)', (tester) async {
-      when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
-      when(() => mockRepo.getAllProfiles())
-          .thenReturn(const [_activeProfile, _otherProfile]);
+      'disposing the section while switchProfile is in flight does not '
+      'throw a dead-ref StateError (#3159)',
+      (tester) async {
+        when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
+        when(
+          () => mockRepo.getAllProfiles(),
+        ).thenReturn(const [_activeProfile, _otherProfile]);
 
-      final std = standardTestOverrides();
-      final gate = Completer<void>();
+        final std = standardTestOverrides();
+        final gate = Completer<void>();
 
-      await pumpApp(
-        tester,
-        const ProfileListSection(),
-        overrides: [
-          ...std.overrides,
-          profileRepositoryProvider.overrideWithValue(mockRepo),
-          activeProfileProvider.overrideWith(
-            () => _GatedActiveProfile(_activeProfile, gate),
-          ),
-        ],
-      );
+        await pumpApp(
+          tester,
+          const ProfileListSection(),
+          overrides: [
+            ...std.overrides,
+            profileRepositoryProvider.overrideWithValue(mockRepo),
+            activeProfileProvider.overrideWith(
+              () => _GatedActiveProfile(_activeProfile, gate),
+            ),
+          ],
+        );
 
-      // Start the switch — _activateProfile is now parked on the gate.
-      await tester.tap(find.text('Activate'));
-      await tester.pump();
+        // Start the switch — _activateProfile is now parked on the gate.
+        await tester.tap(find.text('Activate'));
+        await tester.pump();
 
-      // Tear the whole tree down while the await is still pending
-      // (simulates the user leaving the screen mid-switch).
-      await tester.pumpWidget(const SizedBox.shrink());
+        // Tear the whole tree down while the await is still pending
+        // (simulates the user leaving the screen mid-switch).
+        await tester.pumpWidget(const SizedBox.shrink());
 
-      // Release the future; the continuation must not touch the dead ref.
-      gate.complete();
-      await tester.pump();
+        // Release the future; the continuation must not touch the dead ref.
+        gate.complete();
+        await tester.pump();
 
-      expect(tester.takeException(), isNull,
-          reason: 'post-await ref use on the unmounted section must be '
-              'either pre-captured or mounted-guarded');
-    });
+        expect(
+          tester.takeException(),
+          isNull,
+          reason:
+              'post-await ref use on the unmounted section must be '
+              'either pre-captured or mounted-guarded',
+        );
+      },
+    );
 
     // Note: tapping Cancel/Save inside the naming dialog reliably triggers
     // a Flutter-test-only `_FocusInheritedScope` assertion when the dialog's
@@ -404,8 +431,8 @@ void main() {
 
   group('ProfileListSection source-level regression', () {
     String readSource() => File(
-          'lib/features/profile/presentation/widgets/profile_list_section.dart',
-        ).readAsStringSync();
+      'lib/features/profile/presentation/widgets/profile_list_section.dart',
+    ).readAsStringSync();
 
     test('_createProfile bails out when the name is null or empty', () {
       final source = readSource();
@@ -413,34 +440,39 @@ void main() {
       // any repository call, so an empty Save never creates a profile.
       expect(
         source,
-        matches(RegExp(r'if\s*\(\s*name\s*==\s*null\s*\|\|\s*name\.isEmpty\s*\)\s*return')),
+        matches(
+          RegExp(
+            r'if\s*\(\s*name\s*==\s*null\s*\|\|\s*name\.isEmpty\s*\)\s*return',
+          ),
+        ),
         reason: '_createProfile must early-return on empty/null name',
       );
     });
 
-    test('_createProfile passes active country + language codes to the repo',
-        () {
-      final source = readSource();
-      // The createProfile call must thread country.code and language.code,
-      // not raw values pulled from the profile being edited or hardcoded.
-      // #2597 — the country is suppressed when already taken
-      // (`countryTaken ? null : country.code`) to hold the one-per-country
-      // invariant, so assert the free-country branch threads `country.code`.
-      expect(source, contains('repo.createProfile('));
-      expect(source, contains('country.code'));
-      expect(source, contains('languageCode: language.code'));
-    });
+    test(
+      '_createProfile passes active country + language codes to the repo',
+      () {
+        final source = readSource();
+        // The createProfile call must thread country.code and language.code,
+        // not raw values pulled from the profile being edited or hardcoded.
+        // #2597 — the country is suppressed when already taken
+        // (`countryTaken ? null : country.code`) to hold the one-per-country
+        // invariant, so assert the free-country branch threads `country.code`.
+        expect(source, contains('repo.createProfile('));
+        expect(source, contains('country.code'));
+        expect(source, contains('languageCode: language.code'));
+      },
+    );
 
     test('_editProfile gates onDelete on more than one profile existing', () {
       final source = readSource();
       // Last-profile guard: when allProfiles.length <= 1, the bottom sheet
       // is opened with onDelete: null, hiding the destructive action.
       expect(source, contains('canDelete = allProfiles.length > 1'));
-      expect(source, contains('onDelete: canDelete ?'));
+      expect(source, contains('onDelete: canDelete'));
     });
 
-    test('Activate button calls switchProfile through the active notifier',
-        () {
+    test('Activate button calls switchProfile through the active notifier', () {
       final source = readSource();
       expect(
         source,
@@ -453,9 +485,11 @@ void main() {
     test('edit IconButton wires a tooltip', () {
       final source = readSource();
       // Static-scan equivalent of the accessibility check; ProfileListSection
-      // ships with `tooltip: AppLocalizations.of(context)?.editProfile ?? ...`.
-      expect(source,
-          contains('tooltip: AppLocalizations.of(context)?.editProfile'));
+      // ships with `tooltip: AppLocalizations.of(context).editProfile`.
+      expect(
+        source,
+        contains('tooltip: AppLocalizations.of(context).editProfile'),
+      );
     });
   });
 
@@ -482,8 +516,9 @@ void main() {
         const ProfileListSection(),
         overrides: [
           ...std.overrides,
-          activeLanguageProvider
-              .overrideWith(() => _FixedActiveLanguage(AppLanguages.all.first)),
+          activeLanguageProvider.overrideWith(
+            () => _FixedActiveLanguage(AppLanguages.all.first),
+          ),
         ],
       );
     }

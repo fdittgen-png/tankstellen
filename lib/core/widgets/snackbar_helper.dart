@@ -57,13 +57,12 @@ class SnackBarHelper {
     Duration duration = _infoDuration,
     SnackBarAction? action,
     Key? key,
-  }) =>
-      SnackBar(
-        key: key,
-        content: _Announced(child: Text(message)),
-        duration: duration,
-        action: action,
-      );
+  }) => SnackBar(
+    key: key,
+    content: _Announced(child: Text(message)),
+    duration: duration,
+    action: action,
+  );
 
   /// A success [SnackBar] — themed via [scheme] (`tertiaryContainer`,
   /// never hard-coded green) with a check icon so success is signalled
@@ -72,16 +71,15 @@ class SnackBarHelper {
     ColorScheme scheme,
     String message, {
     Duration duration = _infoDuration,
-  }) =>
-      SnackBar(
-        content: _IconatedContent(
-          icon: Icons.check_circle_outline,
-          message: message,
-          foreground: scheme.onTertiaryContainer,
-        ),
-        backgroundColor: scheme.tertiaryContainer,
-        duration: duration,
-      );
+  }) => SnackBar(
+    content: _IconatedContent(
+      icon: Icons.check_circle_outline,
+      message: message,
+      foreground: scheme.onTertiaryContainer,
+    ),
+    backgroundColor: scheme.tertiaryContainer,
+    duration: duration,
+  );
 
   /// An informational [SnackBar] with a leading icon but the DEFAULT
   /// SnackBar theme (no coloured background) — for coaching/info rows
@@ -94,55 +92,66 @@ class SnackBarHelper {
     String message, {
     Duration duration = _infoDuration,
     Key? key,
-  }) =>
-      SnackBar(
-        key: key,
-        content: _IconatedContent(icon: icon, message: message),
-        duration: duration,
-      );
+  }) => SnackBar(
+    key: key,
+    content: _IconatedContent(icon: icon, message: message),
+    duration: duration,
+  );
 
   /// An error [SnackBar] — themed via [scheme] (`errorContainer`) with
   /// an error icon so the failure is signalled by more than colour.
-  static SnackBar errorSnackBar(ColorScheme scheme, String message) =>
-      SnackBar(
-        content: _IconatedContent(
-          icon: Icons.error_outline,
-          message: message,
-          foreground: scheme.onErrorContainer,
-        ),
-        backgroundColor: scheme.errorContainer,
-        duration: _errorDuration,
-      );
+  static SnackBar errorSnackBar(ColorScheme scheme, String message) => SnackBar(
+    content: _IconatedContent(
+      icon: Icons.error_outline,
+      message: message,
+      foreground: scheme.onErrorContainer,
+    ),
+    backgroundColor: scheme.errorContainer,
+    duration: _errorDuration,
+  );
 
   // ---- Context wrappers ----------------------------------------------
 
   /// Show a simple informational snackbar. [action] adds a trailing
   /// button (e.g. a navigation shortcut).
-  static void show(BuildContext context, String message,
-      {Duration duration = _infoDuration, SnackBarAction? action}) {
+  static void show(
+    BuildContext context,
+    String message, {
+    Duration duration = _infoDuration,
+    SnackBarAction? action,
+  }) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      infoSnackBar(message, duration: duration, action: action),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(infoSnackBar(message, duration: duration, action: action));
   }
 
   /// Show a success snackbar — themed with a check icon.
-  static void showSuccess(BuildContext context, String message,
-      {Duration duration = _infoDuration}) {
+  static void showSuccess(
+    BuildContext context,
+    String message, {
+    Duration duration = _infoDuration,
+  }) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      successSnackBar(Theme.of(context).colorScheme, message,
-          duration: duration),
+      successSnackBar(
+        Theme.of(context).colorScheme,
+        message,
+        duration: duration,
+      ),
     );
   }
 
   /// Show a snackbar with an undo action. [undoLabel] defaults to the
   /// localized "Undo" string — never a hard-coded literal.
-  static void showWithUndo(BuildContext context, String message,
-      {required VoidCallback onUndo, String? undoLabel}) {
+  static void showWithUndo(
+    BuildContext context,
+    String message, {
+    required VoidCallback onUndo,
+    String? undoLabel,
+  }) {
     if (!context.mounted) return;
-    final label =
-        undoLabel ?? AppLocalizations.of(context)?.undo ?? 'Undo';
+    final label = undoLabel ?? AppLocalizations.of(context).undo;
     ScaffoldMessenger.of(context).showSnackBar(
       infoSnackBar(
         message,
@@ -155,9 +164,9 @@ class SnackBarHelper {
   /// Show an error snackbar — themed with an error icon.
   static void showError(BuildContext context, String message) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      errorSnackBar(Theme.of(context).colorScheme, message),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(errorSnackBar(Theme.of(context).colorScheme, message));
   }
 }
 

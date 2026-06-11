@@ -12,7 +12,7 @@ import '../../../l10n/app_localizations.dart';
 /// Pure function — no Riverpod, no I/O. The full exception is still
 /// expected to be logged by the caller via `errorLogger.log` for
 /// diagnostics; only the user-facing string is sanitized here.
-String friendlyAuthError(Object error, AppLocalizations? l) {
+String friendlyAuthError(Object error, AppLocalizations l) {
   final raw = error.toString();
 
   // Network family: DNS NXDOMAIN, dropped sockets, retryable fetch.
@@ -26,24 +26,20 @@ String friendlyAuthError(Object error, AppLocalizations? l) {
       raw.contains('errno = 7') ||
       raw.contains('Network is unreachable') ||
       raw.contains('Connection refused')) {
-    return l?.authErrorNoNetwork ??
-        'No network connection. Try again later.';
+    return l.authErrorNoNetwork;
   }
 
   // Supabase auth-specific error codes surfaced through AuthException.
   if (raw.contains('invalid_credentials')) {
-    return l?.authErrorInvalidCredentials ??
-        'Invalid email or password. Check your credentials.';
+    return l.authErrorInvalidCredentials;
   }
   if (raw.contains('user_already_exists') ||
       raw.contains('already registered')) {
-    return l?.authErrorUserAlreadyExists ??
-        'This email is already registered. Try signing in instead.';
+    return l.authErrorUserAlreadyExists;
   }
   if (raw.contains('email_not_confirmed')) {
-    return l?.authErrorEmailNotConfirmed ??
-        'Please check your email and confirm your account first.';
+    return l.authErrorEmailNotConfirmed;
   }
 
-  return l?.authErrorGeneric ?? 'Sign-in failed. Please try again.';
+  return l.authErrorGeneric;
 }

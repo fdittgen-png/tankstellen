@@ -45,33 +45,39 @@ class SyncCredentialsStep extends StatelessWidget {
           FilledButton.icon(
             onPressed: onScanQr,
             icon: const Icon(Icons.qr_code_scanner),
-            label: Text(l10n?.syncWizardScanQrCode ?? 'Scan QR Code'),
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+            label: Text(l10n.syncWizardScanQrCode),
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+            ),
           ),
           const SizedBox(height: 6),
           Text(
-            l10n?.syncWizardAskOwnerQrShort ??
-                'Ask the database owner to show their QR code',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            l10n.syncWizardAskOwnerQrShort,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          Row(children: [
-            const Expanded(child: Divider()),
-            Padding(
+          Row(
+            children: [
+              const Expanded(child: Divider()),
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(l10n?.syncWizardOrEnterManually ??
-                    'or enter manually')),
-            const Expanded(child: Divider()),
-          ]),
+                child: Text(l10n.syncWizardOrEnterManually),
+              ),
+              const Expanded(child: Divider()),
+            ],
+          ),
           const SizedBox(height: 16),
         ],
 
         if (selectedMode == SyncMode.private) ...[
           Text(
-            l10n?.syncCredentialsPrivateHint ??
-                'Enter your Supabase project credentials. You can find them in your dashboard under Settings > API.',
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            l10n.syncCredentialsPrivateHint,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -79,10 +85,8 @@ class SyncCredentialsStep extends StatelessWidget {
         TextField(
           controller: urlController,
           decoration: InputDecoration(
-            labelText:
-                l10n?.syncCredentialsDatabaseUrlLabel ?? 'Database URL',
-            hintText: l10n?.syncWizardSupabaseUrlHint ??
-                'https://your-project.supabase.co',
+            labelText: l10n.syncCredentialsDatabaseUrlLabel,
+            hintText: l10n.syncWizardSupabaseUrlHint,
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.link, size: 18),
             isDense: true,
@@ -94,10 +98,8 @@ class SyncCredentialsStep extends StatelessWidget {
         TextField(
           controller: keyController,
           decoration: InputDecoration(
-            labelText:
-                l10n?.syncCredentialsAccessKeyLabel ?? 'Access Key',
-            hintText: l10n?.syncCredentialsAccessKeyHint ??
-                'eyJhbGciOiJIUzI1NiIs...',
+            labelText: l10n.syncCredentialsAccessKeyLabel,
+            hintText: l10n.syncCredentialsAccessKeyHint,
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.key, size: 18),
             isDense: true,
@@ -107,16 +109,22 @@ class SyncCredentialsStep extends StatelessWidget {
                 if (keyLen > 0)
                   Padding(
                     padding: const EdgeInsets.only(right: 4),
-                    child: Text('$keyLen', style: TextStyle(fontSize: 10,
-                      color: keyLen >= 200
-                          ? DarkModeColors.success(context)
-                          : DarkModeColors.warning(context))),
+                    child: Text(
+                      '$keyLen',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: keyLen >= 200
+                            ? DarkModeColors.success(context)
+                            : DarkModeColors.warning(context),
+                      ),
+                    ),
                   ),
                 IconButton(
-                  icon: Icon(showKey ? Icons.visibility_off : Icons.visibility, size: 18),
-                  tooltip: showKey
-                      ? (l10n?.hideKey ?? 'Hide key')
-                      : (l10n?.showKey ?? 'Show key'),
+                  icon: Icon(
+                    showKey ? Icons.visibility_off : Icons.visibility,
+                    size: 18,
+                  ),
+                  tooltip: showKey ? (l10n.hideKey) : (l10n.showKey),
                   onPressed: onToggleKeyVisibility,
                 ),
               ],
@@ -128,10 +136,7 @@ class SyncCredentialsStep extends StatelessWidget {
           onChanged: (_) => onChanged(),
         ),
         const SizedBox(height: 20),
-        FilledButton(
-          onPressed: onContinue,
-          child: Text(l10n?.continueButton ?? 'Continue'),
-        ),
+        FilledButton(onPressed: onContinue, child: Text(l10n.continueButton)),
       ],
     );
   }

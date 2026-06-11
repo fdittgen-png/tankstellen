@@ -106,8 +106,7 @@ Future<Obd2Service?> _showPickerSheet(
     // #3181 — the pairing guidance wins over the generic fall-through.
     final text = pairingError != null
         ? pairingError.localizedMessage(l)
-        : l?.obd2PickerPinnedFallback(fallbackAdapterName!) ??
-            "Couldn't reach '$fallbackAdapterName' — pick another adapter";
+        : l.obd2PickerPinnedFallback(fallbackAdapterName!);
     if (messenger != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         messenger.showSnackBar(SnackBarHelper.infoSnackBar(text));
@@ -386,7 +385,7 @@ class _Obd2AdapterPickerSheetState
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l?.obdPickerTitle ?? 'Pick an OBD2 adapter',
+              l.obdPickerTitle,
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
@@ -401,10 +400,10 @@ class _Obd2AdapterPickerSheetState
   /// #3103 — one tile shape for both sections. A recognized candidate shows
   /// its matched profile name; an unrecognized one (empty placeholder profile)
   /// shows the device's own advertised name + a muted "tap to try" hint.
-  Widget _candidateTile(ResolvedObd2Candidate c, AppLocalizations? l) {
+  Widget _candidateTile(ResolvedObd2Candidate c, AppLocalizations l) {
     final subtitle = c.recognized
         ? '${c.profile.displayName} · ${c.candidate.rssi} dBm'
-        : '${l?.obd2PickerTapToTry ?? 'Unrecognized — tap to try'} · '
+        : '${l.obd2PickerTapToTry} · '
             '${c.candidate.rssi} dBm';
     return ListTile(
       key: Key('obdPickerItem_${c.candidate.deviceId}'),
@@ -420,7 +419,7 @@ class _Obd2AdapterPickerSheetState
     );
   }
 
-  Widget _buildBody(AppLocalizations? l) {
+  Widget _buildBody(AppLocalizations l) {
     switch (_phase) {
       case _Phase.scanning:
         return Column(
@@ -428,7 +427,7 @@ class _Obd2AdapterPickerSheetState
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 12),
-            Text(l?.obdPickerScanning ?? 'Scanning for adapters…'),
+            Text(l.obdPickerScanning),
           ],
         );
       case _Phase.selecting:
@@ -449,7 +448,7 @@ class _Obd2AdapterPickerSheetState
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                 child: Text(
-                  l?.obd2PickerOtherDevices ?? 'Other Bluetooth devices',
+                  l.obd2PickerOtherDevices,
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
               ),
@@ -460,10 +459,7 @@ class _Obd2AdapterPickerSheetState
                 key: const Key('obdPickerBleOnlyNotice'),
                 padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
                 child: Text(
-                  l?.obd2PickerBleOnlyNotice ??
-                      'iPhone works with Bluetooth-LE adapters only. A '
-                          'Classic-only adapter (e.g. vLinker BM, Konnwei '
-                          'KW902) must be used on Android.',
+                  l.obd2PickerBleOnlyNotice,
                   style: Theme.of(context).textTheme.bodySmall,
                   textAlign: TextAlign.center,
                 ),
@@ -476,14 +472,14 @@ class _Obd2AdapterPickerSheetState
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 12),
-            Text(l?.obdPickerConnecting ?? 'Connecting…'),
+            Text(l.obdPickerConnecting),
             // #3181 — while a FIRST-connect setNotify is in flight the OS
             // pairing dialog may be waiting for the user; tell them to
             // confirm it instead of letting the spinner look hung.
             ValueListenableBuilder<bool>(
               valueListenable: Obd2PairingMode.pairingWaitPending,
               builder: (context, pending, _) {
-                if (!pending || l == null) return const SizedBox.shrink();
+                if (!pending) return const SizedBox.shrink();
                 return Padding(
                   key: const Key('obdPickerPairingHint'),
                   padding: const EdgeInsets.only(top: 12),
@@ -517,8 +513,7 @@ class _Obd2AdapterPickerSheetState
             const SizedBox(height: 8),
             Text(
               _error?.localizedMessage(l) ??
-                  l?.errorUnknown ??
-                  'Unknown error',
+                  l.errorUnknown,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -526,7 +521,7 @@ class _Obd2AdapterPickerSheetState
               key: const Key('obdPickerRetry'),
               onPressed: _startScan,
               icon: const Icon(Icons.refresh),
-              label: Text(l?.retry ?? 'Retry'),
+              label: Text(l.retry),
             ),
             if (isPermissionError) ...[
               const SizedBox(height: 8),
@@ -541,8 +536,7 @@ class _Obd2AdapterPickerSheetState
                 },
                 icon: const Icon(Icons.settings),
                 label: Text(
-                  l?.obdPermissionDenied ??
-                      'Grant Bluetooth permission in system settings',
+                  l.obdPermissionDenied,
                 ),
               ),
             ],

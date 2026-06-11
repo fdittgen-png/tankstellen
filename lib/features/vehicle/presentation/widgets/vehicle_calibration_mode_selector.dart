@@ -23,10 +23,7 @@ import '../../../../core/logging/error_logger.dart';
 class VehicleCalibrationModeSelector extends ConsumerWidget {
   final String vehicleId;
 
-  const VehicleCalibrationModeSelector({
-    super.key,
-    required this.vehicleId,
-  });
+  const VehicleCalibrationModeSelector({super.key, required this.vehicleId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,12 +36,23 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
     // case rather than crashing the whole screen.
     VehicleProfile profile;
     try {
-      profile = ref.watch(vehicleProfileListProvider).firstWhere(
+      profile = ref
+          .watch(vehicleProfileListProvider)
+          .firstWhere(
             (v) => v.id == vehicleId,
             orElse: () => const VehicleProfile(id: '', name: ''),
           );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'VehicleCalibrationModeSelector: profile lookup failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'VehicleCalibrationModeSelector: profile lookup failed',
+          },
+        ),
+      );
       return const SizedBox.shrink();
     }
 
@@ -53,11 +61,7 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final tooltip =
-        l?.calibrationModeTooltip ??
-            'Rule-based assigns each driving sample to exactly one '
-                'situation. Fuzzy spreads it across all of them by how well '
-                'each fits.';
+    final tooltip = l.calibrationModeTooltip;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -72,7 +76,7 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    l?.calibrationModeLabel ?? 'Calibration mode',
+                    l.calibrationModeLabel,
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
@@ -95,12 +99,12 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
               segments: [
                 ButtonSegment(
                   value: VehicleCalibrationMode.rule,
-                  label: Text(l?.calibrationModeRule ?? 'Rule-based'),
+                  label: Text(l.calibrationModeRule),
                   icon: const Icon(Icons.rule),
                 ),
                 ButtonSegment(
                   value: VehicleCalibrationMode.fuzzy,
-                  label: Text(l?.calibrationModeFuzzy ?? 'Fuzzy'),
+                  label: Text(l.calibrationModeFuzzy),
                   icon: const Icon(Icons.blur_circular),
                 ),
               ],

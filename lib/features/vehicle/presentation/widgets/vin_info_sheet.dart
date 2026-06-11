@@ -46,14 +46,11 @@ class VinInfoSheet extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: theme.colorScheme.primary,
-                  ),
+                  Icon(Icons.info_outline, color: theme.colorScheme.primary),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      l?.vinInfoTooltip ?? 'What is a VIN?',
+                      l.vinInfoTooltip,
                       style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -63,50 +60,27 @@ class VinInfoSheet extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _Section(
-                title: l?.vinInfoSectionWhatTitle ?? 'What is a VIN?',
-                body: l?.vinInfoSectionWhatBody ??
-                    'The Vehicle Identification Number is a 17-character '
-                        'code unique to your car. It\'s stamped on the '
-                        'chassis and printed on your vehicle registration '
-                        'document.',
+                title: l.vinInfoSectionWhatTitle,
+                body: l.vinInfoSectionWhatBody,
               ),
               _Section(
-                title: l?.vinInfoSectionWhyTitle ?? 'Why we ask',
-                body: l?.vinInfoSectionWhyBody ??
-                    'Decoding the VIN auto-fills engine displacement, '
-                        'cylinder count, model year, primary fuel type, '
-                        'and gross weight — saving you from looking up '
-                        'technical specs manually. The OBD2 fuel-rate '
-                        'calculation uses these values to give you '
-                        'accurate consumption numbers.',
+                title: l.vinInfoSectionWhyTitle,
+                body: l.vinInfoSectionWhyBody,
               ),
               _Section(
-                title: l?.vinInfoSectionPrivacyTitle ?? 'Privacy',
-                body: l?.vinInfoSectionPrivacyBody ??
-                    'Your VIN is stored only locally in the app\'s '
-                        'encrypted storage — it\'s never uploaded to '
-                        'Sparkilo servers. The NHTSA vPIC database '
-                        'is queried with the VIN but returns only '
-                        'anonymous technical specs; NHTSA does not '
-                        'link the VIN to any personal data. Without '
-                        'network, an offline lookup returns '
-                        'manufacturer and country only.',
+                title: l.vinInfoSectionPrivacyTitle,
+                body: l.vinInfoSectionPrivacyBody,
               ),
               _Section(
-                title: l?.vinInfoSectionWhereTitle ?? 'Where to find it',
-                body: l?.vinInfoSectionWhereBody ??
-                    'Look through the windshield at the lower-left '
-                        'corner on the driver\'s side, check the '
-                        'driver-side door-frame sticker when the door is '
-                        'open, or read it off your vehicle registration '
-                        'document (card / Carte Grise).',
+                title: l.vinInfoSectionWhereTitle,
+                body: l.vinInfoSectionWhereBody,
               ),
               const SizedBox(height: 4),
               Align(
                 alignment: Alignment.centerRight,
                 child: FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l?.vinInfoDismiss ?? 'Got it'),
+                  child: Text(l.vinInfoDismiss),
                 ),
               ),
             ],
@@ -139,10 +113,7 @@ class _Section extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            body,
-            style: theme.textTheme.bodyMedium,
-          ),
+          Text(body, style: theme.textTheme.bodyMedium),
         ],
       ),
     );

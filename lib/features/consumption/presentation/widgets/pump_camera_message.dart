@@ -37,9 +37,11 @@ class PumpCameraMessage extends StatelessWidget {
           children: [
             Icon(icon, color: Colors.white70, size: 48),
             const SizedBox(height: 16),
-            Text(text,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white)),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white),
+            ),
             const SizedBox(height: 24),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -48,15 +50,17 @@ class PumpCameraMessage extends StatelessWidget {
                   OutlinedButton(
                     onPressed: () => retry(),
                     style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white),
-                    child: Text(retryLabel ?? 'Try again'),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Text(
+                      retryLabel ?? AppLocalizations.of(context).retry,
+                    ),
                   ),
                   const SizedBox(width: 12),
                 ],
                 FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(
-                      AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+                  child: Text(AppLocalizations.of(context).cancel),
                 ),
               ],
             ),

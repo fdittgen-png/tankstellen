@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../../core/domain/vehicle_profile.dart'
-    show ConnectorType;
+import '../../../../core/domain/vehicle_profile.dart' show ConnectorType;
 import '../../providers/ev_providers.dart';
 
 /// Horizontal row of filter chips allowing the user to narrow displayed
@@ -27,7 +26,7 @@ class EvFilterChips extends ConsumerWidget {
       child: Row(
         children: [
           FilterChip(
-            label: Text(l10n?.evAvailableOnly ?? 'Available only'),
+            label: Text(l10n.evAvailableOnly),
             selected: filter.availableOnly,
             onSelected: notifier.setAvailableOnly,
           ),
@@ -57,19 +56,19 @@ class EvFilterChips extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     switch (type) {
       case ConnectorType.type2:
-        return l10n?.connectorType2 ?? 'Type 2';
+        return l10n.connectorType2;
       case ConnectorType.ccs:
-        return l10n?.connectorCcs ?? 'CCS';
+        return l10n.connectorCcs;
       case ConnectorType.chademo:
-        return l10n?.connectorChademo ?? 'CHAdeMO';
+        return l10n.connectorChademo;
       case ConnectorType.tesla:
-        return l10n?.connectorTesla ?? 'Tesla';
+        return l10n.connectorTesla;
       case ConnectorType.schuko:
-        return l10n?.connectorSchuko ?? 'Schuko';
+        return l10n.connectorSchuko;
       case ConnectorType.type1:
-        return l10n?.connectorType1 ?? 'Type 1';
+        return l10n.connectorType1;
       case ConnectorType.threePin:
-        return l10n?.connectorThreePin ?? '3-pin';
+        return l10n.connectorThreePin;
     }
   }
 }
@@ -85,14 +84,14 @@ class _PowerDropdown extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return DropdownButton<double>(
       value: value,
-      hint: Text(l10n?.evMinPower ?? 'Min power'),
+      hint: Text(l10n.evMinPower),
       items: [
-        DropdownMenuItem(value: 0, child: Text(l10n?.evPowerAny ?? 'Any')),
-        DropdownMenuItem(value: 11, child: Text(l10n?.evPowerKw(11) ?? '11 kW+')),
-        DropdownMenuItem(value: 22, child: Text(l10n?.evPowerKw(22) ?? '22 kW+')),
-        DropdownMenuItem(value: 50, child: Text(l10n?.evPowerKw(50) ?? '50 kW+')),
-        DropdownMenuItem(value: 150, child: Text(l10n?.evPowerKw(150) ?? '150 kW+')),
-        DropdownMenuItem(value: 300, child: Text(l10n?.evPowerKw(300) ?? '300 kW+')),
+        DropdownMenuItem(value: 0, child: Text(l10n.evPowerAny)),
+        DropdownMenuItem(value: 11, child: Text(l10n.evPowerKw(11))),
+        DropdownMenuItem(value: 22, child: Text(l10n.evPowerKw(22))),
+        DropdownMenuItem(value: 50, child: Text(l10n.evPowerKw(50))),
+        DropdownMenuItem(value: 150, child: Text(l10n.evPowerKw(150))),
+        DropdownMenuItem(value: 300, child: Text(l10n.evPowerKw(300))),
       ],
       onChanged: (v) {
         if (v != null) onChanged(v);

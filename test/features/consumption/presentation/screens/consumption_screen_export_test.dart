@@ -17,6 +17,7 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 class _FixedFillUpList extends FillUpList {
   final List<FillUp> _value;
@@ -46,7 +47,7 @@ class _RecordingExporter extends FullBackupExporter {
   List<VehicleProfile>? lastVehicles;
 
   _RecordingExporter()
-      : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
+    : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
 
   @override
   Future<FullBackupExportResult> export({
@@ -68,7 +69,7 @@ class _RecordingExporter extends FullBackupExporter {
 
 class _ThrowingExporter extends FullBackupExporter {
   _ThrowingExporter()
-      : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
+    : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
 
   @override
   Future<FullBackupExportResult> export({
@@ -85,7 +86,7 @@ class _ThrowingExporter extends FullBackupExporter {
 /// success snackbar takes the #2815 "Saved to Downloads as {fileName}" branch.
 class _SavedExporter extends FullBackupExporter {
   _SavedExporter()
-      : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
+    : super(xmlWriter: BackupXmlWriter(), zipper: const BackupZipper());
 
   @override
   Future<FullBackupExportResult> export({
@@ -121,7 +122,11 @@ Future<void> _pumpScreen(
 
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
@@ -176,8 +181,9 @@ void main() {
       expect(find.byKey(const Key('export_backup')), findsOneWidget);
     });
 
-    testWidgets('tapping the kebab item invokes the FullBackupExporter',
-        (tester) async {
+    testWidgets('tapping the kebab item invokes the FullBackupExporter', (
+      tester,
+    ) async {
       final exporter = _RecordingExporter();
       ConsumptionScreen.debugExporterOverride = exporter;
 
@@ -200,8 +206,9 @@ void main() {
       expect(exporter.lastFillUps!.single.id, '1');
     });
 
-    testWidgets('shows confirmation snackbar after a successful export',
-        (tester) async {
+    testWidgets('shows confirmation snackbar after a successful export', (
+      tester,
+    ) async {
       ConsumptionScreen.debugExporterOverride = _RecordingExporter();
 
       final fillUp = FillUp(
@@ -216,14 +223,12 @@ void main() {
 
       await openExport(tester);
 
-      expect(
-        find.textContaining('Backup ready'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Backup ready'), findsOneWidget);
     });
 
-    testWidgets('names the saved file in the success snackbar (#2815)',
-        (tester) async {
+    testWidgets('names the saved file in the success snackbar (#2815)', (
+      tester,
+    ) async {
       ConsumptionScreen.debugExporterOverride = _SavedExporter();
 
       final fillUp = FillUp(
@@ -240,11 +245,15 @@ void main() {
 
       // The user is told the exact filename to look for (in Downloads / the
       // restore picker), not a generic "saved to folder".
-      expect(find.textContaining('tankstellen_backup_2026.zip'), findsOneWidget);
+      expect(
+        find.textContaining('tankstellen_backup_2026.zip'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('surfaces an error snackbar when the exporter throws',
-        (tester) async {
+    testWidgets('surfaces an error snackbar when the exporter throws', (
+      tester,
+    ) async {
       ConsumptionScreen.debugExporterOverride = _ThrowingExporter();
 
       final fillUp = FillUp(
@@ -259,10 +268,7 @@ void main() {
 
       await openExport(tester);
 
-      expect(
-        find.textContaining('Backup export failed'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Backup export failed'), findsOneWidget);
     });
   });
 
@@ -274,45 +280,45 @@ void main() {
   // title and carries NO precision chip — only the OBD2 chip, the
   // download/export action, the gated Carbon entry and Settings.
   group('ConsumptionScreen Fuel app-bar after #2433', () {
-    testWidgets('shows the plain Fuel title (no precision chip in the app-bar)',
-        (tester) async {
-      final fillUp = FillUp(
-        id: '1',
-        date: DateTime.utc(2026, 4, 15),
-        liters: 40,
-        totalCost: 60,
-        odometerKm: 10000,
-        fuelType: FuelType.e10,
-      );
-      await _pumpScreen(tester, fillUps: [fillUp]);
+    testWidgets(
+      'shows the plain Fuel title (no precision chip in the app-bar)',
+      (tester) async {
+        final fillUp = FillUp(
+          id: '1',
+          date: DateTime.utc(2026, 4, 15),
+          liters: 40,
+          totalCost: 60,
+          odometerKm: 10000,
+          fuelType: FuelType.e10,
+        );
+        await _pumpScreen(tester, fillUps: [fillUp]);
 
-      // The restored app-bar title (reuses consumptionTabFuel — #2433).
-      expect(
-        find.descendant(
-          of: find.byType(AppBar),
-          matching: find.text('Fuel'),
-        ),
-        findsOneWidget,
-      );
-      // No precision chip surfaces anywhere in the app-bar.
-      expect(
-        find.descendant(
-          of: find.byType(AppBar),
-          matching: find.textContaining('Accuracy:'),
-        ),
-        findsNothing,
-      );
-      expect(
-        find.descendant(
-          of: find.byType(AppBar),
-          matching: find.textContaining('η_v'),
-        ),
-        findsNothing,
-      );
-    });
+        // The restored app-bar title (reuses consumptionTabFuel — #2433).
+        expect(
+          find.descendant(of: find.byType(AppBar), matching: find.text('Fuel')),
+          findsOneWidget,
+        );
+        // No precision chip surfaces anywhere in the app-bar.
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.textContaining('Accuracy:'),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.textContaining('η_v'),
+          ),
+          findsNothing,
+        );
+      },
+    );
 
-    testWidgets('keeps the export action reachable via the overflow kebab',
-        (tester) async {
+    testWidgets('keeps the export action reachable via the overflow kebab', (
+      tester,
+    ) async {
       final fillUp = FillUp(
         id: '1',
         date: DateTime.utc(2026, 4, 15),
@@ -325,7 +331,10 @@ void main() {
 
       // #2756 — export moved into the kebab; the kebab itself is the
       // app-bar action and export appears once it is opened.
-      expect(find.byKey(const Key('consumption_overflow_menu')), findsOneWidget);
+      expect(
+        find.byKey(const Key('consumption_overflow_menu')),
+        findsOneWidget,
+      );
       expect(find.byKey(const Key('export_backup')), findsNothing);
       await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
       await tester.pumpAndSettle();

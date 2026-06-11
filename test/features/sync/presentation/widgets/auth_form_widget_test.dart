@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/auth_form_widget.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   Future<void> pumpForm(
@@ -16,15 +17,18 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SingleChildScrollView(
               child: AuthFormWidget(
-                onSubmit: ({
-                  required bool isEmail,
-                  String? email,
-                  String? password,
-                  required bool isSignUp,
-                }) async {},
+                onSubmit:
+                    ({
+                      required bool isEmail,
+                      String? email,
+                      String? password,
+                      required bool isSignUp,
+                    }) async {},
                 isLoading: isLoading,
                 error: error,
               ),
@@ -45,10 +49,15 @@ void main() {
     testWidgets('default mode is Anonymous — no email fields', (tester) async {
       await pumpForm(tester);
       expect(find.text('Email'), findsOneWidget); // In segmented button
-      expect(find.widgetWithText(TextField, 'Email'), findsNothing); // No input field
+      expect(
+        find.widgetWithText(TextField, 'Email'),
+        findsNothing,
+      ); // No input field
     });
 
-    testWidgets('tapping Email shows email and password fields', (tester) async {
+    testWidgets('tapping Email shows email and password fields', (
+      tester,
+    ) async {
       await pumpForm(tester);
       await tester.tap(find.text('Email'));
       await tester.pumpAndSettle();
@@ -60,7 +69,10 @@ void main() {
       await pumpForm(tester);
       await tester.tap(find.text('Email'));
       await tester.pumpAndSettle();
-      expect(find.widgetWithText(TextField, 'Confirm password'), findsOneWidget);
+      expect(
+        find.widgetWithText(TextField, 'Confirm password'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('toggle to sign-in hides confirm password', (tester) async {
@@ -96,22 +108,27 @@ void main() {
     });
 
     group('password length validation (#198)', () {
-      testWidgets('sign-in accepts passwords shorter than 6 characters', (tester) async {
+      testWidgets('sign-in accepts passwords shorter than 6 characters', (
+        tester,
+      ) async {
         bool submitCalled = false;
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: SingleChildScrollView(
                   child: AuthFormWidget(
-                    onSubmit: ({
-                      required bool isEmail,
-                      String? email,
-                      String? password,
-                      required bool isSignUp,
-                    }) async {
-                      submitCalled = true;
-                    },
+                    onSubmit:
+                        ({
+                          required bool isEmail,
+                          String? email,
+                          String? password,
+                          required bool isSignUp,
+                        }) async {
+                          submitCalled = true;
+                        },
                   ),
                 ),
               ),
@@ -128,8 +145,14 @@ void main() {
         await tester.pumpAndSettle();
 
         // Enter email and short password
-        await tester.enterText(find.widgetWithText(TextField, 'Email'), 'test@example.com');
-        await tester.enterText(find.widgetWithText(TextField, 'Password'), 'abc');
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Email'),
+          'test@example.com',
+        );
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Password'),
+          'abc',
+        );
 
         // Submit
         await tester.tap(find.text('Sign in & connect'));
@@ -139,22 +162,27 @@ void main() {
         expect(submitCalled, isTrue);
       });
 
-      testWidgets('sign-up rejects passwords shorter than 6 characters', (tester) async {
+      testWidgets('sign-up rejects passwords shorter than 6 characters', (
+        tester,
+      ) async {
         bool submitCalled = false;
         await tester.pumpWidget(
           ProviderScope(
             child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
                 body: SingleChildScrollView(
                   child: AuthFormWidget(
-                    onSubmit: ({
-                      required bool isEmail,
-                      String? email,
-                      String? password,
-                      required bool isSignUp,
-                    }) async {
-                      submitCalled = true;
-                    },
+                    onSubmit:
+                        ({
+                          required bool isEmail,
+                          String? email,
+                          String? password,
+                          required bool isSignUp,
+                        }) async {
+                          submitCalled = true;
+                        },
                   ),
                 ),
               ),
@@ -167,9 +195,18 @@ void main() {
         await tester.pumpAndSettle();
 
         // Enter email and short password
-        await tester.enterText(find.widgetWithText(TextField, 'Email'), 'test@example.com');
-        await tester.enterText(find.widgetWithText(TextField, 'Password'), 'abc');
-        await tester.enterText(find.widgetWithText(TextField, 'Confirm password'), 'abc');
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Email'),
+          'test@example.com',
+        );
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Password'),
+          'abc',
+        );
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Confirm password'),
+          'abc',
+        );
 
         // Submit
         await tester.tap(find.text('Create account & connect'));

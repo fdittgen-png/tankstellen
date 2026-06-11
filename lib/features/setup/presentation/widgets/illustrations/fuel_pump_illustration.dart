@@ -25,7 +25,7 @@ class FuelPumpIllustration extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: l10n?.fuelPumpIllustrationSemantic ?? 'Fuel pump with price ticker',
+      label: l10n.fuelPumpIllustrationSemantic,
       image: true,
       child: SizedBox(
         width: size,

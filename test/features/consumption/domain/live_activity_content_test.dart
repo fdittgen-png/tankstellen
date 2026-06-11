@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
@@ -10,12 +12,15 @@ import 'package:tankstellen/features/consumption/domain/live_activity_content.da
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Decision-table coverage for [buildLiveActivityContent] (#3170) — the
 /// pure mapper from (recorder state, approach state, radar fallback) to
 /// the Live Activity payload. Mirrors `TripRecordingPipView`'s layout
 /// precedence so the two glanceable surfaces can never disagree.
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   final now = DateTime(2026, 6, 10, 12);
 
   Station station({
@@ -24,32 +29,31 @@ void main() {
     String brand = 'ARAL',
     double? e10 = 1.789,
     double dist = 0,
-  }) =>
-      Station(
-        id: id,
-        name: name,
-        brand: brand,
-        street: 'Hauptstr. 1',
-        postCode: '12345',
-        place: 'Teststadt',
-        lat: 50.0,
-        lng: 8.0,
-        dist: dist,
-        e10: e10,
-      );
+  }) => Station(
+    id: id,
+    name: name,
+    brand: brand,
+    street: 'Hauptstr. 1',
+    postCode: '12345',
+    place: 'Teststadt',
+    lat: 50.0,
+    lng: 8.0,
+    dist: dist,
+    e10: e10,
+  );
 
   TripRecordingState recording({
     TripRecordingPhase phase = TripRecordingPhase.recording,
     TripLiveReading? live,
-  }) =>
-      TripRecordingState(
-        phase: phase,
-        live: live ??
-            const TripLiveReading(
-              distanceKmSoFar: 12.34,
-              elapsed: Duration(minutes: 10),
-            ),
-      );
+  }) => TripRecordingState(
+    phase: phase,
+    live:
+        live ??
+        const TripLiveReading(
+          distanceKmSoFar: 12.34,
+          elapsed: Duration(minutes: 10),
+        ),
+  );
 
   LiveActivityContent? build({
     TripRecordingState? state,
@@ -57,16 +61,15 @@ void main() {
     Station? radarStation,
     FuelType fuel = FuelType.e10,
     double? radiusMeters = 3000,
-  }) =>
-      buildLiveActivityContent(
-        state: state ?? recording(),
-        approach: approach,
-        radarStation: radarStation,
-        fuel: fuel,
-        radiusMeters: radiusMeters,
-        l: null, // exercises the English fallbacks (harness convention)
-        now: now,
-      );
+  }) => buildLiveActivityContent(
+    state: state ?? recording(),
+    approach: approach,
+    radarStation: radarStation,
+    fuel: fuel,
+    radiusMeters: radiusMeters,
+    l: l10nEn,
+    now: now,
+  );
 
   group('no active trip', () {
     test('idle state yields null (→ coordinator ends the activity)', () {
@@ -133,24 +136,26 @@ void main() {
       expect(content.isEstimate, isTrue);
     });
 
-    test('paused trip → paused flag set and the measured figure suppressed',
-        () {
-      final content = build(
-        state: recording(
-          phase: TripRecordingPhase.paused,
-          live: const TripLiveReading(
-            distanceKmSoFar: 12.34,
-            elapsed: Duration(minutes: 10),
-            fuelRateLPerHour: 3.0,
-            speedKmh: 50,
+    test(
+      'paused trip → paused flag set and the measured figure suppressed',
+      () {
+        final content = build(
+          state: recording(
+            phase: TripRecordingPhase.paused,
+            live: const TripLiveReading(
+              distanceKmSoFar: 12.34,
+              elapsed: Duration(minutes: 10),
+              fuelRateLPerHour: 3.0,
+              speedKmh: 50,
+            ),
           ),
-        ),
-      )!;
+        )!;
 
-      expect(content.paused, isTrue);
-      expect(content.bigFigure, '~');
-      expect(content.pausedLabel, 'Paused');
-    });
+        expect(content.paused, isTrue);
+        expect(content.bigFigure, '~');
+        expect(content.pausedLabel, l10nEn.tripBannerPaused);
+      },
+    );
 
     test('distance under 0.1 km is hidden', () {
       final content = build(
@@ -183,8 +188,7 @@ void main() {
   });
 
   group('approach mode — in-radius wins (PiP precedence #2084)', () {
-    test('ApproachInRadius → price lead with metres caption + closeness',
-        () {
+    test('ApproachInRadius → price lead with metres caption + closeness', () {
       final content = build(
         approach: ApproachInRadius(station: station(), distanceMeters: 450),
         // The radar fallback must NOT win over the locked target.
@@ -195,14 +199,12 @@ void main() {
       expect(content.stationName, 'ARAL Hauptstr.');
       expect(content.priceText, PriceFormatter.formatPrice(1.789));
       expect(content.fuelLabel, FuelType.e10.displayName);
-      expect(content.stationDistanceText, '450 m');
+      expect(content.stationDistanceText, l10nEn.approachStationDistance('450'));
       expect(content.progress, RadarCloseness.fillFor(450, 3000));
     });
 
     test('ApproachLeaving keeps the last station, drops distance + bar', () {
-      final content = build(
-        approach: ApproachLeaving(lastStation: station()),
-      )!;
+      final content = build(approach: ApproachLeaving(lastStation: station()))!;
 
       expect(content.mode, LiveActivityMode.approach);
       expect(content.stationDistanceText, isNull);
@@ -231,12 +233,11 @@ void main() {
   });
 
   group('approach mode — polling radar fallback (#2661 parity)', () {
-    test('radar station leads with a km caption when nothing is in radius',
-        () {
+    test('radar station leads with a km caption when nothing is in radius', () {
       final content = build(radarStation: station(dist: 1.2))!;
 
       expect(content.mode, LiveActivityMode.approach);
-      expect(content.stationDistanceText, '1.2 km');
+      expect(content.stationDistanceText, l10nEn.fuelStationRadarDistanceKm('1.2'));
       expect(content.progress, RadarCloseness.fillFor(1200, 3000));
       // The consumption hero stays populated for the expanded island.
       expect(content.bigFigure, isNotEmpty);
@@ -253,7 +254,7 @@ void main() {
         radarStation: station(dist: 1.2),
         radiusMeters: null,
       )!;
-      expect(content.stationDistanceText, '1.2 km');
+      expect(content.stationDistanceText, l10nEn.fuelStationRadarDistanceKm('1.2'));
       expect(content.progress, isNull);
     });
   });

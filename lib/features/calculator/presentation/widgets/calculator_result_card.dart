@@ -37,14 +37,15 @@ class CalculatorResultCard extends StatelessWidget {
 
     final tiles = <Widget>[
       _BreakdownTile(
-        label: l10n?.fuelNeeded ?? 'Fuel needed',
+        label: l10n.fuelNeeded,
         value: filled
             ? UnitFormatter.formatVolume(
-                calc.effectiveLiters(roundTrip: roundTrip))
+                calc.effectiveLiters(roundTrip: roundTrip),
+              )
             : _placeholder,
       ),
       _BreakdownTile(
-        label: l10n?.costPerDistance ?? 'Cost per km',
+        label: l10n.costPerDistance,
         value: filled
             ? '${PriceFormatter.formatPerKm(calc.costPerKm)} $_perKmSuffix'
             : _placeholder,
@@ -52,12 +53,14 @@ class CalculatorResultCard extends StatelessWidget {
     ];
 
     if (roundTrip) {
-      tiles.add(_BreakdownTile(
-        label: l10n?.roundTripTotal ?? 'Round trip',
-        value: filled
-            ? PriceFormatter.formatTotal(calc.roundTripCost)
-            : _placeholder,
-      ));
+      tiles.add(
+        _BreakdownTile(
+          label: l10n.roundTripTotal,
+          value: filled
+              ? PriceFormatter.formatTotal(calc.roundTripCost)
+              : _placeholder,
+        ),
+      );
     }
 
     final monthly = calc.monthlyCost(
@@ -65,14 +68,16 @@ class CalculatorResultCard extends StatelessWidget {
       tripsPerMonth: state.tripsPerMonth,
     );
     if (state.tripsPerMonth != null && state.tripsPerMonth! > 0) {
-      tiles.add(_BreakdownTile(
-        label: l10n?.costPerMonth ?? 'Cost per month',
-        value: filled ? PriceFormatter.formatTotal(monthly) : _placeholder,
-      ));
+      tiles.add(
+        _BreakdownTile(
+          label: l10n.costPerMonth,
+          value: filled ? PriceFormatter.formatTotal(monthly) : _placeholder,
+        ),
+      );
     }
 
     return SectionCard(
-      title: l10n?.tripCost ?? 'Trip Cost',
+      title: l10n.tripCost,
       leadingIcon: Icons.calculate_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -87,9 +92,7 @@ class CalculatorResultCard extends StatelessWidget {
           if (!filled) ...[
             const SizedBox(height: Spacing.sm),
             Text(
-              l10n?.calculatorResultPlaceholder ??
-                  'Fill in distance, consumption and price to see your '
-                      'trip cost',
+              l10n.calculatorResultPlaceholder,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,

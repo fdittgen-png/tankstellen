@@ -276,23 +276,19 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
     );
   }
 
-  Widget _body(BuildContext context, AppLocalizations? l10n) {
+  Widget _body(BuildContext context, AppLocalizations l10n) {
     if (_permissionDenied) {
       return PumpCameraMessage(
         icon: Icons.no_photography_outlined,
-        text: l10n?.pumpCameraPermissionDenied ??
-            'Camera access is needed to scan the pump display. '
-                'Enable it in your device settings.',
+        text: l10n.pumpCameraPermissionDenied,
       );
     }
     if (_failed) {
       return PumpCameraMessage(
         icon: Icons.error_outline,
-        text: l10n?.pumpCameraError ??
-            "The camera couldn't start. Try again or enter the values "
-                'by hand.',
+        text: l10n.pumpCameraError,
         onRetry: _setUpCamera,
-        retryLabel: l10n?.retry ?? 'Try again',
+        retryLabel: l10n.retry,
       );
     }
     final ctrl = _controller;
@@ -313,7 +309,7 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
 
   Widget _preview(
     BuildContext context,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     CameraController ctrl, {
     required bool isPortrait,
   }) {
@@ -332,7 +328,7 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
           top: 4,
           child: IconButton(
             icon: const Icon(Icons.close, color: Colors.white),
-            tooltip: l10n?.cancel ?? 'Cancel',
+            tooltip: l10n.cancel,
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
@@ -348,9 +344,8 @@ class _PumpDisplayCameraScreenState extends State<PumpDisplayCameraScreen>
               color: Colors.white,
             ),
             tooltip: _orientation == OcrDisplayOrientation.horizontal
-                ? (l10n?.pumpCameraOrientationVertical ?? 'Switch to vertical')
-                : (l10n?.pumpCameraOrientationHorizontal ??
-                    'Switch to horizontal'),
+                ? (l10n.pumpCameraOrientationVertical)
+                : (l10n.pumpCameraOrientationHorizontal),
             onPressed: _toggleOrientation,
           ),
         ),

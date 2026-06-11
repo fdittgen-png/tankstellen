@@ -55,12 +55,7 @@ Future<void> runPasteReceiptText(
     final parsed = parser.parse(text, countryCode: state.activeCountry);
     if (!parsed.hasData) {
       if (state.isMounted() && context.mounted) {
-        SnackBarHelper.show(
-          context,
-          l?.pasteReceiptNoData ??
-              "Couldn't read any fuel data from that text — check it's a "
-                  'fuel receipt and try again.',
-        );
+        SnackBarHelper.show(context, l.pasteReceiptNoData);
       }
       return;
     }
@@ -78,16 +73,16 @@ Future<void> runPasteReceiptText(
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-      'where': 'AddFillUp: paste-receipt parse failed',
-    }));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {'where': 'AddFillUp: paste-receipt parse failed'},
+      ),
+    );
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.show(
-        context,
-        l?.pasteReceiptNoData ??
-            "Couldn't read any fuel data from that text — check it's a "
-                'fuel receipt and try again.',
-      );
+      SnackBarHelper.show(context, l.pasteReceiptNoData);
     }
   }
 }
@@ -124,18 +119,14 @@ class _PasteReceiptDialogState extends State<_PasteReceiptDialog> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(l?.pasteReceiptDialogTitle ?? 'Paste receipt text'),
+      title: Text(l.pasteReceiptDialogTitle),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l?.pasteReceiptDialogHint ??
-                  'Paste the text of a fuel receipt — e-mail, SMS, or a '
-                      'shared PDF. The litres, price per litre, fuel grade, '
-                      'total and station are read on-device and used to '
-                      'pre-fill the form. Nothing is sent to a server.',
+              l.pasteReceiptDialogHint,
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
@@ -148,7 +139,7 @@ class _PasteReceiptDialogState extends State<_PasteReceiptDialog> {
               keyboardType: TextInputType.multiline,
               textInputAction: TextInputAction.newline,
               decoration: InputDecoration(
-                hintText: l?.pasteReceiptFieldHint ?? 'Receipt text',
+                hintText: l.pasteReceiptFieldHint,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -158,12 +149,12 @@ class _PasteReceiptDialogState extends State<_PasteReceiptDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l?.cancel ?? 'Cancel'),
+          child: Text(l.cancel),
         ),
         FilledButton(
           key: const Key('paste_receipt_confirm_button'),
           onPressed: () => Navigator.of(context).pop(_controller.text),
-          child: Text(l?.pasteReceiptParseAction ?? 'Pre-fill'),
+          child: Text(l.pasteReceiptParseAction),
         ),
       ],
     );

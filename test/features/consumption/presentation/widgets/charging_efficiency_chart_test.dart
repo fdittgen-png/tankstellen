@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/charging_efficiency_chart.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// The chart paints lines and dots directly onto the canvas (no Text widgets
 /// for the data series), so structural assertions stick to the [CustomPaint]
@@ -33,7 +34,9 @@ void main() {
       DateTime(2026, 2): 15.8,
     };
 
-    testWidgets('axis month abbreviations localize under French', (tester) async {
+    testWidgets('axis month abbreviations localize under French', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ChargingEfficiencyChart(monthlyEfficiency: monthly),
@@ -45,8 +48,9 @@ void main() {
       expect(label, isNot('Jan'));
     });
 
-    testWidgets('axis month abbreviations stay English under English',
-        (tester) async {
+    testWidgets('axis month abbreviations stay English under English', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         ChargingEfficiencyChart(monthlyEfficiency: monthly),
@@ -107,50 +111,26 @@ void main() {
       },
     );
 
-    testWidgets(
-      'falls back to "Not enough data yet" when AppLocalizations is absent',
-      (tester) async {
-        // No localization delegates → AppLocalizations.of(context) is null,
-        // so the widget must use its hard-coded English fallback string.
-        await tester.pumpWidget(
-          const MaterialApp(
-            home: Scaffold(
-              body: ChargingEfficiencyChart(monthlyEfficiency: {}),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
+    testWidgets('uses the German translation for the empty caption', (
+      tester,
+    ) async {
+      await pumpApp(
+        tester,
+        const ChargingEfficiencyChart(monthlyEfficiency: {}),
+        locale: const Locale('de'),
+      );
 
-        expect(find.text('Not enough data yet'), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'uses the German translation for the empty caption',
-      (tester) async {
-        await pumpApp(
-          tester,
-          const ChargingEfficiencyChart(monthlyEfficiency: {}),
-          locale: const Locale('de'),
-        );
-
-        expect(find.text('Noch nicht genügend Daten'), findsOneWidget);
-      },
-    );
+      expect(find.text('Noch nicht genügend Daten'), findsOneWidget);
+    });
 
     testWidgets(
       'renders a CustomPaint with a painter when one non-null month exists',
       (tester) async {
         // Single-point layout exercises the entries.length == 1 branch
         // inside `xForIndex` (centre of chart instead of normalised stride).
-        final data = <DateTime, double?>{
-          DateTime(2026, 6): 17.5,
-        };
+        final data = <DateTime, double?>{DateTime(2026, 6): 17.5};
 
-        await pumpApp(
-          tester,
-          ChargingEfficiencyChart(monthlyEfficiency: data),
-        );
+        await pumpApp(tester, ChargingEfficiencyChart(monthlyEfficiency: data));
 
         // Must not fall back to the empty-state text on a non-null sample.
         expect(find.text('Not enough data yet'), findsNothing);
@@ -182,10 +162,7 @@ void main() {
           DateTime(2026, 4): 16.9,
         };
 
-        await pumpApp(
-          tester,
-          ChargingEfficiencyChart(monthlyEfficiency: data),
-        );
+        await pumpApp(tester, ChargingEfficiencyChart(monthlyEfficiency: data));
 
         expect(tester.takeException(), isNull);
         expect(find.text('Not enough data yet'), findsNothing);
@@ -202,44 +179,39 @@ void main() {
       },
     );
 
-    testWidgets(
-      'forwards an explicit color override into the painter',
-      (tester) async {
-        const probeColor = Color(0xFF00C0AA);
-        final data = <DateTime, double?>{
-          DateTime(2026, 1): 15.0,
-          DateTime(2026, 2): 17.0,
-          DateTime(2026, 3): 14.5,
-        };
+    testWidgets('forwards an explicit color override into the painter', (
+      tester,
+    ) async {
+      const probeColor = Color(0xFF00C0AA);
+      final data = <DateTime, double?>{
+        DateTime(2026, 1): 15.0,
+        DateTime(2026, 2): 17.0,
+        DateTime(2026, 3): 14.5,
+      };
 
-        await pumpApp(
-          tester,
-          ChargingEfficiencyChart(
-            monthlyEfficiency: data,
-            color: probeColor,
-          ),
-        );
+      await pumpApp(
+        tester,
+        ChargingEfficiencyChart(monthlyEfficiency: data, color: probeColor),
+      );
 
-        expect(tester.takeException(), isNull);
+      expect(tester.takeException(), isNull);
 
-        final painter = tester
-            .widgetList<CustomPaint>(find.byType(CustomPaint))
-            .map((p) => p.painter)
-            .firstWhere(
-              (p) =>
-                  p != null && p.runtimeType.toString().contains('Efficiency'),
-            );
+      final painter = tester
+          .widgetList<CustomPaint>(find.byType(CustomPaint))
+          .map((p) => p.painter)
+          .firstWhere(
+            (p) => p != null && p.runtimeType.toString().contains('Efficiency'),
+          );
 
-        // Inspect the private painter's exposed `color` field via dynamic
-        // dispatch — the painter type is intentionally library-private.
-        // ignore: avoid_dynamic_calls
-        final dynamic dyn = painter;
-        // ignore: avoid_dynamic_calls
-        expect(dyn.color, probeColor);
-        // ignore: avoid_dynamic_calls
-        expect((dyn.entries as List).length, data.length);
-      },
-    );
+      // Inspect the private painter's exposed `color` field via dynamic
+      // dispatch — the painter type is intentionally library-private.
+      // ignore: avoid_dynamic_calls
+      final dynamic dyn = painter;
+      // ignore: avoid_dynamic_calls
+      expect(dyn.color, probeColor);
+      // ignore: avoid_dynamic_calls
+      expect((dyn.entries as List).length, data.length);
+    });
 
     testWidgets(
       'falls back to theme.colorScheme.primary when no color is provided',
@@ -252,6 +224,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             theme: ThemeData(
               colorScheme: const ColorScheme.light(primary: themePrimary),
             ),
@@ -352,6 +326,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: ChargingEfficiencyChart(monthlyEfficiency: next),
             ),
@@ -372,4 +348,3 @@ void main() {
     );
   });
 }
-

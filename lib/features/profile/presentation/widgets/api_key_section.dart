@@ -20,7 +20,8 @@ class ApiKeySection extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final country = ref.watch(activeCountryProvider);
-    final tankerkoenigUrl = country.apiKeyRegistrationUrl ??
+    final tankerkoenigUrl =
+        country.apiKeyRegistrationUrl ??
         AppConstants.tankerkoenigRegistrationUrl;
 
     return Card(
@@ -33,10 +34,10 @@ class ApiKeySection extends ConsumerWidget {
               context: context,
               theme: theme,
               icon: Icons.local_gas_station,
-              title: l?.fuelPricesTankerkoenig ?? 'Fuel prices (Tankerkoenig)',
+              title: l.fuelPricesTankerkoenig,
               subtitle: storage.hasApiKey()
-                  ? (l?.configured ?? 'Configured')
-                  : (l?.notConfigured ?? 'Not configured'),
+                  ? (l.configured)
+                  : (l.notConfigured),
               isConfigured: storage.hasApiKey(),
               onEdit: () => _editApiKey(context, ref, storage),
             ),
@@ -45,7 +46,7 @@ class ApiKeySection extends ConsumerWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  l?.requiredForFuelSearch ?? 'Required for fuel price search in Germany',
+                  l.requiredForFuelSearch,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -62,7 +63,7 @@ class ApiKeySection extends ConsumerWidget {
                     mode: LaunchMode.externalApplication,
                   ),
                   child: Text(
-                    l?.register ?? 'Register free \u2192',
+                    l.register,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.primary,
                       decoration: TextDecoration.underline,
@@ -79,10 +80,10 @@ class ApiKeySection extends ConsumerWidget {
               context: context,
               theme: theme,
               icon: Icons.ev_station,
-              title: l?.evChargingOpenChargeMap ?? 'EV Charging (OpenChargeMap)',
+              title: l.evChargingOpenChargeMap,
               subtitle: storage.hasCustomEvApiKey()
-                  ? (l?.customKey ?? 'Custom key')
-                  : (l?.appDefaultKey ?? 'App default key'),
+                  ? (l.customKey)
+                  : (l.appDefaultKey),
               isConfigured: true,
               onEdit: () => _editEvApiKey(context, ref, storage),
             ),
@@ -91,7 +92,7 @@ class ApiKeySection extends ConsumerWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  l?.optionalOverrideKey ?? 'Optional: override the built-in app key with your own',
+                  l.optionalOverrideKey,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -104,11 +105,13 @@ class ApiKeySection extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 child: InkWell(
                   onTap: () => launchUrl(
-                    Uri.parse('https://openchargemap.org/site/profile/register'),
+                    Uri.parse(
+                      'https://openchargemap.org/site/profile/register',
+                    ),
                     mode: LaunchMode.externalApplication,
                   ),
                   child: Text(
-                    l?.register ?? 'Register free \u2192',
+                    l.register,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.primary,
                       decoration: TextDecoration.underline,
@@ -151,37 +154,37 @@ class ApiKeySection extends ConsumerWidget {
       trailing: IconButton(
         icon: const Icon(Icons.edit, size: 20),
         onPressed: onEdit,
-        tooltip: AppLocalizations.of(context)?.edit ?? 'Edit',
+        tooltip: AppLocalizations.of(context).edit,
       ),
     );
   }
 
   Future<void> _editApiKey(
-      BuildContext context, WidgetRef ref, ApiKeyStorage storage) async {
-    final controller = TextEditingController(
-      text: storage.getApiKey() ?? '',
-    );
+    BuildContext context,
+    WidgetRef ref,
+    ApiKeyStorage storage,
+  ) async {
+    final controller = TextEditingController(text: storage.getApiKey() ?? '');
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)?.fuelPricesApiKey ?? 'Fuel prices API Key'),
+        title: Text(AppLocalizations.of(context).fuelPricesApiKey),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.tankerkoenigApiKeyLabel ??
-                'Tankerkoenig API Key',
+            labelText: AppLocalizations.of(context).tankerkoenigApiKeyLabel,
             border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(AppLocalizations.of(context)?.save ?? 'Save'),
+            child: Text(AppLocalizations.of(context).save),
           ),
         ],
       ),
@@ -198,31 +201,31 @@ class ApiKeySection extends ConsumerWidget {
   }
 
   Future<void> _editEvApiKey(
-      BuildContext context, WidgetRef ref, ApiKeyStorage storage) async {
-    final controller = TextEditingController(
-      text: storage.getEvApiKey() ?? '',
-    );
+    BuildContext context,
+    WidgetRef ref,
+    ApiKeyStorage storage,
+  ) async {
+    final controller = TextEditingController(text: storage.getEvApiKey() ?? '');
 
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)?.evChargingApiKey ?? 'EV Charging API Key'),
+        title: Text(AppLocalizations.of(context).evChargingApiKey),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)?.openChargeMapApiKeyLabel ??
-                'OpenChargeMap API Key',
+            labelText: AppLocalizations.of(context).openChargeMapApiKeyLabel,
             border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(AppLocalizations.of(context)?.save ?? 'Save'),
+            child: Text(AppLocalizations.of(context).save),
           ),
         ],
       ),

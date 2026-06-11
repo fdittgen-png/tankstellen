@@ -70,9 +70,8 @@ class VehicleDrivetrainSection extends StatelessWidget {
     final showEv = type != VehicleType.combustion;
     final showCombustion = type != VehicleType.ev;
     return FormSectionCard(
-      title: l?.vehicleSectionDrivetrainTitle ?? 'Drivetrain',
-      subtitle:
-          l?.vehicleSectionDrivetrainSubtitle ?? 'How this vehicle moves',
+      title: l.vehicleSectionDrivetrainTitle,
+      subtitle: l.vehicleSectionDrivetrainSubtitle,
       icon: Icons.settings_outlined,
       accent: accent,
       children: [

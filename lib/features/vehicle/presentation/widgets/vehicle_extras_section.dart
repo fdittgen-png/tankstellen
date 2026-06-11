@@ -70,7 +70,7 @@ class VehicleExtrasSection {
       OutlinedButton.icon(
         onPressed: onResetVolumetricEfficiency,
         icon: const Icon(Icons.local_gas_station_outlined),
-        label: Text(l?.veResetAction ?? 'Reset volumetric efficiency'),
+        label: Text(l.veResetAction),
       ),
       // Service reminders (#584). Keyed by vehicle id; hidden on Add.
       const SizedBox(height: 16),

@@ -42,8 +42,7 @@ class ConfidenceTierBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final spec = _specFor(tier, l, theme.colorScheme);
-    final label = l?.consumptionAccuracyLabel(spec.levelWord, spec.band) ??
-        'Accuracy: ${spec.levelWord} · ${spec.band}';
+    final label = l.consumptionAccuracyLabel(spec.levelWord, spec.band);
     return Tooltip(
       message: spec.tooltip,
       child: Container(
@@ -75,41 +74,33 @@ class ConfidenceTierBadge extends StatelessWidget {
   /// the badge colours.
   _AccuracySpec _specFor(
     CalibrationConfidenceTier tier,
-    AppLocalizations? l,
+    AppLocalizations l,
     ColorScheme scheme,
   ) {
     switch (tier) {
       case CalibrationConfidenceTier.a:
         return _AccuracySpec(
-          levelWord: l?.consumptionAccuracyLow ?? 'Low',
+          levelWord: l.consumptionAccuracyLow,
           band: '±40-60%', // i18n-ignore: language-neutral error-band mask
-          tooltip: l?.consumptionAccuracyTooltipLow ??
-              'GPS-only — no fill-ups have anchored the consumption model '
-                  'yet. Add a couple of full fill-ups to improve the '
-                  'accuracy.',
+          tooltip: l.consumptionAccuracyTooltipLow,
           filledDots: 1,
           bg: scheme.errorContainer,
           fg: scheme.onErrorContainer,
         );
       case CalibrationConfidenceTier.b:
         return _AccuracySpec(
-          levelWord: l?.consumptionAccuracyMedium ?? 'Medium',
+          levelWord: l.consumptionAccuracyMedium,
           band: '±10-20%', // i18n-ignore: language-neutral error-band mask
-          tooltip: l?.consumptionAccuracyTooltipMedium ??
-              'Fill-ups have anchored the consumption model, but no OBD2 '
-                  'trip has fed the loop yet. Record one with OBD2 connected '
-                  'to reach High accuracy.',
+          tooltip: l.consumptionAccuracyTooltipMedium,
           filledDots: 2,
           bg: scheme.tertiaryContainer,
           fg: scheme.onTertiaryContainer,
         );
       case CalibrationConfidenceTier.c:
         return _AccuracySpec(
-          levelWord: l?.consumptionAccuracyHigh ?? 'High',
+          levelWord: l.consumptionAccuracyHigh,
           band: '±3-7%', // i18n-ignore: language-neutral error-band mask
-          tooltip: l?.consumptionAccuracyTooltipHigh ??
-              'Full calibration: fill-ups plus OBD2-recorded trips. The '
-                  'L/100 km figure tracks reality to within a few percent.',
+          tooltip: l.consumptionAccuracyTooltipHigh,
           filledDots: 3,
           bg: scheme.primaryContainer,
           fg: scheme.onPrimaryContainer,

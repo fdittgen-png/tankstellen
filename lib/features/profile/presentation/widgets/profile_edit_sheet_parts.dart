@@ -23,7 +23,7 @@ class _RouteSegmentSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text('${l10n?.routeSegment ?? "Route segment"}:'),
+            Text('${l10n.routeSegment}:'),
             Expanded(
               child: Slider(
                 value: state.routeSegmentKm,
@@ -38,15 +38,14 @@ class _RouteSegmentSection extends StatelessWidget {
           ],
         ),
         Text(
-          l10n?.showCheapestEveryNKm(state.routeSegmentKm.round()) ??
-              'Show cheapest station every ${state.routeSegmentKm.round()} km along route',
+          l10n.showCheapestEveryNKm(state.routeSegmentKm.round()),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         Row(
           children: [
-            Text('${l10n?.routeDetourBudget ?? "Maximum detour"}:'),
+            Text('${l10n.routeDetourBudget}:'),
             Expanded(
               child: Slider(
                 value: state.routeDetourBudgetKm,
@@ -61,9 +60,7 @@ class _RouteSegmentSection extends StatelessWidget {
           ],
         ),
         Text(
-          l10n?.routeDetourBudgetCaption(state.routeDetourBudgetKm.round()) ??
-              'Surface stations up to ${state.routeDetourBudgetKm.round()} '
-                  'km off your direct route',
+          l10n.routeDetourBudgetCaption(state.routeDetourBudgetKm.round()),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -79,19 +76,19 @@ class _RouteSegmentSection extends StatelessWidget {
   Widget _buildMinSavingRow(
     BuildContext context,
     ThemeData theme,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) {
     final saving = state.minRouteSavingPerLiter;
     final off = saving <= 0;
     // i18n-ignore: language-neutral currency-per-litre unit mask.
     final amount = '${saving.toStringAsFixed(2)} €/L';
-    final valueLabel = off ? (l10n?.routeMinSavingOff ?? 'Off') : amount;
+    final valueLabel = off ? (l10n.routeMinSavingOff) : amount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            Text('${l10n?.routeMinSaving ?? "Minimum saving"}:'),
+            Text('${l10n.routeMinSaving}:'),
             Expanded(
               child: Slider(
                 value: saving,
@@ -106,10 +103,8 @@ class _RouteSegmentSection extends StatelessWidget {
         ),
         Text(
           off
-              ? (l10n?.routeMinSavingOffCaption ??
-                  'Showing every station found along the route')
-              : (l10n?.routeMinSavingCaption(amount) ??
-                  "Only stations within $amount of the route's cheapest"),
+              ? (l10n.routeMinSavingOffCaption)
+              : (l10n.routeMinSavingCaption(amount)),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -145,33 +140,26 @@ class _TogglesSection extends ConsumerWidget {
         SwitchListTile(
           value: state.avoidHighways,
           onChanged: ctrl.setAvoidHighways,
-          title: Text(l10n?.avoidHighways ?? 'Avoid highways'),
-          subtitle: Text(l10n?.avoidHighwaysDesc ??
-              'Route calculation avoids toll roads and highways'),
+          title: Text(l10n.avoidHighways),
+          subtitle: Text(l10n.avoidHighwaysDesc),
           dense: true,
         ),
         SwitchListTile(
           value: showFuel,
           onChanged: (v) {
-            unawaited(
-              ref.read(showFuelEnabledProvider.notifier).set(v),
-            );
+            unawaited(ref.read(showFuelEnabledProvider.notifier).set(v));
           },
-          title: Text(l10n?.showFuelStations ?? 'Show fuel stations'),
-          subtitle: Text(l10n?.showFuelStationsDesc ??
-              'Include gas, diesel, LPG, CNG stations'),
+          title: Text(l10n.showFuelStations),
+          subtitle: Text(l10n.showFuelStationsDesc),
           dense: true,
         ),
         SwitchListTile(
           value: showElectric,
           onChanged: (v) {
-            unawaited(
-              ref.read(showElectricEnabledProvider.notifier).set(v),
-            );
+            unawaited(ref.read(showElectricEnabledProvider.notifier).set(v));
           },
-          title: Text(l10n?.showEvStations ?? 'Show EV charging stations'),
-          subtitle: Text(l10n?.showEvStationsDesc ??
-              'Include electric charging stations in search results'),
+          title: Text(l10n.showEvStations),
+          subtitle: Text(l10n.showEvStationsDesc),
           dense: true,
         ),
       ],
@@ -196,17 +184,20 @@ class _RatingModeSection extends StatelessWidget {
         SegmentedButton<String>(
           segments: [
             ButtonSegment(
-                value: 'local',
-                label: Text(l10n?.ratingModeLocal ?? 'Local'),
-                icon: const Icon(Icons.phone_android, size: 16)),
+              value: 'local',
+              label: Text(l10n.ratingModeLocal),
+              icon: const Icon(Icons.phone_android, size: 16),
+            ),
             ButtonSegment(
-                value: 'private',
-                label: Text(l10n?.ratingModePrivate ?? 'Private'),
-                icon: const Icon(Icons.lock, size: 16)),
+              value: 'private',
+              label: Text(l10n.ratingModePrivate),
+              icon: const Icon(Icons.lock, size: 16),
+            ),
             ButtonSegment(
-                value: 'shared',
-                label: Text(l10n?.ratingModeShared ?? 'Shared'),
-                icon: const Icon(Icons.people, size: 16)),
+              value: 'shared',
+              label: Text(l10n.ratingModeShared),
+              icon: const Icon(Icons.people, size: 16),
+            ),
           ],
           selected: {state.ratingMode},
           onSelectionChanged: (s) => ctrl.setRatingMode(s.first),
@@ -214,12 +205,10 @@ class _RatingModeSection extends StatelessWidget {
         const SizedBox(height: Spacing.sm),
         Text(
           state.ratingMode == 'local'
-              ? (l10n?.ratingDescLocal ?? 'Ratings saved on this device only')
+              ? (l10n.ratingDescLocal)
               : state.ratingMode == 'private'
-                  ? (l10n?.ratingDescPrivate ??
-                      'Synced with your database (not visible to others)')
-                  : (l10n?.ratingDescShared ??
-                      'Visible to all users of your database'),
+              ? (l10n.ratingDescPrivate)
+              : (l10n.ratingDescShared),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -247,25 +236,20 @@ class _DefaultVehicleSection extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     return DropdownButtonFormField<String?>(
-      initialValue:
-          vehicles.any((v) => v.id == state.defaultVehicleId)
-              ? state.defaultVehicleId
-              : null,
+      initialValue: vehicles.any((v) => v.id == state.defaultVehicleId)
+          ? state.defaultVehicleId
+          : null,
       decoration: InputDecoration(
-        labelText:
-            l10n?.profileDefaultVehicleLabel ?? 'Default vehicle (optional)',
+        labelText: l10n.profileDefaultVehicleLabel,
         prefixIcon: const Icon(Icons.directions_car_outlined),
       ),
       items: [
         DropdownMenuItem<String?>(
           value: null,
-          child: Text(l10n?.profileDefaultVehicleNone ?? 'No default'),
+          child: Text(l10n.profileDefaultVehicleNone),
         ),
         ...vehicles.map(
-          (v) => DropdownMenuItem<String?>(
-            value: v.id,
-            child: Text(v.name),
-          ),
+          (v) => DropdownMenuItem<String?>(value: v.id, child: Text(v.name)),
         ),
       ],
       onChanged: (v) {
@@ -353,7 +337,7 @@ class _SaveDeleteActions extends StatelessWidget {
               await onSave(updated);
               if (context.mounted) Navigator.pop(context);
             },
-            child: Text(l10n?.save ?? 'Save'),
+            child: Text(l10n.save),
           ),
         ),
         if (onDelete != null) ...[
@@ -363,7 +347,7 @@ class _SaveDeleteActions extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: DarkModeColors.error(context),
             ),
-            child: Text(l10n?.delete ?? 'Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ],

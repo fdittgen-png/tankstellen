@@ -30,7 +30,8 @@ class AuthFormWidget extends ConsumerStatefulWidget {
     String? email,
     String? password,
     required bool isSignUp,
-  }) onSubmit;
+  })
+  onSubmit;
   final bool isLoading;
   final String? error;
 
@@ -64,17 +65,16 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (email.isEmpty) {
-      return l10n?.authPleaseEnterEmail ?? 'Please enter your email';
+      return l10n.authPleaseEnterEmail;
     }
     if (!email.contains('@')) {
-      return l10n?.authInvalidEmail ?? 'Invalid email address';
+      return l10n.authInvalidEmail;
     }
     if (form.isSignUp && !PasswordValidator.isValid(password)) {
-      return l10n?.passwordTooWeak ??
-          'Password does not meet all requirements';
+      return l10n.passwordTooWeak;
     }
     if (form.isSignUp && password != _confirmController.text) {
-      return l10n?.authPasswordsDoNotMatch ?? 'Passwords do not match';
+      return l10n.authPasswordsDoNotMatch;
     }
     return null;
   }
@@ -85,12 +85,14 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
       SnackBarHelper.showError(context, error);
       return;
     }
-    unawaited(widget.onSubmit(
-      isEmail: form.useEmail,
-      email: form.useEmail ? _emailController.text.trim() : null,
-      password: form.useEmail ? _passwordController.text : null,
-      isSignUp: form.isSignUp,
-    ));
+    unawaited(
+      widget.onSubmit(
+        isEmail: form.useEmail,
+        email: form.useEmail ? _emailController.text.trim() : null,
+        password: form.useEmail ? _passwordController.text : null,
+        isSignUp: form.isSignUp,
+      ),
+    );
   }
 
   @override
@@ -104,7 +106,7 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          l10n?.syncChooseAccountType ?? 'Choose your account type',
+          l10n.syncChooseAccountType,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -116,12 +118,12 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
           segments: [
             ButtonSegment(
               value: false,
-              label: Text(l10n?.authAnonymousSegment ?? 'Anonymous'),
+              label: Text(l10n.authAnonymousSegment),
               icon: const Icon(Icons.person_outline, size: 18),
             ),
             ButtonSegment(
               value: true,
-              label: Text(l10n?.authEmailSegment ?? 'Email'),
+              label: Text(l10n.authEmailSegment),
               icon: const Icon(Icons.email_outlined, size: 18),
             ),
           ],
@@ -133,10 +135,8 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
         // Description text
         Text(
           form.useEmail
-              ? (l10n?.authEmailDescription ??
-                  'Sign in from any device. Recover your data if your phone is lost.')
-              : (l10n?.authAnonymousDescription ??
-                  'Instant access, no email needed. Data tied to this device.'),
+              ? (l10n.authEmailDescription)
+              : (l10n.authAnonymousDescription),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -148,7 +148,7 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
           TextField(
             controller: _emailController,
             decoration: InputDecoration(
-              labelText: l10n?.authEmailLabel ?? 'Email',
+              labelText: l10n.authEmailLabel,
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.email, size: 18),
               isDense: true,
@@ -160,7 +160,7 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
           TextField(
             controller: _passwordController,
             decoration: InputDecoration(
-              labelText: l10n?.authPasswordLabel ?? 'Password',
+              labelText: l10n.authPasswordLabel,
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.lock, size: 18),
               isDense: true,
@@ -170,8 +170,8 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
                   size: 18,
                 ),
                 tooltip: form.showPassword
-                    ? (l10n?.tooltipHidePassword ?? 'Hide password')
-                    : (l10n?.tooltipShowPassword ?? 'Show password'),
+                    ? (l10n.tooltipHidePassword)
+                    : (l10n.tooltipShowPassword),
                 onPressed: notifier.togglePassword,
               ),
             ),
@@ -181,30 +181,26 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
           if (form.isSignUp)
             ListenableBuilder(
               listenable: _passwordController,
-              builder: (context, _) => PasswordStrengthIndicator(
-                password: _passwordController.text,
-              ),
+              builder: (context, _) =>
+                  PasswordStrengthIndicator(password: _passwordController.text),
             ),
           if (form.isSignUp) ...[
             const SizedBox(height: 10),
             TextField(
               controller: _confirmController,
               decoration: InputDecoration(
-                labelText:
-                    l10n?.authConfirmPasswordLabel ?? 'Confirm password',
+                labelText: l10n.authConfirmPasswordLabel,
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.lock_outline, size: 18),
                 isDense: true,
                 suffixIcon: IconButton(
                   icon: Icon(
-                    form.showConfirm
-                        ? Icons.visibility_off
-                        : Icons.visibility,
+                    form.showConfirm ? Icons.visibility_off : Icons.visibility,
                     size: 18,
                   ),
                   tooltip: form.showConfirm
-                      ? (l10n?.tooltipHidePassword ?? 'Hide password')
-                      : (l10n?.tooltipShowPassword ?? 'Show password'),
+                      ? (l10n.tooltipHidePassword)
+                      : (l10n.tooltipShowPassword),
                   onPressed: notifier.toggleConfirm,
                 ),
               ),
@@ -224,9 +220,8 @@ class _AuthFormWidgetState extends ConsumerState<AuthFormWidget> {
                     },
               child: Text(
                 form.isSignUp
-                    ? (l10n?.syncHaveAccountSignIn ??
-                        'Already have an account? Sign in')
-                    : (l10n?.syncCreateNewAccount ?? 'Create new account'),
+                    ? (l10n.syncHaveAccountSignIn)
+                    : (l10n.syncCreateNewAccount),
                 style: const TextStyle(fontSize: 12),
               ),
             ),

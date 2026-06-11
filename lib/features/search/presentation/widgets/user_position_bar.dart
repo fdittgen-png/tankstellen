@@ -10,10 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 class UserPositionBar extends ConsumerWidget {
   final VoidCallback onUpdatePosition;
 
-  const UserPositionBar({
-    super.key,
-    required this.onUpdatePosition,
-  });
+  const UserPositionBar({super.key, required this.onUpdatePosition});
 
   String _formatAge(DateTime updatedAt) {
     final diff = DateTime.now().difference(updatedAt);
@@ -29,10 +26,9 @@ class UserPositionBar extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    final posLabel = l10n?.yourPosition ?? 'Your position';
-    final unknownLabel = l10n?.positionUnknown ?? 'Position unknown';
-    final distFromSearchLabel =
-        l10n?.distancesFromCenter ?? 'Distances from search center';
+    final posLabel = l10n.yourPosition;
+    final unknownLabel = l10n.positionUnknown;
+    final distFromSearchLabel = l10n.distancesFromCenter;
 
     if (userPos != null) {
       return Container(
@@ -40,8 +36,7 @@ class UserPositionBar extends ConsumerWidget {
         color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
         child: Row(
           children: [
-            Icon(Icons.my_location,
-                size: 16, color: theme.colorScheme.primary),
+            Icon(Icons.my_location, size: 16, color: theme.colorScheme.primary),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -56,10 +51,12 @@ class UserPositionBar extends ConsumerWidget {
               onTap: onUpdatePosition,
               borderRadius: BorderRadius.circular(12),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                child: Icon(Icons.refresh,
-                    size: 18, color: theme.colorScheme.primary),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                child: Icon(
+                  Icons.refresh,
+                  size: 18,
+                  color: theme.colorScheme.primary,
+                ),
               ),
             ),
           ],
@@ -72,8 +69,11 @@ class UserPositionBar extends ConsumerWidget {
       color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
       child: Row(
         children: [
-          Icon(Icons.location_off,
-              size: 16, color: theme.colorScheme.onErrorContainer),
+          Icon(
+            Icons.location_off,
+            size: 16,
+            color: theme.colorScheme.onErrorContainer,
+          ),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
@@ -86,11 +86,15 @@ class UserPositionBar extends ConsumerWidget {
           ),
           TextButton.icon(
             onPressed: onUpdatePosition,
-            icon: Icon(Icons.my_location,
-                size: 14, color: theme.colorScheme.primary),
-            label: Text('GPS',
-                style:
-                    TextStyle(fontSize: 12, color: theme.colorScheme.primary)),
+            icon: Icon(
+              Icons.my_location,
+              size: 14,
+              color: theme.colorScheme.primary,
+            ),
+            label: Text(
+              'GPS',
+              style: TextStyle(fontSize: 12, color: theme.colorScheme.primary),
+            ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               minimumSize: Size.zero,

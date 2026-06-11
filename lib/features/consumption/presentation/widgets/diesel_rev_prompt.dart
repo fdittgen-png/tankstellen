@@ -83,25 +83,16 @@ class _DieselRevPromptState extends State<DieselRevPrompt>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l?.brokenMapRevPromptTitle ?? 'Rev the engine',
-            style: theme.textTheme.titleMedium,
-          ),
+          Text(l.brokenMapRevPromptTitle, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
-          Text(
-            l?.brokenMapRevPromptBody ??
-                'Briefly blip the throttle so the app can check the MAP '
-                    'sensor responds.',
-            style: theme.textTheme.bodyMedium,
-          ),
+          Text(l.brokenMapRevPromptBody, style: theme.textTheme.bodyMedium),
           const SizedBox(height: 16),
           // Counts down the rev window — full at the start, empty when
           // it elapses.
           AnimatedBuilder(
             animation: _controller,
-            builder: (context, _) => LinearProgressIndicator(
-              value: 1.0 - _controller.value,
-            ),
+            builder: (context, _) =>
+                LinearProgressIndicator(value: 1.0 - _controller.value),
           ),
           const SizedBox(height: 16),
           Align(
@@ -109,7 +100,7 @@ class _DieselRevPromptState extends State<DieselRevPrompt>
             child: FilledButton(
               key: const Key('dieselRevPromptConfirm'),
               onPressed: () => _finish(revved: true),
-              child: Text(l?.brokenMapRevPromptConfirm ?? 'Done — I revved'),
+              child: Text(l.brokenMapRevPromptConfirm),
             ),
           ),
         ],

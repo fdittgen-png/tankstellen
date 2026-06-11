@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/shell/shell_destinations.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Pure-function tests for the destination-resolution helper.
 ///
@@ -20,20 +21,25 @@ import 'package:tankstellen/app/shell/shell_destinations.dart';
 ///     fuel-only:           `Map · Favorites · [Search] · Carburant`
 ///     fuel + trips:        `Map · Favorites · [Search] · Carburant · Trajets`
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   group('resolveShellDestinations', () {
     test(
       'conso off → Map · [Search] · Favorites (Carburant + Trajets dropped)',
       () {
         final result = resolveShellDestinations(
-          l10n: null,
+          l10n: l10nEn,
           showConsumption: false,
           showTrajets: false,
         );
 
         expect(result.items, hasLength(3));
         expect(result.branchForSlot, [2, 0, 1]);
-        expect(result.items.map((i) => i.label).toList(),
-            ['Favorites', 'Search', 'Map']);
+        expect(result.items.map((i) => i.label).toList(), [
+          'Favorites',
+          'Search',
+          'Map',
+        ]);
 
         // No fuel-station / route icon in the visible items list.
         for (final item in result.items) {
@@ -43,68 +49,67 @@ void main() {
       },
     );
 
-    test(
-      'fuel-only mode → Favorites · Map · [Search] · Carburant '
-      '(#1901: Trajets hidden)',
-      () {
-        final result = resolveShellDestinations(
-          l10n: null,
-          showConsumption: true,
-          showTrajets: false,
-        );
+    test('fuel-only mode → Favorites · Map · [Search] · Carburant '
+        '(#1901: Trajets hidden)', () {
+      final result = resolveShellDestinations(
+        l10n: l10nEn,
+        showConsumption: true,
+        showTrajets: false,
+      );
 
-        expect(result.items, hasLength(4));
-        // Visual slots map back to router branches Search=0, Map=1,
-        // Favorites=2, Carburant=3.
-        expect(result.branchForSlot, [2, 1, 0, 3]);
-        expect(result.items.map((i) => i.label).toList(),
-            ['Favorites', 'Map', 'Search', 'Fuel']);
+      expect(result.items, hasLength(4));
+      // Visual slots map back to router branches Search=0, Map=1,
+      // Favorites=2, Carburant=3.
+      expect(result.branchForSlot, [2, 1, 0, 3]);
+      expect(result.items.map((i) => i.label).toList(), [
+        'Favorites',
+        'Map',
+        'Search',
+        'Fuel',
+      ]);
 
-        // Carburant item carries the fuel-station icon.
-        expect(result.items[3].outlinedIcon, Icons.local_gas_station_outlined);
-        expect(result.items[3].filledIcon, Icons.local_gas_station);
+      // Carburant item carries the fuel-station icon.
+      expect(result.items[3].outlinedIcon, Icons.local_gas_station_outlined);
+      expect(result.items[3].filledIcon, Icons.local_gas_station);
 
-        // No Trajets destination in fuel-only mode.
-        for (final item in result.items) {
-          expect(item.outlinedIcon, isNot(Icons.route_outlined));
-        }
-      },
-    );
+      // No Trajets destination in fuel-only mode.
+      for (final item in result.items) {
+        expect(item.outlinedIcon, isNot(Icons.route_outlined));
+      }
+    });
 
-    test(
-      'fuel + trips mode → Favorites · Map · [Search] · Carburant · Trajets '
-      '(#1901)',
-      () {
-        final result = resolveShellDestinations(
-          l10n: null,
-          showConsumption: true,
-          showTrajets: true,
-        );
+    test('fuel + trips mode → Favorites · Map · [Search] · Carburant · Trajets '
+        '(#1901)', () {
+      final result = resolveShellDestinations(
+        l10n: l10nEn,
+        showConsumption: true,
+        showTrajets: true,
+      );
 
-        expect(result.items, hasLength(5));
-        // Search=0, Map=1, Favorites=2, Carburant=3, Trajets=5.
-        expect(result.branchForSlot, [2, 1, 0, 3, kTrajetsBranchIndex]);
-        expect(result.items.map((i) => i.label).toList(),
-            ['Favorites', 'Map', 'Search', 'Fuel', 'Trips']);
+      expect(result.items, hasLength(5));
+      // Search=0, Map=1, Favorites=2, Carburant=3, Trajets=5.
+      expect(result.branchForSlot, [2, 1, 0, 3, kTrajetsBranchIndex]);
+      expect(result.items.map((i) => i.label).toList(), [
+        'Favorites',
+        'Map',
+        'Search',
+        'Fuel',
+        'Trips',
+      ]);
 
-        // Carburant carries the fuel-station icon, Trajets the route icon.
-        expect(result.items[3].outlinedIcon, Icons.local_gas_station_outlined);
-        expect(result.items[3].filledIcon, Icons.local_gas_station);
-        expect(result.items[4].outlinedIcon, Icons.route_outlined);
-        expect(result.items[4].filledIcon, Icons.route);
-      },
-    );
+      // Carburant carries the fuel-station icon, Trajets the route icon.
+      expect(result.items[3].outlinedIcon, Icons.local_gas_station_outlined);
+      expect(result.items[3].filledIcon, Icons.local_gas_station);
+      expect(result.items[4].outlinedIcon, Icons.route_outlined);
+      expect(result.items[4].filledIcon, Icons.route);
+    });
 
     test('Search is the only primary (raised, centre) item', () {
       // #1901 — fuel + trips mode has an even item count (5 is odd, so
       // the centre is well-defined); cover all three visibility states.
-      for (final state in const [
-        (false, false),
-        (true, false),
-        (true, true),
-      ]) {
+      for (final state in const [(false, false), (true, false), (true, true)]) {
         final result = resolveShellDestinations(
-          l10n: null,
+          l10n: l10nEn,
           showConsumption: state.$1,
           showTrajets: state.$2,
         );
@@ -118,19 +123,17 @@ void main() {
     });
 
     test('Settings is never a bottom-bar destination (#1874)', () {
-      for (final state in const [
-        (false, false),
-        (true, false),
-        (true, true),
-      ]) {
+      for (final state in const [(false, false), (true, false), (true, true)]) {
         final result = resolveShellDestinations(
-          l10n: null,
+          l10n: l10nEn,
           showConsumption: state.$1,
           showTrajets: state.$2,
         );
         expect(result.items.map((i) => i.label), isNot(contains('Settings')));
-        expect(result.items.map((i) => i.outlinedIcon),
-            isNot(contains(Icons.settings_outlined)));
+        expect(
+          result.items.map((i) => i.outlinedIcon),
+          isNot(contains(Icons.settings_outlined)),
+        );
         // Branch 4 (the Settings/profile branch) is never a slot.
         expect(result.branchForSlot, isNot(contains(4)));
       }
@@ -138,34 +141,41 @@ void main() {
 
     test('falls back to English labels when l10n is null', () {
       final result = resolveShellDestinations(
-        l10n: null,
+        l10n: l10nEn,
         showConsumption: true,
         showTrajets: true,
       );
-      expect(result.items.map((i) => i.label).toList(),
-          ['Favorites', 'Map', 'Search', 'Fuel', 'Trips']);
+      expect(result.items.map((i) => i.label).toList(), [
+        'Favorites',
+        'Map',
+        'Search',
+        'Fuel',
+        'Trips',
+      ]);
     });
 
     test('the Carburant slot routes to kConsumptionBranchIndex', () {
       final result = resolveShellDestinations(
-        l10n: null,
+        l10n: l10nEn,
         showConsumption: true,
         showTrajets: false,
       );
-      final consoSlot = result.items
-          .indexWhere((i) => i.outlinedIcon == Icons.local_gas_station_outlined);
+      final consoSlot = result.items.indexWhere(
+        (i) => i.outlinedIcon == Icons.local_gas_station_outlined,
+      );
       expect(consoSlot, isNonNegative);
       expect(result.branchForSlot[consoSlot], kConsumptionBranchIndex);
     });
 
     test('the Trajets slot routes to kTrajetsBranchIndex (#1901)', () {
       final result = resolveShellDestinations(
-        l10n: null,
+        l10n: l10nEn,
         showConsumption: true,
         showTrajets: true,
       );
-      final trajetsSlot =
-          result.items.indexWhere((i) => i.outlinedIcon == Icons.route_outlined);
+      final trajetsSlot = result.items.indexWhere(
+        (i) => i.outlinedIcon == Icons.route_outlined,
+      );
       expect(trajetsSlot, isNonNegative);
       expect(result.branchForSlot[trajetsSlot], kTrajetsBranchIndex);
     });

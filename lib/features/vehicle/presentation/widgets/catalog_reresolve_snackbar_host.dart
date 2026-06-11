@@ -30,10 +30,7 @@ class CatalogReresolveSnackbarHost extends ConsumerStatefulWidget {
   /// Subtree the host wraps. Returned verbatim from `build`.
   final Widget child;
 
-  const CatalogReresolveSnackbarHost({
-    super.key,
-    required this.child,
-  });
+  const CatalogReresolveSnackbarHost({super.key, required this.child});
 
   @override
   ConsumerState<CatalogReresolveSnackbarHost> createState() =>
@@ -77,15 +74,11 @@ class _CatalogReresolveSnackbarHostState
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
 
-    final makeModel =
-        '${candidate.make} ${candidate.model}'.trim();
-    final message = l10n != null
-        ? l10n.catalogReresolveSnackbarMessage(
-            makeModel.isEmpty ? candidate.vehicleId : makeModel,
-          )
-        : 'Your $makeModel is marked as diesel but matches a '
-            'petrol catalog entry. Tap to update.';
-    final action = l10n?.catalogReresolveSnackbarAction ?? 'Update';
+    final makeModel = '${candidate.make} ${candidate.model}'.trim();
+    final message = l10n.catalogReresolveSnackbarMessage(
+      makeModel.isEmpty ? candidate.vehicleId : makeModel,
+    );
+    final action = l10n.catalogReresolveSnackbarAction;
 
     messenger.showSnackBar(
       SnackBarHelper.infoSnackBar(
@@ -114,21 +107,23 @@ class _CatalogReresolveSnackbarHostState
     // again for this vehicle. Done after `showSnackBar` so a failure
     // in the messenger doesn't leave the user permanently un-
     // nudgeable.
-    unawaited(Future<void>(() async {
-      // #3159 — this future is detached, so the host can unmount before it
-      // runs; both the helper's ref.read and the invalidate below would
-      // then throw a StateError. Skipping is safe: the candidate provider
-      // re-fires the nudge on the next build.
-      if (!mounted) return;
-      try {
-        await markCatalogReresolveSuggested(ref, candidate.vehicleId);
-      } finally {
-        // Force the provider to drop this candidate from its list so
-        // the next pending vehicle can take its turn on the next
-        // build.
-        if (mounted) ref.invalidate(catalogReresolveCandidatesProvider);
-      }
-    }));
+    unawaited(
+      Future<void>(() async {
+        // #3159 — this future is detached, so the host can unmount before it
+        // runs; both the helper's ref.read and the invalidate below would
+        // then throw a StateError. Skipping is safe: the candidate provider
+        // re-fires the nudge on the next build.
+        if (!mounted) return;
+        try {
+          await markCatalogReresolveSuggested(ref, candidate.vehicleId);
+        } finally {
+          // Force the provider to drop this candidate from its list so
+          // the next pending vehicle can take its turn on the next
+          // build.
+          if (mounted) ref.invalidate(catalogReresolveCandidatesProvider);
+        }
+      }),
+    );
   }
 }
 
@@ -136,11 +131,11 @@ class _CatalogReresolveSnackbarHostState
 /// search synchronous without throwing on an empty list.
 class _SentinelCandidate extends CatalogReresolveCandidate {
   const _SentinelCandidate()
-      : super(
-          vehicleId: '',
-          make: '',
-          model: '',
-          resolvedReferenceVehicleId: '',
-          resolvedFuelType: '',
-        );
+    : super(
+        vehicleId: '',
+        make: '',
+        model: '',
+        resolvedReferenceVehicleId: '',
+        resolvedFuelType: '',
+      );
 }

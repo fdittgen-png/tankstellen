@@ -37,7 +37,7 @@ class StarRating extends StatelessWidget {
         final isFilled = rating != null && starNumber <= rating!;
         return Semantics(
           button: true,
-          label: l10n?.ratingStarLabel(starNumber) ?? 'Rate $starNumber stars',
+          label: l10n.ratingStarLabel(starNumber),
           child: GestureDetector(
             onTap: () => onRatingChanged(starNumber),
             behavior: HitTestBehavior.opaque,

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/onboarding_navigation_buttons.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('OnboardingNavigationButtons', () {
@@ -19,6 +20,8 @@ void main() {
     }) {
       return tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: OnboardingNavigationButtons(
               currentStep: currentStep,
@@ -45,8 +48,7 @@ void main() {
       expect(find.text('Back'), findsOneWidget);
     });
 
-    testWidgets('hides Skip button when step is not skippable',
-        (tester) async {
+    testWidgets('hides Skip button when step is not skippable', (tester) async {
       await pumpButtons(tester, currentStep: 1, isSkippable: false);
       expect(find.text('Skip'), findsNothing);
     });
@@ -56,16 +58,18 @@ void main() {
       expect(find.text('Skip'), findsOneWidget);
     });
 
-    testWidgets('shows "Get started" + check icon on the last step',
-        (tester) async {
+    testWidgets('shows "Get started" + check icon on the last step', (
+      tester,
+    ) async {
       await pumpButtons(tester, currentStep: 3, isLastStep: true);
       expect(find.text('Get started'), findsOneWidget);
       expect(find.byIcon(Icons.check), findsOneWidget);
       expect(find.byIcon(Icons.arrow_forward), findsNothing);
     });
 
-    testWidgets('shows "Next" + arrow icon on intermediate steps',
-        (tester) async {
+    testWidgets('shows "Next" + arrow icon on intermediate steps', (
+      tester,
+    ) async {
       await pumpButtons(tester, currentStep: 1, isLastStep: false);
       expect(find.text('Next'), findsOneWidget);
       expect(find.byIcon(Icons.arrow_forward), findsOneWidget);

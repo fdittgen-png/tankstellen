@@ -33,7 +33,7 @@ class CountryLanguageStep extends ConsumerWidget {
           const SizedBox(height: 16),
           // Language selector
           Text(
-            l10n?.language ?? 'Language',
+            l10n.language,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -45,16 +45,17 @@ class CountryLanguageStep extends ConsumerWidget {
             children: AppLanguages.all.map((lang) {
               final isSelected = lang.code == language.code;
               return Semantics(
-                label: l10n?.languageChipSemantic(
-                      lang.nativeName,
-                      '$isSelected',
-                    ) ??
-                    'Language ${lang.nativeName}',
+                label: l10n.languageChipSemantic(
+                  lang.nativeName,
+                  '$isSelected',
+                ),
                 child: ChoiceChip(
                   label: Text(lang.nativeName),
                   selected: isSelected,
                   onSelected: (_) {
-                    unawaited(ref.read(activeLanguageProvider.notifier).select(lang));
+                    unawaited(
+                      ref.read(activeLanguageProvider.notifier).select(lang),
+                    );
                   },
                   visualDensity: VisualDensity.compact,
                 ),
@@ -65,7 +66,7 @@ class CountryLanguageStep extends ConsumerWidget {
 
           // Country selector
           Text(
-            l10n?.country ?? 'Country',
+            l10n.country,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -77,13 +78,14 @@ class CountryLanguageStep extends ConsumerWidget {
             children: Countries.verified.map((c) {
               final isSelected = c.code == country.code;
               return Semantics(
-                label: l10n?.countryChipSemantic(c.name, '$isSelected') ??
-                    'Country ${c.name}',
+                label: l10n.countryChipSemantic(c.name, '$isSelected'),
                 child: ChoiceChip(
                   label: Text('${c.flag} ${c.name}'),
                   selected: isSelected,
                   onSelected: (_) {
-                    unawaited(ref.read(activeCountryProvider.notifier).select(c));
+                    unawaited(
+                      ref.read(activeCountryProvider.notifier).select(c),
+                    );
                   },
                 ),
               );
@@ -100,10 +102,7 @@ class CountryLanguageStep extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        country.flag,
-                        style: const TextStyle(fontSize: 24),
-                      ),
+                      Text(country.flag, style: const TextStyle(fontSize: 24)),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -116,11 +115,10 @@ class CountryLanguageStep extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              l10n?.countryInfoDataSource(
-                                    country.apiProvider ??
-                                        (l10n.countryInfoDemoSource),
-                                  ) ??
-                                  'Data: ${country.apiProvider ?? 'Demo'}',
+                              l10n.countryInfoDataSource(
+                                country.apiProvider ??
+                                    (l10n.countryInfoDemoSource),
+                              ),
                               style: theme.textTheme.bodySmall,
                             ),
                           ],
@@ -139,8 +137,8 @@ class CountryLanguageStep extends ConsumerWidget {
                         ),
                         child: Text(
                           country.requiresApiKey
-                              ? (l10n?.apiKeyRequired ?? 'API key required')
-                              : (l10n?.freeNoKey ?? 'Free — no key needed'),
+                              ? (l10n.apiKeyRequired)
+                              : (l10n.freeNoKey),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,

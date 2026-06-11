@@ -89,8 +89,9 @@ class VehicleCard extends StatelessWidget {
               child: Text(
                 vehicle.name,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             if (isActive) ...[
@@ -122,12 +123,10 @@ class VehicleCard extends StatelessWidget {
             if (!isActive)
               PopupMenuItem(
                 value: 'activate',
-                child: Text(l10n?.vehicleSetActive ?? 'Set active'),
+                child: Text(l10n.vehicleSetActive),
               ),
-            PopupMenuItem(
-                value: 'edit', child: Text(l10n?.edit ?? 'Edit')),
-            PopupMenuItem(
-                value: 'delete', child: Text(l10n?.delete ?? 'Delete')),
+            PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
+            PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
           ],
         ),
         onTap: onTap,

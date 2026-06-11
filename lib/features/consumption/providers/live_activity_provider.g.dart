@@ -213,7 +213,7 @@ final class LiveActivitySyncProvider
   }
 }
 
-String _$liveActivitySyncHash() => r'6b551cc8f221281a76fc2a30cddff113188293f1';
+String _$liveActivitySyncHash() => r'f110ae1f32c596620c6682ea34c96bf7321d4050';
 
 /// Keeps the iOS Live Activity (lock screen + Dynamic Island, #3170) in
 /// lock-step with the live trip/approach state — the iOS counterpart of

@@ -38,62 +38,62 @@ class _LocalDataCardState extends State<LocalDataCard> {
     final entries = <_RowEntry>[
       _RowEntry(
         icon: Icons.favorite,
-        label: l?.favorites ?? 'Favorites',
+        label: l.favorites,
         value: '${s.favoritesCount}',
         isEmpty: s.favoritesCount == 0,
       ),
       _RowEntry(
         icon: Icons.visibility_off,
-        label: l?.privacyIgnoredStations ?? 'Ignored stations',
+        label: l.privacyIgnoredStations,
         value: '${s.ignoredCount}',
         isEmpty: s.ignoredCount == 0,
       ),
       _RowEntry(
         icon: Icons.star,
-        label: l?.privacyRatings ?? 'Station ratings',
+        label: l.privacyRatings,
         value: '${s.ratingsCount}',
         isEmpty: s.ratingsCount == 0,
       ),
       _RowEntry(
         icon: Icons.notifications,
-        label: l?.priceAlerts ?? 'Price alerts',
+        label: l.priceAlerts,
         value: '${s.alertsCount}',
         isEmpty: s.alertsCount == 0,
       ),
       _RowEntry(
         icon: Icons.show_chart,
-        label: l?.privacyPriceHistory ?? 'Price history stations',
+        label: l.privacyPriceHistory,
         value: '${s.priceHistoryStationCount}',
         isEmpty: s.priceHistoryStationCount == 0,
       ),
       _RowEntry(
         icon: Icons.person,
-        label: l?.privacyProfiles ?? 'Search profiles',
+        label: l.privacyProfiles,
         value: '${s.profileCount}',
         isEmpty: s.profileCount == 0,
       ),
       _RowEntry(
         icon: Icons.route,
-        label: l?.privacyItineraries ?? 'Saved routes',
+        label: l.privacyItineraries,
         value: '${s.itineraryCount}',
         isEmpty: s.itineraryCount == 0,
       ),
       _RowEntry(
         icon: Icons.cached,
-        label: l?.privacyCacheEntries ?? 'Cache entries',
+        label: l.privacyCacheEntries,
         value: '${s.cacheEntryCount}',
         isEmpty: s.cacheEntryCount == 0,
       ),
       _RowEntry(
         icon: Icons.key,
-        label: l?.privacyApiKey ?? 'API key stored',
-        value: s.hasApiKey ? (l?.yes ?? 'Yes') : (l?.no ?? 'No'),
+        label: l.privacyApiKey,
+        value: s.hasApiKey ? (l.yes) : (l.no),
         isEmpty: !s.hasApiKey,
       ),
       _RowEntry(
         icon: Icons.ev_station,
-        label: l?.privacyEvApiKey ?? 'EV API key stored',
-        value: s.hasEvApiKey ? (l?.yes ?? 'Yes') : (l?.no ?? 'No'),
+        label: l.privacyEvApiKey,
+        value: s.hasEvApiKey ? (l.yes) : (l.no),
         isEmpty: !s.hasEvApiKey,
       ),
     ];
@@ -111,11 +111,14 @@ class _LocalDataCardState extends State<LocalDataCard> {
           children: [
             Row(
               children: [
-                Icon(Icons.phone_android,
-                    size: 20, color: theme.colorScheme.primary),
+                Icon(
+                  Icons.phone_android,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  l?.privacyLocalData ?? 'Data on this device',
+                  l.privacyLocalData,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -130,9 +133,7 @@ class _LocalDataCardState extends State<LocalDataCard> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  l?.privacyLocalDataEmpty ??
-                      'Nothing stored yet. Add a favorite or set a price '
-                          'alert to see entries here.',
+                  l.privacyLocalDataEmpty,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -140,11 +141,7 @@ class _LocalDataCardState extends State<LocalDataCard> {
               )
             else
               for (final e in visible)
-                PrivacyDataRow(
-                  icon: e.icon,
-                  label: e.label,
-                  value: e.value,
-                ),
+                PrivacyDataRow(icon: e.icon, label: e.label, value: e.value),
             if (hiddenCount > 0)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
@@ -157,13 +154,14 @@ class _LocalDataCardState extends State<LocalDataCard> {
                   ),
                   label: Text(
                     _showAll
-                        ? (l?.privacyHideEmptyRows ?? 'Hide empty rows')
-                        : (l?.privacyShowEmptyRows(hiddenCount) ??
-                            'Show $hiddenCount empty row${hiddenCount == 1 ? '' : 's'}'),
+                        ? (l.privacyHideEmptyRows)
+                        : (l.privacyShowEmptyRows(hiddenCount)),
                   ),
                   style: TextButton.styleFrom(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -174,7 +172,7 @@ class _LocalDataCardState extends State<LocalDataCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  l?.privacyEstimatedSize ?? 'Estimated storage',
+                  l.privacyEstimatedSize,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

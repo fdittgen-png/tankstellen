@@ -32,7 +32,8 @@ class EVStationDetailScreen extends ConsumerStatefulWidget {
   const EVStationDetailScreen({super.key, required this.station});
 
   @override
-  ConsumerState<EVStationDetailScreen> createState() => _EVStationDetailScreenState();
+  ConsumerState<EVStationDetailScreen> createState() =>
+      _EVStationDetailScreenState();
 }
 
 class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
@@ -63,9 +64,14 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
       final enriched = (await enricher.enrich([widget.station])).first;
       if (mounted) setState(() => _station = enriched);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'EVStationDetailScreen: enrich on open',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'EVStationDetailScreen: enrich on open'},
+        ),
+      );
     }
   }
 
@@ -86,29 +92,42 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
         maxResults: 10,
       );
       final ocmId = _station.id.replaceFirst('ocm-', '');
-      final refreshed = result.data.where((s) => s.id == _station.id || s.id == 'ocm-$ocmId').firstOrNull;
+      final refreshed = result.data
+          .where((s) => s.id == _station.id || s.id == 'ocm-$ocmId')
+          .firstOrNull;
       if (refreshed != null && mounted) {
         // Re-apply the same country-authoritative enrich the open path uses
         // (#2632). The raw OCM re-fetch carries null UsageType / no IRVE
         // flag, so a plain `_station = refreshed` here STRIPPED the badge
         // a search-list open had shown. Inside the try/catch, so an IRVE
         // outage degrades to the raw refreshed station rather than blanking.
-        final enriched =
-            (await ref.read(evPriceEnricherProvider).enrich([refreshed])).first;
+        final enriched = (await ref.read(evPriceEnricherProvider).enrich([
+          refreshed,
+        ])).first;
         if (!mounted) return;
         setState(() => _station = enriched);
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showSuccess(context, l10n?.evStatusUpdated ?? 'Status updated');
+        SnackBarHelper.showSuccess(context, l10n.evStatusUpdated);
       } else if (mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showError(context, l10n?.evStationNotFound ?? 'Could not refresh — station not found nearby');
+        SnackBarHelper.showError(context, l10n.evStationNotFound);
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'EVStationDetailScreen._refreshStation: refresh failed',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'EVStationDetailScreen._refreshStation: refresh failed',
+          },
+        ),
+      );
       if (mounted) {
-        SnackBarHelper.showError(context, AppLocalizations.of(context)?.refreshFailed ?? 'Refresh failed. Please try again.');
+        SnackBarHelper.showError(
+          context,
+          AppLocalizations.of(context).refreshFailed,
+        );
       }
     } finally {
       if (mounted) setState(() => _isRefreshing = false);
@@ -116,8 +135,13 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   }
 
   void _navigateToStation() {
-    unawaited(NavigationUtils.openInMaps(_station.lat, _station.lng,
-        label: _station.name));
+    unawaited(
+      NavigationUtils.openInMaps(
+        _station.lat,
+        _station.lng,
+        label: _station.name,
+      ),
+    );
   }
 
   /// Open the add-charging-log form pre-filled with this station
@@ -150,57 +174,65 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
       title: operatorName.isNotEmpty ? operatorName : station.name,
       bodyPadding: EdgeInsets.zero,
       actions: [
-        Consumer(builder: (context, ref, _) {
-          final isFav = ref.watch(isFavoriteProvider(station.id));
-          return IconButton(
-            icon: Icon(
-              isFav ? Icons.star : Icons.star_outline,
-              color: isFav ? Colors.amber : Colors.white70,
-              size: 26,
-            ),
-            tooltip: isFav ? (l10n?.removeFavorite ?? 'Remove from favorites') : (l10n?.addFavorite ?? 'Add to favorites'),
-            onPressed: () async {
-              // Await the toggle so the snackbar fires AFTER persistence
-              // and the isFavoriteProvider has flipped. Otherwise a quick
-              // back-navigation can cancel the in-flight Hive write and
-              // leave the favorite half-persisted (#566).
-              // Persist the ALREADY-ENRICHED `_station` (not the raw
-              // `widget.station`) so a later rehydrate of the favorite keeps
-              // the IRVE free/paid signal that initState enriched in (#2632).
-              await ref.read(favoritesProvider.notifier).toggle(
-                    station.id,
-                    rawJson: _station.toJson(),
-                  );
-              if (!context.mounted) return;
-              // Temporary diagnostic: surface live storage counts in the
-              // snackbar so a user on an APK without logcat can verify
-              // the favorite actually persisted.
-              final storage = ref.read(storageRepositoryProvider);
-              final evIds = storage.getEvFavoriteIds();
-              final savedCount = evIds
-                  .where((id) => storage.getEvFavoriteStationData(id) != null)
-                  .length;
-              final base = isFav
-                  ? (l10n?.removedFromFavorites ?? 'Removed from favorites')
-                  : (l10n?.addedToFavorites ?? 'Added to favorites');
-              SnackBarHelper.show(
-                context,
-                '$base (EV: ${evIds.length} ids / $savedCount saved)',
-                duration: const Duration(seconds: 3),
-              );
-            },
-          );
-        }),
+        Consumer(
+          builder: (context, ref, _) {
+            final isFav = ref.watch(isFavoriteProvider(station.id));
+            return IconButton(
+              icon: Icon(
+                isFav ? Icons.star : Icons.star_outline,
+                color: isFav ? Colors.amber : Colors.white70,
+                size: 26,
+              ),
+              tooltip: isFav ? (l10n.removeFavorite) : (l10n.addFavorite),
+              onPressed: () async {
+                // Await the toggle so the snackbar fires AFTER persistence
+                // and the isFavoriteProvider has flipped. Otherwise a quick
+                // back-navigation can cancel the in-flight Hive write and
+                // leave the favorite half-persisted (#566).
+                // Persist the ALREADY-ENRICHED `_station` (not the raw
+                // `widget.station`) so a later rehydrate of the favorite keeps
+                // the IRVE free/paid signal that initState enriched in (#2632).
+                await ref
+                    .read(favoritesProvider.notifier)
+                    .toggle(station.id, rawJson: _station.toJson());
+                if (!context.mounted) return;
+                // Temporary diagnostic: surface live storage counts in the
+                // snackbar so a user on an APK without logcat can verify
+                // the favorite actually persisted.
+                final storage = ref.read(storageRepositoryProvider);
+                final evIds = storage.getEvFavoriteIds();
+                final savedCount = evIds
+                    .where((id) => storage.getEvFavoriteStationData(id) != null)
+                    .length;
+                final base = isFav
+                    ? (l10n.removedFromFavorites)
+                    : (l10n.addedToFavorites);
+                SnackBarHelper.show(
+                  context,
+                  '$base (EV: ${evIds.length} ids / $savedCount saved)',
+                  duration: const Duration(seconds: 3),
+                );
+              },
+            );
+          },
+        ),
         IconButton(
           icon: _isRefreshing
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70))
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white70,
+                  ),
+                )
               : const Icon(Icons.refresh),
-          tooltip: l10n?.evRefreshStatus ?? 'Refresh status',
+          tooltip: l10n.evRefreshStatus,
           onPressed: _isRefreshing ? null : _refreshStation,
         ),
         IconButton(
           icon: const Icon(Icons.navigation),
-          tooltip: l10n?.navigate ?? 'Navigate',
+          tooltip: l10n.navigate,
           onPressed: _navigateToStation,
         ),
       ],
@@ -218,13 +250,17 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   Widget _compactBody(
     BuildContext context,
     ThemeData theme,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     ChargingStation station,
     Color evColor,
   ) {
     return ListView(
       padding: EdgeInsets.fromLTRB(
-          16, 16, 16, 16 + MediaQuery.of(context).viewPadding.bottom + 24),
+        16,
+        16,
+        16,
+        16 + MediaQuery.of(context).viewPadding.bottom + 24,
+      ),
       children: [
         ..._headerSections(station, evColor),
         const SizedBox(height: 8),
@@ -240,7 +276,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   Widget _wideBody(
     BuildContext context,
     ThemeData theme,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     ChargingStation station,
     Color evColor,
   ) {
@@ -259,8 +295,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
         Expanded(
           flex: 3,
           child: ListView(
-            padding:
-                EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding + 24),
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding + 24),
             children: _detailSections(context, theme, l10n, station, evColor),
           ),
         ),
@@ -283,7 +318,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
   List<Widget> _detailSections(
     BuildContext context,
     ThemeData theme,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     ChargingStation station,
     Color evColor,
   ) {
@@ -302,28 +337,31 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n?.yourRating ?? 'Your rating',
-                  style: theme.textTheme.titleMedium),
+              Text(l10n.yourRating, style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
-              Consumer(builder: (context, ref, _) {
-                final rating = ref.watch(stationRatingProvider(station.id));
-                return Row(
-                  children: [
-                    StarRating(
-                      rating: rating,
-                      onRatingChanged: (stars) {
-                        unawaited(ref
-                            .read(stationRatingsProvider.notifier)
-                            .rate(station.id, stars));
-                      },
-                    ),
-                    if (rating != null) ...[
-                      const SizedBox(width: 12),
-                      Text('$rating/5', style: theme.textTheme.bodyMedium),
+              Consumer(
+                builder: (context, ref, _) {
+                  final rating = ref.watch(stationRatingProvider(station.id));
+                  return Row(
+                    children: [
+                      StarRating(
+                        rating: rating,
+                        onRatingChanged: (stars) {
+                          unawaited(
+                            ref
+                                .read(stationRatingsProvider.notifier)
+                                .rate(station.id, stars),
+                          );
+                        },
+                      ),
+                      if (rating != null) ...[
+                        const SizedBox(width: 12),
+                        Text('$rating/5', style: theme.textTheme.bodyMedium),
+                      ],
                     ],
-                  ],
-                );
-              }),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -335,7 +373,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
         key: const Key('ev_log_charging_button'),
         onPressed: _logCharging,
         icon: const Icon(Icons.ev_station),
-        label: Text(l10n?.chargingLogButtonLabel ?? 'Log charging'),
+        label: Text(l10n.chargingLogButtonLabel),
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(48),
           backgroundColor: evColor,
@@ -347,7 +385,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
       FilledButton.icon(
         onPressed: _navigateToStation,
         icon: const Icon(Icons.navigation),
-        label: Text(l10n?.evNavigateToStation ?? 'Navigate to station'),
+        label: Text(l10n.evNavigateToStation),
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(48),
           backgroundColor: evColor.withValues(alpha: 0.85),

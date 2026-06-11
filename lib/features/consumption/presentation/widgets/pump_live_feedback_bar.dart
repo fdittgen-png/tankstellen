@@ -56,21 +56,17 @@ class PumpLiveFeedbackBar extends StatelessWidget {
     final IconData icon;
     if (isPortrait) {
       // Highest priority — block capture until the phone is sideways.
-      text = l10n?.pumpCameraRotateToLandscape ??
-          'Turn your phone sideways — the pump display is wide, so the '
-              'numbers come out larger and upright';
+      text = l10n.pumpCameraRotateToLandscape;
       bg = Colors.redAccent.withValues(alpha: 0.92);
       textColor = Colors.white;
       icon = Icons.screen_rotation_outlined;
     } else if (isOverGlared) {
-      text = l10n?.pumpCameraGlareWarning ??
-          'Too much glare — tilt slightly to avoid reflections';
+      text = l10n.pumpCameraGlareWarning;
       bg = Colors.amber.withValues(alpha: 0.88);
       textColor = Colors.black87;
       icon = Icons.wb_sunny_outlined;
     } else {
-      text = l10n?.pumpCameraAlignHint ??
-          'Line up the display inside the frame, then capture';
+      text = l10n.pumpCameraAlignHint;
       bg = Colors.black.withValues(alpha: 0.55);
       textColor = Colors.white;
       icon = Icons.center_focus_weak;

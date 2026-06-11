@@ -28,7 +28,7 @@ class AlertStatisticsCard extends ConsumerWidget {
               icon: Icons.notifications_active,
               iconColor: theme.colorScheme.primary,
               value: stats.activeAlerts.toString(),
-              label: l10n?.alertStatsActive ?? 'Active',
+              label: l10n.alertStatsActive,
             ),
             _StatColumn(
               icon: Icons.today,
@@ -36,13 +36,13 @@ class AlertStatisticsCard extends ConsumerWidget {
                   ? DarkModeColors.success(context)
                   : theme.colorScheme.onSurfaceVariant,
               value: stats.triggeredToday.toString(),
-              label: l10n?.alertStatsToday ?? 'Today',
+              label: l10n.alertStatsToday,
             ),
             _StatColumn(
               icon: Icons.date_range,
               iconColor: theme.colorScheme.onSurfaceVariant,
               value: stats.triggeredThisWeek.toString(),
-              label: l10n?.alertStatsThisWeek ?? 'This week',
+              label: l10n.alertStatsThisWeek,
             ),
           ],
         ),

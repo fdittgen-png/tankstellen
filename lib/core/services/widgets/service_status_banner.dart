@@ -33,8 +33,7 @@ class ServiceStatusBanner extends StatelessWidget {
     if (result.isStale) {
       backgroundColor = theme.colorScheme.errorContainer;
       icon = Icons.cloud_off;
-      message =
-          '${l10n?.offlineLabel ?? 'Offline'} — ${result.freshnessLabel}';
+      message = '${l10n.offlineLabel} — ${result.freshnessLabel}';
     } else if (result.hadFallbacks) {
       backgroundColor = theme.colorScheme.tertiaryContainer;
       icon = Icons.info_outline;
@@ -61,12 +60,13 @@ class ServiceStatusBanner extends StatelessWidget {
 /// Builds the "X unavailable. Using Y." banner message using the active
 /// localization, falling back to the untranslated [ServiceResult.fallbackSummary].
 String _localizedFallbackSummary(
-    ServiceResult<dynamic> result, AppLocalizations? l10n) {
+  ServiceResult<dynamic> result,
+  AppLocalizations l10n,
+) {
   if (result.errors.isEmpty) return '';
   final failedNames = result.errors.map((e) => e.source.displayName).join(', ');
   final current = result.source.displayName;
-  return l10n?.fallbackSummary(failedNames, current) ??
-      result.fallbackSummary;
+  return l10n.fallbackSummary(failedNames, current);
 }
 
 /// Shows error when the entire service chain failed.
@@ -104,47 +104,42 @@ class ServiceChainErrorWidget extends StatelessWidget {
   });
 
   /// Extract a short, user-friendly title from the error.
-  String _title(AppLocalizations? l10n) {
+  String _title(AppLocalizations l10n) {
     if (error is NoApiKeyException || error is NoEvApiKeyException) {
-      return l10n?.errorTitleApiKey ?? 'API key required';
+      return l10n.errorTitleApiKey;
     }
     if (error is LocationException) {
-      return l10n?.errorTitleLocation ?? 'Location unavailable';
+      return l10n.errorTitleLocation;
     }
-    return l10n?.noResults ?? 'No stations found.';
+    return l10n.noResults;
   }
 
   /// Extract actionable hint text from the error chain.
-  String _hint(AppLocalizations? l10n) {
+  String _hint(AppLocalizations l10n) {
     final msg = error.toString().toLowerCase();
     if (msg.contains('no stations found') ||
         msg.contains('keine tankstellen')) {
-      return l10n?.errorHintNoStations ??
-          'Try increasing the search radius or search a different location.';
+      return l10n.errorHintNoStations;
     }
     if (msg.contains('api key') ||
         error is NoApiKeyException ||
         error is NoEvApiKeyException) {
-      return l10n?.errorHintApiKey ?? 'Configure your API key in Settings.';
+      return l10n.errorHintApiKey;
     }
     if (msg.contains('location') ||
         msg.contains('gps') ||
         error is LocationException) {
-      return l10n?.locationDenied ??
-          'Location unavailable. Try searching by postal code or city name.';
+      return l10n.locationDenied;
     }
     if (msg.contains('timeout') || msg.contains('connection')) {
-      return l10n?.errorHintConnection ??
-          'Check your internet connection and try again.';
+      return l10n.errorHintConnection;
     }
     if (msg.contains('route') ||
         msg.contains('osrm') ||
         msg.contains('routing')) {
-      return l10n?.errorHintRouting ??
-          'Route calculation failed. Check your internet connection and try again.';
+      return l10n.errorHintRouting;
     }
-    return l10n?.errorHintFallback ??
-        'Try again or search by postal code / city name.';
+    return l10n.errorHintFallback;
   }
 
   /// Extract technical details for the expandable section.
@@ -152,7 +147,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
   /// Domain exceptions go through [ErrorLocalizer] so the user sees the
   /// translated message; unknown errors stay as their raw [toString] so the
   /// expandable section still carries useful debug info.
-  List<String> _technicalDetails(AppLocalizations? l10n) {
+  List<String> _technicalDetails(AppLocalizations l10n) {
     String render(Object e) =>
         e is AppException ? ErrorLocalizer.localize(e, l10n) : e.toString();
 
@@ -186,7 +181,9 @@ class ServiceChainErrorWidget extends StatelessWidget {
       searchContext: searchContext,
       stackTrace: stackTrace,
     );
-    unawaited((reporter ?? const ErrorReporter()).reportError(context, payload));
+    unawaited(
+      (reporter ?? const ErrorReporter()).reportError(context, payload),
+    );
   }
 
   @override
@@ -220,7 +217,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: Text(l10n?.retry ?? 'Try again'),
+                label: Text(l10n.retry),
               ),
             // #1606 — suppress the report CTA for errors that should
             // never become a GitHub issue: designed-in stop-gap
@@ -232,7 +229,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
               TextButton.icon(
                 onPressed: () => _onReportPressed(context),
                 icon: const Icon(Icons.bug_report_outlined, size: 18),
-                label: Text(l10n?.reportThisIssue ?? 'Report this issue'),
+                label: Text(l10n.reportThisIssue),
               ),
             ],
             const SizedBox(height: 12),
@@ -241,23 +238,27 @@ class ServiceChainErrorWidget extends StatelessWidget {
               data: theme.copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
                 title: Text(
-                  l10n?.detailsLabel ?? 'Details',
+                  l10n.detailsLabel,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 children: _technicalDetails(l10n)
-                    .map((d) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 2),
-                          child: Text(
-                            d,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 11,
-                            ),
+                    .map(
+                      (d) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 2,
+                        ),
+                        child: Text(
+                          d,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 11,
                           ),
-                        ))
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ),

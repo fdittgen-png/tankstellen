@@ -18,7 +18,7 @@ class ApiKeyInputSection extends StatelessWidget {
   final CountryConfig country;
   final TextEditingController controller;
   final bool? formatValid;
-  final AppLocalizations? l10n;
+  final AppLocalizations l10n;
 
   const ApiKeyInputSection({
     super.key,
@@ -42,53 +42,38 @@ class ApiKeyInputSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n?.apiKeySetupTitle ?? 'API key setup (optional)',
-            style: theme.textTheme.titleMedium),
+        Text(l10n.apiKeySetupTitle, style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
-        Text(
-          l10n?.apiKeySetupDescription ??
-              'Register for a free API key, or skip to explore '
-                  'the app with demo data.',
-          style: theme.textTheme.bodyMedium,
-        ),
+        Text(l10n.apiKeySetupDescription, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 12),
         if (country.apiKeyRegistrationUrl != null)
           OutlinedButton.icon(
             onPressed: () async {
               final uri = Uri.parse(country.apiKeyRegistrationUrl!);
               if (await canLaunchUrl(uri)) {
-                await launchUrl(
-                  uri,
-                  mode: LaunchMode.externalApplication,
-                );
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
               }
             },
             icon: const Icon(Icons.open_in_new),
             label: Text(
-              l10n?.apiKeyRegistrationButton(country.apiProvider ?? '') ??
-                  '${country.apiProvider} Registration',
+              l10n.apiKeyRegistrationButton(country.apiProvider ?? ''),
             ),
           ),
         const SizedBox(height: 16),
         TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: l10n?.apiKeyLabel ?? 'API Key',
+            labelText: l10n.apiKeyLabel,
             hintText: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
             prefixIcon: const Icon(Icons.key),
             border: const OutlineInputBorder(),
             suffixIcon: _buildFormatIndicator(context),
-            errorText: formatValid == false
-                ? (l10n?.apiKeyFormatError ??
-                    'Invalid format — expected UUID (8-4-4-4-12)')
-                : null,
+            errorText: formatValid == false ? (l10n.apiKeyFormatError) : null,
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          l10n?.apiKeyTerms(country.apiProvider ?? '') ??
-              'By entering an API key you accept the terms of '
-                  '${country.apiProvider}. Data redistribution is prohibited.',
+          l10n.apiKeyTerms(country.apiProvider ?? ''),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),

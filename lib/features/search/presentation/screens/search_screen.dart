@@ -118,9 +118,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       if (!consented) {
         if (mounted) {
           SnackBarHelper.show(
-              context,
-              AppLocalizations.of(context)?.locationDenied ??
-                  'Location permission denied. You can search by postal code.');
+            context,
+            AppLocalizations.of(context).locationDenied,
+          );
         }
         return;
       }
@@ -128,20 +128,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     }
 
     // SearchState dispatches to EV or fuel service internally based on fuelType.
-    unawaited(searchNotifier.searchByGps(
-          fuelType: fuelType,
-          radiusKm: radius,
-        ));
+    unawaited(searchNotifier.searchByGps(fuelType: fuelType, radiusKm: radius));
   }
 
   void _performZipSearch(String zip) {
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
-    unawaited(ref.read(searchStateProvider.notifier).searchByZipCode(
-          zipCode: zip,
-          fuelType: fuelType,
-          radiusKm: radius,
-        ));
+    unawaited(
+      ref
+          .read(searchStateProvider.notifier)
+          .searchByZipCode(zipCode: zip, fuelType: fuelType, radiusKm: radius),
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -176,9 +173,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     // before the re-search lands.
     ref.listen<FuelType>(selectedFuelTypeProvider, (prev, next) {
       if (prev != next) {
-        unawaited(
-          ref.read(searchStateProvider.notifier).repeatLastSearch(),
-        );
+        unawaited(ref.read(searchStateProvider.notifier).repeatLastSearch());
       }
     });
 
@@ -216,7 +211,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     }
 
     return PageScaffold(
-      title: l10n?.appTitle ?? 'Sparkilo', // i18n-ignore: brand name
+      title: l10n.appTitle, // i18n-ignore: brand name
       toolbarHeight: isLandscape ? 40 : null,
       actions: [
         IconButton(
@@ -226,7 +221,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               ref.read(searchStateProvider.notifier).repeatLastSearch(),
             );
           },
-          tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+          tooltip: l10n.refreshPrices,
         ),
         if (radarActive) ...[
           // Pin — wake lock + immersive bars (copied from the trip screen).
@@ -235,8 +230,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             button: true,
             toggled: pinned,
             label: pinned
-                ? (l10n?.tripRecordingPinSemanticOn ?? 'Unpin recording form')
-                : (l10n?.tripRecordingPinSemanticOff ?? 'Pin recording form'),
+                ? (l10n.tripRecordingPinSemanticOn)
+                : (l10n.tripRecordingPinSemanticOff),
             // #2785 — long-press opens the pin-help sheet (what pinning does
             // + the "always pin when the radar starts" toggle).
             child: GestureDetector(
@@ -248,8 +243,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
                   pinned ? Icons.push_pin : Icons.push_pin_outlined,
                   color: pinned ? Theme.of(context).colorScheme.primary : null,
                 ),
-                tooltip: l10n?.tripRecordingPinTooltip ??
-                    'Pinning keeps the screen on — uses more battery',
+                tooltip: l10n.tripRecordingPinTooltip,
                 isSelected: pinned,
                 onPressed: togglePin,
               ),
@@ -260,8 +254,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             IconButton(
               key: const Key('radarMinimiseButton'),
               icon: const Icon(Icons.picture_in_picture_alt),
-              tooltip: l10n?.tripRecordingMinimiseTooltip ??
-                  'Minimise to a floating tile',
+              tooltip: l10n.tripRecordingMinimiseTooltip,
               onPressed: () => _pip.enterPip(),
             ),
         ],
@@ -303,8 +296,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
       detail: (!radarActive && selectedId != null)
           ? StationDetailInline(
               stationId: selectedId,
-              onClose: () =>
-                  ref.read(selectedStationProvider.notifier).clear(),
+              onClose: () => ref.read(selectedStationProvider.notifier).clear(),
             )
           : null,
       detailPlaceholder: const InlineMap(),
@@ -325,10 +317,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final isRoute = ref.watch(activeSearchModeProvider) == SearchMode.route;
     final corridorCodes = isRoute
         ? (ref
-                .watch(routeSearchStateProvider)
-                .value
-                ?.contributingCountryCodes(ref.watch(selectedFuelTypeProvider)) ??
-            const <String>{})
+                  .watch(routeSearchStateProvider)
+                  .value
+                  ?.contributingCountryCodes(
+                    ref.watch(selectedFuelTypeProvider),
+                  ) ??
+              const <String>{})
         : const <String>{};
 
     return Column(
@@ -360,14 +354,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               // user; show a localized, actionable message instead.
               // #2146 — route to the exportable log so the cause is
               // recoverable from a bug report.
-              unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-                'where': 'SearchScreen: userPosition.updateFromGps',
-              }));
+              unawaited(
+                errorLogger.log(
+                  ErrorLayer.ui,
+                  e,
+                  st,
+                  context: const {
+                    'where': 'SearchScreen: userPosition.updateFromGps',
+                  },
+                ),
+              );
               if (!context.mounted) return;
               SnackBarHelper.showError(
                 context,
-                AppLocalizations.of(context)?.searchFailedSnackbar ??
-                    'Search failed — please try again',
+                AppLocalizations.of(context).searchFailedSnackbar,
               );
             }
           },
@@ -375,7 +375,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         // Results dominate the remaining vertical space.
         Expanded(
           child: Semantics(
-            label: l10n?.searchResultsSemanticLabel ?? 'Search results',
+            label: l10n.searchResultsSemanticLabel,
             child: SearchResultsContent(onGpsRetry: _performGpsSearch),
           ),
         ),

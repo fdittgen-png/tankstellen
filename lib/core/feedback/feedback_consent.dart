@@ -19,11 +19,7 @@ import '../../core/logging/error_logger.dart';
 ///
 /// `denied` — user explicitly opted out. Subsequent reports fall
 /// back to the SharePlus path without re-prompting.
-enum FeedbackConsentState {
-  unset,
-  granted,
-  denied,
-}
+enum FeedbackConsentState { unset, granted, denied }
 
 /// Persistent storage for [FeedbackConsentState], backed by
 /// `shared_preferences` so the choice survives app restarts but is
@@ -57,7 +53,14 @@ class FeedbackConsent {
           return FeedbackConsentState.unset;
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FeedbackConsent.read failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.other,
+          e,
+          st,
+          context: const {'where': 'FeedbackConsent.read failed'},
+        ),
+      );
       return FeedbackConsentState.unset;
     }
   }
@@ -79,7 +82,14 @@ class FeedbackConsent {
           return;
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'FeedbackConsent.write failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.other,
+          e,
+          st,
+          context: const {'where': 'FeedbackConsent.write failed'},
+        ),
+      );
     }
   }
 }
@@ -87,11 +97,7 @@ class FeedbackConsent {
 /// Result of [FeedbackConsentDialog]. Distinct from [FeedbackConsentState]
 /// because "later" must NOT mutate persisted state — the dialog will be
 /// shown again on the next attempt.
-enum FeedbackConsentChoice {
-  granted,
-  denied,
-  later,
-}
+enum FeedbackConsentChoice { granted, denied, later }
 
 /// One-time consent dialog asking the user to allow the bad-scan
 /// reporter to file a public GitHub issue with the receipt photo and
@@ -122,30 +128,23 @@ class FeedbackConsentDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(
-        l?.feedbackConsentTitle ?? 'Send report to GitHub?',
-      ),
-      content: Text(
-        l?.feedbackConsentBody ??
-            'This creates a public ticket on our GitHub repository with '
-                'your photo and the OCR text. No personal data (location, '
-                'account id) is sent. Continue?',
-      ),
+      title: Text(l.feedbackConsentTitle),
+      content: Text(l.feedbackConsentBody),
       actions: [
         TextButton(
           onPressed: () =>
               Navigator.of(context).pop(FeedbackConsentChoice.later),
-          child: Text(l?.feedbackConsentLater ?? 'Later'),
+          child: Text(l.feedbackConsentLater),
         ),
         TextButton(
           onPressed: () =>
               Navigator.of(context).pop(FeedbackConsentChoice.denied),
-          child: Text(l?.feedbackConsentCancel ?? 'Cancel'),
+          child: Text(l.feedbackConsentCancel),
         ),
         FilledButton(
           onPressed: () =>
               Navigator.of(context).pop(FeedbackConsentChoice.granted),
-          child: Text(l?.feedbackConsentContinue ?? 'Continue'),
+          child: Text(l.feedbackConsentContinue),
         ),
       ],
     );

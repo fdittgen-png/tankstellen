@@ -112,12 +112,21 @@ class AutoRecordSection extends ConsumerWidget {
     // an empty card keeps the surrounding form rendering.
     VehicleProfile profile;
     try {
-      profile = ref.watch(vehicleProfileListProvider).firstWhere(
+      profile = ref
+          .watch(vehicleProfileListProvider)
+          .firstWhere(
             (v) => v.id == vehicleId,
             orElse: () => const VehicleProfile(id: '', name: ''),
           );
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AutoRecordSection: profile lookup failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'AutoRecordSection: profile lookup failed'},
+        ),
+      );
       return const SizedBox.shrink();
     }
 
@@ -128,7 +137,7 @@ class AutoRecordSection extends ConsumerWidget {
     }
 
     return SectionCard(
-      title: l?.autoRecordSectionTitle ?? 'Auto-record',
+      title: l.autoRecordSectionTitle,
       leadingIcon: Icons.smart_toy_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -136,7 +145,7 @@ class AutoRecordSection extends ConsumerWidget {
           SwitchListTile(
             key: const Key('autoRecordToggle'),
             contentPadding: EdgeInsets.zero,
-            title: Text(l?.autoRecordToggleLabel ?? 'Auto-record trips'),
+            title: Text(l.autoRecordToggleLabel),
             value: profile.autoRecord,
             onChanged: (next) =>
                 _persist(ref, profile.copyWith(autoRecord: next)),
@@ -152,8 +161,7 @@ class AutoRecordSection extends ConsumerWidget {
             const SizedBox(height: 16),
             _SpeedThresholdSlider(
               value: profile.movementStartThresholdKmh,
-              label: l?.autoRecordSpeedThresholdLabel ??
-                  'Start speed (km/h)',
+              label: l.autoRecordSpeedThresholdLabel,
               onChangeEnd: (v) => _persistWithFeedback(
                 context,
                 ref,
@@ -164,8 +172,7 @@ class AutoRecordSection extends ConsumerWidget {
             const SizedBox(height: 16),
             _SaveDelaySlider(
               value: profile.disconnectSaveDelaySec,
-              label: l?.autoRecordSaveDelayLabel ??
-                  'Save delay after disconnect (seconds)',
+              label: l.autoRecordSaveDelayLabel,
               onChangeEnd: (v) => _persistWithFeedback(
                 context,
                 ref,
@@ -179,10 +186,8 @@ class AutoRecordSection extends ConsumerWidget {
             const SizedBox(height: 16),
             _BackgroundLocationRow(
               consent: profile.backgroundLocationConsent,
-              label: l?.autoRecordBackgroundLocationLabel ??
-                  'Background location allowed',
-              requestLabel: l?.autoRecordBackgroundLocationRequest ??
-                  'Request permission',
+              label: l.autoRecordBackgroundLocationLabel,
+              requestLabel: l.autoRecordBackgroundLocationRequest,
               theme: theme,
               onRequest: () => _handleBackgroundLocationRequest(
                 context: context,
@@ -190,10 +195,8 @@ class AutoRecordSection extends ConsumerWidget {
                 profile: profile,
                 l: l,
               ),
-              onShowExplanation: () => _showConsentExplanationDialog(
-                context: context,
-                l: l,
-              ),
+              onShowExplanation: () =>
+                  _showConsentExplanationDialog(context: context, l: l),
               onRevoke: () => (openSettings ?? _defaultOpenSettings)(),
             ),
           ],
@@ -211,19 +214,24 @@ class AutoRecordSection extends ConsumerWidget {
   Future<void> _persistWithFeedback(
     BuildContext context,
     WidgetRef ref,
-    AppLocalizations? l,
+    AppLocalizations l,
     VehicleProfile next,
   ) async {
     try {
       await _persist(ref, next);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'AutoRecordSection._persistWithFeedback'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'AutoRecordSection._persistWithFeedback'},
+        ),
+      );
       if (!context.mounted) return;
       SnackBarHelper.showError(
         context,
-        l?.autoRecordBackgroundLocationRequestFailedSnackbar ??
-            'Could not save setting',
+        l.autoRecordBackgroundLocationRequestFailedSnackbar,
       );
     }
   }
@@ -263,7 +271,7 @@ class AutoRecordSection extends ConsumerWidget {
     required BuildContext context,
     required WidgetRef ref,
     required VehicleProfile profile,
-    required AppLocalizations? l,
+    required AppLocalizations l,
   }) async {
     final navigator = Navigator.maybeOf(context);
     final foregroundPrompt =
@@ -279,8 +287,7 @@ class AutoRecordSection extends ConsumerWidget {
         if (!context.mounted) return;
         SnackBarHelper.show(
           context,
-          l?.autoRecordBackgroundLocationForegroundDeniedSnackbar ??
-              'Location permission required',
+          l.autoRecordBackgroundLocationForegroundDeniedSnackbar,
         );
         return;
       }
@@ -290,10 +297,7 @@ class AutoRecordSection extends ConsumerWidget {
       // rationale dialog → Settings fallback instead of re-prompting.
       final bgStatus = await backgroundPrompt();
       if (bgStatus.isGranted) {
-        await _persist(
-          ref,
-          profile.copyWith(backgroundLocationConsent: true),
-        );
+        await _persist(ref, profile.copyWith(backgroundLocationConsent: true));
         return;
       }
 
@@ -326,15 +330,12 @@ class AutoRecordSection extends ConsumerWidget {
         ErrorLayer.ui,
         e,
         st,
-        context: const {
-          'op': 'autoRecordSection.requestBackgroundLocation',
-        },
+        context: const {'op': 'autoRecordSection.requestBackgroundLocation'},
       );
       if (!context.mounted) return;
       SnackBarHelper.showError(
         context,
-        l?.autoRecordBackgroundLocationRequestFailedSnackbar ??
-            'Could not request background location',
+        l.autoRecordBackgroundLocationRequestFailedSnackbar,
       );
     }
   }
@@ -347,30 +348,20 @@ class AutoRecordSection extends ConsumerWidget {
   /// reported in user feedback (issue #1439).
   Future<void> _showConsentExplanationDialog({
     required BuildContext context,
-    required AppLocalizations? l,
+    required AppLocalizations l,
   }) {
     return showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           key: const Key('autoRecordConsentExplanationDialog'),
-          title: Text(
-            l?.autoRecordConsentExplanationTitle ?? 'About this permission',
-          ),
-          content: Text(
-            l?.autoRecordConsentExplanationBody ??
-                'Auto-record needs background location to detect when you '
-                    'start driving while the app is closed. This grant is '
-                    'used only by auto-record — station search and map '
-                    'centering use a separate foreground location grant.',
-          ),
+          title: Text(l.autoRecordConsentExplanationTitle),
+          content: Text(l.autoRecordConsentExplanationBody),
           actions: [
             TextButton(
               key: const Key('autoRecordConsentExplanationClose'),
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                l?.autoRecordConsentExplanationCloseButton ?? 'Got it',
-              ),
+              child: Text(l.autoRecordConsentExplanationCloseButton),
             ),
           ],
         );
@@ -382,25 +373,15 @@ class AutoRecordSection extends ConsumerWidget {
     required BuildContext context,
     required NavigatorState? navigator,
     required Future<void> Function() openSettingsFn,
-    required AppLocalizations? l,
+    required AppLocalizations l,
   }) {
     return showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           key: const Key('autoRecordBackgroundLocationRationaleDialog'),
-          title: Text(
-            l?.autoRecordBackgroundLocationRationaleTitle ??
-                'Why "Allow all the time"?',
-          ),
-          content: Text(
-            l?.autoRecordBackgroundLocationRationaleBody ??
-                'Auto-record streams GPS coordinates from the OBD-II '
-                    'foreground service while the screen is off so your '
-                    'trip route stays accurate. Android requires the '
-                    '"Allow all the time" option for that to keep '
-                    'working after the device locks.',
-          ),
+          title: Text(l.autoRecordBackgroundLocationRationaleTitle),
+          content: Text(l.autoRecordBackgroundLocationRationaleBody),
           actions: [
             TextButton(
               key: const Key('autoRecordBackgroundLocationOpenSettings'),
@@ -408,10 +389,7 @@ class AutoRecordSection extends ConsumerWidget {
                 Navigator.of(dialogContext).pop();
                 await openSettingsFn();
               },
-              child: Text(
-                l?.autoRecordBackgroundLocationOpenSettings ??
-                    'Open settings',
-              ),
+              child: Text(l.autoRecordBackgroundLocationOpenSettings),
             ),
           ],
         );
@@ -444,7 +422,7 @@ enum _AutoRecordStatus {
 class _AutoRecordStatusBanner extends StatelessWidget {
   final _AutoRecordStatus state;
   final ThemeData theme;
-  final AppLocalizations? l;
+  final AppLocalizations l;
   final VoidCallback? onScrollToObd2Card;
 
   const _AutoRecordStatusBanner({
@@ -493,9 +471,7 @@ class _AutoRecordStatusBanner extends StatelessWidget {
           Expanded(
             child: Text(
               _labelFor(state, l),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: onContainer,
-              ),
+              style: theme.textTheme.bodySmall?.copyWith(color: onContainer),
             ),
           ),
         ],
@@ -503,22 +479,18 @@ class _AutoRecordStatusBanner extends StatelessWidget {
     );
   }
 
-  static String _labelFor(_AutoRecordStatus s, AppLocalizations? l) {
+  static String _labelFor(_AutoRecordStatus s, AppLocalizations l) {
     switch (s) {
       case _AutoRecordStatus.active:
-        return l?.autoRecordStatusActiveLabel ??
-            'Auto-record will activate the next time you enter the car.';
+        return l.autoRecordStatusActiveLabel;
       case _AutoRecordStatus.needsPairing:
         // Unused for needsPairing — the passive link in
         // [_PairAdapterLink] supplies its own copy. Kept as a fallback
         // for completeness so a future refactor that re-routes this
         // helper for needsPairing still gets a sensible string.
-        return l?.autoRecordStatusNeedsPairingLabel ??
-            'Pair an OBD2 adapter to enable auto-record.';
+        return l.autoRecordStatusNeedsPairingLabel;
       case _AutoRecordStatus.needsBackgroundLocation:
-        return l?.autoRecordStatusNeedsBackgroundLocationLabel ??
-            'Allow background location so auto-record keeps running '
-                'with the screen off.';
+        return l.autoRecordStatusNeedsBackgroundLocationLabel;
     }
   }
 
@@ -543,7 +515,7 @@ class _AutoRecordStatusBanner extends StatelessWidget {
 /// isolated widget tests don't need to wire scroll plumbing.
 class _PairAdapterLink extends StatelessWidget {
   final ThemeData theme;
-  final AppLocalizations? l;
+  final AppLocalizations l;
   final VoidCallback? onTap;
 
   const _PairAdapterLink({
@@ -569,9 +541,7 @@ class _PairAdapterLink extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  l?.autoRecordPairAdapterLinkText ??
-                      'Pair an adapter in the section below to enable '
-                          'auto-recording',
+                  l.autoRecordPairAdapterLinkText,
                   style: theme.textTheme.bodySmall,
                 ),
               ),
@@ -695,10 +665,7 @@ class _SaveDelaySliderState extends State<_SaveDelaySlider> {
             Expanded(
               child: Text(widget.label, style: theme.textTheme.bodyMedium),
             ),
-            Text(
-              _current.toString(),
-              style: theme.textTheme.titleMedium,
-            ),
+            Text(_current.toString(), style: theme.textTheme.titleMedium),
           ],
         ),
         Slider(
@@ -744,12 +711,9 @@ class _BackgroundLocationRow extends StatelessWidget {
       // opens the explanation dialog, tapping the row body opens the
       // system app-settings page so the user can revoke. Hides the
       // pre-#1439 ambiguous "Background location allowed" check.
-      final badgeLabel = l?.autoRecordConsentBadgeLabel ??
-          'Background location — for auto-record only';
-      final revokeHint = l?.autoRecordConsentRevokeAction ??
-          'Tap to manage in system settings';
-      final helpTooltip = l?.autoRecordConsentExplanationTooltip ??
-          'What does this mean?';
+      final badgeLabel = l.autoRecordConsentBadgeLabel;
+      final revokeHint = l.autoRecordConsentRevokeAction;
+      final helpTooltip = l.autoRecordConsentExplanationTooltip;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -772,10 +736,7 @@ class _BackgroundLocationRow extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          badgeLabel,
-                          style: theme.textTheme.bodyMedium,
-                        ),
+                        Text(badgeLabel, style: theme.textTheme.bodyMedium),
                         const SizedBox(height: 2),
                         Text(
                           revokeHint,
@@ -812,9 +773,7 @@ class _BackgroundLocationRow extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: Text(label, style: theme.textTheme.bodyMedium),
-            ),
+            Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           ],
         ),
         const SizedBox(height: 8),

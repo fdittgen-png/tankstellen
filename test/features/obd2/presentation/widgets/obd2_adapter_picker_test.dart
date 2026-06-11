@@ -32,8 +32,9 @@ void main() {
       expect(find.byKey(const Key('obdPickerScanning')), findsOneWidget);
     });
 
-    testWidgets('renders the ranked candidates once scan emits',
-        (tester) async {
+    testWidgets('renders the ranked candidates once scan emits', (
+      tester,
+    ) async {
       final svc = _buildService([
         [
           _scanHit(name: 'vLinker FD', rssi: -55),
@@ -51,36 +52,38 @@ void main() {
     });
 
     testWidgets(
-        '#3103 — recognized + NAMED-unrecognized render in two sections, with '
-        'the BLE-only notice when Classic discovery is unavailable',
-        (tester) async {
-      final svc = _buildService([
-        [
-          _scanHit(name: 'vLinker FD', rssi: -50), // recognized BLE profile
-          _scanHit(name: 'My Random Dongle', rssi: -70), // named, unknown
-        ],
-      ]);
-      await _pump(tester, svc);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+      '#3103 — recognized + NAMED-unrecognized render in two sections, with '
+      'the BLE-only notice when Classic discovery is unavailable',
+      (tester) async {
+        final svc = _buildService([
+          [
+            _scanHit(name: 'vLinker FD', rssi: -50), // recognized BLE profile
+            _scanHit(name: 'My Random Dongle', rssi: -70), // named, unknown
+          ],
+        ]);
+        await _pump(tester, svc);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
 
-      // The recognized adapter shows as before.
-      expect(find.text('vLinker FD'), findsOneWidget);
-      // The unrecognized device is SURFACED (not dropped) under the "other
-      // devices" header with a tap-to-try subtitle.
-      expect(find.text('My Random Dongle'), findsOneWidget);
-      expect(find.text('Other Bluetooth devices'), findsOneWidget);
-      expect(find.textContaining('Unrecognized — tap to try'), findsOneWidget);
-      // _buildService wires no Classic facade ⇒ supportsClassicDiscovery is
-      // false ⇒ the iOS-style "BLE adapters only" notice is shown.
-      expect(
-        find.byKey(const Key('obdPickerBleOnlyNotice')),
-        findsOneWidget,
-      );
-    });
+        // The recognized adapter shows as before.
+        expect(find.text('vLinker FD'), findsOneWidget);
+        // The unrecognized device is SURFACED (not dropped) under the "other
+        // devices" header with a tap-to-try subtitle.
+        expect(find.text('My Random Dongle'), findsOneWidget);
+        expect(find.text('Other Bluetooth devices'), findsOneWidget);
+        expect(
+          find.textContaining('Unrecognized — tap to try'),
+          findsOneWidget,
+        );
+        // _buildService wires no Classic facade ⇒ supportsClassicDiscovery is
+        // false ⇒ the iOS-style "BLE adapters only" notice is shown.
+        expect(find.byKey(const Key('obdPickerBleOnlyNotice')), findsOneWidget);
+      },
+    );
 
-    testWidgets('tapping a candidate transitions to connecting state',
-        (tester) async {
+    testWidgets('tapping a candidate transitions to connecting state', (
+      tester,
+    ) async {
       final svc = _buildService([
         [_scanHit(name: 'vLinker FD', rssi: -55)],
       ]);
@@ -106,33 +109,33 @@ void main() {
     });
 
     testWidgets(
-        'shows the retry button + error message + open-settings CTA on permission denied',
-        (tester) async {
-      final svc = Obd2ConnectionService(
-        registry: Obd2AdapterRegistry.defaults(),
-        permissions: _FakePermissions(Obd2PermissionState.denied),
-        bluetooth: _StreamingFacade(const []),
-      );
-      await _pump(tester, svc);
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('obdPickerError')), findsOneWidget);
-      // The denial error message itself is rendered.
-      expect(
-        find.text('Bluetooth permission denied'),
-        findsOneWidget,
-      );
-      // Retry stays visible — the user might be on a transient denial
-      // (first prompt, "Don't Allow") and Retry will re-prompt.
-      expect(find.byKey(const Key('obdPickerRetry')), findsOneWidget);
-      // New CTA introduced for the iOS permanently-denied case: deep-
-      // link into the app's Settings row so the user can flip the
-      // Bluetooth toggle. Tappable by key — we don't verify the platform
-      // channel call here (it's a no-op in widget tests by default).
-      expect(
-        find.byKey(const Key('obdPickerOpenSettings')),
-        findsOneWidget,
-      );
-    });
+      'shows the retry button + error message + open-settings CTA on permission denied',
+      (tester) async {
+        final svc = Obd2ConnectionService(
+          registry: Obd2AdapterRegistry.defaults(),
+          permissions: _FakePermissions(Obd2PermissionState.denied),
+          bluetooth: _StreamingFacade(const []),
+        );
+        await _pump(tester, svc);
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('obdPickerError')), findsOneWidget);
+        // The denial error message itself is rendered.
+        expect(
+          find.text(
+            'Bluetooth permission is required to connect to an OBD2 adapter.',
+          ),
+          findsOneWidget,
+        );
+        // Retry stays visible — the user might be on a transient denial
+        // (first prompt, "Don't Allow") and Retry will re-prompt.
+        expect(find.byKey(const Key('obdPickerRetry')), findsOneWidget);
+        // New CTA introduced for the iOS permanently-denied case: deep-
+        // link into the app's Settings row so the user can flip the
+        // Bluetooth toggle. Tappable by key — we don't verify the platform
+        // channel call here (it's a no-op in widget tests by default).
+        expect(find.byKey(const Key('obdPickerOpenSettings')), findsOneWidget);
+      },
+    );
   });
 
   // #1188 — pinned-MAC fast path. `showObd2AdapterPicker` accepts a
@@ -140,8 +143,9 @@ void main() {
   // a silent direct connect via [Obd2ConnectionService.connectByMac]
   // and only falls back to the modal sheet when that fails.
   group('showObd2AdapterPicker pinned-MAC fast path (#1188)', () {
-    testWidgets('pinnedMac=null shows the sheet (regression check)',
-        (tester) async {
+    testWidgets('pinnedMac=null shows the sheet (regression check)', (
+      tester,
+    ) async {
       final svc = _RecordingFakeConnection.success();
       final completer = Completer<Obd2Service?>();
 
@@ -170,106 +174,108 @@ void main() {
       expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
       expect(svc.connectByMacCalls, isEmpty);
       // Tear down the open future cleanly.
-      Navigator.of(tester.element(find.text('Pick an OBD2 adapter')))
-          .pop();
+      Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
       await tester.pumpAndSettle();
       await completer.future;
     });
 
     testWidgets(
-        'pinnedMac with successful connect resolves silently (no sheet)',
-        (tester) async {
-      final fakeService = _NoopObd2Service();
-      final svc = _RecordingFakeConnection(
-        connectByMacResult: fakeService,
-      );
-      final completer = Completer<Obd2Service?>();
+      'pinnedMac with successful connect resolves silently (no sheet)',
+      (tester) async {
+        final fakeService = _NoopObd2Service();
+        final svc = _RecordingFakeConnection(connectByMacResult: fakeService);
+        final completer = Completer<Obd2Service?>();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Builder(
-                builder: (ctx) => ElevatedButton(
-                  onPressed: () {
-                    completer.complete(showObd2AdapterPicker(
-                      ctx,
-                      pinnedMac: 'AA:BB:CC:DD:EE:FF',
-                      pinnedAdapterName: 'vLinker FS',
-                    ));
-                  },
-                  child: const Text('open'),
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder(
+                  builder: (ctx) => ElevatedButton(
+                    onPressed: () {
+                      completer.complete(
+                        showObd2AdapterPicker(
+                          ctx,
+                          pinnedMac: 'AA:BB:CC:DD:EE:FF',
+                          pinnedAdapterName: 'vLinker FS',
+                        ),
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.tap(find.text('open'));
-      await tester.pumpAndSettle();
+        );
+        await tester.tap(find.text('open'));
+        await tester.pumpAndSettle();
 
-      expect(svc.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
-      // No sheet rendered.
-      expect(find.text('Pick an OBD2 adapter'), findsNothing);
-      // Future resolved with the service.
-      final resolved = await completer.future;
-      expect(resolved, same(fakeService));
-    });
+        expect(svc.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
+        // No sheet rendered.
+        expect(find.text('Pick an OBD2 adapter'), findsNothing);
+        // Future resolved with the service.
+        final resolved = await completer.future;
+        expect(resolved, same(fakeService));
+      },
+    );
 
     testWidgets(
-        'pinnedMac with failed connect (returns null) opens sheet + snackbar',
-        (tester) async {
-      final svc = _RecordingFakeConnection(
-        connectByMacResult: null, // simulate timeout / out-of-range
-      );
-      final completer = Completer<Obd2Service?>();
+      'pinnedMac with failed connect (returns null) opens sheet + snackbar',
+      (tester) async {
+        final svc = _RecordingFakeConnection(
+          connectByMacResult: null, // simulate timeout / out-of-range
+        );
+        final completer = Completer<Obd2Service?>();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Builder(
-                builder: (ctx) => ElevatedButton(
-                  onPressed: () {
-                    completer.complete(showObd2AdapterPicker(
-                      ctx,
-                      pinnedMac: 'AA:BB:CC:DD:EE:FF',
-                      pinnedAdapterName: 'vLinker FS',
-                    ));
-                  },
-                  child: const Text('open'),
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [obd2ConnectionProvider.overrideWith((_) => svc)],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Builder(
+                  builder: (ctx) => ElevatedButton(
+                    onPressed: () {
+                      completer.complete(
+                        showObd2AdapterPicker(
+                          ctx,
+                          pinnedMac: 'AA:BB:CC:DD:EE:FF',
+                          pinnedAdapterName: 'vLinker FS',
+                        ),
+                      );
+                    },
+                    child: const Text('open'),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-      await tester.tap(find.text('open'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
+        );
+        await tester.tap(find.text('open'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
 
-      expect(svc.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
-      // Sheet IS rendered now (fallback) — its title shows.
-      expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
-      // Snackbar with the pinned name carries the localized message.
-      expect(
-        find.textContaining("Couldn't reach 'vLinker FS'"),
-        findsOneWidget,
-      );
+        expect(svc.connectByMacCalls, ['AA:BB:CC:DD:EE:FF']);
+        // Sheet IS rendered now (fallback) — its title shows.
+        expect(find.text('Pick an OBD2 adapter'), findsOneWidget);
+        // Snackbar with the pinned name carries the localized message.
+        expect(
+          find.textContaining("Couldn't reach 'vLinker FS'"),
+          findsOneWidget,
+        );
 
-      // Drain the picker — the underlying scan stream is empty so it
-      // sits in `scanning`. Pop the sheet to resolve the future.
-      Navigator.of(tester.element(find.text('Pick an OBD2 adapter')))
-          .pop();
-      await tester.pumpAndSettle();
-      await completer.future;
-    });
+        // Drain the picker — the underlying scan stream is empty so it
+        // sits in `scanning`. Pop the sheet to resolve the future.
+        Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
+        await tester.pumpAndSettle();
+        await completer.future;
+      },
+    );
   });
 
   // #2745 — error-log #14 trace #5: an `[ui] Obd2AdapterUnresponsive` ERROR
@@ -297,9 +303,11 @@ void main() {
             home: Scaffold(
               body: Builder(
                 builder: (ctx) => ElevatedButton(
-                  onPressed: () => showObd2AdapterPicker(ctx,
-                      pinnedMac: 'AA:BB:CC:DD:EE:FF',
-                      pinnedAdapterName: 'vLinker FS'),
+                  onPressed: () => showObd2AdapterPicker(
+                    ctx,
+                    pinnedMac: 'AA:BB:CC:DD:EE:FF',
+                    pinnedAdapterName: 'vLinker FS',
+                  ),
                   child: const Text('open'),
                 ),
               ),
@@ -313,27 +321,35 @@ void main() {
     }
 
     testWidgets(
-        'an expected Obd2AdapterUnresponsive is a breadcrumb, NOT an ERROR',
-        (tester) async {
-      await pumpAndOpen(tester, const Obd2AdapterUnresponsive());
+      'an expected Obd2AdapterUnresponsive is a breadcrumb, NOT an ERROR',
+      (tester) async {
+        await pumpAndOpen(tester, const Obd2AdapterUnresponsive());
 
-      expect(rec.errors, isEmpty,
-          reason: 'an already-user-surfaced condition must NOT ERROR-log');
-      expect(
-        BreadcrumbCollector.snapshot().map((b) => b.action),
-        contains('OBD2 connect failed — expected user condition'),
-      );
+        expect(
+          rec.errors,
+          isEmpty,
+          reason: 'an already-user-surfaced condition must NOT ERROR-log',
+        );
+        expect(
+          BreadcrumbCollector.snapshot().map((b) => b.action),
+          contains('OBD2 connect failed — expected user condition'),
+        );
 
-      Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
-      await tester.pumpAndSettle();
-    });
+        Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
+        await tester.pumpAndSettle();
+      },
+    );
 
-    testWidgets('a genuine Obd2PermissionDenied STILL ERROR-logs (the guard)',
-        (tester) async {
+    testWidgets('a genuine Obd2PermissionDenied STILL ERROR-logs (the guard)', (
+      tester,
+    ) async {
       await pumpAndOpen(tester, const Obd2PermissionDenied());
 
-      expect(rec.errors, hasLength(1),
-          reason: 'permission denial is a genuine, diagnostic-worthy fault');
+      expect(
+        rec.errors,
+        hasLength(1),
+        reason: 'permission denial is a genuine, diagnostic-worthy fault',
+      );
       expect(rec.errors.single.toString(), contains('pinned connect failed'));
 
       Navigator.of(tester.element(find.text('Pick an OBD2 adapter'))).pop();
@@ -359,73 +375,77 @@ void main() {
     });
 
     testWidgets(
-        'unmounting the sheet before connect resolves does NOT ref-after-unmount',
-        (tester) async {
-      final list = _RecordingVehicleList([
-        const VehicleProfile(id: 'v1', name: 'Golf'),
-      ]);
-      // connect() is gated on a completer the test controls, so we can
-      // unmount the sheet while it is still pending.
-      final svc = _GatedConnection();
+      'unmounting the sheet before connect resolves does NOT ref-after-unmount',
+      (tester) async {
+        final list = _RecordingVehicleList([
+          const VehicleProfile(id: 'v1', name: 'Golf'),
+        ]);
+        // connect() is gated on a completer the test controls, so we can
+        // unmount the sheet while it is still pending.
+        final svc = _GatedConnection();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            obd2ConnectionProvider.overrideWith((_) => svc),
-            vehicleProfileListProvider.overrideWith(() => list),
-            activeVehicleProfileProvider.overrideWith(
-              () => _StubActiveVehicle(
-                const VehicleProfile(id: 'v1', name: 'Golf'),
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              obd2ConnectionProvider.overrideWith((_) => svc),
+              vehicleProfileListProvider.overrideWith(() => list),
+              activeVehicleProfileProvider.overrideWith(
+                () => _StubActiveVehicle(
+                  const VehicleProfile(id: 'v1', name: 'Golf'),
+                ),
               ),
+            ],
+            child: const MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(body: Obd2AdapterPickerSheet()),
             ),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(body: Obd2AdapterPickerSheet()),
           ),
-        ),
-      );
-      // Scan emits one candidate → selecting state with a tappable tile.
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
-      await tester.tap(find.text('vLinker FD'));
-      await tester.pump(); // flips to connecting; connect() now pending.
+        );
+        // Scan emits one candidate → selecting state with a tappable tile.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.tap(find.text('vLinker FD'));
+        await tester.pump(); // flips to connecting; connect() now pending.
 
-      // Dismiss the sheet WHILE connect() is still in flight — this is the
-      // crash window: the sheet unmounts, then connect() resolves and the
-      // post-await persist runs.
-      await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: SizedBox.shrink())),
-      );
-      expect(
-        find.byType(Obd2AdapterPickerSheet),
-        findsNothing,
-        reason: 'sheet must be unmounted before connect resolves',
-      );
+        // Dismiss the sheet WHILE connect() is still in flight — this is the
+        // crash window: the sheet unmounts, then connect() resolves and the
+        // post-await persist runs.
+        await tester.pumpWidget(
+          const MaterialApp(home: Scaffold(body: SizedBox.shrink())),
+        );
+        expect(
+          find.byType(Obd2AdapterPickerSheet),
+          findsNothing,
+          reason: 'sheet must be unmounted before connect resolves',
+        );
 
-      // Now resolve the connect — on master this drove a ref read after
-      // unmount, swallowed into a `[ui] Bad state` ERROR trace.
-      svc.completeConnect(_NoopObd2Service());
-      await tester.pump();
-      await tester.pump();
+        // Now resolve the connect — on master this drove a ref read after
+        // unmount, swallowed into a `[ui] Bad state` ERROR trace.
+        svc.completeConnect(_NoopObd2Service());
+        await tester.pump();
+        await tester.pump();
 
-      // No ref-after-unmount StateError reached the error logger.
-      final unmountErrors = rec.errors
-          .map((e) => e.toString())
-          .where((s) => s.contains('unmounted') || s.contains('Bad state'))
-          .toList();
-      expect(
-        unmountErrors,
-        isEmpty,
-        reason: 'post-await persist must not touch `ref` after unmount',
-      );
-      // The persist still happened via the pre-await capture — the picked
-      // adapter MAC was written even though the sheet was gone.
-      expect(list.savedProfiles, hasLength(1));
-      expect(list.savedProfiles.single.obd2AdapterMac, 'id-vLinker FD');
-    });
+        // No ref-after-unmount StateError reached the error logger.
+        final unmountErrors = rec.errors
+            .map((e) => e.toString())
+            .where((s) => s.contains('unmounted') || s.contains('Bad state'))
+            .toList();
+        expect(
+          unmountErrors,
+          isEmpty,
+          reason: 'post-await persist must not touch `ref` after unmount',
+        );
+        // The persist still happened via the pre-await capture — the picked
+        // adapter MAC was written even though the sheet was gone.
+        expect(list.savedProfiles, hasLength(1));
+        expect(list.savedProfiles.single.obd2AdapterMac, 'id-vLinker FD');
+      },
+    );
 
-    testWidgets('the mounted path still persists the picked adapter',
-        (tester) async {
+    testWidgets('the mounted path still persists the picked adapter', (
+      tester,
+    ) async {
       final list = _RecordingVehicleList([
         const VehicleProfile(id: 'v1', name: 'Golf'),
       ]);
@@ -444,6 +464,8 @@ void main() {
             ),
           ],
           child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: Obd2AdapterPickerSheet()),
           ),
         ),
@@ -498,11 +520,11 @@ class _StubActiveVehicle extends ActiveVehicleProfile {
 /// single candidate so the picker reaches `selecting` with a tappable tile.
 class _GatedConnection extends Obd2ConnectionService {
   _GatedConnection()
-      : super(
-          registry: Obd2AdapterRegistry.defaults(),
-          permissions: _FakePermissions(Obd2PermissionState.granted),
-          bluetooth: _StreamingFacade(const []),
-        );
+    : super(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: _StreamingFacade(const []),
+      );
 
   final Completer<Obd2Service> _connectGate = Completer<Obd2Service>();
 
@@ -533,8 +555,11 @@ class _GatedConnection extends Obd2ConnectionService {
 class _CaptureRecorder implements TraceRecorder {
   final errors = <Object>[];
   @override
-  Future<void> record(Object error, StackTrace stackTrace,
-      {ServiceChainSnapshot? serviceChainState}) async {
+  Future<void> record(
+    Object error,
+    StackTrace stackTrace, {
+    ServiceChainSnapshot? serviceChainState,
+  }) async {
     errors.add(error);
   }
 
@@ -551,11 +576,11 @@ class _CaptureRecorder implements TraceRecorder {
 /// "the sheet IS rendered" without chasing further state transitions.
 class _RecordingFakeConnection extends Obd2ConnectionService {
   _RecordingFakeConnection({this.connectByMacResult, this.connectByMacError})
-      : super(
-          registry: Obd2AdapterRegistry.defaults(),
-          permissions: _FakePermissions(Obd2PermissionState.granted),
-          bluetooth: _StreamingFacade(const []),
-        );
+    : super(
+        registry: Obd2AdapterRegistry.defaults(),
+        permissions: _FakePermissions(Obd2PermissionState.granted),
+        bluetooth: _StreamingFacade(const []),
+      );
   factory _RecordingFakeConnection.success() =>
       _RecordingFakeConnection(connectByMacResult: _NoopObd2Service());
 
@@ -591,10 +616,7 @@ class _NoopObd2Service implements Obd2Service {
 
 // --- helpers ---------------------------------------------------------
 
-Future<void> _pump(
-  WidgetTester tester,
-  Obd2ConnectionService svc,
-) async {
+Future<void> _pump(WidgetTester tester, Obd2ConnectionService svc) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -611,14 +633,15 @@ Future<void> _pump(
         ),
       ],
       child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: Obd2AdapterPickerSheet()),
       ),
     ),
   );
 }
 
-Obd2ConnectionService _buildService(
-    List<List<Obd2AdapterCandidate>> batches) {
+Obd2ConnectionService _buildService(List<List<Obd2AdapterCandidate>> batches) {
   return Obd2ConnectionService(
     registry: Obd2AdapterRegistry.defaults(),
     permissions: _FakePermissions(Obd2PermissionState.granted),
@@ -663,10 +686,7 @@ class _StreamingFacade implements BluetoothFacade {
   Future<void> stopScan() async {}
 
   @override
-  ElmByteChannel channelFor(
-    String deviceId,
-    Obd2AdapterProfile profile,
-  ) =>
+  ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile) =>
       _SilentChannel();
 
   @override
@@ -674,8 +694,7 @@ class _StreamingFacade implements BluetoothFacade {
     String mac, {
     Duration connectTimeout = const Duration(seconds: 4),
     bool autoConnect = false,
-  }) =>
-      _SilentChannel();
+  }) => _SilentChannel();
 }
 
 /// Silent channel — never answers, so the transport's init sequence

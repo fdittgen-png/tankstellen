@@ -32,7 +32,7 @@ class FillUpDateRow extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: const Icon(Icons.calendar_today),
-      title: Text(l?.fillUpDate ?? 'Date'),
+      title: Text(l.fillUpDate),
       subtitle: Text(dateLabel),
       onTap: onTap,
     );

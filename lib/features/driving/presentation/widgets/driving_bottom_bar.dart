@@ -35,10 +35,9 @@ class DrivingBottomBar extends StatelessWidget {
       decoration: BoxDecoration(
         // #2117 — in-car bottom bar needs higher contrast for at-a-glance
         // legibility. surfaceContainerHighest lifts it cleanly off the map.
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest
-            .withValues(alpha: 0.95),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.95),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
@@ -52,18 +51,18 @@ class DrivingBottomBar extends StatelessWidget {
         children: [
           _DrivingButton(
             icon: Icons.my_location,
-            label: l10n?.currentLocation ?? 'Location',
+            label: l10n.currentLocation,
             onTap: onRecenter,
           ),
           _DrivingButton(
             icon: Icons.local_gas_station,
-            label: l10n?.drivingNearestStation ?? 'Nearest',
+            label: l10n.drivingNearestStation,
             onTap: onNearestStation,
             isPrimary: true,
           ),
           _DrivingButton(
             icon: Icons.close,
-            label: l10n?.drivingExit ?? 'Exit',
+            label: l10n.drivingExit,
             onTap: onExit,
           ),
         ],

@@ -52,7 +52,7 @@ class VehicleAdapterSection extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    l?.vehicleAdapterSectionTitle ?? 'OBD2 adapter',
+                    l.vehicleAdapterSectionTitle,
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
@@ -61,9 +61,7 @@ class VehicleAdapterSection extends ConsumerWidget {
             const SizedBox(height: 12),
             if (paired) ...[
               Text(
-                name == null || name.isEmpty
-                    ? (l?.vehicleAdapterUnnamed ?? 'Unknown adapter')
-                    : name,
+                name == null || name.isEmpty ? (l.vehicleAdapterUnnamed) : name,
                 style: theme.textTheme.bodyLarge,
               ),
               const SizedBox(height: 4),
@@ -80,17 +78,11 @@ class VehicleAdapterSection extends ConsumerWidget {
                   key: const Key('vehicleAdapterForget'),
                   onPressed: onForget,
                   icon: const Icon(Icons.link_off),
-                  label: Text(
-                    l?.vehicleAdapterForget ?? 'Forget adapter',
-                  ),
+                  label: Text(l.vehicleAdapterForget),
                 ),
               ),
             ] else ...[
-              Text(
-                l?.vehicleAdapterEmpty ??
-                    'No adapter paired. Pair one so the app can reconnect automatically next time.',
-                style: theme.textTheme.bodySmall,
-              ),
+              Text(l.vehicleAdapterEmpty, style: theme.textTheme.bodySmall),
               const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
@@ -98,7 +90,7 @@ class VehicleAdapterSection extends ConsumerWidget {
                   key: const Key('vehicleAdapterPair'),
                   onPressed: () => _onPair(context),
                   icon: const Icon(Icons.bluetooth_searching),
-                  label: Text(l?.vehicleAdapterPair ?? 'Pair adapter'),
+                  label: Text(l.vehicleAdapterPair),
                 ),
               ),
             ],

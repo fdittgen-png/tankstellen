@@ -22,11 +22,7 @@ class PayWithAppButton extends StatelessWidget {
   /// Override for tests; production uses [PaymentAppLauncher.open].
   final Future<bool> Function(PaymentApp app)? onLaunch;
 
-  const PayWithAppButton({
-    super.key,
-    required this.brand,
-    this.onLaunch,
-  });
+  const PayWithAppButton({super.key, required this.brand, this.onLaunch});
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +30,7 @@ class PayWithAppButton extends StatelessWidget {
     if (app == null) return const SizedBox.shrink();
 
     final l10n = AppLocalizations.of(context);
-    final label = l10n?.payWithApp(app.displayName) ??
-        'Pay with ${app.displayName}';
+    final label = l10n.payWithApp(app.displayName);
 
     return Align(
       alignment: Alignment.centerLeft,
@@ -54,10 +49,17 @@ class PayWithAppButton extends StatelessWidget {
     } on Exception catch (e, st) {
       // #2146 — route to the exportable log so a missing deep-link
       // handler is visible from a bug report.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: {
-        'where': 'PayWithAppButton._launch',
-        'app': app.displayName,
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: {
+            'where': 'PayWithAppButton._launch',
+            'app': app.displayName,
+          },
+        ),
+      );
     }
   }
 }

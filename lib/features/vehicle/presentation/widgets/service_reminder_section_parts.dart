@@ -27,24 +27,18 @@ class _PresetChipRow extends StatelessWidget {
       children: [
         ActionChip(
           avatar: const Icon(Icons.oil_barrel_outlined, size: 18),
-          label:
-              Text(l?.serviceReminderPresetOil ?? 'Oil (15,000 km)'),
-          onPressed: () =>
-              onAdd(l?.serviceReminderPresetOilLabel ?? 'Oil change', 15000),
+          label: Text(l.serviceReminderPresetOil),
+          onPressed: () => onAdd(l.serviceReminderPresetOilLabel, 15000),
         ),
         ActionChip(
           avatar: const Icon(Icons.tire_repair_outlined, size: 18),
-          label:
-              Text(l?.serviceReminderPresetTires ?? 'Tires (20,000 km)'),
-          onPressed: () =>
-              onAdd(l?.serviceReminderPresetTiresLabel ?? 'Tires', 20000),
+          label: Text(l.serviceReminderPresetTires),
+          onPressed: () => onAdd(l.serviceReminderPresetTiresLabel, 20000),
         ),
         ActionChip(
           avatar: const Icon(Icons.build_outlined, size: 18),
-          label: Text(
-              l?.serviceReminderPresetInspection ?? 'Inspection (30,000 km)'),
-          onPressed: () => onAdd(
-              l?.serviceReminderPresetInspectionLabel ?? 'Inspection', 30000),
+          label: Text(l.serviceReminderPresetInspection),
+          onPressed: () => onAdd(l.serviceReminderPresetInspectionLabel, 30000),
         ),
       ],
     );

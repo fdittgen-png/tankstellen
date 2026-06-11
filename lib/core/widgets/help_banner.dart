@@ -55,7 +55,14 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
     } catch (e, st) {
       // Widget tests without an initialized settings box — keep the
       // banner hidden rather than crashing.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HelpBanner: cannot read shown flag'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.other,
+          e,
+          st,
+          context: const {'where': 'HelpBanner: cannot read shown flag'},
+        ),
+      );
     }
   }
 
@@ -64,7 +71,14 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
       final settings = ref.read(settingsStorageProvider);
       await settings.putSetting(widget.storageKey, true);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HelpBanner: cannot persist dismiss'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.other,
+          e,
+          st,
+          context: const {'where': 'HelpBanner: cannot persist dismiss'},
+        ),
+      );
     }
     if (mounted) {
       setState(() => _visible = false);
@@ -87,7 +101,11 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
       ),
       child: Row(
         children: [
-          Icon(widget.icon, color: theme.colorScheme.onPrimaryContainer, size: 28),
+          Icon(
+            widget.icon,
+            color: theme.colorScheme.onPrimaryContainer,
+            size: 28,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -98,10 +116,7 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
             ),
           ),
           const SizedBox(width: 8),
-          TextButton(
-            onPressed: _dismiss,
-            child: Text(l?.swipeTutorialDismiss ?? 'Got it'),
-          ),
+          TextButton(onPressed: _dismiss, child: Text(l.swipeTutorialDismiss)),
         ],
       ),
     );

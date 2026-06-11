@@ -22,11 +22,7 @@ class BrandLogo extends StatelessWidget {
   /// The size of the logo (width and height). Defaults to 48.
   final double size;
 
-  const BrandLogo({
-    super.key,
-    required this.brand,
-    this.size = 48,
-  });
+  const BrandLogo({super.key, required this.brand, this.size = 48});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +34,7 @@ class BrandLogo extends StatelessWidget {
     // logo on every station card. `image: true` marks it as a
     // graphic; the label names the brand it depicts.
     return Semantics(
-      label: l10n?.brandLogoLabel(brand) ?? '$brand logo',
+      label: l10n.brandLogoLabel(brand),
       image: true,
       child: url == null
           ? _fallbackIcon(theme)

@@ -28,15 +28,15 @@ class PriceHistoryScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     return PageScaffold(
-      title: l10n?.priceHistory ?? 'Price History',
+      title: l10n.priceHistory,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l10n?.tooltipBack ?? 'Back',
+        tooltip: l10n.tooltipBack,
         onPressed: () => context.pop(),
       ),
       bodyPadding: EdgeInsets.zero,
       body: history.isEmpty
-          ? Center(child: Text(l10n?.noPriceHistory ?? 'No price history yet'))
+          ? Center(child: Text(l10n.noPriceHistory))
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -92,9 +92,9 @@ class _FuelTypeSection extends ConsumerWidget {
           children: [
             Text(
               fuelType.displayName,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             PriceChart(records: List.from(records), fuelType: fuelType),

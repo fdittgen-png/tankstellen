@@ -23,14 +23,14 @@ class FeatureFlagDumpScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final enabled = ref.watch(enabledFeaturesProvider);
-    final on = l?.developerToolsFlagOn ?? 'On';
-    final off = l?.developerToolsFlagOff ?? 'Off';
+    final on = l.developerToolsFlagOn;
+    final off = l.developerToolsFlagOff;
 
     final features = Feature.values.toList()
       ..sort((a, b) => a.name.compareTo(b.name));
 
     return PageScaffold(
-      title: l?.developerToolsFeatureFlagDump ?? 'Feature flag inspector',
+      title: l.developerToolsFeatureFlagDump,
       bodyPadding: EdgeInsets.zero,
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -51,8 +51,7 @@ class FeatureFlagDumpScreen extends ConsumerWidget {
             trailing: Text(
               isOn ? on : off,
               style: theme.textTheme.labelMedium?.copyWith(
-                color:
-                    isOn ? theme.colorScheme.primary : theme.disabledColor,
+                color: isOn ? theme.colorScheme.primary : theme.disabledColor,
               ),
             ),
           );

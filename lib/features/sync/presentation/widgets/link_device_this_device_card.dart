@@ -37,23 +37,23 @@ class LinkDeviceThisDeviceCard extends StatelessWidget {
                 const Icon(Icons.smartphone, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  l10n?.linkDeviceThisDeviceLabel ?? 'This device',
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  l10n.linkDeviceThisDeviceLabel,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             Text(
-              l10n?.linkDeviceShareCodeHint ??
-                  'Share this code with your other device:',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              l10n.linkDeviceShareCodeHint,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 8),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(8),
@@ -62,28 +62,30 @@ class LinkDeviceThisDeviceCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: SelectableText(
-                      myId ??
-                          (l10n?.linkDeviceNotConnected ?? 'Not connected'),
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(fontFamily: 'monospace'),
+                      myId ?? (l10n.linkDeviceNotConnected),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontFamily: 'monospace',
+                      ),
                     ),
                   ),
                   if (myId != null)
                     IconButton(
                       icon: const Icon(Icons.copy, size: 18),
-                      tooltip:
-                          l10n?.linkDeviceCopyCodeTooltip ?? 'Copy code',
+                      tooltip: l10n.linkDeviceCopyCodeTooltip,
                       onPressed: () {
-                        unawaited(Clipboard.setData(ClipboardData(text: myId!)));
+                        unawaited(
+                          Clipboard.setData(ClipboardData(text: myId!)),
+                        );
                         SnackBarHelper.show(
                           context,
-                          AppLocalizations.of(context)?.deviceCodeCopied ??
-                              'Device code copied',
+                          AppLocalizations.of(context).deviceCodeCopied,
                         );
                       },
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(
-                          minWidth: 32, minHeight: 32),
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
                     ),
                 ],
               ),

@@ -40,12 +40,9 @@ void main() {
     expect(engineOff.toLowerCase(), contains('engine'));
     expect(engineOff, isNot(l10n.obd2ErrorAdapterUnresponsive));
     // The reworded adapter-unresponsive string no longer says "ignition".
-    expect(l10n.obd2ErrorAdapterUnresponsive.toLowerCase(),
-        isNot(contains('ignition')));
-  });
-
-  test('falls back to the English diagnostic when l10n is null', () {
-    const error = Obd2ScanTimeout();
-    expect(error.localizedMessage(null), error.message);
+    expect(
+      l10n.obd2ErrorAdapterUnresponsive.toLowerCase(),
+      isNot(contains('ignition')),
+    );
   });
 }

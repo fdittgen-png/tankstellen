@@ -49,7 +49,7 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
           Icon(Icons.tune, size: 48, color: theme.colorScheme.primary),
           const SizedBox(height: 16),
           Text(
-            l10n?.onboardingPreferencesTitle ?? 'Your preferences',
+            l10n.onboardingPreferencesTitle,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -61,10 +61,9 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
           TextField(
             controller: _zipController,
             decoration: InputDecoration(
-              labelText: l10n?.homeZip ?? 'Home postal code',
-              hintText: l10n?.zipCodeHint ?? 'e.g. 10115',
-              helperText: l10n?.onboardingZipHelper ??
-                  'Used when GPS is unavailable',
+              labelText: l10n.homeZip,
+              hintText: l10n.zipCodeHint,
+              helperText: l10n.onboardingZipHelper,
               prefixIcon: const Icon(Icons.home),
               border: const OutlineInputBorder(),
             ),
@@ -73,13 +72,14 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
             // keyboard.
             keyboardType: TextInputType.number,
             onChanged: (value) => notifier.setHomeZipCode(
-                value.trim().isEmpty ? null : value.trim()),
+              value.trim().isEmpty ? null : value.trim(),
+            ),
           ),
           const SizedBox(height: 24),
 
           // Search radius
           Text(
-            '${l10n?.searchRadius ?? 'Radius'}: ${wizardState.defaultSearchRadius.round()} km',
+            '${l10n.searchRadius}: ${wizardState.defaultSearchRadius.round()} km',
             style: theme.textTheme.titleSmall,
           ),
           Slider(
@@ -91,8 +91,7 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
             onChanged: notifier.setDefaultSearchRadius,
           ),
           Text(
-            l10n?.onboardingRadiusHelper ??
-                'Larger radius = more results',
+            l10n.onboardingRadiusHelper,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -102,75 +101,77 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
           // Fuel type — locked to the default vehicle's fuel if one is
           // configured in the previous wizard step (#710). The chips
           // are disabled so the user can't pick a conflicting value.
-          Builder(builder: (_) {
-            final vehicles = ref.watch(vehicleProfileListProvider);
-            final defaultVehicle =
-                vehicles.isNotEmpty ? vehicles.first : null;
-            final derivedFromVehicle =
-                defaultVehicle != null ? _fuelForVehicle(defaultVehicle) : null;
-            // Sync wizard state to the vehicle's fuel so completion
-            // writes the right value to the profile.
-            if (derivedFromVehicle != null &&
-                wizardState.preferredFuelType.runtimeType !=
-                    derivedFromVehicle.runtimeType) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                notifier.setPreferredFuelType(derivedFromVehicle);
-              });
-            }
-            final locked = derivedFromVehicle != null;
-            final activeFuel = derivedFromVehicle ?? wizardState.preferredFuelType;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n?.preferredFuel ?? 'Preferred fuel',
-                  style: theme.textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
-                Opacity(
-                  opacity: locked ? 0.5 : 1.0,
-                  child: IgnorePointer(
-                    ignoring: locked,
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        FuelType.e5,
-                        FuelType.e10,
-                        FuelType.diesel,
-                        FuelType.e98,
-                        FuelType.lpg,
-                        FuelType.e85,
-                        FuelType.electric,
-                      ].map((fuel) {
-                        final selected =
-                            activeFuel.runtimeType == fuel.runtimeType;
-                        return ChoiceChip(
-                          label: Text(fuel.displayName),
-                          selected: selected,
-                          onSelected: locked
-                              ? null
-                              : (_) => notifier.setPreferredFuelType(fuel),
-                        );
-                      }).toList(),
+          Builder(
+            builder: (_) {
+              final vehicles = ref.watch(vehicleProfileListProvider);
+              final defaultVehicle = vehicles.isNotEmpty
+                  ? vehicles.first
+                  : null;
+              final derivedFromVehicle = defaultVehicle != null
+                  ? _fuelForVehicle(defaultVehicle)
+                  : null;
+              // Sync wizard state to the vehicle's fuel so completion
+              // writes the right value to the profile.
+              if (derivedFromVehicle != null &&
+                  wizardState.preferredFuelType.runtimeType !=
+                      derivedFromVehicle.runtimeType) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  notifier.setPreferredFuelType(derivedFromVehicle);
+                });
+              }
+              final locked = derivedFromVehicle != null;
+              final activeFuel =
+                  derivedFromVehicle ?? wizardState.preferredFuelType;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.preferredFuel, style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  Opacity(
+                    opacity: locked ? 0.5 : 1.0,
+                    child: IgnorePointer(
+                      ignoring: locked,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children:
+                            [
+                              FuelType.e5,
+                              FuelType.e10,
+                              FuelType.diesel,
+                              FuelType.e98,
+                              FuelType.lpg,
+                              FuelType.e85,
+                              FuelType.electric,
+                            ].map((fuel) {
+                              final selected =
+                                  activeFuel.runtimeType == fuel.runtimeType;
+                              return ChoiceChip(
+                                label: Text(fuel.displayName),
+                                selected: selected,
+                                onSelected: locked
+                                    ? null
+                                    : (_) =>
+                                          notifier.setPreferredFuelType(fuel),
+                              );
+                            }).toList(),
+                      ),
                     ),
                   ),
-                ),
-                if (locked) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    l10n?.profileFuelFromVehicleHint ??
-                        'Fuel type is derived from your default vehicle. '
-                            'Clear the vehicle to pick a fuel directly.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontStyle: FontStyle.italic,
+                  if (locked) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.profileFuelFromVehicleHint,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
-            );
-          }),
+              );
+            },
+          ),
           const SizedBox(height: 24),
 
           // Privacy reassurance
@@ -182,13 +183,11 @@ class _PreferencesStepState extends ConsumerState<PreferencesStep> {
             ),
             child: Row(
               children: [
-                Icon(Icons.shield, size: 20,
-                    color: theme.colorScheme.primary),
+                Icon(Icons.shield, size: 20, color: theme.colorScheme.primary),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    l10n?.onboardingPrivacy ??
-                        'These settings are stored only on your device and never shared.',
+                    l10n.onboardingPrivacy,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onPrimaryContainer,
                     ),

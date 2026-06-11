@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/feedback/github_issue_reporter.dart';
 import 'package:tankstellen/features/consumption/data/pump_display_parse_result.dart';
@@ -8,12 +10,15 @@ import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/bad_scan_report_formatters.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Unit tests for the pure formatting helpers in
 /// [bad_scan_report_formatters.dart]. These functions must stay pure
 /// — no `BuildContext`, no provider reads — so a plain `flutter_test`
 /// without `pumpWidget` is the right fixture.
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   // ── Fixtures ────────────────────────────────────────────────────────
 
   ReceiptScanOutcome buildReceiptOutcome({
@@ -74,7 +79,7 @@ void main() {
         pumpScan: null,
         enteredLiters: 32.4,
         enteredTotalCost: 55.20,
-        l: null,
+        l: l10nEn,
       );
 
       expect(rows, hasLength(7));
@@ -129,7 +134,7 @@ void main() {
         pumpScan: null,
         enteredLiters: null,
         enteredTotalCost: null,
-        l: null,
+        l: l10nEn,
       );
 
       // Liters / Total / Price/L scanned-side dashes.
@@ -158,7 +163,7 @@ void main() {
         pumpScan: null,
         enteredLiters: 12.345,
         enteredTotalCost: 24,
-        l: null,
+        l: l10nEn,
       );
 
       expect(rows[1].scanned, '12.00');
@@ -179,7 +184,7 @@ void main() {
         pumpScan: buildPumpOutcome(),
         enteredLiters: 39.9,
         enteredTotalCost: 69.85,
-        l: null,
+        l: l10nEn,
       );
 
       expect(rows, hasLength(3));
@@ -209,7 +214,7 @@ void main() {
         ),
         enteredLiters: null,
         enteredTotalCost: null,
-        l: null,
+        l: l10nEn,
       );
 
       for (final row in rows) {
@@ -317,15 +322,18 @@ void main() {
         pumpScan: null,
       );
 
-      expect(fields.keys, containsAll(<String>[
-        'brandLayout',
-        'liters',
-        'totalCost',
-        'pricePerLiter',
-        'stationName',
-        'fuelType',
-        'date',
-      ]));
+      expect(
+        fields.keys,
+        containsAll(<String>[
+          'brandLayout',
+          'liters',
+          'totalCost',
+          'pricePerLiter',
+          'stationName',
+          'fuelType',
+          'date',
+        ]),
+      );
       expect(fields['brandLayout'], 'carrefour');
       expect(fields['liters'], '32.50');
       expect(fields['totalCost'], '55.12');
@@ -388,10 +396,7 @@ void main() {
         enteredLiters: 41.234,
         enteredTotalCost: 71.5,
       );
-      expect(map, <String, String?>{
-        'liters': '41.23',
-        'totalCost': '71.50',
-      });
+      expect(map, <String, String?>{'liters': '41.23', 'totalCost': '71.50'});
     });
 
     test('preserves null values on either field', () {
@@ -399,10 +404,7 @@ void main() {
         enteredLiters: null,
         enteredTotalCost: null,
       );
-      expect(mapBoth, <String, String?>{
-        'liters': null,
-        'totalCost': null,
-      });
+      expect(mapBoth, <String, String?>{'liters': null, 'totalCost': null});
 
       final mapPartial = buildBadScanUserCorrections(
         enteredLiters: 32,
@@ -418,19 +420,17 @@ void main() {
   // ── resolveBadScanTitle ─────────────────────────────────────────────
 
   group('resolveBadScanTitle', () {
-    test('receipt falls back to the kind-specific English string when l is null',
-        () {
+    test('receipt resolves the kind-specific localized title', () {
       expect(
-        resolveBadScanTitle(ScanKind.receipt, null),
-        'Report a scan error — Receipt',
+        resolveBadScanTitle(ScanKind.receipt, l10nEn),
+        l10nEn.badScanReportTitleReceipt,
       );
     });
 
-    test('pumpDisplay falls back to its own English string when l is null',
-        () {
+    test('pumpDisplay resolves its own localized title', () {
       expect(
-        resolveBadScanTitle(ScanKind.pumpDisplay, null),
-        'Report a scan error — Pump display',
+        resolveBadScanTitle(ScanKind.pumpDisplay, l10nEn),
+        l10nEn.badScanReportTitlePumpDisplay,
       );
     });
   });

@@ -36,10 +36,7 @@ class DrivingInsightsCard extends StatelessWidget {
   /// → empty-state row.
   final List<DrivingLesson> lessons;
 
-  const DrivingInsightsCard({
-    super.key,
-    required this.lessons,
-  });
+  const DrivingInsightsCard({super.key, required this.lessons});
 
   @override
   Widget build(BuildContext context) {
@@ -53,16 +50,10 @@ class DrivingInsightsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l?.insightCardTitle ?? 'Top wasteful behaviours',
-              style: theme.textTheme.titleMedium,
-            ),
+            Text(l.insightCardTitle, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             if (lessons.isEmpty)
-              _EmptyState(
-                message: l?.insightEmptyState ??
-                    'No notable inefficiencies — keep it up!',
-              )
+              _EmptyState(message: l.insightEmptyState)
             else
               for (final lesson in lessons) _LessonTile(lesson: lesson),
           ],
@@ -90,10 +81,7 @@ class _LessonTile extends StatelessWidget {
     return ListTile(
       key: ValueKey('insight_tile_${lesson.id}'),
       contentPadding: EdgeInsets.zero,
-      leading: Icon(
-        _iconFor(lesson),
-        color: _colorFor(lesson.polarity, theme),
-      ),
+      leading: Icon(_iconFor(lesson), color: _colorFor(lesson.polarity, theme)),
       title: Text(lesson.title),
       subtitle: subtitle == null
           ? null
@@ -164,17 +152,9 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         children: [
-          Icon(
-            Icons.thumb_up_alt_outlined,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(Icons.thumb_up_alt_outlined, color: theme.colorScheme.primary),
           const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
+          Expanded(child: Text(message, style: theme.textTheme.bodyMedium)),
         ],
       ),
     );

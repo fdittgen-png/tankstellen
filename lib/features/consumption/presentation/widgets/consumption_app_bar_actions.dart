@@ -77,14 +77,14 @@ class ConsumptionAppBarActions extends ConsumerWidget {
       // existing `ConsumptionScreen.debugExporterOverride = …` widget
       // tests keep driving a recording exporter through this extracted
       // action widget (#2756).
-      // ignore: invalid_use_of_visible_for_testing_member
-      final exporter = ConsumptionScreen.debugExporterOverride ??
-          FullBackupExporter();
+      final exporter =
+          // ignore: invalid_use_of_visible_for_testing_member
+          ConsumptionScreen.debugExporterOverride ?? FullBackupExporter();
       // #2815 — show an indeterminate progress modal while the XML builds,
       // zips, and writes (1-3 s, previously a silent freeze).
       final result = await runWithBackupProgress(
         context,
-        label: l?.backupExportProgress ?? 'Exporting your backup…',
+        label: l.backupExportProgress,
         icon: Icons.archive_outlined,
         work: () => exporter.export(
           vehicles: vehicles,
@@ -99,19 +99,22 @@ class ConsumptionAppBarActions extends ConsumerWidget {
       // folder, name the file so the user can find it (e.g. in the restore
       // picker, which now also opens on Downloads).
       final message = (result.savedPath != null)
-          ? (l?.exportBackupSavedAs(result.fileName) ??
-              'Saved to Downloads as ${result.fileName}')
-          : (l?.exportBackupReady ?? 'Backup ready — pick a destination');
+          ? (l.exportBackupSavedAs(result.fileName))
+          : (l.exportBackupReady);
       SnackBarHelper.showSuccess(context, message);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'ConsumptionAppBarActions._runBackupExport failed',
-      }));
-      if (!context.mounted) return;
-      SnackBarHelper.showError(
-        context,
-        l?.exportBackupFailed ?? 'Backup export failed — please try again',
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'ConsumptionAppBarActions._runBackupExport failed',
+          },
+        ),
       );
+      if (!context.mounted) return;
+      SnackBarHelper.showError(context, l.exportBackupFailed);
     }
   }
 
@@ -125,8 +128,9 @@ class ConsumptionAppBarActions extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final carbonEnabled =
-        ref.watch(enabledFeaturesProvider).contains(Feature.carbonDashboard);
+    final carbonEnabled = ref
+        .watch(enabledFeaturesProvider)
+        .contains(Feature.carbonDashboard);
     final ids = tripIds;
 
     return Row(
@@ -139,20 +143,22 @@ class ConsumptionAppBarActions extends ConsumerWidget {
         if (ids != null)
           IconButton(
             key: const Key('trajets_view_all_on_map'),
-            tooltip: l?.trajetsViewAllOnMap ?? 'View all on map',
+            tooltip: l.trajetsViewAllOnMap,
             icon: const Icon(Icons.map_outlined),
             onPressed: () {
-              unawaited(Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => TrajetsMapScreen(tripIds: ids),
+              unawaited(
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => TrajetsMapScreen(tripIds: ids),
+                  ),
                 ),
-              ));
+              );
             },
           ),
         PopupMenuButton<_OverflowAction>(
           key: const Key('consumption_overflow_menu'),
           icon: const Icon(Icons.more_vert),
-          tooltip: l?.moreActionsTooltip ?? 'More',
+          tooltip: l.moreActionsTooltip,
           onSelected: (action) => _onSelected(context, action),
           // The outer `context` (not the menu's) is captured by every
           // `onTap` below: PopupMenuItem.onTap fires after the menu
@@ -164,7 +170,7 @@ class ConsumptionAppBarActions extends ConsumerWidget {
               onTap: () => unawaited(_runBackupExport(context, ref)),
               child: _MenuRow(
                 icon: Icons.download_outlined,
-                label: l?.exportBackupMenuLabel ?? 'Export backup',
+                label: l.exportBackupMenuLabel,
               ),
             ),
             // #2571 — full-backup restore. The flow (pick .zip →
@@ -175,7 +181,7 @@ class ConsumptionAppBarActions extends ConsumerWidget {
               onTap: () => unawaited(BackupRestoreFlow.run(context, ref)),
               child: _MenuRow(
                 icon: Icons.restore_outlined,
-                label: l?.restoreBackupMenuLabel ?? 'Restore backup',
+                label: l.restoreBackupMenuLabel,
               ),
             ),
             if (carbonEnabled)
@@ -184,7 +190,7 @@ class ConsumptionAppBarActions extends ConsumerWidget {
                 onTap: () => context.push(RoutePaths.carbon),
                 child: _MenuRow(
                   icon: Icons.eco_outlined,
-                  label: l?.carbonDashboardMenuLabel ?? 'Carbon dashboard',
+                  label: l.carbonDashboardMenuLabel,
                 ),
               ),
             const PopupMenuDivider(),
@@ -192,7 +198,7 @@ class ConsumptionAppBarActions extends ConsumerWidget {
               value: _OverflowAction.settings,
               child: _MenuRow(
                 icon: Icons.settings_outlined,
-                label: l?.settingsMenuLabel ?? 'Settings',
+                label: l.settingsMenuLabel,
               ),
             ),
           ],

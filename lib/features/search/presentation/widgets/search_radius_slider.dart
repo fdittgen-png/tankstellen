@@ -32,15 +32,9 @@ class SearchRadiusSlider extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(
-              '${l10n?.searchRadius ?? "Radius"}:',
-              style: theme.textTheme.titleSmall,
-            ),
+            Text('${l10n.searchRadius}:', style: theme.textTheme.titleSmall),
             const Spacer(),
-            Text(
-              '${radiusKm.round()} km',
-              style: theme.textTheme.titleSmall,
-            ),
+            Text('${radiusKm.round()} km', style: theme.textTheme.titleSmall),
           ],
         ),
         // #1962 — shrink the slider's reaction overlay so the control
@@ -48,8 +42,7 @@ class SearchRadiusSlider extends StatelessWidget {
         // (the default 24 dp overlay inflates the row to ~48 dp).
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            overlayShape:
-                const RoundSliderOverlayShape(overlayRadius: 14),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
           ),
           child: Slider(
             value: radiusKm.clamp(minKm, maxKm),

@@ -29,11 +29,14 @@ class SyncedDataCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.cloud_outlined,
-                    size: 20, color: theme.colorScheme.secondary),
+                Icon(
+                  Icons.cloud_outlined,
+                  size: 20,
+                  color: theme.colorScheme.secondary,
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  l?.privacySyncedData ?? 'Cloud sync (TankSync)',
+                  l.privacySyncedData,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -54,7 +57,7 @@ class SyncedDataCard extends StatelessWidget {
 
 class _SyncDisabledBanner extends StatelessWidget {
   final ThemeData theme;
-  final AppLocalizations? l;
+  final AppLocalizations l;
 
   const _SyncDisabledBanner({required this.theme, required this.l});
 
@@ -68,13 +71,15 @@ class _SyncDisabledBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.cloud_off,
-              size: 20, color: theme.colorScheme.onSurfaceVariant),
+          Icon(
+            Icons.cloud_off,
+            size: 20,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              l?.privacySyncDisabled ??
-                  'Cloud sync is disabled. All data stays on this device only.',
+              l.privacySyncDisabled,
               style: theme.textTheme.bodySmall,
             ),
           ),
@@ -86,7 +91,7 @@ class _SyncDisabledBanner extends StatelessWidget {
 
 class _SyncEnabledBody extends ConsumerWidget {
   final ThemeData theme;
-  final AppLocalizations? l;
+  final AppLocalizations l;
   final PrivacyDataSnapshot snapshot;
 
   const _SyncEnabledBody({
@@ -104,18 +109,17 @@ class _SyncEnabledBody extends ConsumerWidget {
       children: [
         PrivacyDataRow(
           icon: Icons.sync,
-          label: l?.privacySyncMode ?? 'Sync mode',
+          label: l.privacySyncMode,
           value: snapshot.syncMode ?? '-',
         ),
         PrivacyDataRow(
           icon: Icons.perm_identity,
-          label: l?.privacySyncUserId ?? 'User ID',
+          label: l.privacySyncUserId,
           value: userId != null ? '${userId.substring(0, 8)}...' : '-',
         ),
         const SizedBox(height: 8),
         Text(
-          l?.privacySyncDescription ??
-              'When sync is enabled, favorites, alerts, ignored stations, and ratings are also stored on the TankSync server.',
+          l.privacySyncDescription,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -127,12 +131,9 @@ class _SyncEnabledBody extends ConsumerWidget {
         SwitchListTile(
           key: const Key('syncBaselinesToggle'),
           value: baselineSyncOn,
-          title: Text(
-            l?.syncBaselinesToggleTitle ?? 'Share learned vehicle profiles',
-          ),
+          title: Text(l.syncBaselinesToggleTitle),
           subtitle: Text(
-            l?.syncBaselinesToggleSubtitle ??
-                'Upload per-vehicle consumption baselines so a second device can reuse them.',
+            l.syncBaselinesToggleSubtitle,
             style: theme.textTheme.bodySmall,
           ),
           onChanged: (v) async {
@@ -143,7 +144,7 @@ class _SyncEnabledBody extends ConsumerWidget {
         OutlinedButton.icon(
           onPressed: () => context.push(RoutePaths.dataTransparency),
           icon: const Icon(Icons.visibility, size: 18),
-          label: Text(l?.privacyViewServerData ?? 'View server data'),
+          label: Text(l.privacyViewServerData),
         ),
       ],
     );

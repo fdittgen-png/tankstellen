@@ -49,24 +49,19 @@ class CarbonDashboardScreen extends ConsumerWidget {
     final hasData = fillUps.isNotEmpty;
 
     final Widget body = hasData
-        ? ChartsTab(
-            summaries: last12,
-            totalCost: totalCost,
-            totalCo2: totalCo2,
-          )
+        ? ChartsTab(summaries: last12, totalCost: totalCost, totalCo2: totalCo2)
         : EmptyState(
             icon: Icons.eco_outlined,
-            title: l?.carbonEmptyTitle ?? 'No data yet',
-            subtitle: l?.carbonEmptySubtitle ??
-                'Log fill-ups to see your carbon dashboard.',
+            title: l.carbonEmptyTitle,
+            subtitle: l.carbonEmptySubtitle,
           );
 
     return PageScaffold(
-      title: l?.carbonDashboardTitle ?? 'Carbon dashboard',
+      title: l.carbonDashboardTitle,
       bannerIcon: Icons.eco_outlined,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         onPressed: () => context.pop(),
       ),
       // #2005 — share-summary button. Hidden when the user has no
@@ -80,7 +75,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
               IconButton(
                 key: const Key('carbon-dashboard-share'),
                 icon: const Icon(Icons.share_outlined),
-                tooltip: l?.tooltipShare ?? 'Share',
+                tooltip: l.tooltipShare,
                 onPressed: () => _shareSummary(
                   l: l,
                   totalCost: totalCost,
@@ -100,17 +95,18 @@ class CarbonDashboardScreen extends ConsumerWidget {
   /// `carbonSummaryTotalCost`, `carbonSummaryTotalCo2`) — no new
   /// 24-locale fill is needed.
   Future<void> _shareSummary({
-    required AppLocalizations? l,
+    required AppLocalizations l,
     required double totalCost,
     required double totalCo2,
   }) async {
-    final title = l?.carbonDashboardTitle ?? 'Carbon dashboard';
-    final costLabel = l?.carbonSummaryTotalCost ?? 'Total cost';
-    final co2Label = l?.carbonSummaryTotalCo2 ?? 'Total CO2';
+    final title = l.carbonDashboardTitle;
+    final costLabel = l.carbonSummaryTotalCost;
+    final co2Label = l.carbonSummaryTotalCo2;
     // Same formatting as the on-screen `_SummaryRow` (charts_tab.dart):
     // integer cost with the currency suffix, integer kg for CO2.
     // i18n-ignore: language-neutral number/unit format mask.
-    final body = '$title\n\n'
+    final body =
+        '$title\n\n'
         '$costLabel: ${totalCost.toStringAsFixed(0)} ${PriceFormatter.currency}\n'
         '$co2Label: ${totalCo2.toStringAsFixed(0)} kg';
     final sink = debugCarbonShareSinkOverride ?? _defaultCarbonShareSink;
@@ -119,7 +115,14 @@ class CarbonDashboardScreen extends ConsumerWidget {
     } on Object catch (e, st) {
       // Share-sheet wiring failures should never crash the screen.
       // The user can re-tap; the failure ends in the debug console.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'CarbonDashboardScreen: share failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'CarbonDashboardScreen: share failed'},
+        ),
+      );
     }
   }
 }

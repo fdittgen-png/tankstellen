@@ -80,7 +80,7 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                 child: _BigMetricTile(
                   key: const Key('landscapeSpeedTile'),
                   icon: Icons.speed,
-                  label: l?.tripMetricSpeed ?? 'Speed',
+                  label: l.tripMetricSpeed,
                   value: r?.speedKmh == null
                       ? '—'
                       : '${r!.speedKmh!.toStringAsFixed(0)} km/h',
@@ -112,7 +112,7 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                             child: _BigMetricTile(
                               key: const Key('landscapeDistanceTile'),
                               icon: Icons.route,
-                              label: l?.tripMetricDistance ?? 'Distance',
+                              label: l.tripMetricDistance,
                               value: r == null
                                   ? '—'
                                   : '${r.distanceKmSoFar.toStringAsFixed(2)} km',
@@ -130,7 +130,7 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                             child: _BigMetricTile(
                               key: const Key('landscapeAvgTile'),
                               icon: Icons.eco,
-                              label: l?.tripMetricAvgConsumption ?? 'Avg',
+                              label: l.tripMetricAvgConsumption,
                               value: TripAvgConsumptionCard.resolveDisplay(
                                 r,
                                 brokenMapOverride: brokenMapOverride,
@@ -149,7 +149,7 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                             child: _BigMetricTile(
                               key: const Key('landscapeElapsedTile'),
                               icon: Icons.timer,
-                              label: l?.tripMetricElapsed ?? 'Elapsed',
+                              label: l.tripMetricElapsed,
                               value: r == null ? '—' : _fmtElapsed(r.elapsed),
                             ),
                           ),
@@ -158,12 +158,12 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                             child: _BigMetricTile(
                               key: const Key('landscapeFuelTile'),
                               icon: Icons.local_gas_station,
-                              label: l?.tripMetricFuelUsed ?? 'Fuel used',
+                              label: l.tripMetricFuelUsed,
                               value: r?.fuelLitersSoFar != null
                                   ? '${r!.fuelLitersSoFar!.toStringAsFixed(2)} L'
                                   : r?.gpsEstimatedFuelLitersSoFar != null
-                                      ? '~${r!.gpsEstimatedFuelLitersSoFar!.toStringAsFixed(2)} L'
-                                      : '—',
+                                  ? '~${r!.gpsEstimatedFuelLitersSoFar!.toStringAsFixed(2)} L'
+                                  : '—',
                             ),
                           ),
                         ],

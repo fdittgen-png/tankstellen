@@ -76,9 +76,7 @@ class DrivingStationSheet extends StatelessWidget {
                 ),
               ),
               Text(
-                price != null
-                    ? PriceFormatter.formatPrice(price)
-                    : '--',
+                price != null ? PriceFormatter.formatPrice(price) : '--',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -94,10 +92,7 @@ class DrivingStationSheet extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: () => _launchNavigation(context),
               icon: const Icon(Icons.navigation, size: 28),
-              label: Text(
-                l10n?.navigate ?? 'Navigate',
-                style: const TextStyle(fontSize: 20),
-              ),
+              label: Text(l10n.navigate, style: const TextStyle(fontSize: 20)),
             ),
           ),
         ],

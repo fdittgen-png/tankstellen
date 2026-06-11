@@ -25,17 +25,14 @@ class CompletionStep extends StatelessWidget {
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 16,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const ShieldIllustration(size: 160),
                   const SizedBox(height: 24),
                   Text(
-                    l10n?.onboardingComplete ?? 'All set!',
+                    l10n.onboardingComplete,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -43,9 +40,7 @@ class CompletionStep extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    l10n?.onboardingCompleteHint ??
-                        'You can change these settings anytime in your '
-                            'profile.',
+                    l10n.onboardingCompleteHint,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

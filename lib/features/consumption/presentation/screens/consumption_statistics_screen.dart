@@ -53,7 +53,7 @@ class ConsumptionStatisticsPage extends ConsumerWidget {
               const FuelTypeEfficiencyCard(),
               const SizedBox(height: 4),
               SectionHeader(
-                title: l?.consumptionStatsTrendsTitle ?? 'Evolution over time',
+                title: l.consumptionStatsTrendsTitle,
                 leadingIcon: Icons.show_chart,
               ),
               MonthlyFuelCharts(months: months),
@@ -61,18 +61,16 @@ class ConsumptionStatisticsPage extends ConsumerWidget {
           )
         : EmptyState(
             icon: Icons.show_chart_outlined,
-            title: l?.noFillUpsTitle ?? 'No fill-ups yet',
-            subtitle:
-                l?.noFillUpsSubtitle ??
-                'Log your first fill-up to start tracking consumption.',
+            title: l.noFillUpsTitle,
+            subtitle: l.noFillUpsSubtitle,
           );
 
     return PageScaffold(
-      title: l?.consumptionStatsPageTitle ?? 'Consumption statistics',
+      title: l.consumptionStatsPageTitle,
       bannerIcon: Icons.insights_outlined,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         onPressed: () => context.pop(),
       ),
       bodyPadding: EdgeInsets.zero,
@@ -95,36 +93,36 @@ class _HeaderTiles extends StatelessWidget {
     final tiles = <_TileData>[
       _TileData(
         icon: Icons.local_gas_station,
-        label: l?.statTotalLiters ?? 'Total liters',
+        label: l.statTotalLiters,
         value: stats.totalLiters.toStringAsFixed(1),
       ),
       _TileData(
         icon: Icons.payments_outlined,
-        label: l?.statTotalSpent ?? 'Total spent',
+        label: l.statTotalSpent,
         value: PriceFormatter.formatTotal(stats.totalSpent),
       ),
       _TileData(
         icon: Icons.local_offer_outlined,
-        label: l?.consumptionStatsPricePerLiter ?? 'Avg price/L',
+        label: l.consumptionStatsPricePerLiter,
         value: PriceFormatter.formatPriceCompact(stats.avgPricePerLiter),
       ),
       _TileData(
         icon: Icons.speed,
-        label: l?.statAvgConsumption ?? 'Avg L/100km',
+        label: l.statAvgConsumption,
         value: stats.avgConsumptionL100km != null
             ? stats.avgConsumptionL100km!.toStringAsFixed(2)
             : '—',
       ),
       _TileData(
         icon: Icons.euro,
-        label: l?.statAvgCostPerKm ?? 'Avg cost/km',
+        label: l.statAvgCostPerKm,
         value: stats.avgCostPerKm != null
             ? PriceFormatter.formatPerKm(stats.avgCostPerKm)
             : '—',
       ),
       _TileData(
         icon: Icons.format_list_numbered,
-        label: l?.statFillUpCount ?? 'Fill-ups',
+        label: l.statFillUpCount,
         value: stats.fillUpCount.toString(),
       ),
     ];

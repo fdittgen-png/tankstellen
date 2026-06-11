@@ -84,22 +84,19 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
           color: Theme.of(context).colorScheme.error,
           size: 48,
         ),
-        title: Text(l10n?.deleteProfileTitle ?? 'Delete profile?'),
-        content: Text(
-          l10n?.deleteProfileBody ??
-              'This profile and its settings will be permanently deleted. This cannot be undone.',
-        ),
+        title: Text(l10n.deleteProfileTitle),
+        content: Text(l10n.deleteProfileBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n?.deleteProfileConfirm ?? 'Delete profile'),
+            child: Text(l10n.deleteProfileConfirm),
           ),
         ],
       ),
@@ -114,8 +111,9 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
   @override
   Widget build(BuildContext context) {
     final editState = ref.watch(profileEditControllerProvider(widget.profile));
-    final editCtrl =
-        ref.read(profileEditControllerProvider(widget.profile).notifier);
+    final editCtrl = ref.read(
+      profileEditControllerProvider(widget.profile).notifier,
+    );
 
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
@@ -138,7 +136,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       // 1 — Identity: name + preferred-fuel (disabled when a vehicle
       // owns the fuel, #695) + the derived-fuel hint.
       SectionCard(
-        title: l10n?.vehicleSectionIdentityTitle ?? 'Identity',
+        title: l10n.vehicleSectionIdentityTitle,
         leadingIcon: Icons.person_outline,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -146,7 +144,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText: l10n?.profileName ?? 'Profile name',
+                labelText: l10n.profileName,
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -168,9 +166,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
             if (editState.defaultVehicleId != null) ...[
               const SizedBox(height: Spacing.sm),
               Text(
-                l10n?.profileFuelFromVehicleHint ??
-                    'Fuel type is derived from your default vehicle. '
-                        'Clear the vehicle to pick a fuel directly.',
+                l10n.profileFuelFromVehicleHint,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -182,7 +178,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       ),
       // 2 — Search radius.
       SectionCard(
-        title: l10n?.defaultRadius ?? 'Default radius',
+        title: l10n.defaultRadius,
         leadingIcon: Icons.my_location,
         child: ProfileRadiusSlider(
           value: editState.radius,
@@ -192,26 +188,25 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       // 3 — Route planning (gated on Feature.routePlanning).
       if (routePlanningOn)
         SectionCard(
-          title: l10n?.routePlanningSection ?? 'Route planning',
+          title: l10n.routePlanningSection,
           leadingIcon: Icons.alt_route,
           child: _RouteSegmentSection(state: editState, ctrl: editCtrl),
         ),
       // 4 — Display & stations toggles.
       SectionCard(
-        title:
-            l10n?.profileSectionDisplayStations ?? 'Display & stations',
+        title: l10n.profileSectionDisplayStations,
         leadingIcon: Icons.tune,
         child: _TogglesSection(state: editState, ctrl: editCtrl),
       ),
       // 5 — Station ratings.
       SectionCard(
-        title: l10n?.privacyRatings ?? 'Station ratings',
+        title: l10n.privacyRatings,
         leadingIcon: Icons.reviews_outlined,
         child: _RatingModeSection(state: editState, ctrl: editCtrl),
       ),
       // 6 — Start screen.
       SectionCard(
-        title: l10n?.landingScreen ?? 'Start screen',
+        title: l10n.landingScreen,
         leadingIcon: Icons.home_outlined,
         child: ProfileLandingScreenDropdown(
           value: editState.landingScreen,
@@ -220,28 +215,25 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       ),
       // 7 — Approach overlay.
       SectionCard(
-        title: l10n?.approachOverlaySection ?? 'Approach-station overlay',
+        title: l10n.approachOverlaySection,
         leadingIcon: Icons.radar,
         child: _ApproachOverlaySection(state: editState, ctrl: editCtrl),
       ),
       // 8 — Vehicle (only when a vehicle exists).
       if (hasVehicles)
         SectionCard(
-          title: l10n?.fillUpVehicleLabel ?? 'Vehicle',
+          title: l10n.fillUpVehicleLabel,
           leadingIcon: Icons.directions_car_outlined,
           child: _DefaultVehicleSection(state: editState, ctrl: editCtrl),
         ),
       // 9 — Region: country + language under one card.
       SectionCard(
-        title: l10n?.profileSectionRegion ?? 'Region',
+        title: l10n.profileSectionRegion,
         leadingIcon: Icons.public,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n?.profileCountry ?? 'Country',
-              style: theme.textTheme.bodyMedium,
-            ),
+            Text(l10n.profileCountry, style: theme.textTheme.bodyMedium),
             const SizedBox(height: Spacing.md),
             _CountrySection(
               state: editState,
@@ -249,10 +241,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
               profileId: widget.profile.id,
             ),
             const SizedBox(height: Spacing.xl),
-            Text(
-              l10n?.profileLanguage ?? 'Language',
-              style: theme.textTheme.bodyMedium,
-            ),
+            Text(l10n.profileLanguage, style: theme.textTheme.bodyMedium),
             const SizedBox(height: Spacing.md),
             _LanguageSection(state: editState, ctrl: editCtrl),
           ],
@@ -260,17 +249,17 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       ),
       // 10 — Home postal code.
       SectionCard(
-        title: l10n?.home ?? 'Home',
+        title: l10n.home,
         leadingIcon: Icons.location_on_outlined,
         child: TextField(
           controller: _zipController,
           keyboardType: TextInputType.number,
           maxLength: editState.countryCode != null
               ? (Countries.byCode(editState.countryCode!)?.postalCodeLength ??
-                  5)
+                    5)
               : 5,
           decoration: InputDecoration(
-            labelText: l10n?.homeZip ?? 'Home postal code',
+            labelText: l10n.homeZip,
             border: const OutlineInputBorder(),
             counterText: '',
           ),
@@ -327,10 +316,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
                     ),
                   ),
                 ),
-                Text(
-                  l10n?.editProfile ?? 'Edit profile',
-                  style: theme.textTheme.titleLarge,
-                ),
+                Text(l10n.editProfile, style: theme.textTheme.titleLarge),
                 const SizedBox(height: Spacing.xl),
                 for (final card in cards) ...[
                   card,

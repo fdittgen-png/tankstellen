@@ -17,19 +17,16 @@ Future<bool> showDiscardChangesDialog(BuildContext context) async {
   final result = await showDialog<bool>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      title: Text(l?.discardChangesTitle ?? 'Discard changes?'),
-      content: Text(
-        l?.discardChangesBody ??
-            'You have unsaved changes. Leaving now will discard them.',
-      ),
+      title: Text(l.discardChangesTitle),
+      content: Text(l.discardChangesBody),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(false),
-          child: Text(l?.discardChangesKeepEditing ?? 'Keep editing'),
+          child: Text(l.discardChangesKeepEditing),
         ),
         FilledButton(
           onPressed: () => Navigator.of(dialogContext).pop(true),
-          child: Text(l?.discardChangesConfirm ?? 'Discard'),
+          child: Text(l.discardChangesConfirm),
         ),
       ],
     ),

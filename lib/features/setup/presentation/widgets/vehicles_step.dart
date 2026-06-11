@@ -35,7 +35,7 @@ class VehiclesStep extends ConsumerWidget {
           Semantics(
             header: true,
             child: Text(
-              l10n?.vehiclesWizardTitle ?? 'My vehicles (optional)',
+              l10n.vehiclesWizardTitle,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -44,9 +44,7 @@ class VehiclesStep extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n?.vehiclesWizardSubtitle ??
-                'Add your car to pre-fill the consumption log and enable '
-                    'EV connector filters. You can skip this and add vehicles later.',
+            l10n.vehiclesWizardSubtitle,
             style: theme.textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -61,13 +59,15 @@ class VehiclesStep extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline,
-                            color: theme.colorScheme.primary, size: 20),
+                        Icon(
+                          Icons.info_outline,
+                          color: theme.colorScheme.primary,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            l10n?.vehiclesWizardNoneYet ??
-                                'No vehicle configured yet.',
+                            l10n.vehiclesWizardNoneYet,
                             style: theme.textTheme.bodyMedium,
                           ),
                         ),
@@ -82,8 +82,7 @@ class VehiclesStep extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n?.vehiclesWizardYoursList(vehicles.length) ??
-                      'You have ${vehicles.length} vehicle(s):',
+                  l10n.vehiclesWizardYoursList(vehicles.length),
                   style: theme.textTheme.titleSmall,
                 ),
                 const SizedBox(height: 8),
@@ -101,7 +100,7 @@ class VehiclesStep extends ConsumerWidget {
                       _typeLabel(l10n, v.isEv, v.isCombustion) +
                           _fuelSuffix(v.preferredFuelType) +
                           (isDefault
-                              ? '  •  ${l10n?.wizardVehicleDefaultBadge ?? 'Default'}'
+                              ? '  •  ${l10n.wizardVehicleDefaultBadge}'
                               : ''),
                     ),
                     trailing: const Icon(Icons.edit_outlined),
@@ -126,13 +125,12 @@ class VehiclesStep extends ConsumerWidget {
                 await const EditVehicleRoute().push<void>(context);
               },
               icon: const Icon(Icons.add),
-              label: Text(l10n?.vehicleAdd ?? 'Add vehicle'),
+              label: Text(l10n.vehicleAdd),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            l10n?.vehiclesWizardSkipHint ??
-                'Skip to finish setup — you can add vehicles anytime from Settings.',
+            l10n.vehiclesWizardSkipHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontStyle: FontStyle.italic,
@@ -143,10 +141,10 @@ class VehiclesStep extends ConsumerWidget {
     );
   }
 
-  String _typeLabel(AppLocalizations? l10n, bool isEv, bool isCombustion) {
-    if (isEv && isCombustion) return l10n?.vehicleTypeHybrid ?? 'Hybrid';
-    if (isEv) return l10n?.vehicleTypeEv ?? 'Electric';
-    return l10n?.vehicleTypeCombustion ?? 'Combustion';
+  String _typeLabel(AppLocalizations l10n, bool isEv, bool isCombustion) {
+    if (isEv && isCombustion) return l10n.vehicleTypeHybrid;
+    if (isEv) return l10n.vehicleTypeEv;
+    return l10n.vehicleTypeCombustion;
   }
 
   String _fuelSuffix(String? fuel) {

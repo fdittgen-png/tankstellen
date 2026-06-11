@@ -41,11 +41,7 @@ class AlertsBestEffortNote extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              l10n?.alertsIosBestEffortNote ??
-                  'On iPhone, alert checks are best effort: iOS decides '
-                      'when the app may check prices in the background, so '
-                      'an alert can arrive late or occasionally not at all. '
-                      'Opening the app always runs a fresh check.',
+              l10n.alertsIosBestEffortNote,
               key: const ValueKey('alerts-best-effort-note'),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,

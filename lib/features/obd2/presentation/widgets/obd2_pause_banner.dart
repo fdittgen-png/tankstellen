@@ -38,9 +38,7 @@ class Obd2PauseBanner extends ConsumerWidget {
     // Watching only the phase (via select) means unrelated state
     // changes — live readings, band transitions — don't rebuild the
     // banner. The wider TripRecordingBanner already rebuilds on those.
-    final phase = ref.watch(
-      tripRecordingProvider.select((s) => s.phase),
-    );
+    final phase = ref.watch(tripRecordingProvider.select((s) => s.phase));
     if (phase != TripRecordingPhase.pausedDueToDrop) {
       return const SizedBox.shrink();
     }
@@ -54,9 +52,7 @@ class Obd2PauseBanner extends ConsumerWidget {
     return MaterialBanner(
       key: const Key('obd2PauseBanner'),
       backgroundColor: theme.colorScheme.errorContainer,
-      contentTextStyle: TextStyle(
-        color: theme.colorScheme.onErrorContainer,
-      ),
+      contentTextStyle: TextStyle(color: theme.colorScheme.onErrorContainer),
       leading: Icon(
         isSilentFailure
             ? Icons.report_gmailerrorred_outlined
@@ -65,25 +61,19 @@ class Obd2PauseBanner extends ConsumerWidget {
       ),
       content: Text(
         isSilentFailure
-            ? (l?.tripRecordingObd2NotResponding ??
-                'OBD2 adapter connected but not returning data. Try a '
-                "different adapter or check the vehicle's diagnostic "
-                'protocol.')
-            : (l?.obd2PauseBannerTitle ??
-                'OBD2 connection lost — recording paused'),
+            ? (l.tripRecordingObd2NotResponding)
+            : (l.obd2PauseBannerTitle),
       ),
       actions: [
         TextButton(
           key: const Key('obd2PauseBannerResume'),
-          onPressed: () =>
-              ref.read(tripRecordingProvider.notifier).resume(),
-          child: Text(l?.obd2PauseBannerResume ?? 'Resume recording'),
+          onPressed: () => ref.read(tripRecordingProvider.notifier).resume(),
+          child: Text(l.obd2PauseBannerResume),
         ),
         TextButton(
           key: const Key('obd2PauseBannerEnd'),
-          onPressed: () =>
-              ref.read(tripRecordingProvider.notifier).stop(),
-          child: Text(l?.obd2PauseBannerEnd ?? 'End recording'),
+          onPressed: () => ref.read(tripRecordingProvider.notifier).stop(),
+          child: Text(l.obd2PauseBannerEnd),
         ),
       ],
     );

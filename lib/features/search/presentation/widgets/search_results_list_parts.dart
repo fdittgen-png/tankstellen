@@ -67,25 +67,25 @@ class _CollapsibleBrandFilters extends ConsumerWidget {
     final theme = Theme.of(context);
     final selectedBrands = ref.watch(selectedBrandsProvider);
     final excludeHighway = ref.watch(excludeHighwayStationsProvider);
-    final hasActiveFilters =
-        selectedBrands.isNotEmpty || excludeHighway;
+    final hasActiveFilters = selectedBrands.isNotEmpty || excludeHighway;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
-          onTap: () =>
-              ref.read(brandFiltersExpandedProvider.notifier).toggle(),
+          onTap: () => ref.read(brandFiltersExpandedProvider.notifier).toggle(),
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Row(
               children: [
-                Icon(Icons.filter_list, size: 16,
-                    color: theme.colorScheme.primary),
+                Icon(
+                  Icons.filter_list,
+                  size: 16,
+                  color: theme.colorScheme.primary,
+                ),
                 const SizedBox(width: 6),
                 Text(
-                  l10n?.brandFilterAll ?? 'Brands',
+                  l10n.brandFilterAll,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
@@ -103,9 +103,7 @@ class _CollapsibleBrandFilters extends ConsumerWidget {
                 ],
                 const Spacer(),
                 Icon(
-                  expanded
-                      ? Icons.expand_less
-                      : Icons.expand_more,
+                  expanded ? Icons.expand_less : Icons.expand_more,
                   size: 18,
                   color: theme.colorScheme.primary,
                 ),
@@ -134,8 +132,8 @@ class _ViewToggleButton extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     final label = allPrices
-        ? (l10n?.switchToCompactView ?? 'Switch to compact view')
-        : (l10n?.switchToAllPricesView ?? 'Switch to all-prices view');
+        ? (l10n.switchToCompactView)
+        : (l10n.switchToAllPricesView);
 
     return Semantics(
       label: label,
@@ -143,9 +141,7 @@ class _ViewToggleButton extends ConsumerWidget {
       child: Tooltip(
         message: label,
         child: InkWell(
-          onTap: () => ref
-              .read(allPricesViewEnabledProvider.notifier)
-              .toggle(),
+          onTap: () => ref.read(allPricesViewEnabledProvider.notifier).toggle(),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

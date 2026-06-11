@@ -31,8 +31,9 @@ class BadgeShelf extends ConsumerWidget {
     final cardMargin = compact
         ? const EdgeInsets.symmetric(horizontal: 12, vertical: 4)
         : const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
-    final cardPadding =
-        compact ? const EdgeInsets.all(8) : const EdgeInsets.all(12);
+    final cardPadding = compact
+        ? const EdgeInsets.all(8)
+        : const EdgeInsets.all(12);
 
     return Card(
       margin: cardMargin,
@@ -45,10 +46,7 @@ class BadgeShelf extends ConsumerWidget {
               children: [
                 const Icon(Icons.emoji_events_outlined, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  l?.achievementsTitle ?? 'Achievements',
-                  style: theme.textTheme.titleSmall,
-                ),
+                Text(l.achievementsTitle, style: theme.textTheme.titleSmall),
                 const Spacer(),
                 Text(
                   '${earnedIds.length}/${AchievementId.values.length}',
@@ -135,76 +133,49 @@ class _BadgeTile extends StatelessWidget {
     );
   }
 
-  (IconData, String) _iconAndLabel(AchievementId id, AppLocalizations? l) {
+  (IconData, String) _iconAndLabel(AchievementId id, AppLocalizations l) {
     switch (id) {
       case AchievementId.firstTrip:
-        return (Icons.route, l?.achievementFirstTrip ?? 'First trip');
+        return (Icons.route, l.achievementFirstTrip);
       case AchievementId.firstFillUp:
-        return (
-          Icons.local_gas_station,
-          l?.achievementFirstFillUp ?? 'First fill-up',
-        );
+        return (Icons.local_gas_station, l.achievementFirstFillUp);
       case AchievementId.tenTrips:
-        return (Icons.military_tech, l?.achievementTenTrips ?? '10 trips');
+        return (Icons.military_tech, l.achievementTenTrips);
       case AchievementId.zeroHarshTrip:
-        return (Icons.spa, l?.achievementZeroHarsh ?? 'Smooth driver');
+        return (Icons.spa, l.achievementZeroHarsh);
       case AchievementId.ecoWeek:
-        return (
-          Icons.event_available,
-          l?.achievementEcoWeek ?? 'Eco week',
-        );
+        return (Icons.event_available, l.achievementEcoWeek);
       case AchievementId.priceWin:
-        return (
-          Icons.savings,
-          l?.achievementPriceWin ?? 'Price win',
-        );
+        return (Icons.savings, l.achievementPriceWin);
       case AchievementId.smoothDriver:
-        return (
-          Icons.timeline,
-          l?.achievementSmoothDriver ?? 'Smooth streak',
-        );
+        return (Icons.timeline, l.achievementSmoothDriver);
       case AchievementId.coldStartAware:
-        return (
-          Icons.ac_unit,
-          l?.achievementColdStartAware ?? 'Cold-start aware',
-        );
+        return (Icons.ac_unit, l.achievementColdStartAware);
       case AchievementId.highwayMaster:
-        return (
-          Icons.straight,
-          l?.achievementHighwayMaster ?? 'Highway master',
-        );
+        return (Icons.straight, l.achievementHighwayMaster);
     }
   }
 
-  String _description(AchievementId id, AppLocalizations? l) {
+  String _description(AchievementId id, AppLocalizations l) {
     switch (id) {
       case AchievementId.firstTrip:
-        return l?.achievementFirstTripDesc ??
-            'Record your first OBD2 trip.';
+        return l.achievementFirstTripDesc;
       case AchievementId.firstFillUp:
-        return l?.achievementFirstFillUpDesc ??
-            'Log your first fill-up.';
+        return l.achievementFirstFillUpDesc;
       case AchievementId.tenTrips:
-        return l?.achievementTenTripsDesc ??
-            'Record 10 OBD2 trips.';
+        return l.achievementTenTripsDesc;
       case AchievementId.zeroHarshTrip:
-        return l?.achievementZeroHarshDesc ??
-            'Complete a trip of 10 km or more with no harsh braking or acceleration.';
+        return l.achievementZeroHarshDesc;
       case AchievementId.ecoWeek:
-        return l?.achievementEcoWeekDesc ??
-            'Drive 7 consecutive days with at least one smooth trip each day.';
+        return l.achievementEcoWeekDesc;
       case AchievementId.priceWin:
-        return l?.achievementPriceWinDesc ??
-            'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
+        return l.achievementPriceWinDesc;
       case AchievementId.smoothDriver:
-        return l?.achievementSmoothDriverDesc ??
-            'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
+        return l.achievementSmoothDriverDesc;
       case AchievementId.coldStartAware:
-        return l?.achievementColdStartAwareDesc ??
-            'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
+        return l.achievementColdStartAwareDesc;
       case AchievementId.highwayMaster:
-        return l?.achievementHighwayMasterDesc ??
-            'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
+        return l.achievementHighwayMasterDesc;
     }
   }
 }

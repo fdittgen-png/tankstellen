@@ -12,7 +12,11 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 void main() {
   group('ServiceStatusBanner', () {
     Widget wrapInApp(Widget child) {
-      return MaterialApp(home: Scaffold(body: child));
+      return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: child),
+      );
     }
 
     test('returns SizedBox.shrink when not stale and no fallbacks', () {
@@ -30,8 +34,9 @@ void main() {
       expect(result.hadFallbacks, isFalse);
     });
 
-    testWidgets('shows nothing when data is fresh and no fallbacks',
-        (tester) async {
+    testWidgets('shows nothing when data is fresh and no fallbacks', (
+      tester,
+    ) async {
       final result = ServiceResult(
         data: <String>[],
         source: ServiceSource.tankerkoenigApi,
@@ -60,8 +65,9 @@ void main() {
       expect(find.textContaining('Offline'), findsOneWidget);
     });
 
-    testWidgets('shows fallback banner when errors present but not stale',
-        (tester) async {
+    testWidgets('shows fallback banner when errors present but not stale', (
+      tester,
+    ) async {
       final result = ServiceResult(
         data: <String>[],
         source: ServiceSource.cache,
@@ -82,8 +88,9 @@ void main() {
       expect(find.textContaining('unavailable'), findsOneWidget);
     });
 
-    testWidgets('stale takes priority over fallbacks in display',
-        (tester) async {
+    testWidgets('stale takes priority over fallbacks in display', (
+      tester,
+    ) async {
       final result = ServiceResult(
         data: <String>[],
         source: ServiceSource.cache,
@@ -108,17 +115,23 @@ void main() {
 
   group('ServiceChainErrorWidget', () {
     Widget wrapInApp(Widget child) {
-      return MaterialApp(home: Scaffold(body: SingleChildScrollView(child: child)));
+      return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: SingleChildScrollView(child: child)),
+      );
     }
 
     testWidgets('displays error icon and retry button', (tester) async {
       var retryPressed = false;
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: Exception('test error'),
-          onRetry: () => retryPressed = true,
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: Exception('test error'),
+            onRetry: () => retryPressed = true,
+          ),
         ),
-      ));
+      );
 
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
       expect(find.byIcon(Icons.refresh), findsOneWidget);
@@ -128,88 +141,96 @@ void main() {
     });
 
     testWidgets('hides retry button when onRetry is null', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        const ServiceChainErrorWidget(
-          error: NoApiKeyException(),
-        ),
-      ));
+      await tester.pumpWidget(
+        wrapInApp(const ServiceChainErrorWidget(error: NoApiKeyException())),
+      );
 
       expect(find.byType(FilledButton), findsNothing);
     });
 
     testWidgets('shows hint for NoApiKeyException', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        const ServiceChainErrorWidget(
-          error: NoApiKeyException(),
-        ),
-      ));
+      await tester.pumpWidget(
+        wrapInApp(const ServiceChainErrorWidget(error: NoApiKeyException())),
+      );
 
       expect(find.textContaining('API key'), findsWidgets);
     });
 
     testWidgets('shows hint for LocationException', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: const LocationException(message: 'GPS unavailable'),
-          onRetry: () {},
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: const LocationException(message: 'GPS unavailable'),
+            onRetry: () {},
+          ),
         ),
-      ));
+      );
 
       // Should contain location-related hint
       expect(find.textContaining('Location'), findsWidgets);
     });
 
     testWidgets('shows hint for timeout errors', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: Exception('connection timeout occurred'),
-          onRetry: () {},
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: Exception('connection timeout occurred'),
+            onRetry: () {},
+          ),
         ),
-      ));
+      );
 
       expect(find.textContaining('internet'), findsOneWidget);
     });
 
     testWidgets('shows hint for route errors', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: Exception('Route calculation via OSRM failed'),
-          onRetry: () {},
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: Exception('Route calculation via OSRM failed'),
+            onRetry: () {},
+          ),
         ),
-      ));
+      );
 
       expect(find.textContaining('Route'), findsOneWidget);
     });
 
     testWidgets('shows generic hint for unknown errors', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: Exception('something weird'),
-          onRetry: () {},
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: Exception('something weird'),
+            onRetry: () {},
+          ),
         ),
-      ));
+      );
 
       expect(find.textContaining('Try again'), findsWidgets);
     });
 
     testWidgets('shows expandable technical details', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: ServiceChainExhaustedException(errors: [
-            ServiceError(
-              source: ServiceSource.tankerkoenigApi,
-              message: 'API timeout',
-              occurredAt: DateTime.now(),
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: ServiceChainExhaustedException(
+              errors: [
+                ServiceError(
+                  source: ServiceSource.tankerkoenigApi,
+                  message: 'API timeout',
+                  occurredAt: DateTime.now(),
+                ),
+                ServiceError(
+                  source: ServiceSource.cache,
+                  message: 'Cache empty',
+                  occurredAt: DateTime.now(),
+                ),
+              ],
             ),
-            ServiceError(
-              source: ServiceSource.cache,
-              message: 'Cache empty',
-              occurredAt: DateTime.now(),
-            ),
-          ]),
-          onRetry: () {},
+            onRetry: () {},
+          ),
         ),
-      ));
+      );
 
       // Details section exists
       expect(find.text('Details'), findsOneWidget);
@@ -224,12 +245,14 @@ void main() {
     });
 
     testWidgets('shows technical details for plain exception', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: Exception('plain error'),
-          onRetry: () {},
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: Exception('plain error'),
+            onRetry: () {},
+          ),
         ),
-      ));
+      );
 
       // Expand details
       await tester.tap(find.text('Details'));
@@ -239,12 +262,14 @@ void main() {
     });
 
     testWidgets('shows no stations found hint', (tester) async {
-      await tester.pumpWidget(wrapInApp(
-        ServiceChainErrorWidget(
-          error: Exception('no stations found in area'),
-          onRetry: () {},
+      await tester.pumpWidget(
+        wrapInApp(
+          ServiceChainErrorWidget(
+            error: Exception('no stations found in area'),
+            onRetry: () {},
+          ),
         ),
-      ));
+      );
 
       expect(find.textContaining('search radius'), findsOneWidget);
     });
@@ -259,29 +284,34 @@ void main() {
       }
 
       testWidgets('renders a "Report this issue" button', (tester) async {
-        await tester.pumpWidget(wrapWithL10n(
-          ServiceChainErrorWidget(
-            error: const ApiException(
-              message: 'Upstream broken',
-              statusCode: 404,
+        await tester.pumpWidget(
+          wrapWithL10n(
+            ServiceChainErrorWidget(
+              error: const ApiException(
+                message: 'Upstream broken',
+                statusCode: 404,
+              ),
+              onRetry: () {},
             ),
-            onRetry: () {},
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Report this issue'), findsOneWidget);
         expect(find.byIcon(Icons.bug_report_outlined), findsOneWidget);
       });
 
-      testWidgets('hides the report CTA for a tracked stop-gap error (#1606)',
-          (tester) async {
-        await tester.pumpWidget(wrapWithL10n(
-          ServiceChainErrorWidget(
-            error: Exception('NSW FuelCheck retired. Tracked in #504'),
-            onRetry: () {},
+      testWidgets('hides the report CTA for a tracked stop-gap error (#1606)', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          wrapWithL10n(
+            ServiceChainErrorWidget(
+              error: Exception('NSW FuelCheck retired. Tracked in #504'),
+              onRetry: () {},
+            ),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         // A designed-in message tied to a tracked issue must not offer
@@ -290,23 +320,28 @@ void main() {
         expect(find.byIcon(Icons.bug_report_outlined), findsNothing);
       });
 
-      testWidgets('hides the report CTA for a transient network error (#1606)',
-          (tester) async {
-        await tester.pumpWidget(wrapWithL10n(
-          ServiceChainErrorWidget(
-            error: Exception('Network error (status: null)'),
-            onRetry: () {},
-          ),
-        ));
-        await tester.pumpAndSettle();
+      testWidgets(
+        'hides the report CTA for a transient network error (#1606)',
+        (tester) async {
+          await tester.pumpWidget(
+            wrapWithL10n(
+              ServiceChainErrorWidget(
+                error: Exception('Network error (status: null)'),
+                onRetry: () {},
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
 
-        // A status-less connectivity failure is non-actionable as a bug
-        // report — the hint tells the user to check their connection.
-        expect(find.text('Report this issue'), findsNothing);
-      });
+          // A status-less connectivity failure is non-actionable as a bug
+          // report — the hint tells the user to check their connection.
+          expect(find.text('Report this issue'), findsNothing);
+        },
+      );
 
-      testWidgets('tapping report opens the consent dialog, not the browser',
-          (tester) async {
+      testWidgets('tapping report opens the consent dialog, not the browser', (
+        tester,
+      ) async {
         Uri? launched;
         final reporter = ErrorReporter(
           launcher: (uri) async {
@@ -315,17 +350,19 @@ void main() {
           },
         );
 
-        await tester.pumpWidget(wrapWithL10n(
-          ServiceChainErrorWidget(
-            error: const ApiException(
-              message: 'Upstream broken',
-              statusCode: 404,
+        await tester.pumpWidget(
+          wrapWithL10n(
+            ServiceChainErrorWidget(
+              error: const ApiException(
+                message: 'Upstream broken',
+                statusCode: 404,
+              ),
+              onRetry: () {},
+              reporter: reporter,
+              countryCode: 'GB',
             ),
-            onRetry: () {},
-            reporter: reporter,
-            countryCode: 'GB',
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Report this issue'));
@@ -346,8 +383,9 @@ void main() {
         expect(launched!.queryParameters['title'], contains('GB'));
       });
 
-      testWidgets('cancelling the consent dialog does not launch a URL',
-          (tester) async {
+      testWidgets('cancelling the consent dialog does not launch a URL', (
+        tester,
+      ) async {
         Uri? launched;
         final reporter = ErrorReporter(
           launcher: (uri) async {
@@ -356,13 +394,15 @@ void main() {
           },
         );
 
-        await tester.pumpWidget(wrapWithL10n(
-          ServiceChainErrorWidget(
-            error: Exception('weird error'),
-            onRetry: () {},
-            reporter: reporter,
+        await tester.pumpWidget(
+          wrapWithL10n(
+            ServiceChainErrorWidget(
+              error: Exception('weird error'),
+              onRetry: () {},
+              reporter: reporter,
+            ),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Report this issue'));

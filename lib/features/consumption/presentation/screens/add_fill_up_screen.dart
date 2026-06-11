@@ -441,8 +441,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
     // success confirmation appears on the surface we return to (#1692).
     final messenger = ScaffoldMessenger.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final savedMessage = AppLocalizations.of(context)?.fillUpSavedSnackbar ??
-        'Fill-up saved';
+    final savedMessage = AppLocalizations.of(context).fillUpSavedSnackbar;
 
     await ref.read(fillUpListProvider.notifier).add(fillUp);
     if (!mounted) return;
@@ -565,10 +564,10 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       canPop: !_isDirty,
       onPopInvokedWithResult: _onPopInvoked,
       child: PageScaffold(
-      title: l?.addFillUp ?? 'Add fill-up',
+      title: l.addFillUp,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         onPressed: () => Navigator.maybePop(context),
       ),
       // #3073 — app-bar save stays above the iOS keyboard, which covers the
@@ -576,7 +575,7 @@ class _AddFillUpScreenState extends ConsumerState<AddFillUpScreen> {
       actions: [
         IconButton(
           icon: const Icon(Icons.check),
-          tooltip: l?.save ?? 'Save',
+          tooltip: l.save,
           onPressed: _save,
         ),
       ],

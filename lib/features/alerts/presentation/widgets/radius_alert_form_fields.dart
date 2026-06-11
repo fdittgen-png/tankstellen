@@ -31,7 +31,7 @@ class RadiusAlertLabelField extends StatelessWidget {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        hintText: l10n?.alertsRadiusLabelHint ?? 'Label',
+        hintText: l10n.alertsRadiusLabelHint,
         border: const OutlineInputBorder(),
       ),
       onChanged: (_) => onChanged(),
@@ -77,14 +77,11 @@ class RadiusAlertFuelTypeField extends StatelessWidget {
     return DropdownButtonFormField<FuelType>(
       initialValue: value,
       decoration: InputDecoration(
-        labelText: l10n?.alertsRadiusFuelType ?? 'Fuel type',
+        labelText: l10n.alertsRadiusFuelType,
         border: const OutlineInputBorder(),
       ),
       items: fuels
-          .map((t) => DropdownMenuItem(
-                value: t,
-                child: Text(t.displayName),
-              ))
+          .map((t) => DropdownMenuItem(value: t, child: Text(t.displayName)))
           .toList(),
       onChanged: (v) {
         if (v != null) onChanged(v);
@@ -121,8 +118,7 @@ class RadiusAlertThresholdField extends StatelessWidget {
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       decoration: InputDecoration(
-        labelText: l10n?.alertThresholdWithCurrency(currencySymbol) ??
-            'Threshold ($currencySymbol/L)',
+        labelText: l10n.alertThresholdWithCurrency(currencySymbol),
         border: const OutlineInputBorder(),
       ),
       onChanged: (_) => onChanged(),
@@ -151,10 +147,7 @@ class RadiusAlertRadiusSlider extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(
-              l10n?.alertsRadiusKm ?? 'Radius (km)',
-              style: theme.textTheme.titleSmall,
-            ),
+            Text(l10n.alertsRadiusKm, style: theme.textTheme.titleSmall),
             const Spacer(),
             Text('${value.round()} km', style: theme.textTheme.titleSmall),
           ],
@@ -192,28 +185,25 @@ class RadiusAlertFrequencyField extends StatelessWidget {
     return DropdownButtonFormField<int>(
       initialValue: value,
       decoration: InputDecoration(
-        labelText: l10n?.alertsRadiusFrequencyLabel ?? 'Check frequency',
+        labelText: l10n.alertsRadiusFrequencyLabel,
         border: const OutlineInputBorder(),
       ),
       items: <DropdownMenuItem<int>>[
         DropdownMenuItem(
           value: 1,
-          child: Text(l10n?.alertsRadiusFrequencyDaily ?? 'Once a day'),
+          child: Text(l10n.alertsRadiusFrequencyDaily),
         ),
         DropdownMenuItem(
           value: 2,
-          child:
-              Text(l10n?.alertsRadiusFrequencyTwiceDaily ?? 'Twice a day'),
+          child: Text(l10n.alertsRadiusFrequencyTwiceDaily),
         ),
         DropdownMenuItem(
           value: 3,
-          child: Text(l10n?.alertsRadiusFrequencyThriceDaily ??
-              'Three times a day'),
+          child: Text(l10n.alertsRadiusFrequencyThriceDaily),
         ),
         DropdownMenuItem(
           value: 4,
-          child: Text(l10n?.alertsRadiusFrequencyFourTimesDaily ??
-              'Four times a day'),
+          child: Text(l10n.alertsRadiusFrequencyFourTimesDaily),
         ),
       ],
       onChanged: (v) {
@@ -243,7 +233,7 @@ class RadiusAlertCenterButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             icon: const Icon(Icons.my_location),
             onPressed: onUseMyLocation,
-            label: Text(l10n?.alertsRadiusCenterGps ?? 'Use my location'),
+            label: Text(l10n.alertsRadiusCenterGps),
           ),
         ),
         const SizedBox(width: 12),
@@ -251,7 +241,7 @@ class RadiusAlertCenterButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             icon: const Icon(Icons.map_outlined),
             onPressed: onPickOnMap,
-            label: Text(l10n?.radiusAlertPickOnMap ?? 'Pick on map'),
+            label: Text(l10n.radiusAlertPickOnMap),
           ),
         ),
       ],
@@ -277,7 +267,7 @@ class RadiusAlertPostalCodeField extends StatelessWidget {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: l10n?.alertsRadiusCenterPostalCode ?? 'Postal code',
+        labelText: l10n.alertsRadiusCenterPostalCode,
         border: const OutlineInputBorder(),
       ),
       onChanged: (_) => onChanged(),
@@ -304,14 +294,14 @@ class RadiusAlertActionButtons extends StatelessWidget {
         Expanded(
           child: OutlinedButton(
             onPressed: onCancel,
-            child: Text(l10n?.alertsRadiusCancel ?? 'Cancel'),
+            child: Text(l10n.alertsRadiusCancel),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: FilledButton(
             onPressed: onSave,
-            child: Text(l10n?.alertsRadiusSave ?? 'Save'),
+            child: Text(l10n.alertsRadiusSave),
           ),
         ),
       ],

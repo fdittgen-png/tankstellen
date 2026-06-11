@@ -62,8 +62,7 @@ void main() {
         tester,
         const DrivingSettingsSection(),
         overrides: [
-          settingsStorageProvider
-              .overrideWithValue(_FakeSettingsStorage()),
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
           storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
           featureFlagsProvider.overrideWith(() => fakeFlags),
         ],
@@ -114,8 +113,7 @@ void main() {
         tester,
         const DrivingSettingsSection(),
         overrides: [
-          settingsStorageProvider
-              .overrideWithValue(_FakeSettingsStorage()),
+          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
           storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
           featureFlagsProvider.overrideWith(() => fakeFlags),
         ],
@@ -134,55 +132,56 @@ void main() {
     },
   );
 
-  testWidgets(
-    'composes vehicles + fuel-club tiles above the eco-coach toggle '
-    '(#1242 — Console grouping)',
-    (tester) async {
-      await pumpApp(
-        tester,
-        const DrivingSettingsSection(),
-        overrides: [
-          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
-          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
-          // #1517 / #1520 — the Fuel club cards tile is now gated by
-          // `Feature.loyaltyCards`. Pin it on so this composition test
-          // still asserts both tiles render together. Default-off
-          // semantics are covered separately by the gating-audit
-          // unit tests.
-          featureFlagsProvider.overrideWith(
-            () => _TestFeatureFlags(<Feature>{Feature.loyaltyCards}),
-          ),
-        ],
-      );
+  testWidgets('composes vehicles + fuel-club tiles above the eco-coach toggle '
+      '(#1242 — Console grouping)', (tester) async {
+    await pumpApp(
+      tester,
+      const DrivingSettingsSection(),
+      overrides: [
+        settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+        storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+        // #1517 / #1520 — the Fuel club cards tile is now gated by
+        // `Feature.loyaltyCards`. Pin it on so this composition test
+        // still asserts both tiles render together. Default-off
+        // semantics are covered separately by the gating-audit
+        // unit tests.
+        featureFlagsProvider.overrideWith(
+          () => _TestFeatureFlags(<Feature>{Feature.loyaltyCards}),
+        ),
+      ],
+    );
 
-      // #2566 — the vehicles tile is the first group (Vehicles); the
-      // fuel-club tile lives in the Rewards & savings group.
-      expect(
-        find.byKey(const Key('consoleVehiclesTile')),
-        findsOneWidget,
-        reason: 'My vehicles tile must render inside the Conso section '
-            'as the first (Vehicles) group after #2566.',
-      );
-      expect(
-        find.byKey(const Key('consoleFuelClubCardsTile')),
-        findsOneWidget,
-        reason: 'Fuel club cards tile is part of the Rewards & savings '
-            'group.',
-      );
+    // #2566 — the vehicles tile is the first group (Vehicles); the
+    // fuel-club tile lives in the Rewards & savings group.
+    expect(
+      find.byKey(const Key('consoleVehiclesTile')),
+      findsOneWidget,
+      reason:
+          'My vehicles tile must render inside the Conso section '
+          'as the first (Vehicles) group after #2566.',
+    );
+    expect(
+      find.byKey(const Key('consoleFuelClubCardsTile')),
+      findsOneWidget,
+      reason:
+          'Fuel club cards tile is part of the Rewards & savings '
+          'group.',
+    );
 
-      final children = <Widget>[
-        for (final t in tester
-            .widgetList<SettingsMenuTile>(find.byType(SettingsMenuTile)))
-          t,
-      ];
-      expect(
-        children.length,
-        2,
-        reason: 'Exactly two SettingsMenuTile children: the vehicles tile '
-            '(Vehicles group) + Fuel club cards (Rewards & savings group).',
-      );
-    },
-  );
+    final children = <Widget>[
+      for (final t in tester.widgetList<SettingsMenuTile>(
+        find.byType(SettingsMenuTile),
+      ))
+        t,
+    ];
+    expect(
+      children.length,
+      2,
+      reason:
+          'Exactly two SettingsMenuTile children: the vehicles tile '
+          '(Vehicles group) + Fuel club cards (Rewards & savings group).',
+    );
+  });
 
   testWidgets(
     'regroups the section into the #2566 purpose-driven IA — Vehicles, '
@@ -214,7 +213,7 @@ void main() {
       // Resolve the localized group-header strings from the running app.
       final l = AppLocalizations.of(
         tester.element(find.byType(DrivingSettingsSection)),
-      )!;
+      );
       final headerTitles = tester
           .widgetList<SectionHeader>(find.byType(SectionHeader))
           .map((h) => h.title)
@@ -227,7 +226,8 @@ void main() {
           l.consoGroupRewards,
           l.consoGroupTroubleshooting,
         ],
-        reason: 'The four purpose-driven groups must render in IA order '
+        reason:
+            'The four purpose-driven groups must render in IA order '
             '(#2566): Vehicles, Coaching while driving, Rewards & savings, '
             'Troubleshooting.',
       );
@@ -241,7 +241,8 @@ void main() {
       expect(
         find.byKey(const Key('obd2DebugLoggingToggle')),
         findsOneWidget,
-        reason: 'The OBD2 debug-logging diagnostic lives in the '
+        reason:
+            'The OBD2 debug-logging diagnostic lives in the '
             'Troubleshooting group, shown only when the OBD2 stack is on.',
       );
 
@@ -250,12 +251,14 @@ void main() {
       final ecoY = tester
           .getTopLeft(find.byKey(const Key('hapticEcoCoachToggle')))
           .dy;
-      final glideY =
-          tester.getTopLeft(find.byKey(const Key('glideCoachToggle'))).dy;
+      final glideY = tester
+          .getTopLeft(find.byKey(const Key('glideCoachToggle')))
+          .dy;
       expect(
         ecoY < glideY,
         isTrue,
-        reason: 'Eco-coaching must render above glide-coach within the '
+        reason:
+            'Eco-coaching must render above glide-coach within the '
             'Coaching while driving group.',
       );
     },
@@ -277,7 +280,7 @@ void main() {
 
       final l = AppLocalizations.of(
         tester.element(find.byType(DrivingSettingsSection)),
-      )!;
+      );
       final headerTitles = tester
           .widgetList<SectionHeader>(find.byType(SectionHeader))
           .map((h) => h.title)
@@ -285,7 +288,8 @@ void main() {
       expect(
         headerTitles,
         isNot(contains(l.consoGroupTroubleshooting)),
-        reason: 'No Troubleshooting group without the OBD2 stack — the '
+        reason:
+            'No Troubleshooting group without the OBD2 stack — the '
             'debug-logging diagnostic only concerns the OBD2 link.',
       );
       expect(find.byKey(const Key('obd2DebugLoggingToggle')), findsNothing);
@@ -319,34 +323,31 @@ void main() {
     },
   );
 
-  testWidgets(
-    'nests the gamification opt-out tile inside the Conso section '
-    '(#1249 — moved out of the standalone settings card)',
-    (tester) async {
-      await pumpApp(
-        tester,
-        const DrivingSettingsSection(),
-        overrides: [
-          settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
-          storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
-          featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
-        ],
-      );
+  testWidgets('nests the gamification opt-out tile inside the Conso section '
+      '(#1249 — moved out of the standalone settings card)', (tester) async {
+    await pumpApp(
+      tester,
+      const DrivingSettingsSection(),
+      overrides: [
+        settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
+        storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
+        featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
+      ],
+    );
 
-      // The gamification toggle now lives as the last child of the
-      // Consumption foldable instead of as a sibling Card on the
-      // Settings page. Asserting it is present here pins that
-      // placement so a future rewrite can't silently move it back.
-      expect(
-        find.byType(GamificationSettingsTile),
-        findsOneWidget,
-        reason:
-            'Exactly one GamificationSettingsTile must render inside '
-            'DrivingSettingsSection — duplication or absence indicates '
-            'the #1249 placement regressed.',
-      );
-    },
-  );
+    // The gamification toggle now lives as the last child of the
+    // Consumption foldable instead of as a sibling Card on the
+    // Settings page. Asserting it is present here pins that
+    // placement so a future rewrite can't silently move it back.
+    expect(
+      find.byType(GamificationSettingsTile),
+      findsOneWidget,
+      reason:
+          'Exactly one GamificationSettingsTile must render inside '
+          'DrivingSettingsSection — duplication or absence indicates '
+          'the #1249 placement regressed.',
+    );
+  });
 
   testWidgets(
     'voice-announcement sliders show their CURRENT value as visible text at '
@@ -370,8 +371,9 @@ void main() {
           featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
           // The voice-announcements tile is gated behind this master flag.
           voiceAnnouncementsEnabledProvider.overrideWithValue(true),
-          voiceAnnouncementSettingsProvider
-              .overrideWith(() => _FakeVoiceSettings(config)),
+          voiceAnnouncementSettingsProvider.overrideWith(
+            () => _FakeVoiceSettings(config),
+          ),
         ],
       );
 
@@ -379,7 +381,8 @@ void main() {
       expect(
         find.byType(LabeledValueSlider),
         findsNWidgets(3),
-        reason: 'All three voice sliders must use the shared '
+        reason:
+            'All three voice sliders must use the shared '
             'LabeledValueSlider so the value is always visible.',
       );
 
@@ -388,7 +391,8 @@ void main() {
       expect(
         find.text('2.5 km'),
         findsOneWidget,
-        reason: 'The announcement-radius slider must show "2.5 km" at rest '
+        reason:
+            'The announcement-radius slider must show "2.5 km" at rest '
             '(#2920) — a bare Slider.label is invisible until dragged.',
       );
       expect(
@@ -400,7 +404,8 @@ void main() {
       expect(
         find.text(priceText),
         findsOneWidget,
-        reason: 'The price-limit slider must show the formatted price '
+        reason:
+            'The price-limit slider must show the formatted price '
             '("$priceText") at rest.',
       );
 
@@ -408,17 +413,19 @@ void main() {
       // subtitle text it used to fall back to (#2920 mislabel).
       final l = AppLocalizations.of(
         tester.element(find.byType(DrivingSettingsSection)),
-      )!;
+      );
       expect(
         find.text(l.voiceAnnouncementPriceLimit),
         findsOneWidget,
-        reason: 'The price-threshold slider must show a distinct '
+        reason:
+            'The price-threshold slider must show a distinct '
             '"Maximum price" label — not the duplicated section subtitle.',
       );
       expect(
         find.text(l.voiceAnnouncementsDescription),
         findsOneWidget,
-        reason: 'The section subtitle text must appear exactly once (on the '
+        reason:
+            'The section subtitle text must appear exactly once (on the '
             'enable toggle) — never duplicated onto the price slider.',
       );
     },
@@ -434,7 +441,8 @@ void main() {
 ///     that throw [StateError] for prerequisite violations to mirror
 ///     the real central-provider contract the shim relies on.
 class _TestFeatureFlags extends FeatureFlags {
-  _TestFeatureFlags([Set<Feature>? initial]) : _initial = initial ?? <Feature>{};
+  _TestFeatureFlags([Set<Feature>? initial])
+    : _initial = initial ?? <Feature>{};
 
   final Set<Feature> _initial;
 
@@ -443,13 +451,15 @@ class _TestFeatureFlags extends FeatureFlags {
 
   @override
   Future<void> enable(Feature feature) async {
-    final current = state.value ?? const <Feature>{}; if (current.contains(feature)) return;
+    final current = state.value ?? const <Feature>{};
+    if (current.contains(feature)) return;
     state = AsyncData({...current, feature});
   }
 
   @override
   Future<void> disable(Feature feature) async {
-    final current = state.value ?? const <Feature>{}; if (!current.contains(feature)) return;
+    final current = state.value ?? const <Feature>{};
+    if (!current.contains(feature)) return;
     state = AsyncData({...current}..remove(feature));
   }
 }
