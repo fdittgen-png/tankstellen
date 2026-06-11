@@ -80,12 +80,14 @@ class IgnoredStationsSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
     try {
+      // #3123 — tombstone-first (journal-backed): a failed row delete must
+      // not also skip the tombstone, or the un-ignore resurrects.
+      await DeletionsSync.record('ignored_stations', stationId);
       await client
           .from('ignored_stations')
           .delete()
           .eq('user_id', userId)
           .eq('station_id', stationId);
-      await DeletionsSync.record('ignored_stations', stationId);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'IgnoredStationsSync.delete FAILED'}));

@@ -146,12 +146,14 @@ class FillUpsSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
     try {
+      // #3078/#3123 — tombstone-first (journal-backed): the tombstone must
+      // not depend on the row delete succeeding.
+      await DeletionsSync.record('fill_ups', fillUpId);
       await client
           .from('fill_ups')
           .delete()
           .eq('user_id', userId)
           .eq('id', fillUpId);
-      await DeletionsSync.record('fill_ups', fillUpId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FillUpsSync.delete FAILED'}));
     }

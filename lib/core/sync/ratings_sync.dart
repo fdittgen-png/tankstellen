@@ -99,14 +99,15 @@ class RatingsSync {
     if (client == null || userId == null) return;
 
     try {
+      // #3078/#3123 — tombstone-first (journal-backed) so another device's
+      // re-upload / fetch can't resurrect the deleted rating even when the
+      // row delete below fails transiently.
+      await DeletionsSync.record('station_ratings', stationId);
       await client
           .from('station_ratings')
           .delete()
           .eq('user_id', userId)
           .eq('station_id', stationId);
-      // #3078 — tombstone so another device's re-upload / fetch can't
-      // resurrect the deleted rating.
-      await DeletionsSync.record('station_ratings', stationId);
       debugPrint('RatingsSync.delete: $stationId removed');
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.delete FAILED'}));

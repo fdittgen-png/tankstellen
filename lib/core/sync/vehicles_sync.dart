@@ -147,12 +147,14 @@ class VehiclesSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
     try {
+      // #3078/#3123 — tombstone-first (journal-backed): the tombstone must
+      // not depend on the row delete succeeding.
+      await DeletionsSync.record('vehicles', vehicleId);
       await client
           .from('vehicles')
           .delete()
           .eq('user_id', userId)
           .eq('id', vehicleId);
-      await DeletionsSync.record('vehicles', vehicleId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'VehiclesSync.delete FAILED'}));
     }
