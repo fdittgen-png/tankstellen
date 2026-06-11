@@ -43,12 +43,75 @@ void main() {
       // #2787 — the foreground service is gated OFF while the manifest
       // FOREGROUND_SERVICE permission is removed (#1498); requesting it threw
       // a startForeground Permission Denial that killed the GPS stream (error
-      // log #17). Foreground-only until the flag + manifest permission return.
+      // log #17). #3173 made the restore a single build define
+      // (FGS_FORM_APPROVED) that flips the Dart flag AND the manifest overlay
+      // together — this test runs WITHOUT the define, so it pins the
+      // ships-dark default: throttled, foreground-only, Play-compliant.
       expect(kGpsRecordingForegroundServiceEnabled, isFalse,
-          reason: 'guards against re-enabling the FGS without the manifest '
-              'permission — flip both together when #1498 lands');
+          reason: 'default builds (no --dart-define=FGS_FORM_APPROVED=true) '
+              'must stay foreground-only until the #1498 Play form clears');
       expect(android.foregroundNotificationConfig, isNull,
           reason: 'no startForeground while FOREGROUND_SERVICE is removed');
+    });
+
+    group('#3173 — FGS_FORM_APPROVED gating (throttled vs restored)', () {
+      test(
+          'throttled (form pending, foregroundServiceEnabled: false) → '
+          'NO foreground service requested', () {
+        final settings = recordingLocationSettings(
+          l10n: l10n,
+          platform: TargetPlatform.android,
+          foregroundServiceEnabled: false,
+        ) as AndroidSettings;
+
+        expect(settings.foregroundNotificationConfig, isNull,
+            reason: 'while the #1498 form is pending the merged manifest has '
+                'no FOREGROUND_SERVICE permission — requesting the service '
+                'would crash startForeground (error log #17)');
+        // The fine cadence stays requested either way; only the
+        // background-batching counter-lever (the FGS) is withheld.
+        expect(settings.intervalDuration, const Duration(seconds: 1));
+        expect(settings.distanceFilter, 0);
+      });
+
+      test(
+          'restored (form approved, foregroundServiceEnabled: true) → '
+          'ForegroundNotificationConfig with ARB copy + wakelock + ongoing',
+          () {
+        final settings = recordingLocationSettings(
+          l10n: l10n,
+          platform: TargetPlatform.android,
+          foregroundServiceEnabled: true,
+        ) as AndroidSettings;
+
+        final config = settings.foregroundNotificationConfig;
+        expect(config, isNotNull,
+            reason: 'with FGS_FORM_APPROVED the foreground service is the '
+                'un-throttle lever against the ~5 s background batching');
+        expect(config!.notificationTitle,
+            l10n.tripRecordingGpsNotificationTitle,
+            reason: 'notification copy must come from ARB, never inline');
+        expect(
+            config.notificationText, l10n.tripRecordingGpsNotificationText);
+        expect(config.enableWakeLock, isTrue,
+            reason: 'CPU must stay awake for the 1 s fixes with screen off');
+        expect(config.setOngoing, isTrue,
+            reason: 'the recording notification must not be swipe-dismissable');
+        // The restored profile keeps the same fine cadence.
+        expect(settings.intervalDuration, const Duration(seconds: 1));
+        expect(settings.distanceFilter, 0);
+      });
+
+      test('iOS ignores the Android FGS flag entirely (no platform fork)', () {
+        final settings = recordingLocationSettings(
+          l10n: l10n,
+          platform: TargetPlatform.iOS,
+          foregroundServiceEnabled: true,
+        );
+        expect(settings, isA<AppleSettings>(),
+            reason: 'the flag is an Android-only lever behind the existing '
+                'platform seam — iOS keeps its full background profile');
+      });
     });
 
     test('iOS → AppleSettings: automotiveNavigation + background updates', () {

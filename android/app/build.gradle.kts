@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import java.util.Base64
 import java.util.Properties
 import java.io.FileInputStream
 
@@ -71,6 +72,52 @@ fun resolveReleaseSigning(): ReleaseSigningConfig? {
 }
 
 val releaseSigning: ReleaseSigningConfig? = resolveReleaseSigning()
+
+// -----------------------------------------------------------------------------
+// #3173 — Foreground-service un-throttle trigger (ships dark until the Google
+// Play "Foreground Service Use" form (#1498) is approved).
+//
+// Flutter forwards every --dart-define to Gradle as the `dart-defines`
+// project property (comma-separated base64 "KEY=VALUE" entries). Decoding it
+// here lets ONE flag flip both halves of the restore in lockstep:
+//
+//   flutter build appbundle --flavor play --dart-define=FGS_FORM_APPROVED=true
+//
+//   * Dart   — kGpsRecordingForegroundServiceEnabled (lib/core/location/
+//              recording_location_settings.dart) turns true, so the trip
+//              recorder requests geolocator's foreground service (the
+//              un-throttle lever against Android's ~5 s background batching).
+//   * Gradle — the flavor manifest overlay (sourceSets below) swaps to the
+//              *FgsApproved variant, which re-declares the FOREGROUND_SERVICE*
+//              permissions and (play flavor) the AutoRecordForegroundService.
+//
+// Without the define (the default, and what every current CI build does) the
+// merged manifest keeps today's Play-compliant shape: ZERO FOREGROUND_SERVICE*
+// permissions, so edits.commit never 403s on the form. FGS_FORM_APPROVED=1 in
+// the environment is accepted as a fallback for plain ./gradlew invocations
+// (e.g. manifest-merge inspection without the Flutter tool in front).
+// -----------------------------------------------------------------------------
+val dartDefines: Map<String, String> =
+    (project.findProperty("dart-defines") as String?)
+        ?.split(",")
+        ?.mapNotNull { encoded ->
+            try {
+                val decoded = String(
+                    Base64.getDecoder().decode(encoded),
+                    Charsets.UTF_8,
+                )
+                val idx = decoded.indexOf('=')
+                if (idx > 0) decoded.take(idx) to decoded.substring(idx + 1) else null
+            } catch (_: IllegalArgumentException) {
+                null // not base64 (defensive) — skip the entry
+            }
+        }
+        ?.toMap()
+        ?: emptyMap()
+
+val fgsFormApproved: Boolean =
+    (dartDefines["FGS_FORM_APPROVED"] ?: System.getenv("FGS_FORM_APPROVED") ?: "false")
+        .let { it.equals("true", ignoreCase = true) || it == "1" }
 
 android {
     namespace = "de.tankstellen.tankstellen"
@@ -183,6 +230,27 @@ android {
             // file is fdroid-scoped: the play flavor keeps the real GMS and the
             // base `-keep com.google.mlkit.**` rule.
             proguardFiles("proguard-rules-fdroid.pro")
+        }
+    }
+
+    // #3173 — see the dart-defines block above. Default (form pending): the
+    // checked-in, Play-compliant manifests, byte-identical to before. With
+    // FGS_FORM_APPROVED set, each flavor's manifest overlay swaps to its
+    // *FgsApproved variant, restoring the FOREGROUND_SERVICE* permissions
+    // (+ AutoRecordForegroundService on play). The flavor overlays are
+    // higher-priority than src/main in the manifest merge, so their plain
+    // permission declarations win over main's tools:node="remove" guards.
+    sourceSets {
+        getByName("play").manifest.srcFile(
+            if (fgsFormApproved) {
+                "src/play/AndroidManifestFgsApproved.xml"
+            } else {
+                "src/play/AndroidManifest.xml"
+            }
+        )
+        if (fgsFormApproved) {
+            getByName("fdroid")
+                .manifest.srcFile("src/fdroid/AndroidManifestFgsApproved.xml")
         }
     }
 }

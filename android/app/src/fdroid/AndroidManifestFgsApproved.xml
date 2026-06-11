@@ -1,0 +1,33 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
+<!-- #3173 — the FGS-APPROVED manifest overlay for the fdroid flavor.
+
+     NOT used by default: the fdroid source set normally has NO manifest
+     overlay at all. android/app/build.gradle.kts wires this file in only
+     when the build carries the FGS_FORM_APPROVED define (see the #3173
+     block there). It exists so that building fdroid with the same define
+     does not recreate error log #17: the Dart flag
+     kGpsRecordingForegroundServiceEnabled is compile-time and
+     flavor-agnostic, so without these permissions an fdroid build made
+     with the define would call startForeground() and hit a Permission
+     Denial that kills the trip-GPS stream.
+
+     The Play "Foreground Service Use" form does not apply to F-Droid, but
+     the flag is kept single and global on purpose — one trigger, both
+     halves (Dart + manifest), every flavor consistent.
+
+     GPS-recording scope only: FOREGROUND_SERVICE (base) +
+     FOREGROUND_SERVICE_LOCATION (API 34+ type-specific permission for
+     geolocator's foregroundServiceType="location" service). No Android
+     Auto components (the Auto host is GMS, absent from the GMS-free fdroid
+     build) and no AutoRecordForegroundService / CONNECTED_DEVICE here —
+     extending hands-free auto-record to fdroid is a separate decision. -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+</manifest>

@@ -10,8 +10,10 @@
 /// transitions for the user's paired ELM327 adapter and bridges them
 /// through a `MethodChannel` / `EventChannel` into
 /// [BackgroundAdapterListener.events]. The service `<service>` entry is
-/// currently commented out in the manifest pending the Google Play
-/// "Foreground Service Use" form (#1498); while it is disabled, the
+/// absent from default builds pending the Google Play "Foreground
+/// Service Use" form (#1498) — it lives in the gated
+/// `AndroidManifestFgsApproved.xml` overlay that the
+/// `FGS_FORM_APPROVED` define wires in (#3173). While it is absent, the
 /// foreground-active arming fallback (#2282 concern 1) drives
 /// engine-start detection from the live engine instead. Tests inject a
 /// [FakeBackgroundAdapterListener] from
