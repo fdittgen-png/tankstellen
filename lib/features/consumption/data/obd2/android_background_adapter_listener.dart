@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'background_adapter_listener.dart';
-import 'event_channel_cancel.dart';
+import '../../../../core/utils/event_channel_cancel.dart';
 
 /// Production [BackgroundAdapterListener] backed by the native Android
 /// foreground service shipped in #1004 phase 2b-1.

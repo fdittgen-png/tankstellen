@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/event_channel_cancel.dart';
+import 'package:tankstellen/core/utils/event_channel_cancel.dart';
 
 /// Minimal fake [StreamSubscription] whose only meaningful method is
 /// [cancel]. Every other method throws [UnimplementedError] so a

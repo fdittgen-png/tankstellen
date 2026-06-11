@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 
 import 'ble_disconnect_classifier.dart';
 import 'elm_byte_channel.dart';
-import 'event_channel_cancel.dart';
+import '../../../../core/utils/event_channel_cancel.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_read_timeout.dart';
 import 'obd2_transport.dart';

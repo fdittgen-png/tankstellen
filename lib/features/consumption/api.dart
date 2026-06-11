@@ -23,7 +23,6 @@ export 'data/obd2/adapter_registry.dart';
 export 'data/obd2/broken_map_belief.dart';
 export 'data/obd2/broken_map_detector.dart';
 export 'data/obd2/elm327_protocol.dart';
-export 'data/obd2/event_channel_cancel.dart';
 export 'data/obd2/ios_state_restoration_provider.dart';
 export 'data/obd2/obd2_comm_diagnostics.dart';
 export 'data/obd2/obd2_connect_trace.dart';
