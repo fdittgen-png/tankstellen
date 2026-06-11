@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'sync_provider.dart';
 import '../../core/logging/error_logger.dart';
+import '../utils/json_extensions.dart';
 
 /// Shared helper to execute sync operations only when TankSync is connected.
 ///
@@ -84,4 +85,77 @@ class SyncHelper {
     if (tombstoned.isEmpty) return serverRows;
     return serverRows.where((row) => !tombstoned.contains(key(row)));
   }
+
+  /// Last-write-wins comparison over the ids present on BOTH sides (#3122).
+  ///
+  /// The id-union merges upload only local-only ids and download only
+  /// server-only ids, so a record present on both sides never re-syncs —
+  /// an edit to an existing fill-up / vehicle diverges between devices
+  /// forever. This is the shared seam that fixes it: for every both-sides
+  /// id it compares the server row's `updated_at` against the record's
+  /// local modification stamp and splits them into
+  ///
+  /// - [LwwSplit.localNewer] — local edit is fresher → caller re-upserts;
+  /// - [LwwSplit.serverNewer] — server row is fresher → caller decodes the
+  ///   row and overwrites the local record.
+  ///
+  /// **Tie / missing-stamp policy: skip.** A both-sides id is acted on only
+  /// when BOTH stamps are present and strictly unequal. Rationale: skipping
+  /// is non-destructive (a legacy record without a local stamp keeps
+  /// today's behaviour instead of being clobbered by whichever side
+  /// happens to hold a stamp), it produces zero churn for records that are
+  /// already in sync (equal stamps), and it self-heals — the next edit on
+  /// either side stamps the record and LWW propagation kicks in.
+  ///
+  /// [tombstoned] ids are excluded outright — a deleted record must never
+  /// be re-uploaded or re-downloaded by the LWW path.
+  static LwwSplit<L> lwwSplit<L>({
+    required Iterable<L> local,
+    required Iterable<Map<String, dynamic>> serverRows,
+    required String? Function(L) id,
+    required DateTime? Function(L) localStamp,
+    String stampColumn = 'updated_at',
+    Set<String> tombstoned = const {},
+  }) {
+    final serverById = <String, Map<String, dynamic>>{};
+    for (final row in serverRows) {
+      final rowId = row.getString('id');
+      if (rowId != null) serverById[rowId] = row;
+    }
+
+    final localNewer = <L>[];
+    final serverNewer = <Map<String, dynamic>>[];
+    for (final record in local) {
+      final recordId = id(record);
+      if (recordId == null || tombstoned.contains(recordId)) continue;
+      final serverRow = serverById[recordId];
+      if (serverRow == null) continue; // local-only — the union path uploads.
+
+      final localTime = localStamp(record)?.toUtc();
+      final serverTime =
+          DateTime.tryParse(serverRow.getString(stampColumn) ?? '')?.toUtc();
+      // Tie / missing stamp → skip (see policy above).
+      if (localTime == null || serverTime == null) continue;
+      if (localTime.isAfter(serverTime)) {
+        localNewer.add(record);
+      } else if (serverTime.isAfter(localTime)) {
+        serverNewer.add(serverRow);
+      }
+    }
+    return LwwSplit(localNewer: localNewer, serverNewer: serverNewer);
+  }
+}
+
+/// Result of [SyncHelper.lwwSplit] — the both-sides records each side of
+/// the merge must re-sync (#3122).
+class LwwSplit<L> {
+  /// Local records whose stamp is strictly newer than the server row's —
+  /// the caller re-upserts these.
+  final List<L> localNewer;
+
+  /// Server rows strictly newer than the local record — the caller decodes
+  /// these and overwrites the matching local records.
+  final List<Map<String, dynamic>> serverNewer;
+
+  const LwwSplit({required this.localNewer, required this.serverNewer});
 }

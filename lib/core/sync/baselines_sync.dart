@@ -105,12 +105,14 @@ class BaselinesSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
     try {
+      // #3078/#3123 — tombstone-first (journal-backed): the tombstone must
+      // not depend on the row delete succeeding.
+      await DeletionsSync.record('obd2_baselines', vehicleId);
       await client
           .from('obd2_baselines')
           .delete()
           .eq('user_id', userId)
           .eq('vehicle_id', vehicleId);
-      await DeletionsSync.record('obd2_baselines', vehicleId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'BaselinesSync.delete FAILED'}));
     }

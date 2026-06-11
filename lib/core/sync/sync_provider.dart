@@ -14,6 +14,7 @@ import 'sync_config.dart';
 import 'favorites_sync.dart';
 import 'ignored_stations_sync.dart';
 import 'ratings_sync.dart';
+import 'sync_run_trace.dart';
 import 'user_data_sync.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -298,6 +299,9 @@ class SyncState extends _$SyncState {
   void _performInitialSync(StorageRepository storage) {
     Future.microtask(() async {
       try {
+        // #3126 — one run id threads every per-table merge of this sync
+        // pass through the breadcrumb trace.
+        SyncRunTrace.begin('connect');
         await syncAndPersistIds(storage);
         // #2319 — batch every local rating into one upsert round-trip
         // instead of N serial calls on connect.

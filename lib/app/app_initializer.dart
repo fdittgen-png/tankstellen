@@ -34,6 +34,7 @@ import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
 import '../core/sync/sync_provider.dart';
+import '../core/sync/sync_run_trace.dart';
 import '../core/sync/trips_sync.dart';
 import '../core/sync/trips_sync_enabled_provider.dart';
 import '../core/telemetry/pii_scrubber.dart';
@@ -183,6 +184,8 @@ class AppInitializer {
     _deferPostFirstFrame(() async {
       await CommunityConfig.load();
       await _maybeInitTankSync(storage);
+      // #3126 — one run id threads the launch merges into the trace.
+      if (TankSyncClient.client != null) SyncRunTrace.begin('launch');
       // #1541 — run the trip-summaries merge + details retention pass
       // once TankSync is up. No-ops cleanly when the user is signed
       // out or when the trip-history Hive box isn't open.

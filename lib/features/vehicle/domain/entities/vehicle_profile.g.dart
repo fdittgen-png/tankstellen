@@ -116,6 +116,9 @@ _VehicleProfile _$VehicleProfileFromJson(Map<String, dynamic> json) =>
           : GpsCalibrationMatrix.fromJson(
               json['gpsCalibration'] as Map<String, dynamic>,
             ),
+      updatedAt: json['updatedAt'] == null
+          ? null
+          : DateTime.parse(json['updatedAt'] as String),
     );
 
 Map<String, dynamic> _$VehicleProfileToJson(
@@ -176,4 +179,5 @@ Map<String, dynamic> _$VehicleProfileToJson(
   'detectedEngineDisplacementCc': instance.detectedEngineDisplacementCc,
   'detectedFuelType': instance.detectedFuelType,
   'gpsCalibration': instance.gpsCalibration?.toJson(),
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };

@@ -9,6 +9,7 @@ import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import 'sync_helper.dart';
+import 'sync_run_trace.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Favorites sync with Supabase, pulled out of [SyncService] (#727).
@@ -65,6 +66,14 @@ class FavoritesSync {
             '${localOnly.length} new favorites');
       }
 
+      // #3126 — per-table counts into the exportable trace.
+      SyncRunTrace.table(
+        'favorites',
+        uploaded: localOnly.length,
+        downloaded: serverIds.difference(localIds).length,
+        tombstoned: tombstoned.length,
+      );
+
       return localIds.union(serverIds).toList();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FavoritesSync.merge FAILED'}));
@@ -81,13 +90,16 @@ class FavoritesSync {
     if (client == null || userId == null) return;
 
     try {
+      // #3078/#3123 — tombstone-first: the tombstone is the durable "this
+      // id is dead" record (journal-backed), so it must not depend on the
+      // row delete succeeding — a network blip used to skip it entirely
+      // and the next union merge resurrected the favorite.
+      await DeletionsSync.record('favorites', stationId);
       await client
           .from('favorites')
           .delete()
           .eq('user_id', userId)
           .eq('station_id', stationId);
-      // #3078 — tombstone the id so other devices' merge never re-adds it.
-      await DeletionsSync.record('favorites', stationId);
       debugPrint('FavoritesSync.delete: $stationId removed from server');
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'FavoritesSync.delete FAILED'}));

@@ -154,12 +154,12 @@ class TripsSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
     try {
+      await DeletionsSync.record('trip_summaries', tripId); // #3123 first
       await client
           .from('trip_summaries')
           .delete()
           .eq('user_id', userId)
           .eq('id', tripId);
-      await DeletionsSync.record('trip_summaries', tripId); // #3078
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'TripsSync.deleteSummary FAILED for $tripId'}));
     }

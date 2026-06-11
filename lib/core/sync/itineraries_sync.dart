@@ -109,12 +109,14 @@ class ItinerariesSync {
     if (client == null || userId == null) return false;
 
     try {
+      // #3078/#3123 — tombstone-first (journal-backed): the tombstone must
+      // not depend on the row delete succeeding.
+      await DeletionsSync.record('itineraries', itineraryId);
       await client
           .from('itineraries')
           .delete()
           .eq('id', itineraryId)
           .eq('user_id', userId);
-      await DeletionsSync.record('itineraries', itineraryId); // #3078
       return true;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItinerariesSync.delete FAILED'}));
