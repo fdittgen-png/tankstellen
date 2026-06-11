@@ -66,28 +66,31 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       ref.read(authFormControllerProvider.notifier);
 
   Future<void> _continueAsGuest() async {
-    _formNotifier.setLoading(true);
+    // #3159 — capture the ref-derived objects BEFORE the awaits; the
+    // `_formNotifier` getter reads the WidgetRef, which throws a StateError
+    // once the screen has unmounted (Riverpod 3).
+    final form = _formNotifier;
+    final settings = ref.read(settingsStorageProvider);
+    form.setLoading(true);
     try {
       final userId = await TankSyncClient.signInAnonymously();
       if (userId != null) {
-        final settings = ref.read(settingsStorageProvider);
         await settings.putSetting('sync_user_id', userId);
+        if (!mounted) return;
         ref.invalidate(syncStateProvider);
-        if (mounted) {
-          SnackBarHelper.showSuccess(
-              context,
-              AppLocalizations.of(context)?.connectedAsGuest ??
-                  'Connected as guest');
-          context.pop();
-        }
+        SnackBarHelper.showSuccess(
+            context,
+            AppLocalizations.of(context)?.connectedAsGuest ??
+                'Connected as guest');
+        context.pop();
       }
     } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
-        _formNotifier.setError(
+        form.setError(
             friendlyAuthError(e, AppLocalizations.of(context)));
       }
     } finally {
-      _formNotifier.setLoading(false);
+      if (mounted) form.setLoading(false);
     }
   }
 
@@ -95,27 +98,29 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final isSignUp = ref.read(authFormControllerProvider).isSignUp;
+    // #3159 — captured before the await below; see _continueAsGuest.
+    final form = _formNotifier;
 
     if (email.isEmpty || password.isEmpty) {
-      _formNotifier.setError('Please enter email and password');
+      form.setError('Please enter email and password');
       return;
     }
     if (!email.contains('@')) {
-      _formNotifier.setError('Please enter a valid email address');
+      form.setError('Please enter a valid email address');
       return;
     }
     if (isSignUp && !PasswordValidator.isValid(password)) {
       final l10n = AppLocalizations.of(context);
-      _formNotifier.setError(
+      form.setError(
           l10n?.passwordTooWeak ?? 'Password does not meet all requirements');
       return;
     }
     if (isSignUp && password != _confirmController.text) {
-      _formNotifier.setError('Passwords do not match');
+      form.setError('Passwords do not match');
       return;
     }
 
-    _formNotifier.setLoading(true);
+    form.setLoading(true);
     try {
       final result = await ref.read(syncStateProvider.notifier).signInWithEmail(
             email, password,
@@ -145,16 +150,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
-        _formNotifier.setError(
+        form.setError(
             friendlyAuthError(e, AppLocalizations.of(context)));
       }
     } finally {
-      _formNotifier.setLoading(false);
+      if (mounted) form.setLoading(false);
     }
   }
 
   Future<void> _switchToAnonymous() async {
-    _formNotifier.setLoading(true);
+    // #3159 — captured before the await below; see _continueAsGuest.
+    final form = _formNotifier;
+    form.setLoading(true);
     try {
       await ref.read(syncStateProvider.notifier).switchToAnonymous();
       if (mounted) {
@@ -166,11 +173,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
-        _formNotifier.setError(
+        form.setError(
             friendlyAuthError(e, AppLocalizations.of(context)));
       }
     } finally {
-      _formNotifier.setLoading(false);
+      if (mounted) form.setLoading(false);
     }
   }
 

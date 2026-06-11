@@ -33,6 +33,12 @@ class EvFavoriteDismissible extends ConsumerWidget {
     return Dismissible(
       key: ValueKey('ev-fav-${station.id}'),
       confirmDismiss: (direction) async {
+        // #3159 — capture before any await: the dismissed row's element
+        // unmounts once the swipe completes, so the snackbar's onUndo (and
+        // any post-await ref use) would throw a StateError on the dead
+        // WidgetRef. evFavoritesProvider is keepAlive, so the captured
+        // notifier stays valid for the undo.
+        final favorites = ref.read(evFavoritesProvider.notifier);
         if (direction == DismissDirection.startToEnd) {
           await NavigationUtils.openInMaps(
             station.latitude,
@@ -41,7 +47,7 @@ class EvFavoriteDismissible extends ConsumerWidget {
           );
           return false;
         }
-        await ref.read(evFavoritesProvider.notifier).remove(station.id);
+        await favorites.remove(station.id);
         if (!context.mounted) return true;
         final l10nSnack = AppLocalizations.of(context);
         SnackBarHelper.showWithUndo(
@@ -49,9 +55,7 @@ class EvFavoriteDismissible extends ConsumerWidget {
           l10nSnack?.removedFromFavoritesName(label) ??
               '$label removed from favorites',
           undoLabel: l10nSnack?.undo ?? 'Undo',
-          onUndo: () => ref
-              .read(evFavoritesProvider.notifier)
-              .add(station.id, stationData: station),
+          onUndo: () => favorites.add(station.id, stationData: station),
         );
         return true;
       },

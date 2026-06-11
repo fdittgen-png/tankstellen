@@ -151,6 +151,10 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
 
     // Invalidate the reporter so the next bad-scan submission picks
     // up the freshly stored PAT instead of the cached null.
+    // #3159 — mounted guard: the dialog/storage awaits above mean the
+    // section can be gone here, and invalidating on a dead WidgetRef
+    // throws a StateError under Riverpod 3.
+    if (!mounted) return;
     ref.invalidate(githubIssueReporterProvider);
     await _refresh();
   }
@@ -164,6 +168,7 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
         'where': 'FeedbackTokenSection._clearToken: secure-storage delete',
       }));
     }
+    if (!mounted) return; // #3159 — see _setToken.
     ref.invalidate(githubIssueReporterProvider);
     await _refresh();
   }

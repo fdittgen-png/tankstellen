@@ -272,13 +272,18 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     _badgeDecremented = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
+        // #3159 — capture the count notifier BEFORE the awaits so the
+        // refresh below never reads the WidgetRef after the screen
+        // unmounted (Riverpod 3 throws a StateError there).
+        final countNotifier =
+            ref.read(autoRecordBadgeCountProvider.notifier);
         final badge =
             await ref.read(autoRecordBadgeServiceProvider.future);
         await badge.decrement();
         // Phase 6: also refresh the reactive count so the
         // trip-history "Mark all as read" badge updates without
         // waiting for a route change.
-        await ref.read(autoRecordBadgeCountProvider.notifier).refresh();
+        await countNotifier.refresh();
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripDetailScreen badge decrement'}));
       }

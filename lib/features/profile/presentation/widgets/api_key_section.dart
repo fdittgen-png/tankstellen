@@ -189,8 +189,10 @@ class ApiKeySection extends ConsumerWidget {
 
     if (result != null && result.isNotEmpty) {
       await storage.setApiKey(result);
-      // Force rebuild to show updated status
-      ref.invalidate(apiKeyStorageProvider);
+      // Force rebuild to show updated status. #3159 — mounted guard: the
+      // dialog + storage awaits mean the section can be gone here, and
+      // invalidating a dead WidgetRef throws a StateError under Riverpod 3.
+      if (context.mounted) ref.invalidate(apiKeyStorageProvider);
     }
     controller.dispose();
   }
@@ -228,8 +230,8 @@ class ApiKeySection extends ConsumerWidget {
 
     if (result != null && result.isNotEmpty) {
       await storage.setEvApiKey(result);
-      // Force rebuild to show updated status
-      ref.invalidate(apiKeyStorageProvider);
+      // Force rebuild to show updated status. #3159 — see _editApiKey.
+      if (context.mounted) ref.invalidate(apiKeyStorageProvider);
     }
     controller.dispose();
   }

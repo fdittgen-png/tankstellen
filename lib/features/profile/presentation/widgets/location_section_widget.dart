@@ -179,6 +179,9 @@ class LocationSectionWidget extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
+      // #3159 — the dialog await above means the section can be gone here;
+      // ref.read on a dead WidgetRef throws a StateError under Riverpod 3.
+      if (!context.mounted) return;
       ref.read(userPositionProvider.notifier).clear();
     }
   }

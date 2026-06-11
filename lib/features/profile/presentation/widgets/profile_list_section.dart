@@ -85,10 +85,14 @@ class ProfileListSection extends ConsumerWidget {
   /// active provider and invalidate the list before surfacing feedback.
   Future<void> _activateProfile(
       BuildContext context, WidgetRef ref, UserProfile profile) async {
-    await ref.read(activeProfileProvider.notifier).switchProfile(profile.id);
-    ref.read(activeProfileProvider.notifier).refresh();
-    ref.invalidate(allProfilesProvider);
+    // #3159 — capture the notifier BEFORE the await: Riverpod 3 throws a
+    // StateError when a WidgetRef is used after the element unmounted, and
+    // the user can leave the screen while switchProfile persists.
+    final profileNotifier = ref.read(activeProfileProvider.notifier);
+    await profileNotifier.switchProfile(profile.id);
+    profileNotifier.refresh();
     if (!context.mounted) return;
+    ref.invalidate(allProfilesProvider);
     final l10n = AppLocalizations.of(context);
     SnackBarHelper.showSuccess(
       context,
@@ -98,6 +102,13 @@ class ProfileListSection extends ConsumerWidget {
   }
 
   Future<void> _createProfile(BuildContext context, WidgetRef ref) async {
+    // #3159 — every ref.read happens BEFORE the dialog await so a dismissal
+    // that races the screen's disposal can't touch a dead WidgetRef.
+    final country = ref.read(activeCountryProvider);
+    final language = ref.read(activeLanguageProvider);
+    final repo = ref.read(profileRepositoryProvider);
+    final profileNotifier = ref.read(activeProfileProvider.notifier);
+
     final name = await _showNameDialog(
       context,
       AppLocalizations.of(context)?.newProfile ?? 'New profile',
@@ -105,9 +116,6 @@ class ProfileListSection extends ConsumerWidget {
     );
     if (name == null || name.isEmpty) return;
 
-    final country = ref.read(activeCountryProvider);
-    final language = ref.read(activeLanguageProvider);
-    final repo = ref.read(profileRepositoryProvider);
     // #2597 — one profile per country. A new profile defaults to the active
     // country, but if another profile already owns it we create the profile
     // WITHOUT a country (rather than blocking the whole flow); the user then
@@ -123,9 +131,9 @@ class ProfileListSection extends ConsumerWidget {
     // does not change when a non-first profile is added, so the new card
     // never appeared. Invalidate the list provider so the new profile
     // shows immediately, then confirm with a SnackBar.
-    ref.read(activeProfileProvider.notifier).refresh();
-    ref.invalidate(allProfilesProvider);
+    profileNotifier.refresh();
     if (!context.mounted) return;
+    ref.invalidate(allProfilesProvider);
     final l10n = AppLocalizations.of(context);
     SnackBarHelper.showSuccess(
       context,
@@ -138,28 +146,32 @@ class ProfileListSection extends ConsumerWidget {
     // Check how many profiles exist — the last one cannot be deleted
     final allProfiles = ref.read(allProfilesProvider);
     final canDelete = allProfiles.length > 1;
+    // #3159 — the sheet's callbacks fire after awaits; capture the notifier
+    // and repo now so neither callback touches the WidgetRef once this
+    // section could have unmounted underneath the modal sheet.
+    final profileNotifier = ref.read(activeProfileProvider.notifier);
+    final repo = ref.read(profileRepositoryProvider);
 
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => ProfileEditSheet(
+      // `_` (not `context`) so the mounted guards below check the section's
+      // own element — the one `ref` belongs to — not the sheet's.
+      builder: (_) => ProfileEditSheet(
         profile: profile,
         onSave: (updated) async {
-          await ref
-              .read(activeProfileProvider.notifier)
-              .updateProfile(updated);
+          await profileNotifier.updateProfile(updated);
           // #2596 — refresh the active provider too so an edit to the
           // active profile's own fields (name, country) re-renders the
           // highlighted card, not just the list.
-          ref.read(activeProfileProvider.notifier).refresh();
-          ref.invalidate(allProfilesProvider);
+          profileNotifier.refresh();
+          if (context.mounted) ref.invalidate(allProfilesProvider);
         },
         // Default profile (last remaining) cannot be deleted
         onDelete: canDelete ? () async {
-          final repo = ref.read(profileRepositoryProvider);
           await repo.deleteProfile(profile.id);
-          ref.read(activeProfileProvider.notifier).refresh();
-          ref.invalidate(allProfilesProvider);
+          profileNotifier.refresh();
+          if (context.mounted) ref.invalidate(allProfilesProvider);
         } : null,
       ),
     );

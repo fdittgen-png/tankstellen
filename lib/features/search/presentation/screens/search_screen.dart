@@ -107,6 +107,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     final fuelType = ref.read(selectedFuelTypeProvider);
     final radius = ref.read(searchRadiusProvider);
     final settings = ref.read(settingsStorageProvider);
+    // #3159 — capture the notifier BEFORE the consent-dialog awaits: a
+    // post-await ref.read throws a StateError if the screen unmounted
+    // while the dialog was up. The captured notifier still fires the
+    // search (searchStateProvider is app-global) on the unmounted path.
+    final searchNotifier = ref.read(searchStateProvider.notifier);
     if (!LocationConsentDialog.hasConsent(settings)) {
       if (!mounted) return;
       final consented = await LocationConsentDialog.show(context);
@@ -123,7 +128,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     }
 
     // SearchState dispatches to EV or fuel service internally based on fuelType.
-    unawaited(ref.read(searchStateProvider.notifier).searchByGps(
+    unawaited(searchNotifier.searchByGps(
           fuelType: fuelType,
           radiusKm: radius,
         ));
@@ -334,6 +339,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         UserPositionBar(
           onUpdatePosition: () async {
             final settings = ref.read(settingsStorageProvider);
+            // #3159 — capture before the consent/GPS awaits; ref.read on an
+            // unmounted element throws a StateError under Riverpod 3.
+            final positionNotifier = ref.read(userPositionProvider.notifier);
             if (!LocationConsentDialog.hasConsent(settings)) {
               if (!mounted) return;
               final consented = await LocationConsentDialog.show(context);
@@ -341,7 +349,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
               await LocationConsentDialog.recordConsent(settings);
             }
             try {
-              await ref.read(userPositionProvider.notifier).updateFromGps();
+              await positionNotifier.updateFromGps();
+              if (!mounted) return;
               final state = ref.read(searchStateProvider);
               if (state.hasValue && state.value!.data.isNotEmpty) {
                 unawaited(_performGpsSearch());

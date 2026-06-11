@@ -66,13 +66,16 @@ class LoyaltySettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _openAddSheet(BuildContext context, WidgetRef ref) async {
+    // #3159 — capture before the sheet await: ref.read on an unmounted
+    // element throws a StateError under Riverpod 3.
+    final cards = ref.read(loyaltyCardsProvider.notifier);
     final result = await showModalBottomSheet<LoyaltyCard>(
       context: context,
       isScrollControlled: true,
       builder: (sheetContext) => const LoyaltyAddCardSheet(),
     );
     if (result != null) {
-      await ref.read(loyaltyCardsProvider.notifier).upsert(result);
+      await cards.upsert(result);
     }
   }
 
@@ -82,6 +85,8 @@ class LoyaltySettingsScreen extends ConsumerWidget {
     LoyaltyCard card,
   ) async {
     final l = AppLocalizations.of(context);
+    // #3159 — capture before the dialog await; see _openAddSheet.
+    final cards = ref.read(loyaltyCardsProvider.notifier);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -103,7 +108,7 @@ class LoyaltySettingsScreen extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
-      await ref.read(loyaltyCardsProvider.notifier).remove(card.id);
+      await cards.remove(card.id);
     }
   }
 }

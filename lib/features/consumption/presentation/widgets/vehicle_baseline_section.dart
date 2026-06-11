@@ -273,7 +273,10 @@ class _VehicleBaselineSectionState
         ],
       ),
     );
-    if (confirm != true) return;
+    // #3159 — guard before the post-dialog ref use: a dead WidgetRef throws
+    // a StateError under Riverpod 3, and the read itself performs the reset
+    // so it cannot be captured before the confirmation dialog.
+    if (confirm != true || !mounted) return;
     await ref.read(resetVehicleBaselinesProvider(widget.vehicleId).future);
   }
 

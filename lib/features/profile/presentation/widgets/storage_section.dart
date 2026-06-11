@@ -237,12 +237,17 @@ class StorageSection extends ConsumerWidget {
     );
 
     if (confirmed == true) {
+      // #3159 — the dialog await above means the section can be gone here;
+      // ref.read / ref.invalidate on a dead WidgetRef throw a StateError
+      // under Riverpod 3.
+      if (!ctx.mounted) return;
       final cache = ref.read(cacheManagerProvider);
       await cache.clearAll();
       // Also wipe Flutter's in-memory ImageCache so map tiles are
       // refetched on the next Carte visit (#711).
       PaintingBinding.instance.imageCache.clear();
       PaintingBinding.instance.imageCache.clearLiveImages();
+      if (!ctx.mounted) return;
       ref.invalidate(storageManagementProvider);
       if (ctx.mounted) {
         SnackBarHelper.show(
@@ -285,6 +290,7 @@ class StorageSection extends ConsumerWidget {
     );
 
     if (confirmed == true) {
+      if (!ctx.mounted) return; // #3159 — see _clearCache.
       final storageMgmt = ref.read(storageManagementProvider);
       await storageMgmt.clearCache();
       await storageMgmt.clearPriceHistory();
@@ -297,10 +303,9 @@ class StorageSection extends ConsumerWidget {
         final box = Hive.box(boxName);
         await box.clear();
       }
+      if (!ctx.mounted) return; // #3159 — see _clearCache.
       ref.invalidate(storageManagementProvider);
-      if (ctx.mounted) {
-        ctx.go('/setup');
-      }
+      ctx.go('/setup');
     }
   }
 }

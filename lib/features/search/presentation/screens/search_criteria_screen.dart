@@ -254,11 +254,22 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     final brands = ref.read(selectedBrandsProvider);
     final excludeHighway = ref.read(excludeHighwayStationsProvider);
 
+    // #3159 — read everything BEFORE the storage awaits below: a
+    // post-await ref.read throws a StateError if the screen unmounted
+    // while the settings were persisting. The captured notifier still
+    // finishes the profile write on the unmounted path.
+    final storage = ref.read(storageRepositoryProvider);
+    final profile = ref.read(activeProfileProvider);
+    final profileNotifier = ref.read(activeProfileProvider.notifier);
+    final inRoute = ref.read(activeSearchModeProvider) == SearchMode.route;
+    final routeSegmentKm = ref.read(routeSegmentSearchParamProvider);
+    final routeDetourBudgetKm = ref.read(routeDetourSearchParamProvider);
+    final minRouteSavingPerLiter = ref.read(minRouteSavingSearchParamProvider);
+
     // #1792 — the criteria with no UserProfile field of their own
     // (open-only, amenity set, brand filter) persist device-locally so
     // the *whole* default set round-trips, not just the profile
     // subset. This runs regardless of whether a profile is active.
-    final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(StorageKeys.defaultOpenOnly, openOnly);
     await storage.putSetting(
         StorageKeys.defaultExcludeHighway, excludeHighway);
@@ -272,21 +283,19 @@ class _SearchCriteriaScreenState extends ConsumerState<SearchCriteriaScreen> {
     // active profile so existing profile consumers keep seeing them.
     // #2592 — in route mode also persist the route-planning params so the
     // per-search overrides become the new profile defaults.
-    final profile = ref.read(activeProfileProvider);
     if (profile != null) {
-      final inRoute = ref.read(activeSearchModeProvider) == SearchMode.route;
-      await ref.read(activeProfileProvider.notifier).updateProfile(
+      await profileNotifier.updateProfile(
             profile.copyWith(
               preferredFuelType: fuelType,
               defaultSearchRadius: radius,
               routeSegmentKm: inRoute
-                  ? ref.read(routeSegmentSearchParamProvider)
+                  ? routeSegmentKm
                   : profile.routeSegmentKm,
               routeDetourBudgetKm: inRoute
-                  ? ref.read(routeDetourSearchParamProvider)
+                  ? routeDetourBudgetKm
                   : profile.routeDetourBudgetKm,
               minRouteSavingPerLiter: inRoute
-                  ? ref.read(minRouteSavingSearchParamProvider)
+                  ? minRouteSavingPerLiter
                   : profile.minRouteSavingPerLiter,
             ),
           );

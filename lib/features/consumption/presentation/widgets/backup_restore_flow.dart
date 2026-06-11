@@ -90,6 +90,11 @@ class BackupRestoreFlow {
         work: () => importer.import(bytes: bytes!, sinks: sinks, mode: mode),
       );
 
+      // #3159 — guard BEFORE the invalidates: the import await above means
+      // the host can be gone here, and invalidating on a dead WidgetRef
+      // throws a StateError under Riverpod 3. (Skipping just defers the
+      // list refresh to the next provider rebuild.)
+      if (!context.mounted) return;
       // Refresh every list provider so the restored records appear
       // without a relaunch. The repositories were written directly, so
       // the notifiers must be invalidated to re-read their stores.
@@ -98,7 +103,6 @@ class BackupRestoreFlow {
       ref.invalidate(tripHistoryListProvider);
       ref.invalidate(chargingLogsProvider);
 
-      if (!context.mounted) return;
       // #2815 — surface the per-entity breakdown, worded by mode so the user
       // sees exactly what was "merged" vs "replaced" (the result already
       // carries the counts + mode).
