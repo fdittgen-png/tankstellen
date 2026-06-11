@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/app/responsive_search_layout.dart';
+import 'package:tankstellen/core/widgets/responsive_layout.dart';
 
 void main() {
   group('screenSizeFromWidth', () {
@@ -154,94 +154,10 @@ void main() {
     });
   });
 
-  group('ResponsiveLayoutWrapper', () {
-    testWidgets('shows only compactBody on phone screen', (tester) async {
-      tester.view.physicalSize = const Size(360, 640);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ResponsiveLayoutWrapper(
-              compactBody: Text('Primary'),
-              detailBody: Text('Detail'),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Primary'), findsOneWidget);
-      expect(find.text('Detail'), findsNothing);
-    });
-
-    testWidgets('shows split view on tablet screen', (tester) async {
-      tester.view.physicalSize = const Size(768, 1024);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ResponsiveLayoutWrapper(
-              compactBody: Text('Primary'),
-              detailBody: Text('Detail'),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Primary'), findsOneWidget);
-      expect(find.text('Detail'), findsOneWidget);
-      expect(find.byType(VerticalDivider), findsOneWidget);
-    });
-
-    testWidgets('shows split view on expanded screen', (tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ResponsiveLayoutWrapper(
-              compactBody: Text('Primary'),
-              detailBody: Text('Detail'),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Primary'), findsOneWidget);
-      expect(find.text('Detail'), findsOneWidget);
-      expect(find.byType(VerticalDivider), findsOneWidget);
-    });
-
-    testWidgets('shows only compactBody when detailBody is null',
-        (tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: ResponsiveLayoutWrapper(
-              compactBody: Text('Primary'),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('Primary'), findsOneWidget);
-      expect(find.byType(VerticalDivider), findsNothing);
-    });
-  });
-
+  // ResponsiveLayoutWrapper (the old internal delegate of
+  // ResponsiveMasterDetail) was dead outside this file and deleted in #3133 —
+  // its breakpoint/split/hinge logic now lives directly in
+  // ResponsiveMasterDetail, covered by the group below.
   group('ResponsiveMasterDetail', () {
     // The two flex panes of the wrapper's Row are the only `Expanded`s in
     // these trees, in master-then-detail order.

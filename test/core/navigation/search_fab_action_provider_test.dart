@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
+import 'package:tankstellen/core/navigation/search_fab_action_provider.dart';
 
 /// Unit tests for [SearchFabActionController] (#2553).
 ///

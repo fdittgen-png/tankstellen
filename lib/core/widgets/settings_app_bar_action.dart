@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../core/navigation/app_routes.dart';
-import '../current_shell_branch_provider.dart';
+import '../navigation/app_routes.dart';
+import '../navigation/current_shell_branch_provider.dart';
 import '../../l10n/app_localizations.dart';
 
 part 'settings_app_bar_action.g.dart';

@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../app/responsive_search_layout.dart';
-import '../../../../app/shell/settings_app_bar_action.dart';
+import '../../../../core/widgets/responsive_layout.dart';
+import '../../../../core/widgets/settings_app_bar_action.dart';
 import '../../../../core/sharing/widget_share_renderer.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/widgets/page_scaffold.dart';

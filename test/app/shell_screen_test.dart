@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
+import 'package:tankstellen/core/navigation/search_fab_action_provider.dart';
 import 'package:tankstellen/app/shell_screen.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';

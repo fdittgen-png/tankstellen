@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/shell/settings_app_bar_action.dart';
+import '../../../../core/widgets/settings_app_bar_action.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/theme/theme_mode_provider.dart';
