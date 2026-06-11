@@ -5,8 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/fuel_rate_estimator.dart'
-    as estimator;
+import 'package:tankstellen/features/obd2/data/fuel_rate_estimator.dart' as estimator;
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
 
 /// Verifies the diesel-sibling entries added in #1396.

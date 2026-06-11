@@ -7,8 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/data/obd2/adapter_capability.dart';
-import '../../../consumption/providers/obd2_capability_provider.dart';
+import '../../../obd2/api.dart';
 
 /// Card on the vehicle settings stack that surfaces the connected
 /// adapter's runtime [Obd2AdapterCapability] tier (#1401 phase 6).

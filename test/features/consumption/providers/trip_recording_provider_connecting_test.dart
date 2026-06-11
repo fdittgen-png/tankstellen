@@ -3,8 +3,8 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 
 import '../../../helpers/silence_error_logger.dart';

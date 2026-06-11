@@ -4,12 +4,7 @@
 import 'dart:async';
 
 import '../../../core/logging/error_logger.dart';
-import '../../consumption/data/obd2/broken_map_belief.dart';
-import '../../consumption/data/obd2/broken_map_detector.dart';
-import '../../consumption/data/obd2/obd2_connection_service.dart';
-import '../../consumption/data/obd2/obd2_read_telemetry.dart';
-import '../../consumption/data/obd2/obd2_service.dart';
-import '../../consumption/data/obd2/obd_adapter_blocklist.dart';
+import '../../obd2/api.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../domain/entities/vin_data.dart';
 import 'vin_auto_populator.dart';

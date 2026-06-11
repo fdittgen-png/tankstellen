@@ -8,7 +8,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/obd2/broken_map_belief.dart';
+import '../../../obd2/api.dart';
 import '../../providers/consumption_providers.dart';
 
 /// Confidence band thresholds shared by every broken-MAP UI surface

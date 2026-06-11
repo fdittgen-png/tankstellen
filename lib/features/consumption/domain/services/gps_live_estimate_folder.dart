@@ -3,7 +3,7 @@
 
 import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../../../../core/domain/vehicle_profile.dart';
-import '../../data/obd2/trip_live_reading.dart';
+import '../../../obd2/api.dart';
 import '../driving_coaching.dart'
     show DrivingCoachingHint, gpsCoachingHint, recentSamplesWithin;
 import '../road_grade_calculator.dart';

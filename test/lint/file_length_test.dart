@@ -235,7 +235,7 @@ void main() {
     // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (OBD2 god-class decomposition, successor to the closed #2190 the
     // comments above reference).
-    'lib/features/consumption/data/obd2/adapter_registry.dart': (
+    'lib/features/obd2/data/adapter_registry.dart': (
       lines: 697,
       bumps: 5,
       decompositionIssue: 3140,
@@ -320,7 +320,7 @@ void main() {
     // consolidation removed two inline forks from this library's part file).
     // 12 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2187/#2188 the comments above reference).
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': (
+    'lib/features/obd2/data/obd2_connection_service.dart': (
       lines: 939,
       bumps: 12,
       decompositionIssue: 3140,
@@ -378,7 +378,7 @@ void main() {
     // that never got a GATT link — from ONE field export.
     // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2190 the comments above reference).
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': (
+    'lib/features/obd2/data/flutter_blue_plus_elm_channel.dart': (
       lines: 866,
       bumps: 6,
       decompositionIssue: 3140,
@@ -390,12 +390,12 @@ void main() {
     // #2892/#2935/#2945 never reached this site) via a small shared `_denoise`
     // helper + its dartdoc. The net push just past 400 is a real fix; further
     // compression would hurt readability. Decomposition tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/adapter_reconnect_scanner.dart': (
+    'lib/features/obd2/data/adapter_reconnect_scanner.dart': (
       lines: 405,
       bumps: 0,
       decompositionIssue: null,
     ),
-    'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': (
+    'lib/features/obd2/data/auto_trip_coordinator.dart': (
       lines: 726,
       bumps: 0,
       decompositionIssue: null,
@@ -411,7 +411,7 @@ void main() {
     // ambient-air (0x46) temps. All trivial decoders reusing the existing
     // `_parseFuelTrim` / `_parse1BytePercent` / `_parseModeOneBody`
     // plumbing. Decomposition tracked separately by #2187/#2188.
-    'lib/features/consumption/data/obd2/elm327_parsers.dart': (
+    'lib/features/obd2/data/elm327_parsers.dart': (
       lines: 538,
       bumps: 2,
       decompositionIssue: null,
@@ -445,7 +445,7 @@ void main() {
     // is a net-neutral token swap; only the explanatory comment adds a line.
     // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2187/#2188 the comments above reference).
-    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': (
+    'lib/features/obd2/data/live_sample_snapshot.dart': (
       lines: 674,
       bumps: 5,
       decompositionIssue: 3140,
@@ -506,7 +506,7 @@ void main() {
     // visible in the error-log export.
     // 10 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (Obd2Service is named in that issue's breakdown).
-    'lib/features/consumption/data/obd2/obd2_service.dart': (
+    'lib/features/obd2/data/obd2_service.dart': (
       lines: 1689,
       bumps: 10,
       decompositionIssue: 3140,
@@ -634,7 +634,7 @@ void main() {
     // 17 bumps (the worst offender in this map) — decomposition forced
     // (#3141), tracked by the OPEN #3140 (TripRecordingController is
     // named in that issue's breakdown).
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': (
+    'lib/features/obd2/data/trip_recording_controller.dart': (
       lines: 1717,
       bumps: 17,
       decompositionIssue: 3140,
@@ -781,7 +781,7 @@ void main() {
     // (the connect-failure catch now logs e/st before the mounted check).
     // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2187/#2188 the comments above reference).
-    'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart': (
+    'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': (
       lines: 555,
       bumps: 6,
       decompositionIssue: 3140,

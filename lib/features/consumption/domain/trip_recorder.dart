@@ -3,8 +3,7 @@
 
 import 'dart:math' as math;
 
-import '../data/obd2/trip_distance_source.dart'
-    show kDistanceSourceGps, kDistanceSourceVirtual;
+import '../../obd2/api.dart' show kDistanceSourceGps, kDistanceSourceVirtual;
 import 'harsh_event_detector.dart';
 import 'services/trip_consumption_reliability.dart';
 import 'trip_sample.dart';

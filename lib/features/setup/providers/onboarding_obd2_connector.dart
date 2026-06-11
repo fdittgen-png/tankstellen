@@ -4,10 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../consumption/data/obd2/elm327_protocol.dart';
-import '../../consumption/data/obd2/obd2_read_telemetry.dart';
-import '../../consumption/data/obd2/obd2_service.dart';
-import '../../consumption/presentation/widgets/obd2_adapter_picker.dart';
+import '../../obd2/api.dart';
 
 part 'onboarding_obd2_connector.g.dart';
 

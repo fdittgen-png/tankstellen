@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import 'obd2_adapter_picker.dart';
+import '../../../obd2/api.dart';
 
 /// "OBD2 adapter" section on the vehicle edit screen (#779).
 ///

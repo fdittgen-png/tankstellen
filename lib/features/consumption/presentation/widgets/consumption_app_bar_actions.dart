@@ -22,7 +22,7 @@ import '../screens/consumption_screen.dart';
 import '../screens/trajets_map_screen.dart';
 import 'backup_progress_dialog.dart';
 import 'backup_restore_flow.dart';
-import 'obd2_status_chip.dart';
+import '../../../obd2/api.dart';
 
 /// Navigation targets the overflow kebab dispatches via its single
 /// `onSelected` path (#2756). Export / Carbon run from each item's own

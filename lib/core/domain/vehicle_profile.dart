@@ -191,7 +191,7 @@ abstract class VehicleProfile with _$VehicleProfile {
     // of the edit-vehicle screen; non-null values take precedence over
     // every other source in the resolution chain
     //   manualOverride → vehicle.<field> → referenceVehicle.<field> → kDefault
-    // wired through `lib/features/consumption/data/obd2/obd2_service.dart`
+    // wired through `lib/features/obd2/data/obd2_service.dart`
     // and `trip_recording_controller.dart`. The "Reset to detected"
     // button in the calibration card simply nulls the matching field.
     //

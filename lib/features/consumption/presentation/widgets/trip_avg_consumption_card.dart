@@ -8,7 +8,7 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/obd2/trip_live_reading.dart';
+import '../../../obd2/api.dart';
 import 'gps_matrix_maturity_badge.dart';
 
 /// Live **Average consumption** card for the trip-recording screen

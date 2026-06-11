@@ -5,15 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../vehicle/providers/vehicle_providers.dart';
-import '../data/obd2/android_background_adapter_listener.dart';
-import '../data/obd2/auto_trip_coordinator.dart';
-import '../data/obd2/background_adapter_listener.dart';
-import '../data/obd2/ios_background_adapter_listener.dart';
-import '../data/obd2/ios_state_restoration_provider.dart';
-import '../data/obd2/ios_state_restoration_service.dart';
-import '../data/obd2/obd2_connect_trace.dart';
-import '../data/obd2/obd2_connect_trace_log.dart';
-import '../data/obd2/obd2_connection_service.dart';
+import '../../obd2/api.dart';
 
 part 'auto_record_orchestrator_factories.g.dart';
 

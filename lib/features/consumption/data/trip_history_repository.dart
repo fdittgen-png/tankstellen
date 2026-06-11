@@ -9,7 +9,7 @@ import 'package:hive/hive.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/trip_recorder.dart';
-import 'obd2/obd2_session_diagnostic.dart';
+import '../../obd2/api.dart';
 import 'trip_dedup.dart';
 import 'trip_sample_codec.dart';
 import 'trip_summary_codec.dart';

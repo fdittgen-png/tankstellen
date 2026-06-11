@@ -3,7 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 
-import '../data/obd2/trip_live_reading.dart';
+import '../../obd2/api.dart';
 import 'cold_start_baselines.dart';
 import 'situation_classifier.dart';
 import 'trip_recorder.dart' show TripSample;

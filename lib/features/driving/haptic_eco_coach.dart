@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/logging/error_logger.dart';
 import '../../core/utils/num_extensions.dart';
-import '../consumption/data/obd2/trip_live_reading.dart';
+import '../obd2/api.dart';
 
 /// One coach fire decision (#1273).
 ///

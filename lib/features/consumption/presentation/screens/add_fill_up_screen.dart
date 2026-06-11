@@ -27,7 +27,7 @@ import '../../domain/entities/fill_up.dart';
 import '../../domain/fill_up_auto_cost_calculator.dart';
 import '../../domain/fill_up_variance.dart';
 import '../../providers/consumption_providers.dart';
-import '../../providers/current_obd2_fuel_level_provider.dart';
+import '../../../obd2/api.dart';
 import '../widgets/add_fill_up_form_fields.dart';
 import '../widgets/fill_up_no_vehicle_cta.dart';
 import '../widgets/fill_up_paste_receipt_handler.dart';

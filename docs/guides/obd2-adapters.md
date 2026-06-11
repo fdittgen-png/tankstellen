@@ -14,7 +14,7 @@ rule that improves the experience (for example a confident
 for a chip that misses the default timing).
 
 The registry source of truth is
-`lib/features/consumption/data/obd2/adapter_registry.dart`; the
+`lib/features/obd2/data/adapter_registry.dart`; the
 catalogue below is curated manually from that file.
 
 ## Buying an adapter (#1648 decisions)
@@ -41,7 +41,7 @@ sourcing decisions, recorded here so they don't drift:
 
 Each adapter row carries one of three states, sourced from the
 `Obd2AdapterCompatibility` enum in
-`lib/features/consumption/data/obd2/adapter_registry.dart`:
+`lib/features/obd2/data/adapter_registry.dart`:
 
 - ✅ **tested** — the maintainer has confirmed connect + live PID
   stream on real hardware.
@@ -114,7 +114,7 @@ scannable; the registry file is the long-form reference.
 
 ## How to add a new adapter
 
-1. Open `lib/features/consumption/data/obd2/adapter_registry.dart`.
+1. Open `lib/features/obd2/data/adapter_registry.dart`.
 2. Add a new `Obd2AdapterProfile(...)` entry in the `_defaultProfiles`
    const list. Place it **before** the two generic fallbacks
    (`generic-fff0`, `generic-classic`) — the generics must remain the
@@ -131,7 +131,7 @@ scannable; the registry file is the long-form reference.
    `serviceUuid`, `writeCharUuid`, `notifyCharUuid`. The Nordic UART
    family is `0000fff0-…` / `0000fff2-…` / `0000fff1-…`.
 5. Add a name-match test to
-   `test/features/consumption/data/obd2/adapter_registry_test.dart`
+   `test/features/obd2/data/adapter_registry_test.dart`
    that asserts `resolve(_candidate(name: '<brand-string>', …))`
    returns your new profile id. Follow the pattern of the
    `#949` block at the bottom of the file.
@@ -173,7 +173,7 @@ commit before #951's revert.
 
 ## Reference
 
-- Registry source: `lib/features/consumption/data/obd2/adapter_registry.dart`
-- Tests: `test/features/consumption/data/obd2/adapter_registry_test.dart`
+- Registry source: `lib/features/obd2/data/adapter_registry.dart`
+- Tests: `test/features/obd2/data/adapter_registry_test.dart`
 - Related issues: #733 (initial registry), #761 (Classic transport),
   #949 (expansion), #951 (odometer-unreliable rollback).

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../data/obd2/trip_distance_source.dart';
+import '../../obd2/api.dart';
 import '../domain/trip_summary.dart';
 
 /// Decides whether a finalised trip is a stub / ghost that should be

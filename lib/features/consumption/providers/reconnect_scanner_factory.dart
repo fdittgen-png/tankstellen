@@ -7,10 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
-import '../data/obd2/adapter_reconnect_scanner.dart';
-import '../data/obd2/obd2_connection_service.dart';
-import '../data/obd2/obd2_service.dart';
-import '../data/obd2/reconnect_connector.dart';
+import '../../obd2/api.dart';
 
 /// Build the reconnect-scanner factory handed to `TripRecordingController`
 /// (#797 phase 3), extracted out of `Obd2RecordingPipeline` as a free

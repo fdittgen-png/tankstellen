@@ -23,7 +23,7 @@ volumetric efficiency or odometer PID strategy by hand.
   `lib/features/vehicle/data/reference_vehicle_catalog_provider.dart` —
   loads the JSON once at app startup (`keepAlive: true`) and exposes
   a make/model/year lookup helper.
-- **Consumer:** `lib/features/consumption/data/obd2/obd2_service.dart`
+- **Consumer:** `lib/features/obd2/data/obd2_service.dart`
   — looks up the active `VehicleProfile` against the catalog and uses
   the matched entry's `volumetricEfficiency` and
   `odometerPidStrategy` to drive the OBD-II command pipeline.

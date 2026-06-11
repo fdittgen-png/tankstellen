@@ -236,6 +236,12 @@ void main() {
 /// go through the target feature's `api.dart` barrel, grouped
 /// `importing-feature -> imported-feature`. ONLY EVER DECREASES — never
 /// raise an entry, never add a pair; remove an entry when it hits 0.
+///
+/// #3137 (OBD2 extraction) re-attributed the moved stack's edges: former
+/// intra-`consumption` and `consumption -> X` imports now appear as
+/// `obd2 -> X`, and every `X -> obd2` consumer goes through the new
+/// `obd2/api.dart` barrel (exempt). Same graph, new attribution — the
+/// `obd2 -> *` entries are the decomposition's measured starting point.
 const _featurePairBaseline = <String, int>{
   'achievements -> consumption': 8,
   'achievements -> price_history': 2,
@@ -253,17 +259,17 @@ const _featurePairBaseline = <String, int>{
   'consumption -> achievements': 1,
   'consumption -> approach': 8,
   'consumption -> carbon': 2,
-  'consumption -> driving': 6,
+  'consumption -> driving': 5,
   'consumption -> ev': 12,
-  'consumption -> feature_management': 25,
+  'consumption -> feature_management': 21,
   'consumption -> glide_coach': 4,
   'consumption -> map': 2,
   'consumption -> profile': 10,
   'consumption -> search': 2,
   'consumption -> sync': 1,
-  'consumption -> vehicle': 47,
+  'consumption -> vehicle': 37,
   'driving -> approach': 1,
-  'driving -> consumption': 8,
+  'driving -> consumption': 5,
   'driving -> feature_management': 6,
   'driving -> glide_coach': 2,
   'driving -> map': 3,
@@ -286,11 +292,15 @@ const _featurePairBaseline = <String, int>{
   'map -> profile': 1,
   'map -> route_search': 6,
   'map -> search': 10,
+  'obd2 -> consumption': 42,
+  'obd2 -> driving': 1,
+  'obd2 -> feature_management': 4,
+  'obd2 -> vehicle': 10,
   'price_history -> feature_management': 6,
   'profile -> alerts': 2,
   'profile -> approach': 1,
   'profile -> consent': 1,
-  'profile -> consumption': 23,
+  'profile -> consumption': 10,
   'profile -> driving': 1,
   'profile -> feature_management': 52,
   'profile -> search': 2,
@@ -310,7 +320,6 @@ const _featurePairBaseline = <String, int>{
   'search -> route_search': 14,
   'search -> station_detail': 3,
   'search -> widget': 2,
-  'setup -> consumption': 5,
   'setup -> feature_management': 4,
   'setup -> profile': 4,
   'setup -> vehicle': 7,
@@ -329,7 +338,7 @@ const _featurePairBaseline = <String, int>{
   'sync -> favorites': 2,
   'sync -> feature_management': 2,
   'sync -> vehicle': 2,
-  'vehicle -> consumption': 24,
+  'vehicle -> consumption': 12,
   'vehicle -> profile': 1,
   'widget -> price_history': 2,
   'widget -> profile': 3,
@@ -340,7 +349,8 @@ const _featurePairBaseline = <String, int>{
 /// this direction is never legitimate. ONLY EVER DECREASES.
 // #3131 — the alert-scan engine moved into features/alerts: alerts 17→3
 // (the journal/trigger/telemetry seams remain), price_history and widget
-// hit ZERO.
+// hit ZERO. #3137 — the obd2 extraction added no core→obd2 edge (the
+// event-channel guard lives in core/utils since #3134).
 const _coreImportBaseline = <String, int>{
   'alerts': 3,
   'consumption': 6,

@@ -4,7 +4,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/logging/error_logger.dart';
-import '../../consumption/data/obd2/obd2_connection_service.dart';
+import '../../obd2/api.dart';
 import '../data/obd2_vin_reader.dart';
 
 /// Service shape exposed to the vehicle-edit UI for "Read VIN from car"

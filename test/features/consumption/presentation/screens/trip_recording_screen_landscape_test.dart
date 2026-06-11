@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
 import 'package:tankstellen/features/approach/providers/radar_candidate_list_provider.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/minimal_drive_summary.dart';

@@ -12,7 +12,7 @@ import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
 import 'package:tankstellen/features/approach/providers/approach_state_provider.dart';
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/approach_overlay_enabled_provider.dart';

@@ -36,7 +36,7 @@ void main() {
   // wrappers even without ios_/android_ in the name. These are
   // exempted from the scan entirely.
   const allowedPlatformWrappers = <String>{
-    'lib/features/consumption/data/obd2/obd2_permissions.dart',
+    'lib/features/obd2/data/obd2_permissions.dart',
   };
 
   // Sanctioned `defaultTargetPlatform` dispatch seams (#3163). These
@@ -50,11 +50,11 @@ void main() {
   // business logic (that's exactly the hole #3163 closed).
   const sanctionedDefaultTargetPlatformSeams = <String>{
     'lib/core/location/recording_location_settings.dart',
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart',
+    'lib/features/obd2/data/obd2_connection_service.dart',
     // #3172 — the consolidated BLE budgets object: the ONE remaining
     // platform fork for the OBD2 timing budgets (replaced the three
     // per-file forks in elm_channel / connect_by_mac).
-    'lib/features/consumption/data/obd2/obd2_platform_budgets.dart',
+    'lib/features/obd2/data/obd2_platform_budgets.dart',
     'lib/features/consumption/data/pip_controller.dart',
     'lib/features/consumption/providers/auto_record_orchestrator_factories.dart',
     'lib/features/setup/providers/onboarding_platform_steps_provider.dart',

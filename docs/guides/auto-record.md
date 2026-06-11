@@ -178,8 +178,8 @@ flow. Boot sequence:
 | Bridge | `android/app/src/main/kotlin/de/tankstellen/tankstellen/autorecord/BackgroundAdapterChannel.kt` |
 | Activity wiring | `android/app/src/main/kotlin/de/tankstellen/tankstellen/MainActivity.kt` |
 | Manifest | `android/app/src/main/AndroidManifest.xml` |
-| Dart bridge | `lib/features/consumption/data/obd2/android_background_adapter_listener.dart` |
-| Coordinator | `lib/features/consumption/data/obd2/auto_trip_coordinator.dart` |
+| Dart bridge | `lib/features/obd2/data/android_background_adapter_listener.dart` |
+| Coordinator | `lib/features/obd2/data/auto_trip_coordinator.dart` |
 | Orchestrator | `lib/features/consumption/providers/auto_record_orchestrator.dart` |
 | App boot | `lib/app/app_initializer.dart` |
-| Tests | `test/features/consumption/data/obd2/android_background_adapter_listener_test.dart`, `test/features/consumption/providers/auto_record_orchestrator_test.dart` |
+| Tests | `test/features/obd2/data/android_background_adapter_listener_test.dart`, `test/features/consumption/providers/auto_record_orchestrator_test.dart` |

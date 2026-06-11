@@ -5,9 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../data/obd2/adapter_capability.dart';
-import '../data/obd2/oem_pid_registry.dart';
-import '../data/obd2/oem_pid_table.dart';
+import '../../obd2/api.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Owns the #1615 experimental OEM-PID exact-fuel-level concern: a slow
