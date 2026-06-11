@@ -4337,7 +4337,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Poháňané pretcarburant.ro (Rada pre hospodársku súťaž + ANPC)';
+      'Poháňané monitorulpreturilor.info (Rada pre hospodársku súťaž + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

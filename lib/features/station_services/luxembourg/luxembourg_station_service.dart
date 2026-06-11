@@ -4,13 +4,18 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../search/data/models/search_params.dart';
+import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/error/exceptions.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import 'lustat_parser.dart' as lustat;
+import 'lustat_parser.dart' show LustatObservation;
 import '../../../core/logging/error_logger.dart';
 
 /// Luxembourg fuel prices — government-regulated, uniform nationally.
@@ -18,56 +23,78 @@ import '../../../core/logging/error_logger.dart';
 /// Unlike every other country supported by Tankstellen, Luxembourg does not
 /// have per-station price variation: the Ministry of the Economy publishes
 /// official maximum retail prices by decree (roughly weekly), and every
-/// filling station in the country charges the same figure. Because there is
-/// no station-level variance, there is also no public price API — the
-/// numbers live on two government / motoring-club pages:
-///   - https://gouvernement.lu/en/service-citoyen/gestion-crise-energie/prix-petroliers.html
-///   - https://www.acl.lu/en/mobility/fuel-prices/
+/// filling station in the country charges the same figure. There is no
+/// station-level API; the model is a fixed set of "virtual" stations
+/// covering the largest Luxembourg cities, each stamped with the same
+/// officially-decreed prices.
 ///
-/// The pages are heavyweight HTML/SPAs and the ACL page embeds prices in a
-/// minified Vue `window.__INITIAL_STATE__` blob that loses its variable
-/// names under their bundler, so a robust parser would be a project in
-/// itself. The pragmatic trade-off (see issue #574) is to ship a fixed set
-/// of "virtual" stations covering the largest Luxembourg cities, each
-/// stamped with the same officially-decreed prices held in
-/// [_regulatedPrices]. When the Ministry updates the decree, bump the
-/// constants here — no new API calls, no cached dataset, no background
-/// refresh race conditions.
+/// **Live prices (#3195)**: the decree figures are fetched from
+/// **LUSTAT**, STATEC's official statistics API (the national statistics
+/// institute republishes the ministerial *prix maxima* per decree date).
+/// The two SDMX dataflows consumed — both live-verified and recorded as
+/// fixtures (`test/fixtures/lu_lustat_{essence,diesel}_slice.json`,
+/// recorded 2026-06-10):
 ///
-/// If later we want live prices, the plan is:
-///   1. Scrape the ACL `__INITIAL_STATE__` JSON at service load
-///   2. Fall back to [_regulatedPrices] on any parse failure
-/// but the static constants alone satisfy the "uniform country-wide price"
-/// contract the issue asks for.
+/// ```
+/// GET https://lustat.statec.lu/rest/data/LU1,DSD_PRIX_ESSENCE@DF_E5301,1.0/
+///     all?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata
+///       → MOTOR_ENERGY SP95 / SP98 (EUR/L petrol maxima + decree date)
+/// GET .../LU1,DSD_PRIX_ESSENCE@DF_E5302,1.0/...
+///       → MOTOR_ENERGY DIE (EUR/L road-diesel maximum + decree date)
+/// ```
+///
+/// Mapping: `SP95 → e5 + e10` (the decree publishes one 95-octane
+/// figure), `SP98 → e98`, `DIE → diesel`. The decree's effective date
+/// (SDMX `TIME_PERIOD`) is surfaced as the stations' `updatedAt`. LPG
+/// has no daily LUSTAT flow (only a quarterly price-structure table) and
+/// is therefore only present on the stale fallback below.
+///
+/// **Fallback (#3195)**: when LUSTAT is unreachable or unparseable the
+/// service falls back to the compile-time [_fallbackPrices] constants —
+/// explicitly marked stale via `ServiceResult.isStale` and an attached
+/// [ServiceError], so the UI/chain can tell decree-fresh figures from
+/// the conservative baseline. The previous behaviour (constants always,
+/// silently ~15–18 % stale within weeks) was the bug this fixes.
 class LuxembourgStationService
     with StationServiceHelpers
     implements StationService {
-  /// Injectable Dio for tests. The service does not currently make HTTP
-  /// calls — the parameter is accepted so future scrape work can wire in
-  /// a mock without changing the constructor signature.
-  // ignore: unused_field
-  final Dio _dio;
+  /// LUSTAT SDMX REST root.
+  static const String defaultBaseUrl = 'https://lustat.statec.lu/rest/data';
 
-  LuxembourgStationService({Dio? dio})
+  /// Dataflow id for *Prix maxima de l'essence* (SP95 / SP98).
+  static const String essenceFlow = 'LU1,DSD_PRIX_ESSENCE@DF_E5301,1.0';
+
+  /// Dataflow id for *Prix maxima du gasoil routier* (DIE).
+  static const String dieselFlow = 'LU1,DSD_PRIX_ESSENCE@DF_E5302,1.0';
+
+  /// Query suffix asking for only the latest observation per series in
+  /// flat SDMX-JSON.
+  static const String _query =
+      'all?lastNObservations=1&dimensionAtObservation=AllDimensions&format=jsondata';
+
+  final Dio _dio;
+  final String _baseUrl;
+
+  LuxembourgStationService({Dio? dio, String? baseUrl})
       : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 15),
-            );
+            ),
+        _baseUrl = baseUrl ?? defaultBaseUrl;
 
-  /// Officially decreed maximum retail prices in EUR/L.
+  /// Last-resort fallback prices in EUR/L (officially decreed maxima).
   ///
-  /// Source: Ministère de l'Économie, arrêté ministériel fixant les prix
-  /// maxima de vente au détail des produits pétroliers.
-  ///
-  /// Last checked 2026-04 — update when a new arrêté is published. The
-  /// figures are conservative baselines so the app still shows sensible
-  /// data even if the decree falls behind the calendar by a few days.
-  static const Map<String, double> _regulatedPrices = {
-    'e5': 1.552,
-    'e10': 1.524,
-    'e98': 1.697,
-    'diesel': 1.487,
+  /// Source: Ministère de l'Économie via LUSTAT, recorded 2026-06-10
+  /// (petrol decree of 2026-06-05, diesel decree of 2026-06-03; LPG from
+  /// the older 2026-04 check — no daily LUSTAT flow exists for it).
+  /// Served **only** when the live LUSTAT fetch fails, and always marked
+  /// stale via `ServiceResult.isStale` (#3195).
+  static const Map<String, double> _fallbackPrices = {
+    'e5': 1.720,
+    'e10': 1.720,
+    'e98': 1.848,
+    'diesel': 1.782,
     'lpg': 0.863,
   };
 
@@ -76,7 +103,7 @@ class LuxembourgStationService
   ///
   /// The set is deliberately small and evenly distributed so a user
   /// searching from any part of Luxembourg hits at least one "station"
-  /// within a sensible radius without cluttering the map. The same four
+  /// within a sensible radius without cluttering the map. The same
   /// regulated prices are stamped on every entry.
   static const List<_LuxembourgCity> _cities = [
     _LuxembourgCity(
@@ -158,45 +185,109 @@ class LuxembourgStationService
     SearchParams params, {
     CancelToken? cancelToken,
   }) async {
+    Map<FuelType, double> prices;
+    String? effectiveDate;
+    var isStale = false;
+    final errors = <ServiceError>[];
+
     try {
-      final e5 = _regulatedPrices['e5'];
-      final e10 = _regulatedPrices['e10'];
-      final e98 = _regulatedPrices['e98'];
-      final diesel = _regulatedPrices['diesel'];
-      final lpg = _regulatedPrices['lpg'];
+      final responses = await Future.wait([
+        _dio.get('$_baseUrl/$essenceFlow/$_query', cancelToken: cancelToken),
+        _dio.get('$_baseUrl/$dieselFlow/$_query', cancelToken: cancelToken),
+      ]);
 
-      final stations = <Station>[
-        for (final c in _cities)
-          Station(
-            id: c.id,
-            name: c.name,
-            brand: 'Luxembourg',
-            street: c.street,
-            postCode: c.postCode,
-            place: c.place,
-            lat: c.lat,
-            lng: c.lng,
-            dist: roundedDistance(params.lat, params.lng, c.lat, c.lng),
-            e5: e5,
-            e10: e10,
-            e98: e98,
-            diesel: diesel,
-            lpg: lpg,
-            isOpen: true,
-          ),
-      ];
+      final latest = <String, LustatObservation>{};
+      for (final r in responses) {
+        parseLustatLatest(r.data, into: latest);
+      }
 
-      final filtered = filterByRadius(stations, params.radiusKm);
-      sortStations(filtered, params);
+      final sp95 = latest['SP95'];
+      final sp98 = latest['SP98'];
+      final die = latest['DIE'];
 
-      return wrapStations(filtered, ServiceSource.luxembourgApi);
-    } on DioException catch (e, st) {
-      // No HTTP call is made today, but the catch keeps the signature
-      // stable if a future scrape is added.
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'LU search failed'}));
-      throwApiException(e, defaultMessage: 'Network error', stackTrace: st);
+      prices = <FuelType, double>{
+        if (sp95 != null) FuelType.e5: sp95.value,
+        if (sp95 != null) FuelType.e10: sp95.value,
+        if (sp98 != null) FuelType.e98: sp98.value,
+        if (die != null) FuelType.diesel: die.value,
+      };
+      if (prices.isEmpty) {
+        throw const ApiException(
+          message: 'LUSTAT returned no motor-fuel observations',
+          kind: FailureKind.parse,
+        );
+      }
+
+      // Surface the newest decree date among the fuels we actually use.
+      effectiveDate = [sp95, sp98, die]
+          .whereType<LustatObservation>()
+          .map((o) => o.period)
+          .reduce((a, b) => a.compareTo(b) >= 0 ? a : b);
+    } catch (e, st) {
+      // Never-throws fallback (#3195): any fetch/parse failure degrades
+      // to the compile-time constants, clearly marked stale.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+          context: const {'where': 'LU LUSTAT fetch failed → stale fallback'}));
+      isStale = true;
+      errors.add(ServiceError(
+        source: ServiceSource.luxembourgApi,
+        message: 'LUSTAT prix-maxima fetch failed; serving compile-time '
+            'fallback decree prices (#3195): $e',
+        kind: e is ApiException ? e.kind : FailureKind.network,
+        occurredAt: DateTime.now(),
+      ));
+      prices = <FuelType, double>{
+        FuelType.e5: _fallbackPrices['e5']!,
+        FuelType.e10: _fallbackPrices['e10']!,
+        FuelType.e98: _fallbackPrices['e98']!,
+        FuelType.diesel: _fallbackPrices['diesel']!,
+        FuelType.lpg: _fallbackPrices['lpg']!,
+      };
     }
+
+    final stations = <Station>[
+      for (final c in _cities)
+        Station(
+          id: c.id,
+          name: c.name,
+          brand: 'Luxembourg',
+          street: c.street,
+          postCode: c.postCode,
+          place: c.place,
+          lat: c.lat,
+          lng: c.lng,
+          dist: roundedDistance(params.lat, params.lng, c.lat, c.lng),
+          e5: prices[FuelType.e5],
+          e10: prices[FuelType.e10],
+          e98: prices[FuelType.e98],
+          diesel: prices[FuelType.diesel],
+          lpg: prices[FuelType.lpg],
+          isOpen: true,
+          updatedAt: effectiveDate,
+        ),
+    ];
+
+    final filtered = filterByRadius(stations, params.radiusKm);
+    sortStations(filtered, params);
+
+    return ServiceResult(
+      data: filtered,
+      source: ServiceSource.luxembourgApi,
+      fetchedAt: DateTime.now(),
+      isStale: isStale,
+      errors: errors,
+    );
   }
+
+  /// Thin delegate over the pure [parseLustatLatest] in
+  /// `lustat_parser.dart` (#3195 split) — kept on the service so tests
+  /// drive the exact parser the live call uses.
+  @visibleForTesting
+  Map<String, LustatObservation> parseLustatLatest(
+    dynamic data, {
+    Map<String, LustatObservation>? into,
+  }) =>
+      lustat.parseLustatLatest(data, into: into);
 
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(

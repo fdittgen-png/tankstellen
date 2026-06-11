@@ -4359,7 +4359,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Propulsé par pretcarburant.ro (Conseil de la concurrence + ANPC)';
+      'Propulsé par monitorulpreturilor.info (Conseil de la concurrence + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

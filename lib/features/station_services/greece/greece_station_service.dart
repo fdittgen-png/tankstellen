@@ -87,13 +87,22 @@ import '../../../core/logging/error_logger.dart';
 class GreeceStationService
     with StationServiceHelpers
     implements StationService {
-  /// Community API base URL. The upstream project documents that it
-  /// runs at `http://localhost:8000/api` locally; a hosted mirror is
-  /// commonly available at `https://fuelpricesgr.com/api/` (or a
-  /// user-operated mirror). The exact hosted URL is a moving target
-  /// between releases of the upstream project — if the hosted endpoint
-  /// drifts, override via the constructor's `baseUrl` argument without
-  /// changing the parser.
+  /// Community API base URL.
+  ///
+  /// **#3194 — this host does not exist.** `fuelpricesgr.com` is
+  /// NXDOMAIN (live-verified 2026-06-10, as is the ministry's old
+  /// `deltia.fuelprices.gr`), and the upstream project
+  /// (github.com/mavroprovato/fuelpricesgr) documents no public
+  /// deployment — its README is localhost-only. Greece therefore cannot
+  /// work out of the box; the country is `verified: false` and hidden
+  /// from the pickers. Rather than fan out one doomed DNS lookup per
+  /// prefecture on every search, [searchStations] short-circuits when
+  /// it is still pointed at this default and reports the service as
+  /// unavailable (one errorLogger trace + a [ServiceError]).
+  ///
+  /// Operators who self-host the upstream wrapper can pass their own
+  /// `baseUrl` to the constructor — the full fetch/parse path then runs
+  /// unchanged (the route shapes match the upstream FastAPI exactly).
   static const String defaultBaseUrl = 'https://fuelpricesgr.com/api';
 
   final Dio _dio;
@@ -125,6 +134,36 @@ class GreeceStationService
     SearchParams params, {
     CancelToken? cancelToken,
   }) async {
+    // #3194 — the default host is NXDOMAIN and upstream has no public
+    // deployment. Degrade gracefully: one clear trace + an unavailable
+    // marker instead of N doomed DNS lookups and a raw throw. A
+    // self-hosted mirror (custom baseUrl) takes the normal path below.
+    if (_baseUrl == defaultBaseUrl) {
+      final unavailable = ServiceError(
+        source: ServiceSource.greeceApi,
+        message: 'GR service unavailable: default host is NXDOMAIN and '
+            'upstream fuelpricesgr has no public deployment (#3194); '
+            'set a self-hosted baseUrl to enable Greece',
+        kind: FailureKind.unsupported,
+        occurredAt: DateTime.now(),
+      );
+      unawaited(errorLogger.log(
+        ErrorLayer.other,
+        ApiException(
+          message: unavailable.message,
+          kind: FailureKind.unsupported,
+        ),
+        StackTrace.current,
+        context: const {'where': 'GR search short-circuit (#3194)'},
+      ));
+      return ServiceResult(
+        data: const <Station>[],
+        source: ServiceSource.greeceApi,
+        fetchedAt: DateTime.now(),
+        errors: [unavailable],
+      );
+    }
+
     // Pull the user's nearest prefectures first — a radius-based
     // pre-filter so we don't slam the upstream with 8 serial requests
     // when the user is standing in Athens and the answer is `ATTICA`.

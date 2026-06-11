@@ -4351,7 +4351,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Работи с pretcarburant.ro (Съвет за конкуренция + ANPC)';
+      'Работи с monitorulpreturilor.info (Съвет за конкуренция + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

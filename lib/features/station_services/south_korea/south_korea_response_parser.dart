@@ -23,6 +23,7 @@ import '../../search/domain/entities/fuel_type.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
+import 'katec_converter.dart';
 
 /// OPINET `prodcd` parsing utilities.
 ///
@@ -71,13 +72,35 @@ class OpinetStationAccumulator {
   /// Pull the address / coords / distance fields off the first
   /// product-call payload that carries them. Subsequent calls for the
   /// same `UNI_ID` only update the price map.
+  ///
+  /// OPINET serves `GIS_X_COOR`/`GIS_Y_COOR` in **KATEC** metres
+  /// (#3192); parsing them as WGS84 degrees put every station at an
+  /// absurd position that `filterByRadius` then dropped. Projected
+  /// KATEC values are 5–7-digit metre counts while WGS84 degrees for
+  /// Korea sit in [124, 132] × [33, 39], so the magnitude check below
+  /// distinguishes the two unambiguously and keeps the parser tolerant
+  /// of any OPINET endpoint that *does* serve WGS84.
   void absorbBase(Map raw) {
     brandCode ??= raw['POLL_DIV_CD']?.toString();
     name ??= raw['OS_NM']?.toString().trim();
     address ??= raw['NEW_ADR']?.toString().trim();
 
-    lat ??= _parseDouble(raw['GIS_Y_COOR']);
-    lng ??= _parseDouble(raw['GIS_X_COOR']);
+    if (lat == null || lng == null) {
+      final rawY = _parseDouble(raw['GIS_Y_COOR']);
+      final rawX = _parseDouble(raw['GIS_X_COOR']);
+      if (rawY != null && rawX != null) {
+        if (rawX.abs() > 1000 || rawY.abs() > 1000) {
+          // KATEC easting/northing — convert back to WGS84.
+          final wgs = katecToWgs84(rawX, rawY);
+          lat = wgs.lat;
+          lng = wgs.lng;
+        } else {
+          // Already WGS84 degrees.
+          lat = rawY;
+          lng = rawX;
+        }
+      }
+    }
 
     final distRaw = raw['DISTANCE'];
     final distMeters = _parseDouble(distRaw);

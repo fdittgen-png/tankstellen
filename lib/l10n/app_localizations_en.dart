@@ -4299,7 +4299,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Powered by pretcarburant.ro (Competition Council + ANPC)';
+      'Powered by monitorulpreturilor.info (Competition Council + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {
@@ -12168,7 +12168,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get romaniaScrapingNotice =>
-      '⟦Ƥóŵéřéđ ƀý ƥřéŧçářƀúřáñŧ.řó (Çóɱƥéŧîŧîóñ Çóúñçîł + ÁÑƤÇ) ·····················⟧';
+      '⟦Ƥóŵéřéđ ƀý ɱóñîŧóřúłƥřéŧúřîłóř.îñƒó (Çóɱƥéŧîŧîóñ Çóúñçîł + ÁÑƤÇ) ························⟧';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

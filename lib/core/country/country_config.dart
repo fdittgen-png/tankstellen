@@ -481,7 +481,7 @@ class Countries {
     postalCodeRegex: r'^\d{7}$',
     postalCodeLabel: 'Código postal',
     requiresApiKey: true,
-    apiKeyRegistrationUrl: 'https://api.cne.cl/',
+    apiKeyRegistrationUrl: 'https://apidocs.cne.cl/', // #3200 docs portal
     apiProvider: 'CNE Bencina en Linea',
     attribution: 'Datos: Comisión Nacional de Energía (cne.cl)',
     fuelTypes: ['Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'GLP'],
@@ -495,8 +495,8 @@ class Countries {
     examplePostalCode: '8320000',
     exampleCity: 'Santiago',
     pricePerUnitSuffix: '\$/L',
-    // #1828 — CNE endpoint unverified against the live portal
-    // (#1823). Hidden from the picker.
+    // #3200 — path + Bearer auth match apidocs.cne.cl; hidden until a
+    // registered token confirms the payload shape end-to-end.
     verified: false,
   );
 
@@ -530,18 +530,17 @@ class Countries {
     },
     examplePostalCode: '10431',
     exampleCity: 'Αθήνα',
-    // #1828 — fixture-driven best-guess feed, unverified end-to-end.
-    // Hidden from the picker.
+    // #3194 — default host is NXDOMAIN; the service short-circuits to
+    // "unavailable" unless self-hosted. Hidden until a real source exists.
     verified: false,
   );
 
-  /// Romania — *Monitorul Prețurilor la Carburanți* (pretcarburant.ro),
-  /// the Competition Council + ANPC joint observatory (#577). Romanian
-  /// law mandates 15-minute price updates from every retailer and ~1 500
-  /// stations are covered (Petrom / OMV / Rompetrol / MOL / Lukoil /
-  /// Socar). The feed is public — no key required. Fuels: Benzină
-  /// Standard (→ e5), Benzină Premium (→ e98), Motorină Standard
-  /// (→ diesel), Motorină Premium (→ diesel premium), GPL (→ lpg).
+  /// Romania — *Monitorul Prețurilor*, the Competition Council's
+  /// official observatory at monitorulpreturilor.info (#577; #3193
+  /// rebased off the dead third-party pretcarburant.ro). ~1 500
+  /// stations, public feed, no key. Fuels (catalog ids): Benzină
+  /// standard 11 (→ e5), premium 12 (→ e98), Motorină standard 21
+  /// (→ diesel), premium 22 (→ diesel premium), GPL 31 (→ lpg).
   static const romania = CountryConfig(
     code: 'RO',
     name: 'România',
@@ -555,7 +554,7 @@ class Countries {
     requiresApiKey: false,
     apiProvider: 'Monitorul Prețurilor',
     attribution:
-        'Date: Consiliul Concurenței + ANPC — pretcarburant.ro',
+        'Date: Consiliul Concurenței — monitorulpreturilor.info',
     fuelTypes: [
       'Benzină Standard',
       'Benzină Premium',
@@ -574,8 +573,8 @@ class Countries {
     examplePostalCode: '010101',
     exampleCity: 'București',
     pricePerUnitSuffix: 'lei/L',
-    // #1828 — no documented public API; best-guess endpoint,
-    // unverified end-to-end. Hidden from the picker.
+    // #3193 — rebased onto the real monitorulpreturilor.info backend;
+    // hidden until the maintainer field-verifies, then flip to true.
     verified: false,
   );
 

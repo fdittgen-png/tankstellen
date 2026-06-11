@@ -1,0 +1,188 @@
+{
+ "Stations": [
+  {
+   "id": "041B11",
+   "name": "Vulcan Judetu (Bucuresti)",
+   "updatedate": "11/06/2026 00:19 ",
+   "network": {
+    "id": "ROMPETROL",
+    "name": "Rompetrol",
+    "logo": {
+     "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/rompetrol.png"
+    }
+   },
+   "addr": {
+    "addrstring": "Sos. Mihai Bravu nr. 396, sector 3, 030327, Bucuresti",
+    "zipcode": "396",
+    "location": {
+     "Lat": 44.421467,
+     "Lon": 26.136633
+    },
+    "wkt": "POINT(26.136633 44.421467)",
+    "uatid": "179132"
+   }
+  },
+  {
+   "id": "J012",
+   "name": "Bucuresti - Ramnicu Valcea",
+   "updatedate": "10/06/2026 22:30 ",
+   "network": {
+    "id": "MOL",
+    "name": "MOL România Petroleum Products",
+    "logo": {
+     "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/mol.png"
+    }
+   },
+   "addr": {
+    "addrstring": "str. Ramnicu Valcea",
+    "zipcode": "12",
+    "location": {
+     "Lat": 44.41609,
+     "Lon": 26.14051
+    },
+    "wkt": "POINT(26.14051 44.41609)",
+    "uatid": "179132"
+   }
+  },
+  {
+   "id": "R1009",
+   "name": "MIHAI VODA",
+   "updatedate": "10/06/2026 20:05 ",
+   "network": {
+    "id": "PETROM",
+    "name": "PETROM",
+    "logo": {
+     "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/petrom.png"
+    }
+   },
+   "addr": {
+    "addrstring": "Spl. Independentei, nr. 26, Sect 5",
+    "zipcode": "50082",
+    "location": {
+     "Lat": 44.43328,
+     "Lon": 26.09273
+    },
+    "wkt": "POINT(26.09273 44.43328)",
+    "uatid": "179132",
+    "contactdetails": "Non-Stop; Blueline: 0800 0800 11"
+   }
+  }
+ ],
+ "Products": [
+  {
+   "id": "15",
+   "stationid": "R1009",
+   "name": "Motorina Standard",
+   "price": 9.18,
+   "specs": "Nivel optim de accelerare . Adaptat la conditiile climaterice din Romania, inclusiv pe timp de iarna.",
+   "distance": 0.68405,
+   "network": {
+    "id": "PETROM",
+    "name": "PETROM",
+    "logo": {
+     "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/petrom.png"
+    }
+   },
+   "catprod": {
+    "id": "21",
+    "name": "Motorină standard",
+    "logo": {}
+   },
+   "logo": {}
+  },
+  {
+   "id": "33EFX10B00",
+   "stationid": "041B11",
+   "name": "Efix Motorina 51",
+   "price": 8.99,
+   "specs": "51 EFIX DIESEL - Folosind o combinatie optima de aditivi, Efix – protejeaza motorul, curata supapele si injectoarele, reduce consumul de carburant.",
+   "distance": 3.06732,
+   "network": {
+    "id": "ROMPETROL",
+    "name": "Rompetrol",
+    "logo": {
+     "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/rompetrol.png"
+    }
+   },
+   "catprod": {
+    "id": "21",
+    "name": "Motorină standard",
+    "logo": {}
+   },
+   "logo": {}
+  },
+  {
+   "id": "22",
+   "stationid": "J012",
+   "name": "MOTORINA EVO D",
+   "price": 9.24,
+   "specs": "Motorina EURO 5, cf.SR EN 590+ A1:2017,Cifra Cetanica min 51,fara sulf,min 6,5% continut biocarburant, aditivat cu un pachet de aditivi care asigura cresterea duratei de viata a motorului",
+   "specsdetail": "Pachetul de aditivi FORMULA MOL EVOTECH din reteta carburantilor MOL EVO, asigura curatarea eficienta si indelungata a motorului, consum optim de carburant, durata de viata prelungita a motorului, performanta imbunatatita.",
+   "distance": 3.57715,
+   "network": {
+    "id": "MOL",
+    "name": "MOL România Petroleum Products",
+    "logo": {
+     "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/mol.png"
+    }
+   },
+   "catprod": {
+    "id": "21",
+    "name": "Motorină standard",
+    "logo": {}
+   },
+   "logo": {}
+  }
+ ],
+ "services": [
+  {
+   "id": "1",
+   "name": "Magazin",
+   "logo": {
+    "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/magazin.png"
+   },
+   "stationid": "041B11"
+  },
+  {
+   "id": "5",
+   "name": "Peaj",
+   "logo": {
+    "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/peaj.png"
+   },
+   "stationid": "041B11"
+  },
+  {
+   "id": "7",
+   "name": "Plati facturi, reincarcare electronica",
+   "logo": {
+    "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/facturi.png"
+   },
+   "stationid": "041B11"
+  },
+  {
+   "id": "2",
+   "name": "Restaurant",
+   "logo": {
+    "logouri": "http://monitorulpreturilor.info/MonitorulPreturilor/Images/restaurant.png"
+   },
+   "stationid": "041B11"
+  }
+ ],
+ "area": {
+  "Points": [
+   {
+    "Lat": 44.42936965941984,
+    "Lon": 26.16278940140367
+   },
+   {
+    "Lat": 44.42795674660661,
+    "Lon": 26.16273000952096
+   },
+   {
+    "Lat": 44.426545867789926,
+    "Lon": 26.1626087181892
+   }
+  ]
+ },
+ "areawkt": ""
+}

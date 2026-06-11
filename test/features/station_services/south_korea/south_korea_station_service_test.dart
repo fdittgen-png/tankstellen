@@ -17,13 +17,18 @@ import '../../../mocks/mocks.dart';
 
 /// A single OPINET `RESULT.OIL[]` entry as returned by the developer
 /// portal's `aroundAll.do` endpoint. KRW prices are integer strings.
+///
+/// `GIS_X_COOR`/`GIS_Y_COOR` are **KATEC** metres (#3192) — the
+/// defaults are the PROJ-derived KATEC pair for the WGS84 point
+/// (37.4997, 127.0287) near Gangnam station, so parsed stations must
+/// come back out at that WGS84 position.
 Map<String, dynamic> _opinetStation({
   String uniId = 'A0010684',
   String brandCode = 'SKE',
   String name = 'SK에너지 강남주유소',
   String address = '서울특별시 강남구 테헤란로 152',
-  double lng = 127.0287, // GIS_X_COOR
-  double lat = 37.4997, // GIS_Y_COOR
+  double gisX = 314312.63, // KATEC easting of WGS84 (37.4997, 127.0287)
+  double gisY = 544612.34, // KATEC northing
   int? priceWon = 1689,
   num? distanceMeters = 382,
 }) {
@@ -32,8 +37,8 @@ Map<String, dynamic> _opinetStation({
     'POLL_DIV_CD': brandCode,
     'OS_NM': name,
     'NEW_ADR': address,
-    'GIS_X_COOR': lng.toString(),
-    'GIS_Y_COOR': lat.toString(),
+    'GIS_X_COOR': gisX.toString(),
+    'GIS_Y_COOR': gisY.toString(),
     if (priceWon != null) 'PRICE': priceWon.toString(),
     if (distanceMeters != null) 'DISTANCE': distanceMeters.toString(),
   };
@@ -215,7 +220,8 @@ void main() {
         expect(s.lpg, closeTo(1050, 0.001));
       });
 
-      test('sends API key and coordinates in query parameters', () async {
+      test('sends API key and KATEC-projected coordinates in query '
+          'parameters (#3192)', () async {
         when(() => mockDio.get(
               any(),
               queryParameters: any(named: 'queryParameters'),
@@ -235,15 +241,17 @@ void main() {
         for (final qp in captured) {
           final m = qp as Map<String, dynamic>;
           expect(m['code'], 'test-key');
-          // OPINET uses x=lng, y=lat (WGS84).
-          expect(m['x'], 127.0);
-          expect(m['y'], 37.5);
+          // OPINET's x/y are KATEC metres, NOT WGS84 degrees (#3192).
+          // PROJ reference for WGS84 (37.5, 127.0): (311775.30, 544672.18).
+          expect(m['x'] as double, closeTo(311775.30, 1.0));
+          expect(m['y'] as double, closeTo(544672.18, 1.0));
           expect(m['radius'], 5000);
           expect(m['out'], 'json');
         }
       });
 
-      test('clamps absurdly large radius to 50 km', () async {
+      test('clamps radius to the documented 5 km OPINET ceiling (#3192)',
+          () async {
         when(() => mockDio.get(
               any(),
               queryParameters: any(named: 'queryParameters'),
@@ -258,7 +266,7 @@ void main() {
               queryParameters: captureAny(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).captured.first as Map<String, dynamic>;
-        expect(captured['radius'], 50000);
+        expect(captured['radius'], 5000);
       });
 
       test('empty radius search → empty list, not an error', () async {
@@ -363,6 +371,32 @@ void main() {
     });
 
     group('parseSingleProductResponse', () {
+      test('converts KATEC GIS coordinates back to WGS84 (#3192)', () {
+        final stations = service.parseSingleProductResponse(
+          _envelope([_opinetStation()]), // KATEC (314312.63, 544612.34)
+          FuelType.e5,
+          fromLat: 37.4997,
+          fromLng: 127.0287,
+        );
+        expect(stations, hasLength(1));
+        final s = stations.first;
+        expect(s.lat, closeTo(37.4997, 0.0005));
+        expect(s.lng, closeTo(127.0287, 0.0005));
+      });
+
+      test('still accepts WGS84-degree GIS coordinates (legacy/endpoint '
+          'drift tolerance)', () {
+        final stations = service.parseSingleProductResponse(
+          _envelope([_opinetStation(gisX: 127.0287, gisY: 37.4997)]),
+          FuelType.e5,
+          fromLat: 37.4997,
+          fromLng: 127.0287,
+        );
+        expect(stations, hasLength(1));
+        expect(stations.first.lat, closeTo(37.4997, 0.0001));
+        expect(stations.first.lng, closeTo(127.0287, 0.0001));
+      });
+
       test('maps OPINET KRW integer strings to numeric prices', () {
         final stations = service.parseSingleProductResponse(
           _envelope([_opinetStation(priceWon: 1689)]),
@@ -411,7 +445,7 @@ void main() {
           <String, dynamic>{
             'RESULT': <String, dynamic>{
               'OIL': [
-                _opinetStation(uniId: 'Z01', lat: 0, lng: 0),
+                _opinetStation(uniId: 'Z01', gisX: 0, gisY: 0),
                 _opinetStation(uniId: 'Z02'),
               ],
             },

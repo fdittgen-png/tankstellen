@@ -25,10 +25,13 @@ import '../../../core/logging/error_logger.dart';
 /// https://api.cne.cl/. Key facts:
 ///
 /// - **Auth**: free registration yields a personal API token. The
-///   service passes it as a `token` query parameter on every call
-///   (some CNE endpoints accept it in the `Authorization: Bearer` header
-///   too — the query-parameter form is documented as the "simple" path
-///   and is what we use here).
+///   official docs (apidocs.cne.cl, fetched live for #3200) require it
+///   in an `Authorization: Bearer <token>` **header** — the old
+///   `?token=` query-parameter form 404s. Note the API answers auth
+///   failures with **HTTP 200** and a JSON `{"status": "..."}` body
+///   (live-recorded: `Authorization Token not found` / `Token is
+///   Invalid` — see `test/fixtures/cl_cne_v4_auth_error.json`), so the
+///   parser, not the HTTP status, is the auth gate.
 /// - **Coverage**: ~6 000 service stations ("estaciones de servicio")
 ///   nationwide.
 /// - **Fuels published per station** (CNE product codes):
@@ -49,7 +52,8 @@ import '../../../core/logging/error_logger.dart';
 ///
 /// A typical "all stations" dump looks like:
 /// ```
-/// GET https://api.cne.cl/api/v4/combustibles/estaciones?token=<apiKey>
+/// GET https://api.cne.cl/api/v4/estaciones
+/// Authorization: Bearer <apiKey>
 /// ```
 /// returning
 /// ```json
@@ -85,14 +89,14 @@ import '../../../core/logging/error_logger.dart';
 /// full list is parsed we drop everything outside the user's radius
 /// through the shared [StationServiceHelpers.filterByRadius] pass.
 ///
-/// **Endpoint verification**: the live CNE developer docs evolve (path
-/// segments like `api/v3/combustibles`, `api/v4/combustibles`,
-/// `combustibles/estaciones` drift between minor releases). The
-/// [defaultBaseUrl] constant is the current best-guess path; the
-/// parser and fuel mapping stay valid regardless of which exact path
-/// the API settles on. If a path change breaks the live call, the bug
-/// is a one-line URL constant — the rest of the service remains
-/// correct against the JSON contract captured above.
+/// **Endpoint verification (#3200)**: the official docs at
+/// apidocs.cne.cl document `GET /api/v4/estaciones` with Bearer-header
+/// auth; the old best-guess `/api/v4/combustibles/estaciones?token=`
+/// 404s live (host alive — verified 2026-06-10). [defaultBaseUrl] now
+/// matches the documented path and the auth header is stamped in the
+/// constructor. The station payload shape (`precios` scalar vs nested)
+/// remains unconfirmed until a registered token exists — the parser's
+/// contract above is the docs' shape.
 ///
 /// **Split (#563)**: the JSON parsing + per-row → [Station] mapping
 /// lives in `chile_response_parser.dart` so it can be tested as a pure
@@ -102,15 +106,11 @@ import '../../../core/logging/error_logger.dart';
 class ChileStationService
     with StationServiceHelpers
     implements StationService {
-  /// CNE "combustibles" dump — returns every station with nested prices
-  /// for each product code.
-  ///
-  /// TODO: verify against the live CNE developer portal. The JSON
-  /// payload shape (top-level `data` list, per-station `precios` map,
-  /// `ubicacion.latitud` / `ubicacion.longitud`) is stable across CNE
-  /// API minor versions and is the contract our parser depends on.
-  static const String defaultBaseUrl =
-      'https://api.cne.cl/api/v4/combustibles/estaciones';
+  /// CNE "estaciones" dump — returns every station with nested prices
+  /// for each product code. Path per the official apidocs.cne.cl docs
+  /// (#3200); the endpoint answers (with an auth-error body) on this
+  /// exact path, live-verified 2026-06-10.
+  static const String defaultBaseUrl = 'https://api.cne.cl/api/v4/estaciones';
 
   /// Product keys we deliberately drop because no [FuelType] exists
   /// yet. Re-exported from the parser for tests that pin the MVP
@@ -131,7 +131,14 @@ class ChileStationService
               receiveTimeout: const Duration(seconds: 20),
             ),
         _apiKey = apiKey,
-        _baseUrl = baseUrl ?? defaultBaseUrl;
+        _baseUrl = baseUrl ?? defaultBaseUrl {
+    // #3200 — CNE requires the token in an Authorization: Bearer header
+    // (the old `?token=` query form 404s). Stamped once here so every
+    // request this Dio instance makes carries it.
+    if (_apiKey.isNotEmpty) {
+      _dio.options.headers['Authorization'] = 'Bearer $_apiKey';
+    }
+  }
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -145,16 +152,12 @@ class ChileStationService
     }
 
     try {
+      // The token travels in the Authorization header (constructor).
+      // No query parameters: we pull everything and filter locally so
+      // the radius / sort semantics from [StationServiceHelpers] stay
+      // consistent with every other country.
       final response = await _dio.get(
         _baseUrl,
-        queryParameters: {
-          'token': _apiKey,
-          // Some CNE paths accept a `region` filter — we pull everything
-          // and filter locally because the radius / sort semantics are
-          // enforced by [StationServiceHelpers] and must stay consistent
-          // with every other country.
-          'formato': 'json',
-        },
         cancelToken: cancelToken,
       );
 

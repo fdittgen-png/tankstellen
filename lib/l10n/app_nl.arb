@@ -1163,7 +1163,7 @@
   "greeceApiProvider": "Paratiritirio Timon (Griekenland)",
   "greeceCommunityApiNotice": "Mogelijk gemaakt door de door de community onderhouden fuelpricesgr API",
   "romaniaApiProvider": "Monitorul Prețurilor (Roemenië)",
-  "romaniaScrapingNotice": "Mogelijk gemaakt door pretcarburant.ro (Mededingingsraad + ANPC)",
+  "romaniaScrapingNotice": "Mogelijk gemaakt door monitorulpreturilor.info (Mededingingsraad + ANPC)",
   "crossBorderCheaper": "{country}-stations {km} km verderop — €{price}/L goedkoper",
   "crossBorderTapToSwitch": "Tik om van land te wisselen",
   "crossBorderDismissTooltip": "Sluiten",

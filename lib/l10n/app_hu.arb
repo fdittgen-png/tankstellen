@@ -1163,7 +1163,7 @@
   "greeceApiProvider": "Paratiritirio Timon (Görögország)",
   "greeceCommunityApiNotice": "A közösség által fenntartott fuelpricesgr API segítségével",
   "romaniaApiProvider": "Monitorul Prețurilor (Románia)",
-  "romaniaScrapingNotice": "A pretcarburant.ro segítségével (Versenytanács + ANPC)",
+  "romaniaScrapingNotice": "A monitorulpreturilor.info segítségével (Versenytanács + ANPC)",
   "crossBorderCheaper": "{country} állomások {km} km-re — €{price}/L olcsóbb",
   "crossBorderTapToSwitch": "Érintsen az ország váltásához",
   "crossBorderDismissTooltip": "Elvetés",
