@@ -29,6 +29,7 @@ import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/features/widget/data/impl/widget_reload_dispatcher.dart';
 import 'package:tankstellen/features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../../../helpers/silence_error_logger.dart';
 
@@ -310,6 +311,110 @@ void main() {
             reason: 'leaving the cache-key cell means the cached result no '
                 'longer answers the new position — refresh now even inside '
                 'the TTL');
+      });
+
+      // #3171 — the iOS widget's AppIntent refresh button writes an
+      // ISO-8601 request timestamp into the shared store. A request newer
+      // than the last completed refresh must bypass the gate exactly once
+      // (the completed refresh moves `_lastNearestRefreshAt` past it); a
+      // stale request must not defeat the gate.
+      group('manual refresh nudge (#3171)', () {
+        /// Re-wires the home_widget channel mock so `getWidgetData` on the
+        /// manual-refresh key returns [iso] (null = key absent).
+        void wireManualRefreshRequest(String? iso) {
+          messenger.setMockMethodCallHandler(homeWidgetChannel, (call) async {
+            if (call.method == 'getWidgetData') {
+              final id = (call.arguments as Map)['id'];
+              if (id == kWidgetManualRefreshRequestedAtKey) return iso;
+              return null;
+            }
+            if (call.method == 'getInstalledWidgets') return <dynamic>[];
+            if (call.method == 'updateWidget') return true;
+            return null;
+          });
+        }
+
+        test('a request newer than the last refresh bypasses the gate',
+            () async {
+          final c = makeContainer();
+          addTearDown(c.dispose);
+          final start = DateTime(2026, 6, 10, 12, 0);
+          final notifier = await arm(c, start);
+          final after = countingService.searchCalls;
+
+          // The user taps the widget's refresh button 30s after the last
+          // refresh; the next tick is still inside the TTL + unmoved.
+          wireManualRefreshRequest(
+            start.add(const Duration(seconds: 30)).toIso8601String(),
+          );
+          notifier.debugNow = () => start.add(const Duration(minutes: 1));
+          await notifier.debugTick();
+
+          expect(countingService.searchCalls, after + 1,
+              reason: 'a manual-refresh request newer than the last '
+                  'completed refresh must bypass the freshness/movement '
+                  'gate');
+        });
+
+        test('the same request does not bypass the gate twice (consumed by '
+            'the refresh it triggered)', () async {
+          final c = makeContainer();
+          addTearDown(c.dispose);
+          final start = DateTime(2026, 6, 10, 12, 0);
+          final notifier = await arm(c, start);
+
+          wireManualRefreshRequest(
+            start.add(const Duration(seconds: 30)).toIso8601String(),
+          );
+          notifier.debugNow = () => start.add(const Duration(minutes: 1));
+          await notifier.debugTick();
+          final afterBypass = countingService.searchCalls;
+
+          // Same request still in the store; next tick inside the TTL.
+          notifier.debugNow = () => start.add(const Duration(minutes: 2));
+          await notifier.debugTick();
+
+          expect(countingService.searchCalls, afterBypass,
+              reason: 'the bypass refresh moved the last-refresh stamp past '
+                  'the request, so the unchanged request must not defeat '
+                  'the gate again');
+        });
+
+        test('a request older than the last refresh does NOT bypass the gate',
+            () async {
+          final c = makeContainer();
+          addTearDown(c.dispose);
+          final start = DateTime(2026, 6, 10, 12, 0);
+          final notifier = await arm(c, start);
+          final after = countingService.searchCalls;
+
+          // Request stamped BEFORE the last completed refresh.
+          wireManualRefreshRequest(
+            start.subtract(const Duration(minutes: 5)).toIso8601String(),
+          );
+          notifier.debugNow = () => start.add(const Duration(minutes: 1));
+          await notifier.debugTick();
+
+          expect(countingService.searchCalls, after,
+              reason: 'an already-served request must not keep re-running '
+                  'the search inside the TTL');
+        });
+
+        test('an unparsable request value is ignored (gate stays in force)',
+            () async {
+          final c = makeContainer();
+          addTearDown(c.dispose);
+          final start = DateTime(2026, 6, 10, 12, 0);
+          final notifier = await arm(c, start);
+          final after = countingService.searchCalls;
+
+          wireManualRefreshRequest('not-a-timestamp');
+          notifier.debugNow = () => start.add(const Duration(minutes: 1));
+          await notifier.debugTick();
+
+          expect(countingService.searchCalls, after,
+              reason: 'garbage in the store must fail safe — keep the gate');
+        });
       });
     });
 

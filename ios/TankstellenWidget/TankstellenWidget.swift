@@ -3,14 +3,17 @@
 
 // Widget extension bundle entry point.
 //
-// Defines the Nearest-Stations widget and registers it with the WidgetKit
-// runtime. Pair widget for the Cheapest / Favourites variant can be added
-// alongside `NearestStationsWidget` inside the `WidgetBundle` body once a
-// dedicated provider lands.
+// Registers the three station-list widgets (#3171 — Nearest, Favorites,
+// Predictive; Android-parity for `StationWidgetRenderer.kt`'s modes +
+// the #1121 predictive variant) and the trip Live Activity (#3170) with
+// the WidgetKit runtime.
 //
-// Shape mirrors the Android `StationWidgetRenderer`'s NearestStations row
-// — same JSON contract under the shared App Group UserDefaults so a single
-// Dart write path (`HomeWidgetService.updateWidget`) feeds both platforms.
+// Shape mirrors the Android `StationWidgetRenderer`'s row — same JSON
+// contract under the shared App Group UserDefaults so a single Dart
+// write path (`HomeWidgetService`) feeds both platforms. The `kind`
+// strings here MUST stay in lock-step with `kIosWidgetKinds` in
+// `lib/features/widget/data/impl/widget_reload_dispatcher.dart` — that
+// list is what the Dart side reloads after every data write.
 
 import SwiftUI
 import WidgetKit
@@ -19,6 +22,9 @@ import WidgetKit
 struct TankstellenWidgetBundle: WidgetBundle {
     var body: some Widget {
         NearestStationsWidget()
+        // #3171 — favorites + predictive variants (Android parity).
+        FavoriteStationsWidget()
+        PredictiveStationsWidget()
         // #3170 — trip-recording / approach-radar Live Activity
         // (Dynamic Island + lock screen), driven by the Runner-side
         // LiveActivityBridge over `tankstellen/live_activity`.

@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/cache/cache_manager.dart' show CacheKey, CacheTtl;
@@ -14,6 +15,7 @@ import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../price_history/providers/price_prediction_provider.dart';
 import '../data/home_widget_service.dart';
+import '../data/impl/widget_reload_dispatcher.dart';
 import '../../../core/logging/error_logger.dart';
 
 part 'nearest_widget_refresh_provider.g.dart';
@@ -113,9 +115,20 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
       // stored position is still inside the same cache-key cell (the same
       // rounding `CacheKey.stationSearch` uses) — the search chain would
       // only re-serve its cached result anyway.
+      //
+      // #3171 — EXCEPT when the iOS widget's AppIntent refresh button has
+      // written a manual-refresh request newer than the last completed
+      // refresh into the shared App-Group store. The nudge is consumed by
+      // this existing tick (no new wake-ups): once the refresh below
+      // completes, `_lastNearestRefreshAt` moves past the request
+      // timestamp, so the same nudge can never bypass the gate twice.
       final posKey = _positionCellKey(storage);
       final last = _lastNearestRefreshAt;
-      if (last != null &&
+      final manualRequestedAt = await _readManualRefreshRequest();
+      final manualPending = manualRequestedAt != null &&
+          (last == null || manualRequestedAt.isAfter(last));
+      if (!manualPending &&
+          last != null &&
           debugNow().difference(last) < CacheTtl.stationSearch &&
           posKey == _lastNearestRefreshPosKey) {
         return;
@@ -138,6 +151,25 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
       _lastNearestRefreshPosKey = posKey;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'NearestWidgetRefresh: tick failed'}));
+    }
+  }
+
+  /// #3171 — the ISO-8601 timestamp the iOS widget's AppIntent refresh
+  /// button (iOS 17+) last wrote into the shared App-Group store, or null
+  /// when the key is absent/unparsable. Read through the same `home_widget`
+  /// bridge every other widget key uses — no new mechanism. Non-fatal on
+  /// failure: a broken read just means the gate stays in force.
+  Future<DateTime?> _readManualRefreshRequest() async {
+    try {
+      final iso = await HomeWidget.getWidgetData<String>(
+        kWidgetManualRefreshRequestedAtKey,
+      );
+      return iso == null ? null : DateTime.tryParse(iso);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'NearestWidgetRefresh: manual refresh request read failed',
+      }));
+      return null;
     }
   }
 

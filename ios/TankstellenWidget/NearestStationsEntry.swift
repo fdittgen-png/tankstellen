@@ -1,13 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-// TimelineEntry payload for the Nearest-Stations widget.
+// TimelineEntry payload shared by every station-list widget in the bundle
+// (#3171): Nearest reads `nearest_json`, Favorites reads `stations_json`,
+// Predictive reuses the nearest payload.
 //
-// `rows` is the parsed `nearest_json` array (see `StationRow`). `isStale`
+// `rows` is the parsed station array (see `StationRow`). `isStale`
 // reflects the `nearest_is_stale` flag the Dart side sets when the data
 // is older than the freshness budget — the SwiftUI view renders a small
 // "stale" pill when this is true so the user knows the prices may have
-// moved since the last sync.
+// moved since the last sync (always false for the favorites payload,
+// which has no stale concept).
 
 import Foundation
 import WidgetKit
@@ -39,7 +42,10 @@ struct NearestStationsEntry: TimelineEntry {
                 distanceKm: Double(i),
                 isOpen: true,
                 currency: "€",
-                priceFormatted: "—"
+                priceFormatted: "—",
+                isCheapest: false,
+                predictiveBestLabel: nil,
+                predictiveBestPrice: nil
             )
         },
         isStale: false,
