@@ -1,0 +1,948 @@
+[
+ {
+  "id": 1494440,
+  "name": "TMC Werkstatt & Tankstelle",
+  "location": {
+   "address": "Rechte Wienzeile 43",
+   "postalCode": "1050",
+   "city": "Wien",
+   "latitude": 48.1963966,
+   "longitude": 16.358812
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "mail": "redacted@example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "00:00",
+    "to": "00:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "00:00",
+    "to": "00:00"
+   }
+  ],
+  "offerInformation": {
+   "service": true,
+   "selfService": false,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "otherServiceOffers": "Wäsche \nAuto reperaturen \nPickerl (§57a)",
+  "position": 1,
+  "open": true,
+  "distance": 1.7211838804228863,
+  "prices": [
+   {
+    "fuelType": "SUP",
+    "amount": 1.689,
+    "label": "Super 95"
+   }
+  ]
+ },
+ {
+  "id": 1476471,
+  "name": "Turmöl",
+  "location": {
+   "address": "Margaretenstraße 28",
+   "postalCode": "1040",
+   "city": "Wien",
+   "latitude": 48.19633,
+   "longitude": 16.36464
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "fax": "00000/0000-00",
+   "mail": "redacted@example.com",
+   "website": "https://example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "08:00",
+    "to": "22:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "08:00",
+    "to": "22:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "08:00",
+    "to": "22:00"
+   }
+  ],
+  "offerInformation": {
+   "service": false,
+   "selfService": true,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true,
+   "others": "Turmöl Quick Tankkarte"
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "position": 2,
+  "open": true,
+  "distance": 1.485691181812229,
+  "prices": [
+   {
+    "fuelType": "SUP",
+    "amount": 1.734,
+    "label": "Super 95"
+   }
+  ]
+ },
+ {
+  "id": 427017,
+  "name": "Shell Austria",
+  "location": {
+   "address": "AUSSTELLUNGSSTRASSE 4",
+   "postalCode": "1020",
+   "city": "WIEN",
+   "latitude": 48.21777,
+   "longitude": 16.39464
+  },
+  "contact": {
+   "telephone": "+430000000000"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "00:00",
+    "to": "24:00"
+   }
+  ],
+  "offerInformation": {
+   "service": false,
+   "selfService": false,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "position": 3,
+  "open": true,
+  "distance": 1.8773199304830526,
+  "prices": [
+   {
+    "fuelType": "SUP",
+    "amount": 1.789,
+    "label": "Super 95"
+   }
+  ]
+ },
+ {
+  "id": 6070,
+  "name": "TANKEnergie Ringgarage",
+  "location": {
+   "address": "Untere Viaduktgasse 47-49",
+   "postalCode": "1030",
+   "city": "Wien",
+   "latitude": 48.2066605,
+   "longitude": 16.3873229
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "fax": "00000/0000-00",
+   "mail": "redacted@example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "05:00",
+    "to": "23:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "05:00",
+    "to": "23:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "05:00",
+    "to": "23:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "05:00",
+    "to": "23:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "05:00",
+    "to": "23:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "05:00",
+    "to": "23:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "05:00",
+    "to": "23:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "05:00",
+    "to": "23:00"
+   }
+  ],
+  "offerInformation": {
+   "service": false,
+   "selfService": true,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "otherServiceOffers": "Shop, Waschanlage, Staubsaugerplatz, Garage für Dauer- und Kurzparker, der Betrieb ist täglich von 00.00 bis 24.00 Uhr mit Personal besetzt; die angegebenen Öffnungszeiten beziehen sich auf den Tankstellenbetrieb und Shop",
+  "position": 4,
+  "open": true,
+  "distance": 1.017757129586136,
+  "prices": [
+   {
+    "fuelType": "SUP",
+    "amount": 1.799,
+    "label": "Super 95"
+   }
+  ]
+ },
+ {
+  "id": 1354901,
+  "name": "AVANTI - Wien Gaussplatz 1",
+  "location": {
+   "address": "Gaussplatz 1",
+   "postalCode": "1020",
+   "city": "Wien",
+   "latitude": 48.22588,
+   "longitude": 16.3708
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "website": "https://example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "00:00",
+    "to": "24:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "00:00",
+    "to": "24:00"
+   }
+  ],
+  "offerInformation": {
+   "service": false,
+   "selfService": false,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": false,
+   "debitCard": false,
+   "creditCard": false,
+   "others": " UTA, DKV, OMV ROUTEX, MASTERCARD, EUROTRAFIC, MAESTRO, ROUTEX, DINERS, VISA, AMEX, OMV STATIONSKARTE"
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "position": 5,
+  "open": true,
+  "distance": 1.980325559805048,
+  "prices": [
+   {
+    "fuelType": "SUP",
+    "amount": 1.829,
+    "label": "Super 95"
+   }
+  ]
+ },
+ {
+  "id": 41587,
+  "name": "DISK",
+  "location": {
+   "address": "Franzensbrückenstraße 15",
+   "postalCode": "1020",
+   "city": "Wien,Leopoldstadt",
+   "latitude": 48.21461,
+   "longitude": 16.39166
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "mail": "redacted@example.com",
+   "website": "https://example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "07:00",
+    "to": "19:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "07:00",
+    "to": "19:00"
+   }
+  ],
+  "offerInformation": {
+   "service": true,
+   "selfService": true,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true,
+   "others": "Gutmann-Card, DKV"
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "otherServiceOffers": "Gutmann-Card, DKV",
+  "position": 6,
+  "open": true,
+  "distance": 1.5047618484922738,
+  "prices": []
+ },
+ {
+  "id": 35631,
+  "name": "BP",
+  "location": {
+   "address": "Linke Wienzeile 90-92 ",
+   "postalCode": "1060",
+   "city": "Wien",
+   "latitude": 48.1947585,
+   "longitude": 16.3537622
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "fax": "00000/0000-00",
+   "mail": "redacted@example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "06:00",
+    "to": "22:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "07:00",
+    "to": "22:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "08:00",
+    "to": "22:00"
+   }
+  ],
+  "offerInformation": {
+   "service": false,
+   "selfService": true,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true,
+   "others": "Routex"
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "position": 7,
+  "open": true,
+  "distance": 2.1091438807423746,
+  "prices": []
+ },
+ {
+  "id": 4348,
+  "name": "eni",
+  "location": {
+   "address": "Floragasse 7a",
+   "postalCode": "1040",
+   "city": "Wien",
+   "latitude": 48.1943861,
+   "longitude": 16.3680232
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "fax": "00000/0000-00",
+   "mail": "redacted@example.com",
+   "website": "https://example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "07:00",
+    "to": "22:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "07:00",
+    "to": "22:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "07:00",
+    "to": "22:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "07:00",
+    "to": "22:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "07:00",
+    "to": "22:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "09:00",
+    "to": "14:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "00:00",
+    "to": "00:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "00:00",
+    "to": "00:00"
+   }
+  ],
+  "offerInformation": {
+   "service": true,
+   "selfService": false,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true,
+   "others": "ROUTEX, VISA, Mastercard, Maestro, OMV Card, eni multicard, BP Plus Karte, Diners Club, AMEX"
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "otherServiceOffers": "Ebenerdige Garage mit Kurz- und Dauerparkplätzen, Tiefgaragenplätze, großes Angebot an Autowäschen und Innenreinigungen",
+  "position": 8,
+  "open": true,
+  "distance": 1.5961138658557679,
+  "prices": []
+ },
+ {
+  "id": 35567,
+  "name": "BP",
+  "location": {
+   "address": "Franz Josefskai/Morzinpl ",
+   "postalCode": "1010",
+   "city": "Wien",
+   "latitude": 48.2123537,
+   "longitude": 16.3743119
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "fax": "00000/0000-00",
+   "mail": "redacted@example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "05:00",
+    "to": "24:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "05:00",
+    "to": "24:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "05:00",
+    "to": "24:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "05:00",
+    "to": "24:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "05:00",
+    "to": "22:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "07:00",
+    "to": "22:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "07:00",
+    "to": "22:00"
+   }
+  ],
+  "offerInformation": {
+   "service": false,
+   "selfService": true,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true,
+   "others": "Routex"
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "otherServiceOffers": "Shop",
+  "position": 9,
+  "open": true,
+  "distance": 0.4638638227197776,
+  "prices": []
+ },
+ {
+  "id": 255985,
+  "name": "123tanken.at - Tankstellenbetriebs & Service GmbH",
+  "location": {
+   "address": "Rotensterngasse 25",
+   "postalCode": "1020",
+   "city": "Wien",
+   "latitude": 48.2172366,
+   "longitude": 16.3844335
+  },
+  "contact": {
+   "telephone": "+430000000000",
+   "mail": "redacted@example.com",
+   "website": "https://example.com"
+  },
+  "openingHours": [
+   {
+    "day": "MO",
+    "label": "Montag",
+    "order": 1,
+    "from": "08:00",
+    "to": "18:00"
+   },
+   {
+    "day": "DI",
+    "label": "Dienstag",
+    "order": 2,
+    "from": "08:00",
+    "to": "18:00"
+   },
+   {
+    "day": "MI",
+    "label": "Mittwoch",
+    "order": 3,
+    "from": "08:00",
+    "to": "18:00"
+   },
+   {
+    "day": "DO",
+    "label": "Donnerstag",
+    "order": 4,
+    "from": "08:00",
+    "to": "18:00"
+   },
+   {
+    "day": "FR",
+    "label": "Freitag",
+    "order": 5,
+    "from": "08:00",
+    "to": "18:00"
+   },
+   {
+    "day": "SA",
+    "label": "Samstag",
+    "order": 6,
+    "from": "00:00",
+    "to": "00:00"
+   },
+   {
+    "day": "SO",
+    "label": "Sonntag",
+    "order": 7,
+    "from": "00:00",
+    "to": "00:00"
+   },
+   {
+    "day": "FE",
+    "label": "Feiertag",
+    "order": 8,
+    "from": "00:00",
+    "to": "00:00"
+   }
+  ],
+  "offerInformation": {
+   "service": true,
+   "selfService": false,
+   "unattended": false
+  },
+  "paymentMethods": {
+   "cash": true,
+   "debitCard": true,
+   "creditCard": true
+  },
+  "paymentArrangements": {
+   "cooperative": false,
+   "clubCard": false
+  },
+  "otherServiceOffers": "Bedienungstankstelle \r\nAutoreinigung - Autoaufbereitung\r\nInnenreinigung - Außenreinigung\r\nParkhaus\r\nSpezielle Tarife für Flotten ",
+  "position": 10,
+  "open": true,
+  "distance": 1.2781908582846992,
+  "prices": []
+ }
+]
