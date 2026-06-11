@@ -179,13 +179,17 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
           lat: raw.lat,
           lng: raw.lng,
           dist: roundedDistance(params.lat, params.lng, entry.raw.lat, entry.raw.lng),
+          // #3198 — Nafta súper lives in e5 only; the old e10 mirror
+          // asserted an E10 price the feed never publishes (catalog
+          // change in CountryConfig / registry).
           e5: entry.naftaRegular,
-          e10: entry.naftaRegular,
           e98: entry.naftaPremium,
           diesel: entry.dieselRegular,
           dieselPremium: entry.dieselPremium,
           cng: entry.gnc,
-          isOpen: true,
+          // #3198 — the Secretaría feed publishes prices, not hours:
+          // honest unknown instead of the old hard-coded `true`.
+          isOpen: null,
           updatedAt: raw.fechaVigencia,
           region: raw.provincia,
         ));

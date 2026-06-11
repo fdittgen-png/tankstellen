@@ -237,7 +237,9 @@ class UkStationService with StationServiceHelpers implements StationService {
           // wrongly mapped to e98 (no CMA feed publishes premium petrol).
           diesel: _parsePence(prices['B7'] ?? prices['diesel']),
           dieselPremium: _parsePence(prices['SDV']),
-          isOpen: true,
+          // #3198 — the CMA feed carries no open/closed signal: honest
+          // unknown instead of the old hard-coded `true`.
+          isOpen: null,
         ));
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'UK station parse failed'}));

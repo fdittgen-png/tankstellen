@@ -307,7 +307,9 @@ class GreeceStationService
       e98: prices[FuelType.e98],
       diesel: prices[FuelType.diesel],
       lpg: prices[FuelType.lpg],
-      isOpen: true,
+      // #3198 — prefecture-level virtual stations have no open/closed
+      // notion at all: honest unknown.
+      isOpen: null,
       updatedAt: newestDate.isEmpty ? null : newestDate,
     );
   }

@@ -27,5 +27,7 @@
   "closedLabel": "Geschlossen",
   "openingHoursNotAvailable": "Öffnungszeiten nicht verfügbar",
   "showAllHours": "Alle Zeiten anzeigen",
-  "showLessHours": "Weniger anzeigen"
+  "showLessHours": "Weniger anzeigen",
+  "openStateUnknown": "Unbekannt",
+  "stationOpenStateSemantic": "{open, select, true{Station ist geöffnet} false{Station ist geschlossen} other{Öffnungsstatus unbekannt}}"
 }

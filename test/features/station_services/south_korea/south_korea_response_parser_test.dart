@@ -250,7 +250,8 @@ void main() {
       expect(station.diesel, closeTo(1499.0, 1e-9));
       expect(station.e98, isNull);
       expect(station.lpg, isNull);
-      expect(station.isOpen, isTrue);
+      // #3198 — OPINET publishes no open/closed signal: honest unknown.
+      expect(station.isOpen, isNull);
     });
 
     test('falls back to brand label as station name when OS_NM is missing',
@@ -675,7 +676,8 @@ void main() {
       expect(station.e98, closeTo(1900.0, 1e-9));
       expect(station.diesel, closeTo(1499.0, 1e-9));
       expect(station.lpg, closeTo(1099.0, 1e-9));
-      expect(station.isOpen, isTrue);
+      // #3198 — OPINET publishes no open/closed signal: honest unknown.
+      expect(station.isOpen, isNull);
     });
   });
 }

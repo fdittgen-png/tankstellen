@@ -165,7 +165,8 @@ void main() {
 
     test('returns status based on cached isOpen', () async {
       final searchResult = await service.searchStations(defaultParams);
-      final openStation = searchResult.data.firstWhere((s) => s.isOpen);
+      final openStation =
+          searchResult.data.firstWhere((s) => s.isOpen == true);
       final prices = await service.getPrices([openStation.id]);
       expect(prices.data[openStation.id]!.status, 'open');
     });

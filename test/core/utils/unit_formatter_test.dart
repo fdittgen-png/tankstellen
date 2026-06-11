@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/unit_formatter.dart';
+import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
 
 void main() {
   // Ensure every test starts from the default "France" context that
@@ -96,6 +97,32 @@ void main() {
       // $1.859 → 185.9 c/L
       expect(UnitFormatter.formatPricePerUnit(1.859, countryCode: 'AU'),
           '185,9 c/L');
+    });
+
+    test('AR GNC renders the per-fuel \$/m³ suffix override (#3198)', () {
+      // GNC is priced per cubic metre upstream, not per litre.
+      expect(
+        UnitFormatter.formatPricePerUnit(450.0,
+            countryCode: 'AR', fuelType: FuelType.cng),
+        endsWith('\u0024/m\u00b3'),
+      );
+      // Every other AR fuel keeps the country-wide \$/L suffix.
+      expect(
+        UnitFormatter.formatPricePerUnit(980.0,
+            countryCode: 'AR', fuelType: FuelType.e5),
+        endsWith('\u0024/L'),
+      );
+      // Fuel not known at the call site → country-wide suffix.
+      expect(
+        UnitFormatter.formatPricePerUnit(980.0, countryCode: 'AR'),
+        endsWith('\u0024/L'),
+      );
+      // The bare-suffix accessor honours the override too.
+      expect(
+        UnitFormatter.pricePerUnitSuffix(
+            countryCode: 'AR', fuelType: FuelType.cng),
+        '\u0024/m\u00b3',
+      );
     });
 
     test('Denmark uses kr/L suffix', () {

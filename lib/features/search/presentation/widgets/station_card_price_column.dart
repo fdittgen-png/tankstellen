@@ -135,9 +135,11 @@ class _StationPriceColumn extends StatelessWidget {
                 child: Icon(
                   iconForPriceTier(priceTier!),
                   size: 16,
-                  color: station.isOpen
-                      ? fuelColor
-                      : theme.colorScheme.onSurfaceVariant,
+                  // #3198 — only a KNOWN-closed station greys the price;
+                  // unknown keeps the fuel colour (price data is valid).
+                  color: station.isOpen == false
+                      ? theme.colorScheme.onSurfaceVariant
+                      : fuelColor,
                 ),
               ),
             AnimatedPriceText(
@@ -159,9 +161,10 @@ class _StationPriceColumn extends StatelessWidget {
                     currencyOverride: currencyOverride,
                     baseStyle: theme.textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: station.isOpen
-                          ? fuelColor
-                          : theme.colorScheme.onSurfaceVariant,
+                      // #3198 — grey only when known-closed (see above).
+                      color: station.isOpen == false
+                          ? theme.colorScheme.onSurfaceVariant
+                          : fuelColor,
                     ),
                   ),
                 ),

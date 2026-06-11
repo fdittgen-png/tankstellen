@@ -447,7 +447,13 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: 54.0, maxLat: 58.0, minLng: 7.5, maxLng: 15.5,
       ),
-      availableFuelTypes: _defaultFuelTypes,
+      // DK (#3198): the single 95-octane grade is e5 only (no published
+      // E10); the #3187 exact-grade mapping emits Oktan 100 / V-Power →
+      // e98 and V-Power Diesel → dieselPremium.
+      availableFuelTypes: [
+        FuelType.e5, FuelType.e98, FuelType.diesel,
+        FuelType.dieselPremium, FuelType.electric, FuelType.all,
+      ],
       policy: _dkPolicy,
     ),
     CountryServiceEntry(
@@ -474,13 +480,12 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: 45.3, maxLat: 47.0, minLng: 13.3, maxLng: 16.7,
       ),
-      // Slovenia (#575): NMB-95 → e5 (also surfaced as e10 — single
-      // 95-octane grade), NMB-100/98 → e98, Dizel → diesel, Dizel
-      // Premium → dieselPremium, avtoplin-lpg → lpg, cng → cng. #2180:
-      // e10 + cng were missing here though SloveniaStationService emits
-      // both; added to match the service and the picker's supported set.
+      // Slovenia (#575/#3198): NMB-95 → e5 (single 95-octane grade — the
+      // old e5→e10 mirror is gone, goriva.si publishes no E10),
+      // NMB-100/98 → e98, Dizel → diesel, Dizel Premium → dieselPremium,
+      // avtoplin-lpg → lpg, cng → cng.
       availableFuelTypes: [
-        FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+        FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.dieselPremium, FuelType.lpg, FuelType.cng,
         FuelType.electric, FuelType.all,
       ],
@@ -493,7 +498,11 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: 46.0, maxLat: 49.5, minLng: 9.0, maxLng: 17.5,
       ),
-      availableFuelTypes: _defaultFuelTypes,
+      // AT (#3198): E-Control publishes exactly one petrol grade (SUP);
+      // the default set advertised an E10 the feed never carries.
+      availableFuelTypes: [
+        FuelType.e5, FuelType.diesel, FuelType.electric, FuelType.all,
+      ],
       policy: _atPolicy,
     ),
     CountryServiceEntry(
@@ -589,13 +598,11 @@ class CountryServiceRegistry {
       boundingBox: CountryBoundingBox(
         minLat: -56.0, maxLat: -21.0, minLng: -74.0, maxLng: -53.0,
       ),
-      // AR (#2180): ArgentinaStationService emits Nafta súper → e5/e10,
-      // Nafta premium → e98, Gas oil → diesel, Gas oil premium →
-      // dieselPremium, GNC → cng. Promoted off _defaultFuelTypes (which
-      // dropped cng/e98/dieselPremium) so the selector surfaces every
-      // fuel the CSV actually publishes — GNC stations were unsearchable.
+      // AR (#2180/#3198): ArgentinaStationService emits Nafta súper → e5
+      // (no e10 — the feed publishes no E10 grade), Nafta premium → e98,
+      // Gas oil → diesel, Gas oil premium → dieselPremium, GNC → cng.
       availableFuelTypes: [
-        FuelType.e5, FuelType.e10, FuelType.e98, FuelType.diesel,
+        FuelType.e5, FuelType.e98, FuelType.diesel,
         FuelType.dieselPremium, FuelType.cng, FuelType.electric,
         FuelType.all,
       ],

@@ -39,12 +39,21 @@ class StationStatusRow extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final rating = ref.watch(stationRatingProvider(stationId));
 
-    final color = station.isOpen
-        ? DarkModeColors.success(context)
-        : DarkModeColors.error(context);
+    // #3198 — tri-state: an unknown open state renders the neutral muted
+    // dot/text and is announced as unknown, never as open or closed.
+    final color = switch (station.isOpen) {
+      true => DarkModeColors.success(context),
+      false => DarkModeColors.error(context),
+      null => DarkModeColors.mutedText(context),
+    };
 
-    final statusSemantic = l10n?.stationStatusSemantic('${station.isOpen}') ??
-        (station.isOpen ? 'Station is open' : 'Station is closed');
+    final statusSemantic =
+        l10n?.stationOpenStateSemantic('${station.isOpen}') ??
+            switch (station.isOpen) {
+              true => 'Station is open',
+              false => 'Station is closed',
+              null => 'Open state unknown',
+            };
 
     return Row(
       children: [
@@ -109,9 +118,11 @@ class StationStatusRow extends ConsumerWidget {
     ServiceResult<dynamic> result,
     AppLocalizations? l10n,
   ) {
-    final status = station.isOpen
-        ? (l10n?.open ?? 'Open')
-        : (l10n?.closed ?? 'Closed');
+    final status = switch (station.isOpen) {
+      true => l10n?.open ?? 'Open',
+      false => l10n?.closed ?? 'Closed',
+      null => l10n?.openStateUnknown ?? 'Unknown',
+    };
     final agoSuffix = l10n?.freshnessAgo ?? 'ago';
     final freshness = result.freshnessLabel;
     return '$status — $freshness $agoSuffix';

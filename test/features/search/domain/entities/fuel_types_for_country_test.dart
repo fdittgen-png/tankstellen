@@ -41,12 +41,11 @@ void main() {
       );
     });
 
-    test('AT — E5, E10, Diesel, Electric, All', () {
+    test('AT — E5, Diesel, Electric, All (#3198: no phantom E10)', () {
       expect(
         fuelTypesForCountry('AT'),
         equals(<FuelType>[
           FuelType.e5,
-          FuelType.e10,
           FuelType.diesel,
           FuelType.electric,
           FuelType.all,
@@ -99,17 +98,15 @@ void main() {
       );
     });
 
-    test('SI — NMB-95 (e5+e10)/100, Diesel, Diesel Premium, LPG, CNG '
-        '(#575, #2180)', () {
-      // #2180 — e10 + cng added: SloveniaStationService surfaces the single
-      // 95-octane grade as both e5 and e10, and maps the goriva.si "cng"
-      // key onto Station.cng. The registry now matches what the service
-      // emits and the country's supportedFuelTypes picker set.
+    test('SI — NMB-95 (e5)/100, Diesel, Diesel Premium, LPG, CNG '
+        '(#575, #3198)', () {
+      // #3198 — the single 95-octane grade is e5 only: the #2180 e5→e10
+      // mirror asserted an E10 price goriva.si never publishes, so e10
+      // is gone from the catalog. cng stays (#2180, really emitted).
       expect(
         fuelTypesForCountry('SI'),
         equals(<FuelType>[
           FuelType.e5,
-          FuelType.e10,
           FuelType.e98,
           FuelType.diesel,
           FuelType.dieselPremium,

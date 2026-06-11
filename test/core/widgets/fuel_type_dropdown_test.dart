@@ -36,6 +36,25 @@ void main() {
           reason: 'The "all" wildcard must never be pickable as a preference');
     });
 
+    testWidgets(
+        '#3198 — a stored selection missing from the catalog stays '
+        'renderable instead of asserting', (tester) async {
+      // e.g. an e10 preference saved before the phantom-E10 cleanup, in a
+      // country whose catalog no longer offers e10.
+      await pumpApp(
+        tester,
+        FuelTypeDropdown(
+          value: FuelType.e10,
+          onChanged: (_) {},
+          options: const [FuelType.e5, FuelType.diesel],
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.text(FuelType.e10.displayName), findsOneWidget,
+          reason: 'the legacy selection must render so the user can '
+              'switch to a real grade');
+    });
+
     testWidgets('selecting a fuel fires onChanged with the FuelType',
         (tester) async {
       FuelType? picked;

@@ -65,16 +65,14 @@ class EControlStationService with StationServiceHelpers implements StationServic
         final id = int.tryParse(_stripCountryPrefix(s.id)) ?? 0;
         final existing = merged[id];
         if (existing != null) {
-          // Merge e5 from super query into existing diesel station
-          merged[id] = existing.copyWith(
-            e5: s.e5,
-            e10: s.e5, // Austrian "Super 95" maps to both E5 and E10
-          );
+          // Merge e5 from super query into existing diesel station.
+          // #3198 — E-Control publishes ONE petrol grade (SUP); it is no
+          // longer mirrored into e10, which asserted an E10 price the
+          // feed never carries. The fuel catalog (CountryConfig /
+          // registry) drops e10 for AT in the same change.
+          merged[id] = existing.copyWith(e5: s.e5);
         } else {
-          merged[id] = s.copyWith(
-            e5: s.e5,
-            e10: s.e5,
-          );
+          merged[id] = s;
         }
       }
 
@@ -158,7 +156,9 @@ class EControlStationService with StationServiceHelpers implements StationServic
       }).where((s) => s.isNotEmpty).join(', ');
 
       final name = r['name']?.toString() ?? '';
-      final isOpen = r['open'] as bool? ?? true;
+      // #3198 — E-Control's `open` flag is authoritative when present;
+      // a missing flag is honest unknown, not `true`.
+      final isOpen = r['open'] as bool?;
 
       // #753 — `at-` prefix so a numeric E-Control id can never collide
       // with another country's numeric id space when widget JSON or
@@ -177,7 +177,6 @@ class EControlStationService with StationServiceHelpers implements StationServic
         lng: lng,
         dist: apiDist ?? roundedDistance(searchLat, searchLng, lat, lng),
         e5: fuelType == 'SUP' ? price : null,
-        e10: fuelType == 'SUP' ? price : null,
         diesel: fuelType == 'DIE' ? price : null,
         // #3196 — E-Control's GAS fuel type is CNG (Erdgas/Methan), not LPG.
         cng: fuelType == 'GAS' ? price : null,

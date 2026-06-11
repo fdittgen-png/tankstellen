@@ -111,7 +111,8 @@ void main() {
     test('Austria returns correct fuel types', () {
       final types = fuelTypesForCountry('AT');
       expect(types, contains(FuelType.e5));
-      expect(types, contains(FuelType.e10));
+      // #3198 — no e10: E-Control publishes exactly one petrol grade.
+      expect(types, isNot(contains(FuelType.e10)));
       expect(types, contains(FuelType.diesel));
       expect(types, contains(FuelType.electric));
       expect(types, contains(FuelType.all));

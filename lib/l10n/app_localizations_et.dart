@@ -6803,6 +6803,19 @@ class AppLocalizationsEt extends AppLocalizations {
   String get showLessHours => 'Kuva vähem';
 
   @override
+  String get openStateUnknown => 'Unknown';
+
+  @override
+  String stationOpenStateSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Station is open',
+      'false': 'Station is closed',
+      'other': 'Open state unknown',
+    });
+    return '$_temp0';
+  }
+
+  @override
   String get tripRecordingPipEstConsumptionCaption => 'hinn. L/100 km';
 
   @override

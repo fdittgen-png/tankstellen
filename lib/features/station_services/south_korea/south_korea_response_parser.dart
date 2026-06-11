@@ -137,7 +137,9 @@ class OpinetStationAccumulator {
       e98: prices[FuelType.e98],
       diesel: prices[FuelType.diesel],
       lpg: prices[FuelType.lpg],
-      isOpen: true, // OPINET does not expose a reliable open/closed flag
+      // #3198 — OPINET exposes no reliable open/closed flag: honest
+      // unknown instead of the old hard-coded `true`.
+      isOpen: null,
     );
   }
 }

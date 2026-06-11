@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
 import '../../../core/cache/cache_manager.dart';
+import '../../../core/country/country_time.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/cached_dataset_mixin.dart';
@@ -15,8 +16,8 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
-import '../../station_detail/domain/open_now.dart';
 import '../../station_detail/domain/opening_hours.dart';
+import '../opening_hours/open_state_from_hours.dart';
 import 'spain_opening_hours_adapter.dart';
 import 'spain_provinces.dart';
 
@@ -61,7 +62,10 @@ class MitecoStationService
             ),
         _baseUrl = baseUrl ?? defaultBaseUrl,
         _cache = cache,
-        _now = now ?? DateTime.now,
+        // #3198 — default the clock seam to SPAIN's wall clock, not the
+        // device's, so a user browsing ES from another timezone gets the
+        // open state at the station.
+        _now = now ?? (() => nowInCountry('ES')),
         _parseOpeningHours =
             parseOpeningHours ?? const SpainOpeningHoursAdapter().parse;
 
@@ -293,20 +297,19 @@ class MitecoStationService
   Station _withSearchContext(Station template, double dist) =>
       template.copyWith(dist: dist, isOpen: _isOpenNow(template));
 
-  /// #3189 open-now derivation, computed from the template's already-parsed
-  /// fields: the structured schedule when available (`openingHours` is null
-  /// exactly when the adapter returned `notProvided`), else the legacy
-  /// non-empty-horario heuristic.
-  bool _isOpenNow(Station template) {
-    final horario = template.openingHoursText ?? '';
-    final fallbackOpen = horario.isNotEmpty && horario != 'Cerrado';
-    final weeklyHours = template.openingHours;
-    if (weeklyHours == null) return fallbackOpen;
-    return switch (computeOpenNow(weeklyHours, _now()).status) {
-      OpenStatus.open => true,
-      OpenStatus.closed => false,
-      OpenStatus.unknown => fallbackOpen,
-    };
+  /// #3189/#3198 open-now derivation, computed from the template's
+  /// already-parsed fields: the structured schedule decides when available
+  /// (`openingHours` is null exactly when the adapter returned
+  /// `notProvided`). Without a usable schedule only the explicit `Cerrado`
+  /// marker is a real signal — a non-empty but unparseable horario no
+  /// longer asserts "open" (#3198: that legacy heuristic presented
+  /// possibly-closed stations as open); it is honest unknown (`null`).
+  bool? _isOpenNow(Station template) {
+    final derived = openStateFromHours(template.openingHours, _now());
+    if (derived != null) return derived;
+    final horario = (template.openingHoursText ?? '').trim().toLowerCase();
+    if (horario.startsWith('cerrado')) return false;
+    return null;
   }
 
   /// Parse a number string that uses comma as decimal separator.

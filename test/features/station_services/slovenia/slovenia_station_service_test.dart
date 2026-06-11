@@ -129,10 +129,10 @@ void main() {
         expect(s.postCode, '1000');
         expect(s.lat, closeTo(46.058, 0.001));
         expect(s.lng, closeTo(14.503, 0.001));
-        // NMB-95 -> e5 (and mirrored into e10 as Slovenia sells a
-        // single 95 grade)
+        // NMB-95 -> e5 only (#3198 — the old e10 mirror asserted an E10
+        // price goriva.si never publishes).
         expect(s.e5, closeTo(1.605, 0.001));
-        expect(s.e10, closeTo(1.605, 0.001));
+        expect(s.e10, isNull);
         // NMB-100 -> e98 (premium petrol slot)
         expect(s.e98, closeTo(1.901, 0.001));
         expect(s.diesel, closeTo(1.736, 0.001));

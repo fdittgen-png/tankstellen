@@ -6772,6 +6772,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showLessHours => 'Show less';
 
   @override
+  String get openStateUnknown => 'Unknown';
+
+  @override
+  String stationOpenStateSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Station is open',
+      'false': 'Station is closed',
+      'other': 'Open state unknown',
+    });
+    return '$_temp0';
+  }
+
+  @override
   String get tripRecordingPipEstConsumptionCaption => 'est. L/100 km';
 
   @override
@@ -14718,6 +14731,19 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get showLessHours => '⟦Šĥóŵ łéšš ····⟧';
+
+  @override
+  String get openStateUnknown => '⟦Úñķñóŵñ ···⟧';
+
+  @override
+  String stationOpenStateSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Station is open',
+      'false': 'Station is closed',
+      'other': 'Open state unknown',
+    });
+    return '⟦$_temp0⟧';
+  }
 
   @override
   String get tripRecordingPipEstConsumptionCaption => '⟦éšŧ. Ł/100 ķɱ ···⟧';

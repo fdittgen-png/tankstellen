@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/country/country_config.dart';
+import '../../../../core/country/country_time.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/station.dart';
@@ -72,7 +74,18 @@ class StationInfoSection extends StatelessWidget {
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
-          OpeningHoursView(hours: hours),
+          // #3198 — evaluate "open now" on the STATION's wall clock, not
+          // the device's: weekly hours are local to the pump, so browsing
+          // a foreign country from home used to flip every open/closed
+          // status by the timezone gap. Unknown country → device clock.
+          OpeningHoursView(
+            hours: hours,
+            now: nowInCountry(Countries.countryForStation(
+              id: station.id,
+              lat: station.lat,
+              lng: station.lng,
+            )?.code),
+          ),
           const SizedBox(height: 12),
         ],
 

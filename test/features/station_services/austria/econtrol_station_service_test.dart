@@ -177,9 +177,10 @@ void main() {
       expect(s.lat, closeTo(48.2, 0.001));
       expect(s.lng, closeTo(16.37, 0.001));
       expect(s.diesel, closeTo(1.659, 0.001));
-      // Austrian "Super 95" maps to both E5 and E10.
+      // #3198 — E-Control publishes ONE petrol grade (SUP → e5); e10 is
+      // no longer mirrored (the feed has no E10 price).
       expect(s.e5, closeTo(1.549, 0.001));
-      expect(s.e10, closeTo(1.549, 0.001));
+      expect(s.e10, isNull);
       expect(s.isOpen, isTrue);
     });
 
@@ -221,7 +222,8 @@ void main() {
 
       final superOnly = stations.firstWhere((s) => s.id == 'at-300');
       expect(superOnly.e5, closeTo(1.519, 0.001));
-      expect(superOnly.e10, closeTo(1.519, 0.001));
+      expect(superOnly.e10, isNull,
+          reason: '#3198 — no e10 mirror: the feed has no E10 grade');
       expect(superOnly.diesel, isNull);
     });
 

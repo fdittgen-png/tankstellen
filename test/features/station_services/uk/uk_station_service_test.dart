@@ -366,7 +366,8 @@ void main() {
       expect(s.e10, closeTo(1.459, 0.0001));
       expect(s.e5, closeTo(1.559, 0.0001));
       expect(s.diesel, closeTo(1.529, 0.0001));
-      expect(s.isOpen, isTrue);
+      // #3198 — the CMA feed carries no open/closed signal: honest unknown.
+      expect(s.isOpen, isNull);
     });
 
     test('keeps prices under 10 as-is (already in pounds)', () {

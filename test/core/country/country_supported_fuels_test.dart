@@ -31,10 +31,11 @@ void main() {
       });
     });
 
-    test('Austria — E5, E10, Diesel, Electric (same as default)', () {
+    test('Austria — E5, Diesel, Electric (#3198: no phantom E10)', () {
+      // E-Control publishes exactly one petrol grade (SUP); the catalog
+      // no longer advertises an E10 the feed never carries.
       expect(Countries.austria.supportedFuelTypes, {
         FuelType.e5,
-        FuelType.e10,
         FuelType.diesel,
         FuelType.electric,
       });

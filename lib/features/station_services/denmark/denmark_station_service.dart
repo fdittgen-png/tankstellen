@@ -225,11 +225,15 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           lat: lat,
           lng: lng,
           dist: 0,
+          // #3198 — the single Danish 95-octane grade lives in e5 only;
+          // the old e10 mirror asserted an E10 price the feed never
+          // publishes (catalog change in CountryConfig / registry).
           e5: e5,
-          e10: e5,
           e98: e98,
           diesel: diesel,
-          isOpen: true,
+          // #3198 — the OK feed carries no open/closed signal: honest
+          // unknown instead of the old hard-coded `true`.
+          isOpen: null,
           updatedAt: _formatIsoTime(r['last_updated_time']?.toString()),
         );
       }).whereType<Station>().toList();
@@ -291,12 +295,13 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           lat: lat,
           lng: lng,
           dist: 0,
+          // #3198 — no e10 mirror (single 95-octane grade, see above).
           e5: e5,
-          e10: e5,
           e98: e98,
           diesel: diesel,
           dieselPremium: dieselPremium,
-          isOpen: true,
+          // #3198 — the Shell feed carries no open/closed signal either.
+          isOpen: null,
           updatedAt: _formatIsoTime(
             (prices.isNotEmpty ? prices.first['lastUpdated'] : null)?.toString(),
           ),

@@ -262,7 +262,9 @@ class LuxembourgStationService
           e98: prices[FuelType.e98],
           diesel: prices[FuelType.diesel],
           lpg: prices[FuelType.lpg],
-          isOpen: true,
+          // #3198 — the decree publishes prices, not per-station hours:
+          // honest unknown instead of the old hard-coded `true`.
+          isOpen: null,
           updatedAt: effectiveDate,
         ),
     ];

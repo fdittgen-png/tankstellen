@@ -203,18 +203,19 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
       lat: lat,
       lng: lng,
       dist: distKm,
+      // #3198 — the single NMB-95 grade lives in e5 only; the old e10
+      // mirror asserted an E10 price goriva.si never publishes (catalog
+      // change in CountryConfig / registry).
       e5: nmb95,
-      e10: nmb95, // Slovenia ships a single 95-octane grade; surface as both
       e98: nmb100 ?? nmb98,
       diesel: dizel,
       dieselPremium: dizelPremium,
       lpg: lpg,
       cng: cng,
-      // #3196 — open/closed is not reliably derivable here (Station.isOpen
-      // is non-nullable, so "unknown" cannot be expressed without a model
-      // change); keep the optimistic default the other no-signal countries
-      // use and carry the raw hours text alongside.
-      isOpen: true,
+      // #3198 — goriva.si exposes no reliable open/closed flag and only a
+      // free-form hours text: honest unknown (the #3196 optimistic `true`
+      // existed only because the field was non-nullable back then).
+      isOpen: null,
       openingHoursText: openHoursText,
       is24h: openHoursText != null && openHoursText.startsWith('00:00-23:59'),
     );

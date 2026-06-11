@@ -201,6 +201,33 @@ void main() {
       expect(result.any((s) => s.id == 'b'), isFalse);
     });
 
+    test(
+        '#3198 — openOnly keeps an UNKNOWN open state (only known-closed '
+        'is dropped)', () {
+      // A country whose feed publishes no open/closed signal (UK/MX/KR…)
+      // carries isOpen == null on every station; the open-now filter must
+      // not empty the whole list for it.
+      const unknownState = Station(
+        id: 'u',
+        name: 'U',
+        brand: 'ESSO',
+        street: 'Str',
+        postCode: '10000',
+        place: 'Berlin',
+        lat: 0,
+        lng: 0,
+        isOpen: null,
+      );
+      final result = applyAmenityAndStatusFilters(
+        [wifiShopOpen, wifiOnlyClosed, unknownState],
+        requiredAmenities: const {},
+        openOnly: true,
+      );
+      expect(result.map((s) => s.id), containsAll(['a', 'u']));
+      expect(result.any((s) => s.id == 'b'), isFalse,
+          reason: 'known-closed still drops');
+    });
+
     test('amenity + openOnly combine — wifi AND open', () {
       final result = applyAmenityAndStatusFilters(
         all,

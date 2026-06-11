@@ -139,9 +139,13 @@ class StationCard extends StatelessWidget {
       currencyOverride: currencyOverride,
     );
     final l10n = AppLocalizations.of(context);
-    final semanticStatus = station.isOpen
-        ? (l10n?.open ?? 'Open')
-        : (l10n?.closed ?? 'Closed');
+    // #3198 — tri-state: an unknown open state is announced as unknown,
+    // never as closed (and never as open).
+    final semanticStatus = switch (station.isOpen) {
+      true => l10n?.open ?? 'Open',
+      false => l10n?.closed ?? 'Closed',
+      null => l10n?.openStateUnknown ?? 'Unknown',
+    };
     final semanticLabel =
         '${_hasBrand ? station.brand : station.name}, ${station.street}, '
         '$formattedPrice, $semanticStatus';

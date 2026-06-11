@@ -3,7 +3,7 @@
 
 part of 'station_card.dart';
 
-/// Status dot (green/red) with optional 24h badge below it.
+/// Status dot (green/red/neutral) with optional 24h badge below it.
 class _StatusColumn extends StatelessWidget {
   final Station station;
 
@@ -20,9 +20,13 @@ class _StatusColumn extends StatelessWidget {
           height: 12,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: station.isOpen
-                ? DarkModeColors.success(context)
-                : DarkModeColors.error(context),
+            // #3198 — tri-state: an unknown open state renders the neutral
+            // muted dot, never the red "closed" one.
+            color: switch (station.isOpen) {
+              true => DarkModeColors.success(context),
+              false => DarkModeColors.error(context),
+              null => DarkModeColors.mutedText(context),
+            },
           ),
         ),
         if (station.is24h)

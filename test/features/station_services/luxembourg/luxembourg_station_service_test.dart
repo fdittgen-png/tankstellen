@@ -188,12 +188,14 @@ void main() {
         }
       });
 
-      test('all stations report isOpen: true', () async {
+      test('all stations report an unknown open state (#3198)', () async {
+        // The decree publishes prices, not per-station hours — honest
+        // unknown instead of the old hard-coded true.
         const params =
             SearchParams(lat: 49.6116, lng: 6.1319, radiusKm: 100.0);
         final result = await service.searchStations(params);
         for (final s in result.data) {
-          expect(s.isOpen, isTrue);
+          expect(s.isOpen, isNull);
         }
       });
 

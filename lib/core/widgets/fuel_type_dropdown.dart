@@ -39,8 +39,14 @@ class FuelTypeDropdown extends ConsumerWidget {
     // switching country re-filters every picker without each call
     // site having to wire the provider itself. Explicit `options`
     // still wins.
-    final List<FuelType> items =
-        options ?? ref.watch(fuelTypePickerProvider);
+    final List<FuelType> items = [
+      ...options ?? ref.watch(fuelTypePickerProvider),
+    ];
+    // #3198 — a stored selection that the country catalog no longer
+    // offers (e.g. an e10 preference saved before the phantom-E10 cleanup)
+    // must stay renderable: DropdownButtonFormField asserts when the value
+    // is missing from items. Surface it so the user can pick a real grade.
+    if (!items.contains(value)) items.insert(0, value);
     return DropdownButtonFormField<FuelType>(
       initialValue: value,
       decoration: InputDecoration(
@@ -88,8 +94,12 @@ class NullableFuelTypeDropdown extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final List<FuelType> items =
-        options ?? ref.watch(fuelTypePickerProvider);
+    final List<FuelType> items = [
+      ...options ?? ref.watch(fuelTypePickerProvider),
+    ];
+    // #3198 — same legacy-selection guard as [FuelTypeDropdown] above.
+    final v = value;
+    if (v != null && !items.contains(v)) items.insert(0, v);
     return DropdownButtonFormField<FuelType?>(
       initialValue: value,
       decoration: InputDecoration(

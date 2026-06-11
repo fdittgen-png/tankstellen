@@ -157,7 +157,9 @@ class MonitorulStationAccumulator {
       diesel: prices[FuelType.diesel],
       dieselPremium: prices[FuelType.dieselPremium],
       lpg: prices[FuelType.lpg],
-      isOpen: true, // the observatory exposes no open/closed flag
+      // #3198 — the observatory exposes no open/closed flag: honest
+      // unknown instead of the old hard-coded `true`.
+      isOpen: null,
       updatedAt: updatedAt,
     );
   }

@@ -48,6 +48,12 @@ class CountryConfig {
   /// Defaults to '€/L' for the EUR-zone metric countries.
   final String pricePerUnitSuffix;
 
+  /// Per-fuel overrides of [pricePerUnitSuffix] (#3198). Most fuels share
+  /// the country-wide suffix; a fuel sold by a different physical unit
+  /// overrides here — Argentina's GNC is priced per cubic metre
+  /// (dollars per m³), not per litre. Read via [pricePerUnitSuffixFor].
+  final Map<FuelType, String> pricePerUnitSuffixByFuel;
+
   /// Whether this country's station service runs against a verified
   /// price feed (#1828).
   ///
@@ -85,8 +91,17 @@ class CountryConfig {
     this.distanceUnit = 'km',
     this.volumeUnit = 'L',
     this.pricePerUnitSuffix = '\u20ac/L',
+    this.pricePerUnitSuffixByFuel = const {},
     this.verified = true,
   });
+
+  /// The price-per-unit suffix for [fuelType]: the per-fuel override when
+  /// one exists, else the country-wide [pricePerUnitSuffix]. A null
+  /// [fuelType] (fuel not known at the call site) gets the country-wide
+  /// suffix.
+  String pricePerUnitSuffixFor(FuelType? fuelType) =>
+      (fuelType == null ? null : pricePerUnitSuffixByFuel[fuelType]) ??
+      pricePerUnitSuffix;
 }
 
 class Countries {
@@ -145,7 +160,15 @@ class Countries {
     requiresApiKey: false,
     apiProvider: 'E-Control Spritpreisrechner',
     attribution: 'Daten von E-Control (spritpreisrechner.at)',
-    fuelTypes: ['Super 95', 'Super 95 E10', 'Diesel'],
+    fuelTypes: ['Super 95', 'Diesel'],
+    // #3198 — E-Control publishes exactly one petrol grade (SUP); the old
+    // default set advertised an E10 the feed never carries (the service
+    // mirrored e5 into e10 to fill it). Catalog now matches the source.
+    supportedFuelTypes: {
+      FuelType.e5,
+      FuelType.diesel,
+      FuelType.electric,
+    },
     examplePostalCode: '1010',
     exampleCity: 'Wien',
   );
@@ -211,14 +234,16 @@ class Countries {
     requiresApiKey: false,
     apiProvider: 'OK / Shell / Q8',
     attribution: 'Data: ok.dk, shell.dk, q8.dk',
-    fuelTypes: ['Blyfri 95', 'Diesel'],
-    // #2180 — DenmarkStationService surfaces the single 95-octane grade
-    // ("Blyfri 95") as both e5 and e10, plus diesel. Add e10 so the
-    // profile picker matches what the search selector already shows.
+    fuelTypes: ['Blyfri 95', 'Oktan 100', 'Diesel', 'V-Power Diesel'],
+    // #3198 — the single Danish 95-octane grade is e5 only (the #2180
+    // e5→e10 mirror asserted an E10 price no DK feed publishes); the
+    // #3187 exact-grade mapping added the real premium grades instead:
+    // Oktan 100 / V-Power → e98, V-Power Diesel → dieselPremium.
     supportedFuelTypes: {
       FuelType.e5,
-      FuelType.e10,
+      FuelType.e98,
       FuelType.diesel,
+      FuelType.dieselPremium,
       FuelType.electric,
     },
     examplePostalCode: '1000',
@@ -240,13 +265,13 @@ class Countries {
     apiProvider: 'Secretaría de Energía',
     attribution: 'Datos: datos.energia.gob.ar',
     fuelTypes: ['Nafta', 'Gas Oil', 'GNC'],
-    // #2180 — aligned to what ArgentinaStationService actually emits:
-    // Nafta súper → e5/e10, Nafta premium → e98, Gas oil → diesel, Gas
-    // oil premium → dieselPremium, GNC → cng (see classifyArgentinaProduct
-    // and argentina_station_service.dart's Station mapping).
+    // #2180/#3198 — aligned to what ArgentinaStationService actually
+    // emits: Nafta súper → e5 (no e10 — the old mirror asserted an E10
+    // price the feed never publishes), Nafta premium → e98, Gas oil →
+    // diesel, Gas oil premium → dieselPremium, GNC → cng (see
+    // classifyArgentinaProduct and the service's Station mapping).
     supportedFuelTypes: {
       FuelType.e5,
-      FuelType.e10,
       FuelType.e98,
       FuelType.diesel,
       FuelType.dieselPremium,
@@ -256,6 +281,9 @@ class Countries {
     examplePostalCode: '1000',
     exampleCity: 'Buenos Aires',
     pricePerUnitSuffix: '\$/L',
+    // #3198 — GNC (CNG) is priced per cubic metre upstream, not per
+    // litre; the per-fuel override keeps every other fuel on \$/L.
+    pricePerUnitSuffixByFuel: {FuelType.cng: '\$/m\u00b3'},
   );
 
   // ── New countries (v4.1.0) ──
@@ -361,9 +389,10 @@ class Countries {
     apiProvider: 'goriva.si (gov.si)',
     attribution: 'Podatki: goriva.si / Ministrstvo za gospodarstvo',
     fuelTypes: ['NMB-95', 'NMB-100', 'Dizel', 'Dizel Premium', 'LPG'],
+    // #3198 — the single NMB-95 grade is e5 only (the old e5→e10 mirror
+    // asserted an E10 price goriva.si never publishes).
     supportedFuelTypes: {
       FuelType.e5,
-      FuelType.e10,
       FuelType.e98,
       FuelType.diesel,
       FuelType.dieselPremium,
