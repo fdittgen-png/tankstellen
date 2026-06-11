@@ -130,13 +130,19 @@ void main() {
     // gating/scheduling logic lives in the under-cap background_service.dart;
     // this is launch glue only.
     // #3135 — re-grandfathered 1113 → 1114: the typed-route layer import
-    // (core/navigation/app_routes.dart) so the #3167 active-trip recovery
-    // navigates via RoutePaths.tripRecording instead of a banned string
-    // literal. Pure import line; no logic added.
-    // 14 bumps — decomposition forced (#3141), tracked by the OPEN #3139
+    // (core/navigation/app_routes.dart). 14 bumps — decomposition DONE by
     // (AppInitializer phase decomposition).
+    // #3139 — shrunk 1113 → 724: the launch sync merges, trip crash
+    // recovery, provider warm-ups and the isolate-spool drain moved into
+    // ordered phase objects under lib/app/startup/ (all under-cap).
+    // What remains is pinned IN PLACE by the structural startup tests
+    // (test/app/app_initializer*_test.dart, startup_brick_recovery_test,
+    // startup_instrumentation_test): run()'s ordering + brick catches,
+    // _initStorage, _maybeInitTankSync, _installErrorHandlers,
+    // _stashWidgetLaunchUri, the Sentry gate and the #3149 replay.
+    // Snapshot lowered to lock the shrink in (a shrink never bumps).
     'lib/app/app_initializer.dart': (
-      lines: 1114,
+      lines: 724,
       bumps: 14,
       decompositionIssue: 3139,
     ),

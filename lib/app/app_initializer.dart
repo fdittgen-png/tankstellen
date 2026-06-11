@@ -13,62 +13,35 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-import 'package:hive/hive.dart';
-
 import '../features/alerts/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
-import '../core/feedback/auto_record_badge_provider.dart';
-import '../core/navigation/app_routes.dart';
 import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/health_counters.dart';
-import '../core/telemetry/storage/isolate_error_spool.dart';
 import '../core/telemetry/storage/startup_failure_store.dart';
 import '../core/telemetry/storage/trace_storage.dart';
-import '../core/telemetry/trace_recorder.dart';
 import '../core/logging/app_log.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
-import '../core/data/storage_repository.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
 import '../core/storage/hive_boxes.dart';
 import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
-import '../core/sync/sync_provider.dart';
 import '../core/sync/sync_run_trace.dart';
-import '../core/sync/trips_sync.dart';
-import '../core/sync/trips_sync_enabled_provider.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
-import '../features/alerts/providers/alert_provider.dart';
-import '../features/obd2/data/active_trip_recovery_service.dart';
-import '../features/obd2/data/active_trip_repository.dart';
-import '../features/obd2/data/ios_state_restoration_provider.dart';
 import '../features/obd2/data/obd2_connect_trace_persistence.dart';
-import '../features/obd2/data/paused_trip_recovery_service.dart';
-import '../features/obd2/data/paused_trip_repository.dart';
-import '../features/consumption/data/trip_history_repository.dart';
-import '../features/consumption/providers/auto_record_orchestrator.dart';
-import '../features/consumption/providers/consumption_providers.dart';
-import '../features/obd2/providers/obd2_comm_diagnostics_gate_provider.dart';
-import '../features/obd2/providers/obd2_debug_logging_provider.dart';
-import '../features/consumption/providers/trip_recording_provider.dart';
-import '../features/consumption/providers/trip_ve_recompute_provider.dart';
 import '../features/feature_management/application/legacy_toggle_migration_provider.dart';
 import '../features/price_history/data/repositories/price_history_repository.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
-import '../features/vehicle/data/reference_vehicle_catalog_provider.dart';
-import '../features/vehicle/data/repositories/vehicle_profile_repository.dart';
-import '../features/vehicle/data/vehicle_profile_migrator.dart';
-import '../features/vehicle/providers/vehicle_aggregate_updater_provider.dart';
-import '../features/vehicle/providers/vehicle_providers.dart';
 import '../features/widget/data/home_widget_service.dart';
-import '../features/widget/providers/nearest_widget_refresh_provider.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
-import 'profile_language_binding.dart';
-import 'router.dart';
+import 'startup/launch_sync_phase.dart';
+import 'startup/provider_warmup_phase.dart';
+import 'startup/telemetry_replay_phase.dart';
+import 'startup/trip_recovery_phase.dart';
 import 'widgets/storage_recovery_screen.dart';
 
 /// Drives the cold-start sequence in well-defined phases instead of one
@@ -100,6 +73,20 @@ import 'widgets/storage_recovery_screen.dart';
 /// 5. **runApp** — wires global error handlers and hands control to the
 ///    Flutter framework. Wrapped in `SentryFlutter.init` when a DSN is
 ///    configured so framework + platform errors land in Sentry.
+///
+/// ## Phase objects (#3139)
+///
+/// The bulky deferred work is decomposed into ordered phase objects under
+/// `lib/app/startup/` — [LaunchSyncPhase] (launch-time server→local
+/// merges), [TripRecoveryPhase] (paused-then-active trip crash recovery),
+/// [ProviderWarmupPhase] (one-shot migrations + keep-alive provider
+/// kick-offs) and [TelemetryReplayPhase] (background-isolate error-spool
+/// drain). This class stays the single ordering authority: every phase
+/// documents its slot in the sequence, and the scheduling (pre-Zone /
+/// post-bind / post-first-frame placement) lives ONLY here. The #3149
+/// storage catch-all stays inline in [run] because it must execute BEFORE
+/// `_launch` installs the global handlers — there is no Zone handler yet
+/// at that point, which is the entire reason it exists.
 class AppInitializer {
   AppInitializer._();
 
@@ -150,7 +137,7 @@ class AppInitializer {
     await _initServicesInParallel();
     StartupTimer.instance.mark('services_init');
 
-    final container = ProviderContainer(overrides: profileLanguageOverrides());
+    final container = ProviderContainer();
 
     final storage = HiveStorage();
 
@@ -194,12 +181,12 @@ class AppInitializer {
       // #1541 — run the trip-summaries merge + details retention pass
       // once TankSync is up. No-ops cleanly when the user is signed
       // out or when the trip-history Hive box isn't open.
-      await _runTripsSyncMerge(container);
+      await LaunchSyncPhase.runTripsSyncMerge(container);
       // #3077 — pull the remaining server→local entities (ratings,
       // alerts, fill-ups, vehicles) once TankSync is up, mirroring the
       // trips merge above. No-ops cleanly when sync is off / unauthenticated
       // and respects each entity's consent gate.
-      await _runEntitySyncMerge(container, storage);
+      await LaunchSyncPhase.runEntitySyncMerge(container, storage);
     });
 
     // Cache runtime version so AppConstants.appVersion is accurate (#570).
@@ -218,27 +205,11 @@ class AppInitializer {
       }
     });
 
-    // #950 phase 4 — backfill `referenceVehicleId` on existing
-    // VehicleProfile entries from the reference catalog. One-shot:
-    // gated on `vehicleCatalogMigrationDone` so subsequent launches
-    // skip the work. Runs after the first frame because reading the
-    // bundled JSON asset shouldn't block the landing UI.
-    _deferPostFirstFrame(() async {
-      try {
-        final migrator = VehicleProfileCatalogMigrator(
-          repository: VehicleProfileRepository(storage),
-          settings: storage,
-        );
-        if (migrator.hasRun) return;
-        final catalog =
-            await container.read(referenceVehicleCatalogProvider.future);
-        final matched = await migrator.run(catalog: catalog);
-        log.info('VehicleProfileCatalogMigrator: matched $matched profile(s)');
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'vehicleProfileCatalogMigrator'}));
-      }
-    });
+    // #950 phase 4 — one-shot `referenceVehicleId` backfill from the
+    // bundled reference catalog; deferred so the JSON asset read never
+    // blocks the landing UI (see ProviderWarmupPhase).
+    _deferPostFirstFrame(
+        () => ProviderWarmupPhase.migrateVehicleCatalog(container, storage));
 
     // #1373 phase 3a/3b/3e/3f — kick off the legacy-toggle migrations
     // at every cold start. Reading the provider's future triggers its
@@ -263,47 +234,21 @@ class AppInitializer {
       }
     });
 
-    // #1858 — instantiate the keep-alive η_v recompute listener so it
-    // is watching vehicle-profile edits before the user can reach the
-    // Edit-vehicle screen. Reading the provider triggers its `build`,
-    // which wires the `ref.listen`; deferred because no η_v edit can
-    // happen until well after first frame.
-    _deferPostFirstFrame(() async {
-      try {
-        container.read(tripVeRecomputeListenerProvider);
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'tripVeRecomputeListener kick-off'}));
-      }
-    });
+    // #1858 — warm the keep-alive η_v recompute listener so it watches
+    // vehicle-profile edits before the user can reach the Edit-vehicle
+    // screen (see ProviderWarmupPhase).
+    _deferPostFirstFrame(
+        () => ProviderWarmupPhase.warmTripVeRecomputeListener(container));
 
     // #1925 — arm the OBD2 debug-session recorder from the persisted
-    // opt-in flag. Reading the provider runs its `build`, which mirrors
-    // the flag onto `Obd2DebugSessionRecorder.enabled`, so a user who
-    // opted in last session has logging armed before the next connect
-    // even if they never open Settings.
-    _deferPostFirstFrame(() async {
-      try {
-        container.read(obd2DebugSessionLoggingProvider);
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'obd2DebugSessionLogging kick-off'}));
-      }
-    });
+    // opt-in flag (see ProviderWarmupPhase).
+    _deferPostFirstFrame(
+        () => ProviderWarmupPhase.armObd2DebugSessionLogging(container));
 
     // #2465 — arm the OBD2 comm-health diagnostics collector from
-    // Feature.debugMode. Reading the keep-alive gate provider runs its
-    // `build`, which mirrors the flag onto
-    // `Obd2CommDiagnostics.instance.enabled` and keeps it in sync as the
-    // user toggles Developer mode. A no-op in production (dev mode off).
-    _deferPostFirstFrame(() async {
-      try {
-        container.read(obd2CommDiagnosticsGateProvider);
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'obd2CommDiagnosticsGate kick-off'}));
-      }
-    });
+    // Feature.debugMode (see ProviderWarmupPhase).
+    _deferPostFirstFrame(
+        () => ProviderWarmupPhase.armObd2CommDiagnosticsGate(container));
 
     // Eagerly resolve the home-widget cold-launch URI BEFORE we build
     // the router so the very first redirect pass can land directly on
@@ -452,7 +397,8 @@ class AppInitializer {
     // used to run here too; both walk an entire Hive box and neither
     // result is needed to paint the first frame, so they are deferred
     // past it (see `run()`'s post-first-frame block).
-    await ProfileRepository(HiveStorage()).ensureDefaultProfile();
+    final profileRepo = ProfileRepository(HiveStorage());
+    await profileRepo.ensureDefaultProfile();
   }
 
   // ---------------------------------------------------------------------------
@@ -596,111 +542,6 @@ class AppInitializer {
     }
   }
 
-  /// #1541 — on app launch, merge local trip summaries with the
-  /// server's `trip_summaries` rows so cross-device entries land in
-  /// the user's history without needing a manual sync gesture. Heavy
-  /// `trip_details` rows older than 90 days are pruned in the same
-  /// pass.
-  ///
-  /// No-ops cleanly when:
-  /// - TankSync isn't initialised (the user opted out or init
-  ///   timed out above), or
-  /// - the `obd2_trip_history` Hive box isn't open, or
-  /// - the user isn't authenticated (the `TripsSync` methods
-  ///   themselves short-circuit on null user id).
-  ///
-  /// Failures are caught + logged. The merge result tolerates a
-  /// missing server row — `TripsSync.merge` returns the input
-  /// unchanged on error so a transient network blip never costs the
-  /// user their local history view.
-  static Future<void> _runTripsSyncMerge(ProviderContainer container) async {
-    // #1794 — `obd2TripHistory` is a deferred box; wait for the
-    // post-first-frame opens before reading it.
-    await HiveBoxes.initDeferred();
-    if (TankSyncClient.client == null) return;
-    if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
-    // #1665 — gate the launch-time merge on the trajet-sync gate so an
-    // anonymous session no longer downloads / heals trip rows.
-    if (!container.read(tripsSyncEnabledProvider)) return;
-    try {
-      final repo = TripHistoryRepository(
-        box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-      );
-      final local = repo.loadAll();
-      final localIds = local.map((e) => e.id).toSet();
-      final merged = await TripsSync.merge(local);
-      // Persist server-only entries — those whose ids weren't in the
-      // local set before the merge. The summaries-only blob lands now;
-      // the heavy samples + gpsd payload arrives via the trip-detail
-      // screen's lazy fetch on first open.
-      for (final entry in merged) {
-        if (localIds.contains(entry.id)) continue;
-        await repo.save(entry);
-      }
-      // Retention pass — drop server-side detail blobs that have
-      // aged past the default 90-day window so the per-user storage
-      // budget stays bounded.
-      await TripsSync.pruneOldDetails();
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-          context: {'where': 'runTripsSyncMerge'}));
-    }
-  }
-
-  /// #3077 — on app launch, pull the remaining server→local entities into
-  /// local storage so cross-device rows land without a manual sync
-  /// gesture. TankSync was upload-only for these: the download branch
-  /// existed in each `*_sync.dart` but had no connect/launch caller
-  /// (fill-ups + vehicles), its return was discarded (ratings), or it only
-  /// fired on a local edit (alerts). The per-entity pull-persist seams are
-  /// the unit-tested units; this method is the launch-time glue.
-  ///
-  /// Consent gates (conservative — never pull data the user hasn't
-  /// consented to):
-  /// - **ratings / alerts** ride the master TankSync consent — they pull
-  ///   whenever `sync_enabled` is set (the same gate the existing
-  ///   favorites/ignored pull and the alert-mutation pull already use).
-  /// - **fill-ups / vehicles** are trip-data adjacent (fill-ups carry
-  ///   linked trajet ids + OBD2-derived consumption; a vehicle profile is
-  ///   the anchor trips attach to), so they ride the stricter trip-sync
-  ///   gate (`tripsSyncEnabledProvider` = email ∧ cloudSync ∧ syncTrips).
-  ///
-  /// No-ops cleanly when TankSync isn't initialised or the user is signed
-  /// out. Each entity is independently error-protected AND time-budgeted
-  /// (#3128) so one failing or hung pull never blocks the others.
-  static Future<void> _runEntitySyncMerge(
-    ProviderContainer container,
-    StorageRepository storage,
-  ) async {
-    if (TankSyncClient.client == null) return;
-    if (!container.read(syncStateProvider).enabled) return;
-
-    // ratings + alerts ride the master consent; fill-ups + vehicles are
-    // trip-data adjacent and ride the stricter trip-sync gate.
-    final tripData = container.read(tripsSyncEnabledProvider);
-    final pulls = <String, Future<void> Function()>{
-      'ratings': () =>
-          container.read(syncStateProvider.notifier).syncAndPersistRatings(storage),
-      'alerts': () => container.read(alertProvider.notifier).pullFromServer(),
-      if (tripData)
-        'vehicles': () =>
-            container.read(vehicleProfileListProvider.notifier).pullFromServer(),
-      if (tripData)
-        'fillUps': () => container.read(fillUpListProvider.notifier).pullFromServer(),
-    };
-    for (final entry in pulls.entries) {
-      try {
-        await entry.value().timeout(const Duration(seconds: 15));
-      } on TimeoutException catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-            context: {'where': 'entity pull timed out', 'entity': entry.key}));
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-            context: {'where': 'entity pull FAILED', 'entity': entry.key}));
-      }
-    }
-  }
-
   /// Reads the URI carried by the home-widget tap that cold-started
   /// the app (if any) and stashes it in [pendingWidgetUriProvider] so
   /// the router's redirect chain can land the user on the station
@@ -732,146 +573,6 @@ class AppInitializer {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st,
           context: {'where': 'stashWidgetLaunchUri'}));
-    }
-  }
-
-  /// #1303 — recover an in-progress trip snapshot that survived a
-  /// process death. Walks the active-trip Hive box; if a fresh
-  /// snapshot is on disk (within the 24 h staleness window) the
-  /// `TripRecording` provider is rehydrated into a
-  /// `pausedDueToDrop`-shaped state with the captured samples
-  /// preserved, the launcher-icon badge is bumped (auto-record
-  /// trips only), and the user is navigated to `/trip-recording`.
-  ///
-  /// Stale snapshots are dropped quietly — the user gave up; we
-  /// don't surface a stale recovery prompt that would confuse them
-  /// on a fresh launch.
-  ///
-  /// No-ops cleanly when the active-trip box isn't open.
-  static Future<void> _runActiveTripRecovery(
-    ProviderContainer container,
-  ) async {
-    // #1794 — the active-trip + trip-history boxes are deferred; wait
-    // for the post-first-frame opens before reading them.
-    await HiveBoxes.initDeferred();
-    if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return;
-    final activeRepo = ActiveTripRepository(
-      box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
-    );
-    TripHistoryRepository? historyRepo;
-    if (Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) {
-      historyRepo = TripHistoryRepository(
-        box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-      );
-    }
-    final service = ActiveTripRecoveryService(
-      activeRepo: activeRepo,
-      historyRepo: historyRepo,
-      onAutomaticRecovered: () async {
-        try {
-          final badge =
-              await container.read(autoRecordBadgeServiceProvider.future);
-          await badge.increment();
-        } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.background, e, st,
-              context: {'where': 'activeTripRecovery badge bump'}));
-        }
-      },
-    );
-    final outcome = await service.recover();
-    switch (outcome) {
-      case ActiveTripRecoveryOutcome.none:
-      case ActiveTripRecoveryOutcome.failed:
-      case ActiveTripRecoveryOutcome.discarded:
-        return;
-      case ActiveTripRecoveryOutcome.recovered:
-        final snapshot = service.recoveredSnapshot;
-        if (snapshot == null) return;
-        try {
-          final notifier = container.read(tripRecordingProvider.notifier);
-          final applied = notifier.restoreFromSnapshot(snapshot);
-          if (!applied) return;
-          // Bump the unseen-trip badge for auto-record sessions —
-          // the user should see "your auto-trip didn't fully save"
-          // in the launcher even if they don't tap the recording
-          // banner. Mirrors the paused-trip recovery semantics.
-          if (snapshot.automatic) {
-            try {
-              final badge = await container
-                  .read(autoRecordBadgeServiceProvider.future);
-              await badge.increment();
-            } catch (e, st) {
-              unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
-                'where': 'activeTripRecovery recovered badge bump'
-              }));
-            }
-          }
-          // Auto-navigate to /trip-recording on the next frame so
-          // the user lands directly on the live recording UI. We
-          // re-enter post-frame because the GoRouter redirect chain
-          // (consent → setup → landing) has to settle before we
-          // can push a new route — a synchronous push from inside
-          // the recovery callback would race against the redirect
-          // logic and lose.
-          SchedulerBinding.instance.addPostFrameCallback((_) {
-            try {
-              final goRouter = container.read(routerProvider);
-              goRouter.go(RoutePaths.tripRecording);
-            } catch (e, st) {
-              unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
-                'where': 'activeTripRecovery go(/trip-recording)'
-              }));
-            }
-          });
-        } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
-            'where': 'activeTripRecovery restoreFromSnapshot'
-          }));
-        }
-    }
-  }
-
-  /// #1004 phase 4-WAL — finalise paused trips that survived an app
-  /// kill mid-grace-window into the trip-history rolling log.
-  ///
-  /// Resolves the paused-trips + history Hive boxes (no-op when either
-  /// is closed — widget tests, fresh installs), wires the badge bump
-  /// from [autoRecordBadgeServiceProvider] only for entries flagged as
-  /// auto-record, and calls [PausedTripRecoveryService.recoverStale]
-  /// with the default 5-minute threshold. The recovered count is
-  /// debug-printed; production builds drop the message.
-  static Future<void> _runPausedTripRecovery(
-    ProviderContainer container,
-  ) async {
-    // #1794 — the paused-trip + trip-history boxes are deferred; wait
-    // for the post-first-frame opens before reading them.
-    await HiveBoxes.initDeferred();
-    if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return;
-    if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
-    final pausedRepo = PausedTripRepository(
-      box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
-    );
-    final historyRepo = TripHistoryRepository(
-      box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-    );
-    final service = PausedTripRecoveryService(
-      pausedRepo: pausedRepo,
-      historyRepo: historyRepo,
-      onAutomaticRecovered: () async {
-        try {
-          final badge =
-              await container.read(autoRecordBadgeServiceProvider.future);
-          await badge.increment();
-        } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.background, e, st,
-              context: {'where': 'pausedTripRecovery badge bump'}));
-        }
-      },
-    );
-    final recovered = await service.recoverStale();
-    if (recovered > 0) {
-      log.info(
-          'AppInitializer: recovered $recovered paused trip(s) into history');
     }
   }
 
@@ -958,128 +659,37 @@ class AppInitializer {
     _installErrorHandlers();
 
     // #609 — kick the 2-minute nearest-widget heartbeat so the home-screen
-    // widget stays fresh while the app is running. The provider is
-    // keepAlive and owns its own Timer; disposal cancels it cleanly.
-    try {
-      container.read(nearestWidgetRefreshProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.background, e, st,
-          context: {'where': 'nearestWidgetRefresh start'}));
-    }
+    // widget stays fresh while the app is running (see ProviderWarmupPhase).
+    ProviderWarmupPhase.startNearestWidgetHeartbeat(container);
 
-    // #1004 phase 4-WAL — recover paused trips that were never
-    // finalised because the app was killed mid-grace-window. Walks
-    // the `obd2_paused_trips` box, finalises any entry older than 5
-    // minutes into the trip-history rolling log, and bumps the
-    // launcher-icon badge for entries that came from the auto-record
-    // path. Deferred to the post-frame microtask so the first paint
-    // isn't blocked by what is at most a 100 ms Hive walk on devices
-    // with a single stale entry. Sequenced BEFORE the orchestrator
-    // start below so the user lands on a history list with the
-    // recovered trip already populated.
-    _deferPostFirstFrame(() async {
-      try {
-        await _runPausedTripRecovery(container);
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'pausedTripRecovery'}));
-      }
-    });
+    // #1004 phase 4-WAL — finalise paused trips that survived an app
+    // kill mid-grace-window. Sequenced BEFORE the active recovery AND
+    // the orchestrator start below so the user lands on a history list
+    // with the recovered trip already populated (see TripRecoveryPhase).
+    _deferPostFirstFrame(() => TripRecoveryPhase.recoverPausedTrips(container));
 
     // #1303 — recover an in-progress trip whose process was killed
-    // before it could finalise. Walks the active-trip Hive box,
-    // hands a non-stale snapshot back to the [TripRecording]
-    // provider, bumps the unseen-trip badge for auto-record
-    // sessions, and navigates to `/trip-recording`. Sequenced
-    // AFTER the paused-trip recovery so a stale paused row from
-    // the same drive lands in history before the active recovery
-    // re-enters the recording UI.
-    _deferPostFirstFrame(() async {
-      try {
-        await _runActiveTripRecovery(container);
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'activeTripRecovery'}));
-      }
-    });
+    // before it could finalise. Sequenced AFTER the paused-trip recovery
+    // so a stale paused row from the same drive lands in history before
+    // the active recovery re-enters the recording UI
+    // (see TripRecoveryPhase).
+    _deferPostFirstFrame(() => TripRecoveryPhase.recoverActiveTrip(container));
 
-    // #1004 phase 2b-2 — instantiate the auto-record orchestrator. The
-    // provider is `keepAlive: true` and watches the vehicle list
-    // internally; reading it once is enough to spin up coordinators
-    // for any vehicle that already has `autoRecord: true`. Deferred to
-    // a post-frame microtask so a slow listener factory (Android
-    // platform channel handshake) cannot delay the first paint. The
-    // try/catch belongs here, not just inside the provider, because a
-    // bug in `defaultTargetPlatform` resolution or in the listener
-    // factory would otherwise crash the whole launch path.
-    _deferPostFirstFrame(() async {
-      // #3167 — opt the shared FBP central manager into Core Bluetooth
-      // state restoration BEFORE the orchestrator's first Bluetooth
-      // touch, sequenced in the SAME deferred block so the ordering is
-      // guaranteed. This also drains the host bridge's launch signal
-      // ("relaunched by Core Bluetooth?") that tags the first
-      // auto-record connect trace. No-op off iOS; a failure never
-      // blocks the orchestrator below.
-      try {
-        await container.read(iosStateRestorationServiceProvider).initialize();
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'iosStateRestoration init'}));
-      }
-      try {
-        container.read(autoRecordOrchestratorProvider);
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'autoRecordOrchestrator init'}));
-      }
-    });
+    // #1004 phase 2b-2 — start the auto-record orchestrator, with the
+    // #3167 iOS Core Bluetooth state-restoration opt-in sequenced first
+    // inside the same deferred block (see ProviderWarmupPhase).
+    _deferPostFirstFrame(
+        () => ProviderWarmupPhase.startAutoRecordOrchestrator(container));
 
-    // #1193 phase 2 — wire the vehicle aggregator's `runForVehicle`
-    // hook onto `TripHistoryRepository.onSavedHook` so every saved
-    // trip with a non-null vehicleId triggers a background recompute
-    // of the rolling driving aggregates. Deferred to the post-frame
-    // microtask because the trip-history Hive box is opened during
-    // the storage phase but the Riverpod provider may not have read
-    // it yet — by post-frame the provider graph has settled. Errors
-    // are logged but never block launch (the aggregator is purely an
-    // optimisation; trips still save without it).
-    _deferPostFirstFrame(() async {
-      try {
-        // #1794 — the aggregator hook reads `obd2TripHistory`, a
-        // deferred box; wait for the post-first-frame opens first.
-        await HiveBoxes.initDeferred();
-        final wired = wireAggregatorIntoTripHistory(container);
-        if (!wired) {
-          log.info('AppInitializer: vehicle aggregator hook deferred — '
-              'trip-history box not open yet');
-        }
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'vehicle aggregator wiring'}));
-      }
-    });
+    // #1193 phase 2 — wire the vehicle aggregator's `runForVehicle` hook
+    // onto `TripHistoryRepository.onSavedHook` (see ProviderWarmupPhase).
+    _deferPostFirstFrame(
+        () => ProviderWarmupPhase.wireVehicleAggregatorHook(container));
 
     // #1105 — drain the background-isolate error spool through the
-    // foreground TraceRecorder. WorkManager runs without Riverpod, so
-    // every BG failure is parked in a Hive ring buffer until the app
-    // is in the foreground; replaying here puts those errors in the
-    // same observability pipeline as foreground exceptions (and into
-    // Sentry when the user has consented). Deferred to the post-frame
-    // microtask so the first paint isn't delayed by Hive reads /
-    // recorder writes.
-    _deferPostFirstFrame(() async {
-      try {
-        final recorder = container.read(traceRecorderProvider);
-        final replayed = await IsolateErrorSpool.drain(recorder);
-        if (replayed > 0) {
-          log.info(
-              'AppInitializer: drained $replayed isolate error(s) into TraceRecorder');
-        }
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.background, e, st,
-            context: {'where': 'isolate spool drain'}));
-      }
-    });
+    // foreground TraceRecorder (see TelemetryReplayPhase).
+    _deferPostFirstFrame(
+        () => TelemetryReplayPhase.drainIsolateErrorSpool(container));
 
     // #3149 — replay a previous bricked launch's plain-file cause record
     // into the trace pipeline, so the frozen splash finally has a why.
