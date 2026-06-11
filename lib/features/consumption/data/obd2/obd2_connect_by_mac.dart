@@ -44,14 +44,12 @@ Future<Obd2Service?> _connectByMacDirect(
 }) async {
   // #3113 — a cold iOS CoreBluetooth GATT connect to an ELM clone (OBDLink CX)
   // routinely exceeds Android's 4s, so a live adapter was clipped mid-connect
-  // ("Timed out after 4s"). Give iOS a 7s budget; Android keeps the
-  // LOAD-BEARING 4s (#2242: autoConnect:false blocks ~35s on a sleeping
-  // adapter, so the bound must stay tight there). The scan-resolved path
-  // already uses 10s — only this direct path was too tight.
-  final connectTimeout = timeout ??
-      (defaultTargetPlatform == TargetPlatform.iOS
-          ? const Duration(seconds: 7)
-          : const Duration(seconds: 4));
+  // ("Timed out after 4s"). iOS gets 7s; Android keeps the LOAD-BEARING 4s
+  // (#2242). The scan-resolved path already uses 10s — only this direct path
+  // was too tight. #3172 — the platform fork lives in the consolidated
+  // [Obd2PlatformBudgets] (same values, single audited home).
+  final connectTimeout =
+      timeout ?? Obd2PlatformBudgets.resolved.directConnectTimeout;
   // #2906 — stop any active scan + settle before the direct GATT open. An
   // in-trip reconnect can reach here while the scanner's last active scan is
   // still winding down on the radio; an unstopped scan racing this connect()

@@ -28,6 +28,7 @@ import 'obd2_connection_errors.dart';
 import 'obd2_known_adapters_store.dart';
 import 'obd2_pairing_mode.dart';
 import 'obd2_permissions.dart';
+import 'obd2_platform_budgets.dart';
 import 'obd2_read_telemetry.dart';
 import 'obd2_scan_governor.dart';
 import 'obd2_service.dart';

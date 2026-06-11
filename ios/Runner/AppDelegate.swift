@@ -219,7 +219,15 @@ final class ShareIntentBridge: NSObject, FlutterStreamHandler {
     guard let container = FileManager.default.containerURL(
       forSecurityApplicationGroupIdentifier: Self.appGroupId
     ) else { return nil }
-    let url = container.appendingPathComponent(Self.manifestName)
+    return Self.consumeManifest(at: container.appendingPathComponent(Self.manifestName))
+  }
+
+  /// #3172 — the testable consume-once body of `readManifest`, split from the
+  /// App Group container resolution (which needs entitlements no XCTest host
+  /// can fake). Reads the manifest at [url], deletes it BEFORE parsing (so a
+  /// malformed file can't replay), and returns the payload only when it is a
+  /// non-empty `{items:[...]}` map. Covered by `RunnerTests`.
+  static func consumeManifest(at url: URL) -> [String: Any]? {
     guard let data = try? Data(contentsOf: url) else { return nil }
     // Consume once — delete before parsing so a malformed file can't replay.
     try? FileManager.default.removeItem(at: url)
@@ -272,6 +280,28 @@ final class VisionOcrBridge {
     }
   }
 
+  /// #3172 — the pure coordinate conversion behind the OCR block payload,
+  /// split out so XCTest can pin it (a silent regression here breaks iOS OCR
+  /// with green CI — the Dart extractor just stops matching label anchors).
+  /// Vision `boundingBox` is normalized [0,1] with a BOTTOM-LEFT origin;
+  /// `OcrBox` (the Android ML Kit shape) is source-image PIXELS with a
+  /// TOP-LEFT origin, so Y is flipped: top = (1 − maxY)·height,
+  /// bottom = (1 − minY)·height. Covered by `RunnerTests`.
+  static func pixelBlock(
+    text: String,
+    normalizedBox box: CGRect,
+    width: CGFloat,
+    height: CGFloat
+  ) -> [String: Any] {
+    return [
+      "text": text,
+      "left": Double(box.minX * width),
+      "top": Double((1.0 - box.maxY) * height),
+      "right": Double(box.maxX * width),
+      "bottom": Double((1.0 - box.minY) * height),
+    ]
+  }
+
   /// Runs `VNRecognizeTextRequest` on the image at [path] off the main thread
   /// and returns `{ text: String, blocks: [{text,left,top,right,bottom}] }`
   /// (pixel, top-left). Any failure resolves to nil so the Dart caller degrades
@@ -309,20 +339,12 @@ final class VisionOcrBridge {
         let text = candidate.string
         if text.isEmpty { continue }
         lines.append(text)
-        // Vision boundingBox: normalized [0,1], origin BOTTOM-LEFT. Convert to
-        // source-image PIXELS with a TOP-LEFT origin (flip Y) to match OcrBox.
-        let box = observation.boundingBox
-        let left = box.minX * width
-        let right = box.maxX * width
-        let top = (1.0 - box.maxY) * height
-        let bottom = (1.0 - box.minY) * height
-        blocks.append([
-          "text": text,
-          "left": Double(left),
-          "top": Double(top),
-          "right": Double(right),
-          "bottom": Double(bottom),
-        ])
+        blocks.append(Self.pixelBlock(
+          text: text,
+          normalizedBox: observation.boundingBox,
+          width: width,
+          height: height
+        ))
       }
       finish(["text": lines.joined(separator: "\n"), "blocks": blocks])
     }
