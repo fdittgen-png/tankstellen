@@ -16,6 +16,9 @@
 ///  - [parsePrixCarburantsOpeningHours]: cleans up the opaque
 ///    `Automate-24-24, Lundi07.00-18.30, ...` string into a
 ///    line-per-day `HH:MM-HH:MM` form.
+///  - [parsePrixCarburantsHoursInput]: resolves a record's opening-hours
+///    signal from the derived `horaires_jour` column with a fallback to
+///    the canonical structured `horaires` column (#3219).
 ///  - [parsePrixCarburantsServices]: coerces the `services_service`
 ///    field (sometimes `null`, sometimes a JSON list) to a flat
 ///    `List<String>`.
@@ -29,7 +32,7 @@
 library;
 
 import 'dart:async';
-
+import 'dart:convert';
 
 import '../../search/domain/entities/station.dart';
 import '../../search/domain/entities/station_amenity.dart';
@@ -108,14 +111,14 @@ Station? parsePrixCarburantsStation(
     // numeric id space. Stripped before any call back out to the
     // Prix-Carburants API by `prix_carburants_station_service.dart`.
     final rawId = r['id']?.toString() ?? '';
-    final automate24h = r['horaires_automate_24_24'] == 'Oui';
+    // #3219 — resolve the hours signal ONCE (derived `horaires_jour`,
+    // falling back to the canonical structured `horaires` column).
+    final hoursInput = parsePrixCarburantsHoursInput(r);
+    final automate24h = hoursInput['horaires_automate_24_24'] == 'Oui';
     // #2751 — carry the STRUCTURED schedule on the search Station so the
-    // detail provider's search-cache fast path renders the staffed
-    // boutique hours (+ the 24/7-automate badge) directly, instead of
-    // falling through `legacyOpeningHoursBridge` (which collapses an
-    // automate station to "Open 24 hours" and loses the staffed hours).
-    // Same adapter call the cold `getStationDetail` path already uses.
-    final openingHours = const FranceOpeningHoursAdapter().parse(r);
+    // detail fast path renders staffed hours instead of collapsing an
+    // automate station to "Open 24 hours" via legacyOpeningHoursBridge.
+    final openingHours = const FranceOpeningHoursAdapter().parse(hoursInput);
     return Station(
       id: rawId.isEmpty
           ? ''
@@ -134,16 +137,15 @@ Station? parsePrixCarburantsStation(
       diesel: _toDouble(r['gazole_prix']),
       e85: _toDouble(r['e85_prix']),
       lpg: _toDouble(r['gplc_prix']),
-      // #3198 — schedule-derived instead of the old hard-coded `true`: a
-      // 24/7 automate dispenses fuel regardless of the staffed hours, so
-      // it counts as open; otherwise the parsed weekly schedule decides
-      // (null when the record carries no usable hours).
+      // #3198 — schedule-derived (automate dispenses 24/7 → open; else the
+      // parsed weekly schedule decides; null when no usable hours).
       isOpen: automate24h
           ? true
           : openStateFromHours(openingHours, now ?? nowInCountry('FR')),
       updatedAt: parsePrixCarburantsMostRecentUpdate(r),
       is24h: automate24h,
-      openingHoursText: parsePrixCarburantsOpeningHours(r['horaires_jour']),
+      openingHoursText:
+          parsePrixCarburantsOpeningHours(hoursInput['horaires_jour']),
       openingHours: openingHours,
       services: parsePrixCarburantsServices(r['services_service']),
       amenities: parseAmenitiesFromServices(
@@ -213,6 +215,87 @@ String? parsePrixCarburantsOpeningHours(dynamic hoursStr) {
       .replaceAllMapped(RegExp(r'(\d{2})\.(\d{2})'),
           (m) => '${m[1]}:${m[2]}')
       .replaceAll(', ', '\n');
+}
+
+/// Resolve a Prix-Carburants record's opening-hours signal into the
+/// `{'horaires_jour': …, 'horaires_automate_24_24': 'Oui'|'Non'}` map the
+/// [FranceOpeningHoursAdapter] consumes (#3219).
+///
+/// The v2 feed publishes the SAME schedule twice: the canonical structured
+/// `horaires` column (the JSON rendition of the flux XML
+/// `<horaires>/<jour>/<horaire>` tree) and the DERIVED flattened
+/// `horaires_jour` string. Roughly half the live records carry only one of
+/// the two, and the derived column is the one the upstream's flattening
+/// drops first — the field failure behind #3219: with `horaires_jour` null
+/// every consumer downstream went hours-less, and ONLY the orthogonal
+/// `horaires_automate_24_24` flag survived (rendered as "Open 24 hours" via
+/// the legacy bridge), so 24/7 stations kept hours while per-day schedules
+/// vanished. This resolver prefers the derived column (back-compat
+/// byte-for-byte) and falls back to flattening the structured column into
+/// the identical `Lundi07.00-18.30, …` form — the same normalisation the
+/// flux XML path performs in `_flattenHoraires` — so one adapter grammar
+/// serves both. The automate flag is the union of the flattened column and
+/// the structured `@automate-24-24` attribute. Pure, never throws.
+Map<String, dynamic> parsePrixCarburantsHoursInput(Map<String, dynamic> r) {
+  final structured = _flattenStructuredHoraires(r['horaires']);
+  final automate = r['horaires_automate_24_24'] == 'Oui' ||
+      (structured?.automate24h ?? false);
+  return <String, dynamic>{
+    'horaires_jour': r['horaires_jour'] ?? structured?.joined,
+    // i18n-ignore: gouv.fr feed enum value, not user-facing text
+    'horaires_automate_24_24': automate ? 'Oui' : 'Non',
+  };
+}
+
+/// Flatten the structured `horaires` column (a JSON string — or an already
+/// decoded map — of the flux `<horaires>` tree) into the comma-joined
+/// `horaires_jour` form (`"Lundi07.00-18.30, Mardi08.00-12.00, …"`), plus
+/// the `@automate-24-24` attribute ("1"/"Oui" → true). Mirrors the flux XML
+/// path's `_flattenHoraires` exactly: only days with a usable
+/// `@ouverture`/`@fermeture` pair contribute (`horaire` may be a single map
+/// or a list of split shifts); day stubs without ranges are skipped, so a
+/// schedule-less record still resolves to "no data", never to a fabricated
+/// closed week. Returns `null` when the column is absent/blank/unparseable
+/// AND carries no automate flag.
+({String? joined, bool automate24h})? _flattenStructuredHoraires(
+  dynamic raw,
+) {
+  dynamic decoded = raw;
+  if (raw is String) {
+    if (raw.trim().isEmpty) return null;
+    try {
+      decoded = jsonDecode(raw);
+    } on FormatException {
+      return null;
+    }
+  }
+  if (decoded is! Map) return null;
+
+  final automateRaw =
+      decoded['@automate-24-24']?.toString().trim().toLowerCase();
+  final automate24h = automateRaw == '1' || automateRaw == 'oui';
+
+  final jourRaw = decoded['jour'];
+  final jours = jourRaw is List ? jourRaw : [if (jourRaw != null) jourRaw];
+  final parts = <String>[];
+  for (final jour in jours) {
+    if (jour is! Map) continue;
+    final nom = jour['@nom']?.toString().trim() ?? '';
+    if (nom.isEmpty) continue;
+    final horaireRaw = jour['horaire'];
+    final horaires =
+        horaireRaw is List ? horaireRaw : [if (horaireRaw != null) horaireRaw];
+    for (final h in horaires) {
+      if (h is! Map) continue;
+      final open = h['@ouverture']?.toString().trim() ?? '';
+      final close = h['@fermeture']?.toString().trim() ?? '';
+      if (open.isEmpty || close.isEmpty) continue;
+      parts.add('$nom$open-$close');
+    }
+  }
+
+  if (parts.isEmpty && !automate24h) return null;
+  return (joined: parts.isEmpty ? null : parts.join(', '), automate24h: automate24h);
 }
 
 /// Coerce the `services_service` field to a flat `List<String>`.

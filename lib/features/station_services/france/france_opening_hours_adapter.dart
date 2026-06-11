@@ -83,11 +83,14 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
   WeeklyOpeningHours parse(dynamic rawProviderData) {
     try {
       final (raw, automate24h) = _narrow(rawProviderData);
-      if (raw == null) return WeeklyOpeningHours.notAvailable;
 
-      final trimmed = raw.trim();
+      final trimmed = raw?.trim() ?? '';
       // No usable schedule text. A pure automate flag with no schedule still
-      // means the pump is open 24/7 (#2742); without it there is no data.
+      // means the pump is open 24/7 (#2742) — and that must hold for a NULL
+      // `horaires_jour` exactly like an empty one (#3219: a null column used
+      // to discard the automate flag, so the structured path lost the 24/7
+      // signal the feed DID publish and only the legacy `is24h` bridge saved
+      // the display). Without the flag there is no data.
       if (trimmed.isEmpty) {
         return automate24h
             ? WeeklyOpeningHours.allWeek24h(rawSource: raw, automate24h: true)
@@ -177,8 +180,12 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
         rawSource: raw,
         automate24h: automate24h,
       );
-    } catch (_) {
-      // Contract: never throw — degrade to no-data.
+    } catch (e, st) {
+      // Contract: never throw — degrade to no-data, release-visibly
+      // (#3148 parity: FR was the one adapter skipped by that wave, so an
+      // FR format change degraded every station with zero field signal —
+      // exactly the blindness #3219's triage ran into).
+      reportParseFailure('FR', e, st);
       return WeeklyOpeningHours.notAvailable;
     }
   }
