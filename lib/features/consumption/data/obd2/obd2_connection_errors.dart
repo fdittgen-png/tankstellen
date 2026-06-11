@@ -31,6 +31,10 @@ sealed class Obd2ConnectionError implements Exception {
         Obd2ScanTimeout() => true,
         Obd2BluetoothOff() => true,
         Obd2DisconnectedException() => true,
+        // #3181 — pairing is a user-actionable hardware condition (confirm
+        // the OS dialog / power-cycle the adapter), surfaced with its own
+        // localized guidance — a breadcrumb, not an ERROR trace.
+        Obd2PairingRequired() => true,
         Obd2PermissionDenied() => false,
         Obd2ProtocolInitFailed() => false,
       };
@@ -98,6 +102,21 @@ class Obd2EngineOff extends Obd2ConnectionError {
 class Obd2ProtocolInitFailed extends Obd2ConnectionError {
   const Obd2ProtocolInitFailed(String rawResponse)
       : super('Adapter returned unexpected init string: $rawResponse');
+}
+
+/// BLE pairing/bonding is required but did not complete (#3181). The
+/// OBDLink CX family initiates OS pairing via the first CCCD subscribe
+/// (`setNotifyValue`) and only ACCEPTS new bonds in the first ~5 minutes
+/// after power-on: a setNotify that fails with an authentication /
+/// encryption / bonding error — or times out on a FIRST-connect deviceId
+/// even under the generous pairing budget — lands here. Actionable
+/// guidance: confirm the pairing dialog, or unplug/replug the adapter
+/// and retry within 5 minutes.
+class Obd2PairingRequired extends Obd2ConnectionError {
+  const Obd2PairingRequired([
+    super.message = 'Bluetooth pairing required — unplug the adapter, plug '
+        'it back in, then retry within 5 minutes',
+  ]);
 }
 
 /// The Bluetooth transport dropped mid-session (#797). Raised by

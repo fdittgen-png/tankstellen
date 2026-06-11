@@ -60,6 +60,34 @@ class Obd2ConnectTraceLog {
   /// the screen's provider registers it; best-effort + never throws.
   static void Function()? onTraceAdded;
 
+  /// #3184 — persistence hook fired with each FINALISED trace.
+  /// `Obd2ConnectTracePersistence.init()` registers it at startup so the
+  /// ring survives an app kill (the in-memory-only ring lost every trace
+  /// the moment the user relaunched to report the failure). Best-effort +
+  /// never throws; null until the persistence layer initialises.
+  static void Function(Obd2ConnectTrace trace)? onTracePersist;
+
+  /// #3184(d) — adapter-radio-state probe, registered by the plugin-wiring
+  /// layer (`obd2Connection` provider: `FlutterBluePlus.adapterStateNow`).
+  /// When set, every ROOT trace opens with an `adapter-state` step 0 — the
+  /// single most common "why did nothing happen" answer (radio off /
+  /// still `unknown` on a cold iOS launch, #3182). Kept as a seam so this
+  /// file stays platform-free and tests inject a fake.
+  static String Function()? adapterStateProbe;
+
+  /// #3184 — hydrate the in-memory ring from persisted traces at startup
+  /// (oldest-first; trimmed to [maxTraces]). Called once by
+  /// `Obd2ConnectTracePersistence.init()` before any live connect runs.
+  static void hydrateFromPersisted(List<Obd2ConnectTrace> traces) {
+    if (traces.isEmpty) return;
+    final sorted = [...traces]
+      ..sort((a, b) => a.startedAtMs.compareTo(b.startedAtMs));
+    _ring.addAll(sorted);
+    while (_ring.length > maxTraces) {
+      _ring.removeAt(0);
+    }
+  }
+
   /// The trace currently being built, exposed so [Obd2CommDiagnostics] can tee
   /// each AT handshake line into it (#2969 correction 4 — the AT-transcript tee
   /// at the chokepoint) without instrumenting `obd2_service` directly. Null
@@ -119,15 +147,32 @@ class Obd2ConnectTraceLog {
   }) {
     final existing = _active;
     if (existing != null) {
-      // A nested connect (e.g. connectByMacDirect → scan fallback → connect)
-      // records into the already-open trace so the whole attempt is ONE trace.
-      // #3014 — a child can still carry the NAME up to the root when the outer
-      // begin had none (the by-MAC chokepoint knows the paired name; the inner
-      // scan fallback re-enters with the same name), so the headline is filled.
-      if (adapterName != null && adapterName.isNotEmpty) {
-        existing.setAdapterName(adapterName);
+      if (existing.origin == Obd2ConnectOrigin.pickerScan) {
+        // #3184(f) — a live PICKER-SCAN trace never absorbs what follows:
+        // the user picking a candidate (or any entry point starting while
+        // the ambient scan stream is still open) deserves its OWN root
+        // trace. The scan is finalised HERE — as success when nothing
+        // failed earlier (the user picked FROM its results) — because the
+        // picker's stream cancel is fire-and-forget and the scan
+        // generator's own `finally` may only run after this new attempt
+        // has already begun. Success only when the scan actually surfaced
+        // candidates — a superseded EMPTY scan stays outcome-less.
+        if (!existing.hasOutcome && existing.hasScannedDevices) {
+          existing.setOutcome(Obd2ConnectOutcome.success);
+        }
+        endTrace(existing);
+      } else {
+        // A nested connect (e.g. connectByMacDirect → scan fallback →
+        // connect) records into the already-open trace so the whole
+        // attempt is ONE trace. #3014 — a child can still carry the NAME
+        // up to the root when the outer begin had none (the by-MAC
+        // chokepoint knows the paired name; the inner scan fallback
+        // re-enters with the same name), so the headline is filled.
+        if (adapterName != null && adapterName.isNotEmpty) {
+          existing.setAdapterName(adapterName);
+        }
+        return Obd2ConnectTraceHandle._child(existing);
       }
-      return Obd2ConnectTraceHandle._child(existing);
     }
     final handle = Obd2ConnectTraceHandle._(
       attemptId: 't${_seq++}-${_now().microsecondsSinceEpoch}',
@@ -143,6 +188,22 @@ class Obd2ConnectTraceLog {
       handle.setTransportDecisionReason(_decisionReasonOverride!);
     }
     _active = handle;
+    // #3184(d) — step 0 of every ROOT trace: the adapter radio state at
+    // the moment the scan/connect began. Best-effort; a throwing probe
+    // must never derail the connect that follows (#1103).
+    final probe = adapterStateProbe;
+    if (probe != null) {
+      try {
+        handle.addStep(
+          label: 'adapter-state',
+          status: Obd2ConnectStepStatus.ok,
+          detail: probe(),
+        );
+      } catch (e, st) {
+        debugPrint(
+            'Obd2ConnectTraceLog: adapterStateProbe threw (ignored): $e\n$st');
+      }
+    }
     return handle;
   }
 
@@ -190,6 +251,16 @@ class Obd2ConnectTraceLog {
         _ring.removeAt(0);
       }
       if (identical(_active, handle)) _active = null;
+      // #3184 — persist the finalised trace (best-effort, fire-and-forget;
+      // the persistence layer owns its own error handling). UNGATED by
+      // debugMode, like the ring itself: a real field failure must survive
+      // the app kill that precedes "let me export the error log".
+      try {
+        onTracePersist?.call(finished);
+      } catch (e, st) {
+        debugPrint('Obd2ConnectTraceLog: onTracePersist hook threw '
+            '(ignored): $e\n$st');
+      }
       // Notify the dev health screen (best-effort; a throwing listener must
       // never derail a connect's finally block).
       try {
@@ -231,14 +302,17 @@ class Obd2ConnectTraceLog {
   static List<Obd2ConnectTrace> snapshot() =>
       List.unmodifiable(_ring.reversed.toList());
 
-  /// Test reset — drops every trace + the active handle + the seq counter.
-  /// Leaves [onTraceAdded] registered (the provider owns its lifecycle); tests
-  /// that need it cleared null it explicitly.
+  /// Test reset — drops every trace + the active handle + the seq counter
+  /// + the #3184 probe/persist hooks. Leaves [onTraceAdded] registered
+  /// (the provider owns its lifecycle); tests that need it cleared null it
+  /// explicitly.
   static void clear() {
     _ring.clear();
     _active = null;
     _originOverride = null;
     _seq = 0;
+    adapterStateProbe = null;
+    onTracePersist = null;
   }
 
   /// Test seam — inject a deterministic clock. Pass null to restore

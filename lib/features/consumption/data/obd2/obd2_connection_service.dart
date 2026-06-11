@@ -18,10 +18,13 @@ import 'last_good_adapter_store.dart';
 import 'negotiated_protocol_cache.dart';
 import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
+import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
 import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
+import 'obd2_known_adapters_store.dart';
+import 'obd2_pairing_mode.dart';
 import 'obd2_permissions.dart';
 import 'obd2_read_telemetry.dart';
 import 'obd2_service.dart';
@@ -108,6 +111,13 @@ class Obd2ConnectionService {
   /// Null in tests / configs that don't wire it — pinning is then skipped.
   final LastGoodAdapterStore? lastGoodAdapterStore;
 
+  /// #3181 — set of deviceIds that have EVER completed a successful
+  /// connect on this phone. The "first connect" discriminator for pairing
+  /// mode: an unknown id gets the generous setNotify pairing budget (the
+  /// OBDLink CX pairs via the first CCCD subscribe). Null in tests /
+  /// configs that don't wire it — pairing mode is then never armed.
+  final KnownObd2AdaptersStore? knownAdaptersStore;
+
   /// #2906 — settle pause after [_stopScanBeforeConnect] stops the radio and
   /// before a `channel.open()` fires. Android BLE is fragile if a `connect()`
   /// races an active scan still winding down on the radio — a stale scan can
@@ -127,6 +137,7 @@ class Obd2ConnectionService {
     this.adapterWakeCache,
     this.activeVehicleKeyFields,
     this.lastGoodAdapterStore,
+    this.knownAdaptersStore,
     this.scanSettleDelay = const Duration(milliseconds: 120),
   });
 
@@ -148,63 +159,117 @@ class Obd2ConnectionService {
   Stream<List<ResolvedObd2Candidate>> scan({
     Duration timeout = const Duration(seconds: 8),
   }) async* {
-    final state = await permissions.request();
-    if (state != Obd2PermissionState.granted) {
-      throw const Obd2PermissionDenied();
-    }
-
+    // #3184(f) — picker-UI scans get a trace too. A standalone scan ("I
+    // scanned and saw nothing") previously left NO artefact. When a
+    // connect entry already opened a trace, this begin returns a CHILD
+    // recording into the same trace (and the end/outcome below become
+    // no-ops via [Obd2ConnectTraceHandle.isRoot]), so connect-path
+    // behaviour is unchanged.
+    final scanTrace =
+        Obd2ConnectTraceLog.beginTrace(origin: Obd2ConnectOrigin.pickerScan);
     var sawAny = false;
-    final accumulated = <String, Obd2AdapterCandidate>{};
-
-    // #3097 — scan UNFILTERED: a withServices filter starves iOS of name-only
-    // ELM327 clones; registry.rank still drops non-adapter noise post-scan.
-    final bleStream = bluetooth.scan(serviceUuids: const {}, timeout: timeout);
-    final classicStream = classicBluetooth?.scan(timeout: timeout) ??
-        const Stream<List<Obd2AdapterCandidate>>.empty();
-
-    // #761 — merge BLE + Classic scan streams. Both emit the
-    // accumulated-so-far list each tick, so we key by deviceId and
-    // re-rank on every event. Closing either stream doesn't end the
-    // merged stream — the window is the OUTER [timeout], enforced
-    // by the facades themselves.
-    final merged = StreamGroup.merge<List<Obd2AdapterCandidate>>(
-      [bleStream, classicStream],
-    );
-
-    // #2969 — record each newly-seen ranked candidate into the active connect
-    // trace so a failed connect's trace carries the scan list (device + RSSI +
-    // matched profile + transport). Deduped by MAC so a repeating batch doesn't
-    // spam the capped list. A no-op when no trace is active (the picker UI scan,
-    // which has no connect attempt in flight).
-    final tracedScanMacs = <String>{};
-    await for (final batch in merged) {
-      for (final c in batch) {
-        accumulated[c.deviceId] = c;
+    try {
+      final state = await permissions.request();
+      if (state != Obd2PermissionState.granted) {
+        throw const Obd2PermissionDenied();
       }
-      final ranked = registry.rank(accumulated.values.toList());
-      if (ranked.isNotEmpty) sawAny = true;
-      _lastRanked = ranked;
-      final trace = Obd2ConnectTraceLog.active;
-      if (trace != null) {
-        for (final r in ranked) {
-          if (tracedScanMacs.add(r.candidate.deviceId)) {
-            trace.recordScan(
-              mac: r.candidate.deviceId,
-              name: r.candidate.deviceName,
-              rssi: r.candidate.rssi,
-              transport: r.profile.transport == BluetoothTransport.classic
-                  ? Obd2ConnectTransport.classic
-                  : Obd2ConnectTransport.ble,
-              matchedProfileId: r.profile.id,
-            );
+
+      final accumulated = <String, Obd2AdapterCandidate>{};
+
+      // #3097 — scan UNFILTERED: a withServices filter starves iOS of name-only
+      // ELM327 clones; registry.rank still drops non-adapter noise post-scan.
+      final bleStream =
+          bluetooth.scan(serviceUuids: const {}, timeout: timeout);
+      final classicStream = classicBluetooth?.scan(timeout: timeout) ??
+          const Stream<List<Obd2AdapterCandidate>>.empty();
+
+      // #761 — merge BLE + Classic scan streams. Both emit the
+      // accumulated-so-far list each tick, so we key by deviceId and
+      // re-rank on every event. Closing either stream doesn't end the
+      // merged stream — the window is the OUTER [timeout], enforced
+      // by the facades themselves.
+      final merged = StreamGroup.merge<List<Obd2AdapterCandidate>>(
+        [bleStream, classicStream],
+      );
+
+      // #2969 — record each newly-seen ranked candidate into the active
+      // connect trace so a failed connect's trace carries the scan list
+      // (device + RSSI + matched profile + transport). Deduped by MAC so a
+      // repeating batch doesn't spam the capped list.
+      final tracedScanMacs = <String>{};
+      // #3184(e)/#3168 — deviceIds already stamped `pinned-id-mismatch`.
+      final mismatchStamped = <String>{};
+      await for (final batch in merged) {
+        for (final c in batch) {
+          accumulated[c.deviceId] = c;
+        }
+        final ranked = registry.rank(accumulated.values.toList());
+        if (ranked.isNotEmpty) sawAny = true;
+        _lastRanked = ranked;
+        final trace = Obd2ConnectTraceLog.active;
+        if (trace != null) {
+          for (final r in ranked) {
+            if (tracedScanMacs.add(r.candidate.deviceId)) {
+              trace.recordScan(
+                mac: r.candidate.deviceId,
+                name: r.candidate.deviceName,
+                rssi: r.candidate.rssi,
+                transport: r.profile.transport == BluetoothTransport.classic
+                    ? Obd2ConnectTransport.classic
+                    : Obd2ConnectTransport.ble,
+                matchedProfileId: r.profile.id,
+              );
+            }
+            _stampPinnedIdMismatch(trace, r, mismatchStamped);
           }
         }
+        yield ranked;
       }
-      yield ranked;
+      if (!sawAny) {
+        throw const Obd2ScanTimeout();
+      }
+      // classification-only binding; rethrow preserves the stack.
+      // ignore: catch_no_st
+    } catch (e) {
+      if (scanTrace.isRoot) scanTrace.setOutcomeFromError(e);
+      rethrow;
+    } finally {
+      if (scanTrace.isRoot && !scanTrace.hasOutcome) {
+        scanTrace.setOutcome(sawAny
+            ? Obd2ConnectOutcome.success
+            : Obd2ConnectOutcome.scanEmpty);
+      }
+      Obd2ConnectTraceLog.endTrace(scanTrace);
     }
-    if (!sawAny) {
-      throw const Obd2ScanTimeout();
-    }
+  }
+
+  /// #3184(e) — the #3168 discriminator: a scanned device whose NAME
+  /// matches the pinned adapter's name but whose deviceId DIFFERS. On iOS
+  /// the deviceId is a per-app CBPeripheral UUID (not the MAC) and can
+  /// rotate after an unpair / restore / adapter re-provision — the pinned
+  /// id then dials a ghost while the real adapter advertises under a new
+  /// id. This step makes that visible in the field trace: see #3168.
+  void _stampPinnedIdMismatch(
+    Obd2ConnectTraceHandle trace,
+    ResolvedObd2Candidate r,
+    Set<String> stamped,
+  ) {
+    final pinnedMac = trace.rawRequestedMac;
+    final pinnedName = trace.adapterName;
+    if (pinnedMac == null || pinnedMac.isEmpty) return;
+    if (pinnedName == null || pinnedName.isEmpty) return;
+    final c = r.candidate;
+    if (c.deviceName != pinnedName) return;
+    if (c.deviceId.toUpperCase() == pinnedMac.toUpperCase()) return;
+    if (!stamped.add(c.deviceId)) return;
+    trace.addStep(
+      label: 'pinned-id-mismatch',
+      status: Obd2ConnectStepStatus.fail,
+      detail: 'scanned "${c.deviceName}" under id '
+          '${redactObd2Mac(c.deviceId)} but the pinned id is '
+          '${redactObd2Mac(pinnedMac)} — iOS UUID-vs-MAC identity drift? '
+          '(#3168)',
+    );
   }
 
   /// Connect to the specific [candidate]. Dispatches on the
@@ -332,27 +397,61 @@ class Obd2ConnectionService {
       vin: vehicle?.vin,
       linkKind: linkKind, // #2465 — gated comm-diagnostics session label
     );
-    // #2268 concern 3 — a no-op override suppresses the wake window for a
-    // MAC observed never to need it; null ⇒ honour the adapter policy.
-    final wakeOverride = await adapterWakeCache?.overrideFor(mac);
-    // #1330 init. #2379 — recoverable attempts suppress the fail trace.
-    final ok = await service.connect(adapter: adapter,
-        wakePolicyOverride: wakeOverride, logFailureAsError: logFailureAsError);
-    // #2268 concern 3 — persist the observed wake outcome (no-op unless the bounded window ran).
-    await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
-    if (!ok) {
-      // #2969 — `Obd2Service.connect` swallowed the real failure into a `false`,
-      // so classify the connect-trace outcome from the AT transcript teed so
-      // far (channel-open outcomes were already stamped FIRST at the channel
-      // layer, and first-wins keeps those): ATZ garbage → counterfeit clone,
-      // an AT timeout → init timeout, else a silent ECU / ignition off. A no-op
-      // when no trace is active (a non-connect-path caller).
-      final trace = Obd2ConnectTraceLog.active;
-      if (trace != null && !trace.hasOutcome) {
-        trace.setOutcome(trace.classifyInitFailureOutcome());
+    // #3181 — FIRST-connect detection: a deviceId with NO recorded
+    // successful connect (and that isn't the auto-pinned last-good
+    // adapter — the pre-#3181 migration case) gets pairing mode armed for
+    // the duration of this attempt, so the BLE channel widens the
+    // setNotify budget to the 30 s pairing window and the UI can show the
+    // "confirm the pairing request" hint. Cleared in `finally` so a
+    // failed attempt never leaks the mode.
+    final firstConnect = _isFirstConnectDevice(mac);
+    if (firstConnect) {
+      Obd2PairingMode.markFirstConnect(mac);
+      Obd2ConnectTraceLog.active?.addStep(
+        label: 'first-connect',
+        status: Obd2ConnectStepStatus.ok,
+        detail: 'deviceId has no prior successful connect — '
+            '${Obd2PairingMode.firstConnectSetNotifySecs}s pairing budget '
+            'armed (#3181)',
+      );
+    }
+    try {
+      // #2268 concern 3 — a no-op override suppresses the wake window for a
+      // MAC observed never to need it; null ⇒ honour the adapter policy.
+      final wakeOverride = await adapterWakeCache?.overrideFor(mac);
+      // #1330 init. #2379 — recoverable attempts suppress the fail trace.
+      final ok = await service.connect(adapter: adapter,
+          wakePolicyOverride: wakeOverride,
+          logFailureAsError: logFailureAsError);
+      // #2268 concern 3 — persist the observed wake outcome (no-op unless the bounded window ran).
+      await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
+      if (!ok) {
+        // #2969 — `Obd2Service.connect` swallowed the real failure into a `false`,
+        // so classify the connect-trace outcome from the AT transcript teed so
+        // far (channel-open outcomes were already stamped FIRST at the channel
+        // layer, and first-wins keeps those): ATZ garbage → counterfeit clone,
+        // an AT timeout → init timeout, else a silent ECU / ignition off. A no-op
+        // when no trace is active (a non-connect-path caller).
+        final trace = Obd2ConnectTraceLog.active;
+        if (trace != null && !trace.hasOutcome) {
+          trace.setOutcome(trace.classifyInitFailureOutcome());
+        }
+        await service.disconnect();
+        // #3181 — a pairing-classified failure (the channel-open catch /
+        // Obd2Service.connect stamped it, first-wins) surfaces TYPED so the
+        // by-MAC paths skip the masking scan fallback and the UI shows the
+        // "power-cycle and retry within 5 minutes" guidance — not the
+        // generic adapter-unresponsive message.
+        if (trace?.outcome == Obd2ConnectOutcome.pairingRequired) {
+          throw const Obd2PairingRequired();
+        }
+        throw const Obd2AdapterUnresponsive();
       }
-      await service.disconnect();
-      throw const Obd2AdapterUnresponsive();
+      // #3181 — ANY successful init (even an engine-off one) proves the
+      // BOND + link work, so the deviceId is no longer a first connect.
+      await knownAdaptersStore?.markKnownGood(mac);
+    } finally {
+      if (firstConnect) Obd2PairingMode.clearFirstConnect(mac);
     }
     // #3009/#3035 — init SUCCEEDED (every AT answered) but the vehicle bus
     // may be SILENT. CRITICAL distinction (#3035): the `0100` probe is now
@@ -387,6 +486,24 @@ class Obd2ConnectionService {
       );
     }
     return service;
+  }
+
+  /// #3181 — whether [mac] has NEVER completed a successful connect on
+  /// this phone. False when no [knownAdaptersStore] is wired (tests /
+  /// legacy configs — pairing mode is then never armed), when the store
+  /// knows the id, or when it matches the auto-pinned last-good adapter
+  /// (a pre-#3181 user who already connected must not re-enter pairing
+  /// mode before the store backfills on their next success).
+  bool _isFirstConnectDevice(String mac) {
+    final store = knownAdaptersStore;
+    if (store == null) return false;
+    if (store.isKnownGood(mac)) return false;
+    final pinned = lastGoodAdapterStore?.recall();
+    if (pinned != null &&
+        pinned.mac.trim().toUpperCase() == mac.trim().toUpperCase()) {
+      return false;
+    }
+    return true;
   }
 
   /// Convenience entry point — picks the highest-RSSI candidate from
@@ -659,6 +776,13 @@ class Obd2ConnectionService {
 
 @Riverpod(keepAlive: true)
 Obd2ConnectionService obd2Connection(Ref ref) {
+  // #3184(d) — register the adapter-radio-state probe so every ROOT
+  // connect/scan trace opens with an `adapter-state` step 0. Lives at this
+  // plugin-wiring seam (the one place outside the channel/facade that may
+  // touch FlutterBluePlus) so the trace log stays platform-free.
+  // `adapterStateNow` is FBP's cached last-known state — no platform call.
+  Obd2ConnectTraceLog.adapterStateProbe =
+      () => FlutterBluePlus.adapterStateNow.name;
   return Obd2ConnectionService(
     registry: Obd2AdapterRegistry.defaults(),
     permissions: ref.watch(obd2PermissionsProvider),
@@ -687,6 +811,11 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     // the trip-independent reconnect controller for the fast pinned path.
     lastGoodAdapterStore:
         LastGoodAdapterStore(ref.watch(settingsStorageProvider)),
+    // #3181 — known-good deviceId set (same local `settings` box). The
+    // "first connect" discriminator that arms the generous setNotify
+    // pairing budget for a never-bonded adapter (OBDLink CX).
+    knownAdaptersStore:
+        KnownObd2AdaptersStore(ref.watch(settingsStorageProvider)),
     activeVehicleKeyFields: () {
       // Defensive: the vehicle provider must never make a connect throw.
       try {

@@ -20,6 +20,7 @@ class Obd2ConnectTraceHandle {
     required this.startedAt,
   })  : _parent = null,
         requestedMac = redactObd2Mac(mac),
+        _rawRequestedMac = mac,
         _adapterName = adapterName;
 
   Obd2ConnectTraceHandle._child(Obd2ConnectTraceHandle parent)
@@ -27,17 +28,34 @@ class Obd2ConnectTraceHandle {
         attemptId = parent.attemptId,
         origin = parent.origin,
         requestedMac = parent.requestedMac,
+        _rawRequestedMac = parent._rawRequestedMac,
         requestedTransport = parent.requestedTransport,
         startedAt = parent.startedAt;
 
   final Obd2ConnectTraceHandle? _parent;
   bool get _isChild => _parent != null;
 
+  /// True for the handle that OWNS the trace lifecycle (#3184). A caller
+  /// instrumenting a phase that may run inside an outer connect (the
+  /// service's `scan()`) checks this before stamping a terminal outcome,
+  /// so a child never stamps the parent's outcome prematurely.
+  bool get isRoot => !_isChild;
+
   final String attemptId;
   Obd2ConnectOrigin origin;
   final String? requestedMac;
+
+  /// #3184(e) — the UNREDACTED requested MAC, kept ONLY in memory on the
+  /// live handle (never serialised — [Obd2ConnectTrace] carries just the
+  /// redacted form) so the scan loop can compare a scanned deviceId
+  /// against the pinned id for the `pinned-id-mismatch` step (#3168).
+  final String? _rawRequestedMac;
   final Obd2ConnectTransport requestedTransport;
   final DateTime startedAt;
+
+  /// The raw requested MAC/deviceId for in-memory comparisons (#3184(e)).
+  /// NOT serialised into the trace — PII stays redacted at rest.
+  String? get rawRequestedMac => _root._rawRequestedMac;
 
   /// #3014 — the human adapter NAME for the trace headline. Mutable so the
   /// chokepoint (which knows the paired name) can stamp it onto a trace the
@@ -150,6 +168,17 @@ class Obd2ConnectTraceHandle {
 
   /// Whether a terminal outcome has been stamped (success or any failure).
   bool get hasOutcome => _root._outcome != null;
+
+  /// Whether the scan loop recorded at least one ranked candidate (#3184(f)
+  /// — lets `beginTrace` finalise a SUPERSEDED picker-scan trace as success
+  /// only when the scan actually surfaced something the user could pick).
+  bool get hasScannedDevices => _root._scanned.isNotEmpty;
+
+  /// The stamped terminal outcome, or null while undecided (#3181 — lets
+  /// `_openAndInit` surface a pairing-classified failure as the TYPED
+  /// `Obd2PairingRequired` after `Obd2Service.connect` flattened the real
+  /// error into a generic `false`).
+  Obd2ConnectOutcome? get outcome => _root._outcome;
 
   /// Classify an INIT failure (the channel opened, the ELM handshake failed)
   /// from the AT steps teed so far (#2969 correction 4): distinguish a

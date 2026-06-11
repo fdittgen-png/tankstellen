@@ -6615,6 +6615,12 @@ abstract class AppLocalizations {
   /// **'The OBD2 adapter disconnected. Reconnect and try again.'**
   String get obd2ErrorDisconnected;
 
+  /// User-facing OBD2 connection error (#3181): BLE pairing was required but did not complete — the OBDLink CX family pairs on the first connection and only accepts new pairings in the first ~5 minutes after power-on, so the actionable fix is to power-cycle the adapter and retry promptly.
+  ///
+  /// In en, this message translates to:
+  /// **'The adapter needs Bluetooth pairing. Unplug the adapter, plug it back in, then retry within 5 minutes.'**
+  String get obd2ErrorPairingRequired;
+
   /// Onboarding API-key step — CTA to skip key entry and use demo data (#1691).
   ///
   /// In en, this message translates to:
@@ -11315,6 +11321,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'iPhone works with Bluetooth-LE adapters only. A Classic-only adapter (e.g. vLinker BM, Konnwei KW902) must be used on Android.'**
   String get obd2PickerBleOnlyNotice;
+
+  /// Hint shown under the connecting spinner while a FIRST-connect OBD2 adapter is waiting for the user to confirm the OS Bluetooth pairing dialog (#3181). Secure-BLE adapters like the OBDLink CX initiate pairing on the first connection; without this hint the spinner looks hung while the dialog waits.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm the pairing request on your phone'**
+  String get obd2PairingConfirmHint;
 
   /// Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight.
   ///

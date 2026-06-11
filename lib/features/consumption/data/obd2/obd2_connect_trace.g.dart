@@ -108,6 +108,7 @@ const _$Obd2ConnectOriginEnumMap = {
   Obd2ConnectOrigin.liveReconnect: 'liveReconnect',
   Obd2ConnectOrigin.firstConnect: 'firstConnect',
   Obd2ConnectOrigin.autoRecord: 'autoRecord',
+  Obd2ConnectOrigin.pickerScan: 'pickerScan',
 };
 
 const _$Obd2ConnectOutcomeEnumMap = {
@@ -122,5 +123,6 @@ const _$Obd2ConnectOutcomeEnumMap = {
   Obd2ConnectOutcome.initTimeout: 'initTimeout',
   Obd2ConnectOutcome.protocolInitFailed: 'protocolInitFailed',
   Obd2ConnectOutcome.ignitionOff: 'ignitionOff',
+  Obd2ConnectOutcome.pairingRequired: 'pairingRequired',
   Obd2ConnectOutcome.unknown: 'unknown',
 };

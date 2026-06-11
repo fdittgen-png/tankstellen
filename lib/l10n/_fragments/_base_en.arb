@@ -1899,6 +1899,10 @@
   "@obd2ErrorDisconnected": {
     "description": "User-facing OBD2 connection error: the transport dropped mid-session (#1663)."
   },
+  "obd2ErrorPairingRequired": "The adapter needs Bluetooth pairing. Unplug the adapter, plug it back in, then retry within 5 minutes.",
+  "@obd2ErrorPairingRequired": {
+    "description": "User-facing OBD2 connection error (#3181): BLE pairing was required but did not complete — the OBDLink CX family pairs on the first connection and only accepts new pairings in the first ~5 minutes after power-on, so the actionable fix is to power-cycle the adapter and retry promptly."
+  },
   "onboardingExploreDemoData": "Explore with demo data",
   "@onboardingExploreDemoData": {
     "description": "Onboarding API-key step \u2014 CTA to skip key entry and use demo data (#1691)."

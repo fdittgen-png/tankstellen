@@ -23,6 +23,12 @@ enum Obd2ConnectOrigin {
 
   /// Any other auto-record-driven connect not covered above.
   autoRecord,
+
+  /// A picker-UI / standalone SCAN with no connect attempt riding it
+  /// (#3184). Previously untraced: "I scanned and saw nothing" left no
+  /// artefact. When a connect entry point opened the trace first, the
+  /// scan joins it as a child instead and this origin never appears.
+  pickerScan,
 }
 
 /// The transport a connect step requested / resolved (#2969). `unknown` is the
@@ -87,6 +93,14 @@ enum Obd2ConnectOutcome {
   /// from a post-init probe). The #1 real field condition: a parked car
   /// with the ignition off.
   ignitionOff,
+
+  /// BLE pairing/bonding was required but did not complete (#3181): the
+  /// connect/setNotify failed with an authentication / encryption /
+  /// pairing / bond error, or the setNotify timed out on a FIRST-connect
+  /// deviceId (the OBDLink CX initiates pairing via the first CCCD
+  /// subscribe and only accepts new bonds ~5 min after power-on).
+  /// Actionable: power-cycle the adapter and retry within 5 minutes.
+  pairingRequired,
 
   /// An unclassified failure. The [Obd2ConnectTrace.failureDetail] carries
   /// the raw `toString()` so a maintainer can still triage it.

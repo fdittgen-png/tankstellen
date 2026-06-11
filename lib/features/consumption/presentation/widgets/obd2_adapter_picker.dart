@@ -15,6 +15,7 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/adapter_registry.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/obd2/obd2_connection_service.dart';
+import '../../data/obd2/obd2_pairing_mode.dart';
 import '../../data/obd2/obd2_service.dart';
 import '../obd2_connection_error_l10n.dart';
 import '../obd2_connect_telemetry.dart';
@@ -50,6 +51,7 @@ Future<Obd2Service?> showObd2AdapterPicker(
   if (pinnedMac != null && pinnedMac.isNotEmpty) {
     final container = ProviderScope.containerOf(context, listen: false);
     Obd2Service? service;
+    Obd2PairingRequired? pairingError;
     try {
       // #3025 — TRANSPORT-AWARE pinned connect. The old call hard-wired the
       // scan-based `connectByMac`, but coming off the (now transport-aware,
@@ -66,6 +68,10 @@ Future<Obd2Service?> showObd2AdapterPicker(
       // Drop through to the sheet so the user can pick another adapter; the
       // fall-through snackbar surfaces it. #2745 — an expected, user-surfaced
       // condition is a breadcrumb, a genuine fault still ERROR-logs.
+      // #3181 — a pairing failure carries ACTIONABLE guidance (power-cycle
+      // the adapter, retry within 5 minutes), so it overrides the generic
+      // "couldn't reach X" fall-through snackbar below.
+      if (e is Obd2PairingRequired) pairingError = e;
       recordObd2ConnectFailure(e, st, where: 'pinned connect failed');
     }
     if (service != null) {
@@ -78,6 +84,7 @@ Future<Obd2Service?> showObd2AdapterPicker(
     return _showPickerSheet(
       context,
       fallbackAdapterName: pinnedAdapterName,
+      pairingError: pairingError,
     );
   }
   return _showPickerSheet(context);
@@ -86,21 +93,24 @@ Future<Obd2Service?> showObd2AdapterPicker(
 Future<Obd2Service?> _showPickerSheet(
   BuildContext context, {
   String? fallbackAdapterName,
+  Obd2PairingRequired? pairingError,
 }) {
-  if (fallbackAdapterName != null && fallbackAdapterName.isNotEmpty) {
+  final hasFallbackName =
+      fallbackAdapterName != null && fallbackAdapterName.isNotEmpty;
+  if (pairingError != null || hasFallbackName) {
     // Surface the snackbar against the surrounding Scaffold (not the
     // modal route). Schedules after the current frame so the modal
     // is mounted by the time the snackbar slides in.
     final messenger = ScaffoldMessenger.maybeOf(context);
     final l = AppLocalizations.of(context);
+    // #3181 — the pairing guidance wins over the generic fall-through.
+    final text = pairingError != null
+        ? pairingError.localizedMessage(l)
+        : l?.obd2PickerPinnedFallback(fallbackAdapterName!) ??
+            "Couldn't reach '$fallbackAdapterName' — pick another adapter";
     if (messenger != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        messenger.showSnackBar(
-          SnackBarHelper.infoSnackBar(
-            l?.obd2PickerPinnedFallback(fallbackAdapterName) ??
-                "Couldn't reach '$fallbackAdapterName' — pick another adapter",
-          ),
-        );
+        messenger.showSnackBar(SnackBarHelper.infoSnackBar(text));
       });
     }
   }
@@ -263,10 +273,19 @@ class _Obd2AdapterPickerSheetState
     // succeeded — the pinned MAC must be written either way).
     final activeProfile = ref.read(activeVehicleProfileProvider);
     final vehicleListNotifier = ref.read(vehicleProfileListProvider.notifier);
+    final connection = ref.read(obd2ConnectionProvider);
+    // #3184(f) — end the scan stream before the connect begins. NOT
+    // awaited: a cancel future can take extra event-loop turns (and never
+    // completes under widget-test fake-async) and must delay neither the
+    // spinner nor the connect. Trace separation does not depend on this
+    // ordering — `Obd2ConnectTraceLog.beginTrace` SUPERSEDES a live
+    // picker-scan trace, so the connect always opens its own root. The
+    // connect path stops the radio itself (stopScanBeforeConnect); this
+    // cancels the Dart side.
+    unawaited(_sub?.cancel());
+    _sub = null;
     try {
-      final service = await ref
-          .read(obd2ConnectionProvider)
-          .connect(candidate);
+      final service = await connection.connect(candidate);
       // #1188 — persist MAC + display name back onto the active vehicle
       // profile so the next session takes the pinned-MAC fast path and skips
       // the picker. Best-effort; uses the pre-await captures (errorlog_30) so
@@ -460,6 +479,24 @@ class _Obd2AdapterPickerSheetState
             const CircularProgressIndicator(),
             const SizedBox(height: 12),
             Text(l?.obdPickerConnecting ?? 'Connecting…'),
+            // #3181 — while a FIRST-connect setNotify is in flight the OS
+            // pairing dialog may be waiting for the user; tell them to
+            // confirm it instead of letting the spinner look hung.
+            ValueListenableBuilder<bool>(
+              valueListenable: Obd2PairingMode.pairingWaitPending,
+              builder: (context, pending, _) {
+                if (!pending || l == null) return const SizedBox.shrink();
+                return Padding(
+                  key: const Key('obdPickerPairingHint'),
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(
+                    l.obd2PairingConfirmHint,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              },
+            ),
           ],
         );
       case _Phase.error:

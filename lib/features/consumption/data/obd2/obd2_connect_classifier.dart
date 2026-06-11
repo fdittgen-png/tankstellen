@@ -20,6 +20,9 @@ Obd2ConnectOutcome classifyObd2ConnectError(Object error) {
   if (error is Obd2PermissionDenied) return Obd2ConnectOutcome.permissionDenied;
   if (error is Obd2BluetoothOff) return Obd2ConnectOutcome.bluetoothOff;
   if (error is Obd2ScanTimeout) return Obd2ConnectOutcome.scanEmpty;
+  // #3181 — typed pairing failure raised by the BLE channel's setNotify
+  // stage (the OBDLink CX pairs via the first CCCD subscribe).
+  if (error is Obd2PairingRequired) return Obd2ConnectOutcome.pairingRequired;
   if (error is Obd2ProtocolInitFailed) {
     return Obd2ConnectOutcome.protocolInitFailed;
   }
@@ -49,7 +52,20 @@ Obd2ConnectOutcome classifyObd2ConnectError(Object error) {
 /// scan fallback re-runs, so the real wrong-transport timeout wins (first-wins)
 /// over the fallback's scanEmpty.
 Obd2ConnectOutcome classifyBleOpenOutcome(Object error) {
+  if (error is Obd2PairingRequired) return Obd2ConnectOutcome.pairingRequired;
   final msg = error.toString().toUpperCase();
+  // #3181 — pairing/bonding failure markers BEFORE the generic buckets:
+  // Android surfaces "GATT_INSUFFICIENT_AUTHENTICATION"/"...ENCRYPTION",
+  // iOS CoreBluetooth "Authentication is insufficient" / "Encryption is
+  // insufficient" / "Peer removed pairing information"; clones also say
+  // "bond" / "pairing". These need the power-cycle guidance, not a
+  // generic timeout/133 message.
+  if (msg.contains('AUTHENTICAT') ||
+      msg.contains('ENCRYPT') ||
+      msg.contains('PAIR') ||
+      msg.contains('BOND')) {
+    return Obd2ConnectOutcome.pairingRequired;
+  }
   if (msg.contains('133') || msg.contains('GATT_ERROR')) {
     return Obd2ConnectOutcome.gatt133;
   }
@@ -65,4 +81,28 @@ Obd2ConnectOutcome classifyBleOpenOutcome(Object error) {
     return Obd2ConnectOutcome.serviceNotFound;
   }
   return Obd2ConnectOutcome.unknown;
+}
+
+/// Classify a `setNotifyValue` failure (#3181). The OBDLink CX initiates
+/// OS pairing via the FIRST CCCD subscribe, so:
+///
+///   * an explicit authentication/encryption/pairing/bond error is
+///     [Obd2ConnectOutcome.pairingRequired] on ANY connect;
+///   * a TIMEOUT on a FIRST-connect deviceId ([firstConnect]) is
+///     LIKELY-pairing — the dialog was missed, or the adapter has been
+///     powered >5 min and silently refuses new bonds — and classifies as
+///     [Obd2ConnectOutcome.pairingRequired] too, so the user gets the
+///     "power-cycle and retry within 5 minutes" guidance instead of a
+///     generic timeout;
+///   * everything else keeps its [classifyBleOpenOutcome] bucket.
+Obd2ConnectOutcome classifySetNotifyFailure(
+  Object error, {
+  required bool firstConnect,
+}) {
+  final base = classifyBleOpenOutcome(error);
+  if (base == Obd2ConnectOutcome.pairingRequired) return base;
+  if (firstConnect && base == Obd2ConnectOutcome.gattTimeout) {
+    return Obd2ConnectOutcome.pairingRequired;
+  }
+  return base;
 }

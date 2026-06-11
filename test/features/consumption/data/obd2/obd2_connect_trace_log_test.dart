@@ -240,4 +240,88 @@ void main() {
       Obd2ConnectTraceLog.endTrace(h);
     });
   });
+
+  group('adapterStateProbe — step 0 of every root trace (#3184)', () {
+    test('a registered probe stamps adapter-state as the FIRST step', () {
+      Obd2ConnectTraceLog.adapterStateProbe = () => 'off';
+
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      Obd2ConnectTraceLog.endTrace(h);
+
+      final step = Obd2ConnectTraceLog.snapshot().single.steps.first;
+      expect(step.label, 'adapter-state');
+      expect(step.detail, 'off',
+          reason: 'the radio state at connect-begin is the single most '
+              'common "why did nothing happen" answer');
+    });
+
+    test('a THROWING probe never derails the connect (#1103 fault seam)',
+        () {
+      Obd2ConnectTraceLog.adapterStateProbe =
+          () => throw StateError('platform channel dead');
+
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      h.setOutcome(Obd2ConnectOutcome.success);
+      Obd2ConnectTraceLog.endTrace(h);
+
+      final trace = Obd2ConnectTraceLog.snapshot().single;
+      expect(trace.outcome, Obd2ConnectOutcome.success);
+      expect(trace.steps.map((s) => s.label),
+          isNot(contains('adapter-state')));
+    });
+
+    test('no probe registered → no synthetic step (pre-#3184 shape)', () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      Obd2ConnectTraceLog.endTrace(h);
+      expect(Obd2ConnectTraceLog.snapshot().single.steps, isEmpty);
+    });
+  });
+
+  group('onTracePersist hook (#3184)', () {
+    test('endTrace hands the FINALISED trace to the persist hook', () {
+      Obd2ConnectTrace? persisted;
+      Obd2ConnectTraceLog.onTracePersist = (t) => persisted = t;
+
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB:CC:DD:EE:F1');
+      h.setOutcome(Obd2ConnectOutcome.gattTimeout);
+      Obd2ConnectTraceLog.endTrace(h);
+
+      expect(persisted, isNotNull);
+      expect(persisted!.outcome, Obd2ConnectOutcome.gattTimeout);
+      expect(persisted!.endedAtMs, isNotNull,
+          reason: 'the hook must see the finalised snapshot');
+    });
+
+    test('a THROWING persist hook never derails endTrace (#1103 fault seam)',
+        () {
+      Obd2ConnectTraceLog.onTracePersist =
+          (_) => throw StateError('hive is sick');
+
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      h.setOutcome(Obd2ConnectOutcome.success);
+      expect(() => Obd2ConnectTraceLog.endTrace(h), returnsNormally);
+      // The ring still received the trace.
+      expect(Obd2ConnectTraceLog.snapshot(), hasLength(1));
+    });
+
+    test('a CHILD endTrace does not fire the hook (parent owns lifecycle)',
+        () {
+      var calls = 0;
+      Obd2ConnectTraceLog.onTracePersist = (_) => calls++;
+
+      final root = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect, mac: 'AA:BB');
+      final child = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.pickerScan);
+      Obd2ConnectTraceLog.endTrace(child);
+      expect(calls, 0, reason: 'child end is a lifecycle no-op');
+      Obd2ConnectTraceLog.endTrace(root);
+      expect(calls, 1);
+    });
+  });
 }
