@@ -9,6 +9,7 @@ import '../../search/domain/entities/station.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/dio_factory.dart';
+import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
@@ -25,7 +26,9 @@ import 'spain_provinces.dart';
 /// The API has no coordinate/radius search — only by province/municipality.
 /// Strategy: fetch all stations, calculate distances locally, filter by radius.
 /// The full dataset (~12,000 stations) is cached aggressively.
-class MitecoStationService with StationServiceHelpers implements StationService {
+class MitecoStationService
+    with StationServiceHelpers, KeyedCachedDatasetMixin
+    implements StationService {
   static const String defaultBaseUrl =
       'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes'
       '/PreciosCarburantes';
@@ -34,6 +37,7 @@ class MitecoStationService with StationServiceHelpers implements StationService 
   final String _baseUrl;
   final CacheStrategy? _cache;
   final DateTime Function() _now;
+  final WeeklyOpeningHours Function(String horario) _parseOpeningHours;
 
   /// #2181 — Dio injectable for tests; defaults to the standard factory.
   /// #2193 — [baseUrl] injectable too, harmonising the override surface
@@ -42,11 +46,14 @@ class MitecoStationService with StationServiceHelpers implements StationService 
   /// omit it for the pure in-memory behaviour the parser tests rely on.
   /// #3189 — [now] is the clock seam for the schedule-derived `isOpen`;
   /// defaults to the wall clock.
+  /// #3156 — [parseOpeningHours] is the parse-count seam for the no-re-parse
+  /// regression test; defaults to the real [SpainOpeningHoursAdapter].
   MitecoStationService({
     Dio? dio,
     String? baseUrl,
     CacheStrategy? cache,
     DateTime Function()? now,
+    WeeklyOpeningHours Function(String horario)? parseOpeningHours,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 20),
@@ -54,7 +61,9 @@ class MitecoStationService with StationServiceHelpers implements StationService 
             ),
         _baseUrl = baseUrl ?? defaultBaseUrl,
         _cache = cache,
-        _now = now ?? DateTime.now;
+        _now = now ?? DateTime.now,
+        _parseOpeningHours =
+            parseOpeningHours ?? const SpainOpeningHoursAdapter().parse;
 
   // #2264 — soft/hard dataset TTLs mirror the ES FuelServicePolicy (soft 6 h,
   // hard 24 h). The legacy single-list 10-minute cache is replaced by a
@@ -62,10 +71,19 @@ class MitecoStationService with StationServiceHelpers implements StationService 
   static const Duration _softTtl = Duration(hours: 6);
   static const Duration _hardTtl = Duration(hours: 24);
 
-  /// Per-province in-memory cache, keyed by `IDProvincia`. The previous single
-  /// unkeyed `_cachedStations` list meant the first province searched was
-  /// served for every later search regardless of location (#2264).
-  final Map<String, _ProvinceCache> _byProvince = {};
+  /// Per-province raw rows, keyed by `IDProvincia` (#2264 — province A's
+  /// stations are never served for B). Kept for [getStationDetail]'s id
+  /// lookup; they are also the persisted format, so the on-disk
+  /// `dataset:ES:province-<id>` entries of existing installs stay readable.
+  final Map<String, List<Map<String, dynamic>>> _rowsByProvince = {};
+
+  /// Per-province *parsed* [Station] templates (#3156). The expensive parse —
+  /// including the regex [SpainOpeningHoursAdapter] pass per row — runs ONCE
+  /// per dataset refresh (inside the keyed-mixin `store` callback), not on
+  /// every search; a dense province used to re-pay 800-2500 row parses per
+  /// repeat search. Templates carry placeholder `dist`/`isOpen`;
+  /// [_withSearchContext] stamps the real per-search values.
+  final Map<String, List<Station>> _stationsByProvince = {};
 
   @override
   Future<ServiceResult<List<Station>>> searchStations(
@@ -79,22 +97,38 @@ class MitecoStationService with StationServiceHelpers implements StationService 
       final provinceIds =
           spainProvincesNear(params.lat, params.lng, params.radiusKm);
 
-      final allStations = <Station>[];
+      // Dedupe across province borders by station id, pairing every cached
+      // template with its distance to the search centre. #3152
+      // filter-before-copyWith: only the in-result survivors below pay the
+      // `copyWith` + open-now computation.
+      final candidates = <(Station, double)>[];
       final seenIds = <String>{};
       for (final provinceId in provinceIds) {
-        final rawStations =
+        final templates =
             await _stationsForProvince(provinceId, cancelToken: cancelToken);
-        for (final r in rawStations) {
-          final station = _parseStation(r, params.lat, params.lng);
-          // Dedupe across province borders by station id.
-          if (station != null && seenIds.add(station.id)) {
-            allStations.add(station);
-          }
+        for (final t in templates) {
+          if (!seenIds.add(t.id)) continue;
+          candidates
+              .add((t, roundedDistance(params.lat, params.lng, t.lat, t.lng)));
         }
       }
 
-      // Filter by radius; if nothing found, return nearest 20
-      final stations = filterByRadius(allStations, params.radiusKm);
+      // Same semantics as [StationServiceHelpers.filterByRadius] (within
+      // radius; if nothing found, the nearest 20), applied on the (template,
+      // dist) pairs so out-of-radius templates are never materialised.
+      var survivors = [
+        for (final c in candidates)
+          if (c.$2 <= params.radiusKm) c,
+      ];
+      if (survivors.isEmpty && candidates.isNotEmpty) {
+        candidates.sort((a, b) => a.$2.compareTo(b.$2));
+        survivors = candidates.take(20).toList();
+      }
+
+      final stations = [
+        for (final (template, dist) in survivors)
+          _withSearchContext(template, dist),
+      ];
 
       // Sort
       sortStations(stations, params);
@@ -105,45 +139,36 @@ class MitecoStationService with StationServiceHelpers implements StationService 
     }
   }
 
-  /// Returns the raw station rows for one province, served from (in order):
-  /// the fresh in-memory copy, the persisted Hive copy (read-through, when a
-  /// cache is wired), then the network — and persisted on a fresh fetch.
-  Future<List<Map<String, dynamic>>> _stationsForProvince(
+  /// Returns the parsed [Station] templates for one province, served from (in
+  /// order): the fresh in-memory copy, the persisted Hive copy (read-through,
+  /// when a cache is wired), then the network — and persisted on a fresh
+  /// fetch. The TTL / read-through / dedupe / offline state machine lives in
+  /// the shared [KeyedCachedDatasetMixin] (#3156 — it used to be hand-rolled
+  /// here, a fork that mixin fixes never reached); this method only wires the
+  /// per-province seams and parses rows → templates once per refresh.
+  Future<List<Station>> _stationsForProvince(
     String provinceId, {
     CancelToken? cancelToken,
   }) async {
-    final mem = _byProvince[provinceId];
-    if (mem != null &&
-        DateTime.now().difference(mem.fetchedAt) < _softTtl) {
-      return mem.rows;
-    }
-
-    final persistent = _persistentFor(provinceId);
-    if (persistent != null) {
-      final disk = persistent.read();
-      if (disk != null && disk.age <= _hardTtl) {
-        _byProvince[provinceId] =
-            _ProvinceCache(disk.value, DateTime.now().subtract(disk.age));
-        if (disk.age <= _softTtl) return disk.value;
-      }
-    }
-
-    try {
-      final rows = await _fetchProvince(provinceId, cancelToken: cancelToken);
-      _byProvince[provinceId] = _ProvinceCache(rows, DateTime.now());
-      await persistent?.write(rows, hardTtl: _hardTtl);
-      return rows;
-    } on Object {
-      // Network failed — serve any persisted/in-memory copy rather than throw.
-      final disk = persistent?.read();
-      if (disk != null) {
-        _byProvince[provinceId] =
-            _ProvinceCache(disk.value, DateTime.now().subtract(disk.age));
-        return disk.value;
-      }
-      if (mem != null) return mem.rows;
-      rethrow;
-    }
+    await loadKeyedPersistentDataset<List<Map<String, dynamic>>>(
+      key: provinceId,
+      cached: _rowsByProvince[provinceId],
+      softTtl: _softTtl,
+      hardTtl: _hardTtl,
+      persistent: _persistentFor(provinceId),
+      fetch: () => _fetchProvince(provinceId, cancelToken: cancelToken),
+      store: (rows) {
+        _rowsByProvince[provinceId] = rows;
+        // #3156 — parse once per dataset refresh, NOT once per search. The
+        // two maps are only ever written together here, so a non-null
+        // `_rowsByProvince[id]` guarantees its parsed twin below.
+        _stationsByProvince[provinceId] =
+            rows.map(_parseStation).whereType<Station>().toList(
+                  growable: false,
+                );
+      },
+    );
+    return _stationsByProvince[provinceId] ?? const [];
   }
 
   PersistentDataset<List<Map<String, dynamic>>>? _persistentFor(
@@ -187,9 +212,13 @@ class MitecoStationService with StationServiceHelpers implements StationService 
     return list.cast<Map<String, dynamic>>();
   }
 
-  Station? _parseStation(
-    Map<String, dynamic> r, double searchLat, double searchLng,
-  ) {
+  /// Parse one raw MITECO row into a [Station] *template* (#3156): every
+  /// search-independent field is final, while `dist` (0 placeholder) and
+  /// `isOpen` (legacy heuristic placeholder) are stamped per search / detail
+  /// tap by [_withSearchContext]. Templates are cached per province in
+  /// [_stationsByProvince], so this — including the regex opening-hours
+  /// adapter — runs once per dataset refresh.
+  Station? _parseStation(Map<String, dynamic> r) {
     try {
       // Coordinates use comma as decimal separator
       final lat = _parseCommaDouble(r['Latitud']?.toString());
@@ -207,23 +236,7 @@ class MitecoStationService with StationServiceHelpers implements StationService 
       // [WeeklyOpeningHours]. The legacy `openingHoursText` / `isOpen` stay
       // for back-compat; the structured `weeklyHours` is the canonical
       // signal the #2706 detail-fallback threads into the detail screen.
-      final weeklyHours = const SpainOpeningHoursAdapter().parse(horario);
-
-      // #3189 — derive isOpen from the parsed schedule when available (the
-      // old heuristic returned true for ANY non-empty horario, so a
-      // "L-V: 06:00-23:00" station showed open at 3 AM). When the schedule is
-      // unusable, fall back to the legacy non-empty heuristic.
-      final fallbackOpen = horario.isNotEmpty && horario != 'Cerrado';
-      final bool isOpen;
-      if (weeklyHours.availability == OpeningHoursAvailability.notProvided) {
-        isOpen = fallbackOpen;
-      } else {
-        isOpen = switch (computeOpenNow(weeklyHours, _now()).status) {
-          OpenStatus.open => true,
-          OpenStatus.closed => false,
-          OpenStatus.unknown => fallbackOpen,
-        };
-      }
+      final weeklyHours = _parseOpeningHours(horario);
 
       // #753 — `es-` prefix so a MITECO `IDEESS` (bare numeric) cannot
       // collide with another country's numeric id space.
@@ -239,7 +252,9 @@ class MitecoStationService with StationServiceHelpers implements StationService 
         place: city,
         lat: lat,
         lng: lng,
-        dist: roundedDistance(searchLat, searchLng, lat, lng),
+        // Placeholder — [_withSearchContext] stamps the real per-search
+        // distance (templates are parsed before any search centre is known).
+        dist: 0,
         e5: _parseCommaDouble(r['Precio Gasolina 95 E5']?.toString()),
         e10: _parseCommaDouble(r['Precio Gasolina 95 E10']?.toString()),
         e98: _parseCommaDouble(r['Precio Gasolina 98 E5']?.toString()),
@@ -252,7 +267,9 @@ class MitecoStationService with StationServiceHelpers implements StationService 
             _parseCommaDouble(r['Precio Gasolina 95 E85']?.toString()),
         lpg: _parseCommaDouble(r['Precio Gases licuados del petróleo']?.toString()),
         cng: _parseCommaDouble(r['Precio Gas Natural Comprimido']?.toString()),
-        isOpen: isOpen,
+        // Placeholder (legacy non-empty heuristic) — [_withSearchContext]
+        // stamps the schedule-derived value at the moment of each search.
+        isOpen: horario.isNotEmpty && horario != 'Cerrado',
         openingHoursText: horario.isNotEmpty ? horario : null,
         openingHours: weeklyHours.availability ==
                 OpeningHoursAvailability.notProvided
@@ -268,6 +285,30 @@ class MitecoStationService with StationServiceHelpers implements StationService 
     }
   }
 
+  /// Stamp a cached [template] with the per-search values: the distance to
+  /// the search centre and the schedule-derived open state *at this moment*
+  /// (#3156 — `isOpen` is recomputed on every search precisely so the 6 h
+  /// province cache can never pin a stale open/closed flag; the pre-cache
+  /// code recomputed it implicitly by re-parsing every row).
+  Station _withSearchContext(Station template, double dist) =>
+      template.copyWith(dist: dist, isOpen: _isOpenNow(template));
+
+  /// #3189 open-now derivation, computed from the template's already-parsed
+  /// fields: the structured schedule when available (`openingHours` is null
+  /// exactly when the adapter returned `notProvided`), else the legacy
+  /// non-empty-horario heuristic.
+  bool _isOpenNow(Station template) {
+    final horario = template.openingHoursText ?? '';
+    final fallbackOpen = horario.isNotEmpty && horario != 'Cerrado';
+    final weeklyHours = template.openingHours;
+    if (weeklyHours == null) return fallbackOpen;
+    return switch (computeOpenNow(weeklyHours, _now()).status) {
+      OpenStatus.open => true,
+      OpenStatus.closed => false,
+      OpenStatus.unknown => fallbackOpen,
+    };
+  }
+
   /// Parse a number string that uses comma as decimal separator.
   /// "1,817" → 1.817, "" → null, null → null
   double? _parseCommaDouble(String? value) {
@@ -280,7 +321,7 @@ class MitecoStationService with StationServiceHelpers implements StationService 
     String stationId,
   ) async {
     // #2706 — MITECO is a BULK feed: there is no per-station detail endpoint.
-    // A search already cached every province's full rows in [_byProvince],
+    // A search already cached every province's full rows in [_rowsByProvince],
     // and each row carries name/brand/street/prices/coords. So a detail tap
     // that falls through the provider's in-search fast path (widget rows,
     // deep links, favorites) is resolved from that cache rather than throwing.
@@ -289,14 +330,12 @@ class MitecoStationService with StationServiceHelpers implements StationService 
         : stationId;
     final row = _findCachedRow(rawId);
     if (row != null) {
-      final lat = _parseCommaDouble(row['Latitud']?.toString()) ?? 0;
-      final lng = _parseCommaDouble(row['Longitud (WGS84)']?.toString()) ?? 0;
-      // Reuse the search parser; `dist` is irrelevant on the detail screen so
-      // the station's own coords double as the (no-op) search centre.
-      final station = _parseStation(row, lat, lng);
-      if (station != null) {
+      // Reuse the search parser; `dist` is irrelevant on the detail screen
+      // (stamped 0, as the pre-#3156 own-coords-as-centre parse yielded).
+      final template = _parseStation(row);
+      if (template != null) {
         return ServiceResult<StationDetail>(
-          data: StationDetail(station: station),
+          data: StationDetail(station: _withSearchContext(template, 0)),
           source: ServiceSource.cache,
           fetchedAt: DateTime.now(),
         );
@@ -310,10 +349,10 @@ class MitecoStationService with StationServiceHelpers implements StationService 
 
   /// Linear scan of every cached province for the raw `IDEESS` row matching
   /// [rawId] (#2706). A per-detail-tap scan is cheap and deliberately does NOT
-  /// restructure [_byProvince] (that would collide with the #2713 OH adapter).
+  /// restructure [_rowsByProvince].
   Map<String, dynamic>? _findCachedRow(String rawId) {
-    for (final province in _byProvince.values) {
-      for (final row in province.rows) {
+    for (final rows in _rowsByProvince.values) {
+      for (final row in rows) {
         if (row['IDEESS']?.toString() == rawId) return row;
       }
     }
@@ -326,13 +365,4 @@ class MitecoStationService with StationServiceHelpers implements StationService 
   ) async {
     return emptyPricesResult(ServiceSource.mitecoApi);
   }
-}
-
-/// One province's cached raw rows + when they were fetched (#2264). Keyed by
-/// `IDProvincia` in [MitecoStationService._byProvince] so province A's
-/// stations are never served for a search in province B.
-class _ProvinceCache {
-  final List<Map<String, dynamic>> rows;
-  final DateTime fetchedAt;
-  const _ProvinceCache(this.rows, this.fetchedAt);
 }
