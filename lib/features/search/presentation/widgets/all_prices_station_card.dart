@@ -52,6 +52,14 @@ class AllPricesStationCard extends StatelessWidget {
   /// the card keeps that exclusion on top.
   bool get _hasBrand => hasRealBrand(station) && station.brand != 'Autoroute';
 
+  /// #3198 — tri-state status colour: green when known-open, red when
+  /// known-closed, neutral muted when the source gave no signal.
+  Color _statusColor(BuildContext context) => switch (station.isOpen) {
+        true => DarkModeColors.success(context),
+        false => DarkModeColors.error(context),
+        null => DarkModeColors.mutedText(context),
+      };
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -71,15 +79,14 @@ class AllPricesStationCard extends StatelessWidget {
             // Header row: status dot + name + distance + favorite
             Row(
               children: [
-                // Status indicator
+                // Status indicator — #3198 tri-state: unknown renders the
+                // neutral muted dot, never the red "closed" one.
                 Container(
                   width: 12,
                   height: 12,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: station.isOpen
-                        ? DarkModeColors.success(context)
-                        : DarkModeColors.error(context),
+                    color: _statusColor(context),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -94,30 +101,26 @@ class AllPricesStationCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                // Status badge
+                // Status badge — #3198 tri-state (Open / Closed / Unknown).
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 6,
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: station.isOpen
-                        ? DarkModeColors.success(
-                            context,
-                          ).withValues(alpha: 0.12)
-                        : DarkModeColors.error(context).withValues(alpha: 0.12),
+                    color: _statusColor(context).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    station.isOpen
-                        ? (l10n?.open ?? 'Open')
-                        : (l10n?.closed ?? 'Closed'),
+                    switch (station.isOpen) {
+                      true => l10n?.open ?? 'Open',
+                      false => l10n?.closed ?? 'Closed',
+                      null => l10n?.openStateUnknown ?? 'Unknown',
+                    },
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: station.isOpen
-                          ? DarkModeColors.success(context)
-                          : DarkModeColors.error(context),
+                      color: _statusColor(context),
                     ),
                   ),
                 ),

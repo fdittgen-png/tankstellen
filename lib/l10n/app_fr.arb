@@ -4854,5 +4854,20 @@
   "@alertsLastCheckedNever": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "openStateUnknown": "Unknown",
+  "@openStateUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "stationOpenStateSemantic": "{open, select, true{Station is open} false{Station is closed} other{Open state unknown}}",
+  "@stationOpenStateSemantic": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "open": {
+        "type": "String"
+      }
+    }
   }
 }

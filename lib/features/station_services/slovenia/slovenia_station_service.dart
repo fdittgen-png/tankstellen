@@ -210,11 +210,10 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
       dieselPremium: dizelPremium,
       lpg: lpg,
       cng: cng,
-      // #3196 — open/closed is not reliably derivable here (Station.isOpen
-      // is non-nullable, so "unknown" cannot be expressed without a model
-      // change); keep the optimistic default the other no-signal countries
-      // use and carry the raw hours text alongside.
-      isOpen: true,
+      // #3198 — goriva.si exposes no reliable open/closed flag and only a
+      // free-form hours text: honest unknown (the #3196 optimistic `true`
+      // existed only because the field was non-nullable back then).
+      isOpen: null,
       openingHoursText: openHoursText,
       is24h: openHoursText != null && openHoursText.startsWith('00:00-23:59'),
     );

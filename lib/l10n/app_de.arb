@@ -3176,6 +3176,8 @@
   "openingHoursNotAvailable": "Öffnungszeiten nicht verfügbar",
   "showAllHours": "Alle Zeiten anzeigen",
   "showLessHours": "Weniger anzeigen",
+  "openStateUnknown": "Unbekannt",
+  "stationOpenStateSemantic": "{open, select, true{Station ist geöffnet} false{Station ist geschlossen} other{Öffnungsstatus unbekannt}}",
   "tripRecordingPipEstConsumptionCaption": "gesch. L/100 km",
   "@tripRecordingPipEstConsumptionCaption": {
     "description": "#2393 — unit caption under the big GPS-estimated consumption figure on the PiP tile (the GPS-only branch added by #2390). Marks the value as an estimate ('est.') so it reads distinctly from the OBD2-measured 'L/100 km' caption — the leading '~' on the figure carries the same meaning visually. Short, fits a narrow PiP window."

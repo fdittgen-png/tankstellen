@@ -108,7 +108,9 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
               prices?.gasolioPremiumSelf ?? prices?.gasolioPremiumServed,
           lpg: prices?.gpl,
           cng: prices?.metano,
-          isOpen: true,
+          // #3198 — the MIMIT dataset carries no open/closed signal:
+          // honest unknown instead of the old hard-coded `true`.
+          isOpen: null,
           updatedAt: prices?.updatedAt,
           stationType: s.type == 'Autostradale' ? 'A' : 'R',
         ));

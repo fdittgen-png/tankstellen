@@ -105,7 +105,7 @@ void main() {
       expect(stations.singleWhere((s) => s.id == 'es-12616').isOpen, isTrue);
     });
 
-    test('an empty horario falls back to the legacy heuristic (closed=false)',
+    test('an empty horario is honest unknown, not closed (#3198)',
         () async {
       final stations = await searchMitecoStations([
         {
@@ -120,7 +120,8 @@ void main() {
           'Horario': '',
         },
       ]);
-      expect(stations.singleWhere((s) => s.id == 'es-77').isOpen, isFalse);
+      expect(stations.singleWhere((s) => s.id == 'es-77').isOpen, isNull,
+          reason: 'no hours data is unknown — neither open nor closed');
     });
   });
 

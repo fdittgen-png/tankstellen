@@ -58,6 +58,18 @@ void main() {
       expect(find.text('Closed'), findsOneWidget);
     });
 
+    testWidgets(
+        '#3198 — an unknown open state shows the Unknown badge, '
+        'never Closed (and never Open)', (tester) async {
+      final unknownStation = testStation.copyWith(isOpen: null);
+
+      await pumpApp(tester, AllPricesStationCard(station: unknownStation));
+
+      expect(find.text('Unknown'), findsOneWidget);
+      expect(find.text('Closed'), findsNothing);
+      expect(find.text('Open'), findsNothing);
+    });
+
     testWidgets('renders fuel price badges for available fuels', (
       tester,
     ) async {

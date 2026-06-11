@@ -11856,6 +11856,18 @@ abstract class AppLocalizations {
   /// **'Show less'**
   String get showLessHours;
 
+  /// Tri-state open badge/status when the data source publishes no open/closed signal (#3198). Shown instead of Open/Closed on cards and the detail status row.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get openStateUnknown;
+
+  /// Screen-reader label for the tri-state station open state (#3198). 'true'/'false' are the known states; any other value (the stringified null) means the source gave no signal.
+  ///
+  /// In en, this message translates to:
+  /// **'{open, select, true{Station is open} false{Station is closed} other{Open state unknown}}'**
+  String stationOpenStateSemantic(String open);
+
   /// #2393 — unit caption under the big GPS-estimated consumption figure on the PiP tile (the GPS-only branch added by #2390). Marks the value as an estimate ('est.') so it reads distinctly from the OBD2-measured 'L/100 km' caption — the leading '~' on the figure carries the same meaning visually. Short, fits a narrow PiP window.
   ///
   /// In en, this message translates to:

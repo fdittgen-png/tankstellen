@@ -1939,6 +1939,8 @@
   "openingHoursNotAvailable": "⟦Óƥéñîñǧ ĥóúřš ñóŧ áṽáîłáƀłé ···········⟧",
   "showAllHours": "⟦Šĥóŵ áłł ĥóúřš ·····⟧",
   "showLessHours": "⟦Šĥóŵ łéšš ····⟧",
+  "openStateUnknown": "⟦Úñķñóŵñ ···⟧",
+  "stationOpenStateSemantic": "⟦{open, select, true{Station is open} false{Station is closed} other{Open state unknown}}⟧",
   "tripRecordingPipEstConsumptionCaption": "⟦éšŧ. Ł/100 ķɱ ···⟧",
   "tripRecordingEstimatedInfo": "⟦Éšŧîɱáŧéđ ṽáłúé (~) — ñó ƒúéł šéñšóř óñ ŧĥîš ŧřîƥ, šó ŧĥé Ł/100 ķɱ ƒîǧúřé îš ɱóđéłłéđ ƒřóɱ ǦƤŠ šƥééđ áñđ ýóúř ṽéĥîçłé'š çáłîƀřáŧîóñ. Îŧ îš áƥƥřóẋîɱáŧé (ŧýƥîçáłłý ±10–30 %, ŧîǧĥŧéñîñǧ áš ŧĥé çáłîƀřáŧîóñ ɱáŧúřéš), ñóŧ á ɱéášúřéđ řéáđîñǧ. ··············································································⟧",
   "tripRecordingPipElapsedCaption": "⟦éłáƥšéđ ···⟧",

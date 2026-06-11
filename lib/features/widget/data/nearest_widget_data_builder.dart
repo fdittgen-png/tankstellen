@@ -319,7 +319,11 @@ class NearestWidgetDataBuilder {
       'distanceKm': double.parse(station.dist.toStringAsFixed(1)),
       'priceFormatted': priceFormatted,
       'currency': currency,
-      'isOpen': station.isOpen,
+      // #3198 — the Kotlin/Swift widget renderers expect a bool and have
+      // no third state; an unknown open state must not render the "closed"
+      // marker, so it maps to true here (the pre-#3198 value for every
+      // country that publishes no signal).
+      'isOpen': station.isOpen ?? true,
       // Parity fields with the favorites widget so the Kotlin renderer
       // can switch modes without a second JSON shape.
       'preferred_fuel_code': fuel.apiValue,

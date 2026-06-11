@@ -158,7 +158,9 @@ class EControlStationService with StationServiceHelpers implements StationServic
       }).where((s) => s.isNotEmpty).join(', ');
 
       final name = r['name']?.toString() ?? '';
-      final isOpen = r['open'] as bool? ?? true;
+      // #3198 — E-Control's `open` flag is authoritative when present;
+      // a missing flag is honest unknown, not `true`.
+      final isOpen = r['open'] as bool?;
 
       // #753 — `at-` prefix so a numeric E-Control id can never collide
       // with another country's numeric id space when widget JSON or

@@ -68,7 +68,11 @@ List<Station> applyAmenityAndStatusFilters(
   }
 
   if (openOnly) {
-    result = result.where((s) => s.isOpen).toList();
+    // #3198 — drop only KNOWN-closed stations. An unknown open state
+    // (`isOpen == null` — the source publishes no signal, e.g. UK/MX/KR)
+    // passes: excluding it would empty the whole result list for those
+    // countries, which is worse than showing a possibly-closed station.
+    result = result.where((s) => s.isOpen != false).toList();
   }
 
   return result;

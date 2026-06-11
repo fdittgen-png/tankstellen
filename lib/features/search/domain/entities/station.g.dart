@@ -25,7 +25,7 @@ _Station _$StationFromJson(Map<String, dynamic> json) => _Station(
   e85: _priceFromJson(json['e85']),
   lpg: _priceFromJson(json['lpg']),
   cng: _priceFromJson(json['cng']),
-  isOpen: json['isOpen'] as bool,
+  isOpen: json['isOpen'] as bool?,
   updatedAt: json['updatedAt'] as String?,
   openingHoursText: json['openingHoursText'] as String?,
   openingHours: json['openingHours'] == null

@@ -37,8 +37,13 @@ Map<String, dynamic> stationPricesToTankerkoenigShape(StationPrices prices) => {
 /// `getPrices` returns empty by design (prices live on the dataset rows the
 /// search emits, not behind a per-station endpoint).
 Map<String, dynamic> stationToTankerkoenigShape(Station station) => {
-      TankerkoenigFields.status:
-          station.isOpen ? TankerkoenigFields.statusOpen : 'closed',
+      // #3198 — tri-state `Station.isOpen`: only a KNOWN-closed station
+      // reports 'closed'; an unknown state stays 'open' so price alerts
+      // keep evaluating for the many countries whose feed publishes no
+      // open/closed signal (the pre-#3198 behaviour for those countries).
+      TankerkoenigFields.status: station.isOpen == false
+          ? 'closed'
+          : TankerkoenigFields.statusOpen,
       TankerkoenigFields.e5: station.e5,
       TankerkoenigFields.e10: station.e10,
       TankerkoenigFields.diesel: station.diesel,

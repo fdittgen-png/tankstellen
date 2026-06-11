@@ -185,7 +185,9 @@ class ArgentinaStationService with StationServiceHelpers, CachedDatasetMixin imp
           diesel: entry.dieselRegular,
           dieselPremium: entry.dieselPremium,
           cng: entry.gnc,
-          isOpen: true,
+          // #3198 — the Secretaría feed publishes prices, not hours:
+          // honest unknown instead of the old hard-coded `true`.
+          isOpen: null,
           updatedAt: raw.fechaVigencia,
           region: raw.provincia,
         ));

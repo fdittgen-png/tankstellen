@@ -188,7 +188,8 @@ void main() {
       expect(s.e98, 24.89, reason: 'CRE premium → e98 (high-octane), not e10');
       expect(s.e10, isNull, reason: 'no European e10 grade in Mexico');
       expect(s.diesel, 23.45);
-      expect(s.isOpen, isTrue);
+      // #3198 — CRE publishes no open/closed signal: honest unknown.
+      expect(s.isOpen, isNull);
     });
 
     test('location.x is longitude and y is latitude (never swapped)',

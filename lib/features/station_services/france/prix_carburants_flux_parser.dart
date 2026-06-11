@@ -31,17 +31,19 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
+import '../../../core/country/country_time.dart';
 import '../../search/domain/entities/station.dart';
+import '../opening_hours/open_state_from_hours.dart';
 import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_parsers.dart' as parser;
 
 /// Decode the flux ZIP [bytes], locate the inner XML entry, and parse every
 /// point-of-sale into a [Station] (distance 0 — the caller stamps it per
 /// search). Returns `[]` when the ZIP holds no XML entry or it is empty.
-List<Station> parseFluxZip(List<int> bytes) {
+List<Station> parseFluxZip(List<int> bytes, {DateTime? now}) {
   final xml = extractFluxXml(bytes);
   if (xml == null || xml.isEmpty) return const [];
-  return parseFluxXml(xml);
+  return parseFluxXml(xml, now: now);
 }
 
 /// Pull the inner XML document text out of the flux ZIP. The archive holds a
@@ -71,7 +73,7 @@ String _decodeBytes(Uint8List bytes) {
 
 /// Parse the flux XML document text into [Station]s. Exposed separately so the
 /// XML-shape contract can be tested without zipping a fixture first.
-List<Station> parseFluxXml(String xml) {
+List<Station> parseFluxXml(String xml, {DateTime? now}) {
   final XmlDocument doc;
   try {
     doc = XmlDocument.parse(xml);
@@ -79,9 +81,12 @@ List<Station> parseFluxXml(String xml) {
     return const [];
   }
 
+  // Resolve the open-now reference instant ONCE per document — #3198 clock
+  // seam; defaults to France's wall clock (see [nowInCountry]).
+  final ref = now ?? nowInCountry('FR');
   final stations = <Station>[];
   for (final pdv in doc.findAllElements('pdv')) {
-    final station = parseFluxPdv(pdv);
+    final station = parseFluxPdv(pdv, now: ref);
     if (station != null) stations.add(station);
   }
   return stations;
@@ -89,7 +94,7 @@ List<Station> parseFluxXml(String xml) {
 
 /// Parse a single `<pdv>` element into a [Station], or `null` when it carries
 /// no usable coordinates. Public for direct unit testing.
-Station? parseFluxPdv(XmlElement pdv) {
+Station? parseFluxPdv(XmlElement pdv, {DateTime? now}) {
   final lat = _coord(pdv.getAttribute('latitude'));
   final lng = _coord(pdv.getAttribute('longitude'));
   if (lat == null || lng == null || lat == 0 || lng == 0) return null;
@@ -145,6 +150,14 @@ Station? parseFluxPdv(XmlElement pdv) {
     }
   }
 
+  // #2751 — same structured schedule the instantané path parses (the glued
+  // `rawHoraires` is the shape the adapter handles) so the detail fast path
+  // renders staffed hours.
+  final openingHours = const FranceOpeningHoursAdapter().parse(<String, dynamic>{
+    'horaires_jour': rawHoraires,
+    'horaires_automate_24_24': is24h ? 'Oui' : 'Non',
+  });
+
   // #753 — scope the id with the `fr-` country prefix (matches the legacy
   // JSON parser) so a French numeric id cannot collide with another country.
   return Station(
@@ -163,18 +176,17 @@ Station? parseFluxPdv(XmlElement pdv) {
     diesel: diesel,
     e85: e85,
     lpg: lpg,
-    isOpen: true,
+    // #3198 — schedule-derived instead of the old hard-coded `true`; a
+    // 24/7 automate dispenses fuel regardless of staffed hours. `null`
+    // when the pdv carries no usable hours (the honest "unknown").
+    isOpen: is24h
+        ? true
+        : openStateFromHours(openingHours, now ?? nowInCountry('FR')),
     updatedAt: _formatMaj(mostRecentMaj),
     stationType: pop.isEmpty ? null : pop,
     is24h: is24h,
     openingHoursText: openingHoursText,
-    // #2751 — carry the structured schedule on the search Station (the
-    // glued `rawHoraires` is the same shape the adapter parses on the
-    // instantané path) so the detail fast path renders staffed hours.
-    openingHours: const FranceOpeningHoursAdapter().parse(<String, dynamic>{
-      'horaires_jour': rawHoraires,
-      'horaires_automate_24_24': is24h ? 'Oui' : 'Non',
-    }),
+    openingHours: openingHours,
   );
 }
 

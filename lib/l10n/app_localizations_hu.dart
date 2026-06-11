@@ -6850,6 +6850,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get showLessHours => 'Kevesebb megjelenítése';
 
   @override
+  String get openStateUnknown => 'Unknown';
+
+  @override
+  String stationOpenStateSemantic(String open) {
+    String _temp0 = intl.Intl.selectLogic(open, {
+      'true': 'Station is open',
+      'false': 'Station is closed',
+      'other': 'Open state unknown',
+    });
+    return '$_temp0';
+  }
+
+  @override
   String get tripRecordingPipEstConsumptionCaption => 'becsült L/100 km';
 
   @override

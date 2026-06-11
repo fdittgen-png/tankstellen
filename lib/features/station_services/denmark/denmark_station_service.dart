@@ -229,7 +229,9 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           e10: e5,
           e98: e98,
           diesel: diesel,
-          isOpen: true,
+          // #3198 — the OK feed carries no open/closed signal: honest
+          // unknown instead of the old hard-coded `true`.
+          isOpen: null,
           updatedAt: _formatIsoTime(r['last_updated_time']?.toString()),
         );
       }).whereType<Station>().toList();
@@ -296,7 +298,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           e98: e98,
           diesel: diesel,
           dieselPremium: dieselPremium,
-          isOpen: true,
+          // #3198 — the Shell feed carries no open/closed signal either.
+          isOpen: null,
           updatedAt: _formatIsoTime(
             (prices.isNotEmpty ? prices.first['lastUpdated'] : null)?.toString(),
           ),

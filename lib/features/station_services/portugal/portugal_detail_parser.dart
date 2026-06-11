@@ -53,7 +53,9 @@ abstract final class PortugalDetailParser {
       place: place,
       lat: 0,
       lng: 0,
-      isOpen: true,
+      // #3198 — bare detail fallback (no cached search row): the open
+      // state is stamped by the caller from the parsed weekly hours.
+      isOpen: null,
     );
   }
 

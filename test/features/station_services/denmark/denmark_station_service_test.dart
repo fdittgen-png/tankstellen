@@ -337,7 +337,8 @@ void main() {
         expect(s.e5, closeTo(13.49, 0.01));
         expect(s.e10, closeTo(13.49, 0.01));
         expect(s.diesel, closeTo(11.99, 0.01));
-        expect(s.isOpen, isTrue);
+        // #3198 — the OK feed carries no open/closed signal: honest unknown.
+        expect(s.isOpen, isNull);
       });
 
       test('skips stations with zero coordinates', () {
@@ -825,7 +826,7 @@ class _TestableDenmarkParser {
         e5: e5,
         e10: e5,
         diesel: diesel,
-        isOpen: true,
+        isOpen: null, // #3198 — mirrors the real parser: no signal
         updatedAt: testFormatIsoTime(r['last_updated_time']?.toString()),
       );
     }).whereType<Station>().toList();
@@ -865,7 +866,7 @@ class _TestableDenmarkParser {
         e5: e5,
         e10: e5,
         diesel: diesel,
-        isOpen: true,
+        isOpen: null, // #3198 — mirrors the real parser: no signal
         updatedAt: testFormatIsoTime(
           (prices.isNotEmpty ? prices.first['lastUpdated'] : null)?.toString(),
         ),

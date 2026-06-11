@@ -30,7 +30,16 @@ abstract class Station with _$Station {
     @JsonKey(fromJson: _priceFromJson) double? e85,
     @JsonKey(fromJson: _priceFromJson) double? lpg,
     @JsonKey(fromJson: _priceFromJson) double? cng,
-    required bool isOpen,
+    // #3198 — tri-state open flag. `true` / `false` are *known* states (a
+    // provider flag, or schedule-derived at fetch time); `null` means the
+    // source gave no usable open/closed signal. Six countries used to
+    // hard-code `true` because the field was non-nullable, silently
+    // presenting possibly-closed stations as open to radar/alerts/cards.
+    // The UI renders `null` as "unknown" — never as open or closed.
+    // ADDITIVE for every codec (#2777 lesson): older cache/favorites/
+    // widget JSON carries an explicit bool (still read as-is); a missing
+    // or null key reads as null.
+    bool? isOpen,
     String? updatedAt,
     String? openingHoursText,  // "Lun 07:00-18:30, Mar 07:00-18:30..."
     // Epic C4 — structured weekly hours from a per-country

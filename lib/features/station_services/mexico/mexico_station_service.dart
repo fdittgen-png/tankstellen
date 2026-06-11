@@ -135,7 +135,7 @@ class MexicoStationService
           e5: c.regular,
           e98: c.premium,
           diesel: c.diesel,
-          isOpen: true,
+          isOpen: null, // #3198 — CRE publishes no open/closed signal.
         ));
       }
 

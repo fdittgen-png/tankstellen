@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../search/data/models/search_params.dart';
 import '../../search/domain/entities/station.dart';
+import '../../../core/country/country_time.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/dio_factory.dart';
@@ -17,6 +18,7 @@ import '../../../core/services/mixins/cached_dataset_mixin.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../station_detail/domain/opening_hours.dart';
+import '../opening_hours/open_state_from_hours.dart';
 import 'portugal_detail_parser.dart';
 import 'portugal_merged_row.dart';
 import 'portugal_opening_hours_adapter.dart';
@@ -257,7 +259,10 @@ class PortugalStationService
         e98: row.gasolina98,
         diesel: row.gasoleo,
         lpg: row.gpl,
-        isOpen: true,
+        // #3198 — DGEG's search payload carries no open/closed signal and
+        // no hours (they live on the detail endpoint, #2778): honest
+        // unknown instead of the old hard-coded `true`.
+        isOpen: null,
         updatedAt: row.formattedUpdatedAt,
       ));
     }
@@ -332,7 +337,12 @@ class PortugalStationService
 
       return ServiceResult(
         data: StationDetail(
-          station: station,
+          // #3198 — the detail endpoint DOES carry hours: stamp the
+          // schedule-derived open state (on Portugal's wall clock) onto
+          // the station so the detail header renders honestly.
+          station: station.copyWith(
+            isOpen: openStateFromHours(weeklyHours, nowInCountry('PT')),
+          ),
           openingHours: weeklyHours.availability ==
                   OpeningHoursAvailability.notProvided
               ? null

@@ -516,7 +516,8 @@ col0,col1,col2,YPF,AV. RIVADAVIA 5000,CABALLITO,Buenos Aires,col7,col8,Nafta pre
       expect(station.lat, closeTo(-34.62, 0.01));
       expect(station.lng, closeTo(-58.43, 0.01));
       expect(station.e98, closeTo(750.0, 0.01));
-      expect(station.isOpen, isTrue);
+      // #3198 — the Secretaría feed publishes no open/closed signal.
+      expect(station.isOpen, isNull);
       expect(station.region, 'Buenos Aires');
       expect(station.updatedAt, '2026-03-20');
     });

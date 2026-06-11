@@ -39,6 +39,37 @@ void main() {
       expect(json['lng'], isA<double>());
       expect(json['isOpen'], isA<bool>());
     });
+
+    // #3198 — tri-state isOpen across the cache/favorites/widget JSON
+    // codec (the #2776/#2777 silent-drop lesson: every state must survive
+    // the real toJson→fromJson round-trip, and legacy payloads written by
+    // older builds must still read).
+    group('tri-state isOpen codec (#3198)', () {
+      test('an unknown open state (null) survives the JSON round-trip', () {
+        final unknown = testStation.copyWith(isOpen: null);
+        final roundtripped = Station.fromJson(unknown.toJson());
+        expect(roundtripped.isOpen, isNull,
+            reason: 'null must round-trip as null — not collapse to a bool');
+      });
+
+      test('a known-closed state survives the JSON round-trip', () {
+        final closed = testStation.copyWith(isOpen: false);
+        expect(Station.fromJson(closed.toJson()).isOpen, isFalse);
+      });
+
+      test('legacy cache JSON with an explicit bool still reads as-is', () {
+        // Payload shape written by pre-#3198 builds: isOpen always a bool.
+        final legacy = Map<String, dynamic>.from(testStation.toJson())
+          ..['isOpen'] = true;
+        expect(Station.fromJson(legacy).isOpen, isTrue);
+      });
+
+      test('cache JSON missing the isOpen key reads as unknown', () {
+        final json = Map<String, dynamic>.from(testStation.toJson())
+          ..remove('isOpen');
+        expect(Station.fromJson(json).isOpen, isNull);
+      });
+    });
   });
 
   group('Station.priceFor', () {
