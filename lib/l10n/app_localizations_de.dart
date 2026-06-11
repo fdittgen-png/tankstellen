@@ -3689,6 +3689,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Preise wurden im Hintergrund noch nicht geprüft';
 
   @override
+  String get alertsIosBestEffortNote =>
+      'Auf dem iPhone sind Preisprüfungen Best-Effort: iOS entscheidet, wann die App im Hintergrund Preise prüfen darf — ein Alarm kann daher verspätet oder vereinzelt gar nicht eintreffen. Beim Öffnen der App wird immer sofort neu geprüft.';
+
+  @override
   String alertTargetPriceWithCurrency(String currency) {
     return 'Zielpreis ($currency)';
   }

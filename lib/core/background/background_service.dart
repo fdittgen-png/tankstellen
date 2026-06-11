@@ -10,9 +10,11 @@ import '../../core/logging/error_logger.dart';
 import '../../features/alerts/data/radius_alert_store.dart';
 import '../storage/hive_storage.dart';
 import 'background_alert_scan_coordinator.dart';
+import 'background_price_fetcher.dart';
 import 'background_price_fetcher_provider.dart';
 import 'background_price_history_writer.dart';
 import 'notification_templates.dart';
+import 'slc_wake_monitor.dart';
 
 /// Background price-refresh scheduling + the WorkManager / iOS BGTask
 /// callback entry point.
@@ -144,15 +146,8 @@ class BackgroundService {
   /// startup. Cancels only when BOTH alert kinds are empty.
   static Future<void> reconcile() async {
     try {
-      final hasPriceAlert =
-          HiveStorage().getAlerts().any((a) => a['isActive'] == true);
-      var hasRadiusAlert = false;
-      try {
-        hasRadiusAlert = (await RadiusAlertStore().list()).any((a) => a.enabled);
-      } catch (_) {
-        // Radius store unreadable (e.g. box not open) — treat as none.
-      }
-      if (hasPriceAlert || hasRadiusAlert) {
+      final active = await hasActiveAlerts();
+      if (active) {
         // #2306 — resolve the localized notification templates HERE, in
         // the main isolate, where the active in-app locale is known, and
         // stash them in Hive settings. The OS-spawned background isolate
@@ -163,10 +158,59 @@ class BackgroundService {
       } else {
         await cancelAll();
       }
+      // #3169 — significant-location-change wake (iOS only; no-op
+      // elsewhere via the facade seam). Armed only while alerts are
+      // active, and the native side additionally requires an existing
+      // Always location grant — it never prompts.
+      await createSlcWakeMonitor().setEnabled(active);
     } catch (e, st) {
       // Never let a scheduling hiccup crash an alert mutation or startup.
       unawaited(errorLogger.log(ErrorLayer.background, e, st,
           context: const {'where': 'BackgroundService.reconcile'}));
+    }
+  }
+
+  /// Whether ANY user-consented alert is active — a per-station
+  /// [PriceAlert] OR a [RadiusAlert]. The single gate every scheduling
+  /// surface shares ([reconcile], [onOpportunisticWake]). Never throws on
+  /// a missing/unreadable radius store; a missing alerts box DOES throw —
+  /// callers wrap.
+  static Future<bool> hasActiveAlerts() async {
+    final hasPriceAlert =
+        HiveStorage().getAlerts().any((a) => a['isActive'] == true);
+    var hasRadiusAlert = false;
+    try {
+      hasRadiusAlert = (await RadiusAlertStore().list()).any((a) => a.enabled);
+    } catch (_) {
+      // Radius store unreadable (e.g. box not open) — treat as none.
+    }
+    return hasPriceAlert || hasRadiusAlert;
+  }
+
+  /// #3169 — opportunistic scan on an app-foreground wake (cold launch +
+  /// every resume). On iOS this is one of the few execution windows the
+  /// OS reliably grants, so a user who opens the app gets a fresh alert
+  /// pass without waiting for the sparse BGTask budget; the coordinator's
+  /// cross-trigger cooldown (10 min) makes rapid resumes free. Android's
+  /// fetcher implements it as a no-op — WorkManager Tier-1 already meets
+  /// the SLA and an extra scan would only burn provider budget (#2866).
+  ///
+  /// Never throws — a scan opportunity is best-effort by definition and
+  /// must not break app startup or the lifecycle observer. [fetcher] and
+  /// [alertsGate] are injectable for tests (fault injection on the
+  /// never-throws contract).
+  static Future<void> onOpportunisticWake({
+    BackgroundPriceFetcher? fetcher,
+    Future<bool> Function()? alertsGate,
+  }) async {
+    try {
+      final active = await (alertsGate ?? hasActiveAlerts)();
+      if (!active) return;
+      await (fetcher ?? createBackgroundPriceFetcher())
+          .scheduleOpportunisticScan();
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.background, e, st,
+          context: const {'where': 'BackgroundService.onOpportunisticWake'}));
     }
   }
 
@@ -216,8 +260,44 @@ void callbackDispatcher() {
     }
     debugPrint('BackgroundService: running task "$task" (${trigger.tag})');
     await BackgroundAlertScanCoordinator().scan(trigger: trigger);
+
+    // #3169 — a BGProcessingTask submission is ONE-SHOT (unlike the
+    // BGAppRefresh lane, which the workmanager plugin re-submits inside its
+    // native handler). Re-arm it here, after the scan, so the processing
+    // lane keeps firing across days without the app being opened.
+    if (task == IosBackgroundTaskIds.processing) {
+      await scheduleIosProcessingTask(Workmanager());
+    }
     return true;
   });
+}
+
+/// Submit (or replace) the pending BGProcessingTask request (#3169).
+///
+/// One scheduling surface shared by [IosBackgroundPriceFetcher.init] (arm
+/// on every reconcile) and [callbackDispatcher] (re-arm after each run,
+/// because a processing submission is one-shot). `earliestBeginDate` is the
+/// delay below; iOS then runs the task in an idle window of its choosing —
+/// typically overnight, often while charging. Requires network (the scan is
+/// useless without it) but NOT external power, to maximise run chances.
+///
+/// Never throws — scheduling is best-effort; the host side already logs a
+/// rejected submission. A failure here must not fail the scan that
+/// triggered the re-arm.
+Future<void> scheduleIosProcessingTask(Workmanager workmanager) async {
+  try {
+    await workmanager.registerProcessingTask(
+      IosBackgroundTaskIds.processing,
+      IosBackgroundTaskIds.processing,
+      initialDelay: IosBackgroundTaskIds.processingEarliestDelay,
+      constraints: Constraints(networkType: NetworkType.connected),
+    );
+    debugPrint('BackgroundService: BGProcessingTask armed '
+        '("${IosBackgroundTaskIds.processing}", OS-budgeted, best-effort)');
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.background, e, st,
+        context: const {'where': 'scheduleIosProcessingTask'}));
+  }
 }
 
 /// Resolve the [BackgroundScanTrigger] for a WorkManager / iOS task name.
@@ -236,10 +316,24 @@ BackgroundScanTrigger? _triggerForTask(String task) {
     case Workmanager.iOSBackgroundTask:
     case IosBackgroundTaskIds.appRefresh:
       return BackgroundScanTrigger.iosBackgroundRefresh;
+    // #3169 — the iOS alert-delivery mitigation lanes.
+    case IosBackgroundTaskIds.processing:
+      return BackgroundScanTrigger.iosBgProcessing;
+    case IosBackgroundTaskIds.slcWake:
+      return BackgroundScanTrigger.iosSlcWake;
+    case IosBackgroundTaskIds.opportunistic:
+      return BackgroundScanTrigger.opportunistic;
     default:
       return null;
   }
 }
+
+/// Exposes the file-private task-name → trigger mapping so the scheduling
+/// decision table is unit-testable (#3169) without widening the dispatcher's
+/// API surface.
+@visibleForTesting
+BackgroundScanTrigger? debugTriggerForTask(String task) =>
+    _triggerForTask(task);
 
 /// iOS BGTaskScheduler identifiers. Must match the values registered in
 /// `ios/Runner/AppDelegate.swift` and listed under
@@ -251,4 +345,31 @@ class IosBackgroundTaskIds {
   /// BGAppRefreshTask identifier for the periodic price scan.
   // i18n-ignore: bundle-id-derived task identifier, not user-facing.
   static const String appRefresh = 'de.tankstellen.tankstellen.background';
+
+  /// BGProcessingTask identifier (#3169) — the second BGTask lane. Must be
+  /// listed in `BGTaskSchedulerPermittedIdentifiers` and registered via
+  /// `WorkmanagerPlugin.registerBGProcessingTask` in AppDelegate.swift.
+  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
+  static const String processing = 'de.tankstellen.tankstellen.processing';
+
+  /// One-off task identifier the native SlcWakeBridge enqueues on a
+  /// significant-location-change wake (#3169). NOT a BGTask — it rides a
+  /// plain `beginBackgroundTask` window, so it needs no Info.plist entry;
+  /// it only has to match `SlcWakeBridge.taskIdentifier` in
+  /// AppDelegate.swift.
+  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
+  static const String slcWake = 'de.tankstellen.tankstellen.slcWake';
+
+  /// One-off task identifier for the opportunistic foreground-wake scan
+  /// (#3169). Like [slcWake], a `beginBackgroundTask` one-off — no
+  /// Info.plist entry needed.
+  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
+  static const String opportunistic =
+      'de.tankstellen.tankstellen.opportunistic';
+
+  /// Earliest-begin delay for a BGProcessingTask submission. Long enough
+  /// that the lane complements (rather than duplicates) the BGAppRefresh
+  /// lane and the foreground opportunistic scans; iOS adds its own idle
+  /// scheduling on top, typically landing the run overnight.
+  static const Duration processingEarliestDelay = Duration(hours: 4);
 }

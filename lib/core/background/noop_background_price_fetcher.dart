@@ -20,4 +20,9 @@ class NoopBackgroundPriceFetcher implements BackgroundPriceFetcher {
   Future<void> cancelAll() async {
     // Nothing to cancel.
   }
+
+  @override
+  Future<void> scheduleOpportunisticScan() async {
+    // No background-scan backend — nothing to schedule (#3169).
+  }
 }

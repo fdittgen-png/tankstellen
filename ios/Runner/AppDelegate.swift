@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import CoreLocation
 import Flutter
 import UIKit
 import Vision
@@ -65,6 +66,23 @@ import workmanager_apple
       frequency: NSNumber(value: 30 * 60)  // 30 min hint (15 min minimum)
     )
 
+    // #3169 — second BGTask lane: a BGProcessingTask, budgeted separately
+    // from app refresh and typically run during overnight idle/charging
+    // windows. Registration (here) only installs the launch handler; the
+    // Dart side submits + re-arms the actual one-shot requests
+    // (scheduleIosProcessingTask). Identifier must match Info.plist's
+    // BGTaskSchedulerPermittedIdentifiers and Dart's
+    // IosBackgroundTaskIds.processing.
+    WorkmanagerPlugin.registerBGProcessingTask(
+      withIdentifier: "de.tankstellen.tankstellen.processing"
+    )
+
+    // #3169 — significant-location-change wake: if SLC monitoring was armed
+    // (alerts active + an existing Always grant) and iOS relaunched us for a
+    // location event, resume monitoring NOW so the pending event reaches the
+    // delegate and can piggyback an opportunistic scan.
+    SlcWakeBridge.shared.captureLaunchOptions(launchOptions)
+
     // Make the rest of the app's plugins (Hive/path_provider, local
     // notifications, etc.) available inside the headless background engine
     // that workmanager spins up for a BGAppRefresh/performFetch wake.
@@ -98,6 +116,12 @@ import workmanager_apple
     // TankstellenWidget extension.
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "LiveActivityBridge") {
       LiveActivityBridge.shared.register(messenger: registrar.messenger())
+    }
+    // #3169 — significant-location-change wake bridge (alert-delivery
+    // mitigation; armed/disarmed by BackgroundService.reconcile via the
+    // Dart IosSlcWakeMonitor facade).
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "SlcWakeBridge") {
+      SlcWakeBridge.shared.register(messenger: registrar.messenger())
     }
   }
 
@@ -368,6 +392,149 @@ final class StateRestorationBridge {
       default:
         result(FlutterMethodNotImplemented)
       }
+    }
+  }
+}
+
+/// #3169 — significant-location-change (SLC) wake bridge, serving the
+/// `tankstellen/slc_wake` MethodChannel (Dart counterpart:
+/// `IosSlcWakeMonitor`). One of the free alert-delivery mitigations: while
+/// alerts are active AND the user already granted Always location, the
+/// device moving ~500m+ (cell-tower granularity, near-zero battery cost)
+/// wakes the app — even from terminated — and this bridge piggybacks that
+/// wake into the SAME headless Dart scan every other trigger runs, via
+/// workmanager's one-off task path (`startOneOffTask`, a plain
+/// `beginBackgroundTask` window — no BGTaskScheduler identifier needed).
+///
+/// ## Honest permission framing
+/// SLC delivery to a backgrounded/terminated app requires `.authorizedAlways`.
+/// This bridge only ever CHECKS the current authorization — it NEVER calls
+/// `requestAlwaysAuthorization`/`requestWhenInUseAuthorization`. Alerts must
+/// not escalate the location permission the user granted for other features;
+/// without Always, the lane silently stays off.
+///
+/// The enabled flag persists in `UserDefaults` so a cold relaunch via
+/// `UIApplication.LaunchOptionsKey.location` can resume monitoring before
+/// any Flutter engine exists (see `captureLaunchOptions`). The `location`
+/// UIBackgroundMode this rides is already declared for trip GPS (#1295);
+/// per its Info.plist note, this comment documents the additional non-OBD2
+/// usage: opportunistic alert-scan wakes (#3169).
+///
+/// Inline in AppDelegate.swift (not a separate file) on purpose: a new file
+/// under ios/Runner/ is not in the Runner target's compile sources without
+/// a project.pbxproj edit (see the ShareIntentBridge note above), so
+/// defining it here keeps the build green with zero pbxproj change.
+final class SlcWakeBridge: NSObject, CLLocationManagerDelegate {
+  static let shared = SlcWakeBridge()
+  private static let channelName = "tankstellen/slc_wake"
+  /// Must match `IosBackgroundTaskIds.slcWake` on the Dart side — the
+  /// dispatcher maps it onto the `slcWake` journal trigger (#3147).
+  private static let taskIdentifier = "de.tankstellen.tankstellen.slcWake"
+  private static let enabledKey = "slc_wake_enabled"
+  private static let lastFireKey = "slc_wake_last_fire"
+  /// Native-side wake throttle. SLC can fire in bursts while driving; a
+  /// headless Flutter engine spin-up is not free, so wakes inside this
+  /// window are dropped here, before any engine exists. The Dart
+  /// coordinator's own cross-trigger cooldown then dedups against the
+  /// other scan lanes.
+  private static let minFireInterval: TimeInterval = 15 * 60
+
+  private var manager: CLLocationManager?
+
+  /// Called first thing in `didFinishLaunchingWithOptions`. When iOS
+  /// relaunched us BECAUSE of a location event (`launchOptions[.location]`)
+  /// and the lane is armed, monitoring must be re-established immediately —
+  /// the pending event is only delivered to a live CLLocationManager
+  /// delegate.
+  func captureLaunchOptions(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
+    guard launchOptions?[.location] != nil else { return }
+    guard UserDefaults.standard.bool(forKey: Self.enabledKey) else { return }
+    startMonitoringIfAuthorized()
+  }
+
+  /// Wires the method channel onto `messenger` (called once per engine,
+  /// see `didInitializeImplicitFlutterEngine`) and — on a normal launch
+  /// with the lane previously armed — resumes monitoring for this app
+  /// session.
+  func register(messenger: FlutterBinaryMessenger) {
+    let channel = FlutterMethodChannel(name: Self.channelName, binaryMessenger: messenger)
+    channel.setMethodCallHandler { [weak self] call, result in
+      switch call.method {
+      case "setEnabled":
+        let enabled = (call.arguments as? Bool) ?? false
+        UserDefaults.standard.set(enabled, forKey: Self.enabledKey)
+        if enabled {
+          self?.startMonitoringIfAuthorized()
+        } else {
+          self?.stopMonitoring()
+        }
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+    if UserDefaults.standard.bool(forKey: Self.enabledKey) {
+      startMonitoringIfAuthorized()
+    }
+  }
+
+  /// Starts SLC monitoring iff the capability exists and the user already
+  /// granted Always. Safe to call repeatedly (re-arming an active monitor
+  /// is a CoreLocation no-op). Never prompts.
+  private func startMonitoringIfAuthorized() {
+    guard CLLocationManager.significantLocationChangeMonitoringAvailable() else { return }
+    let m = manager ?? CLLocationManager()
+    manager = m
+    m.delegate = self
+    guard m.authorizationStatus == .authorizedAlways else { return }
+    m.startMonitoringSignificantLocationChanges()
+  }
+
+  private func stopMonitoring() {
+    manager?.stopMonitoringSignificantLocationChanges()
+  }
+
+  // MARK: CLLocationManagerDelegate
+
+  /// An SLC event arrived (app woken or already running). Throttled, and
+  /// only acted on while the app is in the BACKGROUND — a foreground app
+  /// already gets the opportunistic resume scan, and the relaunched-from-
+  /// terminated case lands here as `.background` too.
+  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    guard UserDefaults.standard.bool(forKey: Self.enabledKey) else { return }
+    guard UIApplication.shared.applicationState == .background else { return }
+    let now = Date().timeIntervalSince1970
+    let last = UserDefaults.standard.double(forKey: Self.lastFireKey)
+    guard now - last >= Self.minFireInterval else { return }
+    UserDefaults.standard.set(now, forKey: Self.lastFireKey)
+
+    // Mirror the plugin's own one-off path (registerOneOffTask): open a
+    // finite background-execution window and run the shared Dart scan in a
+    // headless engine. The Dart dispatcher maps the identifier onto the
+    // `slcWake` trigger; its completion ends the window via the operation's
+    // completion block, and the expiration handler bounds a hung scan.
+    var bgTask: UIBackgroundTaskIdentifier = .invalid
+    bgTask = UIApplication.shared.beginBackgroundTask(withName: Self.taskIdentifier) {
+      UIApplication.shared.endBackgroundTask(bgTask)
+    }
+    guard bgTask != .invalid else { return }
+    WorkmanagerPlugin.startOneOffTask(
+      identifier: Self.taskIdentifier,
+      taskIdentifier: bgTask,
+      inputData: nil,
+      delaySeconds: 0
+    )
+  }
+
+  /// Track grant changes without ever prompting: an upgrade to Always while
+  /// armed starts the lane; a downgrade stops it (iOS would stop delivering
+  /// anyway — stopping keeps our state honest).
+  func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    guard UserDefaults.standard.bool(forKey: Self.enabledKey) else { return }
+    if manager.authorizationStatus == .authorizedAlways {
+      startMonitoringIfAuthorized()
+    } else {
+      stopMonitoring()
     }
   }
 }

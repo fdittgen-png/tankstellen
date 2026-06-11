@@ -3679,6 +3679,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Prices haven\'t been checked in the background yet';
 
   @override
+  String get alertsIosBestEffortNote =>
+      'On iPhone, alert checks are best effort: iOS decides when the app may check prices in the background, so an alert can arrive late or occasionally not at all. Opening the app always runs a fresh check.';
+
+  @override
   String alertTargetPriceWithCurrency(String currency) {
     return 'Cílová cena ($currency)';
   }

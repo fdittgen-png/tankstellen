@@ -23,4 +23,14 @@ abstract class BackgroundPriceFetcher {
   /// Called when the user disables background price refresh in settings,
   /// or during cleanup.
   Future<void> cancelAll();
+
+  /// #3169 — run one opportunistic scan because the app just gained a
+  /// free execution window (cold launch / foreground resume).
+  ///
+  /// iOS enqueues an immediate headless one-off task so the scan runs in
+  /// the same coordinator lane (lock + cross-trigger cooldown + journal)
+  /// as every scheduled trigger. Android and the no-op fetcher implement
+  /// this as a no-op: WorkManager Tier-1 already meets the alert SLA, and
+  /// an extra per-launch scan would only burn provider budget (#2866).
+  Future<void> scheduleOpportunisticScan();
 }

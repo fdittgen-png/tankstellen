@@ -6720,6 +6720,12 @@ abstract class AppLocalizations {
   /// **'Prices haven\'t been checked in the background yet'**
   String get alertsLastCheckedNever;
 
+  /// iOS-only honest disclosure on the alerts screen (#3169): background alert delivery on iPhone is OS-budgeted and best-effort — never promise Android-grade delivery. Mentions that opening the app always triggers a fresh check.
+  ///
+  /// In en, this message translates to:
+  /// **'On iPhone, alert checks are best effort: iOS decides when the app may check prices in the background, so an alert can arrive late or occasionally not at all. Opening the app always runs a fresh check.'**
+  String get alertsIosBestEffortNote;
+
   /// Label of the target-price field in the create-alert dialog, parameterised with the station country's currency symbol now that background alerts fire for every country (#2865).
   ///
   /// In en, this message translates to:
