@@ -74,6 +74,24 @@ jobs:
             echo "version=${LATEST_TAG#v}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Check CHANGELOG has an entry for this version
+        # #3177 — Unreleased-section discipline: a version must not ship
+        # without a `## [X.Y.Z]` entry in CHANGELOG.md. Gates only the
+        # tag-triggered release path, so manual rollout promotion of an
+        # already-shipped build is never blocked retroactively.
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          set -euo pipefail
+          # version is "X.Y.Z" or "X.Y.Z+BUILD" — the CHANGELOG entry is
+          # keyed on the bare semver.
+          SEMVER="${{ steps.version.outputs.version }}"
+          SEMVER="${SEMVER%%+*}"
+          if ! grep -qF "## [${SEMVER}]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [${SEMVER}]' entry. Rename the [Unreleased] section to [${SEMVER}] before tagging a release (#3177)." >&2
+            exit 1
+          fi
+          echo "CHANGELOG entry found for ${SEMVER}."
+
       - name: Wait for CI build to complete
         if: startsWith(github.ref, 'refs/tags/v')
         run: |

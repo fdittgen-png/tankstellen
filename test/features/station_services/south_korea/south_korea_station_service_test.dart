@@ -112,12 +112,14 @@ void main() {
     });
 
     group('searchStations', () {
-      test('throws when no API key is configured', () async {
+      test('throws auth-kind ApiException when no API key is configured (#3176)',
+          () async {
         final noKey = SouthKoreaStationService(apiKey: '', dio: mockDio);
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 5.0);
         await expectLater(
           () => noKey.searchStations(params),
-          throwsA(isA<ApiException>()),
+          throwsA(isA<ApiException>()
+              .having((e) => e.kind, 'kind', FailureKind.auth)),
         );
       });
 
@@ -229,6 +231,8 @@ void main() {
             )).thenAnswer((_) async => response(_envelope([])));
 
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 5.0);
+        // An all-empty live result is an empty SUCCESS post-#3192 —
+        // this test only asserts on the outgoing parameters.
         await service.searchStations(params);
 
         final captured = verify(() => mockDio.get(
@@ -259,6 +263,8 @@ void main() {
             )).thenAnswer((_) async => response(_envelope([])));
 
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 10000);
+        // An all-empty live result is an empty SUCCESS post-#3192 —
+        // this test only asserts on the outgoing parameters.
         await service.searchStations(params);
 
         final captured = verify(() => mockDio.get(
@@ -269,7 +275,14 @@ void main() {
         expect(captured['radius'], 5000);
       });
 
-      test('empty radius search → empty list, not an error', () async {
+      test(
+          'all-products-empty live result returns an empty success '
+          '(#3176 — KATEC fix #3192 shipped; empty radius is legitimate)',
+          () async {
+        // With the KATEC conversion in place an all-empty envelope is
+        // usually a station-free radius. OPINET still answers an INVALID
+        // key with the same silent empty envelope, so the service leaves
+        // an errorLogger trace, but it must NOT fail the search.
         when(() => mockDio.get(
               any(),
               queryParameters: any(named: 'queryParameters'),
@@ -279,7 +292,6 @@ void main() {
         const params = SearchParams(lat: 37.5, lng: 127.0, radiusKm: 5.0);
         final result = await service.searchStations(params);
         expect(result.data, isEmpty);
-        expect(result.source, ServiceSource.openinetApi);
       });
 
       test('HTTP 401 is re-raised as ApiException with clear message',

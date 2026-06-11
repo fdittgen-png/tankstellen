@@ -86,20 +86,25 @@ import '../../../core/logging/error_logger.dart';
 /// [`south_korea_response_parser.dart`](south_korea_response_parser.dart)
 /// for the merge accumulator + product-code map).
 ///
-/// **Endpoint verification**: the live OPINET developer docs change
-/// periodically (path segments like `searchByTid.do`, `searchByZcd.do`,
-/// `aroundAll.do` come and go). The [defaultBaseUrl] constant is the
-/// current best-guess path; the service is fully functional against the
-/// documented JSON response shape regardless of whether the exact path
-/// drifts. If a path change breaks the live call, the bug is one URL
-/// constant — the parser + fuel mapping + country wiring stay valid.
+/// **Endpoint verification (#3176, live-probed 2026-06-10)**: the
+/// [defaultBaseUrl] path is **confirmed live** — `GET aroundAll.do`
+/// answers HTTP 200 with the documented `RESULT → OIL` envelope, so the
+/// parser contract holds and the path is no longer a guess. The KATEC
+/// coordinate conversion and the 5 000 m radius clamp shipped with
+/// #3192. One live caveat remains (epic #3186): the portal documents
+/// `certkey` while we send `code`, and an unknown/invalid key is
+/// *silently* answered with an empty `OIL` array (verified live), never
+/// an HTTP 401/403 — so an all-products-empty result is ambiguous
+/// between "no stations in radius" and "bad key". [searchStations]
+/// breadcrumbs that case via errorLogger without failing the search.
 class SouthKoreaStationService
     with StationServiceHelpers
     implements StationService {
-  /// OPINET "around all" endpoint — radius search by WGS84 coordinate.
-  /// TODO: verify endpoint path against the live developer portal. The
-  /// JSON payload shape (RESULT → OIL → array) is stable across OPINET
-  /// endpoints and is the contract our parser depends on.
+  /// OPINET "around all" endpoint — radius search by coordinate.
+  /// Path live-verified 2026-06-10 (#3176): HTTP 200 + the documented
+  /// `RESULT → OIL` JSON envelope. KATEC coordinates + the 5 km radius
+  /// clamp shipped with #3192; the `certkey`-vs-`code` auth question is
+  /// the remaining caveat — see the class doc.
   static const String defaultBaseUrl =
       'https://www.opinet.co.kr/api/aroundAll.do';
 
@@ -125,9 +130,16 @@ class SouthKoreaStationService
     CancelToken? cancelToken,
   }) async {
     if (_apiKey.isEmpty) {
-      throw const ApiException(
+      // #3176 — classify the missing key as an auth failure (the enum's
+      // documented home for "missing API key") and leave a trace, so the
+      // chain treats it as terminal instead of retrying a doomed call.
+      const e = ApiException(
         message: 'OPINET API key is not configured',
+        kind: FailureKind.auth,
       );
+      unawaited(errorLogger.log(ErrorLayer.other, e, StackTrace.current,
+          context: const {'where': 'KR search without API key'}));
+      throw e;
     }
 
     try {
@@ -177,6 +189,20 @@ class SouthKoreaStationService
       final byId = <String, OpinetStationAccumulator>{};
       for (var i = 0; i < entries.length; i++) {
         mergeOpinetProductResponse(responses[i].data, byId, entries[i].value);
+      }
+
+      // #3176 — with the KATEC conversion shipped (#3192) an empty merge
+      // is usually a legitimately station-free radius, but OPINET also
+      // answers an INVALID key with the same silent empty envelope
+      // (verified live), so leave a trace for field diagnosis without
+      // failing the search.
+      if (byId.isEmpty) {
+        unawaited(errorLogger.log(
+            ErrorLayer.other,
+            Exception('OPINET returned zero stations for every product '
+                'code — empty radius or silently-rejected key (#3176)'),
+            StackTrace.current,
+            context: const {'where': 'KR all-products-empty (#3176)'}));
       }
 
       final stations = byId.values

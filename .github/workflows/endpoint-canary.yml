@@ -1,0 +1,127 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Endpoint Canary
+
+# Weekly live-probe of every shipped country service's endpoint (#3199,
+# under epic #3186) — so the next CL-404 / GR-NXDOMAIN / RO-404 /
+# UK-withdrawal-style silent endpoint death is caught in days, not months.
+#
+# The probe list (URLs, shape markers, needs-key / geo-blocked skips) lives
+# in `tool/endpoint_canary.dart`. When any active endpoint is dead, this
+# workflow opens — or refreshes — a SINGLE tracking issue and the run goes
+# red as the at-a-glance signal. When everything is healthy again, the
+# tracking issue is closed automatically.
+#
+# IMPORTANT: schedule + manual dispatch ONLY. This workflow must never run
+# on push/pull_request, must never be added to branch-protection required
+# checks, and must not interfere with auto-merge of normal PRs.
+on:
+  schedule:
+    # Mondays 05:23 UTC — off the busy top of the hour, before the
+    # workday so a weekend endpoint death greets Monday triage.
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: endpoint-canary
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  TRACKING_ISSUE_TITLE: 'Endpoint canary: dead country endpoints'
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Probe country endpoints
+        id: canary
+        run: |
+          set +e
+          dart tool/endpoint_canary.dart \
+            --markdown-out="$RUNNER_TEMP/canary_report.md" \
+            | tee "$RUNNER_TEMP/canary_console.log"
+          CODE=${PIPESTATUS[0]}
+          set -e
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "report_path=$RUNNER_TEMP/canary_report.md" >> "$GITHUB_OUTPUT"
+          if [ ! -f "$RUNNER_TEMP/canary_report.md" ]; then
+            echo "::error::Canary did not produce a report (exit $CODE)." >&2
+            exit 1
+          fi
+
+      - name: Open or refresh the tracking issue
+        if: steps.canary.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT: ${{ steps.canary.outputs.report_path }}
+        run: |
+          set -euo pipefail
+          BODY_FILE="$RUNNER_TEMP/issue_body.md"
+          {
+            echo "Automated report from the weekly endpoint canary (#3199)."
+            echo "Latest run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            cat "$REPORT"
+          } > "$BODY_FILE"
+
+          # Single tracking issue: search by exact title rather than by
+          # label so the workflow needs no pre-created label to exist.
+          EXISTING=$(gh issue list --state open \
+            --search "in:title \"$TRACKING_ISSUE_TITLE\"" \
+            --json number,title \
+            --jq "[.[] | select(.title == \"$TRACKING_ISSUE_TITLE\")][0].number // \"\"")
+          if [ -z "$EXISTING" ]; then
+            echo "Opening new tracking issue."
+            gh issue create \
+              --title "$TRACKING_ISSUE_TITLE" \
+              --body-file "$BODY_FILE"
+          else
+            echo "Refreshing tracking issue #$EXISTING."
+            gh issue edit "$EXISTING" --body-file "$BODY_FILE"
+            gh issue comment "$EXISTING" \
+              --body "Canary still failing — report refreshed by run ${{ github.run_id }} ($(date -u +%Y-%m-%d))."
+          fi
+
+      - name: Close the tracking issue when healthy
+        if: steps.canary.outputs.exit_code == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          EXISTING=$(gh issue list --state open \
+            --search "in:title \"$TRACKING_ISSUE_TITLE\"" \
+            --json number,title \
+            --jq "[.[] | select(.title == \"$TRACKING_ISSUE_TITLE\")][0].number // \"\"")
+          if [ -n "$EXISTING" ]; then
+            echo "All endpoints healthy — closing tracking issue #$EXISTING."
+            gh issue close "$EXISTING" \
+              --comment "All active endpoints healthy again (canary run ${{ github.run_id }})."
+          else
+            echo "All endpoints healthy; no open tracking issue."
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f "${{ steps.canary.outputs.report_path }}" ]; then
+            cat "${{ steps.canary.outputs.report_path }}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Fail the run when endpoints are dead
+        if: steps.canary.outputs.exit_code != '0'
+        run: |
+          echo "::error::Endpoint canary found dead endpoints (see summary + tracking issue)."
+          exit 1
