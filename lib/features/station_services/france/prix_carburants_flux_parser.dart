@@ -263,11 +263,15 @@ String? _formatMaj(String? maj) {
   }
 }
 
-/// The flux XML carries no brand column, so reuse the autoroute fallback the
-/// legacy path uses: `pop == 'A'` → highway service area, else the `Independent`
-/// sentinel (#482) rendered as a localised "independent station" row. Address /
-/// ville substring brand detection stays in the legacy enricher path.
-String _brandFor(String pop, String adresse, String ville) {
-  if (pop == 'A') return 'Autoroute';
-  return 'Independent';
-}
+/// The flux XML carries no brand column — delegate to the SAME
+/// [parser.detectPrixCarburantsBrand] the legacy JSON path uses (#3198):
+/// address/ville substring map first, then the `pop == 'A'` autoroute
+/// fallback, then the `Independent` sentinel (#482). Before this the flux
+/// path only knew Autoroute/Independent, so the same station showed a
+/// different brand depending on which path served it.
+String _brandFor(String pop, String adresse, String ville) =>
+    parser.detectPrixCarburantsBrand(
+      adresse,
+      null,
+      <String, dynamic>{'ville': ville, 'pop': pop},
+    );

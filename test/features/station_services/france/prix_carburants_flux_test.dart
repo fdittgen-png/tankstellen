@@ -12,6 +12,8 @@ import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/features/search/data/models/search_params.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_flux_parser.dart'
     as flux;
+import 'package:tankstellen/features/station_services/france/prix_carburants_parsers.dart'
+    as parser;
 import 'package:tankstellen/features/station_services/france/prix_carburants_flux_station_service.dart';
 
 /// #2277 — the FR *flux instantané* bulk-file path: download the whole-country
@@ -185,6 +187,27 @@ void main() {
         },
       ]);
       expect(flux.parseFluxXml(xml).first.brand, 'Autoroute');
+    });
+
+    test(
+        '#3198 — flux path detects chain brands from adresse/ville like '
+        'the JSON path (no more path-dependent brand)', () {
+      final xml = _fluxXml([
+        _pdv(id: '11', lat: 43.45, lng: 3.52, adresse: 'CC CARREFOUR RN 113'),
+        _pdv(id: '12', lat: 43.46, lng: 3.53, adresse: 'AVENUE TOTALENERGIES'),
+        _pdv(id: '13', lat: 43.47, lng: 3.54, adresse: '1 RUE DES FLEURS',
+            ville: 'PAU'),
+      ]);
+      final byId = {for (final s in flux.parseFluxXml(xml)) s.id: s};
+      // Same substring map the legacy JSON path uses
+      // (detectPrixCarburantsBrand) — and the same value it would return.
+      expect(byId['fr-11']!.brand, 'Carrefour');
+      expect(byId['fr-11']!.brand,
+          parser.detectPrixCarburantsBrand('CC CARREFOUR RN 113', null,
+              <String, dynamic>{'ville': 'CASTELNAU'}));
+      expect(byId['fr-12']!.brand, 'TotalEnergies');
+      // Genuinely unbranded stays the #482 Independent sentinel.
+      expect(byId['fr-13']!.brand, 'Independent');
     });
 
     test('skips a pdv with no/zero coordinates', () {
