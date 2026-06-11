@@ -1,0 +1,86 @@
+{
+ "B027": {
+  "RESULT": {
+   "OIL": [
+    {
+     "UNI_ID": "A0010684",
+     "POLL_DIV_CD": "SKE",
+     "OS_NM": "SK에너지 강남주유소",
+     "NEW_ADR": "서울특별시 강남구 테헤란로 152",
+     "GIS_X_COOR": "314312.63",
+     "GIS_Y_COOR": "544612.34",
+     "PRICE": "1689",
+     "DISTANCE": "382"
+    },
+    {
+     "UNI_ID": "A0001234",
+     "POLL_DIV_CD": "GSC",
+     "OS_NM": "GS칼텍스 역삼주유소",
+     "NEW_ADR": "서울특별시 강남구 역삼로 215",
+     "GIS_X_COOR": "314856.11",
+     "GIS_Y_COOR": "544401.07",
+     "PRICE": "1705",
+     "DISTANCE": "910"
+    }
+   ]
+  }
+ },
+ "B034": {
+  "RESULT": {
+   "OIL": [
+    {
+     "UNI_ID": "A0010684",
+     "POLL_DIV_CD": "SKE",
+     "OS_NM": "SK에너지 강남주유소",
+     "NEW_ADR": "서울특별시 강남구 테헤란로 152",
+     "GIS_X_COOR": "314312.63",
+     "GIS_Y_COOR": "544612.34",
+     "PRICE": "1985",
+     "DISTANCE": "382"
+    }
+   ]
+  }
+ },
+ "D047": {
+  "RESULT": {
+   "OIL": [
+    {
+     "UNI_ID": "A0010684",
+     "POLL_DIV_CD": "SKE",
+     "OS_NM": "SK에너지 강남주유소",
+     "NEW_ADR": "서울특별시 강남구 테헤란로 152",
+     "GIS_X_COOR": "314312.63",
+     "GIS_Y_COOR": "544612.34",
+     "PRICE": "1589",
+     "DISTANCE": "382"
+    },
+    {
+     "UNI_ID": "A0001234",
+     "POLL_DIV_CD": "GSC",
+     "OS_NM": "GS칼텍스 역삼주유소",
+     "NEW_ADR": "서울특별시 강남구 역삼로 215",
+     "GIS_X_COOR": "314856.11",
+     "GIS_Y_COOR": "544401.07",
+     "PRICE": "1612",
+     "DISTANCE": "910"
+    }
+   ]
+  }
+ },
+ "K015": {
+  "RESULT": {
+   "OIL": [
+    {
+     "UNI_ID": "A0001234",
+     "POLL_DIV_CD": "GSC",
+     "OS_NM": "GS칼텍스 역삼주유소",
+     "NEW_ADR": "서울특별시 강남구 역삼로 215",
+     "GIS_X_COOR": "314856.11",
+     "GIS_Y_COOR": "544401.07",
+     "PRICE": "1045",
+     "DISTANCE": "910"
+    }
+   ]
+  }
+ }
+}
