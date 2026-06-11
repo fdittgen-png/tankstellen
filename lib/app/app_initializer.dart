@@ -20,6 +20,7 @@ import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
 import '../core/feedback/auto_record_badge_provider.dart';
 import '../core/telemetry/collectors/breadcrumb_collector.dart';
+import '../core/telemetry/health_counters.dart';
 import '../core/telemetry/storage/isolate_error_spool.dart';
 import '../core/telemetry/storage/startup_failure_store.dart';
 import '../core/telemetry/storage/trace_storage.dart';
@@ -428,6 +429,7 @@ class AppInitializer {
       // ring, registers the persist hook + the `obd2ConnectTraces` export
       // section. Independent of the other two (own box); best-effort.
       Obd2ConnectTracePersistence.init(),
+      HealthCounters.init(), // #3146 — always-on production counters
     ]);
 
     // Verify all countries have registered service implementations.

@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../health_counters.dart';
 import '../models/error_trace.dart';
 import '../pii_scrubber.dart';
 
@@ -189,6 +190,13 @@ class TraceStorage {
           .map((t) => PiiScrubber.scrubErrorTrace(t).toJson())
           .toList(),
       'unparsedRaw': unparsed.map(_scrubRawDeep).toList(),
+      // #3146 — always-on production health signals ride in the SAME
+      // export the user already mails/attaches; every builder is
+      // never-throws + PII-free by construction (counter names are
+      // country codes / sync-table names / ble.*, never user data).
+      'diagnostics': <String, Object?>{
+        'healthCounters': healthCounters.exportSnapshot(),
+      },
     };
     // #3184 — feature-registered sections (e.g. obd2ConnectTraces). A
     // throwing supplier must never kill the export the user is mid-way
