@@ -1,0 +1,45 @@
+group = "com.google_mlkit_text_recognition"
+version = "1.0"
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.13.0")
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: "com.android.library"
+
+android {
+    namespace = "com.google_mlkit_text_recognition"
+
+    compileSdk = 35
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    defaultConfig {
+        minSdk = 21
+    }
+
+    dependencies {
+        implementation("com.google.mlkit:text-recognition:16.0.1")
+        compileOnly("com.google.mlkit:text-recognition-chinese:16.0.1")
+        compileOnly("com.google.mlkit:text-recognition-devanagari:16.0.1")
+        compileOnly("com.google.mlkit:text-recognition-japanese:16.0.1")
+        compileOnly("com.google.mlkit:text-recognition-korean:16.0.1")
+    }
+}

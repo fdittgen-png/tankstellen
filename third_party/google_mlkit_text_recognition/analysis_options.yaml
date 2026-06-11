@@ -1,0 +1,3 @@
+# tankstellen #3172 — upstream included ../google_ml_kit/analysis_options.yaml,
+# which does not exist in this vendored copy; use flutter_lints directly.
+include: package:flutter_lints/flutter.yaml
