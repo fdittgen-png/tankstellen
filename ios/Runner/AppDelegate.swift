@@ -92,6 +92,13 @@ import workmanager_apple
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "StateRestorationBridge") {
       StateRestorationBridge.shared.register(messenger: registrar.messenger())
     }
+    // #3170 — trip-recording / approach-radar Live Activity (Dynamic Island +
+    // lock screen), the iOS answer to the Android PiP driving tile. Serves the
+    // `tankstellen/live_activity` channel; views render in the
+    // TankstellenWidget extension.
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "LiveActivityBridge") {
+      LiveActivityBridge.shared.register(messenger: registrar.messenger())
+    }
   }
 
   /// Handles the `sparkilo-share://receipt` URL the Share Extension opens to

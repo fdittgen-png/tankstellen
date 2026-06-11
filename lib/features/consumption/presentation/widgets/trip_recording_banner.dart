@@ -20,6 +20,7 @@ import '../../domain/driving_coaching.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/obd2_reconnect_provider.dart';
+import '../../providers/live_activity_provider.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'gps_degraded_banner.dart';
@@ -47,6 +48,18 @@ class TripRecordingBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(tripRecordingProvider);
     final obd2 = ref.watch(obd2ConnectionStatusProvider);
+
+    // #3170 — arm the iOS Live Activity sync here, where every screen
+    // passes through (MaterialApp.builder), so the lock-screen/Dynamic
+    // Island surface tracks the trip no matter which route was visible
+    // when the user switched to their navigation app. Inert no-op off
+    // iOS (the provider subscribes to nothing); guarded like the PiP
+    // watches below so a harness without the full graph never crashes.
+    try {
+      ref.watch(liveActivitySyncProvider);
+    } on Object {
+      // best-effort surface — never let it take the banner down
+    }
 
     // #1977 — once the OS shrinks the app into a Picture-in-Picture
     // tile, render ONLY the compact trip strip. This wrapper sits above
