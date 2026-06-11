@@ -19,6 +19,10 @@ import WidgetKit
 struct TankstellenWidgetBundle: WidgetBundle {
     var body: some Widget {
         NearestStationsWidget()
+        // #3170 — trip-recording / approach-radar Live Activity
+        // (Dynamic Island + lock screen), driven by the Runner-side
+        // LiveActivityBridge over `tankstellen/live_activity`.
+        TripRecordingLiveActivity()
     }
 }
 

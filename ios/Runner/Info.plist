@@ -104,6 +104,12 @@
 	<string>Sparkilo uses the camera to scan fuel receipts and payment QR codes.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Sparkilo needs access to your photo library so you can attach an existing receipt photo to a fill-up entry.</string>
+	<!-- #3170 — trip-recording / approach-radar Live Activity (Dynamic Island +
+	     lock screen), the iOS answer to the Android PiP driving tile. Views
+	     live in the TankstellenWidget extension; the host requests/updates the
+	     activity via LiveActivityBridge.swift. -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
