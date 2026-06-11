@@ -339,17 +339,18 @@ const _featurePairBaseline = <String, int>{
 /// Post-#3130 measurement (2026-06-11): `lib/core/` files importing
 /// `lib/features/` files, grouped by imported feature. Target **0** —
 /// this direction is never legitimate. ONLY EVER DECREASES.
+// #3131 — the alert-scan engine moved into features/alerts: alerts 17→3
+// (the journal/trigger/telemetry seams remain), price_history and widget
+// hit ZERO.
 const _coreImportBaseline = <String, int>{
-  'alerts': 17,
+  'alerts': 3,
   'consumption': 8,
   'feature_management': 3,
   'itinerary': 3,
   'map': 1,
-  'price_history': 1,
   'profile': 5,
   'search': 2,
   'station_services': 19,
-  'widget': 1,
 };
 
 /// Post-#3130 measurement (2026-06-11): bidirectional feature↔feature

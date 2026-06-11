@@ -15,7 +15,7 @@ import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 /// `debugPrint` swallowed the failure in production. This test pins the
 /// runtime behaviour for the shared deferral helper: a failing deferred
 /// body is routed through `errorLogger` (→ TraceRecorder / Sentry), not
-/// just printed. The static sweep over lib/app + lib/core/background is
+/// just printed. The static sweep over lib/app + the background-scan dirs is
 /// enforced by `test/lint/no_debugprint_only_catch_test.dart`.
 class _CapturingRecorder implements TraceRecorder {
   final captured = <Object>[];

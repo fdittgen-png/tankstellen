@@ -14,7 +14,8 @@ import 'package:flutter_test/flutter_test.dart';
 /// SILENT swallow in production — the failure never reaches the
 /// `errorLogger` / TraceRecorder / Sentry pipeline and is invisible to
 /// field triage. The startup phases (`lib/app/`) and the background
-/// scan machinery (`lib/core/background/`) are exactly the code that
+/// scan machinery (`lib/core/background/` and, since the #3131 move,
+/// `lib/features/alerts/background/`) are exactly the code that
 /// runs when nobody is watching, so they get a hard gate.
 ///
 /// ## What is forbidden
@@ -35,7 +36,8 @@ import 'package:flutter_test/flutter_test.dart';
 ///   ever SHRINK.
 void main() {
   test(
-      'no debugPrint-only catch handlers in lib/app + lib/core/background '
+      'no debugPrint-only catch handlers in lib/app + lib/core/background + '
+      'lib/features/alerts/background '
       '(#3143)', () {
     // Allowlisted bodies, matched by substring of the debugPrint message.
     // ⚠️ May only shrink — see the docstring.
@@ -49,7 +51,11 @@ void main() {
       r'(?:\bon\s+[\w<>.]+\s*(?:catch\s*\([^)]*\))?|\bcatch\s*\([^)]*\))\s*\{',
     );
 
-    for (final dir in ['lib/app', 'lib/core/background']) {
+    for (final dir in [
+      'lib/app',
+      'lib/core/background',
+      'lib/features/alerts/background',
+    ]) {
       for (final entity in Directory(dir).listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
         if (entity.path.endsWith('.g.dart') ||

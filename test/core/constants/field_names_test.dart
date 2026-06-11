@@ -52,7 +52,7 @@ void main() {
       // follows the code: the runner must still use the typed field
       // constants, never bare Tankerkönig strings.
       final source = File(
-        'lib/core/background/background_scan_runners.dart',
+        'lib/features/alerts/background/background_scan_runners.dart',
       ).readAsStringSync();
 
       expect(source, contains('TankerkoenigFields.'));

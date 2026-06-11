@@ -9,9 +9,9 @@ import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/core/background/bulk_dataset_alert_strategy.dart';
-import 'package:tankstellen/core/background/country_alert_strategy.dart';
-import 'package:tankstellen/core/background/polled_alert_strategy.dart';
+import 'package:tankstellen/features/alerts/background/bulk_dataset_alert_strategy.dart';
+import 'package:tankstellen/features/alerts/background/country_alert_strategy.dart';
+import 'package:tankstellen/features/alerts/background/polled_alert_strategy.dart';
 import 'package:tankstellen/core/background/provider_request_budget.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';

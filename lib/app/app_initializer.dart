@@ -15,7 +15,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'package:hive/hive.dart';
 
-import '../core/background/background_service.dart';
+import '../features/alerts/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
 import '../core/feedback/auto_record_badge_provider.dart';

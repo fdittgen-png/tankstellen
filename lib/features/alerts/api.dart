@@ -29,3 +29,6 @@ export 'domain/velocity_alert_detector.dart';
 export 'presentation/screens/alerts_screen.dart';
 export 'presentation/widgets/create_alert_dialog.dart';
 export 'providers/alert_provider.dart';
+// #3131 — the background engine moved in; car_data_service consumes the
+// country strategy through this contract.
+export 'background/country_alert_strategy.dart';
