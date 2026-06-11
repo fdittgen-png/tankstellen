@@ -14,6 +14,7 @@ import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import 'katec_converter.dart';
 import 'south_korea_response_parser.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -42,16 +43,19 @@ import '../../../core/logging/error_logger.dart';
 ///   decoding — do **not** override to latin1).
 ///
 /// The typical station-lookup call is a radius / region query that
-/// returns a list of stations around a coordinate. An approximate URL
-/// shape is
+/// returns a list of stations around a coordinate. The documented URL
+/// shape (opinet.co.kr API doc, apiId=3) is
 /// ```
 /// https://www.opinet.co.kr/api/aroundAll.do
-///   ?code=<apiKey>&x=<lng>&y=<lat>&radius=<meters>&sort=1&prodcd=B027
-///   &out=json
+///   ?code=<apiKey>&x=<easting>&y=<northing>&radius=<meters>&sort=1
+///   &prodcd=B027&out=json
 /// ```
-/// where `x` is longitude and `y` is latitude in WGS84 (the public site
-/// also serves KATEC-projected coords, but the documented developer
-/// endpoint accepts WGS84).
+/// where `x`/`y` are **KATEC** (Korean TM grid) metres, *not* WGS84
+/// degrees (#3192). The service converts the caller's WGS84 search
+/// point through [wgs84ToKatec] before querying, and the parser
+/// converts the response's KATEC `GIS_X_COOR`/`GIS_Y_COOR` back to
+/// WGS84 (see `south_korea_response_parser.dart`). The documented
+/// radius ceiling is 5 000 m.
 ///
 /// Response shape observed on the developer portal:
 /// ```json
@@ -63,8 +67,8 @@ import '../../../core/logging/error_logger.dart';
 ///         "POLL_DIV_CD": "SKE",
 ///         "OS_NM":  "SK에너지 강남주유소",
 ///         "NEW_ADR": "서울특별시 강남구 테헤란로 152",
-///         "GIS_X_COOR": "127.0287",
-///         "GIS_Y_COOR": "37.4997",
+///         "GIS_X_COOR": "314312.63",   // KATEC easting (m) — not WGS84!
+///         "GIS_Y_COOR": "544612.34",   // KATEC northing (m)
 ///         "PRICE":  "1689",   // KRW per litre (integer string)
 ///         "HPRICE": "1999",
 ///         "LPRICE": "1689",
@@ -127,11 +131,15 @@ class SouthKoreaStationService
     }
 
     try {
-      // OPINET limits radius to ~5 km on the free tier; clamp to a
-      // sensible 50 km upper bound so an accidental huge radius can't
-      // get a 400 back.
+      // OPINET documents a 5 000 m radius ceiling (#3192) — clamp so an
+      // oversized search radius can't get a 400 (or silent truncation)
+      // back. The shared filterByRadius pass keeps semantics consistent.
       final radiusMeters =
-          (params.radiusKm * 1000).clamp(1000, 50 * 1000).round();
+          (params.radiusKm * 1000).clamp(1000, 5000).round();
+
+      // OPINET expects the query point in KATEC metres, not WGS84
+      // degrees (#3192) — convert once for all four product calls.
+      final katec = wgs84ToKatec(params.lat, params.lng);
 
       // OPINET returns prices one product at a time, so a full multi-fuel
       // search needs four calls. Issue them in parallel instead of serially
@@ -149,8 +157,11 @@ class SouthKoreaStationService
             _baseUrl,
             queryParameters: {
               'code': _apiKey,
-              'x': params.lng,
-              'y': params.lat,
+              // KATEC easting/northing in metres (#3192). Sub-metre
+              // precision is irrelevant for a radius search — round to
+              // keep URLs short and logs readable.
+              'x': double.parse(katec.x.toStringAsFixed(1)),
+              'y': double.parse(katec.y.toStringAsFixed(1)),
               'radius': radiusMeters,
               'prodcd': entry.key,
               'sort': 1, // 1 = by price ascending; server still returns all
