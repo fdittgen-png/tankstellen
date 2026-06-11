@@ -86,6 +86,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   }
 
   Future<void> _validateAndSaveKey(String apiKey) async {
+    // #3159 — read BEFORE the validate await: a post-await ref.read throws
+    // a StateError if the screen unmounted while the network call ran.
+    final apiKeys = ref.read(apiKeyStorageProvider);
     setState(() => _isLoading = true);
     try {
       final validator = ref.read(apiKeyValidatorProvider);
@@ -100,7 +103,6 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         }
         return;
       }
-      final apiKeys = ref.read(apiKeyStorageProvider);
       await apiKeys.setApiKey(apiKey);
       await _finishSetup();
     } finally {
@@ -109,13 +111,16 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   }
 
   Future<void> _finishSetup() async {
+    // #3159 — every ref.read happens BEFORE the first await so the
+    // persistence chain never touches a dead WidgetRef if the screen
+    // unmounts mid-save; the captured repo/notifier finish the writes.
     final settings = ref.read(settingsStorageProvider);
-    await settings.skipSetup();
-
     final country = ref.read(activeCountryProvider);
     final language = ref.read(activeLanguageProvider);
-
     final profileRepo = ref.read(profileRepositoryProvider);
+    final profileNotifier = ref.read(activeProfileProvider.notifier);
+
+    await settings.skipSetup();
     final profile = await profileRepo.ensureDefaultProfile();
 
     // Persist chosen country/language onto the profile
@@ -124,7 +129,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       languageCode: language.code,
     );
     await profileRepo.updateProfile(updated);
-    ref.read(activeProfileProvider.notifier).refresh();
+    profileNotifier.refresh();
 
     if (mounted) context.go('/');
   }

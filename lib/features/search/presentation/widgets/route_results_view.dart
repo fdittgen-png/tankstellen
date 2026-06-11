@@ -198,6 +198,10 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     return Dismissible(
       key: ValueKey('swipe-${item.id}'),
       confirmDismiss: (direction) async {
+        // #3159 — capture before any await: the snackbar's onUndo can fire
+        // after this view unmounted (root messenger outlives the route),
+        // and a post-await ref use would throw on the dead WidgetRef.
+        final ignored = ref.read(ignoredStationsProvider.notifier);
         if (direction == DismissDirection.startToEnd) {
           await NavigationUtils.openInMaps(
             item.station.lat, item.station.lng,
@@ -205,7 +209,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           );
           return false;
         } else {
-          await ref.read(ignoredStationsProvider.notifier).add(item.id);
+          await ignored.add(item.id);
           if (context.mounted) {
             final stationLabel = item.station.brand.isNotEmpty ? item.station.brand : item.station.name;
             final l10n = AppLocalizations.of(context);
@@ -213,7 +217,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
               context,
               l10n?.stationHidden(stationLabel) ?? '$stationLabel hidden',
               undoLabel: l10n?.undo ?? 'Undo',
-              onUndo: () => ref.read(ignoredStationsProvider.notifier).remove(item.id),
+              onUndo: () => ignored.remove(item.id),
             );
           }
           return true;

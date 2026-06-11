@@ -12,6 +12,27 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+# riverpod_lint 3.x ships as a NATIVE analyzer plugin (#3159) — its
+# diagnostics surface directly in `flutter analyze` (and therefore in CI's
+# analyze gate) and in IDEs. Note: custom_lint is NOT used — every
+# custom_lint release requires analyzer <9 while riverpod_generator 4.x
+# requires analyzer ^9, so the custom_lint route is unresolvable here.
+plugins:
+  riverpod_lint:
+    version: 3.1.3
+    # Warning-level rules disabled for now (#3159): `flutter analyze` is
+    # warning-fatal in CI and the initial run surfaced ~20 findings across
+    # these four rules (several in files owned by in-flight branches, the
+    # rest pre-existing patterns like `ref.keepAlive()` inside autoDispose
+    # rebuild-throttles and the bootstrap-owned ProviderScope). Re-enable
+    # rule by rule as the burn-down lands. Info-level rules (e.g.
+    # avoid_public_notifier_properties) stay on — they don't fail CI.
+    diagnostics:
+      missing_provider_scope: false
+      only_use_keep_alive_inside_keep_alive: false
+      scoped_providers_should_specify_dependencies: false
+      provider_parameters: false
+
 analyzer:
   errors:
     # freezed uses @JsonKey on constructor parameters, which the analyzer

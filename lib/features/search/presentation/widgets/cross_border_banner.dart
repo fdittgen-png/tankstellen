@@ -142,6 +142,13 @@ class _CrossBorderSuggestionCard extends ConsumerWidget {
     final neighbor = Countries.byCode(suggestion.neighborCountryCode);
     if (neighbor == null) return;
 
+    // #3159 — capture everything BEFORE the country-switch await: the
+    // switch rebuilds the search surface and typically unmounts this very
+    // banner, so any post-await ref use throws a StateError under
+    // Riverpod 3. The captured notifier still re-runs the search.
+    final position = ref.read(userPositionProvider);
+    final searchNotifier = ref.read(searchStateProvider.notifier);
+
     // Switch active country — the StationService provider rebuilds for
     // the new country automatically.
     await ref.read(activeCountryProvider.notifier).select(neighbor);
@@ -149,9 +156,8 @@ class _CrossBorderSuggestionCard extends ConsumerWidget {
     // Re-run the search at the user's current position. Using
     // `searchByCoordinates` (rather than `searchByGps`) avoids a fresh
     // location-permission prompt — we already have the position.
-    final position = ref.read(userPositionProvider);
     if (position == null) return;
-    await ref.read(searchStateProvider.notifier).searchByCoordinates(
+    await searchNotifier.searchByCoordinates(
           lat: position.lat,
           lng: position.lng,
         );

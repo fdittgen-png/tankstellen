@@ -170,6 +170,9 @@ class _OnboardingWizardScreenState
 
   Future<bool> _validateAndSaveKey(String apiKey) async {
     final ctrl = ref.read(onboardingWizardControllerProvider.notifier);
+    // #3159 — read BEFORE the validate await: a post-await ref.read throws
+    // a StateError if the wizard unmounted while the network call ran.
+    final apiKeys = ref.read(apiKeyStorageProvider);
     ctrl.setLoading(true);
     try {
       final validator = ref.read(apiKeyValidatorProvider);
@@ -181,7 +184,6 @@ class _OnboardingWizardScreenState
         }
         return false;
       }
-      final apiKeys = ref.read(apiKeyStorageProvider);
       await apiKeys.setApiKey(apiKey);
       return true;
     } finally {
@@ -191,16 +193,20 @@ class _OnboardingWizardScreenState
 
   Future<void> _completeSetup() async {
     final ctrl = ref.read(onboardingWizardControllerProvider.notifier);
+    // #3159 — every ref.read happens BEFORE the first await so the
+    // persistence chain never touches a dead WidgetRef if the wizard
+    // unmounts mid-save. The captured repo/notifier finish the writes
+    // either way.
+    final settings = ref.read(settingsStorageProvider);
+    final country = ref.read(activeCountryProvider);
+    final language = ref.read(activeLanguageProvider);
+    final wizardState = ref.read(onboardingWizardControllerProvider);
+    final profileRepo = ref.read(profileRepositoryProvider);
+    final profileNotifier = ref.read(activeProfileProvider.notifier);
     ctrl.setLoading(true);
     try {
-      final settings = ref.read(settingsStorageProvider);
       await settings.skipSetup();
 
-      final country = ref.read(activeCountryProvider);
-      final language = ref.read(activeLanguageProvider);
-      final wizardState = ref.read(onboardingWizardControllerProvider);
-
-      final profileRepo = ref.read(profileRepositoryProvider);
       final profile = await profileRepo.ensureDefaultProfile();
 
       final updated = profile.copyWith(
@@ -212,7 +218,7 @@ class _OnboardingWizardScreenState
         landingScreen: wizardState.landingScreen,
       );
       await profileRepo.updateProfile(updated);
-      ref.read(activeProfileProvider.notifier).refresh();
+      profileNotifier.refresh();
 
       if (mounted) context.go('/');
     } finally {

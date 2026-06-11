@@ -245,12 +245,17 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
   Future<void> _adopt() async {
     final email = ref.read(syncWizardControllerProvider).adoptEmail;
     if (email == null || _passwordController.text.isEmpty) return;
-    _notifier.setConnecting(true);
+    // #3159 — capture both notifiers BEFORE the awaits; touching the
+    // WidgetRef (incl. via the `_notifier` getter) after the screen
+    // unmounted throws a StateError under Riverpod 3.
+    final wizard = _notifier;
+    final syncNotifier = ref.read(syncStateProvider.notifier);
+    wizard.setConnecting(true);
     try {
       final url = _sanitizeUrl(_urlController.text);
       final key = _sanitizeKey(_keyController.text);
-      await ref.read(syncStateProvider.notifier).connect(url, key);
-      await ref.read(syncStateProvider.notifier).signInWithEmail(
+      await syncNotifier.connect(url, key);
+      await syncNotifier.signInWithEmail(
             email,
             _passwordController.text,
             isSignUp: false,
@@ -259,27 +264,39 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
       await _verifySchemaAfterConnect();
     } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
-        _notifier.adoptFailed('Connection failed: $e');
+        wizard.adoptFailed('Connection failed: $e');
       }
     } finally {
-      if (mounted) _notifier.setConnecting(false);
+      if (mounted) wizard.setConnecting(false);
     }
   }
 
   Future<void> _testConnection() async {
-    _notifier.startTesting();
+    // #3159 — capture before the await; `_notifier` reads the WidgetRef.
+    final wizard = _notifier;
+    wizard.startTesting();
     try {
       final url = _sanitizeUrl(_urlController.text);
       final key = _sanitizeKey(_keyController.text);
       await TankSyncClient.init(url: url, anonKey: key);
-      _notifier.testSucceeded('Connection successful!');
+      if (mounted) wizard.testSucceeded('Connection successful!');
     } catch (e, st) { // ignore: unused_catch_stack
-      _notifier.testFailed('Connection failed:\n$e');
+      if (mounted) wizard.testFailed('Connection failed:\n$e');
     }
   }
 
   Future<void> _connect() async {
-    _notifier.setConnecting(true);
+    // #3159 — capture every ref-derived object BEFORE the awaits. The user
+    // can back out of the wizard while the network calls run; a post-await
+    // `ref.read` (incl. via the `_notifier` getter) then throws a
+    // StateError. The storages are plain singletons, so the settings
+    // writes still complete on the unmounted path — only the UI-facing
+    // invalidate is skipped.
+    final notifier = _notifier;
+    final settings = ref.read(settingsStorageProvider);
+    final apiKeys = ref.read(apiKeyStorageProvider);
+    final syncNotifier = ref.read(syncStateProvider.notifier);
+    notifier.setConnecting(true);
     try {
       final wizard = ref.read(syncWizardControllerProvider);
       final url = _sanitizeUrl(_urlController.text);
@@ -293,25 +310,23 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         } else {
           userId = await TankSyncClient.signInWithEmail(_emailController.text.trim(), _passwordController.text);
         }
-        final settings = ref.read(settingsStorageProvider);
-        final apiKeys = ref.read(apiKeyStorageProvider);
         await settings.putSetting('sync_enabled', true);
         await settings.putSetting('supabase_url', url);
         await apiKeys.setSupabaseAnonKey(key);
         if (userId != null) await settings.putSetting('sync_user_id', userId);
-        ref.invalidate(syncStateProvider);
+        if (mounted) ref.invalidate(syncStateProvider);
       } else {
-        await ref.read(syncStateProvider.notifier).connect(url, key);
+        await syncNotifier.connect(url, key);
       }
 
       if (!mounted) return;
       await _verifySchemaAfterConnect();
     } catch (e, st) { // ignore: unused_catch_stack
       if (mounted) {
-        _notifier.connectFailed('Connection failed: $e');
+        notifier.connectFailed('Connection failed: $e');
       }
     } finally {
-      if (mounted) _notifier.setConnecting(false);
+      if (mounted) notifier.setConnecting(false);
     }
   }
 

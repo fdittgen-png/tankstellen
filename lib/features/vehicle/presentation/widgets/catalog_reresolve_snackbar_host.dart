@@ -113,13 +113,18 @@ class _CatalogReresolveSnackbarHostState
     // in the messenger doesn't leave the user permanently un-
     // nudgeable.
     Future<void>(() async {
+      // #3159 — this future is detached, so the host can unmount before it
+      // runs; both the helper's ref.read and the invalidate below would
+      // then throw a StateError. Skipping is safe: the candidate provider
+      // re-fires the nudge on the next build.
+      if (!mounted) return;
       try {
         await markCatalogReresolveSuggested(ref, candidate.vehicleId);
       } finally {
         // Force the provider to drop this candidate from its list so
         // the next pending vehicle can take its turn on the next
         // build.
-        ref.invalidate(catalogReresolveCandidatesProvider);
+        if (mounted) ref.invalidate(catalogReresolveCandidatesProvider);
       }
     });
   }

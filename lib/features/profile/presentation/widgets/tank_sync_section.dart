@@ -183,6 +183,10 @@ class TankSyncSection extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
+      // #3159 — captured before the dialog await would also work, but the
+      // simplest safe shape mirrors the sibling confirmations: only touch
+      // the WidgetRef while the element is still mounted.
+      if (!context.mounted) return;
       await ref.read(syncStateProvider.notifier).disconnect();
     }
   }

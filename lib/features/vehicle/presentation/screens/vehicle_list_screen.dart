@@ -93,6 +93,10 @@ class VehicleListScreen extends ConsumerWidget {
     String name,
   ) async {
     final l = AppLocalizations.of(context);
+    // #3159 — capture before the dialog await: ref.read on an unmounted
+    // element throws a StateError under Riverpod 3, and the screen can be
+    // popped out from underneath the open dialog.
+    final vehicles = ref.read(vehicleProfileListProvider.notifier);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -112,7 +116,7 @@ class VehicleListScreen extends ConsumerWidget {
       ),
     );
     if (confirmed == true) {
-      await ref.read(vehicleProfileListProvider.notifier).remove(id);
+      await vehicles.remove(id);
     }
   }
 }

@@ -156,6 +156,9 @@ class ServiceReminderSection extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final labelCtrl = TextEditingController();
     final intervalCtrl = TextEditingController();
+    // #3159 — capture before the dialog await: ref.read on an unmounted
+    // element throws a StateError under Riverpod 3.
+    final reminders = ref.read(serviceReminderListProvider.notifier);
     try {
       final added = await showDialog<bool>(
         context: context,
@@ -207,7 +210,7 @@ class ServiceReminderSection extends ConsumerWidget {
         intervalKm: interval,
         lastServiceOdometerKm: currentOdometerKm,
       );
-      await ref.read(serviceReminderListProvider.notifier).save(reminder);
+      await reminders.save(reminder);
     } finally {
       labelCtrl.dispose();
       intervalCtrl.dispose();

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -39,6 +40,26 @@ class _RecordingActiveProfile extends ActiveProfile {
   @override
   void refresh() {
     // No-op; repository reads are mocked separately.
+  }
+}
+
+/// Gate-controlled fake of [ActiveProfile]: `switchProfile` blocks on a
+/// [Completer] so a test can dispose the widget tree mid-await and then
+/// release the future — the #3159 dispose-during-await reproduction.
+class _GatedActiveProfile extends ActiveProfile {
+  _GatedActiveProfile(this._initial, this.gate);
+  final UserProfile? _initial;
+  final Completer<void> gate;
+
+  @override
+  UserProfile? build() => _initial;
+
+  @override
+  Future<void> switchProfile(String id) => gate.future;
+
+  @override
+  void refresh() {
+    // No-op; this fake only models the async gap.
   }
 }
 
@@ -327,6 +348,50 @@ void main() {
         expect(find.byType(TextField), findsOneWidget);
       },
     );
+
+    // #3159 — Riverpod 3 throws a StateError when a WidgetRef is used after
+    // the element unmounted. _activateProfile awaits switchProfile, so a
+    // user leaving the screen mid-switch used to hit `ref.read`/
+    // `ref.invalidate` on a dead ref. The notifier is now captured BEFORE
+    // the await and the invalidate is mounted-guarded.
+    testWidgets(
+        'disposing the section while switchProfile is in flight does not '
+        'throw a dead-ref StateError (#3159)', (tester) async {
+      when(() => mockRepo.getActiveProfile()).thenReturn(_activeProfile);
+      when(() => mockRepo.getAllProfiles())
+          .thenReturn(const [_activeProfile, _otherProfile]);
+
+      final std = standardTestOverrides();
+      final gate = Completer<void>();
+
+      await pumpApp(
+        tester,
+        const ProfileListSection(),
+        overrides: [
+          ...std.overrides,
+          profileRepositoryProvider.overrideWithValue(mockRepo),
+          activeProfileProvider.overrideWith(
+            () => _GatedActiveProfile(_activeProfile, gate),
+          ),
+        ],
+      );
+
+      // Start the switch — _activateProfile is now parked on the gate.
+      await tester.tap(find.text('Activate'));
+      await tester.pump();
+
+      // Tear the whole tree down while the await is still pending
+      // (simulates the user leaving the screen mid-switch).
+      await tester.pumpWidget(const SizedBox.shrink());
+
+      // Release the future; the continuation must not touch the dead ref.
+      gate.complete();
+      await tester.pump();
+
+      expect(tester.takeException(), isNull,
+          reason: 'post-await ref use on the unmounted section must be '
+              'either pre-captured or mounted-guarded');
+    });
 
     // Note: tapping Cancel/Save inside the naming dialog reliably triggers
     // a Flutter-test-only `_FocusInheritedScope` assertion when the dialog's

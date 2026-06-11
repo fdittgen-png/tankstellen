@@ -96,7 +96,11 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
           'cng': r['cng'],
         }).toList();
         await storageMgmt.savePriceRecords(widget.stationId, records);
-        ref.invalidate(priceHistoryProvider(widget.stationId));
+        // #3159 — same #2298 guard as _recordAndLoad: the save above can
+        // outlive the widget, and invalidating a dead WidgetRef throws.
+        if (mounted) {
+          ref.invalidate(priceHistoryProvider(widget.stationId));
+        }
       }
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'PriceHistory DB fetch failed'}));
