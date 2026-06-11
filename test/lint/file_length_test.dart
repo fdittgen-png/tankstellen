@@ -26,20 +26,51 @@ import 'package:flutter_test/flutter_test.dart';
 ///
 /// When a file legitimately needs more lines during a refactoring, the
 /// snapshot entry must be updated in the same PR, with a comment
-/// explaining why.
+/// explaining why — and the entry's `bumps` counter incremented.
+///
+/// ### Anti-re-grandfathering ratchet (#3141)
+/// Repeated "justified +N" re-grandfatherings are how god files grow
+/// forever (app_initializer took 9 bumps in one iteration; ~40 upward
+/// bumps are recorded in this file's own comments). Each snapshot entry
+/// therefore carries a `bumps` counter — the number of UPWARD snapshot
+/// changes since the entry was created (shrinks don't count). Once a
+/// file accumulates **3 or more bumps**, its entry MUST reference an
+/// **open** GitHub decomposition issue via `decompositionIssue`, or the
+/// test fails. The issue must stay open until the file graduates below
+/// the cap; closing it without decomposing means the next bump fails
+/// review honesty, not just CI. Existing entries were seeded at their
+/// historical bump counts (parsed from the re-grandfather comments) and
+/// linked to the open decomposition issues of epic #3136.
 ///
 /// Generated files are not scanned: `.g.dart` / `.freezed.dart` and the
 /// `lib/l10n/app_localizations*.dart` outputs of `flutter gen-l10n`
 /// (each thousands of lines, none handwritten).
+
+/// One grandfathered file's ratchet state (#1680 / #2351 / #3141):
+/// the snapshot [lines] count, the upward re-grandfathering [bumps]
+/// counter, and the open [decompositionIssue] number (mandatory once
+/// `bumps >= 3`).
+typedef _GrandfatherEntry = ({int lines, int bumps, int? decompositionIssue});
+
 void main() {
   const lineLimit = 400;
 
-  // Snapshot map: grandfathered path → line count at time of
-  // grandfathering (SPDX header excluded, same as the runtime count).
-  // The growth ratchet fails CI if current > snapshot. Update the value
-  // here when a legitimate re-grandfathering is needed (same PR, with
-  // a comment). NEVER add new entries — use decomposition instead.
-  const grandfatheredSnapshot = <String, int>{
+  // A file may be re-grandfathered upward at most this many times before
+  // an OPEN decomposition issue must be referenced in its entry (#3141).
+  const reGrandfatherBumpLimit = 3;
+
+  // Snapshot map: grandfathered path → ratchet state.
+  //  - lines: line count at (re-)grandfathering time (SPDX header
+  //    excluded, same as the runtime count). The growth ratchet fails
+  //    CI if current > lines.
+  //  - bumps: UPWARD snapshot changes since the entry was created.
+  //    When you raise `lines` you MUST increment `bumps` by 1 in the
+  //    same edit (a shrink or a removal never increments).
+  //  - decompositionIssue: the OPEN GitHub issue tracking this file's
+  //    decomposition — MANDATORY once bumps >= 3 (#3141).
+  // Update an entry only for a legitimate re-grandfathering (same PR,
+  // with a comment). NEVER add new entries — use decomposition instead.
+  const grandfatheredSnapshot = <String, _GrandfatherEntry>{
     // #2465 — re-grandfathered 934 → 950: a post-first-frame warm-up block
     // that reads `obd2CommDiagnosticsGateProvider` to arm the gated OBD2
     // comm-health collector from `Feature.debugMode` (mirrors the adjacent
@@ -98,14 +129,24 @@ void main() {
     // (the cold-launch opportunistic alert scan, + rationale comment). The
     // gating/scheduling logic lives in the under-cap background_service.dart;
     // this is launch glue only.
-    'lib/app/app_initializer.dart': 1113,
+    // 13 bumps — decomposition forced (#3141), tracked by the OPEN #3139
+    // (AppInitializer phase decomposition).
+    'lib/app/app_initializer.dart': (
+      lines: 1113,
+      bumps: 13,
+      decompositionIssue: 3139,
+    ),
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
     // deletion-tombstone fix threads a tombstoned-id set through `merge` and
     // `mergeRows` (fetch + dual-side filter so a delete on another device
     // doesn't resurrect) plus the `deleteSummary` tombstone write — a real
     // fix, not boilerplate. Decomposition of this near-cap file is its own
     // future task.
-    'lib/core/sync/trips_sync.dart': 414,
+    'lib/core/sync/trips_sync.dart': (
+      lines: 414,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
     // #2415 — background_service.dart graduated: the scan body moved into
     // BackgroundAlertScanCoordinator + BackgroundScanRunners +
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
@@ -115,7 +156,11 @@ void main() {
     // suffix facility (pricePerUnitSuffixByFuel + pricePerUnitSuffixFor)
     // and the honest per-country fuel-catalog comments (AT/DK/SI/AR no
     // longer advertise a phantom E10).
-    'lib/core/country/country_config.dart': 751,
+    'lib/core/country/country_config.dart': (
+      lines: 751,
+      bumps: 1,
+      decompositionIssue: null,
+    ),
     // #2373 — re-grandfathered 868 → 887: one required `sourceUrl` field
     // added to every per-country FuelServicePolicy row (19 data lines) so
     // the country-service header can link the upstream data source.
@@ -150,7 +195,13 @@ void main() {
     // #3198 — re-grandfathered 857 → 864: AT/DK promoted off
     // _defaultFuelTypes to explicit lists (phantom-E10 removal + DK's
     // real premium grades).
-    'lib/core/services/country_service_registry.dart': 864,
+    // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3232
+    // (data rows out of the registry; successor to closed #2187/#2188).
+    'lib/core/services/country_service_registry.dart': (
+      lines: 864,
+      bumps: 6,
+      decompositionIssue: 3232,
+    ),
     // #2969 — re-grandfathered 500 → 522: the `transportForName` inference
     // (matches a stored adapter name against the profile nameMatchers so the
     // transport-aware self-test takes RFCOMM for a Classic-SPP adapter instead
@@ -177,7 +228,14 @@ void main() {
     // #3180 — 693 → 697: comment-only growth documenting WHY the OBDLink CX
     // profile is the FFF0/FFF2/FFF1 layout (not the MX+/LX 18F0 it was
     // wrongly pinned to). Decomposition still tracked by #2190.
-    'lib/features/consumption/data/obd2/adapter_registry.dart': 697,
+    // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // (OBD2 god-class decomposition, successor to the closed #2190 the
+    // comments above reference).
+    'lib/features/consumption/data/obd2/adapter_registry.dart': (
+      lines: 697,
+      bumps: 5,
+      decompositionIssue: 3140,
+    ),
     // #2969 — grandfathered at 563 (was 389, under-cap before). The #2969
     // connect-trace instrumentation opens/finalises a trace at the FIVE public
     // connect entry points (the single virtual-dispatch chokepoint every live
@@ -256,7 +314,13 @@ void main() {
     // #3185 wiring — combined snapshot below.)
     // #3172 — +1: the obd2_platform_budgets.dart import (the BLE-budget
     // consolidation removed two inline forks from this library's part file).
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 939,
+    // 12 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // (successor to the closed #2187/#2188 the comments above reference).
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': (
+      lines: 939,
+      bumps: 12,
+      decompositionIssue: 3140,
+    ),
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
@@ -308,7 +372,13 @@ void main() {
     // ms + `discover-start` with its budget) in `_connectAndDiscover`, so
     // a connect dying in discover/setNotify is distinguishable from one
     // that never got a GATT link — from ONE field export.
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': 866,
+    // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // (successor to the closed #2190 the comments above reference).
+    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart': (
+      lines: 866,
+      bumps: 6,
+      decompositionIssue: 3140,
+    ),
     // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
     // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
     // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off
@@ -316,8 +386,16 @@ void main() {
     // #2892/#2935/#2945 never reached this site) via a small shared `_denoise`
     // helper + its dartdoc. The net push just past 400 is a real fix; further
     // compression would hurt readability. Decomposition tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/adapter_reconnect_scanner.dart': 405,
-    'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': 726,
+    'lib/features/consumption/data/obd2/adapter_reconnect_scanner.dart': (
+      lines: 405,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
+    'lib/features/consumption/data/obd2/auto_trip_coordinator.dart': (
+      lines: 726,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
     // #2456 — re-grandfathered 457 → 481: two new pure parsers,
     // `parseBaroPressureKpa` (PID 0x33) and `parseCommandedEquivalenceRatio`
     // (PID 0x44, commanded λ), each with their dartdoc, so the
@@ -329,7 +407,11 @@ void main() {
     // ambient-air (0x46) temps. All trivial decoders reusing the existing
     // `_parseFuelTrim` / `_parse1BytePercent` / `_parseModeOneBody`
     // plumbing. Decomposition tracked separately by #2187/#2188.
-    'lib/features/consumption/data/obd2/elm327_parsers.dart': 538,
+    'lib/features/consumption/data/obd2/elm327_parsers.dart': (
+      lines: 538,
+      bumps: 2,
+      decompositionIssue: null,
+    ),
     // #2456 — re-grandfathered 471 → 524: the live integrator gained λ
     // (PID 0x44, 2 Hz) + baro (PID 0x33, 0.5 Hz) supportsPid-gated
     // subscriptions and threads both into the MAF + speed-density fuel
@@ -357,7 +439,13 @@ void main() {
     // the altitude isFinite chokepoint guard (NaN altitude was poisoning the
     // RoadGradeCalculator on ~22 % of the 77-trip backup). The guard itself
     // is a net-neutral token swap; only the explanatory comment adds a line.
-    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': 674,
+    // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // (successor to the closed #2187/#2188 the comments above reference).
+    'lib/features/consumption/data/obd2/live_sample_snapshot.dart': (
+      lines: 674,
+      bumps: 5,
+      decompositionIssue: 3140,
+    ),
     // #2379 — re-grandfathered 1457 → 1468: threaded the
     // `logFailureAsError` flag through `connect()` (param + doc + the
     // guarded `if` around the now-conditional connect-failed trace) so a
@@ -412,7 +500,13 @@ void main() {
     // `healthCounters` connect-rate taps (attempts / successes / failures)
     // + import + rationale comment, so a slowly-failing BLE adapter is
     // visible in the error-log export.
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1689,
+    // 10 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // (Obd2Service is named in that issue's breakdown).
+    'lib/features/consumption/data/obd2/obd2_service.dart': (
+      lines: 1689,
+      bumps: 10,
+      decompositionIssue: 3140,
+    ),
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb
@@ -533,13 +627,24 @@ void main() {
     // is already correct after the recorder suppresses GPS-derived harsh
     // scoring — i.e. why no #2895 IMU-veto wiring is needed here. Doc-only;
     // decomposition stays tracked by #2187/#2188.
-    'lib/features/consumption/data/obd2/trip_recording_controller.dart': 1717,
+    // 17 bumps (the worst offender in this map) — decomposition forced
+    // (#3141), tracked by the OPEN #3140 (TripRecordingController is
+    // named in that issue's breakdown).
+    'lib/features/consumption/data/obd2/trip_recording_controller.dart': (
+      lines: 1717,
+      bumps: 17,
+      decompositionIssue: 3140,
+    ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
     // with a contrast-stretched GRAYSCALE pass when the #2275 binarized pass
     // recovers nothing (the binarization erased faint 7-seg value digits). The
     // retry + its parseFor helper + the threaded `binarize` flag push this just
     // past 400; further compression would hurt readability of a real fix.
-    'lib/features/consumption/data/receipt_scan_service.dart': 408,
+    'lib/features/consumption/data/receipt_scan_service.dart': (
+      lines: 408,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
     // #2442 — re-grandfathered 496 → 513: the save flow now raises the
     // guided reconciliation workflow after a plein save (a 7-line
     // await-then-route call into the extracted
@@ -584,8 +689,13 @@ void main() {
     // #3073 — +11 → 649: app-bar check action (save above the iOS keyboard,
     // which covers the bottom save bar and has no system dismiss) + onDrag
     // keyboard dismissal. Small iOS bug fix; decomposition still tracked (#2187).
-    'lib/features/consumption/presentation/screens/add_fill_up_screen.dart':
-        649,
+    // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3138
+    // (trips/fillups feature split; this screen is fill-ups).
+    'lib/features/consumption/presentation/screens/add_fill_up_screen.dart': (
+      lines: 649,
+      bumps: 8,
+      decompositionIssue: 3138,
+    ),
     // #2380 — +5: closest-station radar card at the top of the
     // recording column + a SingleChildScrollView wrap so the longer
     // column (radar + 5 metric cards + coaching card) scrolls instead
@@ -623,10 +733,15 @@ void main() {
     // trip_recording_landscape_body.dart (262 lines); only the
     // MediaQuery.orientation branch + its import remain here. Full
     // decomposition of this screen still tracked under #2187/#2188.
+    // 7 bumps — decomposition forced (#3141), tracked by the OPEN #3138
+    // (trips/fillups feature split; this screen is trips).
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        1106,
-    'lib/features/consumption/presentation/widgets/broken_map_widgets.dart':
-        439,
+        (lines: 1106, bumps: 7, decompositionIssue: 3138),
+    'lib/features/consumption/presentation/widgets/broken_map_widgets.dart': (
+      lines: 439,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
     // errorlog_30 — re-grandfathered 439 → 458: `_connect` now captures the
     // active profile + vehicle-list notifier BEFORE its first `await` and
     // threads them into `_persistPickedAdapterToActiveVehicle`, so the
@@ -656,13 +771,21 @@ void main() {
     // it. Decomposition stays tracked under #2187/#2188.
     // #3164 — re-grandfathered 552 → 555: errorLogger routing adds 3 lines
     // (the connect-failure catch now logs e/st before the mounted check).
-    'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
-        555,
+    // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // (successor to the closed #2187/#2188 the comments above reference).
+    'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart': (
+      lines: 555,
+      bumps: 6,
+      decompositionIssue: 3140,
+    ),
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
-    'lib/features/consumption/presentation/widgets/trip_path_map_card.dart':
-        450,
+    'lib/features/consumption/presentation/widgets/trip_path_map_card.dart': (
+      lines: 450,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
     // #2441 — re-grandfathered 879 → 911: split the trip-vs-pump
     // reconciliation into a detect-vs-apply seam. The detector still
     // lives in reconciler.dart; the apply step (`applyReconciliation`)
@@ -691,7 +814,13 @@ void main() {
     // the five fill-up/vehicle mutation paths + the changed-entry filter in
     // `pullFromServer` (server-newer overwrites). Decomposition is still
     // tracked #2187/#2188.
-    'lib/features/consumption/providers/consumption_providers.dart': 1025,
+    // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3138
+    // (this providers file / FillUpList is named in that issue).
+    'lib/features/consumption/providers/consumption_providers.dart': (
+      lines: 1025,
+      bumps: 5,
+      decompositionIssue: 3138,
+    ),
     // #2509 — re-grandfathered 1180 → 1217: the persist guard in
     // `_saveToHistory` was tightened from the buggy disjunction
     // (`startedAt == null || distance < 0.01`, which silently discarded a
@@ -726,8 +855,19 @@ void main() {
     // call + the `obd2Diagnostic` constructor arg) so the always-empty card is
     // fixed. Minimum footprint for a new persisted field; the god-class
     // decomposition stays tracked by #2187/#2188/#2190.
-    'lib/features/consumption/providers/trip_recording_provider.dart': 1250,
-    'lib/features/feature_management/data/legacy_toggle_migrator.dart': 647,
+    // 7 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // (the trip-recording pipeline; successor to the closed
+    // #2187/#2188/#2190 the comments above reference).
+    'lib/features/consumption/providers/trip_recording_provider.dart': (
+      lines: 1250,
+      bumps: 7,
+      decompositionIssue: 3140,
+    ),
+    'lib/features/feature_management/data/legacy_toggle_migrator.dart': (
+      lines: 647,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
     // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
     // hides results behind count-clusters. Adds the `rankForEmphasis`
     // helper + two `@visibleForTesting` constants (emphasisCount,
@@ -784,7 +924,13 @@ void main() {
     // +1 (#3161): the `discarded_futures` burn-down added the lint-mandated
     // `import 'dart:async';` line for the `unawaited(...)` wrap of the
     // marker-tap HapticFeedback call. No new logic.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 700,
+    // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3233
+    // (marker-model builder out of the widget).
+    'lib/features/map/presentation/widgets/station_map_layers.dart': (
+      lines: 700,
+      bumps: 8,
+      decompositionIssue: 3233,
+    ),
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,
@@ -799,7 +945,13 @@ void main() {
     // documentation block (catalog-pre-filled rated power, Epic #3015).
     // #3122 — re-grandfathered 480 → 491: the LWW `updatedAt` stamp field
     // + its documentation block (last-write-wins edit propagation).
-    'lib/features/vehicle/domain/entities/vehicle_profile.dart': 491,
+    // 3 bumps — decomposition forced (#3141), tracked by the OPEN #3234
+    // (vehicle god-files; coordinate with the #3130 core/domain move).
+    'lib/features/vehicle/domain/entities/vehicle_profile.dart': (
+      lines: 491,
+      bumps: 3,
+      decompositionIssue: 3234,
+    ),
     // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
     // receives a directFuelRateSupported flag computed from the vehicle's
     // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE
@@ -815,16 +967,34 @@ void main() {
     // #3015 — +1: thread the powerKwController into VehicleDrivetrainSection
     // for the catalog-pre-filled engine-power field. Decomposition tracked
     // under #2187/#2188.
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 879,
-    'lib/features/vehicle/presentation/widgets/auto_record_section.dart': 830,
+    // 4 bumps — decomposition forced (#3141), tracked by the OPEN #3234
+    // (per-section form-state extraction).
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': (
+      lines: 879,
+      bumps: 4,
+      decompositionIssue: 3234,
+    ),
+    'lib/features/vehicle/presentation/widgets/auto_record_section.dart': (
+      lines: 830,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
     // #2837 — re-grandfathered 465 → 523: on a direct-fuel-rate (PID 5E)
     // car the η_v field + its "0 samples" learner readout + Reset learner
     // are replaced by an explanatory _DirectFuelRateNote, since η_v never
     // touches the direct branch. The note widget + the conditional
     // rendering account for the growth. Decomposition tracked under
     // #2187/#2188.
-    'lib/features/vehicle/presentation/widgets/calibration_section.dart': 523,
-    'lib/features/widget/data/home_widget_service.dart': 696,
+    'lib/features/vehicle/presentation/widgets/calibration_section.dart': (
+      lines: 523,
+      bumps: 1,
+      decompositionIssue: null,
+    ),
+    'lib/features/widget/data/home_widget_service.dart': (
+      lines: 696,
+      bumps: 0,
+      decompositionIssue: null,
+    ),
   };
 
   bool isScanned(String path) {
@@ -844,10 +1014,10 @@ void main() {
     // it so the 400-line norm measures actual content, not boilerplate.
     final headerOffset =
         rawLines.length >= 2 &&
-                rawLines[0].contains('Copyright (c) 2026 Florian DITTGEN') &&
-                rawLines[1].contains('SPDX-License-Identifier')
-            ? 3
-            : 0;
+            rawLines[0].contains('Copyright (c) 2026 Florian DITTGEN') &&
+            rawLines[1].contains('SPDX-License-Identifier')
+        ? 3
+        : 0;
     return rawLines.length - headerOffset;
   }
 
@@ -869,7 +1039,7 @@ void main() {
         if (lines > lineLimit) {
           stillOver.add(path);
           // Growth ratchet (#2351): fail if current > snapshot.
-          final snapshot = grandfatheredSnapshot[path]!;
+          final snapshot = grandfatheredSnapshot[path]!.lines;
           if (lines > snapshot) {
             grownFiles.add(
               '$path  ($lines lines, snapshot $snapshot, '
@@ -916,15 +1086,19 @@ void main() {
       reason:
           'Grandfathered file(s) have GROWN beyond their snapshot. '
           'Decompose the file or update the snapshot in this test with '
-          'a comment explaining why more lines are justified.\n'
+          'a comment explaining why more lines are justified — and '
+          'increment the entry\'s `bumps` counter by 1 in the same edit '
+          '(at >= $reGrandfatherBumpLimit bumps an open decomposition '
+          'issue must be referenced, #3141).\n'
           '${grownFiles.join("\n")}',
     );
 
     // Shrink ratchet (#1680): a grandfathered file decomposed below the
     // limit must be removed from the snapshot map so the debt baseline
     // stays honest.
-    final staleBaseline =
-        grandfatheredSnapshot.keys.toSet().difference(stillOver);
+    final staleBaseline = grandfatheredSnapshot.keys.toSet().difference(
+      stillOver,
+    );
     expect(
       staleBaseline,
       isEmpty,
@@ -932,6 +1106,49 @@ void main() {
           'These files are no longer over $lineLimit lines — remove '
           'them from the `grandfatheredSnapshot` map in this test so '
           'the debt baseline stays honest:\n${staleBaseline.join("\n")}',
+    );
+  });
+
+  test('anti-re-grandfathering ratchet (#3141): '
+      '>= $reGrandfatherBumpLimit snapshot bumps require an open '
+      'decomposition issue', () {
+    // Repeatedly re-grandfathering a file upward is how god files grow
+    // forever via "justified +N" bumps. Once a file has accumulated
+    // [reGrandfatherBumpLimit] bumps, its entry must reference the OPEN
+    // GitHub issue that tracks decomposing it (and that issue must stay
+    // open until the file graduates below the cap).
+    final missingIssue = <String>[];
+    final invalidIssue = <String>[];
+    for (final MapEntry(key: path, value: snap)
+        in grandfatheredSnapshot.entries) {
+      final issue = snap.decompositionIssue;
+      if (issue != null && issue <= 0) {
+        invalidIssue.add('$path  (decompositionIssue: $issue)');
+      }
+      if (snap.bumps >= reGrandfatherBumpLimit && issue == null) {
+        missingIssue.add('$path  (${snap.bumps} bumps, no issue)');
+      }
+    }
+
+    expect(
+      invalidIssue,
+      isEmpty,
+      reason:
+          'decompositionIssue must be a real GitHub issue number:\n'
+          '${invalidIssue.join("\n")}',
+    );
+
+    expect(
+      missingIssue,
+      isEmpty,
+      reason:
+          'These grandfathered files have been re-grandfathered upward '
+          '$reGrandfatherBumpLimit+ times without an open decomposition '
+          'issue. File a decomposition issue for each file (what to '
+          'extract, along which seams, done = under the '
+          '$lineLimit-line cap) and record its number as '
+          '`decompositionIssue:` on the snapshot entry — the bump '
+          'pattern stops here (#3141):\n${missingIssue.join("\n")}',
     );
   });
 }
