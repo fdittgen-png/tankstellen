@@ -290,7 +290,22 @@ class FlutterBluePlusElmChannel
   /// constructible in a test — the pure [resolveElmGatt] matcher carries the
   /// property-matching coverage, and these seams carry the ordering coverage).
   Future<void> _connectAndDiscover() async {
+    // #3184 — stage-tag the pre-discover phases. The trace previously
+    // recorded NOTHING between `scan-seed` and the AT lines, so a connect
+    // dying in discover/setNotify was indistinguishable from one that
+    // never got a GATT link. Each step carries its elapsed ms.
+    final sw = Stopwatch()..start();
     await connectDevice();
+    Obd2ConnectTraceLog.active?.addStep(
+      label: 'gatt-connect-ok',
+      status: Obd2ConnectStepStatus.ok,
+      latencyMs: sw.elapsedMilliseconds,
+    );
+    Obd2ConnectTraceLog.active?.addStep(
+      label: 'discover-start',
+      status: Obd2ConnectStepStatus.ok,
+      detail: 'budget ${_discoverTimeoutSecs}s',
+    );
     await discoverAndBind();
     // #2261 concern 1 — subscribe to the connection-state stream so a real
     // disconnect is noticed in ~1–2 s. The first emission is the current state

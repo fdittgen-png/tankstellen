@@ -273,10 +273,19 @@ class _Obd2AdapterPickerSheetState
     // succeeded — the pinned MAC must be written either way).
     final activeProfile = ref.read(activeVehicleProfileProvider);
     final vehicleListNotifier = ref.read(vehicleProfileListProvider.notifier);
+    final connection = ref.read(obd2ConnectionProvider);
+    // #3184(f) — end the scan stream before the connect begins. NOT
+    // awaited: a cancel future can take extra event-loop turns (and never
+    // completes under widget-test fake-async) and must delay neither the
+    // spinner nor the connect. Trace separation does not depend on this
+    // ordering — `Obd2ConnectTraceLog.beginTrace` SUPERSEDES a live
+    // picker-scan trace, so the connect always opens its own root. The
+    // connect path stops the radio itself (stopScanBeforeConnect); this
+    // cancels the Dart side.
+    unawaited(_sub?.cancel());
+    _sub = null;
     try {
-      final service = await ref
-          .read(obd2ConnectionProvider)
-          .connect(candidate);
+      final service = await connection.connect(candidate);
       // #1188 — persist MAC + display name back onto the active vehicle
       // profile so the next session takes the pinned-MAC fast path and skips
       // the picker. Best-effort; uses the pre-await captures (errorlog_30) so

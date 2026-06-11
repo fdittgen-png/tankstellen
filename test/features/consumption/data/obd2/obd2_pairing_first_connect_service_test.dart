@@ -161,6 +161,7 @@ class _CapturingChannel implements ElmByteChannel {
   final String deviceId;
   final Object error;
   bool? firstConnectAtOpen;
+  // ignore: close_sinks
   final _controller = StreamController<List<int>>.broadcast();
 
   @override

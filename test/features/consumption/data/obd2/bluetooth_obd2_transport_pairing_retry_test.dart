@@ -22,6 +22,7 @@ class _FakeChannel implements ElmByteChannel {
   final Object fault;
   int openAttempts = 0;
   int closeCalls = 0;
+  // ignore: close_sinks
   final _controller = StreamController<List<int>>.broadcast();
 
   @override

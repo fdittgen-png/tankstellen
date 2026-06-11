@@ -23,6 +23,12 @@ enum Obd2ConnectOrigin {
 
   /// Any other auto-record-driven connect not covered above.
   autoRecord,
+
+  /// A picker-UI / standalone SCAN with no connect attempt riding it
+  /// (#3184). Previously untraced: "I scanned and saw nothing" left no
+  /// artefact. When a connect entry point opened the trace first, the
+  /// scan joins it as a child instead and this origin never appears.
+  pickerScan,
 }
 
 /// The transport a connect step requested / resolved (#2969). `unknown` is the

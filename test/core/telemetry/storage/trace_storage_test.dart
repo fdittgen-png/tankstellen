@@ -49,10 +49,12 @@ void main() {
     tempDir = await Directory.systemTemp.createTemp('trace_storage_test_');
     Hive.init(tempDir.path);
     await TraceStorage.init();
+    TraceStorage.extraExportSections.clear();
     storage = TraceStorage();
   });
 
   tearDown(() async {
+    TraceStorage.extraExportSections.clear();
     await Hive.close();
     if (tempDir.existsSync()) {
       tempDir.deleteSync(recursive: true);
@@ -311,6 +313,40 @@ void main() {
         final lines = raw.split('\n');
         expect(lines.length, greaterThan(1));
         expect(lines[1], startsWith('  '));
+      });
+    });
+
+    /// #3184 — feature modules register extra export sections (e.g. the
+    /// OBD2 connect-trace ring) so the ONE exportable error log carries
+    /// their diagnostics, ungated by debugMode and without core importing
+    /// any feature code.
+    group('extraExportSections (#3184)', () {
+      test('a registered section lands under its key in the export', () {
+        TraceStorage.extraExportSections['obd2ConnectTraces'] = () => [
+              {'id': 't1', 'oc': 'gattTimeout'},
+            ];
+
+        final decoded =
+            jsonDecode(storage.exportAsJson()) as Map<String, dynamic>;
+        final section = decoded['obd2ConnectTraces'] as List;
+        expect((section.single as Map<String, dynamic>)['id'], 't1');
+      });
+
+      test(
+          'a THROWING supplier must never kill the export mid-attach — its '
+          'failure is recorded in-line and the rest of the export survives',
+          () async {
+        await Hive.box('error_traces').put('e1', _makePlainJson(id: 'e1'));
+        TraceStorage.extraExportSections['sick'] =
+            () => throw StateError('box corrupt');
+        TraceStorage.extraExportSections['healthy'] = () => 'ok';
+
+        final decoded =
+            jsonDecode(storage.exportAsJson()) as Map<String, dynamic>;
+        expect(decoded['sick'], startsWith('unavailable:'));
+        expect(decoded['healthy'], 'ok');
+        expect(decoded['traceCount'], 1,
+            reason: 'the core export payload is untouched');
       });
     });
 

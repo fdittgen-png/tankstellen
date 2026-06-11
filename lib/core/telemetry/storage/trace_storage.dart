@@ -19,6 +19,16 @@ class TraceStorage {
   static const int maxTraces = 50;
   static const Duration maxAge = Duration(days: 7);
 
+  /// #3184 — pluggable EXTRA sections for [exportAsJson], registered by
+  /// feature modules at init (e.g. `obd2ConnectTraces`, registered by
+  /// `Obd2ConnectTracePersistence.init`). Keeps core free of feature
+  /// imports while the ONE exportable error log carries feature
+  /// diagnostics — UNGATED by debugMode (the user must never have to
+  /// reproduce a field failure with developer mode on). Each supplier is
+  /// best-effort: a throw is captured into the section instead of
+  /// killing the whole export.
+  static final Map<String, Object? Function()> extraExportSections = {};
+
   static Future<void> init() async {
     await Hive.openBox(_boxName);
   }
@@ -170,7 +180,7 @@ class TraceStorage {
     // ErrorTrace.fromJson over every entry).
     final (:traces, :unparsed) = _partition();
     traces.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-    return const JsonEncoder.withIndent('  ').convert({
+    final doc = <String, dynamic>{
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'traceCount': traces.length + unparsed.length,
       'parsedCount': traces.length,
@@ -179,7 +189,19 @@ class TraceStorage {
           .map((t) => PiiScrubber.scrubErrorTrace(t).toJson())
           .toList(),
       'unparsedRaw': unparsed.map(_scrubRawDeep).toList(),
+    };
+    // #3184 — feature-registered sections (e.g. obd2ConnectTraces). A
+    // throwing supplier must never kill the export the user is mid-way
+    // through attaching to an issue; its failure is recorded in-line.
+    extraExportSections.forEach((key, supplier) {
+      try {
+        doc[key] = supplier();
+      } catch (e, st) {
+        debugPrint('TraceStorage: export section "$key" failed: $e\n$st');
+        doc[key] = 'unavailable: $e';
+      }
     });
+    return const JsonEncoder.withIndent('  ').convert(doc);
   }
 
   /// Recursively applies [PiiScrubber.scrubText] to every string value

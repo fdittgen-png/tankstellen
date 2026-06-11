@@ -108,6 +108,7 @@ const _$Obd2ConnectOriginEnumMap = {
   Obd2ConnectOrigin.liveReconnect: 'liveReconnect',
   Obd2ConnectOrigin.firstConnect: 'firstConnect',
   Obd2ConnectOrigin.autoRecord: 'autoRecord',
+  Obd2ConnectOrigin.pickerScan: 'pickerScan',
 };
 
 const _$Obd2ConnectOutcomeEnumMap = {

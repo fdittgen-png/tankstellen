@@ -18,6 +18,7 @@ import 'last_good_adapter_store.dart';
 import 'negotiated_protocol_cache.dart';
 import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
+import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
 import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
@@ -158,63 +159,117 @@ class Obd2ConnectionService {
   Stream<List<ResolvedObd2Candidate>> scan({
     Duration timeout = const Duration(seconds: 8),
   }) async* {
-    final state = await permissions.request();
-    if (state != Obd2PermissionState.granted) {
-      throw const Obd2PermissionDenied();
-    }
-
+    // #3184(f) — picker-UI scans get a trace too. A standalone scan ("I
+    // scanned and saw nothing") previously left NO artefact. When a
+    // connect entry already opened a trace, this begin returns a CHILD
+    // recording into the same trace (and the end/outcome below become
+    // no-ops via [Obd2ConnectTraceHandle.isRoot]), so connect-path
+    // behaviour is unchanged.
+    final scanTrace =
+        Obd2ConnectTraceLog.beginTrace(origin: Obd2ConnectOrigin.pickerScan);
     var sawAny = false;
-    final accumulated = <String, Obd2AdapterCandidate>{};
-
-    // #3097 — scan UNFILTERED: a withServices filter starves iOS of name-only
-    // ELM327 clones; registry.rank still drops non-adapter noise post-scan.
-    final bleStream = bluetooth.scan(serviceUuids: const {}, timeout: timeout);
-    final classicStream = classicBluetooth?.scan(timeout: timeout) ??
-        const Stream<List<Obd2AdapterCandidate>>.empty();
-
-    // #761 — merge BLE + Classic scan streams. Both emit the
-    // accumulated-so-far list each tick, so we key by deviceId and
-    // re-rank on every event. Closing either stream doesn't end the
-    // merged stream — the window is the OUTER [timeout], enforced
-    // by the facades themselves.
-    final merged = StreamGroup.merge<List<Obd2AdapterCandidate>>(
-      [bleStream, classicStream],
-    );
-
-    // #2969 — record each newly-seen ranked candidate into the active connect
-    // trace so a failed connect's trace carries the scan list (device + RSSI +
-    // matched profile + transport). Deduped by MAC so a repeating batch doesn't
-    // spam the capped list. A no-op when no trace is active (the picker UI scan,
-    // which has no connect attempt in flight).
-    final tracedScanMacs = <String>{};
-    await for (final batch in merged) {
-      for (final c in batch) {
-        accumulated[c.deviceId] = c;
+    try {
+      final state = await permissions.request();
+      if (state != Obd2PermissionState.granted) {
+        throw const Obd2PermissionDenied();
       }
-      final ranked = registry.rank(accumulated.values.toList());
-      if (ranked.isNotEmpty) sawAny = true;
-      _lastRanked = ranked;
-      final trace = Obd2ConnectTraceLog.active;
-      if (trace != null) {
-        for (final r in ranked) {
-          if (tracedScanMacs.add(r.candidate.deviceId)) {
-            trace.recordScan(
-              mac: r.candidate.deviceId,
-              name: r.candidate.deviceName,
-              rssi: r.candidate.rssi,
-              transport: r.profile.transport == BluetoothTransport.classic
-                  ? Obd2ConnectTransport.classic
-                  : Obd2ConnectTransport.ble,
-              matchedProfileId: r.profile.id,
-            );
+
+      final accumulated = <String, Obd2AdapterCandidate>{};
+
+      // #3097 — scan UNFILTERED: a withServices filter starves iOS of name-only
+      // ELM327 clones; registry.rank still drops non-adapter noise post-scan.
+      final bleStream =
+          bluetooth.scan(serviceUuids: const {}, timeout: timeout);
+      final classicStream = classicBluetooth?.scan(timeout: timeout) ??
+          const Stream<List<Obd2AdapterCandidate>>.empty();
+
+      // #761 — merge BLE + Classic scan streams. Both emit the
+      // accumulated-so-far list each tick, so we key by deviceId and
+      // re-rank on every event. Closing either stream doesn't end the
+      // merged stream — the window is the OUTER [timeout], enforced
+      // by the facades themselves.
+      final merged = StreamGroup.merge<List<Obd2AdapterCandidate>>(
+        [bleStream, classicStream],
+      );
+
+      // #2969 — record each newly-seen ranked candidate into the active
+      // connect trace so a failed connect's trace carries the scan list
+      // (device + RSSI + matched profile + transport). Deduped by MAC so a
+      // repeating batch doesn't spam the capped list.
+      final tracedScanMacs = <String>{};
+      // #3184(e)/#3168 — deviceIds already stamped `pinned-id-mismatch`.
+      final mismatchStamped = <String>{};
+      await for (final batch in merged) {
+        for (final c in batch) {
+          accumulated[c.deviceId] = c;
+        }
+        final ranked = registry.rank(accumulated.values.toList());
+        if (ranked.isNotEmpty) sawAny = true;
+        _lastRanked = ranked;
+        final trace = Obd2ConnectTraceLog.active;
+        if (trace != null) {
+          for (final r in ranked) {
+            if (tracedScanMacs.add(r.candidate.deviceId)) {
+              trace.recordScan(
+                mac: r.candidate.deviceId,
+                name: r.candidate.deviceName,
+                rssi: r.candidate.rssi,
+                transport: r.profile.transport == BluetoothTransport.classic
+                    ? Obd2ConnectTransport.classic
+                    : Obd2ConnectTransport.ble,
+                matchedProfileId: r.profile.id,
+              );
+            }
+            _stampPinnedIdMismatch(trace, r, mismatchStamped);
           }
         }
+        yield ranked;
       }
-      yield ranked;
+      if (!sawAny) {
+        throw const Obd2ScanTimeout();
+      }
+      // classification-only binding; rethrow preserves the stack.
+      // ignore: catch_no_st
+    } catch (e) {
+      if (scanTrace.isRoot) scanTrace.setOutcomeFromError(e);
+      rethrow;
+    } finally {
+      if (scanTrace.isRoot && !scanTrace.hasOutcome) {
+        scanTrace.setOutcome(sawAny
+            ? Obd2ConnectOutcome.success
+            : Obd2ConnectOutcome.scanEmpty);
+      }
+      Obd2ConnectTraceLog.endTrace(scanTrace);
     }
-    if (!sawAny) {
-      throw const Obd2ScanTimeout();
-    }
+  }
+
+  /// #3184(e) — the #3168 discriminator: a scanned device whose NAME
+  /// matches the pinned adapter's name but whose deviceId DIFFERS. On iOS
+  /// the deviceId is a per-app CBPeripheral UUID (not the MAC) and can
+  /// rotate after an unpair / restore / adapter re-provision — the pinned
+  /// id then dials a ghost while the real adapter advertises under a new
+  /// id. This step makes that visible in the field trace: see #3168.
+  void _stampPinnedIdMismatch(
+    Obd2ConnectTraceHandle trace,
+    ResolvedObd2Candidate r,
+    Set<String> stamped,
+  ) {
+    final pinnedMac = trace.rawRequestedMac;
+    final pinnedName = trace.adapterName;
+    if (pinnedMac == null || pinnedMac.isEmpty) return;
+    if (pinnedName == null || pinnedName.isEmpty) return;
+    final c = r.candidate;
+    if (c.deviceName != pinnedName) return;
+    if (c.deviceId.toUpperCase() == pinnedMac.toUpperCase()) return;
+    if (!stamped.add(c.deviceId)) return;
+    trace.addStep(
+      label: 'pinned-id-mismatch',
+      status: Obd2ConnectStepStatus.fail,
+      detail: 'scanned "${c.deviceName}" under id '
+          '${redactObd2Mac(c.deviceId)} but the pinned id is '
+          '${redactObd2Mac(pinnedMac)} — iOS UUID-vs-MAC identity drift? '
+          '(#3168)',
+    );
   }
 
   /// Connect to the specific [candidate]. Dispatches on the
@@ -721,6 +776,13 @@ class Obd2ConnectionService {
 
 @Riverpod(keepAlive: true)
 Obd2ConnectionService obd2Connection(Ref ref) {
+  // #3184(d) — register the adapter-radio-state probe so every ROOT
+  // connect/scan trace opens with an `adapter-state` step 0. Lives at this
+  // plugin-wiring seam (the one place outside the channel/facade that may
+  // touch FlutterBluePlus) so the trace log stays platform-free.
+  // `adapterStateNow` is FBP's cached last-known state — no platform call.
+  Obd2ConnectTraceLog.adapterStateProbe =
+      () => FlutterBluePlus.adapterStateNow.name;
   return Obd2ConnectionService(
     registry: Obd2AdapterRegistry.defaults(),
     permissions: ref.watch(obd2PermissionsProvider),

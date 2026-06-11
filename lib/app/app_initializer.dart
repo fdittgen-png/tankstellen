@@ -41,6 +41,7 @@ import '../core/utils/edge_to_edge.dart';
 import '../features/alerts/providers/alert_provider.dart';
 import '../features/consumption/data/obd2/active_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/active_trip_repository.dart';
+import '../features/consumption/data/obd2/obd2_connect_trace_persistence.dart';
 import '../features/consumption/data/obd2/paused_trip_recovery_service.dart';
 import '../features/consumption/data/obd2/paused_trip_repository.dart';
 import '../features/consumption/data/trip_history_repository.dart';
@@ -415,6 +416,10 @@ class AppInitializer {
     await Future.wait<void>([
       HiveStorage.loadApiKey(),
       TraceStorage.init(),
+      // #3184 — persisted OBD2 connect-trace ring: hydrates the in-memory
+      // ring, registers the persist hook + the `obd2ConnectTraces` export
+      // section. Independent of the other two (own box); best-effort.
+      Obd2ConnectTracePersistence.init(),
     ]);
 
     // Verify all countries have registered service implementations.
