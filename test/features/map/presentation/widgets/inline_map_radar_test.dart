@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/map/presentation/widgets/inline_map.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/radar_search_provider.dart';
 import 'package:tankstellen/features/search/providers/selected_station_provider.dart';
 

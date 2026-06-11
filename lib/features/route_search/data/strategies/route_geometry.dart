@@ -8,7 +8,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/country/country_bounding_box.dart';
 import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/utils/geo_utils.dart';
-import '../../../search/domain/entities/search_result_item.dart';
+import '../../../../core/domain/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 
 /// Shared route-search geometry helpers (#2197).

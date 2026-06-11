@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// Unit tests for the #1872 minimum-saving route filter — the pure
 /// function that drops fuel stations not priced within the user's

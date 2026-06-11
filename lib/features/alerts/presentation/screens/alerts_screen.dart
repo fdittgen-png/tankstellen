@@ -14,7 +14,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../domain/entities/price_alert.dart';
 import '../../domain/entities/radius_alert.dart';
 import '../../providers/alert_provider.dart';

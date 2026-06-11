@@ -9,7 +9,7 @@ import '../../../core/services/service_result.dart';
 import '../../../core/country/country_provider.dart';
 import '../../ev/data/services/ev_price_enricher.dart';
 import '../../ev/data/services/fr_irve_price_service.dart';
-import '../../ev/domain/entities/charging_station.dart';
+import '../../../core/domain/ev/charging_station.dart';
 import 'ev_charging_service_provider.dart';
 
 part 'ev_search_provider.g.dart';

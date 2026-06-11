@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/services/approach_detector.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import '../../domain/driving_coaching.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'trip_recording_pip_price_layout.dart';

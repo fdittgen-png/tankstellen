@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/station_detail/domain/open_now.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 
 void main() {
   group('TimeRange', () {

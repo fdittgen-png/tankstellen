@@ -6,9 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_card.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+import 'package:tankstellen/core/domain/vehicle_profile.dart'
     show ConnectorType;
 
 import '../../../../helpers/pump_app.dart';

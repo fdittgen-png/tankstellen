@@ -8,7 +8,7 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 import 'package:tankstellen/features/station_services/austria/austria_opening_hours_adapter.dart';
 import 'package:tankstellen/features/station_services/chile/chile_opening_hours_adapter.dart';
 import 'package:tankstellen/features/station_services/germany/germany_opening_hours_adapter.dart';

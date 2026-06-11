@@ -11,7 +11,7 @@ import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/data/repositories/profile_repository.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/location_section_widget.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';

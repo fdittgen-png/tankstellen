@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/consumption/domain/services/fill_up_monthly_stats_aggregator.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Reuse-fidelity coverage for [FillUpMonthlyStatsAggregator] (#2698).
 ///

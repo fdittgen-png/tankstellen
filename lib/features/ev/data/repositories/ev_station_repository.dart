@@ -7,7 +7,7 @@ import 'dart:async';
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../../../core/storage/storage_keys.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// CRUD repository for [ChargingStation] entries.

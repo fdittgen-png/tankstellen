@@ -3,7 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import 'vehicle_providers.dart';
 
 part 'auto_record_config_provider.g.dart';

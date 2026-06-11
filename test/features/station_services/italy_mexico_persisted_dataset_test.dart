@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/services/persistent_dataset.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/station_services/italy/mise_station_service.dart';
 import 'package:tankstellen/features/station_services/mexico/mexico_station_service.dart';
 

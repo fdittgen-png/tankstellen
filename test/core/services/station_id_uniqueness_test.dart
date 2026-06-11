@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_parsers.dart'
     as fr;
 

@@ -4,13 +4,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 /// Coverage for the search-filters providers (#727):

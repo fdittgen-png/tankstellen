@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/gps_calibration_matrix.dart';
+import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';
 
 void main() {
   group('GpsCalibrationMatrix.coldStart', () {

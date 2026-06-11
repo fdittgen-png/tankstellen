@@ -11,7 +11,7 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../../domain/entities/price_alert.dart';
 import '../../providers/alert_provider.dart';
 import 'create_alert_dialog.dart';

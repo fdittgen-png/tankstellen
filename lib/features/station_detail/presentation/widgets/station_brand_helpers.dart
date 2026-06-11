@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../search/domain/entities/brand_registry.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 
 /// True when the station has a real, displayable brand — i.e. not
 /// empty and not one of the sentinel strings that parsers use when

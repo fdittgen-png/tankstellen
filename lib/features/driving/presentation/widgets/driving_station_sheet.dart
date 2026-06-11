@@ -9,8 +9,8 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 
 /// Simplified bottom sheet for driving mode showing brand, price, distance,
 /// and a large Navigate button (72dp).

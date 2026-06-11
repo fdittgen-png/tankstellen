@@ -5,9 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/services/dio_factory.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart'
+import '../../../../core/domain/vehicle_profile.dart'
     show ConnectorType;
-import '../../domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 import 'ocm_poi_parser.dart';
 
 /// Abstract contract for an EV charging station backend.

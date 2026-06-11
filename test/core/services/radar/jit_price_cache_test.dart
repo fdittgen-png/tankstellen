@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 Station _station(String id, {double? e10}) => Station(
       id: id,

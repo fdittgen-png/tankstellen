@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/foundation.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/utils/num_extensions.dart';
 import '../../domain/entities/price_stats.dart';

@@ -9,7 +9,7 @@ import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/data/repositories/alert_repository.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// In-memory [AlertStorage] so the per-station alert runner can persist a fired
 /// alert's cooldown without Hive.

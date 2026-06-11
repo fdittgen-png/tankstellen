@@ -22,8 +22,8 @@ import 'package:tankstellen/features/route_search/data/cross_border_corridor.dar
 import 'package:tankstellen/features/route_search/data/strategies/route_geometry.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_station_service.dart';
 import 'package:tankstellen/features/station_services/spain/miteco_station_service.dart';
 

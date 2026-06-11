@@ -14,7 +14,7 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Reproduces the real friend's backup ghost-trip pair (#2833): a

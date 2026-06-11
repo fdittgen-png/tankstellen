@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import 'adapter_capability.dart';
 import 'auto_record_trace_log.dart';
 import 'bluetooth_obd2_transport.dart';

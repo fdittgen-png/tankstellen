@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/search_mode.dart';
+import '../../../../core/domain/search_mode.dart';
 
 /// Two-button SegmentedButton that switches between *nearby* and *along
 /// route* search modes. Stateless: the parent owns the [SearchMode] state

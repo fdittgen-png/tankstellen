@@ -19,7 +19,7 @@ import '../../profile/data/models/user_profile.dart' as profile_model;
 import '../../profile/providers/approach_overlay_enabled_provider.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 import 'fuel_station_radar_provider.dart';
 
 part 'approach_state_provider.g.dart';

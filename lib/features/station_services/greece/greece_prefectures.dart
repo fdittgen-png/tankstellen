@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../../../core/utils/geo_utils.dart';
 
 /// Internal data representation of a Greek prefecture used by

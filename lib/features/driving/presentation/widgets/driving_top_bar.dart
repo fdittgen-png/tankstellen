@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 
 /// Top bar of the driving-mode screen — title + active fuel type chip,
 /// over a translucent gradient that fades into the map below.

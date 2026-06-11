@@ -12,7 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/ev/presentation/widgets/ev_map_overlay.dart';
 import 'package:tankstellen/features/ev/presentation/widgets/ev_marker_widget.dart';
 import 'package:tankstellen/features/ev/providers/ev_providers.dart';

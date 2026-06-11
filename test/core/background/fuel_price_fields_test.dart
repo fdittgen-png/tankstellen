@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/fuel_price_fields.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// #2864 — the background alert evaluator used a DE-only e5/e10/diesel switch
 /// (`tankerkoenigKeyFor`). It is now the per-country [priceFieldKeyForCountry],

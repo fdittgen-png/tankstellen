@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 import '../../providers/ev_providers.dart';
 import 'ev_marker_widget.dart';
 

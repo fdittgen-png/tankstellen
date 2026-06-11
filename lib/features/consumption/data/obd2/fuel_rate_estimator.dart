@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// Pure-math fuel-rate estimator + stoichiometric constants (#800,
 /// #810, #812, #813). Extracted from `obd2_service.dart` as part of

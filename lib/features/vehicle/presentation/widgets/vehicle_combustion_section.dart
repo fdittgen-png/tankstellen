@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import 'engine_power_field.dart';
 
 /// Combustion-engine portion of the [EditVehicleScreen] form. Owns the tank

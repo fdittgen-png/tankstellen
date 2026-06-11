@@ -23,7 +23,7 @@ import '../../../route_search/presentation/widgets/route_input.dart'
 import '../../../route_search/providers/route_input_provider.dart';
 import '../../../route_search/providers/route_search_params_provider.dart';
 import '../../../route_search/providers/route_search_provider.dart';
-import '../../domain/entities/search_mode.dart';
+import '../../../../core/domain/search_mode.dart';
 import '../../providers/brand_filter_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';

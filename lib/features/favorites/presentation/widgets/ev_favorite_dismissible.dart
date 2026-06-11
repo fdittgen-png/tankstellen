@@ -9,7 +9,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 import '../../providers/ev_favorites_provider.dart';
 import 'ev_favorite_card.dart';
 

@@ -10,7 +10,7 @@ import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/widgets/help_banner.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_repository.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/screens/vehicle_list_screen.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/vehicle_card.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';

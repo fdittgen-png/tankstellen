@@ -18,7 +18,7 @@ import '../../data/obd2_vin_reader.dart';
 import '../../data/reference_vehicle_catalog_provider.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
 import '../../providers/obd2_vin_reader_provider.dart';
 import '../../providers/vehicle_providers.dart';

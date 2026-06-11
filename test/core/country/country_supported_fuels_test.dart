@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Typed [CountryConfig.supportedFuelTypes] catalog (#699). Pins every
 /// shipped country's set so a country service migration can't silently

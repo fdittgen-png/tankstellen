@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fuel_type_efficiency_stats.dart';
 import 'package:tankstellen/features/consumption/domain/services/fuel_type_efficiency_aggregator.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Coverage for [FuelTypeEfficiencyAggregator] under the v2 COMPOSITION-BUCKET
 /// model (Epic #2881, #2928, ADR 0015 — supersedes ADR 0014's dominant-fuel

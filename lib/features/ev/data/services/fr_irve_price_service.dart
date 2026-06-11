@@ -9,7 +9,7 @@ import '../../../../core/country/country_bounding_box.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/services/dio_factory.dart';
 import '../../../../core/utils/geo_utils.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 import 'ev_price_enricher.dart';
 
 /// A single matchable IRVE record (the four fields we select).

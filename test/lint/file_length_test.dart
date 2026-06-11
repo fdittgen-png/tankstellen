@@ -946,8 +946,9 @@ void main() {
     // #3122 — re-grandfathered 480 → 491: the LWW `updatedAt` stamp field
     // + its documentation block (last-write-wins edit propagation).
     // 3 bumps — decomposition forced (#3141), tracked by the OPEN #3234
-    // (vehicle god-files; coordinate with the #3130 core/domain move).
-    'lib/features/vehicle/domain/entities/vehicle_profile.dart': (
+    // (vehicle god-files). #3130 — path-only update: moved to the shared
+    // domain kernel (lib/core/domain/), same grandfathered length.
+    'lib/core/domain/vehicle_profile.dart': (
       lines: 491,
       bumps: 3,
       decompositionIssue: 3234,

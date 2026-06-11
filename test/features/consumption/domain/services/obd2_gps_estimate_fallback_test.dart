@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/services/obd2_gps_estimate_fallback.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// #2431 — the OBD2 GPS-estimate fallback. When an adapter+ECU supported
 /// no fuel PID (every captured sample's `fuelRateLPerHour` is null), this

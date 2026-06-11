@@ -7,7 +7,7 @@ import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import '../../helpers/silence_error_logger.dart';
 
 Position _pos(double lat, double lng, {double speedMps = 0}) => Position(

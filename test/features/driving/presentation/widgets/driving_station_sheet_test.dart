@@ -7,8 +7,8 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/unit_formatter.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_station_sheet.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:url_launcher_platform_interface/link.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/ev_price.dart';
+import 'package:tankstellen/core/domain/ev/ev_price.dart';
 
 /// Pins `EvPrice.parse` (#1785) — the heuristic parser that turns
 /// OpenChargeMap's free-form `usageCost` string into a typed price.

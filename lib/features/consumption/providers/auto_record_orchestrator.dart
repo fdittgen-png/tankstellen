@@ -11,7 +11,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/android_background_adapter_listener.dart';
 import '../data/obd2/auto_trip_coordinator.dart';

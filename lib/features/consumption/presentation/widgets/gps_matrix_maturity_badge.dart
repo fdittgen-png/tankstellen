@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
+import '../../../../core/domain/gps_calibration_matrix.dart';
 
 /// Compact A/B/C-style chip rendering the maturity of a vehicle's
 /// [GpsCalibrationMatrix] (#2082 / Epic #2055).

@@ -8,8 +8,8 @@ import '../../../core/utils/price_formatter.dart';
 import '../../../core/utils/radar_closeness.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 import '../providers/trip_recording_provider.dart';
 import 'driving_coaching.dart';
 

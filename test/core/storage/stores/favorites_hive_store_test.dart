@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/stores/favorites_hive_store.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 
 void main() {
   late FavoritesHiveStore store;

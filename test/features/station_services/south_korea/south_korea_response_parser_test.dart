@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/station_services/south_korea/south_korea_response_parser.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Tests cover the helpers extracted in PR #1035:
 ///   * [OpinetProductCodes.fuelForProductCode]

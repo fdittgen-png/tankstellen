@@ -12,8 +12,8 @@ import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../search/domain/entities/brand_registry.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import '../../../../core/utils/station_extensions.dart';
 import 'price_tile.dart';
 

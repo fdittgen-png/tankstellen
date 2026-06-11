@@ -6,8 +6,8 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/services/tank_level_estimator.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Pure unit tests for [estimateTankLevel] (#1195).
 ///

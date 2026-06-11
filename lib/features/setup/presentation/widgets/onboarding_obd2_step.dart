@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/data/obd2/obd2_service.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/domain/entities/vin_data.dart';
 import '../../../vehicle/presentation/widgets/vin_confirm_dialog.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';

@@ -11,7 +11,7 @@ import 'package:tankstellen/features/consumption/data/baseline_store.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/providers/trip_baseline_recorder.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../helpers/silence_error_logger.dart';

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../price_history/domain/entities/price_prediction.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 
 /// Callback that produces a [PricePrediction] for a given station + fuel
 /// type, or `null` when the predictor can't form an actionable

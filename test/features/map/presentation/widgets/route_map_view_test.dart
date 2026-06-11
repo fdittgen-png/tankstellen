@@ -16,9 +16,9 @@ import 'package:tankstellen/features/map/presentation/widgets/station_map_layers
 import 'package:tankstellen/core/widgets/selectable_pill.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';

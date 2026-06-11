@@ -4,9 +4,9 @@
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/utils/geo_utils.dart';
-import '../../ev/domain/entities/charging_station.dart';
-import '../domain/entities/search_result_item.dart';
-import '../domain/entities/station.dart';
+import '../../../core/domain/ev/charging_station.dart';
+import '../../../core/domain/search_result_item.dart';
+import '../../../core/domain/station.dart';
 
 /// Pure helpers that convert country-service results into the unified
 /// [SearchResultItem] feed consumed by the UI.

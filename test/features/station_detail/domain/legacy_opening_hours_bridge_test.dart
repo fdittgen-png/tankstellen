@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_detail/domain/legacy_opening_hours_bridge.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 
 Station _station({bool is24h = false}) => Station(
       id: 's1',

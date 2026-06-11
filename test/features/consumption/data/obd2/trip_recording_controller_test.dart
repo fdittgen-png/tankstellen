@@ -12,7 +12,7 @@ import 'package:tankstellen/features/consumption/data/obd2/paused_trip_repositor
 import 'package:tankstellen/features/consumption/data/obd2/pid_scheduler.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 void main() {

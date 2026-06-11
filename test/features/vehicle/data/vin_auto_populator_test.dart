@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/vehicle/data/vin_auto_populator.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vin_data.dart';
 
 /// Tests for [VinAutoPopulator] (#1399) — pure-merge function.

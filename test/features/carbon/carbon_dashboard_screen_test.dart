@@ -10,7 +10,7 @@ import 'package:tankstellen/features/carbon/presentation/screens/carbon_dashboar
 import 'package:tankstellen/features/carbon/presentation/widgets/monthly_bar_chart.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../helpers/pump_app.dart';
 

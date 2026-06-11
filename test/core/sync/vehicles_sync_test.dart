@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/vehicles_sync.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Contract tests for [VehiclesSync] (#727 extract). Higher-fidelity
 /// coverage of the bidirectional-merge + decode path would require

@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/price_history/data/models/price_record.dart';
 import 'package:tankstellen/features/price_history/domain/entities/fill_up_guidance.dart';
 import 'package:tankstellen/features/price_history/domain/services/fill_up_guidance_predictor.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Unit tests for the pure, model-free [FillUpGuidancePredictor] (#1543).
 ///

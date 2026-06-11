@@ -7,7 +7,7 @@ import '../../../core/storage/storage_providers.dart';
 import '../../profile/data/models/user_profile.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../../route_search/domain/route_search_strategy.dart';
-import '../domain/entities/station_amenity.dart';
+import '../../../core/domain/station_amenity.dart';
 import '../presentation/widgets/sort_selector.dart';
 
 part 'search_screen_ui_provider.g.dart';

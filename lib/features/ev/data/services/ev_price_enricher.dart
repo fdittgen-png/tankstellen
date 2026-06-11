@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 
 /// Enriches a list of [ChargingStation]s with a country-authoritative
 /// price/access signal where one is freely available (#2618).

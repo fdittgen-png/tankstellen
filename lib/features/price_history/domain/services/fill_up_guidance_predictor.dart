@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../../core/calendar/public_holiday_calendar.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../data/models/price_record.dart';
 import '../entities/fill_up_guidance.dart';
 import 'holiday_premium.dart';

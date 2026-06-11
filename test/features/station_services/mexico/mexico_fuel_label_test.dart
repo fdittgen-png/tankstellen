@@ -5,8 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/utils/station_extensions.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/station_services/mexico/mexico_station_service.dart';
 
 /// #2717 — Mexican CRE stations must render real PEMEX grade NAMES

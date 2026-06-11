@@ -11,7 +11,7 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
 
 /// Hands-free auto-record configuration card on the vehicle edit

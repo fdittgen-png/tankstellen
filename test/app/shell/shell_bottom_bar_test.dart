@@ -12,7 +12,7 @@ import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_criteria_screen.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 

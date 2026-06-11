@@ -8,7 +8,7 @@ import 'package:tankstellen/core/services/bulk_migration_flags.dart';
 import 'package:tankstellen/core/services/country_service_registry.dart';
 import 'package:tankstellen/core/services/fuel_service_policy.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 void main() {
   group('CountryServiceRegistry', () {

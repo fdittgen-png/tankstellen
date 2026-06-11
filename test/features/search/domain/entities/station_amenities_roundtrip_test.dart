@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
+import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
 
 void main() {
   group('Station amenities field', () {

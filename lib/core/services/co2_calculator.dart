@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../features/consumption/domain/entities/fill_up.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
+import '../domain/fuel_type.dart';
 
 /// Pure utility for estimating CO2 emissions from fuel consumption.
 ///

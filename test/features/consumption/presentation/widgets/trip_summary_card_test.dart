@@ -8,7 +8,7 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_summary_card.dart';
 import 'package:tankstellen/features/consumption/providers/trip_fuel_cost_provider.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 import '../../../../helpers/pump_app.dart';
 

@@ -38,7 +38,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_station_service.dart';
 import 'package:tankstellen/features/station_services/germany/tankerkoenig_station_service.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 
 /// A single service under test, with:
 /// - a label (shown in failure messages),

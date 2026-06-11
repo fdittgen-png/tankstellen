@@ -1,9 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// A basic station with all fields filled.
 const testStation = Station(

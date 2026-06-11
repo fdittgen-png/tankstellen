@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_filter_wrap.dart';
 
 void main() {

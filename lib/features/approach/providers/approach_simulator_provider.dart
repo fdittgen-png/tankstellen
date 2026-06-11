@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/services/approach_detector.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 
 part 'approach_simulator_provider.g.dart';
 

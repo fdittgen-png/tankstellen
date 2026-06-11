@@ -6,9 +6,9 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';

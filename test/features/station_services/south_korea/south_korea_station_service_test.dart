@@ -9,8 +9,8 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/station_services/south_korea/south_korea_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 import '../../../mocks/mocks.dart';

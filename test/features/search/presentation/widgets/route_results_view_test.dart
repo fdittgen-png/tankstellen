@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/route_results_view.dart';
 import 'package:tankstellen/features/search/providers/ignored_stations_provider.dart';
 

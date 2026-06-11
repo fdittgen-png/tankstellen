@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/price_history/data/models/price_prediction.dart';
 import 'package:tankstellen/features/price_history/data/models/price_record.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 // We test the prediction computation by importing the provider's top-level
 // function and calling it through a ProviderContainer. Since the provider

@@ -1,14 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-/// What kind of search the user is performing — the presentation layer's
-/// domain model for the search tab strip. Kept in `domain/` so it can be
-/// used by providers and screens without leaking imports from `data/`.
-enum SearchMode {
-  nearby('nearby', 'Around me'),
-  route('route', 'Along route');
+/// Re-export shim (#3130): this type moved to the shared domain kernel.
+///
+/// The canonical home is now `lib/core/domain/search_mode.dart` — shared app-wide
+/// vocabulary lives in `lib/core/domain/` so neither core nor other
+/// features have to reach into this feature for it. New code must import
+/// the kernel path; this shim only keeps legacy import sites compiling
+/// until the feature-boundary lint (#3132) retires them.
+library;
 
-  final String apiValue;
-  final String displayName;
-  const SearchMode(this.apiValue, this.displayName);
-}
+export '../../../../core/domain/search_mode.dart';

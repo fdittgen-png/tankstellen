@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/announcement_engine.dart';
 import 'package:tankstellen/core/services/voice_announcement_service.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import '../../helpers/silence_error_logger.dart';
 
 import '../../fixtures/stations.dart';

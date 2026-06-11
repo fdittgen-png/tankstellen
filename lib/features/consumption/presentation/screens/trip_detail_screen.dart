@@ -15,7 +15,7 @@ import '../../../../core/sync/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/trip_history_repository.dart';
 import '../../providers/shared_trips_provider.dart';

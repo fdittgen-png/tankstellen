@@ -14,7 +14,7 @@ import '../../features/consumption/presentation/screens/trip_detail_screen.dart'
 import '../../features/consumption/presentation/screens/trip_recording_screen.dart';
 import '../../features/feature_management/application/feature_flags_provider.dart';
 import '../../features/feature_management/domain/feature.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
+import '../../core/domain/fuel_type.dart';
 import 'invalid_id_screen.dart';
 
 /// Routes that drive the "behind-the-wheel" savings lens: consumption logging,

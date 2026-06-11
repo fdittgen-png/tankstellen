@@ -3,8 +3,8 @@
 
 import 'dart:math' as math;
 
-import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/gps_calibration_matrix.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import 'gps_fuel_estimator.dart';
 
 /// GPS-only **live** fuel-consumption estimator — a calibrated physics

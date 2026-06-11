@@ -11,7 +11,7 @@ import 'package:tankstellen/features/price_history/data/repositories/price_histo
 import 'package:tankstellen/features/price_history/domain/entities/fill_up_guidance.dart';
 import 'package:tankstellen/features/price_history/providers/fill_up_guidance_provider.dart';
 import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Tests for the feature-gate wiring of [fillUpGuidanceProvider] (#1543).
 ///

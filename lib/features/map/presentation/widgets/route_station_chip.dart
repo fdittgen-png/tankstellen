@@ -7,7 +7,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/utils/unit_formatter.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 
 /// A chip representing a station stop along the route.
 ///

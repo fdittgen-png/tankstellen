@@ -7,7 +7,7 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/station_services/mexico/mexico_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 
 /// Fake HTTP adapter that maps request URLs to canned XML responses.
 class _FakeCreAdapter implements HttpClientAdapter {

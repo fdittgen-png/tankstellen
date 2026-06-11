@@ -15,7 +15,7 @@ import '../../features/alerts/data/velocity_alert_cooldown.dart';
 import '../../features/alerts/data/velocity_alert_runner.dart';
 import '../../features/alerts/domain/radius_alert_evaluator.dart';
 import '../../features/alerts/domain/velocity_alert_detector.dart';
-import '../../features/search/data/models/search_params.dart';
+import '../domain/search_params.dart';
 import '../constants/field_names.dart';
 import '../logging/error_logger.dart';
 import '../notifications/local_notification_service.dart';

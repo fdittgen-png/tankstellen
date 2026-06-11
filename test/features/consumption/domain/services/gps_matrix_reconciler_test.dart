@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/gps_driving_features.dart';
 import 'package:tankstellen/features/consumption/domain/services/gps_matrix_reconciler.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/gps_calibration_matrix.dart';
+import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';
 
 GpsDrivingFeatures _features({
   required double distanceKm,

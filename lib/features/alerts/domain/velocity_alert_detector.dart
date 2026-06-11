@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../core/utils/geo_utils.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../data/models/price_snapshot.dart';
 import 'entities/velocity_alert_config.dart';
 

@@ -14,8 +14,8 @@ import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../profile/data/models/user_profile.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/search_result_item.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/search_result_item.dart';
 import '../../domain/route_search_strategy.dart';
 
 /// Executes station queries in concurrent batches for faster route search.

@@ -6,7 +6,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_station_service.dart';
 
 import '../../../helpers/silence_error_logger.dart';

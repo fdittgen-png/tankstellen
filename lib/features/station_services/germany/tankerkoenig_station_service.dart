@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:dio/dio.dart';
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
-import '../../station_detail/domain/opening_hours.dart';
+import '../../../core/domain/opening_hours.dart';
 import 'germany_opening_hours_adapter.dart';
 import 'tankerkoenig_batch_price_fetcher.dart';
 

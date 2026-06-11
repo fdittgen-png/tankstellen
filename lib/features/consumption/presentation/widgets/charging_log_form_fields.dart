@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/charging_log_readout.dart';
 import '../../domain/charging_log_validators.dart';
 import 'charging_log_derived_readout_panel.dart';

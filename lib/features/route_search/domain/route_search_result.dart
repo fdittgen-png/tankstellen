@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/search_result_item.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/search_result_item.dart';
 import '../data/cross_border_corridor.dart' show contributingCountryCodesFor;
 import 'entities/route_info.dart';
 import 'route_search_strategy.dart';

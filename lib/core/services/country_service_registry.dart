@@ -11,7 +11,7 @@ import '../country/country_bounding_box.dart';
 import '../country/country_config.dart';
 import '../data/storage_repository.dart';
 import '../storage/storage_providers.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
+import '../domain/fuel_type.dart';
 import 'bulk_migration_flags.dart';
 import 'country_raw_service_builder.dart';
 import 'diagnostics/data_access_recorder.dart';

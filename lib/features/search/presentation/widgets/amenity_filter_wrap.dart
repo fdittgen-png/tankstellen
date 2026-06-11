@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/station_amenity.dart';
+import '../../../../core/domain/station_amenity.dart';
 
 /// FilterChips, one per [StationAmenity], used by the Search criteria
 /// screen to let the user filter results by station equipment (shop,

@@ -4,7 +4,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/setup/providers/onboarding_wizard_provider.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vin_data.dart';
 

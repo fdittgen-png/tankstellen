@@ -9,9 +9,9 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/features/map/presentation/widgets/inline_map.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../fixtures/stations.dart';

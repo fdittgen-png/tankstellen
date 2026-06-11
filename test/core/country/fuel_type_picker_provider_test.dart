@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/country/fuel_type_picker_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// #703 — every fuel picker in the app reads from this provider, so
 /// switching country re-filters every dropdown in one place.

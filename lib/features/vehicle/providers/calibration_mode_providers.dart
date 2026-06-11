@@ -3,7 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../domain/fuzzy_classifier.dart';
 import 'vehicle_providers.dart';
 

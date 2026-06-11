@@ -4,8 +4,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/station_extensions.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import 'route_station_chip.dart';
 
 /// Horizontal scrollable list of best-stop station chips for the route map.

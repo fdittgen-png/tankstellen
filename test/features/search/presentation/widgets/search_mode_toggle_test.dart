@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/search_mode.dart';
+import 'package:tankstellen/core/domain/search_mode.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_mode_toggle.dart';
 
 void main() {

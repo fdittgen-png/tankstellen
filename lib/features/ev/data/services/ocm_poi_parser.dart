@@ -5,7 +5,7 @@ import 'dart:async';
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/geo_utils.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 
 /// Shared OpenChargeMap POI-list parser.
 ///

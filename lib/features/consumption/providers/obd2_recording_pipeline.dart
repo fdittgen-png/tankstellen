@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../data/obd2/obd2_service.dart';
 import '../data/obd2/obd2_session_context_block.dart';
 import '../data/obd2/trip_recording_controller.dart';

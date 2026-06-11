@@ -13,7 +13,7 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/services/reconciler.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../helpers/silence_error_logger.dart';
 

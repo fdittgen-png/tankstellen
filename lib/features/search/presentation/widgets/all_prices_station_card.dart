@@ -14,8 +14,8 @@ import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
-import '../../domain/entities/fuel_type.dart';
-import '../../domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 
 part 'all_prices_station_card_parts.dart';
 

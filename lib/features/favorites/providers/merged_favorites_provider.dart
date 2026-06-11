@@ -3,8 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../search/domain/entities/search_result_item.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_result_item.dart';
+import '../../../core/domain/station.dart';
 import 'ev_favorites_provider.dart';
 import 'favorite_stations_provider.dart';
 

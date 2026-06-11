@@ -8,8 +8,8 @@ import '../../../core/country/country_config.dart';
 import '../../../core/theme/price_band_colors.dart';
 import '../../../core/utils/price_tier.dart';
 import '../../../core/utils/station_extensions.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 
 /// Android Auto v1 — pure serializer for the car Search / Radar station lists.
 ///

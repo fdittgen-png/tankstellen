@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_tariff.dart';
 import 'package:tankstellen/features/ev/domain/services/ev_price_calculator.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Builds a single-element tariff from a flat list of components.
 ChargingTariff _tariff(

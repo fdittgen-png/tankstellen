@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
 import 'package:tankstellen/core/services/radar/jit_price_cache.dart';
 import 'package:tankstellen/features/approach/providers/fuel_station_radar_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 Station _station(String id, double lat, double lng, {double? e10}) => Station(
       id: id,

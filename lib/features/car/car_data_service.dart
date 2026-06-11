@@ -18,9 +18,9 @@ import '../../core/services/country_service_registry.dart';
 import '../../core/storage/hive_storage.dart';
 import '../../core/storage/storage_keys.dart';
 import '../../core/utils/geo_utils.dart' show isUsableCoord;
-import '../search/data/models/search_params.dart';
-import '../search/domain/entities/fuel_type.dart';
-import '../search/domain/entities/station.dart';
+import '../../core/domain/search_params.dart';
+import '../../core/domain/fuel_type.dart';
+import '../../core/domain/station.dart';
 import '../widget/data/car_station_data.dart';
 
 /// Android Auto v2 — PHASE-1 (#2947 / epic #2946): the headless Flutter entry

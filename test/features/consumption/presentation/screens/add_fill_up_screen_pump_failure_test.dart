@@ -16,7 +16,7 @@ import 'package:tankstellen/features/consumption/presentation/screens/add_fill_u
 import 'package:tankstellen/features/consumption/presentation/screens/pump_display_camera_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/bad_scan_report_sheet.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/pump_scan_failure_sheet.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';

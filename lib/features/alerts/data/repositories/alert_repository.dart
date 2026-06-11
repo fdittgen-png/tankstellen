@@ -3,7 +3,7 @@
 
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/utils/station_extensions.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../models/price_alert.dart';
 
 /// Repository for managing price alerts, backed by [AlertStorage].

@@ -7,7 +7,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/consumption/data/repositories/fill_up_repository.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../fakes/fake_hive_storage.dart';
 import '../../helpers/silence_error_logger.dart';

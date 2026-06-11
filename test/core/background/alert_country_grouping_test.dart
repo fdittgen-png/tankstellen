@@ -6,7 +6,7 @@ import 'package:tankstellen/core/background/alert_country_grouping.dart';
 import 'package:tankstellen/core/services/country_service_registry.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 void main() {
   PriceAlert priceAlert(String id, String stationId, {bool active = true}) =>

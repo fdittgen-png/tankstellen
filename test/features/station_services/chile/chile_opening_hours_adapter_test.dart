@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 import 'package:tankstellen/features/station_services/chile/chile_opening_hours_adapter.dart';
 import 'package:tankstellen/features/station_services/opening_hours/opening_hours_adapter.dart';
 

@@ -5,8 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/services/gps_live_fuel_estimator.dart';
 import 'package:tankstellen/features/consumption/domain/services/physics_scale_calibrator.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/gps_calibration_matrix.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 const _vehicle = VehicleProfile(
   id: 'v1',

@@ -15,7 +15,7 @@ import 'package:tankstellen/features/price_history/data/tflite_price_predictor.d
 import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
 import 'package:tankstellen/features/price_history/providers/price_prediction_provider.dart';
 import 'package:tankstellen/features/price_history/providers/tflite_price_predictor_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Tests for the [pricePredictionProvider].
 ///

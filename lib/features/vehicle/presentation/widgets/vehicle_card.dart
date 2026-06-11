@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// Compact summary card for one [VehicleProfile].
 ///

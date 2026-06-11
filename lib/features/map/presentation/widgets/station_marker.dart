@@ -11,8 +11,8 @@ import '../../../../core/utils/price_gradient.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/animated_price_text.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 
 /// Compact marker dimensions — small enough to fit dozens on screen
 /// while keeping the price legible.

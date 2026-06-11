@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/ev_access_cost.dart';
+import 'package:tankstellen/core/domain/ev/ev_access_cost.dart';
 
 void main() {
   group('EvAccessCost.from', () {

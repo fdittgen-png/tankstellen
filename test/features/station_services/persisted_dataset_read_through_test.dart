@@ -9,7 +9,7 @@ import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/services/persistent_dataset.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/station_services/argentina/argentina_station_service.dart';
 
 /// #2264 concern 3 — bulk datasets persist to Hive under a keepAlive provider

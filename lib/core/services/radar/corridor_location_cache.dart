@@ -3,7 +3,7 @@
 
 import 'dart:async';
 
-import '../../../features/search/domain/entities/station.dart';
+import '../../domain/station.dart';
 import 'corridor_geo.dart';
 import 'geo_tile.dart';
 

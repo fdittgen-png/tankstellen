@@ -26,7 +26,7 @@ import 'package:tankstellen/features/consumption/data/obd2/oem_pid_table.dart';
 import 'package:tankstellen/features/vehicle/data/vin_adapter_pair_auto_populator.dart';
 import 'package:tankstellen/features/vehicle/data/vin_decoder.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Integration tests for [VinAdapterPairAutoPopulator] (#1399).
 ///

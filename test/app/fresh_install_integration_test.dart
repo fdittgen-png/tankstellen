@@ -19,8 +19,8 @@ import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorite_stations_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 

@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/fill_ups_sync.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Contract tests for [FillUpsSync] (#727 extract). Higher-fidelity
 /// tests of the merge + decode path would require mocking Supabase;

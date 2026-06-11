@@ -10,8 +10,8 @@ import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../route_search/providers/route_search_provider.dart';
-import '../../search/domain/entities/search_result_item.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_result_item.dart';
+import '../../../core/domain/station.dart';
 import '../../search/providers/search_provider.dart';
 
 part 'station_detail_provider.g.dart';

@@ -15,10 +15,10 @@ import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../widget/data/car_station_writer.dart';
-import '../data/models/search_params.dart';
-import '../domain/entities/fuel_type.dart';
-import '../domain/entities/search_result_item.dart';
-import '../domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/search_result_item.dart';
+import '../../../core/domain/station.dart';
 // #727 — SearchState reads `searchLocationProvider` so we import
 // filters_provider directly (re-exports don't surface symbols here).
 import 'search_filters_provider.dart';

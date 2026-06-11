@@ -4,8 +4,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/add_fill_up_fuel_resolver.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Unit tests for the pure helpers extracted from
 /// `add_fill_up_screen.dart` (#563 refactor). Covers:

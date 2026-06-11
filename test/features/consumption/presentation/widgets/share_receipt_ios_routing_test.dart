@@ -20,7 +20,7 @@ import 'package:tankstellen/features/consumption/providers/'
 import 'package:tankstellen/features/feature_management/application/'
     'feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// #2736 — the iOS Share Extension seam. On iOS the share arrives as a

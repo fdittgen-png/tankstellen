@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/profile_fuel_type_dropdown.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Override the active country to France so the dropdown includes

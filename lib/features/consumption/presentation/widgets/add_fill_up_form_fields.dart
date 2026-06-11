@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/form_section_card.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/add_fill_up_validators.dart';
 import 'fill_up_import_buttons_pair.dart';
 import 'fill_up_notes_field.dart';

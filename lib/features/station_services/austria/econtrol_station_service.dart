@@ -5,14 +5,14 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
-import '../../station_detail/domain/opening_hours.dart';
+import '../../../core/domain/opening_hours.dart';
 import 'austria_opening_hours_adapter.dart';
 
 /// Austrian fuel prices from E-Control Spritpreisrechner.

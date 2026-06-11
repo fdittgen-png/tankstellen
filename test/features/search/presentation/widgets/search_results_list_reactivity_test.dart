@@ -11,8 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/search_results_list.dart';
 import 'package:tankstellen/features/search/providers/ignored_stations_provider.dart';
 

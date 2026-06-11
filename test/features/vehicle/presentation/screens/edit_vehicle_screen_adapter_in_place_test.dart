@@ -17,7 +17,7 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_servi
 import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_repository.dart';
 import 'package:tankstellen/features/vehicle/data/vin_adapter_pair_auto_populator.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/features/vehicle/providers/vin_adapter_pair_auto_populator_provider.dart';

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../core/utils/geo_utils.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/utils/station_extensions.dart';
 import 'entities/radius_alert.dart';
 

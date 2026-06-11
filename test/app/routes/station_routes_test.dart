@@ -8,7 +8,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/routes/station_routes.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/ev/data/repositories/ev_station_repository.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 
 import '../../mocks/mocks.dart';
 

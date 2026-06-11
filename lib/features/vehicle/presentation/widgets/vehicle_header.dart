@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// Card-free big header rendered at the top of the restyled
 /// edit-vehicle form (#751 §3). Shows the vehicle's name as a large

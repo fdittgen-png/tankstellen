@@ -10,7 +10,7 @@ import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_foldable.dart';
 import '../widgets/station_brand_header.dart';

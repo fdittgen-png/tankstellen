@@ -3,7 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 
 part 'price_snapshot.freezed.dart';
 part 'price_snapshot.g.dart';

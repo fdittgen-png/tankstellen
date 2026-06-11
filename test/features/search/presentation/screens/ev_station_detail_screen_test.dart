@@ -8,14 +8,14 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/ev/data/services/ev_price_enricher.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/search/data/services/ev_charging_service.dart';
 import 'package:tankstellen/features/search/presentation/screens/ev_station_detail_screen.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_station_header_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_station_info_cards.dart';
 import 'package:tankstellen/features/search/providers/ev_charging_service_provider.dart';
 import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+import 'package:tankstellen/core/domain/vehicle_profile.dart'
     show ConnectorType;
 
 import '../../../../helpers/mock_providers.dart';

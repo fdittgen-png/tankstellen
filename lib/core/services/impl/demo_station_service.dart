@@ -5,8 +5,8 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 
-import '../../../features/search/data/models/search_params.dart';
-import '../../../features/search/domain/entities/station.dart';
+import '../../domain/search_params.dart';
+import '../../domain/station.dart';
 import '../service_result.dart';
 import '../station_service.dart';
 

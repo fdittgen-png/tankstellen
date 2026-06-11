@@ -17,11 +17,11 @@ import 'package:tankstellen/core/services/geocoding_chain.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/ev_search_provider.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 

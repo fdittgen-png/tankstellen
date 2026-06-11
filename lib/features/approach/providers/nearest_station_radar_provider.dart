@@ -9,7 +9,7 @@ import '../../../core/utils/geo_utils.dart' as geo;
 import '../../../core/utils/station_extensions.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 import 'effective_approach_state_provider.dart';
 import 'fuel_station_radar_provider.dart';
 

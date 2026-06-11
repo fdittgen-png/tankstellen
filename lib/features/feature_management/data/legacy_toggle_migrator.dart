@@ -8,7 +8,7 @@ import 'package:hive/hive.dart';
 
 import '../../../core/storage/storage_keys.dart';
 import '../../profile/data/models/user_profile.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../domain/feature.dart';
 import '../domain/feature_manifest.dart';
 import 'feature_flags_repository.dart';

@@ -15,8 +15,8 @@ import 'package:tankstellen/features/consumption/presentation/widgets/trip_radar
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/silence_error_logger.dart';

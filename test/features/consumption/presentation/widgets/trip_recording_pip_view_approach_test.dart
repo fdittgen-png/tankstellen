@@ -10,8 +10,8 @@ import 'package:tankstellen/features/consumption/domain/situation_classifier.dar
 import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_recording_pip_view.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 const _stationE10 = Station(

@@ -16,7 +16,7 @@ import 'package:tankstellen/features/consumption/providers/trip_recording_provid
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
 import 'package:tankstellen/features/driving/haptic_eco_coach.dart';
 import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
 import '../../../../helpers/recording_profile_override.dart';

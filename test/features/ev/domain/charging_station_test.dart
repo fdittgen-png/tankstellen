@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
-import 'package:tankstellen/features/ev/domain/entities/opening_hours.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/opening_hours.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart'
     show ConnectorType;
 
 /// Canonical tests for [ChargingStation] after the #560 consolidation.
 ///
 /// Post-#560, a single `ChargingStation` lives at
-/// `lib/features/ev/domain/entities/charging_station.dart`. The tests
+/// `lib/core/domain/ev/charging_station.dart` (#3130). The tests
 /// below pin down:
 ///   1. [fromJson] accepts BOTH `lat`/`lng` AND `latitude`/`longitude`
 ///      (TDD for #567 — the "fromJson handles both shapes" checkbox).

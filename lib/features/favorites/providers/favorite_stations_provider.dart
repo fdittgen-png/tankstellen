@@ -13,7 +13,7 @@ import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 import 'favorites_provider.dart';
 import '../../../core/logging/error_logger.dart';
 

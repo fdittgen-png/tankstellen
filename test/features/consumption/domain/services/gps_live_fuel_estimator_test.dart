@@ -4,8 +4,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/services/gps_fuel_estimator.dart';
 import 'package:tankstellen/features/consumption/domain/services/gps_live_fuel_estimator.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/gps_calibration_matrix.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Drive a steady-state cruise: feed [ticks] samples at constant
 /// [speedMps] and 1 s dt so acceleration settles to ~0.

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../core/utils/geo_utils.dart';
-import '../../../search/domain/entities/search_result_item.dart';
+import '../../../../core/domain/search_result_item.dart';
 
 /// Shared off-isolate detour-filter + itinerary-sort for the route-search
 /// strategies (#2303).

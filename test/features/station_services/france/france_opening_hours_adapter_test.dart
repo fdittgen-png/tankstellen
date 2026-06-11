@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 import 'package:tankstellen/features/station_services/france/france_opening_hours_adapter.dart';
 
 /// Reuse-fidelity tests for the real [FranceOpeningHoursAdapter] (#2710),

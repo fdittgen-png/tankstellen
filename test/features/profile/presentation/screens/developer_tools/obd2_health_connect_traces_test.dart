@@ -11,7 +11,7 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/obd2_connect_trace_card.dart';
 import 'package:tankstellen/features/profile/presentation/screens/developer_tools/obd2_health_screen.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../../helpers/pump_app.dart';

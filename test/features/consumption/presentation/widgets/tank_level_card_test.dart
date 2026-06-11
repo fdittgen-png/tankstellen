@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/services/tank_level_estimator.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/tank_level_card.dart';
 import 'package:tankstellen/features/consumption/providers/tank_level_provider.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';

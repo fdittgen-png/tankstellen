@@ -22,7 +22,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/price_history/domain/entities/price_prediction.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/widget/data/home_widget_service.dart';
 import 'package:tankstellen/features/widget/data/predictive_payload.dart';
 import 'package:tankstellen/features/widget/data/widget_variants.dart';

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import '../../profile/data/models/user_profile.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/search_result_item.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/search_result_item.dart';
 import '../domain/entities/route_info.dart';
 
 /// Strategy interface for different route search algorithms.

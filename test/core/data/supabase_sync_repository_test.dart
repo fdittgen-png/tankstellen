@@ -6,7 +6,7 @@ import 'package:tankstellen/core/data/impl/supabase_sync_repository.dart';
 import 'package:tankstellen/core/data/sync_repository.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/itinerary/domain/entities/saved_itinerary.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Tests that [SupabaseSyncRepository] is a thin adapter delegating to
 /// [SyncService]. Since TankSyncClient is not initialized in tests,

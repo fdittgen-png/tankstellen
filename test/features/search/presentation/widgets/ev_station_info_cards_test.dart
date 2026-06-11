@@ -3,10 +3,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_connector_tile.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_station_info_cards.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+import 'package:tankstellen/core/domain/vehicle_profile.dart'
     show ConnectorType;
 
 import '../../../../helpers/pump_app.dart';

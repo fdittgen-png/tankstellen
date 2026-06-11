@@ -13,8 +13,8 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/presentation/screens/developer_tools/developer_tools_screen.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../../helpers/pump_app.dart';

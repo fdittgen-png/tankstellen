@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart'
+import '../../../../core/domain/vehicle_profile.dart'
     show ConnectorType;
-import '../../domain/entities/search_result_item.dart';
+import '../../../../core/domain/search_result_item.dart';
 import '../../providers/mixed_results_filter_provider.dart';
 import '../../providers/search_provider.dart';
 

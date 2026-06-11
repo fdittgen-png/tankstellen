@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../vehicle/domain/entities/vehicle_profile.dart' show ConnectorType;
+import '../../../core/domain/vehicle_profile.dart' show ConnectorType;
 import 'entities/brand_registry.dart';
-import 'entities/search_result_item.dart';
-import 'entities/station.dart';
-import 'entities/station_amenity.dart';
+import '../../../core/domain/search_result_item.dart';
+import '../../../core/domain/station.dart';
+import '../../../core/domain/station_amenity.dart';
 
 /// Pure filter functions for the search-results pipeline.
 ///

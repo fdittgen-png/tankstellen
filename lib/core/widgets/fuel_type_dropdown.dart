@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/search/domain/entities/fuel_type.dart';
+import '../domain/fuel_type.dart';
 import '../../l10n/app_localizations.dart';
 import '../country/fuel_type_picker_provider.dart';
 

@@ -14,9 +14,9 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/providers/route_search_provider.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../../search/providers/search_mode_provider.dart';
-import '../../../search/domain/entities/search_mode.dart';
+import '../../../../core/domain/search_mode.dart';
 import '../../providers/itinerary_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
 

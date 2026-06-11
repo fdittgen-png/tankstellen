@@ -18,7 +18,7 @@ import 'package:tankstellen/features/consumption/domain/services/trip_length_agg
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/pending_reconciliation_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import '../helpers/silence_error_logger.dart';
 
 /// Cross-view invariant integration test (Epic #2439 / #2448) — the

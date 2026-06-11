@@ -20,8 +20,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/presentation/widgets/proximity_fill_bar.dart';
 import '../../../station_detail/presentation/widgets/station_brand_helpers.dart';
 import '../../domain/entities/brand_registry.dart';
-import '../../domain/entities/fuel_type.dart';
-import '../../domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import 'amenity_chips.dart';
 
 part 'station_card_price_column.dart';

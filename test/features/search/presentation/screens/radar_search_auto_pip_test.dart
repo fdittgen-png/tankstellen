@@ -9,7 +9,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/consumption/data/pip_controller.dart';
 import 'package:tankstellen/features/consumption/providers/pip_mode_provider.dart';
 import 'package:tankstellen/features/consumption/providers/wakelock_facade.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/presentation/screens/search_screen.dart';
 import 'package:tankstellen/features/search/providers/radar_search_provider.dart';
 

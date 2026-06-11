@@ -11,7 +11,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/search/presentation/screens/ev_station_detail_screen.dart';

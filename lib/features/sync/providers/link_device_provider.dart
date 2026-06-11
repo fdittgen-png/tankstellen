@@ -15,7 +15,7 @@ import '../../alerts/providers/alert_provider.dart';
 import '../../consumption/domain/entities/fill_up.dart';
 import '../../consumption/providers/consumption_providers.dart';
 import '../../favorites/providers/favorites_provider.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../../../core/logging/error_logger.dart';
 

@@ -6,8 +6,8 @@ import 'dart:ui' show Color;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/price_band_colors.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/widget/data/car_station_data.dart';
 
 /// Android Auto v1 (#2948 / epic #2946) — proves the car-data write helper

@@ -3,7 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/fuel_rate_estimator.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Guardrails for the pure-math fuel-rate estimator extracted out of
 /// `obd2_service.dart` in the #563 service-split refactor. These

@@ -15,9 +15,9 @@ import '../../../core/services/service_result.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
 import '../../../core/utils/station_extensions.dart';
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 
 part 'fuel_station_radar_provider.g.dart';
 

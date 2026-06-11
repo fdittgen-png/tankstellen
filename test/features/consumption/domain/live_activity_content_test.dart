@@ -8,8 +8,8 @@ import 'package:tankstellen/core/utils/radar_closeness.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/live_activity_content.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// Decision-table coverage for [buildLiveActivityContent] (#3170) — the
 /// pure mapper from (recorder state, approach state, radar fallback) to

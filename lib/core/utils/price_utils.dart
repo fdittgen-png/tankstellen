@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import '../constants/app_constants.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
-import '../../features/search/domain/entities/station.dart';
+import '../domain/fuel_type.dart';
+import '../domain/station.dart';
 import 'station_extensions.dart';
 
 /// Returns the price of the given [fuelType] for [station], or null if unavailable.

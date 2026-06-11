@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart'
+import '../../../../core/domain/vehicle_profile.dart'
     show ConnectorType;
 import '../../providers/ev_providers.dart';
 

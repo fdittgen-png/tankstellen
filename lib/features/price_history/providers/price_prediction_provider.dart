@@ -13,7 +13,7 @@ import '../../../core/utils/num_extensions.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../data/models/price_prediction.dart';
 import '../domain/entities/feature_vector.dart';
 import '../domain/services/holiday_premium.dart';

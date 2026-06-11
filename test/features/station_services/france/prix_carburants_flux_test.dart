@@ -9,7 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_flux_parser.dart'
     as flux;
 import 'package:tankstellen/features/station_services/france/prix_carburants_parsers.dart'

@@ -14,8 +14,8 @@ import '../../../core/utils/station_extensions.dart';
 import '../../approach/providers/approach_state_provider.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/voice_announcements_enabled_provider.dart';
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 import 'voice_announcement_settings_provider.dart';
 
 part 'voice_announcement_listener_provider.g.dart';

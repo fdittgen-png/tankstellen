@@ -4,7 +4,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/providers/mixed_results_filter_provider.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+import 'package:tankstellen/core/domain/vehicle_profile.dart'
     show ConnectorType;
 
 /// Pins the mixed fuel + EV results filter notifiers (#1784).

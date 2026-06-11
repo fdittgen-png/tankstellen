@@ -4,8 +4,8 @@
 import 'dart:async';
 
 import '../../core/logging/error_logger.dart';
-import '../../features/search/domain/entities/station.dart';
-import '../../features/station_detail/domain/opening_hours.dart';
+import '../domain/station.dart';
+import '../domain/opening_hours.dart';
 import 'station_service.dart';
 
 /// JSON-safe (de)serialization helpers for the [StationServiceChain] cache

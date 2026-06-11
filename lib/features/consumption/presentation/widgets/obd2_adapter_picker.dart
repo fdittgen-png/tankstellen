@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/adapter_registry.dart';
 import '../../data/obd2/obd2_adapter_identity.dart';

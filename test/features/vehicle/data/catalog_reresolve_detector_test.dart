@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/vehicle/data/catalog_reresolve_detector.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_profile_catalog_matcher.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Unit tests for [CatalogReresolveDetector] (#1396).
 ///

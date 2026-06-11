@@ -9,9 +9,9 @@ import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/price_tier.dart';
 import 'package:tankstellen/core/widgets/station_card_shell.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/presentation/widgets/amenity_chips.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 

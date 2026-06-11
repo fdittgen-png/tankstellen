@@ -32,7 +32,7 @@ import 'package:archive/archive.dart';
 import 'package:xml/xml.dart';
 
 import '../../../core/country/country_time.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 import '../opening_hours/open_state_from_hours.dart';
 import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_parsers.dart' as parser;

@@ -15,7 +15,7 @@ import '../../../core/sync/fill_ups_sync.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/ve_learner.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
-import '../../vehicle/domain/entities/gps_calibration_matrix.dart';
+import '../../../core/domain/gps_calibration_matrix.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../vehicle/providers/service_reminder_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';

@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 
 /// Form section widgets for [RadiusAlertCreateSheet]
 /// (#563 phase: radius_alert_create_sheet). Pure stateless widgets —

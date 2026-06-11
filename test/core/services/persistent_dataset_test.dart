@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/services/persistent_dataset.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// #3154 — [PersistentDataset.write] / [PersistentDataset.readAsync] run the
 /// (de)serialize closures through `compute()` so a whole-country dataset

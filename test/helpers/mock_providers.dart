@@ -14,8 +14,8 @@ import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.d
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_params_provider.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_mode.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_mode.dart';
 import 'package:tankstellen/features/search/providers/search_mode_provider.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 

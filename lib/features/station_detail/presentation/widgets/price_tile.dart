@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/animated_price_text.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 
 /// A single fuel price row with colored icon and formatted price.
 class PriceTile extends StatelessWidget {

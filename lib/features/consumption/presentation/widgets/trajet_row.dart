@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import 'trajet_stripe_colors.dart';
 

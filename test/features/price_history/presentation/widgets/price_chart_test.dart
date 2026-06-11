@@ -8,7 +8,7 @@ import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/price_history/data/models/price_record.dart';
 import 'package:tankstellen/features/price_history/presentation/widgets/price_chart.dart';
 import 'package:tankstellen/features/price_history/presentation/widgets/price_chart_axes.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/pump_app.dart';
 

@@ -20,7 +20,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/sharing/widget_share_renderer.dart';
 import 'package:tankstellen/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../fixtures/stations.dart';

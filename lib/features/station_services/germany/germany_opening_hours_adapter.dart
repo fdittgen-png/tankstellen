@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../station_detail/domain/opening_hours.dart';
+import '../../../core/domain/opening_hours.dart';
 import '../opening_hours/opening_hours_adapter.dart';
 
 /// Normalises the German Tankerkönig (`detail.php`) opening-hours payload into

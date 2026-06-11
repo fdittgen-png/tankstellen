@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/driving_coaching.dart' show DrivingCoachingHint;
 import '../../domain/entities/gps_sample_diagnostic.dart';
 import '../../domain/services/gear_inference.dart';

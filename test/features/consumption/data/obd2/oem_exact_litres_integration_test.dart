@@ -10,7 +10,7 @@ import 'package:tankstellen/features/consumption/data/obd2/trip_recording_contro
 import 'package:tankstellen/features/consumption/providers/current_obd2_fuel_level_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_oem_fuel_level_controller.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 /// End-to-end coverage for the OEM exact-litres path (#1620): a

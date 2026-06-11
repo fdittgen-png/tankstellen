@@ -11,7 +11,7 @@ import '../../../../core/theme/fuel_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/show_electric_enabled_provider.dart';
 import '../../../profile/providers/show_fuel_enabled_provider.dart';
-import '../../domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../providers/search_provider.dart';
 
 class FuelTypeSelector extends ConsumerWidget {

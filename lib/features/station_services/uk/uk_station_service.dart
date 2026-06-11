@@ -7,8 +7,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/utils/json_extensions.dart';

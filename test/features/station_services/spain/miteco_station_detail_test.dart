@@ -8,8 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service_chain_codec.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_services/spain/miteco_station_service.dart';
 import 'package:tankstellen/features/station_services/spain/spain_provinces.dart';
 

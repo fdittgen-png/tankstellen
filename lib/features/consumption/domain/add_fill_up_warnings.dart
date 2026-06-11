@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../search/domain/entities/fuel_type.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import 'add_fill_up_fuel_resolver.dart';
 import 'entities/fill_up.dart';
 

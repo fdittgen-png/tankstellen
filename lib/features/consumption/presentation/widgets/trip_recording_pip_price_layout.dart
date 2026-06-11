@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import 'proximity_fill_bar.dart';
 
 /// The huge-price PiP layout for the Fuel Station Radar (#2084 / #2601 /

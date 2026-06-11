@@ -4,9 +4,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/search_result_helpers.dart';
 
 void main() {

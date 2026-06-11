@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
+import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/trip_live_reading.dart';
 import 'gps_matrix_maturity_badge.dart';

@@ -7,7 +7,7 @@ import 'package:tankstellen/features/consumption/data/obd2/obd2_breadcrumb_colle
 import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
 import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 // Shared AT-init boilerplate for the FakeObd2Transport.
 const _initResponses = {

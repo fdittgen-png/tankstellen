@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/storage/hive_boxes.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Per-fuel cooldown tracker for the velocity alert detector (#579).

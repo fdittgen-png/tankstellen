@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../consumption/data/trip_history_repository.dart';
-import '../domain/entities/trip_length_breakdown.dart';
+import '../../../core/domain/trip_length_breakdown.dart';
 
 /// Below this trip count a length-bucket entry is treated as "not
 /// enough data yet" — the aggregator emits `null` for that bucket

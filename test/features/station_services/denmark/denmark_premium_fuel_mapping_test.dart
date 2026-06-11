@@ -17,8 +17,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_services/denmark/denmark_station_service.dart';
 
 const _okUrl = 'https://mobility-prices.ok.dk/api/v1/fuel-prices';

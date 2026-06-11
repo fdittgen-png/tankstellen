@@ -3,7 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../ocr/pump_ocr_config.dart';
 import 'receipt_currency_profile.dart';
 
