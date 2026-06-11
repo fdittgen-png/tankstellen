@@ -15,9 +15,11 @@
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		35A2294918D818734C462990 /* StationRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56BA2B737BFEAFAF64046B1 /* StationRow.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		3DFBC3A7D6D2E931C4B535EC /* StationListWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B178E98F93A82662B8ED4165 /* StationListWidgetView.swift */; };
 		595226A68EC384B12AF0A93F /* TankstellenWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4EA6D51155FBB08B992BDCD8 /* TankstellenWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5E24927367580828DD745BD3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53F08202EBE1619234A8ED70 /* Assets.xcassets */; };
 		617A7DBF52F20550E6FAD8F0 /* TripActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE94E0B255E44A6D24AC543B /* TripActivityAttributes.swift */; };
+		69AB881AFDF951061E686013 /* PredictiveStationsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A15DA64CF250BB6FB784375 /* PredictiveStationsWidget.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		976F22DFFA3574104BBF6FEC /* TripActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE94E0B255E44A6D24AC543B /* TripActivityAttributes.swift */; };
@@ -25,10 +27,12 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A1A2A3A41E000001A0000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1A2A3A41E000002A0000002 /* PrivacyInfo.xcprivacy */; };
+		B40FD09E966968C1027C08D0 /* WidgetRefreshIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B6E3FDCA71BDEF55ED246F /* WidgetRefreshIntent.swift */; };
 		C1D3C7BC3EE97D07059B912D /* NearestStationsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844ADBBCA2F2A79394B541E8 /* NearestStationsProvider.swift */; };
 		E05A76E23ACD50B61271D84D /* NearestStationsEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AB9171C55A8C662C3106F67 /* NearestStationsEntry.swift */; };
 		E128B0129985B6FE9E2D5787 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AE182BA7429614C5B4D896D8 /* Pods_RunnerTests.framework */; };
 		F41E24A56C7842FF0D7B1473 /* TripRecordingLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BDF230A6D8AB196E7C7CA0 /* TripRecordingLiveActivity.swift */; };
+		FF0BC870C426C2F4DA1A295F /* FavoriteStationsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DF7BD8C44FEF87F0FDD9706 /* FavoriteStationsWidget.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,11 +78,14 @@
 
 /* Begin PBXFileReference section */
 		021C8A9CAC0B84B64CE59171 /* NearestStationsWidgetView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NearestStationsWidgetView.swift; sourceTree = "<group>"; };
+		0A15DA64CF250BB6FB784375 /* PredictiveStationsWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PredictiveStationsWidget.swift; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		1DF7BD8C44FEF87F0FDD9706 /* FavoriteStationsWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FavoriteStationsWidget.swift; sourceTree = "<group>"; };
 		2815EFFDECEACD9EAFE42DF1 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		38B6E3FDCA71BDEF55ED246F /* WidgetRefreshIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetRefreshIntent.swift; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		48958D39212C2CFDBF19D6DB /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		4EA6D51155FBB08B992BDCD8 /* TankstellenWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TankstellenWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +111,7 @@
 		A1A2A3A41E000002A0000002 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA0B2B41CF68C8C0A67F6D1B /* Runner.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		AE182BA7429614C5B4D896D8 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B178E98F93A82662B8ED4165 /* StationListWidgetView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StationListWidgetView.swift; sourceTree = "<group>"; };
 		C56BA2B737BFEAFAF64046B1 /* StationRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StationRow.swift; sourceTree = "<group>"; };
 		D5BAD308B99CCC0C792854A9 /* TankstellenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TankstellenWidget.swift; sourceTree = "<group>"; };
 		E1C4E7855C3D7D6AF8148EDF /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -236,6 +244,10 @@
 				E6531D801740AA014ACC14D5 /* TankstellenWidget.entitlements */,
 				EE94E0B255E44A6D24AC543B /* TripActivityAttributes.swift */,
 				85BDF230A6D8AB196E7C7CA0 /* TripRecordingLiveActivity.swift */,
+				B178E98F93A82662B8ED4165 /* StationListWidgetView.swift */,
+				1DF7BD8C44FEF87F0FDD9706 /* FavoriteStationsWidget.swift */,
+				0A15DA64CF250BB6FB784375 /* PredictiveStationsWidget.swift */,
+				38B6E3FDCA71BDEF55ED246F /* WidgetRefreshIntent.swift */,
 			);
 			name = TankstellenWidget;
 			path = TankstellenWidget;
@@ -519,6 +531,10 @@
 				35A2294918D818734C462990 /* StationRow.swift in Sources */,
 				976F22DFFA3574104BBF6FEC /* TripActivityAttributes.swift in Sources */,
 				F41E24A56C7842FF0D7B1473 /* TripRecordingLiveActivity.swift in Sources */,
+				3DFBC3A7D6D2E931C4B535EC /* StationListWidgetView.swift in Sources */,
+				FF0BC870C426C2F4DA1A295F /* FavoriteStationsWidget.swift in Sources */,
+				69AB881AFDF951061E686013 /* PredictiveStationsWidget.swift in Sources */,
+				B40FD09E966968C1027C08D0 /* WidgetRefreshIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

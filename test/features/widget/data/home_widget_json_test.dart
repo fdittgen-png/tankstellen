@@ -111,4 +111,69 @@ void main() {
       expect(entry.containsKey('closedReason'), isTrue);
     });
   });
+
+  // #2600 / #3171 — shared cheapest-row flagging (moved out of
+  // NearestWidgetDataBuilder so the favorites payload carries the same
+  // `isCheapest` flag the iOS favorites variant + Android renderer read).
+  group('flagCheapestRows', () {
+    test('flags exactly the minimum-priced row, false on the rest', () {
+      final rows = <Map<String, dynamic>>[
+        {'id': 'a', 'preferred_fuel_price': 1.85},
+        {'id': 'b', 'preferred_fuel_price': 1.79},
+        {'id': 'c', 'preferred_fuel_price': 1.92},
+      ];
+
+      flagCheapestRows(rows);
+
+      expect(rows[0]['isCheapest'], isFalse);
+      expect(rows[1]['isCheapest'], isTrue);
+      expect(rows[2]['isCheapest'], isFalse);
+    });
+
+    test('rows without a price are never the cheapest but still get the '
+        'key (predictable bool for the native readers)', () {
+      final rows = <Map<String, dynamic>>[
+        {'id': 'a'},
+        {'id': 'b', 'preferred_fuel_price': 1.79},
+      ];
+
+      flagCheapestRows(rows);
+
+      expect(rows[0]['isCheapest'], isFalse);
+      expect(rows[1]['isCheapest'], isTrue);
+    });
+
+    test('all rows unpriced — every flag is false, none missing', () {
+      final rows = <Map<String, dynamic>>[
+        {'id': 'a'},
+        {'id': 'b'},
+      ];
+
+      flagCheapestRows(rows);
+
+      for (final row in rows) {
+        expect(row['isCheapest'], isFalse);
+      }
+    });
+
+    test('ties at the minimum flag every tied row', () {
+      final rows = <Map<String, dynamic>>[
+        {'id': 'a', 'preferred_fuel_price': 1.79},
+        {'id': 'b', 'preferred_fuel_price': 1.79},
+        {'id': 'c', 'preferred_fuel_price': 1.99},
+      ];
+
+      flagCheapestRows(rows);
+
+      expect(rows[0]['isCheapest'], isTrue);
+      expect(rows[1]['isCheapest'], isTrue);
+      expect(rows[2]['isCheapest'], isFalse);
+    });
+
+    test('empty list is a no-op', () {
+      final rows = <Map<String, dynamic>>[];
+      expect(() => flagCheapestRows(rows), returnsNormally);
+      expect(rows, isEmpty);
+    });
+  });
 }

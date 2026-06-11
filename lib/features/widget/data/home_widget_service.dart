@@ -19,6 +19,7 @@ import '../../../core/utils/geo_utils.dart' as geo;
 import '../../profile/data/models/user_profile.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import 'home_widget_json.dart';
+import 'impl/widget_reload_dispatcher.dart';
 import 'nearest_widget_data_builder.dart';
 import 'predictive_payload.dart';
 import '../../../core/logging/error_logger.dart';
@@ -60,28 +61,10 @@ String get _widgetGroupId =>
 // and nearest modes internally. The old NearestWidgetProvider receiver
 // was dropped from the manifest.
 
-/// #2206 — the AppWidgetProvider lives in the Gradle **namespace**
-/// `de.tankstellen.tankstellen` (the manifest `.FuelPriceWidgetProvider`
-/// receiver), which differs from the **applicationId**
-/// `de.tankstellen.fuelprices`. home_widget's `updateWidget` resolves the
-/// short `androidName` against the applicationId
-/// (`${packageName}.${androidName}`), so it looked for
-/// `de.tankstellen.fuelprices.FuelPriceWidgetProvider` and threw
-/// `ClassNotFoundException` on every update.
-///
-/// home_widget 0.9.2 resolves the provider class as
-/// `Class.forName(qualifiedAndroidName ?? "${packageName}.${androidName}")`
-/// — when `qualifiedAndroidName` is non-null it is used **as-is** and the
-/// short name is ignored for resolution. BUT the plugin's
-/// `ClassNotFoundException` message always prints the SHORT `androidName`
-/// ("No Widget found with Name FuelPriceWidgetProvider"), which made the
-/// device log misleading. We therefore pass ONLY the fully-qualified name
-/// at every call site (no short `androidName`), so the qualified class is
-/// always resolved and a future failure message reports `null` rather
-/// than the wrong short name. (#2207 field follow-up.)
-// i18n-ignore: Android class identifier, not user-facing text.
-const _widgetQualifiedAndroidName =
-    'de.tankstellen.tankstellen.FuelPriceWidgetProvider';
+// #2206 / #3171 — the per-platform "re-render the native widgets" call
+// (fully-qualified Android provider name, per-kind iOS timeline reloads)
+// lives in `impl/widget_reload_dispatcher.dart`; every update path below
+// finishes with `notifyNativeWidgets()`.
 
 /// Maximum number of stations to include in widget data.
 const _maxWidgetStations = 5;
@@ -118,9 +101,7 @@ class HomeWidgetService {
       if (favoriteIds.isEmpty) {
         await HomeWidget.saveWidgetData('station_count', 0);
         await HomeWidget.saveWidgetData('stations_json', '[]');
-        await HomeWidget.updateWidget(
-          qualifiedAndroidName: _widgetQualifiedAndroidName,
-        );
+        await notifyNativeWidgets();
         return;
       }
 
@@ -147,9 +128,7 @@ class HomeWidgetService {
       // backward compatibility.
       await _writeGlobalWidgetDefaults(profileStorage);
 
-      await HomeWidget.updateWidget(
-        qualifiedAndroidName: _widgetQualifiedAndroidName,
-      );
+      await notifyNativeWidgets();
       debugPrint('HomeWidget: favorites updated with ${stations.length} stations');
     } catch (e, st) {
       _logWidgetUpdateFailure(e, st, 'HomeWidget: favorites update failed');
@@ -183,9 +162,7 @@ class HomeWidgetService {
           pricePredictor: pricePredictor,
         );
         final payload = await builder.build();
-        await HomeWidget.updateWidget(
-          qualifiedAndroidName: _widgetQualifiedAndroidName,
-        );
+        await notifyNativeWidgets();
         debugPrint(
           'HomeWidget: nearest (real search) updated — '
           'count=${payload.stations.length} '
@@ -212,9 +189,7 @@ class HomeWidgetService {
           lat == null || lng == null ? 'no_gps' : 'no_favorites',
         );
         await HomeWidget.saveWidgetData('nearest_is_stale', false);
-        await HomeWidget.updateWidget(
-          qualifiedAndroidName: _widgetQualifiedAndroidName,
-        );
+        await notifyNativeWidgets();
         return;
       }
 
@@ -249,9 +224,7 @@ class HomeWidgetService {
       await HomeWidget.saveWidgetData('nearest_lat', lat);
       await HomeWidget.saveWidgetData('nearest_lng', lng);
 
-      await HomeWidget.updateWidget(
-        qualifiedAndroidName: _widgetQualifiedAndroidName,
-      );
+      await notifyNativeWidgets();
       debugPrint('HomeWidget: nearest updated with ${stations.length} stations');
     } catch (e, st) {
       _logWidgetUpdateFailure(e, st, 'HomeWidget: nearest update failed');
@@ -279,6 +252,10 @@ class HomeWidgetService {
         ));
       }
     }
+    // #3171 — parity with the nearest payload: flag the cheapest priced
+    // row(s) so the native renderers can colour their price green in the
+    // favorites variant too.
+    flagCheapestRows(stations);
     return stations;
   }
 
