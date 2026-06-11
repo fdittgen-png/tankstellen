@@ -10,7 +10,7 @@ import '../hive_boxes.dart';
 ///
 /// Manages user-configured price alerts for specific stations.
 class AlertsHiveStore implements AlertStorage {
-  Box get _alerts => Hive.box(HiveBoxes.alerts);
+  Box<dynamic> get _alerts => Hive.box(HiveBoxes.alerts);
 
   @override
   List<Map<String, dynamic>> getAlerts() {

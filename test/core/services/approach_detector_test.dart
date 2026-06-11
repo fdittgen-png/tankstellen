@@ -262,9 +262,9 @@ void main() {
             reason: 'must target the cheapest DIESEL station (A=1.849), not '
                 'the cheapest-any-fuel station (B, by its 1.659 e10)');
 
-        sub.cancel();
-        det.dispose();
-        gps.close();
+        unawaited(sub.cancel());
+        unawaited(det.dispose());
+        unawaited(gps.close());
       });
     });
   });
@@ -308,9 +308,9 @@ void main() {
         expect(emitted.last, isA<ApproachPolling>(),
             reason: 'with no priced station in radius the detector polls');
 
-        sub.cancel();
-        det.dispose();
-        gps.close();
+        unawaited(sub.cancel());
+        unawaited(det.dispose());
+        unawaited(gps.close());
       });
     });
 
@@ -346,9 +346,9 @@ void main() {
                 'surface');
         expect(inRadius.last.station.id, 'A');
 
-        sub.cancel();
-        det.dispose();
-        gps.close();
+        unawaited(sub.cancel());
+        unawaited(det.dispose());
+        unawaited(gps.close());
       });
     });
   });
@@ -407,9 +407,9 @@ void main() {
         expect(fetchCount, fetchesAfterPoll,
             reason: 'the live recompute must NOT poll the data service');
 
-        sub.cancel();
-        det.dispose();
-        gps.close();
+        unawaited(sub.cancel());
+        unawaited(det.dispose());
+        unawaited(gps.close());
       });
     });
   });

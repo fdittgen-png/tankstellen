@@ -45,10 +45,10 @@ void main() {
     // Reopen a clean alerts box for every test. Mirrors the pattern
     // used by the legacy alerts repository test.
     if (Hive.isBoxOpen(HiveBoxes.alerts)) {
-      await Hive.box(HiveBoxes.alerts).close();
+      await Hive.box<dynamic>(HiveBoxes.alerts).close();
     }
-    await Hive.openBox(HiveBoxes.alerts);
-    await Hive.box(HiveBoxes.alerts).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.alerts);
+    await Hive.box<dynamic>(HiveBoxes.alerts).clear();
   });
 
   tearDownAll(() async {
@@ -117,7 +117,7 @@ void main() {
       // Legacy per-station alerts live under the 'alerts' key (a
       // list of maps). list() must filter those out so we don't
       // crash on unrelated payloads.
-      final box = Hive.box(HiveBoxes.alerts);
+      final box = Hive.box<dynamic>(HiveBoxes.alerts);
       await box.put('alerts', [
         {'id': 'legacy', 'stationId': 's', 'targetPrice': 1.5},
       ]);
@@ -147,13 +147,13 @@ void main() {
     });
 
     test('list returns empty list when the alerts box is closed', () async {
-      final box = Hive.box(HiveBoxes.alerts);
+      final box = Hive.box<dynamic>(HiveBoxes.alerts);
       await box.close();
 
       final store = RadiusAlertStore();
       expect(await store.list(), isEmpty);
       // Restore for teardown
-      await Hive.openBox(HiveBoxes.alerts);
+      await Hive.openBox<dynamic>(HiveBoxes.alerts);
     });
   });
 
@@ -223,7 +223,7 @@ void main() {
         '(pre-#1012 hive payload backwards compat)', () async {
       // Simulate a Hive payload written before #1012 — no
       // frequencyPerDay key.
-      final box = Hive.box(HiveBoxes.alerts);
+      final box = Hive.box<dynamic>(HiveBoxes.alerts);
       await box.put('${RadiusAlertStore.keyPrefix}legacy', {
         'id': 'legacy',
         'fuelType': 'diesel',

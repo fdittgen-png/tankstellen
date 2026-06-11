@@ -53,7 +53,7 @@ void main() {
 
       final session = block['obd2Session'] as Map<String, Object?>;
       // Compact short keys carried from the model's toJson.
-      expect(session['pid'], isA<Map>());
+      expect(session['pid'], isA<Map<dynamic, dynamic>>());
       expect((session['pid'] as Map).keys, containsAll(['010C', '0105']));
       expect((session['conn'] as Map)['dr'], 1); // one drop
     });
@@ -75,7 +75,7 @@ void main() {
       // Must not throw — proves the block is JSON-safe inside the export.
       final encoded = jsonEncode(block);
       expect(encoded, contains('obd2Session'));
-      expect(jsonDecode(encoded), isA<Map>());
+      expect(jsonDecode(encoded), isA<Map<dynamic, dynamic>>());
     });
   });
 

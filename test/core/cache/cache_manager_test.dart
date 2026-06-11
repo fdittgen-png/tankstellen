@@ -176,7 +176,7 @@ void main() {
 
       final entry = cache.get('nested');
       expect(entry, isNotNull);
-      expect(entry!.payload['station'], isA<Map>());
+      expect(entry!.payload['station'], isA<Map<dynamic, dynamic>>());
     });
   });
 
@@ -483,7 +483,7 @@ void main() {
   group('CacheManager - concurrent access patterns', () {
     test('multiple puts to same key resolve to last write', () async {
       // Simulate concurrent puts
-      final futures = <Future>[];
+      final futures = <Future<dynamic>>[];
       for (int i = 0; i < 10; i++) {
         futures.add(cache.put(
           'concurrent-key',

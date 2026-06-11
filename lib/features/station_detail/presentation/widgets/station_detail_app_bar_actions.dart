@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -54,11 +56,11 @@ class StationDetailAppBarActions extends ConsumerWidget {
           onPressed: () {
             final s = station;
             if (s != null) {
-              NavigationUtils.openInMaps(
+              unawaited(NavigationUtils.openInMaps(
                 s.lat,
                 s.lng,
                 label: hasRealBrand(s) ? s.brand : s.street,
-              );
+              ));
             }
           },
           tooltip: l10n?.navigate ?? 'Navigate',
@@ -89,9 +91,9 @@ class StationDetailAppBarActions extends ConsumerWidget {
         IconButton(
           icon: AnimatedFavoriteStar(isFavorite: isFav),
           onPressed: () {
-            ref
+            unawaited(ref
                 .read(favoritesProvider.notifier)
-                .toggle(stationId, stationData: station);
+                .toggle(stationId, stationData: station));
           },
           tooltip: isFav ? 'Remove from favorites' : 'Add to favorites',
         ),

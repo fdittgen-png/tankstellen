@@ -22,7 +22,7 @@ void main() {
 
   group('searchStations', () {
     test('parses valid response with stations', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(),
                 statusCode: 200,
@@ -58,10 +58,10 @@ void main() {
     });
 
     test('returns empty list for empty stations array', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(),
-                data: {'ok': true, 'stations': []},
+                data: {'ok': true, 'stations': <dynamic>[]},
               ));
 
       const params = SearchParams(lat: 52.52, lng: 13.405, radiusKm: 10.0);
@@ -71,7 +71,7 @@ void main() {
     });
 
     test('throws ApiException when ok is false', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
           .thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(),
                 data: {'ok': false, 'message': 'Invalid API key'},
@@ -85,7 +85,7 @@ void main() {
     });
 
     test('throws on DioException', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters'), cancelToken: any(named: 'cancelToken')))
           .thenThrow(DioException(
             type: DioExceptionType.connectionTimeout,
             requestOptions: RequestOptions(),
@@ -101,7 +101,7 @@ void main() {
 
   group('getStationDetail', () {
     test('parses valid detail response', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters')))
           .thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(),
                 data: {
@@ -139,7 +139,7 @@ void main() {
     });
 
     test('handles missing openingTimes gracefully', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters')))
           .thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(),
                 data: {
@@ -173,7 +173,7 @@ void main() {
     });
 
     test('parses valid prices response', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters')))
           .thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(),
                 data: {
@@ -193,7 +193,7 @@ void main() {
     });
 
     test('handles empty prices map', () async {
-      when(() => mockDio.get(any(), queryParameters: any(named: 'queryParameters')))
+      when(() => mockDio.get<dynamic>(any(), queryParameters: any(named: 'queryParameters')))
           .thenAnswer((_) async => Response(
                 requestOptions: RequestOptions(),
                 data: <String, dynamic>{'ok': true, 'prices': <String, dynamic>{}},

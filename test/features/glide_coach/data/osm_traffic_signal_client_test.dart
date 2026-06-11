@@ -36,7 +36,7 @@ void main() {
             any(),
             data: any(named: 'data'),
             options: any(named: 'options'),
-          )).thenAnswer((_) async => okResponse({'elements': []}));
+          )).thenAnswer((_) async => okResponse({'elements': <dynamic>[]}));
 
       await client.fetchInBoundingBox(
         south: 43.4,

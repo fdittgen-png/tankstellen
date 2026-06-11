@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -71,7 +73,7 @@ class ChargingTab extends ConsumerWidget {
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (_) {
-                ref.read(chargingLogsProvider.notifier).remove(log.id);
+                unawaited(ref.read(chargingLogsProvider.notifier).remove(log.id));
               },
               child: ChargingLogCard(log: log),
             );

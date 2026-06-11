@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -25,12 +27,12 @@ void main() {
     bool vinOnlineDecode = false,
     bool syncTrips = false,
   }) {
-    fakeStorage.putSetting(StorageKeys.consentLocation, location);
-    fakeStorage.putSetting(StorageKeys.consentErrorReporting, errorReporting);
-    fakeStorage.putSetting(StorageKeys.consentCloudSync, cloudSync);
-    fakeStorage.putSetting(
-        StorageKeys.consentVinOnlineDecode, vinOnlineDecode);
-    fakeStorage.putSetting(StorageKeys.consentSyncTrips, syncTrips);
+    unawaited(fakeStorage.putSetting(StorageKeys.consentLocation, location));
+    unawaited(fakeStorage.putSetting(StorageKeys.consentErrorReporting, errorReporting));
+    unawaited(fakeStorage.putSetting(StorageKeys.consentCloudSync, cloudSync));
+    unawaited(fakeStorage.putSetting(
+        StorageKeys.consentVinOnlineDecode, vinOnlineDecode));
+    unawaited(fakeStorage.putSetting(StorageKeys.consentSyncTrips, syncTrips));
 
     return ProviderScope(
       overrides: [

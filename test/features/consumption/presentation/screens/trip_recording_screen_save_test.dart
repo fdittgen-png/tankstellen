@@ -115,7 +115,7 @@ Future<void> _pumpAndStop(
     overrides: [
       tripRecordingProvider.overrideWith(() => notifier),
       wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride(),
+            recordingProfileOverride() as Object,
     ],
   );
 
@@ -178,7 +178,7 @@ void main() {
         overrides: [
           tripRecordingProvider.overrideWith(() => notifier),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride(),
+            recordingProfileOverride() as Object,
         ],
       );
 
@@ -250,7 +250,7 @@ void main() {
         overrides: [
           tripRecordingProvider.overrideWith(() => notifier),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride(),
+            recordingProfileOverride() as Object,
         ],
       );
 

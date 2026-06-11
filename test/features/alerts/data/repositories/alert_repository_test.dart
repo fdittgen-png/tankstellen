@@ -18,12 +18,12 @@ void main() {
     // Use a temporary directory for Hive in tests
     final dir = '${Directory.systemTemp.path}/hive_test_${DateTime.now().millisecondsSinceEpoch}';
     Hive.init(dir);
-    await Hive.openBox('alerts');
+    await Hive.openBox<dynamic>('alerts');
   });
 
   setUp(() async {
     // Clear alerts box before each test
-    final box = Hive.box('alerts');
+    final box = Hive.box<dynamic>('alerts');
     await box.clear();
     repo = AlertRepository(HiveStorage());
   });

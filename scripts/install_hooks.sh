@@ -141,14 +141,13 @@ if ! git diff --exit-code -- lib/l10n/; then
 fi
 
 # --- 4. Static analysis --------------------------------------------------
-# Match CI exactly: CI runs `flutter analyze --no-fatal-infos`, so info-level
-# lints (e.g. a stray unnecessary_import) are NON-fatal there. A bare
-# `flutter analyze` here is fatal on infos, so a pre-existing info anywhere in
-# the tree blocked EVERY push's gate and forced SKIP_PREPUSH (#3031). Stay
-# fatal on warnings + errors (what CI fails on); let infos through.
-echo "pre-push [4/5]: flutter analyze (--no-fatal-infos, matching CI)..."
-if ! flutter analyze --no-fatal-infos; then
-  fail "flutter analyze reported warnings/errors" "Fix the analyzer output above."
+# Match CI exactly: since #3161 CI runs a bare `flutter analyze` (fatal on
+# infos too — the lint phase-in is over and the tree is info-clean). A new
+# info is a CI failure, so it must block the push here as well; deliberate
+# exceptions carry an explicit `// ignore:` with a reason.
+echo "pre-push [4/5]: flutter analyze (fatal infos, matching CI)..."
+if ! flutter analyze; then
+  fail "flutter analyze reported errors/warnings/infos" "Fix the analyzer output above."
 fi
 
 # --- 5. Lint + l10n contract tests (cheap, network-free) -----------------

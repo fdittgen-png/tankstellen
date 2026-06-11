@@ -198,7 +198,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         ),
       );
     }
-    _coachEventsSub?.cancel();
+    unawaited(_coachEventsSub?.cancel());
     _coachEventsSub = null;
     // #1458 phase 2 — cancel any pending unpinned-warning fire so the
     // SnackBar never lands in the next route's messenger after the
@@ -486,7 +486,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   /// effect is visible without waiting for the next drive.
   void _showPinHelp() {
     final l = AppLocalizations.of(context);
-    showModalBottomSheet<void>(
+    unawaited(showModalBottomSheet<void>(
       context: context,
       builder: (ctx) {
         return SafeArea(
@@ -542,7 +542,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           ),
         );
       },
-    );
+    ));
   }
 
   /// #1273 — handle the back-press. If the trip is still recording
@@ -679,7 +679,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final wantAutoPip = stopped == null && state.isActive;
     if (wantAutoPip != _autoPipRequested) {
       _autoPipRequested = wantAutoPip;
-      _pip.setAutoEnterEnabled(wantAutoPip);
+      unawaited(_pip.setAutoEnterEnabled(wantAutoPip));
     }
 
     // #1977 — when the OS shrinks the app into a PiP tile, the compact

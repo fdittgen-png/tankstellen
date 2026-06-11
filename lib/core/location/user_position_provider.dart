@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../storage/storage_providers.dart';
 import '../storage/storage_keys.dart';
@@ -65,20 +67,20 @@ class UserPosition extends _$UserPosition {
 
   void clear() {
     final storage = ref.read(storageRepositoryProvider);
-    storage.putSetting(StorageKeys.userPositionLat, null);
-    storage.putSetting(StorageKeys.userPositionLng, null);
-    storage.putSetting(StorageKeys.userPositionTimestamp, null);
-    storage.putSetting(StorageKeys.userPositionSource, null);
+    unawaited(storage.putSetting(StorageKeys.userPositionLat, null));
+    unawaited(storage.putSetting(StorageKeys.userPositionLng, null));
+    unawaited(storage.putSetting(StorageKeys.userPositionTimestamp, null));
+    unawaited(storage.putSetting(StorageKeys.userPositionSource, null));
     state = null;
   }
 
   void _persist(double lat, double lng, String source) {
     final now = DateTime.now();
     final storage = ref.read(storageRepositoryProvider);
-    storage.putSetting(StorageKeys.userPositionLat, lat);
-    storage.putSetting(StorageKeys.userPositionLng, lng);
-    storage.putSetting(StorageKeys.userPositionTimestamp, now.millisecondsSinceEpoch);
-    storage.putSetting(StorageKeys.userPositionSource, source);
+    unawaited(storage.putSetting(StorageKeys.userPositionLat, lat));
+    unawaited(storage.putSetting(StorageKeys.userPositionLng, lng));
+    unawaited(storage.putSetting(StorageKeys.userPositionTimestamp, now.millisecondsSinceEpoch));
+    unawaited(storage.putSetting(StorageKeys.userPositionSource, source));
     state = UserPositionData(lat: lat, lng: lng, updatedAt: now, source: source);
   }
 }

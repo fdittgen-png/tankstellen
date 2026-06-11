@@ -38,7 +38,7 @@ void main() {
 
       await c.flush();
 
-      final row = Hive.box(HealthCounters.boxName).get('2026-06-10') as Map;
+      final row = Hive.box<dynamic>(HealthCounters.boxName).get('2026-06-10') as Map;
       expect(row['api.de.ok'], 2);
       expect(row['sync.favorites.failures'], 3);
     });
@@ -52,7 +52,7 @@ void main() {
       c.increment('ble.connect.successes');
       await c.flush();
 
-      final row = Hive.box(HealthCounters.boxName).get('2026-06-10') as Map;
+      final row = Hive.box<dynamic>(HealthCounters.boxName).get('2026-06-10') as Map;
       expect(row['ble.connect.attempts'], 2);
       expect(row['ble.connect.successes'], 1);
     });
@@ -68,7 +68,7 @@ void main() {
     });
 
     test('flush prunes day rows older than the retention window', () async {
-      final box = Hive.box(HealthCounters.boxName);
+      final box = Hive.box<dynamic>(HealthCounters.boxName);
       await box.put('2026-01-01', {'api.de.ok': 9});
       await box.put('2026-06-09', {'api.de.ok': 1});
 
@@ -129,14 +129,14 @@ void main() {
         () async {
       final c = counters();
       c.increment('api.de.ok');
-      await Hive.box(HealthCounters.boxName).close();
+      await Hive.box<dynamic>(HealthCounters.boxName).close();
 
       await expectLater(c.flush(), completes);
 
       // Re-open: the pending delta survives to the next flush.
       await HealthCounters.init();
       await c.flush();
-      final row = Hive.box(HealthCounters.boxName).get('2026-06-10') as Map;
+      final row = Hive.box<dynamic>(HealthCounters.boxName).get('2026-06-10') as Map;
       expect(row['api.de.ok'], 1);
     });
 
@@ -148,7 +148,7 @@ void main() {
     });
 
     test('flush skips malformed persisted rows without throwing', () async {
-      final box = Hive.box(HealthCounters.boxName);
+      final box = Hive.box<dynamic>(HealthCounters.boxName);
       await box.put('2026-06-10', 'not-a-map');
 
       final c = counters();

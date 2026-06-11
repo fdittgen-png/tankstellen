@@ -93,7 +93,7 @@ void main() {
     container.invalidate(favoritesProvider);
 
     final state = container.read(favoriteStationsProvider);
-    expect(state, isA<AsyncData>(),
+    expect(state, isA<AsyncData<dynamic>>(),
         reason: 'Provider builds synchronously from storage');
     final stations = state.value!.data;
     expect(stations, hasLength(3),

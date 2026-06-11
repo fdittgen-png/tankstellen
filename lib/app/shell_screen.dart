@@ -83,7 +83,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       ref.read(currentShellBranchProvider.notifier).set(_currentIndex);
       // #1690 — one-time first-run hint that the tabs can be swiped
       // between (the gesture is otherwise undiscoverable).
-      _maybeShowSwipeHint();
+      unawaited(_maybeShowSwipeHint());
     });
 
     _iconControllers = List.generate(
@@ -133,13 +133,12 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
     _transitionController.value = 0.0;
 
     // Play icon bounce
-    _iconControllers[index]
-      ..reset()
-      ..forward();
+    _iconControllers[index].reset();
+    unawaited(_iconControllers[index].forward());
 
-    _transitionController.forward().then((_) {
+    unawaited(_transitionController.forward().then((_) {
       _isTransitioning = false;
-    });
+    }));
 
     setState(() => _currentIndex = index);
     // Publish the new branch index so observers (e.g. MapScreen for its

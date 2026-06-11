@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -113,7 +115,7 @@ class LogFillUpButton extends ConsumerWidget {
         };
         if (pricedFuel != null) extra['fuelType'] = pricedFuel;
         if (pricePerLiter != null) extra['pricePerLiter'] = pricePerLiter;
-        context.push('/consumption/add', extra: extra);
+        unawaited(context.push('/consumption/add', extra: extra));
       },
       icon: const Icon(Icons.local_gas_station_outlined),
       label: Text(

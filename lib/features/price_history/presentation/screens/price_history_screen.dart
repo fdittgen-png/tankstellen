@@ -66,7 +66,7 @@ class PriceHistoryScreen extends ConsumerWidget {
 class _FuelTypeSection extends ConsumerWidget {
   final String stationId;
   final FuelType fuelType;
-  final List records;
+  final List<dynamic> records;
 
   const _FuelTypeSection({
     required this.stationId,

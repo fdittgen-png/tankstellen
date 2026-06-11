@@ -80,7 +80,7 @@ class OpinetStationAccumulator {
   /// Korea sit in [124, 132] × [33, 39], so the magnitude check below
   /// distinguishes the two unambiguously and keeps the parser tolerant
   /// of any OPINET endpoint that *does* serve WGS84.
-  void absorbBase(Map raw) {
+  void absorbBase(Map<dynamic, dynamic> raw) {
     brandCode ??= raw['POLL_DIV_CD']?.toString();
     name ??= raw['OS_NM']?.toString().trim();
     address ??= raw['NEW_ADR']?.toString().trim();
@@ -232,7 +232,7 @@ double? _parseDouble(dynamic raw) {
   return null;
 }
 
-Map? _coerceMap(dynamic data) {
+Map<dynamic, dynamic>? _coerceMap(dynamic data) {
   if (data is Map) return data;
   return null;
 }

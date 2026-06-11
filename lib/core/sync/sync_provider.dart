@@ -297,7 +297,7 @@ class SyncState extends _$SyncState {
   }
 
   void _performInitialSync(StorageRepository storage) {
-    Future.microtask(() async {
+    unawaited(Future.microtask(() async {
       try {
         // #3126 — one run id threads every per-table merge of this sync
         // pass through the breadcrumb trace.
@@ -314,7 +314,7 @@ class SyncState extends _$SyncState {
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'InitialSync failed (non-fatal)'}));
       }
-    });
+    }));
   }
 
   /// Bidirectionally sync favorites + ignored stations and **persist the

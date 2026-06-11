@@ -25,15 +25,34 @@ plugins:
     # these four rules (several in files owned by in-flight branches, the
     # rest pre-existing patterns like `ref.keepAlive()` inside autoDispose
     # rebuild-throttles and the bootstrap-owned ProviderScope). Re-enable
-    # rule by rule as the burn-down lands. Info-level rules (e.g.
-    # avoid_public_notifier_properties) stay on — they don't fail CI.
+    # rule by rule as the burn-down lands.
     diagnostics:
       missing_provider_scope: false
       only_use_keep_alive_inside_keep_alive: false
       scoped_providers_should_specify_dependencies: false
       provider_parameters: false
+      # #3161 — CI analyze is now fatal on infos, which would make this
+      # info-level rule a build breaker. All 38 findings were audited:
+      # the 7 lib sites are deliberate, documented seams (test-override
+      # function fields in InAppReviewService, the cross-provider read
+      # getters on TripRecording (#888), the broadcast event/bus stream
+      # getters in HapticEcoCoachLifecycle (#1273) and LiveHarshEventBus)
+      # and the 31 test sites are fake-notifier probe fields. riverpod_lint
+      # 3.1.3's native plugin does NOT honor `// ignore:` /
+      # `// ignore_for_file:` comments (verified empirically), so per-site
+      # opt-outs are impossible — disabling the rule is the only lever.
+      # Re-enable once the plugin honors ignore comments.
+      avoid_public_notifier_properties: false
 
 analyzer:
+  # Strict language modes (#3160) — the project paid for implicit-dynamic
+  # casts twice (#2296, #2311 in the Hive/JSON codec layer); these make
+  # implicit downcasts, raw generic types and uninferable invocations
+  # compile-time diagnostics instead of runtime surprises.
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
   errors:
     # freezed uses @JsonKey on constructor parameters, which the analyzer
     # flags as invalid. This is a known false positive with freezed.
@@ -52,17 +71,28 @@ analyzer:
     unawaited_futures: error
     cancel_subscriptions: error
     close_sinks: error
-    # Phase in at info so existing code isn't a wall of red; tighten once clean.
+    # #3161 — the "phase in at info" era is over: the codebase is clean,
+    # CI runs `flutter analyze` with fatal infos, and the correctness
+    # subset is promoted to error so a violation is unmistakably a build
+    # failure (not a fatal-info side effect that a future flag tweak
+    # could silently un-fatal).
+    avoid_slow_async_io: error
+    avoid_type_to_string: error
+    no_logic_in_create_state: error
+    prefer_void_to_null: error
+    test_types_in_equals: error
+    throw_in_finally: error
+    unnecessary_statements: error
+    unrelated_type_equality_checks: error
+    valid_regexps: error
+    # Style-leaning; stays info (still fatal in CI since #3161, but an
+    # IDE shows it in proportion to its weight).
     avoid_print: info
-    avoid_slow_async_io: info
-    avoid_type_to_string: info
-    no_logic_in_create_state: info
-    prefer_void_to_null: info
-    test_types_in_equals: info
-    throw_in_finally: info
-    unnecessary_statements: info
-    unrelated_type_equality_checks: info
-    valid_regexps: info
+    # #3161 — sync-context fire-and-forget (dispose, constructors,
+    # non-async callbacks) was previously unchecked; `unawaited_futures`
+    # only covers async bodies. Deliberate fire-and-forget wraps in
+    # `unawaited(...)`.
+    discarded_futures: error
 
 linter:
   rules:
@@ -77,6 +107,7 @@ linter:
     - avoid_type_to_string
     - cancel_subscriptions
     - close_sinks
+    - discarded_futures
     - no_adjacent_strings_in_list
     - no_logic_in_create_state
     - prefer_void_to_null

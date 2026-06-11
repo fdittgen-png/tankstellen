@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -60,9 +62,9 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
 
     if (hasRoutePrice) {
       _priceApplied = true;
-      Future.microtask(() {
+      unawaited(Future.microtask(() {
         ref.read(calculatorProvider.notifier).setPrice(routePrice);
-      });
+      }));
     }
   }
 

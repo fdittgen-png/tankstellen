@@ -240,7 +240,7 @@ class CarDataService {
       try {
         await HiveStorage.closeIsolateBoxes();
       } catch (_) {
-        // Best-effort close — a stray fault here is never actionable.
+        // ignore: silent_catch — Best-effort close — a stray fault here is never actionable.
       }
       lock?.release();
     }
@@ -386,6 +386,7 @@ class CarDataService {
     if (key != null) {
       try {
         fuel = FuelType.fromString(key);
+      // #3164 — kept: preference validation; unknown fuel key falls back.
       } catch (e, st) { // ignore: unused_catch_stack
         debugPrint('CarDataService: unknown preferred fuel "$key": $e');
       }

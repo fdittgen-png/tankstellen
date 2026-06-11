@@ -39,6 +39,8 @@ class OverrideFieldSpec {
     // Validate the regex compiles so the parser doesn't throw later.
     try {
       RegExp(pattern);
+    // #3164 — kept: per-entry config validation; the invalid entry is
+    // skipped by design.
     } on FormatException catch (e, st) { // ignore: unused_catch_stack
       debugPrint(
         'ReceiptOverrideRegistry: invalid regex "$pattern" skipped: $e',
@@ -198,7 +200,11 @@ class ReceiptOverrideRegistry {
     dynamic decoded;
     try {
       decoded = json.decode(raw);
-    } on FormatException catch (e, st) { // ignore: unused_catch_stack
+    } on FormatException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        'where':
+            'ReceiptOverrideRegistry._ingest: malformed JSON in $_assetPath'
+      }));
       debugPrint(
         'ReceiptOverrideRegistry: malformed JSON in $_assetPath: $e',
       );

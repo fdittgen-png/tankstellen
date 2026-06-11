@@ -559,8 +559,8 @@ void main() {
       const dynamic favorites = 'unexpected';
       const dynamic alerts = null;
 
-      final favList = favorites is List ? favorites : [];
-      final alertList = alerts is List ? alerts : [];
+      final favList = favorites is List ? favorites : <dynamic>[];
+      final alertList = alerts is List ? alerts : <dynamic>[];
 
       expect(favList, isEmpty);
       expect(alertList, isEmpty);

@@ -61,7 +61,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       ref.read(routeInputControllerProvider.notifier).reset();
       if (!_autoGpsTriggered) {
         _autoGpsTriggered = true;
-        _useGpsForStart();
+        unawaited(_useGpsForStart());
       }
     });
   }
@@ -266,7 +266,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       try {
         notifier.setSearching(false);
       } catch (_) {
-        // Provider disposed — state is gone anyway.
+        // ignore: silent_catch — Provider disposed — state is gone anyway.
       }
     }
   }

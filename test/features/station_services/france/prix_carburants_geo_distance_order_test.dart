@@ -183,7 +183,7 @@ class _GeoOrderAdapter implements HttpClientAdapter {
       final isOrdered = uri.contains('order_by');
       body.addAll(isOrdered ? ordered : unordered);
     } else {
-      body['results'] = const [];
+      body['results'] = const <dynamic>[];
     }
     return ResponseBody.fromString(
       jsonEncode(body),

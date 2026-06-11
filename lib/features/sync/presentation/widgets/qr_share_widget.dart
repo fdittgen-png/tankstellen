@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -66,7 +68,7 @@ class QrShareWidget extends ConsumerWidget {
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () {
-            Clipboard.setData(ClipboardData(text: qrData));
+            unawaited(Clipboard.setData(ClipboardData(text: qrData)));
             SnackBarHelper.show(context, AppLocalizations.of(context)?.connectionDataCopied ?? 'Connection data copied');
           },
           icon: const Icon(Icons.copy, size: 16),

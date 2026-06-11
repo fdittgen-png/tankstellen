@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,7 +45,7 @@ class RadarSearchFab extends ConsumerWidget {
         if (active) {
           notifier.dismiss();
         } else {
-          notifier.runRadar();
+          unawaited(notifier.runRadar());
         }
       },
       icon: Icon(active ? Icons.stop_circle : Icons.radar),

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../error/error_localizer.dart';
@@ -12,7 +14,7 @@ import '../service_result.dart';
 
 /// Displays a banner when data comes from cache or fallback services.
 class ServiceStatusBanner extends StatelessWidget {
-  final ServiceResult result;
+  final ServiceResult<dynamic> result;
 
   const ServiceStatusBanner({super.key, required this.result});
 
@@ -58,7 +60,8 @@ class ServiceStatusBanner extends StatelessWidget {
 
 /// Builds the "X unavailable. Using Y." banner message using the active
 /// localization, falling back to the untranslated [ServiceResult.fallbackSummary].
-String _localizedFallbackSummary(ServiceResult result, AppLocalizations? l10n) {
+String _localizedFallbackSummary(
+    ServiceResult<dynamic> result, AppLocalizations? l10n) {
   if (result.errors.isEmpty) return '';
   final failedNames = result.errors.map((e) => e.source.displayName).join(', ');
   final current = result.source.displayName;
@@ -161,7 +164,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
           // technical-details section, intentionally raw for debugging.
           return '${e.source.displayName}: ${e.message}';
         }
-        return render(e);
+        return render(e as Object);
       }).toList();
     }
     return [render(error)];
@@ -183,7 +186,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
       searchContext: searchContext,
       stackTrace: stackTrace,
     );
-    (reporter ?? const ErrorReporter()).reportError(context, payload);
+    unawaited((reporter ?? const ErrorReporter()).reportError(context, payload));
   }
 
   @override

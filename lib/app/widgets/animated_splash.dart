@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_motion.dart';
@@ -101,7 +103,7 @@ class _AnimatedSplashState extends State<AnimatedSplash>
     // jump the controller straight to its end (logo full-size, fully opaque)
     // instead of running the 650 ms scale+fade reveal.
     if (AppMotion.enabled(context)) {
-      _controller.forward();
+      unawaited(_controller.forward());
     } else {
       _controller.value = 1.0;
     }

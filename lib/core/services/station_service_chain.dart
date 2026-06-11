@@ -392,7 +392,7 @@ class StationServiceChain implements StationService {
         .map((e) => e.key)
         .toList();
     for (final key in staleKeys) {
-      _inFlight.remove(key);
+      unawaited(_inFlight.remove(key));
       _inFlightTimestamps.remove(key);
       debugPrint('StationServiceChain: evicted stale in-flight entry: $key');
     }

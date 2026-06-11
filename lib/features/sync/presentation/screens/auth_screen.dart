@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -84,7 +87,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 'Connected as guest');
         context.pop();
       }
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'AuthScreen._continueAsGuest: guest sign-in failed'
+      }));
       if (mounted) {
         form.setError(
             friendlyAuthError(e, AppLocalizations.of(context)));
@@ -148,7 +154,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         }
         context.pop();
       }
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'AuthScreen._submitEmail: email auth failed'
+      }));
       if (mounted) {
         form.setError(
             friendlyAuthError(e, AppLocalizations.of(context)));
@@ -171,7 +180,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 'Switched to anonymous session');
         context.pop();
       }
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'AuthScreen._switchToAnonymous: switch failed'
+      }));
       if (mounted) {
         form.setError(
             friendlyAuthError(e, AppLocalizations.of(context)));

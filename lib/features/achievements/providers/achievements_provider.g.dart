@@ -173,7 +173,7 @@ final class AchievementsProvider
   }
 }
 
-String _$achievementsHash() => r'3825e61016915e7fdfd88e4317a2c3ad82fa3e4f';
+String _$achievementsHash() => r'9b7655096f50c916ce14e224d5faf89277810abc';
 
 /// Earned badges, newest-first. Watches the trip-history and
 /// fill-up providers so that adding a trip or fill-up naturally

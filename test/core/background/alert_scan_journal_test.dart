@@ -21,9 +21,9 @@ void main() {
 
   setUp(() async {
     if (!Hive.isBoxOpen(HiveBoxes.alerts)) {
-      await Hive.openBox(HiveBoxes.alerts);
+      await Hive.openBox<dynamic>(HiveBoxes.alerts);
     }
-    await Hive.box(HiveBoxes.alerts).clear();
+    await Hive.box<dynamic>(HiveBoxes.alerts).clear();
   });
 
   tearDownAll(() async {
@@ -133,7 +133,7 @@ void main() {
   group('never-throws contract (fault injection)', () {
     test('append/entries degrade to a no-op when the alerts box is closed',
         () async {
-      await Hive.box(HiveBoxes.alerts).close();
+      await Hive.box<dynamic>(HiveBoxes.alerts).close();
       final journal = AlertScanJournal();
 
       await expectLater(
@@ -144,12 +144,12 @@ void main() {
       expect(journal.entries(), isEmpty);
       expect(AlertScanJournal.exportSection, returnsNormally);
 
-      await Hive.openBox(HiveBoxes.alerts); // restore for the next test
+      await Hive.openBox<dynamic>(HiveBoxes.alerts); // restore for the next test
     });
 
     test('a malformed persisted value is ignored, then overwritten',
         () async {
-      final box = Hive.box(HiveBoxes.alerts);
+      final box = Hive.box<dynamic>(HiveBoxes.alerts);
       await box.put(AlertScanJournal.journalKey, 'not-a-list');
       final journal = AlertScanJournal();
 

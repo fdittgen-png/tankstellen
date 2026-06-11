@@ -526,7 +526,7 @@ class FlutterBluePlusElmChannel
     await enableNotify();
     _subscription = _notifyChar!.lastValueStream.listen(
       handleNotifyBytes,
-      onError: (e, st) {
+      onError: (Object e, StackTrace st) {
         // #2900 — a mid-session disconnect can surface here too (the GATT/ATT
         // stack errors the notify stream when the adapter drops). Clear the
         // session and forward the RECLASSIFIED recoverable disconnect (not the
@@ -680,7 +680,7 @@ class FlutterBluePlusElmChannel
         }
         _dropDebouncer.noteConnectionState(disconnected: disconnected);
       },
-      onError: (e, st) {
+      onError: (Object e, StackTrace st) {
         debugPrint('FlutterBluePlusElmChannel connectionState error: $e');
       },
     );

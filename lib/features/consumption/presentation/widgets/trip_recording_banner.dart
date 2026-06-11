@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -105,7 +107,7 @@ class TripRecordingBanner extends ConsumerWidget {
       // off Android, so the tile stays safe on every other platform.
       void onBodyTap() {
         try {
-          ref.read(pipControllerProvider).bringToFront();
+          unawaited(ref.read(pipControllerProvider).bringToFront());
         } on Object {
           // Best-effort: a failed reorder just leaves the tile in PiP.
         }

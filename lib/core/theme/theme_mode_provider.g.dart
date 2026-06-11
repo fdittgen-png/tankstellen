@@ -68,7 +68,7 @@ final class ThemeModeSettingProvider
   }
 }
 
-String _$themeModeSettingHash() => r'3a434cc7afb6cd8664151d3d5fee6458df9392c5';
+String _$themeModeSettingHash() => r'a31a377f69c08674f0d53d90f83868c8b3ed5277';
 
 /// Persisted theme preference (#752; Eco theme added #1712).
 ///

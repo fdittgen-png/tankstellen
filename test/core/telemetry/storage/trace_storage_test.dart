@@ -66,7 +66,7 @@ void main() {
       final json = _makePlainJson(id: 'trace-1');
       final trace = ErrorTrace.fromJson(json);
       // Store the plain JSON directly in Hive box (bypassing toJson issue)
-      await Hive.box('error_traces').put(trace.id, json);
+      await Hive.box<dynamic>('error_traces').put(trace.id, json);
 
       final retrieved = storage.getById('trace-1');
       expect(retrieved, isNotNull);
@@ -82,7 +82,7 @@ void main() {
       final olderJson = _makePlainJson(id: 'old', timestamp: DateTime(2025, 1, 1));
       final newerJson = _makePlainJson(id: 'new', timestamp: DateTime(2025, 6, 1));
 
-      final box = Hive.box('error_traces');
+      final box = Hive.box<dynamic>('error_traces');
       await box.put('old', olderJson);
       await box.put('new', newerJson);
 
@@ -95,7 +95,7 @@ void main() {
 
     test('delete removes a trace', () async {
       final json = _makePlainJson(id: 'to-delete');
-      await Hive.box('error_traces').put('to-delete', json);
+      await Hive.box<dynamic>('error_traces').put('to-delete', json);
       expect(storage.getById('to-delete'), isNotNull);
 
       await storage.delete('to-delete');
@@ -103,7 +103,7 @@ void main() {
     });
 
     test('clearAll removes all traces', () async {
-      final box = Hive.box('error_traces');
+      final box = Hive.box<dynamic>('error_traces');
       await box.put('a', _makePlainJson(id: 'a'));
       await box.put('b', _makePlainJson(id: 'b'));
       expect(storage.count, 2);
@@ -114,7 +114,7 @@ void main() {
     });
 
     test('count reflects number of stored traces', () async {
-      final box = Hive.box('error_traces');
+      final box = Hive.box<dynamic>('error_traces');
       expect(storage.count, 0);
       await box.put('1', _makePlainJson(id: '1'));
       expect(storage.count, 1);
@@ -123,7 +123,7 @@ void main() {
     });
 
     test('prune removes entries beyond maxTraces', () async {
-      final box = Hive.box('error_traces');
+      final box = Hive.box<dynamic>('error_traces');
       // Store more than maxTraces (50)
       for (var i = 0; i < 55; i++) {
         final json = _makePlainJson(
@@ -206,7 +206,7 @@ void main() {
 
       test('parsed traces match getAll and unparsed match getUnparsedRaw',
           () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put(
             'v1', _makePlainJson(id: 'v1', timestamp: DateTime(2025, 1, 1)));
         await box.put(
@@ -237,7 +237,7 @@ void main() {
       });
 
       test('exported traces are sorted newest-first', () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put(
             'old', _makePlainJson(id: 'old', timestamp: DateTime(2024, 1, 1)));
         await box.put(
@@ -254,7 +254,7 @@ void main() {
 
     test('getAll parses stored JSON back into ErrorTrace objects', () async {
       final json = _makePlainJson(id: 'parse-test');
-      await Hive.box('error_traces').put('parse-test', json);
+      await Hive.box<dynamic>('error_traces').put('parse-test', json);
 
       final traces = storage.getAll();
       expect(traces, hasLength(1));
@@ -274,11 +274,11 @@ void main() {
 
       test('serialises every persisted trace into the traces array',
           () async {
-        await Hive.box('error_traces')
+        await Hive.box<dynamic>('error_traces')
             .put('e1', _makePlainJson(id: 'e1'));
-        await Hive.box('error_traces')
+        await Hive.box<dynamic>('error_traces')
             .put('e2', _makePlainJson(id: 'e2'));
-        await Hive.box('error_traces')
+        await Hive.box<dynamic>('error_traces')
             .put('e3', _makePlainJson(id: 'e3'));
 
         final raw = storage.exportAsJson();
@@ -336,7 +336,7 @@ void main() {
           'a THROWING supplier must never kill the export mid-attach — its '
           'failure is recorded in-line and the rest of the export survives',
           () async {
-        await Hive.box('error_traces').put('e1', _makePlainJson(id: 'e1'));
+        await Hive.box<dynamic>('error_traces').put('e1', _makePlainJson(id: 'e1'));
         TraceStorage.extraExportSections['sick'] =
             () => throw StateError('box corrupt');
         TraceStorage.extraExportSections['healthy'] = () => 'ok';
@@ -365,7 +365,7 @@ void main() {
       test(
           'count returns the raw box length while parsedCount filters out '
           'failures', () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put('valid', _makePlainJson(id: 'valid'));
         await box.put('broken-1', malformedEntry('broken-1'));
         await box.put('broken-2', malformedEntry('broken-2'));
@@ -378,7 +378,7 @@ void main() {
       test(
           'when every entry fails to parse, exportAsJson surfaces the raw '
           'payload under unparsedRaw and traces is empty', () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put('broken-1', malformedEntry('broken-1'));
         await box.put('broken-2', malformedEntry('broken-2'));
 
@@ -404,7 +404,7 @@ void main() {
       test(
           'with mixed valid/invalid entries both arrays populate and counts '
           'add up to the raw box length', () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put('valid-1', _makePlainJson(id: 'valid-1'));
         await box.put('valid-2', _makePlainJson(id: 'valid-2'));
         await box.put('broken', malformedEntry('broken'));
@@ -426,7 +426,7 @@ void main() {
 
       test('unparsedCount is 0 (never negative) when every entry parses',
           () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put('a', _makePlainJson(id: 'a'));
         await box.put('b', _makePlainJson(id: 'b'));
 
@@ -496,7 +496,7 @@ void main() {
       }
 
       test('getAll parses Hive-shaped Map<dynamic, dynamic> trace', () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca', hiveShapedTrace());
 
         final all = storage.getAll();
@@ -512,7 +512,7 @@ void main() {
       });
 
       test('getUnparsedRaw is empty when input is Hive-shaped', () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca', hiveShapedTrace());
 
         expect(storage.getUnparsedRaw(), isEmpty);
@@ -522,7 +522,7 @@ void main() {
 
       test('getById parses Hive-shaped Map<dynamic, dynamic> trace',
           () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         await box.put('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca', hiveShapedTrace());
 
         final t = storage.getById('30be7070-8aa2-4f9e-bfc0-e61fa4e486ca');
@@ -533,7 +533,7 @@ void main() {
       test(
           'malformed entries still surface in unparsedRaw (regression: #1301 '
           'broad-catch path is preserved)', () async {
-        final box = Hive.box('error_traces');
+        final box = Hive.box<dynamic>('error_traces');
         // Hive-shaped map with the required `id` field removed — schema drift.
         final broken = hiveShapedTrace()..remove('id');
         await box.put('broken', broken);
@@ -568,7 +568,7 @@ void main() {
             'detail': 'lat=48.137154 lng=11.576124 type=PlatformException',
           },
         ];
-        await Hive.box('error_traces').put('coord-trace', json);
+        await Hive.box<dynamic>('error_traces').put('coord-trace', json);
 
         final raw = storage.exportAsJson();
         expect(raw, isNot(contains('48.137154')),
@@ -582,7 +582,7 @@ void main() {
         // Schema-drifted entry (no id → fails fromJson) carrying coords.
         final broken = _makePlainJson(id: 'drifted')..remove('id');
         broken['errorMessage'] = 'failed at lat=48.137154 lng=11.576124';
-        await Hive.box('error_traces').put('drifted', broken);
+        await Hive.box<dynamic>('error_traces').put('drifted', broken);
 
         final raw = storage.exportAsJson();
         final decoded = jsonDecode(raw) as Map<String, dynamic>;

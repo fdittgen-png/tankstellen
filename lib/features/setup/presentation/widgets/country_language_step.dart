@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_config.dart';
@@ -52,7 +54,7 @@ class CountryLanguageStep extends ConsumerWidget {
                   label: Text(lang.nativeName),
                   selected: isSelected,
                   onSelected: (_) {
-                    ref.read(activeLanguageProvider.notifier).select(lang);
+                    unawaited(ref.read(activeLanguageProvider.notifier).select(lang));
                   },
                   visualDensity: VisualDensity.compact,
                 ),
@@ -81,7 +83,7 @@ class CountryLanguageStep extends ConsumerWidget {
                   label: Text('${c.flag} ${c.name}'),
                   selected: isSelected,
                   onSelected: (_) {
-                    ref.read(activeCountryProvider.notifier).select(c);
+                    unawaited(ref.read(activeCountryProvider.notifier).select(c));
                   },
                 ),
               );

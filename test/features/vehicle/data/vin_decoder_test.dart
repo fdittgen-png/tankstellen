@@ -147,7 +147,7 @@ void main() {
           )).thenAnswer((_) async => Response<Map<String, dynamic>>(
             requestOptions: RequestOptions(path: ''),
             statusCode: 200,
-            data: const {'Results': []},
+            data: const {'Results': <dynamic>[]},
           ));
 
       final dec = VinDecoder(dio: dio);

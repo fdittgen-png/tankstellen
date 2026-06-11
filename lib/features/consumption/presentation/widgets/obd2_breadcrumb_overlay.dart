@@ -277,9 +277,9 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          ref
+                          unawaited(ref
                               .read(obd2DebugOverlayProvider.notifier)
-                              .disable();
+                              .disable());
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white,

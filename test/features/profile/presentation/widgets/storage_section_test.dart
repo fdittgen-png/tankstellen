@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/storage_section.dart';
@@ -141,20 +143,20 @@ void _seedStorageStats(
   int alerts = 0,
 }) {
   for (var i = 0; i < profiles; i++) {
-    fake.saveProfile('p$i', {'name': 'p$i'});
+    unawaited(fake.saveProfile('p$i', {'name': 'p$i'}));
   }
-  fake.setFavoriteIds(List.generate(favorites, (i) => 'f$i'));
+  unawaited(fake.setFavoriteIds(List.generate(favorites, (i) => 'f$i')));
   for (var i = 0; i < cacheEntries; i++) {
-    fake.cacheData('k$i', {'v': i});
+    unawaited(fake.cacheData('k$i', {'v': i}));
   }
   if (priceHistory > 0) {
-    fake.savePriceRecords(
+    unawaited(fake.savePriceRecords(
       's-history',
       List.generate(priceHistory, (i) => {'ts': '$i'}),
-    );
+    ));
   }
   if (alerts > 0) {
-    fake.saveAlerts(List.generate(alerts, (i) => {'id': 'a$i'}));
+    unawaited(fake.saveAlerts(List.generate(alerts, (i) => {'id': 'a$i'})));
   }
 
   // Override the byte-stats so the widget gets stable totals matching

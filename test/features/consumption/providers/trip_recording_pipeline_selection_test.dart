@@ -117,7 +117,7 @@ class _FakeGeo extends GeolocatorWrapper {
   Stream<Position> getPositionStream({LocationSettings? locationSettings}) {
     final prev = _controller;
     if (prev != null && !prev.isClosed) {
-      prev.close();
+      unawaited(prev.close());
     }
     _controller = StreamController<Position>(
       onListen: () => activeListeners++,

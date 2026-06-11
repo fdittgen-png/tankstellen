@@ -159,7 +159,7 @@ void main() {
       await fake.saveProfile('p2', {});
       await fake.setFavoriteIds(['a', 'b', 'c', 'd', 'e']);
       for (var i = 0; i < 10; i++) {
-        await fake.cacheData('k$i', {});
+        await fake.cacheData('k$i', <dynamic, dynamic>{});
       }
       await fake.savePriceRecords('s1', [
         {'a': 1},

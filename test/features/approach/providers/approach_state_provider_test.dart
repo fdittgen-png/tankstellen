@@ -63,7 +63,7 @@ class _FakeGeolocator extends GeolocatorWrapper {
       controller.stream;
 
   void close() {
-    if (!controller.isClosed) controller.close();
+    if (!controller.isClosed) unawaited(controller.close());
   }
 }
 

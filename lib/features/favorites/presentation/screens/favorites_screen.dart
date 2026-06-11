@@ -46,9 +46,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     // when the user is on the Alerts tab (Share v1 only supports the
     // Favorites tab — see #1344).
     _tabController.addListener(_handleTabChange);
-    Future.microtask(() {
-      ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
-    });
+    unawaited(Future.microtask(() {
+      unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
+    }));
   }
 
   void _handleTabChange() {
@@ -81,7 +81,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
       syncStateProvider.select((s) => s.userId),
       (prev, next) {
         if (prev != next) {
-          ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
+          unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
         }
       },
     );
@@ -100,7 +100,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              ref.read(favoriteStationsProvider.notifier).loadAndRefresh();
+              unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
             },
             tooltip: l10n?.refreshPrices ?? 'Refresh prices',
           ),

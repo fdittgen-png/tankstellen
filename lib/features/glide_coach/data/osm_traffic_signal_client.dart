@@ -121,7 +121,7 @@ class OsmTrafficSignalClient {
 
     try {
       return elements
-          .whereType<Map>()
+          .whereType<Map<dynamic, dynamic>>()
           .map(_parseElement)
           .whereType<TrafficSignal>()
           .toList(growable: false);
@@ -135,7 +135,7 @@ class OsmTrafficSignalClient {
   /// Convert one Overpass element into a [TrafficSignal]. Returns null
   /// when the element is missing a coordinate so a single bad row
   /// doesn't poison the whole batch — the caller filters nulls out.
-  TrafficSignal? _parseElement(Map element) {
+  TrafficSignal? _parseElement(Map<dynamic, dynamic> element) {
     final lat = element['lat'];
     final lon = element['lon'];
     if (lat is! num || lon is! num) return null;

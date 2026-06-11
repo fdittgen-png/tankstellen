@@ -49,10 +49,13 @@ class NativeGeocodingProvider implements GeocodingProvider {
       }
       final location = locations.first;
       return (lat: location.latitude, lng: location.longitude);
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
       if (e is LocationException) rethrow;
-      throw LocationException(
-        message: 'Geräte-Geocodierung fehlgeschlagen: $e',
+      Error.throwWithStackTrace(
+        LocationException(
+          message: 'Geräte-Geocodierung fehlgeschlagen: $e',
+        ),
+        st,
       );
     }
   }

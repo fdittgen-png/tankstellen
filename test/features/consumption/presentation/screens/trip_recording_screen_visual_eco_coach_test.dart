@@ -121,7 +121,7 @@ Future<void> _pumpRecordingScreen(
         () => _FakeTripRecording(state ?? _recordingState()),
       ),
       wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
       hapticEcoCoachLifecycleProvider
           .overrideWith(() => _FakeHapticEcoCoachLifecycle(
                 coachEventsController,
@@ -186,11 +186,11 @@ void main() {
           builder: (context) => ElevatedButton(
             key: const Key('openRecordingScreen'),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
+              unawaited(Navigator.of(context).push(
+                MaterialPageRoute<dynamic>(
                   builder: (_) => const TripRecordingScreen(),
                 ),
-              );
+              ));
             },
             child: const Text('Open'),
           ),
@@ -200,7 +200,7 @@ void main() {
             () => _FakeTripRecording(_recordingState()),
           ),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
           hapticEcoCoachLifecycleProvider
               .overrideWith(() => _FakeHapticEcoCoachLifecycle(events)),
         ],
@@ -331,11 +331,11 @@ void main() {
           builder: (context) => ElevatedButton(
             key: const Key('openRecordingScreen'),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
+              unawaited(Navigator.of(context).push(
+                MaterialPageRoute<dynamic>(
                   builder: (_) => const TripRecordingScreen(),
                 ),
-              );
+              ));
             },
             child: const Text('Open'),
           ),
@@ -345,7 +345,7 @@ void main() {
             () => _FakeTripRecording(_recordingState()),
           ),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
           hapticEcoCoachLifecycleProvider
               .overrideWith(() => _FakeHapticEcoCoachLifecycle(events)),
           settingsStorageProvider.overrideWithValue(settings),
@@ -399,11 +399,11 @@ void main() {
           builder: (context) => ElevatedButton(
             key: const Key('openRecordingScreen'),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
+              unawaited(Navigator.of(context).push(
+                MaterialPageRoute<dynamic>(
                   builder: (_) => const TripRecordingScreen(),
                 ),
-              );
+              ));
             },
             child: const Text('Open'),
           ),
@@ -413,7 +413,7 @@ void main() {
             () => _FakeTripRecording(_recordingState()),
           ),
           wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
           hapticEcoCoachLifecycleProvider
               .overrideWith(() => _FakeHapticEcoCoachLifecycle(events)),
           settingsStorageProvider.overrideWithValue(settings),

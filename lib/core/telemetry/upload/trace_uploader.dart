@@ -74,7 +74,7 @@ class TraceUploader {
       // breadcrumb payloads so the user-configured trace endpoint sees
       // the same scrubbed surface Sentry does.
       final scrubbed = PiiScrubber.scrubErrorTrace(trace);
-      await dio.post(
+      await dio.post<dynamic>(
         config.serverUrl!,
         data: scrubbed.toJson(),
         options: Options(headers: {

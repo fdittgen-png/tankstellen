@@ -97,7 +97,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride(),
+            recordingProfileOverride() as Object,
           ],
         );
         // The warning is deferred ~600 ms post-mount so it doesn't
@@ -137,7 +137,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride(),
+            recordingProfileOverride() as Object,
           ],
         );
         // Pump past the deferred-fire timer so the post-mount path
@@ -179,7 +179,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride(),
+            recordingProfileOverride() as Object,
           ],
         );
         await tester.pump();
@@ -215,7 +215,7 @@ void main() {
           overrides: [
             tripRecordingProvider.overrideWith(() => notifier),
             wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-            recordingProfileOverride(),
+            recordingProfileOverride() as Object,
           ],
         );
         await tester.pump();

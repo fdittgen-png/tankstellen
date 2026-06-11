@@ -313,7 +313,7 @@ void main() {
       final container = createContainer();
       final state = container.read(searchStateProvider);
 
-      expect(state, isA<AsyncData>());
+      expect(state, isA<AsyncData<dynamic>>());
       final data = state.value!;
       expect(data.data, isEmpty);
       expect(data.source, ServiceSource.cache);
@@ -346,7 +346,7 @@ void main() {
       await notifier.searchByZipCode(zipCode: '10115');
 
       final state = container.read(searchStateProvider);
-      expect(state, isA<AsyncData>());
+      expect(state, isA<AsyncData<dynamic>>());
       expect(state.value!.data.length, 1);
       expect(state.value!.data.first.id, 'test-1');
     });
@@ -361,7 +361,7 @@ void main() {
       await notifier.searchByZipCode(zipCode: '99999');
 
       final state = container.read(searchStateProvider);
-      expect(state, isA<AsyncError>());
+      expect(state, isA<AsyncError<dynamic>>());
     });
 
     test('searchByCoordinates uses explicit lat/lng', () async {
@@ -383,7 +383,7 @@ void main() {
       );
 
       final state = container.read(searchStateProvider);
-      expect(state, isA<AsyncData>());
+      expect(state, isA<AsyncData<dynamic>>());
       expect(state.value!.data.length, 1);
     });
 
@@ -439,7 +439,7 @@ void main() {
           .searchByCoordinates(lat: 52.52, lng: 13.41);
 
       final state = container.read(searchStateProvider);
-      expect(state, isA<AsyncError>());
+      expect(state, isA<AsyncError<dynamic>>());
     });
 
     test('searchByZipCode merges geocoding errors into result', () async {
@@ -586,7 +586,7 @@ void main() {
           .searchByZipCode(zipCode: '10115');
 
       final state = container.read(searchStateProvider);
-      expect(state, isA<AsyncData>());
+      expect(state, isA<AsyncData<dynamic>>());
       expect(state.value!.data.length, 1);
     });
 
@@ -696,7 +696,7 @@ void main() {
       await notifier.repeatLastSearch();
 
       final state = container.read(searchStateProvider);
-      expect(state, isA<AsyncData>());
+      expect(state, isA<AsyncData<dynamic>>());
       expect(state.value!.data, isEmpty);
       verifyNever(() => mockStationService.searchStations(any(),
           cancelToken: any(named: 'cancelToken')));
@@ -1161,7 +1161,7 @@ void main() {
 
       await t.container.read(searchStateProvider.notifier).searchByGps();
 
-      expect(t.container.read(searchStateProvider), isA<AsyncError>());
+      expect(t.container.read(searchStateProvider), isA<AsyncError<dynamic>>());
       expect(t.spy.persisted, isEmpty,
           reason: 'a null-island fix must never reach userPositionProvider');
       verifyNever(() => mockStationService.searchStations(any(),
@@ -1175,7 +1175,7 @@ void main() {
 
       await t.container.read(searchStateProvider.notifier).searchByGps();
 
-      expect(t.container.read(searchStateProvider), isA<AsyncError>());
+      expect(t.container.read(searchStateProvider), isA<AsyncError<dynamic>>());
       expect(t.spy.persisted, isEmpty);
       verifyNever(() => mockStationService.searchStations(any(),
           cancelToken: any(named: 'cancelToken')));
@@ -1195,7 +1195,7 @@ void main() {
 
       await t.container.read(searchStateProvider.notifier).searchByGps();
 
-      expect(t.container.read(searchStateProvider), isA<AsyncData>());
+      expect(t.container.read(searchStateProvider), isA<AsyncData<dynamic>>());
       expect(t.spy.persisted, hasLength(1));
       expect(t.spy.persisted.single.lat, closeTo(42.7667, 0.0001));
       expect(t.spy.persisted.single.lng, closeTo(2.8667, 0.0001));

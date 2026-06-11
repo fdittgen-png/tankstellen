@@ -11,7 +11,7 @@ import '../hive_boxes.dart';
 /// Manages 30-day price history records per station for trend analysis
 /// and "best time to fill" predictions.
 class PriceHistoryHiveStore implements PriceHistoryStorage {
-  Box get _priceHistory => Hive.box(HiveBoxes.priceHistory);
+  Box<dynamic> get _priceHistory => Hive.box(HiveBoxes.priceHistory);
 
   @override
   Future<void> savePriceRecords(

@@ -134,7 +134,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
 
   Future<List<Map<String, dynamic>>> _queryByPostalCode(String cp, {CancelToken? cancelToken}) async {
     try {
-      final response = await _dio.get(_baseUrl, queryParameters: {
+      final response = await _dio.get<dynamic>(_baseUrl, queryParameters: {
         'where': "cp='$cp'",
         'limit': 50,
       }, cancelToken: cancelToken);
@@ -176,7 +176,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     // by the unchanged `within_distance` filter).
     final point = "geom'POINT($lng $lat)'";
     try {
-      final response = await _dio.get(_baseUrl, queryParameters: {
+      final response = await _dio.get<dynamic>(_baseUrl, queryParameters: {
         'where': 'within_distance(geom,$point,${radiusStr}km)',
         'order_by': 'distance(geom,$point)',
         'limit': 50,
@@ -248,7 +248,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     // unprefixed favorites.
     final upstreamId =
         stationId.startsWith('fr-') ? stationId.substring(3) : stationId;
-    final response = await _dio.get(_baseUrl, queryParameters: {
+    final response = await _dio.get<dynamic>(_baseUrl, queryParameters: {
       'where': 'id=$upstreamId',
       'limit': 1,
     });
@@ -354,7 +354,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     }
 
     try {
-      final response = await _dio.get(_baseUrl, queryParameters: {
+      final response = await _dio.get<dynamic>(_baseUrl, queryParameters: {
         'where': whereClauses.join(' OR '),
         'limit': batch.length,
       });

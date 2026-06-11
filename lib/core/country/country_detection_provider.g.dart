@@ -47,7 +47,7 @@ final class DetectedCountryProvider
   }
 }
 
-String _$detectedCountryHash() => r'964c768179655a56dc2e11604370590e9710e5a5';
+String _$detectedCountryHash() => r'4e070d98a0ae947883d185b04a3fa6d427c3bb64';
 
 /// Detects the user's country from their GPS position via reverse geocoding.
 /// Watches [userPositionProvider] and updates when position changes.

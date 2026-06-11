@@ -27,10 +27,10 @@ void main() {
 
   setUp(() async {
     if (Hive.isBoxOpen(HiveBoxes.priceHistory)) {
-      await Hive.box(HiveBoxes.priceHistory).close();
+      await Hive.box<dynamic>(HiveBoxes.priceHistory).close();
     }
-    await Hive.openBox(HiveBoxes.priceHistory);
-    await Hive.box(HiveBoxes.priceHistory).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.priceHistory);
+    await Hive.box<dynamic>(HiveBoxes.priceHistory).clear();
   });
 
   tearDownAll(() async {

@@ -73,7 +73,7 @@ final class SyncStateProvider extends $NotifierProvider<SyncState, SyncConfig> {
   }
 }
 
-String _$syncStateHash() => r'd5d6a7aad6e920b76d75d090f7c66cc8ce072f76';
+String _$syncStateHash() => r'92e15215a89b95a4fabf218fe485e091f581709f';
 
 /// Manages the cloud sync connection state.
 ///

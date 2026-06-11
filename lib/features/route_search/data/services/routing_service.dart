@@ -46,7 +46,7 @@ class RoutingService {
 
       if (avoidHighways) {
         // Try with exclude=motorway first; fall back if unsupported
-        final response = await _dio.get(
+        final response = await _dio.get<dynamic>(
           '$_baseUrl/route/v1/driving/$coords',
           queryParameters: {
             'overview': 'full',
@@ -59,7 +59,7 @@ class RoutingService {
 
         if (data['code'] != 'Ok') {
           debugPrint('RouteSearch: exclude=motorway not supported, falling back to normal route');
-          final fallback = await _dio.get(
+          final fallback = await _dio.get<dynamic>(
             '$_baseUrl/route/v1/driving/$coords',
             queryParameters: {
               'overview': 'full',
@@ -70,7 +70,7 @@ class RoutingService {
           data = fallback.data as Map<String, dynamic>;
         }
       } else {
-        final response = await _dio.get(
+        final response = await _dio.get<dynamic>(
           '$_baseUrl/route/v1/driving/$coords',
           queryParameters: {
             'overview': 'full',
@@ -121,10 +121,13 @@ class RoutingService {
         source: ServiceSource.osrmRouting,
         fetchedAt: DateTime.now(),
       );
-    } on DioException catch (e, st) { // ignore: unused_catch_stack
-      throw ApiException(
-        message: e.message ?? 'Route calculation failed',
-        statusCode: e.response?.statusCode,
+    } on DioException catch (e, st) {
+      Error.throwWithStackTrace(
+        ApiException(
+          message: e.message ?? 'Route calculation failed',
+          statusCode: e.response?.statusCode,
+        ),
+        st,
       );
     }
   }

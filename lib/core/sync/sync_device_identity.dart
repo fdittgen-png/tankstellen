@@ -45,7 +45,7 @@ class SyncDeviceIdentity {
     String? id;
     try {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        final box = Hive.box(HiveBoxes.settings);
+        final box = Hive.box<dynamic>(HiveBoxes.settings);
         id = box.get(settingsKey) as String?;
         if (id == null) {
           id = const Uuid().v4();

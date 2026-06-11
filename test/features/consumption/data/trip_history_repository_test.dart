@@ -342,7 +342,7 @@ void main() {
       // Stored under the compact 'fe' key; the measured 'f' key is absent.
       final raw = box.get(start.toIso8601String())!;
       final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final stored = (decoded['samples'] as List).cast<Map>().first;
+      final stored = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>().first;
       expect(stored.containsKey('fe'), isTrue);
       expect(stored.containsKey('f'), isFalse);
     });
@@ -440,7 +440,7 @@ void main() {
       // Read the raw stored JSON and inspect the sample's keys.
       final raw = box.get(start.toIso8601String())!;
       final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final samples = (decoded['samples'] as List).cast<Map>();
+      final samples = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>();
       expect(samples.first.containsKey('th'), isFalse);
       expect(samples.first.containsKey('f'), isFalse);
     });
@@ -819,7 +819,7 @@ void main() {
 
       final raw = box.get(start.toIso8601String())!;
       final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final samples = (decoded['samples'] as List).cast<Map>();
+      final samples = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>();
       expect(samples.first.containsKey('el'), isFalse);
       expect(samples.first.containsKey('ct'), isFalse);
     });
@@ -940,7 +940,7 @@ void main() {
 
       final raw = box.get(start.toIso8601String())!;
       final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      final samples = (decoded['samples'] as List).cast<Map>();
+      final samples = (decoded['samples'] as List).cast<Map<dynamic, dynamic>>();
       expect(samples.first.containsKey('la'), isFalse,
           reason: 'flag-off ticks must not bloat the JSON');
       expect(samples.first.containsKey('lo'), isFalse,

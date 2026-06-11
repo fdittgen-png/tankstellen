@@ -174,7 +174,7 @@ class GreeceStationService
 
     for (final pref in candidates) {
       try {
-        final response = await _dio.get(
+        final response = await _dio.get<dynamic>(
           '$_baseUrl/data/daily/prefecture/${pref.apiName}',
           cancelToken: cancelToken,
         );
@@ -276,7 +276,7 @@ class GreeceStationService
     // Prefer the newest entry. The community API documents "most recent
     // first" but we defend against order drift by picking the entry with
     // the greatest `date` string (ISO-8601 lexicographic order works).
-    Map? newest;
+    Map<dynamic, dynamic>? newest;
     String newestDate = '';
     for (final item in data) {
       if (item is! Map) continue;

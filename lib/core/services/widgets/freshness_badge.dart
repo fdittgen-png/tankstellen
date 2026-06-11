@@ -16,7 +16,7 @@ import '../service_result.dart';
 /// matches the badge's `warning_amber_rounded` icon (#2492) and gives users
 /// an at-a-glance sense of data quality without the full [ServiceStatusBanner].
 class FreshnessBadge extends StatelessWidget {
-  final ServiceResult result;
+  final ServiceResult<dynamic> result;
 
   const FreshnessBadge({super.key, required this.result});
 

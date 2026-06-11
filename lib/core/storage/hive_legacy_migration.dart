@@ -1,8 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+import '../logging/error_logger.dart';
 
 /// One-time migration of pre-encryption plaintext Hive boxes into their
 /// encrypted equivalents (#1686).
@@ -24,17 +28,20 @@ class HiveLegacyMigration {
   static Future<void> migrateLegacyPlaintextBox(
       String boxName, HiveAesCipher cipher) async {
     try {
-      final box = await Hive.openBox(boxName, encryptionCipher: cipher);
+      final box = await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
       await box.close();
       return; // Already encrypted, or a fresh install.
     } catch (_) {
-      // Fall through — the box may be a pre-encryption plaintext box.
+      // ignore: silent_catch — Fall through — the box may be a pre-encryption plaintext box.
     }
 
     Box<dynamic> plain;
     try {
       plain = await Hive.openBox(boxName);
-    } catch (e, st) { // ignore: unused_catch_stack
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        'where': 'HiveLegacyMigration: plaintext probe failed for $boxName'
+      }));
       debugPrint('Hive: "$boxName" unreadable during the migration probe '
           '— left on disk for Phase 2 to surface.');
       return;
@@ -56,7 +63,7 @@ class HiveLegacyMigration {
 
     await Hive.deleteBoxFromDisk(boxName);
     final encryptedBox =
-        await Hive.openBox(boxName, encryptionCipher: cipher);
+        await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
     if (entries.isNotEmpty) {
       await encryptedBox.putAll(entries);
     }

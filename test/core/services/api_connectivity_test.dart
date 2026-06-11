@@ -38,7 +38,7 @@ void main() {
     test('Germany — Tankerkoenig API is reachable', () async {
       // The list endpoint requires an API key, but the status endpoint is open
       // We test that the server responds (even with an auth error = server is up)
-      final response = await dio.get(
+      final response = await dio.get<dynamic>(
         'https://creativecommons.tankerkoenig.de/json/list.php',
         queryParameters: {
           'lat': 52.52,
@@ -52,13 +52,13 @@ void main() {
 
       // Server responds (200 with error message about invalid key, or 200 with data)
       expect(response.statusCode, 200);
-      expect(response.data, isA<Map>());
+      expect(response.data, isA<Map<dynamic, dynamic>>());
       // The API returns ok:false for invalid keys, which proves the server is reachable
       expect(response.data.containsKey('ok'), isTrue);
     });
 
     test('France — Prix-Carburants API is reachable and returns stations', () async {
-      final response = await dio.get(
+      final response = await dio.get<dynamic>(
         'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets'
         '/prix-des-carburants-en-france-flux-instantane-v2/records',
         queryParameters: {
@@ -68,8 +68,8 @@ void main() {
       );
 
       expect(response.statusCode, 200);
-      expect(response.data, isA<Map>());
-      expect(response.data['results'], isA<List>());
+      expect(response.data, isA<Map<dynamic, dynamic>>());
+      expect(response.data['results'], isA<List<dynamic>>());
 
       // The Paris 75001 query intermittently returns 0 rows as the open-data
       // endpoint rebuilds its index. Reachability + schema is the goal — only
@@ -85,7 +85,7 @@ void main() {
     });
 
     test('Austria — E-Control API is reachable and returns stations', () async {
-      final response = await dio.get(
+      final response = await dio.get<dynamic>(
         'https://api.e-control.at/sprit/1.0/search/gas-stations/by-address',
         queryParameters: {
           'latitude': 48.2082,
@@ -96,7 +96,7 @@ void main() {
       );
 
       expect(response.statusCode, 200);
-      expect(response.data, isA<List>());
+      expect(response.data, isA<List<dynamic>>());
       expect((response.data as List).length, greaterThan(0));
 
       // Verify key fields exist
@@ -113,25 +113,25 @@ void main() {
 
     test('Spain — MITECO API is reachable and returns stations', () async {
       // Fetch province list first
-      final provincesResponse = await dio.get(
+      final provincesResponse = await dio.get<dynamic>(
         'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes'
         '/PreciosCarburantes/Listados/Provincias/',
       );
 
       expect(provincesResponse.statusCode, 200);
-      expect(provincesResponse.data, isA<List>());
+      expect(provincesResponse.data, isA<List<dynamic>>());
       expect((provincesResponse.data as List).length, greaterThan(40));
 
       // Fetch stations for Madrid (province 28)
-      final stationsResponse = await dio.get(
+      final stationsResponse = await dio.get<dynamic>(
         'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes'
         '/PreciosCarburantes/EstacionesTerrestres/FiltroProvincia/28',
       );
 
       expect(stationsResponse.statusCode, 200);
-      expect(stationsResponse.data, isA<Map>());
+      expect(stationsResponse.data, isA<Map<dynamic, dynamic>>());
       expect(stationsResponse.data['ResultadoConsulta'], 'OK');
-      expect(stationsResponse.data['ListaEESSPrecio'], isA<List>());
+      expect(stationsResponse.data['ListaEESSPrecio'], isA<List<dynamic>>());
       expect(
         (stationsResponse.data['ListaEESSPrecio'] as List).length,
         greaterThan(100),
@@ -214,13 +214,13 @@ void main() {
     });
 
     test('Denmark — OK API is reachable and returns stations', () async {
-      final response = await dio.get(
+      final response = await dio.get<dynamic>(
         'https://mobility-prices.ok.dk/api/v1/fuel-prices',
       );
 
       expect(response.statusCode, 200);
-      expect(response.data, isA<Map>());
-      expect(response.data['items'], isA<List>());
+      expect(response.data, isA<Map<dynamic, dynamic>>());
+      expect(response.data['items'], isA<List<dynamic>>());
       expect((response.data['items'] as List).length, greaterThan(0));
 
       final station = (response.data['items'] as List).first;
@@ -230,12 +230,12 @@ void main() {
     });
 
     test('Denmark — Shell API is reachable and returns stations', () async {
-      final response = await dio.get(
+      final response = await dio.get<dynamic>(
         'https://shellpumpepriser.geoapp.me/v1/prices',
       );
 
       expect(response.statusCode, 200);
-      expect(response.data, isA<List>());
+      expect(response.data, isA<List<dynamic>>());
       expect((response.data as List).length, greaterThan(0));
 
       final station = (response.data as List).first;
@@ -283,7 +283,7 @@ void main() {
       };
 
       for (final entry in testCases.entries) {
-        final response = await dio.get(
+        final response = await dio.get<dynamic>(
           'https://nominatim.openstreetmap.org/search',
           queryParameters: {
             'q': entry.value,
@@ -295,7 +295,7 @@ void main() {
 
         expect(response.statusCode, 200,
             reason: '${entry.key}: Nominatim returned non-200');
-        expect(response.data, isA<List>(),
+        expect(response.data, isA<List<dynamic>>(),
             reason: '${entry.key}: Response is not a list');
         expect((response.data as List).length, greaterThan(0),
             reason: '${entry.key}: No results for ${entry.value}');

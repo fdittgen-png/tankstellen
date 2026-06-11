@@ -78,10 +78,10 @@ void main() {
       await Hive.box<String>(name).clear();
     }
     if (Hive.isBoxOpen(HiveBoxes.settings)) {
-      await Hive.box(HiveBoxes.settings).close();
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
     }
-    await Hive.openBox(HiveBoxes.settings);
-    await Hive.box(HiveBoxes.settings).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.settings);
+    await Hive.box<dynamic>(HiveBoxes.settings).clear();
   });
 
   tearDownAll(() async {

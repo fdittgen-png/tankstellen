@@ -39,7 +39,7 @@ class VoiceCoachingEnabled extends _$VoiceCoachingEnabled {
 
   @override
   bool build() {
-    _load();
+    unawaited(_load());
     // Pre-load frame: default ON. `_load` only overrides it if the user
     // has explicitly persisted a value (i.e. opted out).
     return true;

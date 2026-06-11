@@ -196,7 +196,7 @@ class MitecoStationService
     String provinceId, {
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.get(
+    final response = await _dio.get<dynamic>(
       '$_baseUrl/EstacionesTerrestres/FiltroProvincia/$provinceId',
       cancelToken: cancelToken,
     );

@@ -652,8 +652,10 @@ void main() {
     // connection read, so the connect opens its OWN trace (beginTrace
     // supersedes a live pickerScan trace) instead of the scan's absorbing
     // it. Decomposition stays tracked under #2187/#2188.
+    // #3164 — re-grandfathered 552 → 555: errorLogger routing adds 3 lines
+    // (the connect-failure catch now logs e/st before the mounted check).
     'lib/features/consumption/presentation/widgets/obd2_adapter_picker.dart':
-        552,
+        555,
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
@@ -777,7 +779,10 @@ void main() {
     // `station_marker.dart` (the `_drivingMarker` content variant), not here, so
     // nothing further can move off this widget. Decomposition of this god-class
     // is still tracked by #2187/#2188.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': 699,
+    // +1 (#3161): the `discarded_futures` burn-down added the lint-mandated
+    // `import 'dart:async';` line for the `unawaited(...)` wrap of the
+    // marker-tap HapticFeedback call. No new logic.
+    'lib/features/map/presentation/widgets/station_map_layers.dart': 700,
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,

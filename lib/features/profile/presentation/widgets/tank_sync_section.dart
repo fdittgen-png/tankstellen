@@ -272,7 +272,7 @@ class TankSyncSection extends ConsumerWidget {
   }
 
   void _showQrShare(BuildContext context) {
-    showDialog(
+    unawaited(showDialog<void>(
       context: context,
       builder: (ctx) => Dialog(
         child: Padding(
@@ -290,6 +290,6 @@ class TankSyncSection extends ConsumerWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }

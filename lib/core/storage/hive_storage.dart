@@ -321,7 +321,7 @@ class HiveStorage implements StorageRepository {
   }
 
   int _boxSizeBytes(String boxName, {required int fallbackPerEntry}) {
-    final box = Hive.box(boxName);
+    final box = Hive.box<dynamic>(boxName);
     if (kIsWeb) return box.length * fallbackPerEntry;
     final path = box.path;
     if (path == null) return box.length * fallbackPerEntry;

@@ -15,7 +15,7 @@ import 'package:tankstellen/core/services/rate_limit_interceptor.dart';
 class _CapturingResponseHandler extends ResponseInterceptorHandler {
   bool called = false;
   @override
-  void next(Response response) {
+  void next(Response<dynamic> response) {
     called = true;
   }
 }
@@ -69,7 +69,7 @@ void main() {
   group('RateLimitInterceptor 429 / Retry-After cooldown (#2255)', () {
     RequestOptions opts() => RequestOptions(path: '/test');
 
-    Response resp429(RequestOptions o, {String? retryAfter}) => Response(
+    Response<dynamic> resp429(RequestOptions o, {String? retryAfter}) => Response(
           requestOptions: o,
           statusCode: 429,
           headers: retryAfter == null

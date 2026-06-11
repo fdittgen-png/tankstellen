@@ -51,7 +51,7 @@ class ReportService {
     }
 
     try {
-      final response = await _dio.post(
+      final response = await _dio.post<dynamic>(
         ApiConstants.complaintEndpoint,
         data: {
           'id': stationId,
@@ -73,10 +73,13 @@ class ReportService {
         success: true,
         message: data is Map ? data['message']?.toString() : null,
       );
-    } on DioException catch (e, st) { // ignore: unused_catch_stack
-      throw ApiException(
-        message: e.message ?? 'Network error submitting report',
-        statusCode: e.response?.statusCode,
+    } on DioException catch (e, st) {
+      Error.throwWithStackTrace(
+        ApiException(
+          message: e.message ?? 'Network error submitting report',
+          statusCode: e.response?.statusCode,
+        ),
+        st,
       );
     }
   }

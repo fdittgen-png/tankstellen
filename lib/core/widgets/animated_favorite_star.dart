@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 /// A filled/unfilled star icon that bounces (scale 1.0 → 1.3 → 1.0) and
@@ -70,9 +72,8 @@ class _AnimatedFavoriteStarState extends State<AnimatedFavoriteStar>
   void didUpdateWidget(covariant AnimatedFavoriteStar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isFavorite != widget.isFavorite) {
-      _controller
-        ..reset()
-        ..forward();
+      _controller.reset();
+      unawaited(_controller.forward());
     }
   }
 

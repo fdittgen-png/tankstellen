@@ -289,7 +289,7 @@ void main() {
 
     void stubResponse(List<Map<String, dynamic>> raw) {
       when(
-        () => mockDio.get(
+        () => mockDio.get<dynamic>(
           any(),
           queryParameters: any(named: 'queryParameters'),
           cancelToken: any(named: 'cancelToken'),

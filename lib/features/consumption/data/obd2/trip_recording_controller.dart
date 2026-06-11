@@ -1076,6 +1076,7 @@ class TripRecordingController {
         final response = await _sendOrShortCircuit(command);
         _dropDetector.registerSuccess();
         return response;
+      // #3164 — kept: `rethrow` preserves the original stack.
       } catch (e, st) { // ignore: unused_catch_stack
         _registerTransportError(e);
         rethrow;

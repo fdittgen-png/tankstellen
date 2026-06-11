@@ -1,12 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/error/exceptions.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/feedback/github_issue_reporter/error_report_payload.dart';
 import '../../../../core/feedback/github_issue_reporter/error_reporter.dart';
 import '../../../../core/feedback/github_issue_reporter/error_reporter_context.dart';
@@ -155,7 +158,10 @@ class ReportSubmitHandler {
         );
         context.pop();
       }
-    } on ApiException catch (e, st) { // ignore: unused_catch_stack
+    } on ApiException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': 'ReportSubmitHandler.submit: report submission failed'
+      }));
       if (context.mounted) {
         SnackBarHelper.showError(
           context,

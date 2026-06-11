@@ -59,7 +59,7 @@ class HealthCounters {
   /// Open the counter box. Foreground-only, called once from
   /// AppInitializer's storage phase alongside `TraceStorage.init()`.
   static Future<void> init() async {
-    await Hive.openBox(boxName);
+    await Hive.openBox<dynamic>(boxName);
   }
 
   /// Whether a debounced flush is currently scheduled (test hook).
@@ -106,7 +106,7 @@ class HealthCounters {
       _flushTimer = null;
       if (_pending.isEmpty) return;
       if (!Hive.isBoxOpen(boxName)) return; // keep pending — see docstring
-      final box = Hive.box(boxName);
+      final box = Hive.box<dynamic>(boxName);
       final today = _dayKey(_clock());
       final row = _rowFrom(box.get(today));
       for (final entry in _pending.entries) {
@@ -128,7 +128,7 @@ class HealthCounters {
     try {
       final days = <String, Map<String, int>>{};
       if (Hive.isBoxOpen(boxName)) {
-        final box = Hive.box(boxName);
+        final box = Hive.box<dynamic>(boxName);
         for (final key in box.keys) {
           days['$key'] = _rowFrom(box.get(key));
         }
@@ -148,7 +148,7 @@ class HealthCounters {
 
   /// Delete rows older than [retainDays] before [today]'s date. Day
   /// keys sort lexicographically, so a plain string compare suffices.
-  Future<void> _prune(Box box, String today) async {
+  Future<void> _prune(Box<dynamic> box, String today) async {
     final cutoff = _dayKey(_clock().subtract(const Duration(days: retainDays)));
     final stale =
         box.keys.where((k) => '$k'.compareTo(cutoff) < 0).toList(growable: false);

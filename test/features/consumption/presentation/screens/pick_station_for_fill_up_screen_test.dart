@@ -41,7 +41,7 @@ void main() {
       await tester.tap(find.byKey(const Key('pick_station_tile_super-u-1')));
       await tester.pumpAndSettle();
       expect(_lastRoute, '/consumption/add');
-      expect(_lastExtra, isA<Map>());
+      expect(_lastExtra, isA<Map<dynamic, dynamic>>());
       final extra = _lastExtra as Map;
       expect(extra['stationId'], 'super-u-1');
       expect(extra['stationName'], 'SUPER U');

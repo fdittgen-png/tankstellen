@@ -97,7 +97,7 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
           .clamp(1000, 200 * 1000)
           .round();
 
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         _baseUrl,
         queryParameters: {
           'format': 'json',
@@ -148,7 +148,7 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
     return parsed;
   }
 
-  Station? _parseStation(Map raw) {
+  Station? _parseStation(Map<dynamic, dynamic> raw) {
     final lat = (raw['lat'] as num?)?.toDouble();
     final lng = (raw['lng'] as num?)?.toDouble();
     if (lat == null || lng == null) return null;
@@ -239,7 +239,7 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
   /// goriva.si stores missing prices as JSON `null` and present prices
   /// as numeric EUR-per-litre values. Anything else (empty string, bad
   /// number) is treated as missing.
-  double? _priceFor(Map prices, String key) {
+  double? _priceFor(Map<dynamic, dynamic> prices, String key) {
     final v = prices[key];
     if (v == null) return null;
     if (v is num) return v.toDouble();

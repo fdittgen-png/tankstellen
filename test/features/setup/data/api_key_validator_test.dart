@@ -18,10 +18,10 @@ void main() {
   });
 
   test('returns valid when API responds with ok=true', () async {
-    when(() => mockDio.get(any(),
+    when(() => mockDio.get<dynamic>(any(),
             queryParameters: any(named: 'queryParameters')))
         .thenAnswer((_) async => Response(
-              data: {'ok': true, 'stations': []},
+              data: {'ok': true, 'stations': <dynamic>[]},
               statusCode: 200,
               requestOptions: RequestOptions(path: '/list.php'),
             ));
@@ -33,7 +33,7 @@ void main() {
 
   test('returns invalid with message when API responds with ok=false',
       () async {
-    when(() => mockDio.get(any(),
+    when(() => mockDio.get<dynamic>(any(),
             queryParameters: any(named: 'queryParameters')))
         .thenAnswer((_) async => Response(
               data: {'ok': false, 'message': 'apikey invalid'},
@@ -48,7 +48,7 @@ void main() {
   });
 
   test('returns invalid on DioException', () async {
-    when(() => mockDio.get(any(),
+    when(() => mockDio.get<dynamic>(any(),
             queryParameters: any(named: 'queryParameters')))
         .thenThrow(DioException(
       requestOptions: RequestOptions(path: '/list.php'),
@@ -61,7 +61,7 @@ void main() {
   });
 
   test('returns invalid on timeout', () async {
-    when(() => mockDio.get(any(),
+    when(() => mockDio.get<dynamic>(any(),
             queryParameters: any(named: 'queryParameters')))
         .thenThrow(DioException(
       type: DioExceptionType.connectionTimeout,
@@ -76,7 +76,7 @@ void main() {
   });
 
   test('includes error message from API response', () async {
-    when(() => mockDio.get(any(),
+    when(() => mockDio.get<dynamic>(any(),
             queryParameters: any(named: 'queryParameters')))
         .thenAnswer((_) async => Response(
               data: {

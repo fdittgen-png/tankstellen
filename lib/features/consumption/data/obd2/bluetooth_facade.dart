@@ -265,7 +265,7 @@ class PluginBluetoothFacade implements BluetoothFacade {
       try {
         await FlutterBluePlus.stopScan();
       } catch (_) {
-        // Best-effort — a stopScan that throws (no scan in flight, plugin
+        // ignore: silent_catch — Best-effort — a stopScan that throws (no scan in flight, plugin
         // quirk) must not block the connect that follows.
       }
       if (!completer.isCompleted) completer.complete(sawMac);

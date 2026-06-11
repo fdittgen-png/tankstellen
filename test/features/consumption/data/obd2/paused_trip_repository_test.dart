@@ -228,7 +228,7 @@ void main() {
       // Required keys present.
       expect(json['id'], entry.id);
       expect(json['pausedAt'], entry.pausedAt.toIso8601String());
-      expect(json['summary'], isA<Map>());
+      expect(json['summary'], isA<Map<dynamic, dynamic>>());
 
       // Summary-level optional keys absent.
       final summaryJson = (json['summary'] as Map).cast<String, dynamic>();

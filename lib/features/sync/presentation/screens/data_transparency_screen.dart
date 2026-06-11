@@ -29,7 +29,7 @@ class DataTransparencyScreen extends ConsumerWidget {
     Map<String, dynamic> data,
   ) async {
     final json = _prettyJson(data);
-    await showDialog(
+    await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(AppLocalizations.of(context)?.rawDataJson ?? 'Raw data (JSON)'),

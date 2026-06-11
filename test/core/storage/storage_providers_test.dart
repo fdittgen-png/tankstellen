@@ -95,7 +95,7 @@ void main() {
       await fakeStorage.saveProfile('p3', {});
       await fakeStorage.setFavoriteIds(List.generate(12, (i) => 's$i'));
       for (var i = 0; i < 87; i++) {
-        await fakeStorage.cacheData('k$i', {});
+        await fakeStorage.cacheData('k$i', <dynamic, dynamic>{});
       }
       await fakeStorage.savePriceRecords('s1', [
         {'a': 1},

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 
 import '../domain/cold_start_baselines.dart';
@@ -39,10 +41,10 @@ class TripHapticController {
     switch (hapticForBandTransition(previous, current)) {
       case HapticIntensity.light:
         _lightCount++;
-        HapticFeedback.lightImpact();
+        unawaited(HapticFeedback.lightImpact());
       case HapticIntensity.medium:
         _mediumCount++;
-        HapticFeedback.mediumImpact();
+        unawaited(HapticFeedback.mediumImpact());
       case HapticIntensity.none:
         break;
     }

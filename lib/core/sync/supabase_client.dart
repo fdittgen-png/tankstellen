@@ -152,6 +152,8 @@ class TankSyncClient {
       try {
         await c.from('users').upsert({'id': userId}, onConflict: 'id');
         return; // success
+      // #3164 — kept: transient retry loop; the final error propagates
+      // after exhaustion.
       } catch (e, st) { // ignore: unused_catch_stack
         lastError = e;
         debugPrint(

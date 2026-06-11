@@ -25,7 +25,7 @@ class VelocityAlertCooldown {
   /// Key prefix in the settings box — one entry per fuel apiValue.
   static const String keyPrefix = 'velocity_cooldown:';
 
-  Box? _boxOrNull() {
+  Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);

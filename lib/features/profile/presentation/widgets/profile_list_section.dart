@@ -152,7 +152,7 @@ class ProfileListSection extends ConsumerWidget {
     final profileNotifier = ref.read(activeProfileProvider.notifier);
     final repo = ref.read(profileRepositoryProvider);
 
-    await showModalBottomSheet(
+    await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       // `_` (not `context`) so the mounted guards below check the section's

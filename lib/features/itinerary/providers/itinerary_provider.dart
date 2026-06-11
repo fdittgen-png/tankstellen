@@ -30,7 +30,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     final storage = ref.read(storageRepositoryProvider);
     final local = _fromStorage(storage);
     // Kick off async merge in background
-    Future.microtask(() => _loadAndMerge());
+    unawaited(Future.microtask(() => _loadAndMerge()));
     return local;
   }
 

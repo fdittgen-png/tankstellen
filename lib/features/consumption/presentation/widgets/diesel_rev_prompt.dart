@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
@@ -54,8 +56,8 @@ class _DieselRevPromptState extends State<DieselRevPrompt>
     _controller = AnimationController(vsync: this, duration: widget.window)
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) _finish(revved: false);
-      })
-      ..forward();
+      });
+    unawaited(_controller.forward());
   }
 
   @override

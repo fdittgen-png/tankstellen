@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -387,7 +389,7 @@ void main() {
         // Capture the future so its completion can be awaited within the fake
         // zone — leaving it dangling lets a thrown sub-future surface as an
         // unhandled zone error under concurrent suite load (#2255 test flake).
-        helper
+        unawaited(helper
             .queryAll(
               samplePoints: [const LatLng(48, 2), const LatLng(49, 2)],
               fuelType: FuelType.e10,
@@ -403,7 +405,7 @@ void main() {
                 return const <SearchResultItem>[];
               },
             )
-            .whenComplete(() => done = true);
+            .whenComplete(() => done = true));
         // Advance the fake clock past any pause and flush all microtasks so
         // the sweep fully settles before we read the recorded gap.
         async.elapse(const Duration(seconds: 2));

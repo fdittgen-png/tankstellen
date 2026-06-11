@@ -88,7 +88,7 @@ class HiveSchemaMigration {
   /// Called only from [ensureSchemaVersions] after the cache box is open.
   static Future<void> evictStaleCacheOnUpgrade({required String cacheBox}) async {
     if (!Hive.isBoxOpen(cacheBox)) return;
-    final box = Hive.box(cacheBox);
+    final box = Hive.box<dynamic>(cacheBox);
     // Snapshot the keys first — deleting while iterating box.keys is unsafe.
     final stale = box.keys
         .whereType<String>()

@@ -91,7 +91,7 @@ class EControlStationService with StationServiceHelpers implements StationServic
   Future<List<Station>> _queryByCoordinates(
     double lat, double lng, String fuelType, {CancelToken? cancelToken}
   ) async {
-    final response = await _dio.get(
+    final response = await _dio.get<dynamic>(
       '$_baseUrl/search/gas-stations/by-address',
       queryParameters: {
         'latitude': lat,
@@ -106,7 +106,8 @@ class EControlStationService with StationServiceHelpers implements StationServic
 
     final stations = <Station>[];
     for (final r in response.data as List) {
-      final station = _parseStation(r, lat, lng, fuelType);
+      final station =
+          _parseStation(r as Map<String, dynamic>, lat, lng, fuelType);
       if (station != null) stations.add(station);
     }
     return stations;

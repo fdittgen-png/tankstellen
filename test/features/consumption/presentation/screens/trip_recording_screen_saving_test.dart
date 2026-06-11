@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/trip_recording_screen.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_save_progress.dart';
@@ -53,7 +54,7 @@ Future<void> _pumpSaving(WidgetTester tester, TripSaveStage stage) async {
           ),
         ),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Override,
       ],
       child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

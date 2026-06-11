@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,7 +55,7 @@ class GlideCoachSettingsNotifier extends _$GlideCoachSettingsNotifier {
 
   @override
   GlideCoachSettings build() {
-    _load();
+    unawaited(_load());
     return const GlideCoachSettings();
   }
 

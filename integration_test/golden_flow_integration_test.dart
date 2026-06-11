@@ -465,7 +465,7 @@ void main() {
       // The fake notifier records every show() call so the test can
       // assert "exactly one" notification with the expected payload.
       // -----------------------------------------------------------------
-      await Hive.openBox(HiveBoxes.alerts);
+      await Hive.openBox<dynamic>(HiveBoxes.alerts);
       final radiusStore = RadiusAlertStore();
       final radiusDedup = RadiusAlertDedup();
       final fakeNotifier = _CapturingNotificationService();
@@ -585,7 +585,7 @@ void main() {
               'prices do not cross the threshold');
 
       // Tidy up.
-      await Hive.box(HiveBoxes.alerts).clear();
+      await Hive.box<dynamic>(HiveBoxes.alerts).clear();
     },
     timeout: const Timeout(Duration(seconds: 60)),
   );

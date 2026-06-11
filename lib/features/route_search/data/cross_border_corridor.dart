@@ -199,6 +199,8 @@ StationQueryFunction buildCorridorQueryFunction(
         raw = result.data
             .map((s) => FuelStationResult(s) as SearchResultItem)
             .toList();
+      // #3164 — kept: #2703 breadcrumb-not-ERROR decision; recoverable leg
+      // outage is recorded as a diagnostic breadcrumb.
       } catch (e, st) { // ignore: unused_catch_stack
         // #2621 — degrade to the other legs rather than aborting the whole
         // route; never silently swallow. #2703 — a single country's feed

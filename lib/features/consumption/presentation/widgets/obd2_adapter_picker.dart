@@ -225,7 +225,7 @@ class _Obd2AdapterPickerSheetState
 
   @override
   void dispose() {
-    _sub?.cancel();
+    unawaited(_sub?.cancel());
     super.dispose();
   }
 
@@ -237,7 +237,7 @@ class _Obd2AdapterPickerSheetState
     });
     final connection = ref.read(obd2ConnectionProvider);
     _supportsClassicDiscovery = connection.supportsClassicDiscovery;
-    _sub?.cancel();
+    unawaited(_sub?.cancel());
     _sub = connection.scan().listen(
       (list) {
         if (!mounted) return;
@@ -246,7 +246,7 @@ class _Obd2AdapterPickerSheetState
           if (list.isNotEmpty) _phase = _Phase.selecting;
         });
       },
-      onError: (e, _) {
+      onError: (Object e, _) {
         if (!mounted || e is! Obd2ConnectionError) return;
         setState(() {
           _error = e;
@@ -311,7 +311,10 @@ class _Obd2AdapterPickerSheetState
       } else {
         Navigator.of(context).pop(service);
       }
-    } on Obd2ConnectionError catch (e, st) { // ignore: unused_catch_stack
+    } on Obd2ConnectionError catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+        'where': '_Obd2AdapterPicker._connect: adapter connect failed'
+      }));
       if (!mounted) return;
       setState(() {
         _error = e;

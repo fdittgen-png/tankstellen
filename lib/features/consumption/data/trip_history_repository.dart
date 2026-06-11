@@ -295,7 +295,7 @@ class TripHistoryRepository {
   List<TripHistoryEntry> loadAll({bool dedupe = true}) {
     final result = <TripHistoryEntry>[];
     for (final key in _box.keys) {
-      final entry = _decode(key);
+      final entry = _decode(key as Object);
       if (entry != null) result.add(entry);
     }
     result.sort((a, b) {

@@ -45,7 +45,7 @@ void main() {
 
   /// Stub the two LUSTAT dataflow calls with the recorded fixtures.
   void stubLiveLustat() {
-    when(() => mockDio.get(
+    when(() => mockDio.get<dynamic>(
           any(),
           cancelToken: any(named: 'cancelToken'),
         )).thenAnswer((invocation) async {
@@ -61,7 +61,7 @@ void main() {
   }
 
   void stubLustatDown() {
-    when(() => mockDio.get(
+    when(() => mockDio.get<dynamic>(
           any(),
           cancelToken: any(named: 'cancelToken'),
         )).thenThrow(DioException(
@@ -238,7 +238,7 @@ void main() {
 
       test('unparseable LUSTAT body also degrades to the stale fallback',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response('<html>maintenance</html>'));

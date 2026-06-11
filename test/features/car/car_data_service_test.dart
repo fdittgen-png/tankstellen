@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
@@ -215,9 +217,9 @@ void main() {
 
     test('getUserLocation reports the persisted fix payload', () {
       final storage = FakeStorageRepository();
-      storage.inner.putSetting(StorageKeys.userPositionLat, 48.8566);
-      storage.inner.putSetting(StorageKeys.userPositionLng, 2.3522);
-      storage.inner.putSetting(StorageKeys.userPositionSource, 'gps');
+      unawaited(storage.inner.putSetting(StorageKeys.userPositionLat, 48.8566));
+      unawaited(storage.inner.putSetting(StorageKeys.userPositionLng, 2.3522));
+      unawaited(storage.inner.putSetting(StorageKeys.userPositionSource, 'gps'));
       final loc = CarDataService().readUserLocation(storage);
       expect(loc['lat'], 48.8566);
       expect(loc['lng'], 2.3522);

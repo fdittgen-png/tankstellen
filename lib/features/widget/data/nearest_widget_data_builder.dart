@@ -237,7 +237,12 @@ class NearestWidgetDataBuilder {
             await _persist(payload, userLat: lat, userLng: lng);
             return payload;
           }
-        } catch (decodeErr, st) { // ignore: unused_catch_stack
+        } catch (decodeErr, st) {
+          unawaited(errorLogger.log(ErrorLayer.storage, decodeErr, st,
+              context: const {
+                'where': 'NearestWidgetDataBuilder: stale-fallback '
+                    'previous JSON decode failed'
+              }));
           debugPrint(
             'NearestWidgetDataBuilder: previous JSON decode failed: '
             '$decodeErr',
@@ -269,6 +274,8 @@ class NearestWidgetDataBuilder {
     if (key != null) {
       try {
         fuel = FuelType.fromString(key);
+      // #3164 — kept: stored-preference validation; unknown fuel key is
+      // expected and falls back.
       } catch (e, st) { // ignore: unused_catch_stack
         debugPrint(
           'NearestWidgetDataBuilder: unknown preferred fuel "$key": $e',

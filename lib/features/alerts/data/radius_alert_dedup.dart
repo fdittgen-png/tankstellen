@@ -65,7 +65,7 @@ class RadiusAlertDedup {
   /// and suppressed within the dedup window.
   static const double priceDropEpsilon = 0.001;
 
-  Box? _boxOrNull() {
+  Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);
@@ -240,7 +240,7 @@ class _LastFire {
   final DateTime firedAt;
   const _LastFire({required this.price, required this.firedAt});
 
-  factory _LastFire.fromJson(Map raw) {
+  factory _LastFire.fromJson(Map<dynamic, dynamic> raw) {
     final priceRaw = raw['price'];
     final tsRaw = raw['firedAt'];
     final price = priceRaw is num ? priceRaw.toDouble() : null;

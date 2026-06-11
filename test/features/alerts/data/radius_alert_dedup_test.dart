@@ -21,10 +21,10 @@ void main() {
 
   setUp(() async {
     if (Hive.isBoxOpen(HiveBoxes.alerts)) {
-      await Hive.box(HiveBoxes.alerts).close();
+      await Hive.box<dynamic>(HiveBoxes.alerts).close();
     }
-    await Hive.openBox(HiveBoxes.alerts);
-    await Hive.box(HiveBoxes.alerts).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.alerts);
+    await Hive.box<dynamic>(HiveBoxes.alerts).clear();
   });
 
   tearDownAll(() async {

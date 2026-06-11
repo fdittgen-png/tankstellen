@@ -42,7 +42,7 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(_checkIfShouldShow);
+    unawaited(Future.microtask(_checkIfShouldShow));
   }
 
   void _checkIfShouldShow() {

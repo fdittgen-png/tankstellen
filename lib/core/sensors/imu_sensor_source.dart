@@ -99,7 +99,7 @@ class ImuSensorSource {
             },
           );
         } catch (_) {
-          // Sensors unavailable — leave the stream quiet.
+          // ignore: silent_catch — Sensors unavailable — leave the stream quiet.
         }
       },
       onCancel: () async {
@@ -107,7 +107,7 @@ class ImuSensorSource {
           await accelSub?.cancel();
           await gyroSub?.cancel();
         } catch (_) {
-          // A subscription that failed to set up cleanly may also throw on
+          // ignore: silent_catch — A subscription that failed to set up cleanly may also throw on
           // cancel; nothing to recover.
         }
         if (!out.isClosed) await out.close();

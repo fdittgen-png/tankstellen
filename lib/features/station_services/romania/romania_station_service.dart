@@ -165,7 +165,7 @@ class RomaniaStationService
 
       final responses = await Future.wait([
         for (final entry in entries)
-          _dio.get(
+          _dio.get<dynamic>(
             '$_baseUrl$searchPath',
             queryParameters: {
               'lon': params.lng,

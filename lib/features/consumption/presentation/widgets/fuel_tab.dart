@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -94,7 +96,7 @@ class FuelTab extends ConsumerWidget {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (_) {
-          ref.read(fillUpListProvider.notifier).remove(fillUp.id);
+          unawaited(ref.read(fillUpListProvider.notifier).remove(fillUp.id));
         },
         child: FillUpCard(
           fillUp: fillUp,
@@ -146,11 +148,11 @@ class FuelTab extends ConsumerWidget {
   }
 
   void _openCorrectionEditor(BuildContext context, FillUp fillUp) {
-    showModalBottomSheet<void>(
+    unawaited(showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (_) => EditCorrectionFillUpSheet(fillUp: fillUp),
-    );
+    ));
   }
 }

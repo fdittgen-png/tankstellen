@@ -48,7 +48,7 @@ class WidgetLaunchHandler {
     );
     if (path == null) return;
     try {
-      _router.push(path);
+      unawaited(_router.push(path));
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: {'where': 'WidgetLaunchHandler: push failed for $uri → $path'}));
     }

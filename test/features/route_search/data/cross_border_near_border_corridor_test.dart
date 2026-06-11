@@ -123,7 +123,7 @@ class _PrixCarburantsFixtureAdapter implements HttpClientAdapter {
   int calls = 0;
 
   static final _emptyBody =
-      jsonEncode({'total_count': 0, 'results': const []});
+      jsonEncode({'total_count': 0, 'results': const <dynamic>[]});
 
   // The recorded A9 stations cluster around Perpignan (lat ~42.6–42.8); the
   // live feed has none south of ~42.4. Parse the query point out of the
@@ -175,7 +175,7 @@ class _MitecoFixtureAdapter implements HttpClientAdapter {
         : id == '08'
             ? barcelona08
             : jsonEncode(
-                {'ResultadoConsulta': 'OK', 'ListaEESSPrecio': const []});
+                {'ResultadoConsulta': 'OK', 'ListaEESSPrecio': const <dynamic>[]});
     return ResponseBody.fromBytes(utf8.encode(body), 200, headers: {
       Headers.contentTypeHeader: ['application/json'],
     });

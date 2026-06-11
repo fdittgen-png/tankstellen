@@ -38,7 +38,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
   @override
   void initState() {
     super.initState();
-    _recordAndLoad();
+    unawaited(_recordAndLoad());
   }
 
   Future<void> _recordAndLoad() async {

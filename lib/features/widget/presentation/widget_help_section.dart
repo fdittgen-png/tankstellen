@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -164,7 +166,7 @@ class _WidgetDefaultsEditor extends ConsumerWidget {
     // Riverpod listeners watching activeProfileProvider repaint as
     // soon as Hive returns. Errors are surfaced via the provider's
     // own logging.
-    ref.read(activeProfileProvider.notifier).updateProfile(next);
+    unawaited(ref.read(activeProfileProvider.notifier).updateProfile(next));
   }
 
   static String _localizedSchemeLabel(

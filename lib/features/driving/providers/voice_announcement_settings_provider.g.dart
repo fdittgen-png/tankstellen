@@ -117,7 +117,7 @@ final class VoiceAnnouncementSettingsProvider
 }
 
 String _$voiceAnnouncementSettingsHash() =>
-    r'17337690219582d9e3905048b8cd0d8c3699603b';
+    r'8c2f48be1713a522129b2351b510dcde58556d28';
 
 /// Persisted user settings for voice announcements while driving (#2569).
 ///

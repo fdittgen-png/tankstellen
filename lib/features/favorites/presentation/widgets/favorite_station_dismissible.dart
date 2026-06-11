@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -114,7 +116,7 @@ class FavoriteStationDismissible extends ConsumerWidget {
         profileFuelType: ref.watch(activeProfileProvider)?.preferredFuelType,
         onTap: () => context.push('/station/${station.id}'),
         onFavoriteTap: () {
-          ref.read(favoritesProvider.notifier).remove(station.id);
+          unawaited(ref.read(favoritesProvider.notifier).remove(station.id));
         },
       ),
     );

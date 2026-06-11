@@ -287,7 +287,7 @@ void main() {
 
       Future<ChargingStation> parseSingle(Map<String, dynamic> item) async {
         final dio = MockDio();
-        when(() => dio.get(
+        when(() => dio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),

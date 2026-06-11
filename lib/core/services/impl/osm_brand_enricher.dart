@@ -73,7 +73,7 @@ class OsmBrandEnricher {
       minLat -= 0.01; maxLat += 0.01;
       minLng -= 0.01; maxLng += 0.01;
 
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         'https://nominatim.openstreetmap.org/search',
         queryParameters: {
           'format': 'json',

@@ -230,7 +230,7 @@ void main() {
     test('returns empty list when OSRM code != "Ok"', () {
       final candidates = EcoRouteSearchStrategy.parseOsrmAlternatives({
         'code': 'NoRoute',
-        'routes': [],
+        'routes': <dynamic>[],
       });
       expect(candidates, isEmpty);
     });

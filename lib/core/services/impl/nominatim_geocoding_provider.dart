@@ -96,9 +96,12 @@ class NominatimGeocodingProvider implements GeocodingProvider {
       }
 
       return (lat: lat, lng: lng);
-    } on DioException catch (e, st) { // ignore: unused_catch_stack
-      throw LocationException(
-        message: 'Nominatim geocoding failed: ${e.message}',
+    } on DioException catch (e, st) {
+      Error.throwWithStackTrace(
+        LocationException(
+          message: 'Nominatim geocoding failed: ${e.message}',
+        ),
+        st,
       );
     }
   }

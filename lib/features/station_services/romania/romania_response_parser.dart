@@ -101,7 +101,7 @@ class MonitorulStationAccumulator {
 
   /// Pull the base fields off the first product-call payload that
   /// carries them; later calls for the same station only add prices.
-  void absorbStation(Map raw) {
+  void absorbStation(Map<dynamic, dynamic> raw) {
     name ??= raw['name']?.toString().trim();
 
     final network = raw['network'];

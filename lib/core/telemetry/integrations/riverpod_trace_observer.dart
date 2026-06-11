@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../logging/error_logger.dart';
 
@@ -25,8 +27,8 @@ final class RiverpodTraceObserver extends ProviderObserver {
     // the future is fine because `errorLogger.log` never throws.
     // #3150 — name the failing provider: a bare `[providers]` trace was
     // un-triageable without it.
-    errorLogger.log(ErrorLayer.providers, error, stackTrace, context: {
+    unawaited(errorLogger.log(ErrorLayer.providers, error, stackTrace, context: {
       'provider': context.provider.toString(),
-    });
+    }));
   }
 }

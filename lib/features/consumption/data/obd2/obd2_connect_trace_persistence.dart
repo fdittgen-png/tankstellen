@@ -47,7 +47,7 @@ class Obd2ConnectTracePersistence {
   Obd2ConnectTracePersistence({DateTime Function()? clock})
       : _now = clock ?? DateTime.now;
 
-  Box get _box => Hive.box(boxName);
+  Box<dynamic> get _box => Hive.box(boxName);
 
   /// Open the box, hydrate the in-memory ring, and register the persist
   /// hook + the error-log export section. Called once from
@@ -55,7 +55,7 @@ class Obd2ConnectTracePersistence {
   /// degrades to the pre-#3184 in-memory-only behaviour.
   static Future<void> init() async {
     try {
-      await Hive.openBox(boxName);
+      await Hive.openBox<dynamic>(boxName);
       final persistence = Obd2ConnectTracePersistence();
       Obd2ConnectTraceLog.hydrateFromPersisted(persistence.load());
       Obd2ConnectTraceLog.onTracePersist =
@@ -116,7 +116,7 @@ class Obd2ConnectTracePersistence {
         try {
           started = (jsonDecode(raw) as Map<String, dynamic>)['st'] as int?;
         } catch (_) {
-          // unreadable — treated as aged-out below.
+          // ignore: silent_catch — unreadable — treated as aged-out below.
         }
       }
       if (started == null || started < cutoff) {

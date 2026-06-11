@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,9 +47,9 @@ class FuelTypeSelector extends ConsumerWidget {
 
     // If selected type isn't available in this country, reset to 'all'
     if (!types.contains(selected)) {
-      Future.microtask(() {
+      unawaited(Future.microtask(() {
         ref.read(selectedFuelTypeProvider.notifier).select(FuelType.all);
-      });
+      }));
     }
 
     return SingleChildScrollView(
@@ -78,7 +80,7 @@ class FuelTypeSelector extends ConsumerWidget {
                   // matching the everyday tap-surface haptics. selectionClick
                   // only (never heavyImpact); never fires on scroll because
                   // ChoiceChip.onSelected is a discrete tap, not a drag.
-                  HapticFeedback.selectionClick();
+                  unawaited(HapticFeedback.selectionClick());
                   ref.read(selectedFuelTypeProvider.notifier).select(type);
                 },
                 visualDensity: VisualDensity.compact,

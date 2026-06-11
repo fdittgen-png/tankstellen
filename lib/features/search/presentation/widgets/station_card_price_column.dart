@@ -90,7 +90,7 @@ class _StationPriceColumn extends StatelessWidget {
             onPressed: onFavoriteTap == null
                 ? null
                 : () {
-                    HapticFeedback.selectionClick();
+                    unawaited(HapticFeedback.selectionClick());
                     onFavoriteTap!();
                   },
             tooltip: isFavorite

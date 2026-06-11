@@ -156,7 +156,7 @@ class ChileStationService
       // No query parameters: we pull everything and filter locally so
       // the radius / sort semantics from [StationServiceHelpers] stay
       // consistent with every other country.
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         _baseUrl,
         cancelToken: cancelToken,
       );

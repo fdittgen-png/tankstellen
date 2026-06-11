@@ -66,7 +66,7 @@ class ConditionalGetInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
     final options = response.requestOptions;
     if (!_isGet(options)) {
       handler.next(response);
@@ -127,7 +127,7 @@ class ConditionalGetInterceptor extends Interceptor {
   }
 
   /// Cache a 2xx GET response that carries an ETag and/or Last-Modified.
-  void _cacheIfValidated(Response response) {
+  void _cacheIfValidated(Response<dynamic> response) {
     final status = response.statusCode ?? 0;
     if (status < 200 || status >= 300) return;
     final etag = response.headers.value('etag');
@@ -146,7 +146,8 @@ class ConditionalGetInterceptor extends Interceptor {
 
   /// Build the replay response for a 304, or null when nothing is cached for
   /// this URI (header survived a store eviction).
-  Response? _replay304(RequestOptions options, {Map<String, dynamic>? extra}) {
+  Response<dynamic>? _replay304(RequestOptions options,
+      {Map<String, dynamic>? extra}) {
     final key = _keyFor(options);
     final cached = _store[key];
     if (cached == null) return null;
@@ -160,7 +161,7 @@ class ConditionalGetInterceptor extends Interceptor {
     );
   }
 
-  Response _synthetic(
+  Response<dynamic> _synthetic(
     RequestOptions options,
     _CachedResponse cached, {
     required String tag,

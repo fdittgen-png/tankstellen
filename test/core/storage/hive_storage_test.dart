@@ -204,7 +204,7 @@ void main() {
 
     test('getCachedData returns null when maxAge is exceeded', () async {
       // Manually insert an entry with old timestamp
-      final box = Hive.box('cache');
+      final box = Hive.box<dynamic>('cache');
       await box.put('old-key', {
         'data': {'hello': 'world'},
         'timestamp': DateTime.now()
@@ -229,7 +229,7 @@ void main() {
     });
 
     test('getCachedData without maxAge ignores age', () async {
-      final box = Hive.box('cache');
+      final box = Hive.box<dynamic>('cache');
       await box.put('ancient-key', {
         'data': {'old': true},
         'timestamp': 0, // epoch start
@@ -242,7 +242,7 @@ void main() {
     test('getCachedData returns null when data is not a Map', () async {
       // cacheData wraps in {data: ..., timestamp: ...}
       // If someone stored a non-map as 'data', getCachedData should return null
-      final box = Hive.box('cache');
+      final box = Hive.box<dynamic>('cache');
       await box.put('string-data', {
         'data': 'just a string',
         'timestamp': DateTime.now().millisecondsSinceEpoch,
@@ -721,7 +721,7 @@ void main() {
     // real-bytes implementation the reported value should track
     // `File(box.path).lengthSync()` to within rounding.
     test('storageStats matches File.lengthSync of the underlying box', () {
-      final cacheBox = Hive.box('cache');
+      final cacheBox = Hive.box<dynamic>('cache');
       final cachePath = cacheBox.path;
       expect(cachePath, isNotNull,
           reason: 'native Hive box should expose a path');

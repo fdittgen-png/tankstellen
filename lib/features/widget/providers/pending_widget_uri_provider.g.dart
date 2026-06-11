@@ -101,7 +101,7 @@ final class PendingWidgetUriProvider
   }
 }
 
-String _$pendingWidgetUriHash() => r'c6f9435f44a1ab9dcf183bc4be69410215c4ce9e';
+String _$pendingWidgetUriHash() => r'ac09e8785e713755c741e78d06bfb73860862b6f';
 
 /// One-shot stash for the URI a home-screen widget tap delivered to the
 /// app on cold start.

@@ -181,7 +181,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
   /// OK — https://mobility-prices.ok.dk/api/v1/fuel-prices
   Future<List<Station>> _fetchOk({CancelToken? cancelToken}) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         'https://mobility-prices.ok.dk/api/v1/fuel-prices',
         cancelToken: cancelToken,
       );
@@ -249,7 +249,7 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
   /// Shell — https://shellpumpepriser.geoapp.me/v1/prices
   Future<List<Station>> _fetchShell({CancelToken? cancelToken}) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         'https://shellpumpepriser.geoapp.me/v1/prices',
         cancelToken: cancelToken,
       );

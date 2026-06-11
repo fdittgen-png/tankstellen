@@ -272,12 +272,12 @@ class HiveBoxes {
   static Future<void> initInIsolate() async {
     await Hive.initFlutter();
     final cipher = await HiveCipherLoader.loadGuarded();
-    await Hive.openBox(settings, encryptionCipher: cipher);
-    await Hive.openBox(favorites, encryptionCipher: cipher);
-    await Hive.openBox(profiles, encryptionCipher: cipher); // #2205 BG widget
-    await Hive.openBox(alerts, encryptionCipher: cipher);
-    await Hive.openBox(cache, encryptionCipher: cipher);
-    await Hive.openBox(priceHistory, encryptionCipher: cipher);
+    await Hive.openBox<dynamic>(settings, encryptionCipher: cipher);
+    await Hive.openBox<dynamic>(favorites, encryptionCipher: cipher);
+    await Hive.openBox<dynamic>(profiles, encryptionCipher: cipher); // #2205 BG widget
+    await Hive.openBox<dynamic>(alerts, encryptionCipher: cipher);
+    await Hive.openBox<dynamic>(cache, encryptionCipher: cipher);
+    await Hive.openBox<dynamic>(priceHistory, encryptionCipher: cipher);
     // #579 — velocity detector reads/writes snapshots from the BG
     // isolate, mirroring the main-isolate open above.
     await Hive.openBox<String>(priceSnapshots);
@@ -308,7 +308,7 @@ class HiveBoxes {
       if (HiveIsolateOwnership.isOwned(name)) continue;
       try {
         if (Hive.isBoxOpen(name)) {
-          await Hive.box(name).close();
+          await Hive.box<dynamic>(name).close();
         }
       } catch (e, st) {
         debugPrint('HiveBoxes: failed to close box "$name": $e\n$st');
@@ -318,12 +318,12 @@ class HiveBoxes {
 
   @visibleForTesting
   static Future<void> initForTest() async {
-    await Hive.openBox(settings);
-    await Hive.openBox(favorites);
-    await Hive.openBox(cache);
-    await Hive.openBox(profiles);
-    await Hive.openBox(priceHistory);
-    await Hive.openBox(alerts);
+    await Hive.openBox<dynamic>(settings);
+    await Hive.openBox<dynamic>(favorites);
+    await Hive.openBox<dynamic>(cache);
+    await Hive.openBox<dynamic>(profiles);
+    await Hive.openBox<dynamic>(priceHistory);
+    await Hive.openBox<dynamic>(alerts);
     // #584 — service reminders live in their own box so tests that
     // exercise the vehicle feature can open it without pulling in the
     // rest of the app. String-typed to match runtime.

@@ -44,7 +44,9 @@ class RouteBestStopsList extends StatelessWidget {
           final station = stations[index];
           final isSelected = selectedStationIds.contains(station.id);
           final price = station.priceFor(
-              fuelResolver != null ? fuelResolver!(station) : selectedFuel);
+              fuelResolver != null
+                  ? fuelResolver!(station)
+                  : selectedFuel as FuelType);
           final stopNumber = index + 1;
           return RouteStationChip(
             key: ValueKey('route-station-${station.id}'),

@@ -182,7 +182,7 @@ class BackgroundService {
     try {
       hasRadiusAlert = (await RadiusAlertStore().list()).any((a) => a.enabled);
     } catch (_) {
-      // Radius store unreadable (e.g. box not open) — treat as none.
+      // ignore: silent_catch — Radius store unreadable (e.g. box not open) — treat as none.
     }
     return hasPriceAlert || hasRadiusAlert;
   }

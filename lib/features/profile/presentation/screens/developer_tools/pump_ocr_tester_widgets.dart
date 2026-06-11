@@ -290,7 +290,7 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
         base64: base64Encode(bytes),
       );
     } catch (_) {
-      // Image attach is best-effort; the trace JSON is still useful.
+      // ignore: silent_catch — Image attach is best-effort; the trace JSON is still useful.
     }
   }
 

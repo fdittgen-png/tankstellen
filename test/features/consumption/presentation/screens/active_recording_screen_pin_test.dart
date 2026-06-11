@@ -97,7 +97,7 @@ Future<void> _pumpRecordingScreen(
       wakelockFacadeProvider.overrideWithValue(facade),
       // #2785 — these tests exercise the MANUAL pin toggle from an unpinned
       // start, so pin the profile to auto-pin OFF (the global default is now ON).
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
     ],
   );
 }

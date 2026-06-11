@@ -102,7 +102,7 @@ void main() {
   group('append / load / prune (#3184)', () {
     test('round-trips a trace through the box JSON-string encoding',
         () async {
-      await Hive.openBox(Obd2ConnectTracePersistence.boxName);
+      await Hive.openBox<dynamic>(Obd2ConnectTracePersistence.boxName);
       final persistence = Obd2ConnectTracePersistence();
       final trace = makeTrace(id: 't1', startedAtMs: _nowMs());
 
@@ -112,7 +112,7 @@ void main() {
     });
 
     test('caps the box at maxPersisted, dropping the OLDEST', () async {
-      await Hive.openBox(Obd2ConnectTracePersistence.boxName);
+      await Hive.openBox<dynamic>(Obd2ConnectTracePersistence.boxName);
       final persistence = Obd2ConnectTracePersistence();
       final base = _nowMs();
       const extra = 5;
@@ -132,7 +132,7 @@ void main() {
 
     test('drops traces older than maxAge on prune AND skips them on load',
         () async {
-      await Hive.openBox(Obd2ConnectTracePersistence.boxName);
+      await Hive.openBox<dynamic>(Obd2ConnectTracePersistence.boxName);
       final now = DateTime.now();
       final persistence = Obd2ConnectTracePersistence(clock: () => now);
       final aged = now
@@ -146,13 +146,13 @@ void main() {
           makeTrace(id: 'fresh', startedAtMs: now.millisecondsSinceEpoch));
 
       expect(persistence.load().single.attemptId, 'fresh');
-      final box = Hive.box(Obd2ConnectTracePersistence.boxName);
+      final box = Hive.box<dynamic>(Obd2ConnectTracePersistence.boxName);
       expect(box.get('old'), isNull,
           reason: 'the aged-out entry must be physically pruned');
     });
 
     test('a corrupt entry is skipped and never poisons the rest', () async {
-      final box = await Hive.openBox(Obd2ConnectTracePersistence.boxName);
+      final box = await Hive.openBox<dynamic>(Obd2ConnectTracePersistence.boxName);
       final persistence = Obd2ConnectTracePersistence();
       await box.put('corrupt', 'not json at all {');
       await box.put('wrong-type', 42);
@@ -190,7 +190,7 @@ void main() {
 
   group('serialised PII shape (#3184)', () {
     test('the persisted JSON carries only the REDACTED MAC', () async {
-      await Hive.openBox(Obd2ConnectTracePersistence.boxName);
+      await Hive.openBox<dynamic>(Obd2ConnectTracePersistence.boxName);
       final persistence = Obd2ConnectTracePersistence();
 
       final h = Obd2ConnectTraceLog.beginTrace(
@@ -203,7 +203,7 @@ void main() {
       await persistence.append(Obd2ConnectTraceLog.snapshot().single);
 
       final raw =
-          Hive.box(Obd2ConnectTracePersistence.boxName).values.single
+          Hive.box<dynamic>(Obd2ConnectTracePersistence.boxName).values.single
               as String;
       expect(raw, isNot(contains('AA:BB')),
           reason: 'the raw MAC must never reach disk');

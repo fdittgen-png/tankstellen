@@ -37,10 +37,10 @@ void main() {
 
   setUp(() async {
     if (Hive.isBoxOpen(HiveBoxes.settings)) {
-      await Hive.box(HiveBoxes.settings).close();
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
     }
-    await Hive.openBox(HiveBoxes.settings);
-    await Hive.box(HiveBoxes.settings).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.settings);
+    await Hive.box<dynamic>(HiveBoxes.settings).clear();
   });
 
   tearDownAll(() async {
@@ -130,7 +130,7 @@ void main() {
 
     test('loadAll ignores unrelated keys in the shared settings box',
         () async {
-      final box = Hive.box(HiveBoxes.settings);
+      final box = Hive.box<dynamic>(HiveBoxes.settings);
       // Legacy settings entry — must not be deserialised as a card.
       await box.put('some_other_setting', {'foo': 'bar'});
 
@@ -143,7 +143,7 @@ void main() {
     });
 
     test('clear wipes only the loyalty-card keys', () async {
-      final box = Hive.box(HiveBoxes.settings);
+      final box = Hive.box<dynamic>(HiveBoxes.settings);
       await box.put('unrelated_setting', {'x': 1});
       final repo = LoyaltyCardRepository(box: box);
       await repo.upsert(makeCard(id: 'a1'));
@@ -165,8 +165,8 @@ void main() {
       );
 
       // Simulate "app restart": close and reopen the box.
-      await Hive.box(HiveBoxes.settings).close();
-      await Hive.openBox(HiveBoxes.settings);
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
+      await Hive.openBox<dynamic>(HiveBoxes.settings);
 
       final repo2 = LoyaltyCardRepository(box: Hive.box(HiveBoxes.settings));
       final all = repo2.loadAll();

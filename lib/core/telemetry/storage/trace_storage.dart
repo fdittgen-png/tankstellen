@@ -32,10 +32,10 @@ class TraceStorage {
   static final Map<String, Object? Function()> extraExportSections = {};
 
   static Future<void> init() async {
-    await Hive.openBox(_boxName);
+    await Hive.openBox<dynamic>(_boxName);
   }
 
-  Box get _box => Hive.box(_boxName);
+  Box<dynamic> get _box => Hive.box(_boxName);
 
   Future<void> store(ErrorTrace trace) async {
     await _box.put(trace.id, trace.toJson());
@@ -135,7 +135,7 @@ class TraceStorage {
   /// (and every nested `_$XFromJson`) throws `TypeError` on the first
   /// `as Map<String, dynamic>` cast against a Hive-shaped nested map —
   /// see #1388.
-  Map<String, dynamic> _jsonMapFrom(Map raw) {
+  Map<String, dynamic> _jsonMapFrom(Map<dynamic, dynamic> raw) {
     final result = <String, dynamic>{};
     raw.forEach((key, value) {
       result[key.toString()] = _coerceJsonValue(value);

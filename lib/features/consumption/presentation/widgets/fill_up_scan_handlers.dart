@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/feedback/github_issue_reporter.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../search/domain/entities/fuel_type.dart';
@@ -27,10 +30,10 @@ import 'pump_scan_failure_sheet.dart';
 /// `_lastScan`, `_date`, `_vehicleId`, `_fuelType`, and the
 /// `_scanService` — and passes them in via the `state` parameter.
 ///
-/// Lifting these flows out of the screen halves its line count and
-/// drops the ad-hoc `// ignore: unused_catch_stack` noise from the
-/// orchestration layer; the catches stay here, contained alongside
-/// the user-facing snackbars they emit.
+/// Lifting these flows out of the screen halves its line count; the
+/// catches stay here, contained alongside the user-facing snackbars
+/// they emit, and route their stack traces through `errorLogger`
+/// (#3164).
 
 /// Mutable surface the host screen exposes to the scan helpers. The
 /// helpers only read/write through this struct so the screen can
@@ -137,7 +140,10 @@ Future<void> runReceiptScan(
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
-  } catch (e, st) { // ignore: unused_catch_stack
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+      'where': 'runReceiptScan: receipt scan failed'
+    }));
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.showError(
         context,
@@ -227,7 +233,10 @@ Future<void> runPumpDisplayScan(
         l?.scanPumpSuccess ?? 'Pump display scanned — verify the values.',
       );
     }
-  } catch (e, st) { // ignore: unused_catch_stack
+  } catch (e, st) {
+    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
+      'where': 'runPumpDisplayScan: pump display scan failed'
+    }));
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.showError(
         context,

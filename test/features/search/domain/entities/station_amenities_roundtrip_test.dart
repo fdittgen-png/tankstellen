@@ -84,7 +84,7 @@ void main() {
       );
 
       final json = station.toJson();
-      expect(json['amenities'], isA<List>());
+      expect(json['amenities'], isA<List<dynamic>>());
       expect(json['amenities'], contains('shop'));
     });
 

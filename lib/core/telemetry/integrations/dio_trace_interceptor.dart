@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../logging/error_logger.dart';
@@ -27,7 +29,7 @@ class DioTraceInterceptor extends Interceptor {
     // #1104 — route through the unified logger so service-layer Dio
     // failures land in the same pipeline as foreground / background
     // errors. Fire-and-forget: the interceptor contract is sync.
-    errorLogger.log(
+    unawaited(errorLogger.log(
       ErrorLayer.services,
       err,
       err.stackTrace,
@@ -37,7 +39,7 @@ class DioTraceInterceptor extends Interceptor {
         'statusCode': err.response?.statusCode,
         'dioType': err.type.name,
       },
-    );
+    ));
     handler.next(err);
   }
 }

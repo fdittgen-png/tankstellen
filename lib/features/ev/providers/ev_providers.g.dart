@@ -333,7 +333,7 @@ final class EvStationsProvider
   }
 }
 
-String _$evStationsHash() => r'8cafa106900a85ce445bb9be57aeddbc5342ae0b';
+String _$evStationsHash() => r'1d22131a2eb49dc23a112bce6b26404c937a6769';
 
 /// Fetches charging stations for the given [viewport] and writes them
 /// through the local repository cache. Applies the current

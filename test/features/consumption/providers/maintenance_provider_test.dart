@@ -43,10 +43,10 @@ void main() {
 
   setUp(() async {
     if (Hive.isBoxOpen(HiveBoxes.settings)) {
-      await Hive.box(HiveBoxes.settings).close();
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
     }
-    await Hive.openBox(HiveBoxes.settings);
-    await Hive.box(HiveBoxes.settings).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.settings);
+    await Hive.box<dynamic>(HiveBoxes.settings).clear();
   });
 
   tearDownAll(() async {
@@ -124,7 +124,7 @@ void main() {
           .read(maintenanceSuggestionsControllerProvider.notifier);
       await controller.snoozeForDefault(MaintenanceSignal.idleRpmCreep);
 
-      final box = Hive.box(HiveBoxes.settings);
+      final box = Hive.box<dynamic>(HiveBoxes.settings);
       final stored = box.get(
         '${MaintenanceSnoozeRepository.keyPrefix}'
         '${MaintenanceSignal.idleRpmCreep.name}',
