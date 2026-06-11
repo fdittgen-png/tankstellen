@@ -5,14 +5,17 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../core/logging/error_logger.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
-import 'supabase_client.dart';
-import '../../core/logging/error_logger.dart';
+import 'entity_sync.dart';
+import 'sync_transport.dart';
 
 /// Station-rating sync with Supabase, pulled out of [SyncService] (#727).
 ///
-/// Three read/write paths on the `station_ratings` table:
+/// Ratings keep a bespoke read/write surface (an explicit-column table
+/// with no union merge), but since #3127 all I/O rides the injectable
+/// [SyncTransport] seam and the delete shares [EntitySync.deleteRow]:
 ///
 /// - [upsert] — add or update a rating (owner-private by default,
 ///   shareable when [shared] is true).
@@ -29,29 +32,38 @@ import '../../core/logging/error_logger.dart';
 class RatingsSync {
   RatingsSync._();
 
+  static const _table = 'station_ratings';
+
   /// Upsert a single station rating. Safe to call for both new and
   /// existing ratings — `onConflict` resolves by `(user_id, station_id)`.
   static Future<void> upsert(
     String stationId,
     int rating, {
     bool shared = false,
+    SyncTransport? transport,
   }) async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return;
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) return;
 
     try {
-      await client.from('station_ratings').upsert({
-        'user_id': userId,
-        'station_id': stationId,
-        'rating': rating,
-        'is_shared': shared,
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
-      }, onConflict: 'user_id,station_id');
+      await t.upsert(
+        _table,
+        [
+          {
+            'user_id': t.userId,
+            'station_id': stationId,
+            'rating': rating,
+            'is_shared': shared,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          },
+        ],
+        onConflict: 'user_id,station_id',
+      );
       debugPrint(
           'RatingsSync.upsert: $stationId = $rating stars (shared=$shared)');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.upsert FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'RatingsSync.upsert FAILED'}));
     }
   }
 
@@ -64,16 +76,18 @@ class RatingsSync {
   /// authenticated. All ratings default to owner-private
   /// (`is_shared = false`) — the per-rating share toggle still goes
   /// through [upsert].
-  static Future<void> upsertAll(Map<String, int> ratings) async {
+  static Future<void> upsertAll(
+    Map<String, int> ratings, {
+    SyncTransport? transport,
+  }) async {
     if (ratings.isEmpty) return;
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return;
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) return;
 
     final now = DateTime.now().toUtc().toIso8601String();
     final rows = ratings.entries
         .map((e) => {
-              'user_id': userId,
+              'user_id': t.userId,
               'station_id': e.key,
               'rating': e.value,
               'is_shared': false,
@@ -82,54 +96,41 @@ class RatingsSync {
         .toList();
 
     try {
-      await client
-          .from('station_ratings')
-          .upsert(rows, onConflict: 'user_id,station_id');
+      await t.upsert(_table, rows, onConflict: 'user_id,station_id');
       debugPrint('RatingsSync.upsertAll: ${rows.length} ratings in 1 round-trip');
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.upsertAll FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'RatingsSync.upsertAll FAILED'}));
     }
   }
 
   /// Delete a rating from the server. Typically called when the
   /// station is unfavorited (ratings live alongside favorites).
-  static Future<void> delete(String stationId) async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return;
-
-    try {
-      // #3078/#3123 — tombstone-first (journal-backed) so another device's
-      // re-upload / fetch can't resurrect the deleted rating even when the
-      // row delete below fails transiently.
-      await DeletionsSync.record('station_ratings', stationId);
-      await client
-          .from('station_ratings')
-          .delete()
-          .eq('user_id', userId)
-          .eq('station_id', stationId);
-      debugPrint('RatingsSync.delete: $stationId removed');
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.delete FAILED'}));
-    }
-  }
+  /// Tombstone-first (journal-backed, #3078/#3123) via the shared
+  /// [EntitySync.deleteRow], so another device's re-upload / fetch
+  /// can't resurrect the deleted rating even when the row delete
+  /// fails transiently.
+  static Future<void> delete(String stationId, {SyncTransport? transport}) =>
+      EntitySync.deleteRow(
+        table: _table,
+        idColumn: 'station_id',
+        recordId: stationId,
+        logContext: 'RatingsSync.delete',
+        transport: transport,
+      );
 
   /// Fetch every rating owned by the authenticated user. Returns a
   /// `stationId → rating` map. Empty map when the session isn't
   /// authenticated or the query fails.
-  static Future<Map<String, int>> fetchAll() async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return {};
+  static Future<Map<String, int>> fetchAll({SyncTransport? transport}) async {
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) return {};
 
     try {
-      final rows = await client
-          .from('station_ratings')
-          .select('station_id, rating')
-          .eq('user_id', userId);
+      final rows = await t.select(_table, 'station_id, rating');
       // #3078 — never re-hydrate a rating the user deleted on another device.
       final tombstoned =
-          await DeletionsSync.fetchTombstonedIds('station_ratings');
+          await DeletionsSync.fetchTombstonedIds(_table, transport: t);
       final result = <String, int>{};
       for (final r in rows) {
         final stationId = r.getString('station_id');
@@ -142,7 +143,8 @@ class RatingsSync {
       }
       return result;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'RatingsSync.fetchAll FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'RatingsSync.fetchAll FAILED'}));
       return {};
     }
   }
