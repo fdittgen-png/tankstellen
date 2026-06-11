@@ -44,6 +44,10 @@ jobs:
   build-and-upload:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      # contents: write — required by the post-upload tag push (#3177) so
+      # every shipped versionCode maps back to a commit.
+      contents: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -135,6 +139,24 @@ jobs:
       - name: Clean up service-account key
         if: always()
         run: rm -f "$PLAY_KEY_PATH"
+
+      - name: Tag the shipped build (vX.Y.Z+BUILD)
+        # #3177 — every CI-minted versionCode must map back to a commit
+        # (the About-screen build number is the documented first triage
+        # step). Annotated tag pushed with the default GITHUB_TOKEN:
+        # token-pushed tags do NOT trigger other workflows (GitHub's
+        # recursion guard), so deploy.yml's `on: push: tags: v*` does NOT
+        # fire for these — manual `git push origin v...` stays the only
+        # way to trigger a Play production deploy.
+        run: |
+          set -euo pipefail
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          TAG="v${VERSION}+${{ steps.bn.outputs.build_number }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Beta build ${{ steps.bn.outputs.build_number }} (track: ${{ github.event.inputs.track || 'beta' }}) — $GITHUB_SHA"
+          git push origin "$TAG"
+          echo "Tagged $TAG"
 
       - name: Summary
         if: always()
