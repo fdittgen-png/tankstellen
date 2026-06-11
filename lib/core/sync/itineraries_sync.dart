@@ -5,73 +5,86 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../core/logging/error_logger.dart';
 import '../../features/itinerary/domain/entities/saved_itinerary.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
-import 'supabase_client.dart';
+import 'entity_sync.dart';
 import 'sync_helper.dart';
-import '../../core/logging/error_logger.dart';
+import 'sync_transport.dart';
 
 /// Saved-itinerary sync with Supabase, pulled out of [SyncService]
 /// (#727).
 ///
-/// Unlike the other merge-style sync classes, itineraries are
-/// one-way from the server's perspective: local provider holds the
-/// source of truth and push explicitly via [save] / [delete] on
-/// every user action, then reconciles with [fetchAll] on login.
-/// Deduplication happens at the caller (the itinerary provider
-/// unions the local list with `fetchAll`'s return before rendering).
+/// Unlike the [EntitySync]-merged entities, itineraries are one-way
+/// from the server's perspective: the local provider holds the source
+/// of truth and pushes explicitly via [save] / [delete] on every user
+/// action, then reconciles with [fetchAll] on login. Deduplication
+/// happens at the caller (the itinerary provider unions the local list
+/// with `fetchAll`'s return before rendering). Since #3127 the I/O
+/// rides the injectable [SyncTransport] seam and the delete shares
+/// [EntitySync.deleteRow].
 class ItinerariesSync {
   ItinerariesSync._();
+
+  static const _table = 'itineraries';
 
   /// Save or update an itinerary on the server. Returns `true` on
   /// success, `false` when unauthenticated or the upsert fails —
   /// mirrors the original contract so the itinerary provider's
   /// "synced?" badge keeps working.
-  static Future<bool> save(SavedItinerary itinerary) async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return false;
+  static Future<bool> save(
+    SavedItinerary itinerary, {
+    SyncTransport? transport,
+  }) async {
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) return false;
 
     try {
-      await client.from('itineraries').upsert({
-        'id': itinerary.id,
-        'user_id': userId,
-        'name': itinerary.name,
-        'waypoints': itinerary.waypoints,
-        'distance_km': itinerary.distanceKm,
-        'duration_minutes': itinerary.durationMinutes,
-        'avoid_highways': itinerary.avoidHighways,
-        'fuel_type': itinerary.fuelType,
-        'selected_station_ids': itinerary.selectedStationIds,
-        'updated_at': DateTime.now().toUtc().toIso8601String(),
-      }, onConflict: 'id');
+      await t.upsert(
+        _table,
+        [
+          {
+            'id': itinerary.id,
+            'user_id': t.userId,
+            'name': itinerary.name,
+            'waypoints': itinerary.waypoints,
+            'distance_km': itinerary.distanceKm,
+            'duration_minutes': itinerary.durationMinutes,
+            'avoid_highways': itinerary.avoidHighways,
+            'fuel_type': itinerary.fuelType,
+            'selected_station_ids': itinerary.selectedStationIds,
+            'updated_at': DateTime.now().toUtc().toIso8601String(),
+          },
+        ],
+        onConflict: 'id',
+      );
       debugPrint('ItinerariesSync.save: saved "${itinerary.name}"');
       return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItinerariesSync.save FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'ItinerariesSync.save FAILED'}));
       return false;
     }
   }
 
-  /// Fetch every itinerary owned by the authenticated user. Returns
-  /// an empty list when unauthenticated or the query fails — the
-  /// provider keeps showing whatever was in local cache.
-  static Future<List<SavedItinerary>> fetchAll() async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return [];
+  /// Fetch every itinerary owned by the authenticated user, newest
+  /// edit first. Returns an empty list when unauthenticated or the
+  /// query fails — the provider keeps showing whatever was in local
+  /// cache.
+  static Future<List<SavedItinerary>> fetchAll({
+    SyncTransport? transport,
+  }) async {
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) return [];
 
     try {
-      final rows = await client
-          .from('itineraries')
-          .select()
-          .eq('user_id', userId)
-          .order('updated_at', ascending: false);
+      final rows = await t.select(_table, '*');
 
       // #3078 — never re-hydrate an itinerary deleted on another device.
-      final tombstoned = await DeletionsSync.fetchTombstonedIds('itineraries');
-      return SyncHelper.removeTombstoned(
+      final tombstoned =
+          await DeletionsSync.fetchTombstonedIds(_table, transport: t);
+      final result = SyncHelper.removeTombstoned(
         rows,
         tombstoned,
         key: (r) => r.getString('id'),
@@ -94,33 +107,30 @@ class ItinerariesSync {
               ? DateTime.tryParse(updatedAtStr) ?? DateTime.now()
               : DateTime.now(),
         );
-      }).toList();
+      }).toList()
+        // The pre-#3127 query ordered server-side
+        // (`order('updated_at', ascending: false)`); the transport seam
+        // is filter-only, so the same newest-first contract is applied
+        // here instead.
+        ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      return result;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItinerariesSync.fetchAll FAILED'}));
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'ItinerariesSync.fetchAll FAILED'}));
       return [];
     }
   }
 
   /// Delete a single itinerary from the server. Returns `true` on
   /// success, `false` when unauthenticated or the delete fails.
-  static Future<bool> delete(String itineraryId) async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return false;
-
-    try {
-      // #3078/#3123 — tombstone-first (journal-backed): the tombstone must
-      // not depend on the row delete succeeding.
-      await DeletionsSync.record('itineraries', itineraryId);
-      await client
-          .from('itineraries')
-          .delete()
-          .eq('id', itineraryId)
-          .eq('user_id', userId);
-      return true;
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItinerariesSync.delete FAILED'}));
-      return false;
-    }
-  }
+  /// Tombstone-first (journal-backed, #3078/#3123) via the shared
+  /// [EntitySync.deleteRow].
+  static Future<bool> delete(String itineraryId, {SyncTransport? transport}) =>
+      EntitySync.deleteRow(
+        table: _table,
+        idColumn: 'id',
+        recordId: itineraryId,
+        logContext: 'ItinerariesSync.delete',
+        transport: transport,
+      );
 }
