@@ -530,20 +530,17 @@ class Countries {
     },
     examplePostalCode: '10431',
     exampleCity: 'Αθήνα',
-    // #1828 — fixture-driven best-guess feed, unverified end-to-end.
-    // Hidden from the picker.
+    // #3194 — default host is NXDOMAIN; the service short-circuits to
+    // "unavailable" unless self-hosted. Hidden until a real source exists.
     verified: false,
   );
 
   /// Romania — *Monitorul Prețurilor*, the Competition Council's
-  /// official price observatory at monitorulpreturilor.info (#577,
-  /// rebased onto the real observatory in #3193 — the old
-  /// pretcarburant.ro endpoint was a third-party 404). ~1 500 stations
-  /// covered (Petrom / OMV / Rompetrol / MOL / Lukoil / Socar). The
-  /// feed is public — no key required. Fuels (catalog ids): Benzină
-  /// standard 11 (→ e5), Benzină premium 12 (→ e98), Motorină standard
-  /// 21 (→ diesel), Motorină premium 22 (→ diesel premium), GPL 31
-  /// (→ lpg).
+  /// official observatory at monitorulpreturilor.info (#577; #3193
+  /// rebased off the dead third-party pretcarburant.ro). ~1 500
+  /// stations, public feed, no key. Fuels (catalog ids): Benzină
+  /// standard 11 (→ e5), premium 12 (→ e98), Motorină standard 21
+  /// (→ diesel), premium 22 (→ diesel premium), GPL 31 (→ lpg).
   static const romania = CountryConfig(
     code: 'RO',
     name: 'România',

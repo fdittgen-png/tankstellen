@@ -70,6 +70,55 @@ void main() {
       expect(service, isA<StationService>());
     });
 
+    group('default-host unavailability short-circuit (#3194)', () {
+      // fuelpricesgr.com is NXDOMAIN (live-verified 2026-06-10) and the
+      // upstream project has no public deployment. A service still
+      // pointed at the dead default must not fire one doomed DNS lookup
+      // per prefecture — it reports unavailable in one step.
+      test('returns empty result with an unsupported ServiceError and '
+          'makes NO network call', () async {
+        final defaultService = GreeceStationService(dio: mockDio);
+        const params =
+            SearchParams(lat: 37.9838, lng: 23.7275, radiusKm: 25);
+
+        final result = await defaultService.searchStations(params);
+
+        expect(result.data, isEmpty);
+        expect(result.source, ServiceSource.greeceApi);
+        expect(result.errors, hasLength(1));
+        expect(result.errors.single.kind, FailureKind.unsupported);
+        expect(result.errors.single.message, contains('#3194'));
+        verifyNever(() => mockDio.get(
+              any(),
+              queryParameters: any(named: 'queryParameters'),
+              cancelToken: any(named: 'cancelToken'),
+            ));
+        verifyNever(() => mockDio.get(
+              any(),
+              cancelToken: any(named: 'cancelToken'),
+            ));
+      });
+
+      test('a self-hosted baseUrl bypasses the short-circuit and fetches',
+          () async {
+        when(() => mockDio.get(
+              any(),
+              cancelToken: any(named: 'cancelToken'),
+            )).thenAnswer((_) async => response(_envelope([])));
+
+        const params =
+            SearchParams(lat: 37.9838, lng: 23.7275, radiusKm: 25);
+        // `service` from setUp targets https://test/api.
+        final result = await service.searchStations(params);
+
+        expect(result.source, ServiceSource.greeceApi);
+        verify(() => mockDio.get(
+              any(),
+              cancelToken: any(named: 'cancelToken'),
+            )).called(greaterThan(0));
+      });
+    });
+
     test('country registered as GR with EUR currency', () {
       final gr = Countries.byCode('GR');
       expect(gr, isNotNull);
