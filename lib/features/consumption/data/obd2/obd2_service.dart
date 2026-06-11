@@ -741,15 +741,9 @@ class Obd2Service implements Obd2RawCommandPort {
   ///     `false` — callers skip the query.
   bool isPidSupported(int pid) => _pids.isPidSupported(pid);
 
-  /// Alias for [isPidSupported] — matches the name used in the #811
-  /// issue. Same semantics: `true` when the cache is unpopulated or
-  /// [pid] is present, `false` only when we know the car doesn't
-  /// implement it.
-  bool supportsPid(int pid) => _pids.supportsPid(pid);
-
   /// Direct view of the supported-PID set for tests and diagnostics.
   /// Returns an unmodifiable empty set when discovery hasn't run —
-  /// callers that want "is this supported?" should use [supportsPid]
+  /// callers that want "is this supported?" should use [isPidSupported]
   /// instead to respect the "unknown ⇒ allow" semantics.
   @visibleForTesting
   Set<int> get debugSupportedPids => _pids.debugSupportedPids;

@@ -284,11 +284,11 @@ void main() {
       expect(ok, isTrue);
 
       // Scan ran → in-memory set populated with the decoded PIDs.
-      expect(service.supportsPid(0x01), isTrue);
-      expect(service.supportsPid(0x0B), isTrue);
-      expect(service.supportsPid(0x0C), isTrue);
-      expect(service.supportsPid(0x0F), isTrue);
-      expect(service.supportsPid(0x5E), isFalse);
+      expect(service.isPidSupported(0x01), isTrue);
+      expect(service.isPidSupported(0x0B), isTrue);
+      expect(service.isPidSupported(0x0C), isTrue);
+      expect(service.isPidSupported(0x0F), isTrue);
+      expect(service.isPidSupported(0x5E), isFalse);
 
       // And persisted under the VIN key for next session.
       expect(cache.get('VF7PPPP0000000001'),
@@ -306,7 +306,7 @@ void main() {
       // Note: '0100' is INTENTIONALLY NOT in the transport's response
       // map. If the service tries to scan, FakeObd2Transport returns
       // 'NO DATA>' — which would blank the in-memory cache and fail
-      // the supportsPid(0x0B) assertion below.
+      // the isPidSupported(0x0B) assertion below.
       final transport = FakeObd2Transport({
         ..._initResponses,
         '0902': _vinResponse('VF7PPPP0000000001'),
@@ -317,10 +317,10 @@ void main() {
       final ok = await service.connect();
       expect(ok, isTrue);
 
-      expect(service.supportsPid(0x0B), isTrue,
+      expect(service.isPidSupported(0x0B), isTrue,
           reason: 'cached set must have populated _supportedPids without '
               'any 01 XX round-trip');
-      expect(service.supportsPid(0x5E), isFalse);
+      expect(service.isPidSupported(0x5E), isFalse);
     });
 
     test(
@@ -345,10 +345,10 @@ void main() {
       expect(ok, isTrue);
 
       // Fresh-scan PIDs, NOT the cached VIN-A single-PID set.
-      expect(service.supportsPid(0x0B), isTrue);
-      expect(service.supportsPid(0x0C), isTrue);
-      expect(service.supportsPid(0x0F), isTrue);
-      expect(service.supportsPid(0x01), isFalse,
+      expect(service.isPidSupported(0x0B), isTrue);
+      expect(service.isPidSupported(0x0C), isTrue);
+      expect(service.isPidSupported(0x0F), isTrue);
+      expect(service.isPidSupported(0x01), isFalse,
           reason: 'VIN-A cache must not leak into VIN-B');
     });
 
@@ -370,7 +370,7 @@ void main() {
       expect(box.length, 0);
       // And nothing primed in memory either — supportsPid stays in
       // "unknown ⇒ allow" mode.
-      expect(service.supportsPid(0x5E), isTrue);
+      expect(service.isPidSupported(0x5E), isTrue);
     });
 
     test(
@@ -399,8 +399,8 @@ void main() {
       final ok = await service.connect();
       expect(ok, isTrue);
       // Cached PIDs loaded → 0x5E still false → sanity signal.
-      expect(service.supportsPid(0x0B), isTrue);
-      expect(service.supportsPid(0x5E), isFalse);
+      expect(service.isPidSupported(0x0B), isTrue);
+      expect(service.isPidSupported(0x5E), isFalse);
     });
 
     test('readFuelRateLPerHour skips PID 5E and MAF round-trips when '
@@ -428,8 +428,8 @@ void main() {
       );
       await service.connect();
 
-      expect(service.supportsPid(0x5E), isFalse);
-      expect(service.supportsPid(0x10), isFalse);
+      expect(service.isPidSupported(0x5E), isFalse);
+      expect(service.isPidSupported(0x10), isFalse);
       final rate = await service.readFuelRateLPerHour();
       expect(rate, isNotNull);
       expect(rate, greaterThan(0));
@@ -549,8 +549,8 @@ void main() {
       // Scan ran on the cold path.
       expect(transport.sentCommands, contains('0100'));
       // In-memory + persisted under the production key.
-      expect(service.supportsPid(0x0B), isTrue);
-      expect(service.supportsPid(0x5E), isFalse);
+      expect(service.isPidSupported(0x0B), isTrue);
+      expect(service.isPidSupported(0x5E), isFalse);
       expect(box.get(prodKey), isNotNull,
           reason: 'cold path must persist the bitmap under the prod key');
       expect(
@@ -587,8 +587,8 @@ void main() {
           reason: 'HIT must skip the supported-PID support scan');
 
       // Cached set populated the in-memory bitmap.
-      expect(service.supportsPid(0x0B), isTrue);
-      expect(service.supportsPid(0x5E), isFalse);
+      expect(service.isPidSupported(0x0B), isTrue);
+      expect(service.isPidSupported(0x5E), isFalse);
     });
 
     test(
@@ -613,8 +613,8 @@ void main() {
       );
       await service.connect();
 
-      expect(service.supportsPid(0x5E), isFalse);
-      expect(service.supportsPid(0x10), isFalse);
+      expect(service.isPidSupported(0x5E), isFalse);
+      expect(service.isPidSupported(0x10), isFalse);
 
       final rate = await service.readFuelRateLPerHour();
       expect(rate, isNotNull);
@@ -641,8 +641,8 @@ void main() {
       expect(transport.sentCommands, isNot(contains('0100')));
       expect(transport.sentCommands, isNot(contains('0902')));
       // "Unknown ⇒ allow": every PID still reports supported.
-      expect(service.supportsPid(0x5E), isTrue);
-      expect(service.supportsPid(0x0B), isTrue);
+      expect(service.isPidSupported(0x5E), isTrue);
+      expect(service.isPidSupported(0x0B), isTrue);
     });
 
     test(
@@ -667,8 +667,8 @@ void main() {
       expect(transport.sentCommands, contains('0902'));
       // …and the cached set loaded → no support scan.
       expect(transport.sentCommands, isNot(contains('0100')));
-      expect(service.supportsPid(0x0B), isTrue);
-      expect(service.supportsPid(0x5E), isFalse);
+      expect(service.isPidSupported(0x0B), isTrue);
+      expect(service.isPidSupported(0x5E), isFalse);
     });
   });
 }

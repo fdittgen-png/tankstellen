@@ -97,4 +97,4 @@ final class GlideCoachEnabledProvider
   }
 }
 
-String _$glideCoachEnabledHash() => r'7d23e90a8f332109eea7166f350b2b64e503e189';
+String _$glideCoachEnabledHash() => r'dcdd3f68792d41b04d3ed482d266b36e7a780a03';

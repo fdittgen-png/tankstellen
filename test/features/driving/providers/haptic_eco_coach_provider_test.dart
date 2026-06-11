@@ -162,22 +162,20 @@ void main() {
       expect(container.read(hapticEcoCoachEnabledProvider), isFalse);
     });
 
-    test('set(true) surfaces a StateError when the prerequisite is missing '
-        '(#1608)', () async {
+    test('set(true) with the prerequisite missing is swallowed and the '
+        'toggle stays off (#3175, supersedes #1608)', () async {
       // Prerequisite obd2TripRecording is OFF — enabling hapticEcoCoach
-      // is a dependency violation. Since #1608 the shim no longer
-      // swallows it: the central provider's StateError surfaces so a
-      // mis-gated call site fails loudly instead of silently no-op'ing.
-      // The only real call site, the driving-settings toggle, disables
-      // itself when the parent is off (canEnable pre-check), so the UI
-      // path can never reach this — only a programmatic caller can.
+      // is a dependency violation. #1608 had this shim surface the
+      // central provider's StateError; #3175 unified all toggle shims
+      // on the shared FeatureToggleNotifier, whose setter swallows the
+      // dependency-violation StateError (the safest variant — the
+      // toggle stays at its prior state instead of crashing a
+      // programmatic caller). The #1608 guarantee that the violating
+      // enable never takes effect is preserved.
       final container = makeContainer();
       await pumpLoad(container);
 
-      await expectLater(
-        container.read(hapticEcoCoachEnabledProvider.notifier).set(true),
-        throwsStateError,
-      );
+      await container.read(hapticEcoCoachEnabledProvider.notifier).set(true);
 
       // The violating enable did not take effect — state is unchanged.
       expect(

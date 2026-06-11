@@ -8,12 +8,17 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
 import 'package:tankstellen/features/ev/presentation/widgets/ev_map_overlay.dart';
+import 'package:tankstellen/features/ev/presentation/widgets/ev_marker_widget.dart';
 import 'package:tankstellen/features/ev/providers/ev_providers.dart';
+import 'package:tankstellen/features/search/presentation/screens/ev_station_detail_screen.dart';
 
+import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// Widget tests for [EvMapLayer] and [EvToggleButton] from
@@ -231,6 +236,71 @@ void main() {
       // Cluster widget owns its own internal marker rendering — the bare
       // `MarkerLayer` from the <=20 branch must not appear.
       expect(find.byType(MarkerLayer), findsNothing);
+    });
+
+    testWidgets(
+        'marker tap navigates to the routed rich EVStationDetailScreen '
+        'via /ev-station (#3174)', (tester) async {
+      // #3174 — the overlay used to push a diverged 238-line legacy copy
+      // (lib/features/ev/.../ev_station_detail_screen.dart) directly,
+      // while every other EV entry point (search list, favorites, route
+      // results) routed to the rich screen via `/ev-station`. The marker
+      // tap must open the SAME rich screen through the same route.
+      //
+      // Compact single-pane surface (same 590x900 as
+      // ev_station_detail_screen_test.dart): at the 800px default test
+      // width the destination screen's #2532 two-pane layout kicks in and
+      // its narrow left pane overflows in the boxy test font.
+      tester.view.physicalSize = const Size(590, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final station = buildStation('tap-1');
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.getRatings()).thenReturn(<String, int>{});
+
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (_, _) => Scaffold(
+              body: hostInMap(const EvMapLayer(viewport: viewport)),
+            ),
+          ),
+          // Mirrors the production `/ev-station` route in
+          // `lib/app/routes/station_routes.dart` (extra-hydrated).
+          GoRoute(
+            path: '/ev-station',
+            builder: (_, state) => EVStationDetailScreen(
+              station: state.extra as ChargingStation,
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: <Object>[
+            ...test.overrides,
+            evStationsProvider(viewport).overrideWith((_) async => [station]),
+          ].cast(),
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(EvMarkerWidget), findsOneWidget);
+      await tester.tap(find.byType(EvMarkerWidget));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byType(EVStationDetailScreen),
+        findsOneWidget,
+        reason: 'the marker tap must open the routed rich detail screen, '
+            'not a private legacy copy',
+      );
     });
 
     testWidgets('memoises the marker list across host rebuilds (#2175)',

@@ -410,7 +410,7 @@ class LiveSampleSnapshot {
   /// [optionalPid] gate. Null [optionalPid] → unconditional core, always
   /// subscribed (`isPidSupported` don't-reject-blind + the #2379 backoff
   /// self-evicts on NO DATA); set → subscribed only if
-  /// `_service.supportsPid(optionalPid)` (intersected the discovered set).
+  /// `_service.isPidSupported(optionalPid)` intersects the discovered set.
   void _sub(
     PidScheduler scheduler,
     String command,
@@ -420,7 +420,7 @@ class LiveSampleSnapshot {
     PidPriority priority = PidPriority.medium,
     int? optionalPid,
   }) {
-    if (optionalPid != null && !_service.supportsPid(optionalPid)) return;
+    if (optionalPid != null && !_service.isPidSupported(optionalPid)) return;
     scheduler.subscribe(
       command,
       ScheduledPid(hz: hz, priority: priority, tier: tier),
