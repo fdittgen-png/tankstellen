@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/driving_coaching.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';

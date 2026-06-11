@@ -3,7 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 
-import '../data/obd2/trip_recording_controller.dart';
+import '../../obd2/api.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/driving_coaching.dart' show DrivingCoachingHint;
 import '../domain/entities/trip_save_stage.dart';

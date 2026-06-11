@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/utils/radar_closeness.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/live_activity_content.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';

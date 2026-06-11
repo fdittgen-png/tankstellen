@@ -9,10 +9,7 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/obd2/obd2_connection_errors.dart';
-import '../../data/obd2/obd2_connection_service.dart';
-import '../../data/obd2/obd2_service.dart';
-import '../obd2_connect_telemetry.dart';
+import '../../../obd2/api.dart';
 import '../../providers/trip_recording_provider.dart';
 
 /// Owns the #2274 recording-start orchestration that the trajets tab

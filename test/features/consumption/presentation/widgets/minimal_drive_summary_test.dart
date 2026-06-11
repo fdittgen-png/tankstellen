@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/minimal_drive_summary.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';

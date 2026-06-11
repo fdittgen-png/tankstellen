@@ -25,7 +25,7 @@ import 'driving_score_card.dart';
 import 'gps_diagnostics_card.dart';
 import 'gps_efficiency_kpi_card.dart';
 import 'gps_road_usage_card.dart';
-import 'obd2_diagnostics_trip_card.dart';
+import '../../../obd2/api.dart';
 import 'imu_accel_brake_card.dart';
 import 'throttle_rpm_histogram_card.dart';
 import 'trip_detail_charts.dart';

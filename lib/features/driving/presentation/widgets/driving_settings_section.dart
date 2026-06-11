@@ -12,7 +12,7 @@ import '../../../../core/widgets/labeled_value_slider.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/settings_menu_tile.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/providers/obd2_debug_logging_provider.dart';
+import '../../../obd2/api.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/conso_mode.dart';
 import '../../../feature_management/domain/feature.dart';

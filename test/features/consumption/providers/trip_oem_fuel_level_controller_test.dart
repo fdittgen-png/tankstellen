@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/adapter_capability.dart';
-import 'package:tankstellen/features/consumption/data/obd2/oem_pid_registry.dart';
-import 'package:tankstellen/features/consumption/data/obd2/oem_pid_table.dart';
+import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
+import 'package:tankstellen/features/obd2/data/oem_pid_registry.dart';
+import 'package:tankstellen/features/obd2/data/oem_pid_table.dart';
 import 'package:tankstellen/features/consumption/providers/trip_oem_fuel_level_controller.dart';
 
 /// Unit tests for [TripOemFuelLevelController] — the #1615 experimental

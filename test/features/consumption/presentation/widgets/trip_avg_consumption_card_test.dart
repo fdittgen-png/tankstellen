@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/gps_matrix_maturity_badge.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_avg_consumption_card.dart';
 import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';

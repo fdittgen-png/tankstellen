@@ -4,8 +4,7 @@
 import 'dart:async';
 
 import '../../../core/logging/error_logger.dart';
-import '../../consumption/data/obd2/elm327_protocol.dart';
-import '../../consumption/data/obd2/obd2_service.dart';
+import '../../obd2/api.dart';
 
 /// Outcome of an [Obd2VinReader.read] call (#1162).
 ///

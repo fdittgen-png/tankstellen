@@ -3,9 +3,9 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/adapter_capability.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
+import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/psa_fuel_level_provider.dart';
 
 /// Tests for [psaFuelLevelProvider] (#1418).

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../../l10n/app_localizations.dart';
-import '../../../../consumption/data/obd2/adapter_registry.dart';
+import '../../../../obd2/api.dart';
 
 part 'obd2_self_test_adapter_choice.g.dart';
 

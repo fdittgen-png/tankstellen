@@ -9,7 +9,7 @@ import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/theme/contrast_utils.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/features/approach/providers/effective_approach_state_provider.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/app/router.dart';

@@ -4,7 +4,7 @@
 import 'dart:collection';
 import 'dart:math' as math;
 
-import '../data/obd2/trip_live_reading.dart';
+import '../../obd2/api.dart';
 import 'road_grade_calculator.dart';
 
 /// One timestamped speed reading in the rolling stop-and-go window

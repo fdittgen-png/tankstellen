@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_recording_controller.dart';
+import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/proximity_fill_bar.dart';

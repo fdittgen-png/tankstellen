@@ -323,7 +323,7 @@ shippable:
       `CBCentralManagerOptionRestoreIdentifierKey`. v1.35.x doesn't
       forward the option (verified by reading the FBP changelog).
       Major-version migration; budget a half-day for breaking-API
-      cleanup in `lib/features/consumption/data/obd2/`.
+      cleanup in `lib/features/obd2/data/`.
 - [x] **MFi adapter decision.** Resolved (#1542 phase 8): iOS is
       BLE-only — Classic-BT ELM327 adapters are not MFi-certified, so
       an External Accessory path is not buildable for them. No

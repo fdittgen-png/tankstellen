@@ -38,9 +38,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../data/obd2/adapter_capability.dart';
-import '../data/obd2/can_frame_decoders/psa_fuel_level_can_decoder.dart';
-import '../data/obd2/obd2_service.dart';
+import '../../obd2/api.dart';
 
 part 'psa_fuel_level_provider.g.dart';
 

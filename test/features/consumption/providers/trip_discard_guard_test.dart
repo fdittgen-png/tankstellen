@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_distance_source.dart';
+import 'package:tankstellen/features/obd2/data/trip_distance_source.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
 import 'package:tankstellen/features/consumption/providers/trip_discard_guard.dart';
 

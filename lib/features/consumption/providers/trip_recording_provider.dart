@@ -16,10 +16,7 @@ import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
-import '../data/obd2/active_trip_repository.dart';
-import '../data/obd2/obd2_comm_diagnostics.dart';
-import '../data/obd2/obd2_service.dart';
-import '../data/obd2/trip_recording_controller.dart';
+import '../../obd2/api.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';
@@ -27,7 +24,6 @@ import '../domain/entities/trip_start_stage.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_recording_pipeline.dart';
-import 'obd2_recording_pipeline.dart';
 import 'recording_pipeline.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
@@ -51,7 +47,7 @@ export 'trip_recording_state.dart' show TripRecordingState;
 // #1330 phase 3 — re-export TripDropReason so widgets watching
 // `tripRecordingProvider.select((s) => s.dropReason)` resolve the
 // type without a second import.
-export '../data/obd2/trip_recording_controller.dart' show TripDropReason;
+export '../../obd2/api.dart' show TripDropReason;
 // #2190 — StoppedTripResult moved next to the RecordingPipeline strategy
 // seam to avoid a circular import. Re-export it so the ~10 callers that
 // import this provider keep resolving the type without a new import.

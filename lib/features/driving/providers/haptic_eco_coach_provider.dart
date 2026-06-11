@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ProviderListenableSelect;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../consumption/data/obd2/trip_live_reading.dart';
+import '../../obd2/api.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 import '../../feature_management/application/feature_toggle_notifier.dart';
 import '../../feature_management/domain/feature.dart';

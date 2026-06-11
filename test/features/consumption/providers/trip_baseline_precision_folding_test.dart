@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/consumption/data/baseline_store.dart';
-import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
+import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/providers/trip_baseline_recorder.dart';

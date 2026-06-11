@@ -13,11 +13,7 @@ import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
-import '../data/obd2/android_background_adapter_listener.dart';
-import '../data/obd2/auto_trip_coordinator.dart';
-import '../data/obd2/background_adapter_listener.dart';
-import '../data/obd2/obd2_permissions.dart';
-import '../data/obd2/obd2_service.dart';
+import '../../obd2/api.dart';
 import 'auto_record_orchestrator_factories.dart';
 import 'trip_recording_provider.dart';
 

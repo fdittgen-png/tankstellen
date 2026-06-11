@@ -3,7 +3,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../consumption/data/obd2/obd2_connection_service.dart';
+import '../../obd2/api.dart';
 import '../data/vin_adapter_pair_auto_populator.dart';
 import 'vin_decoder_provider.dart';
 

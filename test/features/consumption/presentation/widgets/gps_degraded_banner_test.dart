@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/gps_degraded_banner.dart';
-import 'package:tankstellen/features/consumption/presentation/widgets/obd2_pause_banner.dart';
+import 'package:tankstellen/features/obd2/presentation/widgets/obd2_pause_banner.dart';
 // `trip_recording_provider.dart` re-exports TripRecordingPhase + State.
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 

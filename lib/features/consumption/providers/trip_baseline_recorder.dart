@@ -14,7 +14,7 @@ import '../../vehicle/domain/fuzzy_classifier.dart';
 import '../../vehicle/providers/calibration_mode_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
-import '../data/obd2/trip_live_reading.dart';
+import '../../obd2/api.dart';
 import '../domain/baseline_rolling_state.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';

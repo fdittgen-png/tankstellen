@@ -11,11 +11,9 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
-import '../../data/obd2/obd2_connection_errors.dart';
+import '../../../obd2/api.dart';
 import '../../providers/trip_recording_provider.dart';
-import '../obd2_connection_error_l10n.dart';
 import '../screens/trip_recording_screen.dart';
-import 'obd2_adapter_picker.dart';
 import 'recording_start_coordinator.dart';
 
 /// The "Start / Resume recording" FAB for the Trajets section (#2494).

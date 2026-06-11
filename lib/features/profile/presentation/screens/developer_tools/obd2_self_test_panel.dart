@@ -8,10 +8,7 @@ import '../../../../../core/theme/app_radius.dart';
 import '../../../../../core/theme/dark_mode_colors.dart';
 import '../../../../../core/widgets/section_header.dart';
 import '../../../../../l10n/app_localizations.dart';
-import '../../../../consumption/data/obd2/adapter_registry.dart';
-import '../../../../consumption/data/obd2/obd2_connect_trace.dart';
-import '../../../../consumption/data/obd2/obd2_self_test_driver.dart';
-import '../../../../consumption/providers/obd2_self_test_controller.dart';
+import '../../../../obd2/api.dart';
 import '../../../../vehicle/providers/vehicle_providers.dart';
 import 'obd2_self_test_adapter_choice.dart';
 

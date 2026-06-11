@@ -3,14 +3,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/adapter_registry.dart';
-import 'package:tankstellen/features/consumption/data/obd2/bluetooth_facade.dart';
-import 'package:tankstellen/features/consumption/data/obd2/elm_byte_channel.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_comm_diagnostics.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_connection_service.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_permissions.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
+import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
+import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
+import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
+import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';

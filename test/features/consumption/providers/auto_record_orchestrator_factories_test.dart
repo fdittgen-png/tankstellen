@@ -6,14 +6,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/obd2/android_background_adapter_listener.dart';
-import 'package:tankstellen/features/consumption/data/obd2/background_adapter_listener.dart';
-import 'package:tankstellen/features/consumption/data/obd2/ios_background_adapter_listener.dart';
-import 'package:tankstellen/features/consumption/data/obd2/ios_restoration_event.dart';
-import 'package:tankstellen/features/consumption/data/obd2/ios_state_restoration_service.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_connect_trace_log.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/android_background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/ios_background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/ios_restoration_event.dart';
+import 'package:tankstellen/features/obd2/data/ios_state_restoration_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
+import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
+import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/consumption/providers/auto_record_orchestrator_factories.dart';
 
 /// #3167 — tests for the auto-record factory seams: per-platform

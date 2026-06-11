@@ -4,7 +4,7 @@
 import '../../../../../l10n/app_localizations.dart';
 import '../../../domain/lessons/driving_lesson.dart';
 import '../../../domain/lessons/driving_lesson_rule.dart';
-import '../../../domain/services/obd2_analytics_signals.dart';
+import '../../../../obd2/api.dart';
 import '../../../domain/trip_recorder.dart';
 
 /// Lesson id for the smooth-driving praise. Stable, non-localized.

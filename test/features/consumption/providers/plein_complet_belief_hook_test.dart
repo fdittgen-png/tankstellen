@@ -9,7 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
-import 'package:tankstellen/features/consumption/data/obd2/broken_map_belief.dart';
+import 'package:tankstellen/features/obd2/data/broken_map_belief.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';

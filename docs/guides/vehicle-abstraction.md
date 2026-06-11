@@ -52,7 +52,7 @@ Here is what the codebase actually looks like:
 | Fallback when nothing known  | `kDefaultEngineDisplacementCc=1000`, `kDefaultVe=0.85`         | **yes** (these two)   |
 
 Those two fallback constants live in
-`lib/features/consumption/data/obd2/fuel_rate_estimator.dart:39`
+`lib/features/obd2/data/fuel_rate_estimator.dart:39`
 and `:45`. They were originally tuned for the Peugeot 107 / Toyota
 Aygo / Citroën C1 (1KR-FE 1.0 L NA petrol) — the engines that
 motivated the speed-density branch when the developer's own car
@@ -259,7 +259,7 @@ the abstraction layer and is meant to grow.
 
 ## Section 4 — The fuel-rate fallback chain
 
-Source: `lib/features/consumption/data/obd2/obd2_service.dart:480`
+Source: `lib/features/obd2/data/obd2_service.dart:480`
 (`readFuelRateLPerHour`).
 
 The fuel-rate estimator dispatches on **PID capability discovered at
@@ -373,7 +373,7 @@ there's no partial answer worth shipping. See
 
 ## Section 5 — The two hardcoded fallback constants
 
-Source: `lib/features/consumption/data/obd2/fuel_rate_estimator.dart`.
+Source: `lib/features/obd2/data/fuel_rate_estimator.dart`.
 
 These are the only two vehicle-specific hardcodes left in the
 fuel-rate path:
@@ -497,7 +497,7 @@ strategy enum + handler:
 1. Add the new key (e.g. `"renaultCan"`) to the docstring in
    `lib/features/vehicle/domain/entities/reference_vehicle.dart:55`.
 2. Add the dispatch branch in the OBD-II odometer reader (search
-   `odometerPidStrategy` in `lib/features/consumption/data/obd2/`
+   `odometerPidStrategy` in `lib/features/obd2/data/`
    for the dispatch site).
 3. Update `assets/reference_vehicles/vehicles.json` rows that should
    use the new strategy.

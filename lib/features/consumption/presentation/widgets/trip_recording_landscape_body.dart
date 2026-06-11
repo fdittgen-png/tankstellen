@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../data/obd2/trip_live_reading.dart';
+import '../../../obd2/api.dart';
 import 'broken_map_widgets.dart';
 import 'minimal_drive_summary.dart';
 import 'trip_avg_consumption_card.dart';

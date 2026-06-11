@@ -15,7 +15,7 @@ import '../../glide_coach/domain/entities/glide_coach_advice.dart';
 import '../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../glide_coach/providers/glide_coach_evaluator_provider.dart';
 import '../../glide_coach/providers/glide_coach_settings_provider.dart';
-import '../data/obd2/trip_recording_controller.dart';
+import '../../obd2/api.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Owns the #1374 / #1125 / #1458 GPS concern extracted from the

@@ -7,9 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/consumption/data/obd2/elm327_protocol.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_service.dart';
-import 'package:tankstellen/features/consumption/data/obd2/obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
+import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/vehicle/data/obd2_vin_reader.dart';
 
 /// Unit tests for [Obd2VinReader] (#1162).
