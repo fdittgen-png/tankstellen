@@ -40,11 +40,11 @@ extension ConnectorStatusStyle on ConnectorStatus {
   String label(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return switch (this) {
-      ConnectorStatus.available => l10n?.evStatusAvailable ?? 'Available',
-      ConnectorStatus.occupied => l10n?.evStatusOccupied ?? 'Occupied',
-      ConnectorStatus.partial => l10n?.evStatusPartial ?? 'Partly available',
-      ConnectorStatus.outOfOrder => l10n?.evStatusOutOfOrder ?? 'Out of order',
-      ConnectorStatus.unknown => l10n?.evStatusUnknown ?? 'Unknown',
+      ConnectorStatus.available => l10n.evStatusAvailable,
+      ConnectorStatus.occupied => l10n.evStatusOccupied,
+      ConnectorStatus.partial => l10n.evStatusPartial,
+      ConnectorStatus.outOfOrder => l10n.evStatusOutOfOrder,
+      ConnectorStatus.unknown => l10n.evStatusUnknown,
     };
   }
 }

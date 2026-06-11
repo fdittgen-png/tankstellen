@@ -25,10 +25,10 @@ class FillUpNoVehicleCta extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return PageScaffold(
-      title: l?.addFillUp ?? 'Add fill-up',
+      title: l.addFillUp,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         onPressed: () => context.pop(),
       ),
       bodyPadding: const EdgeInsets.all(32),
@@ -43,15 +43,13 @@ class FillUpNoVehicleCta extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
+              l.consumptionNoVehicleTitle,
               style: theme.textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
-              l?.consumptionNoVehicleBody ??
-                  'Fill-ups are attributed to a vehicle. Add your car '
-                      'to start logging consumption.',
+              l.consumptionNoVehicleBody,
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -59,7 +57,7 @@ class FillUpNoVehicleCta extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => const EditVehicleRoute().push<void>(context),
               icon: const Icon(Icons.add),
-              label: Text(l?.vehicleAdd ?? 'Add vehicle'),
+              label: Text(l.vehicleAdd),
             ),
           ],
         ),

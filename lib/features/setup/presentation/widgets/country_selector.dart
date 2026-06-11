@@ -28,7 +28,7 @@ class CountrySelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n?.country ?? 'Country', style: theme.textTheme.titleMedium),
+        Text(l10n.country, style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -36,8 +36,7 @@ class CountrySelector extends StatelessWidget {
           children: Countries.verified.map((c) {
             final isSelected = c.code == selected.code;
             return Semantics(
-              label: l10n?.countryChipSemantic(c.name, '$isSelected') ??
-                  'Country ${c.name}',
+              label: l10n.countryChipSemantic(c.name, '$isSelected'),
               child: ChoiceChip(
                 label: Text('${c.flag} ${c.name}'),
                 selected: isSelected,

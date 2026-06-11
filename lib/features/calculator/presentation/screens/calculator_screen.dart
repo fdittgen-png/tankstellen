@@ -63,9 +63,11 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
 
     if (hasRoutePrice) {
       _priceApplied = true;
-      unawaited(Future.microtask(() {
-        ref.read(calculatorProvider.notifier).setPrice(routePrice);
-      }));
+      unawaited(
+        Future.microtask(() {
+          ref.read(calculatorProvider.notifier).setPrice(routePrice);
+        }),
+      );
     }
   }
 
@@ -85,10 +87,10 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     final l10n = AppLocalizations.of(context);
 
     return PageScaffold(
-      title: l10n?.fuelCostCalculator ?? 'Fuel Cost Calculator',
+      title: l10n.fuelCostCalculator,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l10n?.tooltipBack ?? 'Back',
+        tooltip: l10n.tooltipBack,
         onPressed: () => context.go(RoutePaths.search),
       ),
       bodyPadding: EdgeInsets.zero,
@@ -111,12 +113,14 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               icon: const Icon(Icons.refresh),
-              label: Text(l10n?.calculatorReset ?? 'Reset'),
+              label: Text(l10n.calculatorReset),
               onPressed: () {
                 notifier.reset();
                 _distanceController.clear();
-                _consumptionController.text =
-                    ref.read(calculatorProvider).consumptionPer100Km.toString();
+                _consumptionController.text = ref
+                    .read(calculatorProvider)
+                    .consumptionPer100Km
+                    .toString();
                 _priceController.clear();
                 _tripsPerMonthController.clear();
                 setState(() => _priceApplied = false);

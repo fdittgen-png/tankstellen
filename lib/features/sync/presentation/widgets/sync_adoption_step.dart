@@ -57,26 +57,26 @@ class SyncAdoptionStep extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                l10n?.syncAdoptTitle(email) ?? "Join $email's account",
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                l10n.syncAdoptTitle(email),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
         Text(
-          l10n?.syncAdoptSubtitle ??
-              "Sign in with this account's password to share its data "
-                  'across both devices.',
-          style: theme.textTheme.bodySmall
-              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          l10n.syncAdoptSubtitle,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 16),
         TextField(
           controller: passwordController,
           decoration: InputDecoration(
-            labelText: l10n?.syncAdoptPasswordLabel ?? 'Account password',
+            labelText: l10n.syncAdoptPasswordLabel,
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.lock, size: 18),
             isDense: true,
@@ -86,8 +86,8 @@ class SyncAdoptionStep extends StatelessWidget {
                 size: 18,
               ),
               tooltip: showPassword
-                  ? (l10n?.tooltipHidePassword ?? 'Hide password')
-                  : (l10n?.tooltipShowPassword ?? 'Show password'),
+                  ? (l10n.tooltipHidePassword)
+                  : (l10n.tooltipShowPassword),
               onPressed: onTogglePassword,
             ),
           ),
@@ -106,20 +106,19 @@ class SyncAdoptionStep extends StatelessWidget {
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white),
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
                 )
               : const Icon(Icons.login),
-          label: Text(l10n?.syncAdoptJoinButton ?? 'Join account'),
+          label: Text(l10n.syncAdoptJoinButton),
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(44)),
         ),
         const SizedBox(height: 4),
         Center(
           child: TextButton(
             onPressed: isLoading ? null : onUseDifferentAccount,
-            child: Text(
-              l10n?.syncAdoptUseDifferentAccount ??
-                  'Use a different account instead',
-            ),
+            child: Text(l10n.syncAdoptUseDifferentAccount),
           ),
         ),
       ],

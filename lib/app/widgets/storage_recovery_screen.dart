@@ -50,14 +50,9 @@ class _StorageRecoveryBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final title = l10n?.storageRecoveryTitle ?? 'Storage problem';
-    final message = l10n?.storageRecoveryMessage ??
-        "Sparkilo couldn't open its local data store. The storage file "
-            'appears to be damaged.';
-    final guidance = l10n?.storageRecoveryGuidance ??
-        "To recover, clear the app's storage in your device settings, or "
-            'reinstall the app. Your favourites and history are stored on '
-            'this device only, so they cannot be restored automatically.';
+    final title = l10n.storageRecoveryTitle;
+    final message = l10n.storageRecoveryMessage;
+    final guidance = l10n.storageRecoveryGuidance;
 
     return Semantics(
       container: true,

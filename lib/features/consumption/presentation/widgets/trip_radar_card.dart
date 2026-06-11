@@ -77,10 +77,11 @@ class TripRadarCard extends ConsumerWidget {
       ApproachLeaving(:final lastStation) => lastStation,
       _ => null,
     };
-    final double? distanceMeters =
-        approach is ApproachInRadius ? approach.distanceMeters : null;
+    final double? distanceMeters = approach is ApproachInRadius
+        ? approach.distanceMeters
+        : null;
 
-    final title = l?.tripRadarClosestStation ?? 'Fuel Station Radar';
+    final title = l.tripRadarClosestStation;
 
     // The proximity fill bar's "indicated radius" is the user's default
     // radar radius (the same `profile.approachRadiusKm` the detector fences
@@ -126,7 +127,7 @@ class TripRadarCard extends ConsumerWidget {
           // A load COMPLETED with no priced station in range.
           return RadarPlaceholder(
             title: title,
-            message: l?.tripRadarNoStationNearby ?? 'No station nearby',
+            message: l.tripRadarNoStationNearby,
           );
         }
         // Clamp the page index against the live list length — a stale index
@@ -143,14 +144,10 @@ class TripRadarCard extends ConsumerWidget {
         );
       },
       // FIRST load only (no retained value) — the row is genuinely empty.
-      loading: () => RadarPlaceholder(
-        title: title,
-        message: l?.tripRadarScanning ?? 'Scanning for nearby stations',
-      ),
-      error: (_, _) => RadarPlaceholder(
-        title: title,
-        message: l?.tripRadarNoStationNearby ?? 'No station nearby',
-      ),
+      loading: () =>
+          RadarPlaceholder(title: title, message: l.tripRadarScanning),
+      error: (_, _) =>
+          RadarPlaceholder(title: title, message: l.tripRadarNoStationNearby),
     );
   }
 }
@@ -203,10 +200,8 @@ class RadarCard extends StatelessWidget {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final price = station.priceFor(fuel);
-    final priceText =
-        price != null ? PriceFormatter.formatPrice(price) : '--';
-    final name =
-        station.name.isNotEmpty ? station.name : station.brand;
+    final priceText = price != null ? PriceFormatter.formatPrice(price) : '--';
+    final name = station.name.isNotEmpty ? station.name : station.brand;
 
     // In-radius shows sub-km precision (metres); the fallback radar page-set
     // shows km — the great-circle distance the driver still has to cover
@@ -214,22 +209,18 @@ class RadarCard extends StatelessWidget {
     final String? distanceLabel = distanceMeters == null
         ? null
         : live
-            ? (l?.approachStationDistance(distanceMeters!.toStringAsFixed(0)) ??
-                '${distanceMeters!.toStringAsFixed(0)} m')
-            : (l?.fuelStationRadarDistanceKm(
-                    (distanceMeters! / 1000.0).toStringAsFixed(1)) ??
-                '${(distanceMeters! / 1000.0).toStringAsFixed(1)} km');
-    final subtitleParts = <String>[
-      fuel.displayName,
-      ?distanceLabel,
-    ];
+        ? (l.approachStationDistance(distanceMeters!.toStringAsFixed(0)))
+        : (l.fuelStationRadarDistanceKm(
+            (distanceMeters! / 1000.0).toStringAsFixed(1),
+          ));
+    final subtitleParts = <String>[fuel.displayName, ?distanceLabel];
 
     // Tap → hand the station's coords to the SSoT navigation util, which
     // launches the OS's default driving/itinéraire app (geo: URI, Google-
     // Maps web fallback) — #2545. Reuses the existing `navigate` ARB key
     // for the tooltip/semantics affordance (no new key → no 23-locale
     // fan-out).
-    final navigateLabel = l?.navigate ?? 'Navigate';
+    final navigateLabel = l.navigate;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -338,8 +329,11 @@ class RadarCard extends StatelessWidget {
 class RadarPlaceholder extends StatelessWidget {
   final String title;
   final String message;
-  const RadarPlaceholder(
-      {super.key, required this.title, required this.message});
+  const RadarPlaceholder({
+    super.key,
+    required this.title,
+    required this.message,
+  });
 
   @override
   Widget build(BuildContext context) {

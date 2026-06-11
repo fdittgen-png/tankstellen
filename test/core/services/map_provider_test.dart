@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/core/constants/app_constants.dart';
 import 'package:tankstellen/core/services/impl/flutter_map_provider.dart';
 import 'package:tankstellen/core/services/map_provider.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('TileLayerConfig', () {
@@ -115,15 +116,17 @@ void main() {
       expect(provider.name, 'OpenStreetMap');
     });
 
-    test('tileConfig returns the effective (proxy) tile URL from AppConstants',
-        () {
-      final config = provider.tileConfig;
-      // #2396 — flipped to the Supabase OSM caching proxy via
-      // `effectiveTileUrl` (OSM-direct retained as the empty-proxy fallback).
-      expect(config.urlTemplate, AppConstants.effectiveTileUrl);
-      expect(config.userAgent, AppConstants.osmUserAgent);
-      expect(config.attribution, AppConstants.osmAttribution);
-    });
+    test(
+      'tileConfig returns the effective (proxy) tile URL from AppConstants',
+      () {
+        final config = provider.tileConfig;
+        // #2396 — flipped to the Supabase OSM caching proxy via
+        // `effectiveTileUrl` (OSM-direct retained as the empty-proxy fallback).
+        expect(config.urlTemplate, AppConstants.effectiveTileUrl);
+        expect(config.userAgent, AppConstants.osmUserAgent);
+        expect(config.attribution, AppConstants.osmAttribution);
+      },
+    );
 
     test('createController returns a MapController', () {
       final controller = provider.createController();
@@ -136,8 +139,9 @@ void main() {
     });
 
     group('buildMarkerLayer', () {
-      testWidgets('returns MarkerLayer for few markers',
-          (WidgetTester tester) async {
+      testWidgets('returns MarkerLayer for few markers', (
+        WidgetTester tester,
+      ) async {
         final markers = List.generate(
           5,
           (i) => MapMarkerConfig(
@@ -155,6 +159,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: FlutterMap(
               options: const MapOptions(
                 initialCenter: LatLng(48.0, 2.0),
@@ -168,77 +174,88 @@ void main() {
         expect(find.byType(MarkerLayer), findsOneWidget);
       });
 
-      testWidgets('returns MarkerLayer when cluster is false even with many markers',
-          (WidgetTester tester) async {
-        final markers = List.generate(
-          30,
-          (i) => MapMarkerConfig(
-            point: LatLng(48.0 + i * 0.001, 2.0),
-            width: 40,
-            height: 40,
-            child: const SizedBox(),
-          ),
-        );
-
-        final widget = provider.buildMarkerLayer(
-          markers: markers,
-          cluster: false,
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: FlutterMap(
-              options: const MapOptions(
-                initialCenter: LatLng(48.0, 2.0),
-                initialZoom: 10,
-              ),
-              children: [widget],
+      testWidgets(
+        'returns MarkerLayer when cluster is false even with many markers',
+        (WidgetTester tester) async {
+          final markers = List.generate(
+            30,
+            (i) => MapMarkerConfig(
+              point: LatLng(48.0 + i * 0.001, 2.0),
+              width: 40,
+              height: 40,
+              child: const SizedBox(),
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(MarkerLayer), findsOneWidget);
-      });
+          final widget = provider.buildMarkerLayer(
+            markers: markers,
+            cluster: false,
+          );
 
-      testWidgets('returns cluster widget when cluster is true and >20 markers',
-          (WidgetTester tester) async {
-        final markers = List.generate(
-          25,
-          (i) => MapMarkerConfig(
-            point: LatLng(48.0 + i * 0.001, 2.0),
-            width: 40,
-            height: 40,
-            child: const SizedBox(),
-          ),
-        );
-
-        final widget = provider.buildMarkerLayer(
-          markers: markers,
-          cluster: true,
-        );
-
-        await tester.pumpWidget(
-          MaterialApp(
-            home: FlutterMap(
-              options: const MapOptions(
-                initialCenter: LatLng(48.0, 2.0),
-                initialZoom: 10,
+          await tester.pumpWidget(
+            MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: FlutterMap(
+                options: const MapOptions(
+                  initialCenter: LatLng(48.0, 2.0),
+                  initialZoom: 10,
+                ),
+                children: [widget],
               ),
-              children: [widget],
             ),
-          ),
-        );
+          );
 
-        expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
-      });
+          expect(find.byType(MarkerLayer), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'returns cluster widget when cluster is true and >20 markers',
+        (WidgetTester tester) async {
+          final markers = List.generate(
+            25,
+            (i) => MapMarkerConfig(
+              point: LatLng(48.0 + i * 0.001, 2.0),
+              width: 40,
+              height: 40,
+              child: const SizedBox(),
+            ),
+          );
+
+          final widget = provider.buildMarkerLayer(
+            markers: markers,
+            cluster: true,
+          );
+
+          await tester.pumpWidget(
+            MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: FlutterMap(
+                options: const MapOptions(
+                  initialCenter: LatLng(48.0, 2.0),
+                  initialZoom: 10,
+                ),
+                children: [widget],
+              ),
+            ),
+          );
+
+          expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
+        },
+      );
     });
 
-    testWidgets('buildTileLayer returns a TileLayer',
-        (WidgetTester tester) async {
+    testWidgets('buildTileLayer returns a TileLayer', (
+      WidgetTester tester,
+    ) async {
       final widget = provider.buildTileLayer();
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: FlutterMap(
             options: const MapOptions(
               initialCenter: LatLng(48.0, 2.0),
@@ -252,12 +269,15 @@ void main() {
       expect(find.byType(TileLayer), findsOneWidget);
     });
 
-    testWidgets('buildAttribution returns a RichAttributionWidget',
-        (WidgetTester tester) async {
+    testWidgets('buildAttribution returns a RichAttributionWidget', (
+      WidgetTester tester,
+    ) async {
       final widget = provider.buildAttribution();
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: FlutterMap(
             options: const MapOptions(
               initialCenter: LatLng(48.0, 2.0),
@@ -271,8 +291,9 @@ void main() {
       expect(find.byType(RichAttributionWidget), findsOneWidget);
     });
 
-    testWidgets('buildPolylineLayer renders polylines',
-        (WidgetTester tester) async {
+    testWidgets('buildPolylineLayer renders polylines', (
+      WidgetTester tester,
+    ) async {
       final widget = provider.buildPolylineLayer(
         polylines: [
           const MapPolylineConfig(
@@ -284,6 +305,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: FlutterMap(
             options: const MapOptions(
               initialCenter: LatLng(48.0, 2.0),
@@ -297,8 +320,9 @@ void main() {
       expect(find.byType(PolylineLayer), findsOneWidget);
     });
 
-    testWidgets('buildCircleLayer renders circles',
-        (WidgetTester tester) async {
+    testWidgets('buildCircleLayer renders circles', (
+      WidgetTester tester,
+    ) async {
       final widget = provider.buildCircleLayer(
         circles: [
           const MapCircleConfig(
@@ -312,6 +336,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: FlutterMap(
             options: const MapOptions(
               initialCenter: LatLng(48.0, 2.0),
@@ -325,8 +351,9 @@ void main() {
       expect(find.byType(CircleLayer), findsOneWidget);
     });
 
-    testWidgets('buildMapWidget renders a FlutterMap',
-        (WidgetTester tester) async {
+    testWidgets('buildMapWidget renders a FlutterMap', (
+      WidgetTester tester,
+    ) async {
       final controller = provider.createController();
 
       try {
@@ -337,7 +364,13 @@ void main() {
           children: [provider.buildTileLayer()],
         );
 
-        await tester.pumpWidget(MaterialApp(home: Scaffold(body: widget)));
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: widget),
+          ),
+        );
 
         expect(find.byType(FlutterMap), findsOneWidget);
       } finally {

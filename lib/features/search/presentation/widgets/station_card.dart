@@ -144,9 +144,9 @@ class StationCard extends StatelessWidget {
     // #3198 — tri-state: an unknown open state is announced as unknown,
     // never as closed (and never as open).
     final semanticStatus = switch (station.isOpen) {
-      true => l10n?.open ?? 'Open',
-      false => l10n?.closed ?? 'Closed',
-      null => l10n?.openStateUnknown ?? 'Unknown',
+      true => l10n.open,
+      false => l10n.closed,
+      null => l10n.openStateUnknown,
     };
     final semanticLabel =
         '${_hasBrand ? station.brand : station.name}, ${station.street}, '

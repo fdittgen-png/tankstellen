@@ -23,7 +23,7 @@ class ShieldIllustration extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: l10n?.shieldIllustrationSemantic ?? 'Privacy shield with fuel drop',
+      label: l10n.shieldIllustrationSemantic,
       image: true,
       child: SizedBox(
         width: size,
@@ -36,20 +36,13 @@ class ShieldIllustration extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    scheme.surface,
-                    scheme.surfaceContainerLow,
-                  ],
+                  colors: [scheme.surface, scheme.surfaceContainerLow],
                   stops: const [0.3, 1.0],
                 ),
               ),
             ),
             // Shield — the privacy pledge.
-            Icon(
-              Icons.verified_user,
-              size: size * 0.72,
-              color: scheme.primary,
-            ),
+            Icon(Icons.verified_user, size: size * 0.72, color: scheme.primary),
             // Fuel drop — nested inside the shield, white so it reads
             // against the primary-tinted shield fill.
             Padding(

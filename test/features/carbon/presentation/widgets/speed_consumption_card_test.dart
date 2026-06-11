@@ -18,17 +18,14 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 ///   * the title + localised band labels resolve through the bundle
 void main() {
   group('SpeedConsumptionCard — happy path', () {
-    testWidgets('renders one bar per band when telemetry is sufficient',
-        (tester) async {
+    testWidgets('renders one bar per band when telemetry is sufficient', (
+      tester,
+    ) async {
       // Build a histogram with 1800+ s of total telemetry so the card
       // renders the bars instead of the empty-state placeholder.
       final bins = _binsWithTotalSeconds(2000);
 
-      await _pumpCard(
-        tester,
-        bins: bins,
-        overallAvgLPer100Km: 7.5,
-      );
+      await _pumpCard(tester, bins: bins, overallAvgLPer100Km: 7.5);
 
       // Title must resolve from the localisations bundle.
       expect(find.text('Consumption by speed'), findsOneWidget);
@@ -55,11 +52,7 @@ void main() {
       (tester) async {
         final bins = _binsWithTotalSeconds(2000);
 
-        await _pumpCard(
-          tester,
-          bins: bins,
-          overallAvgLPer100Km: 7.5,
-        );
+        await _pumpCard(tester, bins: bins, overallAvgLPer100Km: 7.5);
 
         // The reference line is keyed once per bar that has an avg.
         // At least one bar in our fixture has an avg → at least one
@@ -79,11 +72,7 @@ void main() {
         // 1500 s = 25 min — under the 1800-s floor.
         final bins = _binsWithTotalSeconds(1500);
 
-        await _pumpCard(
-          tester,
-          bins: bins,
-          overallAvgLPer100Km: 7.5,
-        );
+        await _pumpCard(tester, bins: bins, overallAvgLPer100Km: 7.5);
 
         // Empty-state copy is visible.
         expect(
@@ -94,10 +83,7 @@ void main() {
           findsOneWidget,
         );
         // No per-band bar widgets render in the empty-state.
-        expect(
-          find.byKey(const Key('speed_bar_${'urban'}')),
-          findsNothing,
-        );
+        expect(find.byKey(const Key('speed_bar_${'urban'}')), findsNothing);
         // The empty-state widget itself is keyed for stable assertion.
         expect(
           find.byKey(const ValueKey('speed_consumption_insufficient_data')),
@@ -106,58 +92,48 @@ void main() {
       },
     );
 
-    testWidgets(
-      'shows the placeholder when there are zero OBD2 samples',
-      (tester) async {
-        // Every band empty (0 samples) → 0 s total → placeholder.
-        final bins = <SpeedConsumptionBin>[
-          for (final band in SpeedBand.values)
-            SpeedConsumptionBin(
-              band: band,
-              sampleCount: 0,
-              timeShareSeconds: 0,
-              avgLPer100Km: null,
-            ),
-        ];
+    testWidgets('shows the placeholder when there are zero OBD2 samples', (
+      tester,
+    ) async {
+      // Every band empty (0 samples) → 0 s total → placeholder.
+      final bins = <SpeedConsumptionBin>[
+        for (final band in SpeedBand.values)
+          SpeedConsumptionBin(
+            band: band,
+            sampleCount: 0,
+            timeShareSeconds: 0,
+            avgLPer100Km: null,
+          ),
+      ];
 
-        await _pumpCard(
-          tester,
-          bins: bins,
-          overallAvgLPer100Km: null,
-        );
+      await _pumpCard(tester, bins: bins, overallAvgLPer100Km: null);
 
-        expect(
-          find.byKey(const ValueKey('speed_consumption_insufficient_data')),
-          findsOneWidget,
-        );
-        // Reference line is suppressed in the empty state — there's no
-        // bar to anchor it against.
-        expect(
-          find.byKey(const ValueKey('speed_consumption_reference_line')),
-          findsNothing,
-        );
-      },
-    );
+      expect(
+        find.byKey(const ValueKey('speed_consumption_insufficient_data')),
+        findsOneWidget,
+      );
+      // Reference line is suppressed in the empty state — there's no
+      // bar to anchor it against.
+      expect(
+        find.byKey(const ValueKey('speed_consumption_reference_line')),
+        findsNothing,
+      );
+    });
   });
 
   group('SpeedConsumptionCard — reference line suppression', () {
-    testWidgets(
-      'no reference line renders when overallAvgLPer100Km is null',
-      (tester) async {
-        final bins = _binsWithTotalSeconds(2000);
+    testWidgets('no reference line renders when overallAvgLPer100Km is null', (
+      tester,
+    ) async {
+      final bins = _binsWithTotalSeconds(2000);
 
-        await _pumpCard(
-          tester,
-          bins: bins,
-          overallAvgLPer100Km: null,
-        );
+      await _pumpCard(tester, bins: bins, overallAvgLPer100Km: null);
 
-        expect(
-          find.byKey(const ValueKey('speed_consumption_reference_line')),
-          findsNothing,
-        );
-      },
-    );
+      expect(
+        find.byKey(const ValueKey('speed_consumption_reference_line')),
+        findsNothing,
+      );
+    });
   });
 }
 
@@ -176,23 +152,23 @@ List<SpeedConsumptionBin> _binsWithTotalSeconds(int totalSeconds) {
     for (final band in SpeedBand.values)
       switch (band) {
         SpeedBand.rural => SpeedConsumptionBin(
-            band: band,
-            sampleCount: ruralSeconds,
-            timeShareSeconds: ruralSeconds.toDouble(),
-            avgLPer100Km: 7.0,
-          ),
+          band: band,
+          sampleCount: ruralSeconds,
+          timeShareSeconds: ruralSeconds.toDouble(),
+          avgLPer100Km: 7.0,
+        ),
         SpeedBand.motorway => SpeedConsumptionBin(
-            band: band,
-            sampleCount: motorwaySeconds,
-            timeShareSeconds: motorwaySeconds.toDouble(),
-            avgLPer100Km: 8.5,
-          ),
+          band: band,
+          sampleCount: motorwaySeconds,
+          timeShareSeconds: motorwaySeconds.toDouble(),
+          avgLPer100Km: 8.5,
+        ),
         _ => SpeedConsumptionBin(
-            band: band,
-            sampleCount: 0,
-            timeShareSeconds: 0,
-            avgLPer100Km: null,
-          ),
+          band: band,
+          sampleCount: 0,
+          timeShareSeconds: 0,
+          avgLPer100Km: null,
+        ),
       },
   ];
 }
@@ -222,7 +198,6 @@ Future<void> _pumpCard(
             builder: (context) {
               final l = AppLocalizations.of(context);
               final theme = Theme.of(context);
-              if (l == null) return const SizedBox.shrink();
               return SpeedConsumptionCard(
                 bins: bins,
                 overallAvgLPer100Km: overallAvgLPer100Km,

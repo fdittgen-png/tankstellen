@@ -47,11 +47,10 @@ class OpeningHoursStatusLine extends StatelessWidget {
     final Color colour = closingSoon
         ? DarkModeColors.warning(context)
         : (isOpen
-            ? DarkModeColors.success(context)
-            : DarkModeColors.mutedText(context));
+              ? DarkModeColors.success(context)
+              : DarkModeColors.mutedText(context));
 
-    final headline =
-        isOpen ? (l10n?.openNow ?? 'Open') : (l10n?.openNowClosed ?? 'Closed');
+    final headline = isOpen ? (l10n.openNow) : (l10n.openNowClosed);
     final detail = _detailText(status, l10n);
 
     return Row(
@@ -65,23 +64,27 @@ class OpeningHoursStatusLine extends StatelessWidget {
         const SizedBox(width: Spacing.md),
         Flexible(
           child: Text.rich(
-            TextSpan(children: [
-              TextSpan(
-                text: headline,
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(color: colour, fontWeight: FontWeight.w700),
-              ),
-              if (detail != null)
+            TextSpan(
+              children: [
                 TextSpan(
-                  text: ' · $detail',
-                  style: theme.textTheme.bodyMedium,
+                  text: headline,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colour,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-            ]),
+                if (detail != null)
+                  TextSpan(
+                    text: ' · $detail',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+              ],
+            ),
           ),
         ),
         if (badge24h) ...[
           const SizedBox(width: Spacing.md),
-          _Badge24h(label: l10n?.badge24h ?? '24h'),
+          _Badge24h(label: l10n.badge24h),
         ],
       ],
     );
@@ -89,21 +92,21 @@ class OpeningHoursStatusLine extends StatelessWidget {
 
   /// The "Closes …" / "Opens …" trailing fragment, or `null` when there is
   /// no determinable next change (a 24/7 station).
-  String? _detailText(OpenNowStatus status, AppLocalizations? l10n) {
+  String? _detailText(OpenNowStatus status, AppLocalizations l10n) {
     if (status.nextChangeDay == null || status.nextChangeMinutes == null) {
       return null;
     }
     final time = formatHhmm(status.nextChangeMinutes!);
     if (status.status == OpenStatus.open) {
-      return l10n?.closesAt(time) ?? 'Closes $time';
+      return l10n.closesAt(time);
     }
     // Closed → opens. Same-day vs other-day phrasing.
     final today = openingDayFromIsoWeekday(now.weekday);
     if (status.nextChangeDay == today) {
-      return l10n?.opensToday(time) ?? 'Opens $time';
+      return l10n.opensToday(time);
     }
     final day = shortDayName(status.nextChangeDay!, l10n);
-    return l10n?.opensAt(day, time) ?? 'Opens $day $time';
+    return l10n.opensAt(day, time);
   }
 
   /// True when an open station closes in under an hour (the amber
@@ -129,7 +132,9 @@ class _Badge24h extends StatelessWidget {
     return Container(
       key: const ValueKey('opening-hours-24h-badge'),
       padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.md, vertical: Spacing.xs),
+        horizontal: Spacing.md,
+        vertical: Spacing.xs,
+      ),
       decoration: BoxDecoration(
         color: DarkModeColors.successSurface(context),
         borderRadius: AppRadius.sm,

@@ -18,6 +18,7 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #2756 — the consumption app bar was crammed with 5–6 trailing actions
 /// (OBD2 chip + export + restore + carbon[gated] + Settings, plus the
@@ -43,11 +44,11 @@ class _FixedChargingLogs extends ChargingLogs {
 class _PairedVehicle extends ActiveVehicleProfile {
   @override
   VehicleProfile? build() => const VehicleProfile(
-        id: 'paired',
-        name: 'Paired',
-        type: VehicleType.combustion,
-        obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
-      );
+    id: 'paired',
+    name: 'Paired',
+    type: VehicleType.combustion,
+    obd2AdapterMac: 'AA:BB:CC:DD:EE:FF',
+  );
 }
 
 class _EmptyVehicleList extends VehicleProfileList {
@@ -64,17 +65,15 @@ class _FixedTripHistoryList extends TripHistoryList {
 class _CarbonOnFlags extends FeatureFlags {
   @override
   Future<Set<Feature>> build() async => <Feature>{
-        Feature.showConsumptionTab,
-        Feature.carbonDashboard,
-      };
+    Feature.showConsumptionTab,
+    Feature.carbonDashboard,
+  };
 }
 
 /// Feature flags with the carbon dashboard DISABLED.
 class _CarbonOffFlags extends FeatureFlags {
   @override
-  Future<Set<Feature>> build() async => <Feature>{
-        Feature.showConsumptionTab,
-      };
+  Future<Set<Feature>> build() async => <Feature>{Feature.showConsumptionTab};
 }
 
 Future<void> _pump(
@@ -101,7 +100,11 @@ Future<void> _pump(
 
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList()),
       chargingLogsProvider.overrideWith(() => _FixedChargingLogs()),
@@ -118,24 +121,28 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('ConsumptionAppBarActions — title no longer truncates (#2756)', () {
-    testWidgets('Carburant: full title, no visible IconButton but the kebab',
-        (tester) async {
-      await _pump(tester,
-          section: ConsumptionSection.fuel, flags: () => _CarbonOnFlags());
+    testWidgets('Carburant: full title, no visible IconButton but the kebab', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        section: ConsumptionSection.fuel,
+        flags: () => _CarbonOnFlags(),
+      );
 
       // The full "Fuel" title is rendered (no "Car…" truncation).
       expect(
-        find.descendant(
-          of: find.byType(AppBar),
-          matching: find.text('Fuel'),
-        ),
+        find.descendant(of: find.byType(AppBar), matching: find.text('Fuel')),
         findsOneWidget,
       );
 
       // Only the overflow kebab is a visible trailing IconButton (the
       // OBD2 chip self-hides for a paired-but-disconnected adapter; the
       // leading car icon is not a trailing action). No map on Carburant.
-      expect(find.byKey(const Key('consumption_overflow_menu')), findsOneWidget);
+      expect(
+        find.byKey(const Key('consumption_overflow_menu')),
+        findsOneWidget,
+      );
       expect(find.byKey(const Key('trajets_view_all_on_map')), findsNothing);
       expect(
         find.descendant(
@@ -158,16 +165,17 @@ void main() {
       expect(tester.widgetList(appBarIconButtons).length, 2);
     });
 
-    testWidgets('Trajets: map shortcut + kebab are both visible, full title',
-        (tester) async {
-      await _pump(tester,
-          section: ConsumptionSection.trajets, flags: () => _CarbonOnFlags());
+    testWidgets('Trajets: map shortcut + kebab are both visible, full title', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        section: ConsumptionSection.trajets,
+        flags: () => _CarbonOnFlags(),
+      );
 
       expect(
-        find.descendant(
-          of: find.byType(AppBar),
-          matching: find.text('Trips'),
-        ),
+        find.descendant(of: find.byType(AppBar), matching: find.text('Trips')),
         findsOneWidget,
       );
       // The Trajets map shortcut is a visible primary action in the bar.
@@ -178,15 +186,22 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.byKey(const Key('consumption_overflow_menu')), findsOneWidget);
+      expect(
+        find.byKey(const Key('consumption_overflow_menu')),
+        findsOneWidget,
+      );
     });
   });
 
   group('ConsumptionAppBarActions — overflow kebab contents (#2756)', () {
-    testWidgets('opens to export / restore / carbon / Settings (carbon on)',
-        (tester) async {
-      await _pump(tester,
-          section: ConsumptionSection.fuel, flags: () => _CarbonOnFlags());
+    testWidgets('opens to export / restore / carbon / Settings (carbon on)', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        section: ConsumptionSection.fuel,
+        flags: () => _CarbonOnFlags(),
+      );
 
       await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
       await tester.pumpAndSettle();
@@ -204,10 +219,14 @@ void main() {
       expect(find.text('Settings'), findsOneWidget);
     });
 
-    testWidgets('hides the carbon item when the feature is disabled',
-        (tester) async {
-      await _pump(tester,
-          section: ConsumptionSection.fuel, flags: () => _CarbonOffFlags());
+    testWidgets('hides the carbon item when the feature is disabled', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        section: ConsumptionSection.fuel,
+        flags: () => _CarbonOffFlags(),
+      );
 
       await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
       await tester.pumpAndSettle();
@@ -221,15 +240,22 @@ void main() {
     });
 
     testWidgets('the kebab carries a "More" tooltip for a11y', (tester) async {
-      await _pump(tester,
-          section: ConsumptionSection.fuel, flags: () => _CarbonOnFlags());
+      await _pump(
+        tester,
+        section: ConsumptionSection.fuel,
+        flags: () => _CarbonOnFlags(),
+      );
       expect(find.byTooltip('More'), findsOneWidget);
     });
 
-    testWidgets('choosing the carbon item routes to /carbon (gated)',
-        (tester) async {
-      await _pump(tester,
-          section: ConsumptionSection.fuel, flags: () => _CarbonOnFlags());
+    testWidgets('choosing the carbon item routes to /carbon (gated)', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        section: ConsumptionSection.fuel,
+        flags: () => _CarbonOnFlags(),
+      );
 
       await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
       await tester.pumpAndSettle();
@@ -241,8 +267,11 @@ void main() {
     });
 
     testWidgets('choosing Settings routes to /profile', (tester) async {
-      await _pump(tester,
-          section: ConsumptionSection.fuel, flags: () => _CarbonOnFlags());
+      await _pump(
+        tester,
+        section: ConsumptionSection.fuel,
+        flags: () => _CarbonOnFlags(),
+      );
 
       await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
       await tester.pumpAndSettle();

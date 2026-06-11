@@ -6,10 +6,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/freshness_badge.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   Widget wrapInApp(Widget child) {
-    return MaterialApp(home: Scaffold(body: child));
+    return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(body: child),
+    );
   }
 
   /// Resolves the semantic warning / error colours against the same theme
@@ -18,11 +23,17 @@ void main() {
   Future<({Color warning, Color error})> tokensOf(WidgetTester tester) async {
     late Color warning;
     late Color error;
-    await tester.pumpWidget(wrapInApp(Builder(builder: (context) {
-      warning = DarkModeColors.warning(context);
-      error = DarkModeColors.error(context);
-      return const SizedBox();
-    })));
+    await tester.pumpWidget(
+      wrapInApp(
+        Builder(
+          builder: (context) {
+            warning = DarkModeColors.warning(context);
+            error = DarkModeColors.error(context);
+            return const SizedBox();
+          },
+        ),
+      ),
+    );
     return (warning: warning, error: error);
   }
 
@@ -31,8 +42,9 @@ void main() {
       tester.widget<Icon>(find.byIcon(icon)).color!;
 
   group('FreshnessBadge', () {
-    testWidgets('shows green check icon for fresh data (< 5 min)',
-        (tester) async {
+    testWidgets('shows green check icon for fresh data (< 5 min)', (
+      tester,
+    ) async {
       final result = ServiceResult(
         data: <String>[],
         source: ServiceSource.tankerkoenigApi,
@@ -46,39 +58,43 @@ void main() {
       expect(find.textContaining('2 min'), findsOneWidget);
     });
 
-    testWidgets('shows amber schedule icon for moderately old data (5-15 min)',
-        (tester) async {
-      final result = ServiceResult(
-        data: <String>[],
-        source: ServiceSource.tankerkoenigApi,
-        fetchedAt: DateTime.now().subtract(const Duration(minutes: 10)),
-      );
+    testWidgets(
+      'shows amber schedule icon for moderately old data (5-15 min)',
+      (tester) async {
+        final result = ServiceResult(
+          data: <String>[],
+          source: ServiceSource.tankerkoenigApi,
+          fetchedAt: DateTime.now().subtract(const Duration(minutes: 10)),
+        );
 
-      await tester.pumpWidget(wrapInApp(FreshnessBadge(result: result)));
+        await tester.pumpWidget(wrapInApp(FreshnessBadge(result: result)));
 
-      expect(find.byIcon(Icons.schedule), findsOneWidget);
-      expect(find.textContaining('10 min'), findsOneWidget);
-    });
+        expect(find.byIcon(Icons.schedule), findsOneWidget);
+        expect(find.textContaining('10 min'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'shows amber (warning, not error-red) warning icon for old data '
-        '(> 15 min) [#2492]', (tester) async {
-      final result = ServiceResult(
-        data: <String>[],
-        source: ServiceSource.tankerkoenigApi,
-        fetchedAt: DateTime.now().subtract(const Duration(minutes: 20)),
-      );
-      final tokens = await tokensOf(tester);
+      'shows amber (warning, not error-red) warning icon for old data '
+      '(> 15 min) [#2492]',
+      (tester) async {
+        final result = ServiceResult(
+          data: <String>[],
+          source: ServiceSource.tankerkoenigApi,
+          fetchedAt: DateTime.now().subtract(const Duration(minutes: 20)),
+        );
+        final tokens = await tokensOf(tester);
 
-      await tester.pumpWidget(wrapInApp(FreshnessBadge(result: result)));
+        await tester.pumpWidget(wrapInApp(FreshnessBadge(result: result)));
 
-      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
-      expect(find.textContaining('20 min'), findsOneWidget);
-      // #2492 — very-stale stays in the amber/warning family, NOT error-red.
-      final c = iconColor(tester, Icons.warning_amber_rounded);
-      expect(c, tokens.warning);
-      expect(c, isNot(tokens.error));
-    });
+        expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+        expect(find.textContaining('20 min'), findsOneWidget);
+        // #2492 — very-stale stays in the amber/warning family, NOT error-red.
+        final c = iconColor(tester, Icons.warning_amber_rounded);
+        expect(c, tokens.warning);
+        expect(c, isNot(tokens.error));
+      },
+    );
 
     testWidgets('shows "Stale" prefix when result is stale', (tester) async {
       final result = ServiceResult(
@@ -95,8 +111,9 @@ void main() {
       expect(find.textContaining('30 min'), findsOneWidget);
     });
 
-    testWidgets('shows stale with amber icon even for recent stale data',
-        (tester) async {
+    testWidgets('shows stale with amber icon even for recent stale data', (
+      tester,
+    ) async {
       final result = ServiceResult(
         data: <String>[],
         source: ServiceSource.cache,
@@ -192,8 +209,9 @@ void main() {
       expect(find.byIcon(Icons.schedule), findsOneWidget);
     });
 
-    testWidgets('boundary: exactly 15 minutes shows amber (not red)',
-        (tester) async {
+    testWidgets('boundary: exactly 15 minutes shows amber (not red)', (
+      tester,
+    ) async {
       final result = ServiceResult(
         data: <String>[],
         source: ServiceSource.tankerkoenigApi,
@@ -206,8 +224,9 @@ void main() {
       expect(find.byIcon(Icons.schedule), findsOneWidget);
     });
 
-    testWidgets('boundary: 16 minutes shows the warning icon (amber)',
-        (tester) async {
+    testWidgets('boundary: 16 minutes shows the warning icon (amber)', (
+      tester,
+    ) async {
       final result = ServiceResult(
         data: <String>[],
         source: ServiceSource.tankerkoenigApi,

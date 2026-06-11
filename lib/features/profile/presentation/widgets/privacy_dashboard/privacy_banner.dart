@@ -26,8 +26,7 @@ class PrivacyBanner extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              l?.privacyDashboardBanner ??
-                  'Your data belongs to you. Here you can see everything this app stores, export it, or delete it.',
+              l.privacyDashboardBanner,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w500,

@@ -20,11 +20,7 @@ class StationDetailInline extends ConsumerWidget {
   final String stationId;
   final VoidCallback? onClose;
 
-  const StationDetailInline({
-    super.key,
-    required this.stationId,
-    this.onClose,
-  });
+  const StationDetailInline({super.key, required this.stationId, this.onClose});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,7 +42,7 @@ class StationDetailInline extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: onClose,
-                  tooltip: l10n?.tooltipClose ?? 'Close',
+                  tooltip: l10n.tooltipClose,
                 ),
               Expanded(
                 child: Text(
@@ -68,10 +64,7 @@ class StationDetailInline extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    StationInfoSection(
-                      station: detail.station,
-                      detail: detail,
-                    ),
+                    StationInfoSection(station: detail.station, detail: detail),
                     const SizedBox(height: 16),
                     PriceHistorySection(
                       stationId: stationId,

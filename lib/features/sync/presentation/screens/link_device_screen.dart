@@ -36,7 +36,7 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
     final l10n = AppLocalizations.of(context);
 
     return PageScaffold(
-      title: l10n?.linkDeviceScreenTitle ?? 'Link Device',
+      title: l10n.linkDeviceScreenTitle,
       bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -51,6 +51,3 @@ class _LinkDeviceScreenState extends ConsumerState<LinkDeviceScreen> {
     );
   }
 }
-
-
-

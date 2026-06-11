@@ -77,7 +77,7 @@ class FillUpImportButtonsPair extends ConsumerWidget {
                     )
                   : const Icon(Icons.document_scanner_outlined),
               label: Text(
-                l?.fillUpImportReceiptLabel ?? 'Receipt',
+                l.fillUpImportReceiptLabel,
                 maxLines: 2,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.visible,
@@ -98,7 +98,7 @@ class FillUpImportButtonsPair extends ConsumerWidget {
                     )
                   : const Icon(Icons.local_gas_station_outlined),
               label: Text(
-                l?.fillUpImportPumpLabel ?? 'Pump display',
+                l.fillUpImportPumpLabel,
                 maxLines: 2,
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.visible,
@@ -115,15 +115,14 @@ class FillUpImportButtonsPair extends ConsumerWidget {
             key: const Key('import_paste_receipt_button'),
             onPressed: onPasteReceipt,
             icon: const Icon(Icons.content_paste_outlined, size: 18),
-            label: Text(l?.fillUpImportPasteLabel ?? 'Paste text'),
+            label: Text(l.fillUpImportPasteLabel),
           )
         : null;
 
     final scanRow = Row(
       children: [
         ?receiptBtn,
-        if (receiptBtn != null && pumpBtn != null)
-          const SizedBox(width: 8),
+        if (receiptBtn != null && pumpBtn != null) const SizedBox(width: 8),
         ?pumpBtn,
       ],
     );
@@ -133,10 +132,7 @@ class FillUpImportButtonsPair extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         scanRow,
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: pasteBtn,
-        ),
+        Align(alignment: AlignmentDirectional.centerStart, child: pasteBtn),
       ],
     );
   }

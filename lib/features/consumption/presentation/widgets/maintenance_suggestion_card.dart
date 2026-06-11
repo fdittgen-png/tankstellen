@@ -28,10 +28,7 @@ import '../../providers/maintenance_provider.dart';
 class MaintenanceSuggestionCard extends ConsumerWidget {
   final MaintenanceSuggestion suggestion;
 
-  const MaintenanceSuggestionCard({
-    super.key,
-    required this.suggestion,
-  });
+  const MaintenanceSuggestionCard({super.key, required this.suggestion});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,10 +47,8 @@ class MaintenanceSuggestionCard extends ConsumerWidget {
     // ask a sighted partner about.
     final mergedLabel = '$title. $body';
 
-    final dismissLabel =
-        l?.maintenanceActionDismiss ?? 'Dismiss';
-    final snoozeLabel =
-        l?.maintenanceActionSnooze ?? 'Snooze 30 days';
+    final dismissLabel = l.maintenanceActionDismiss;
+    final snoozeLabel = l.maintenanceActionSnooze;
 
     return Semantics(
       container: true,
@@ -81,15 +76,9 @@ class MaintenanceSuggestionCard extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            title,
-                            style: theme.textTheme.titleMedium,
-                          ),
+                          Text(title, style: theme.textTheme.titleMedium),
                           const SizedBox(height: 4),
-                          Text(
-                            body,
-                            style: theme.textTheme.bodyMedium,
-                          ),
+                          Text(body, style: theme.textTheme.bodyMedium),
                         ],
                       ),
                     ),
@@ -104,20 +93,24 @@ class MaintenanceSuggestionCard extends ConsumerWidget {
                   children: [
                     TextButton(
                       key: ValueKey(
-                          'maintenance-${suggestion.signal.name}-dismiss'),
+                        'maintenance-${suggestion.signal.name}-dismiss',
+                      ),
                       onPressed: () => ref
                           .read(
-                              maintenanceSuggestionsControllerProvider.notifier)
+                            maintenanceSuggestionsControllerProvider.notifier,
+                          )
                           .dismissForToday(suggestion.signal),
                       child: Text(dismissLabel),
                     ),
                     const SizedBox(width: 4),
                     TextButton(
                       key: ValueKey(
-                          'maintenance-${suggestion.signal.name}-snooze'),
+                        'maintenance-${suggestion.signal.name}-snooze',
+                      ),
                       onPressed: () => ref
                           .read(
-                              maintenanceSuggestionsControllerProvider.notifier)
+                            maintenanceSuggestionsControllerProvider.notifier,
+                          )
                           .snoozeForDefault(suggestion.signal),
                       child: Text(snoozeLabel),
                     ),
@@ -131,34 +124,26 @@ class MaintenanceSuggestionCard extends ConsumerWidget {
     );
   }
 
-  String _titleFor(AppLocalizations? l, MaintenanceSignal signal) {
+  String _titleFor(AppLocalizations l, MaintenanceSignal signal) {
     switch (signal) {
       case MaintenanceSignal.idleRpmCreep:
-        return l?.maintenanceSignalIdleRpmCreepTitle ??
-            'Idle RPM creep detected';
+        return l.maintenanceSignalIdleRpmCreepTitle;
       case MaintenanceSignal.mafDeviation:
-        return l?.maintenanceSignalMafDeviationTitle ??
-            'Possible intake restriction';
+        return l.maintenanceSignalMafDeviationTitle;
     }
   }
 
   String _bodyFor(
-    AppLocalizations? l,
+    AppLocalizations l,
     MaintenanceSignal signal,
     String percent,
     int tripCount,
   ) {
     switch (signal) {
       case MaintenanceSignal.idleRpmCreep:
-        return l?.maintenanceSignalIdleRpmCreepBody(percent, tripCount) ??
-            'Idle RPM has crept up by $percent% over your last $tripCount '
-                'trips. Possible early sign of a clogged air filter or '
-                'sensor drift.';
+        return l.maintenanceSignalIdleRpmCreepBody(percent, tripCount);
       case MaintenanceSignal.mafDeviation:
-        return l?.maintenanceSignalMafDeviationBody(percent, tripCount) ??
-            'Cruise fuel rate has dropped by $percent% over your last '
-                '$tripCount trips. Possible sign of a clogged air filter '
-                'or restricted intake — worth a check-up.';
+        return l.maintenanceSignalMafDeviationBody(percent, tripCount);
     }
   }
 }

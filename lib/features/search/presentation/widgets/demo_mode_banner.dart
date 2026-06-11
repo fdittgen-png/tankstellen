@@ -59,13 +59,13 @@ class DemoModeBanner extends ConsumerWidget {
         forceActionsBelow: true,
         content: Text(
           '${country.flag} ${country.name} — '
-          '${l10n?.demoModeBanner ?? 'Demo mode — showing sample prices.'}',
+          '${l10n.demoModeBanner}',
         ),
         leading: const Icon(Icons.science_outlined),
         actions: [
           TextButton(
             onPressed: () => context.go(RoutePaths.profile),
-            child: Text(l10n?.demoModeBannerAction ?? 'Get live prices'),
+            child: Text(l10n.demoModeBannerAction),
           ),
         ],
       );
@@ -141,9 +141,7 @@ class _CountryServiceHeader extends StatelessWidget {
           children: [
             flag,
             const SizedBox(width: 6),
-            Expanded(
-              child: Text(labelText, style: theme.textTheme.labelSmall),
-            ),
+            Expanded(child: Text(labelText, style: theme.textTheme.labelSmall)),
           ],
         ),
       );
@@ -154,8 +152,7 @@ class _CountryServiceHeader extends StatelessWidget {
     // screen-reader users still get the full open-data credit (#2373).
     final source = attribution ?? providerLabel ?? country.name;
     final lic = license ?? '';
-    final semanticLabel = l10n?.dataSourceLinkSemantic(source, lic) ??
-        'Open the $source data source ($lic) in your browser.';
+    final semanticLabel = l10n.dataSourceLinkSemantic(source, lic);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -244,7 +241,7 @@ class _MultiSourceHeader extends StatelessWidget {
     if (segments.isEmpty) return const SizedBox.shrink();
 
     final joined = segments.join(' · ');
-    final labelText = l10n?.routeDataSourceMulti(joined) ?? joined;
+    final labelText = l10n.routeDataSourceMulti(joined);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -253,9 +250,7 @@ class _MultiSourceHeader extends StatelessWidget {
         children: [
           Text(flags.join(' '), style: const TextStyle(fontSize: 14)),
           const SizedBox(width: 6),
-          Expanded(
-            child: Text(labelText, style: theme.textTheme.labelSmall),
-          ),
+          Expanded(child: Text(labelText, style: theme.textTheme.labelSmall)),
         ],
       ),
     );

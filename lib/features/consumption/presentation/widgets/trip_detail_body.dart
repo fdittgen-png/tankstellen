@@ -114,8 +114,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
       DrivingLessonRegistry.standard();
 
   /// GPS-only efficiency features (#2697 P3) — null for OBD2/EV/empty.
-  late final GpsDrivingFeatures? _gpsFeatures = GpsEfficiencyKpiCard
-      .featuresFor(widget.samples.map(tripDetailToTripSample), isEv: widget.isEv);
+  late final GpsDrivingFeatures? _gpsFeatures =
+      GpsEfficiencyKpiCard.featuresFor(
+        widget.samples.map(tripDetailToTripSample),
+        isEv: widget.isEv,
+      );
 
   List<DrivingInsight> _computeInsights() {
     if (widget.samples.isEmpty) return const [];
@@ -126,9 +129,9 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // Skip the analysis for EVs entirely; phase 4 will revisit once
     // the kWh equivalent lands.
     if (widget.isEv) return const [];
-    final tripSamples = widget.samples.map(tripDetailToTripSample).toList(
-          growable: false,
-        );
+    final tripSamples = widget.samples
+        .map(tripDetailToTripSample)
+        .toList(growable: false);
     // Epic #3015 — scale the hard-accel wasted-litres by the active
     // vehicle's engine power (a small engine wastes proportionally more for
     // the same hard pull). Trips aren't tagged with a vehicle, so the
@@ -153,9 +156,9 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   DrivingScore _computeScore() {
     if (widget.samples.isEmpty) return DrivingScore.perfect;
     if (widget.isEv) return DrivingScore.perfect;
-    final tripSamples = widget.samples.map(tripDetailToTripSample).toList(
-          growable: false,
-        );
+    final tripSamples = widget.samples
+        .map(tripDetailToTripSample)
+        .toList(growable: false);
     final summary = widget.entry.summary;
     // #2460 — thread the trip-end lugging metric stored on the summary
     // into the canonical score so the over-rev/shift family includes it
@@ -217,22 +220,20 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // analyzer / score passes don't re-run on a theme / locale rebuild.
     // Empty for EV / empty trips on the same gating rule as the card
     // below, and the registry returns [] when no rule fires (the
-    // empty-state path). `l == null` only in degenerate test harnesses;
-    // fall back to no lessons rather than crash.
-    final List<DrivingLesson> lessons =
-        (l == null || widget.isEv || widget.samples.isEmpty)
-            ? const []
-            : _lessonRegistry.evaluateContext(
-                LessonContext(
-                  summary: widget.entry.summary,
-                  samples: widget.samples.map(tripDetailToTripSample).toList(
-                        growable: false,
-                      ),
-                  score: _score,
-                  insights: _insights,
-                ),
-                l,
-              );
+    // empty-state path).
+    final List<DrivingLesson> lessons = (widget.isEv || widget.samples.isEmpty)
+        ? const []
+        : _lessonRegistry.evaluateContext(
+            LessonContext(
+              summary: widget.entry.summary,
+              samples: widget.samples
+                  .map(tripDetailToTripSample)
+                  .toList(growable: false),
+              score: _score,
+              insights: _insights,
+            ),
+            l,
+          );
 
     // Wrap the report content in a [RepaintBoundary] so the Share
     // action (#1189) can call `boundary.toImage(...)` to produce a PNG
@@ -287,8 +288,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         if (!widget.isEv && widget.samples.isNotEmpty && _gpsFeatures == null)
           ThrottleRpmHistogramCard(histogram: _histogram),
         // GPS-only efficiency KPIs (#2697 P3) — only for engine-signal-less trips.
-        if (_gpsFeatures != null)
-          GpsEfficiencyKpiCard(features: _gpsFeatures),
+        if (_gpsFeatures != null) GpsEfficiencyKpiCard(features: _gpsFeatures),
         // #2796 C7 — the GPS-only replacement for the throttle/RPM card: a
         // speed-only "how you used the road" panel (speed-band + movement-
         // phase shares + a positive coasting line). Same gate as the KPI
@@ -307,9 +307,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // service) is conditional on what this card surfaces during
         // field testing.
         if (widget.entry.gpsSampleDiagnostics.isNotEmpty)
-          GpsDiagnosticsCard(
-            diagnostics: widget.entry.gpsSampleDiagnostics,
-          ),
+          GpsDiagnosticsCard(diagnostics: widget.entry.gpsSampleDiagnostics),
         // OBD2 communication-health diagnostics (#2470). Dev-only — the
         // card self-hides unless Feature.debugMode is on AND a session was
         // captured, the OBD2 analogue of the GPS card above. #2912 — feeds
@@ -357,4 +355,3 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     );
   }
 }
-

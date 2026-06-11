@@ -125,14 +125,14 @@ class AddFillUpFormFields extends StatelessWidget {
         if (stationName != null) ...[
           FillUpStationPreFillBanner(
             stationName: stationName!,
-            label: l?.stationPreFilled ?? 'Station pre-filled',
+            label: l.stationPreFilled,
           ),
           const SizedBox(height: 16),
         ],
         // Card 1: "What you filled" — date, vehicle, fuel, liters, cost.
         FormSectionCard(
-          title: l?.fillUpSectionWhatTitle ?? 'What you filled',
-          subtitle: l?.fillUpSectionWhatSubtitle ?? 'Fuel, amount, price',
+          title: l.fillUpSectionWhatTitle,
+          subtitle: l.fillUpSectionWhatSubtitle,
           icon: Icons.local_gas_station_outlined,
           children: [
             FormFieldTile(
@@ -142,7 +142,7 @@ class AddFillUpFormFields extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: InputDecorator(
                   decoration: InputDecoration(
-                    labelText: l?.fillUpDate ?? 'Date',
+                    labelText: l.fillUpDate,
                     border: const OutlineInputBorder(),
                   ),
                   child: Text(dateLabel),
@@ -172,7 +172,7 @@ class AddFillUpFormFields extends StatelessWidget {
               icon: Icons.opacity_outlined,
               content: FillUpNumericField(
                 controller: litersCtrl,
-                label: l?.liters ?? 'Liters',
+                label: l.liters,
                 icon: Icons.water_drop_outlined,
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
@@ -184,7 +184,7 @@ class AddFillUpFormFields extends StatelessWidget {
                 children: [
                   FillUpNumericField(
                     controller: costCtrl,
-                    label: l?.totalCost ?? 'Total cost',
+                    label: l.totalCost,
                     icon: Icons.euro,
                     validator: (v) => AddFillUpValidators.positiveNumber(v, l),
                   ),
@@ -206,12 +206,8 @@ class AddFillUpFormFields extends StatelessWidget {
               content: SwitchListTile(
                 key: const Key('add_fill_up_is_full_tank_toggle'),
                 contentPadding: EdgeInsets.zero,
-                title: Text(l?.addFillUpIsFullTankLabel ?? 'Full tank'),
-                subtitle: Text(
-                  l?.addFillUpIsFullTankSubtitle ??
-                      'Tank filled to the brim — uncheck if this was a '
-                          'partial fill',
-                ),
+                title: Text(l.addFillUpIsFullTankLabel),
+                subtitle: Text(l.addFillUpIsFullTankSubtitle),
                 value: isFullTank,
                 onChanged: onIsFullTankChanged,
               ),
@@ -221,16 +217,15 @@ class AddFillUpFormFields extends StatelessWidget {
         const SizedBox(height: 16),
         // Card 2: "Where you were" — odometer, notes.
         FormSectionCard(
-          title: l?.fillUpSectionWhereTitle ?? 'Where you were',
-          subtitle:
-              l?.fillUpSectionWhereSubtitle ?? 'Station, odometer, notes',
+          title: l.fillUpSectionWhereTitle,
+          subtitle: l.fillUpSectionWhereSubtitle,
           icon: Icons.place_outlined,
           children: [
             FormFieldTile(
               icon: Icons.speed_outlined,
               content: FillUpNumericField(
                 controller: odoCtrl,
-                label: l?.odometerKm ?? 'Odometer (km)',
+                label: l.odometerKm,
                 icon: Icons.speed,
                 validator: (v) => AddFillUpValidators.positiveNumber(v, l),
               ),
@@ -246,9 +241,7 @@ class AddFillUpFormFields extends StatelessWidget {
                 child: TextButton.icon(
                   onPressed: onReportBadScan,
                   icon: const Icon(Icons.flag_outlined, size: 18),
-                  label: Text(
-                    l?.reportScanError ?? 'Report scan error',
-                  ),
+                  label: Text(l.reportScanError),
                 ),
               ),
             ],

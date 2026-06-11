@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/vin_info_sheet.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for [VinInfoSheet] (#895 / #561 zero-coverage backlog).
 ///
@@ -36,8 +37,7 @@ void main() {
       expect(find.text('Where to find it'), findsOneWidget);
     });
 
-    testWidgets('renders the dismiss button labeled "Got it"',
-        (tester) async {
+    testWidgets('renders the dismiss button labeled "Got it"', (tester) async {
       await pumpApp(tester, const VinInfoSheet());
 
       expect(find.widgetWithText(FilledButton, 'Got it'), findsOneWidget);
@@ -47,13 +47,16 @@ void main() {
       await pumpApp(tester, const VinInfoSheet());
 
       final safeArea = tester.widget<SafeArea>(find.byType(SafeArea).first);
-      expect(safeArea.top, isFalse,
-          reason: 'top:false avoids double-padding when the sheet '
-              'opens above a transparent system status bar.');
+      expect(
+        safeArea.top,
+        isFalse,
+        reason:
+            'top:false avoids double-padding when the sheet '
+            'opens above a transparent system status bar.',
+      );
     });
 
-    testWidgets('caps maxHeight at 85% of the screen height',
-        (tester) async {
+    testWidgets('caps maxHeight at 85% of the screen height', (tester) async {
       // Force a known viewport so the cap is deterministic.
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1;
@@ -72,12 +75,19 @@ void main() {
           .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
           .where((b) => b.constraints.maxHeight.isFinite)
           .toList();
-      expect(boxes, isNotEmpty,
-          reason: 'VinInfoSheet must wrap its body in a finite-height '
-              'ConstrainedBox so long copy scrolls instead of '
-              'spilling past the top of the screen.');
-      expect(boxes.first.constraints.maxHeight, closeTo(800 * 0.85, 0.01),
-          reason: 'The sheet caps height at 85% of the viewport.');
+      expect(
+        boxes,
+        isNotEmpty,
+        reason:
+            'VinInfoSheet must wrap its body in a finite-height '
+            'ConstrainedBox so long copy scrolls instead of '
+            'spilling past the top of the screen.',
+      );
+      expect(
+        boxes.first.constraints.maxHeight,
+        closeTo(800 * 0.85, 0.01),
+        reason: 'The sheet caps height at 85% of the viewport.',
+      );
     });
 
     testWidgets('long body uses a SingleChildScrollView', (tester) async {
@@ -91,6 +101,8 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: Builder(
                 builder: (context) => Center(
@@ -118,9 +130,13 @@ void main() {
         final sheetFinder = find.byType(BottomSheet);
         expect(sheetFinder, findsOneWidget);
         final sheet = tester.widget<BottomSheet>(sheetFinder);
-        expect(sheet.showDragHandle, isTrue,
-            reason: 'show() must request a drag handle so users can '
-                'pull the sheet down.');
+        expect(
+          sheet.showDragHandle,
+          isTrue,
+          reason:
+              'show() must request a drag handle so users can '
+              'pull the sheet down.',
+        );
         expect(sheet.enableDrag, isTrue);
       },
     );

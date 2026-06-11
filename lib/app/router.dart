@@ -39,9 +39,7 @@ String? _consumePendingWidgetPath(Ref ref) {
   // returns — Riverpod asserts against state writes during the build
   // phase. The URI itself is returned synchronously so the redirect
   // can act on it in the same tick.
-  final pending = ref
-      .read(pendingWidgetUriProvider.notifier)
-      .consumeDeferred();
+  final pending = ref.read(pendingWidgetUriProvider.notifier).consumeDeferred();
   if (pending == null) return null;
   return widgetUriToPath(pending);
 }
@@ -106,9 +104,7 @@ GoRouter router(Ref ref) {
       // doesn't render in English for non-English users.
       final l = AppLocalizations.of(context);
       return Scaffold(
-        appBar: AppBar(
-          title: Text(l?.notFoundTitle ?? 'Page not found'),
-        ),
+        appBar: AppBar(title: Text(l.notFoundTitle)),
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -116,14 +112,13 @@ GoRouter router(Ref ref) {
               const Icon(Icons.error_outline, size: 64, color: Colors.grey),
               const SizedBox(height: 16),
               Text(
-                l?.notFoundBody(state.matchedLocation) ??
-                    '"${state.matchedLocation}" not found.',
+                l.notFoundBody(state.matchedLocation),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () => context.go(RoutePaths.search),
-                child: Text(l?.notFoundHomeButton ?? 'Home'),
+                child: Text(l.notFoundHomeButton),
               ),
             ],
           ),

@@ -57,16 +57,11 @@ class EmailAuthCard extends StatelessWidget {
     // current account (UUID + data preserved, #3079) — frame it that way.
     final linking = isSignUp && linkMode;
     final headingText = linking
-        ? (l10n?.authLinkEmailTitle ?? 'Link an email')
-        : (isSignUp
-            ? (l10n?.createAccount ?? 'Create account')
-            : (l10n?.signIn ?? 'Sign in'));
+        ? (l10n.authLinkEmailTitle)
+        : (isSignUp ? (l10n.createAccount) : (l10n.signIn));
     final subtitleText = linking
-        ? (l10n?.authLinkEmailSubtitle ??
-            'Link an email so your data syncs across devices. '
-                'Your current favorites and trips stay on this account.')
-        : (l10n?.authSyncAcrossDevices ??
-            'Sync data automatically across all your devices.');
+        ? (l10n.authLinkEmailSubtitle)
+        : (l10n.authSyncAcrossDevices);
 
     return Card(
       child: Padding(
@@ -81,8 +76,9 @@ class EmailAuthCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     headingText,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -90,8 +86,9 @@ class EmailAuthCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitleText,
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -99,7 +96,7 @@ class EmailAuthCard extends StatelessWidget {
             TextField(
               controller: emailController,
               decoration: InputDecoration(
-                labelText: l10n?.authEmailLabel ?? 'Email',
+                labelText: l10n.authEmailLabel,
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.email, size: 18),
                 isDense: true,
@@ -113,7 +110,7 @@ class EmailAuthCard extends StatelessWidget {
             TextField(
               controller: passwordController,
               decoration: InputDecoration(
-                labelText: l10n?.authPasswordLabel ?? 'Password',
+                labelText: l10n.authPasswordLabel,
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.lock, size: 18),
                 isDense: true,
@@ -123,8 +120,8 @@ class EmailAuthCard extends StatelessWidget {
                     size: 18,
                   ),
                   tooltip: showPassword
-                      ? (l10n?.tooltipHidePassword ?? 'Hide password')
-                      : (l10n?.tooltipShowPassword ?? 'Show password'),
+                      ? (l10n.tooltipHidePassword)
+                      : (l10n.tooltipShowPassword),
                   onPressed: onTogglePassword,
                 ),
               ),
@@ -143,8 +140,7 @@ class EmailAuthCard extends StatelessWidget {
               TextField(
                 controller: confirmController,
                 decoration: InputDecoration(
-                  labelText:
-                      l10n?.authConfirmPasswordLabel ?? 'Confirm password',
+                  labelText: l10n.authConfirmPasswordLabel,
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.lock_outline, size: 18),
                   isDense: true,
@@ -154,8 +150,8 @@ class EmailAuthCard extends StatelessWidget {
                       size: 18,
                     ),
                     tooltip: showConfirm
-                        ? (l10n?.tooltipHidePassword ?? 'Hide password')
-                        : (l10n?.tooltipShowPassword ?? 'Show password'),
+                        ? (l10n.tooltipHidePassword)
+                        : (l10n.tooltipShowPassword),
                     onPressed: onToggleConfirm,
                   ),
                 ),
@@ -172,23 +168,29 @@ class EmailAuthCard extends StatelessWidget {
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white))
-                  : Icon(linking
-                      ? Icons.link
-                      : (isSignUp ? Icons.person_add : Icons.login)),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Icon(
+                      linking
+                          ? Icons.link
+                          : (isSignUp ? Icons.person_add : Icons.login),
+                    ),
               label: Text(headingText),
               style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44)),
+                minimumSize: const Size.fromHeight(44),
+              ),
             ),
             const SizedBox(height: 8),
             Center(
               child: TextButton(
                 onPressed: isLoading ? null : onToggleMode,
-                child: Text(isSignUp
-                    ? (l10n?.syncHaveAccountSignIn ??
-                        'Already have an account? Sign in')
-                    : (l10n?.authNewHereCreateAccount ??
-                        'New here? Create account')),
+                child: Text(
+                  isSignUp
+                      ? (l10n.syncHaveAccountSignIn)
+                      : (l10n.authNewHereCreateAccount),
+                ),
               ),
             ),
             if (error != null) ...[
@@ -222,9 +224,10 @@ class _ErrorBanner extends StatelessWidget {
           Icon(Icons.error_outline, size: 16, color: theme.colorScheme.error),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(error,
-                style:
-                    TextStyle(color: theme.colorScheme.error, fontSize: 12)),
+            child: Text(
+              error,
+              style: TextStyle(color: theme.colorScheme.error, fontSize: 12),
+            ),
           ),
         ],
       ),

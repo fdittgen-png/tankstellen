@@ -61,14 +61,14 @@ class _TripSaveProgressState extends State<TripSaveProgress>
     }
   }
 
-  String _labelFor(AppLocalizations? l, TripSaveStage stage) {
+  String _labelFor(AppLocalizations l, TripSaveStage stage) {
     switch (stage) {
       case TripSaveStage.finalizingSummary:
-        return l?.tripSaveProgressFinalizingSummary ?? 'Finalizing summary…';
+        return l.tripSaveProgressFinalizingSummary;
       case TripSaveStage.savingToHistory:
-        return l?.tripSaveProgressSavingToHistory ?? 'Saving to history…';
+        return l.tripSaveProgressSavingToHistory;
       case TripSaveStage.syncingToCloud:
-        return l?.tripSaveProgressSyncingToCloud ?? 'Syncing in background…';
+        return l.tripSaveProgressSyncingToCloud;
     }
   }
 

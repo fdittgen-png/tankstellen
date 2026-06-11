@@ -31,7 +31,7 @@ class RoutePlanningControls extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Text('${l10n?.routeSegment ?? "Route segment"}:'),
+            Text('${l10n.routeSegment}:'),
             Expanded(
               child: Slider(
                 value: segment,
@@ -47,15 +47,14 @@ class RoutePlanningControls extends ConsumerWidget {
           ],
         ),
         Text(
-          l10n?.showCheapestEveryNKm(segment.round()) ??
-              'Show cheapest station every ${segment.round()} km along route',
+          l10n.showCheapestEveryNKm(segment.round()),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         Row(
           children: [
-            Text('${l10n?.routeDetourBudget ?? "Maximum detour"}:'),
+            Text('${l10n.routeDetourBudget}:'),
             Expanded(
               child: Slider(
                 value: detour,
@@ -71,9 +70,7 @@ class RoutePlanningControls extends ConsumerWidget {
           ],
         ),
         Text(
-          l10n?.routeDetourBudgetCaption(detour.round()) ??
-              'Surface stations up to ${detour.round()} '
-                  'km off your direct route',
+          l10n.routeDetourBudgetCaption(detour.round()),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -90,28 +87,27 @@ class RoutePlanningControls extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ThemeData theme,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) {
     final saving = ref.watch(minRouteSavingSearchParamProvider);
     final off = saving <= 0;
     // i18n-ignore: language-neutral currency-per-litre unit mask.
     final amount = '${saving.toStringAsFixed(2)} €/L';
-    final valueLabel = off ? (l10n?.routeMinSavingOff ?? 'Off') : amount;
+    final valueLabel = off ? (l10n.routeMinSavingOff) : amount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            Text('${l10n?.routeMinSaving ?? "Minimum saving"}:'),
+            Text('${l10n.routeMinSaving}:'),
             Expanded(
               child: Slider(
                 value: saving,
                 max: 0.30,
                 divisions: 30,
                 label: valueLabel,
-                onChanged: (v) => ref
-                    .read(minRouteSavingSearchParamProvider.notifier)
-                    .set(v),
+                onChanged: (v) =>
+                    ref.read(minRouteSavingSearchParamProvider.notifier).set(v),
               ),
             ),
             Text(valueLabel),
@@ -119,10 +115,8 @@ class RoutePlanningControls extends ConsumerWidget {
         ),
         Text(
           off
-              ? (l10n?.routeMinSavingOffCaption ??
-                  'Showing every station found along the route')
-              : (l10n?.routeMinSavingCaption(amount) ??
-                  "Only stations within $amount of the route's cheapest"),
+              ? (l10n.routeMinSavingOffCaption)
+              : (l10n.routeMinSavingCaption(amount)),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),

@@ -61,8 +61,7 @@ class _OverlayView extends StatelessWidget {
           aspectRatio: aspect <= 0 ? 1.0 : aspect,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final size =
-                  Size(constraints.maxWidth, constraints.maxHeight);
+              final size = Size(constraints.maxWidth, constraints.maxHeight);
               final painter = OcrBlockOverlayPainter(
                 package: package,
                 imageSize: imageSize,
@@ -112,17 +111,21 @@ class _OverlayLegend extends StatelessWidget {
         runSpacing: 4,
         children: [
           _LegendChip(
-              color: OcrBlockOverlayColors.label,
-              label: l?.ocrTesterLegendLabel ?? 'Label'),
+            color: OcrBlockOverlayColors.label,
+            label: l.ocrTesterLegendLabel,
+          ),
           _LegendChip(
-              color: OcrBlockOverlayColors.numeric,
-              label: l?.ocrTesterLegendNumeric ?? 'Numeric'),
+            color: OcrBlockOverlayColors.numeric,
+            label: l.ocrTesterLegendNumeric,
+          ),
           _LegendChip(
-              color: OcrBlockOverlayColors.noise,
-              label: l?.ocrTesterLegendNoise ?? 'Noise'),
+            color: OcrBlockOverlayColors.noise,
+            label: l.ocrTesterLegendNoise,
+          ),
           _LegendChip(
-              color: OcrBlockOverlayColors.derived,
-              label: l?.ocrTesterLegendDerived ?? 'Derived'),
+            color: OcrBlockOverlayColors.derived,
+            label: l.ocrTesterLegendDerived,
+          ),
         ],
       ),
     );
@@ -274,11 +277,7 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
   /// wired. Uses [ReceiptScanService.parseReceiptImage] so no camera is
   /// reopened (the tester owns the source image).
   Future<void> _runReceipt(String path, OcrTraceRecorder trace) async {
-    await _service.parseReceiptImage(
-      path,
-      country: _country,
-      trace: trace,
-    );
+    await _service.parseReceiptImage(path, country: _country, trace: trace);
   }
 
   /// Reads [path]'s bytes and attaches them base64 to [trace] for export.
@@ -307,10 +306,7 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       final frame = await codec.getNextFrame();
       return (
         bytes: baked,
-        size: Size(
-          frame.image.width.toDouble(),
-          frame.image.height.toDouble(),
-        ),
+        size: Size(frame.image.width.toDouble(), frame.image.height.toDouble()),
       );
     } catch (_) {
       return null;
@@ -329,31 +325,20 @@ extension _PumpOcrTesterActions on _PumpOcrTesterScreenState {
       await _exportPackage(package);
       return;
     }
-    SnackBarHelper.showSuccess(
-      context,
-      l?.ocrTesterCopied ?? 'OCR trace copied to clipboard.',
-    );
+    SnackBarHelper.showSuccess(context, l.ocrTesterCopied);
   }
 
   Future<void> _exportPackage(OcrTracePackage package) async {
     await OcrTesterExport.exportPackage(package);
     if (!mounted) return;
     final l = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l?.ocrTesterExported ?? 'OCR package saved to your Downloads folder.',
-    );
+    SnackBarHelper.showSuccess(context, l.ocrTesterExported);
   }
 
   Future<void> _saveAsFixture(OcrTracePackage package) async {
     await OcrTesterExport.saveAsFixture(package);
     if (!mounted) return;
     final l = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l?.ocrTesterFixtureSaved ??
-          'Fixture saved to your Downloads folder. Move it under '
-              'test/fixtures and run tool/promote_ocr_fixture.dart.',
-    );
+    SnackBarHelper.showSuccess(context, l.ocrTesterFixtureSaved);
   }
 }

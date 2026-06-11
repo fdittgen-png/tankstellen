@@ -34,11 +34,11 @@ class AlertsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
 
     return PageScaffold(
-      title: l10n?.priceAlerts ?? 'Price Alerts',
+      title: l10n.priceAlerts,
       bodyPadding: EdgeInsets.zero,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l10n?.tooltipBack ?? 'Back',
+        tooltip: l10n.tooltipBack,
         onPressed: () => context.pop(),
       ),
       body: alertsAsync.when(
@@ -47,8 +47,7 @@ class AlertsScreen extends ConsumerWidget {
         error: (error, stackTrace) => ServiceChainErrorWidget(
           error: error,
           stackTrace: stackTrace,
-          searchContext:
-              l10n?.alertsLoadErrorTitle ?? "Couldn't load your alerts",
+          searchContext: l10n.alertsLoadErrorTitle,
           onRetry: () {
             // Invalidate both the underlying notifier and the async
             // wrapper so the read is retried from scratch.
@@ -87,9 +86,9 @@ class _AlertsBody extends ConsumerWidget {
         const SizedBox(height: 4),
         // ── Station alerts ──────────────────────────────────────────
         _SectionHeader(
-          title: l10n?.alertsStationSectionTitle ?? 'Station alerts',
+          title: l10n.alertsStationSectionTitle,
           count: alerts.length,
-          addTooltip: l10n?.alertsStationAdd ?? 'Add a station alert',
+          addTooltip: l10n.alertsStationAdd,
           // #2857 — the "+" used to be a dead-end that only re-showed the
           // "create from a station's detail page" hint. It now opens the
           // favorite-station picker and, on selection, the same
@@ -99,8 +98,7 @@ class _AlertsBody extends ConsumerWidget {
         if (alerts.isEmpty)
           _SectionEmpty(
             icon: Icons.notifications_off_outlined,
-            text: l10n?.noPriceAlertsHint ??
-                'Create an alert from a station\'s detail page.',
+            text: l10n.noPriceAlertsHint,
           )
         else
           _GroupedAlertsCard(
@@ -112,9 +110,9 @@ class _AlertsBody extends ConsumerWidget {
         const SizedBox(height: 12),
         // ── Zone / radius alerts (#578 phase 2) ─────────────────────
         _SectionHeader(
-          title: l10n?.alertsRadiusSectionTitle ?? 'Radius alerts',
+          title: l10n.alertsRadiusSectionTitle,
           count: radiusAsync.asData?.value.length ?? 0,
-          addTooltip: l10n?.alertsRadiusAdd ?? 'Add radius alert',
+          addTooltip: l10n.alertsRadiusAdd,
           onAdd: () => RadiusAlertCreateSheet.show(context),
         ),
         radiusAsync.when(
@@ -126,7 +124,9 @@ class _AlertsBody extends ConsumerWidget {
               children: [
                 for (final a in radiusAlerts)
                   _RadiusAlertListTile(
-                      key: ValueKey('radius-${a.id}'), alert: a),
+                    key: ValueKey('radius-${a.id}'),
+                    alert: a,
+                  ),
               ],
             );
           },
@@ -137,8 +137,7 @@ class _AlertsBody extends ConsumerWidget {
           error: (error, stackTrace) => ServiceChainErrorWidget(
             error: error,
             stackTrace: stackTrace,
-            searchContext:
-                l10n?.alertsLoadErrorTitle ?? "Couldn't load your alerts",
+            searchContext: l10n.alertsLoadErrorTitle,
             onRetry: () => ref.invalidate(radiusAlertsProvider),
           ),
         ),
@@ -237,7 +236,7 @@ class _AlertListTile extends ConsumerWidget {
       ),
       onDismissed: (_) {
         unawaited(ref.read(alertProvider.notifier).removeAlert(alert.id));
-        SnackBarHelper.show(context, l10n?.alertDeleted(alert.stationName) ?? 'Alert "${alert.stationName}" deleted');
+        SnackBarHelper.show(context, l10n.alertDeleted(alert.stationName));
       },
       child: ListTile(
         dense: true,
@@ -289,10 +288,7 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              '$title ($count)',
-              style: theme.textTheme.titleMedium,
-            ),
+            child: Text('$title ($count)', style: theme.textTheme.titleMedium),
           ),
           IconButton(
             icon: const Icon(Icons.add),
@@ -313,8 +309,8 @@ class _RadiusEmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: EmptyState(
         icon: Icons.location_searching,
-        title: l10n?.alertsRadiusEmptyTitle ?? 'No radius alerts yet',
-        actionLabel: l10n?.alertsRadiusEmptyCta ?? 'Create a radius alert',
+        title: l10n.alertsRadiusEmptyTitle,
+        actionLabel: l10n.alertsRadiusEmptyCta,
         onAction: () => RadiusAlertCreateSheet.show(context),
       ),
     );
@@ -354,8 +350,7 @@ class _RadiusAlertListTile extends ConsumerWidget {
         unawaited(notifier.remove(alert.id));
         SnackBarHelper.showWithUndo(
           context,
-          l10n?.radiusAlertDeleted(alert.label) ??
-              'Radius alert "${alert.label}" deleted',
+          l10n.radiusAlertDeleted(alert.label),
           onUndo: () => notifier.add(alert),
         );
       },
@@ -365,11 +360,7 @@ class _RadiusAlertListTile extends ConsumerWidget {
           Icons.location_searching,
           color: alert.enabled ? theme.colorScheme.primary : Colors.grey,
         ),
-        title: Text(
-          alert.label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        title: Text(alert.label, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(
           '${FuelType.fromString(alert.fuelType).displayName} ≤ '
           '${PriceFormatter.formatPrice(alert.threshold)} '

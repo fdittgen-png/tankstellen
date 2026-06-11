@@ -33,17 +33,16 @@ class _BucketRow extends StatelessWidget {
     // Capture the field into a local so the analyzer can promote it past the
     // null check.
     final best = bestCostPerKm;
-    final delta =
-        (costPerKm != null && best != null) ? costPerKm - best : 0.0;
+    final delta = (costPerKm != null && best != null) ? costPerKm - best : 0.0;
 
     final badge = stats.isMix
-        ? (l?.fuelEfficiencyMixBadge ?? 'Blend')
-        : (l?.fuelEfficiencyPureBadge ?? 'Pure');
+        ? (l.fuelEfficiencyMixBadge)
+        : (l.fuelEfficiencyPureBadge);
     final dominantName = localizedFuelName(l, bucket.dominant);
     // Secondary line: a blend names its dominant fuel; a pure bucket names
     // its (single) fuel so the row is never just an opaque grade code.
     final secondaryLine = stats.isMix
-        ? (l?.fuelEfficiencyMixDominant(dominantName) ?? 'Mostly $dominantName')
+        ? (l.fuelEfficiencyMixDominant(dominantName))
         : dominantName;
 
     return Row(
@@ -65,8 +64,9 @@ class _BucketRow extends StatelessWidget {
                       // code / A/B mix mask (see FuelEfficiencyBucket.label).
                       bucket.label,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight:
-                            isWinner ? FontWeight.w700 : FontWeight.w600,
+                        fontWeight: isWinner
+                            ? FontWeight.w700
+                            : FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -93,7 +93,7 @@ class _BucketRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               _MetricLine(
-                label: l?.fuelEfficiencyColCostPerKm ?? 'Cost/km',
+                label: l.fuelEfficiencyColCostPerKm,
                 value: costPerKm != null
                     ? PriceFormatter.formatPerKm(costPerKm)
                     : '—',
@@ -101,16 +101,15 @@ class _BucketRow extends StatelessWidget {
                 emphasised: true,
               ),
               _MetricLine(
-                label: l?.fuelEfficiencyColL100km ?? 'L/100km',
+                label: l.fuelEfficiencyColL100km,
                 value: l100 != null ? l100.toStringAsFixed(1) : '—',
               ),
               _MetricLine(
-                label: l?.fuelEfficiencyColTotalSpent ?? 'Total spent',
+                label: l.fuelEfficiencyColTotalSpent,
                 value: PriceFormatter.formatTotal(stats.totalSpent),
               ),
               Text(
-                l?.fuelEfficiencyFillCount(stats.fillCount) ??
-                    '${stats.fillCount} fills',
+                l.fuelEfficiencyFillCount(stats.fillCount),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -135,8 +134,9 @@ class _CompositionBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final bg =
-        isMix ? scheme.tertiaryContainer : scheme.surfaceContainerHighest;
+    final bg = isMix
+        ? scheme.tertiaryContainer
+        : scheme.surfaceContainerHighest;
     final fg = isMix ? scheme.onTertiaryContainer : scheme.onSurfaceVariant;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
@@ -188,13 +188,14 @@ class _MetricLine extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           value,
-          style: (emphasised
-                  ? theme.textTheme.titleSmall
-                  : theme.textTheme.bodyMedium)
-              ?.copyWith(
-            fontFeatures: const [FontFeature.tabularFigures()],
-            fontWeight: emphasised ? FontWeight.w700 : null,
-          ),
+          style:
+              (emphasised
+                      ? theme.textTheme.titleSmall
+                      : theme.textTheme.bodyMedium)
+                  ?.copyWith(
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                    fontWeight: emphasised ? FontWeight.w700 : null,
+                  ),
         ),
         if (trailing != null) ...[
           const SizedBox(width: 2),

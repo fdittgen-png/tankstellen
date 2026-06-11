@@ -41,11 +41,9 @@ class PriceChart extends StatefulWidget {
     for (int i = 0; i < reversed.length; i++) {
       final price = priceForFuelType(reversed[i], fuelType);
       if (price != null) {
-        points.add(ChartPoint(
-          index: i,
-          price: price,
-          date: reversed[i].recordedAt,
-        ));
+        points.add(
+          ChartPoint(index: i, price: price, date: reversed[i].recordedAt),
+        );
       }
     }
     return points;
@@ -82,7 +80,7 @@ class _PriceChartState extends State<PriceChart> {
       final l = AppLocalizations.of(context);
       return SizedBox(
         height: _chartHeight,
-        child: Center(child: Text(l?.noPriceHistory ?? 'No price history yet')),
+        child: Center(child: Text(l.noPriceHistory)),
       );
     }
 
@@ -92,8 +90,9 @@ class _PriceChartState extends State<PriceChart> {
     final locale = Localizations.localeOf(context).toString();
     final dateFormat = DateFormat.Md(locale);
 
-    final selected =
-        (_selected != null && _selected! < points.length) ? _selected : null;
+    final selected = (_selected != null && _selected! < points.length)
+        ? _selected
+        : null;
 
     return SizedBox(
       height: _chartHeight,
@@ -195,11 +194,7 @@ class _PriceChartPainter extends CustomPainter {
       final dotPaint = Paint()
         ..color = color
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2),
-        4,
-        dotPaint,
-      );
+      canvas.drawCircle(Offset(size.width / 2, size.height / 2), 4, dotPaint);
       return;
     }
 
@@ -242,11 +237,15 @@ class _PriceChartPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
-    path.moveTo(layout.xForIndex(points.first.index),
-        layout.yForPrice(points.first.price));
+    path.moveTo(
+      layout.xForIndex(points.first.index),
+      layout.yForPrice(points.first.price),
+    );
     for (int i = 1; i < points.length; i++) {
       path.lineTo(
-          layout.xForIndex(points[i].index), layout.yForPrice(points[i].price));
+        layout.xForIndex(points[i].index),
+        layout.yForPrice(points[i].price),
+      );
     }
     canvas.drawPath(path, linePaint);
 
@@ -278,8 +277,10 @@ class _PriceChartPainter extends CustomPainter {
     // Highlight the selected point with a ring.
     if (selectedIndex != null && selectedIndex! < points.length) {
       final sel = points[selectedIndex!];
-      final center =
-          Offset(layout.xForIndex(sel.index), layout.yForPrice(sel.price));
+      final center = Offset(
+        layout.xForIndex(sel.index),
+        layout.yForPrice(sel.price),
+      );
       canvas.drawCircle(center, 5, dotPaint);
       canvas.drawCircle(
         center,

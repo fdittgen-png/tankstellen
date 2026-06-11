@@ -48,11 +48,8 @@ class DrivingScoreCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     final scoreText = score.score.toString();
-    final outOf =
-        l?.drivingScoreCardOutOf ?? '/100';
-    final scoreSemanticsLabel =
-        l?.drivingScoreCardSemanticsLabel(scoreText) ??
-            'Driving score $scoreText out of 100';
+    final outOf = l.drivingScoreCardOutOf;
+    final scoreSemanticsLabel = l.drivingScoreCardSemanticsLabel(scoreText);
 
     final topPenalties = _topPenalties(l);
     final classLabel = _classLabel(l, score.styleClass);
@@ -64,10 +61,7 @@ class DrivingScoreCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l?.drivingScoreCardTitle ?? 'Driving score',
-              style: theme.textTheme.titleMedium,
-            ),
+            Text(l.drivingScoreCardTitle, style: theme.textTheme.titleMedium),
             const SizedBox(height: 4),
             // #2460 — the coarse VERY-GOOD / GOOD / AVERAGE / BAD band, so
             // the driver reads a verdict before the bare number.
@@ -113,9 +107,7 @@ class DrivingScoreCard extends StatelessWidget {
               // Placeholder for the future "Better than X% of past
               // trips" sub-text — see the class docstring for why it's
               // a follow-up.
-              l?.drivingScoreCardSubtitle ??
-                  'Composite score from idling, hard accelerations, '
-                      'hard braking, and high-RPM time.',
+              l.drivingScoreCardSubtitle,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -141,48 +133,48 @@ class DrivingScoreCard extends StatelessWidget {
   /// chips. Returns an empty list when every category is below a
   /// 1-point floor (the trip was clean enough that singling out a
   /// "biggest" contributor would be misleading).
-  List<String> _topPenalties(AppLocalizations? l) {
+  List<String> _topPenalties(AppLocalizations l) {
     final entries = <_NamedPenalty>[
       _NamedPenalty(
         value: score.idlingPenalty,
-        label: l?.drivingScorePenaltyIdling ?? 'Idling',
+        label: l.drivingScorePenaltyIdling,
       ),
       _NamedPenalty(
         value: score.hardAccelPenalty,
-        label: l?.drivingScorePenaltyHardAccel ?? 'Hard accelerations',
+        label: l.drivingScorePenaltyHardAccel,
       ),
       _NamedPenalty(
         value: score.hardBrakePenalty,
-        label: l?.drivingScorePenaltyHardBrake ?? 'Hard braking',
+        label: l.drivingScorePenaltyHardBrake,
       ),
       _NamedPenalty(
         value: score.highRpmPenalty,
-        label: l?.drivingScorePenaltyHighRpm ?? 'High RPM',
+        label: l.drivingScorePenaltyHighRpm,
       ),
       _NamedPenalty(
         value: score.fullThrottlePenalty,
-        label: l?.drivingScorePenaltyFullThrottle ?? 'Full throttle',
+        label: l.drivingScorePenaltyFullThrottle,
       ),
       // #2460 — the new canonical sub-scores join the breakdown ranking.
       _NamedPenalty(
         value: score.luggingPenalty,
-        label: l?.drivingScorePenaltyLugging ?? 'Lugging',
+        label: l.drivingScorePenaltyLugging,
       ),
       _NamedPenalty(
         value: score.smoothnessPenalty,
-        label: l?.drivingScorePenaltySmoothness ?? 'Jerky driving',
+        label: l.drivingScorePenaltySmoothness,
       ),
       _NamedPenalty(
         value: score.speedEfficiencyPenalty,
-        label: l?.drivingScorePenaltyHighSpeed ?? 'High speed',
+        label: l.drivingScorePenaltyHighSpeed,
       ),
       _NamedPenalty(
         value: score.pedalVelocityPenalty,
-        label: l?.drivingScorePenaltyPedalVelocity ?? 'Aggressive pedal',
+        label: l.drivingScorePenaltyPedalVelocity,
       ),
       _NamedPenalty(
         value: score.lambdaEnrichmentPenalty,
-        label: l?.drivingScorePenaltyLambda ?? 'Rich mixture',
+        label: l.drivingScorePenaltyLambda,
       ),
     ]..sort((a, b) => b.value.compareTo(a.value));
 
@@ -193,16 +185,16 @@ class DrivingScoreCard extends StatelessWidget {
   }
 
   /// Localized headline for the coarse classification band (#2460).
-  String _classLabel(AppLocalizations? l, DrivingStyleClass c) {
+  String _classLabel(AppLocalizations l, DrivingStyleClass c) {
     switch (c) {
       case DrivingStyleClass.veryGood:
-        return l?.drivingScoreClassVeryGood ?? 'Very good';
+        return l.drivingScoreClassVeryGood;
       case DrivingStyleClass.good:
-        return l?.drivingScoreClassGood ?? 'Good';
+        return l.drivingScoreClassGood;
       case DrivingStyleClass.average:
-        return l?.drivingScoreClassAverage ?? 'Average';
+        return l.drivingScoreClassAverage;
       case DrivingStyleClass.bad:
-        return l?.drivingScoreClassBad ?? 'Needs work';
+        return l.drivingScoreClassBad;
     }
   }
 

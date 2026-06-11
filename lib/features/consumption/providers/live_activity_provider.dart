@@ -107,9 +107,10 @@ class LiveActivitySync extends _$LiveActivitySync {
 
   /// Resolve [AppLocalizations] without a `BuildContext` (#2766 pattern
   /// — `lookupAppLocalizations` is a pure synchronous constructor).
-  /// Guarded twice so a harness without the language graph degrades to
-  /// English, then to the builder's literal fallbacks.
-  AppLocalizations? _l10n() {
+  /// Guarded so a harness without the language graph degrades to
+  /// English; the `en` lookup itself is total (it is the template
+  /// locale and always supported).
+  AppLocalizations _l10n() {
     String code;
     try {
       code = ref.read(activeLanguageProvider).code;
@@ -119,11 +120,7 @@ class LiveActivitySync extends _$LiveActivitySync {
     try {
       return lookupAppLocalizations(ui.Locale(code));
     } on Object {
-      try {
-        return lookupAppLocalizations(const ui.Locale('en'));
-      } on Object {
-        return null;
-      }
+      return lookupAppLocalizations(const ui.Locale('en'));
     }
   }
 }

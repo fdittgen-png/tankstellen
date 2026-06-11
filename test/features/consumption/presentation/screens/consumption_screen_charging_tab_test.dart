@@ -13,6 +13,7 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #582 phase 2 — the ConsumptionScreen grows a Fuel/Charging tab
 /// toggle. These tests verify that both tabs render, empty states
@@ -64,7 +65,11 @@ Future<void> _pumpScreen(
 
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       chargingLogsProvider.overrideWith(() => _FixedChargingLogs(chargingLogs)),
@@ -89,8 +94,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.descendant(
-            of: find.byType(Tab), matching: find.text('Charging')),
+        find.descendant(of: find.byType(Tab), matching: find.text('Charging')),
         findsOneWidget,
       );
       // The Fuel/Charging switcher has exactly two entries (#1901 —
@@ -98,22 +102,20 @@ void main() {
       expect(find.byType(Tab), findsNWidgets(2));
     });
 
-    testWidgets('Fuel tab shows its empty state with 0 fill-ups',
-        (tester) async {
+    testWidgets('Fuel tab shows its empty state with 0 fill-ups', (
+      tester,
+    ) async {
       await _pumpScreen(tester);
       expect(find.textContaining('No fill-ups'), findsOneWidget);
     });
 
-    testWidgets(
-        'Charging tab shows its empty state with 0 charging logs',
-        (tester) async {
+    testWidgets('Charging tab shows its empty state with 0 charging logs', (
+      tester,
+    ) async {
       await _pumpScreen(tester);
       await tester.tap(find.text('Charging'));
       await tester.pumpAndSettle();
-      expect(
-        find.byKey(const Key('charging_empty_state')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('charging_empty_state')), findsOneWidget);
       expect(find.textContaining('No charging logs'), findsOneWidget);
     });
 
@@ -129,8 +131,9 @@ void main() {
       expect(find.byKey(const Key('fab_add_fillup')), findsNothing);
     });
 
-    testWidgets('Charging tab renders a card per logged session',
-        (tester) async {
+    testWidgets('Charging tab renders a card per logged session', (
+      tester,
+    ) async {
       // Phase-3 added a charts header above the log list. On the
       // default 800px test surface the cards end up below the fold,
       // so we enlarge the viewport for this assertion only —

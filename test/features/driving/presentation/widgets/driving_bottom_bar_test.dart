@@ -10,8 +10,9 @@ import '../../../../helpers/pump_app.dart';
 
 void main() {
   group('DrivingBottomBar', () {
-    testWidgets('fires onRecenter exactly once when the location button taps',
-        (tester) async {
+    testWidgets('fires onRecenter exactly once when the location button taps', (
+      tester,
+    ) async {
       var recenter = 0;
       var nearest = 0;
       var exit = 0;
@@ -34,31 +35,33 @@ void main() {
     });
 
     testWidgets(
-        'fires onNearestStation exactly once when the gas-station button taps',
-        (tester) async {
-      var recenter = 0;
-      var nearest = 0;
-      var exit = 0;
+      'fires onNearestStation exactly once when the gas-station button taps',
+      (tester) async {
+        var recenter = 0;
+        var nearest = 0;
+        var exit = 0;
 
-      await pumpApp(
-        tester,
-        DrivingBottomBar(
-          onRecenter: () => recenter++,
-          onNearestStation: () => nearest++,
-          onExit: () => exit++,
-        ),
-      );
+        await pumpApp(
+          tester,
+          DrivingBottomBar(
+            onRecenter: () => recenter++,
+            onNearestStation: () => nearest++,
+            onExit: () => exit++,
+          ),
+        );
 
-      await tester.tap(find.byIcon(Icons.local_gas_station));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.local_gas_station));
+        await tester.pumpAndSettle();
 
-      expect(nearest, 1);
-      expect(recenter, 0);
-      expect(exit, 0);
-    });
+        expect(nearest, 1);
+        expect(recenter, 0);
+        expect(exit, 0);
+      },
+    );
 
-    testWidgets('fires onExit exactly once when the close button taps',
-        (tester) async {
+    testWidgets('fires onExit exactly once when the close button taps', (
+      tester,
+    ) async {
       var recenter = 0;
       var nearest = 0;
       var exit = 0;
@@ -80,30 +83,9 @@ void main() {
       expect(nearest, 0);
     });
 
-    testWidgets('renders English fallback labels when no l10n delegate wired',
-        (tester) async {
-      // Builds the bar with a bare MaterialApp that has no
-      // AppLocalizations delegate, forcing the `?? 'fallback'` arms.
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DrivingBottomBar(
-              onRecenter: () {},
-              onNearestStation: () {},
-              onExit: () {},
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Location'), findsOneWidget);
-      expect(find.text('Nearest'), findsOneWidget);
-      expect(find.text('Exit'), findsOneWidget);
-    });
-
-    testWidgets('renders the localized labels when AppLocalizations is wired',
-        (tester) async {
+    testWidgets('renders the localized labels when AppLocalizations is wired', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         DrivingBottomBar(
@@ -120,29 +102,29 @@ void main() {
       expect(find.text('Exit'), findsOneWidget);
     });
 
-    testWidgets('all three buttons meet the Android tap-target guideline (>=48dp)',
-        (tester) async {
-      final handle = tester.ensureSemantics();
+    testWidgets(
+      'all three buttons meet the Android tap-target guideline (>=48dp)',
+      (tester) async {
+        final handle = tester.ensureSemantics();
 
-      await pumpApp(
-        tester,
-        DrivingBottomBar(
-          onRecenter: () {},
-          onNearestStation: () {},
-          onExit: () {},
-        ),
-      );
+        await pumpApp(
+          tester,
+          DrivingBottomBar(
+            onRecenter: () {},
+            onNearestStation: () {},
+            onExit: () {},
+          ),
+        );
 
-      await expectLater(
-        tester,
-        meetsGuideline(androidTapTargetGuideline),
-      );
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
 
-      handle.dispose();
-    });
+        handle.dispose();
+      },
+    );
 
-    testWidgets('bottom padding includes MediaQuery viewPadding.bottom',
-        (tester) async {
+    testWidgets('bottom padding includes MediaQuery viewPadding.bottom', (
+      tester,
+    ) async {
       const inset = 34.0;
 
       await tester.pumpWidget(
@@ -186,8 +168,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('lays out the three buttons in a single Row',
-        (tester) async {
+    testWidgets('lays out the three buttons in a single Row', (tester) async {
       await pumpApp(
         tester,
         DrivingBottomBar(

@@ -28,7 +28,7 @@ class LanguageSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n?.language ?? 'Language', style: theme.textTheme.titleMedium),
+        Text(l10n.language, style: theme.textTheme.titleMedium),
         const SizedBox(height: 8),
         Wrap(
           spacing: 6,
@@ -36,11 +36,7 @@ class LanguageSelector extends StatelessWidget {
           children: AppLanguages.all.map((lang) {
             final isSelected = lang.code == selected.code;
             return Semantics(
-              label: l10n?.languageChipSemantic(
-                    lang.nativeName,
-                    '$isSelected',
-                  ) ??
-                  'Language ${lang.nativeName}',
+              label: l10n.languageChipSemantic(lang.nativeName, '$isSelected'),
               child: ChoiceChip(
                 label: Text(lang.nativeName),
                 selected: isSelected,

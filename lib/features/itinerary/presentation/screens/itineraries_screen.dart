@@ -42,13 +42,13 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     final l10n = AppLocalizations.of(context);
 
     return PageScaffold(
-      title: l10n?.savedRoutes ?? 'Saved Routes',
+      title: l10n.savedRoutes,
       bodyPadding: EdgeInsets.zero,
       body: itineraries.isEmpty
           ? EmptyState(
               icon: Icons.route,
-              title: l10n?.noSavedRoutes ?? 'No saved routes',
-              subtitle: l10n?.noSavedRoutesHint ?? 'Search along a route and save it for quick access later.',
+              title: l10n.noSavedRoutes,
+              subtitle: l10n.noSavedRoutesHint,
             )
           : RefreshIndicator(
               onRefresh: () async {
@@ -59,17 +59,26 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
                 itemBuilder: (context, index) {
                   final it = itineraries[index];
                   final highwaysSuffix = it.avoidHighways
-                      ? ' · ${l10n?.avoidHighways ?? 'no highways'}'
+                      ? ' · ${l10n.avoidHighways}'
                       : '';
                   return SwipeToDelete(
                     dismissKey: ValueKey(it.id),
                     onDismissed: () {
-                      unawaited(ref.read(itineraryProvider.notifier).delete(it.id));
-                      SnackBarHelper.show(context, AppLocalizations.of(context)?.itineraryDeleted(it.name) ?? '${it.name} deleted');
+                      unawaited(
+                        ref.read(itineraryProvider.notifier).delete(it.id),
+                      );
+                      SnackBarHelper.show(
+                        context,
+                        AppLocalizations.of(context).itineraryDeleted(it.name),
+                      );
                     },
                     child: ListTile(
                       leading: const Icon(Icons.route),
-                      title: Text(it.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      title: Text(
+                        it.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       subtitle: Text(
                         '${it.distanceKm.round()} km · ${it.durationMinutes.round()} min'
                         '$highwaysSuffix',
@@ -108,16 +117,23 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     final fuelType = FuelType.fromString(it.fuelType as String);
     final detourBudgetKm =
         ref.read(activeProfileProvider)?.routeDetourBudgetKm ?? 5.0;
-    unawaited(ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
-      waypoints: waypoints,
-      fuelType: fuelType,
-      searchRadiusKm: detourBudgetKm,
-    ));
+    unawaited(
+      ref
+          .read(routeSearchStateProvider.notifier)
+          .searchAlongRoute(
+            waypoints: waypoints,
+            fuelType: fuelType,
+            searchRadiusKm: detourBudgetKm,
+          ),
+    );
 
     // Navigate to search screen
     context.go(RoutePaths.search);
 
-    SnackBarHelper.show(context, AppLocalizations.of(context)?.loadingRoute(it.name as String) ?? 'Loading route: ${it.name}');
+    SnackBarHelper.show(
+      context,
+      AppLocalizations.of(context).loadingRoute(it.name as String),
+    );
   }
 
   String _formatDate(DateTime dt) {

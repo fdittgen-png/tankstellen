@@ -51,43 +51,39 @@ class PumpScanFailureSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l?.pumpScanFailureTitle ?? 'Display unreadable',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              l.pumpScanFailureTitle,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
-              l?.pumpScanFailureBody ??
-                  "We couldn't read the pump display. What would you like "
-                      'to do?',
+              l.pumpScanFailureBody,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 16),
             FilledButton.icon(
-              onPressed: () => Navigator.of(context)
-                  .pop(PumpScanFailureAction.correctManually),
+              onPressed: () => Navigator.of(
+                context,
+              ).pop(PumpScanFailureAction.correctManually),
               icon: const Icon(Icons.edit_outlined),
-              label: Text(
-                l?.pumpScanFailureCorrectManually ?? 'Correct manually',
-              ),
+              label: Text(l.pumpScanFailureCorrectManually),
             ),
             const SizedBox(height: 8),
             OutlinedButton.icon(
-              onPressed: () => Navigator.of(context)
-                  .pop(PumpScanFailureAction.report),
+              onPressed: () =>
+                  Navigator.of(context).pop(PumpScanFailureAction.report),
               icon: const Icon(Icons.flag_outlined),
-              label: Text(l?.pumpScanFailureReport ?? 'Report'),
+              label: Text(l.pumpScanFailureReport),
             ),
             const SizedBox(height: 8),
             TextButton.icon(
-              onPressed: () => Navigator.of(context)
-                  .pop(PumpScanFailureAction.removePhoto),
+              onPressed: () =>
+                  Navigator.of(context).pop(PumpScanFailureAction.removePhoto),
               icon: const Icon(Icons.delete_outline),
-              label: Text(
-                l?.pumpScanFailureRemove ?? 'Remove photo',
-              ),
+              label: Text(l.pumpScanFailureRemove),
             ),
           ],
         ),

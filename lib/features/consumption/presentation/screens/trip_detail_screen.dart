@@ -33,7 +33,7 @@ import '../../../../core/logging/error_logger.dart';
 /// up a Supabase client.
 @visibleForTesting
 Future<Map<String, dynamic>?> Function(String tripId)?
-    debugTripDetailFetchDetailsOverride;
+debugTripDetailFetchDetailsOverride;
 
 /// Test-only override for the trip-detail Share renderer (#1189).
 ///
@@ -46,7 +46,8 @@ Future<void> Function({
   required GlobalKey boundaryKey,
   required String subject,
   required String fileNameStem,
-})? debugTripDetailShareOverride;
+})?
+debugTripDetailShareOverride;
 
 /// Trip detail screen (#890).
 ///
@@ -128,7 +129,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     // only actions (cross-account share / delete) off for these.
     final sharedTrips = ref.watch(sharedTripsProvider).value ?? const [];
     final isShared = ownedEntry == null;
-    final entry = ownedEntry ??
+    final entry =
+        ownedEntry ??
         sharedTrips.where((t) => t.id == widget.tripId).firstOrNull;
     _maybeDecrementBadge(entry);
     if (!isShared) _maybeHydrateDetails(entry);
@@ -148,7 +150,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final vehicle = entry?.vehicleId == null
         ? activeVehicle
         : vehicles.where((v) => v.id == entry!.vehicleId).firstOrNull ??
-            activeVehicle;
+              activeVehicle;
     final isEv = vehicle?.type == VehicleType.ev;
 
     // Production callers pass widget.samples = const [] so the screen
@@ -159,13 +161,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final List<TripDetailSample> samples = widget.samples.isNotEmpty
         ? widget.samples
         : (entry?.samples.map(toDetailSample).toList(growable: false) ??
-            const []);
+              const []);
 
     return PageScaffold(
-      title: l?.tripHistoryTitle ?? 'Trip history',
+      title: l.tripHistoryTitle,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         onPressed: () => context.pop(),
       ),
       actions: entry == null
@@ -174,7 +176,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               PopupMenuButton<String>(
                 key: const Key('trip_detail_share_menu'),
                 icon: const Icon(Icons.share),
-                tooltip: l?.trajetDetailShareAction ?? 'Share',
+                tooltip: l.trajetDetailShareAction,
                 onSelected: (value) {
                   switch (value) {
                     case 'image':
@@ -202,7 +204,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 IconButton(
                   key: const Key('trip_detail_delete_button'),
                   icon: const Icon(Icons.delete_outline),
-                  tooltip: l?.trajetDetailDeleteAction ?? 'Delete',
+                  tooltip: l.trajetDetailDeleteAction,
                   onPressed: () => _onDelete(context, ref, l),
                 ),
             ],
@@ -212,7 +214,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Text(
-                  l?.tripHistoryEmptyTitle ?? 'No trips yet',
+                  l.tripHistoryEmptyTitle,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -235,8 +237,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   void _maybeHydrateDetails(TripHistoryEntry? entry) {
     if (_detailsHydrationAttempted) return;
     if (entry == null) return;
-    if (entry.samples.isNotEmpty ||
-        entry.gpsSampleDiagnostics.isNotEmpty) {
+    if (entry.samples.isNotEmpty || entry.gpsSampleDiagnostics.isNotEmpty) {
       // Already hydrated locally — either the trip was recorded on
       // this device or a previous mount already downloaded the
       // details. Nothing to do.
@@ -245,8 +246,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     _detailsHydrationAttempted = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        final fetcher = debugTripDetailFetchDetailsOverride ??
-            TripsSync.fetchDetails;
+        final fetcher =
+            debugTripDetailFetchDetailsOverride ?? TripsSync.fetchDetails;
         final data = await fetcher(entry.id);
         if (data == null) return;
         // Round-trip the merged JSON through fromJson so the
@@ -258,7 +259,14 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         if (!mounted) return;
         await ref.read(tripHistoryListProvider.notifier).save(hydrated);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripDetailScreen lazy-fetch'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: const {'where': 'TripDetailScreen lazy-fetch'},
+          ),
+        );
       }
     });
   }
@@ -275,24 +283,29 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         // #3159 — capture the count notifier BEFORE the awaits so the
         // refresh below never reads the WidgetRef after the screen
         // unmounted (Riverpod 3 throws a StateError there).
-        final countNotifier =
-            ref.read(autoRecordBadgeCountProvider.notifier);
-        final badge =
-            await ref.read(autoRecordBadgeServiceProvider.future);
+        final countNotifier = ref.read(autoRecordBadgeCountProvider.notifier);
+        final badge = await ref.read(autoRecordBadgeServiceProvider.future);
         await badge.decrement();
         // Phase 6: also refresh the reactive count so the
         // trip-history "Mark all as read" badge updates without
         // waiting for a route change.
         await countNotifier.refresh();
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripDetailScreen badge decrement'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: const {'where': 'TripDetailScreen badge decrement'},
+          ),
+        );
       }
     });
   }
 
   Future<void> _onShare(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     TripHistoryEntry entry,
     VehicleProfile? vehicle,
   ) async {
@@ -301,10 +314,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     // instead of a bare filename.
     final locale = Localizations.localeOf(context);
     final shareDate = entry.summary.startedAt ?? DateTime.now();
-    final formattedDate =
-        DateFormat.yMMMd(locale.toString()).format(shareDate);
-    final subject = l?.trajetDetailShareSubject(formattedDate) ??
-        'Sparkilo — trip on $formattedDate';
+    final formattedDate = DateFormat.yMMMd(locale.toString()).format(shareDate);
+    final subject = l.trajetDetailShareSubject(formattedDate);
     final messenger = ScaffoldMessenger.maybeOf(context);
     final scheme = Theme.of(context).colorScheme;
     final renderer = debugTripDetailShareOverride ?? shareWidgetAsImage;
@@ -318,10 +329,16 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       // Surface the failure to the user instead of silently swallowing
       // it — the snackbar tells them the share didn't go through, and
       // the debugPrint keeps the cause in `flutter logs` for support.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripDetailScreen share image'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'TripDetailScreen share image'},
+        ),
+      );
       if (messenger == null) return;
-      final errorMsg = l?.trajetDetailShareError ??
-          "Couldn't generate share image";
+      final errorMsg = l.trajetDetailShareError;
       messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
     }
   }
@@ -329,31 +346,22 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   Future<void> _onDelete(
     BuildContext context,
     WidgetRef ref,
-    AppLocalizations? l,
+    AppLocalizations l,
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-          l?.trajetDetailDeleteConfirmTitle ?? 'Delete this trip?',
-        ),
-        content: Text(
-          l?.trajetDetailDeleteConfirmBody ??
-              'This trip will be permanently removed from your history.',
-        ),
+        title: Text(l.trajetDetailDeleteConfirmTitle),
+        content: Text(l.trajetDetailDeleteConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(
-              l?.trajetDetailDeleteConfirmCancel ?? 'Cancel',
-            ),
+            child: Text(l.trajetDetailDeleteConfirmCancel),
           ),
           TextButton(
             key: const Key('trip_detail_delete_confirm'),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              l?.trajetDetailDeleteConfirmConfirm ?? 'Delete',
-            ),
+            child: Text(l.trajetDetailDeleteConfirmConfirm),
           ),
         ],
       ),
@@ -364,4 +372,3 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     context.pop();
   }
 }
-

@@ -17,11 +17,7 @@ class AmenityChips extends StatelessWidget {
   /// Maximum number of chips to display. Extra amenities show a "+N" chip.
   final int maxVisible;
 
-  const AmenityChips({
-    super.key,
-    required this.amenities,
-    this.maxVisible = 4,
-  });
+  const AmenityChips({super.key, required this.amenities, this.maxVisible = 4});
 
   @override
   Widget build(BuildContext context) {
@@ -36,43 +32,43 @@ class AmenityChips extends StatelessWidget {
       spacing: 4,
       runSpacing: 2,
       children: [
-        ...visible.map((a) => AppPill(
-              icon: amenityIcon(a),
-              label: _localizedLabel(a, l10n),
-            )),
+        ...visible.map(
+          (a) => AppPill(icon: amenityIcon(a), label: _localizedLabel(a, l10n)),
+        ),
         // #2622 — make the "+N" overflow pill meaningful: a tooltip +
         // accessibility label spell out the hidden amenities by localized
         // name so the count is no longer opaque.
         if (overflow > 0)
-          Builder(builder: (_) {
-            final hiddenNames = sorted
-                .skip(maxVisible)
-                .map((a) => _localizedLabel(a, l10n))
-                .join(', ');
-            final message =
-                l10n?.amenityMoreTooltip(hiddenNames) ?? 'Also: $hiddenNames';
-            return Tooltip(
-              message: message,
-              child: Semantics(
-                label: message,
-                child: AppPill(label: '+$overflow'),
-              ),
-            );
-          }),
+          Builder(
+            builder: (_) {
+              final hiddenNames = sorted
+                  .skip(maxVisible)
+                  .map((a) => _localizedLabel(a, l10n))
+                  .join(', ');
+              final message = l10n.amenityMoreTooltip(hiddenNames);
+              return Tooltip(
+                message: message,
+                child: Semantics(
+                  label: message,
+                  child: AppPill(label: '+$overflow'),
+                ),
+              );
+            },
+          ),
       ],
     );
   }
 
-  String _localizedLabel(StationAmenity a, AppLocalizations? l10n) {
+  String _localizedLabel(StationAmenity a, AppLocalizations l10n) {
     return switch (a) {
-      StationAmenity.shop => l10n?.amenityShop ?? 'Shop',
-      StationAmenity.carWash => l10n?.amenityCarWash ?? 'Car Wash',
-      StationAmenity.airPump => l10n?.amenityAirPump ?? 'Air',
-      StationAmenity.toilet => l10n?.amenityToilet ?? 'WC',
-      StationAmenity.restaurant => l10n?.amenityRestaurant ?? 'Food',
-      StationAmenity.atm => l10n?.amenityAtm ?? 'ATM',
-      StationAmenity.wifi => l10n?.amenityWifi ?? 'WiFi',
-      StationAmenity.ev => l10n?.amenityEv ?? 'EV',
+      StationAmenity.shop => l10n.amenityShop,
+      StationAmenity.carWash => l10n.amenityCarWash,
+      StationAmenity.airPump => l10n.amenityAirPump,
+      StationAmenity.toilet => l10n.amenityToilet,
+      StationAmenity.restaurant => l10n.amenityRestaurant,
+      StationAmenity.atm => l10n.amenityAtm,
+      StationAmenity.wifi => l10n.amenityWifi,
+      StationAmenity.ev => l10n.amenityEv,
     };
   }
 }

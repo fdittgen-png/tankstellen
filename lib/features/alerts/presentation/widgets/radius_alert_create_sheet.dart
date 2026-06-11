@@ -23,9 +23,8 @@ import 'radius_alert_map_picker.dart';
 /// [RadiusAlertMapPicker.push]; tests inject a stub that returns a
 /// pre-baked [LatLng] so the picker's own widget tree doesn't need to
 /// be built under `pumpApp` (#578 phase 3).
-typedef RadiusAlertMapPickerOpener = Future<LatLng?> Function(
-  BuildContext context,
-);
+typedef RadiusAlertMapPickerOpener =
+    Future<LatLng?> Function(BuildContext context);
 
 /// Bottom sheet that creates a new [RadiusAlert] (#578 phase 2 + 3,
 /// refactored in #563 phase: radius_alert_create_sheet).
@@ -68,9 +67,7 @@ class RadiusAlertCreateSheet extends ConsumerStatefulWidget {
       isScrollControlled: true,
       useSafeArea: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: RadiusAlertCreateSheet(
           idGenerator: idGenerator,
           mapPickerOpener: mapPickerOpener,
@@ -111,8 +108,7 @@ class _RadiusAlertCreateSheetState
     if (pos == null) {
       SnackBarHelper.showError(
         context,
-        AppLocalizations.of(context)?.errorTitleLocation ??
-            'Location unavailable',
+        AppLocalizations.of(context).errorTitleLocation,
       );
       return;
     }
@@ -124,30 +120,31 @@ class _RadiusAlertCreateSheetState
   }
 
   Future<void> _pickOnMap() async {
-    final opener = widget.mapPickerOpener ??
+    final opener =
+        widget.mapPickerOpener ??
         (ctx) => RadiusAlertMapPicker.push(
-              ctx,
-              initialCenter: _centerLat != null && _centerLng != null
-                  ? LatLng(_centerLat!, _centerLng!)
-                  : null,
-            );
+          ctx,
+          initialCenter: _centerLat != null && _centerLng != null
+              ? LatLng(_centerLat!, _centerLng!)
+              : null,
+        );
     final picked = await opener(context);
     if (!mounted || picked == null) return;
     final l10n = AppLocalizations.of(context);
     setState(() {
       _centerLat = picked.latitude;
       _centerLng = picked.longitude;
-      _centerSource = l10n?.radiusAlertCenterFromMap ?? 'Map location';
+      _centerSource = l10n.radiusAlertCenterFromMap;
     });
   }
 
   bool get _canSave => RadiusAlertValidators.canSave(
-        label: _labelController.text,
-        thresholdRaw: _thresholdController.text,
-        centerLat: _centerLat,
-        centerLng: _centerLng,
-        postalCode: _postalCodeController.text,
-      );
+    label: _labelController.text,
+    thresholdRaw: _thresholdController.text,
+    centerLat: _centerLat,
+    centerLng: _centerLng,
+    postalCode: _postalCodeController.text,
+  );
 
   /// The country the alert's centre falls in (#2865) — resolved from the
   /// picked coordinates via the registry's bounding boxes, exactly like
@@ -175,8 +172,9 @@ class _RadiusAlertCreateSheetState
   List<FuelType> get _evaluableFuels => alertEvaluableFuelsFor(_centerCountry);
 
   Future<void> _save() async {
-    final threshold =
-        RadiusAlertValidators.parseThreshold(_thresholdController.text);
+    final threshold = RadiusAlertValidators.parseThreshold(
+      _thresholdController.text,
+    );
     if (threshold == null) return;
 
     // #2211 — a real center is required (canSave enforces it). Guard
@@ -220,10 +218,7 @@ class _RadiusAlertCreateSheetState
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            l10n?.alertsRadiusCreateTitle ?? 'Create radius alert',
-            style: theme.textTheme.titleLarge,
-          ),
+          Text(l10n.alertsRadiusCreateTitle, style: theme.textTheme.titleLarge),
           const SizedBox(height: 16),
           RadiusAlertLabelField(
             controller: _labelController,
@@ -258,10 +253,7 @@ class _RadiusAlertCreateSheetState
           ),
           if (_centerSource != null) ...[
             const SizedBox(height: 8),
-            Text(
-              _centerSource!,
-              style: theme.textTheme.bodySmall,
-            ),
+            Text(_centerSource!, style: theme.textTheme.bodySmall),
           ],
           const SizedBox(height: 16),
           RadiusAlertPostalCodeField(

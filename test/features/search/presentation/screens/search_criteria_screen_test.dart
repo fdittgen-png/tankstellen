@@ -19,6 +19,7 @@ import 'package:tankstellen/features/search/providers/search_screen_ui_provider.
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// ActiveProfile stub that records updates in-memory for test assertions.
 class _FakeActiveProfile extends ActiveProfile {
@@ -38,40 +39,51 @@ class _FakeActiveProfile extends ActiveProfile {
 
 void main() {
   group('SearchCriteriaScreen', () {
-    testWidgets('renders form: LocationInput, FuelTypeSelector, slider, button',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    testWidgets(
+      'renders form: LocationInput, FuelTypeSelector, slider, button',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
-      await pumpApp(
-        tester,
-        const SearchCriteriaScreen(),
-        overrides: [
-          ...test.overrides,
-          selectedFuelTypeOverride(FuelType.e10),
-          searchRadiusOverride(8),
-          userPositionNullOverride(),
-        ],
-      );
+        await pumpApp(
+          tester,
+          const SearchCriteriaScreen(),
+          overrides: [
+            ...test.overrides,
+            selectedFuelTypeOverride(FuelType.e10),
+            searchRadiusOverride(8),
+            userPositionNullOverride(),
+          ],
+        );
 
-      expect(find.byType(LocationInput), findsOneWidget);
-      expect(find.byType(FuelTypeSelector), findsOneWidget);
-      expect(find.byType(Slider), findsOneWidget);
-      // #2131 — the inline "Search" CTA moved to the central FAB in
-      // the shell bar; the criteria screen no longer renders its own
-      // submit button.
-      expect(find.byKey(const ValueKey('criteria-search-button')),
-          findsNothing);
-      expect(find.byKey(const ValueKey('criteria-mode-toggle')),
-          findsOneWidget);
-      expect(find.byKey(const ValueKey('criteria-open-only-toggle')),
-          findsOneWidget);
-      expect(find.byKey(const ValueKey('criteria-save-defaults-button')),
-          findsOneWidget);
-    });
+        expect(find.byType(LocationInput), findsOneWidget);
+        expect(find.byType(FuelTypeSelector), findsOneWidget);
+        expect(find.byType(Slider), findsOneWidget);
+        // #2131 — the inline "Search" CTA moved to the central FAB in
+        // the shell bar; the criteria screen no longer renders its own
+        // submit button.
+        expect(
+          find.byKey(const ValueKey('criteria-search-button')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const ValueKey('criteria-mode-toggle')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('criteria-open-only-toggle')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('criteria-save-defaults-button')),
+          findsOneWidget,
+        );
+      },
+    );
 
-    testWidgets('mode toggle switches from LocationInput to RouteInput',
-        (tester) async {
+    testWidgets('mode toggle switches from LocationInput to RouteInput', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -109,10 +121,16 @@ void main() {
             searchRadiusOverride(8),
             userPositionNullOverride(),
           ].cast(),
-          child: Consumer(builder: (context, ref, _) {
-            container = ProviderScope.containerOf(context);
-            return const MaterialApp(home: SearchCriteriaScreen());
-          }),
+          child: Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: SearchCriteriaScreen(),
+              );
+            },
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -120,8 +138,7 @@ void main() {
       container.read(openOnlyFilterProvider.notifier).set(false);
       expect(container.read(openOnlyFilterProvider), isFalse);
 
-      final toggle =
-          find.byKey(const ValueKey('criteria-open-only-toggle'));
+      final toggle = find.byKey(const ValueKey('criteria-open-only-toggle'));
       await tester.ensureVisible(toggle);
       await tester.pump();
       await tester.tap(toggle);
@@ -143,10 +160,16 @@ void main() {
             searchRadiusOverride(8),
             userPositionNullOverride(),
           ].cast(),
-          child: Consumer(builder: (context, ref, _) {
-            container = ProviderScope.containerOf(context);
-            return const MaterialApp(home: SearchCriteriaScreen());
-          }),
+          child: Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: SearchCriteriaScreen(),
+              );
+            },
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -175,19 +198,18 @@ void main() {
       expect(container.read(selectedAmenitiesProvider), isEmpty);
     });
 
-    testWidgets(
-        'save-as-defaults button updates the active profile', (tester) async {
+    testWidgets('save-as-defaults button updates the active profile', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       // #1792 — open-only, amenities and brands have no UserProfile
       // field; they persist device-locally via putSetting.
-      when(() => test.mockStorage.putSetting(any(), any<dynamic>()))
-          .thenAnswer((_) async {});
+      when(
+        () => test.mockStorage.putSetting(any(), any<dynamic>()),
+      ).thenAnswer((_) async {});
 
-      const initialProfile = UserProfile(
-        id: 'p1',
-        name: 'Standard',
-      );
+      const initialProfile = UserProfile(id: 'p1', name: 'Standard');
       final fake = _FakeActiveProfile(initialProfile);
 
       // Pre-select shop amenity via the provider override container.
@@ -199,11 +221,7 @@ void main() {
         activeProfileProvider.overrideWith(() => fake),
       ];
 
-      await pumpApp(
-        tester,
-        const SearchCriteriaScreen(),
-        overrides: overrides,
-      );
+      await pumpApp(tester, const SearchCriteriaScreen(), overrides: overrides);
 
       // Select the "Air" amenity chip so we can assert it gets persisted.
       final airChip = find.byKey(const ValueKey('criteria-amenity-airPump'));
@@ -212,8 +230,9 @@ void main() {
       await tester.tap(airChip);
       await tester.pump();
 
-      final saveBtn =
-          find.byKey(const ValueKey('criteria-save-defaults-button'));
+      final saveBtn = find.byKey(
+        const ValueKey('criteria-save-defaults-button'),
+      );
       await tester.ensureVisible(saveBtn);
       await tester.pump();
       await tester.tap(saveBtn);
@@ -227,48 +246,52 @@ void main() {
 
       // #1792 — the amenity set has no profile field; it persists
       // device-locally instead of on the profile.
-      verify(() => test.mockStorage.putSetting(
-            StorageKeys.defaultAmenities,
-            [StationAmenity.airPump.name],
-          )).called(1);
+      verify(
+        () => test.mockStorage.putSetting(StorageKeys.defaultAmenities, [
+          StationAmenity.airPump.name,
+        ]),
+      ).called(1);
     });
 
     testWidgets(
-        '#2592 — save-as-defaults persists route params in route mode',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.putSetting(any(), any<dynamic>()))
-          .thenAnswer((_) async {});
+      '#2592 — save-as-defaults persists route params in route mode',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(
+          () => test.mockStorage.putSetting(any(), any<dynamic>()),
+        ).thenAnswer((_) async {});
 
-      const initialProfile = UserProfile(id: 'p1', name: 'Standard');
-      final fake = _FakeActiveProfile(initialProfile);
+        const initialProfile = UserProfile(id: 'p1', name: 'Standard');
+        final fake = _FakeActiveProfile(initialProfile);
 
-      await pumpApp(
-        tester,
-        const SearchCriteriaScreen(),
-        overrides: [
-          ...test.overrides,
-          selectedFuelTypeOverride(FuelType.diesel),
-          searchRadiusOverride(15),
-          userPositionNullOverride(),
-          activeSearchModeOverride(SearchMode.route),
-          routeSegmentSearchParamOverride(250),
-          activeProfileProvider.overrideWith(() => fake),
-        ],
-      );
+        await pumpApp(
+          tester,
+          const SearchCriteriaScreen(),
+          overrides: [
+            ...test.overrides,
+            selectedFuelTypeOverride(FuelType.diesel),
+            searchRadiusOverride(15),
+            userPositionNullOverride(),
+            activeSearchModeOverride(SearchMode.route),
+            routeSegmentSearchParamOverride(250),
+            activeProfileProvider.overrideWith(() => fake),
+          ],
+        );
 
-      final saveBtn =
-          find.byKey(const ValueKey('criteria-save-defaults-button'));
-      await tester.ensureVisible(saveBtn);
-      await tester.pump();
-      await tester.tap(saveBtn);
-      await tester.pump();
+        final saveBtn = find.byKey(
+          const ValueKey('criteria-save-defaults-button'),
+        );
+        await tester.ensureVisible(saveBtn);
+        await tester.pump();
+        await tester.tap(saveBtn);
+        await tester.pump();
 
-      expect(fake.updates, hasLength(1));
-      // Route mode persists the route-segment override onto the profile.
-      expect(fake.updates.single.routeSegmentKm, 250);
-    });
+        expect(fake.updates, hasLength(1));
+        // Route mode persists the route-segment override onto the profile.
+        expect(fake.updates.single.routeSegmentKm, 250);
+      },
+    );
 
     testWidgets('has a close (X) button that pops the route', (tester) async {
       final test = standardTestOverrides();
@@ -305,8 +328,9 @@ void main() {
       expect(find.byType(SearchCriteriaScreen), findsNothing);
     });
 
-    testWidgets('#2131 — registers a SearchFabAction on mount (nearby mode)',
-        (tester) async {
+    testWidgets('#2131 — registers a SearchFabAction on mount (nearby mode)', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -319,18 +343,26 @@ void main() {
             searchRadiusOverride(8),
             userPositionNullOverride(),
           ].cast(),
-          child: Consumer(builder: (context, ref, _) {
-            container = ProviderScope.containerOf(context);
-            return const MaterialApp(home: SearchCriteriaScreen());
-          }),
+          child: Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: SearchCriteriaScreen(),
+              );
+            },
+          ),
         ),
       );
       await tester.pumpAndSettle();
 
-      final action =
-          container.read(searchFabActionControllerProvider);
-      expect(action, isNotNull,
-          reason: 'Criteria screen must publish a FAB action on mount.');
+      final action = container.read(searchFabActionControllerProvider);
+      expect(
+        action,
+        isNotNull,
+        reason: 'Criteria screen must publish a FAB action on mount.',
+      );
       // Nearby mode is the default — FAB enabled, search icon.
       expect(action!.icon, Icons.search);
       expect(action.enabled, isTrue);
@@ -355,8 +387,7 @@ void main() {
     });
 
     group('#522 compaction + l10n', () {
-      testWidgets(
-          'FR locale shows the localised location placeholder '
+      testWidgets('FR locale shows the localised location placeholder '
           '(not "Location search field")', (tester) async {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -381,8 +412,7 @@ void main() {
         expect(find.text('Adresse, code postal ou ville'), findsOneWidget);
       });
 
-      testWidgets(
-          'FR locale renders the HelpBanner with the translated '
+      testWidgets('FR locale renders the HelpBanner with the translated '
           '"Compris" dismiss button', (tester) async {
         final test = standardTestOverrides();
         when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -406,8 +436,7 @@ void main() {
         expect(find.text('Got it'), findsNothing);
       });
 
-      testWidgets(
-          'form renders without a vertical overflow at the S23 Ultra '
+      testWidgets('form renders without a vertical overflow at the S23 Ultra '
           'surface size and 1x text scale', (tester) async {
         // #522 acceptance: every filter control fits above the fold.
         await tester.binding.setSurfaceSize(const Size(412, 915));
@@ -437,4 +466,3 @@ void main() {
     });
   });
 }
-

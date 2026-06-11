@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/add_fill_up_validators.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Unit tests for the pure validators / parsers extracted from
 /// `add_fill_up_screen.dart` (#563 refactor). Each rule is covered
@@ -15,79 +18,69 @@ import 'package:tankstellen/features/consumption/domain/add_fill_up_validators.d
 /// they take in widget tests that don't pump a MaterialApp with
 /// AppLocalizations.delegate.
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   group('AddFillUpValidators.positiveNumber', () {
     test('returns Required when value is null', () {
       expect(
-        AddFillUpValidators.positiveNumber(null, null),
+        AddFillUpValidators.positiveNumber(null, l10nEn),
         equals('Required'),
       );
     });
 
     test('returns Required when value is empty', () {
       expect(
-        AddFillUpValidators.positiveNumber('', null),
+        AddFillUpValidators.positiveNumber('', l10nEn),
         equals('Required'),
       );
     });
 
     test('returns Required when value is whitespace only', () {
       expect(
-        AddFillUpValidators.positiveNumber('   ', null),
+        AddFillUpValidators.positiveNumber('   ', l10nEn),
         equals('Required'),
       );
     });
 
     test('returns Invalid number when value is not numeric', () {
       expect(
-        AddFillUpValidators.positiveNumber('abc', null),
+        AddFillUpValidators.positiveNumber('abc', l10nEn),
         equals('Invalid number'),
       );
     });
 
     test('returns Invalid number when value is zero', () {
       expect(
-        AddFillUpValidators.positiveNumber('0', null),
+        AddFillUpValidators.positiveNumber('0', l10nEn),
         equals('Invalid number'),
       );
     });
 
     test('returns Invalid number when value is negative', () {
       expect(
-        AddFillUpValidators.positiveNumber('-1', null),
+        AddFillUpValidators.positiveNumber('-1', l10nEn),
         equals('Invalid number'),
       );
     });
 
     test('returns null on a positive integer', () {
-      expect(
-        AddFillUpValidators.positiveNumber('40', null),
-        isNull,
-      );
+      expect(AddFillUpValidators.positiveNumber('40', l10nEn), isNull);
     });
 
     test('returns null on a positive decimal with dot', () {
-      expect(
-        AddFillUpValidators.positiveNumber('1.859', null),
-        isNull,
-      );
+      expect(AddFillUpValidators.positiveNumber('1.859', l10nEn), isNull);
     });
 
     test('returns null on a positive decimal with comma (FR/DE locale)', () {
       // The form is bilingual — French / German users type a comma
       // separator. The validator must accept both.
-      expect(
-        AddFillUpValidators.positiveNumber('1,859', null),
-        isNull,
-      );
+      expect(AddFillUpValidators.positiveNumber('1,859', l10nEn), isNull);
     });
 
     test('returns null on a tiny positive value', () {
       // The validator's lower bound is "> 0", not ">= 0.01". A 0.01 L
       // dribble is implausible but not invalid.
-      expect(
-        AddFillUpValidators.positiveNumber('0.01', null),
-        isNull,
-      );
+      expect(AddFillUpValidators.positiveNumber('0.01', l10nEn), isNull);
     });
   });
 

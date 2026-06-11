@@ -38,7 +38,7 @@ class Obd2CapabilitySection extends ConsumerWidget {
     final cs = theme.colorScheme;
 
     return SectionCard(
-      title: l?.obd2CapabilitySectionTitle ?? 'Adapter capabilities',
+      title: l.obd2CapabilitySectionTitle,
       leadingIcon: Icons.memory,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -58,9 +58,7 @@ class Obd2CapabilitySection extends ConsumerWidget {
           if (capability == Obd2AdapterCapability.standardOnly) ...[
             const SizedBox(height: Spacing.md),
             Text(
-              l?.obd2CapabilityUpgradeHintStandard ??
-                  'For exact litres-in-tank on Peugeot/Citroën, the app '
-                      'supports OBDLink MX+/LX/CX (STN chip).',
+              l.obd2CapabilityUpgradeHintStandard,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: cs.onSurfaceVariant,
               ),
@@ -82,17 +80,14 @@ class Obd2CapabilitySection extends ConsumerWidget {
     }
   }
 
-  String _labelFor(
-    Obd2AdapterCapability capability,
-    AppLocalizations? l,
-  ) {
+  String _labelFor(Obd2AdapterCapability capability, AppLocalizations l) {
     switch (capability) {
       case Obd2AdapterCapability.standardOnly:
-        return l?.obd2CapabilityStandardOnly ?? 'Standard';
+        return l.obd2CapabilityStandardOnly;
       case Obd2AdapterCapability.oemPidsCapable:
-        return l?.obd2CapabilityOemPids ?? 'OEM PIDs';
+        return l.obd2CapabilityOemPids;
       case Obd2AdapterCapability.passiveCanCapable:
-        return l?.obd2CapabilityFullCan ?? 'Full CAN';
+        return l.obd2CapabilityFullCan;
     }
   }
 }

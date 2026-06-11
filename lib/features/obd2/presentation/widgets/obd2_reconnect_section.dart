@@ -29,16 +29,12 @@ class Obd2ReconnectSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final line = l?.obd2DiagnosticsReconnectAttemptsLine(
-          summary.reconnectAttemptCount,
-          summary.reconnectSuccessCount,
-          summary.transitionCount,
-          summary.disconnectExceptions,
-        ) ??
-        '${summary.reconnectAttemptCount} reconnect attempts · '
-            '${summary.reconnectSuccessCount} ok · '
-            '${summary.transitionCount} transitions · '
-            '${summary.disconnectExceptions} typed drops';
+    final line = l.obd2DiagnosticsReconnectAttemptsLine(
+      summary.reconnectAttemptCount,
+      summary.reconnectSuccessCount,
+      summary.transitionCount,
+      summary.disconnectExceptions,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -47,7 +43,7 @@ class Obd2ReconnectSection extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              l?.obd2DiagnosticsReconnectSection ?? 'Reconnect telemetry',
+              l.obd2DiagnosticsReconnectSection,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: theme.colorScheme.primary,
               ),
@@ -58,16 +54,14 @@ class Obd2ReconnectSection extends StatelessWidget {
         for (final entry in summary.reconnectReasonCounts.entries)
           _line(
             theme,
-            l?.obd2DiagnosticsReconnectReasonLine(entry.key, entry.value) ??
-                '${entry.key}: ${entry.value}',
+            l.obd2DiagnosticsReconnectReasonLine(entry.key, entry.value),
             key: Key('obd2_diag_reconnect_reason_${entry.key}'),
           ),
         if (summary.fallbackActivated) ...[
           const SizedBox(height: 4),
           _line(
             theme,
-            l?.obd2DiagnosticsFallbackLine ??
-                'GPS-only fallback activated this session.',
+            l.obd2DiagnosticsFallbackLine,
             key: const Key('obd2_diag_fallback_line'),
           ),
         ],
@@ -76,8 +70,8 @@ class Obd2ReconnectSection extends StatelessWidget {
   }
 
   Widget _line(ThemeData theme, String text, {Key? key}) => Align(
-        key: key,
-        alignment: AlignmentDirectional.centerStart,
-        child: Text(text, style: theme.textTheme.bodyMedium),
-      );
+    key: key,
+    alignment: AlignmentDirectional.centerStart,
+    child: Text(text, style: theme.textTheme.bodyMedium),
+  );
 }

@@ -133,7 +133,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return PageScaffold(
-      title: l10n?.syncWizardScanQrCode ?? 'Scan QR Code',
+      title: l10n.syncWizardScanQrCode,
       bodyPadding: EdgeInsets.zero,
       actions: _phase == _ScannerPhase.scanning
           ? [
@@ -147,48 +147,40 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     );
   }
 
-  Widget _buildBody(AppLocalizations? l10n) {
+  Widget _buildBody(AppLocalizations l10n) {
     switch (_phase) {
       case _ScannerPhase.probing:
         return const Center(child: CircularProgressIndicator());
       case _ScannerPhase.denied:
         return QrPermissionDenied(
           key: const Key('qrScannerDenied'),
-          message: l10n?.qrScannerPermissionDenied ??
-              'Camera access is needed to scan QR codes.',
-          buttonLabel: l10n?.qrScannerRetryPermission ?? 'Try again',
+          message: l10n.qrScannerPermissionDenied,
+          buttonLabel: l10n.qrScannerRetryPermission,
           onPressed: _probePermission,
         );
       case _ScannerPhase.permanentlyDenied:
         return QrPermissionDenied(
           key: const Key('qrScannerPermanentlyDenied'),
-          message: l10n?.qrScannerPermissionPermanentlyDenied ??
-              'Camera access was denied. Open settings to grant it.',
-          buttonLabel: l10n?.qrScannerOpenSettings ?? 'Open settings',
+          message: l10n.qrScannerPermissionPermanentlyDenied,
+          buttonLabel: l10n.qrScannerOpenSettings,
           onPressed: widget._permissions.openSettings,
         );
       case _ScannerPhase.timeout:
         return QrScanTimeoutPrompt(
-          message: l10n?.qrScannerTimeout ??
-              'No QR code detected. Move closer or try again.',
-          buttonLabel: l10n?.qrScannerRetry ?? 'Try again',
+          message: l10n.qrScannerTimeout,
+          buttonLabel: l10n.qrScannerRetry,
           onPressed: _retry,
         );
       case _ScannerPhase.scanning:
         return Stack(
           fit: StackFit.expand,
           children: [
-            MobileScanner(
-              controller: _controller,
-              onDetect: _onDetect,
-            ),
+            MobileScanner(controller: _controller, onDetect: _onDetect),
             const QrScanFrameOverlay(),
             Align(
               alignment: Alignment.bottomCenter,
               child: _GuidanceCaption(
-                text: widget.guidance ??
-                    l10n?.qrScannerGuidance ??
-                    'Point the camera at a QR code',
+                text: widget.guidance ?? l10n.qrScannerGuidance,
               ),
             ),
           ],
@@ -236,9 +228,7 @@ class QrScannerTorchButton extends StatelessWidget {
         return IconButton(
           key: const Key('qrScannerTorchToggle'),
           icon: Icon(on ? Icons.flash_on : Icons.flash_off),
-          tooltip: on
-              ? (l10n?.torchOff ?? 'Turn flash off')
-              : (l10n?.torchOn ?? 'Turn flash on'),
+          tooltip: on ? (l10n.torchOff) : (l10n.torchOn),
           onPressed: onToggle,
         );
       },

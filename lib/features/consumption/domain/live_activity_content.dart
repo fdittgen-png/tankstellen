@@ -84,20 +84,20 @@ class LiveActivityContent {
   /// `ios/TankstellenWidget/TripActivityAttributes.swift` — keep the two
   /// in lock-step.
   Map<String, Object?> toChannelMap() => <String, Object?>{
-        'mode': mode.name,
-        'paused': paused,
-        'startedAtEpochMs': startedAtEpochMs,
-        'bigFigure': bigFigure,
-        'bigCaption': bigCaption,
-        'isEstimate': isEstimate,
-        'distanceText': distanceText,
-        'pausedLabel': pausedLabel,
-        'stationName': stationName,
-        'priceText': priceText,
-        'fuelLabel': fuelLabel,
-        'stationDistanceText': stationDistanceText,
-        'progress': progress,
-      };
+    'mode': mode.name,
+    'paused': paused,
+    'startedAtEpochMs': startedAtEpochMs,
+    'bigFigure': bigFigure,
+    'bigCaption': bigCaption,
+    'isEstimate': isEstimate,
+    'distanceText': distanceText,
+    'pausedLabel': pausedLabel,
+    'stationName': stationName,
+    'priceText': priceText,
+    'fuelLabel': fuelLabel,
+    'stationDistanceText': stationDistanceText,
+    'progress': progress,
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -118,20 +118,20 @@ class LiveActivityContent {
 
   @override
   int get hashCode => Object.hash(
-        mode,
-        paused,
-        startedAtEpochMs,
-        bigFigure,
-        bigCaption,
-        isEstimate,
-        distanceText,
-        pausedLabel,
-        stationName,
-        priceText,
-        fuelLabel,
-        stationDistanceText,
-        progress,
-      );
+    mode,
+    paused,
+    startedAtEpochMs,
+    bigFigure,
+    bigCaption,
+    isEstimate,
+    distanceText,
+    pausedLabel,
+    stationName,
+    priceText,
+    fuelLabel,
+    stationDistanceText,
+    progress,
+  );
 }
 
 /// Build the Live Activity content for one trip/approach snapshot, or
@@ -146,15 +146,15 @@ class LiveActivityContent {
 /// 3. **Otherwise** → the consumption hero (OBD2 L/100 km → GPS `~`
 ///    estimate → warm-up `~`), same branch order as the PiP (#2601).
 ///
-/// [l] is nullable with the project-wide `l?.key ?? 'English'` fallback
-/// convention so a harness without the l10n graph still renders.
+/// [l] is non-nullable (#3162) — context-free callers resolve it via
+/// `lookupAppLocalizations` (the #2766 pattern), never a literal fallback.
 LiveActivityContent? buildLiveActivityContent({
   required TripRecordingState state,
   required ApproachState? approach,
   required Station? radarStation,
   required FuelType fuel,
   required double? radiusMeters,
-  required AppLocalizations? l,
+  required AppLocalizations l,
   required DateTime now,
 }) {
   if (!state.isActive) return null;
@@ -164,9 +164,9 @@ LiveActivityContent? buildLiveActivityContent({
   // Round to the second so per-emit recomputation doesn't jitter equality.
   final startedAtEpochMs =
       ((now.millisecondsSinceEpoch - (live?.elapsed.inMilliseconds ?? 0)) ~/
-              1000) *
-          1000;
-  final pausedLabel = l?.tripBannerPaused ?? 'Paused';
+          1000) *
+      1000;
+  final pausedLabel = l.tripBannerPaused;
   final distance = live?.distanceKmSoFar;
   final distanceText = (distance != null && distance >= 0.1)
       ? '${distance.toStringAsFixed(1)} km'
@@ -175,8 +175,9 @@ LiveActivityContent? buildLiveActivityContent({
   // Resolve the consumption hero (shared by both modes — the approach
   // layouts keep it so the island's expanded view can show it secondary).
   final raw = (live != null && !paused) ? formatInstantConsumption(live) : null;
-  final gpsEstimate =
-      (live != null && !paused) ? live.gpsEstimatedLPer100Km : null;
+  final gpsEstimate = (live != null && !paused)
+      ? live.gpsEstimatedLPer100Km
+      : null;
   final String bigFigure;
   final String bigCaption;
   var isEstimate = false;
@@ -186,12 +187,12 @@ LiveActivityContent? buildLiveActivityContent({
     bigCaption = raw.contains('L/100') ? 'L/100 km' : 'L/h';
   } else if (gpsEstimate != null) {
     bigFigure = '~${gpsEstimate.toStringAsFixed(1)}';
-    bigCaption = l?.tripRecordingPipEstConsumptionCaption ?? 'est. L/100 km';
+    bigCaption = l.tripRecordingPipEstConsumptionCaption;
     isEstimate = true;
   } else {
     // Warm-up / paused — keep the hero consumption-framed (#2601).
     bigFigure = '~';
-    bigCaption = l?.tripRecordingPipEstConsumptionCaption ?? 'est. L/100 km';
+    bigCaption = l.tripRecordingPipEstConsumptionCaption;
     isEstimate = true;
   }
 
@@ -204,11 +205,10 @@ LiveActivityContent? buildLiveActivityContent({
     final String? stationDistanceText = distMeters == null
         ? null
         : kmCaption
-            ? (l?.fuelStationRadarDistanceKm(
-                    (distMeters / 1000.0).toStringAsFixed(1)) ??
-                '${(distMeters / 1000.0).toStringAsFixed(1)} km')
-            : (l?.approachStationDistance(distMeters.toStringAsFixed(0)) ??
-                '${distMeters.toStringAsFixed(0)} m');
+        ? (l.fuelStationRadarDistanceKm(
+            (distMeters / 1000.0).toStringAsFixed(1),
+          ))
+        : (l.approachStationDistance(distMeters.toStringAsFixed(0)));
     return LiveActivityContent(
       mode: LiveActivityMode.approach,
       paused: paused,

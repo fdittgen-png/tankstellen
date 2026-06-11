@@ -46,7 +46,7 @@ class TripSummaryCard extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final s = entry.summary;
-    final unknown = l?.trajetDetailFieldValueUnknown ?? '—';
+    final unknown = l.trajetDetailFieldValueUnknown;
 
     // #1209 — estimated trip cost from the most recent fill-up's
     // price-per-litre. Hidden on EV trips (the helper still returns
@@ -57,7 +57,8 @@ class TripSummaryCard extends ConsumerWidget {
     final date = s.startedAt == null ? unknown : _fmtDate(s.startedAt!);
     final vehicleName = vehicle?.name ?? unknown;
     final distance = '${s.distanceKm.toStringAsFixed(1)} km';
-    final duration = s.startedAt != null &&
+    final duration =
+        s.startedAt != null &&
             s.endedAt != null &&
             s.endedAt!.isAfter(s.startedAt!)
         ? _fmtDuration(s.endedAt!.difference(s.startedAt!))
@@ -79,18 +80,12 @@ class TripSummaryCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.trajetDetailSummaryTitle ?? 'Summary',
+              l.trajetDetailSummaryTitle,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            _SummaryRow(
-              label: l?.trajetDetailFieldDate ?? 'Date',
-              value: date,
-            ),
-            _SummaryRow(
-              label: l?.trajetDetailFieldVehicle ?? 'Vehicle',
-              value: vehicleName,
-            ),
+            _SummaryRow(label: l.trajetDetailFieldDate, value: date),
+            _SummaryRow(label: l.trajetDetailFieldVehicle, value: vehicleName),
             // #1312 — surface the OBD2 adapter identity directly
             // under Vehicle so device-test bug reports can name the
             // suspect device (different ELM327 clones expose different
@@ -102,29 +97,20 @@ class TripSummaryCard extends ConsumerWidget {
                 entry.adapterName != null ||
                 entry.adapterFirmware != null)
               _SummaryRow(
-                label: l?.trajetDetailFieldAdapter ?? 'OBD2 adapter',
+                label: l.trajetDetailFieldAdapter,
                 value: _formatAdapter(
                   entry.adapterName,
                   entry.adapterMac,
                   entry.adapterFirmware,
                 ),
               ),
+            _SummaryRow(label: l.trajetDetailFieldDistance, value: distance),
+            _SummaryRow(label: l.trajetDetailFieldDuration, value: duration),
             _SummaryRow(
-              label: l?.trajetDetailFieldDistance ?? 'Distance',
-              value: distance,
-            ),
-            _SummaryRow(
-              label: l?.trajetDetailFieldDuration ?? 'Duration',
-              value: duration,
-            ),
-            _SummaryRow(
-              label: l?.trajetDetailFieldAvgConsumption ?? 'Avg consumption',
+              label: l.trajetDetailFieldAvgConsumption,
               value: avgConsumption,
             ),
-            _SummaryRow(
-              label: l?.trajetDetailFieldFuelUsed ?? 'Fuel used',
-              value: fuelUsed,
-            ),
+            _SummaryRow(label: l.trajetDetailFieldFuelUsed, value: fuelUsed),
             // #1209 — estimated euro/£/$ cost of the fuel used,
             // derived from the most recent fill-up before this trip.
             // Hidden when the provider returns null (no fill-ups, no
@@ -132,39 +118,27 @@ class TripSummaryCard extends ConsumerWidget {
             // shows a misleading "0,00 €" or "—" placeholder.
             if (fuelCost != null)
               _SummaryRow(
-                label: l?.trajetDetailFieldFuelCost ?? 'Fuel cost',
+                label: l.trajetDetailFieldFuelCost,
                 // #2491 — a trip cost is a TOTAL, not a per-litre price:
                 // route it through formatTotal (2 dp + currency symbol)
                 // so a 1.05 € trip reads "1,05 €", not "1,047 €".
                 value: PriceFormatter.formatTotal(fuelCost),
               ),
-            _SummaryRow(
-              label: l?.trajetDetailFieldAvgSpeed ?? 'Avg speed',
-              value: avgSpeed,
-            ),
-            _SummaryRow(
-              label: l?.trajetDetailFieldMaxSpeed ?? 'Max speed',
-              value: maxSpeed,
-            ),
+            _SummaryRow(label: l.trajetDetailFieldAvgSpeed, value: avgSpeed),
+            _SummaryRow(label: l.trajetDetailFieldMaxSpeed, value: maxSpeed),
           ],
         ),
       ),
     );
   }
 
-  static String _avgSpeedLabel(
-    List<TripDetailSample> samples,
-    String unknown,
-  ) {
+  static String _avgSpeedLabel(List<TripDetailSample> samples, String unknown) {
     if (samples.isEmpty) return unknown;
     final avg = samples.map((s) => s.speedKmh).average;
     return '${avg.toStringAsFixed(1)} km/h';
   }
 
-  static String _maxSpeedLabel(
-    List<TripDetailSample> samples,
-    String unknown,
-  ) {
+  static String _maxSpeedLabel(List<TripDetailSample> samples, String unknown) {
     if (samples.isEmpty) return unknown;
     var maxV = samples.first.speedKmh;
     for (final s in samples) {
@@ -179,11 +153,7 @@ class TripSummaryCard extends ConsumerWidget {
   /// when known. Total length is capped at ~40 chars (head-truncated
   /// with an ellipsis) so the row doesn't push the summary card into
   /// a multi-line layout on narrow phones.
-  static String _formatAdapter(
-    String? name,
-    String? mac,
-    String? firmware,
-  ) {
+  static String _formatAdapter(String? name, String? mac, String? firmware) {
     final parts = <String>[];
     if (name != null && name.isNotEmpty) parts.add(name);
     if (mac != null && mac.isNotEmpty) parts.add(mac);
@@ -239,10 +209,7 @@ class _SummaryRow extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            value,
-            style: theme.textTheme.bodyMedium,
-          ),
+          Text(value, style: theme.textTheme.bodyMedium),
         ],
       ),
     );

@@ -49,7 +49,7 @@ class ChargingCostTrendChart extends StatelessWidget {
         height: 140,
         child: Center(
           child: Text(
-            l?.chargingChartsEmpty ?? 'Not enough data yet',
+            l.chargingChartsEmpty,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

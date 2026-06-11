@@ -43,8 +43,9 @@ class _TrajetsRecordFabState extends ConsumerState<TrajetsRecordFab> {
     // #2274 concern 3 — kick the BLE pre-warm after the first frame so
     // it never competes with the tab's initial layout, and read
     // providers off a post-frame callback where `ref` is safe to use.
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _starter.maybePrewarm(ref));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _starter.maybePrewarm(ref),
+    );
   }
 
   @override
@@ -71,9 +72,7 @@ class _TrajetsRecordFabState extends ConsumerState<TrajetsRecordFab> {
       await notifier.startGpsOnly();
       if (!mounted) return;
       await Navigator.of(context).push<TripSaveResult?>(
-        MaterialPageRoute(
-          builder: (_) => const TripRecordingScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const TripRecordingScreen()),
       );
       return;
     }
@@ -81,9 +80,7 @@ class _TrajetsRecordFabState extends ConsumerState<TrajetsRecordFab> {
     // the live recording screen without re-connecting.
     if (ref.read(tripRecordingProvider).isActive) {
       await Navigator.of(context).push<TripSaveResult?>(
-        MaterialPageRoute(
-          builder: (_) => const TripRecordingScreen(),
-        ),
+        MaterialPageRoute(builder: (_) => const TripRecordingScreen()),
       );
       return;
     }
@@ -100,35 +97,37 @@ class _TrajetsRecordFabState extends ConsumerState<TrajetsRecordFab> {
     // Fire the connect concurrently — do NOT await before pushing, or
     // the screen wouldn't open until the connect finished (the old
     // behaviour). The coordinator owns its own error surfacing + teardown.
-    unawaited(_starter.connectAndStart(
-      ref,
-      notifier: notifier,
-      isMounted: () => mounted,
-      openPicker: () {
-        // #1188 — silent `connectByMac` fast path for a paired adapter;
-        // the picker opens the modal sheet only when that fails. Plumbing
-        // both the MAC + display name lets it surface a concrete fallback
-        // snackbar ("Couldn't reach 'X' …") rather than a generic one.
-        final activeVehicle = ref.read(activeVehicleProfileProvider);
-        return showObd2AdapterPicker(
-          context,
-          pinnedMac: activeVehicle?.obd2AdapterMac,
-          pinnedAdapterName: activeVehicle?.obd2AdapterName,
-        );
-      },
-      onConnectionError: (error) {
-        // Only an OBD2 connection error carries user-facing copy; other
-        // failures are logged by the coordinator and stay silent.
-        if (error is Obd2ConnectionError && mounted) {
-          SnackBarHelper.showError(
-              context, error.localizedMessage(AppLocalizations.of(context)));
-        }
-      },
-    ));
-    await Navigator.of(context).push<TripSaveResult?>(
-      MaterialPageRoute(
-        builder: (_) => const TripRecordingScreen(),
+    unawaited(
+      _starter.connectAndStart(
+        ref,
+        notifier: notifier,
+        isMounted: () => mounted,
+        openPicker: () {
+          // #1188 — silent `connectByMac` fast path for a paired adapter;
+          // the picker opens the modal sheet only when that fails. Plumbing
+          // both the MAC + display name lets it surface a concrete fallback
+          // snackbar ("Couldn't reach 'X' …") rather than a generic one.
+          final activeVehicle = ref.read(activeVehicleProfileProvider);
+          return showObd2AdapterPicker(
+            context,
+            pinnedMac: activeVehicle?.obd2AdapterMac,
+            pinnedAdapterName: activeVehicle?.obd2AdapterName,
+          );
+        },
+        onConnectionError: (error) {
+          // Only an OBD2 connection error carries user-facing copy; other
+          // failures are logged by the coordinator and stay silent.
+          if (error is Obd2ConnectionError && mounted) {
+            SnackBarHelper.showError(
+              context,
+              error.localizedMessage(AppLocalizations.of(context)),
+            );
+          }
+        },
       ),
+    );
+    await Navigator.of(context).push<TripSaveResult?>(
+      MaterialPageRoute(builder: (_) => const TripRecordingScreen()),
     );
   }
 
@@ -143,13 +142,15 @@ class _TrajetsRecordFabState extends ConsumerState<TrajetsRecordFab> {
     // #3153 — select the two booleans this FAB renders from instead of
     // the whole trip state, so the 4 Hz live emits during a recording
     // don't rebuild the FAB 4×/s.
-    final isRecordingActive =
-        ref.watch(tripRecordingProvider.select((s) => s.isActive));
+    final isRecordingActive = ref.watch(
+      tripRecordingProvider.select((s) => s.isActive),
+    );
     // #2274 concern 2 — while a start is connecting, the recording
     // screen is already foreground showing the inline progress; reflect
     // that on the CTA too so a glance at the tab matches.
-    final isConnecting =
-        ref.watch(tripRecordingProvider.select((s) => s.isConnecting));
+    final isConnecting = ref.watch(
+      tripRecordingProvider.select((s) => s.isConnecting),
+    );
     return FloatingActionButton.extended(
       key: const Key('trajets_start_recording_button'),
       onPressed: isConnecting ? null : _onStartRecording,
@@ -160,11 +161,10 @@ class _TrajetsRecordFabState extends ConsumerState<TrajetsRecordFab> {
       ),
       label: Text(
         isConnecting
-            ? (l?.tripStartProgressConnectingAdapter ??
-                'Connecting to OBD2 adapter…')
+            ? (l.tripStartProgressConnectingAdapter)
             : isRecordingActive
-                ? (l?.trajetsResumeRecordingButton ?? 'Resume recording')
-                : (l?.trajetsStartRecordingButton ?? 'Start recording'),
+            ? (l.trajetsResumeRecordingButton)
+            : (l.trajetsStartRecordingButton),
       ),
     );
   }

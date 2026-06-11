@@ -44,7 +44,7 @@ class StationPricesSection extends StatelessWidget {
     final isMx = cc == 'MX';
 
     return SectionCard(
-      title: l10n?.prices ?? 'Prices',
+      title: l10n.prices,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -55,8 +55,16 @@ class StationPricesSection extends StatelessWidget {
             price: station.e5,
             fuelType: FuelType.e5,
           ),
-          PriceTile(label: 'Super E10', price: station.e10, fuelType: FuelType.e10),
-          PriceTile(label: 'Diesel', price: station.diesel, fuelType: FuelType.diesel),
+          PriceTile(
+            label: 'Super E10',
+            price: station.e10,
+            fuelType: FuelType.e10,
+          ),
+          PriceTile(
+            label: 'Diesel',
+            price: station.diesel,
+            fuelType: FuelType.diesel,
+          ),
           if (station.e98 != null)
             PriceTile(
               label: isMx
@@ -95,13 +103,15 @@ class LogFillUpButton extends ConsumerWidget {
     // Fall back to any fuel the station reports if the profile fuel isn't
     // available at this station (e.g. diesel-preferring user at a petrol-only
     // bio station).
-    final pricedFuel = preferredFuel != null &&
-            station.priceFor(preferredFuel) != null
+    final pricedFuel =
+        preferredFuel != null && station.priceFor(preferredFuel) != null
         ? preferredFuel
         : _firstAvailableFuel(station);
-    final pricePerLiter =
-        pricedFuel != null ? station.priceFor(pricedFuel) : null;
-    final stationName = station.brand.isNotEmpty &&
+    final pricePerLiter = pricedFuel != null
+        ? station.priceFor(pricedFuel)
+        : null;
+    final stationName =
+        station.brand.isNotEmpty &&
             station.brand != 'Station' &&
             station.brand != BrandRegistry.independentLabel
         ? station.brand
@@ -119,9 +129,7 @@ class LogFillUpButton extends ConsumerWidget {
         ).push<void>(context));
       },
       icon: const Icon(Icons.local_gas_station_outlined),
-      label: Text(
-        AppLocalizations.of(context)?.addFillUp ?? 'Log fill-up here',
-      ),
+      label: Text(AppLocalizations.of(context).addFillUp),
     );
   }
 

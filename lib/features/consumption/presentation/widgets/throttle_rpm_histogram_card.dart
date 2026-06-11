@@ -58,51 +58,38 @@ class ThrottleRpmHistogramCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.throttleRpmHistogramTitle ?? 'How you used the engine',
+              l.throttleRpmHistogramTitle,
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
             if (!histogram.hasData)
-              _EmptyState(
-                message: l?.throttleRpmHistogramEmpty ??
-                    'No throttle or RPM samples in this trip.',
-              )
+              _EmptyState(message: l.throttleRpmHistogramEmpty)
             else ...[
-              _SectionHeader(
-                label: l?.throttleRpmHistogramThrottleSection ??
-                    'Throttle position',
-              ),
+              _SectionHeader(label: l.throttleRpmHistogramThrottleSection),
               const SizedBox(height: 8),
               _BarGroup(
                 shares: histogram.throttleQuartiles,
                 labels: <String>[
-                  l?.throttleRpmHistogramThrottleCoast ?? 'Coast (0–25%)',
-                  l?.throttleRpmHistogramThrottleLight ?? 'Light (25–50%)',
-                  l?.throttleRpmHistogramThrottleFirm ?? 'Firm (50–75%)',
-                  l?.throttleRpmHistogramThrottleWide ??
-                      'Wide-open (75–100%)',
+                  l.throttleRpmHistogramThrottleCoast,
+                  l.throttleRpmHistogramThrottleLight,
+                  l.throttleRpmHistogramThrottleFirm,
+                  l.throttleRpmHistogramThrottleWide,
                 ],
-                emptyCaption: l?.throttleRpmHistogramEmpty ??
-                    'No throttle or RPM samples in this trip.',
+                emptyCaption: l.throttleRpmHistogramEmpty,
                 color: theme.colorScheme.primary,
               ),
               const SizedBox(height: 16),
-              _SectionHeader(
-                label:
-                    l?.throttleRpmHistogramRpmSection ?? 'Engine RPM',
-              ),
+              _SectionHeader(label: l.throttleRpmHistogramRpmSection),
               const SizedBox(height: 8),
               _BarGroup(
                 shares: histogram.rpmBands,
                 labels: <String>[
-                  l?.throttleRpmHistogramRpmIdle ?? 'Idle (≤900)',
-                  l?.throttleRpmHistogramRpmCruise ?? 'Cruise (901–2000)',
-                  l?.throttleRpmHistogramRpmSpirited ??
-                      'Spirited (2001–3000)',
-                  l?.throttleRpmHistogramRpmHard ?? 'Hard (>3000)',
+                  l.throttleRpmHistogramRpmIdle,
+                  l.throttleRpmHistogramRpmCruise,
+                  l.throttleRpmHistogramRpmSpirited,
+                  l.throttleRpmHistogramRpmHard,
                 ],
-                emptyCaption: l?.throttleRpmHistogramEmpty ??
-                    'No throttle or RPM samples in this trip.',
+                emptyCaption: l.throttleRpmHistogramEmpty,
                 color: theme.colorScheme.tertiary,
               ),
             ],
@@ -172,11 +159,7 @@ class _BarGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (int i = 0; i < shares.length; i++)
-          _BarRow(
-            label: labels[i],
-            share: shares[i],
-            color: color,
-          ),
+          _BarRow(label: labels[i], share: shares[i], color: color),
       ],
     );
   }
@@ -207,8 +190,7 @@ class _BarRow extends StatelessWidget {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final pctFormatted = (share * 100).toStringAsFixed(0);
-    final pctLabel = l?.throttleRpmHistogramBarShare(pctFormatted) ??
-        '$pctFormatted%';
+    final pctLabel = l.throttleRpmHistogramBarShare(pctFormatted);
 
     // Convert share to integer flex so Flexible(flex:) stays consistent
     // across rows. 1000 ticks gives 0.1 %-precision — far finer than
@@ -248,10 +230,7 @@ class _BarRow extends StatelessWidget {
                       ),
                     ),
                   if (empty > 0)
-                    Flexible(
-                      flex: empty,
-                      child: const SizedBox.shrink(),
-                    ),
+                    Flexible(flex: empty, child: const SizedBox.shrink()),
                 ],
               ),
             ),
@@ -290,17 +269,9 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(Icons.info_outline, color: theme.colorScheme.primary),
           const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
+          Expanded(child: Text(message, style: theme.textTheme.bodyMedium)),
         ],
       ),
     );

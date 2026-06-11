@@ -17,12 +17,10 @@ class AuthInfoCard extends StatelessWidget {
     final l = AppLocalizations.of(context);
 
     final bullets = <String>[
-      l?.authInfoBenefit1 ??
-          '• Sync favorites, alerts, and saved routes across devices',
-      l?.authInfoBenefit2 ??
-          '• Prepare a route on your phone, use it in your car',
-      l?.authInfoBenefit3 ?? '• No data is shared with third parties',
-      l?.authInfoBenefit4 ?? '• You can delete your account at any time',
+      l.authInfoBenefit1,
+      l.authInfoBenefit2,
+      l.authInfoBenefit3,
+      l.authInfoBenefit4,
     ];
 
     return Card(
@@ -35,15 +33,15 @@ class AuthInfoCard extends StatelessWidget {
               children: [
                 const Icon(Icons.info_outline, size: 18),
                 const SizedBox(width: 8),
-                Text(l?.authInfoTitle ?? 'Why create an account?',
-                    style: theme.textTheme.titleSmall),
+                Text(l.authInfoTitle, style: theme.textTheme.titleSmall),
               ],
             ),
             const SizedBox(height: 8),
             Text(
               bullets.join('\n'),
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

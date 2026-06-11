@@ -191,10 +191,8 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
       ),
       content: Text(
         passiveWaiting
-            ? (l?.obd2GpsDegradedPassiveWaitingBanner ??
-                'Recording with GPS — waiting for the OBD2 adapter')
-            : (l?.obd2GpsDegradedBannerTitle ??
-                'Recording with GPS — OBD2 reconnecting'),
+            ? (l.obd2GpsDegradedPassiveWaitingBanner)
+            : (l.obd2GpsDegradedBannerTitle),
       ),
       // No Resume / End: recording continues automatically. A
       // MaterialBanner requires a non-empty actions list, so a single

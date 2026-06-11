@@ -48,18 +48,14 @@ class WizardAuthStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          l10n?.syncChooseAccountType ?? 'Choose your account type',
-          style: theme.textTheme.titleMedium,
-        ),
+        Text(l10n.syncChooseAccountType, style: theme.textTheme.titleMedium),
         const SizedBox(height: 16),
 
         // Anonymous
         WizardOptionCard(
           icon: Icons.person_outline,
-          title: l10n?.syncAccountTypeAnonymous ?? 'Anonymous',
-          subtitle: l10n?.syncAccountTypeAnonymousDesc ??
-              'Instant, no email needed. Data tied to this device.',
+          title: l10n.syncAccountTypeAnonymous,
+          subtitle: l10n.syncAccountTypeAnonymousDesc,
           selected: !useEmail,
           onTap: () => onUseEmailChanged(false),
         ),
@@ -68,9 +64,8 @@ class WizardAuthStep extends StatelessWidget {
         // Email
         WizardOptionCard(
           icon: Icons.email_outlined,
-          title: l10n?.syncAccountTypeEmail ?? 'Email Account',
-          subtitle: l10n?.syncAccountTypeEmailDesc ??
-              'Sign in from any device. Recover data if phone is lost.',
+          title: l10n.syncAccountTypeEmail,
+          subtitle: l10n.syncAccountTypeEmailDesc,
           selected: useEmail,
           onTap: () => onUseEmailChanged(true),
         ),
@@ -80,7 +75,7 @@ class WizardAuthStep extends StatelessWidget {
           TextField(
             controller: emailController,
             decoration: InputDecoration(
-              labelText: l10n?.authEmailLabel ?? 'Email',
+              labelText: l10n.authEmailLabel,
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.email),
             ),
@@ -90,7 +85,7 @@ class WizardAuthStep extends StatelessWidget {
           TextField(
             controller: passwordController,
             decoration: InputDecoration(
-              labelText: l10n?.authPasswordLabel ?? 'Password',
+              labelText: l10n.authPasswordLabel,
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.lock),
             ),
@@ -104,10 +99,11 @@ class WizardAuthStep extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: onToggleSignUp,
-              child: Text(isSignUp
-                  ? (l10n?.syncHaveAccountSignIn ??
-                      'Already have an account? Sign in')
-                  : (l10n?.syncCreateNewAccount ?? 'Create new account')),
+              child: Text(
+                isSignUp
+                    ? (l10n.syncHaveAccountSignIn)
+                    : (l10n.syncCreateNewAccount),
+              ),
             ),
           ),
         ],
@@ -124,13 +120,17 @@ class WizardAuthStep extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(testSuccess ? Icons.check_circle : Icons.error,
-                      color: testSuccess
-                          ? DarkModeColors.success(context)
-                          : DarkModeColors.error(context),
-                      size: 20),
+                  Icon(
+                    testSuccess ? Icons.check_circle : Icons.error,
+                    color: testSuccess
+                        ? DarkModeColors.success(context)
+                        : DarkModeColors.error(context),
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(testResult!, style: theme.textTheme.bodySmall)),
+                  Expanded(
+                    child: Text(testResult!, style: theme.textTheme.bodySmall),
+                  ),
                 ],
               ),
             ),
@@ -143,18 +143,22 @@ class WizardAuthStep extends StatelessWidget {
             Expanded(
               child: OutlinedButton(
                 onPressed: !testing ? onTestConnection : null,
-                child: Text(testing
-                    ? (l10n?.syncTestingConnection ?? 'Testing...')
-                    : (l10n?.syncTestConnection ?? 'Test Connection')),
+                child: Text(
+                  testing
+                      ? (l10n.syncTestingConnection)
+                      : (l10n.syncTestConnection),
+                ),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: FilledButton(
                 onPressed: !connecting ? onConnect : null,
-                child: Text(connecting
-                    ? (l10n?.syncConnectingButton ?? 'Connecting...')
-                    : (l10n?.syncConnectButton ?? 'Connect')),
+                child: Text(
+                  connecting
+                      ? (l10n.syncConnectingButton)
+                      : (l10n.syncConnectButton),
+                ),
               ),
             ),
           ],

@@ -32,7 +32,7 @@ class DataTransparencyScreen extends ConsumerWidget {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)?.rawDataJson ?? 'Raw data (JSON)'),
+        title: Text(AppLocalizations.of(context).rawDataJson),
         content: SizedBox(
           width: double.maxFinite,
           child: SingleChildScrollView(
@@ -45,7 +45,7 @@ class DataTransparencyScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)?.close ?? 'Close'),
+            child: Text(AppLocalizations.of(context).close),
           ),
         ],
       ),
@@ -58,19 +58,17 @@ class DataTransparencyScreen extends ConsumerWidget {
   ) async {
     await Clipboard.setData(ClipboardData(text: _prettyJson(data)));
     if (!context.mounted) return;
-    SnackBarHelper.show(
-      context,
-      AppLocalizations.of(context)?.jsonCopied ?? 'JSON copied to clipboard',
-    );
+    SnackBarHelper.show(context, AppLocalizations.of(context).jsonCopied);
   }
 
   Future<void> _forceSyncAndReload(BuildContext context, WidgetRef ref) async {
-    await ref.read(dataTransparencyControllerProvider.notifier).forceSyncAndReload();
+    await ref
+        .read(dataTransparencyControllerProvider.notifier)
+        .forceSyncAndReload();
     if (!context.mounted) return;
     SnackBarHelper.showSuccess(
       context,
-      AppLocalizations.of(context)?.syncCompleted ??
-          'Sync completed — data refreshed',
+      AppLocalizations.of(context).syncCompleted,
     );
   }
 
@@ -78,22 +76,19 @@ class DataTransparencyScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)?.deleteServerDataConfirm ?? 'Delete all server data?'),
-        content: Text(AppLocalizations.of(context)?.deleteAccountBody ??
-          'This will permanently remove all your favorites, alerts, push '
-          'tokens, and price reports from the server. Your local data will '
-          'not be affected.\n\nThis action cannot be undone.'),
+        title: Text(AppLocalizations.of(context).deleteServerDataConfirm),
+        content: Text(AppLocalizations.of(context).deleteAccountBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: DarkModeColors.error(context),
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(AppLocalizations.of(context)?.deleteEverything ?? 'Delete everything'),
+            child: Text(AppLocalizations.of(context).deleteEverything),
           ),
         ],
       ),
@@ -105,7 +100,7 @@ class DataTransparencyScreen extends ConsumerWidget {
     if (!context.mounted) return;
     SnackBarHelper.showSuccess(
       context,
-      AppLocalizations.of(context)?.allDataDeleted ?? 'All server data deleted',
+      AppLocalizations.of(context).allDataDeleted,
     );
   }
 
@@ -114,19 +109,12 @@ class DataTransparencyScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(
-          l?.forgetAllSyncedTripsConfirmTitle ?? 'Forget all synced trips?',
-        ),
-        content: Text(
-          l?.forgetAllSyncedTripsConfirmBody ??
-              'Every trip summary and detail blob will be removed from the '
-                  "server. Your local trip history on this device won't be "
-                  'affected.\n\nThis action cannot be undone.',
-        ),
+        title: Text(l.forgetAllSyncedTripsConfirmTitle),
+        content: Text(l.forgetAllSyncedTripsConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           FilledButton(
             key: const Key('forget_all_synced_trips_confirm'),
@@ -134,9 +122,7 @@ class DataTransparencyScreen extends ConsumerWidget {
               backgroundColor: DarkModeColors.error(context),
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              l?.forgetAllSyncedTripsConfirmAction ?? 'Forget all',
-            ),
+            child: Text(l.forgetAllSyncedTripsConfirmAction),
           ),
         ],
       ),
@@ -151,28 +137,23 @@ class DataTransparencyScreen extends ConsumerWidget {
         .read(dataTransparencyControllerProvider.notifier)
         .forceSyncAndReload();
     if (!context.mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      l?.forgetAllSyncedTripsSuccess ?? 'All synced trips removed from server',
-    );
+    SnackBarHelper.showSuccess(context, l.forgetAllSyncedTripsSuccess);
   }
 
   Future<void> _disconnect(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)?.disconnectTitle ?? 'Disconnect TankSync?'),
-        content: Text(AppLocalizations.of(context)?.disconnectBody ??
-          'You will be signed out from cloud sync. Your local data remains '
-          'intact. You can reconnect at any time.'),
+        title: Text(AppLocalizations.of(context).disconnectTitle),
+        content: Text(AppLocalizations.of(context).disconnectBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(AppLocalizations.of(context)?.disconnectAction ?? 'Disconnect'),
+            child: Text(AppLocalizations.of(context).disconnectAction),
           ),
         ],
       ),
@@ -191,42 +172,41 @@ class DataTransparencyScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return PageScaffold(
-      title: AppLocalizations.of(context)?.myServerData ?? 'My server data',
+      title: AppLocalizations.of(context).myServerData,
       bodyPadding: EdgeInsets.zero,
       body: uiState.loading
           ? const Center(child: CircularProgressIndicator())
           : uiState.error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      uiState.error!,
-                      style: TextStyle(color: theme.colorScheme.error),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    AccountInfoCard(syncConfig: syncConfig),
-                    const SizedBox(height: 12),
-                    if (uiState.data != null) ...[
-                      SyncedDataCard(data: uiState.data!),
-                      const SizedBox(height: 16),
-                      DataActionButtons(
-                        loading: uiState.loading,
-                        onSync: () => _forceSyncAndReload(context, ref),
-                        onViewRawJson: () =>
-                            _showRawJson(context, uiState.data!),
-                        onExportJson: () => _exportJson(context, uiState.data!),
-                        onDeleteAll: () => _deleteAllData(context, ref),
-                        onForgetAllTrips: () => _forgetAllTrips(context, ref),
-                        onDisconnect: () => _disconnect(context, ref),
-                      ),
-                    ],
-                  ],
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  uiState.error!,
+                  style: TextStyle(color: theme.colorScheme.error),
+                  textAlign: TextAlign.center,
                 ),
+              ),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                AccountInfoCard(syncConfig: syncConfig),
+                const SizedBox(height: 12),
+                if (uiState.data != null) ...[
+                  SyncedDataCard(data: uiState.data!),
+                  const SizedBox(height: 16),
+                  DataActionButtons(
+                    loading: uiState.loading,
+                    onSync: () => _forceSyncAndReload(context, ref),
+                    onViewRawJson: () => _showRawJson(context, uiState.data!),
+                    onExportJson: () => _exportJson(context, uiState.data!),
+                    onDeleteAll: () => _deleteAllData(context, ref),
+                    onForgetAllTrips: () => _forgetAllTrips(context, ref),
+                    onDisconnect: () => _disconnect(context, ref),
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }

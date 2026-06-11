@@ -44,8 +44,10 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<CountrySwitchEvent?>(countrySwitchEventProvider,
-        (previous, next) {
+    ref.listen<CountrySwitchEvent?>(countrySwitchEventProvider, (
+      previous,
+      next,
+    ) {
       if (next == null) return;
       if (_isOnCooldown(next.detectedCountryCode)) return;
 
@@ -64,14 +66,15 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
 
   void _handleAutoSwitch(CountrySwitchEvent event) {
     final profile = event.matchingProfile!;
-    unawaited(ref.read(activeProfileProvider.notifier).switchProfile(profile.id));
+    unawaited(
+      ref.read(activeProfileProvider.notifier).switchProfile(profile.id),
+    );
 
     final l = AppLocalizations.of(context);
     final countryName =
         Countries.byCode(event.detectedCountryCode)?.name ??
-            event.detectedCountryCode;
-    final message = l?.switchedToProfile(profile.name, countryName) ??
-        'Switched to profile "${profile.name}" ($countryName)';
+        event.detectedCountryCode;
+    final message = l.switchedToProfile(profile.name, countryName);
 
     SnackBarHelper.showSuccess(context, message);
     _markDismissed(event.detectedCountryCode);
@@ -101,19 +104,16 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
         icon: Text(countryFlag, style: const TextStyle(fontSize: 48)),
-        title: Text(l?.switchProfileTitle ?? 'Country changed'),
-        content: Text(
-          l?.switchProfilePrompt(countryName, profile.name) ??
-              'You are now in $countryName. Switch to profile "${profile.name}"?',
-        ),
+        title: Text(l.switchProfileTitle),
+        content: Text(l.switchProfilePrompt(countryName, profile.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l?.dismiss ?? 'Dismiss'),
+            child: Text(l.dismiss),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l?.switchProfile ?? 'Switch'),
+            child: Text(l.switchProfile),
           ),
         ],
       ),
@@ -143,15 +143,12 @@ class _CountrySwitchListenerState extends ConsumerState<CountrySwitchListener> {
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
         icon: Text(countryFlag, style: const TextStyle(fontSize: 48)),
-        title: Text(l?.noProfileForCountryTitle ?? 'No profile for this country'),
-        content: Text(
-          l?.noProfileForCountry(countryName) ??
-              'You are in $countryName, but no profile is configured for it. Create one in Settings.',
-        ),
+        title: Text(l.noProfileForCountryTitle),
+        content: Text(l.noProfileForCountry(countryName)),
         actions: [
           FilledButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l?.dialogOk ?? 'OK'),
+            child: Text(l.dialogOk),
           ),
         ],
       ),

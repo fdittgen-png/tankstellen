@@ -66,8 +66,7 @@ class _VehicleBaselineSectionState
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final counts =
-        ref.watch(vehicleBaselineSummaryProvider(widget.vehicleId));
+    final counts = ref.watch(vehicleBaselineSummaryProvider(widget.vehicleId));
     final theme = Theme.of(context);
 
     // Persisted situations only — transients never accumulate. The
@@ -86,8 +85,10 @@ class _VehicleBaselineSectionState
     ];
 
     final target = widget.fullConfidenceSamples;
-    final totalSamples =
-        situations.fold<int>(0, (acc, s) => acc + (counts[s] ?? 0));
+    final totalSamples = situations.fold<int>(
+      0,
+      (acc, s) => acc + (counts[s] ?? 0),
+    );
     final maxTotal = situations.length * target;
 
     // #2514 — drive the aggregate bar off *coverage*, not raw volume.
@@ -132,8 +133,7 @@ class _VehicleBaselineSectionState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    l?.vehicleBaselineSectionTitle ??
-                        'Baseline calibration',
+                    l.vehicleBaselineSectionTitle,
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
@@ -142,10 +142,8 @@ class _VehicleBaselineSectionState
             const SizedBox(height: 4),
             Text(
               totalSamples == 0
-                  ? (l?.vehicleBaselineEmpty ??
-                      'No samples yet — start an OBD2 trip to begin learning this vehicle\'s fuel profile.')
-                  : (l?.vehicleBaselineProgress ??
-                      'Learned from $totalSamples sample(s) across driving situations.'),
+                  ? (l.vehicleBaselineEmpty)
+                  : (l.vehicleBaselineProgress),
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
@@ -195,14 +193,14 @@ class _VehicleBaselineSectionState
                 ),
                 label: Text(
                   showDetails
-                      ? (l?.vehicleBaselineHideDetails ??
-                          'Hide per-situation breakdown')
-                      : (l?.vehicleBaselineShowDetails ??
-                          'Show per-situation breakdown'),
+                      ? (l.vehicleBaselineHideDetails)
+                      : (l.vehicleBaselineShowDetails),
                 ),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -229,10 +227,7 @@ class _VehicleBaselineSectionState
                 // behaviour" connotation — distinct from the η_v reset's
                 // local_gas_station_outlined icon (#1219).
                 icon: const Icon(Icons.tune_outlined),
-                label: Text(
-                  l?.vehicleBaselineReset ??
-                      'Reset driving-situation baseline',
-                ),
+                label: Text(l.vehicleBaselineReset),
               ),
             ),
           ],
@@ -244,31 +239,21 @@ class _VehicleBaselineSectionState
   Future<void> _confirmReset(
     BuildContext context,
     WidgetRef ref,
-    AppLocalizations? l,
+    AppLocalizations l,
   ) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-          l?.vehicleBaselineResetConfirmTitle ??
-              'Reset driving-situation baseline?',
-        ),
-        content: Text(
-          l?.vehicleBaselineResetConfirmBody ??
-              'This wipes every learned sample for this vehicle. '
-                  'You\'ll drift back to the cold-start defaults until '
-                  'new trips refill the profile.',
-        ),
+        title: Text(l.vehicleBaselineResetConfirmTitle),
+        content: Text(l.vehicleBaselineResetConfirmBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              l?.vehicleBaselineReset ?? 'Reset driving-situation baseline',
-            ),
+            child: Text(l.vehicleBaselineReset),
           ),
         ],
       ),
@@ -280,27 +265,27 @@ class _VehicleBaselineSectionState
     await ref.read(resetVehicleBaselinesProvider(widget.vehicleId).future);
   }
 
-  String _label(DrivingSituation s, AppLocalizations? l) {
+  String _label(DrivingSituation s, AppLocalizations l) {
     switch (s) {
       case DrivingSituation.idle:
-        return l?.situationIdle ?? 'Idle';
+        return l.situationIdle;
       case DrivingSituation.stopAndGo:
-        return l?.situationStopAndGo ?? 'Stop & go';
+        return l.situationStopAndGo;
       case DrivingSituation.urbanCruise:
-        return l?.situationUrban ?? 'Urban';
+        return l.situationUrban;
       case DrivingSituation.highwayCruise:
-        return l?.situationHighway ?? 'Highway';
+        return l.situationHighway;
       case DrivingSituation.deceleration:
-        return l?.situationDecel ?? 'Decelerating';
+        return l.situationDecel;
       case DrivingSituation.climbingOrLoaded:
-        return l?.situationClimbing ?? 'Climbing / loaded';
+        return l.situationClimbing;
       // #2515 — the three new persistent buckets.
       case DrivingSituation.coldStartWarmup:
-        return l?.situationColdStart ?? 'Cold start';
+        return l.situationColdStart;
       case DrivingSituation.sustainedLoadOrTowing:
-        return l?.situationSustainedLoad ?? 'Sustained load / towing';
+        return l.situationSustainedLoad;
       case DrivingSituation.partialThrottleDecel:
-        return l?.situationPartialDecel ?? 'Coasting';
+        return l.situationPartialDecel;
       // Transients are filtered out at the call site.
       case DrivingSituation.hardAccel:
       case DrivingSituation.fuelCutCoast:
@@ -334,10 +319,7 @@ class _BaselineRow extends StatelessWidget {
           ),
           Expanded(
             flex: 5,
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 6,
-            ),
+            child: LinearProgressIndicator(value: progress, minHeight: 6),
           ),
           const SizedBox(width: 8),
           SizedBox(
@@ -389,11 +371,10 @@ class _MissingSituationsWarning extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              l?.vehicleBaselineMissingWarning(joined) ??
-                  'Not detected yet: $joined. These driving situations '
-                      'still read 0 samples, so the baseline is incomplete.',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: scheme.onErrorContainer),
+              l.vehicleBaselineMissingWarning(joined),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: scheme.onErrorContainer,
+              ),
             ),
           ),
         ],

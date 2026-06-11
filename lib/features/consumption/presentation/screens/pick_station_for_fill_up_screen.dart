@@ -43,17 +43,25 @@ class PickStationForFillUpScreen extends ConsumerWidget {
       try {
         stations.add(Station.fromJson(raw));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: {'where': 'PickStationForFillUp: skipping malformed favorite $id'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: {
+              'where': 'PickStationForFillUp: skipping malformed favorite $id',
+            },
+          ),
+        );
       }
     }
-    final profileFuel =
-        ref.watch(activeProfileProvider)?.preferredFuelType;
+    final profileFuel = ref.watch(activeProfileProvider)?.preferredFuelType;
 
     return PageScaffold(
-      title: l?.pickStationTitle ?? 'Pick a station',
+      title: l.pickStationTitle,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         onPressed: () => context.pop(),
       ),
       bodyPadding: EdgeInsets.zero,
@@ -62,19 +70,13 @@ class PickStationForFillUpScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              l?.pickStationHelper ??
-                  'Start the fill-up from a known station so prices, brand '
-                      'and fuel type fill themselves in.',
+              l.pickStationHelper,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
           ),
           Expanded(
             child: stations.isEmpty
-                ? _EmptyState(
-                    message: l?.pickStationEmpty ??
-                        'No favorite stations yet — add some from the Search '
-                            'or Favorites tab, or skip and fill in manually.',
-                  )
+                ? _EmptyState(message: l.pickStationEmpty)
                 : ListView.separated(
                     itemCount: stations.length,
                     separatorBuilder: (_, _) =>
@@ -92,18 +94,13 @@ class PickStationForFillUpScreen extends ConsumerWidget {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: TextButton.icon(
                 key: const Key('pick_station_skip'),
                 onPressed: () =>
                     const AddFillUpRoute().pushReplacement(context),
                 icon: const Icon(Icons.skip_next_outlined),
-                label: Text(
-                  l?.pickStationSkip ?? 'Skip — add without a station',
-                ),
+                label: Text(l.pickStationSkip),
               ),
             ),
           ),
@@ -169,8 +166,7 @@ class _StationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title =
-        station.brand.isNotEmpty ? station.brand : station.name;
+    final title = station.brand.isNotEmpty ? station.brand : station.name;
     final subtitleParts = <String>[];
     if (station.street.isNotEmpty) subtitleParts.add(station.street);
     if (station.place.isNotEmpty) subtitleParts.add(station.place);

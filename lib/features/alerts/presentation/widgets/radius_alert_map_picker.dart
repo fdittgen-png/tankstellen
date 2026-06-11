@@ -43,10 +43,7 @@ class RadiusAlertMapPicker extends ConsumerStatefulWidget {
 
   /// Convenience opener used by the create-sheet button. Returns the
   /// picked [LatLng], or `null` when the user cancels.
-  static Future<LatLng?> push(
-    BuildContext context, {
-    LatLng? initialCenter,
-  }) {
+  static Future<LatLng?> push(BuildContext context, {LatLng? initialCenter}) {
     return Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
         fullscreenDialog: true,
@@ -151,18 +148,18 @@ class _RadiusAlertMapPickerState extends ConsumerState<RadiusAlertMapPicker> {
     final theme = Theme.of(context);
 
     return PageScaffold(
-      title: l10n?.radiusAlertMapPickerTitle ?? 'Pick alert center',
+      title: l10n.radiusAlertMapPickerTitle,
       bodyPadding: EdgeInsets.zero,
       leading: IconButton(
         icon: const Icon(Icons.close),
-        tooltip: l10n?.radiusAlertMapPickerCancel ?? 'Cancel',
+        tooltip: l10n.radiusAlertMapPickerCancel,
         onPressed: _cancel,
       ),
       actions: [
         TextButton(
           onPressed: _confirm,
           child: Text(
-            l10n?.radiusAlertMapPickerConfirm ?? 'Confirm',
+            l10n.radiusAlertMapPickerConfirm,
             style: TextStyle(color: theme.colorScheme.onPrimary),
           ),
         ),
@@ -197,9 +194,7 @@ class _RadiusAlertMapPickerState extends ConsumerState<RadiusAlertMapPicker> {
               Icons.add_location_alt,
               size: 48,
               color: theme.colorScheme.primary,
-              shadows: const [
-                Shadow(blurRadius: 4, color: Colors.black54),
-              ],
+              shadows: const [Shadow(blurRadius: 4, color: Colors.black54)],
             ),
           ),
           Positioned(
@@ -209,13 +204,13 @@ class _RadiusAlertMapPickerState extends ConsumerState<RadiusAlertMapPicker> {
             child: Card(
               // #2117 — hint card should lift subtly off the map backdrop;
               // surfaceContainerLow is the M3 tier for cards on `surface`.
-              color: theme.colorScheme.surfaceContainerLow
-                  .withValues(alpha: 0.9),
+              color: theme.colorScheme.surfaceContainerLow.withValues(
+                alpha: 0.9,
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(12),
                 child: Text(
-                  l10n?.radiusAlertMapPickerHint ??
-                      'Drag the map to position the alert center',
+                  l10n.radiusAlertMapPickerHint,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium,
                 ),

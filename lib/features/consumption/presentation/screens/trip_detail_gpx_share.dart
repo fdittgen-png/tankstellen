@@ -21,10 +21,8 @@ import '../../../../core/logging/error_logger.dart';
 /// the 2026-05-24 follow-up (user request: "for files only download
 /// and do not suggest sharing").
 @visibleForTesting
-Future<void> Function({
-  required Uint8List bytes,
-  required String fileName,
-})? debugTripDetailGpxShareOverride;
+Future<void> Function({required Uint8List bytes, required String fileName})?
+debugTripDetailGpxShareOverride;
 
 /// Export the trip's persisted GPS samples as a GPX 1.1 file and save
 /// it to the device's public Downloads folder (#2032 + 2026-05-24
@@ -37,13 +35,13 @@ Future<void> Function({
 /// samples" message the share path used.
 Future<void> shareTripGpx(
   BuildContext context,
-  AppLocalizations? l,
+  AppLocalizations l,
   TripHistoryEntry entry,
 ) async {
   final messenger = ScaffoldMessenger.maybeOf(context);
   final scheme = Theme.of(context).colorScheme;
   if (countGpsFixes(entry) == 0) {
-    final msg = l?.trajetDetailShareGpxEmpty ?? 'No GPS samples in this trip';
+    final msg = l.trajetDetailShareGpxEmpty;
     messenger?.showSnackBar(SnackBarHelper.errorSnackBar(scheme, msg));
     return;
   }
@@ -62,14 +60,20 @@ Future<void> shareTripGpx(
       mimeType: 'application/gpx+xml',
     );
     if (messenger == null) return;
-    final ok =
-        l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
+    final ok = l.savedToDownloadsFolder;
     // #2173 — themed success toast (matches the sibling error path).
     messenger.showSnackBar(SnackBarHelper.successSnackBar(scheme, ok));
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripDetailScreen save GPX'}));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {'where': 'TripDetailScreen save GPX'},
+      ),
+    );
     if (messenger == null) return;
-    final errorMsg = l?.trajetDetailShareError ?? "Couldn't save the GPX file";
+    final errorMsg = l.trajetDetailShareError;
     messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
   }
 }

@@ -34,21 +34,18 @@ class FillUpPricePerLiterReadout extends StatelessWidget {
     return AnimatedBuilder(
       animation: Listenable.merge([litersController, costController]),
       builder: (context, _) {
-        final liters =
-            double.tryParse(litersController.text.replaceAll(',', '.'));
-        final cost =
-            double.tryParse(costController.text.replaceAll(',', '.'));
-        if (liters == null ||
-            liters <= 0 ||
-            cost == null ||
-            cost <= 0) {
+        final liters = double.tryParse(
+          litersController.text.replaceAll(',', '.'),
+        );
+        final cost = double.tryParse(costController.text.replaceAll(',', '.'));
+        if (liters == null || liters <= 0 || cost == null || cost <= 0) {
           return const SizedBox.shrink();
         }
         final pricePerLiter = cost / liters;
         // Semantics-exposed node — TalkBack WILL read this (the
         // computed value is useful context), but the label is baked
         // into one string so only a single announcement fires.
-        final label = l?.fillUpPricePerLiterLabel ?? 'Price per liter';
+        final label = l.fillUpPricePerLiterLabel;
         final value = pricePerLiter.toStringAsFixed(3);
         return Padding(
           padding: const EdgeInsets.only(top: 6, left: 56),

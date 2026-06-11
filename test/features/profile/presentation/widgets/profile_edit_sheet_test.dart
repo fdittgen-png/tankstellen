@@ -22,38 +22,41 @@ void main() {
           home: Builder(
             builder: (context) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                unawaited(showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    icon: Icon(
-                      Icons.warning_amber_rounded,
-                      color: Theme.of(context).colorScheme.error,
-                      size: 48,
-                    ),
-                    title: Text(AppLocalizations.of(context)?.deleteProfileTitle ??
-                        'Delete profile?'),
-                    content: Text(
-                      AppLocalizations.of(context)?.deleteProfileBody ??
-                          'This profile and its settings will be permanently deleted. This cannot be undone.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text(
-                            AppLocalizations.of(context)?.cancel ?? 'Cancel'),
+                unawaited(
+                  showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      icon: Icon(
+                        Icons.warning_amber_rounded,
+                        color: Theme.of(context).colorScheme.error,
+                        size: 48,
                       ),
-                      FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.error,
+                      title: Text(
+                        AppLocalizations.of(context).deleteProfileTitle,
+                      ),
+                      content: Text(
+                        AppLocalizations.of(context).deleteProfileBody,
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: Text(AppLocalizations.of(context).cancel),
                         ),
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text(
-                            AppLocalizations.of(context)?.deleteProfileConfirm ??
-                                'Delete profile'),
-                      ),
-                    ],
+                        FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.error,
+                          ),
+                          onPressed: () => Navigator.pop(context, true),
+                          child: Text(
+                            AppLocalizations.of(context).deleteProfileConfirm,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ));
+                );
               });
               return const Scaffold(body: SizedBox.expand());
             },
@@ -173,9 +176,7 @@ void main() {
 
     test('all 23 ARB files have deleteProfile keys', () {
       final arbDir = Directory('lib/l10n');
-      final arbFiles = arbDir.listSync().where(
-            (f) => f.path.endsWith('.arb'),
-          );
+      final arbFiles = arbDir.listSync().where((f) => f.path.endsWith('.arb'));
       for (final file in arbFiles) {
         final content = File(file.path).readAsStringSync();
         expect(
@@ -221,8 +222,9 @@ void main() {
 
       // Must NOT call onDelete directly from the delete button's onPressed.
       expect(
-        RegExp(r'onPressed:\s*\(\)\s*\{\s*widget\.onDelete!\(\)')
-            .hasMatch(source),
+        RegExp(
+          r'onPressed:\s*\(\)\s*\{\s*widget\.onDelete!\(\)',
+        ).hasMatch(source),
         isFalse,
         reason:
             'Delete button must NOT call widget.onDelete! directly from onPressed',
@@ -257,8 +259,8 @@ void main() {
 
   group('ProfileEditSheet #2551 SectionCard redesign', () {
     String mainSource() => File(
-          'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
-        ).readAsStringSync();
+      'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
+    ).readAsStringSync();
 
     test('groups every section in a SectionCard', () {
       expect(mainSource(), contains('SectionCard('));
@@ -307,11 +309,11 @@ void main() {
   // #2597 — the country picker enforces one profile per country.
   group('ProfileEditSheet one-per-country picker (#2597)', () {
     String parts2Source() => File(
-          'lib/features/profile/presentation/widgets/profile_edit_sheet_parts2.dart',
-        ).readAsStringSync();
+      'lib/features/profile/presentation/widgets/profile_edit_sheet_parts2.dart',
+    ).readAsStringSync();
     String mainSource() => File(
-          'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
-        ).readAsStringSync();
+      'lib/features/profile/presentation/widgets/profile_edit_sheet.dart',
+    ).readAsStringSync();
 
     test('_CountrySection consults isCountryTaken, excluding the edited '
         'profile', () {
@@ -332,9 +334,11 @@ void main() {
       );
     });
 
-    test('the edit sheet threads the edited profile id into _CountrySection',
-        () {
-      expect(mainSource(), contains('profileId: widget.profile.id'));
-    });
+    test(
+      'the edit sheet threads the edited profile id into _CountrySection',
+      () {
+        expect(mainSource(), contains('profileId: widget.profile.id'));
+      },
+    );
   });
 }

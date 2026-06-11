@@ -36,15 +36,13 @@ class BadScanDiffTable extends StatelessWidget {
       defaultVerticalAlignment: TableCellVerticalAlignment.middle,
       children: [
         TableRow(
-          decoration:
-              BoxDecoration(color: theme.colorScheme.surfaceContainerHighest),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest,
+          ),
           children: [
-            _cell(l?.badScanReportHeaderField ?? 'Field',
-                bold: true, theme: theme),
-            _cell(l?.badScanReportHeaderScanned ?? 'Scanned',
-                bold: true, theme: theme),
-            _cell(l?.badScanReportHeaderYouTyped ?? 'You typed',
-                bold: true, theme: theme),
+            _cell(l.badScanReportHeaderField, bold: true, theme: theme),
+            _cell(l.badScanReportHeaderScanned, bold: true, theme: theme),
+            _cell(l.badScanReportHeaderYouTyped, bold: true, theme: theme),
           ],
         ),
         for (final row in rows)

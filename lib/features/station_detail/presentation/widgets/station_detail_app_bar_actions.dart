@@ -56,19 +56,21 @@ class StationDetailAppBarActions extends ConsumerWidget {
           onPressed: () {
             final s = station;
             if (s != null) {
-              unawaited(NavigationUtils.openInMaps(
-                s.lat,
-                s.lng,
-                label: hasRealBrand(s) ? s.brand : s.street,
-              ));
+              unawaited(
+                NavigationUtils.openInMaps(
+                  s.lat,
+                  s.lng,
+                  label: hasRealBrand(s) ? s.brand : s.street,
+                ),
+              );
             }
           },
-          tooltip: l10n?.navigate ?? 'Navigate',
+          tooltip: l10n.navigate,
         ),
         IconButton(
           icon: const Icon(Icons.notifications_outlined),
           onPressed: () => _showCreateAlertDialog(context, ref),
-          tooltip: l10n?.createAlert ?? 'Create price alert',
+          tooltip: l10n.createAlert,
         ),
         // #1638 — the scan-payment-QR action is gated on the central
         // Feature enum so it can be toggled per profile.
@@ -77,7 +79,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
             key: const Key('scan_payment_qr'),
             icon: const Icon(Icons.qr_code_scanner),
             onPressed: () => _startScanPayment(context),
-            tooltip: l10n?.scanPayment ?? 'Scan payment QR',
+            tooltip: l10n.scanPayment,
           ),
         // #1638 — the community price-report action is gated on the
         // central Feature enum so it can be toggled per profile.
@@ -86,14 +88,16 @@ class StationDetailAppBarActions extends ConsumerWidget {
             key: const Key('report_price'),
             icon: const Icon(Icons.flag_outlined),
             onPressed: () => ReportRoute(stationId).push<void>(context),
-            tooltip: l10n?.reportPrice ?? 'Report price',
+            tooltip: l10n.reportPrice,
           ),
         IconButton(
           icon: AnimatedFavoriteStar(isFavorite: isFav),
           onPressed: () {
-            unawaited(ref
-                .read(favoritesProvider.notifier)
-                .toggle(stationId, stationData: station));
+            unawaited(
+              ref
+                  .read(favoritesProvider.notifier)
+                  .toggle(stationId, stationData: station),
+            );
           },
           tooltip: isFav ? 'Remove from favorites' : 'Add to favorites',
         ),
@@ -102,7 +106,9 @@ class StationDetailAppBarActions extends ConsumerWidget {
   }
 
   Future<void> _showCreateAlertDialog(
-      BuildContext context, WidgetRef ref) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final detailAsync = ref.read(stationDetailProvider(stationId));
     final s = detailAsync.value?.data.station;
     final stationName = s != null
@@ -123,8 +129,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
       await ref.read(alertProvider.notifier).addAlert(alert);
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showSuccess(
-            context, l10n?.alertCreated ?? 'Price alert created');
+        SnackBarHelper.showSuccess(context, l10n.alertCreated);
       }
     }
   }
@@ -133,9 +138,9 @@ class StationDetailAppBarActions extends ConsumerWidget {
   /// dispatches to url_launcher / a confirmation dialog / a fallback
   /// sheet based on the [QrPaymentTarget] classification (#587).
   Future<void> _startScanPayment(BuildContext context) async {
-    final raw = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) => const QrScannerScreen()),
-    );
+    final raw = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => const QrScannerScreen()));
     if (raw == null || !context.mounted) return;
 
     final target = QrPaymentDecoder.decode(raw);
@@ -147,11 +152,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
       case ScanPaymentOutcome.launched:
         break;
       case ScanPaymentOutcome.launchFailed:
-        SnackBarHelper.showError(
-          context,
-          l10n?.qrPaymentLaunchFailed ??
-              'No app available to open this code',
-        );
+        SnackBarHelper.showError(context, l10n.qrPaymentLaunchFailed);
       case ScanPaymentOutcome.confirmEpc:
         final epc = target as QrPaymentEpc;
         final confirmed = await showDialog<bool>(
@@ -165,17 +166,9 @@ class StationDetailAppBarActions extends ConsumerWidget {
             case EpcLaunchOutcome.launched:
               break;
             case EpcLaunchOutcome.copiedToClipboard:
-              SnackBarHelper.showSuccess(
-                context,
-                l10n?.qrPaymentEpcCopied ??
-                    'Bank details copied — paste into your banking app',
-              );
+              SnackBarHelper.showSuccess(context, l10n.qrPaymentEpcCopied);
             case EpcLaunchOutcome.failed:
-              SnackBarHelper.showError(
-                context,
-                l10n?.qrPaymentLaunchFailed ??
-                    'No app available to open this code',
-              );
+              SnackBarHelper.showError(context, l10n.qrPaymentLaunchFailed);
           }
         }
       case ScanPaymentOutcome.unknown:

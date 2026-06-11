@@ -31,14 +31,9 @@ class PriceHistoryFoldable extends StatelessWidget {
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
-        title: Text(
-          l10n?.priceHistory ?? 'Price History',
-          style: theme.textTheme.titleMedium,
-        ),
+        title: Text(l10n.priceHistory, style: theme.textTheme.titleMedium),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        children: [
-          PriceHistorySection(stationId: stationId, station: station),
-        ],
+        children: [PriceHistorySection(stationId: stationId, station: station)],
       ),
     );
   }

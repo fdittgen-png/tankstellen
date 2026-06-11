@@ -13,6 +13,7 @@ import 'package:tankstellen/features/map/presentation/widgets/station_marker.dar
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('StationMapLayers.zoomForRadius', () {
@@ -95,36 +96,36 @@ void main() {
       expect(StationMapLayers.maxZoom, 19.0);
     });
 
-    test('minZoom keeps every pin from collapsing into a single pixel',
-        () {
+    test('minZoom keeps every pin from collapsing into a single pixel', () {
       // Zoom 3 shows a continent-scale viewport; below that, station
       // markers cluster into a single illegible blob and the search
       // affordances stop being meaningful.
       expect(StationMapLayers.minZoom, 3.0);
     });
 
-    test('the clamp expression in the +/− handlers is well-formed',
-        () {
+    test('the clamp expression in the +/− handlers is well-formed', () {
       // Mirror the exact expression both ZoomButton handlers use so a
       // future rename or sign-flip in the production code is caught
       // by this test rather than silently shipping. The clamp turns a
       // tap-at-the-cap into a graceful no-op (camera stays at the
       // bound) instead of pushing past where there are tiles.
-      double inc(double current) =>
-          (current + 1).clamp(StationMapLayers.minZoom, StationMapLayers.maxZoom);
-      double dec(double current) =>
-          (current - 1).clamp(StationMapLayers.minZoom, StationMapLayers.maxZoom);
+      double inc(double current) => (current + 1).clamp(
+        StationMapLayers.minZoom,
+        StationMapLayers.maxZoom,
+      );
+      double dec(double current) => (current - 1).clamp(
+        StationMapLayers.minZoom,
+        StationMapLayers.maxZoom,
+      );
       // Below the cap → increment normally.
       expect(inc(13.0), 14.0);
       expect(dec(13.0), 12.0);
       // At the upper cap → + becomes a no-op, − still moves.
       expect(inc(StationMapLayers.maxZoom), StationMapLayers.maxZoom);
-      expect(dec(StationMapLayers.maxZoom),
-          StationMapLayers.maxZoom - 1.0);
+      expect(dec(StationMapLayers.maxZoom), StationMapLayers.maxZoom - 1.0);
       // At the lower cap → − becomes a no-op, + still moves.
       expect(dec(StationMapLayers.minZoom), StationMapLayers.minZoom);
-      expect(inc(StationMapLayers.minZoom),
-          StationMapLayers.minZoom + 1.0);
+      expect(inc(StationMapLayers.minZoom), StationMapLayers.minZoom + 1.0);
       // Past the upper cap (e.g. via prior pinch-zoom that escaped
       // the camera before #1457 set MapOptions.maxZoom) → the next
       // tap snaps back to the cap rather than pushing further.
@@ -154,6 +155,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: StationMapLayers(
                 mapController: mapController,
@@ -174,8 +177,9 @@ void main() {
         // unified path means there is one keyed tile widget and one
         // reset behaviour shared with every other map surface.
         expect(find.byType(SparkiloTileLayer), findsOneWidget);
-        final sparkilo =
-            tester.widget<SparkiloTileLayer>(find.byType(SparkiloTileLayer));
+        final sparkilo = tester.widget<SparkiloTileLayer>(
+          find.byType(SparkiloTileLayer),
+        );
         expect(sparkilo.key, const ValueKey('main-tiles'));
         expect(
           sparkilo.reset,
@@ -188,45 +192,46 @@ void main() {
       },
     );
 
-    testWidgets(
-      'survives parent rebuilds without re-keying the tile widget '
-      '(provider lifetime is owned inside SparkiloTileLayer)',
-      (tester) async {
-        tester.view.physicalSize = const Size(900, 1600);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets('survives parent rebuilds without re-keying the tile widget '
+        '(provider lifetime is owned inside SparkiloTileLayer)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(900, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-        final mapController = MapController();
-        addTearDown(mapController.dispose);
+      final mapController = MapController();
+      addTearDown(mapController.dispose);
 
-        Widget pumpAt(int rebuildToken) => MaterialApp(
-              home: Scaffold(
-                body: KeyedSubtree(
-                  key: ValueKey('rebuild-$rebuildToken'),
-                  child: StationMapLayers(
-                    mapController: mapController,
-                    stations: const [_seedStation],
-                    center: const LatLng(52.5210, 13.4100),
-                    zoom: 12,
-                    searchRadiusKm: 10,
-                    selectedFuel: FuelType.diesel,
-                  ),
-                ),
-              ),
-            );
+      Widget pumpAt(int rebuildToken) => MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: KeyedSubtree(
+            key: ValueKey('rebuild-$rebuildToken'),
+            child: StationMapLayers(
+              mapController: mapController,
+              stations: const [_seedStation],
+              center: const LatLng(52.5210, 13.4100),
+              zoom: 12,
+              searchRadiusKm: 10,
+              selectedFuel: FuelType.diesel,
+            ),
+          ),
+        ),
+      );
 
-        await tester.pumpWidget(pumpAt(0));
-        await tester.pumpWidget(pumpAt(0));
-        await tester.pumpWidget(pumpAt(0));
+      await tester.pumpWidget(pumpAt(0));
+      await tester.pumpWidget(pumpAt(0));
+      await tester.pumpWidget(pumpAt(0));
 
-        // The keyed SparkiloTileLayer is preserved across rebuilds, so
-        // its State (and the retry provider's http.Client) lives for
-        // the map's whole visible lifetime — the #1234 invariant now
-        // lives inside the wrapper rather than this widget.
-        expect(find.byType(SparkiloTileLayer), findsOneWidget);
-      },
-    );
+      // The keyed SparkiloTileLayer is preserved across rebuilds, so
+      // its State (and the retry provider's http.Client) lives for
+      // the map's whole visible lifetime — the #1234 invariant now
+      // lives inside the wrapper rather than this widget.
+      expect(find.byType(SparkiloTileLayer), findsOneWidget);
+    });
   });
 
   group('StationMapLayers.orderedByPriceForPainting (#2434)', () {
@@ -235,20 +240,20 @@ void main() {
     // stations so the cheapest (green) marker ends up LAST (top) and a
     // price-less marker ends up FIRST (bottom, beneath every real price).
     Station station(String id, {double? diesel, double? e10}) => Station(
-          id: id,
-          name: id,
-          brand: 'Brand $id',
-          street: 'Street',
-          houseNumber: '1',
-          postCode: '10178',
-          place: 'Berlin',
-          lat: 52.0,
-          lng: 13.0,
-          dist: 1.0,
-          diesel: diesel,
-          e10: e10,
-          isOpen: true,
-        );
+      id: id,
+      name: id,
+      brand: 'Brand $id',
+      street: 'Street',
+      houseNumber: '1',
+      postCode: '10178',
+      place: 'Berlin',
+      lat: 52.0,
+      lng: 13.0,
+      dist: 1.0,
+      diesel: diesel,
+      e10: e10,
+      isOpen: true,
+    );
 
     test('orders cheapest LAST (painted on top), most expensive FIRST', () {
       final cheap = station('cheap', diesel: 1.50);
@@ -256,10 +261,11 @@ void main() {
       final expensive = station('expensive', diesel: 1.90);
 
       // Feed them in an arbitrary order.
-      final ordered = StationMapLayers.orderedByPriceForPainting(
-        [mid, expensive, cheap],
-        FuelType.diesel,
-      );
+      final ordered = StationMapLayers.orderedByPriceForPainting([
+        mid,
+        expensive,
+        cheap,
+      ], FuelType.diesel);
 
       // Bottom → top of the paint stack: expensive, mid, cheap.
       expect(
@@ -274,21 +280,27 @@ void main() {
       final expensive = station('expensive', diesel: 1.90);
       final noPrice = station('noprice'); // no diesel, no fallback fuel
 
-      final ordered = StationMapLayers.orderedByPriceForPainting(
-        [cheap, noPrice, expensive],
-        FuelType.diesel,
-      );
+      final ordered = StationMapLayers.orderedByPriceForPainting([
+        cheap,
+        noPrice,
+        expensive,
+      ], FuelType.diesel);
 
       // The null-price marker is first (very bottom) so it can never
       // cover a real green one; cheapest is still last (top).
-      expect(ordered.first.id, 'noprice',
-          reason: 'price-less marker must sit beneath every priced one');
-      expect(ordered.last.id, 'cheap',
-          reason: 'cheapest priced marker must still paint on top');
+      expect(
+        ordered.first.id,
+        'noprice',
+        reason: 'price-less marker must sit beneath every priced one',
+      );
+      expect(
+        ordered.last.id,
+        'cheap',
+        reason: 'cheapest priced marker must still paint on top',
+      );
     });
 
-    test(
-        'orders by the STRICT selected-fuel price, matching the marker '
+    test('orders by the STRICT selected-fuel price, matching the marker '
         'colour (#2510)', () {
       // User has DIESEL selected. `e10Only` has NO diesel price — under
       // #2510 the marker shows "--" (no E10 fallback), so its z-order key
@@ -297,10 +309,10 @@ void main() {
       final dieselPriced = station('diesel-priced', diesel: 1.95);
       final e10Only = station('e10-only', e10: 1.40);
 
-      final ordered = StationMapLayers.orderedByPriceForPainting(
-        [dieselPriced, e10Only],
-        FuelType.diesel,
-      );
+      final ordered = StationMapLayers.orderedByPriceForPainting([
+        dieselPriced,
+        e10Only,
+      ], FuelType.diesel);
 
       // The price-less (for diesel) station sits at the bottom; the real
       // diesel marker paints on top of it.
@@ -309,23 +321,23 @@ void main() {
     });
 
     test('is a pure function — does not mutate the input list', () {
-      final input = [
-        station('a', diesel: 1.90),
-        station('b', diesel: 1.50),
-      ];
+      final input = [station('a', diesel: 1.90), station('b', diesel: 1.50)];
       final before = input.map((s) => s.id).toList();
       StationMapLayers.orderedByPriceForPainting(input, FuelType.diesel);
-      expect(input.map((s) => s.id).toList(), before,
-          reason: 'helper must return a new list, leaving the input intact');
+      expect(
+        input.map((s) => s.id).toList(),
+        before,
+        reason: 'helper must return a new list, leaving the input intact',
+      );
     });
 
     test('is stable for equal prices (preserves relative order)', () {
       final first = station('first', diesel: 1.70);
       final second = station('second', diesel: 1.70);
-      final ordered = StationMapLayers.orderedByPriceForPainting(
-        [first, second],
-        FuelType.diesel,
-      );
+      final ordered = StationMapLayers.orderedByPriceForPainting([
+        first,
+        second,
+      ], FuelType.diesel);
       expect(ordered.map((s) => s.id).toList(), ['first', 'second']);
     });
   });
@@ -338,23 +350,23 @@ void main() {
   // huge / zoomed-far set (>= [StationMapLayers.clusterThreshold]).
   group('StationMapLayers de-clustering (#2510)', () {
     List<Station> nStations(int n) => List.generate(
-          n,
-          (i) => Station(
-            id: 'st-$i',
-            name: 'Station $i',
-            brand: 'Brand',
-            street: 'Street',
-            houseNumber: '$i',
-            postCode: '10178',
-            place: 'Berlin',
-            // Cluster them tightly around the centre so overlap is realistic.
-            lat: 52.5210 + i * 0.0005,
-            lng: 13.4100 + i * 0.0005,
-            dist: 0.8 + i * 0.1,
-            diesel: 1.50 + i * 0.01,
-            isOpen: true,
-          ),
-        );
+      n,
+      (i) => Station(
+        id: 'st-$i',
+        name: 'Station $i',
+        brand: 'Brand',
+        street: 'Street',
+        houseNumber: '$i',
+        postCode: '10178',
+        place: 'Berlin',
+        // Cluster them tightly around the centre so overlap is realistic.
+        lat: 52.5210 + i * 0.0005,
+        lng: 13.4100 + i * 0.0005,
+        dist: 0.8 + i * 0.1,
+        diesel: 1.50 + i * 0.01,
+        isOpen: true,
+      ),
+    );
 
     Future<void> pumpWith(
       WidgetTester tester,
@@ -371,6 +383,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: StationMapLayers(
               mapController: mapController,
@@ -399,21 +413,20 @@ void main() {
       },
     );
 
-    testWidgets(
-      'every one of the 10 stations renders its own marker',
-      (tester) async {
-        await pumpWith(tester, nStations(10));
-        // Collect the markers from the station MarkerLayer(s) — exclude the
-        // single-marker centre layer.
-        final stationMarkers = tester
-            .widgetList<MarkerLayer>(find.byType(MarkerLayer))
-            .expand((l) => l.markers)
-            .where((m) => m.width != 20) // 20 == the centre dot
-            .toList();
-        // All 10 stations are present as individual markers, none hidden.
-        expect(stationMarkers.length, 10);
-      },
-    );
+    testWidgets('every one of the 10 stations renders its own marker', (
+      tester,
+    ) async {
+      await pumpWith(tester, nStations(10));
+      // Collect the markers from the station MarkerLayer(s) — exclude the
+      // single-marker centre layer.
+      final stationMarkers = tester
+          .widgetList<MarkerLayer>(find.byType(MarkerLayer))
+          .expand((l) => l.markers)
+          .where((m) => m.width != 20) // 20 == the centre dot
+          .toList();
+      // All 10 stations are present as individual markers, none hidden.
+      expect(stationMarkers.length, 10);
+    });
 
     testWidgets(
       'the cheapest stations are EMPHASIZED with the full price bubble '
@@ -427,17 +440,20 @@ void main() {
             .expand((l) => l.markers)
             .where((m) => m.width != 20)
             .toList();
-        final fullBubbles =
-            stationMarkers.where((m) => m.width == kStationMarkerWidth).length;
-        final dots =
-            stationMarkers.where((m) => m.width == kStationDotSize).length;
+        final fullBubbles = stationMarkers
+            .where((m) => m.width == kStationMarkerWidth)
+            .length;
+        final dots = stationMarkers
+            .where((m) => m.width == kStationDotSize)
+            .length;
         expect(fullBubbles, StationMapLayers.emphasisCount);
         expect(dots, 10 - StationMapLayers.emphasisCount);
       },
     );
 
-    testWidgets('a SINGLE station renders as its own marker (no cluster)',
-        (tester) async {
+    testWidgets('a SINGLE station renders as its own marker (no cluster)', (
+      tester,
+    ) async {
       await pumpWith(tester, const [_seedStation]);
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
@@ -451,8 +467,9 @@ void main() {
       },
     );
 
-    testWidgets('renders no marker/cluster layer for an empty station set',
-        (tester) async {
+    testWidgets('renders no marker/cluster layer for an empty station set', (
+      tester,
+    ) async {
       await pumpWith(tester, const []);
       expect(find.byType(MarkerClusterLayerWidget), findsNothing);
     });
@@ -556,6 +573,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: StationMapLayers(
               mapController: mapController,
@@ -609,12 +628,20 @@ void main() {
         // The legacy blanket path: every station goes through the cluster
         // layer, and there is NO separate un-clustered selected pill layer.
         final cluster = tester.widget<MarkerClusterLayerWidget>(
-            find.byType(MarkerClusterLayerWidget));
-        expect(cluster.options.markers.length, 5,
-            reason: 'blanket clusterAlways routes ALL stations through the '
-                'cluster layer');
-        expect(stationMarkerLayerMarkers(tester), isEmpty,
-            reason: 'no station MarkerLayer when everything is clustered');
+          find.byType(MarkerClusterLayerWidget),
+        );
+        expect(
+          cluster.options.markers.length,
+          5,
+          reason:
+              'blanket clusterAlways routes ALL stations through the '
+              'cluster layer',
+        );
+        expect(
+          stationMarkerLayerMarkers(tester),
+          isEmpty,
+          reason: 'no station MarkerLayer when everything is clustered',
+        );
       },
     );
 
@@ -632,9 +659,13 @@ void main() {
 
         // The cluster layer receives ONLY the 3 unselected markers.
         final cluster = tester.widget<MarkerClusterLayerWidget>(
-            find.byType(MarkerClusterLayerWidget));
-        expect(cluster.options.markers.length, 3,
-            reason: 'only the unselected stations are clustered');
+          find.byType(MarkerClusterLayerWidget),
+        );
+        expect(
+          cluster.options.markers.length,
+          3,
+          reason: 'only the unselected stations are clustered',
+        );
         final clusteredIds = cluster.options.markers
             .map((m) => stationForMarker(m, unselected)?.id)
             .toSet();
@@ -644,10 +675,13 @@ void main() {
         // a plain MarkerLayer (1:1 list↔map mapping survives).
         final pills = stationMarkerLayerMarkers(tester);
         final allStations = [...selected, ...unselected];
-        final pillIds =
-            pills.map((m) => stationForMarker(m, allStations)?.id).toSet();
-        expect(pillIds, {'sel-a', 'sel-b'},
-            reason: 'exactly the selected stations stay un-clustered');
+        final pillIds = pills
+            .map((m) => stationForMarker(m, allStations)?.id)
+            .toSet();
+        expect(pillIds, {
+          'sel-a',
+          'sel-b',
+        }, reason: 'exactly the selected stations stay un-clustered');
       },
     );
 
@@ -667,66 +701,71 @@ void main() {
         // A selected station is ALWAYS the full pill (kStationMarkerWidth),
         // never a compact dot — the vivid selected styling is preserved.
         for (final m in pills) {
-          expect(m.width, kStationMarkerWidth,
-              reason: 'selected markers keep the full price pill, not a dot');
+          expect(
+            m.width,
+            kStationMarkerWidth,
+            reason: 'selected markers keep the full price pill, not a dot',
+          );
         }
       },
     );
 
-    testWidgets(
-      'GREEN: a cross-border UNSELECTED station clusters with its '
-      'fuelResolver-derived price (not "--") — cheapest rollup composes with '
-      'the resolved MarkerMeta.price (#2631)',
-      (tester) async {
-        // `crossBorder` has NO e10 but DOES have e5; the resolver maps it to
-        // e5 (its country fuel) so its cluster contributes a real price.
-        const crossBorder = Station(
-          id: 'un-cross',
-          name: 'Cross-border ES',
-          brand: 'Brand',
-          street: 'Street',
-          postCode: '00000',
-          place: 'Girona',
-          lat: 52.5215,
-          lng: 13.4105,
-          dist: 0.75,
-          e5: 1.42, // its real price is in e5, NOT e10
-          isOpen: true,
-        );
-        FuelType resolve(Station s) =>
-            s.id == 'un-cross' ? FuelType.e5 : FuelType.e10;
+    testWidgets('GREEN: a cross-border UNSELECTED station clusters with its '
+        'fuelResolver-derived price (not "--") — cheapest rollup composes with '
+        'the resolved MarkerMeta.price (#2631)', (tester) async {
+      // `crossBorder` has NO e10 but DOES have e5; the resolver maps it to
+      // e5 (its country fuel) so its cluster contributes a real price.
+      const crossBorder = Station(
+        id: 'un-cross',
+        name: 'Cross-border ES',
+        brand: 'Brand',
+        street: 'Street',
+        postCode: '00000',
+        place: 'Girona',
+        lat: 52.5215,
+        lng: 13.4105,
+        dist: 0.75,
+        e5: 1.42, // its real price is in e5, NOT e10
+        isOpen: true,
+      );
+      FuelType resolve(Station s) =>
+          s.id == 'un-cross' ? FuelType.e5 : FuelType.e10;
 
-        await pumpSelectionAware(
-          tester,
-          stations: [...selected, crossBorder, ...unselected],
-          selectedIds: {'sel-a', 'sel-b'},
-          excludeSelectedFromClustering: true,
-          fuelResolver: resolve,
-        );
+      await pumpSelectionAware(
+        tester,
+        stations: [...selected, crossBorder, ...unselected],
+        selectedIds: {'sel-a', 'sel-b'},
+        excludeSelectedFromClustering: true,
+        fuelResolver: resolve,
+      );
 
-        // The cross-border station is unselected → it goes to the cluster.
-        final cluster = tester.widget<MarkerClusterLayerWidget>(
-            find.byType(MarkerClusterLayerWidget));
-        final crossMarker = cluster.options.markers.firstWhere(
-          (m) =>
-              (m.point.latitude - crossBorder.lat).abs() < 1e-9 &&
-              (m.point.longitude - crossBorder.lng).abs() < 1e-9,
-        );
+      // The cross-border station is unselected → it goes to the cluster.
+      final cluster = tester.widget<MarkerClusterLayerWidget>(
+        find.byType(MarkerClusterLayerWidget),
+      );
+      final crossMarker = cluster.options.markers.firstWhere(
+        (m) =>
+            (m.point.latitude - crossBorder.lat).abs() < 1e-9 &&
+            (m.point.longitude - crossBorder.lng).abs() < 1e-9,
+      );
 
-        // The per-marker meta the cluster builder rolls up from. The clustered
-        // cross-border station carries its RESOLVED e5 price (1.42), not the
-        // strict-e10 '--' (null) it would otherwise have — so the cheapest
-        // rollup uses a real value, not '--' (#2631).
-        final state = tester.state(find.byType(StationMapLayers));
-        final metaMap = (state as dynamic).markerMetaForTesting
-            as Map<Marker, MarkerMeta>;
-        final meta = metaMap[crossMarker];
-        expect(meta, isNotNull);
-        expect(meta!.price, 1.42,
-            reason: 'cluster rollup uses the fuelResolver-derived price so a '
-                'cross-border station contributes a real value, not "--"');
-      },
-    );
+      // The per-marker meta the cluster builder rolls up from. The clustered
+      // cross-border station carries its RESOLVED e5 price (1.42), not the
+      // strict-e10 '--' (null) it would otherwise have — so the cheapest
+      // rollup uses a real value, not '--' (#2631).
+      final state = tester.state(find.byType(StationMapLayers));
+      final metaMap =
+          (state as dynamic).markerMetaForTesting as Map<Marker, MarkerMeta>;
+      final meta = metaMap[crossMarker];
+      expect(meta, isNotNull);
+      expect(
+        meta!.price,
+        1.42,
+        reason:
+            'cluster rollup uses the fuelResolver-derived price so a '
+            'cross-border station contributes a real value, not "--"',
+      );
+    });
 
     testWidgets(
       'with NO selection, excludeSelectedFromClustering folds everything into '
@@ -740,9 +779,13 @@ void main() {
         );
 
         final cluster = tester.widget<MarkerClusterLayerWidget>(
-            find.byType(MarkerClusterLayerWidget));
-        expect(cluster.options.markers.length, 5,
-            reason: 'with no selection, every station clusters as normal');
+          find.byType(MarkerClusterLayerWidget),
+        );
+        expect(
+          cluster.options.markers.length,
+          5,
+          reason: 'with no selection, every station clusters as normal',
+        );
         expect(stationMarkerLayerMarkers(tester), isEmpty);
       },
     );

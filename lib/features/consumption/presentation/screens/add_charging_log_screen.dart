@@ -107,12 +107,19 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     try {
       activeId = ref.read(activeVehicleProfileProvider)?.id;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddChargingLog: active vehicle unavailable'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'AddChargingLog: active vehicle unavailable',
+          },
+        ),
+      );
     }
-    final evVehicles =
-        vehicles.where((v) => v.isEv).toList(growable: false);
-    if (activeId != null &&
-        evVehicles.any((v) => v.id == activeId)) {
+    final evVehicles = vehicles.where((v) => v.isEv).toList(growable: false);
+    if (activeId != null && evVehicles.any((v) => v.id == activeId)) {
       _vehicleId = activeId;
     } else if (evVehicles.isNotEmpty) {
       _vehicleId = evVehicles.first.id;
@@ -157,15 +164,23 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
         costEur: ChargingLogValidators.parseDouble(_costCtrl.text),
         chargeTimeMin: ChargingLogValidators.parseInt(_timeMinCtrl.text),
         odometerKm: ChargingLogValidators.parseInt(_odoCtrl.text),
-        stationName:
-            _stationCtrl.text.trim().isEmpty ? null : _stationCtrl.text.trim(),
+        stationName: _stationCtrl.text.trim().isEmpty
+            ? null
+            : _stationCtrl.text.trim(),
         chargingStationId: widget.chargingStationId,
       );
       await ref.read(chargingLogsProvider.notifier).add(log);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddChargingLog._save'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'AddChargingLog._save'},
+        ),
+      );
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -178,14 +193,23 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     try {
       vehicles = ref.watch(vehicleProfileListProvider);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'AddChargingLog build: vehicle list unavailable'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'AddChargingLog build: vehicle list unavailable',
+          },
+        ),
+      );
       vehicles = const [];
     }
     _initVehicleIfNeeded(vehicles);
 
     if (vehicles.isEmpty) {
       return PageScaffold(
-        title: l?.addChargingLogTitle ?? 'Log charging session',
+        title: l.addChargingLogTitle,
         bodyPadding: const EdgeInsets.all(32),
         body: Center(
           child: Column(
@@ -198,15 +222,13 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                l?.consumptionNoVehicleTitle ?? 'Add a vehicle first',
+                l.consumptionNoVehicleTitle,
                 style: Theme.of(context).textTheme.headlineSmall,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                l?.consumptionNoVehicleBody ??
-                    'Charging sessions are attributed to a vehicle. '
-                        'Add your car to start logging.',
+                l.consumptionNoVehicleBody,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -216,8 +238,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
       );
     }
 
-    final dateStr =
-        '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
+    final dateStr = '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
     final derived = computeChargingLogReadout(
       vehicleId: _vehicleId,
       kWhText: _kwhCtrl.text,
@@ -228,7 +249,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     );
 
     return PageScaffold(
-      title: l?.addChargingLogTitle ?? 'Log charging session',
+      title: l.addChargingLogTitle,
       bodyPadding: EdgeInsets.zero,
       body: Form(
         key: _formKey,

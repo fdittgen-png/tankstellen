@@ -73,8 +73,13 @@ class SwipeableStationCard extends ConsumerWidget {
           children: [
             const Icon(Icons.navigation, color: Colors.white, size: 20),
             const SizedBox(width: 8),
-            Text(l10n?.navigate ?? 'Navigate',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              l10n.navigate,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -86,8 +91,13 @@ class SwipeableStationCard extends ConsumerWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n?.swipeHide ?? 'Hide',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              l10n.swipeHide,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(width: 8),
             const Icon(Icons.visibility_off, color: Colors.white, size: 20),
           ],
@@ -107,9 +117,7 @@ class SwipeableStationCard extends ConsumerWidget {
         // strings so the StationCard widget stays decoupled from the
         // [LoyaltyBrand] enum.
         activeDiscountsByBrand: {
-          for (final entry in ref
-              .watch(activeDiscountByBrandProvider)
-              .entries)
+          for (final entry in ref.watch(activeDiscountByBrandProvider).entries)
             entry.key.canonicalBrand: entry.value,
         },
       ),

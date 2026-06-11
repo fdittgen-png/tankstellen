@@ -31,15 +31,17 @@ class ProfileLandingScreenDropdown extends StatelessWidget {
     return DropdownButtonFormField<LandingScreen>(
       initialValue: value,
       decoration: InputDecoration(
-        labelText: l10n?.landingScreen ?? 'Start screen',
+        labelText: l10n.landingScreen,
         border: const OutlineInputBorder(),
       ),
       items: LandingScreen.values
           .where((s) => s != LandingScreen.map)
-          .map((s) => DropdownMenuItem(
-                value: s,
-                child: Text(s.localizedName(languageCode)),
-              ))
+          .map(
+            (s) => DropdownMenuItem(
+              value: s,
+              child: Text(s.localizedName(languageCode)),
+            ),
+          )
           .toList(),
       onChanged: (v) {
         if (v != null) onChanged(v);

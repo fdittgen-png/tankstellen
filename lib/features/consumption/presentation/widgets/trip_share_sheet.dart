@@ -94,7 +94,7 @@ class _TripShareSheetState extends State<TripShareSheet> {
     setState(() => _shares = shares);
   }
 
-  Future<void> _onShareEmail(AppLocalizations? l) async {
+  Future<void> _onShareEmail(AppLocalizations l) async {
     final email = _emailController.text.trim();
     if (email.isEmpty || _busy) return;
     setState(() => _busy = true);
@@ -104,56 +104,54 @@ class _TripShareSheetState extends State<TripShareSheet> {
     switch (result) {
       case TripShareResult.shared:
         _emailController.clear();
-        SnackBarHelper.showSuccess(
-            context, l?.tripShareSuccess ?? 'Trip shared.');
+        SnackBarHelper.showSuccess(context, l.tripShareSuccess);
         await _reloadShares();
       case TripShareResult.recipientNotFound:
-        SnackBarHelper.showError(
-            context,
-            l?.tripShareRecipientNotFound ??
-                'No TankSync account uses that email.');
+        SnackBarHelper.showError(context, l.tripShareRecipientNotFound);
       case TripShareResult.notAuthenticated:
       case TripShareResult.failed:
-        SnackBarHelper.showError(context,
-            l?.tripShareError ?? "Couldn't share this trip. Try again.");
+        SnackBarHelper.showError(context, l.tripShareError);
     }
   }
 
-  Future<void> _onCreateLink(AppLocalizations? l) async {
+  Future<void> _onCreateLink(AppLocalizations l) async {
     if (_busy) return;
     setState(() => _busy = true);
     final token = await _wire.createShareLink(widget.tripId);
     if (!mounted) return;
     setState(() => _busy = false);
     if (token == null) {
-      SnackBarHelper.showError(context,
-          l?.tripShareError ?? "Couldn't share this trip. Try again.");
+      SnackBarHelper.showError(context, l.tripShareError);
       return;
     }
     // The deep link the recipient taps to claim the share. The host is
     // the app's universal-link domain; the claim route reads `token`.
-    final link = 'https://sparkilo.app/share/trip?token=$token'; // i18n-ignore: URL
-    final sink = debugTripShareLinkSinkOverride ??
+    final link =
+        'https://sparkilo.app/share/trip?token=$token'; // i18n-ignore: URL
+    final sink =
+        debugTripShareLinkSinkOverride ??
         (params) => SharePlus.instance.share(params).then((_) {});
     try {
       await sink(ShareParams(text: link));
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'TripShareSheet share link'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'TripShareSheet share link'},
+        ),
+      );
     }
     if (!mounted) return;
-    SnackBarHelper.showSuccess(
-        context,
-        l?.tripShareLinkCreated ??
-            'Share link copied — paste it to the recipient.');
+    SnackBarHelper.showSuccess(context, l.tripShareLinkCreated);
     await _reloadShares();
   }
 
-  Future<void> _onRevoke(AppLocalizations? l, TripShare share) async {
+  Future<void> _onRevoke(AppLocalizations l, TripShare share) async {
     await _wire.revoke(share.id);
     if (!mounted) return;
-    SnackBarHelper.showSuccess(
-        context, l?.tripShareRevoked ?? 'Share revoked.');
+    SnackBarHelper.showSuccess(context, l.tripShareRevoked);
     await _reloadShares();
   }
 
@@ -169,17 +167,13 @@ class _TripShareSheetState extends State<TripShareSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              l?.tripShareSheetTitle ?? 'Share this trip',
-              style: theme.textTheme.titleLarge,
-            ),
+            Text(l.tripShareSheetTitle, style: theme.textTheme.titleLarge),
             const SizedBox(height: 4),
             Text(
-              l?.tripShareSheetSubtitle ??
-                  'Give another TankSync account read-only access to '
-                      'this recorded trip.',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              l.tripShareSheetSubtitle,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -188,8 +182,8 @@ class _TripShareSheetState extends State<TripShareSheet> {
               keyboardType: TextInputType.emailAddress,
               autocorrect: false,
               decoration: InputDecoration(
-                labelText: l?.tripShareEmailLabel ?? 'Recipient email',
-                hintText: l?.tripShareEmailHint ?? 'name@example.com',
+                labelText: l.tripShareEmailLabel,
+                hintText: l.tripShareEmailHint,
                 border: const OutlineInputBorder(),
               ),
               onSubmitted: (_) => unawaited(_onShareEmail(l)),
@@ -202,7 +196,7 @@ class _TripShareSheetState extends State<TripShareSheet> {
                     key: const Key('trip_share_send_button'),
                     onPressed: _busy ? null : () => unawaited(_onShareEmail(l)),
                     icon: const Icon(Icons.send),
-                    label: Text(l?.tripShareSendButton ?? 'Share'),
+                    label: Text(l.tripShareSendButton),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -211,35 +205,33 @@ class _TripShareSheetState extends State<TripShareSheet> {
                     key: const Key('trip_share_create_link_button'),
                     onPressed: _busy ? null : () => unawaited(_onCreateLink(l)),
                     icon: const Icon(Icons.link),
-                    label: Text(
-                      l?.tripShareCreateLinkButton ?? 'Create share link',
-                    ),
+                    label: Text(l.tripShareCreateLinkButton),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            Text(
-              l?.tripShareExistingTitle ?? 'Shared with',
-              style: theme.textTheme.titleMedium,
-            ),
+            Text(l.tripShareExistingTitle, style: theme.textTheme.titleMedium),
             const SizedBox(height: 4),
             if (_shares.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  l?.tripShareExistingEmpty ?? 'Not shared with anyone yet.',
+                  l.tripShareExistingEmpty,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant),
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               )
             else
-              ..._shares.map((s) => _ShareRow(
-                    key: Key('trip_share_row_${s.id}'),
-                    share: s,
-                    l: l,
-                    onRevoke: () => unawaited(_onRevoke(l, s)),
-                  )),
+              ..._shares.map(
+                (s) => _ShareRow(
+                  key: Key('trip_share_row_${s.id}'),
+                  share: s,
+                  l: l,
+                  onRevoke: () => unawaited(_onRevoke(l, s)),
+                ),
+              ),
           ],
         ),
       ),
@@ -249,7 +241,7 @@ class _TripShareSheetState extends State<TripShareSheet> {
 
 class _ShareRow extends StatelessWidget {
   final TripShare share;
-  final AppLocalizations? l;
+  final AppLocalizations l;
   final VoidCallback onRevoke;
 
   const _ShareRow({
@@ -263,8 +255,8 @@ class _ShareRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLink = share.sharedWithId == null && share.shareToken != null;
     final label = isLink
-        ? (l?.tripShareLinkRecipient ?? 'Share link (unclaimed)')
-        : (l?.tripShareDirectRecipient ?? 'An account');
+        ? (l.tripShareLinkRecipient)
+        : (l.tripShareDirectRecipient);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(isLink ? Icons.link : Icons.person_outline),
@@ -272,7 +264,7 @@ class _ShareRow extends StatelessWidget {
       trailing: IconButton(
         key: Key('trip_share_revoke_${share.id}'),
         icon: const Icon(Icons.close),
-        tooltip: l?.tripShareRevokeTooltip ?? 'Revoke',
+        tooltip: l.tripShareRevokeTooltip,
         onPressed: onRevoke,
       ),
     );

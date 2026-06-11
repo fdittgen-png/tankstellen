@@ -31,10 +31,9 @@ class ReportInputSection extends StatelessWidget {
         padding: const EdgeInsets.only(top: 16),
         child: TextField(
           controller: priceController,
-          keyboardType:
-              const TextInputType.numberWithOptions(decimal: true),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
-            labelText: l10n?.correctPrice ?? 'Correct price (e.g. 1.459)',
+            labelText: l10n.correctPrice,
             prefixText: '\u20ac ',
             border: const OutlineInputBorder(),
           ),
@@ -51,8 +50,8 @@ class ReportInputSection extends StatelessWidget {
           textCapitalization: TextCapitalization.sentences,
           decoration: InputDecoration(
             labelText: type == ReportType.wrongName
-                ? (l10n?.correctName ?? 'Correct station name')
-                : (l10n?.correctAddress ?? 'Correct address'),
+                ? (l10n.correctName)
+                : (l10n.correctAddress),
             border: const OutlineInputBorder(),
           ),
         ),

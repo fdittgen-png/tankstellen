@@ -59,8 +59,11 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
 
   void _scrub(Offset localPos, Size size, List<_ChartPoint> points) {
     if (points.length < 2) return;
-    final nearest =
-        _TripChartGeometry.nearestPointIndex(localPos, size, points);
+    final nearest = _TripChartGeometry.nearestPointIndex(
+      localPos,
+      size,
+      points,
+    );
     if (nearest != _selected) {
       setState(() => _selected = nearest);
     }
@@ -87,7 +90,7 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
         height: 140,
         child: Center(
           child: Text(
-            l?.trajetDetailChartEmpty ?? 'No samples recorded',
+            l.trajetDetailChartEmpty,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -97,8 +100,9 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
     }
     points.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    final selected =
-        (_selected != null && _selected! < points.length) ? _selected : null;
+    final selected = (_selected != null && _selected! < points.length)
+        ? _selected
+        : null;
     final locale = Localizations.localeOf(context);
 
     final chart = SizedBox(
@@ -109,8 +113,7 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
           return GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTapDown: (d) => _scrub(d.localPosition, size, points),
-            onHorizontalDragStart: (d) =>
-                _scrub(d.localPosition, size, points),
+            onHorizontalDragStart: (d) => _scrub(d.localPosition, size, points),
             onHorizontalDragUpdate: (d) =>
                 _scrub(d.localPosition, size, points),
             child: Stack(
@@ -156,7 +159,7 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              '~ ${l?.trajetDetailChartEstimatedBadge ?? 'estimated'}',
+              '~ ${l.trajetDetailChartEstimatedBadge}',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSecondaryContainer,
               ),
@@ -197,12 +200,12 @@ class _TripChartGeometry {
     required int tSpan,
     required double chartWidth,
     required double chartHeight,
-  })  : _yMin = yMin,
-        _ySpan = ySpan,
-        _firstTs = firstTs,
-        _tSpan = tSpan,
-        _chartWidth = chartWidth,
-        _chartHeight = chartHeight;
+  }) : _yMin = yMin,
+       _ySpan = ySpan,
+       _firstTs = firstTs,
+       _tSpan = tSpan,
+       _chartWidth = chartWidth,
+       _chartHeight = chartHeight;
 
   factory _TripChartGeometry.forSize(Size size, List<_ChartPoint> points) {
     final chartWidth = size.width - leftInset - rightInset;

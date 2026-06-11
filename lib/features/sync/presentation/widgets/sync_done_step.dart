@@ -15,9 +15,8 @@ class SyncDoneStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final successTitle = l10n?.syncSuccessTitle ?? 'Successfully connected!';
-    final successDescription = l10n?.syncSuccessDescription ??
-        'Your data will now sync automatically.';
+    final successTitle = l10n.syncSuccessTitle;
+    final successDescription = l10n.syncSuccessDescription;
     return Column(
       children: [
         const SizedBox(height: 40),
@@ -42,8 +41,9 @@ class SyncDoneStep extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 successDescription,
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

@@ -15,31 +15,31 @@ import 'trip_recording_banner_palette.dart';
 /// accessibility label and its visible content strip (#2515 — extracted
 /// from the two byte-identical switches so the new buckets only need to
 /// be mapped once).
-String situationDisplayLabel(DrivingSituation s, AppLocalizations? l) {
+String situationDisplayLabel(DrivingSituation s, AppLocalizations l) {
   switch (s) {
     case DrivingSituation.idle:
-      return l?.situationIdle ?? 'Idle';
+      return l.situationIdle;
     case DrivingSituation.stopAndGo:
-      return l?.situationStopAndGo ?? 'Stop & go';
+      return l.situationStopAndGo;
     case DrivingSituation.urbanCruise:
-      return l?.situationUrban ?? 'Urban';
+      return l.situationUrban;
     case DrivingSituation.highwayCruise:
-      return l?.situationHighway ?? 'Highway';
+      return l.situationHighway;
     case DrivingSituation.deceleration:
-      return l?.situationDecel ?? 'Decelerating';
+      return l.situationDecel;
     case DrivingSituation.climbingOrLoaded:
-      return l?.situationClimbing ?? 'Climbing / loaded';
+      return l.situationClimbing;
     // #2515 — the three new persistent buckets.
     case DrivingSituation.coldStartWarmup:
-      return l?.situationColdStart ?? 'Cold start';
+      return l.situationColdStart;
     case DrivingSituation.sustainedLoadOrTowing:
-      return l?.situationSustainedLoad ?? 'Sustained load / towing';
+      return l.situationSustainedLoad;
     case DrivingSituation.partialThrottleDecel:
-      return l?.situationPartialDecel ?? 'Coasting';
+      return l.situationPartialDecel;
     case DrivingSituation.hardAccel:
-      return l?.situationHardAccel ?? 'Hard accel';
+      return l.situationHardAccel;
     case DrivingSituation.fuelCutCoast:
-      return l?.situationFuelCut ?? 'Fuel cut — coast';
+      return l.situationFuelCut;
   }
 }
 
@@ -69,7 +69,7 @@ class TripRecordingBannerContent extends StatelessWidget {
 
     final fg = palette.foreground;
     final situationLabel = paused
-        ? (l?.tripBannerPaused ?? 'Paused')
+        ? (l.tripBannerPaused)
         : situationDisplayLabel(state.situation, l);
     final bandIcon = paused
         ? Icons.pause_circle_filled
@@ -86,15 +86,18 @@ class TripRecordingBannerContent extends StatelessWidget {
     // token, leading `~` flagging it an estimate per ADR 0012). The OBD2
     // measured path stays tilde-free; a null estimate (warm-up / OBD2
     // trip) leaves the slot silent as before.
-    final gpsEstimate =
-        (live != null && !paused) ? live.gpsEstimatedLPer100Km : null;
-    final measured =
-        (live != null && !paused) ? formatInstantConsumption(live) : null;
+    final gpsEstimate = (live != null && !paused)
+        ? live.gpsEstimatedLPer100Km
+        : null;
+    final measured = (live != null && !paused)
+        ? formatInstantConsumption(live)
+        : null;
     // #2393 — true only when the value shown is the GPS estimate (no
     // measured value, estimate present). Drives the approximate tooltip /
     // accessibility disclaimer; the OBD2-measured value never carries it.
     final isEstimate = measured == null && gpsEstimate != null;
-    final instantConsumption = measured ??
+    final instantConsumption =
+        measured ??
         (isEstimate ? '~${gpsEstimate.toStringAsFixed(1)} L/100' : null);
     final coachingHintValue = (live != null && !paused)
         ? coachingHint(live, situation: state.situation, band: state.band)
@@ -125,9 +128,7 @@ class TripRecordingBannerContent extends StatelessWidget {
           // ExcludeSemantics.
           if (isEstimate)
             Tooltip(
-              message: l?.tripRecordingEstimatedInfo ??
-                  'Estimated value (~) — modelled from GPS speed, '
-                      'not measured.',
+              message: l.tripRecordingEstimatedInfo,
               child: Text(
                 instantConsumption,
                 style: TextStyle(

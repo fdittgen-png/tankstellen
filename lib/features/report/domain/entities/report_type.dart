@@ -125,28 +125,28 @@ enum ReportType {
   }
 
   /// Localized display name for this report type.
-  String displayName(AppLocalizations? l10n) {
+  String displayName(AppLocalizations l10n) {
     switch (this) {
       case wrongE5:
-        return l10n?.wrongE5Price ?? 'Prix Super E5 incorrect';
+        return l10n.wrongE5Price;
       case wrongE10:
-        return l10n?.wrongE10Price ?? 'Prix Super E10 incorrect';
+        return l10n.wrongE10Price;
       case wrongDiesel:
-        return l10n?.wrongDieselPrice ?? 'Prix Diesel incorrect';
+        return l10n.wrongDieselPrice;
       case wrongE85:
-        return l10n?.wrongE85Price ?? 'Wrong E85 price';
+        return l10n.wrongE85Price;
       case wrongE98:
-        return l10n?.wrongE98Price ?? 'Wrong Super 98 price';
+        return l10n.wrongE98Price;
       case wrongLpg:
-        return l10n?.wrongLpgPrice ?? 'Wrong LPG price';
+        return l10n.wrongLpgPrice;
       case wrongStatusOpen:
-        return l10n?.wrongStatusOpen ?? 'Shown as open, but closed';
+        return l10n.wrongStatusOpen;
       case wrongStatusClosed:
-        return l10n?.wrongStatusClosed ?? 'Shown as closed, but open';
+        return l10n.wrongStatusClosed;
       case wrongName:
-        return l10n?.wrongStationName ?? 'Wrong station name';
+        return l10n.wrongStationName;
       case wrongAddress:
-        return l10n?.wrongStationAddress ?? 'Wrong address';
+        return l10n.wrongStationAddress;
     }
   }
 }

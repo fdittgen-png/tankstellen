@@ -27,10 +27,7 @@ class ShellDestinations {
   final List<ShellNavItem> items;
   final List<int> branchForSlot;
 
-  const ShellDestinations({
-    required this.items,
-    required this.branchForSlot,
-  });
+  const ShellDestinations({required this.items, required this.branchForSlot});
 }
 
 /// Build the visible nav destinations.
@@ -60,7 +57,7 @@ class ShellDestinations {
 /// shell can re-resolve on every build without paying provider-read
 /// overhead.
 ShellDestinations resolveShellDestinations({
-  required AppLocalizations? l10n,
+  required AppLocalizations l10n,
   required bool showConsumption,
   required bool showTrajets,
 }) {
@@ -70,24 +67,24 @@ ShellDestinations resolveShellDestinations({
   final search = ShellNavItem(
     Icons.search_outlined,
     Icons.search,
-    l10n?.search ?? 'Search',
+    l10n.search,
     isPrimary: true,
   );
-  final map = ShellNavItem(Icons.map_outlined, Icons.map, l10n?.map ?? 'Map');
+  final map = ShellNavItem(Icons.map_outlined, Icons.map, l10n.map);
   final favorites = ShellNavItem(
     Icons.star_outline,
     Icons.star,
-    l10n?.favorites ?? 'Favorites',
+    l10n.favorites,
   );
   final carburant = ShellNavItem(
     Icons.local_gas_station_outlined,
     Icons.local_gas_station,
-    l10n?.consumptionTabFuel ?? 'Fuel',
+    l10n.consumptionTabFuel,
   );
   final trajets = ShellNavItem(
     Icons.route_outlined,
     Icons.route,
-    l10n?.trajetsTabLabel ?? 'Trips',
+    l10n.trajetsTabLabel,
   );
 
   if (!showConsumption) {

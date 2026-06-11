@@ -41,7 +41,8 @@ class PaymentMethodChips extends StatelessWidget {
         .toList();
 
     return Semantics(
-      label: '${l10n?.paymentMethods ?? 'Payment methods'}: '
+      label:
+          '${l10n.paymentMethods}: '
           '${labels.join(', ')}',
       container: true,
       child: ExcludeSemantics(
@@ -78,16 +79,15 @@ class PaymentMethodChips extends StatelessWidget {
 
   String _localizedLabel(
     PaymentMethod method,
-    AppLocalizations? l10n, {
+    AppLocalizations l10n, {
     String? appName,
   }) {
     return switch (method) {
-      PaymentMethod.cash => l10n?.paymentMethodCash ?? 'Cash',
-      PaymentMethod.card => l10n?.paymentMethodCard ?? 'Card',
-      PaymentMethod.contactless =>
-        l10n?.paymentMethodContactless ?? 'Contactless',
-      PaymentMethod.fuelCard => l10n?.paymentMethodFuelCard ?? 'Fuel Card',
-      PaymentMethod.app => appName ?? l10n?.paymentMethodApp ?? 'App',
+      PaymentMethod.cash => l10n.paymentMethodCash,
+      PaymentMethod.card => l10n.paymentMethodCard,
+      PaymentMethod.contactless => l10n.paymentMethodContactless,
+      PaymentMethod.fuelCard => l10n.paymentMethodFuelCard,
+      PaymentMethod.app => appName ?? l10n.paymentMethodApp,
     };
   }
 }

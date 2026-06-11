@@ -69,10 +69,7 @@ class StationInfoSection extends StatelessWidget {
       children: [
         // Opening times — section + content fully elided when empty.
         if (hasOpeningInfo) ...[
-          SectionHeader(
-            title: l10n?.openingHours ?? 'Opening hours',
-            padding: EdgeInsets.zero,
-          ),
+          SectionHeader(title: l10n.openingHours, padding: EdgeInsets.zero),
           const SizedBox(height: 8),
           // #3198 — evaluate "open now" on the STATION's wall clock, not
           // the device's: weekly hours are local to the pump, so browsing
@@ -80,41 +77,40 @@ class StationInfoSection extends StatelessWidget {
           // status by the timezone gap. Unknown country → device clock.
           OpeningHoursView(
             hours: hours,
-            now: nowInCountry(Countries.countryForStation(
-              id: station.id,
-              lat: station.lat,
-              lng: station.lng,
-            )?.code),
+            now: nowInCountry(
+              Countries.countryForStation(
+                id: station.id,
+                lat: station.lat,
+                lng: station.lng,
+              )?.code,
+            ),
           ),
           const SizedBox(height: 12),
         ],
 
         // Location info
         if (station.department != null || station.region != null) ...[
-          SectionHeader(
-            title: l10n?.zone ?? 'Zone',
-            padding: EdgeInsets.zero,
-          ),
+          SectionHeader(title: l10n.zone, padding: EdgeInsets.zero),
           const SizedBox(height: 8),
           ListTile(
             dense: true,
             leading: const Icon(Icons.map),
-            title: Text([station.department, station.region]
-                .whereType<String>()
-                .join(', ')),
+            title: Text(
+              [
+                station.department,
+                station.region,
+              ].whereType<String>().join(', '),
+            ),
             subtitle: station.stationType == 'A'
-                ? Text(l10n?.highway ?? 'Highway')
-                : Text(l10n?.localStation ?? 'Local station'),
+                ? Text(l10n.highway)
+                : Text(l10n.localStation),
           ),
           const SizedBox(height: 12),
         ],
 
         // Amenities (icon chips) — at the bottom
         if (station.amenities.isNotEmpty) ...[
-          SectionHeader(
-            title: l10n?.amenities ?? 'Amenities',
-            padding: EdgeInsets.zero,
-          ),
+          SectionHeader(title: l10n.amenities, padding: EdgeInsets.zero),
           const SizedBox(height: 8),
           AmenityChips(amenities: station.amenities, maxVisible: 8),
           const SizedBox(height: 12),
@@ -122,10 +118,7 @@ class StationInfoSection extends StatelessWidget {
 
         // Payment methods (inferred from brand — no API data available)
         if (station.brand.trim().isNotEmpty) ...[
-          SectionHeader(
-            title: l10n?.paymentMethods ?? 'Payment methods',
-            padding: EdgeInsets.zero,
-          ),
+          SectionHeader(title: l10n.paymentMethods, padding: EdgeInsets.zero),
           const SizedBox(height: 8),
           PaymentMethodChips(brand: station.brand, maxVisible: 8),
           const SizedBox(height: 8),
@@ -152,7 +145,7 @@ class StationInfoSection extends StatelessWidget {
               title: Semantics(
                 header: true,
                 child: Text(
-                  '${l10n?.services ?? "Services"} '
+                  '${l10n.services} '
                   '(${station.services.length})',
                   style: theme.textTheme.titleMedium,
                 ),
@@ -161,11 +154,18 @@ class StationInfoSection extends StatelessWidget {
                 Wrap(
                   spacing: 6,
                   runSpacing: 4,
-                  children: station.services.map((s) => Chip(
-                        avatar: const Icon(Icons.check_circle_outline, size: 16),
-                        label: Text(s, style: const TextStyle(fontSize: 11)),
-                        visualDensity: VisualDensity.compact,
-                      )).toList(),
+                  children: station.services
+                      .map(
+                        (s) => Chip(
+                          avatar: const Icon(
+                            Icons.check_circle_outline,
+                            size: 16,
+                          ),
+                          label: Text(s, style: const TextStyle(fontSize: 11)),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      )
+                      .toList(),
                 ),
               ],
             ),

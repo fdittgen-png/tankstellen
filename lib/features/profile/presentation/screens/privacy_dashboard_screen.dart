@@ -77,7 +77,7 @@ class _PrivacyDashboardScreenState
     final errorLogCount = ref.watch(traceStorageProvider).count;
 
     return PageScaffold(
-      title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
+      title: l.privacyDashboardTitle,
       bodyPadding: EdgeInsets.zero,
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -111,8 +111,7 @@ class _PrivacyDashboardScreenState
                     // #2145 — label reflects the dominant behaviour
                     // (save to Downloads); clipboard/share fallbacks
                     // happen automatically based on payload size.
-                    l?.privacySaveErrorLog(errorLogCount) ??
-                        'Save error log ($errorLogCount)',
+                    l.privacySaveErrorLog(errorLogCount),
                   ),
                 ),
               ),
@@ -121,7 +120,7 @@ class _PrivacyDashboardScreenState
                 key: const ValueKey('privacy-clear-error-log-button'),
                 onPressed: errorLogCount == 0 ? null : _clearErrorLog,
                 icon: const Icon(Icons.delete_outline),
-                tooltip: l?.privacyClearErrorLog ?? 'Clear error log',
+                tooltip: l.privacyClearErrorLog,
               ),
             ],
           ),
@@ -145,7 +144,7 @@ class _PrivacyDashboardScreenState
     await _saveExportToDownloads(
       text: json,
       fileName: 'tankstellen-data.json',
-      copySnackbar: l?.privacyExportSuccess ?? 'Data exported to clipboard',
+      copySnackbar: l.privacyExportSuccess,
     );
   }
 
@@ -168,18 +167,21 @@ class _PrivacyDashboardScreenState
         // Share-sheet wiring failed; fall back to clipboard so the bug
         // report isn't blocked on a platform-channel hiccup. #2146 —
         // also surface on the exportable log.
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-          'where': 'PrivacyDashboard._exportErrorLog: share fallback',
-        }));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: const {
+              'where': 'PrivacyDashboard._exportErrorLog: share fallback',
+            },
+          ),
+        );
         await Clipboard.setData(ClipboardData(text: json));
         if (!mounted) return;
         SnackBarHelper.showSuccess(
           context,
-          _formatCopySnackbar(
-            parsed: parsed,
-            unparsed: unparsed,
-            kb: kb,
-          ),
+          _formatCopySnackbar(parsed: parsed, unparsed: unparsed, kb: kb),
         );
         return;
       }
@@ -233,10 +235,7 @@ class _PrivacyDashboardScreenState
     // box, so invalidate it to force `build`'s `count` read to re-run.
     ref.invalidate(traceStorageProvider);
     final l = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l?.privacyErrorLogCleared ?? 'Error log cleared',
-    );
+    SnackBarHelper.showSuccess(context, l.privacyErrorLogCleared);
   }
 
   /// Routes the large error-log payload to the widget-test share seam
@@ -284,8 +283,7 @@ class _PrivacyDashboardScreenState
     await _saveExportToDownloads(
       text: csvText,
       fileName: 'tankstellen-data.csv',
-      copySnackbar:
-          l?.privacyExportCsvSuccess ?? 'CSV data exported to clipboard',
+      copySnackbar: l.privacyExportCsvSuccess,
     );
   }
 
@@ -308,16 +306,20 @@ class _PrivacyDashboardScreenState
         mimeType: fileName.endsWith('.csv') ? 'text/csv' : 'application/json',
       );
       if (!mounted) return;
-      SnackBarHelper.showSuccess(
-        context,
-        l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
-      );
+      SnackBarHelper.showSuccess(context, l.savedToDownloadsFolder);
     } on Object catch (e, st) {
       // #2146 — surface on the user-exportable log.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
-        'where': 'PrivacyDashboard._saveExportToDownloads',
-        'fileName': fileName,
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.storage,
+          e,
+          st,
+          context: {
+            'where': 'PrivacyDashboard._saveExportToDownloads',
+            'fileName': fileName,
+          },
+        ),
+      );
       if (!mounted) return;
       SnackBarHelper.showSuccess(context, copySnackbar);
     }
@@ -351,33 +353,19 @@ class _PrivacyDashboardScreenState
           color: theme.colorScheme.error,
           size: 48,
         ),
-        title: Text(l?.privacyDeleteTitle ?? 'Delete all data?'),
-        content: Text(
-          l?.privacyDeleteBody ??
-              'This will permanently delete:\n\n'
-                  '- All favorites and station data\n'
-                  '- All search profiles\n'
-                  '- All price alerts\n'
-                  '- All price history\n'
-                  '- All cached data\n'
-                  '- Your API key\n'
-                  '- All app settings\n\n'
-                  'The app will reset to its initial state. '
-                  'This action cannot be undone.',
-        ),
+        title: Text(l.privacyDeleteTitle),
+        content: Text(l.privacyDeleteBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: theme.colorScheme.error,
             ),
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              l?.privacyDeleteConfirm ?? 'Delete everything',
-            ),
+            child: Text(l.privacyDeleteConfirm),
           ),
         ],
       ),

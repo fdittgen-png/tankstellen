@@ -71,24 +71,23 @@ class ChartsTab extends ConsumerWidget {
       children: [
         _SummaryRow(totalCost: totalCost, totalCo2: totalCo2),
         const SizedBox(height: 8),
-        if (l != null && !breakdown.isEmpty)
+        if (!breakdown.isEmpty)
           TripLengthBreakdownCard(
             breakdown: breakdown,
             overallAvgLPer100Km: overallAvg,
             l: l,
             theme: theme,
           ),
-        if (l != null)
-          SpeedConsumptionCard(
-            bins: speedBins,
-            overallAvgLPer100Km: overallAvg,
-            l: l,
-            theme: theme,
-          ),
+        SpeedConsumptionCard(
+          bins: speedBins,
+          overallAvgLPer100Km: overallAvg,
+          l: l,
+          theme: theme,
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SectionCard(
-            title: l?.monthlyCostsTitle ?? 'Monthly costs',
+            title: l.monthlyCostsTitle,
             child: MonthlyBarChart(
               key: const Key('monthly_cost_chart'),
               summaries: summaries,
@@ -101,7 +100,7 @@ class ChartsTab extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SectionCard(
-            title: l?.monthlyEmissionsTitle ?? 'Monthly CO2 emissions',
+            title: l.monthlyEmissionsTitle,
             child: MonthlyBarChart(
               key: const Key('monthly_emissions_chart'),
               summaries: summaries,
@@ -156,8 +155,7 @@ List<TripHistoryEntry> _filterTrips(
 ) {
   if (vehicleId == null) return trips.toList(growable: false);
   return trips
-      .where((entry) =>
-          entry.vehicleId == null || entry.vehicleId == vehicleId)
+      .where((entry) => entry.vehicleId == null || entry.vehicleId == vehicleId)
       .toList(growable: false);
 }
 
@@ -181,7 +179,7 @@ class _SummaryRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l?.carbonSummaryTotalCost ?? 'Total cost',
+                    l.carbonSummaryTotalCost,
                     style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(height: 4),
@@ -202,7 +200,7 @@ class _SummaryRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l?.carbonSummaryTotalCo2 ?? 'Total CO2',
+                    l.carbonSummaryTotalCo2,
                     style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(height: 4),

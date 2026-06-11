@@ -8,6 +8,7 @@ import 'package:tankstellen/core/theme/theme_mode_provider.dart';
 import 'package:tankstellen/features/profile/presentation/screens/theme_settings_screen.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Test-only ThemeModeSetting that exposes a fixed `build()` value and
 /// skips the real provider's SharedPreferences load — widget tests do
@@ -27,14 +28,14 @@ class _FixedThemeMode extends ThemeModeSetting {
 
 void main() {
   group('ThemeSettingsScreen (#897)', () {
-    testWidgets('renders Scaffold + AppBar with Theme title',
-        (tester) async {
+    testWidgets('renders Scaffold + AppBar with Theme title', (tester) async {
       await pumpApp(
         tester,
         const ThemeSettingsScreen(),
         overrides: [
-          themeModeSettingProvider
-              .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
+          themeModeSettingProvider.overrideWith(
+            () => _FixedThemeMode(AppThemeChoice.system),
+          ),
         ],
       );
 
@@ -48,8 +49,9 @@ void main() {
         tester,
         const ThemeSettingsScreen(),
         overrides: [
-          themeModeSettingProvider
-              .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
+          themeModeSettingProvider.overrideWith(
+            () => _FixedThemeMode(AppThemeChoice.system),
+          ),
         ],
       );
 
@@ -62,29 +64,29 @@ void main() {
         find.textContaining('Match the current device appearance'),
         findsOneWidget,
       );
-      expect(
-        find.textContaining('Bright backgrounds'),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('Dark backgrounds'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('Bright backgrounds'), findsOneWidget);
+      expect(find.textContaining('Dark backgrounds'), findsOneWidget);
     });
 
-    testWidgets('tapping Light option updates ThemeModeSetting',
-        (tester) async {
+    testWidgets('tapping Light option updates ThemeModeSetting', (
+      tester,
+    ) async {
       late ProviderContainer container;
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            themeModeSettingProvider
-                .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
+            themeModeSettingProvider.overrideWith(
+              () => _FixedThemeMode(AppThemeChoice.system),
+            ),
           ],
           child: Builder(
             builder: (ctx) {
               container = ProviderScope.containerOf(ctx);
-              return const MaterialApp(home: ThemeSettingsScreen());
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: ThemeSettingsScreen(),
+              );
             },
           ),
         ),
@@ -101,19 +103,23 @@ void main() {
       expect(container.read(themeModeSettingProvider), AppThemeChoice.light);
     });
 
-    testWidgets('tapping Dark option updates ThemeModeSetting',
-        (tester) async {
+    testWidgets('tapping Dark option updates ThemeModeSetting', (tester) async {
       late ProviderContainer container;
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            themeModeSettingProvider
-                .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
+            themeModeSettingProvider.overrideWith(
+              () => _FixedThemeMode(AppThemeChoice.system),
+            ),
           ],
           child: Builder(
             builder: (ctx) {
               container = ProviderScope.containerOf(ctx);
-              return const MaterialApp(home: ThemeSettingsScreen());
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: ThemeSettingsScreen(),
+              );
             },
           ),
         ),
@@ -128,19 +134,25 @@ void main() {
       expect(container.read(themeModeSettingProvider), AppThemeChoice.dark);
     });
 
-    testWidgets('tapping System option from Dark resets to System',
-        (tester) async {
+    testWidgets('tapping System option from Dark resets to System', (
+      tester,
+    ) async {
       late ProviderContainer container;
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            themeModeSettingProvider
-                .overrideWith(() => _FixedThemeMode(AppThemeChoice.dark)),
+            themeModeSettingProvider.overrideWith(
+              () => _FixedThemeMode(AppThemeChoice.dark),
+            ),
           ],
           child: Builder(
             builder: (ctx) {
               container = ProviderScope.containerOf(ctx);
-              return const MaterialApp(home: ThemeSettingsScreen());
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: ThemeSettingsScreen(),
+              );
             },
           ),
         ),
@@ -155,21 +167,20 @@ void main() {
       expect(container.read(themeModeSettingProvider), AppThemeChoice.system);
     });
 
-    testWidgets('all interactive options meet the 48dp tap-target guideline',
-        (tester) async {
+    testWidgets('all interactive options meet the 48dp tap-target guideline', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const ThemeSettingsScreen(),
         overrides: [
-          themeModeSettingProvider
-              .overrideWith(() => _FixedThemeMode(AppThemeChoice.system)),
+          themeModeSettingProvider.overrideWith(
+            () => _FixedThemeMode(AppThemeChoice.system),
+          ),
         ],
       );
 
-      await expectLater(
-        tester,
-        meetsGuideline(androidTapTargetGuideline),
-      );
+      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
     });
   });
 }

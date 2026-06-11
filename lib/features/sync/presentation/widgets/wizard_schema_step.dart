@@ -41,8 +41,9 @@ class WizardSchemaStep extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final tablesReady =
-        SchemaVerifier.requiredTables.every((t) => schemaStatus![t] == true);
+    final tablesReady = SchemaVerifier.requiredTables.every(
+      (t) => schemaStatus![t] == true,
+    );
     // Outdated schema must be treated like "not ready": the wizard still
     // needs the self-hoster to re-run the SQL before sync is safe.
     final allReady = tablesReady && !schemaOutdated;
@@ -59,27 +60,27 @@ class WizardSchemaStep extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          allReady
-              ? (l10n?.syncDatabaseReady ?? 'Database ready!')
-              : (l10n?.syncDatabaseNeedsSetup ?? 'Database needs setup'),
+          allReady ? (l10n.syncDatabaseReady) : (l10n.syncDatabaseNeedsSetup),
           style: theme.textTheme.titleMedium,
           textAlign: TextAlign.center,
         ),
         if (tablesReady && schemaOutdated) ...[
           const SizedBox(height: 8),
           Text(
-            l10n?.syncSchemaOutdated ??
-                'Your TankSync schema is outdated — re-run the setup SQL '
-                    'below to enable the latest synced features.',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: DarkModeColors.warning(context)),
+            l10n.syncSchemaOutdated,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: DarkModeColors.warning(context),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
         const SizedBox(height: 16),
 
         // Table status list
-        for (final table in [...SchemaVerifier.requiredTables, ...SchemaVerifier.optionalTables])
+        for (final table in [
+          ...SchemaVerifier.requiredTables,
+          ...SchemaVerifier.optionalTables,
+        ])
           ListTile(
             dense: true,
             leading: Icon(
@@ -92,8 +93,8 @@ class WizardSchemaStep extends StatelessWidget {
             title: Text(table, style: theme.textTheme.bodySmall),
             trailing: Text(
               schemaStatus![table] == true
-                  ? (l10n?.syncTableStatusOk ?? 'OK')
-                  : (l10n?.syncTableStatusMissing ?? 'Missing'),
+                  ? (l10n.syncTableStatusOk)
+                  : (l10n.syncTableStatusMissing),
               style: TextStyle(
                 fontSize: 11,
                 color: schemaStatus![table] == true
@@ -106,37 +107,34 @@ class WizardSchemaStep extends StatelessWidget {
         if (!allReady) ...[
           const SizedBox(height: 16),
           Text(
-            l10n?.syncSqlEditorInstructions ??
-                'Copy the SQL below and run it in your Supabase SQL Editor\n'
-                    '(Dashboard → SQL Editor → New Query → Paste → Run)',
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            l10n.syncSqlEditorInstructions,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           FilledButton.icon(
             onPressed: () {
-              unawaited(Clipboard.setData(ClipboardData(text: migrationSql ?? '')));
-              SnackBarHelper.show(context,
-                  l10n?.sqlCopied ?? 'SQL copied to clipboard');
+              unawaited(
+                Clipboard.setData(ClipboardData(text: migrationSql ?? '')),
+              );
+              SnackBarHelper.show(context, l10n.sqlCopied);
             },
             icon: const Icon(Icons.copy),
-            label: Text(l10n?.syncCopySqlButton ?? 'Copy SQL to clipboard'),
+            label: Text(l10n.syncCopySqlButton),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: onRecheck,
             icon: const Icon(Icons.refresh),
-            label: Text(l10n?.syncRecheckSchemaButton ?? 'Re-check schema'),
+            label: Text(l10n.syncRecheckSchemaButton),
           ),
         ],
 
         if (allReady) ...[
           const SizedBox(height: 24),
-          FilledButton(
-            onPressed: onDone,
-            child: Text(l10n?.syncDoneButton ?? 'Done'),
-          ),
+          FilledButton(onPressed: onDone, child: Text(l10n.syncDoneButton)),
         ],
       ],
     );

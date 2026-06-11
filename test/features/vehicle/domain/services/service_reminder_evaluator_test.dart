@@ -3,6 +3,8 @@
 
 import 'dart:io';
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
@@ -10,6 +12,7 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/service_reminder_repository.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/service_reminder.dart';
 import 'package:tankstellen/features/vehicle/domain/services/service_reminder_evaluator.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Local fake that mirrors `test/core/notifications/notification_service_test.dart`.
 /// Duplicated on purpose so this test file stays self-contained and
@@ -51,6 +54,8 @@ class _FakeNotificationService implements NotificationService {
 }
 
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   late Directory tempDir;
   late Box<String> box;
   late ServiceReminderRepository repo;
@@ -67,6 +72,7 @@ void main() {
     evaluator = ServiceReminderEvaluator(
       repository: repo,
       notifications: notifications,
+      messages: ServiceReminderMessages.fromL10n(l10nEn),
     );
   });
 
@@ -96,15 +102,9 @@ void main() {
       expect(fired, hasLength(1));
       expect(notifications.serviceReminders, hasLength(1));
       expect(notifications.serviceReminders.first.title, 'Service due');
-      // Default-English fallback: "{label} is due — {kmOver} km past the interval."
-      expect(
-        notifications.serviceReminders.first.body,
-        contains('Oil change'),
-      );
-      expect(
-        notifications.serviceReminders.first.body,
-        contains('200'),
-      );
+      // en ARB copy: "{label} is due — {kmOver} km past the interval."
+      expect(notifications.serviceReminders.first.body, contains('Oil change'));
+      expect(notifications.serviceReminders.first.body, contains('200'));
     });
 
     test('does not fire before the threshold', () async {
@@ -136,10 +136,7 @@ void main() {
         ),
       );
 
-      await evaluator.evaluate(
-        vehicleId: 'v-1',
-        currentOdometerKm: 15001,
-      );
+      await evaluator.evaluate(vehicleId: 'v-1', currentOdometerKm: 15001);
 
       expect(repo.getById('r-1')!.pendingAcknowledgment, isTrue);
     });
@@ -154,16 +151,10 @@ void main() {
         ),
       );
 
-      await evaluator.evaluate(
-        vehicleId: 'v-1',
-        currentOdometerKm: 15200,
-      );
+      await evaluator.evaluate(vehicleId: 'v-1', currentOdometerKm: 15200);
       // Second fill-up further past the threshold — the reminder is
       // still pending, so no new notification fires.
-      await evaluator.evaluate(
-        vehicleId: 'v-1',
-        currentOdometerKm: 15500,
-      );
+      await evaluator.evaluate(vehicleId: 'v-1', currentOdometerKm: 15500);
 
       expect(notifications.serviceReminders, hasLength(1));
     });
@@ -178,10 +169,7 @@ void main() {
       await repo.save(reminder);
       await repo.markDone('r-1', 15000);
 
-      await evaluator.evaluate(
-        vehicleId: 'v-1',
-        currentOdometerKm: 20000,
-      );
+      await evaluator.evaluate(vehicleId: 'v-1', currentOdometerKm: 20000);
 
       expect(notifications.serviceReminders, isEmpty);
     });

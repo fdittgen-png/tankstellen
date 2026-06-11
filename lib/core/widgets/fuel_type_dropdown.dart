@@ -50,15 +50,12 @@ class FuelTypeDropdown extends ConsumerWidget {
     return DropdownButtonFormField<FuelType>(
       initialValue: value,
       decoration: InputDecoration(
-        labelText: labelText ?? l10n?.preferredFuel ?? 'Preferred fuel',
+        labelText: labelText ?? l10n.preferredFuel,
         border: const OutlineInputBorder(),
         prefixIcon: prefixIcon,
       ),
       items: items
-          .map((t) => DropdownMenuItem(
-                value: t,
-                child: Text(t.displayName),
-              ))
+          .map((t) => DropdownMenuItem(value: t, child: Text(t.displayName)))
           .toList(),
       onChanged: (v) {
         if (v != null) onChanged(v);
@@ -103,7 +100,7 @@ class NullableFuelTypeDropdown extends ConsumerWidget {
     return DropdownButtonFormField<FuelType?>(
       initialValue: value,
       decoration: InputDecoration(
-        labelText: labelText ?? l10n?.preferredFuel ?? 'Preferred fuel',
+        labelText: labelText ?? l10n.preferredFuel,
         border: const OutlineInputBorder(),
         prefixIcon: prefixIcon,
       ),
@@ -111,14 +108,14 @@ class NullableFuelTypeDropdown extends ConsumerWidget {
         DropdownMenuItem<FuelType?>(
           value: null,
           child: Text(
-            notSetLabel ?? l10n?.vehicleFuelNotSet ?? 'Not set',
+            notSetLabel ?? l10n.vehicleFuelNotSet,
             style: const TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
-        ...items.map((t) => DropdownMenuItem<FuelType?>(
-              value: t,
-              child: Text(t.displayName),
-            )),
+        ...items.map(
+          (t) =>
+              DropdownMenuItem<FuelType?>(value: t, child: Text(t.displayName)),
+        ),
       ],
       onChanged: onChanged,
     );

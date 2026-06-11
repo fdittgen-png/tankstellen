@@ -20,6 +20,7 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #890 — the Trajets detail screen renders the full recording
 /// profile (speed / fuel-rate / RPM) plus a summary card, share +
@@ -128,10 +129,8 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
     routes: [
       GoRoute(
         path: '/trajets-stub',
-        builder: (_, _) => const Scaffold(
-          key: Key('trajets-stub'),
-          body: Text('TrajetsStub'),
-        ),
+        builder: (_, _) =>
+            const Scaffold(key: Key('trajets-stub'), body: Text('TrajetsStub')),
       ),
       GoRoute(
         path: '/trip/:id',
@@ -144,13 +143,19 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
   );
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       tripHistoryListProvider.overrideWith(() => tripsNotifier),
-      activeVehicleProfileProvider
-          .overrideWith(() => _FixedActiveVehicle(activeVehicle)),
-      vehicleProfileListProvider
-          .overrideWith(() => _FixedVehicleProfileList(vehicles)),
+      activeVehicleProfileProvider.overrideWith(
+        () => _FixedActiveVehicle(activeVehicle),
+      ),
+      vehicleProfileListProvider.overrideWith(
+        () => _FixedVehicleProfileList(vehicles),
+      ),
       // #1194 — TripDetailBody now reads gamificationEnabledProvider;
       // override here so it doesn't fall through to the central
       // featureFlagsProvider chain that these tests don't seed.
@@ -181,7 +186,9 @@ void main() {
   );
 
   group('TripDetailScreen summary card (#890)', () {
-    testWidgets('renders all 8 summary fields for a seeded trip', (tester) async {
+    testWidgets('renders all 8 summary fields for a seeded trip', (
+      tester,
+    ) async {
       final samples = _seedSamples();
       final entry = _seedEntry();
       await _pumpDetail(
@@ -227,9 +234,12 @@ void main() {
         final samples = [
           for (var i = 0; i < 100; i++)
             TripDetailSample(
-              timestamp: DateTime.utc(2026, 4, 22, 10).add(
-                Duration(seconds: i),
-              ),
+              timestamp: DateTime.utc(
+                2026,
+                4,
+                22,
+                10,
+              ).add(Duration(seconds: i)),
               speedKmh: i.toDouble(),
               fuelRateLPerHour: 4.5,
             ),
@@ -259,32 +269,29 @@ void main() {
       },
     );
 
-    testWidgets(
-      'RPM chart hidden when every sample carries a null RPM',
-      (tester) async {
-        final samples = [
-          for (var i = 0; i < 5; i++)
-            TripDetailSample(
-              timestamp: DateTime.utc(2026, 4, 22, 10).add(
-                Duration(seconds: i),
-              ),
-              speedKmh: 40 + i.toDouble(),
-            ),
-        ];
-        await _pumpDetail(
-          tester,
-          entry: _seedEntry(),
-          activeVehicle: vehicle,
-          vehicles: const [vehicle],
-          samples: samples,
-        );
-        await tester.pumpAndSettle();
-        expect(
-          find.byType(TripDetailRpmChart, skipOffstage: false),
-          findsNothing,
-        );
-      },
-    );
+    testWidgets('RPM chart hidden when every sample carries a null RPM', (
+      tester,
+    ) async {
+      final samples = [
+        for (var i = 0; i < 5; i++)
+          TripDetailSample(
+            timestamp: DateTime.utc(2026, 4, 22, 10).add(Duration(seconds: i)),
+            speedKmh: 40 + i.toDouble(),
+          ),
+      ];
+      await _pumpDetail(
+        tester,
+        entry: _seedEntry(),
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+        samples: samples,
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byType(TripDetailRpmChart, skipOffstage: false),
+        findsNothing,
+      );
+    });
 
     testWidgets(
       'RPM chart appears when at least one sample carries a non-null RPM',
@@ -332,15 +339,16 @@ void main() {
         GlobalKey? capturedKey;
         String? capturedSubject;
         String? capturedFileNameStem;
-        debugTripDetailShareOverride = ({
-          required GlobalKey boundaryKey,
-          required String subject,
-          required String fileNameStem,
-        }) async {
-          capturedKey = boundaryKey;
-          capturedSubject = subject;
-          capturedFileNameStem = fileNameStem;
-        };
+        debugTripDetailShareOverride =
+            ({
+              required GlobalKey boundaryKey,
+              required String subject,
+              required String fileNameStem,
+            }) async {
+              capturedKey = boundaryKey;
+              capturedSubject = subject;
+              capturedFileNameStem = fileNameStem;
+            };
 
         final samples = _seedSamples();
         await _pumpDetail(
@@ -359,11 +367,18 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(capturedKey, isNotNull,
-            reason: 'share renderer was not invoked');
-        expect(capturedKey!.currentContext, isNotNull,
-            reason: 'boundary key must point at a mounted widget so the '
-                'real renderer can rasterise it');
+        expect(
+          capturedKey,
+          isNotNull,
+          reason: 'share renderer was not invoked',
+        );
+        expect(
+          capturedKey!.currentContext,
+          isNotNull,
+          reason:
+              'boundary key must point at a mounted widget so the '
+              'real renderer can rasterise it',
+        );
         // The subject template is "Sparkilo — trip on {date}" in
         // English (the trip's startedAt is 2026-04-22). Verify the
         // brand + the year ended up in the share subject.
@@ -381,17 +396,21 @@ void main() {
       'Share works with empty samples (no chart crash, still hands off PNG)',
       (tester) async {
         var rendererCalled = false;
-        debugTripDetailShareOverride = ({
-          required GlobalKey boundaryKey,
-          required String subject,
-          required String fileNameStem,
-        }) async {
-          rendererCalled = true;
-          // The empty-samples body must still produce a render-target
-          // boundary, otherwise the production renderer would throw.
-          expect(boundaryKey.currentContext, isNotNull,
-              reason: 'empty-samples body must mount the share boundary');
-        };
+        debugTripDetailShareOverride =
+            ({
+              required GlobalKey boundaryKey,
+              required String subject,
+              required String fileNameStem,
+            }) async {
+              rendererCalled = true;
+              // The empty-samples body must still produce a render-target
+              // boundary, otherwise the production renderer would throw.
+              expect(
+                boundaryKey.currentContext,
+                isNotNull,
+                reason: 'empty-samples body must mount the share boundary',
+              );
+            };
 
         await _pumpDetail(
           tester,
@@ -412,46 +431,44 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(rendererCalled, isTrue,
-            reason: 'share renderer must run even when samples are empty');
-      },
-    );
-
-    testWidgets(
-      'Share surfaces a snackbar when the renderer throws',
-      (tester) async {
-        debugTripDetailShareOverride = ({
-          required GlobalKey boundaryKey,
-          required String subject,
-          required String fileNameStem,
-        }) async {
-          throw StateError('boom');
-        };
-
-        await _pumpDetail(
-          tester,
-          entry: _seedEntry(),
-          activeVehicle: vehicle,
-          vehicles: const [vehicle],
-          samples: _seedSamples(),
-        );
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
-        await tester.pumpAndSettle();
-        await tester.tap(
-          find.byKey(const Key('trip_detail_share_image_option')),
-        );
-        await tester.pumpAndSettle();
-
-        // The error snackbar surfaces — exact message is the EN
-        // fallback because the test pumps the default locale.
         expect(
-          find.text("Couldn't generate share image"),
-          findsOneWidget,
+          rendererCalled,
+          isTrue,
+          reason: 'share renderer must run even when samples are empty',
         );
       },
     );
+
+    testWidgets('Share surfaces a snackbar when the renderer throws', (
+      tester,
+    ) async {
+      debugTripDetailShareOverride =
+          ({
+            required GlobalKey boundaryKey,
+            required String subject,
+            required String fileNameStem,
+          }) async {
+            throw StateError('boom');
+          };
+
+      await _pumpDetail(
+        tester,
+        entry: _seedEntry(),
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+        samples: _seedSamples(),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('trip_detail_share_image_option')));
+      await tester.pumpAndSettle();
+
+      // The error snackbar surfaces — exact message is the EN
+      // fallback because the test pumps the default locale.
+      expect(find.text("Couldn't generate share image"), findsOneWidget);
+    });
   });
 
   group('TripDetailScreen telemetry download (#2652)', () {
@@ -490,20 +507,22 @@ void main() {
       );
     }
 
-    testWidgets('CSV item saves a .csv file with text/csv mime + success',
-        (tester) async {
+    testWidgets('CSV item saves a .csv file with text/csv mime + success', (
+      tester,
+    ) async {
       String? capturedFileName;
       String? capturedMime;
       String? capturedText;
-      debugTripDetailDownloadOverride = ({
-        required String text,
-        required String fileName,
-        required String mimeType,
-      }) async {
-        capturedText = text;
-        capturedFileName = fileName;
-        capturedMime = mimeType;
-      };
+      debugTripDetailDownloadOverride =
+          ({
+            required String text,
+            required String fileName,
+            required String mimeType,
+          }) async {
+            capturedText = text;
+            capturedFileName = fileName;
+            capturedMime = mimeType;
+          };
 
       await _pumpDetail(
         tester,
@@ -516,7 +535,9 @@ void main() {
 
       await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('trip_detail_download_csv_option')));
+      await tester.tap(
+        find.byKey(const Key('trip_detail_download_csv_option')),
+      );
       await tester.pumpAndSettle();
 
       // The test seam captures the save call (and returns before the
@@ -528,20 +549,22 @@ void main() {
       expect(capturedText, contains('timestamp_iso8601'));
     });
 
-    testWidgets('JSON item saves a .json file with application/json mime',
-        (tester) async {
+    testWidgets('JSON item saves a .json file with application/json mime', (
+      tester,
+    ) async {
       String? capturedFileName;
       String? capturedMime;
       String? capturedText;
-      debugTripDetailDownloadOverride = ({
-        required String text,
-        required String fileName,
-        required String mimeType,
-      }) async {
-        capturedText = text;
-        capturedFileName = fileName;
-        capturedMime = mimeType;
-      };
+      debugTripDetailDownloadOverride =
+          ({
+            required String text,
+            required String fileName,
+            required String mimeType,
+          }) async {
+            capturedText = text;
+            capturedFileName = fileName;
+            capturedMime = mimeType;
+          };
 
       await _pumpDetail(
         tester,
@@ -554,8 +577,9 @@ void main() {
 
       await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
       await tester.pumpAndSettle();
-      await tester
-          .tap(find.byKey(const Key('trip_detail_download_json_option')));
+      await tester.tap(
+        find.byKey(const Key('trip_detail_download_json_option')),
+      );
       await tester.pumpAndSettle();
 
       expect(capturedMime, 'application/json');
@@ -564,17 +588,15 @@ void main() {
       expect(capturedText, contains('"samples"'));
     });
 
-    testWidgets('successful save surfaces the Downloads-folder snackbar',
-        (tester) async {
+    testWidgets('successful save surfaces the Downloads-folder snackbar', (
+      tester,
+    ) async {
       // Drive the FULL handler (no high-level download override) through
       // the low-level PublicFileExporter seam so the success snackbar
       // fires — the path the high-level override returns before.
-      debugPublicFileExporterOverride = ({
-        required bytes,
-        required fileName,
-        required mimeType,
-      }) async =>
-          '/tmp/$fileName';
+      debugPublicFileExporterOverride =
+          ({required bytes, required fileName, required mimeType}) async =>
+              '/tmp/$fileName';
 
       await _pumpDetail(
         tester,
@@ -587,22 +609,26 @@ void main() {
 
       await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('trip_detail_download_csv_option')));
+      await tester.tap(
+        find.byKey(const Key('trip_detail_download_csv_option')),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Saved to your Downloads folder'), findsOneWidget);
     });
 
-    testWidgets('empty-samples trip short-circuits with the empty message',
-        (tester) async {
+    testWidgets('empty-samples trip short-circuits with the empty message', (
+      tester,
+    ) async {
       var saverCalled = false;
-      debugTripDetailDownloadOverride = ({
-        required String text,
-        required String fileName,
-        required String mimeType,
-      }) async {
-        saverCalled = true;
-      };
+      debugTripDetailDownloadOverride =
+          ({
+            required String text,
+            required String fileName,
+            required String mimeType,
+          }) async {
+            saverCalled = true;
+          };
 
       // _seedEntry has no entry.samples — the handler must not save.
       await _pumpDetail(
@@ -616,7 +642,9 @@ void main() {
 
       await tester.tap(find.byKey(const Key('trip_detail_share_menu')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('trip_detail_download_csv_option')));
+      await tester.tap(
+        find.byKey(const Key('trip_detail_download_csv_option')),
+      );
       await tester.pumpAndSettle();
 
       expect(saverCalled, isFalse, reason: 'empty trip must not write a file');
@@ -647,10 +675,7 @@ void main() {
       // Screen popped back to the Trajets stub — the stub text is
       // visible and the detail screen's AppBar is gone.
       expect(find.text('TrajetsStub'), findsOneWidget);
-      expect(
-        find.byKey(const Key('trip_detail_delete_button')),
-        findsNothing,
-      );
+      expect(find.byKey(const Key('trip_detail_delete_button')), findsNothing);
     });
 
     testWidgets('cancel → delete NOT called', (tester) async {
@@ -725,62 +750,61 @@ void main() {
         expect(handles.tripsNotifier.saveCalls, hasLength(1));
         final saved = handles.tripsNotifier.saveCalls.single;
         expect(saved.id, entry.id);
-        expect(saved.samples, hasLength(1),
-            reason: 'merged entry must carry the fetched samples so a '
-                'subsequent mount renders the charts from local cache');
+        expect(
+          saved.samples,
+          hasLength(1),
+          reason:
+              'merged entry must carry the fetched samples so a '
+              'subsequent mount renders the charts from local cache',
+        );
         expect(saved.samples.single.speedKmh, 42.0);
       },
     );
 
-    testWidgets(
-      'entry that already has samples skips the lazy fetch '
-      '(no wasted round-trip)',
-      (tester) async {
-        var fetchCalls = 0;
-        debugTripDetailFetchDetailsOverride = (tripId) async {
-          fetchCalls++;
-          return null;
-        };
+    testWidgets('entry that already has samples skips the lazy fetch '
+        '(no wasted round-trip)', (tester) async {
+      var fetchCalls = 0;
+      debugTripDetailFetchDetailsOverride = (tripId) async {
+        fetchCalls++;
+        return null;
+      };
 
-        // Seed the entry with a non-empty samples list — mirrors the
-        // happy path where the trip was recorded on this device and
-        // the per-tick blob is already on disk.
-        final start = DateTime.utc(2026, 5, 11, 12);
-        final entry = TripHistoryEntry(
-          id: 'local-trip',
-          vehicleId: 'v1',
-          summary: TripSummary(
-            startedAt: start,
-            endedAt: start.add(const Duration(minutes: 20)),
-            distanceKm: 10,
-            maxRpm: 2500,
-            highRpmSeconds: 0,
-            idleSeconds: 0,
-            harshBrakes: 0,
-            harshAccelerations: 0,
-          ),
-          samples: [
-            TripSample(
-              timestamp: start,
-              speedKmh: 30,
-              rpm: 1500,
-            ),
-          ],
-        );
+      // Seed the entry with a non-empty samples list — mirrors the
+      // happy path where the trip was recorded on this device and
+      // the per-tick blob is already on disk.
+      final start = DateTime.utc(2026, 5, 11, 12);
+      final entry = TripHistoryEntry(
+        id: 'local-trip',
+        vehicleId: 'v1',
+        summary: TripSummary(
+          startedAt: start,
+          endedAt: start.add(const Duration(minutes: 20)),
+          distanceKm: 10,
+          maxRpm: 2500,
+          highRpmSeconds: 0,
+          idleSeconds: 0,
+          harshBrakes: 0,
+          harshAccelerations: 0,
+        ),
+        samples: [TripSample(timestamp: start, speedKmh: 30, rpm: 1500)],
+      );
 
-        final handles = await _pumpDetail(
-          tester,
-          entry: entry,
-          activeVehicle: vehicle,
-          vehicles: const [vehicle],
-        );
-        await tester.pumpAndSettle();
+      final handles = await _pumpDetail(
+        tester,
+        entry: entry,
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+      );
+      await tester.pumpAndSettle();
 
-        expect(fetchCalls, 0,
-            reason: 'an entry with local samples must short-circuit '
-                'before the post-frame fetch fires');
-        expect(handles.tripsNotifier.saveCalls, isEmpty);
-      },
-    );
+      expect(
+        fetchCalls,
+        0,
+        reason:
+            'an entry with local samples must short-circuit '
+            'before the post-frame fetch fires',
+      );
+      expect(handles.tripsNotifier.saveCalls, isEmpty);
+    });
   });
 }

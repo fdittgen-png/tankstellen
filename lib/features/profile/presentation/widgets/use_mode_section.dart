@@ -40,10 +40,7 @@ class UseModeSection extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
             child: Text(
-              l?.useModeSectionHint ??
-                  'Right-size the app to how you actually use it. '
-                      'Picking a preset enables the matching set of '
-                      'features.',
+              l.useModeSectionHint,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -52,10 +49,8 @@ class UseModeSection extends ConsumerWidget {
           _PresetCard(
             profile: AppProfile.basic,
             icon: Icons.local_gas_station_outlined,
-            title: l?.wizardProfileBasicName ?? 'Basic',
-            description: l?.wizardProfileBasicDescription ??
-                'Cheapest fuel and EV charging prices nearby. '
-                    'Favorites and price alerts.',
+            title: l.wizardProfileBasicName,
+            description: l.wizardProfileBasicDescription,
             isActive: activeProfile == AppProfile.basic,
             onTap: () => _select(context, ref, AppProfile.basic, l),
           ),
@@ -63,10 +58,8 @@ class UseModeSection extends ConsumerWidget {
           _PresetCard(
             profile: AppProfile.medium,
             icon: Icons.analytics_outlined,
-            title: l?.wizardProfileMediumName ?? 'Medium',
-            description: l?.wizardProfileMediumDescription ??
-                'Everything in Basic, plus track your fuel fill-ups '
-                    'and EV charging by hand.',
+            title: l.wizardProfileMediumName,
+            description: l.wizardProfileMediumDescription,
             isActive: activeProfile == AppProfile.medium,
             onTap: () => _select(context, ref, AppProfile.medium, l),
           ),
@@ -74,10 +67,8 @@ class UseModeSection extends ConsumerWidget {
           _PresetCard(
             profile: AppProfile.full,
             icon: Icons.directions_car_filled,
-            title: l?.wizardProfileFullName ?? 'Full',
-            description: l?.wizardProfileFullDescription ??
-                'Everything in Medium, plus automatic OBD2 trip '
-                    'recording, driving scores, and loyalty cards.',
+            title: l.wizardProfileFullName,
+            description: l.wizardProfileFullDescription,
             isActive: activeProfile == AppProfile.full,
             onTap: () => _select(context, ref, AppProfile.full, l),
           ),
@@ -86,11 +77,8 @@ class UseModeSection extends ConsumerWidget {
             _PresetCard(
               profile: AppProfile.custom,
               icon: Icons.tune_outlined,
-              title: l?.wizardProfileCustomName ?? 'Custom',
-              description: l?.useModeCustomSettingsDescription ??
-                  "Your feature mix doesn't match any preset. Pick "
-                      'one above to overwrite, or keep customising '
-                      'individual features in the section below.',
+              title: l.wizardProfileCustomName,
+              description: l.useModeCustomSettingsDescription,
               isActive: true,
               onTap: null,
             ),
@@ -104,29 +92,26 @@ class UseModeSection extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     AppProfile profile,
-    AppLocalizations? l,
+    AppLocalizations l,
   ) async {
     final messenger = ScaffoldMessenger.maybeOf(context);
     await ref.read(activeAppProfileProvider.notifier).select(profile);
     if (messenger != null && context.mounted) {
       final name = _localizedName(profile, l);
-      SnackBarHelper.showSuccess(
-        context,
-        l?.useModeSwitchedSnack(name) ?? 'Use mode set to $name.',
-      );
+      SnackBarHelper.showSuccess(context, l.useModeSwitchedSnack(name));
     }
   }
 
-  String _localizedName(AppProfile profile, AppLocalizations? l) {
+  String _localizedName(AppProfile profile, AppLocalizations l) {
     switch (profile) {
       case AppProfile.basic:
-        return l?.wizardProfileBasicName ?? 'Basic';
+        return l.wizardProfileBasicName;
       case AppProfile.medium:
-        return l?.wizardProfileMediumName ?? 'Medium';
+        return l.wizardProfileMediumName;
       case AppProfile.full:
-        return l?.wizardProfileFullName ?? 'Full';
+        return l.wizardProfileFullName;
       case AppProfile.custom:
-        return l?.wizardProfileCustomName ?? 'Custom';
+        return l.wizardProfileCustomName;
     }
   }
 }
@@ -207,11 +192,7 @@ class _PresetCard extends StatelessWidget {
                         ),
                         if (isActive) ...[
                           const SizedBox(width: 6),
-                          Icon(
-                            Icons.check_circle,
-                            color: activeOn,
-                            size: 16,
-                          ),
+                          Icon(Icons.check_circle, color: activeOn, size: 16),
                         ],
                       ],
                     ),

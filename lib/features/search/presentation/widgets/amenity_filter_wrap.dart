@@ -49,24 +49,23 @@ class AmenityFilterWrap extends StatelessWidget {
               selected: selected.contains(amenity),
               onSelected: (_) => onToggle(amenity),
             ),
-            if (amenity != StationAmenity.values.last)
-              const SizedBox(width: 8),
+            if (amenity != StationAmenity.values.last) const SizedBox(width: 8),
           ],
         ],
       ),
     );
   }
 
-  String _label(StationAmenity a, AppLocalizations? l10n) {
+  String _label(StationAmenity a, AppLocalizations l10n) {
     return switch (a) {
-      StationAmenity.shop => l10n?.amenityShop ?? 'Shop',
-      StationAmenity.carWash => l10n?.amenityCarWash ?? 'Car Wash',
-      StationAmenity.airPump => l10n?.amenityAirPump ?? 'Air',
-      StationAmenity.toilet => l10n?.amenityToilet ?? 'WC',
-      StationAmenity.restaurant => l10n?.amenityRestaurant ?? 'Food',
-      StationAmenity.atm => l10n?.amenityAtm ?? 'ATM',
-      StationAmenity.wifi => l10n?.amenityWifi ?? 'WiFi',
-      StationAmenity.ev => l10n?.amenityEv ?? 'EV',
+      StationAmenity.shop => l10n.amenityShop,
+      StationAmenity.carWash => l10n.amenityCarWash,
+      StationAmenity.airPump => l10n.amenityAirPump,
+      StationAmenity.toilet => l10n.amenityToilet,
+      StationAmenity.restaurant => l10n.amenityRestaurant,
+      StationAmenity.atm => l10n.amenityAtm,
+      StationAmenity.wifi => l10n.amenityWifi,
+      StationAmenity.ev => l10n.amenityEv,
     };
   }
 }

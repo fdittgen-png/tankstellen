@@ -4,18 +4,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/star_rating.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('StarRating', () {
     testWidgets('renders 5 star icons', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: StarRating(
-              rating: 0,
-              onRatingChanged: (_) {},
-            ),
-          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: StarRating(rating: 0, onRatingChanged: (_) {})),
         ),
       );
 
@@ -31,12 +29,9 @@ void main() {
     testWidgets('rating=3 shows 3 filled and 2 border stars', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: StarRating(
-              rating: 3,
-              onRatingChanged: (_) {},
-            ),
-          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: StarRating(rating: 3, onRatingChanged: (_) {})),
         ),
       );
 
@@ -50,11 +45,10 @@ void main() {
     testWidgets('rating=null shows all 5 border stars', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
-            body: StarRating(
-              rating: null,
-              onRatingChanged: (_) {},
-            ),
+            body: StarRating(rating: null, onRatingChanged: (_) {}),
           ),
         ),
       );
@@ -69,12 +63,9 @@ void main() {
     testWidgets('rating=5 shows all 5 filled stars', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: StarRating(
-              rating: 5,
-              onRatingChanged: (_) {},
-            ),
-          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: StarRating(rating: 5, onRatingChanged: (_) {})),
         ),
       );
 
@@ -90,6 +81,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: StarRating(
               rating: null,
@@ -121,6 +114,8 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: StarRating(
               rating: 3,
@@ -151,10 +146,10 @@ void main() {
   // reader announced nothing.
   group('StarRating accessibility (#1687)', () {
     Widget harness() => MaterialApp(
-          home: Scaffold(
-            body: StarRating(rating: 2, onRatingChanged: (_) {}),
-          ),
-        );
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(body: StarRating(rating: 2, onRatingChanged: (_) {})),
+    );
 
     testWidgets('each star has at least a 48dp tap target', (tester) async {
       await tester.pumpWidget(harness());
@@ -171,8 +166,9 @@ void main() {
       expect(boxes.length, 5);
     });
 
-    testWidgets('star tap targets meet the Android tap-target guideline',
-        (tester) async {
+    testWidgets('star tap targets meet the Android tap-target guideline', (
+      tester,
+    ) async {
       final handle = tester.ensureSemantics();
       await tester.pumpWidget(harness());
 
@@ -183,12 +179,11 @@ void main() {
     testWidgets('each star exposes a button semantics label', (tester) async {
       await tester.pumpWidget(harness());
 
-      // Bare harness has no AppLocalizations → the fallback label.
+      // en ARB plural: 'Rate 1 star' / 'Rate {n} stars' (#3162).
       for (var n = 1; n <= 5; n++) {
+        final expected = n == 1 ? 'Rate 1 star' : 'Rate $n stars';
         final semantics = tester.widgetList<Semantics>(find.byType(Semantics));
-        final star = semantics.where(
-          (s) => s.properties.label == 'Rate $n stars',
-        );
+        final star = semantics.where((s) => s.properties.label == expected);
         expect(star.length, 1, reason: 'star $n missing its semantics label');
         expect(star.first.properties.button, isTrue);
       }

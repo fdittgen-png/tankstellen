@@ -28,11 +28,7 @@ class ReportScreen extends ConsumerStatefulWidget {
   /// user confirms the consent dialog. Tests inject a fake.
   final ErrorReporter? reporter;
 
-  const ReportScreen({
-    super.key,
-    required this.stationId,
-    this.reporter,
-  });
+  const ReportScreen({super.key, required this.stationId, this.reporter});
 
   @override
   ConsumerState<ReportScreen> createState() => _ReportScreenState();
@@ -96,11 +92,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     // add metadata-only report types. Generic "Report a problem"
     // matches the actual scope.
     return PageScaffold(
-      title: l10n?.reportIssueTitle ?? 'Report a problem',
+      title: l10n.reportIssueTitle,
       bodyPadding: EdgeInsets.zero,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l10n?.tooltipBack ?? 'Back',
+        tooltip: l10n.tooltipBack,
         onPressed: () => context.pop(),
       ),
       // RadioGroup sits OUTSIDE the ListView so every lazy-built
@@ -114,11 +110,11 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            if (!backends.hasAnyBackend && !backends.allVisibleRouteToGitHub)
-              ...[
-                const NoBackendBanner(),
-                const SizedBox(height: 16),
-              ],
+            if (!backends.hasAnyBackend &&
+                !backends.allVisibleRouteToGitHub) ...[
+              const NoBackendBanner(),
+              const SizedBox(height: 16),
+            ],
             ...buildReportTypeList(
               context,
               ref,
@@ -132,7 +128,8 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
             ),
             const SizedBox(height: 24),
             FilledButton(
-              onPressed: selectedType != null &&
+              onPressed:
+                  selectedType != null &&
                       !form.isSubmitting &&
                       _hasRequiredInput(selectedType) &&
                       (backends.selectedIsGitHubRouted(selectedType) ||
@@ -145,7 +142,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
                       width: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(l10n?.sendReport ?? 'Send report'),
+                  : Text(l10n.sendReport),
             ),
           ],
         ),

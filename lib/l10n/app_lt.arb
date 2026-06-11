@@ -4771,5 +4771,16 @@
   "@alertsIosBestEffortNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "serviceReminderDueNowBody": "{label} is due now.",
+  "@serviceReminderDueNowBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "example": "Oil change"
+      }
+    }
   }
 }

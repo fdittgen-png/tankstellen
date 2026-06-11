@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/star_rating.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('StationRatingSection content', () {
@@ -15,6 +16,8 @@ void main() {
     testWidgets('StarRating renders with no rating', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: StarRating(rating: null, onRatingChanged: (_) {}),
           ),
@@ -28,9 +31,9 @@ void main() {
     testWidgets('StarRating renders with a rating value', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: StarRating(rating: 3, onRatingChanged: (_) {}),
-          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: StarRating(rating: 3, onRatingChanged: (_) {})),
         ),
       );
 

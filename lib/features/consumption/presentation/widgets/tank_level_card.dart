@@ -56,7 +56,7 @@ class TankLevelCard extends ConsumerWidget {
 }
 
 class _EmptyTankLevelCard extends StatelessWidget {
-  final AppLocalizations? l;
+  final AppLocalizations l;
 
   const _EmptyTankLevelCard({required this.l});
 
@@ -70,14 +70,10 @@ class _EmptyTankLevelCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l?.tankLevelTitle ?? 'Tank level',
-              style: theme.textTheme.titleMedium,
-            ),
+            Text(l.tankLevelTitle, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(
-              l?.tankLevelEmptyNoFillUp ??
-                  'Log a fill-up to see your tank level',
+              l.tankLevelEmptyNoFillUp,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -124,13 +120,10 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l?.tankLevelTitle ?? 'Tank level',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text(l.tankLevelTitle, style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Text(
-                l?.tankLevelLitersFormat(litresText) ?? '$litresText L',
+                l.tankLevelLitersFormat(litresText),
                 key: const Key('tank_level_big_number'),
                 // #1914 — was `displayMedium` (~45 sp), which dominated
                 // the card; `titleLarge` (~22 sp) roughly halves it
@@ -144,8 +137,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
               if (rangeKm != null) ...[
                 const SizedBox(height: 4),
                 Text(
-                  l?.tankLevelRangeFormat(rangeKm.round().toString()) ??
-                      '≈ ${rangeKm.round()} km of range',
+                  l.tankLevelRangeFormat(rangeKm.round().toString()),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -173,11 +165,10 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     );
   }
 
-  String _captionFor(AppLocalizations? l, TankLevelEstimate estimate) {
+  String _captionFor(AppLocalizations l, TankLevelEstimate estimate) {
     final dateText = _formatDate(estimate.lastFillUpDate);
     final countText = estimate.tripsSince.toString();
-    final lastFillUpLine = l?.tankLevelLastFillUpFormat(dateText, countText) ??
-        'Last fill-up: $dateText · $countText trip(s) since';
+    final lastFillUpLine = l.tankLevelLastFillUpFormat(dateText, countText);
     final methodLabel = _methodLabel(l, estimate.method);
     return '$lastFillUpLine · $methodLabel';
   }
@@ -189,15 +180,14 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     return '${date.year}-$m-$d';
   }
 
-  String _methodLabel(AppLocalizations? l, TankLevelEstimationMethod method) {
+  String _methodLabel(AppLocalizations l, TankLevelEstimationMethod method) {
     switch (method) {
       case TankLevelEstimationMethod.obd2:
-        return l?.tankLevelMethodObd2 ?? 'OBD2 measured';
+        return l.tankLevelMethodObd2;
       case TankLevelEstimationMethod.distanceFallback:
-        return l?.tankLevelMethodDistanceFallback ??
-            'distance-based estimate';
+        return l.tankLevelMethodDistanceFallback;
       case TankLevelEstimationMethod.mixed:
-        return l?.tankLevelMethodMixed ?? 'mixed measurement';
+        return l.tankLevelMethodMixed;
     }
   }
 
@@ -225,18 +215,16 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  l?.tankLevelDetailSheetTitle ??
-                      'Trips since last fill-up',
+                  l.tankLevelDetailSheetTitle,
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 12),
                 if (relevant.isEmpty)
                   Text(
-                    l?.tankLevelLastFillUpFormat(
-                          _formatDate(lastFillUpDate),
-                          '0',
-                        ) ??
-                        'No trips yet',
+                    l.tankLevelLastFillUpFormat(
+                      _formatDate(lastFillUpDate),
+                      '0',
+                    ),
                     style: theme.textTheme.bodyMedium,
                   )
                 else
@@ -248,8 +236,8 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                         final trip = relevant[index];
                         final startedAt = trip.summary.startedAt;
                         final dateText = _formatDate(startedAt);
-                        final distance =
-                            trip.summary.distanceKm.toStringAsFixed(1);
+                        final distance = trip.summary.distanceKm
+                            .toStringAsFixed(1);
                         final litres = trip.summary.fuelLitersConsumed;
                         final litresText = litres == null
                             ? ''

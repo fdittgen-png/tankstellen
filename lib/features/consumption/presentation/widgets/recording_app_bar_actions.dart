@@ -82,20 +82,20 @@ class RecordingAppBarActions extends StatelessWidget {
         IconButton(
           key: const Key('tripPauseButton'),
           icon: Icon(isPaused ? Icons.play_arrow : Icons.pause),
-          tooltip: isPaused ? (l?.tripResume ?? 'Resume') : (l?.tripPause ?? 'Pause'),
+          tooltip: isPaused ? (l.tripResume) : (l.tripPause),
           onPressed: isActive ? onTogglePause : null,
         ),
         IconButton(
           key: const Key('tripStopButton'),
           icon: const Icon(Icons.stop_circle_outlined),
-          tooltip: l?.tripStop ?? 'Stop recording',
+          tooltip: l.tripStop,
           onPressed: stopping || !isActive ? null : onStop,
         ),
         // Pin / Help / PiP collapse into one kebab so the title keeps room.
         PopupMenuButton<_RecordingOverflowAction>(
           key: const Key('recording_overflow_menu'),
           icon: const Icon(Icons.more_vert),
-          tooltip: l?.moreActionsTooltip ?? 'More',
+          tooltip: l.moreActionsTooltip,
           onSelected: _onSelected,
           itemBuilder: (_) => [
             // #891 — the pin item reflects + toggles `_pinned`. Its
@@ -113,12 +113,12 @@ class RecordingAppBarActions extends StatelessWidget {
                 toggled: pinned,
                 child: _MenuRow(
                   icon: pinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  iconColor:
-                      pinned ? Theme.of(context).colorScheme.primary : null,
+                  iconColor: pinned
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
                   label: pinned
-                      ? (l?.tripRecordingPinSemanticOn ?? 'Unpin recording form')
-                      : (l?.tripRecordingPinSemanticOff ??
-                          'Pin recording form'),
+                      ? (l.tripRecordingPinSemanticOn)
+                      : (l.tripRecordingPinSemanticOff),
                 ),
               ),
             ),
@@ -128,7 +128,7 @@ class RecordingAppBarActions extends StatelessWidget {
               value: _RecordingOverflowAction.help,
               child: _MenuRow(
                 icon: Icons.help_outline,
-                label: l?.tripRecordingPinHelpTooltip ?? 'What does pin do?',
+                label: l.tripRecordingPinHelpTooltip,
               ),
             ),
             // #1884 — minimise to PiP; Android-only.
@@ -138,8 +138,7 @@ class RecordingAppBarActions extends StatelessWidget {
                 value: _RecordingOverflowAction.pip,
                 child: _MenuRow(
                   icon: Icons.picture_in_picture_alt,
-                  label: l?.tripRecordingMinimiseTooltip ??
-                      'Minimise to a floating tile',
+                  label: l.tripRecordingMinimiseTooltip,
                 ),
               ),
           ],

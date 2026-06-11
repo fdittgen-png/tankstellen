@@ -50,7 +50,7 @@ class EvFavoriteCard extends StatelessWidget {
         .toSet()
         .toList();
 
-    final availableLabel = l10n?.evStatusAvailable ?? 'available';
+    final availableLabel = l10n.evStatusAvailable;
     // Screen-reader parity with the fuel card's semantic label: the
     // visual cards are intentionally identical except for the marker
     // colour (#2229), so a11y leans on this label to convey "EV".
@@ -121,8 +121,7 @@ class EvFavoriteCard extends StatelessWidget {
                 connectorTypes: connectorTypes,
                 availableLabel: availableLabel,
                 onFavoriteTap: onFavoriteTap,
-                removeFavoriteTooltip:
-                    l10n?.removeFavorite ?? 'Remove from favorites',
+                removeFavoriteTooltip: l10n.removeFavorite,
               ),
             ],
           ),

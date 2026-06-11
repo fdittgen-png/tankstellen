@@ -85,8 +85,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
           if (result == null || (stations.isEmpty && !hasGeometry)) {
             return EmptyState(
               icon: Icons.route,
-              title: AppLocalizations.of(context)?.noStationsAlongRoute ??
-                  'No stations found along route',
+              title: AppLocalizations.of(context).noStationsAlongRoute,
             );
           }
           return _buildRouteMap(context, result, stations, selectedFuel);
@@ -118,7 +117,12 @@ class _InlineMapState extends ConsumerState<InlineMap> {
             .map((r) => r.station)
             .toList();
         return _buildMap(
-            context, stations, selectedFuel, searchRadius, sortMode);
+          context,
+          stations,
+          selectedFuel,
+          searchRadius,
+          sortMode,
+        );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, _) => _mapUnavailable(context),
@@ -137,8 +141,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
     if (stations.isEmpty) {
       return EmptyState(
         icon: Icons.map_outlined,
-        title: AppLocalizations.of(context)?.searchToSeeMap ??
-            'Search to see stations on the map',
+        title: AppLocalizations.of(context).searchToSeeMap,
       );
     }
 
@@ -215,23 +218,23 @@ class _InlineMapState extends ConsumerState<InlineMap> {
   }
 
   Widget _mapUnavailable(BuildContext context) => Center(
-        child: Text(
-          AppLocalizations.of(context)?.mapUnavailable ?? 'Map unavailable',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-      );
+    child: Text(
+      AppLocalizations.of(context).mapUnavailable,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    ),
+  );
 
   /// The along-route fuel stations of [result] (drops EV/other result kinds),
   /// or `const []` when there is no result yet.
   static List<Station> _routeFuelStations(RouteSearchResult? result) =>
       result == null
-          ? const []
-          : result.stations
-              .whereType<FuelStationResult>()
-              .map((r) => r.station)
-              .toList();
+      ? const []
+      : result.stations
+            .whereType<FuelStationResult>()
+            .map((r) => r.station)
+            .toList();
 
   /// The [LatLngBounds] of the result [stations], with a tiny epsilon box for
   /// a single result so `CameraFit.bounds` cannot divide-by-zero (mirrors

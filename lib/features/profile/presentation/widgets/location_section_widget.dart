@@ -43,8 +43,12 @@ class LocationSectionWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildGpsStatus(BuildContext context, WidgetRef ref, ThemeData theme,
-      AppLocalizations? l) {
+  Widget _buildGpsStatus(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+    AppLocalizations l,
+  ) {
     final userPos = ref.watch(userPositionProvider);
 
     if (userPos != null) {
@@ -52,21 +56,23 @@ class LocationSectionWidget extends ConsumerWidget {
       final age = diff.inMinutes < 60
           ? '${diff.inMinutes} min'
           : diff.inHours < 24
-              ? '${diff.inHours} h'
-              : '${diff.inDays} d';
+          ? '${diff.inHours} h'
+          : '${diff.inDays} d';
 
       return Row(
         children: [
           Icon(Icons.check_circle, size: 16, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
           Expanded(
-            child: Text('${userPos.source} ($age)',
-                style: theme.textTheme.bodyMedium),
+            child: Text(
+              '${userPos.source} ($age)',
+              style: theme.textTheme.bodyMedium,
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline, size: 20),
             onPressed: () => _confirmClearGps(context, ref, l),
-            tooltip: l?.delete ?? 'Clear',
+            tooltip: l.delete,
           ),
         ],
       );
@@ -82,11 +88,14 @@ class LocationSectionWidget extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
-                Icon(Icons.my_location,
-                    size: 16, color: theme.colorScheme.primary),
+                Icon(
+                  Icons.my_location,
+                  size: 16,
+                  color: theme.colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  l?.tapToUpdateGpsPosition ?? 'Tap to update GPS position',
+                  l.tapToUpdateGpsPosition,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
@@ -107,16 +116,17 @@ class LocationSectionWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildAutoUpdateToggle(WidgetRef ref, ThemeData theme,
-      UserProfile? activeProfile, AppLocalizations? l) {
+  Widget _buildAutoUpdateToggle(
+    WidgetRef ref,
+    ThemeData theme,
+    UserProfile? activeProfile,
+    AppLocalizations l,
+  ) {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(
-        l?.autoUpdatePosition ?? 'Auto-update position',
-        style: theme.textTheme.bodyMedium,
-      ),
+      title: Text(l.autoUpdatePosition, style: theme.textTheme.bodyMedium),
       subtitle: Text(
-        l?.autoUpdateDescription ?? 'Refresh GPS position before each search',
+        l.autoUpdateDescription,
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),
@@ -124,8 +134,7 @@ class LocationSectionWidget extends ConsumerWidget {
       value: activeProfile?.autoUpdatePosition ?? false,
       onChanged: (value) {
         if (activeProfile != null) {
-          final updated =
-              activeProfile.copyWith(autoUpdatePosition: value);
+          final updated = activeProfile.copyWith(autoUpdatePosition: value);
           unawaited(ref.read(profileRepositoryProvider).updateProfile(updated));
           ref.invalidate(allProfilesProvider);
           ref.invalidate(activeProfileProvider);
@@ -135,18 +144,17 @@ class LocationSectionWidget extends ConsumerWidget {
   }
 
   Widget _buildAutoSwitchToggle(
-      WidgetRef ref, ThemeData theme, AppLocalizations? l) {
+    WidgetRef ref,
+    ThemeData theme,
+    AppLocalizations l,
+  ) {
     final autoSwitch = ref.watch(autoSwitchProfileProvider);
 
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(
-        l?.autoSwitchProfile ?? 'Auto-switch profile',
-        style: theme.textTheme.bodyMedium,
-      ),
+      title: Text(l.autoSwitchProfile, style: theme.textTheme.bodyMedium),
       subtitle: Text(
-        l?.autoSwitchDescription ??
-            'Automatically switch profile when crossing borders',
+        l.autoSwitchDescription,
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.onSurfaceVariant,
         ),
@@ -159,11 +167,14 @@ class LocationSectionWidget extends ConsumerWidget {
   }
 
   Future<void> _confirmClearGps(
-      BuildContext context, WidgetRef ref, AppLocalizations? l) async {
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l?.delete ?? 'Clear GPS position'),
+        title: Text(l.delete),
         content: const Text(
           'Clear the stored GPS position? '
           'You can update it again at any time.',
@@ -171,11 +182,11 @@ class LocationSectionWidget extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l?.delete ?? 'Clear'),
+            child: Text(l.delete),
           ),
         ],
       ),
@@ -194,13 +205,19 @@ class LocationSectionWidget extends ConsumerWidget {
     } catch (e, st) {
       // #2146 — record the GPS failure on the exportable log so a user
       // bug report has the stack trace instead of just a snackbar.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'LocationSection._updateGps: userPosition.updateFromGps',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'LocationSection._updateGps: userPosition.updateFromGps',
+          },
+        ),
+      );
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showError(
-            context, '${l10n?.gpsError ?? "GPS error"}: $e');
+        SnackBarHelper.showError(context, '${l10n.gpsError}: $e');
       }
     }
   }

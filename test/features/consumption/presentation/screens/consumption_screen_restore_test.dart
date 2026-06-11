@@ -19,13 +19,15 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../../helpers/pump_app.dart';
 import '../../../../helpers/silence_error_logger.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 class _FakeSettings implements SettingsStorage {
   final Map<String, dynamic> _data = {};
   @override
   dynamic getSetting(String key) => _data[key];
   @override
-  Future<void> putSetting(String key, dynamic value) async => _data[key] = value;
+  Future<void> putSetting(String key, dynamic value) async =>
+      _data[key] = value;
   @override
   bool get isSetupComplete => true;
   @override
@@ -75,7 +77,11 @@ Future<void> _pumpScreen(WidgetTester tester) async {
   );
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       settingsStorageProvider.overrideWithValue(storage),
       gamificationEnabledProvider.overrideWithValue(true),
@@ -102,23 +108,26 @@ void main() {
   }
 
   group('ConsumptionScreen full-backup restore (#2571)', () {
-    testWidgets('Restore and Export both appear in the overflow kebab (#2756)',
-        (tester) async {
-      await _pumpScreen(tester);
-      // Neither is a visible trailing button anymore.
-      expect(find.byKey(const Key('restore_backup')), findsNothing);
-      expect(find.byKey(const Key('export_backup')), findsNothing);
-      // Both surface once the kebab opens.
-      await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('restore_backup')), findsOneWidget);
-      expect(find.byKey(const Key('export_backup')), findsOneWidget);
-    });
+    testWidgets(
+      'Restore and Export both appear in the overflow kebab (#2756)',
+      (tester) async {
+        await _pumpScreen(tester);
+        // Neither is a visible trailing button anymore.
+        expect(find.byKey(const Key('restore_backup')), findsNothing);
+        expect(find.byKey(const Key('export_backup')), findsNothing);
+        // Both surface once the kebab opens.
+        await tester.tap(find.byKey(const Key('consumption_overflow_menu')));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('restore_backup')), findsOneWidget);
+        expect(find.byKey(const Key('export_backup')), findsOneWidget);
+      },
+    );
 
-    testWidgets('tapping Restore opens the merge-vs-replace dialog',
-        (tester) async {
-      BackupRestoreFlow.debugFilePickerOverride =
-          () async => _sampleBackupBytes();
+    testWidgets('tapping Restore opens the merge-vs-replace dialog', (
+      tester,
+    ) async {
+      BackupRestoreFlow.debugFilePickerOverride = () async =>
+          _sampleBackupBytes();
       await _pumpScreen(tester);
 
       await openRestore(tester);
@@ -129,8 +138,9 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('cancelling the picker does nothing (no dialog)',
-        (tester) async {
+    testWidgets('cancelling the picker does nothing (no dialog)', (
+      tester,
+    ) async {
       BackupRestoreFlow.debugFilePickerOverride = () async => null;
       await _pumpScreen(tester);
 
@@ -139,10 +149,11 @@ void main() {
       expect(find.text('Merge'), findsNothing);
     });
 
-    testWidgets('choosing Merge shows a per-entity MERGED summary (#2815)',
-        (tester) async {
-      BackupRestoreFlow.debugFilePickerOverride =
-          () async => _sampleBackupBytes();
+    testWidgets('choosing Merge shows a per-entity MERGED summary (#2815)', (
+      tester,
+    ) async {
+      BackupRestoreFlow.debugFilePickerOverride = () async =>
+          _sampleBackupBytes();
       await _pumpScreen(tester);
 
       await openRestore(tester);
@@ -157,10 +168,11 @@ void main() {
       expect(find.textContaining('1 fill-ups'), findsOneWidget);
     });
 
-    testWidgets('choosing Replace all shows a REPLACED summary (#2815)',
-        (tester) async {
-      BackupRestoreFlow.debugFilePickerOverride =
-          () async => _sampleBackupBytes();
+    testWidgets('choosing Replace all shows a REPLACED summary (#2815)', (
+      tester,
+    ) async {
+      BackupRestoreFlow.debugFilePickerOverride = () async =>
+          _sampleBackupBytes();
       await _pumpScreen(tester);
 
       await openRestore(tester);
@@ -172,18 +184,21 @@ void main() {
       expect(find.textContaining('Merged'), findsNothing);
     });
 
-    testWidgets('a corrupt file surfaces a localized error snackbar',
-        (tester) async {
-      BackupRestoreFlow.debugFilePickerOverride =
-          () async => Uint8List.fromList([1, 2, 3, 4]);
+    testWidgets('a corrupt file surfaces a localized error snackbar', (
+      tester,
+    ) async {
+      BackupRestoreFlow.debugFilePickerOverride = () async =>
+          Uint8List.fromList([1, 2, 3, 4]);
       await _pumpScreen(tester);
 
       await openRestore(tester);
       await tester.tap(find.text('Merge'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('not a valid Tankstellen backup'),
-          findsOneWidget);
+      expect(
+        find.textContaining('not a valid Tankstellen backup'),
+        findsOneWidget,
+      );
       // And the exception type is the typed one (sanity on the path).
       expect(const BackupZipReader().runtimeType, BackupZipReader);
     });

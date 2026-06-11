@@ -74,7 +74,7 @@ class ProfileScreen extends ConsumerWidget {
     final debugOn = enabledFlags.contains(Feature.debugMode);
 
     return PageScaffold(
-      title: l?.settings ?? 'Settings',
+      title: l.settings,
       // #3061 — Settings is a shell branch (no back-stack) → explicit back arrow.
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
@@ -97,7 +97,7 @@ class ProfileScreen extends ConsumerWidget {
           // with the consumption-tier-dependent toggles it gates.
           SectionHeader(
             leadingIcon: Icons.person,
-            title: l?.sectionProfile ?? 'Profile',
+            title: l.sectionProfile,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 4),
@@ -107,15 +107,12 @@ class ProfileScreen extends ConsumerWidget {
           // ── 2. Setup & data sources — what a fresh install must
           // configure first. API Key gates fuel search working at all
           // (#2521 promotes it from #5); Location follows.
-          _groupHeader(
-            icon: Icons.tune,
-            title: l?.sectionSetupDataSources ?? 'Setup & data sources',
-          ),
+          _groupHeader(icon: Icons.tune, title: l.sectionSetupDataSources),
           const SizedBox(height: 4),
           // API Key — closed by default (unchanged).
           _FoldableSection(
             icon: Icons.key,
-            title: l?.apiKeySetup ?? 'API Key',
+            title: l.apiKeySetup,
             child: const ApiKeySection(),
           ),
           const SizedBox(height: 8),
@@ -124,7 +121,7 @@ class ProfileScreen extends ConsumerWidget {
           // after the initial setup.
           _FoldableSection(
             icon: Icons.my_location,
-            title: l?.sectionLocation ?? 'Location',
+            title: l.sectionLocation,
             child: const LocationSectionWidget(),
           ),
           const SizedBox(height: 16),
@@ -142,7 +139,7 @@ class ProfileScreen extends ConsumerWidget {
           // detail CTA, deep links).
           _groupHeader(
             icon: Icons.dashboard_customize_outlined,
-            title: l?.sectionFeaturesUsage ?? 'Features & usage',
+            title: l.sectionFeaturesUsage,
           ),
           const SizedBox(height: 4),
           // #1373 phase 2 — central feature-management toggles.
@@ -152,7 +149,7 @@ class ProfileScreen extends ConsumerWidget {
           // chooser at the same time as the toggles it gates.
           _FoldableSection(
             icon: Icons.tune,
-            title: l?.featureManagementSectionTitle ?? 'Feature management',
+            title: l.featureManagementSectionTitle,
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -172,7 +169,7 @@ class ProfileScreen extends ConsumerWidget {
           if (consumptionOn) ...[
             _FoldableSection(
               icon: Icons.local_gas_station_outlined,
-              title: l?.navConsumption ?? 'Consumption',
+              title: l.navConsumption,
               child: const DrivingSettingsSection(),
             ),
             const SizedBox(height: 8),
@@ -189,7 +186,7 @@ class ProfileScreen extends ConsumerWidget {
           if (tankSyncOn) ...[
             _groupHeader(
               icon: Icons.cloud_outlined,
-              title: l?.sectionAccountSync ?? 'Account & sync',
+              title: l.sectionAccountSync,
             ),
             const SizedBox(height: 4),
             _FoldableSection(
@@ -197,8 +194,7 @@ class ProfileScreen extends ConsumerWidget {
               title: 'TankSync', // i18n-ignore: brand name
               // #1696 — a localized descriptive subtitle so the
               // brand-named section isn't an unexplained label.
-              subtitle: l?.tankSyncSectionSubtitle ??
-                  'Cloud sync across your devices',
+              subtitle: l.tankSyncSectionSubtitle,
               child: const TankSyncSection(),
             ),
             const SizedBox(height: 16),
@@ -207,7 +203,7 @@ class ProfileScreen extends ConsumerWidget {
           // ── 5. Appearance & widgets — Theme + Home-screen widget.
           _groupHeader(
             icon: Icons.palette_outlined,
-            title: l?.sectionAppearanceWidgets ?? 'Appearance & widgets',
+            title: l.sectionAppearanceWidgets,
           ),
           const SizedBox(height: 4),
           // Theme — light / dark / follow system (#752, #897).
@@ -217,7 +213,7 @@ class ProfileScreen extends ConsumerWidget {
           // instead of opening a modal bottom sheet inline.
           SettingsMenuTile(
             icon: Icons.palette_outlined,
-            title: l?.themeCardTitle ?? 'Theme',
+            title: l.themeCardTitle,
             subtitle: _themeSubtitle(ref, l),
             onTap: () => context.push(RoutePaths.themeSettings),
           ),
@@ -228,7 +224,7 @@ class ProfileScreen extends ConsumerWidget {
           // in-app discoverable surface for it.
           _FoldableSection(
             icon: Icons.widgets_outlined,
-            title: l?.widgetHelpSectionTitle ?? 'Home-screen widget',
+            title: l.widgetHelpSectionTitle,
             child: const WidgetHelpSection(),
           ),
           const SizedBox(height: 16),
@@ -238,29 +234,28 @@ class ProfileScreen extends ConsumerWidget {
           // and Storage & cache.
           _groupHeader(
             icon: Icons.privacy_tip_outlined,
-            title: l?.sectionPrivacyData ?? 'Privacy & data',
+            title: l.sectionPrivacyData,
           ),
           const SizedBox(height: 4),
           // Privacy & Consent
           _FoldableSection(
             icon: Icons.privacy_tip_outlined,
-            title: l?.gdprTitle ?? 'Privacy',
+            title: l.gdprTitle,
             child: const ConsentSettingsSection(),
           ),
           const SizedBox(height: 8),
           // Privacy Dashboard
           SettingsMenuTile(
             icon: Icons.privacy_tip,
-            title: l?.privacyDashboardTitle ?? 'Privacy Dashboard',
-            subtitle: l?.privacyDashboardSubtitle ??
-                'View, export, or delete your data',
+            title: l.privacyDashboardTitle,
+            subtitle: l.privacyDashboardSubtitle,
             onTap: () => context.push(RoutePaths.privacyDashboard),
           ),
           const SizedBox(height: 8),
           // Storage & Cache
           _FoldableSection(
             icon: Icons.storage,
-            title: l?.storageAndCache ?? 'Storage & cache',
+            title: l.storageAndCache,
             child: const StorageSection(),
           ),
           const SizedBox(height: 16),
@@ -271,7 +266,7 @@ class ProfileScreen extends ConsumerWidget {
           if (patOn || debugOn) ...[
             _groupHeader(
               icon: Icons.developer_mode,
-              title: l?.sectionAdvancedDeveloper ?? 'Advanced & developer',
+              title: l.sectionAdvancedDeveloper,
             ),
             const SizedBox(height: 4),
             // #952 phase 3 + #2116-6 — bad-scan reporter PAT entry,
@@ -281,8 +276,7 @@ class ProfileScreen extends ConsumerWidget {
             if (patOn) ...[
               _FoldableSection(
                 icon: Icons.bug_report_outlined,
-                title: l?.feedbackTokenSectionTitle ??
-                    'Bad-scan feedback (GitHub)',
+                title: l.feedbackTokenSectionTitle,
                 child: const FeedbackTokenSection(),
               ),
               const SizedBox(height: 8),
@@ -293,9 +287,8 @@ class ProfileScreen extends ConsumerWidget {
             if (debugOn) ...[
               SettingsMenuTile(
                 icon: Icons.developer_mode,
-                title: l?.developerToolsSectionTitle ?? 'Developer tools',
-                subtitle: l?.developerToolsMenuSubtitle ??
-                    'Error log, test alerts, diagnostics',
+                title: l.developerToolsSectionTitle,
+                subtitle: l.developerToolsMenuSubtitle,
                 onTap: () => context.push(RoutePaths.developerTools),
               ),
               const SizedBox(height: 8),
@@ -306,7 +299,7 @@ class ProfileScreen extends ConsumerWidget {
           // ── 8. About — kept last (#534).
           SectionHeader(
             leadingIcon: Icons.info_outline,
-            title: l?.about ?? 'About',
+            title: l.about,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 4),
@@ -322,15 +315,8 @@ class ProfileScreen extends ConsumerWidget {
 /// [SectionHeader] that pins the forest-green primary-tinted leading
 /// icon + zero outer padding shared by the new group rows, so the
 /// `build` method reads as a flat list of groups.
-SectionHeader _groupHeader({
-  required IconData icon,
-  required String title,
-}) =>
-    SectionHeader(
-      leadingIcon: icon,
-      title: title,
-      padding: EdgeInsets.zero,
-    );
+SectionHeader _groupHeader({required IconData icon, required String title}) =>
+    SectionHeader(leadingIcon: icon, title: title, padding: EdgeInsets.zero);
 
 // ---------------------------------------------------------------------------
 // Shared layout helpers (kept private to this file)
@@ -365,9 +351,12 @@ class _FoldableSection extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: ExpansionTile(
         leading: Icon(icon, size: 20),
-        title: Text(title,
-            style: theme.textTheme.titleSmall
-                ?.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(
+          title,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         subtitle: subtitleText == null
             ? null
             : Text(
@@ -387,17 +376,16 @@ class _FoldableSection extends StatelessWidget {
 }
 
 /// Active-mode subtitle on the Theme `SettingsMenuTile` (#897).
-String _themeSubtitle(WidgetRef ref, AppLocalizations? l) {
+String _themeSubtitle(WidgetRef ref, AppLocalizations l) {
   final choice = ref.watch(themeModeSettingProvider);
   switch (choice) {
     case AppThemeChoice.light:
-      return l?.themeCardSubtitleLight ?? 'Light';
+      return l.themeCardSubtitleLight;
     case AppThemeChoice.dark:
-      return l?.themeCardSubtitleDark ?? 'Dark';
+      return l.themeCardSubtitleDark;
     case AppThemeChoice.eco:
-      return l?.themeSettingsEcoLabel ?? 'Eco';
+      return l.themeSettingsEcoLabel;
     case AppThemeChoice.system:
-      return l?.themeCardSubtitleSystem ?? 'System';
+      return l.themeCardSubtitleSystem;
   }
 }
-

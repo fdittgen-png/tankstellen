@@ -80,10 +80,7 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
                 key: const ValueKey('error-log-export-button'),
                 onPressed: _exportErrorLog,
                 icon: const Icon(Icons.bug_report_outlined),
-                label: Text(
-                  l?.developerToolsExportErrorLog(errorLogCount) ??
-                      'Save error log ($errorLogCount)',
-                ),
+                label: Text(l.developerToolsExportErrorLog(errorLogCount)),
               ),
             ),
             const SizedBox(width: 8),
@@ -91,7 +88,7 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
               key: const ValueKey('error-log-clear-button'),
               onPressed: errorLogCount == 0 ? null : _clearErrorLog,
               icon: const Icon(Icons.delete_outline),
-              tooltip: l?.developerToolsClearErrorLog ?? 'Clear error log',
+              tooltip: l.developerToolsClearErrorLog,
             ),
           ],
         ),
@@ -101,7 +98,7 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
             key: const ValueKey('error-log-view-button'),
             onPressed: widget.onView,
             icon: const Icon(Icons.list_alt_outlined),
-            label: Text(l?.developerToolsViewErrorLog ?? 'View error log'),
+            label: Text(l.developerToolsViewErrorLog),
           ),
         ],
       ],
@@ -123,9 +120,16 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
       try {
         await _shareErrorLogAsFile(json);
       } on Object catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-          'where': 'ErrorLogExportRow._exportErrorLog: share fallback',
-        }));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: const {
+              'where': 'ErrorLogExportRow._exportErrorLog: share fallback',
+            },
+          ),
+        );
         await Clipboard.setData(ClipboardData(text: json));
         if (!mounted) return;
         SnackBarHelper.showSuccess(
@@ -147,8 +151,11 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
     await Clipboard.setData(ClipboardData(text: json));
     await _saveExportToDownloads(
       text: json,
-      copySnackbar:
-          _formatCopySnackbar(parsed: parsed, unparsed: unparsed, kb: kb),
+      copySnackbar: _formatCopySnackbar(
+        parsed: parsed,
+        unparsed: unparsed,
+        kb: kb,
+      ),
     );
   }
 
@@ -169,10 +176,7 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
     if (!mounted) return;
     ref.invalidate(traceStorageProvider);
     final l = AppLocalizations.of(context);
-    SnackBarHelper.showSuccess(
-      context,
-      l?.privacyErrorLogCleared ?? 'Error log cleared',
-    );
+    SnackBarHelper.showSuccess(context, l.privacyErrorLogCleared);
   }
 
   /// Routes the large payload to the widget-test share seam only. The
@@ -207,15 +211,19 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
         mimeType: 'application/json',
       );
       if (!mounted) return;
-      SnackBarHelper.showSuccess(
-        context,
-        l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
-      );
+      SnackBarHelper.showSuccess(context, l.savedToDownloadsFolder);
     } on Object catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'ErrorLogExportRow._saveExportToDownloads',
-        'fileName': 'tankstellen-error-log.json',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.storage,
+          e,
+          st,
+          context: const {
+            'where': 'ErrorLogExportRow._saveExportToDownloads',
+            'fileName': 'tankstellen-error-log.json',
+          },
+        ),
+      );
       if (!mounted) return;
       SnackBarHelper.showSuccess(context, copySnackbar);
     }

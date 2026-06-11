@@ -26,14 +26,14 @@ class SortSelector extends StatelessWidget {
         child: Row(
           children: [
             _SortChip(
-              label: l10n?.sortDistance ?? 'Distance',
+              label: l10n.sortDistance,
               icon: Icons.near_me,
               selected: selected == SortMode.distance,
               onSelected: () => onChanged(SortMode.distance),
             ),
             const SizedBox(width: 6),
             _SortChip(
-              label: l10n?.price ?? 'Price',
+              label: l10n.price,
               icon: Icons.euro,
               selected: selected == SortMode.price,
               onSelected: () => onChanged(SortMode.price),
@@ -47,21 +47,21 @@ class SortSelector extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             _SortChip(
-              label: l10n?.sortOpen24h ?? '24h',
+              label: l10n.sortOpen24h,
               icon: Icons.schedule,
               selected: selected == SortMode.open24h,
               onSelected: () => onChanged(SortMode.open24h),
             ),
             const SizedBox(width: 6),
             _SortChip(
-              label: l10n?.sortRating ?? 'Rating',
+              label: l10n.sortRating,
               icon: Icons.star,
               selected: selected == SortMode.rating,
               onSelected: () => onChanged(SortMode.rating),
             ),
             const SizedBox(width: 6),
             _SortChip(
-              label: l10n?.sortPriceDistance ?? 'Price/km',
+              label: l10n.sortPriceDistance,
               icon: Icons.balance,
               selected: selected == SortMode.priceDistance,
               onSelected: () => onChanged(SortMode.priceDistance),
@@ -90,7 +90,7 @@ class _SortChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: l10n?.sortBySemantic(label, '$selected') ?? 'Sort by $label',
+      label: l10n.sortBySemantic(label, '$selected'),
       child: ChoiceChip(
         avatar: Icon(icon, size: 16),
         label: Text(label),

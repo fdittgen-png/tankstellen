@@ -3344,6 +3344,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String serviceReminderDueNowBody(String label) {
+    return '$label is due now.';
+  }
+
+  @override
   String get southKoreaApiKeyRequired =>
       'Register at OPINET to get a free API key';
 
@@ -11209,6 +11214,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String serviceReminderDueBody(String label, int kmOver) {
     return '⟦$label îš đúé — $kmOver ķɱ ƥášŧ ŧĥé îñŧéřṽáł. ··········⟧';
+  }
+
+  @override
+  String serviceReminderDueNowBody(String label) {
+    return '⟦$label îš đúé ñóŵ. ····⟧';
   }
 
   @override

@@ -26,111 +26,119 @@ class AlertsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Consumer(builder: (context, ref, _) {
-      final alerts = ref.watch(alertProvider);
-      // The radius-alerts + statistics entry is always shown — it is
-      // the only navigation path to the `/alerts` screen (#1701), so it
-      // must be reachable whether or not the user has price alerts.
-      final body = alerts.isEmpty
-          ? EmptyState(
-              icon: Icons.notifications_off_outlined,
-              title: l10n?.noPriceAlerts ?? 'No price alerts',
-              subtitle: l10n?.noPriceAlertsHint ??
-                  'Create an alert from a station\'s detail page.',
-            )
-          : _priceAlertsList(context, ref, l10n);
-      return Column(
-        children: [
-          const _RadiusAlertsEntry(),
-          Expanded(child: body),
-        ],
-      );
-    });
+    return Consumer(
+      builder: (context, ref, _) {
+        final alerts = ref.watch(alertProvider);
+        // The radius-alerts + statistics entry is always shown — it is
+        // the only navigation path to the `/alerts` screen (#1701), so it
+        // must be reachable whether or not the user has price alerts.
+        final body = alerts.isEmpty
+            ? EmptyState(
+                icon: Icons.notifications_off_outlined,
+                title: l10n.noPriceAlerts,
+                subtitle: l10n.noPriceAlertsHint,
+              )
+            : _priceAlertsList(context, ref, l10n);
+        return Column(
+          children: [
+            const _RadiusAlertsEntry(),
+            Expanded(child: body),
+          ],
+        );
+      },
+    );
   }
 
   Widget _priceAlertsList(
     BuildContext context,
     WidgetRef ref,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) {
     // Re-read here (cheap, idempotent) so the helper carries no
     // explicit alert-model type — keeping favorites/presentation off a
     // direct import of the alerts feature's data layer.
     final alerts = ref.watch(alertProvider);
     return Column(
-        children: [
-          HelpBanner(
-            storageKey: StorageKeys.helpBannerAlerts,
-            icon: Icons.notifications_active_outlined,
-            message: l10n?.helpBannerAlerts ??
-                'Set a price threshold for a station. You\'ll be notified when prices drop below it. Checks run every 30 minutes.',
-          ),
-          Expanded(
-            child: ListView.builder(
-        itemCount: alerts.length,
-        itemBuilder: (context, index) {
-          final alert = alerts[index];
-          // Swipe left to delete alert
-          return Dismissible(
-            key: ValueKey(alert.id),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 24),
-              color: DarkModeColors.error(context),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n?.delete ?? 'Delete',
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.delete, color: Colors.white, size: 20),
-                ],
-              ),
-            ),
-            onDismissed: (_) {
-              unawaited(ref.read(alertProvider.notifier).removeAlert(alert.id));
-              SnackBarHelper.show(
-                  context,
-                  l10n?.alertDeleted(alert.stationName) ??
-                      'Alert "${alert.stationName}" deleted');
-            },
-            child: ListTile(
-              leading: Icon(
-                alert.isActive
-                    ? Icons.notifications_active
-                    : Icons.notifications_off,
-                color: alert.isActive
-                    ? FuelColors.forType(alert.fuelType)
-                    : Colors.grey,
-              ),
-              // #2117 \u2014 Switch.adaptive gets the platform-correct
-              // toggle glyph on iOS without changing the ListTile's
-              // tap-to-detail navigation semantics (a full SwitchListTile
-              // would collide with onTap).
-              title: Text(alert.stationName),
-              subtitle: Text(
-                '${alert.fuelType.displayName} \u2264 ${PriceFormatter.formatPrice(alert.targetPrice)}',
-                style: TextStyle(
+      children: [
+        HelpBanner(
+          storageKey: StorageKeys.helpBannerAlerts,
+          icon: Icons.notifications_active_outlined,
+          message: l10n.helpBannerAlerts,
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: alerts.length,
+            itemBuilder: (context, index) {
+              final alert = alerts[index];
+              // Swipe left to delete alert
+              return Dismissible(
+                key: ValueKey(alert.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 24),
+                  color: DarkModeColors.error(context),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.delete,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.delete, color: Colors.white, size: 20),
+                    ],
+                  ),
+                ),
+                onDismissed: (_) {
+                  unawaited(
+                    ref.read(alertProvider.notifier).removeAlert(alert.id),
+                  );
+                  SnackBarHelper.show(
+                    context,
+                    l10n.alertDeleted(alert.stationName),
+                  );
+                },
+                child: ListTile(
+                  leading: Icon(
+                    alert.isActive
+                        ? Icons.notifications_active
+                        : Icons.notifications_off,
                     color: alert.isActive
                         ? FuelColors.forType(alert.fuelType)
-                        : Colors.grey),
-              ),
-              trailing: Switch.adaptive(
-                value: alert.isActive,
-                onChanged: (_) =>
-                    ref.read(alertProvider.notifier).toggleAlert(alert.id),
-              ),
-              // Tap to open station detail (shows price history)
-              onTap: () => StationDetailRoute(alert.stationId).push<void>(context),
-            ),
-          );
-        },
-      ),
+                        : Colors.grey,
+                  ),
+                  // #2117 — Switch.adaptive gets the platform-correct
+                  // toggle glyph on iOS without changing the ListTile's
+                  // tap-to-detail navigation semantics (a full SwitchListTile
+                  // would collide with onTap).
+                  title: Text(alert.stationName),
+                  subtitle: Text(
+                    '${alert.fuelType.displayName} ≤ ${PriceFormatter.formatPrice(alert.targetPrice)}',
+                    style: TextStyle(
+                      color: alert.isActive
+                          ? FuelColors.forType(alert.fuelType)
+                          : Colors.grey,
+                    ),
+                  ),
+                  trailing: Switch.adaptive(
+                    value: alert.isActive,
+                    onChanged: (_) =>
+                        ref.read(alertProvider.notifier).toggleAlert(alert.id),
+                  ),
+                  // Tap to open station detail (shows price history)
+                  onTap: () =>
+                      StationDetailRoute(alert.stationId).push<void>(context),
+                ),
+              );
+            },
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 }
 
@@ -166,14 +174,12 @@ class _RadiusAlertsEntry extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n?.radiusAlertsEntryTitle ??
-                          'Radius alerts & statistics',
+                      l10n.radiusAlertsEntryTitle,
                       style: theme.textTheme.titleSmall,
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      l10n?.radiusAlertsEntrySubtitle ??
-                          'Get notified when prices drop near you',
+                      l10n.radiusAlertsEntrySubtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -181,8 +187,10 @@ class _RadiusAlertsEntry extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right,
-                  color: theme.colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ],
           ),
         ),

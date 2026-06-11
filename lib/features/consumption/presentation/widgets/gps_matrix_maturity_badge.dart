@@ -34,38 +34,25 @@ class GpsMatrixMaturityBadge extends StatelessWidget {
     final tier = matrix.maturity;
     final (label, tooltip, bgColor, fgColor) = switch (tier) {
       GpsCalibrationMaturity.cold => (
-          l10n?.gpsMatrixMaturityCold ?? 'Cold',
-          l10n?.gpsMatrixMaturityColdTooltip(
-                matrix.fillUpReconciliationCount,
-              ) ??
-              'GPS matrix is still warming up '
-                  '(${matrix.fillUpReconciliationCount} fill-up '
-                  'refinements so far). Estimates are provisional.',
-          theme.colorScheme.errorContainer,
-          theme.colorScheme.onErrorContainer,
-        ),
+        l10n.gpsMatrixMaturityCold,
+        l10n.gpsMatrixMaturityColdTooltip(matrix.fillUpReconciliationCount),
+        theme.colorScheme.errorContainer,
+        theme.colorScheme.onErrorContainer,
+      ),
       GpsCalibrationMaturity.warming => (
-          l10n?.gpsMatrixMaturityWarming ?? 'Warming',
-          l10n?.gpsMatrixMaturityWarmingTooltip(
-                matrix.fillUpReconciliationCount,
-              ) ??
-              'GPS matrix is converging '
-                  '(${matrix.fillUpReconciliationCount} fill-ups). '
-                  'Estimates are usable but may drift a few %.',
-          theme.colorScheme.tertiaryContainer,
-          theme.colorScheme.onTertiaryContainer,
-        ),
+        l10n.gpsMatrixMaturityWarming,
+        l10n.gpsMatrixMaturityWarmingTooltip(matrix.fillUpReconciliationCount),
+        theme.colorScheme.tertiaryContainer,
+        theme.colorScheme.onTertiaryContainer,
+      ),
       GpsCalibrationMaturity.converged => (
-          l10n?.gpsMatrixMaturityConverged ?? 'Converged',
-          l10n?.gpsMatrixMaturityConvergedTooltip(
-                matrix.fillUpReconciliationCount,
-              ) ??
-              'GPS matrix has converged '
-                  '(${matrix.fillUpReconciliationCount} fill-ups). '
-                  'Estimates are within ~2 % of real-world burn.',
-          theme.colorScheme.primaryContainer,
-          theme.colorScheme.onPrimaryContainer,
+        l10n.gpsMatrixMaturityConverged,
+        l10n.gpsMatrixMaturityConvergedTooltip(
+          matrix.fillUpReconciliationCount,
         ),
+        theme.colorScheme.primaryContainer,
+        theme.colorScheme.onPrimaryContainer,
+      ),
     };
 
     return Tooltip(
@@ -83,8 +70,8 @@ class GpsMatrixMaturityBadge extends StatelessWidget {
               tier == GpsCalibrationMaturity.converged
                   ? Icons.check_circle
                   : tier == GpsCalibrationMaturity.warming
-                      ? Icons.hourglass_bottom
-                      : Icons.fiber_new_outlined,
+                  ? Icons.hourglass_bottom
+                  : Icons.fiber_new_outlined,
               size: 14,
               color: fgColor,
             ),

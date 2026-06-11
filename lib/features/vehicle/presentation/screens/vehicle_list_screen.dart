@@ -23,7 +23,7 @@ class VehicleListScreen extends ConsumerWidget {
     final active = ref.watch(activeVehicleProfileProvider);
 
     return PageScaffold(
-      title: l?.vehiclesTitle ?? 'My vehicles',
+      title: l.vehiclesTitle,
       bodyPadding: EdgeInsets.zero,
       body: vehicles.isEmpty
           ? Column(
@@ -31,18 +31,9 @@ class VehicleListScreen extends ConsumerWidget {
                 HelpBanner(
                   storageKey: StorageKeys.helpBannerVehicles,
                   icon: Icons.tips_and_updates_outlined,
-                  message: l?.helpBannerVehicles ??
-                      'Add your vehicles so fill-ups and fuel preferences '
-                          'default correctly. The first vehicle becomes '
-                          'your default.',
+                  message: l.helpBannerVehicles,
                 ),
-                Expanded(
-                  child: _EmptyState(
-                    message: l?.vehiclesEmptyMessage ??
-                        'Add your car to filter by connector and estimate '
-                            'charging costs.',
-                  ),
-                ),
+                Expanded(child: _EmptyState(message: l.vehiclesEmptyMessage)),
               ],
             )
           : ListView.separated(
@@ -59,10 +50,7 @@ class VehicleListScreen extends ConsumerWidget {
                   return HelpBanner(
                     storageKey: StorageKeys.helpBannerVehicles,
                     icon: Icons.tips_and_updates_outlined,
-                    message: l?.helpBannerVehicles ??
-                        'Add your vehicles so fill-ups and fuel preferences '
-                            'default correctly. The first vehicle becomes '
-                            'your default.',
+                    message: l.helpBannerVehicles,
                   );
                 }
                 final v = vehicles[index - 1];
@@ -81,7 +69,7 @@ class VehicleListScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => const EditVehicleRoute().push<void>(context),
         icon: const Icon(Icons.add),
-        label: Text(l?.vehicleAdd ?? 'Add vehicle'),
+        label: Text(l.vehicleAdd),
       ),
     );
   }
@@ -100,17 +88,16 @@ class VehicleListScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l?.vehicleDeleteTitle ?? 'Delete vehicle?'),
-        content: Text(l?.vehicleDeleteMessage(name) ??
-            'Remove "$name" from your profiles?'),
+        title: Text(l.vehicleDeleteTitle),
+        content: Text(l.vehicleDeleteMessage(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l?.cancel ?? 'Cancel'),
+            child: Text(l.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l?.delete ?? 'Delete'),
+            child: Text(l.delete),
           ),
         ],
       ),

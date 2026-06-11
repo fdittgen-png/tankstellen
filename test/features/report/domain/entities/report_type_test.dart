@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/report/domain/entities/report_type.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Tests for `ReportType` enum — Refs #561.
 ///
@@ -12,12 +15,14 @@ import 'package:tankstellen/features/report/domain/entities/report_type.dart';
 ///   - `routesToGitHub` / `isTankerkoenigSupported` routing predicates
 ///   - `fuelTypeColumnValue` Supabase column mapping
 ///   - `visibleForCountry` country gating (#484)
-///   - `displayName(null)` English fallback path (l10n-free)
+///   - `displayName` English (`en` ARB) mapping
 ///
-/// `displayName(AppLocalizations)` with a real localisation delegate is
-/// covered implicitly by widget tests that pump the report screen — here
-/// we only assert the fallback branch so the unit test stays pure.
+/// `displayName` is driven with the real `en` lookup (#3162 — the
+/// nullable fallback branch no longer exists), keeping the unit test
+/// pure while asserting the canonical ARB labels.
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   group('apiValue', () {
     test('wrongE5 → wrongPetrolPremium', () {
       expect(ReportType.wrongE5.apiValue, 'wrongPetrolPremium');
@@ -132,16 +137,18 @@ void main() {
       });
     }
 
-    test('routesToGitHub matches needsText — metadata reports route to GitHub',
-        () {
-      for (final t in ReportType.values) {
-        expect(
-          t.routesToGitHub,
-          t.needsText,
-          reason: '$t should route to GitHub iff it needs free-text input',
-        );
-      }
-    });
+    test(
+      'routesToGitHub matches needsText — metadata reports route to GitHub',
+      () {
+        for (final t in ReportType.values) {
+          expect(
+            t.routesToGitHub,
+            t.needsText,
+            reason: '$t should route to GitHub iff it needs free-text input',
+          );
+        }
+      },
+    );
   });
 
   group('isTankerkoenigSupported', () {
@@ -167,12 +174,14 @@ void main() {
       expect(count, 5);
     });
 
-    test('extended price types (E85, E98, LPG) are NOT Tankerkoenig-supported',
-        () {
-      expect(ReportType.wrongE85.isTankerkoenigSupported, isFalse);
-      expect(ReportType.wrongE98.isTankerkoenigSupported, isFalse);
-      expect(ReportType.wrongLpg.isTankerkoenigSupported, isFalse);
-    });
+    test(
+      'extended price types (E85, E98, LPG) are NOT Tankerkoenig-supported',
+      () {
+        expect(ReportType.wrongE85.isTankerkoenigSupported, isFalse);
+        expect(ReportType.wrongE98.isTankerkoenigSupported, isFalse);
+        expect(ReportType.wrongLpg.isTankerkoenigSupported, isFalse);
+      },
+    );
   });
 
   group('fuelTypeColumnValue (Supabase mapping)', () {
@@ -209,8 +218,9 @@ void main() {
     });
 
     test('all column values are unique (no analytics aliasing)', () {
-      final values =
-          ReportType.values.map((e) => e.fuelTypeColumnValue).toSet();
+      final values = ReportType.values
+          .map((e) => e.fuelTypeColumnValue)
+          .toSet();
       expect(values.length, ReportType.values.length);
     });
   });
@@ -228,24 +238,24 @@ void main() {
     });
 
     test('IT → metadata-only', () {
-      expect(
-        ReportType.visibleForCountry('IT'),
-        const [ReportType.wrongName, ReportType.wrongAddress],
-      );
+      expect(ReportType.visibleForCountry('IT'), const [
+        ReportType.wrongName,
+        ReportType.wrongAddress,
+      ]);
     });
 
     test('ES → metadata-only', () {
-      expect(
-        ReportType.visibleForCountry('ES'),
-        const [ReportType.wrongName, ReportType.wrongAddress],
-      );
+      expect(ReportType.visibleForCountry('ES'), const [
+        ReportType.wrongName,
+        ReportType.wrongAddress,
+      ]);
     });
 
     test('empty country code → metadata-only fallback', () {
-      expect(
-        ReportType.visibleForCountry(''),
-        const [ReportType.wrongName, ReportType.wrongAddress],
-      );
+      expect(ReportType.visibleForCountry(''), const [
+        ReportType.wrongName,
+        ReportType.wrongAddress,
+      ]);
     });
 
     test('lowercase "de" does NOT match — case-sensitive ISO codes', () {
@@ -253,10 +263,10 @@ void main() {
       // lowercase value here means the caller forgot to normalise.
       // Falling back to metadata-only is the safe default (no
       // Tankerkoenig attempt against a non-DE station).
-      expect(
-        ReportType.visibleForCountry('de'),
-        const [ReportType.wrongName, ReportType.wrongAddress],
-      );
+      expect(ReportType.visibleForCountry('de'), const [
+        ReportType.wrongName,
+        ReportType.wrongAddress,
+      ]);
     });
 
     test('non-DE country list only contains GitHub-routed types', () {
@@ -267,11 +277,11 @@ void main() {
     });
   });
 
-  group('displayName (null l10n fallback)', () {
+  group('displayName (en ARB mapping)', () {
     const expected = <ReportType, String>{
-      ReportType.wrongE5: 'Prix Super E5 incorrect',
-      ReportType.wrongE10: 'Prix Super E10 incorrect',
-      ReportType.wrongDiesel: 'Prix Diesel incorrect',
+      ReportType.wrongE5: 'Wrong Super E5 price',
+      ReportType.wrongE10: 'Wrong Super E10 price',
+      ReportType.wrongDiesel: 'Wrong Diesel price',
       ReportType.wrongE85: 'Wrong E85 price',
       ReportType.wrongE98: 'Wrong Super 98 price',
       ReportType.wrongLpg: 'Wrong LPG price',
@@ -282,17 +292,17 @@ void main() {
     };
 
     for (final entry in expected.entries) {
-      test('${entry.key} fallback label', () {
-        expect(entry.key.displayName(null), entry.value);
+      test('${entry.key} en label', () {
+        expect(entry.key.displayName(l10nEn), entry.value);
       });
     }
 
-    test('every report type has a non-empty fallback label', () {
+    test('every report type has a non-empty display name', () {
       for (final t in ReportType.values) {
         expect(
-          t.displayName(null),
+          t.displayName(l10nEn),
           isNotEmpty,
-          reason: '$t returned empty fallback display name',
+          reason: '$t returned an empty display name',
         );
       }
     });
@@ -303,12 +313,12 @@ void main() {
       expect(ReportType.values.length, 10);
     });
 
-    test(
-        'needsPrice, needsText, and status bucket are mutually exclusive and '
+    test('needsPrice, needsText, and status bucket are mutually exclusive and '
         'together cover every enum value', () {
       for (final t in ReportType.values) {
         final isStatus =
-            t == ReportType.wrongStatusOpen || t == ReportType.wrongStatusClosed;
+            t == ReportType.wrongStatusOpen ||
+            t == ReportType.wrongStatusClosed;
         final bucketCount =
             (t.needsPrice ? 1 : 0) + (t.needsText ? 1 : 0) + (isStatus ? 1 : 0);
         expect(

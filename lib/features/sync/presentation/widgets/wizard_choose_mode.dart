@@ -34,20 +34,21 @@ class WizardChooseMode extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(children: [
-                  Icon(Icons.info_outline, color: theme.colorScheme.primary),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n?.syncOptionalTitle ?? 'TankSync is optional',
-                    style: theme.textTheme.titleSmall
-                        ?.copyWith(color: theme.colorScheme.primary),
-                  ),
-                ]),
+                Row(
+                  children: [
+                    Icon(Icons.info_outline, color: theme.colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.syncOptionalTitle,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n?.syncOptionalDescription ??
-                      'Your app works fully without cloud sync. TankSync lets you sync '
-                          'favorites, alerts, and ratings across devices using Supabase (free tier available).',
+                  l10n.syncOptionalDescription,
                   style: theme.textTheme.bodyMedium,
                 ),
               ],
@@ -56,18 +57,14 @@ class WizardChooseMode extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        Text(
-          l10n?.syncHowToConnectQuestion ?? 'How would you like to connect?',
-          style: theme.textTheme.titleMedium,
-        ),
+        Text(l10n.syncHowToConnectQuestion, style: theme.textTheme.titleMedium),
         const SizedBox(height: 16),
 
         // Option 1: Create new
         WizardOptionCard(
           icon: Icons.add_circle_outline,
-          title: l10n?.syncCreateOwnTitle ?? 'Create my own database',
-          subtitle: l10n?.syncCreateOwnSubtitle ??
-              'Free Supabase project — we\'ll guide you step by step',
+          title: l10n.syncCreateOwnTitle,
+          subtitle: l10n.syncCreateOwnSubtitle,
           onTap: onCreateNew,
         ),
         const SizedBox(height: 12),
@@ -75,9 +72,8 @@ class WizardChooseMode extends StatelessWidget {
         // Option 2: Join existing
         WizardOptionCard(
           icon: Icons.qr_code_scanner,
-          title: l10n?.syncJoinExistingTitle ?? 'Join an existing database',
-          subtitle: l10n?.syncJoinExistingSubtitle ??
-              'Scan QR code from the database owner or paste credentials',
+          title: l10n.syncJoinExistingTitle,
+          subtitle: l10n.syncJoinExistingSubtitle,
           onTap: onJoinExisting,
         ),
       ],

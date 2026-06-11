@@ -47,10 +47,7 @@ class ConsumptionScreen extends ConsumerStatefulWidget {
   /// the bare `/consumption-tab` route keeps its historical behaviour.
   final ConsumptionSection section;
 
-  const ConsumptionScreen({
-    super.key,
-    this.section = ConsumptionSection.fuel,
-  });
+  const ConsumptionScreen({super.key, this.section = ConsumptionSection.fuel});
 
   /// Test-only override for the backup exporter wired into the AppBar
   /// download button (#1317). Lets widget tests assert the export
@@ -62,8 +59,7 @@ class ConsumptionScreen extends ConsumerStatefulWidget {
   static FullBackupExporter? debugExporterOverride;
 
   @override
-  ConsumerState<ConsumptionScreen> createState() =>
-      _ConsumptionScreenState();
+  ConsumerState<ConsumptionScreen> createState() => _ConsumptionScreenState();
 }
 
 class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
@@ -115,9 +111,9 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   /// of the title. Shared by every [ConsumptionSection] so the Trajets
   /// and Carburant tabs stay visually consistent. Keeps the original
   /// `open_vehicles` key, tooltip and `/vehicles` target (#1946).
-  Widget _vehiclesLeading(AppLocalizations? l) => IconButton(
+  Widget _vehiclesLeading(AppLocalizations l) => IconButton(
         key: const Key('open_vehicles'),
-        tooltip: l?.vehiclesMenuTitle ?? 'My vehicles',
+        tooltip: l.vehiclesMenuTitle,
         icon: const Icon(Icons.directions_car_outlined),
         onPressed: () => context.push(RoutePaths.vehicles),
       );
@@ -133,13 +129,10 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     ref.listen(lastVeLearnResultProvider, (previous, next) {
       if (next == null) return;
       final vehicles = ref.read(vehicleProfileListProvider);
-      final vehicle =
-          vehicles.where((v) => v.id == next.vehicleId).firstOrNull;
+      final vehicle = vehicles.where((v) => v.id == next.vehicleId).firstOrNull;
       final name = vehicle?.name ?? '';
       final percent = next.accuracyImprovementPct.round().toString();
-      final msg = l?.veCalibratedTitle(name, percent) ??
-          'Consumption calibration updated for $name — '
-              'accuracy improved by $percent%';
+      final msg = l.veCalibratedTitle(name, percent);
       SnackBarHelper.showSuccess(context, msg);
       // Clear so a rebuild doesn't re-fire the snackbar.
       ref.read(lastVeLearnResultProvider.notifier).set(null);
@@ -159,20 +152,22 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
   /// #2374 — computes the same vehicle-filtered trip IDs that [TrajetsTab]
   /// renders, so the AppBar map action opens [TrajetsMapScreen] with exactly
   /// the visible set of trips.
-  Widget _buildTrajets(BuildContext context, AppLocalizations? l) {
+  Widget _buildTrajets(BuildContext context, AppLocalizations l) {
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     final allTrips = ref.watch(tripHistoryListProvider);
     // Mirror TrajetsTab's filter: when a vehicle is active, show only that
     // vehicle's trips (plus untagged legacy trips); otherwise show all.
     final vehicleId = activeVehicle?.id;
-    final tripIds = (vehicleId == null
-            ? allTrips
-            : allTrips.where(
-                (t) => t.vehicleId == null || t.vehicleId == vehicleId))
-        .map((t) => t.id)
-        .toList(growable: false);
+    final tripIds =
+        (vehicleId == null
+                ? allTrips
+                : allTrips.where(
+                    (t) => t.vehicleId == null || t.vehicleId == vehicleId,
+                  ))
+            .map((t) => t.id)
+            .toList(growable: false);
     return PageScaffold(
-      title: l?.trajetsTabLabel ?? 'Trips',
+      title: l.trajetsTabLabel,
       leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
       actions: [ConsumptionAppBarActions(tripIds: tripIds)],
@@ -183,7 +178,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
 
   /// #1901 — the Carburant destination: the fill-up list, plus a Fuel /
   /// Charging switcher for a vehicle that can charge.
-  Widget _buildFuel(BuildContext context, AppLocalizations? l) {
+  Widget _buildFuel(BuildContext context, AppLocalizations l) {
     final fillUps = ref.watch(fillUpListProvider);
     final chargingLogsAsync = ref.watch(chargingLogsProvider);
     final stats = ref.watch(consumptionStatsProvider);
@@ -197,7 +192,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     // no switcher, and the add-fill-up FAB.
     if (!showCharging) {
       return PageScaffold(
-        title: l?.consumptionTabFuel ?? 'Fuel',
+        title: l.consumptionTabFuel,
         leading: _vehiclesLeading(l),
         bodyPadding: EdgeInsets.zero,
         actions: const [ConsumptionAppBarActions()],
@@ -211,7 +206,7 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     final controller = _tabController!;
     final isCharging = controller.index == 1;
     return PageScaffold(
-      title: l?.consumptionTabFuel ?? 'Fuel',
+      title: l.consumptionTabFuel,
       leading: _vehiclesLeading(l),
       bodyPadding: EdgeInsets.zero,
       actions: const [ConsumptionAppBarActions()],
@@ -224,11 +219,11 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
             controller: controller,
             tabs: [
               TabSwitcherEntry(
-                label: l?.consumptionTabFuel ?? 'Fuel',
+                label: l.consumptionTabFuel,
                 icon: Icons.local_gas_station_outlined,
               ),
               TabSwitcherEntry(
-                label: l?.consumptionTabCharging ?? 'Charging',
+                label: l.consumptionTabCharging,
                 icon: Icons.ev_station_outlined,
               ),
             ],
@@ -247,25 +242,23 @@ class _ConsumptionScreenState extends ConsumerState<ConsumptionScreen>
     );
   }
 
-  Widget _addFillUpFab(BuildContext context, AppLocalizations? l) =>
+  Widget _addFillUpFab(BuildContext context, AppLocalizations l) =>
       FloatingActionButton.extended(
         key: const Key('fab_add_fillup'),
         onPressed: () => unawaited(context.push(RoutePaths.pickStationForFillUp)),
         icon: const Icon(Icons.add),
-        label: Text(l?.addFillUp ?? 'Add fill-up'),
+        label: Text(l.addFillUp),
       );
 
-  Widget _addChargingFab(BuildContext context, AppLocalizations? l) =>
+  Widget _addChargingFab(BuildContext context, AppLocalizations l) =>
       FloatingActionButton.extended(
         key: const Key('fab_add_charging'),
         onPressed: () async {
           await Navigator.of(context).push<bool?>(
-            MaterialPageRoute(
-              builder: (_) => const AddChargingLogScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const AddChargingLogScreen()),
           );
         },
         icon: const Icon(Icons.add),
-        label: Text(l?.addChargingLog ?? 'Log charging'),
+        label: Text(l.addChargingLog),
       );
 }

@@ -56,8 +56,7 @@ class _SwipeTutorialBannerState extends ConsumerState<SwipeTutorialBanner> {
     final theme = Theme.of(context);
 
     return Semantics(
-      label: l10n?.swipeTutorialMessage ??
-          'Swipe right to navigate, swipe left to remove',
+      label: l10n.swipeTutorialMessage,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(12),
@@ -75,8 +74,7 @@ class _SwipeTutorialBannerState extends ConsumerState<SwipeTutorialBanner> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                l10n?.swipeTutorialMessage ??
-                    'Swipe right to navigate, swipe left to remove',
+                l10n.swipeTutorialMessage,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onPrimaryContainer,
                 ),
@@ -85,9 +83,7 @@ class _SwipeTutorialBannerState extends ConsumerState<SwipeTutorialBanner> {
             const SizedBox(width: 8),
             TextButton(
               onPressed: _dismiss,
-              child: Text(
-                l10n?.swipeTutorialDismiss ?? 'Got it',
-              ),
+              child: Text(l10n.swipeTutorialDismiss),
             ),
           ],
         ),

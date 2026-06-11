@@ -3,38 +3,32 @@
 
 import 'dart:async';
 
-
 import '../../../../core/notifications/notification_service.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/service_reminder_repository.dart';
 import '../entities/service_reminder.dart';
 import 'service_reminder_trigger.dart';
 import '../../../../core/logging/error_logger.dart';
 
-/// Copy of the strings the notification renders. Dart doesn't have
-/// test-time locale resolution for background isolates, so the
-/// evaluator accepts the already-localised title/body pair from the
-/// caller (the provider reads from the active [AppLocalizations]
-/// before invoking `evaluate`).
+/// Copy of the strings the notification renders. The evaluator accepts
+/// the already-localised title/body pair from the caller; context-free
+/// callers (the fill-up save hook) build it via [fromL10n] with a
+/// `lookupAppLocalizations` resolve (the #2766 pattern, #3162) — never
+/// an English fallback table.
 class ServiceReminderMessages {
   final String title;
   final String Function({required String label, required int kmOver}) bodyFor;
 
-  const ServiceReminderMessages({
-    required this.title,
-    required this.bodyFor,
-  });
+  const ServiceReminderMessages({required this.title, required this.bodyFor});
 
-  /// English fallback used when the UI has no [AppLocalizations]
-  /// handy (background isolates, unit tests).
-  static const fallback = ServiceReminderMessages(
-    title: 'Service due',
-    bodyFor: _fallbackBody,
-  );
-
-  static String _fallbackBody({required String label, required int kmOver}) {
-    if (kmOver <= 0) return '$label is due now.';
-    return '$label is due — $kmOver km past the interval.';
-  }
+  /// Builds the localized bundle from [l] (#3162).
+  factory ServiceReminderMessages.fromL10n(AppLocalizations l) =>
+      ServiceReminderMessages(
+        title: l.serviceReminderDueTitle,
+        bodyFor: ({required String label, required int kmOver}) => kmOver <= 0
+            ? l.serviceReminderDueNowBody(label)
+            : l.serviceReminderDueBody(label, kmOver),
+      );
 }
 
 /// Coordinates the three layers of the #584 reminder flow:
@@ -51,9 +45,15 @@ class ServiceReminderEvaluator {
   final NotificationService notifications;
   final ServiceReminderTrigger trigger;
 
+  /// Localized notification copy, injected by the provider (#3162) —
+  /// built there via `lookupAppLocalizations` (the #2766 pattern) so
+  /// the context-free fill-up save hook never falls back to English.
+  final ServiceReminderMessages messages;
+
   const ServiceReminderEvaluator({
     required this.repository,
     required this.notifications,
+    required this.messages,
     this.trigger = const ServiceReminderTrigger(),
   });
 
@@ -75,8 +75,9 @@ class ServiceReminderEvaluator {
   Future<List<ServiceReminder>> evaluate({
     required String vehicleId,
     required double currentOdometerKm,
-    ServiceReminderMessages messages = ServiceReminderMessages.fallback,
+    ServiceReminderMessages? messages,
   }) async {
+    final copy = messages ?? this.messages;
     final all = repository.getForVehicle(vehicleId);
     final triggered = trigger.findTriggered(
       vehicleId: vehicleId,
@@ -93,20 +94,38 @@ class ServiceReminderEvaluator {
       try {
         await repository.save(updated);
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ServiceReminderEvaluator: failed to persist flag'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.other,
+            e,
+            st,
+            context: const {
+              'where': 'ServiceReminderEvaluator: failed to persist flag',
+            },
+          ),
+        );
         continue;
       }
       try {
         await notifications.showServiceReminder(
           id: notificationIdFor(reminder.id),
-          title: messages.title,
-          body: messages.bodyFor(
+          title: copy.title,
+          body: copy.bodyFor(
             label: reminder.label,
             kmOver: reminder.kmOverdue(currentOdometerKm).round(),
           ),
         );
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ServiceReminderEvaluator: notification failed'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.other,
+            e,
+            st,
+            context: const {
+              'where': 'ServiceReminderEvaluator: notification failed',
+            },
+          ),
+        );
       }
       fired.add(updated);
     }

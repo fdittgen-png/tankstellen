@@ -96,63 +96,67 @@ class _OpeningHoursViewState extends State<OpeningHoursView> {
   }
 
   /// True when every regular weekday is [DayState.open24h].
-  bool _isAllDay24h(WeeklyOpeningHours hours) => kRegularWeekdays
-      .every((d) => hours.dayFor(d)?.state == DayState.open24h);
+  bool _isAllDay24h(WeeklyOpeningHours hours) =>
+      kRegularWeekdays.every((d) => hours.dayFor(d)?.state == DayState.open24h);
 
   /// The collapsed week (consecutive identical days grouped) with an
   /// expand affordance; on expand, the full per-day table.
   List<Widget> _buildWeek(
     WeeklyOpeningHours hours,
     DateTime now,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) {
     final today = openingDayFromIsoWeekday(now.weekday);
     final rows = <Widget>[];
 
     if (_expanded) {
       for (final day in kRegularWeekdays) {
-        rows.add(_DayRow(
-          label: fullDayName(day, l10n),
-          value: dayValueText(hours.dayFor(day), l10n),
-          emphasised: day == today,
-        ));
+        rows.add(
+          _DayRow(
+            label: fullDayName(day, l10n),
+            value: dayValueText(hours.dayFor(day), l10n),
+            emphasised: day == today,
+          ),
+        );
       }
     } else {
       for (final group in _groupWeek(hours)) {
-        rows.add(_DayRow(
-          label: _groupLabel(group, l10n),
-          value: dayValueText(group.sample, l10n),
-          emphasised: group.containsDay(today),
-        ));
+        rows.add(
+          _DayRow(
+            label: _groupLabel(group, l10n),
+            value: dayValueText(group.sample, l10n),
+            emphasised: group.containsDay(today),
+          ),
+        );
       }
     }
 
-    rows.add(Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: TextButton(
-        key: const ValueKey('opening-hours-expand-toggle'),
-        onPressed: () => setState(() => _expanded = !_expanded),
-        child: Text(_expanded
-            ? (l10n?.showLessHours ?? 'Show less')
-            : (l10n?.showAllHours ?? 'Show all hours')),
+    rows.add(
+      Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton(
+          key: const ValueKey('opening-hours-expand-toggle'),
+          onPressed: () => setState(() => _expanded = !_expanded),
+          child: Text(_expanded ? (l10n.showLessHours) : (l10n.showAllHours)),
+        ),
       ),
-    ));
+    );
     return rows;
   }
 
-  String _groupLabel(_DayGroup group, AppLocalizations? l10n) {
+  String _groupLabel(_DayGroup group, AppLocalizations l10n) {
     if (group.from == group.to) return shortDayName(group.from, l10n);
     final from = shortDayName(group.from, l10n);
     final to = shortDayName(group.to, l10n);
-    return l10n?.dayRange(from, to) ?? '$from – $to';
+    return l10n.dayRange(from, to);
   }
 
-  Widget _buildHolidayRow(WeeklyOpeningHours hours, AppLocalizations? l10n) {
+  Widget _buildHolidayRow(WeeklyOpeningHours hours, AppLocalizations l10n) {
     final ph = hours.dayFor(OpeningDay.publicHoliday);
     if (ph == null) return const SizedBox.shrink();
     return _DayRow(
       key: const ValueKey('opening-hours-holiday-row'),
-      label: l10n?.publicHolidays ?? 'Public holidays',
+      label: l10n.publicHolidays,
       value: dayValueText(ph, l10n),
       emphasised: false,
     );
@@ -213,7 +217,7 @@ class _DayGroup {
 
 /// The muted single-line no-data state.
 class _NoDataLine extends StatelessWidget {
-  final AppLocalizations? l10n;
+  final AppLocalizations l10n;
 
   const _NoDataLine({required this.l10n});
 
@@ -225,14 +229,18 @@ class _NoDataLine extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: Spacing.md),
       child: Row(
         children: [
-          Icon(Icons.schedule,
-              size: 18, color: DarkModeColors.mutedText(context)),
+          Icon(
+            Icons.schedule,
+            size: 18,
+            color: DarkModeColors.mutedText(context),
+          ),
           const SizedBox(width: Spacing.lg),
           Expanded(
             child: Text(
-              l10n?.openingHoursNotAvailable ?? 'Opening hours not available',
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: DarkModeColors.mutedText(context)),
+              l10n.openingHoursNotAvailable,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: DarkModeColors.mutedText(context),
+              ),
             ),
           ),
         ],
@@ -243,7 +251,7 @@ class _NoDataLine extends StatelessWidget {
 
 /// The single "Open 24 hours" row shown for an around-the-clock station.
 class _Open24Row extends StatelessWidget {
-  final AppLocalizations? l10n;
+  final AppLocalizations l10n;
 
   const _Open24Row({super.key, required this.l10n});
 
@@ -254,13 +262,13 @@ class _Open24Row extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: Spacing.sm),
       child: Row(
         children: [
-          Icon(Icons.schedule,
-              size: 18, color: DarkModeColors.success(context)),
-          const SizedBox(width: Spacing.lg),
-          Text(
-            l10n?.open24Hours ?? 'Open 24 hours',
-            style: theme.textTheme.bodyMedium,
+          Icon(
+            Icons.schedule,
+            size: 18,
+            color: DarkModeColors.success(context),
           ),
+          const SizedBox(width: Spacing.lg),
+          Text(l10n.open24Hours, style: theme.textTheme.bodyMedium),
         ],
       ),
     );
@@ -270,7 +278,7 @@ class _Open24Row extends StatelessWidget {
 /// The "24/7 automate" indicator: an unattended pump open round-the-clock
 /// alongside the staffed boutique schedule (FR `Automate : 24/24`, #2742).
 class _Automate24Line extends StatelessWidget {
-  final AppLocalizations? l10n;
+  final AppLocalizations l10n;
 
   const _Automate24Line({required this.l10n});
 
@@ -282,11 +290,14 @@ class _Automate24Line extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: Spacing.xs),
       child: Row(
         children: [
-          Icon(Icons.local_gas_station,
-              size: 18, color: DarkModeColors.success(context)),
+          Icon(
+            Icons.local_gas_station,
+            size: 18,
+            color: DarkModeColors.success(context),
+          ),
           const SizedBox(width: Spacing.lg),
           Text(
-            l10n?.openingHoursAutomate24h ?? '24/7 automate',
+            l10n.openingHoursAutomate24h,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: DarkModeColors.success(context),
               fontWeight: FontWeight.w600,

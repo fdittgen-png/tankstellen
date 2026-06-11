@@ -40,11 +40,14 @@ class SharedTripsSection extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Row(
             children: [
-              Icon(Icons.group_outlined,
-                  size: 18, color: theme.colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.group_outlined,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 8),
               Text(
-                l?.trajetsSharedSectionTitle ?? 'Shared with me',
+                l.trajetsSharedSectionTitle,
                 style: theme.textTheme.titleSmall,
               ),
             ],

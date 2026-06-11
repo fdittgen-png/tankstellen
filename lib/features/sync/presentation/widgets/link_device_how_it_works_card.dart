@@ -30,21 +30,16 @@ class LinkDeviceHowItWorksCard extends StatelessWidget {
                 const Icon(Icons.info_outline, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  l10n?.linkDeviceHowItWorksTitle ?? 'How it works',
-                  style: theme.textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  l10n.linkDeviceHowItWorksTitle,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              l10n?.linkDeviceHowItWorksBody ??
-                  '1. On Device A: copy the device code above\n'
-                      '2. On Device B: paste it in the "Device code" field\n'
-                      '3. Tap "Import data" to merge favorites and alerts\n'
-                      '4. Both devices will have all combined data\n\n'
-                      'Each device keeps its own anonymous identity. '
-                      'Data is merged, not moved.',
+              l10n.linkDeviceHowItWorksBody,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

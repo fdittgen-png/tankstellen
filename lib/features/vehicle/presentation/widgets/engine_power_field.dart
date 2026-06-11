@@ -23,10 +23,7 @@ import '../../domain/entities/reference_vehicle.dart';
 class EnginePowerField extends StatefulWidget {
   final TextEditingController controller;
 
-  const EnginePowerField({
-    super.key,
-    required this.controller,
-  });
+  const EnginePowerField({super.key, required this.controller});
 
   @override
   State<EnginePowerField> createState() => _EnginePowerFieldState();
@@ -58,7 +55,7 @@ class _EnginePowerFieldState extends State<EnginePowerField> {
     // parses to a positive number, so an empty / bogus field doesn't
     // show a meaningless "≈ 0 PS".
     final helper = (ps != null && ps > 0)
-        ? (l?.vehiclePowerHelper(ps.toString()) ?? '≈ $ps PS')
+        ? (l.vehiclePowerHelper(ps.toString()))
         : null;
     return TextFormField(
       key: const Key('vehicle_engine_power_field'),
@@ -66,7 +63,7 @@ class _EnginePowerFieldState extends State<EnginePowerField> {
       keyboardType: const TextInputType.numberWithOptions(),
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       decoration: InputDecoration(
-        labelText: l?.vehiclePowerLabel ?? 'Engine power (kW)',
+        labelText: l.vehiclePowerLabel,
         helperText: helper,
       ),
       // Engine power is optional — an empty field must never block Save.

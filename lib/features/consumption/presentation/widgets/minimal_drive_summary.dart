@@ -48,8 +48,7 @@ class MinimalDriveSummary extends ConsumerWidget {
     // logic and keeps the widget's single responsibility.
     final belief = readActiveVehicleBelief(ref);
     if (belief != null &&
-        brokenMapBandFor(belief.pointEstimate) ==
-            BrokenMapBand.hardDisable) {
+        brokenMapBandFor(belief.pointEstimate) == BrokenMapBand.hardDisable) {
       return const SizedBox.shrink();
     }
 
@@ -77,19 +76,19 @@ class MinimalDriveSummary extends ConsumerWidget {
         ? <Widget>[
             _CoachingSymbol(
               icon: Icons.eco,
-              label: l?.coachingGpsLiftOff ?? 'Lift off',
+              label: l.coachingGpsLiftOff,
               active: gpsHint == DrivingCoachingHint.gpsLiftOffCoast,
               scheme: scheme,
             ),
             _CoachingSymbol(
               icon: Icons.visibility,
-              label: l?.coachingGpsAnticipateBrake ?? 'Anticipate',
+              label: l.coachingGpsAnticipateBrake,
               active: gpsHint == DrivingCoachingHint.gpsAnticipateBrake,
               scheme: scheme,
             ),
             _CoachingSymbol(
               icon: Icons.swipe_up,
-              label: l?.coachingGpsSmoothAccel ?? 'Smooth accel',
+              label: l.coachingGpsSmoothAccel,
               active: gpsHint == DrivingCoachingHint.gpsSmoothAccel,
               scheme: scheme,
             ),
@@ -97,19 +96,19 @@ class MinimalDriveSummary extends ConsumerWidget {
         : <Widget>[
             _CoachingSymbol(
               icon: Icons.keyboard_double_arrow_up,
-              label: l?.coachingShiftUp ?? 'Shift up',
+              label: l.coachingShiftUp,
               active: hint == DrivingCoachingHint.shiftUp,
               scheme: scheme,
             ),
             _CoachingSymbol(
               icon: Icons.keyboard_double_arrow_down,
-              label: l?.coachingShiftDown ?? 'Shift down',
+              label: l.coachingShiftDown,
               active: hint == DrivingCoachingHint.shiftDown,
               scheme: scheme,
             ),
             _CoachingSymbol(
               icon: Icons.eco,
-              label: l?.coachingEasePedal ?? 'Ease pedal',
+              label: l.coachingEasePedal,
               active: hint == DrivingCoachingHint.easePedal,
               scheme: scheme,
             ),
@@ -123,7 +122,7 @@ class MinimalDriveSummary extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              l?.minimalDriveInstantConsumption ?? 'Instant consumption',
+              l.minimalDriveInstantConsumption,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: scheme.onSurfaceVariant,
               ),

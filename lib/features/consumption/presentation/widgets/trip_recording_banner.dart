@@ -74,13 +74,27 @@ class TripRecordingBanner extends ConsumerWidget {
       // leaves them null so the tile degrades to the consumption layout.
       Station? radarStation;
       double? radiusMeters;
-      try { approach = ref.watch(effectiveApproachStateProvider); } on Object { /* fall back to null */ }
-      try { fuel = ref.watch(effectiveFuelTypeProvider); } on Object { /* keep e10 */ }
-      try { radarStation = ref.watch(nearestStationRadarProvider).value; } on Object { /* no radar station */ }
+      try {
+        approach = ref.watch(effectiveApproachStateProvider);
+      } on Object {
+        /* fall back to null */
+      }
+      try {
+        fuel = ref.watch(effectiveFuelTypeProvider);
+      } on Object {
+        /* keep e10 */
+      }
+      try {
+        radarStation = ref.watch(nearestStationRadarProvider).value;
+      } on Object {
+        /* no radar station */
+      }
       try {
         final p = ref.watch(activeProfileProvider);
         if (p != null) radiusMeters = p.approachRadiusKm * 1000.0;
-      } on Object { /* no radius */ }
+      } on Object {
+        /* no radius */
+      }
       // #2677 — guarded fallback for the on-search Fuel Station Radar PiP
       // (no trip required): when the trip radar found nothing AND the
       // on-search radar is active, feed its nearest priced station into the
@@ -95,7 +109,9 @@ class TripRecordingBanner extends ConsumerWidget {
             radarStation = ref.watch(radarSearchNearestProvider);
             radiusMeters = ref.watch(searchRadiusProvider) * 1000.0;
           }
-        } on Object { /* no on-search radar */ }
+        } on Object {
+          /* no on-search radar */
+        }
       }
       // #2964 — tapping the floating PiP tile body restores the full app.
       // Built here where `ref` is in scope; the controller is the app-wide
@@ -127,7 +143,8 @@ class TripRecordingBanner extends ConsumerWidget {
     // "reconnecting…" / terminal "tap to retry" banner ABOVE every screen,
     // decoupled from any live trip — a drop while idle still recovers.
     final reconnectState = ref.watch(obd2ReconnectProvider);
-    final reconnectVisible = reconnectState == Obd2ReconnectState.reconnecting ||
+    final reconnectVisible =
+        reconnectState == Obd2ReconnectState.reconnecting ||
         reconnectState == Obd2ReconnectState.terminalFailed ||
         // #3035 — the terminal engine-off banner is user-actionable too.
         reconnectState == Obd2ReconnectState.terminalEngineOff;
@@ -194,9 +211,13 @@ class TripRecordingBanner extends ConsumerWidget {
                       ref.read(routerProvider).push(RoutePaths.tripRecording),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     child: TripRecordingBannerContent(
-                        state: state, palette: bandColor),
+                      state: state,
+                      palette: bandColor,
+                    ),
                   ),
                 ),
               ),
@@ -282,11 +303,11 @@ class TripRecordingBanner extends ConsumerWidget {
     );
   }
 
-  String _semanticsLabel(TripRecordingState state, AppLocalizations? l) {
+  String _semanticsLabel(TripRecordingState state, AppLocalizations l) {
     if (state.phase == TripRecordingPhase.paused) {
-      return l?.tripBannerPaused ?? 'Trip paused';
+      return l.tripBannerPaused;
     }
-    final prefix = l?.tripBannerRecording ?? 'Recording trip';
+    final prefix = l.tripBannerRecording;
     final situation = _situationLabel(state.situation, l);
     final parts = <String>[prefix, situation];
     final delta = state.liveDeltaFraction;
@@ -307,13 +328,11 @@ class TripRecordingBanner extends ConsumerWidget {
     if (live != null &&
         formatInstantConsumption(live) == null &&
         live.gpsEstimatedLPer100Km != null) {
-      parts.add(l?.tripRecordingEstimatedInfo ??
-          'Estimated value (~) — modelled from GPS speed, not measured.');
+      parts.add(l.tripRecordingEstimatedInfo);
     }
     return parts.join(', ');
   }
 
-  String _situationLabel(DrivingSituation s, AppLocalizations? l) =>
+  String _situationLabel(DrivingSituation s, AppLocalizations l) =>
       situationDisplayLabel(s, l);
 }
-

@@ -23,7 +23,7 @@ const String _osmBrand = 'OpenStreetMap'; // i18n-ignore: brand / proper noun
 /// localizations are not yet available.
 String osmAttributionText(BuildContext context) {
   final l = AppLocalizations.of(context);
-  return l?.mapAttributionOsm(_osmBrand) ?? '© $_osmBrand contributors';
+  return l.mapAttributionOsm(_osmBrand);
 }
 
 /// The standard flutter_map [RichAttributionWidget] credit for the
@@ -37,9 +37,7 @@ class OsmAttribution extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RichAttributionWidget(
-      attributions: [
-        TextSourceAttribution(osmAttributionText(context)),
-      ],
+      attributions: [TextSourceAttribution(osmAttributionText(context))],
     );
   }
 }

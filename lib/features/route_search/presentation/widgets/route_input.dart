@@ -110,16 +110,20 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       final coords = LatLng(position.latitude, position.longitude);
       ref.read(routeInputControllerProvider.notifier).setStartCoords(coords);
       final l10n = AppLocalizations.of(context);
-      _startController.text = l10n?.currentLocation ?? 'Current location';
+      _startController.text = l10n.currentLocation;
     } catch (e, st) {
       // #2146 — route to the exportable log; the snackbar is transient.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'RouteInput._useGpsForStart',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'RouteInput._useGpsForStart'},
+        ),
+      );
       if (mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showError(
-            context, '${l10n?.gpsError ?? "GPS error"}: $e');
+        SnackBarHelper.showError(context, '${l10n.gpsError}: $e');
       }
     }
   }
@@ -174,8 +178,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
 
       // Resolve start if needed
       if (startCoords == null && _startController.text.isNotEmpty) {
-        final results =
-            await searchService.searchCities(_startController.text);
+        final results = await searchService.searchCities(_startController.text);
         if (results.isNotEmpty) {
           startCoords = LatLng(results.first.lat, results.first.lng);
           notifier.setStartCoords(startCoords);
@@ -196,8 +199,9 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         if (i < stopCoords.length &&
             stopCoords[i] == null &&
             _stopControllers[i].text.isNotEmpty) {
-          final results =
-              await searchService.searchCities(_stopControllers[i].text);
+          final results = await searchService.searchCities(
+            _stopControllers[i].text,
+          );
           if (results.isNotEmpty) {
             stopCoords[i] = LatLng(results.first.lat, results.first.lng);
             notifier.setStopCoord(i, stopCoords[i]);
@@ -216,9 +220,9 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
           !isUsableCoord(endCoords.latitude, endCoords.longitude)) {
         if (mounted) {
           SnackBarHelper.showError(
-              context,
-              AppLocalizations.of(context)?.couldNotResolve ??
-                  'Could not resolve start or destination');
+            context,
+            AppLocalizations.of(context).couldNotResolve,
+          );
         }
         return;
       }
@@ -251,12 +255,19 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       widget.onSearch(waypoints);
     } catch (e, st) {
       // #2146 — route to the exportable log; the snackbar is transient.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'RouteInput.resolveAndSearch',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'RouteInput.resolveAndSearch'},
+        ),
+      );
       if (mounted) {
-        SnackBarHelper.showError(context,
-            '${AppLocalizations.of(context)?.errorUnknown ?? "Error"}: $e');
+        SnackBarHelper.showError(
+          context,
+          '${AppLocalizations.of(context).errorUnknown}: $e',
+        );
       }
     } finally {
       // #2139 — always reset isSearching, even if the widget unmounted
@@ -284,17 +295,18 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         CityAutocompleteField(
           controller: _startController,
           searchService: searchService,
-          label: l10n?.start ?? 'Start',
-          hint: l10n?.cityAddressOrGps ?? 'City, address, or GPS',
+          label: l10n.start,
+          hint: l10n.cityAddressOrGps,
           prefixIcon: Icons.trip_origin,
           suffixWidget: IconButton(
             icon: const Icon(Icons.my_location, size: 18),
             onPressed: _useGpsForStart,
-            tooltip: l10n?.useGps ?? 'Use GPS',
+            tooltip: l10n.useGps,
           ),
           onCitySelected: _onStartCitySelected,
-          onTextChanged: () =>
-              ref.read(routeInputControllerProvider.notifier).setStartCoords(null),
+          onTextChanged: () => ref
+              .read(routeInputControllerProvider.notifier)
+              .setStartCoords(null),
         ),
         const SizedBox(height: 6),
 
@@ -305,12 +317,12 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
             child: CityAutocompleteField(
               controller: _stopControllers[i],
               searchService: searchService,
-              label: '${l10n?.stop ?? "Stop"} ${i + 1}',
-              hint: l10n?.cityOrAddress ?? 'City or address',
+              label: '${l10n.stop} ${i + 1}',
+              hint: l10n.cityOrAddress,
               prefixIcon: Icons.more_vert,
               suffixWidget: IconButton(
                 icon: const Icon(Icons.close, size: 16),
-                tooltip: l10n?.remove ?? 'Remove',
+                tooltip: l10n.remove,
                 onPressed: () => _removeStop(i),
               ),
               onCitySelected: (city) => _onStopCitySelected(i, city),
@@ -327,8 +339,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
             child: TextButton.icon(
               onPressed: _addStop,
               icon: const Icon(Icons.add, size: 16),
-              label: Text(l10n?.addStop ?? 'Add stop',
-                  style: theme.textTheme.bodySmall),
+              label: Text(l10n.addStop, style: theme.textTheme.bodySmall),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 minimumSize: const Size(0, 32),
@@ -340,12 +351,13 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         CityAutocompleteField(
           controller: _endController,
           searchService: searchService,
-          label: l10n?.destination ?? 'Destination',
-          hint: l10n?.cityOrAddress ?? 'City or address',
+          label: l10n.destination,
+          hint: l10n.cityOrAddress,
           prefixIcon: Icons.place,
           onCitySelected: _onEndCitySelected,
-          onTextChanged: () =>
-              ref.read(routeInputControllerProvider.notifier).setEndCoords(null),
+          onTextChanged: () => ref
+              .read(routeInputControllerProvider.notifier)
+              .setEndCoords(null),
         ),
         // #2131 — the inline "Search along route" submit button moved
         // to the central FAB. RouteInput now owns inputs only;

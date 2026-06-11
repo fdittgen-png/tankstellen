@@ -48,10 +48,11 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final summary =
-        enabled ? computeObd2DiagnosticsSummary(session) : Obd2DiagnosticsSummary.empty;
+    final summary = enabled
+        ? computeObd2DiagnosticsSummary(session)
+        : Obd2DiagnosticsSummary.empty;
 
-    final title = l?.obd2DiagnosticsTitle ?? 'OBD2 communication health';
+    final title = l.obd2DiagnosticsTitle;
 
     if (!summary.presentable) {
       return Card(
@@ -61,9 +62,7 @@ class Obd2DiagnosticsCard extends StatelessWidget {
           leading: const Icon(Icons.bluetooth_disabled_outlined),
           title: Text(title, style: theme.textTheme.titleMedium),
           subtitle: Text(
-            l?.obd2DiagnosticsEmpty ??
-                'No OBD2 session recorded yet — connect an adapter and '
-                    'record a trip with Developer mode on.',
+            l.obd2DiagnosticsEmpty,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -72,13 +71,11 @@ class Obd2DiagnosticsCard extends StatelessWidget {
       );
     }
 
-    final headerLine = l?.obd2DiagnosticsHeader(
-          summary.completenessPercent.toString(),
-          summary.activeDutyPercent.toString(),
-          summary.drops,
-        ) ??
-        '${summary.completenessPercent}% complete · '
-            '${summary.activeDutyPercent}% duty · ${summary.drops} drops';
+    final headerLine = l.obd2DiagnosticsHeader(
+      summary.completenessPercent.toString(),
+      summary.activeDutyPercent.toString(),
+      summary.drops,
+    );
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -114,9 +111,7 @@ class Obd2DiagnosticsCard extends StatelessWidget {
             ),
           const SizedBox(height: 12),
           Text(
-            l?.obd2DiagnosticsExplain ??
-                'Captured while recording to debug the dongle↔app '
-                    'communication — only collected in Developer mode.',
+            l.obd2DiagnosticsExplain,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -127,47 +122,41 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   }
 
   Widget _sectionHeader(ThemeData theme, String text) => Padding(
-        padding: const EdgeInsets.only(top: 12, bottom: 4),
-        child: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(
-            text,
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: theme.colorScheme.primary,
-            ),
-          ),
+    padding: const EdgeInsets.only(top: 12, bottom: 4),
+    child: Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Text(
+        text,
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: theme.colorScheme.primary,
         ),
-      );
+      ),
+    ),
+  );
 
   Widget _line(ThemeData theme, String text, {Key? key}) => Align(
-        key: key,
-        alignment: AlignmentDirectional.centerStart,
-        child: Text(text, style: theme.textTheme.bodyMedium),
-      );
+    key: key,
+    alignment: AlignmentDirectional.centerStart,
+    child: Text(text, style: theme.textTheme.bodyMedium),
+  );
 
   // ---- Adapter identity -------------------------------------------------
   Widget _adapterSection(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     ThemeData theme,
   ) {
     const dash = '—';
-    final identity = l?.obd2DiagnosticsAdapterIdentity(
-          session.redactedMac ?? dash,
-          session.elmVersion ?? dash,
-          session.protocolDigit ?? dash,
-          session.mtu?.toString() ?? dash,
-        ) ??
-        '${session.redactedMac ?? dash} · ${session.elmVersion ?? dash} · '
-            'protocol ${session.protocolDigit ?? dash} · '
-            'MTU ${session.mtu?.toString() ?? dash}';
+    final identity = l.obd2DiagnosticsAdapterIdentity(
+      session.redactedMac ?? dash,
+      session.elmVersion ?? dash,
+      session.protocolDigit ?? dash,
+      session.mtu?.toString() ?? dash,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader(
-          theme,
-          l?.obd2DiagnosticsAdapterSection ?? 'Adapter',
-        ),
+        _sectionHeader(theme, l.obd2DiagnosticsAdapterSection),
         _line(theme, identity, key: const Key('obd2_diag_adapter_line')),
       ],
     );
@@ -176,7 +165,7 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   // ---- Connection lifecycle --------------------------------------------
   Widget _connectionSection(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     ThemeData theme,
     Obd2DiagnosticsSummary summary,
   ) {
@@ -184,28 +173,21 @@ class Obd2DiagnosticsCard extends StatelessWidget {
     final conn = session.connection;
     final p50 = conn.timeToConnectP50Ms?.toString() ?? dash;
     final p95 = conn.timeToConnectP95Ms?.toString() ?? dash;
-    final line = l?.obd2DiagnosticsConnectionLine(
-          conn.attempts,
-          conn.successes,
-          conn.drops,
-          p50,
-          p95,
-        ) ??
-        '${conn.attempts} attempts · ${conn.successes} ok · '
-            '${conn.drops} drops · time-to-connect p50 $p50 / p95 $p95';
-    final reconnects = l?.obd2DiagnosticsReconnectLine(
-          conn.silentReconnects,
-          conn.visibleReconnects,
-        ) ??
-        'Reconnects: ${conn.silentReconnects} silent · '
-            '${conn.visibleReconnects} visible';
+    final line = l.obd2DiagnosticsConnectionLine(
+      conn.attempts,
+      conn.successes,
+      conn.drops,
+      p50,
+      p95,
+    );
+    final reconnects = l.obd2DiagnosticsReconnectLine(
+      conn.silentReconnects,
+      conn.visibleReconnects,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader(
-          theme,
-          l?.obd2DiagnosticsConnectionSection ?? 'Connection lifecycle',
-        ),
+        _sectionHeader(theme, l.obd2DiagnosticsConnectionSection),
         _line(theme, line, key: const Key('obd2_diag_connection_line')),
         const SizedBox(height: 4),
         _line(theme, reconnects),
@@ -216,17 +198,14 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   // ---- Per-PID outcome table -------------------------------------------
   Widget _pidSection(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     ThemeData theme,
     Obd2DiagnosticsSummary summary,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader(
-          theme,
-          l?.obd2DiagnosticsPidSection ?? 'Per-PID outcomes',
-        ),
+        _sectionHeader(theme, l.obd2DiagnosticsPidSection),
         for (final row in summary.pidRows)
           _line(
             theme,
@@ -237,50 +216,41 @@ class Obd2DiagnosticsCard extends StatelessWidget {
     );
   }
 
-  String _pidRowText(AppLocalizations? l, Obd2PidRowView row) {
+  String _pidRowText(AppLocalizations l, Obd2PidRowView row) {
     final s = row.stat;
     final eff = s.effectiveHz.toStringAsFixed(2);
     final target = s.targetHz.toStringAsFixed(2);
-    return l?.obd2DiagnosticsPidRow(
-          row.pid,
-          s.polled,
-          s.ok,
-          s.noData,
-          s.timeout,
-          s.error,
-          s.latencyP50Ms,
-          s.latencyP95Ms,
-          eff,
-          target,
-        ) ??
-        '${row.pid}: ${s.polled} polled · ${s.ok} ok · ${s.noData} ND · '
-            '${s.timeout} TO · ${s.error} err · '
-            'p50 ${s.latencyP50Ms} / p95 ${s.latencyP95Ms} ms · '
-            '$eff/$target Hz';
+    return l.obd2DiagnosticsPidRow(
+      row.pid,
+      s.polled,
+      s.ok,
+      s.noData,
+      s.timeout,
+      s.error,
+      s.latencyP50Ms,
+      s.latencyP95Ms,
+      eff,
+      target,
+    );
   }
 
   // ---- Scheduler health -------------------------------------------------
   Widget _schedulerSection(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     ThemeData theme,
   ) {
     final sch = session.scheduler;
     final tickRate = sch.tickRateHz.toStringAsFixed(1);
-    final line = l?.obd2DiagnosticsSchedulerLine(
-          tickRate,
-          sch.backpressureSkips,
-          sch.demotions,
-        ) ??
-        '$tickRate Hz tick · ${sch.backpressureSkips} back-pressure skips · '
-            '${sch.demotions} demotions';
+    final line = l.obd2DiagnosticsSchedulerLine(
+      tickRate,
+      sch.backpressureSkips,
+      sch.demotions,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader(
-          theme,
-          l?.obd2DiagnosticsSchedulerSection ?? 'Scheduler health',
-        ),
+        _sectionHeader(theme, l.obd2DiagnosticsSchedulerSection),
         _line(theme, line, key: const Key('obd2_diag_scheduler_line')),
         if (sch.starved) ...[
           const SizedBox(height: 4),
@@ -288,9 +258,7 @@ class Obd2DiagnosticsCard extends StatelessWidget {
             key: const Key('obd2_diag_starved'),
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              l?.obd2DiagnosticsStarved ??
-                  'Dynamics tier starved — RPM / speed fell below the '
-                      'governor floor.',
+              l.obd2DiagnosticsStarved,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.error,
               ),
@@ -304,29 +272,23 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   // ---- Completeness rollup ---------------------------------------------
   Widget _completenessSection(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     ThemeData theme,
     Obd2DiagnosticsSummary summary,
   ) {
-    final overall = l?.obd2DiagnosticsCompletenessLine(
-          summary.completenessPercent.toString(),
-          summary.activeDutyPercent.toString(),
-        ) ??
-        'Overall ${summary.completenessPercent}% · '
-            'active duty ${summary.activeDutyPercent}%';
+    final overall = l.obd2DiagnosticsCompletenessLine(
+      summary.completenessPercent.toString(),
+      summary.activeDutyPercent.toString(),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader(
-          theme,
-          l?.obd2DiagnosticsCompletenessSection ?? 'Completeness',
-        ),
+        _sectionHeader(theme, l.obd2DiagnosticsCompletenessSection),
         _line(theme, overall, key: const Key('obd2_diag_completeness_line')),
         for (final entry in summary.perTierPercent.entries)
           _line(
             theme,
-            l?.obd2DiagnosticsTierLine(entry.key, entry.value.toString()) ??
-                '${entry.key}: ${entry.value}%',
+            l.obd2DiagnosticsTierLine(entry.key, entry.value.toString()),
             key: Key('obd2_diag_tier_${entry.key}'),
           ),
       ],
@@ -336,25 +298,19 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   // ---- Discovered-supported tri-state ----------------------------------
   Widget _supportSection(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     ThemeData theme,
     Obd2DiagnosticsSummary summary,
   ) {
-    final line = l?.obd2DiagnosticsSupportLine(
-          summary.supportedCount,
-          summary.unsupportedCount,
-          summary.unknownCount,
-        ) ??
-        '${summary.supportedCount} supported · '
-            '${summary.unsupportedCount} unsupported · '
-            '${summary.unknownCount} unknown';
+    final line = l.obd2DiagnosticsSupportLine(
+      summary.supportedCount,
+      summary.unsupportedCount,
+      summary.unknownCount,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader(
-          theme,
-          l?.obd2DiagnosticsSupportSection ?? 'Discovered-supported PIDs',
-        ),
+        _sectionHeader(theme, l.obd2DiagnosticsSupportSection),
         _line(theme, line, key: const Key('obd2_diag_support_line')),
       ],
     );
@@ -363,23 +319,18 @@ class Obd2DiagnosticsCard extends StatelessWidget {
   // ---- Fuel-tier rollup -------------------------------------------------
   Widget _fuelSection(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     ThemeData theme,
     Obd2DiagnosticsSummary summary,
   ) {
-    final line = l?.obd2DiagnosticsFuelLine(
-          summary.fuelSuspicious,
-          summary.fuelTotal,
-        ) ??
-        'Suspicious ${summary.fuelSuspicious} of ${summary.fuelTotal} '
-            'samples';
+    final line = l.obd2DiagnosticsFuelLine(
+      summary.fuelSuspicious,
+      summary.fuelTotal,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _sectionHeader(
-          theme,
-          l?.obd2DiagnosticsFuelSection ?? 'Fuel-tier rollup',
-        ),
+        _sectionHeader(theme, l.obd2DiagnosticsFuelSection),
         _line(theme, line, key: const Key('obd2_diag_fuel_line')),
       ],
     );

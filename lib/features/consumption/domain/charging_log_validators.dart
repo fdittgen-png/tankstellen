@@ -7,10 +7,8 @@ import '../../../l10n/app_localizations.dart';
 /// (#582 phase 2). Pulled out of `add_charging_log_screen.dart` so the
 /// rules can be unit-tested without pumping a full widget tree.
 ///
-/// All validators accept `null` localizations for tests / golden
-/// fallbacks and degrade to English defaults — the same pattern used
-/// elsewhere in the codebase (see `AppLocalizations.of(context)?.x ??
-/// 'Fallback'`).
+/// Validators take a non-nullable [AppLocalizations] (#3162) — unit
+/// tests drive them with the pure `lookupAppLocalizations` constructor.
 class ChargingLogValidators {
   ChargingLogValidators._();
 
@@ -18,13 +16,13 @@ class ChargingLogValidators {
   /// for kWh, cost, and odometer fields — all three must be > 0 for a
   /// charging log to make sense (you can't charge nothing, pay
   /// nothing, or have a zero-km odometer).
-  static String? positiveNumber(String? value, AppLocalizations? l) {
+  static String? positiveNumber(String? value, AppLocalizations l) {
     if (value == null || value.trim().isEmpty) {
-      return l?.fieldRequired ?? 'Required';
+      return l.fieldRequired;
     }
     final parsed = double.tryParse(value.replaceAll(',', '.'));
     if (parsed == null || parsed <= 0) {
-      return l?.fieldInvalidNumber ?? 'Invalid number';
+      return l.fieldInvalidNumber;
     }
     return null;
   }
@@ -32,13 +30,13 @@ class ChargingLogValidators {
   /// Validates that [value] parses to a non-negative integer. Used for
   /// the charge-time-minutes field — 0 is allowed (slow chargers can
   /// log a zero-minute session if the user hasn't measured it).
-  static String? nonNegativeInt(String? value, AppLocalizations? l) {
+  static String? nonNegativeInt(String? value, AppLocalizations l) {
     if (value == null || value.trim().isEmpty) {
-      return l?.fieldRequired ?? 'Required';
+      return l.fieldRequired;
     }
     final parsed = int.tryParse(value.replaceAll(',', '.').split('.').first);
     if (parsed == null || parsed < 0) {
-      return l?.fieldInvalidNumber ?? 'Invalid number';
+      return l.fieldInvalidNumber;
     }
     return null;
   }

@@ -28,7 +28,7 @@ class GlobeIllustration extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: l10n?.globeIllustrationSemantic ?? 'Globe with fuel station markers',
+      label: l10n.globeIllustrationSemantic,
       image: true,
       child: SizedBox(
         width: size,
@@ -42,20 +42,13 @@ class GlobeIllustration extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [
-                    scheme.surface,
-                    scheme.surfaceContainerLow,
-                  ],
+                  colors: [scheme.surface, scheme.surfaceContainerLow],
                   stops: const [0.3, 1.0],
                 ),
               ),
             ),
             // Central globe glyph.
-            Icon(
-              Icons.public,
-              size: size * 0.6,
-              color: scheme.primary,
-            ),
+            Icon(Icons.public, size: size * 0.6, color: scheme.primary),
             // Three location markers arranged at 10 / 2 / 6 o'clock around
             // the globe to hint at "multi-country coverage".
             Positioned(
@@ -96,11 +89,7 @@ class _Marker extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       alignment: Alignment.center,
-      child: Icon(
-        Icons.local_gas_station,
-        size: size * 0.65,
-        color: color,
-      ),
+      child: Icon(Icons.local_gas_station, size: size * 0.65, color: color),
     );
   }
 }

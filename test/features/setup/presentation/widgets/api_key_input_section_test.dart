@@ -35,6 +35,8 @@ const _germanyNoUrl = CountryConfig(
 );
 
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   group('ApiKeyInputSection', () {
     Future<void> pumpSection(
       WidgetTester tester, {
@@ -59,7 +61,7 @@ void main() {
                 country: country,
                 controller: ctrl,
                 formatValid: formatValid,
-                l10n: null,
+                l10n: l10nEn,
               ),
             ),
           ),
@@ -67,8 +69,9 @@ void main() {
       );
     }
 
-    testWidgets('shows no validation indicator when format state is null',
-        (tester) async {
+    testWidgets('shows no validation indicator when format state is null', (
+      tester,
+    ) async {
       await pumpSection(tester, formatValid: null);
       expect(find.byIcon(Icons.check_circle), findsNothing);
       expect(find.byIcon(Icons.error_outline), findsNothing);
@@ -83,8 +86,9 @@ void main() {
       );
     });
 
-    testWidgets('shows red error icon and error text when format is invalid',
-        (tester) async {
+    testWidgets('shows red error icon and error text when format is invalid', (
+      tester,
+    ) async {
       await pumpSection(tester, formatValid: false);
       final icon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
       expect(
@@ -97,35 +101,36 @@ void main() {
       );
     });
 
-    testWidgets('renders the registration button when a URL is configured',
-        (tester) async {
+    testWidgets('renders the registration button when a URL is configured', (
+      tester,
+    ) async {
       await pumpSection(tester, formatValid: null);
       expect(find.text('Tankerkoenig Registration'), findsOneWidget);
       expect(find.byIcon(Icons.open_in_new), findsOneWidget);
     });
 
-    testWidgets('omits the registration button when no URL is configured',
-        (tester) async {
+    testWidgets('omits the registration button when no URL is configured', (
+      tester,
+    ) async {
       await pumpSection(tester, formatValid: null, country: _germanyNoUrl);
       expect(find.text('Tankerkoenig Registration'), findsNothing);
       expect(find.byIcon(Icons.open_in_new), findsNothing);
     });
 
-    testWidgets('routes typed text into the supplied controller',
-        (tester) async {
+    testWidgets('routes typed text into the supplied controller', (
+      tester,
+    ) async {
       final controller = TextEditingController();
       await pumpSection(tester, formatValid: null, controller: controller);
       await tester.enterText(find.byType(TextField), 'abc-123');
       expect(controller.text, 'abc-123');
     });
 
-    testWidgets('renders the terms-of-use disclaimer with provider name',
-        (tester) async {
+    testWidgets('renders the terms-of-use disclaimer with provider name', (
+      tester,
+    ) async {
       await pumpSection(tester, formatValid: null);
-      expect(
-        find.textContaining('Tankerkoenig'),
-        findsAtLeast(1),
-      );
+      expect(find.textContaining('Tankerkoenig'), findsAtLeast(1));
       expect(
         find.textContaining('Data redistribution is prohibited.'),
         findsOneWidget,

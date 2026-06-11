@@ -46,9 +46,11 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     // when the user is on the Alerts tab (Share v1 only supports the
     // Favorites tab — see #1344).
     _tabController.addListener(_handleTabChange);
-    unawaited(Future.microtask(() {
-      unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
-    }));
+    unawaited(
+      Future.microtask(() {
+        unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
+      }),
+    );
   }
 
   void _handleTabChange() {
@@ -77,32 +79,31 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
 
     // Reload favorites when the auth identity changes
     // (anonymous -> email, reconnect, disconnect, etc.)
-    ref.listen(
-      syncStateProvider.select((s) => s.userId),
-      (prev, next) {
-        if (prev != next) {
-          unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
-        }
-      },
-    );
+    ref.listen(syncStateProvider.select((s) => s.userId), (prev, next) {
+      if (prev != next) {
+        unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
+      }
+    });
 
     return PageScaffold(
-      title: l10n?.favorites ?? 'Favorites',
+      title: l10n.favorites,
       actions: [
         if (favoriteIds.isNotEmpty && isFavoritesTab)
           IconButton(
             key: const Key('favorites_share_button'),
             icon: const Icon(Icons.share),
-            tooltip: l10n?.favoritesShareAction ?? 'Share',
+            tooltip: l10n.favoritesShareAction,
             onPressed: () => _onShare(context, l10n),
           ),
         if (favoriteIds.isNotEmpty)
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              unawaited(ref.read(favoriteStationsProvider.notifier).loadAndRefresh());
+              unawaited(
+                ref.read(favoriteStationsProvider.notifier).loadAndRefresh(),
+              );
             },
-            tooltip: l10n?.refreshPrices ?? 'Refresh prices',
+            tooltip: l10n.refreshPrices,
           ),
         const SettingsAppBarAction(),
       ],
@@ -115,7 +116,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     );
   }
 
-  Widget _buildBody(BuildContext context, AppLocalizations? l10n) {
+  Widget _buildBody(BuildContext context, AppLocalizations l10n) {
     final media = MediaQuery.of(context);
     final isLandscape = media.orientation == Orientation.landscape;
     final isWide = media.size.width >= 600;
@@ -139,12 +140,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
         TabSwitcher(
           controller: _tabController,
           tabs: [
+            TabSwitcherEntry(label: l10n.favorites, icon: Icons.star_outline),
             TabSwitcherEntry(
-              label: l10n?.favorites ?? 'Favorites',
-              icon: Icons.star_outline,
-            ),
-            TabSwitcherEntry(
-              label: l10n?.priceAlerts ?? 'Price Alerts',
+              label: l10n.priceAlerts,
               icon: Icons.notifications_outlined,
             ),
           ],
@@ -165,18 +163,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
     );
   }
 
-  Future<void> _onShare(
-    BuildContext context,
-    AppLocalizations? l10n,
-  ) async {
+  Future<void> _onShare(BuildContext context, AppLocalizations l10n) async {
     // Compose a friendly subject line so the OS share sheet (and the
     // receiving app's preview) shows "Tankstellen — favourites on
     // <date>" instead of a bare filename.
     final locale = Localizations.localeOf(context);
-    final formattedDate =
-        DateFormat.yMMMd(locale.toString()).format(DateTime.now());
-    final subject = l10n?.favoritesShareSubject(formattedDate) ??
-        'Sparkilo — favourites on $formattedDate';
+    final formattedDate = DateFormat.yMMMd(
+      locale.toString(),
+    ).format(DateTime.now());
+    final subject = l10n.favoritesShareSubject(formattedDate);
     // Filename stem uses ISO-style yyyyMMdd so the filename is stable
     // and locale-independent (the user-visible subject still carries
     // the localised date).
@@ -194,10 +189,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
       // Surface the failure to the user instead of silently swallowing
       // it — the snackbar tells them the share didn't go through, and
       // the debugPrint keeps the cause in `flutter logs` for support.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'FavoritesScreen share image'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'FavoritesScreen share image'},
+        ),
+      );
       if (messenger == null) return;
-      final errorMsg = l10n?.favoritesShareError ??
-          "Couldn't generate share image";
+      final errorMsg = l10n.favoritesShareError;
       messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
     }
   }

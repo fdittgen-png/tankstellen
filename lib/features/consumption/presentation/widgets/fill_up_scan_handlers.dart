@@ -127,10 +127,7 @@ Future<void> runReceiptScan(
 
     if (!outcome.parse.hasData) {
       if (context.mounted) {
-        SnackBarHelper.show(
-          context,
-          l?.scanReceiptNoData ?? 'No receipt data found — try again',
-        );
+        SnackBarHelper.show(context, l.scanReceiptNoData);
       }
       return;
     }
@@ -141,14 +138,16 @@ Future<void> runReceiptScan(
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-      'where': 'runReceiptScan: receipt scan failed'
-    }));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {'where': 'runReceiptScan: receipt scan failed'},
+      ),
+    );
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.showError(
-        context,
-        l?.scanReceiptFailed(e.toString()) ?? 'Scan failed: $e',
-      );
+      SnackBarHelper.showError(context, l.scanReceiptFailed(e.toString()));
     }
   } finally {
     if (state.isMounted()) state.setScanning(false);
@@ -188,12 +187,7 @@ Future<void> runPumpDisplayScan(
     if (outcome.glareRejected) {
       await state.readService()?.deleteCapturedImage(outcome.imagePath);
       if (state.isMounted() && context.mounted) {
-        SnackBarHelper.show(
-          context,
-          l?.scanPumpGlare ??
-              'Too much glare on the display — try again at a slight '
-                  'angle so the numbers aren\'t washed out.',
-        );
+        SnackBarHelper.show(context, l.scanPumpGlare);
       }
       return;
     }
@@ -211,11 +205,7 @@ Future<void> runPumpDisplayScan(
         // ask the user to enter the values manually.
         await state.readService()?.deleteCapturedImage(outcome.imagePath);
         if (state.isMounted() && context.mounted) {
-          SnackBarHelper.show(
-            context,
-            l?.scanPumpInconsistent ??
-                'The scanned values don\'t add up — please enter them manually.',
-          );
+          SnackBarHelper.show(context, l.scanPumpInconsistent);
         }
         return;
       case PumpScanDisposition.autofill:
@@ -228,20 +218,21 @@ Future<void> runPumpDisplayScan(
       state.costCtrl.text = result.totalCost!.toStringAsFixed(2);
     }
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.show(
-        context,
-        l?.scanPumpSuccess ?? 'Pump display scanned — verify the values.',
-      );
+      SnackBarHelper.show(context, l.scanPumpSuccess);
     }
   } catch (e, st) {
-    unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-      'where': 'runPumpDisplayScan: pump display scan failed'
-    }));
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        e,
+        st,
+        context: const {
+          'where': 'runPumpDisplayScan: pump display scan failed',
+        },
+      ),
+    );
     if (state.isMounted() && context.mounted) {
-      SnackBarHelper.showError(
-        context,
-        l?.scanPumpFailed(e.toString()) ?? 'Pump scan failed: $e',
-      );
+      SnackBarHelper.showError(context, l.scanPumpFailed(e.toString()));
     }
   } finally {
     if (state.isMounted()) state.setScanningPump(false);
@@ -293,8 +284,7 @@ Future<void> reportBadPumpScan(
   FillUpScanHostState state,
   PumpDisplayScanOutcome outcome,
 ) async {
-  final liters =
-      double.tryParse(state.litersCtrl.text.replaceAll(',', '.'));
+  final liters = double.tryParse(state.litersCtrl.text.replaceAll(',', '.'));
   final cost = double.tryParse(state.costCtrl.text.replaceAll(',', '.'));
   await showModalBottomSheet<void>(
     context: context,
@@ -318,8 +308,7 @@ Future<void> reportBadReceiptScan(
   FillUpScanHostState state,
   ReceiptScanOutcome scan,
 ) async {
-  final liters =
-      double.tryParse(state.litersCtrl.text.replaceAll(',', '.'));
+  final liters = double.tryParse(state.litersCtrl.text.replaceAll(',', '.'));
   final cost = double.tryParse(state.costCtrl.text.replaceAll(',', '.'));
   await showModalBottomSheet<void>(
     context: context,

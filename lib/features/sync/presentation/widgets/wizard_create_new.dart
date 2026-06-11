@@ -45,9 +45,11 @@ class WizardCreateNew extends StatelessWidget {
         const SizedBox(height: 16),
 
         Text(
-            l10n?.syncWizardStepOfSteps(currentStep + 1, steps.length + 1) ??
-                'Step ${currentStep + 1} of ${steps.length + 1}',
-            style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary)),
+          l10n.syncWizardStepOfSteps(currentStep + 1, steps.length + 1),
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: theme.colorScheme.primary,
+          ),
+        ),
         const SizedBox(height: 8),
         Text(step.title, style: theme.textTheme.titleMedium),
         const SizedBox(height: 16),
@@ -62,7 +64,10 @@ class WizardCreateNew extends StatelessWidget {
 
         if (step.actionUrl != null)
           OutlinedButton.icon(
-            onPressed: () => launchUrl(Uri.parse(step.actionUrl!), mode: LaunchMode.externalApplication),
+            onPressed: () => launchUrl(
+              Uri.parse(step.actionUrl!),
+              mode: LaunchMode.externalApplication,
+            ),
             icon: const Icon(Icons.open_in_new),
             label: Text(step.actionLabel),
           ),
@@ -73,10 +78,8 @@ class WizardCreateNew extends StatelessWidget {
           TextField(
             controller: urlController,
             decoration: InputDecoration(
-              labelText:
-                  l10n?.syncWizardSupabaseUrlLabel ?? 'Supabase URL',
-              hintText: l10n?.syncWizardSupabaseUrlHint ??
-                  'https://your-project.supabase.co',
+              labelText: l10n.syncWizardSupabaseUrlLabel,
+              hintText: l10n.syncWizardSupabaseUrlHint,
               border: const OutlineInputBorder(),
               prefixIcon: const Icon(Icons.link),
             ),
@@ -91,17 +94,14 @@ class WizardCreateNew extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             if (currentStep > 0)
-              TextButton(
-                onPressed: onBack,
-                child: Text(l10n?.syncWizardBack ?? 'Back'),
-              )
+              TextButton(onPressed: onBack, child: Text(l10n.syncWizardBack))
             else
               const SizedBox(),
             FilledButton(
               onPressed: currentStep < 2 ? onNext : onContinue,
-              child: Text(currentStep < 2
-                  ? (l10n?.syncWizardNext ?? 'Next')
-                  : (l10n?.continueButton ?? 'Continue')),
+              child: Text(
+                currentStep < 2 ? (l10n.syncWizardNext) : (l10n.continueButton),
+              ),
             ),
           ],
         ),
@@ -109,37 +109,23 @@ class WizardCreateNew extends StatelessWidget {
     );
   }
 
-  static List<_GuideStep> _guideSteps(AppLocalizations? l10n) => [
+  static List<_GuideStep> _guideSteps(AppLocalizations l10n) => [
     _GuideStep(
-      title: l10n?.syncWizardCreateSupabaseTitle ?? 'Create a Supabase project',
-      instructions: l10n?.syncWizardCreateSupabaseInstructions ??
-          '1. Tap "Open Supabase" below\n'
-              '2. Create a free account (if you don\'t have one)\n'
-              '3. Click "New Project"\n'
-              '4. Choose a name and region\n'
-              '5. Wait ~2 minutes for it to start',
-      actionLabel: l10n?.syncWizardOpenSupabase ?? 'Open Supabase',
+      title: l10n.syncWizardCreateSupabaseTitle,
+      instructions: l10n.syncWizardCreateSupabaseInstructions,
+      actionLabel: l10n.syncWizardOpenSupabase,
       actionUrl: 'https://supabase.com/dashboard/new',
     ),
     _GuideStep(
-      title: l10n?.syncWizardEnableAnonTitle ?? 'Enable Anonymous Sign-ins',
-      instructions: l10n?.syncWizardEnableAnonInstructions ??
-          '1. In your Supabase dashboard:\n'
-              '   Authentication → Providers\n'
-              '2. Find "Anonymous Sign-ins"\n'
-              '3. Toggle it ON\n'
-              '4. Click "Save"',
-      actionLabel: l10n?.syncWizardOpenAuthSettings ?? 'Open Auth Settings',
+      title: l10n.syncWizardEnableAnonTitle,
+      instructions: l10n.syncWizardEnableAnonInstructions,
+      actionLabel: l10n.syncWizardOpenAuthSettings,
       actionUrl: null,
     ),
     _GuideStep(
-      title: l10n?.syncWizardCopyCredentialsTitle ?? 'Copy your credentials',
-      instructions: l10n?.syncWizardCopyCredentialsInstructions ??
-          '1. Go to Settings → API in your dashboard\n'
-              '2. Copy the "Project URL"\n'
-              '3. Copy the "anon public" key\n'
-              '4. Paste them below',
-      actionLabel: l10n?.syncWizardOpenApiSettings ?? 'Open API Settings',
+      title: l10n.syncWizardCopyCredentialsTitle,
+      instructions: l10n.syncWizardCopyCredentialsInstructions,
+      actionLabel: l10n.syncWizardOpenApiSettings,
       actionUrl: null,
     ),
   ];
@@ -150,5 +136,10 @@ class _GuideStep {
   final String instructions;
   final String actionLabel;
   final String? actionUrl;
-  const _GuideStep({required this.title, required this.instructions, required this.actionLabel, this.actionUrl});
+  const _GuideStep({
+    required this.title,
+    required this.instructions,
+    required this.actionLabel,
+    this.actionUrl,
+  });
 }

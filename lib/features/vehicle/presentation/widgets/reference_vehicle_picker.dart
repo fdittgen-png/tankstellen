@@ -112,10 +112,12 @@ class _ReferenceVehiclePickerState
   /// search box is non-empty.
   List<ReferenceVehicle> _search(List<ReferenceVehicle> all) {
     if (_query.isEmpty) return const [];
-    return all.where((v) {
-      final haystack = '${v.make} ${v.model} ${v.generation}'.toLowerCase();
-      return haystack.contains(_query);
-    }).toList(growable: false);
+    return all
+        .where((v) {
+          final haystack = '${v.make} ${v.model} ${v.generation}'.toLowerCase();
+          return haystack.contains(_query);
+        })
+        .toList(growable: false);
   }
 
   @override
@@ -143,18 +145,21 @@ class _ReferenceVehiclePickerState
                   if (!searching && _make != null)
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      tooltip: l?.tooltipBack ?? 'Back',
+                      tooltip: l.tooltipBack,
                       onPressed: _drillUp,
                     )
                   else
-                    Icon(Icons.directions_car_outlined,
-                        color: theme.colorScheme.primary),
+                    Icon(
+                      Icons.directions_car_outlined,
+                      color: theme.colorScheme.primary,
+                    ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       _breadcrumb(l),
-                      style: theme.textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w600),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
@@ -164,12 +169,12 @@ class _ReferenceVehiclePickerState
                 controller: _searchController,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
-                  hintText: l?.pickerSearchHint ?? 'Search make or model',
+                  hintText: l.pickerSearchHint,
                   suffixIcon: _searchController.text.isEmpty
                       ? null
                       : IconButton(
                           icon: const Icon(Icons.clear),
-                          tooltip: l?.pickerCancel ?? 'Cancel',
+                          tooltip: l.pickerCancel,
                           onPressed: () => _searchController.clear(),
                         ),
                   border: const OutlineInputBorder(),
@@ -186,7 +191,7 @@ class _ReferenceVehiclePickerState
                       children: [
                         const CircularProgressIndicator(),
                         const SizedBox(height: 12),
-                        Text(l?.pickerLoading ?? 'Loading catalog…'),
+                        Text(l.pickerLoading),
                       ],
                     ),
                   ),
@@ -194,8 +199,9 @@ class _ReferenceVehiclePickerState
                     padding: const EdgeInsets.all(16),
                     child: Text(
                       'Error: $error',
-                      style: theme.textTheme.bodyMedium
-                          ?.copyWith(color: theme.colorScheme.error),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
                     ),
                   ),
                   data: (catalog) => searching
@@ -208,7 +214,7 @@ class _ReferenceVehiclePickerState
                 alignment: Alignment.centerLeft,
                 child: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l?.pickerCancel ?? 'Cancel'),
+                  child: Text(l.pickerCancel),
                 ),
               ),
             ],
@@ -219,22 +225,24 @@ class _ReferenceVehiclePickerState
   }
 
   /// Title text — plain label at the root, else the drill-down path.
-  String _breadcrumb(AppLocalizations? l) {
-    if (_make == null) return l?.pickerButtonLabel ?? 'Pick from catalog';
+  String _breadcrumb(AppLocalizations l) {
+    if (_make == null) return l.pickerButtonLabel;
     if (_model == null) return _make!;
     return '$_make · $_model';
   }
 
-  Widget _emptyState(AppLocalizations? l, ThemeData theme) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(l?.pickerEmptyResults ?? 'No matches',
-              style: theme.textTheme.bodyMedium),
-        ),
-      );
+  Widget _emptyState(AppLocalizations l, ThemeData theme) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Text(l.pickerEmptyResults, style: theme.textTheme.bodyMedium),
+    ),
+  );
 
   Widget _buildSearchResults(
-      List<ReferenceVehicle> catalog, AppLocalizations? l, ThemeData theme) {
+    List<ReferenceVehicle> catalog,
+    AppLocalizations l,
+    ThemeData theme,
+  ) {
     final results = _search(catalog);
     if (results.isEmpty) return _emptyState(l, theme);
     return ListView.builder(
@@ -249,13 +257,15 @@ class _ReferenceVehiclePickerState
   }
 
   Widget _buildDrillDown(
-      List<ReferenceVehicle> catalog, AppLocalizations? l, ThemeData theme) {
+    List<ReferenceVehicle> catalog,
+    AppLocalizations l,
+    ThemeData theme,
+  ) {
     // Level 3 — generations of the selected make + model.
     if (_make != null && _model != null) {
-      final generations = catalog
-          .where((v) => v.make == _make && v.model == _model)
-          .toList()
-        ..sort((a, b) => b.yearStart.compareTo(a.yearStart));
+      final generations =
+          catalog.where((v) => v.make == _make && v.model == _model).toList()
+            ..sort((a, b) => b.yearStart.compareTo(a.yearStart));
       if (generations.isEmpty) return _emptyState(l, theme);
       return ListView.builder(
         shrinkWrap: true,
@@ -313,8 +323,11 @@ class _GroupTile extends StatelessWidget {
   final int count;
   final VoidCallback onTap;
 
-  const _GroupTile(
-      {required this.label, required this.count, required this.onTap});
+  const _GroupTile({
+    required this.label,
+    required this.count,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -323,10 +336,12 @@ class _GroupTile extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$count',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  )),
+          Text(
+            '$count',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(width: 4),
           const Icon(Icons.chevron_right),
         ],
@@ -347,18 +362,22 @@ class _GenerationTile extends StatelessWidget {
   final bool showModel;
   final VoidCallback onTap;
 
-  const _GenerationTile(
-      {required this.entry, required this.showModel, required this.onTap});
+  const _GenerationTile({
+    required this.entry,
+    required this.showModel,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final yearRange = '${entry.yearStart}–${entry.yearEnd?.toString() ?? ''}';
-    final spec =
-        '$yearRange · ${entry.displacementCc}cc ${entry.fuelType}';
+    final spec = '$yearRange · ${entry.displacementCc}cc ${entry.fuelType}';
     return ListTile(
-      title: Text(showModel
-          ? '${entry.make} ${entry.model} · ${entry.generation}'
-          : entry.generation),
+      title: Text(
+        showModel
+            ? '${entry.make} ${entry.model} · ${entry.generation}'
+            : entry.generation,
+      ),
       subtitle: Text(spec),
       onTap: onTap,
       dense: true,

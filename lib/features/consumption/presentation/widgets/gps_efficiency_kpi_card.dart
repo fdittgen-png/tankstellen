@@ -58,60 +58,90 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
     // aggressive so the raw figure carries a verdict + colour, mirroring
     // DrivingScoreCard's class band. Climb energy is terrain, not driving
     // style, so it stays an un-banded plain row.
-    final rpaVerdict = GpsKpiVerdicts.rpa(features.relativePositiveAcceleration);
+    final rpaVerdict = GpsKpiVerdicts.rpa(
+      features.relativePositiveAcceleration,
+    );
     final pkeVerdict = GpsKpiVerdicts.pke(features.positiveKineticEnergy);
     final vaposVerdict = GpsKpiVerdicts.vapos(features.meanPositiveVa);
     final coastVerdict = GpsKpiVerdicts.coast(features.coastShare);
 
     final rows = <Widget>[
-      _kpiRow(theme, l, key: const Key('gps_kpi_rpa'),
-          label: l?.gpsKpiRpa ?? 'Positive acceleration (RPA)',
-          value: features.relativePositiveAcceleration.toStringAsFixed(2),
-          verdict: rpaVerdict),
-      _kpiRow(theme, l, key: const Key('gps_kpi_pke'),
-          label: l?.gpsKpiPke ?? 'Kinetic energy demand (PKE)',
-          value: features.positiveKineticEnergy.toStringAsFixed(2),
-          verdict: pkeVerdict),
-      _kpiRow(theme, l, key: const Key('gps_kpi_vapos'),
-          label: l?.gpsKpiVapos ?? 'Acceleration intensity (VAPOS)',
-          value: features.meanPositiveVa.toStringAsFixed(2),
-          verdict: vaposVerdict),
-      _kpiRow(theme, l, key: const Key('gps_kpi_coast'),
-          label: l?.gpsKpiCoast ?? 'Coasting share',
-          value: '${(features.coastShare * 100).toStringAsFixed(0)}%',
-          verdict: coastVerdict),
-      _kpiRow(theme, l, key: const Key('gps_kpi_climb'),
-          label: l?.gpsKpiClimbEnergy ?? 'Climb energy',
-          value: '${features.climbEnergyPerKm.toStringAsFixed(0)} m/km'),
+      _kpiRow(
+        theme,
+        l,
+        key: const Key('gps_kpi_rpa'),
+        label: l.gpsKpiRpa,
+        value: features.relativePositiveAcceleration.toStringAsFixed(2),
+        verdict: rpaVerdict,
+      ),
+      _kpiRow(
+        theme,
+        l,
+        key: const Key('gps_kpi_pke'),
+        label: l.gpsKpiPke,
+        value: features.positiveKineticEnergy.toStringAsFixed(2),
+        verdict: pkeVerdict,
+      ),
+      _kpiRow(
+        theme,
+        l,
+        key: const Key('gps_kpi_vapos'),
+        label: l.gpsKpiVapos,
+        value: features.meanPositiveVa.toStringAsFixed(2),
+        verdict: vaposVerdict,
+      ),
+      _kpiRow(
+        theme,
+        l,
+        key: const Key('gps_kpi_coast'),
+        label: l.gpsKpiCoast,
+        value: '${(features.coastShare * 100).toStringAsFixed(0)}%',
+        verdict: coastVerdict,
+      ),
+      _kpiRow(
+        theme,
+        l,
+        key: const Key('gps_kpi_climb'),
+        label: l.gpsKpiClimbEnergy,
+        value: '${features.climbEnergyPerKm.toStringAsFixed(0)} m/km',
+      ),
     ];
 
     // Overall verdict = the worst of the four style KPIs, so the one-line
     // interpretation is conservative + actionable (a single aggressive
     // metric is worth flagging even amid otherwise calm figures).
-    final overall = _worst(
-        [rpaVerdict, pkeVerdict, vaposVerdict, coastVerdict]);
+    final overall = _worst([
+      rpaVerdict,
+      pkeVerdict,
+      vaposVerdict,
+      coastVerdict,
+    ]);
     rows.add(const SizedBox(height: 10));
-    rows.add(Text(
-      _interpretation(l, overall),
-      key: const Key('gps_kpi_interpretation'),
-      style: theme.textTheme.bodyMedium?.copyWith(
-        color: _verdictColor(theme, overall),
-        fontWeight: FontWeight.w600,
+    rows.add(
+      Text(
+        _interpretation(l, overall),
+        key: const Key('gps_kpi_interpretation'),
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: _verdictColor(theme, overall),
+          fontWeight: FontWeight.w600,
+        ),
       ),
-    ));
+    );
 
     final delta = baselineDeltaPercent;
     if (delta != null) {
       final sign = delta >= 0 ? '+' : '';
       final pct = '$sign${delta.toStringAsFixed(0)}%';
       rows.add(const SizedBox(height: 8));
-      rows.add(Text(
-        l?.drivingScoreBaselineDelta(pct) ?? '$pct vs your efficient baseline',
-        key: const Key('gps_kpi_baseline_delta'),
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
+      rows.add(
+        Text(
+          l.drivingScoreBaselineDelta(pct),
+          key: const Key('gps_kpi_baseline_delta'),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
-      ));
+      );
     }
 
     return Card(
@@ -122,7 +152,7 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.gpsKpiCardTitle ?? 'GPS efficiency',
+              l.gpsKpiCardTitle,
               key: const Key('gps_kpi_card_title'),
               style: theme.textTheme.titleMedium,
             ),
@@ -136,7 +166,7 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
 
   Widget _kpiRow(
     ThemeData theme,
-    AppLocalizations? l, {
+    AppLocalizations l, {
     required Key key,
     required String label,
     required String value,
@@ -148,9 +178,7 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Text(label, style: theme.textTheme.bodyMedium),
-          ),
+          Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           if (verdict != null) ...[
             Text(
               _verdictLabel(l, verdict),
@@ -175,31 +203,26 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
 
   /// Localized per-KPI verdict badge ("Efficient" / "Moderate" /
   /// "Aggressive").
-  String _verdictLabel(AppLocalizations? l, GpsKpiVerdict v) {
+  String _verdictLabel(AppLocalizations l, GpsKpiVerdict v) {
     switch (v) {
       case GpsKpiVerdict.good:
-        return l?.gpsKpiVerdictGood ?? 'Efficient';
+        return l.gpsKpiVerdictGood;
       case GpsKpiVerdict.moderate:
-        return l?.gpsKpiVerdictModerate ?? 'Moderate';
+        return l.gpsKpiVerdictModerate;
       case GpsKpiVerdict.aggressive:
-        return l?.gpsKpiVerdictAggressive ?? 'Aggressive';
+        return l.gpsKpiVerdictAggressive;
     }
   }
 
   /// One-line overall interpretation under the KPI rows.
-  String _interpretation(AppLocalizations? l, GpsKpiVerdict v) {
+  String _interpretation(AppLocalizations l, GpsKpiVerdict v) {
     switch (v) {
       case GpsKpiVerdict.good:
-        return l?.gpsKpiInterpretationGood ??
-            'Smooth, energy-light driving — this is what efficient looks like.';
+        return l.gpsKpiInterpretationGood;
       case GpsKpiVerdict.moderate:
-        return l?.gpsKpiInterpretationModerate ??
-            'Fairly typical driving — a little smoother on the throttle would '
-                'save more.';
+        return l.gpsKpiInterpretationModerate;
       case GpsKpiVerdict.aggressive:
-        return l?.gpsKpiInterpretationAggressive ??
-            'Energy-heavy driving — easing off the accelerator and coasting '
-                'more would cut fuel use.';
+        return l.gpsKpiInterpretationAggressive;
     }
   }
 

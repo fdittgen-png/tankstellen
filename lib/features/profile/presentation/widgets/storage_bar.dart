@@ -53,8 +53,7 @@ class StorageBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
-          child: Text(l10n?.noStorageUsed ?? 'No storage used',
-              style: const TextStyle(fontSize: 11)),
+          child: Text(l10n.noStorageUsed, style: const TextStyle(fontSize: 11)),
         ),
       );
     }
@@ -172,10 +171,12 @@ class StorageDetailRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    )),
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 Text(
                   detail,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -212,20 +213,17 @@ class CacheTtlInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ttlGroupHeader(l?.cacheTtlGroupNetwork ?? 'Network'),
-        _ttlRow(l?.stationSearch ?? 'Station search', l?.minutes(5) ?? '5 min'),
-        _ttlRow(l?.stationDetails ?? 'Station details',
-            l?.minutes(15) ?? '15 min'),
-        _ttlRow(l?.priceQuery ?? 'Price query', l?.minutes(5) ?? '5 min'),
+        _ttlGroupHeader(l.cacheTtlGroupNetwork),
+        _ttlRow(l.stationSearch, l.minutes(5)),
+        _ttlRow(l.stationDetails, l.minutes(15)),
+        _ttlRow(l.priceQuery, l.minutes(5)),
         const SizedBox(height: 4),
-        _ttlGroupHeader(l?.cacheTtlGroupData ?? 'Data'),
-        _ttlRow(l?.favoritesDataCache ?? 'Favorites data',
-            l?.minutes(30) ?? '30 min'),
-        _ttlRow(l?.citySearchCache ?? 'City search',
-            l?.minutes(30) ?? '30 min'),
+        _ttlGroupHeader(l.cacheTtlGroupData),
+        _ttlRow(l.favoritesDataCache, l.minutes(30)),
+        _ttlRow(l.citySearchCache, l.minutes(30)),
         const SizedBox(height: 4),
-        _ttlGroupHeader(l?.cacheTtlGroupGeocoding ?? 'Geocoding'),
-        _ttlRow(l?.zipGeocoding ?? 'ZIP geocoding', l?.hours(24) ?? '24 h'),
+        _ttlGroupHeader(l.cacheTtlGroupGeocoding),
+        _ttlRow(l.zipGeocoding, l.hours(24)),
       ],
     );
   }
@@ -250,8 +248,11 @@ class CacheTtlInfo extends StatelessWidget {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          Icon(Icons.timer,
-              size: 14, color: theme.colorScheme.onSurfaceVariant),
+          Icon(
+            Icons.timer,
+            size: 14,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(width: 8),
           Text(label, style: theme.textTheme.bodySmall),
           const Spacer(),

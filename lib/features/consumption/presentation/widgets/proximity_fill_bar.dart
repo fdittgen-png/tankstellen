@@ -81,7 +81,7 @@ class ProximityFillBar extends StatelessWidget {
     final percent = (fill * 100).round();
 
     return Semantics(
-      label: l?.fuelStationRadarProximity(percent) ?? 'Proximity $percent%',
+      label: l.fuelStationRadarProximity(percent),
       value: '$percent%',
       child: ClipRRect(
         borderRadius: AppRadius.sm,

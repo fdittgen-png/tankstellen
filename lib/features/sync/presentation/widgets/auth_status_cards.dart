@@ -36,23 +36,25 @@ class EmailUserStatusCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.verified_user,
-                        size: 20, color: theme.colorScheme.primary),
+                    Icon(
+                      Icons.verified_user,
+                      size: 20,
+                      color: theme.colorScheme.primary,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        l10n?.syncSignedInAs(userEmail ?? '') ??
-                            'Signed in as $userEmail',
-                        style: theme.textTheme.titleSmall
-                            ?.copyWith(fontWeight: FontWeight.w600),
+                        l10n.syncSignedInAs(userEmail ?? ''),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n?.syncEmailDescription ??
-                      'Your data syncs across all devices with this email.',
+                  l10n.syncEmailDescription,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -65,10 +67,8 @@ class EmailUserStatusCard extends StatelessWidget {
         Card(
           child: ListTile(
             leading: const Icon(Icons.person_outline),
-            title: Text(
-                l10n?.syncSwitchToAnonymousTitle ?? 'Switch to anonymous'),
-            subtitle: Text(l10n?.syncSwitchToAnonymousDesc ??
-                'Continue without email, new anonymous session'),
+            title: Text(l10n.syncSwitchToAnonymousTitle),
+            subtitle: Text(l10n.syncSwitchToAnonymousDesc),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: isLoading ? null : onSwitchToAnonymous,
           ),
@@ -99,21 +99,23 @@ class GuestOptionCard extends StatelessWidget {
         Card(
           child: ListTile(
             leading: const Icon(Icons.person_outline),
-            title: Text(l10n?.continueAsGuest ?? 'Continue as guest'),
-            subtitle: Text(
-                l10n?.syncGuestDescription ?? 'Anonymous, no email needed.'),
+            title: Text(l10n.continueAsGuest),
+            subtitle: Text(l10n.syncGuestDescription),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: isLoading ? null : onContinueAsGuest,
           ),
         ),
         const SizedBox(height: 16),
-        Row(children: [
-          const Expanded(child: Divider()),
-          Padding(
+        Row(
+          children: [
+            const Expanded(child: Divider()),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(l10n?.syncOrDivider ?? 'or')),
-          const Expanded(child: Divider()),
-        ]),
+              child: Text(l10n.syncOrDivider),
+            ),
+            const Expanded(child: Divider()),
+          ],
+        ),
         const SizedBox(height: 16),
       ],
     );
@@ -130,8 +132,9 @@ class AnonymousStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final idPrefix =
-        (userId != null && userId!.length >= 8) ? userId!.substring(0, 8) : '';
+    final idPrefix = (userId != null && userId!.length >= 8)
+        ? userId!.substring(0, 8)
+        : '';
 
     return Column(
       children: [
@@ -145,10 +148,7 @@ class AnonymousStatusCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    l10n?.authGuestLinkPrompt(idPrefix) ??
-                        "You're using a guest account ($idPrefix…). "
-                            'Link an email so your favorites and trips '
-                            'sync to your other devices.',
+                    l10n.authGuestLinkPrompt(idPrefix),
                     style: theme.textTheme.bodySmall,
                   ),
                 ),

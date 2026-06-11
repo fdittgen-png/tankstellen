@@ -10,11 +10,8 @@ import '../../../../core/domain/fuel_type.dart';
 /// hard-coded English/French strings like "Super E5" / "GPL / LPG") and
 /// from `shortFuelLabel` (language-neutral grade CODES like "E10"). The
 /// per-fuel efficiency card needs a full, translated fuel name, so this
-/// routes every grade through an ARB key and falls back to the
-/// non-localized [FuelType.displayName] only when no localization is
-/// available (the standard defensive-fallback pattern).
-String localizedFuelName(AppLocalizations? l, FuelType fuel) {
-  if (l == null) return fuel.displayName;
+/// routes every grade through an ARB key.
+String localizedFuelName(AppLocalizations l, FuelType fuel) {
   return switch (fuel) {
     FuelTypeE5() => l.fuelNameE5,
     FuelTypeE10() => l.fuelNameE10,

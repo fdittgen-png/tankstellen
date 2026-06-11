@@ -39,7 +39,7 @@ class ErrorReporter {
   final UrlLauncher _launcher;
 
   const ErrorReporter({UrlLauncher launcher = _defaultLauncher})
-      : _launcher = launcher;
+    : _launcher = launcher;
 
   /// Recently-reported error fingerprints — a process-lifetime ring
   /// buffer so the same failure reported twice in a session does not
@@ -79,10 +79,7 @@ class ErrorReporter {
     if (_recentFingerprints.contains(payload.fingerprint)) {
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
-        SnackBarHelper.show(
-          context,
-          l10n?.reportAlreadySent ?? 'You already reported this issue.',
-        );
+        SnackBarHelper.show(context, l10n.reportAlreadySent);
       }
       return false;
     }
@@ -98,7 +95,14 @@ class ErrorReporter {
       if (launched) _rememberFingerprint(payload.fingerprint);
       return launched;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'ErrorReporter launch failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.other,
+          e,
+          st,
+          context: const {'where': 'ErrorReporter launch failed'},
+        ),
+      );
       return false;
     }
   }
@@ -112,18 +116,13 @@ class ErrorReporter {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: Text(l10n?.reportConsentTitle ?? 'Report to GitHub?'),
+          title: Text(l10n.reportConsentTitle),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  l10n?.reportConsentBody ??
-                      'This will open a public GitHub issue with the '
-                          'error details shown below. No GPS coordinates, '
-                          'API keys, or personal data are included.',
-                ),
+                Text(l10n.reportConsentBody),
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -142,12 +141,12 @@ class ErrorReporter {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(l10n?.reportConsentCancel ?? 'Cancel'),
+              child: Text(l10n.reportConsentCancel),
             ),
             FilledButton.icon(
               onPressed: () => Navigator.of(ctx).pop(true),
               icon: const Icon(Icons.open_in_new, size: 18),
-              label: Text(l10n?.reportConsentConfirm ?? 'Open GitHub'),
+              label: Text(l10n.reportConsentConfirm),
             ),
           ],
         );

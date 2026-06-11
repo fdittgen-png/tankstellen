@@ -112,9 +112,10 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
           final l10n = AppLocalizations.of(context);
           SnackBarHelper.showError(
             context,
-            l10n?.invalidPostalCode(
-                    country.postalCodeLength.toString(), country.postalCodeLabel) ??
-                'Please enter a valid ${country.postalCodeLength}-digit ${country.postalCodeLabel}',
+            l10n.invalidPostalCode(
+              country.postalCodeLength.toString(),
+              country.postalCodeLabel,
+            ),
           );
         }
       case LocationInputType.city:
@@ -126,17 +127,16 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
   }
 
   IconData _prefixIcon(LocationInputType type) => switch (type) {
-        LocationInputType.gps => Icons.my_location,
-        LocationInputType.zip => Icons.pin_drop,
-        LocationInputType.city => Icons.location_city,
-      };
+    LocationInputType.gps => Icons.my_location,
+    LocationInputType.zip => Icons.pin_drop,
+    LocationInputType.city => Icons.location_city,
+  };
 
   @override
   Widget build(BuildContext context) {
     final uiState = ref.watch(locationInputControllerProvider);
     final l10n = AppLocalizations.of(context);
-    final placeholder = l10n?.searchLocationPlaceholder ??
-        'Address, postal code or city';
+    final placeholder = l10n.searchLocationPlaceholder;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -159,10 +159,14 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
                   floatingLabelBehavior: FloatingLabelBehavior.never,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 8),
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   prefixIcon: Icon(_prefixIcon(uiState.inputType), size: 20),
-                  prefixIconConstraints:
-                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
                   border: const OutlineInputBorder(),
                   suffixIcon: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -173,17 +177,20 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
                           child: SizedBox(
                             width: 16,
                             height: 16,
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           ),
                         ),
                       if (_controller.text.isNotEmpty)
                         IconButton(
                           icon: const Icon(Icons.clear, size: 18),
-                          tooltip: AppLocalizations.of(context)?.tooltipClearSearch ?? 'Clear search input',
+                          tooltip: AppLocalizations.of(
+                            context,
+                          ).tooltipClearSearch,
                           padding: const EdgeInsets.all(4),
                           constraints: const BoxConstraints(
-                              minWidth: 32, minHeight: 32),
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                           onPressed: () {
                             _controller.clear();
                             _onChanged('');
@@ -191,10 +198,12 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
                         ),
                       IconButton(
                         icon: const Icon(Icons.my_location, size: 18),
-                        tooltip: AppLocalizations.of(context)?.tooltipUseGps ?? 'Use GPS location',
+                        tooltip: AppLocalizations.of(context).tooltipUseGps,
                         padding: const EdgeInsets.all(4),
                         constraints: const BoxConstraints(
-                            minWidth: 32, minHeight: 32),
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
                         onPressed: () {
                           // #2137 — switch the criteria to GPS mode but
                           // don't fire the search; the FAB owns that.
@@ -204,8 +213,10 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
                       ),
                     ],
                   ),
-                  suffixIconConstraints:
-                      const BoxConstraints(minWidth: 36, minHeight: 36),
+                  suffixIconConstraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
                 ),
                 onChanged: _onChanged,
                 // #2137 — Enter is not a search trigger any more; the
@@ -221,9 +232,7 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
             constraints: const BoxConstraints(maxHeight: 200),
             margin: const EdgeInsets.only(top: 4),
             decoration: BoxDecoration(
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline,
-              ),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ListView.builder(
@@ -237,11 +246,12 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
                   dense: true,
                   selected: isSelected,
                   leading: const Icon(Icons.place, size: 18),
-                  title: Text(city.name,
-                      style: const TextStyle(fontSize: 13)),
+                  title: Text(city.name, style: const TextStyle(fontSize: 13)),
                   subtitle: city.postcode != null
-                      ? Text(city.postcode!,
-                          style: const TextStyle(fontSize: 11))
+                      ? Text(
+                          city.postcode!,
+                          style: const TextStyle(fontSize: 11),
+                        )
                       : null,
                   onTap: () {
                     _controller.text = city.name;

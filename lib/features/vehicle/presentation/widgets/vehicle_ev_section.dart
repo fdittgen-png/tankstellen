@@ -37,33 +37,26 @@ class VehicleEvSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          l?.vehicleEvSectionTitle ?? 'Electric',
+          l.vehicleEvSectionTitle,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: batteryController,
-          keyboardType:
-              const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            labelText: l?.vehicleBatteryLabel ?? 'Battery capacity (kWh)',
-          ),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(labelText: l.vehicleBatteryLabel),
           validator: numberValidator,
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: maxChargingKwController,
-          keyboardType:
-              const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            labelText:
-                l?.vehicleMaxChargeLabel ?? 'Max charging power (kW)',
-          ),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(labelText: l.vehicleMaxChargeLabel),
           validator: numberValidator,
         ),
         const SizedBox(height: 16),
         Text(
-          l?.vehicleConnectorsLabel ?? 'Supported connectors',
+          l.vehicleConnectorsLabel,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 8),
@@ -86,9 +79,7 @@ class VehicleEvSection extends StatelessWidget {
               child: TextFormField(
                 controller: minSocController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: l?.vehicleMinSocLabel ?? 'Min SoC %',
-                ),
+                decoration: InputDecoration(labelText: l.vehicleMinSocLabel),
               ),
             ),
             const SizedBox(width: 16),
@@ -96,9 +87,7 @@ class VehicleEvSection extends StatelessWidget {
               child: TextFormField(
                 controller: maxSocController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: l?.vehicleMaxSocLabel ?? 'Max SoC %',
-                ),
+                decoration: InputDecoration(labelText: l.vehicleMaxSocLabel),
               ),
             ),
           ],

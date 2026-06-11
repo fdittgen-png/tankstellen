@@ -13,10 +13,7 @@ import '../../domain/entities/price_stats.dart';
 class PriceStatsCard extends StatelessWidget {
   final PriceStats stats;
 
-  const PriceStatsCard({
-    super.key,
-    required this.stats,
-  });
+  const PriceStatsCard({super.key, required this.stats});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +23,7 @@ class PriceStatsCard extends StatelessWidget {
       final l = AppLocalizations.of(context);
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: Text(l?.noStatistics ?? 'No statistics available'),
+        child: Text(l.noStatistics),
       );
     }
 
@@ -84,16 +81,16 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w600,
-              ),
+            color: color,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -111,17 +108,20 @@ class _CurrentWithTrend extends StatelessWidget {
     final (icon, color) = switch (trend) {
       PriceTrend.up => (Icons.trending_up, DarkModeColors.error(context)),
       PriceTrend.down => (Icons.trending_down, DarkModeColors.success(context)),
-      PriceTrend.stable => (Icons.trending_flat, Theme.of(context).colorScheme.onSurfaceVariant),
+      PriceTrend.stable => (
+        Icons.trending_flat,
+        Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
     };
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          AppLocalizations.of(context)?.priceStatsCurrent ?? 'Current',
+          AppLocalizations.of(context).priceStatsCurrent,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 2),
         Row(
@@ -129,9 +129,9 @@ class _CurrentWithTrend extends StatelessWidget {
           children: [
             Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 4),
             Icon(icon, size: 18, color: color),

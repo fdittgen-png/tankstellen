@@ -9,10 +9,8 @@ import '../../../l10n/app_localizations.dart';
 /// the `charging_log_validators.dart` split landed for the Add-Charging
 /// form in PR #1156.
 ///
-/// All validators accept `null` localizations for tests / golden
-/// fallbacks and degrade to English defaults — the same pattern used
-/// elsewhere in the codebase (see `AppLocalizations.of(context)?.x ??
-/// 'Fallback'`).
+/// Validators take a non-nullable [AppLocalizations] (#3162) — unit
+/// tests drive them with the pure `lookupAppLocalizations` constructor.
 class AddFillUpValidators {
   AddFillUpValidators._();
 
@@ -20,13 +18,13 @@ class AddFillUpValidators {
   /// for liters, total cost, and odometer fields — all three must be
   /// > 0 for a fill-up to make sense (you can't fill nothing, pay
   /// nothing, or have a zero-km odometer reading).
-  static String? positiveNumber(String? value, AppLocalizations? l) {
+  static String? positiveNumber(String? value, AppLocalizations l) {
     if (value == null || value.trim().isEmpty) {
-      return l?.fieldRequired ?? 'Required';
+      return l.fieldRequired;
     }
     final parsed = double.tryParse(value.replaceAll(',', '.'));
     if (parsed == null || parsed <= 0) {
-      return l?.fieldInvalidNumber ?? 'Invalid number';
+      return l.fieldInvalidNumber;
     }
     return null;
   }

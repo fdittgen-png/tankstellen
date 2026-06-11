@@ -46,7 +46,7 @@ class MonthlyInsightsCard extends StatelessWidget {
     final reliable = summary.isComparisonReliable;
 
     final tripsRow = _MetricRow(
-      label: l?.consumptionMonthlyTripsLabel ?? 'Trips',
+      label: l.consumptionMonthlyTripsLabel,
       currentValue: _fmtCount(summary.currentMonthTripCount),
       previousValue: _fmtCount(summary.previousMonthTripCount),
       delta: summary.tripCountDelta,
@@ -55,7 +55,7 @@ class MonthlyInsightsCard extends StatelessWidget {
     );
 
     final driveTimeRow = _MetricRow(
-      label: l?.consumptionMonthlyDriveTimeLabel ?? 'Drive time',
+      label: l.consumptionMonthlyDriveTimeLabel,
       currentValue: _fmtDuration(summary.currentMonthDriveTime),
       previousValue: _fmtDuration(summary.previousMonthDriveTime),
       delta: summary.driveTimeDelta.inMinutes,
@@ -64,7 +64,7 @@ class MonthlyInsightsCard extends StatelessWidget {
     );
 
     final distanceRow = _MetricRow(
-      label: l?.consumptionMonthlyDistanceLabel ?? 'Distance',
+      label: l.consumptionMonthlyDistanceLabel,
       currentValue: _fmtDistance(summary.currentMonthDistanceKm),
       previousValue: _fmtDistance(summary.previousMonthDistanceKm),
       // Convert to a comparable scalar for the arrow: 1-decimal km.
@@ -78,7 +78,7 @@ class MonthlyInsightsCard extends StatelessWidget {
     final showClimbRow = summary.currentMonthClimbMeters > 0;
     final climbRow = showClimbRow
         ? _MetricRow(
-            label: l?.consumptionMonthlyClimbLabel ?? 'Climbed',
+            label: l.consumptionMonthlyClimbLabel,
             currentValue: _fmtClimb(summary.currentMonthClimbMeters),
             previousValue: _fmtClimb(summary.previousMonthClimbMeters),
             delta: summary.climbMetersDelta.round(),
@@ -93,7 +93,7 @@ class MonthlyInsightsCard extends StatelessWidget {
         summary.currentMonthAvgConsumptionLPer100km != null;
     final consumptionRow = showConsumptionRow
         ? _MetricRow(
-            label: l?.consumptionMonthlyAvgConsumptionLabel ?? 'Avg consumption',
+            label: l.consumptionMonthlyAvgConsumptionLabel,
             currentValue: _fmtConsumption(
               summary.currentMonthAvgConsumptionLPer100km,
             ),
@@ -104,7 +104,8 @@ class MonthlyInsightsCard extends StatelessWidget {
             // a coloured arrow when the displayed numbers are equal.
             delta: ((summary.consumptionDeltaLPer100km ?? 0) * 10).round(),
             sentiment: _Sentiment.lowerIsBetter,
-            showPrevious: reliable &&
+            showPrevious:
+                reliable &&
                 summary.previousMonthAvgConsumptionLPer100km != null,
           )
         : null;
@@ -119,14 +120,13 @@ class MonthlyInsightsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.consumptionMonthlyInsightsTitle ?? 'This month vs last month',
+              l.consumptionMonthlyInsightsTitle,
               style: theme.textTheme.titleMedium,
             ),
             if (!reliable) ...[
               const SizedBox(height: 4),
               Text(
-                l?.consumptionMonthlyComparisonNotReliable ??
-                    'Need at least 3 trips per month for comparison',
+                l.consumptionMonthlyComparisonNotReliable,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -139,10 +139,7 @@ class MonthlyInsightsCard extends StatelessWidget {
             driveTimeRow,
             const SizedBox(height: 6),
             distanceRow,
-            if (climbRow != null) ...[
-              const SizedBox(height: 6),
-              climbRow,
-            ],
+            if (climbRow != null) ...[const SizedBox(height: 6), climbRow],
             if (consumptionRow != null) ...[
               const SizedBox(height: 6),
               consumptionRow,

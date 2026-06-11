@@ -11,11 +11,15 @@ import 'package:tankstellen/features/report/presentation/screens/report_screen.d
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
+  final AppLocalizations l10nEn = lookupAppLocalizations(const Locale('en'));
+
   group('ReportScreen', () {
-    testWidgets('renders Scaffold with the retitled "Report a problem"',
-        (tester) async {
+    testWidgets('renders Scaffold with the retitled "Report a problem"', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       when(() => test.mockStorage.getApiKey()).thenReturn(null);
@@ -55,7 +59,8 @@ void main() {
       final scrollable = find.byType(Scrollable).first;
       for (var i = 0; i < 20 && seen.length < ReportType.values.length; i++) {
         for (final radio in tester.widgetList<RadioListTile<ReportType>>(
-            find.byType(RadioListTile<ReportType>))) {
+          find.byType(RadioListTile<ReportType>),
+        )) {
           seen.add(radio.value);
         }
         await tester.drag(scrollable, const Offset(0, -200));
@@ -63,15 +68,20 @@ void main() {
       }
       // Final pass after the last drag.
       for (final radio in tester.widgetList<RadioListTile<ReportType>>(
-          find.byType(RadioListTile<ReportType>))) {
+        find.byType(RadioListTile<ReportType>),
+      )) {
         seen.add(radio.value);
       }
-      expect(seen, equals(ReportType.values.toSet()),
-          reason: 'all 10 report types must be rendered in the list');
+      expect(
+        seen,
+        equals(ReportType.values.toSet()),
+        reason: 'all 10 report types must be rendered in the list',
+      );
     });
 
-    testWidgets('renders send button in disabled state initially',
-        (tester) async {
+    testWidgets('renders send button in disabled state initially', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       when(() => test.mockStorage.getApiKey()).thenReturn(null);
@@ -96,11 +106,9 @@ void main() {
   });
 
   group('ReportScreen country gating (regression #484)', () {
-    testWidgets(
-        'DE without Tankerkoenig key and without TankSync → no-backend '
+    testWidgets('DE without Tankerkoenig key and without TankSync → no-backend '
         'banner shown; price/status radios disabled but name/address '
-        '(GitHub-routed, #508) stay enabled',
-        (tester) async {
+        '(GitHub-routed, #508) stay enabled', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       when(() => test.mockStorage.getApiKey()).thenReturn(null);
@@ -136,11 +144,10 @@ void main() {
       // `true`  → enabled (tappable), `false` → disabled.
       final seen = <ReportType, bool>{};
       final scrollable = find.byType(Scrollable).first;
-      for (var i = 0;
-          i < 20 && seen.length < ReportType.values.length;
-          i++) {
+      for (var i = 0; i < 20 && seen.length < ReportType.values.length; i++) {
         for (final radio in tester.widgetList<RadioListTile<ReportType>>(
-            find.byType(RadioListTile<ReportType>))) {
+          find.byType(RadioListTile<ReportType>),
+        )) {
           seen.putIfAbsent(radio.value, () => radio.enabled ?? true);
         }
         if (seen.length == ReportType.values.length) break;
@@ -161,63 +168,76 @@ void main() {
       expect(button.onPressed, isNull);
 
       for (final type in ReportType.values) {
-        expect(seen.containsKey(type), isTrue,
-            reason: '$type must be rendered in DE even without a backend');
+        expect(
+          seen.containsKey(type),
+          isTrue,
+          reason: '$type must be rendered in DE even without a backend',
+        );
         if (type.routesToGitHub) {
-          expect(seen[type], isTrue,
-              reason:
-                  '$type is GitHub-routed and must stay enabled (#508)');
+          expect(
+            seen[type],
+            isTrue,
+            reason: '$type is GitHub-routed and must stay enabled (#508)',
+          );
         } else {
-          expect(seen[type], isFalse,
-              reason:
-                  '$type needs a backend and must be disabled here');
+          expect(
+            seen[type],
+            isFalse,
+            reason: '$type needs a backend and must be disabled here',
+          );
         }
       }
     });
 
     testWidgets(
-        'FR without TankSync → no banner, only wrongName + wrongAddress '
-        'visible, both enabled (#508)',
-        (tester) async {
-      final test = standardTestOverrides(country: Countries.france);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+      'FR without TankSync → no banner, only wrongName + wrongAddress '
+      'visible, both enabled (#508)',
+      (tester) async {
+        final test = standardTestOverrides(country: Countries.france);
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.getApiKey()).thenReturn(null);
 
-      await pumpApp(
-        tester,
-        const ReportScreen(stationId: 'test-station-1'),
-        overrides: test.overrides,
-      );
-      await tester.pumpAndSettle();
+        await pumpApp(
+          tester,
+          const ReportScreen(stationId: 'test-station-1'),
+          overrides: test.overrides,
+        );
+        await tester.pumpAndSettle();
 
-      // Outside DE, only GitHub-routed types are visible — nothing
-      // needs configuring, so the banner must NOT appear.
-      expect(
-        find.byKey(const ValueKey('report-no-backend-banner')),
-        findsNothing,
-      );
+        // Outside DE, only GitHub-routed types are visible — nothing
+        // needs configuring, so the banner must NOT appear.
+        expect(
+          find.byKey(const ValueKey('report-no-backend-banner')),
+          findsNothing,
+        );
 
-      // Exactly two radios, both GitHub-routed, both enabled.
-      final radios = tester
-          .widgetList<RadioListTile<ReportType>>(
-              find.byType(RadioListTile<ReportType>))
-          .toList();
-      expect(radios, hasLength(2));
-      expect(
-        radios.map((r) => r.value).toList(),
-        equals([ReportType.wrongName, ReportType.wrongAddress]),
-      );
-      for (final r in radios) {
-        expect(r.enabled ?? true, isTrue,
-            reason: 'GitHub-routed radios must be enabled regardless of '
-                'backend availability');
-      }
-    });
+        // Exactly two radios, both GitHub-routed, both enabled.
+        final radios = tester
+            .widgetList<RadioListTile<ReportType>>(
+              find.byType(RadioListTile<ReportType>),
+            )
+            .toList();
+        expect(radios, hasLength(2));
+        expect(
+          radios.map((r) => r.value).toList(),
+          equals([ReportType.wrongName, ReportType.wrongAddress]),
+        );
+        for (final r in radios) {
+          expect(
+            r.enabled ?? true,
+            isTrue,
+            reason:
+                'GitHub-routed radios must be enabled regardless of '
+                'backend availability',
+          );
+        }
+      },
+    );
 
-    testWidgets(
-        'FR with no sync — submit button enables when wrongAddress is '
-        'selected and text is entered, even without any backend (#508)',
-        (tester) async {
+    testWidgets('FR with no sync — submit button enables when wrongAddress is '
+        'selected and text is entered, even without any backend (#508)', (
+      tester,
+    ) async {
       final test = standardTestOverrides(country: Countries.france);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       when(() => test.mockStorage.getApiKey()).thenReturn(null);
@@ -244,38 +264,47 @@ void main() {
       await tester.pumpAndSettle();
 
       button = tester.widget<FilledButton>(find.byType(FilledButton));
-      expect(button.onPressed, isNotNull,
-          reason: 'GitHub-routed reports must work without a backend');
+      expect(
+        button.onPressed,
+        isNotNull,
+        reason: 'GitHub-routed reports must work without a backend',
+      );
     });
 
     testWidgets(
-        'DE WITH Tankerkoenig API key → banner hidden, radios enabled',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
-          .thenReturn('11111111-2222-3333-4444-555555555555');
+      'DE WITH Tankerkoenig API key → banner hidden, radios enabled',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+        when(
+          () => test.mockStorage.getApiKey(),
+        ).thenReturn('11111111-2222-3333-4444-555555555555');
 
-      await pumpApp(
-        tester,
-        const ReportScreen(stationId: 'test-station-1'),
-        overrides: test.overrides,
-      );
+        await pumpApp(
+          tester,
+          const ReportScreen(stationId: 'test-station-1'),
+          overrides: test.overrides,
+        );
 
-      expect(
-        find.byKey(const ValueKey('report-no-backend-banner')),
-        findsNothing,
-        reason: 'DE+key must NOT show the no-backend banner',
-      );
+        expect(
+          find.byKey(const ValueKey('report-no-backend-banner')),
+          findsNothing,
+          reason: 'DE+key must NOT show the no-backend banner',
+        );
 
-      for (final radio in tester
-          .widgetList<RadioListTile<ReportType>>(
-              find.byType(RadioListTile<ReportType>))) {
-        expect(radio.enabled ?? true, isTrue,
-            reason: 'radios must be enabled when at least one backend is '
-                'available');
-      }
-    });
+        for (final radio in tester.widgetList<RadioListTile<ReportType>>(
+          find.byType(RadioListTile<ReportType>),
+        )) {
+          expect(
+            radio.enabled ?? true,
+            isTrue,
+            reason:
+                'radios must be enabled when at least one backend is '
+                'available',
+          );
+        }
+      },
+    );
   });
 
   group('ReportScreen metadata report types (#484)', () {
@@ -295,13 +324,14 @@ void main() {
       );
     }
 
-    testWidgets(
-        'selecting wrongName shows a text field, not the price field',
-        (tester) async {
+    testWidgets('selecting wrongName shows a text field, not the price field', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
-          .thenReturn('11111111-2222-3333-4444-555555555555');
+      when(
+        () => test.mockStorage.getApiKey(),
+      ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
         tester,
@@ -323,13 +353,14 @@ void main() {
       expect(find.text('Correct price (e.g. 1.459)'), findsNothing);
     });
 
-    testWidgets(
-        'selecting wrongAddress shows the correction text field',
-        (tester) async {
+    testWidgets('selecting wrongAddress shows the correction text field', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
-          .thenReturn('11111111-2222-3333-4444-555555555555');
+      when(
+        () => test.mockStorage.getApiKey(),
+      ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
         tester,
@@ -349,38 +380,41 @@ void main() {
     });
 
     testWidgets(
-        'selecting wrongE85 shows the price field (extended fuel type)',
-        (tester) async {
+      'selecting wrongE85 shows the price field (extended fuel type)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+        when(
+          () => test.mockStorage.getApiKey(),
+        ).thenReturn('11111111-2222-3333-4444-555555555555');
+
+        await pumpApp(
+          tester,
+          const ReportScreen(stationId: 'test-station-1'),
+          overrides: test.overrides,
+        );
+        await tester.pumpAndSettle();
+
+        await scrollToRadio(tester, 'Wrong E85 price');
+        await tester.tap(find.text('Wrong E85 price'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Correct price (e.g. 1.459)'), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('report-correction-text-field')),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets('submit stays disabled for wrongName until text is entered', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
-          .thenReturn('11111111-2222-3333-4444-555555555555');
-
-      await pumpApp(
-        tester,
-        const ReportScreen(stationId: 'test-station-1'),
-        overrides: test.overrides,
-      );
-      await tester.pumpAndSettle();
-
-      await scrollToRadio(tester, 'Wrong E85 price');
-      await tester.tap(find.text('Wrong E85 price'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Correct price (e.g. 1.459)'), findsOneWidget);
-      expect(
-        find.byKey(const ValueKey('report-correction-text-field')),
-        findsNothing,
-      );
-    });
-
-    testWidgets(
-        'submit stays disabled for wrongName until text is entered',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
-          .thenReturn('11111111-2222-3333-4444-555555555555');
+      when(
+        () => test.mockStorage.getApiKey(),
+      ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
         tester,
@@ -397,8 +431,11 @@ void main() {
       await scrollToButton(tester);
 
       var button = tester.widget<FilledButton>(find.byType(FilledButton));
-      expect(button.onPressed, isNull,
-          reason: 'submit must stay disabled until correction is typed');
+      expect(
+        button.onPressed,
+        isNull,
+        reason: 'submit must stay disabled until correction is typed',
+      );
 
       await tester.enterText(
         find.byKey(const ValueKey('report-correction-text-field')),
@@ -408,18 +445,21 @@ void main() {
 
       await scrollToButton(tester);
       button = tester.widget<FilledButton>(find.byType(FilledButton));
-      expect(button.onPressed, isNotNull,
-          reason: 'submit must enable once correction text is present');
+      expect(
+        button.onPressed,
+        isNotNull,
+        reason: 'submit must enable once correction text is present',
+      );
     });
   });
 
   group('ReportScreen country-gated visibility (#508)', () {
-    testWidgets(
-        'DE — all 10 report types are rendered', (tester) async {
+    testWidgets('DE — all 10 report types are rendered', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
-          .thenReturn('11111111-2222-3333-4444-555555555555');
+      when(
+        () => test.mockStorage.getApiKey(),
+      ).thenReturn('11111111-2222-3333-4444-555555555555');
 
       await pumpApp(
         tester,
@@ -430,11 +470,10 @@ void main() {
 
       final seen = <ReportType>{};
       final scrollable = find.byType(Scrollable).first;
-      for (var i = 0;
-          i < 20 && seen.length < ReportType.values.length;
-          i++) {
+      for (var i = 0; i < 20 && seen.length < ReportType.values.length; i++) {
         for (final radio in tester.widgetList<RadioListTile<ReportType>>(
-            find.byType(RadioListTile<ReportType>))) {
+          find.byType(RadioListTile<ReportType>),
+        )) {
           seen.add(radio.value);
         }
         await tester.drag(scrollable, const Offset(0, -200));
@@ -443,8 +482,9 @@ void main() {
       expect(seen, equals(ReportType.values.toSet()));
     });
 
-    testWidgets('FR — only wrongName + wrongAddress are rendered',
-        (tester) async {
+    testWidgets('FR — only wrongName + wrongAddress are rendered', (
+      tester,
+    ) async {
       final test = standardTestOverrides(country: Countries.france);
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       when(() => test.mockStorage.getApiKey()).thenReturn(null);
@@ -458,7 +498,8 @@ void main() {
 
       final values = tester
           .widgetList<RadioListTile<ReportType>>(
-              find.byType(RadioListTile<ReportType>))
+            find.byType(RadioListTile<ReportType>),
+          )
           .map((r) => r.value)
           .toList();
       expect(
@@ -468,10 +509,7 @@ void main() {
     });
 
     test('visibleForCountry returns all types for DE, last 2 for FR/GB', () {
-      expect(
-        ReportType.visibleForCountry('DE'),
-        equals(ReportType.values),
-      );
+      expect(ReportType.visibleForCountry('DE'), equals(ReportType.values));
       expect(
         ReportType.visibleForCountry('FR'),
         equals(const [ReportType.wrongName, ReportType.wrongAddress]),
@@ -484,109 +522,109 @@ void main() {
 
     test('routesToGitHub covers exactly wrongName + wrongAddress', () {
       for (final t in ReportType.values) {
-        expect(t.routesToGitHub, t == ReportType.wrongName || t == ReportType.wrongAddress,
-            reason: '$t routesToGitHub is wrong');
+        expect(
+          t.routesToGitHub,
+          t == ReportType.wrongName || t == ReportType.wrongAddress,
+          reason: '$t routesToGitHub is wrong',
+        );
       }
     });
   });
 
   group('ReportScreen GitHub routing (#508)', () {
     testWidgets(
-        'wrongAddress on FR hands off to ErrorReporter with populated payload',
-        (tester) async {
-      ErrorReportPayload? captured;
-      final reporter = ErrorReporter(launcher: (uri) async => true);
+      'wrongAddress on FR hands off to ErrorReporter with populated payload',
+      (tester) async {
+        ErrorReportPayload? captured;
+        final reporter = ErrorReporter(launcher: (uri) async => true);
 
-      final test = standardTestOverrides(country: Countries.france);
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.getApiKey()).thenReturn(null);
+        final test = standardTestOverrides(country: Countries.france);
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+        when(() => test.mockStorage.getApiKey()).thenReturn(null);
 
-      // A wrapped reporter that records the payload on reportError and
-      // then delegates (with consent skipped) to the real one.
-      final recording = _RecordingReporter((p) => captured = p);
+        // A wrapped reporter that records the payload on reportError and
+        // then delegates (with consent skipped) to the real one.
+        final recording = _RecordingReporter((p) => captured = p);
 
-      await pumpApp(
-        tester,
-        ReportScreen(
-          stationId: 'station-42',
-          reporter: recording,
-        ),
-        overrides: test.overrides,
-      );
-      await tester.pumpAndSettle();
+        await pumpApp(
+          tester,
+          ReportScreen(stationId: 'station-42', reporter: recording),
+          overrides: test.overrides,
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Wrong address'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Wrong address'));
+        await tester.pumpAndSettle();
 
-      await tester.enterText(
-        find.byKey(const ValueKey('report-correction-text-field')),
-        '42 rue de la République',
-      );
-      await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const ValueKey('report-correction-text-field')),
+          '42 rue de la République',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(FilledButton));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
 
-      expect(captured, isNotNull, reason: 'reporter must be invoked');
-      expect(captured!.countryCode, 'FR');
-      expect(captured!.errorType, 'WrongMetadataReport');
-      expect(captured!.errorMessage, contains('station-42'));
-      expect(captured!.errorMessage, contains('42 rue de la République'));
-      expect(captured!.sourceLabel, isNotNull);
+        expect(captured, isNotNull, reason: 'reporter must be invoked');
+        expect(captured!.countryCode, 'FR');
+        expect(captured!.errorType, 'WrongMetadataReport');
+        expect(captured!.errorMessage, contains('station-42'));
+        expect(captured!.errorMessage, contains('42 rue de la République'));
+        expect(captured!.sourceLabel, isNotNull);
 
-      // Silence the unused-field lint on `reporter`.
-      expect(reporter, isA<ErrorReporter>());
-    });
+        // Silence the unused-field lint on `reporter`.
+        expect(reporter, isA<ErrorReporter>());
+      },
+    );
 
     testWidgets(
-        'wrongName on DE still routes to GitHub (not to Tankerkoenig)',
-        (tester) async {
-      ErrorReportPayload? captured;
-      final recording = _RecordingReporter((p) => captured = p);
+      'wrongName on DE still routes to GitHub (not to Tankerkoenig)',
+      (tester) async {
+        ErrorReportPayload? captured;
+        final recording = _RecordingReporter((p) => captured = p);
 
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(true);
-      when(() => test.mockStorage.getApiKey())
-          .thenReturn('11111111-2222-3333-4444-555555555555');
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(true);
+        when(
+          () => test.mockStorage.getApiKey(),
+        ).thenReturn('11111111-2222-3333-4444-555555555555');
 
-      await pumpApp(
-        tester,
-        ReportScreen(
-          stationId: 'station-99',
-          reporter: recording,
-        ),
-        overrides: test.overrides,
-      );
-      await tester.pumpAndSettle();
+        await pumpApp(
+          tester,
+          ReportScreen(stationId: 'station-99', reporter: recording),
+          overrides: test.overrides,
+        );
+        await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.text('Wrong station name'),
-        120,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.text('Wrong station name'));
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.text('Wrong station name'),
+          120,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(find.text('Wrong station name'));
+        await tester.pumpAndSettle();
 
-      await tester.enterText(
-        find.byKey(const ValueKey('report-correction-text-field')),
-        'Shell Castelnau',
-      );
-      await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const ValueKey('report-correction-text-field')),
+          'Shell Castelnau',
+        );
+        await tester.pumpAndSettle();
 
-      await tester.scrollUntilVisible(
-        find.byType(FilledButton),
-        120,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.byType(FilledButton));
-      await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byType(FilledButton),
+          120,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(find.byType(FilledButton));
+        await tester.pumpAndSettle();
 
-      expect(captured, isNotNull);
-      expect(captured!.countryCode, 'DE');
-      expect(captured!.errorType, 'WrongMetadataReport');
-      expect(captured!.errorMessage, contains('station-99'));
-      expect(captured!.errorMessage, contains('Shell Castelnau'));
-    });
+        expect(captured, isNotNull);
+        expect(captured!.countryCode, 'DE');
+        expect(captured!.errorType, 'WrongMetadataReport');
+        expect(captured!.errorMessage, contains('station-99'));
+        expect(captured!.errorMessage, contains('Shell Castelnau'));
+      },
+    );
   });
 
   group('ReportType enum (#484)', () {
@@ -598,8 +636,7 @@ void main() {
       expect(ReportType.wrongE98.fuelTypeColumnValue, 'e98');
       expect(ReportType.wrongLpg.fuelTypeColumnValue, 'lpg');
       expect(ReportType.wrongStatusOpen.fuelTypeColumnValue, 'status_open');
-      expect(
-          ReportType.wrongStatusClosed.fuelTypeColumnValue, 'status_closed');
+      expect(ReportType.wrongStatusClosed.fuelTypeColumnValue, 'status_closed');
       expect(ReportType.wrongName.fuelTypeColumnValue, 'name');
       expect(ReportType.wrongAddress.fuelTypeColumnValue, 'address');
     });
@@ -619,16 +656,18 @@ void main() {
       expect(ReportType.wrongAddress.isTankerkoenigSupported, isFalse);
     });
 
-    test('needsPrice / needsText are mutually exclusive and exhaustive',
-        () {
+    test('needsPrice / needsText are mutually exclusive and exhaustive', () {
       for (final type in ReportType.values) {
-        expect(type.needsPrice && type.needsText, isFalse,
-            reason: '$type cannot be both price and text');
+        expect(
+          type.needsPrice && type.needsText,
+          isFalse,
+          reason: '$type cannot be both price and text',
+        );
       }
       // Sanity — every type has a non-empty display name (French
       // fallback is always present).
       for (final type in ReportType.values) {
-        expect(type.displayName(null), isNotEmpty);
+        expect(type.displayName(l10nEn), isNotEmpty);
       }
     });
   });
@@ -638,8 +677,7 @@ void main() {
 /// `reportError` to record the payload — skipping both the consent
 /// dialog and the real browser launcher.
 class _RecordingReporter extends ErrorReporter {
-  _RecordingReporter(this.onReport)
-      : super(launcher: _noopLauncher);
+  _RecordingReporter(this.onReport) : super(launcher: _noopLauncher);
 
   final void Function(ErrorReportPayload) onReport;
 

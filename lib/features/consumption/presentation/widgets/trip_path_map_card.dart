@@ -93,8 +93,8 @@ class TripPathMapCard extends StatelessWidget {
 
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
-    final title = l?.tripPathCardTitle ?? 'Trip path';
-    final subtitle = l?.tripPathCardSubtitle ?? 'GPS-recorded route';
+    final title = l.tripPathCardTitle;
+    final subtitle = l.tripPathCardSubtitle;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
@@ -121,10 +121,7 @@ class TripPathMapCard extends StatelessWidget {
             ),
             SizedBox(
               height: 220,
-              child: _TripPathMap(
-                points: points,
-                pointSamples: pointSamples,
-              ),
+              child: _TripPathMap(points: points, pointSamples: pointSamples),
             ),
             const _TripPathLegend(),
           ],
@@ -142,10 +139,7 @@ class _TripPathMap extends StatefulWidget {
   final List<LatLng> points;
   final List<TripDetailSample> pointSamples;
 
-  const _TripPathMap({
-    required this.points,
-    required this.pointSamples,
-  });
+  const _TripPathMap({required this.points, required this.pointSamples});
 
   @override
   State<_TripPathMap> createState() => _TripPathMapState();
@@ -286,11 +280,7 @@ class _TripPathMapState extends State<_TripPathMap> {
             point: widget.points[idx],
             width: 20,
             height: 20,
-            child: Icon(
-              Icons.bolt,
-              size: 16,
-              color: theme.colorScheme.error,
-            ),
+            child: Icon(Icons.bolt, size: 16, color: theme.colorScheme.error),
           ),
     ];
 
@@ -367,11 +357,9 @@ class _TripPathLegend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final efficient =
-        l?.tripPathLegendEfficient ?? 'Efficient (< 6 L/100km)';
-    final borderline =
-        l?.tripPathLegendBorderline ?? 'Borderline (6–10 L/100km)';
-    final wasteful = l?.tripPathLegendWasteful ?? 'Wasteful (≥ 10 L/100km)';
+    final efficient = l.tripPathLegendEfficient;
+    final borderline = l.tripPathLegendBorderline;
+    final wasteful = l.tripPathLegendWasteful;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       child: Wrap(
@@ -387,10 +375,7 @@ class _TripPathLegend extends StatelessWidget {
             color: DarkModeColors.warning(context),
             label: borderline,
           ),
-          _LegendSwatch(
-            color: DarkModeColors.error(context),
-            label: wasteful,
-          ),
+          _LegendSwatch(color: DarkModeColors.error(context), label: wasteful),
         ],
       ),
     );
@@ -441,10 +426,7 @@ class _PathPin extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 3,
-          ),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 3),
         ],
       ),
       child: Icon(icon, size: 16, color: Colors.white),

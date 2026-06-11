@@ -8,12 +8,14 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/station_rating_provider.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_status_row.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 ServiceResult<dynamic> _result({DateTime? fetchedAt}) {
   return ServiceResult(
     data: const Object(),
     source: ServiceSource.tankerkoenigApi,
-    fetchedAt: fetchedAt ?? DateTime.now().subtract(const Duration(seconds: 10)),
+    fetchedAt:
+        fetchedAt ?? DateTime.now().subtract(const Duration(seconds: 10)),
   );
 }
 
@@ -58,10 +60,13 @@ void main() {
       return tester.pumpWidget(
         ProviderScope(
           overrides: [
-            stationRatingsProvider
-                .overrideWith(() => _FakeStationRatings(ratings)),
+            stationRatingsProvider.overrideWith(
+              () => _FakeStationRatings(ratings),
+            ),
           ],
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
               body: StationStatusRow(
                 station: station,
@@ -74,8 +79,9 @@ void main() {
       );
     }
 
-    testWidgets('renders the open status text when station is open',
-        (tester) async {
+    testWidgets('renders the open status text when station is open', (
+      tester,
+    ) async {
       await pumpRow(
         tester,
         station: _station(isOpen: true),
@@ -84,8 +90,9 @@ void main() {
       expect(find.textContaining('Open —'), findsOneWidget);
     });
 
-    testWidgets('renders the closed status text when station is closed',
-        (tester) async {
+    testWidgets('renders the closed status text when station is closed', (
+      tester,
+    ) async {
       await pumpRow(
         tester,
         station: _station(isOpen: false),

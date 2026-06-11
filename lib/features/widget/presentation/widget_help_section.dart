@@ -41,18 +41,7 @@ class WidgetHelpSection extends ConsumerWidget {
       profile = null;
     }
 
-    final lines = <String>[
-      l?.widgetHelpIntro ??
-          'Add the SparKilo widget to your home screen to see fuel and '
-              'charging prices at a glance.',
-      l?.widgetHelpAdd ??
-          "Add it from your launcher's widget picker — long-press an "
-              'empty area of the home screen, choose Widgets, and find '
-              'SparKilo.',
-      l?.widgetHelpTap ??
-          'Tap a station in the widget to open it in the app. Tap the '
-              'refresh icon to update prices.',
-    ];
+    final lines = <String>[l.widgetHelpIntro, l.widgetHelpAdd, l.widgetHelpTap];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -70,13 +59,7 @@ class WidgetHelpSection extends ConsumerWidget {
           if (profile != null)
             _WidgetDefaultsEditor(profile: profile)
           else
-            Text(
-              l?.widgetHelpConfigure ??
-                  'On Android, long-press the widget and choose '
-                      'Reconfigure to change the profile, colour, and '
-                      'content.',
-              style: theme.textTheme.bodySmall,
-            ),
+            Text(l.widgetHelpConfigure, style: theme.textTheme.bodySmall),
         ],
       ),
     );
@@ -97,27 +80,21 @@ class _WidgetDefaultsEditor extends ConsumerWidget {
       children: [
         const SizedBox(height: 4),
         Text(
-          l?.widgetDefaultsApplyToAllHint ??
-              'Choices below apply to every installed widget on the '
-                  'next refresh.',
+          l.widgetDefaultsApplyToAllHint,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
             fontStyle: FontStyle.italic,
           ),
         ),
         const SizedBox(height: 12),
-        Text(
-          l?.widgetDefaultsColorLabel ?? 'Colour scheme',
-          style: theme.textTheme.labelMedium,
-        ),
+        Text(l.widgetDefaultsColorLabel, style: theme.textTheme.labelMedium),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
           key: const Key('widget_color_scheme_dropdown'),
           initialValue: profile.widgetColorScheme,
           decoration: const InputDecoration(
             isDense: true,
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             border: OutlineInputBorder(),
           ),
           items: [
@@ -133,10 +110,7 @@ class _WidgetDefaultsEditor extends ConsumerWidget {
           },
         ),
         const SizedBox(height: 12),
-        Text(
-          l?.widgetDefaultsVariantLabel ?? 'Content variant',
-          style: theme.textTheme.labelMedium,
-        ),
+        Text(l.widgetDefaultsVariantLabel, style: theme.textTheme.labelMedium),
         const SizedBox(height: 4),
         SegmentedButton<String>(
           key: const Key('widget_variant_segmented'),
@@ -144,11 +118,11 @@ class _WidgetDefaultsEditor extends ConsumerWidget {
           segments: [
             ButtonSegment(
               value: defaultWidgetVariant,
-              label: Text(l?.widgetVariantDefault ?? 'Default'),
+              label: Text(l.widgetVariantDefault),
             ),
             ButtonSegment(
               value: predictiveWidgetVariant,
-              label: Text(l?.widgetVariantPredictive ?? 'Predictive'),
+              label: Text(l.widgetVariantPredictive),
             ),
           ],
           onSelectionChanged: (sel) {
@@ -169,23 +143,20 @@ class _WidgetDefaultsEditor extends ConsumerWidget {
     unawaited(ref.read(activeProfileProvider.notifier).updateProfile(next));
   }
 
-  static String _localizedSchemeLabel(
-    AppLocalizations? l,
-    String scheme,
-  ) {
+  static String _localizedSchemeLabel(AppLocalizations l, String scheme) {
     switch (scheme) {
       case 'system':
-        return l?.widgetColorSchemeSystem ?? 'Follow system';
+        return l.widgetColorSchemeSystem;
       case 'light':
-        return l?.widgetColorSchemeLight ?? 'Light';
+        return l.widgetColorSchemeLight;
       case 'dark':
-        return l?.widgetColorSchemeDark ?? 'Dark';
+        return l.widgetColorSchemeDark;
       case 'blue':
-        return l?.widgetColorSchemeBlue ?? 'Blue';
+        return l.widgetColorSchemeBlue;
       case 'green':
-        return l?.widgetColorSchemeGreen ?? 'Green';
+        return l.widgetColorSchemeGreen;
       case 'orange':
-        return l?.widgetColorSchemeOrange ?? 'Orange';
+        return l.widgetColorSchemeOrange;
       default:
         return scheme;
     }

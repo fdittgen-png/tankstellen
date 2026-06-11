@@ -36,9 +36,9 @@ class PasswordStrengthIndicator extends StatelessWidget {
     };
 
     final label = switch (strength) {
-      PasswordStrength.weak => l10n?.passwordStrengthWeak ?? 'Weak',
-      PasswordStrength.fair => l10n?.passwordStrengthFair ?? 'Fair',
-      PasswordStrength.strong => l10n?.passwordStrengthStrong ?? 'Strong',
+      PasswordStrength.weak => l10n.passwordStrengthWeak,
+      PasswordStrength.fair => l10n.passwordStrengthFair,
+      PasswordStrength.strong => l10n.passwordStrengthStrong,
     };
 
     return Column(
@@ -71,44 +71,55 @@ class PasswordStrengthIndicator extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         // Requirements checklist
-        ...requirements.map((req) => Padding(
-          padding: const EdgeInsets.only(bottom: 2),
-          child: Row(
-            children: [
-              Icon(
-                req.met ? Icons.check_circle : Icons.circle_outlined,
-                size: 14,
-                color: req.met ? DarkModeColors.success(context) : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                _requirementLabel(l10n, req.type),
-                style: theme.textTheme.bodySmall?.copyWith(
+        ...requirements.map(
+          (req) => Padding(
+            padding: const EdgeInsets.only(bottom: 2),
+            child: Row(
+              children: [
+                Icon(
+                  req.met ? Icons.check_circle : Icons.circle_outlined,
+                  size: 14,
                   color: req.met
-                      ? theme.colorScheme.onSurface
-                      : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                  fontSize: 11,
+                      ? DarkModeColors.success(context)
+                      : theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 6),
+                Text(
+                  _requirementLabel(l10n, req.type),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: req.met
+                        ? theme.colorScheme.onSurface
+                        : theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
           ),
-        )),
+        ),
       ],
     );
   }
 
-  String _requirementLabel(AppLocalizations? l10n, PasswordRequirementType type) {
+  String _requirementLabel(
+    AppLocalizations l10n,
+    PasswordRequirementType type,
+  ) {
     switch (type) {
       case PasswordRequirementType.minLength:
-        return l10n?.passwordReqMinLength ?? 'At least ${PasswordValidator.minLength} characters';
+        return l10n.passwordReqMinLength;
       case PasswordRequirementType.uppercase:
-        return l10n?.passwordReqUppercase ?? 'At least 1 uppercase letter';
+        return l10n.passwordReqUppercase;
       case PasswordRequirementType.lowercase:
-        return l10n?.passwordReqLowercase ?? 'At least 1 lowercase letter';
+        return l10n.passwordReqLowercase;
       case PasswordRequirementType.digit:
-        return l10n?.passwordReqDigit ?? 'At least 1 number';
+        return l10n.passwordReqDigit;
       case PasswordRequirementType.special:
-        return l10n?.passwordReqSpecial ?? 'At least 1 special character';
+        return l10n.passwordReqSpecial;
     }
   }
 }

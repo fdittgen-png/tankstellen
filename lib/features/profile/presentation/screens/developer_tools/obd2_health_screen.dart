@@ -49,10 +49,11 @@ class Obd2HealthScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final debugOn =
-        ref.watch(enabledFeaturesProvider).contains(Feature.debugMode);
+    final debugOn = ref
+        .watch(enabledFeaturesProvider)
+        .contains(Feature.debugMode);
 
-    final title = l?.obd2HealthScreenTitle ?? 'OBD2 communication health';
+    final title = l.obd2HealthScreenTitle;
 
     if (!debugOn) {
       // Defensive: a stale deep-link must never expose dev tools.
@@ -83,9 +84,7 @@ class Obd2HealthScreen extends ConsumerWidget {
       body: ListView(
         children: [
           Text(
-            l?.obd2DiagnosticsExplain ??
-                'Captured while recording to debug the dongle↔app '
-                    'communication — only collected in Developer mode.',
+            l.obd2DiagnosticsExplain,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -103,16 +102,14 @@ class Obd2HealthScreen extends ConsumerWidget {
           SectionHeader(
             key: const Key('obd2_health_connect_attempts_section'),
             leadingIcon: Icons.cable_outlined,
-            title: l?.obd2HealthConnectAttemptsSection ??
-                'Recent connect attempts',
+            title: l.obd2HealthConnectAttemptsSection,
             padding: EdgeInsets.zero,
           ),
           if (connectTraces.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
               child: Text(
-                l?.obd2HealthConnectAttemptsEmpty ??
-                    'No connect attempts recorded yet.',
+                l.obd2HealthConnectAttemptsEmpty,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -133,8 +130,7 @@ class Obd2HealthScreen extends ConsumerWidget {
                     onPressed: () =>
                         _downloadConnectTrace(context, l, connectTraces[i]),
                     icon: const Icon(Icons.download_outlined, size: 18),
-                    label: Text(l?.obd2HealthDownloadConnectTrace ??
-                        'Download connect trace'),
+                    label: Text(l.obd2HealthDownloadConnectTrace),
                   ),
                 ),
               ),
@@ -147,9 +143,11 @@ class Obd2HealthScreen extends ConsumerWidget {
                   key: const Key('obd2_health_download_all_connect_traces'),
                   onPressed: () =>
                       _downloadAllConnectTraces(context, l, connectTraces),
-                  icon: const Icon(Icons.download_for_offline_outlined, size: 18),
-                  label: Text(l?.obd2HealthDownloadAllConnectTraces ??
-                      'Download all connect traces'),
+                  icon: const Icon(
+                    Icons.download_for_offline_outlined,
+                    size: 18,
+                  ),
+                  label: Text(l.obd2HealthDownloadAllConnectTraces),
                 ),
               ),
             ),
@@ -159,7 +157,7 @@ class Obd2HealthScreen extends ConsumerWidget {
           // --- Live session ---------------------------------------------
           SectionHeader(
             leadingIcon: Icons.sensors_outlined,
-            title: l?.obd2HealthLiveSection ?? 'Live session',
+            title: l.obd2HealthLiveSection,
             padding: EdgeInsets.zero,
           ),
           Obd2DiagnosticsCard(
@@ -168,13 +166,17 @@ class Obd2HealthScreen extends ConsumerWidget {
             enabled: enabled,
           ),
           _downloadJsonButton(
-              context, l, live, const Key('obd2_health_copy_live')),
+            context,
+            l,
+            live,
+            const Key('obd2_health_copy_live'),
+          ),
           const SizedBox(height: 16),
 
           // --- Recent finished sessions ---------------------------------
           SectionHeader(
             leadingIcon: Icons.history_outlined,
-            title: l?.obd2HealthHistorySection ?? 'Recent sessions',
+            title: l.obd2HealthHistorySection,
             padding: EdgeInsets.zero,
           ),
           for (var i = 0; i < finished.length; i++) ...[
@@ -198,7 +200,7 @@ class Obd2HealthScreen extends ConsumerWidget {
 
   Widget _downloadJsonButton(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     Obd2SessionDiagnostic session,
     Key key,
   ) {
@@ -220,16 +222,13 @@ class Obd2HealthScreen extends ConsumerWidget {
                 key: Key('${keyValue}_init'),
                 onPressed: () => _downloadInitTranscript(context, l, session),
                 icon: const Icon(Icons.terminal_outlined, size: 18),
-                label: Text(
-                  l?.obd2HealthDownloadInitTranscript ??
-                      'Download init transcript only',
-                ),
+                label: Text(l.obd2HealthDownloadInitTranscript),
               ),
             TextButton.icon(
               key: key,
               onPressed: () => _downloadAsJson(context, l, session),
               icon: const Icon(Icons.download_outlined, size: 18),
-              label: Text(l?.obd2HealthDownloadJson ?? 'Download as JSON'),
+              label: Text(l.obd2HealthDownloadJson),
             ),
           ],
         ),
@@ -242,7 +241,7 @@ class Obd2HealthScreen extends ConsumerWidget {
   /// trace that is non-empty on a FAILED connect.
   Future<void> _downloadConnectTrace(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     Obd2ConnectTrace trace,
   ) async {
     final json = const JsonEncoder.withIndent('  ').convert(trace.toJson());
@@ -253,11 +252,12 @@ class Obd2HealthScreen extends ConsumerWidget {
   /// Downloads folder (#2969).
   Future<void> _downloadAllConnectTraces(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     List<Obd2ConnectTrace> traces,
   ) async {
-    final json = const JsonEncoder.withIndent('  ')
-        .convert([for (final t in traces) t.toJson()]);
+    final json = const JsonEncoder.withIndent(
+      '  ',
+    ).convert([for (final t in traces) t.toJson()]);
     await _saveJsonToDownloads(context, l, json, 'connect-traces');
   }
 
@@ -267,7 +267,7 @@ class Obd2HealthScreen extends ConsumerWidget {
   /// file manager.
   Future<void> _downloadAsJson(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     Obd2SessionDiagnostic session,
   ) async {
     final json = const JsonEncoder.withIndent('  ').convert(session.toJson());
@@ -280,7 +280,7 @@ class Obd2HealthScreen extends ConsumerWidget {
   /// for attaching a handshake to a bug report.
   Future<void> _downloadInitTranscript(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     Obd2SessionDiagnostic session,
   ) async {
     final payload = <String, dynamic>{
@@ -307,7 +307,7 @@ class Obd2HealthScreen extends ConsumerWidget {
   /// handled defensively (the #2933 background-isolate degrade pattern).
   Future<void> _saveJsonToDownloads(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     String json,
     String kind,
   ) async {
@@ -315,8 +315,10 @@ class Obd2HealthScreen extends ConsumerWidget {
     // context is touched after the await (lint: use_build_context_synchronously).
     final messenger = ScaffoldMessenger.maybeOf(context);
     final scheme = Theme.of(context).colorScheme;
-    final stamp =
-        DateTime.now().toIso8601String().replaceAll(RegExp(r'[:.]'), '-');
+    final stamp = DateTime.now().toIso8601String().replaceAll(
+      RegExp(r'[:.]'),
+      '-',
+    );
     // i18n-ignore: language-neutral filename mask (brand + kind tag + stamp).
     final fileName = 'tankstellen-obd2-$kind-$stamp.json';
     try {
@@ -326,34 +328,41 @@ class Obd2HealthScreen extends ConsumerWidget {
         mimeType: 'application/json',
       );
       messenger?.showSnackBar(
-        SnackBarHelper.successSnackBar(
-          scheme,
-          l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
-        ),
+        SnackBarHelper.successSnackBar(scheme, l.savedToDownloadsFolder),
       );
     } on MissingPluginException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'Obd2HealthScreen download: public_files channel unavailable',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where':
+                'Obd2HealthScreen download: public_files channel unavailable',
+          },
+        ),
+      );
       _showDownloadError(scheme, l, messenger);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'Obd2HealthScreen download: json write',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'Obd2HealthScreen download: json write'},
+        ),
+      );
       _showDownloadError(scheme, l, messenger);
     }
   }
 
   void _showDownloadError(
     ColorScheme scheme,
-    AppLocalizations? l,
+    AppLocalizations l,
     ScaffoldMessengerState? messenger,
   ) {
     messenger?.showSnackBar(
-      SnackBarHelper.errorSnackBar(
-        scheme,
-        l?.obd2HealthDownloadError ?? "Couldn't save the diagnostics file",
-      ),
+      SnackBarHelper.errorSnackBar(scheme, l.obd2HealthDownloadError),
     );
   }
 }

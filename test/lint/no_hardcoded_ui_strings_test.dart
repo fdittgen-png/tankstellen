@@ -26,19 +26,25 @@ import 'package:flutter_test/flutter_test.dart';
 /// `SnackBar` content and `AppBar` titles are `Text(...)` widgets, so
 /// the `Text(` sink already covers them.
 ///
+/// ## The l10n-fallback pattern (#3162 — gate closed)
+///
+/// `l10n.yaml` sets `nullable-getter: false`, so
+/// `AppLocalizations.of(context)` is non-nullable and the historical
+/// `l10n?.key ?? 'English fallback'` convention is dead code — all
+/// ~708 fallback literals were removed with it. A dedicated sink keeps
+/// the pattern at **zero**: any `l10n.key ?? 'prose'` (or `l?.key`,
+/// `loc.key`, … — with or without arguments) is a violation. Code that
+/// genuinely runs without a `BuildContext` (background isolates, TTS,
+/// notifications) resolves a non-null instance via
+/// `lookupAppLocalizations(locale)` (the #2766 pattern) instead of
+/// falling back to a literal.
+///
 /// ## What is NOT flagged (precision)
 ///
-/// The literal must sit *immediately* after the sink (modulo `const`
-/// and whitespace). That single anchor rules out the bulk of false
-/// positives for free:
+/// For the widget sinks the literal must sit *immediately* after the
+/// sink (modulo `const` and whitespace). That single anchor rules out
+/// the bulk of false positives for free:
 ///
-///   * the intentional fallback pattern `Text(l?.key ?? 'fallback')` /
-///     `Semantics(label: l10n?.key ?? 'fallback')` — a localized
-///     `l10n?…` expression precedes the literal, so the literal is no
-///     longer the first quote after the sink and never matches. This is
-///     the project-wide convention (every `l10n?.x ?? 'English'`); the
-///     `?? 'fallback'` literal is a documented blind spot, intentional
-///     because the primary value is always localized;
 ///   * string interpolation `Text('$count items')` — a `$` inside the
 ///     literal disqualifies it;
 ///   * pure interpolation `Semantics(label: '$a · $b')` that composes
@@ -95,6 +101,19 @@ void main() {
       r'Semantics\(\s*(?:[A-Za-z][A-Za-z0-9]*:\s*[A-Za-z0-9.]+,\s*)*'
       'label:\\s*$quoted',
     ),
+    // #3162 — the l10n-fallback blind spot, closed. `nullable-getter:
+    // false` makes `AppLocalizations.of(context)` non-nullable, so a
+    // `l10n.key ?? 'English fallback'` (let alone `l10n?.key`) is a
+    // duplicated English string that silently drifts from the ARB.
+    // Matches a member access on the conventional localization
+    // identifiers (`l10n`, `l`, `loc`, `localizations`), optionally
+    // with arguments, null-coalesced into a quoted literal — across
+    // newlines (`\s*` spans the wrap).
+    RegExp(
+      r'\b(?:l10n|l|loc|localizations)\??\.[a-zA-Z][a-zA-Z0-9_]*'
+      r'(?:\([^()]*\))?\s*\?\?\s*'
+      '$quoted',
+    ),
   ];
 
   // A ternary *then*-branch that is a bare string literal, sitting
@@ -106,8 +125,8 @@ void main() {
   //
   // The negative lookbehind `(?<!\?)` excludes the null-coalescing
   // operator `?? 'fallback'` (a single `?` is a ternary; a double `??`
-  // is the intentional localized-fallback convention and is NOT a
-  // violation). The trailing `:` confirms it is the `then` arm of a
+  // is handled by the dedicated #3162 fallback sink above, not this
+  // ternary detector). The trailing `:` confirms it is the `then` arm of a
   // conditional rather than a bare expression. The interpolation-context
   // guard below rules out top-level ternaries that are not inside a
   // `${…}` block.

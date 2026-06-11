@@ -50,7 +50,7 @@ class ServiceReminderSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          l?.serviceRemindersSection ?? 'Service reminders',
+          l.serviceRemindersSection,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
@@ -62,8 +62,7 @@ class ServiceReminderSection extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              l?.serviceRemindersEmpty ??
-                  'No reminders yet — pick a preset above.',
+              l.serviceRemindersEmpty,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           )
@@ -79,7 +78,7 @@ class ServiceReminderSection extends ConsumerWidget {
         const SizedBox(height: 8),
         OutlinedButton.icon(
           icon: const Icon(Icons.add),
-          label: Text(l?.addServiceReminder ?? 'Add reminder'),
+          label: Text(l.addServiceReminder),
           onPressed: () => _promptCustom(context, ref),
         ),
       ],
@@ -123,28 +122,26 @@ class ServiceReminderSection extends ConsumerWidget {
       return await showDialog<double>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text(l?.serviceReminderMarkDone ?? 'Mark as done'),
+          title: Text(l.serviceReminderMarkDone),
           content: TextField(
             controller: controller,
             autofocus: true,
-            keyboardType:
-                const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              labelText: l?.odometerKm ?? 'Odometer (km)',
-            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(labelText: l.odometerKm),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l?.cancel ?? 'Cancel'),
+              child: Text(l.cancel),
             ),
             FilledButton(
               onPressed: () {
                 final value = double.tryParse(
-                    controller.text.trim().replaceAll(',', '.'));
+                  controller.text.trim().replaceAll(',', '.'),
+                );
                 Navigator.of(ctx).pop(value);
               },
-              child: Text(l?.save ?? 'Save'),
+              child: Text(l.save),
             ),
           ],
         ),
@@ -165,24 +162,23 @@ class ServiceReminderSection extends ConsumerWidget {
       final added = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text(l?.addServiceReminder ?? 'Add reminder'),
+          title: Text(l.addServiceReminder),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: labelCtrl,
                 autofocus: true,
-                decoration: InputDecoration(
-                  labelText: l?.serviceReminderLabel ?? 'Label',
-                ),
+                decoration: InputDecoration(labelText: l.serviceReminderLabel),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: intervalCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: false),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: false,
+                ),
                 decoration: InputDecoration(
-                  labelText: l?.serviceReminderInterval ?? 'Interval (km)',
+                  labelText: l.serviceReminderInterval,
                 ),
               ),
             ],
@@ -190,11 +186,11 @@ class ServiceReminderSection extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(l?.cancel ?? 'Cancel'),
+              child: Text(l.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(ctx).pop(true),
-              child: Text(l?.save ?? 'Save'),
+              child: Text(l.save),
             ),
           ],
         ),
@@ -241,8 +237,8 @@ class _ReminderRow extends StatelessWidget {
     final subtitle = lastService == null
         ? intervalText
         : '$intervalText • '
-            '${l?.serviceReminderLastService ?? 'Last service'}: '
-            '${lastService.round()} km';
+              '${l.serviceReminderLastService}: '
+              '${lastService.round()} km';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -259,19 +255,18 @@ class _ReminderRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(reminder.label),
-                Text(subtitle,
-                    style: Theme.of(context).textTheme.bodySmall),
+                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
               ],
             ),
           ),
           IconButton(
             icon: const Icon(Icons.check_circle_outline),
-            tooltip: l?.serviceReminderMarkDone ?? 'Mark as done',
+            tooltip: l.serviceReminderMarkDone,
             onPressed: onMarkDone,
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: l?.delete ?? 'Delete',
+            tooltip: l.delete,
             onPressed: onDelete,
           ),
         ],

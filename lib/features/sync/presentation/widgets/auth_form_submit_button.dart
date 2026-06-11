@@ -48,13 +48,12 @@ class AuthFormSubmitButton extends StatelessWidget {
             ),
       label: Text(
         isLoading
-            ? (l10n?.syncConnectingButton ?? 'Connecting...')
+            ? (l10n.syncConnectingButton)
             : useEmail
-                ? (isSignUp
-                    ? (l10n?.authCreateAccountAndConnect ??
-                        'Create account & connect')
-                    : (l10n?.authSignInAndConnect ?? 'Sign in & connect'))
-                : (l10n?.authConnectAnonymously ?? 'Connect anonymously'),
+            ? (isSignUp
+                  ? (l10n.authCreateAccountAndConnect)
+                  : (l10n.authSignInAndConnect))
+            : (l10n.authConnectAnonymously),
       ),
     );
   }

@@ -71,8 +71,7 @@ class SearchCriteriaForm extends ConsumerWidget {
           HelpBanner(
             storageKey: StorageKeys.helpBannerCriteria,
             icon: Icons.lightbulb_outline,
-            message: l10n?.helpBannerCriteria ??
-                'Your profile defaults are pre-filled. Adjust criteria below to refine your search.',
+            message: l10n.helpBannerCriteria,
           ),
           if (routePlanningOn) ...[
             SearchModeToggle(
@@ -91,16 +90,10 @@ class SearchCriteriaForm extends ConsumerWidget {
               onCitySearch: onCitySearch,
             ),
           ] else ...[
-            RouteInput(
-              key: routeInputKey,
-              onSearch: onRouteSearch,
-            ),
+            RouteInput(key: routeInputKey, onSearch: onRouteSearch),
           ],
           const SizedBox(height: 8),
-          Text(
-            l10n?.fuelType ?? 'Fuel type',
-            style: theme.textTheme.titleSmall,
-          ),
+          Text(l10n.fuelType, style: theme.textTheme.titleSmall),
           const SizedBox(height: 4),
           const FuelTypeSelector(),
           const SizedBox(height: 8),
@@ -122,14 +115,11 @@ class SearchCriteriaForm extends ConsumerWidget {
             onChanged: (value) {
               ref.read(openOnlyFilterProvider.notifier).set(value);
             },
-            title: Text(l10n?.openOnlyFilter ?? 'Open only'),
+            title: Text(l10n.openOnlyFilter),
             secondary: const Icon(Icons.schedule),
           ),
           const SizedBox(height: 4),
-          Text(
-            l10n?.amenities ?? 'Amenities',
-            style: theme.textTheme.titleSmall,
-          ),
+          Text(l10n.amenities, style: theme.textTheme.titleSmall),
           const SizedBox(height: 4),
           AmenityFilterWrap(
             selected: amenities,
@@ -149,9 +139,7 @@ class SearchCriteriaForm extends ConsumerWidget {
             key: const ValueKey('criteria-save-defaults-button'),
             onPressed: onSaveDefaults,
             icon: const Icon(Icons.bookmark_add),
-            label: Text(
-              l10n?.saveAsDefaults ?? 'Save as my defaults',
-            ),
+            label: Text(l10n.saveAsDefaults),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(44),
             ),

@@ -95,18 +95,12 @@ class BrokenMapBanner extends ConsumerWidget {
     return MaterialBanner(
       key: const Key('brokenMapBanner'),
       backgroundColor: theme.colorScheme.errorContainer,
-      contentTextStyle: TextStyle(
-        color: theme.colorScheme.onErrorContainer,
-      ),
+      contentTextStyle: TextStyle(color: theme.colorScheme.onErrorContainer),
       leading: Icon(
         Icons.warning_amber_outlined,
         color: theme.colorScheme.onErrorContainer,
       ),
-      content: Text(
-        l?.brokenMapBannerHardDisable ??
-            'MAP sensor unreliable. Showing fill-up averages instead of '
-                'live fuel rate.',
-      ),
+      content: Text(l.brokenMapBannerHardDisable),
       actions: const [SizedBox.shrink()],
     );
   }
@@ -145,9 +139,7 @@ class BrokenMapDisclaimerChip extends ConsumerWidget {
             size: 14,
             color: theme.colorScheme.onErrorContainer,
           ),
-          label: Text(
-            l?.brokenMapChipDisclaimer ?? 'MAP readings suspicious',
-          ),
+          label: Text(l.brokenMapChipDisclaimer),
         ),
       ),
     );
@@ -200,23 +192,19 @@ class BrokenMapOverlayRow extends ConsumerWidget {
         // because observationCount > 0 means we DO want to show the
         // user the live posterior rather than hide it entirely.
         if (belief.isVerifiedClean) {
-          text = l?.brokenMapOverlayPosteriorVerified(pePct, marginPct) ??
-              'MAP sensor: $pePct% ± $marginPct% (verified)';
+          text = l.brokenMapOverlayPosteriorVerified(pePct, marginPct);
         } else {
-          text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
-              'MAP sensor: $pePct% ± $marginPct%';
+          text = l.brokenMapOverlayPosterior(pePct, marginPct);
         }
         color = DarkModeColors.success(context);
         break;
       case BrokenMapBand.verifying:
-        text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
-            'MAP sensor: $pePct% ± $marginPct%';
+        text = l.brokenMapOverlayPosterior(pePct, marginPct);
         color = DarkModeColors.warning(context);
         break;
       case BrokenMapBand.warning:
       case BrokenMapBand.hardDisable:
-        text = l?.brokenMapOverlayPosterior(pePct, marginPct) ??
-            'MAP sensor: $pePct% ± $marginPct%';
+        text = l.brokenMapOverlayPosterior(pePct, marginPct);
         color = DarkModeColors.error(context);
         break;
     }
@@ -291,9 +279,7 @@ class _BrokenMapDiagnosticsCardState
     try {
       // Watch the state so the card rebuilds when the belief map flips.
       ref.watch(brokenMapBeliefByVehicleProvider);
-      return ref
-          .read(brokenMapBeliefByVehicleProvider.notifier)
-          .beliefFor(id);
+      return ref.read(brokenMapBeliefByVehicleProvider.notifier).beliefFor(id);
     } catch (_) {
       return null;
     }
@@ -314,7 +300,7 @@ class _BrokenMapDiagnosticsCardState
         final l = AppLocalizations.of(context);
         final theme = Theme.of(context);
         return SectionCard(
-          title: l?.brokenMapDiagnosticsCardTitle ?? 'MAP sensor diagnostics',
+          title: l.brokenMapDiagnosticsCardTitle,
           leadingIcon: Icons.sensors,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -322,15 +308,13 @@ class _BrokenMapDiagnosticsCardState
               _beliefSection(l, theme, belief, hasBelief),
               const SizedBox(height: 12),
               Text(
-                l?.brokenMapDiagnosticsBlocklistHeading ??
-                    'Blocklisted adapters',
+                l.brokenMapDiagnosticsBlocklistHeading,
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: 4),
               if (blocklist.isEmpty)
                 Text(
-                  l?.brokenMapDiagnosticsBlocklistEmpty ??
-                      'No adapters are blocklisted.',
+                  l.brokenMapDiagnosticsBlocklistEmpty,
                   style: theme.textTheme.bodyMedium,
                 )
               else
@@ -348,12 +332,15 @@ class _BrokenMapDiagnosticsCardState
     );
   }
 
-  Widget _beliefSection(AppLocalizations? l, ThemeData theme,
-      BrokenMapBelief? belief, bool hasBelief) {
+  Widget _beliefSection(
+    AppLocalizations l,
+    ThemeData theme,
+    BrokenMapBelief? belief,
+    bool hasBelief,
+  ) {
     if (!hasBelief) {
       return Text(
-        l?.brokenMapDiagnosticsBeliefNone ??
-            "This vehicle's MAP sensor hasn't been observed yet.",
+        l.brokenMapDiagnosticsBeliefNone,
         style: theme.textTheme.bodyMedium,
       );
     }
@@ -365,14 +352,12 @@ class _BrokenMapDiagnosticsCardState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          l?.brokenMapDiagnosticsBeliefLine(pePct, marginPct) ??
-              'Broken-MAP confidence: $pePct% ± $marginPct%',
+          l.brokenMapDiagnosticsBeliefLine(pePct, marginPct),
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 2),
         Text(
-          l?.brokenMapDiagnosticsObservationCount(belief.observationCount) ??
-              '${belief.observationCount} observations recorded',
+          l.brokenMapDiagnosticsObservationCount(belief.observationCount),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -381,11 +366,14 @@ class _BrokenMapDiagnosticsCardState
           const SizedBox(height: 4),
           Row(
             children: [
-              Icon(Icons.verified_outlined,
-                  size: 16, color: theme.colorScheme.primary),
+              Icon(
+                Icons.verified_outlined,
+                size: 16,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 4),
               Text(
-                l?.brokenMapDiagnosticsVerifiedBadge ?? 'Verified clean',
+                l.brokenMapDiagnosticsVerifiedBadge,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.primary,
                 ),
@@ -423,17 +411,14 @@ class _BlocklistRow extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              l?.brokenMapDiagnosticsBlocklistEntry(elmId, pct) ??
-                  '$elmId — flagged $pct% broken',
+              l.brokenMapDiagnosticsBlocklistEntry(elmId, pct),
               style: theme.textTheme.bodyMedium,
             ),
           ),
           TextButton(
             key: Key('brokenMapBlocklistClear_$elmId'),
             onPressed: onClear,
-            child: Text(
-              l?.brokenMapDiagnosticsClearButton ?? 'Clear',
-            ),
+            child: Text(l.brokenMapDiagnosticsClearButton),
           ),
         ],
       ),

@@ -26,17 +26,17 @@ class VehicleTypeSelector extends StatelessWidget {
       segments: [
         ButtonSegment(
           value: VehicleType.combustion,
-          label: Text(l?.vehicleTypeCombustion ?? 'Combustion'),
+          label: Text(l.vehicleTypeCombustion),
           icon: const Icon(Icons.local_gas_station),
         ),
         ButtonSegment(
           value: VehicleType.hybrid,
-          label: Text(l?.vehicleTypeHybrid ?? 'Hybrid'),
+          label: Text(l.vehicleTypeHybrid),
           icon: const Icon(Icons.directions_car_filled),
         ),
         ButtonSegment(
           value: VehicleType.ev,
-          label: Text(l?.vehicleTypeEv ?? 'Electric'),
+          label: Text(l.vehicleTypeEv),
           icon: const Icon(Icons.electric_car),
         ),
       ],

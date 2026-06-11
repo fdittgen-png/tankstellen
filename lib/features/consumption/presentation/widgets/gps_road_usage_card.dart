@@ -48,25 +48,25 @@ class GpsRoadUsageCard extends StatelessWidget {
     final speedBars = <_ShareBar>[
       _ShareBar(
         key: const Key('gps_road_use_speed_idle'),
-        label: l?.gpsRoadUseSpeedIdle ?? 'Stopped (<5 km/h)',
+        label: l.gpsRoadUseSpeedIdle,
         share: features.idleShare,
         color: theme.colorScheme.onSurfaceVariant,
       ),
       _ShareBar(
         key: const Key('gps_road_use_speed_low'),
-        label: l?.gpsRoadUseSpeedLow ?? 'Town (5–50 km/h)',
+        label: l.gpsRoadUseSpeedLow,
         share: features.lowSpeedShare,
         color: theme.colorScheme.primary,
       ),
       _ShareBar(
         key: const Key('gps_road_use_speed_cruise'),
-        label: l?.gpsRoadUseSpeedCruise ?? 'Cruise (50–110 km/h)',
+        label: l.gpsRoadUseSpeedCruise,
         share: features.cruiseShare,
         color: theme.colorScheme.primary,
       ),
       _ShareBar(
         key: const Key('gps_road_use_speed_high'),
-        label: l?.gpsRoadUseSpeedHigh ?? 'Fast (≥110 km/h)',
+        label: l.gpsRoadUseSpeedHigh,
         share: features.highSpeedShare,
         color: theme.colorScheme.tertiary,
       ),
@@ -75,19 +75,19 @@ class GpsRoadUsageCard extends StatelessWidget {
     final phaseBars = <_ShareBar>[
       _ShareBar(
         key: const Key('gps_road_use_phase_accel'),
-        label: l?.gpsRoadUsePhaseAccel ?? 'Accelerating',
+        label: l.gpsRoadUsePhaseAccel,
         share: features.accelShare,
         color: theme.colorScheme.tertiary,
       ),
       _ShareBar(
         key: const Key('gps_road_use_phase_steady'),
-        label: l?.gpsRoadUsePhaseSteady ?? 'Holding speed',
+        label: l.gpsRoadUsePhaseSteady,
         share: features.steadyShare,
         color: theme.colorScheme.primary,
       ),
       _ShareBar(
         key: const Key('gps_road_use_phase_coast'),
-        label: l?.gpsRoadUsePhaseCoast ?? 'Coasting',
+        label: l.gpsRoadUsePhaseCoast,
         share: features.coastShare,
         color: theme.colorScheme.primary,
       ),
@@ -104,36 +104,29 @@ class GpsRoadUsageCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.gpsRoadUseCardTitle ?? 'How you used the road',
+              l.gpsRoadUseCardTitle,
               key: const Key('gps_road_use_card_title'),
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            _SectionHeader(
-              label: l?.gpsRoadUseSpeedSection ?? 'Where you spent your time',
-            ),
+            _SectionHeader(label: l.gpsRoadUseSpeedSection),
             const SizedBox(height: 8),
             for (final b in speedBars) b,
             const SizedBox(height: 16),
-            _SectionHeader(
-              label: l?.gpsRoadUsePhaseSection ?? 'How you moved',
-            ),
+            _SectionHeader(label: l.gpsRoadUsePhaseSection),
             const SizedBox(height: 8),
             for (final b in phaseBars) b,
             if (showCoastPraise) ...[
               const SizedBox(height: 12),
-              _CoastPraise(
-                message: l?.gpsRoadUseCoastPraise ??
-                    'Lots of coasting — letting the car roll instead of '
-                        'braking saves fuel. Nice.',
-              ),
+              _CoastPraise(message: l.gpsRoadUseCoastPraise),
             ],
             const SizedBox(height: 8),
             Text(
-              l?.gpsRoadUseSource ?? 'From your GPS track',
+              l.gpsRoadUseSource,
               key: const Key('gps_road_use_source'),
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -183,7 +176,7 @@ class _ShareBar extends StatelessWidget {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final pct = (share.clamp(0.0, 1.0) * 100).toStringAsFixed(0);
-    final pctLabel = l?.gpsRoadUseShare(pct) ?? '$pct%';
+    final pctLabel = l.gpsRoadUseShare(pct);
 
     final filled = (share.clamp(0.0, 1.0) * 1000).round();
     final empty = 1000 - filled;
@@ -218,10 +211,7 @@ class _ShareBar extends StatelessWidget {
                       ),
                     ),
                   if (empty > 0)
-                    Flexible(
-                      flex: empty,
-                      child: const SizedBox.shrink(),
-                    ),
+                    Flexible(flex: empty, child: const SizedBox.shrink()),
                 ],
               ),
             ),
@@ -258,11 +248,7 @@ class _CoastPraise extends StatelessWidget {
       key: const Key('gps_road_use_coast_praise'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          Icons.eco_outlined,
-          size: 20,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(Icons.eco_outlined, size: 20, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
         Expanded(
           child: Text(

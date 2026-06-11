@@ -4,15 +4,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/link_device_how_it_works_card.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('LinkDeviceHowItWorksCard', () {
     Future<void> pumpCard(WidgetTester tester) {
       return tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: LinkDeviceHowItWorksCard(),
-          ),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: LinkDeviceHowItWorksCard()),
         ),
       );
     }
@@ -25,18 +26,9 @@ void main() {
 
     testWidgets('renders the step-by-step body text', (tester) async {
       await pumpCard(tester);
-      expect(
-        find.textContaining('On Device A'),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('On Device B'),
-        findsOneWidget,
-      );
-      expect(
-        find.textContaining('Import data'),
-        findsOneWidget,
-      );
+      expect(find.textContaining('On Device A'), findsOneWidget);
+      expect(find.textContaining('On Device B'), findsOneWidget);
+      expect(find.textContaining('Import data'), findsOneWidget);
     });
 
     testWidgets('renders inside a Card', (tester) async {

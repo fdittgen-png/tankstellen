@@ -36,19 +36,15 @@ class FillUpVehicleDropdown extends StatelessWidget {
     return DropdownButtonFormField<String>(
       initialValue: vehicleId,
       decoration: InputDecoration(
-        labelText: l?.fillUpVehicleLabel ?? 'Vehicle',
+        labelText: l.fillUpVehicleLabel,
         prefixIcon: const Icon(Icons.directions_car_outlined),
       ),
       items: vehicles
           .map(
-            (v) => DropdownMenuItem<String>(
-              value: v.id,
-              child: Text(v.name),
-            ),
+            (v) => DropdownMenuItem<String>(value: v.id, child: Text(v.name)),
           )
           .toList(),
-      validator: (v) =>
-          v == null ? (l?.fillUpVehicleRequired ?? 'Required') : null,
+      validator: (v) => v == null ? (l.fillUpVehicleRequired) : null,
       onChanged: (v) {
         if (v == null) return;
         final selected = vehicles.firstWhere((x) => x.id == v);

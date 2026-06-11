@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/features/search/presentation/widgets/ev_connector_chips.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('EvConnectorChips', () {
@@ -15,6 +16,8 @@ void main() {
     }) {
       return tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: EvConnectorChips(
               connectors: connectors,

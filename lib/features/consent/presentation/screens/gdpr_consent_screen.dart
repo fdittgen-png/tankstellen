@@ -26,7 +26,9 @@ class GdprConsentScreen extends ConsumerWidget {
 
   Future<void> _acceptSelected(BuildContext context, WidgetRef ref) async {
     final form = ref.read(gdprConsentFormControllerProvider);
-    await ref.read(gdprConsentProvider.notifier).save(
+    await ref
+        .read(gdprConsentProvider.notifier)
+        .save(
           location: form.locationConsent,
           errorReporting: form.errorReportingConsent,
           cloudSync: form.cloudSyncConsent,
@@ -36,7 +38,9 @@ class GdprConsentScreen extends ConsumerWidget {
   }
 
   Future<void> _acceptAll(BuildContext context, WidgetRef ref) async {
-    await ref.read(gdprConsentProvider.notifier).save(
+    await ref
+        .read(gdprConsentProvider.notifier)
+        .save(
           location: true,
           errorReporting: true,
           cloudSync: true,
@@ -71,15 +75,14 @@ class GdprConsentScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      l10n?.gdprTitle ?? 'Your Privacy',
+                      l10n.gdprTitle,
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      l10n?.gdprSubtitle ??
-                          'This app respects your privacy. Choose which data you want to share. You can change these settings anytime.',
+                      l10n.gdprSubtitle,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -89,9 +92,8 @@ class GdprConsentScreen extends ConsumerWidget {
                     // Location consent
                     _ConsentToggle(
                       icon: Icons.my_location,
-                      title: l10n?.gdprLocationTitle ?? 'Location Access',
-                      description: l10n?.gdprLocationDescription ??
-                          'Your coordinates are sent to the fuel price API to find nearby stations. Location data is never stored on a server and is not used for tracking.',
+                      title: l10n.gdprLocationTitle,
+                      description: l10n.gdprLocationDescription,
                       value: form.locationConsent,
                       onChanged: notifier.setLocation,
                     ),
@@ -100,10 +102,8 @@ class GdprConsentScreen extends ConsumerWidget {
                     // Error reporting consent
                     _ConsentToggle(
                       icon: Icons.bug_report_outlined,
-                      title: l10n?.gdprErrorReportingTitle ??
-                          'Error Reporting',
-                      description: l10n?.gdprErrorReportingDescription ??
-                          'Anonymous crash reports help improve the app. No personal data is included. Reports are sent via Sentry only when configured.',
+                      title: l10n.gdprErrorReportingTitle,
+                      description: l10n.gdprErrorReportingDescription,
                       value: form.errorReportingConsent,
                       onChanged: notifier.setErrorReporting,
                     ),
@@ -112,9 +112,8 @@ class GdprConsentScreen extends ConsumerWidget {
                     // Cloud sync consent
                     _ConsentToggle(
                       icon: Icons.cloud_outlined,
-                      title: l10n?.gdprCloudSyncTitle ?? 'Cloud Sync',
-                      description: l10n?.gdprCloudSyncDescription ??
-                          'Sync favorites and alerts across devices via TankSync. Uses anonymous authentication. Your data is encrypted in transit.',
+                      title: l10n.gdprCloudSyncTitle,
+                      description: l10n.gdprCloudSyncDescription,
                       value: form.cloudSyncConsent,
                       onChanged: notifier.setCloudSync,
                     ),
@@ -123,10 +122,8 @@ class GdprConsentScreen extends ConsumerWidget {
                     // VIN online decode consent (#1399)
                     _ConsentToggle(
                       icon: Icons.directions_car_outlined,
-                      title: l10n?.gdprVinOnlineDecodeTitle ??
-                          'VIN online decode',
-                      description: l10n?.gdprVinOnlineDecodeDescription ??
-                          "When you pair an adapter, your vehicle's VIN is read locally to identify the car. Enabling this sends the 17-char VIN to NHTSA's free vPIC service to look up additional details (model, engine displacement, fuel type). The VIN is the only data sent — no other information leaves your device.",
+                      title: l10n.gdprVinOnlineDecodeTitle,
+                      description: l10n.gdprVinOnlineDecodeDescription,
                       value: form.vinOnlineDecodeConsent,
                       onChanged: notifier.setVinOnlineDecode,
                     ),
@@ -134,8 +131,7 @@ class GdprConsentScreen extends ConsumerWidget {
 
                     // Legal basis
                     Text(
-                      l10n?.gdprLegalBasis ??
-                          'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.',
+                      l10n.gdprLegalBasis,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -161,13 +157,12 @@ class GdprConsentScreen extends ConsumerWidget {
                   // does not nudge toward blanket consent.
                   FilledButton(
                     onPressed: () => _acceptSelected(context, ref),
-                    child: Text(
-                        l10n?.gdprAcceptSelected ?? 'Accept Selected'),
+                    child: Text(l10n.gdprAcceptSelected),
                   ),
                   const SizedBox(height: 8),
                   OutlinedButton(
                     onPressed: () => _acceptAll(context, ref),
-                    child: Text(l10n?.gdprAcceptAll ?? 'Accept All'),
+                    child: Text(l10n.gdprAcceptAll),
                   ),
                 ],
               ),
@@ -214,8 +209,9 @@ class _ConsentToggle extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: theme.textTheme.titleSmall
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -228,10 +224,7 @@ class _ConsentToggle extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Switch(
-              value: value,
-              onChanged: onChanged,
-            ),
+            Switch(value: value, onChanged: onChanged),
           ],
         ),
       ),

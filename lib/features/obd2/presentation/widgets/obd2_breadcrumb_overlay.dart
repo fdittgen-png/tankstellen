@@ -35,7 +35,6 @@ typedef Obd2DiagnosticShareSink = Future<void> Function(ShareParams params);
 @visibleForTesting
 Obd2DiagnosticShareSink? debugObd2DiagnosticShareSinkOverride;
 
-
 /// In-app overlay that renders the most recent fuel-rate breadcrumbs
 /// captured by [Obd2BreadcrumbsNotifier] (#1395). Sibling to the map
 /// debug breadcrumb overlay shipped in PR #1378.
@@ -65,7 +64,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
   /// messenger snackbar when [messenger] is supplied.
   Future<void> _shareDiagnosticLog(
     ScaffoldMessengerState? messenger,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) async {
     final String report = formatObd2DiagnosticReport(
       AutoRecordTraceLog.snapshot(),
@@ -79,7 +78,16 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       try {
         await sink(ShareParams(text: report));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay diagnostic log sink'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: const {
+              'where': 'Obd2BreadcrumbOverlay diagnostic log sink',
+            },
+          ),
+        );
       }
     }
     await _alsoSaveToDownloads(
@@ -97,12 +105,12 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
   /// [_shareDiagnosticLog].
   Future<void> _shareSessionXml(
     ScaffoldMessengerState? messenger,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) async {
     final Obd2DebugSession? session = Obd2DebugSessionRecorder.latestSession;
     final String payload = session == null
         ? '<!-- No OBD2 debug session recorded. Enable "OBD2 debug '
-            'logging" in Settings, then reproduce the issue. -->'
+              'logging" in Settings, then reproduce the issue. -->'
         : formatObd2DebugSessionXml(session);
     // Same download-only policy as `_shareDiagnosticLog` — see note
     // there.
@@ -111,7 +119,14 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       try {
         await sink(ShareParams(text: payload));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay session XML sink'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: const {'where': 'Obd2BreadcrumbOverlay session XML sink'},
+          ),
+        );
       }
     }
     await _alsoSaveToDownloads(
@@ -131,7 +146,7 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     required String text,
     required String fileName,
     required ScaffoldMessengerState? messenger,
-    required AppLocalizations? l10n,
+    required AppLocalizations l10n,
   }) async {
     try {
       await PublicFileExporter.saveTextToDownloads(
@@ -141,12 +156,19 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       );
       // #2173 — route through SnackBarHelper for the liveRegion announce.
       messenger?.showSnackBar(
-        SnackBarHelper.infoSnackBar(
-          l10n?.savedToDownloadsFolder ?? 'Saved to your Downloads folder',
-        ),
+        SnackBarHelper.infoSnackBar(l10n.savedToDownloadsFolder),
       );
     } on Object catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay save-to-downloads failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'Obd2BreadcrumbOverlay save-to-downloads failed',
+          },
+        ),
+      );
     }
   }
 
@@ -162,7 +184,14 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     try {
       flag = ref.watch(obd2DebugOverlayProvider);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay flag read failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'Obd2BreadcrumbOverlay flag read failed'},
+        ),
+      );
       flag = false;
     }
     final visible = kDebugMode || flag;
@@ -172,7 +201,14 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
     try {
       crumbs = ref.watch(obd2BreadcrumbsProvider);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'Obd2BreadcrumbOverlay crumbs read failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'Obd2BreadcrumbOverlay crumbs read failed'},
+        ),
+      );
       crumbs = const [];
     }
     final l10n = AppLocalizations.of(context);
@@ -188,144 +224,135 @@ class Obd2BreadcrumbOverlay extends ConsumerWidget {
       bottom: 8,
       child: ExcludeSemantics(
         child: Material(
-        color: Colors.transparent,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 280,
-            maxHeight: 360,
-            minWidth: 200,
-            minHeight: 100,
-          ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.78),
-              borderRadius: BorderRadius.circular(8),
+          color: Colors.transparent,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 280,
+              maxHeight: 360,
+              minWidth: 200,
+              minHeight: 100,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          l10n?.obd2DebugOverlayTitle ?? 'OBD2 breadcrumbs',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.78),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.obd2DebugOverlayTitle,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          ref
-                              .read(obd2BreadcrumbsProvider.notifier)
-                              .clear();
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
+                        TextButton(
+                          onPressed: () {
+                            ref.read(obd2BreadcrumbsProvider.notifier).clear();
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            minimumSize: const Size(0, 32),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(l10n.obd2DebugOverlayClearButton),
+                        ),
+                        // #1920 — export the OBD2 connect/drop/reconnect
+                        // trace as plain text so a developer can analyse
+                        // a failed recording session. The trace ring is
+                        // process-wide, not tied to the fuel-rate
+                        // breadcrumbs above.
+                        IconButton(
+                          onPressed: () => _shareDiagnosticLog(
+                            ScaffoldMessenger.maybeOf(context),
+                            l10n,
+                          ),
+                          icon: const Icon(Icons.share, size: 18),
+                          color: Colors.white,
+                          tooltip: l10n.obd2DiagnosticShareLabel,
                           padding: const EdgeInsets.symmetric(horizontal: 4),
-                          minimumSize: const Size(0, 32),
-                          tapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                          visualDensity: VisualDensity.compact,
                         ),
-                        child: Text(
-                          l10n?.obd2DebugOverlayClearButton ?? 'Clear',
-                        ),
-                      ),
-                      // #1920 — export the OBD2 connect/drop/reconnect
-                      // trace as plain text so a developer can analyse
-                      // a failed recording session. The trace ring is
-                      // process-wide, not tied to the fuel-rate
-                      // breadcrumbs above.
-                      IconButton(
-                        onPressed: () => _shareDiagnosticLog(
-                          ScaffoldMessenger.maybeOf(context),
-                          l10n,
-                        ),
-                        icon: const Icon(Icons.share, size: 18),
-                        color: Colors.white,
-                        tooltip: l10n?.obd2DiagnosticShareLabel ??
-                            'Share diagnostic log',
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        constraints: const BoxConstraints(
-                          minWidth: 32,
-                          minHeight: 32,
-                        ),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                      // #1925 — export the most recent OBD2 debug
-                      // session (init handshake, data gaps, reconnects)
-                      // as XML when the user enabled debug logging.
-                      IconButton(
-                        onPressed: () => _shareSessionXml(
-                          ScaffoldMessenger.maybeOf(context),
-                          l10n,
-                        ),
-                        icon: const Icon(Icons.bug_report, size: 18),
-                        color: Colors.white,
-                        tooltip: l10n?.obd2DebugSessionShareLabel ??
-                            'Share OBD2 session log',
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        constraints: const BoxConstraints(
-                          minWidth: 32,
-                          minHeight: 32,
-                        ),
-                        visualDensity: VisualDensity.compact,
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          unawaited(ref
-                              .read(obd2DebugOverlayProvider.notifier)
-                              .disable());
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
+                        // #1925 — export the most recent OBD2 debug
+                        // session (init handshake, data gaps, reconnects)
+                        // as XML when the user enabled debug logging.
+                        IconButton(
+                          onPressed: () => _shareSessionXml(
+                            ScaffoldMessenger.maybeOf(context),
+                            l10n,
+                          ),
+                          icon: const Icon(Icons.bug_report, size: 18),
+                          color: Colors.white,
+                          tooltip: l10n.obd2DebugSessionShareLabel,
                           padding: const EdgeInsets.symmetric(horizontal: 4),
-                          minimumSize: const Size(0, 32),
-                          tapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                          visualDensity: VisualDensity.compact,
                         ),
-                        child: Text(
-                          l10n?.obd2DebugOverlayCloseButton ?? 'Close',
+                        TextButton(
+                          onPressed: () {
+                            unawaited(
+                              ref
+                                  .read(obd2DebugOverlayProvider.notifier)
+                                  .disable(),
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            minimumSize: const Size(0, 32),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(l10n.obd2DebugOverlayCloseButton),
                         ),
-                      ),
-                    ],
-                  ),
-                  const Divider(color: Colors.white24, height: 8),
-                  // #1423 phase 5 — broken-MAP belief diagnostic row,
-                  // self-hides when the active vehicle has zero
-                  // observations. Appears above the breadcrumb list so
-                  // the latest belief snapshot is always visible without
-                  // scrolling, even on long crumb sets.
-                  const BrokenMapOverlayRow(),
-                  Flexible(
-                    child: SingleChildScrollView(
-                      reverse: true,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Newest-first: walk reversed so the bottom
-                          // of the scroll view shows the most recent
-                          // sample. `reverse: true` on the scroll view
-                          // keeps the freshest row pinned at bottom.
-                          for (final c in crumbs.reversed)
-                            Obd2BreadcrumbRow(crumb: c),
-                        ],
+                      ],
+                    ),
+                    const Divider(color: Colors.white24, height: 8),
+                    // #1423 phase 5 — broken-MAP belief diagnostic row,
+                    // self-hides when the active vehicle has zero
+                    // observations. Appears above the breadcrumb list so
+                    // the latest belief snapshot is always visible without
+                    // scrolling, even on long crumb sets.
+                    const BrokenMapOverlayRow(),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        reverse: true,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Newest-first: walk reversed so the bottom
+                            // of the scroll view shows the most recent
+                            // sample. `reverse: true` on the scroll view
+                            // keeps the freshest row pinned at bottom.
+                            for (final c in crumbs.reversed)
+                              Obd2BreadcrumbRow(crumb: c),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
-      ),
     );
   }
 }
-

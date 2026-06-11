@@ -24,10 +24,7 @@ class ProfileChoiceStep extends ConsumerWidget {
   /// been applied). The wizard moves to the next step.
   final VoidCallback onProfilePicked;
 
-  const ProfileChoiceStep({
-    super.key,
-    required this.onProfilePicked,
-  });
+  const ProfileChoiceStep({super.key, required this.onProfilePicked});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,9 +50,7 @@ class ProfileChoiceStep extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            l?.wizardProfileChoiceHint ??
-                'Choose how you want to use the app. You can change '
-                    'this later in Settings.',
+            l.wizardProfileChoiceHint,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -65,10 +60,8 @@ class ProfileChoiceStep extends ConsumerWidget {
           _ProfileCard(
             profile: AppProfile.basic,
             icon: Icons.local_gas_station_outlined,
-            title: l?.wizardProfileBasicName ?? 'Basic',
-            description: l?.wizardProfileBasicDescription ??
-                'Cheapest fuel and EV charging prices nearby. '
-                    'Favorites and price alerts.',
+            title: l.wizardProfileBasicName,
+            description: l.wizardProfileBasicDescription,
             isActive: activeProfile == AppProfile.basic,
             onTap: () => _pick(ref, AppProfile.basic),
           ),
@@ -76,10 +69,8 @@ class ProfileChoiceStep extends ConsumerWidget {
           _ProfileCard(
             profile: AppProfile.medium,
             icon: Icons.analytics_outlined,
-            title: l?.wizardProfileMediumName ?? 'Medium',
-            description: l?.wizardProfileMediumDescription ??
-                'Everything in Basic, plus track your fuel fill-ups '
-                    'and EV charging by hand.',
+            title: l.wizardProfileMediumName,
+            description: l.wizardProfileMediumDescription,
             isActive: activeProfile == AppProfile.medium,
             onTap: () => _pick(ref, AppProfile.medium),
           ),
@@ -87,18 +78,14 @@ class ProfileChoiceStep extends ConsumerWidget {
           _ProfileCard(
             profile: AppProfile.full,
             icon: Icons.directions_car_filled,
-            title: l?.wizardProfileFullName ?? 'Full',
-            description: l?.wizardProfileFullDescription ??
-                'Everything in Medium, plus automatic OBD2 trip '
-                    'recording, driving scores, and loyalty cards.',
+            title: l.wizardProfileFullName,
+            description: l.wizardProfileFullDescription,
             isActive: activeProfile == AppProfile.full,
             onTap: () => _pick(ref, AppProfile.full),
           ),
           const SizedBox(height: 16),
           Text(
-            l?.wizardProfileChoiceFooter ??
-                'You can change your choice any time from Settings '
-                    '→ Use mode.',
+            l.wizardProfileChoiceFooter,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontStyle: FontStyle.italic,
@@ -185,11 +172,7 @@ class _ProfileCard extends StatelessWidget {
                         ),
                         if (isActive) ...[
                           const SizedBox(width: 8),
-                          Icon(
-                            Icons.check_circle,
-                            color: brandGreen,
-                            size: 20,
-                          ),
+                          Icon(Icons.check_circle, color: brandGreen, size: 20),
                         ],
                       ],
                     ),

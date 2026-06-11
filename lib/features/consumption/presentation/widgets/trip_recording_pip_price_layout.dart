@@ -75,11 +75,8 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
     final String? distanceText = distance == null
         ? null
         : kmCaption
-            ? (l?.fuelStationRadarDistanceKm(
-                    (distance / 1000.0).toStringAsFixed(1)) ??
-                '${(distance / 1000.0).toStringAsFixed(1)} km')
-            : (l?.approachStationDistance(distance.toStringAsFixed(0)) ??
-                '${distance.toStringAsFixed(0)} m');
+        ? (l.fuelStationRadarDistanceKm((distance / 1000.0).toStringAsFixed(1)))
+        : (l.approachStationDistance(distance.toStringAsFixed(0)));
 
     final content = Column(
       mainAxisSize: MainAxisSize.min,
@@ -156,7 +153,10 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 child: Center(
                   child: FittedBox(fit: BoxFit.scaleDown, child: content),
                 ),
@@ -175,10 +175,10 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
     final onTap = onBodyTap;
     if (onTap == null) return body;
     return Tooltip(
-      message: l?.pipTapToRestore ?? 'Tap to open the full app',
+      message: l.pipTapToRestore,
       child: Semantics(
         button: true,
-        label: l?.pipTapToRestore ?? 'Tap to open the full app',
+        label: l.pipTapToRestore,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTap,

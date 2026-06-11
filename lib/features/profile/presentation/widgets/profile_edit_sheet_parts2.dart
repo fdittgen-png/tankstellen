@@ -28,8 +28,7 @@ class _CountrySection extends ConsumerWidget {
       children: Countries.verified.map((c) {
         // A country owned by another profile is taken — the profile being
         // edited may keep its own current country.
-        final taken =
-            repo.isCountryTaken(c.code, excludeProfileId: profileId);
+        final taken = repo.isCountryTaken(c.code, excludeProfileId: profileId);
         return ChoiceChip(
           label: Text('${c.flag} ${c.name}'),
           selected: c.code == state.countryCode,
@@ -47,11 +46,7 @@ class _CountrySection extends ConsumerWidget {
 
   void _explainTaken(BuildContext context, CountryConfig c) {
     final l10n = AppLocalizations.of(context);
-    SnackBarHelper.show(
-      context,
-      l10n?.profileCountryTaken(c.name) ??
-          'A profile for ${c.name} already exists — edit it instead.',
-    );
+    SnackBarHelper.show(context, l10n.profileCountryTaken(c.name));
   }
 
   Future<void> _selectCountry(BuildContext context, CountryConfig c) async {
@@ -107,7 +102,7 @@ class _ApproachOverlaySection extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text('${l10n?.approachRadiusLabel ?? "Radius"}:'),
+            Text('${l10n.approachRadiusLabel}:'),
             Expanded(
               child: Slider(
                 value: state.approachRadiusKm,
@@ -122,39 +117,30 @@ class _ApproachOverlaySection extends StatelessWidget {
           ],
         ),
         Text(
-          l10n?.approachRadiusCaption(
-                  state.approachRadiusKm.toStringAsFixed(1)) ??
-              'Overlay grows + shows the price when within '
-                  '${state.approachRadiusKm.toStringAsFixed(1)} km '
-                  'of a fuel station',
+          l10n.approachRadiusCaption(state.approachRadiusKm.toStringAsFixed(1)),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: Spacing.md),
-        Text(
-          l10n?.approachPriceModeLabel ?? 'Show price for',
-          style: theme.textTheme.bodyMedium,
-        ),
+        Text(l10n.approachPriceModeLabel, style: theme.textTheme.bodyMedium),
         const SizedBox(height: Spacing.sm),
         Wrap(
           spacing: 6,
           children: [
             ChoiceChip(
-              label: Text(l10n?.approachPriceModeNearest ?? 'Nearest station'),
-              selected:
-                  state.approachPriceMode == ApproachPriceMode.nearest,
+              label: Text(l10n.approachPriceModeNearest),
+              selected: state.approachPriceMode == ApproachPriceMode.nearest,
               onSelected: (_) =>
                   ctrl.setApproachPriceMode(ApproachPriceMode.nearest),
               visualDensity: VisualDensity.compact,
             ),
             ChoiceChip(
-              label: Text(l10n?.approachPriceModeCheapestInRadius ??
-                  'Cheapest in radius'),
-              selected: state.approachPriceMode ==
-                  ApproachPriceMode.cheapestInRadius,
-              onSelected: (_) => ctrl
-                  .setApproachPriceMode(ApproachPriceMode.cheapestInRadius),
+              label: Text(l10n.approachPriceModeCheapestInRadius),
+              selected:
+                  state.approachPriceMode == ApproachPriceMode.cheapestInRadius,
+              onSelected: (_) =>
+                  ctrl.setApproachPriceMode(ApproachPriceMode.cheapestInRadius),
               visualDensity: VisualDensity.compact,
             ),
           ],
@@ -162,7 +148,7 @@ class _ApproachOverlaySection extends StatelessWidget {
         const SizedBox(height: Spacing.md),
         Row(
           children: [
-            Text('${l10n?.approachMinPollLabel ?? "Min refresh"}:'),
+            Text('${l10n.approachMinPollLabel}:'),
             Expanded(
               child: Slider(
                 value: state.approachMinPollSeconds.toDouble(),
@@ -170,18 +156,14 @@ class _ApproachOverlaySection extends StatelessWidget {
                 max: 10,
                 divisions: 9,
                 label: '${state.approachMinPollSeconds} s',
-                onChanged: (v) =>
-                    ctrl.setApproachMinPollSeconds(v.round()),
+                onChanged: (v) => ctrl.setApproachMinPollSeconds(v.round()),
               ),
             ),
             Text('${state.approachMinPollSeconds} s'),
           ],
         ),
         Text(
-          l10n?.approachMinPollCaption(state.approachMinPollSeconds) ??
-              'Floor on how often the overlay refreshes the nearest '
-                  'station (faster at speed, never tighter than '
-                  '${state.approachMinPollSeconds} s)',
+          l10n.approachMinPollCaption(state.approachMinPollSeconds),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),

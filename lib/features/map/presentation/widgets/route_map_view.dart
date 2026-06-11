@@ -48,6 +48,7 @@ class RouteMapView extends ConsumerStatefulWidget {
   @override
   ConsumerState<RouteMapView> createState() => _RouteMapViewState();
 }
+
 class _RouteMapViewState extends ConsumerState<RouteMapView> {
   RouteViewMode _viewMode = RouteViewMode.allStations;
   final Set<String> _selectedStationIds = {};
@@ -113,8 +114,8 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     if (allFuelStations.isEmpty && result.route.geometry.isEmpty) {
       return EmptyState(
         icon: Icons.route,
-        title: l10n?.noStationsAlongRoute ?? 'No stations found along route',
-        actionLabel: l10n?.search ?? 'Back to search',
+        title: l10n.noStationsAlongRoute,
+        actionLabel: l10n.search,
         onAction: () => context.go(RoutePaths.search),
       );
     }
@@ -180,8 +181,9 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             cameraFitBounds: _routeBounds,
             routePolyline: result.route.geometry,
             showSearchRadius: false,
-            selectedStationIds:
-                _selectedStationIds.isNotEmpty ? _selectedStationIds : null,
+            selectedStationIds: _selectedStationIds.isNotEmpty
+                ? _selectedStationIds
+                : null,
             fuelResolver: resolveFuel,
             // #3000 (Epic #2997) — adopt the radar clustered+cheapest-labelled
             // grammar, but SELECTION-AWARE: cluster the non-selected stations
@@ -210,40 +212,41 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           distanceKm: result.route.distanceKm,
           durationMinutes: result.route.durationMinutes,
           stationCountLabel: _viewMode == RouteViewMode.bestStops
-              ? (l10n?.nBest(displayStations.length) ??
-                  '${displayStations.length} best')
-              : (l10n?.nStations(allFuelStations.length) ??
-                  '${allFuelStations.length}'),
+              ? (l10n.nBest(displayStations.length))
+              : (l10n.nStations(allFuelStations.length)),
           onSaveRoute: () => _showSaveRouteDialog(context, result),
           onOpenInMaps: () => _openSelectedInMaps(result),
         ),
       ],
     );
   }
+
   Future<void> _showSaveRouteDialog(
-      BuildContext context, RouteSearchResult result) async {
+    BuildContext context,
+    RouteSearchResult result,
+  ) async {
     final controller = TextEditingController();
     final l10n = AppLocalizations.of(context);
     final name = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n?.saveRoute ?? 'Save Route'),
+        title: Text(l10n.saveRoute),
         content: TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: l10n?.routeName ?? 'Route name',
-            hintText: l10n?.routeNameHintExample ?? 'e.g. Paris \u2192 Lyon',
+            labelText: l10n.routeName,
+            hintText: l10n.routeNameHintExample,
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text),
-            child: Text(l10n?.save ?? 'Save'),
+            child: Text(l10n.save),
           ),
         ],
       ),
@@ -259,33 +262,42 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       final end = result.route.geometry.last;
       final selectedIds = _selectedStationIds.toList();
       final profile = ref.read(activeProfileProvider);
-      final success = await ref.read(itineraryProvider.notifier).saveRoute(
+      // #3159 — capture everything ref-dependent BEFORE the await so the
+      // unmount race can't touch a dead WidgetRef.
+      final fuelType = ref.read(selectedFuelTypeProvider).apiValue;
+      final itineraries = ref.read(itineraryProvider.notifier);
+      final success = await itineraries.saveRoute(
         name: name,
         waypoints: [
           RouteWaypoint(
-              lat: start.latitude, lng: start.longitude, label: 'Start'),
+            lat: start.latitude,
+            lng: start.longitude,
+            label: 'Start',
+          ),
           RouteWaypoint(
-              lat: end.latitude, lng: end.longitude, label: 'Destination'),
+            lat: end.latitude,
+            lng: end.longitude,
+            label: 'Destination',
+          ),
         ],
         distanceKm: result.route.distanceKm,
         durationMinutes: result.route.durationMinutes,
         avoidHighways: profile?.avoidHighways ?? false,
-        fuelType: ref.read(selectedFuelTypeProvider).apiValue,
+        fuelType: fuelType,
         selectedStationIds: selectedIds,
       );
 
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);
         if (success) {
-          SnackBarHelper.showSuccess(
-              context, l10n?.routeSaved ?? 'Route saved!');
+          SnackBarHelper.showSuccess(context, l10n.routeSaved);
         } else {
-          SnackBarHelper.showError(
-              context, l10n?.routeSaveFailed ?? 'Failed to save route');
+          SnackBarHelper.showError(context, l10n.routeSaveFailed);
         }
       }
     }
   }
+
   List<Station> _getBestStopStations(
     List<Station> allStations,
     RouteSearchResult result,
@@ -300,6 +312,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     final bestIds = segmentMap.values.toSet();
     return allStations.where((s) => bestIds.contains(s.id)).toList();
   }
+
   void _openSelectedInMaps(RouteSearchResult result) {
     final start = result.route.geometry.first;
     final end = result.route.geometry.last;
@@ -317,19 +330,23 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         return aIdx.compareTo(bIdx);
       });
 
-    unawaited(NavigationUtils.openRouteInMaps(
-      origin: '${start.latitude},${start.longitude}',
-      destination: '${end.latitude},${end.longitude}',
-      waypoints: selectedStations.map((s) => '${s.lat},${s.lng}').toList(),
-    ));
+    unawaited(
+      NavigationUtils.openRouteInMaps(
+        origin: '${start.latitude},${start.longitude}',
+        destination: '${end.latitude},${end.longitude}',
+        waypoints: selectedStations.map((s) => '${s.lat},${s.lng}').toList(),
+      ),
+    );
   }
+
   int _nearestPolylineIndex(double lat, double lng, List<LatLng> polyline) {
     int bestIdx = 0;
     double bestDist = double.infinity;
     final step = polyline.length > 200 ? 5 : 1;
     for (int i = 0; i < polyline.length; i += step) {
       final p = polyline[i];
-      final d = (p.latitude - lat) * (p.latitude - lat) +
+      final d =
+          (p.latitude - lat) * (p.latitude - lat) +
           (p.longitude - lng) * (p.longitude - lng);
       if (d < bestDist) {
         bestDist = d;

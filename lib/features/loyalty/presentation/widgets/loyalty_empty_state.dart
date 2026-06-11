@@ -34,15 +34,13 @@ class LoyaltyEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              l?.loyaltyEmptyTitle ?? 'No fuel club cards yet',
+              l.loyaltyEmptyTitle,
               style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              l?.loyaltyEmptyBody ??
-                  'Add a card to apply your per-litre discount to '
-                      'matching stations automatically.',
+              l.loyaltyEmptyBody,
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),

@@ -63,7 +63,8 @@ class _StationPriceColumn extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final effective = _effectivePrice;
-    final hasDiscount = loyaltyDiscount != null &&
+    final hasDiscount =
+        loyaltyDiscount != null &&
         loyaltyDiscount! > 0 &&
         price != null &&
         effective != null;
@@ -80,10 +81,7 @@ class _StationPriceColumn extends StatelessWidget {
           child: IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            icon: AnimatedFavoriteStar(
-              isFavorite: isFavorite,
-              size: 22,
-            ),
+            icon: AnimatedFavoriteStar(isFavorite: isFavorite, size: 22),
             // #2974 — a selection tick on the favourite toggle, matching the
             // everyday tap-surface haptics. selectionClick only (never
             // heavyImpact); fires only on the discrete star tap, never scroll.
@@ -93,9 +91,7 @@ class _StationPriceColumn extends StatelessWidget {
                     unawaited(HapticFeedback.selectionClick());
                     onFavoriteTap!();
                   },
-            tooltip: isFavorite
-                ? (l10n?.favoriteRemove ?? 'Remove from favorites')
-                : (l10n?.favoriteAdd ?? 'Add to favorites'),
+            tooltip: isFavorite ? (l10n.favoriteRemove) : (l10n.favoriteAdd),
           ),
         ),
         if (rating != null && rating! >= 1 && rating! <= 5)
@@ -108,16 +104,13 @@ class _StationPriceColumn extends StatelessWidget {
         if (isCheapest)
           Container(
             margin: const EdgeInsets.only(bottom: 2),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 6,
-              vertical: 1,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
               color: DarkModeColors.successSurface(context),
               borderRadius: AppRadius.sm,
             ),
             child: Text(
-              l10n?.cheapest ?? 'Cheapest',
+              l10n.cheapest,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
@@ -149,10 +142,12 @@ class _StationPriceColumn extends StatelessWidget {
                 // tooltip surfaces the un-discounted raw price so
                 // power users can verify what the operator quoted.
                 message: hasDiscount
-                    ? (l10n?.loyaltyRawPriceTooltip(
-                            PriceFormatter.formatPrice(price,
-                                currencyOverride: currencyOverride)) ??
-                        'Raw: ${PriceFormatter.formatPrice(price, currencyOverride: currencyOverride)}')
+                    ? (l10n.loyaltyRawPriceTooltip(
+                        PriceFormatter.formatPrice(
+                          price,
+                          currencyOverride: currencyOverride,
+                        ),
+                      ))
                     : '',
                 child: RichText(
                   overflow: TextOverflow.ellipsis,
@@ -230,7 +225,7 @@ class _LoyaltyDiscountBadge extends StatelessWidget {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final canonical = BrandRegistry.canonicalize(station.brand) ?? '';
-    final prefix = l?.loyaltyBadgePrefix ?? '−';
+    final prefix = l.loyaltyBadgePrefix;
     final discountStr = PriceFormatter.formatPrice(
       discount,
       currencyOverride: currencyOverride,
@@ -250,8 +245,7 @@ class _LoyaltyDiscountBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '$prefix$discountStr ${canonical.isEmpty ? '' : canonical}'
-                .trim(),
+            '$prefix$discountStr ${canonical.isEmpty ? '' : canonical}'.trim(),
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
@@ -264,8 +258,9 @@ class _LoyaltyDiscountBadge extends StatelessWidget {
             rawStr,
             style: TextStyle(
               fontSize: 10,
-              color: theme.colorScheme.onPrimaryContainer
-                  .withValues(alpha: 0.7),
+              color: theme.colorScheme.onPrimaryContainer.withValues(
+                alpha: 0.7,
+              ),
               decoration: TextDecoration.lineThrough,
             ),
             overflow: TextOverflow.ellipsis,

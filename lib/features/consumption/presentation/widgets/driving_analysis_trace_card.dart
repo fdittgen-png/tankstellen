@@ -38,8 +38,9 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final debugOn =
-        ref.watch(enabledFeaturesProvider).contains(Feature.debugMode);
+    final debugOn = ref
+        .watch(enabledFeaturesProvider)
+        .contains(Feature.debugMode);
     if (!debugOn) return const SizedBox.shrink();
 
     final l = AppLocalizations.of(context);
@@ -51,27 +52,16 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l?.drivingTraceCardTitle ?? 'Driving-analysis trace (dev)',
-              style: theme.textTheme.titleMedium,
-            ),
+            Text(l.drivingTraceCardTitle, style: theme.textTheme.titleMedium),
             const SizedBox(height: 4),
-            Text(
-              l?.drivingTraceCardBody ??
-                  "Export this trip's GPS KPIs, score and lessons as JSON, "
-                      'write how the drive felt in the comment field, and '
-                      'share it back to calibrate the thresholds.',
-              style: theme.textTheme.bodySmall,
-            ),
+            Text(l.drivingTraceCardBody, style: theme.textTheme.bodySmall),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerLeft,
               child: FilledButton.tonalIcon(
                 onPressed: () => _export(context),
                 icon: const Icon(Icons.bug_report_outlined),
-                label: Text(
-                  l?.drivingTraceExportAction ?? 'Export analysis trace',
-                ),
+                label: Text(l.drivingTraceExportAction),
               ),
             ),
           ],
@@ -95,11 +85,7 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
     messenger.showSnackBar(
       SnackBar(
         content: Text(
-          ok
-              ? (l?.drivingTraceExported ??
-                  'Analysis trace saved to Downloads.')
-              : (l?.drivingTraceExportFailed ??
-                  "Couldn't export the analysis trace."),
+          ok ? (l.drivingTraceExported) : (l.drivingTraceExportFailed),
         ),
       ),
     );

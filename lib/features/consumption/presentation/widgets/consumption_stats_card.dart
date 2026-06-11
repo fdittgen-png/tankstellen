@@ -98,7 +98,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
         !showResolveGapBanner && stats.correctionShare > 0.05;
 
     final titleText = Text(
-      l?.consumptionStatsTitle ?? 'Consumption stats',
+      l.consumptionStatsTitle,
       style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
     );
     // #2698 — when tappable, the title gains a trailing chevron so the
@@ -124,12 +124,9 @@ class ConsumptionStatsCard extends ConsumerWidget {
         children: [
           if (showOpenWindowBanner) ...[
             _OpenWindowBanner(
-              text:
-                  l?.consumptionStatsOpenWindowBanner(
-                    stats.openWindowFillCount,
-                  ) ??
-                  '${stats.openWindowFillCount} partial fill(s) pending '
-                      'plein complet — not in average',
+              text: l.consumptionStatsOpenWindowBanner(
+                stats.openWindowFillCount,
+              ),
             ),
             const SizedBox(height: 8),
           ],
@@ -139,12 +136,9 @@ class ConsumptionStatsCard extends ConsumerWidget {
           ],
           if (showCorrectionHint) ...[
             _CorrectionShareHint(
-              text:
-                  l?.consumptionStatsCorrectionShareHint(
-                    (stats.correctionShare * 100).round(),
-                  ) ??
-                  '${(stats.correctionShare * 100).round()}% of fuel from '
-                      'auto-corrections — review entries',
+              text: l.consumptionStatsCorrectionShareHint(
+                (stats.correctionShare * 100).round(),
+              ),
             ),
             const SizedBox(height: 8),
           ],
@@ -182,7 +176,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
               Expanded(
                 child: _StatTile(
                   icon: Icons.speed,
-                  label: l?.statAvgConsumption ?? 'Avg L/100km',
+                  label: l.statAvgConsumption,
                   value: avgConsumption != null
                       ? avgConsumption.toStringAsFixed(2)
                       : '—',
@@ -191,7 +185,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
               Expanded(
                 child: _StatTile(
                   icon: Icons.euro,
-                  label: l?.statAvgCostPerKm ?? 'Avg /km',
+                  label: l.statAvgCostPerKm,
                   // #2491 — locale-aware 3 dp via formatPerKm.
                   value: avgCostKm != null
                       ? PriceFormatter.formatPerKm(avgCostKm)
@@ -206,14 +200,14 @@ class ConsumptionStatsCard extends ConsumerWidget {
               Expanded(
                 child: _StatTile(
                   icon: Icons.local_gas_station,
-                  label: l?.statTotalLiters ?? 'Total L',
+                  label: l.statTotalLiters,
                   value: stats.totalLiters.toStringAsFixed(1),
                 ),
               ),
               Expanded(
                 child: _StatTile(
                   icon: Icons.payments_outlined,
-                  label: l?.statTotalSpent ?? 'Total spent',
+                  label: l.statTotalSpent,
                   // #2491 — locale-aware 2 dp + currency symbol.
                   value: PriceFormatter.formatTotal(stats.totalSpent),
                 ),
@@ -223,7 +217,7 @@ class ConsumptionStatsCard extends ConsumerWidget {
           if (stats.fillUpCount > 0) ...[
             const SizedBox(height: 8),
             Text(
-              '${l?.statFillUpCount ?? 'Fill-ups'}: ${stats.fillUpCount}',
+              '${l.statFillUpCount}: ${stats.fillUpCount}',
               style: theme.textTheme.bodySmall,
             ),
           ],
@@ -235,10 +229,9 @@ class ConsumptionStatsCard extends ConsumerWidget {
           if (stats.correctionLitersTotal > 0) ...[
             const SizedBox(height: 4),
             Text(
-              l?.statCorrectionLiters(
-                    stats.correctionLitersTotal.toStringAsFixed(1),
-                  ) ??
-                  'Corrections: +${stats.correctionLitersTotal.toStringAsFixed(1)} L',
+              l.statCorrectionLiters(
+                stats.correctionLitersTotal.toStringAsFixed(1),
+              ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

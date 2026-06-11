@@ -46,18 +46,15 @@ class Obd2InitTranscriptSection extends StatelessWidget {
     const dash = '—';
 
     final start = (session.warmStart ?? false)
-        ? (l?.obd2DiagnosticsInitWarm ?? 'warm')
-        : (l?.obd2DiagnosticsInitCold ?? 'cold');
-    final header = l?.obd2DiagnosticsInitHeader(
-          session.protocolDigit ?? dash,
-          start,
-          session.elmVersion ?? dash,
-          session.capabilityTier ?? dash,
-          supportedCount,
-        ) ??
-        'Protocol ${session.protocolDigit ?? dash} · $start · '
-            'firmware ${session.elmVersion ?? dash} · '
-            '${session.capabilityTier ?? dash} · $supportedCount PIDs';
+        ? (l.obd2DiagnosticsInitWarm)
+        : (l.obd2DiagnosticsInitCold);
+    final header = l.obd2DiagnosticsInitHeader(
+      session.protocolDigit ?? dash,
+      start,
+      session.elmVersion ?? dash,
+      session.capabilityTier ?? dash,
+      supportedCount,
+    );
 
     final mono = theme.textTheme.bodySmall?.copyWith(
       fontFamily: 'monospace',
@@ -72,7 +69,7 @@ class Obd2InitTranscriptSection extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              l?.obd2DiagnosticsInitSection ?? 'Dongle init transcript',
+              l.obd2DiagnosticsInitSection,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: theme.colorScheme.primary,
               ),
@@ -90,14 +87,11 @@ class Obd2InitTranscriptSection extends StatelessWidget {
             key: Key('obd2_diag_init_line_$i'),
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              l?.obd2DiagnosticsInitLine(
-                    session.initTranscript[i].cmd,
-                    session.initTranscript[i].response,
-                    session.initTranscript[i].latencyMs,
-                  ) ??
-                  '${session.initTranscript[i].cmd} → '
-                      '${session.initTranscript[i].response} '
-                      '(${session.initTranscript[i].latencyMs} ms)',
+              l.obd2DiagnosticsInitLine(
+                session.initTranscript[i].cmd,
+                session.initTranscript[i].response,
+                session.initTranscript[i].latencyMs,
+              ),
               style: mono,
             ),
           ),

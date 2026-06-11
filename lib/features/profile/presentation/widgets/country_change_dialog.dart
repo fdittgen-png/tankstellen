@@ -24,16 +24,16 @@ Future<bool> showCountryChangeDialog(
     context: context,
     builder: (ctx) {
       return AlertDialog(
-        title: Text(l10n?.countryChangeTitle ?? 'Switch country?'),
+        title: Text(l10n.countryChangeTitle),
         content: _DialogBody(from: from, to: to, l10n: l10n),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n?.cancel ?? 'Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n?.countryChangeConfirm ?? 'Switch'),
+            child: Text(l10n.countryChangeConfirm),
           ),
         ],
       );
@@ -58,13 +58,9 @@ bool countriesDifferInUnits(CountryConfig from, CountryConfig to) {
 class _DialogBody extends StatelessWidget {
   final CountryConfig from;
   final CountryConfig to;
-  final AppLocalizations? l10n;
+  final AppLocalizations l10n;
 
-  const _DialogBody({
-    required this.from,
-    required this.to,
-    required this.l10n,
-  });
+  const _DialogBody({required this.from, required this.to, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -73,44 +69,39 @@ class _DialogBody extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n?.countryChangeBody(to.name) ??
-              'Switching to ${to.name} will change:',
-        ),
+        Text(l10n.countryChangeBody(to.name)),
         const SizedBox(height: 12),
         if (from.currencySymbol != to.currencySymbol)
           _UnitRow(
-            label: l10n?.countryChangeCurrency ?? 'Currency',
+            label: l10n.countryChangeCurrency,
             fromValue: from.currencySymbol,
             toValue: to.currencySymbol,
             theme: theme,
           ),
         if (from.distanceUnit != to.distanceUnit)
           _UnitRow(
-            label: l10n?.countryChangeDistance ?? 'Distance',
+            label: l10n.countryChangeDistance,
             fromValue: from.distanceUnit,
             toValue: to.distanceUnit,
             theme: theme,
           ),
         if (from.volumeUnit != to.volumeUnit)
           _UnitRow(
-            label: l10n?.countryChangeVolume ?? 'Volume',
+            label: l10n.countryChangeVolume,
             fromValue: from.volumeUnit,
             toValue: to.volumeUnit,
             theme: theme,
           ),
         if (from.pricePerUnitSuffix != to.pricePerUnitSuffix)
           _UnitRow(
-            label: l10n?.countryChangePricePerUnit ?? 'Price format',
+            label: l10n.countryChangePricePerUnit,
             fromValue: from.pricePerUnitSuffix,
             toValue: to.pricePerUnitSuffix,
             theme: theme,
           ),
         const SizedBox(height: 12),
         Text(
-          l10n?.countryChangeNote ??
-              'Existing favorites and fill-up logs are not rewritten; '
-                  'only new entries use the new units.',
+          l10n.countryChangeNote,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),

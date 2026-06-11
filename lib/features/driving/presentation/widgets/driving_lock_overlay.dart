@@ -26,7 +26,7 @@ class DrivingLockOverlay extends StatelessWidget {
                 const Icon(Icons.lock_outline, size: 64, color: Colors.white70),
                 const SizedBox(height: 16),
                 Text(
-                  l10n?.drivingTapToUnlock ?? 'Tap to unlock',
+                  l10n.drivingTapToUnlock,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

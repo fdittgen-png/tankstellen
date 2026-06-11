@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
@@ -16,7 +15,7 @@ import 'trajet_stripe_colors.dart';
 class TrajetRow extends StatelessWidget {
   final TripHistoryEntry entry;
   final VehicleProfile? vehicle;
-  final AppLocalizations? l;
+  final AppLocalizations l;
   final ThemeData theme;
   final VoidCallback onTap;
 
@@ -81,9 +80,7 @@ class TrajetRow extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(color: stripeColor, width: 4),
-            ),
+            border: Border(left: BorderSide(color: stripeColor, width: 4)),
           ),
           padding: innerPadding,
           child: Row(
@@ -96,7 +93,7 @@ class TrajetRow extends StatelessWidget {
                   children: [
                     Text(
                       startedAt == null
-                          ? (l?.tripHistoryUnknownDate ?? 'Unknown date')
+                          ? (l.tripHistoryUnknownDate)
                           : _fmtDate(startedAt),
                       style: compact
                           ? theme.textTheme.bodyMedium
@@ -108,45 +105,33 @@ class TrajetRow extends StatelessWidget {
                       runSpacing: 4,
                       children: [
                         if (shared)
-                          _Chip(
-                            icon: Icons.group,
-                            text: l?.trajetsSharedBadge ?? 'Shared',
-                          ),
+                          _Chip(icon: Icons.group, text: l.trajetsSharedBadge),
                         _Chip(
                           icon: Icons.straighten,
-                          text: l?.trajetsRowDistance(
-                                s.distanceKm.toStringAsFixed(1),
-                              ) ??
-                              '${s.distanceKm.toStringAsFixed(1)} km',
+                          text: l.trajetsRowDistance(
+                            s.distanceKm.toStringAsFixed(1),
+                          ),
                         ),
                         if (durationMinutes != null && durationMinutes > 0)
                           _Chip(
                             icon: Icons.timer,
-                            text: l?.trajetsRowDuration(
-                                  durationMinutes.toString(),
-                                ) ??
-                                '$durationMinutes min',
+                            text: l.trajetsRowDuration(
+                              durationMinutes.toString(),
+                            ),
                           ),
                         if (s.avgLPer100Km != null)
                           _Chip(
                             icon: Icons.eco,
-                            text: l?.trajetsRowAvgConsumption(
-                                  s.avgLPer100Km!.toStringAsFixed(1),
-                                  avgUnit,
-                                ) ??
-                                UnitFormatter.formatConsumption(
-                                  s.avgLPer100Km!,
-                                  isEv: isEv,
-                                ),
+                            text: l.trajetsRowAvgConsumption(
+                              s.avgLPer100Km!.toStringAsFixed(1),
+                              avgUnit,
+                            ),
                           ),
                         if (s.coldStartSurcharge)
                           _Chip(
                             icon: Icons.ac_unit,
-                            text: l?.trajetsRowColdStartChip ?? 'Cold start',
-                            tooltip: l?.trajetsRowColdStartTooltip ??
-                                "Engine didn't reach operating temperature "
-                                    'during this trip — fuel consumption '
-                                    'was higher than usual.',
+                            text: l.trajetsRowColdStartChip,
+                            tooltip: l.trajetsRowColdStartTooltip,
                           ),
                       ],
                     ),
@@ -177,7 +162,7 @@ class TrajetRow extends StatelessWidget {
 /// that opens the virtual-trip edit sheet.
 class _VirtualTrajetRow extends StatelessWidget {
   final TripHistoryEntry entry;
-  final AppLocalizations? l;
+  final AppLocalizations l;
   final ThemeData theme;
   final VoidCallback onTap;
 
@@ -214,7 +199,7 @@ class _VirtualTrajetRow extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  l?.reconcileVirtualTrajetLabel ?? 'Virtual trip — tap to edit',
+                  l.reconcileVirtualTrajetLabel,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelMedium?.copyWith(

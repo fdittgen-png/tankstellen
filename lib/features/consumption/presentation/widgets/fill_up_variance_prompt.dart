@@ -35,33 +35,21 @@ Future<FillUpVarianceChoice> showFillUpVarianceDialog({
     barrierDismissible: true,
     builder: (dialogContext) {
       return AlertDialog(
-        title: Text(
-          l?.fillUpReconciliationVarianceDialogTitle ??
-              "Doesn't match adapter reading",
-        ),
+        title: Text(l.fillUpReconciliationVarianceDialogTitle),
         content: Text(
-          l?.fillUpReconciliationVarianceDialogBody(userL, adapterL) ??
-              'Your entry: $userL L. Adapter says: $adapterL L (delta from '
-                  'before/after fuel-level capture). Use adapter value?',
+          l.fillUpReconciliationVarianceDialogBody(userL, adapterL),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(
-              FillUpVarianceChoice.keepUser,
-            ),
-            child: Text(
-              l?.fillUpReconciliationVarianceDialogKeepMine ??
-                  'Keep my entry',
-            ),
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(FillUpVarianceChoice.keepUser),
+            child: Text(l.fillUpReconciliationVarianceDialogKeepMine),
           ),
           FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(
-              FillUpVarianceChoice.useAdapter,
-            ),
-            child: Text(
-              l?.fillUpReconciliationVarianceDialogUseAdapter ??
-                  'Use adapter value',
-            ),
+            onPressed: () => Navigator.of(
+              dialogContext,
+            ).pop(FillUpVarianceChoice.useAdapter),
+            child: Text(l.fillUpReconciliationVarianceDialogUseAdapter),
           ),
         ],
       );

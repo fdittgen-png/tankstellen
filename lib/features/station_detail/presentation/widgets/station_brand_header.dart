@@ -70,7 +70,8 @@ class StationBrandHeader extends StatelessWidget {
                 ),
                 if (headingIsBrandOrName)
                   Text(addressLine, style: theme.textTheme.bodyLarge)
-                else if (addressLine != station.street && addressLine.isNotEmpty)
+                else if (addressLine != station.street &&
+                    addressLine.isNotEmpty)
                   // Heading IS the street — still surface postal code +
                   // place on a second line so the user gets the city.
                   Text(
@@ -81,7 +82,7 @@ class StationBrandHeader extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 2),
                     child: Text(
-                      l10n?.independentStation ?? 'Independent station',
+                      l10n.independentStation,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontStyle: FontStyle.italic,

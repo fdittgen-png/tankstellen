@@ -53,18 +53,18 @@ class TrajetsTab extends ConsumerWidget {
     final filteredUnsorted = vehicleId == null
         ? trips.toList(growable: false)
         : trips
-            .where((t) => t.vehicleId == null || t.vehicleId == vehicleId)
-            .toList(growable: false);
+              .where((t) => t.vehicleId == null || t.vehicleId == vehicleId)
+              .toList(growable: false);
     // Defensive sort: `TripHistoryRepository.loadAll` already returns
     // newest-first, but we don't want to assume the provider was
     // populated by the repo path (tests, future sync sources). Sort
     // by `startedAt` descending here so the UI contract is tab-level.
     final filtered = List<TripHistoryEntry>.from(filteredUnsorted)
       ..sort((a, b) {
-        final ax = a.summary.startedAt ??
-            DateTime.fromMillisecondsSinceEpoch(0);
-        final bx = b.summary.startedAt ??
-            DateTime.fromMillisecondsSinceEpoch(0);
+        final ax =
+            a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bx =
+            b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         return bx.compareTo(ax);
       });
 
@@ -81,9 +81,8 @@ class TrajetsTab extends ConsumerWidget {
             child: EmptyState(
               key: const Key('trajets_empty_state'),
               icon: Icons.route_outlined,
-              title: l?.trajetsEmptyStateTitle ?? 'No trips yet',
-              subtitle: l?.trajetsEmptyStateBody ??
-                  'Tap Start recording to begin logging your drives.',
+              title: l.trajetsEmptyStateTitle,
+              subtitle: l.trajetsEmptyStateBody,
               topBiased: true,
             ),
           ),
@@ -112,7 +111,7 @@ class TrajetsTab extends ConsumerWidget {
         final vehicle = entry.vehicleId == null
             ? activeVehicle
             : vehicles.where((v) => v.id == entry.vehicleId).firstOrNull ??
-                activeVehicle;
+                  activeVehicle;
         return TrajetRow(
           entry: entry,
           vehicle: vehicle,

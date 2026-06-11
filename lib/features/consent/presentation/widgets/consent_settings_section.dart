@@ -54,8 +54,7 @@ class _ConsentSettingsSectionState
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            l10n?.gdprSettingsHint ??
-                'You can change your privacy choices at any time.',
+            l10n.gdprSettingsHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -64,14 +63,15 @@ class _ConsentSettingsSectionState
         const SizedBox(height: 8),
         SwitchListTile(
           secondary: const Icon(Icons.my_location, size: 20),
-          title: Text(l10n?.gdprLocationTitle ?? 'Location Access'),
+          title: Text(l10n.gdprLocationTitle),
           subtitle: Text(
-            l10n?.gdprLocationShort ??
-                'Find nearby fuel stations using your location',
+            l10n.gdprLocationShort,
             style: theme.textTheme.bodySmall,
           ),
           value: consent.location,
-          onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
+          onChanged: (v) => ref
+              .read(gdprConsentProvider.notifier)
+              .save(
                 location: v,
                 errorReporting: consent.errorReporting,
                 cloudSync: consent.cloudSync,
@@ -81,14 +81,15 @@ class _ConsentSettingsSectionState
         ),
         SwitchListTile(
           secondary: const Icon(Icons.bug_report_outlined, size: 20),
-          title: Text(l10n?.gdprErrorReportingTitle ?? 'Error Reporting'),
+          title: Text(l10n.gdprErrorReportingTitle),
           subtitle: Text(
-            l10n?.gdprErrorReportingShort ??
-                'Send anonymous crash reports to improve the app',
+            l10n.gdprErrorReportingShort,
             style: theme.textTheme.bodySmall,
           ),
           value: consent.errorReporting,
-          onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
+          onChanged: (v) => ref
+              .read(gdprConsentProvider.notifier)
+              .save(
                 location: consent.location,
                 errorReporting: v,
                 cloudSync: consent.cloudSync,
@@ -98,16 +99,17 @@ class _ConsentSettingsSectionState
         ),
         SwitchListTile(
           secondary: const Icon(Icons.cloud_outlined, size: 20),
-          title: Text(l10n?.gdprCloudSyncTitle ?? 'Cloud Sync'),
+          title: Text(l10n.gdprCloudSyncTitle),
           subtitle: Text(
-            l10n?.gdprCloudSyncShort ??
-                'Sync favorites and alerts across devices',
+            l10n.gdprCloudSyncShort,
             style: theme.textTheme.bodySmall,
             maxLines: collapsedMaxLines(),
             overflow: collapsedOverflow(),
           ),
           value: consent.cloudSync,
-          onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
+          onChanged: (v) => ref
+              .read(gdprConsentProvider.notifier)
+              .save(
                 location: consent.location,
                 errorReporting: consent.errorReporting,
                 cloudSync: v,
@@ -117,16 +119,17 @@ class _ConsentSettingsSectionState
         ),
         SwitchListTile(
           secondary: const Icon(Icons.directions_car_outlined, size: 20),
-          title: Text(l10n?.gdprVinOnlineDecodeTitle ?? 'VIN online decode'),
+          title: Text(l10n.gdprVinOnlineDecodeTitle),
           subtitle: Text(
-            l10n?.gdprVinOnlineDecodeShort ??
-                "Decode the VIN via NHTSA's free public service",
+            l10n.gdprVinOnlineDecodeShort,
             style: theme.textTheme.bodySmall,
             maxLines: collapsedMaxLines(),
             overflow: collapsedOverflow(),
           ),
           value: consent.vinOnlineDecode,
-          onChanged: (v) => ref.read(gdprConsentProvider.notifier).save(
+          onChanged: (v) => ref
+              .read(gdprConsentProvider.notifier)
+              .save(
                 location: consent.location,
                 errorReporting: consent.errorReporting,
                 cloudSync: consent.cloudSync,
@@ -154,9 +157,7 @@ class _ConsentSettingsSectionState
               size: 18,
             ),
             label: Text(
-              _expanded
-                  ? (l10n?.consentHideDetails ?? 'Hide details')
-                  : (l10n?.consentShowDetails ?? 'Show details'),
+              _expanded ? (l10n.consentHideDetails) : (l10n.consentShowDetails),
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

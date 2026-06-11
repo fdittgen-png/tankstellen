@@ -57,19 +57,19 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
 
   Widget _reconnectingBanner(
     ThemeData theme,
-    AppLocalizations? l,
+    AppLocalizations l,
     String? adapterName,
   ) {
     final hasName = adapterName != null && adapterName.isNotEmpty;
     final text = hasName
-        ? (l?.obd2ReconnectInProgressNamed(adapterName) ??
-            'Reconnecting to $adapterName…')
-        : (l?.obd2ReconnectInProgress ?? 'Reconnecting to your OBD2 adapter…');
+        ? (l.obd2ReconnectInProgressNamed(adapterName))
+        : (l.obd2ReconnectInProgress);
     return MaterialBanner(
       key: const Key('obd2ReconnectingBanner'),
       backgroundColor: theme.colorScheme.secondaryContainer,
-      contentTextStyle:
-          TextStyle(color: theme.colorScheme.onSecondaryContainer),
+      contentTextStyle: TextStyle(
+        color: theme.colorScheme.onSecondaryContainer,
+      ),
       leading: SizedBox(
         width: 20,
         height: 20,
@@ -88,7 +88,7 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ThemeData theme,
-    AppLocalizations? l,
+    AppLocalizations l,
   ) {
     return MaterialBanner(
       key: const Key('obd2ReconnectFailedBanner'),
@@ -98,17 +98,12 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
         Icons.bluetooth_disabled,
         color: theme.colorScheme.onErrorContainer,
       ),
-      content: Text(
-        l?.obd2ReconnectFailedBody ??
-            'The OBD2 connection was lost and automatic reconnection didn’t '
-                'succeed. Check the adapter is powered and in range, then tap '
-                'retry.',
-      ),
+      content: Text(l.obd2ReconnectFailedBody),
       actions: [
         TextButton(
           key: const Key('obd2ReconnectRetryButton'),
           onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
-          child: Text(l?.obd2ReconnectRetry ?? 'Tap to retry'),
+          child: Text(l.obd2ReconnectRetry),
         ),
       ],
     );
@@ -125,26 +120,22 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     ThemeData theme,
-    AppLocalizations? l,
+    AppLocalizations l,
   ) {
     return MaterialBanner(
       key: const Key('obd2ReconnectEngineOffBanner'),
       backgroundColor: theme.colorScheme.tertiaryContainer,
-      contentTextStyle:
-          TextStyle(color: theme.colorScheme.onTertiaryContainer),
+      contentTextStyle: TextStyle(color: theme.colorScheme.onTertiaryContainer),
       leading: Icon(
         Icons.power_settings_new,
         color: theme.colorScheme.onTertiaryContainer,
       ),
-      content: Text(
-        l?.obdAdapterUnresponsive ??
-            'Adapter didn’t answer — turn the ignition on and retry',
-      ),
+      content: Text(l.obdAdapterUnresponsive),
       actions: [
         TextButton(
           key: const Key('obd2ReconnectEngineOffRetryButton'),
           onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
-          child: Text(l?.obd2ReconnectRetry ?? 'Tap to retry'),
+          child: Text(l.obd2ReconnectRetry),
         ),
       ],
     );

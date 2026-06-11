@@ -18,6 +18,7 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #889 / #1901 — the Trajets surface (OBD2 trip history).
 ///
@@ -43,9 +44,9 @@ import '../../../../helpers/pump_app.dart';
 class _ObdEnabledFlags extends FeatureFlags {
   @override
   Set<Feature> build() => <Feature>{
-        Feature.showConsumptionTab,
-        Feature.obd2TripRecording,
-      };
+    Feature.showConsumptionTab,
+    Feature.obd2TripRecording,
+  };
 }
 
 class _FixedFillUpList extends FillUpList {
@@ -134,9 +135,8 @@ Future<void> _pumpScreen(
     routes: [
       GoRoute(
         path: '/trajets-tab',
-        builder: (_, _) => const ConsumptionScreen(
-          section: ConsumptionSection.trajets,
-        ),
+        builder: (_, _) =>
+            const ConsumptionScreen(section: ConsumptionSection.trajets),
       ),
       GoRoute(path: '/consumption/add', builder: (_, _) => const SizedBox()),
       GoRoute(
@@ -158,16 +158,21 @@ Future<void> _pumpScreen(
 
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       chargingLogsProvider.overrideWith(() => _FixedChargingLogs(chargingLogs)),
-      activeVehicleProfileProvider
-          .overrideWith(() => _FixedActiveVehicle(activeVehicle)),
-      vehicleProfileListProvider
-          .overrideWith(() => _FixedVehicleProfileList(vehicles)),
-      tripHistoryListProvider
-          .overrideWith(() => _FixedTripHistoryList(trips)),
+      activeVehicleProfileProvider.overrideWith(
+        () => _FixedActiveVehicle(activeVehicle),
+      ),
+      vehicleProfileListProvider.overrideWith(
+        () => _FixedVehicleProfileList(vehicles),
+      ),
+      tripHistoryListProvider.overrideWith(() => _FixedTripHistoryList(trips)),
       featureFlagsProvider.overrideWith(() => _ObdEnabledFlags()),
     ],
   );
@@ -188,13 +193,10 @@ void main() {
       type: VehicleType.hybrid,
     );
 
-    testWidgets('renders the Trajets section directly — no tab bar, no FAB',
-        (tester) async {
-      await _pumpScreen(
-        tester,
-        activeVehicle: vehicle,
-        vehicles: [vehicle],
-      );
+    testWidgets('renders the Trajets section directly — no tab bar, no FAB', (
+      tester,
+    ) async {
+      await _pumpScreen(tester, activeVehicle: vehicle, vehicles: [vehicle]);
       // #1901 — the Trajets destination has no in-screen TabSwitcher
       // and no screen-level FAB (the "Start recording" CTA lives in
       // the tab header).
@@ -203,13 +205,10 @@ void main() {
       expect(find.byKey(const Key('fab_add_charging')), findsNothing);
     });
 
-    testWidgets('Trajets empty state renders CTA + "Start recording" button',
-        (tester) async {
-      await _pumpScreen(
-        tester,
-        activeVehicle: vehicle,
-        vehicles: [vehicle],
-      );
+    testWidgets('Trajets empty state renders CTA + "Start recording" button', (
+      tester,
+    ) async {
+      await _pumpScreen(tester, activeVehicle: vehicle, vehicles: [vehicle]);
 
       expect(find.byKey(const Key('trajets_empty_state')), findsOneWidget);
       expect(
@@ -260,12 +259,18 @@ void main() {
       );
 
       // Every trip should render a row.
-      expect(find.byKey(const ValueKey('trajet-2026-04-20T09:00:00.000Z')),
-          findsOneWidget);
-      expect(find.byKey(const ValueKey('trajet-2026-04-21T09:00:00.000Z')),
-          findsOneWidget);
-      expect(find.byKey(const ValueKey('trajet-2026-04-22T09:00:00.000Z')),
-          findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('trajet-2026-04-20T09:00:00.000Z')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('trajet-2026-04-21T09:00:00.000Z')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('trajet-2026-04-22T09:00:00.000Z')),
+        findsOneWidget,
+      );
 
       // Newest-first: the April 22nd row must sit above April 20th.
       final newestY = tester
@@ -278,12 +283,16 @@ void main() {
             find.byKey(const ValueKey('trajet-2026-04-20T09:00:00.000Z')),
           )
           .dy;
-      expect(newestY, lessThan(oldestY),
-          reason: 'Newest trip should appear above the oldest');
+      expect(
+        newestY,
+        lessThan(oldestY),
+        reason: 'Newest trip should appear above the oldest',
+      );
     });
 
-    testWidgets('tap row navigates to /trip/:id with the correct id',
-        (tester) async {
+    testWidgets('tap row navigates to /trip/:id with the correct id', (
+      tester,
+    ) async {
       final trips = <TripHistoryEntry>[
         _entry(
           id: '2026-04-22T09:00:00.000Z',
@@ -330,9 +339,9 @@ void main() {
       type: VehicleType.combustion,
     );
 
-    testWidgets(
-        'map IconButton is present in the AppBar when trips exist',
-        (tester) async {
+    testWidgets('map IconButton is present in the AppBar when trips exist', (
+      tester,
+    ) async {
       final trips = <TripHistoryEntry>[
         _entry(
           id: 'trip-1',
@@ -351,10 +360,7 @@ void main() {
 
       // The AppBar map IconButton carries the localized tooltip and
       // the map_outlined icon.
-      expect(
-        find.byKey(const Key('trajets_view_all_on_map')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('trajets_view_all_on_map')), findsOneWidget);
       final btn = tester.widget<IconButton>(
         find.byKey(const Key('trajets_view_all_on_map')),
       );
@@ -368,26 +374,19 @@ void main() {
       );
     });
 
-    testWidgets(
-        'map IconButton is present even with an empty trip list',
-        (tester) async {
-      await _pumpScreen(
-        tester,
-        activeVehicle: vehicle,
-        vehicles: [vehicle],
-      );
+    testWidgets('map IconButton is present even with an empty trip list', (
+      tester,
+    ) async {
+      await _pumpScreen(tester, activeVehicle: vehicle, vehicles: [vehicle]);
 
       // The button is always present (empty tripIds list is valid for
       // TrajetsMapScreen — it renders its own empty state).
-      expect(
-        find.byKey(const Key('trajets_view_all_on_map')),
-        findsOneWidget,
-      );
+      expect(find.byKey(const Key('trajets_view_all_on_map')), findsOneWidget);
     });
 
-    testWidgets(
-        'standalone TextButton.icon row is absent from the body',
-        (tester) async {
+    testWidgets('standalone TextButton.icon row is absent from the body', (
+      tester,
+    ) async {
       final trips = <TripHistoryEntry>[
         _entry(
           id: 'trip-2',
@@ -407,6 +406,5 @@ void main() {
       // body scroll area; it must be gone now.
       expect(find.byType(TextButton), findsNothing);
     });
-
   });
 }

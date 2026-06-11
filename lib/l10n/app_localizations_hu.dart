@@ -3379,6 +3379,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String serviceReminderDueNowBody(String label) {
+    return '$label is due now.';
+  }
+
+  @override
   String get southKoreaApiKeyRequired =>
       'Regisztráljon az OPINET-en ingyenes API-kulcsért';
 

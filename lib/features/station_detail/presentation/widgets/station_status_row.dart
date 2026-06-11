@@ -47,13 +47,7 @@ class StationStatusRow extends ConsumerWidget {
       null => DarkModeColors.mutedText(context),
     };
 
-    final statusSemantic =
-        l10n?.stationOpenStateSemantic('${station.isOpen}') ??
-            switch (station.isOpen) {
-              true => 'Station is open',
-              false => 'Station is closed',
-              null => 'Open state unknown',
-            };
+    final statusSemantic = l10n.stationOpenStateSemantic('${station.isOpen}');
 
     return Row(
       children: [
@@ -116,14 +110,14 @@ class StationStatusRow extends ConsumerWidget {
   static String _buildStatusText(
     Station station,
     ServiceResult<dynamic> result,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) {
     final status = switch (station.isOpen) {
-      true => l10n?.open ?? 'Open',
-      false => l10n?.closed ?? 'Closed',
-      null => l10n?.openStateUnknown ?? 'Unknown',
+      true => l10n.open,
+      false => l10n.closed,
+      null => l10n.openStateUnknown,
     };
-    final agoSuffix = l10n?.freshnessAgo ?? 'ago';
+    final agoSuffix = l10n.freshnessAgo;
     final freshness = result.freshnessLabel;
     return '$status — $freshness $agoSuffix';
   }

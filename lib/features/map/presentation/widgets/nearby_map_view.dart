@@ -81,9 +81,8 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
         if (allItems.isEmpty) {
           return EmptyState(
             icon: Icons.map_outlined,
-            title: l10n?.startSearch ??
-                'Search for stations to see them on the map',
-            actionLabel: l10n?.search ?? 'Search now',
+            title: l10n.startSearch,
+            actionLabel: l10n.search,
             onAction: () => context.go(RoutePaths.search),
             iconSize: 80,
           );
@@ -103,8 +102,8 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
         final center = stations.isNotEmpty
             ? StationMapLayers.centerOf(stations)
             : (userPos != null
-                ? LatLng(userPos.lat, userPos.lng)
-                : const LatLng(0, 0));
+                  ? LatLng(userPos.lat, userPos.lng)
+                  : const LatLng(0, 0));
         final zoom = StationMapLayers.zoomForRadius(searchRadiusKm);
 
         final evLat = center.latitude;
@@ -128,8 +127,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
         // changed search centre. The old per-build post-frame `fitCamera`
         // here raced the (now-deleted) cold-start reset window and is
         // gone. `bounds` is still computed for the recenter button.
-        final bounds =
-            StationMapLayers.boundsForRadius(center, searchRadiusKm);
+        final bounds = StationMapLayers.boundsForRadius(center, searchRadiusKm);
 
         return Stack(
           children: [
@@ -191,7 +189,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
 
   Widget _buildInfoBar(
     BuildContext context,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
     List<dynamic> stations,
     dynamic result,
   ) {
@@ -201,22 +199,27 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
       color: theme.colorScheme.surfaceContainerHighest,
       child: Row(
         children: [
-          Icon(Icons.local_gas_station,
-              size: 16, color: theme.colorScheme.primary),
+          Icon(
+            Icons.local_gas_station,
+            size: 16,
+            color: theme.colorScheme.primary,
+          ),
           const SizedBox(width: 8),
           Text(
-            l10n?.nStations(stations.length) ?? '${stations.length} stations',
+            l10n.nStations(stations.length),
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(width: 16),
-          Icon(Icons.circle,
-              size: 8,
-              color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+          Icon(
+            Icons.circle,
+            size: 8,
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
+          ),
           const SizedBox(width: 4),
           Text(
-            '${widget.searchRadiusKm.round()} km ${l10n?.searchRadius ?? "radius"}',
+            '${widget.searchRadiusKm.round()} km ${l10n.searchRadius}',
             style: theme.textTheme.bodySmall,
           ),
           const Spacer(),

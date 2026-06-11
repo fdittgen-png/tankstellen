@@ -25,10 +25,8 @@ import '../../../../core/logging/error_logger.dart';
 /// captures the outgoing payload (#2030). Lets widget tests assert on
 /// the GPX bytes without launching `share_plus`.
 @visibleForTesting
-Future<void> Function({
-  required Uint8List bytes,
-  required String fileName,
-})? debugTrajetsMapGpxShareOverride;
+Future<void> Function({required Uint8List bytes, required String fileName})?
+debugTrajetsMapGpxShareOverride;
 
 /// Aggregates the GPS polylines of multiple trajets on a single
 /// flutter_map view (#2030).
@@ -53,8 +51,7 @@ class TrajetsMapScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final allTrips = ref.watch(tripHistoryListProvider);
     final selected = <TripHistoryEntry>[
-      for (final id in tripIds)
-        ...allTrips.where((t) => t.id == id),
+      for (final id in tripIds) ...allTrips.where((t) => t.id == id),
     ];
 
     final tracks = <_TripTrack>[];
@@ -72,28 +69,26 @@ class TrajetsMapScreen extends ConsumerWidget {
         }
       }
       if (points.length >= 2) {
-        tracks.add(_TripTrack(
-          entry: trip,
-          points: points,
-          colour: _colourForIndex(i),
-        ));
+        tracks.add(
+          _TripTrack(entry: trip, points: points, colour: _colourForIndex(i)),
+        );
       }
     }
 
     final canExport = tracks.isNotEmpty;
 
     return PageScaffold(
-      title: l?.trajetsMapTitle ?? 'Trajets on map',
+      title: l.trajetsMapTitle,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
         IconButton(
           key: const Key('trajets_map_share_gpx'),
           icon: const Icon(Icons.ios_share),
-          tooltip: l?.trajetsMapShareGpx ?? 'Share GPX',
+          tooltip: l.trajetsMapShareGpx,
           onPressed: canExport
               ? () => unawaited(_shareGpx(context, l, selected))
               : null,
@@ -104,11 +99,7 @@ class TrajetsMapScreen extends ConsumerWidget {
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text(
-                  l?.trajetsMapEmpty ??
-                      'None of the selected trajets carry GPS samples.',
-                  textAlign: TextAlign.center,
-                ),
+                child: Text(l.trajetsMapEmpty, textAlign: TextAlign.center),
               ),
             )
           : _Map(tracks: tracks, allPoints: allPoints),
@@ -117,7 +108,7 @@ class TrajetsMapScreen extends ConsumerWidget {
 
   Future<void> _shareGpx(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     List<TripHistoryEntry> trips,
   ) async {
     final messenger = ScaffoldMessenger.maybeOf(context);
@@ -143,16 +134,21 @@ class TrajetsMapScreen extends ConsumerWidget {
         mimeType: 'application/gpx+xml',
       );
       if (messenger == null) return;
-      final ok = l?.savedToDownloadsFolder ?? 'Saved to your Downloads folder';
+      final ok = l.savedToDownloadsFolder;
       // #2173 — themed success toast (matches the sibling error path).
       messenger.showSnackBar(SnackBarHelper.successSnackBar(scheme, ok));
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TrajetsMapScreen save GPX'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'TrajetsMapScreen save GPX'},
+        ),
+      );
       if (messenger == null) return;
-      final errorMsg =
-          l?.trajetsMapShareError ?? "Couldn't save the GPX file";
-      messenger
-          .showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
+      final errorMsg = l.trajetsMapShareError;
+      messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));
     }
   }
 
@@ -215,15 +211,9 @@ class _MapState extends State<_Map> {
       if (p.longitude < minLng) minLng = p.longitude;
       if (p.longitude > maxLng) maxLng = p.longitude;
     }
-    final bounds = LatLngBounds(
-      LatLng(minLat, minLng),
-      LatLng(maxLat, maxLng),
-    );
+    final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
     _controller.fitCamera(
-      CameraFit.bounds(
-        bounds: bounds,
-        padding: const EdgeInsets.all(32),
-      ),
+      CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(32)),
     );
   }
 
@@ -246,11 +236,7 @@ class _MapState extends State<_Map> {
         PolylineLayer(
           polylines: [
             for (final t in widget.tracks)
-              Polyline(
-                points: t.points,
-                color: t.colour,
-                strokeWidth: 4,
-              ),
+              Polyline(points: t.points, color: t.colour, strokeWidth: 4),
           ],
         ),
         const OsmAttribution(),

@@ -46,15 +46,10 @@ class BadScanIssueCreatedSurface extends StatelessWidget {
         FilledButton.icon(
           onPressed: onOpenInBrowser,
           icon: const Icon(Icons.open_in_new),
-          label: Text(
-            l?.badScanReportOpenInBrowser ?? 'Open in browser',
-          ),
+          label: Text(l.badScanReportOpenInBrowser),
         ),
         const SizedBox(height: 8),
-        TextButton(
-          onPressed: onClose,
-          child: Text(l?.close ?? 'Close'),
-        ),
+        TextButton(onPressed: onClose, child: Text(l.close)),
       ],
     );
   }

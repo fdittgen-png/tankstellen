@@ -68,7 +68,7 @@ class MonthlyFuelCharts extends StatelessWidget {
         _chart(
           context,
           key: const Key('monthly_litres_chart'),
-          title: l?.consumptionStatsChartLiters ?? 'Litres per month',
+          title: l.consumptionStatsChartLiters,
           summaries: rows((m) => m.stats.totalLiters),
           color: theme.colorScheme.primary,
           unitLabel: 'L',
@@ -76,7 +76,7 @@ class MonthlyFuelCharts extends StatelessWidget {
         _chart(
           context,
           key: const Key('monthly_spend_chart'),
-          title: l?.consumptionStatsChartSpend ?? 'Spend per month',
+          title: l.consumptionStatsChartSpend,
           summaries: rows((m) => m.stats.totalSpent),
           color: theme.colorScheme.tertiary,
           unitLabel: PriceFormatter.currency,
@@ -84,7 +84,7 @@ class MonthlyFuelCharts extends StatelessWidget {
         _chart(
           context,
           key: const Key('monthly_price_per_litre_chart'),
-          title: l?.consumptionStatsChartPricePerLiter ?? 'Price per litre',
+          title: l.consumptionStatsChartPricePerLiter,
           summaries: rows((m) => m.stats.avgPricePerLiter ?? 0),
           color: theme.colorScheme.secondary,
           unitLabel: PriceFormatter.currency,
@@ -93,7 +93,7 @@ class MonthlyFuelCharts extends StatelessWidget {
           _chart(
             context,
             key: const Key('monthly_consumption_chart'),
-            title: l?.consumptionStatsChartConsumption ?? 'L/100km per month',
+            title: l.consumptionStatsChartConsumption,
             summaries: consumptionRows,
             color: theme.colorScheme.primary,
             unitLabel: 'L/100km',

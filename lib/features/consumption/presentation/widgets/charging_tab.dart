@@ -26,7 +26,7 @@ import 'charging_log_card.dart';
 /// already uses.
 class ChargingTab extends ConsumerWidget {
   final AsyncValue<List<ChargingLog>> async;
-  final AppLocalizations? l;
+  final AppLocalizations l;
 
   const ChargingTab({super.key, required this.async, required this.l});
 
@@ -34,18 +34,14 @@ class ChargingTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return async.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(
-        child: Text('Failed to load charging logs: $e'),
-      ),
+      error: (e, _) => Center(child: Text('Failed to load charging logs: $e')),
       data: (logs) {
         if (logs.isEmpty) {
           return EmptyState(
             key: const Key('charging_empty_state'),
             icon: Icons.ev_station_outlined,
-            title: l?.noChargingLogsTitle ?? 'No charging logs yet',
-            subtitle: l?.noChargingLogsSubtitle ??
-                'Log your first charging session to start tracking '
-                    'EUR/100 km and kWh/100 km.',
+            title: l.noChargingLogsTitle,
+            subtitle: l.noChargingLogsSubtitle,
           );
         }
         final ordered = logs.reversed.toList(growable: false);
@@ -73,7 +69,9 @@ class ChargingTab extends ConsumerWidget {
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (_) {
-                unawaited(ref.read(chargingLogsProvider.notifier).remove(log.id));
+                unawaited(
+                  ref.read(chargingLogsProvider.notifier).remove(log.id),
+                );
               },
               child: ChargingLogCard(log: log),
             );
@@ -111,7 +109,7 @@ class _ChargingChartsSection extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l?.chargingCostTrendTitle ?? 'Charging cost trend',
+                    l.chargingCostTrendTitle,
                     style: theme.textTheme.titleSmall,
                   ),
                   const SizedBox(height: 6),
@@ -131,8 +129,7 @@ class _ChargingChartsSection extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l?.chargingEfficiencyTitle ??
-                        'Efficiency (kWh/100 km)',
+                    l.chargingEfficiencyTitle,
                     style: theme.textTheme.titleSmall,
                   ),
                   const SizedBox(height: 6),

@@ -64,9 +64,7 @@ class OcrTraceStepsPanel extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (_fallbackFired)
-          _FallbackBanner(text: l?.ocrTesterFallbackBanner ??
-              'A field was recovered via magnitude fallback — verify it.'),
+        if (_fallbackFired) _FallbackBanner(text: l.ocrTesterFallbackBanner),
         for (final stage in _stages)
           _StageTile(
             key: Key('ocr_step_${stage.name}'),
@@ -80,29 +78,27 @@ class OcrTraceStepsPanel extends StatelessWidget {
 
   bool get _fallbackFired => package.magnitudeFallback.isNotEmpty;
 
-  String _stageLabel(AppLocalizations? l, OcrTraceStage stage) =>
+  String _stageLabel(AppLocalizations l, OcrTraceStage stage) =>
       switch (stage) {
-        OcrTraceStage.glare => l?.ocrTesterStageGlare ?? 'Capture / glare',
-        OcrTraceStage.mlkit => l?.ocrTesterStageMlkit ?? 'ML Kit',
-        OcrTraceStage.classify => l?.ocrTesterStageClassify ?? 'Classify',
-        OcrTraceStage.assemble => l?.ocrTesterStageAssemble ?? 'Assemble',
-        OcrTraceStage.anchor => l?.ocrTesterStageAnchor ?? 'Anchor',
-        OcrTraceStage.fallback => l?.ocrTesterStageFallback ?? 'Fallback',
-        OcrTraceStage.crossCheck =>
-          l?.ocrTesterStageCrossCheck ?? 'Cross-check',
-        OcrTraceStage.confidence =>
-          l?.ocrTesterStageConfidence ?? 'Confidence',
-        OcrTraceStage.gate => l?.ocrTesterStageGate ?? 'Gate',
-        OcrTraceStage.brand => l?.ocrTesterStageBrand ?? 'Brand',
-        OcrTraceStage.overrides => l?.ocrTesterStageOverrides ?? 'Overrides',
-        OcrTraceStage.reconcile => l?.ocrTesterStageReconcile ?? 'Reconcile',
-        OcrTraceStage.result => l?.ocrTesterStageResult ?? 'Result',
+        OcrTraceStage.glare => l.ocrTesterStageGlare,
+        OcrTraceStage.mlkit => l.ocrTesterStageMlkit,
+        OcrTraceStage.classify => l.ocrTesterStageClassify,
+        OcrTraceStage.assemble => l.ocrTesterStageAssemble,
+        OcrTraceStage.anchor => l.ocrTesterStageAnchor,
+        OcrTraceStage.fallback => l.ocrTesterStageFallback,
+        OcrTraceStage.crossCheck => l.ocrTesterStageCrossCheck,
+        OcrTraceStage.confidence => l.ocrTesterStageConfidence,
+        OcrTraceStage.gate => l.ocrTesterStageGate,
+        OcrTraceStage.brand => l.ocrTesterStageBrand,
+        OcrTraceStage.overrides => l.ocrTesterStageOverrides,
+        OcrTraceStage.reconcile => l.ocrTesterStageReconcile,
+        OcrTraceStage.result => l.ocrTesterStageResult,
       };
 
   /// The detail rows for [stage], or an empty list (→ "did not run").
   List<Widget> _stageChildren(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     OcrTraceStage stage,
   ) {
     return switch (stage) {
@@ -144,8 +140,7 @@ class OcrTraceStepsPanel extends StatelessWidget {
   List<Widget> _classifyRows(BuildContext context) {
     if (package.classification.isEmpty) return const [];
     return [
-      for (final c in package.classification)
-        _ClassifyRow(classification: c),
+      for (final c in package.classification) _ClassifyRow(classification: c),
     ];
   }
 
@@ -159,10 +154,7 @@ class OcrTraceStepsPanel extends StatelessWidget {
 
   List<Widget> _anchorRows(BuildContext context) {
     if (package.anchors.isEmpty) return const [];
-    return [
-      for (final a in package.anchors)
-        _AnchorRow(anchor: a),
-    ];
+    return [for (final a in package.anchors) _AnchorRow(anchor: a)];
   }
 
   List<Widget> _fallbackRows() {
@@ -197,12 +189,12 @@ class OcrTraceStepsPanel extends StatelessWidget {
     ];
   }
 
-  List<Widget> _gateRows(BuildContext context, AppLocalizations? l) {
+  List<Widget> _gateRows(BuildContext context, AppLocalizations l) {
     final g = package.gate;
     if (g == null) return const [];
     final verdict = g.accepted
-        ? (l?.ocrTesterGateAccepted ?? 'Accepted')
-        : (l?.ocrTesterGateRejected ?? 'Rejected');
+        ? (l.ocrTesterGateAccepted)
+        : (l.ocrTesterGateRejected);
     return [
       _kv('verdict', verdict),
       _kv('reason', g.reason),
@@ -226,8 +218,11 @@ class OcrTraceStepsPanel extends StatelessWidget {
     if (r == null || r.overrides.isEmpty) return const [];
     return [
       for (final o in r.overrides)
-        _kv(o.field, '/${o.pattern}/ → "${o.match}"'
-            '${o.value != null ? ' = ${o.value}' : ''}'),
+        _kv(
+          o.field,
+          '/${o.pattern}/ → "${o.match}"'
+          '${o.value != null ? ' = ${o.value}' : ''}',
+        ),
     ];
   }
 
@@ -243,16 +238,28 @@ class OcrTraceStepsPanel extends StatelessWidget {
     ];
   }
 
-  List<Widget> _resultRows(BuildContext context, AppLocalizations? l) {
+  List<Widget> _resultRows(BuildContext context, AppLocalizations l) {
     final r = package.result;
     if (r == null) return const [];
     return [
-      _ResultRow(label: 'total', value: r.totalCost, derived: r.derived,
-          field: 'total'),
-      _ResultRow(label: 'volume', value: r.liters, derived: r.derived,
-          field: 'volume'),
-      _ResultRow(label: 'pricePerLitre', value: r.pricePerLiter,
-          derived: r.derived, field: 'pricePerLitre'),
+      _ResultRow(
+        label: 'total',
+        value: r.totalCost,
+        derived: r.derived,
+        field: 'total',
+      ),
+      _ResultRow(
+        label: 'volume',
+        value: r.liters,
+        derived: r.derived,
+        field: 'volume',
+      ),
+      _ResultRow(
+        label: 'pricePerLitre',
+        value: r.pricePerLiter,
+        derived: r.derived,
+        field: 'pricePerLitre',
+      ),
       _kv('confidence', r.confidence.toStringAsFixed(2)),
       _kv('validated', '${r.validated}'),
       if (r.validationReason != null) _kv('reason', r.validationReason!),

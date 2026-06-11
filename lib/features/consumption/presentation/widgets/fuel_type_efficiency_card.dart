@@ -62,10 +62,9 @@ class FuelTypeEfficiencyCard extends ConsumerWidget {
     // aggregator already guarantees this, but the gate is cheap and hardens
     // the chip against any future change to `cheapestPerKm` (a crowned-but-
     // null bucket would otherwise render "Cheapest per km: … (--)").
-    final winner =
-        (crowned != null && _costPerKmOf(withFills, crowned) != null)
-            ? crowned
-            : null;
+    final winner = (crowned != null && _costPerKmOf(withFills, crowned) != null)
+        ? crowned
+        : null;
     // Best (lowest) non-null €/km — the sentiment baseline for the delta
     // arrows. Independent of the verdict gate so arrows render even when no
     // crown is awarded.
@@ -76,9 +75,8 @@ class FuelTypeEfficiencyCard extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: SectionCard(
         key: const ValueKey('fuel_type_efficiency_card'),
-        title: l?.fuelEfficiencyCardTitle ?? 'Cost per kilometre by fuel',
-        subtitle: l?.fuelEfficiencyCardSubtitle ??
-            'Which fuel mix is actually cheapest to drive on',
+        title: l.fuelEfficiencyCardTitle,
+        subtitle: l.fuelEfficiencyCardSubtitle,
         leadingIcon: Icons.eco_outlined,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -100,19 +98,11 @@ class FuelTypeEfficiencyCard extends ConsumerWidget {
             ],
             if (winner == null) ...[
               const SizedBox(height: 2),
-              _Footnote(
-                text: l?.fuelEfficiencyInsufficientData ??
-                    'Log at least two full tanks per composition to crown the '
-                        'cheapest.',
-              ),
+              _Footnote(text: l.fuelEfficiencyInsufficientData),
             ],
             if (anyMix) ...[
               const SizedBox(height: 4),
-              _Footnote(
-                text: l?.fuelEfficiencyCompositionFootnote ??
-                    'Tanks are grouped by composition: a tank is pure when '
-                        'one fuel is at least 85% of it, otherwise a blend.',
-              ),
+              _Footnote(text: l.fuelEfficiencyCompositionFootnote),
             ],
           ],
         ),
@@ -161,8 +151,7 @@ class _WinnerChip extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final cost = PriceFormatter.formatPerKm(costPerKm);
-    final text = l?.fuelEfficiencyWinnerChip(label, cost) ??
-        'Cheapest per km: $label ($cost)';
+    final text = l.fuelEfficiencyWinnerChip(label, cost);
     return Container(
       key: const ValueKey('fuel_efficiency_winner_chip'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

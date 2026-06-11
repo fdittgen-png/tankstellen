@@ -15,15 +15,16 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Enables the consumption surface. #1901 — the Fuel section's
 /// Fuel/Charging switcher does not depend on the OBD2 flag.
 class _ObdEnabledFlags extends FeatureFlags {
   @override
   Set<Feature> build() => <Feature>{
-        Feature.showConsumptionTab,
-        Feature.obd2TripRecording,
-      };
+    Feature.showConsumptionTab,
+    Feature.obd2TripRecording,
+  };
 }
 
 /// #1163 — counterpart to `favorites_screen_tab_icons_test.dart`.
@@ -76,8 +77,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('ConsumptionScreen sub-tab icons (#1163)', () {
-    testWidgets('every TabSwitcher entry renders a leading Icon',
-        (tester) async {
+    testWidgets('every TabSwitcher entry renders a leading Icon', (
+      tester,
+    ) async {
       final router = GoRouter(
         initialLocation: '/consumption',
         routes: [
@@ -94,28 +96,27 @@ void main() {
             builder: (_, _) => const SizedBox(),
           ),
           GoRoute(path: '/carbon', builder: (_, _) => const SizedBox()),
-          GoRoute(
-            path: '/trip-history',
-            builder: (_, _) => const SizedBox(),
-          ),
-          GoRoute(
-            path: '/vehicles/edit',
-            builder: (_, _) => const SizedBox(),
-          ),
+          GoRoute(path: '/trip-history', builder: (_, _) => const SizedBox()),
+          GoRoute(path: '/vehicles/edit', builder: (_, _) => const SizedBox()),
         ],
       );
 
       await pumpApp(
         tester,
-        MaterialApp.router(routerConfig: router),
+        MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
         overrides: [
           fillUpListProvider.overrideWith(() => _FixedFillUpList(const [])),
-          chargingLogsProvider
-              .overrideWith(() => _FixedChargingLogs(const [])),
-          activeVehicleProfileProvider
-              .overrideWith(() => _FixedActiveVehicle(_evVehicle)),
-          vehicleProfileListProvider
-              .overrideWith(() => _FixedVehicleProfileList(const [_evVehicle])),
+          chargingLogsProvider.overrideWith(() => _FixedChargingLogs(const [])),
+          activeVehicleProfileProvider.overrideWith(
+            () => _FixedActiveVehicle(_evVehicle),
+          ),
+          vehicleProfileListProvider.overrideWith(
+            () => _FixedVehicleProfileList(const [_evVehicle]),
+          ),
           featureFlagsProvider.overrideWith(() => _ObdEnabledFlags()),
         ],
       );
@@ -123,8 +124,11 @@ void main() {
       // #1901 — EV profile renders the 2-entry Fuel / Charging
       // switcher (Trajets moved out to its own destination).
       final tabs = tester.widgetList<Tab>(find.byType(Tab)).toList();
-      expect(tabs, hasLength(2),
-          reason: 'EV profile must render the Fuel + Charging switcher');
+      expect(
+        tabs,
+        hasLength(2),
+        reason: 'EV profile must render the Fuel + Charging switcher',
+      );
 
       // Every Tab must render a leading icon — the visual contract this
       // issue locked across both Conso and Favoris. #2237 made the tab

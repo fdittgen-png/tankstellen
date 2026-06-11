@@ -88,8 +88,8 @@ abstract class AppLocalizations {
 
   final String localeName;
 
-  static AppLocalizations? of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
   static const LocalizationsDelegate<AppLocalizations> delegate =
@@ -6217,6 +6217,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{label} is due — {kmOver} km past the interval.'**
   String serviceReminderDueBody(String label, int kmOver);
+
+  /// No description provided for @serviceReminderDueNowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} is due now.'**
+  String serviceReminderDueNowBody(String label);
 
   /// No description provided for @southKoreaApiKeyRequired.
   ///

@@ -68,8 +68,8 @@ class VehicleIdentitySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return FormSectionCard(
-      title: l?.vehicleSectionIdentityTitle ?? 'Identity',
-      subtitle: l?.vehicleSectionIdentitySubtitle ?? 'Name & VIN',
+      title: l.vehicleSectionIdentityTitle,
+      subtitle: l.vehicleSectionIdentitySubtitle,
       icon: Icons.badge_outlined,
       accent: accent,
       children: [
@@ -79,13 +79,12 @@ class VehicleIdentitySection extends StatelessWidget {
           content: TextFormField(
             controller: nameController,
             decoration: InputDecoration(
-              labelText: l?.vehicleNameLabel ?? 'Name',
-              hintText: l?.vehicleNameHint ?? 'e.g. My Tesla Model 3',
+              labelText: l.vehicleNameLabel,
+              hintText: l.vehicleNameHint,
               border: const OutlineInputBorder(),
             ),
-            validator: (v) => (v == null || v.trim().isEmpty)
-                ? (l?.fieldRequired ?? 'Required')
-                : null,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? (l.fieldRequired) : null,
           ),
         ),
         // VIN row — the FormFieldTile keeps the existing input layout,
@@ -103,7 +102,7 @@ class VehicleIdentitySection extends StatelessWidget {
                   controller: vinController,
                   focusNode: vinFocus,
                   decoration: InputDecoration(
-                    labelText: l?.vinLabel ?? 'VIN (optional)',
+                    labelText: l.vinLabel,
                     border: const OutlineInputBorder(),
                     suffixIcon: decodingVin
                         ? const Padding(
@@ -111,13 +110,12 @@ class VehicleIdentitySection extends StatelessWidget {
                             child: SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2),
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           )
                         : IconButton(
                             icon: const Icon(Icons.search),
-                            tooltip: l?.vinDecodeTooltip ?? 'Decode VIN',
+                            tooltip: l.vinDecodeTooltip,
                             onPressed: onDecodeVin,
                           ),
                   ),
@@ -125,11 +123,11 @@ class VehicleIdentitySection extends StatelessWidget {
               ),
             ),
             Semantics(
-              label: l?.vinInfoTooltip ?? 'What is a VIN?',
+              label: l.vinInfoTooltip,
               button: true,
               child: IconButton(
                 icon: const Icon(Icons.info_outline),
-                tooltip: l?.vinInfoTooltip ?? 'What is a VIN?',
+                tooltip: l.vinInfoTooltip,
                 onPressed: onShowVinInfo,
               ),
             ),
@@ -158,11 +156,8 @@ class VehicleIdentitySection extends StatelessWidget {
                   )
                 : const Icon(Icons.bluetooth_searching),
             label: Tooltip(
-              message: l?.vehicleReadVinFromCarTooltip ??
-                  'Read VIN from the paired OBD2 adapter',
-              child: Text(
-                l?.vehicleReadVinFromCarButton ?? 'Read VIN from car',
-              ),
+              message: l.vehicleReadVinFromCarTooltip,
+              child: Text(l.vehicleReadVinFromCarButton),
             ),
           ),
         ),
@@ -180,12 +175,11 @@ class VehicleIdentitySection extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(left: 12),
               child: Text(
-                l?.vehicleReadVinNoAdapterHint ??
-                    'Pair an OBD2 adapter first to read VIN automatically',
+                l.vehicleReadVinNoAdapterHint,
                 key: const Key('vehicleReadVinNoAdapterHint'),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ),

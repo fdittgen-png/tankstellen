@@ -62,15 +62,13 @@ class _CrossBorderSuggestionCard extends ConsumerWidget {
     final priceLabel = suggestion.priceDeltaPerLiter.toStringAsFixed(2);
     final distanceLabel = suggestion.distanceKm.toStringAsFixed(0);
 
-    final headline = l10n?.crossBorderCheaper(
-          suggestion.neighborName,
-          distanceLabel,
-          priceLabel,
-        ) ??
-        '${suggestion.neighborName} stations $distanceLabel km away '
-            '— €$priceLabel/L cheaper';
+    final headline = l10n.crossBorderCheaper(
+      suggestion.neighborName,
+      distanceLabel,
+      priceLabel,
+    );
 
-    final hint = l10n?.crossBorderTapToSwitch ?? 'Tap to switch country';
+    final hint = l10n.crossBorderTapToSwitch;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -79,9 +77,7 @@ class _CrossBorderSuggestionCard extends ConsumerWidget {
         color: colorScheme.tertiaryContainer.withValues(alpha: 0.4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: colorScheme.tertiary.withValues(alpha: 0.3),
-          ),
+          side: BorderSide(color: colorScheme.tertiary.withValues(alpha: 0.3)),
         ),
         child: InkWell(
           onTap: () => _onTap(ref),
@@ -125,7 +121,7 @@ class _CrossBorderSuggestionCard extends ConsumerWidget {
                   icon: const Icon(Icons.close),
                   iconSize: 20,
                   visualDensity: VisualDensity.compact,
-                  tooltip: l10n?.crossBorderDismissTooltip ?? 'Dismiss',
+                  tooltip: l10n.crossBorderDismissTooltip,
                   onPressed: () => ref
                       .read(crossBorderBannerDismissedProvider.notifier)
                       .dismiss(suggestion.neighborCountryCode),
@@ -158,8 +154,8 @@ class _CrossBorderSuggestionCard extends ConsumerWidget {
     // location-permission prompt — we already have the position.
     if (position == null) return;
     await searchNotifier.searchByCoordinates(
-          lat: position.lat,
-          lng: position.lng,
-        );
+      lat: position.lat,
+      lng: position.lng,
+    );
   }
 }

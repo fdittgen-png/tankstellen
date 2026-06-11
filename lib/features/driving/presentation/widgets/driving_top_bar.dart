@@ -44,7 +44,7 @@ class DrivingTopBar extends StatelessWidget {
             Icon(Icons.drive_eta, color: theme.colorScheme.primary, size: 24),
             const SizedBox(width: 8),
             Text(
-              l10n?.drivingMode ?? 'Driving Mode',
+              l10n.drivingMode,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

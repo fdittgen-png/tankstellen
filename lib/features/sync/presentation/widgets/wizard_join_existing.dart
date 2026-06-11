@@ -30,59 +30,61 @@ class WizardJoinExisting extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-            l10n?.syncWizardJoinExistingTitle ?? 'Join an existing database',
-            style: theme.textTheme.titleMedium),
+          l10n.syncWizardJoinExistingTitle,
+          style: theme.textTheme.titleMedium,
+        ),
         const SizedBox(height: 16),
 
         // QR Scanner
         FilledButton.icon(
           onPressed: onScanQr,
           icon: const Icon(Icons.qr_code_scanner),
-          label: Text(l10n?.syncWizardScanQrCode ?? 'Scan QR Code'),
+          label: Text(l10n.syncWizardScanQrCode),
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
         ),
         const SizedBox(height: 8),
         Text(
-          l10n?.syncWizardAskOwnerQr ??
-              'Ask the database owner to show you their QR code\n(Settings → TankSync → Share)',
-          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          l10n.syncWizardAskOwnerQr,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           textAlign: TextAlign.center,
         ),
 
         const SizedBox(height: 24),
-        Row(children: [
-          const Expanded(child: Divider()),
-          Padding(
+        Row(
+          children: [
+            const Expanded(child: Divider()),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(l10n?.syncOrDivider ?? 'or')),
-          const Expanded(child: Divider()),
-        ]),
+              child: Text(l10n.syncOrDivider),
+            ),
+            const Expanded(child: Divider()),
+          ],
+        ),
         const SizedBox(height: 24),
 
         // Manual entry
-        Text(l10n?.syncWizardEnterManuallyTitle ?? 'Enter manually',
-            style: theme.textTheme.titleSmall),
+        Text(
+          l10n.syncWizardEnterManuallyTitle,
+          style: theme.textTheme.titleSmall,
+        ),
         const SizedBox(height: 12),
         TextField(
           controller: urlController,
           decoration: InputDecoration(
-            labelText: l10n?.syncWizardSupabaseUrlLabel ?? 'Supabase URL',
-            hintText: l10n?.syncWizardSupabaseUrlHint ??
-                'https://your-project.supabase.co',
+            labelText: l10n.syncWizardSupabaseUrlLabel,
+            hintText: l10n.syncWizardSupabaseUrlHint,
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.link),
-            helperText: l10n?.syncWizardUrlHelperText ??
-                'Whitespace and line breaks removed automatically',
+            helperText: l10n.syncWizardUrlHelperText,
           ),
           maxLines: 1,
         ),
         const SizedBox(height: 12),
         keyField,
         const SizedBox(height: 24),
-        FilledButton(
-          onPressed: onContinue,
-          child: Text(l10n?.continueButton ?? 'Continue'),
-        ),
+        FilledButton(onPressed: onContinue, child: Text(l10n.continueButton)),
       ],
     );
   }

@@ -39,8 +39,8 @@ class _FuelBadge extends StatelessWidget {
     final bgColor = isChampion
         ? color
         : isHighlighted
-            ? FuelColors.forType(fuelType).withValues(alpha: 0.22)
-            : FuelColors.forTypeLight(fuelType);
+        ? FuelColors.forType(fuelType).withValues(alpha: 0.22)
+        : FuelColors.forTypeLight(fuelType);
 
     final borderWidth = isChampion ? 1.5 : (isHighlighted ? 1.5 : 0.5);
     final labelFontSize = isHighlighted ? 11.0 : 10.0;
@@ -60,9 +60,7 @@ class _FuelBadge extends StatelessWidget {
             : bgColor,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isUnavailable
-              ? theme.colorScheme.outlineVariant
-              : borderColor,
+          color: isUnavailable ? theme.colorScheme.outlineVariant : borderColor,
           width: borderWidth,
         ),
       ),
@@ -77,8 +75,8 @@ class _FuelBadge extends StatelessWidget {
               color: isUnavailable
                   ? theme.colorScheme.onSurfaceVariant
                   : isChampion
-                      ? Colors.white
-                      : color,
+                  ? Colors.white
+                  : color,
             ),
           ),
           const SizedBox(width: 4),
@@ -92,8 +90,8 @@ class _FuelBadge extends StatelessWidget {
               color: isUnavailable
                   ? theme.colorScheme.onSurfaceVariant
                   : isChampion
-                      ? Colors.white
-                      : color,
+                  ? Colors.white
+                  : color,
             ),
           ),
           const SizedBox(width: 4),
@@ -106,7 +104,7 @@ class _FuelBadge extends StatelessWidget {
             price: isUnavailable ? null : price,
             child: Text(
               isUnavailable
-                  ? (l10n?.outOfStock ?? 'Out of stock')
+                  ? (l10n.outOfStock)
                   : PriceFormatter.formatPriceCompact(price),
               style: TextStyle(
                 fontSize: priceFontSize,
@@ -114,10 +112,10 @@ class _FuelBadge extends StatelessWidget {
                 color: isUnavailable
                     ? theme.colorScheme.onSurfaceVariant
                     : isChampion
-                        ? Colors.white
-                        : isHighlighted
-                            ? color
-                            : theme.colorScheme.onSurface,
+                    ? Colors.white
+                    : isHighlighted
+                    ? color
+                    : theme.colorScheme.onSurface,
               ),
             ),
           ),

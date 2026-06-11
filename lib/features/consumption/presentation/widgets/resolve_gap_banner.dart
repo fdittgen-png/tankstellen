@@ -32,10 +32,8 @@ class ResolveGapBanner extends ConsumerWidget {
     final locale = Localizations.localeOf(context).toString();
     final nf = NumberFormat.decimalPattern(locale)..maximumFractionDigits = 1;
     final gapText = nf.format(pending.gap);
-    final label = l?.reconcileResolveGapBanner(gapText) ??
-        'Unresolved fuel/trip gap of $gapText L — tap to resolve';
-    final semanticLabel = l?.reconcileResolveGapSemanticLabel ??
-        'Resolve unresolved fuel and trip gap';
+    final label = l.reconcileResolveGapBanner(gapText);
+    final semanticLabel = l.reconcileResolveGapSemanticLabel;
 
     return Semantics(
       button: true,
@@ -62,9 +60,7 @@ class ResolveGapBanner extends ConsumerWidget {
               children: [
                 Icon(Icons.error_outline, size: 18, color: orange),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: Text(label, style: theme.textTheme.bodySmall),
-                ),
+                Expanded(child: Text(label, style: theme.textTheme.bodySmall)),
                 Icon(
                   Icons.chevron_right,
                   size: 18,

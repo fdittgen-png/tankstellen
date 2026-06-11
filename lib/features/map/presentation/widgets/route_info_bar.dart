@@ -36,15 +36,16 @@ class RouteInfoBar extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '${distanceKm.round()}km \u00b7 ${durationMinutes.round()}min',
-            style: theme.textTheme.labelSmall
-                ?.copyWith(fontWeight: FontWeight.w600),
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(width: 6),
           Text(stationCountLabel, style: theme.textTheme.labelSmall),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.bookmark_add, size: 14),
-            tooltip: l10n?.saveRoute ?? 'Save route',
+            tooltip: l10n.saveRoute,
             onPressed: onSaveRoute,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
@@ -52,7 +53,7 @@ class RouteInfoBar extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.navigation, size: 14),
-            tooltip: l10n?.openInMaps ?? 'Open in Maps',
+            tooltip: l10n.openInMaps,
             onPressed: onOpenInMaps,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 28, minHeight: 28),

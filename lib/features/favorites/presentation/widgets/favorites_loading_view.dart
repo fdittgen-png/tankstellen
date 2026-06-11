@@ -73,11 +73,11 @@ class _FavoritesLoadingViewState extends State<FavoritesLoadingView>
                       style: theme.textTheme.titleSmall!.copyWith(
                         color: theme.colorScheme.onSurface,
                       ),
-                      child: Text(l?.updatingFavorites ?? 'Updating your favorites...'),
+                      child: Text(l.updatingFavorites),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      l?.fetchingLatestPrices ?? 'Fetching the latest prices',
+                      l.fetchingLatestPrices,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

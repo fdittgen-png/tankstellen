@@ -61,9 +61,16 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
     } catch (e, st) {
       // #2146 — route to errorLogger so secure-storage failures land
       // in the user-exportable log alongside other catches.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'FeedbackTokenSection._refresh: secure-storage read',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.storage,
+          e,
+          st,
+          context: const {
+            'where': 'FeedbackTokenSection._refresh: secure-storage read',
+          },
+        ),
+      );
       if (!mounted) return;
       setState(() {
         _hasToken = false;
@@ -82,10 +89,7 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            l?.feedbackTokenDescription ??
-                'To automatically open a GitHub ticket from a failed scan, '
-                    'paste a GitHub PAT (`public_repo` scope on the tankstellen '
-                    'repository). Otherwise manual sharing remains available.',
+            l.feedbackTokenDescription,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -105,19 +109,19 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
                 _loading
                     ? '…'
                     : _hasToken
-                        ? (l?.feedbackTokenStatusSet ?? 'Token configured')
-                        : (l?.feedbackTokenStatusUnset ?? 'No token'),
+                    ? (l.feedbackTokenStatusSet)
+                    : (l.feedbackTokenStatusUnset),
                 style: theme.textTheme.bodySmall,
               ),
               const Spacer(),
               if (_hasToken)
                 TextButton(
                   onPressed: _loading ? null : _clearToken,
-                  child: Text(l?.feedbackTokenClear ?? 'Clear'),
+                  child: Text(l.feedbackTokenClear),
                 ),
               FilledButton(
                 onPressed: _loading ? null : _setToken,
-                child: Text(l?.feedbackTokenSet ?? 'Set'),
+                child: Text(l.feedbackTokenSet),
               ),
             ],
           ),
@@ -137,15 +141,19 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
     if (scrubbed.isEmpty) return;
 
     try {
-      await _storage.write(
-        key: kGithubFeedbackTokenKey,
-        value: scrubbed,
-      );
+      await _storage.write(key: kGithubFeedbackTokenKey, value: scrubbed);
     } catch (e, st) {
       // #2146 — same routing rationale as the read catch above.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'FeedbackTokenSection._setToken: secure-storage write',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.storage,
+          e,
+          st,
+          context: const {
+            'where': 'FeedbackTokenSection._setToken: secure-storage write',
+          },
+        ),
+      );
       return;
     }
 
@@ -164,9 +172,16 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
       await _storage.delete(key: kGithubFeedbackTokenKey);
     } catch (e, st) {
       // #2146 — same routing rationale as the read/write catches above.
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'FeedbackTokenSection._clearToken: secure-storage delete',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.storage,
+          e,
+          st,
+          context: const {
+            'where': 'FeedbackTokenSection._clearToken: secure-storage delete',
+          },
+        ),
+      );
     }
     if (!mounted) return; // #3159 — see _setToken.
     ref.invalidate(githubIssueReporterProvider);
@@ -199,24 +214,24 @@ class _TokenInputDialogState extends State<_TokenInputDialog> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(l?.feedbackTokenDialogTitle ?? 'GitHub PAT'),
+      title: Text(l.feedbackTokenDialogTitle),
       content: TextField(
         controller: _controller,
         autofocus: true,
         obscureText: true,
         decoration: InputDecoration(
-          labelText: l?.feedbackTokenFieldLabel ?? 'Personal Access Token',
+          labelText: l.feedbackTokenFieldLabel,
           border: const OutlineInputBorder(),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l?.cancel ?? 'Cancel'),
+          child: Text(l.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(context, _controller.text),
-          child: Text(l?.save ?? 'Save'),
+          child: Text(l.save),
         ),
       ],
     );

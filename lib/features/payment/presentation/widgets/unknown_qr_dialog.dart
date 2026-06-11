@@ -40,12 +40,10 @@ class UnknownQrDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(l10n?.qrPaymentUnknownTitle ?? 'Unrecognised code'),
+      title: Text(l10n.qrPaymentUnknownTitle),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxHeight: 240),
-        child: SingleChildScrollView(
-          child: SelectableText(raw),
-        ),
+        child: SingleChildScrollView(child: SelectableText(raw)),
       ),
       actions: [
         TextButton.icon(
@@ -54,13 +52,10 @@ class UnknownQrDialog extends StatelessWidget {
             await _writeClipboard(raw);
             if (!context.mounted) return;
             Navigator.of(context).pop();
-            SnackBarHelper.showSuccess(
-              context,
-              l10n?.qrPaymentCopiedRaw ?? 'Copied to clipboard',
-            );
+            SnackBarHelper.showSuccess(context, l10n.qrPaymentCopiedRaw);
           },
           icon: const Icon(Icons.copy),
-          label: Text(l10n?.qrPaymentCopyRaw ?? 'Copy raw text'),
+          label: Text(l10n.qrPaymentCopyRaw),
         ),
         TextButton.icon(
           key: const Key('unknownQrReport'),
@@ -73,11 +68,11 @@ class UnknownQrDialog extends StatelessWidget {
             }
           },
           icon: const Icon(Icons.flag_outlined),
-          label: Text(l10n?.qrPaymentReport ?? 'Report this scan'),
+          label: Text(l10n.qrPaymentReport),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n?.cancel ?? 'Cancel'),
+          child: Text(l10n.cancel),
         ),
       ],
     );

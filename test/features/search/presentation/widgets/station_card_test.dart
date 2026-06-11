@@ -17,6 +17,7 @@ import 'package:tankstellen/features/search/presentation/widgets/station_card.da
 
 import '../../../../helpers/pump_app.dart';
 import '../../../../fixtures/stations.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('StationCard', () {
@@ -40,8 +41,7 @@ void main() {
       expect(find.textContaining('10115'), findsOneWidget);
     });
 
-    testWidgets(
-        'brand-less CRE station shows full name as title and NO orphan '
+    testWidgets('brand-less CRE station shows full name as title and NO orphan '
         'comma in the address line (#2704)', (tester) async {
       // #2704 — Mexican CRE stations carry no brand and no address: the
       // service sets brand:'' and mirrors the full company name into both
@@ -68,8 +68,11 @@ void main() {
         const StationCard(station: mxStation, selectedFuelType: FuelType.e5),
       );
 
-      expect(find.text('TRENOGAS SA DE CV'), findsOneWidget,
-          reason: 'full company name is the card title');
+      expect(
+        find.text('TRENOGAS SA DE CV'),
+        findsOneWidget,
+        reason: 'full company name is the card title',
+      );
       // The address line collapses to '' (postCode + place both empty);
       // there must be no orphan comma anywhere on the card.
       expect(find.text(', '), findsNothing);
@@ -332,50 +335,52 @@ void main() {
     });
 
     testWidgets(
-        '#2622 — favourite star is hoisted OUT of the price row but keeps '
-        'its 32x32 tap target', (tester) async {
-      await pumpApp(
-        tester,
-        const StationCard(
-          station: testStation,
-          selectedFuelType: FuelType.e10,
-          isFavorite: true,
-        ),
-      );
+      '#2622 — favourite star is hoisted OUT of the price row but keeps '
+      'its 32x32 tap target',
+      (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+            isFavorite: true,
+          ),
+        );
 
-      // The favourite icon is still rendered and 22px (compact).
-      final favIcon = find.byWidgetPredicate(
-        (widget) =>
-            widget is Icon &&
-            widget.icon == Icons.star &&
-            widget.color == Colors.amber,
-      );
-      expect(favIcon, findsOneWidget);
+        // The favourite icon is still rendered and 22px (compact).
+        final favIcon = find.byWidgetPredicate(
+          (widget) =>
+              widget is Icon &&
+              widget.icon == Icons.star &&
+              widget.color == Colors.amber,
+        );
+        expect(favIcon, findsOneWidget);
 
-      // The favourite IconButton retains its compact 32x32 tap target even
-      // after being relocated to the card's top-right (#2622).
-      final sizedBox = find.ancestor(
-        of: find.byIcon(Icons.star),
-        matching: find.byWidgetPredicate(
-          (w) => w is SizedBox && w.width == 32 && w.height == 32,
-        ),
-      );
-      expect(sizedBox, findsOneWidget);
+        // The favourite IconButton retains its compact 32x32 tap target even
+        // after being relocated to the card's top-right (#2622).
+        final sizedBox = find.ancestor(
+          of: find.byIcon(Icons.star),
+          matching: find.byWidgetPredicate(
+            (w) => w is SizedBox && w.width == 32 && w.height == 32,
+          ),
+        );
+        expect(sizedBox, findsOneWidget);
 
-      // The star now sits ABOVE the price headline (own line), not on the
-      // same baseline as the price RichText.
-      final starTop = tester.getTopLeft(find.byIcon(Icons.star)).dy;
-      final priceTop =
-          tester.getTopLeft(find.byType(RichText).last).dy;
-      expect(
-        starTop,
-        lessThan(priceTop),
-        reason: 'favourite star is hoisted above the price row (#2622)',
-      );
-    });
+        // The star now sits ABOVE the price headline (own line), not on the
+        // same baseline as the price RichText.
+        final starTop = tester.getTopLeft(find.byIcon(Icons.star)).dy;
+        final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
+        expect(
+          starTop,
+          lessThan(priceTop),
+          reason: 'favourite star is hoisted above the price row (#2622)',
+        );
+      },
+    );
 
-    testWidgets('#2622 — favourite star still toggles when tapped after move',
-        (tester) async {
+    testWidgets('#2622 — favourite star still toggles when tapped after move', (
+      tester,
+    ) async {
       var favTapped = false;
       await pumpApp(
         tester,
@@ -392,61 +397,64 @@ void main() {
     });
 
     testWidgets(
-        '#2622 — Cheapest badge precedes the price in the widget tree',
-        (tester) async {
-      await pumpApp(
-        tester,
-        const StationCard(
-          station: testStation,
-          selectedFuelType: FuelType.e10,
-          isCheapest: true,
-        ),
-      );
+      '#2622 — Cheapest badge precedes the price in the widget tree',
+      (tester) async {
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: testStation,
+            selectedFuelType: FuelType.e10,
+            isCheapest: true,
+          ),
+        );
 
-      // The "Cheapest" badge must sit visually ABOVE the price headline so
-      // it anchors the stop before the eye reaches the number (#2622).
-      final cheapest = find.text('Cheapest');
-      expect(cheapest, findsOneWidget);
+        // The "Cheapest" badge must sit visually ABOVE the price headline so
+        // it anchors the stop before the eye reaches the number (#2622).
+        final cheapest = find.text('Cheapest');
+        expect(cheapest, findsOneWidget);
 
-      final cheapestTop = tester.getTopLeft(cheapest).dy;
-      final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
-      expect(
-        cheapestTop,
-        lessThan(priceTop),
-        reason: 'Cheapest badge must be promoted above the price (#2622)',
-      );
-    });
+        final cheapestTop = tester.getTopLeft(cheapest).dy;
+        final priceTop = tester.getTopLeft(find.byType(RichText).last).dy;
+        expect(
+          cheapestTop,
+          lessThan(priceTop),
+          reason: 'Cheapest badge must be promoted above the price (#2622)',
+        );
+      },
+    );
 
     testWidgets(
-        '#2622 — last-updated timestamp reads as "Updated {time}", not a '
-        'bare code', (tester) async {
-      const updatedStation = Station(
-        id: 'updated-test',
-        name: 'Test Station',
-        brand: 'TEST',
-        street: 'Teststr.',
-        postCode: '12345',
-        place: 'Teststadt',
-        lat: 52.0,
-        lng: 13.0,
-        dist: 1.0,
-        e10: 1.799,
-        isOpen: true,
-        updatedAt: '10:30',
-      );
+      '#2622 — last-updated timestamp reads as "Updated {time}", not a '
+      'bare code',
+      (tester) async {
+        const updatedStation = Station(
+          id: 'updated-test',
+          name: 'Test Station',
+          brand: 'TEST',
+          street: 'Teststr.',
+          postCode: '12345',
+          place: 'Teststadt',
+          lat: 52.0,
+          lng: 13.0,
+          dist: 1.0,
+          e10: 1.799,
+          isOpen: true,
+          updatedAt: '10:30',
+        );
 
-      await pumpApp(
-        tester,
-        const StationCard(
-          station: updatedStation,
-          selectedFuelType: FuelType.e10,
-        ),
-      );
+        await pumpApp(
+          tester,
+          const StationCard(
+            station: updatedStation,
+            selectedFuelType: FuelType.e10,
+          ),
+        );
 
-      expect(find.textContaining('Updated 10:30'), findsOneWidget);
-      // The bare timestamp on its own must not appear.
-      expect(find.text('10:30'), findsNothing);
-    });
+        expect(find.textContaining('Updated 10:30'), findsOneWidget);
+        // The bare timestamp on its own must not appear.
+        expect(find.text('10:30'), findsNothing);
+      },
+    );
 
     testWidgets('renders amenity chips on single horizontal line', (
       tester,
@@ -1140,6 +1148,8 @@ void main() {
       testWidgets('card uses elevation 1 in dark mode', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             theme: ThemeData.dark(),
             home: const Scaffold(
               body: StationCard(
@@ -1230,38 +1240,32 @@ void main() {
       },
     );
 
-    testWidgets(
-      '#2926 — an unbranded station WITH a real name shows that name '
-      '(not the localized fallback)',
-      (tester) async {
-        // Mexican CRE stations carry no brand but a real company name; that
-        // name must stay the title — the "Unbranded station" fallback is only
-        // for the no-brand AND no-name case.
-        const namedStation = Station(
-          id: 'mx-named',
-          name: 'TRENOGAS SA DE CV',
-          brand: '',
-          street: 'CALLE 5',
-          postCode: '11700',
-          place: 'CDMX',
-          lat: 19.43,
-          lng: -99.13,
-          e5: 22.95,
-          isOpen: true,
-        );
+    testWidgets('#2926 — an unbranded station WITH a real name shows that name '
+        '(not the localized fallback)', (tester) async {
+      // Mexican CRE stations carry no brand but a real company name; that
+      // name must stay the title — the "Unbranded station" fallback is only
+      // for the no-brand AND no-name case.
+      const namedStation = Station(
+        id: 'mx-named',
+        name: 'TRENOGAS SA DE CV',
+        brand: '',
+        street: 'CALLE 5',
+        postCode: '11700',
+        place: 'CDMX',
+        lat: 19.43,
+        lng: -99.13,
+        e5: 22.95,
+        isOpen: true,
+      );
 
-        await pumpApp(
-          tester,
-          const StationCard(
-            station: namedStation,
-            selectedFuelType: FuelType.e5,
-          ),
-        );
+      await pumpApp(
+        tester,
+        const StationCard(station: namedStation, selectedFuelType: FuelType.e5),
+      );
 
-        expect(find.text('TRENOGAS SA DE CV'), findsOneWidget);
-        expect(find.text('Unbranded station'), findsNothing);
-      },
-    );
+      expect(find.text('TRENOGAS SA DE CV'), findsOneWidget);
+      expect(find.text('Unbranded station'), findsNothing);
+    });
   });
 
   group('StationCardShell composition (#2493)', () {
@@ -1362,8 +1366,9 @@ void main() {
       isOpen: true,
     );
 
-    testWidgets('no bar when closenessRadiusMeters is null (regular list)',
-        (tester) async {
+    testWidgets('no bar when closenessRadiusMeters is null (regular list)', (
+      tester,
+    ) async {
       await pumpApp(
         tester,
         const StationCard(
@@ -1374,8 +1379,9 @@ void main() {
       expect(find.byType(ProximityFillBar), findsNothing);
     });
 
-    testWidgets('renders the bar in radar mode at the expected fraction',
-        (tester) async {
+    testWidgets('renders the bar in radar mode at the expected fraction', (
+      tester,
+    ) async {
       // 0.2 km station scaled to a 1 km search radius → 80% full.
       await pumpApp(
         tester,
@@ -1389,8 +1395,11 @@ void main() {
       final bar = tester.widget<ProximityFillBar>(
         find.byType(ProximityFillBar),
       );
-      expect(bar.distanceMeters, closeTo(200, 1e-9),
-          reason: 'station.dist (km) → metres for the bar');
+      expect(
+        bar.distanceMeters,
+        closeTo(200, 1e-9),
+        reason: 'station.dist (km) → metres for the bar',
+      );
       expect(bar.radiusMeters, 1000);
       expect(
         ProximityFillBar.fillFor(bar.distanceMeters, bar.radiusMeters!),
@@ -1398,8 +1407,9 @@ void main() {
       );
     });
 
-    testWidgets('a far station scales to near-empty against the search radius',
-        (tester) async {
+    testWidgets('a far station scales to near-empty against the search radius', (
+      tester,
+    ) async {
       // 6.2 km exceeds the 1 km trip geo-fence but reads as RELATIVE closeness
       // against the wider search radius (10 km) → ~0.38, not pinned to empty.
       const farStation = Station(

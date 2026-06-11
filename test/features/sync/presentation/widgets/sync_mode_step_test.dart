@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/features/sync/presentation/widgets/sync_mode_step.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('SyncModeStep', () {
@@ -15,6 +16,8 @@ void main() {
     }) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: SyncModeStep(
               onSelectMode: onSelectMode,
@@ -25,13 +28,10 @@ void main() {
       );
     }
 
-    testWidgets('renders three sync mode cards + stay-offline button',
-        (tester) async {
-      await pumpStep(
-        tester,
-        onSelectMode: (_) {},
-        onStayOffline: () {},
-      );
+    testWidgets('renders three sync mode cards + stay-offline button', (
+      tester,
+    ) async {
+      await pumpStep(tester, onSelectMode: (_) {}, onStayOffline: () {});
 
       expect(find.text('Sparkilo Community'), findsOneWidget);
       expect(find.text('Private Database'), findsOneWidget);
@@ -39,8 +39,9 @@ void main() {
       expect(find.text('Stay offline'), findsOneWidget);
     });
 
-    testWidgets('tapping community card invokes onSelectMode(community)',
-        (tester) async {
+    testWidgets('tapping community card invokes onSelectMode(community)', (
+      tester,
+    ) async {
       SyncMode? captured;
       await pumpStep(
         tester,
@@ -54,8 +55,9 @@ void main() {
       expect(captured, SyncMode.community);
     });
 
-    testWidgets('tapping private card invokes onSelectMode(private)',
-        (tester) async {
+    testWidgets('tapping private card invokes onSelectMode(private)', (
+      tester,
+    ) async {
       SyncMode? captured;
       await pumpStep(
         tester,
@@ -69,8 +71,9 @@ void main() {
       expect(captured, SyncMode.private);
     });
 
-    testWidgets('tapping join card invokes onSelectMode(joinExisting)',
-        (tester) async {
+    testWidgets('tapping join card invokes onSelectMode(joinExisting)', (
+      tester,
+    ) async {
       SyncMode? captured;
       await pumpStep(
         tester,

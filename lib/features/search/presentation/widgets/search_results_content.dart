@@ -40,9 +40,7 @@ class SearchResultsContent extends ConsumerWidget {
     final searchState = ref.watch(searchStateProvider);
 
     if (searchMode == SearchMode.route) {
-      return const CustomScrollView(
-        slivers: [RouteResultsView()],
-      );
+      return const CustomScrollView(slivers: [RouteResultsView()]);
     }
 
     // #2675 — when the on-search Fuel Station Radar is active it OWNS the
@@ -69,8 +67,7 @@ class SearchResultsContent extends ConsumerWidget {
           // still searching (the old bare "0 stations" + blank was ambiguous).
           if (stations.isEmpty) {
             return _RadarEmptyState(
-              onRetry: () =>
-                  ref.read(radarSearchProvider.notifier).runRadar(),
+              onRetry: () => ref.read(radarSearchProvider.notifier).runRadar(),
             );
           }
           final radarResult = ServiceResult<List<SearchResultItem>>(
@@ -80,8 +77,7 @@ class SearchResultsContent extends ConsumerWidget {
           );
           return SearchResultsList(
             result: radarResult,
-            onRefresh: () =>
-                ref.read(radarSearchProvider.notifier).runRadar(),
+            onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
           );
         },
         loading: () => const ShimmerStationList(),
@@ -111,7 +107,7 @@ class SearchResultsContent extends ConsumerWidget {
                   // on this screen, so the empty state is no longer a
                   // dead-end even without an inline button.
                   Text(
-                    l10n?.startSearch ?? 'Search to find fuel stations.',
+                    l10n.startSearch,
                     style: TextStyle(
                       fontSize: 14,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -125,13 +121,13 @@ class SearchResultsContent extends ConsumerWidget {
         return SearchResultsList(result: result, onRefresh: onGpsRetry);
       },
       loading: () => const ShimmerStationList(),
-      error: (error, stackTrace) =>
-          ServiceChainErrorWidget(
-            error: error,
-            onRetry: onGpsRetry,
-            stackTrace: stackTrace,
-            searchContext: 'Station search (${ref.read(selectedFuelTypeProvider).apiValue})',
-          ),
+      error: (error, stackTrace) => ServiceChainErrorWidget(
+        error: error,
+        onRetry: onGpsRetry,
+        stackTrace: stackTrace,
+        searchContext:
+            'Station search (${ref.read(selectedFuelTypeProvider).apiValue})',
+      ),
     );
   }
 }
@@ -155,17 +151,20 @@ class _RadarEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.radar, size: 56, color: theme.colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.radar,
+              size: 56,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(height: 16),
             Text(
-              l10n?.noResults ?? 'No stations found.',
+              l10n.noResults,
               style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              l10n?.errorHintNoStations ??
-                  'Try increasing the search radius or search a different location.',
+              l10n.errorHintNoStations,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -175,7 +174,7 @@ class _RadarEmptyState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: Text(l10n?.retry ?? 'Try again'),
+              label: Text(l10n.retry),
             ),
           ],
         ),

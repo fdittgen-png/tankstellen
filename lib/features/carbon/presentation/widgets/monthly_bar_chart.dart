@@ -44,7 +44,7 @@ class MonthlyBarChart extends StatelessWidget {
       final l = AppLocalizations.of(context);
       return SizedBox(
         height: 180,
-        child: Center(child: Text(l?.noDataAvailable ?? 'No data')),
+        child: Center(child: Text(l.noDataAvailable)),
       );
     }
     // Month-axis labels are locale DATA, not a translatable string: resolve

@@ -19,7 +19,7 @@ class PrivacyExportJsonButton extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: onPressed,
         icon: const Icon(Icons.download),
-        label: Text(l?.privacyExportButton ?? 'Export all data as JSON'),
+        label: Text(l.privacyExportButton),
       ),
     );
   }
@@ -39,7 +39,7 @@ class PrivacyExportCsvButton extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: onPressed,
         icon: const Icon(Icons.table_chart),
-        label: Text(l?.privacyExportCsvButton ?? 'Export all data as CSV'),
+        label: Text(l.privacyExportCsvButton),
       ),
     );
   }
@@ -64,7 +64,7 @@ class PrivacyDeleteAllButton extends StatelessWidget {
           side: BorderSide(color: theme.colorScheme.error),
         ),
         icon: const Icon(Icons.delete_forever),
-        label: Text(l?.privacyDeleteButton ?? 'Delete all data'),
+        label: Text(l.privacyDeleteButton),
       ),
     );
   }

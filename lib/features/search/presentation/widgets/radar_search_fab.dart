@@ -32,9 +32,7 @@ class RadarSearchFab extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final active = ref.watch(radarSearchProvider).active;
 
-    final label = active
-        ? (l10n?.stopRadar ?? 'Stop radar')
-        : (l10n?.fuelStationRadarStart ?? 'Start fuel station radar');
+    final label = active ? (l10n.stopRadar) : (l10n.fuelStationRadarStart);
 
     return FloatingActionButton.extended(
       key: const Key('radarSearchButton'),

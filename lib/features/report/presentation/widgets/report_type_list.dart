@@ -38,10 +38,7 @@ List<Widget> buildReportTypeList(
   ref.watch(reportFormControllerProvider);
 
   return [
-    Text(
-      l10n?.whatsWrong ?? "What's wrong?",
-      style: theme.textTheme.titleMedium,
-    ),
+    Text(l10n.whatsWrong, style: theme.textTheme.titleMedium),
     const SizedBox(height: 12),
     for (final type in visibleTypes)
       RadioListTile<ReportType>(

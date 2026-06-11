@@ -58,25 +58,24 @@ class DeveloperToolsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final debugOn =
-        ref.watch(enabledFeaturesProvider).contains(Feature.debugMode);
+    final debugOn = ref
+        .watch(enabledFeaturesProvider)
+        .contains(Feature.debugMode);
 
     if (!debugOn) {
       // Defensive: a stale deep-link must never expose dev tools.
       return PageScaffold(
-        title: l?.developerToolsSectionTitle ?? 'Developer tools',
+        title: l.developerToolsSectionTitle,
         body: const SizedBox.shrink(),
       );
     }
 
     return PageScaffold(
-      title: l?.developerToolsSectionTitle ?? 'Developer tools',
+      title: l.developerToolsSectionTitle,
       body: ListView(
         children: [
           Text(
-            l?.developerToolsSubtitle ??
-                'Diagnostics and tools for debugging — only visible in '
-                    'Developer / Debug mode.',
+            l.developerToolsSubtitle,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -86,7 +85,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           // --- Error log -------------------------------------------------
           SectionHeader(
             leadingIcon: Icons.bug_report_outlined,
-            title: l?.developerToolsErrorLogGroupTitle ?? 'Error log',
+            title: l.developerToolsErrorLogGroupTitle,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
@@ -98,8 +97,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           // --- Alerts & notifications ------------------------------------
           SectionHeader(
             leadingIcon: Icons.notifications_active_outlined,
-            title: l?.developerToolsAlertsGroupTitle ??
-                'Alerts & notifications',
+            title: l.developerToolsAlertsGroupTitle,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
@@ -107,26 +105,21 @@ class DeveloperToolsScreen extends ConsumerWidget {
             key: const ValueKey('debug-fire-test-notification'),
             onPressed: () => _fireTestNotification(context, ref),
             icon: const Icon(Icons.notifications_outlined),
-            label: Text(
-              l?.developerToolsFireTestNotification ??
-                  'Fire test notification',
-            ),
+            label: Text(l.developerToolsFireTestNotification),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const ValueKey('debug-run-test-alert'),
             onPressed: () => _runTestAlert(context, ref),
             icon: const Icon(Icons.crisis_alert_outlined),
-            label: Text(
-              l?.developerToolsRunTestAlert ?? 'Run test alert pipeline',
-            ),
+            label: Text(l.developerToolsRunTestAlert),
           ),
           const SizedBox(height: 16),
 
           // --- Diagnostics ----------------------------------------------
           SectionHeader(
             leadingIcon: Icons.analytics_outlined,
-            title: l?.developerToolsDiagnosticsGroupTitle ?? 'Diagnostics',
+            title: l.developerToolsDiagnosticsGroupTitle,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
@@ -134,9 +127,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
             key: const ValueKey('debug-feature-flag-dump'),
             onPressed: () => context.push(RoutePaths.developerToolsFlags),
             icon: const Icon(Icons.flag_outlined),
-            label: Text(
-              l?.developerToolsFeatureFlagDump ?? 'Feature flag inspector',
-            ),
+            label: Text(l.developerToolsFeatureFlagDump),
           ),
           const SizedBox(height: 8),
           // #2471 — OBD2 communication-health diagnostics (Epic #2463).
@@ -144,9 +135,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
             key: const ValueKey('debug-obd2-health'),
             onPressed: () => context.push(RoutePaths.developerToolsObd2Health),
             icon: const Icon(Icons.bluetooth_searching_outlined),
-            label: Text(
-              l?.obd2HealthNavLabel ?? 'OBD2 communication health',
-            ),
+            label: Text(l.obd2HealthNavLabel),
           ),
           const SizedBox(height: 8),
           // #2518 — in-app OCR tester (Epic #2516 Child 2).
@@ -154,23 +143,21 @@ class DeveloperToolsScreen extends ConsumerWidget {
             key: const ValueKey('debug-ocr-tester'),
             onPressed: () => context.push(RoutePaths.developerToolsOcrTester),
             icon: const Icon(Icons.document_scanner_outlined),
-            label: Text(l?.ocrTesterNavLabel ?? 'OCR tester'),
+            label: Text(l.ocrTesterNavLabel),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const ValueKey('debug-clear-caches'),
             onPressed: () => _clearCaches(context, ref),
             icon: const Icon(Icons.cached_outlined),
-            label: Text(l?.developerToolsClearCaches ?? 'Clear caches'),
+            label: Text(l.developerToolsClearCaches),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
             key: const ValueKey('debug-copy-diagnostics'),
             onPressed: () => _copyDiagnostics(context, ref),
             icon: const Icon(Icons.copy_all_outlined),
-            label: Text(
-              l?.developerToolsCopyDiagnostics ?? 'Copy diagnostics',
-            ),
+            label: Text(l.developerToolsCopyDiagnostics),
           ),
           const SizedBox(height: 8),
           // #2824 — export the recorded network-vs-cache data-access trace so
@@ -180,9 +167,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
             key: const ValueKey('debug-data-access-tracer'),
             onPressed: () => _exportDataAccessTrace(context, ref),
             icon: const Icon(Icons.network_check_outlined),
-            label: Text(
-              l?.dataAccessTracerExport ?? 'Export data-access trace',
-            ),
+            label: Text(l.dataAccessTracerExport),
           ),
           const SizedBox(height: 16),
 
@@ -192,7 +177,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           // control, so it belongs with the rest of the dev diagnostics.
           SectionHeader(
             leadingIcon: Icons.local_gas_station_outlined,
-            title: l?.approachOverlaySection ?? 'Approach-station overlay',
+            title: l.approachOverlaySection,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
@@ -202,7 +187,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
           // --- Build info -----------------------------------------------
           SectionHeader(
             leadingIcon: Icons.info_outline,
-            title: l?.developerToolsBuildInfoGroupTitle ?? 'Build info',
+            title: l.developerToolsBuildInfoGroupTitle,
             padding: EdgeInsets.zero,
           ),
           const SizedBox(height: 8),
@@ -224,23 +209,17 @@ class DeveloperToolsScreen extends ConsumerWidget {
     if (!granted) {
       SnackBarHelper.showError(
         context,
-        l?.developerToolsTestNotificationBlocked ??
-            'Notifications are blocked — enable them in system settings, '
-                'then retry.',
+        l.developerToolsTestNotificationBlocked,
       );
       return;
     }
     await notifier.showPriceAlert(
       id: 'debug:test-notification'.hashCode,
-      title: l?.developerToolsTestNotificationTitle ?? 'Test notification',
-      body: l?.developerToolsTestNotificationBody ??
-          'If you can read this, notifications are working.',
+      title: l.developerToolsTestNotificationTitle,
+      body: l.developerToolsTestNotificationBody,
     );
     if (!context.mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      l?.developerToolsTestNotificationSent ?? 'Test notification sent.',
-    );
+    SnackBarHelper.showSuccess(context, l.developerToolsTestNotificationSent);
   }
 
   Future<void> _runTestAlert(BuildContext context, WidgetRef ref) async {
@@ -251,33 +230,22 @@ class DeveloperToolsScreen extends ConsumerWidget {
     // fire a stuck synthetic deep-link and tell the user to search first.
     final station = _firstSearchStation(ref);
     if (station == null) {
-      SnackBarHelper.show(
-        context,
-        l?.developerToolsTestAlertNoStation ??
-            'Search for stations first, then run the test alert so the '
-                'notification can open a real station.',
-      );
+      SnackBarHelper.show(context, l.developerToolsTestAlertNoStation);
       return;
     }
     final sample = StationPriceSample.fromStation(station).firstOrNull;
     if (sample == null) {
       // The station reports no priced fuel — nothing the evaluator can
       // match, so the same "search first" guidance applies.
-      SnackBarHelper.show(
-        context,
-        l?.developerToolsTestAlertNoStation ??
-            'Search for stations first, then run the test alert so the '
-                'notification can open a real station.',
-      );
+      SnackBarHelper.show(context, l.developerToolsTestAlertNoStation);
       return;
     }
     final runner = TestAlertRunner(
       notifier: ref.read(notificationServiceProvider),
     );
     final count = await runner.run(
-      title: l?.developerToolsTestAlertTitle ?? 'Test price alert',
-      body: l?.developerToolsTestAlertBody(station.displayName) ??
-          'Synthetic match: ${station.displayName} is below your target.',
+      title: l.developerToolsTestAlertTitle,
+      body: l.developerToolsTestAlertBody(station.displayName),
       station: sample,
       country: (Countries.countryCodeForStationId(station.id) ?? 'de')
           .toLowerCase(),
@@ -286,17 +254,11 @@ class DeveloperToolsScreen extends ConsumerWidget {
     if (count == 0) {
       SnackBarHelper.showError(
         context,
-        l?.developerToolsTestNotificationBlocked ??
-            'Notifications are blocked — enable them in system settings, '
-                'then retry.',
+        l.developerToolsTestNotificationBlocked,
       );
       return;
     }
-    SnackBarHelper.showSuccess(
-      context,
-      l?.developerToolsTestAlertFired(count) ??
-          'Test alert fired — pipeline delivered $count notification(s).',
-    );
+    SnackBarHelper.showSuccess(context, l.developerToolsTestAlertFired(count));
   }
 
   Future<void> _clearCaches(BuildContext context, WidgetRef ref) async {
@@ -305,10 +267,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
     await storageMgmt.clearCache();
     await storageMgmt.clearPriceHistory();
     if (!context.mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      l?.developerToolsCachesCleared ?? 'Caches cleared.',
-    );
+    SnackBarHelper.showSuccess(context, l.developerToolsCachesCleared);
   }
 
   Future<void> _copyDiagnostics(BuildContext context, WidgetRef ref) async {
@@ -320,11 +279,7 @@ class DeveloperToolsScreen extends ConsumerWidget {
     );
     await Clipboard.setData(ClipboardData(text: blob));
     if (!context.mounted) return;
-    SnackBarHelper.showSuccess(
-      context,
-      l?.developerToolsDiagnosticsCopied ??
-          'Diagnostics copied to clipboard.',
-    );
+    SnackBarHelper.showSuccess(context, l.developerToolsDiagnosticsCopied);
   }
 
   /// #2824 — build a [DataAccessTrace] from the recorded events and write it to
@@ -337,28 +292,15 @@ class DeveloperToolsScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final recorder = ref.read(dataAccessRecorderProvider);
     if (recorder == null || recorder.events.isEmpty) {
-      SnackBarHelper.show(
-        context,
-        l?.dataAccessTracerEmpty ??
-            'No data-access events recorded yet — search or open stations '
-                'first, then export.',
-      );
+      SnackBarHelper.show(context, l.dataAccessTracerEmpty);
       return;
     }
     final ok = await DataAccessTraceExport.export(recorder.build());
     if (!context.mounted) return;
     if (ok) {
-      SnackBarHelper.showSuccess(
-        context,
-        l?.dataAccessTracerExportSuccess ??
-            'Data-access trace saved to Downloads.',
-      );
+      SnackBarHelper.showSuccess(context, l.dataAccessTracerExportSuccess);
     } else {
-      SnackBarHelper.showError(
-        context,
-        l?.dataAccessTracerExportFailure ??
-            "Couldn't export the data-access trace.",
-      );
+      SnackBarHelper.showError(context, l.dataAccessTracerExportFailure);
     }
   }
 }
@@ -388,13 +330,13 @@ class _BuildInfoRows extends StatelessWidget {
         ListTile(
           dense: true,
           contentPadding: EdgeInsets.zero,
-          title: Text(l?.developerToolsBuildVersion ?? 'App version'),
+          title: Text(l.developerToolsBuildVersion),
           trailing: Text(AppConstants.appVersion),
         ),
         ListTile(
           dense: true,
           contentPadding: EdgeInsets.zero,
-          title: Text(l?.developerToolsBuildChannel ?? 'Build channel'),
+          title: Text(l.developerToolsBuildChannel),
           trailing: Text(channel.name),
         ),
       ],

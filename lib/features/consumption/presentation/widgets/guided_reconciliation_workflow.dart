@@ -88,10 +88,8 @@ class _GuidedReconciliationDialogState
   @override
   void initState() {
     super.initState();
-    _litersCtrl =
-        TextEditingController(text: _fmt(widget.gapLiters));
-    _distanceCtrl =
-        TextEditingController(text: _fmt(widget.defaultDistanceKm));
+    _litersCtrl = TextEditingController(text: _fmt(widget.gapLiters));
+    _distanceCtrl = TextEditingController(text: _fmt(widget.defaultDistanceKm));
   }
 
   @override
@@ -107,10 +105,9 @@ class _GuidedReconciliationDialogState
   /// Maintainer decision logic: a fill-up missing/wrong → Path A;
   /// otherwise (fill-ups correct, including the "both individually
   /// correct" elimination case) → Path B.
-  ReconciliationPath get _resolvedPath =>
-      _fillUpsComplete == false
-          ? ReconciliationPath.correctFillUp
-          : ReconciliationPath.virtualTrajet;
+  ReconciliationPath get _resolvedPath => _fillUpsComplete == false
+      ? ReconciliationPath.correctFillUp
+      : ReconciliationPath.virtualTrajet;
 
   bool get _attributed => _fillUpsComplete != null && _drivesRecorded != null;
 
@@ -139,7 +136,7 @@ class _GuidedReconciliationDialogState
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text(l?.reconcileWorkflowTitle ?? 'Reconcile your fuel'),
+      title: Text(l.reconcileWorkflowTitle),
       content: SingleChildScrollView(
         child: switch (_step) {
           _Step.explain => _buildExplain(l),
@@ -151,7 +148,7 @@ class _GuidedReconciliationDialogState
     );
   }
 
-  Widget _buildExplain(AppLocalizations? l) {
+  Widget _buildExplain(AppLocalizations l) {
     final theme = Theme.of(context);
     return Column(
       key: const Key('reconcile-step-explain'),
@@ -159,39 +156,29 @@ class _GuidedReconciliationDialogState
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          l?.reconcileWorkflowExplainHeadline(widget.gapText) ??
-              'We found a ${widget.gapText} L gap',
+          l.reconcileWorkflowExplainHeadline(widget.gapText),
           style: theme.textTheme.titleMedium,
         ),
         const SizedBox(height: 12),
         Text(
-          l?.reconcileWorkflowExplainBody(
-                widget.pumpedText,
-                widget.consumedText,
-                widget.gapText,
-              ) ??
-              'You pumped ${widget.pumpedText} L, but your recorded trips '
-                  'only account for ${widget.consumedText} L. That leaves '
-                  '${widget.gapText} L unexplained.',
+          l.reconcileWorkflowExplainBody(
+            widget.pumpedText,
+            widget.consumedText,
+            widget.gapText,
+          ),
         ),
         const SizedBox(height: 12),
-        Text(
-          l?.reconcileWorkflowExplainCauses ??
-              "This usually means a drive wasn't recorded, or a fill-up is "
-                  'missing or mistyped.',
-        ),
+        Text(l.reconcileWorkflowExplainCauses),
         const SizedBox(height: 12),
         Text(
-          l?.reconcileWorkflowExplainConsequence ??
-              'Until this is resolved, your fuel total and your trips total '
-                  "won't match.",
+          l.reconcileWorkflowExplainConsequence,
           style: theme.textTheme.bodySmall,
         ),
       ],
     );
   }
 
-  Widget _buildAttribute(AppLocalizations? l) {
+  Widget _buildAttribute(AppLocalizations l) {
     final theme = Theme.of(context);
     return Column(
       key: const Key('reconcile-step-attribute'),
@@ -199,32 +186,30 @@ class _GuidedReconciliationDialogState
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          l?.reconcileWorkflowAttributeQuestion ?? 'Help us attribute the gap',
+          l.reconcileWorkflowAttributeQuestion,
           style: theme.textTheme.titleMedium,
         ),
         const SizedBox(height: 16),
         _YesNoQuestion(
-          question: l?.reconcileWorkflowFillUpsCompleteQuestion ??
-              'Are all your fill-ups for this tank complete and correct?',
+          question: l.reconcileWorkflowFillUpsCompleteQuestion,
           value: _fillUpsComplete,
-          yesLabel: l?.reconcileWorkflowAnswerYes ?? 'Yes',
-          noLabel: l?.reconcileWorkflowAnswerNo ?? 'No',
+          yesLabel: l.reconcileWorkflowAnswerYes,
+          noLabel: l.reconcileWorkflowAnswerNo,
           onChanged: (v) => setState(() => _fillUpsComplete = v),
         ),
         const SizedBox(height: 16),
         _YesNoQuestion(
-          question: l?.reconcileWorkflowDrivesRecordedQuestion ??
-              'Are all your drives recorded?',
+          question: l.reconcileWorkflowDrivesRecordedQuestion,
           value: _drivesRecorded,
-          yesLabel: l?.reconcileWorkflowAnswerYes ?? 'Yes',
-          noLabel: l?.reconcileWorkflowAnswerNo ?? 'No',
+          yesLabel: l.reconcileWorkflowAnswerYes,
+          noLabel: l.reconcileWorkflowAnswerNo,
           onChanged: (v) => setState(() => _drivesRecorded = v),
         ),
       ],
     );
   }
 
-  Widget _buildGather(AppLocalizations? l) {
+  Widget _buildGather(AppLocalizations l) {
     final pathA = _resolvedPath == ReconciliationPath.correctFillUp;
     return Form(
       key: _formKey,
@@ -235,22 +220,19 @@ class _GuidedReconciliationDialogState
         children: [
           Text(
             pathA
-                ? (l?.reconcileWorkflowPathAHint ??
-                    "A fill-up is missing or wrong — we'll add a correction.")
-                : (l?.reconcileWorkflowPathBHint ??
-                    'Your fill-ups are right and a drive went unrecorded — '
-                        "we'll add a virtual trip."),
+                ? (l.reconcileWorkflowPathAHint)
+                : (l.reconcileWorkflowPathBHint),
           ),
           const SizedBox(height: 16),
           if (pathA)
             TextFormField(
               key: const Key('reconcile-correction-liters'),
               controller: _litersCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
-                labelText: l?.reconcileWorkflowCorrectionLitersLabel ??
-                    'Correction litres',
+                labelText: l.reconcileWorkflowCorrectionLitersLabel,
                 prefixIcon: const Icon(Icons.local_drink),
               ),
               validator: (v) => AddFillUpValidators.positiveNumber(v, l),
@@ -259,11 +241,11 @@ class _GuidedReconciliationDialogState
             TextFormField(
               key: const Key('reconcile-virtual-distance'),
               controller: _distanceCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
-                labelText: l?.reconcileWorkflowVirtualDistanceLabel ??
-                    'How far was the unrecorded drive? (km)',
+                labelText: l.reconcileWorkflowVirtualDistanceLabel,
                 prefixIcon: const Icon(Icons.straighten),
               ),
               validator: (v) => AddFillUpValidators.positiveNumber(v, l),
@@ -273,11 +255,11 @@ class _GuidedReconciliationDialogState
     );
   }
 
-  List<Widget> _buildActions(AppLocalizations? l) {
+  List<Widget> _buildActions(AppLocalizations l) {
     final deferBtn = TextButton(
       key: const Key('reconcile-decide-later'),
       onPressed: _defer,
-      child: Text(l?.reconcileWorkflowDecideLater ?? 'Decide later'),
+      child: Text(l.reconcileWorkflowDecideLater),
     );
     switch (_step) {
       case _Step.explain:
@@ -286,14 +268,14 @@ class _GuidedReconciliationDialogState
           FilledButton(
             key: const Key('reconcile-next'),
             onPressed: () => setState(() => _step = _Step.attribute),
-            child: Text(l?.reconcileWorkflowNext ?? 'Next'),
+            child: Text(l.reconcileWorkflowNext),
           ),
         ];
       case _Step.attribute:
         return [
           TextButton(
             onPressed: () => setState(() => _step = _Step.explain),
-            child: Text(l?.reconcileWorkflowBack ?? 'Back'),
+            child: Text(l.reconcileWorkflowBack),
           ),
           deferBtn,
           FilledButton(
@@ -301,20 +283,20 @@ class _GuidedReconciliationDialogState
             onPressed: _attributed
                 ? () => setState(() => _step = _Step.gather)
                 : null,
-            child: Text(l?.reconcileWorkflowNext ?? 'Next'),
+            child: Text(l.reconcileWorkflowNext),
           ),
         ];
       case _Step.gather:
         return [
           TextButton(
             onPressed: () => setState(() => _step = _Step.attribute),
-            child: Text(l?.reconcileWorkflowBack ?? 'Back'),
+            child: Text(l.reconcileWorkflowBack),
           ),
           deferBtn,
           FilledButton(
             key: const Key('reconcile-apply'),
             onPressed: _apply,
-            child: Text(l?.reconcileWorkflowApply ?? 'Apply'),
+            child: Text(l.reconcileWorkflowApply),
           ),
         ];
     }

@@ -127,16 +127,18 @@ class FeatureManagementSection extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
             child: Text(
-              l?.featureManagementSectionSubtitle ??
-                  'Turn individual features on or off. Some features '
-                      'depend on others — switches are disabled until '
-                      'prerequisites are met.',
+              l.featureManagementSectionSubtitle,
               style: theme.textTheme.bodySmall,
             ),
           ),
           for (final category in categoryOrder)
-            ..._buildSection(category, byCategory[category] ?? [], consoCard,
-                manifest, enabled),
+            ..._buildSection(
+              category,
+              byCategory[category] ?? [],
+              consoCard,
+              manifest,
+              enabled,
+            ),
         ],
       ),
     );

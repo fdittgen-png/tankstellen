@@ -15,6 +15,7 @@ import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Enables the consumption surface. #1901 — Trajets is no longer a tab
 /// of this screen, so the Fuel section just needs the Conso surface
@@ -22,9 +23,9 @@ import '../../../../helpers/pump_app.dart';
 class _ObdEnabledFlags extends FeatureFlags {
   @override
   Set<Feature> build() => <Feature>{
-        Feature.showConsumptionTab,
-        Feature.obd2TripRecording,
-      };
+    Feature.showConsumptionTab,
+    Feature.obd2TripRecording,
+  };
 }
 
 /// #892 / #1901 — the Charging slot on the Fuel section of
@@ -125,14 +126,18 @@ Future<_MutableActiveVehicle> _pumpScreen(
 
   await pumpApp(
     tester,
-    MaterialApp.router(routerConfig: router),
+    MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
+    ),
     overrides: [
       fillUpListProvider.overrideWith(() => _FixedFillUpList(const [])),
-      chargingLogsProvider
-          .overrideWith(() => _FixedChargingLogs(chargingLogs)),
+      chargingLogsProvider.overrideWith(() => _FixedChargingLogs(chargingLogs)),
       activeVehicleProfileProvider.overrideWith(() => activeNotifier),
-      vehicleProfileListProvider
-          .overrideWith(() => _FixedVehicleProfileList(vehicles)),
+      vehicleProfileListProvider.overrideWith(
+        () => _FixedVehicleProfileList(vehicles),
+      ),
       featureFlagsProvider.overrideWith(() => _ObdEnabledFlags()),
     ],
   );
@@ -147,10 +152,8 @@ void main() {
     /// Matches a [Tab] whose `text` carries the given label — the Fuel
     /// section's AppBar title is also 'Fuel', so the bare text finder
     /// would be ambiguous.
-    Finder tabLabelled(String label) => find.descendant(
-          of: find.byType(Tab),
-          matching: find.text(label),
-        );
+    Finder tabLabelled(String label) =>
+        find.descendant(of: find.byType(Tab), matching: find.text(label));
 
     testWidgets(
       'ICE vehicle active → no Fuel/Charging switcher, no "Charging" [AC1]',
@@ -164,8 +167,11 @@ void main() {
         // #1901 — a pure-combustion vehicle gets no Fuel/Charging
         // switcher at all: the Fuel section renders the fill-up list
         // directly with no `Tab` widgets.
-        expect(find.byType(Tab), findsNothing,
-            reason: 'ICE vehicle has no Fuel/Charging switcher');
+        expect(
+          find.byType(Tab),
+          findsNothing,
+          reason: 'ICE vehicle has no Fuel/Charging switcher',
+        );
 
         // The localised tab labels for Charging must not appear.
         expect(find.text('Charging'), findsNothing);
@@ -175,25 +181,24 @@ void main() {
       },
     );
 
-    testWidgets(
-      'EV vehicle active → 2-entry Fuel / Charging switcher [AC2]',
-      (tester) async {
-        await _pumpScreen(
-          tester,
-          activeVehicle: _evVehicle,
-          vehicles: const [_evVehicle],
-        );
+    testWidgets('EV vehicle active → 2-entry Fuel / Charging switcher [AC2]', (
+      tester,
+    ) async {
+      await _pumpScreen(
+        tester,
+        activeVehicle: _evVehicle,
+        vehicles: const [_evVehicle],
+      );
 
-        expect(tabLabelled('Fuel'), findsOneWidget);
-        expect(
-          tabLabelled('Charging'),
-          findsOneWidget,
-          reason: 'Charging tab must render for EV vehicles',
-        );
-        // #1901 — Trajets is no longer a tab of this screen.
-        expect(find.byType(Tab), findsNWidgets(2));
-      },
-    );
+      expect(tabLabelled('Fuel'), findsOneWidget);
+      expect(
+        tabLabelled('Charging'),
+        findsOneWidget,
+        reason: 'Charging tab must render for EV vehicles',
+      );
+      // #1901 — Trajets is no longer a tab of this screen.
+      expect(find.byType(Tab), findsNWidgets(2));
+    });
 
     testWidgets(
       'Hybrid vehicle active → 2-entry Fuel / Charging switcher [AC3]',
@@ -213,63 +218,62 @@ void main() {
       },
     );
 
-    testWidgets(
-      'Live switch EV → ICE while on Charging sub-tab: '
-      'switcher disappears, no crash, screen falls back to Fuel [AC4]',
-      (tester) async {
-        // Start on the EV profile with the Charging tab visible and a
-        // couple of logs seeded so the data layer has state we can
-        // observe *doesn't* get cleared by the switch.
-        final activeNotifier = await _pumpScreen(
-          tester,
-          activeVehicle: _evVehicle,
-          vehicles: const [_evVehicle, _iceVehicle],
-          chargingLogs: [
-            ChargingLog(
-              id: 'c1',
-              vehicleId: 'v-ev',
-              date: DateTime.utc(2026, 4, 20),
-              kWh: 30.0,
-              costEur: 12.0,
-              chargeTimeMin: 30,
-              odometerKm: 10000,
-              stationName: 'Ionity Castelnau',
-            ),
-          ],
-        );
+    testWidgets('Live switch EV → ICE while on Charging sub-tab: '
+        'switcher disappears, no crash, screen falls back to Fuel [AC4]', (
+      tester,
+    ) async {
+      // Start on the EV profile with the Charging tab visible and a
+      // couple of logs seeded so the data layer has state we can
+      // observe *doesn't* get cleared by the switch.
+      final activeNotifier = await _pumpScreen(
+        tester,
+        activeVehicle: _evVehicle,
+        vehicles: const [_evVehicle, _iceVehicle],
+        chargingLogs: [
+          ChargingLog(
+            id: 'c1',
+            vehicleId: 'v-ev',
+            date: DateTime.utc(2026, 4, 20),
+            kWh: 30.0,
+            costEur: 12.0,
+            chargeTimeMin: 30,
+            odometerKm: 10000,
+            stationName: 'Ionity Castelnau',
+          ),
+        ],
+      );
 
-        // Sanity: Charging tab is there.
-        expect(tabLabelled('Charging'), findsOneWidget);
+      // Sanity: Charging tab is there.
+      expect(tabLabelled('Charging'), findsOneWidget);
 
-        // Tap onto Charging so we're ON the tab that will vanish.
-        await tester.tap(tabLabelled('Charging'));
-        await tester.pumpAndSettle();
+      // Tap onto Charging so we're ON the tab that will vanish.
+      await tester.tap(tabLabelled('Charging'));
+      await tester.pumpAndSettle();
 
-        // Flip the active vehicle to ICE — the switcher should vanish.
-        activeNotifier.setVehicle(_iceVehicle);
-        await tester.pumpAndSettle();
+      // Flip the active vehicle to ICE — the switcher should vanish.
+      activeNotifier.setVehicle(_iceVehicle);
+      await tester.pumpAndSettle();
 
-        // No exception was surfaced by the harness (TestWidgetsFlutter
-        // Binding rethrows on pump if one occurred).
-        expect(tester.takeException(), isNull);
+      // No exception was surfaced by the harness (TestWidgetsFlutter
+      // Binding rethrows on pump if one occurred).
+      expect(tester.takeException(), isNull);
 
-        // #1901 — a combustion vehicle has no Fuel/Charging switcher
-        // at all: the screen falls back to the plain fuel list, the
-        // `Tab` widgets and the TabBar are gone.
-        expect(find.text('Charging'), findsNothing);
-        expect(find.byType(Tab), findsNothing);
-        expect(find.byType(TabBar), findsNothing);
+      // #1901 — a combustion vehicle has no Fuel/Charging switcher
+      // at all: the screen falls back to the plain fuel list, the
+      // `Tab` widgets and the TabBar are gone.
+      expect(find.text('Charging'), findsNothing);
+      expect(find.byType(Tab), findsNothing);
+      expect(find.byType(TabBar), findsNothing);
 
-        // Flip back to EV — the Fuel/Charging switcher must return and
-        // the logs must still be available from the unchanged provider.
-        activeNotifier.setVehicle(_evVehicle);
-        await tester.pumpAndSettle();
-        expect(
-          tabLabelled('Charging'),
-          findsOneWidget,
-          reason: 'Charging tab must come back when vehicle is EV again',
-        );
-      },
-    );
+      // Flip back to EV — the Fuel/Charging switcher must return and
+      // the logs must still be available from the unchanged provider.
+      activeNotifier.setVehicle(_evVehicle);
+      await tester.pumpAndSettle();
+      expect(
+        tabLabelled('Charging'),
+        findsOneWidget,
+        reason: 'Charging tab must come back when vehicle is EV again',
+      );
+    });
   });
 }

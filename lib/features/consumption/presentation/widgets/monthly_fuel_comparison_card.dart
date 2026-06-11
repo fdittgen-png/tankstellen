@@ -40,7 +40,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
     final rows = <Widget>[
       _row(
         context,
-        label: l?.statTotalLiters ?? 'Total liters',
+        label: l.statTotalLiters,
         current: current?.totalLiters,
         previous: previous?.totalLiters,
         format: _fmtLiters,
@@ -49,7 +49,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       ),
       _row(
         context,
-        label: l?.statTotalSpent ?? 'Total spent',
+        label: l.statTotalSpent,
         current: current?.totalSpent,
         previous: previous?.totalSpent,
         format: PriceFormatter.formatTotal,
@@ -58,7 +58,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       ),
       _row(
         context,
-        label: l?.consumptionStatsPricePerLiter ?? 'Avg price/L',
+        label: l.consumptionStatsPricePerLiter,
         current: current?.avgPricePerLiter,
         previous: previous?.avgPricePerLiter,
         format: PriceFormatter.formatPriceCompact,
@@ -67,7 +67,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       ),
       _row(
         context,
-        label: l?.statAvgConsumption ?? 'Avg L/100km',
+        label: l.statAvgConsumption,
         current: current?.avgConsumptionL100km,
         previous: previous?.avgConsumptionL100km,
         format: _fmtConsumption,
@@ -76,7 +76,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       ),
       _row(
         context,
-        label: l?.statAvgCostPerKm ?? 'Avg cost/km',
+        label: l.statAvgCostPerKm,
         current: current?.avgCostPerKm,
         previous: previous?.avgCostPerKm,
         format: PriceFormatter.formatPerKm,
@@ -85,7 +85,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       ),
       _row(
         context,
-        label: l?.statFillUpCount ?? 'Fill-ups',
+        label: l.statFillUpCount,
         current: current?.fillUpCount.toDouble(),
         previous: previous?.fillUpCount.toDouble(),
         format: _fmtCount,
@@ -103,14 +103,13 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l?.consumptionStatsComparisonTitle ?? 'This month vs last month',
+              l.consumptionStatsComparisonTitle,
               style: theme.textTheme.titleMedium,
             ),
             if (!hasComparison) ...[
               const SizedBox(height: 4),
               Text(
-                l?.consumptionStatsNeedTwoMonths ??
-                    'Log fill-ups across at least two months to compare.',
+                l.consumptionStatsNeedTwoMonths,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
@@ -148,7 +147,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
       final sign = pct > 0 ? '+' : '';
       // i18n-ignore: numeric value forwarded into the ARB {pct} mask.
       final value = '$sign${pct.toStringAsFixed(0)}';
-      percentText = l?.consumptionStatsDeltaPercent(value) ?? '$value%';
+      percentText = l.consumptionStatsDeltaPercent(value);
     }
     return _MetricRow(
       label: label,

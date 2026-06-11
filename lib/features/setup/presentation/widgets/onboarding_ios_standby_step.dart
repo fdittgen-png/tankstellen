@@ -32,15 +32,10 @@ class OnboardingIosStandbyStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            Icons.phone_iphone,
-            size: 48,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(Icons.phone_iphone, size: 48, color: theme.colorScheme.primary),
           const SizedBox(height: 16),
           Text(
-            l10n?.iosAutoRecordOnboardingTitle ??
-                "Stay out of the app — but don't quit it.",
+            l10n.iosAutoRecordOnboardingTitle,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -49,32 +44,20 @@ class OnboardingIosStandbyStep extends StatelessWidget {
           const SizedBox(height: 24),
           _Bullet(
             number: 1,
-            title: l10n?.iosAutoRecordOnboardingBullet1Title ??
-                'Open Sparkilo once after each reboot.',
-            body: l10n?.iosAutoRecordOnboardingBullet1Body ??
-                'Apple wakes Sparkilo only after you’ve opened it at '
-                    'least once since the phone restarted. After that, '
-                    'your trips record automatically.',
+            title: l10n.iosAutoRecordOnboardingBullet1Title,
+            body: l10n.iosAutoRecordOnboardingBullet1Body,
           ),
           const SizedBox(height: 16),
           _Bullet(
             number: 2,
-            title: l10n?.iosAutoRecordOnboardingBullet2Title ??
-                'Don’t swipe Sparkilo away in the app switcher.',
-            body: l10n?.iosAutoRecordOnboardingBullet2Body ??
-                '"Force-quit" tells iOS to stop relaunching the app. Your '
-                    'trips will stop recording until you open Sparkilo '
-                    'again.',
+            title: l10n.iosAutoRecordOnboardingBullet2Title,
+            body: l10n.iosAutoRecordOnboardingBullet2Body,
           ),
           const SizedBox(height: 16),
           _Bullet(
             number: 3,
-            title: l10n?.iosAutoRecordOnboardingBullet3Title ??
-                'When iOS asks for "Always" location, please say yes.',
-            body: l10n?.iosAutoRecordOnboardingBullet3Body ??
-                'The fallback that records your trip when the OBD2 '
-                    'adapter is slow needs background location. We never '
-                    'share it.',
+            title: l10n.iosAutoRecordOnboardingBullet3Title,
+            body: l10n.iosAutoRecordOnboardingBullet3Body,
           ),
         ],
       ),

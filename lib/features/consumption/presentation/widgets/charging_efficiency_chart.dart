@@ -41,13 +41,15 @@ class ChargingEfficiencyChart extends StatelessWidget {
     final effective = color ?? theme.colorScheme.primary;
     final entries = monthlyEfficiency.entries.toList(growable: false)
       ..sort((a, b) => a.key.compareTo(b.key));
-    final points = entries.where((e) => e.value != null).toList(growable: false);
+    final points = entries
+        .where((e) => e.value != null)
+        .toList(growable: false);
     if (entries.isEmpty || points.isEmpty) {
       return SizedBox(
         height: 140,
         child: Center(
           child: Text(
-            l?.chargingChartsEmpty ?? 'Not enough data yet',
+            l.chargingChartsEmpty,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -114,7 +116,8 @@ class _EfficiencyPainter extends CustomPainter {
     final yMax = maxV + padding;
 
     double xForIndex(int i) =>
-        leftInset + (entries.length == 1
+        leftInset +
+        (entries.length == 1
             ? chartWidth / 2
             : (i / (entries.length - 1)) * chartWidth);
     double yForValue(double v) =>
@@ -173,11 +176,7 @@ class _EfficiencyPainter extends CustomPainter {
     for (int i = 0; i < entries.length; i++) {
       final v = entries[i].value;
       if (v == null) continue;
-      canvas.drawCircle(
-        Offset(xForIndex(i), yForValue(v)),
-        3,
-        dotPaint,
-      );
+      canvas.drawCircle(Offset(xForIndex(i), yForValue(v)), 3, dotPaint);
     }
   }
 

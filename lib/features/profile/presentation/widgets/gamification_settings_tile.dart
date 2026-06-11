@@ -40,13 +40,9 @@ class GamificationSettingsTile extends ConsumerWidget {
     return SwitchListTile(
       key: const Key('gamificationToggle'),
       value: enabled,
-      title: Text(
-        l?.profileGamificationToggleTitle ?? 'Show achievements & scores',
-      ),
+      title: Text(l.profileGamificationToggleTitle),
       subtitle: Text(
-        l?.profileGamificationToggleSubtitle ??
-            'When off, badges, scores and trophy icons are hidden across '
-                'the app.',
+        l.profileGamificationToggleSubtitle,
         style: theme.textTheme.bodySmall,
       ),
       onChanged: (v) {

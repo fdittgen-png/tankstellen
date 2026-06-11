@@ -57,13 +57,14 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
   String _titleFor(SyncSetupStep step, SyncMode mode) {
     final l10n = AppLocalizations.of(context);
     return switch (step) {
-      SyncSetupStep.mode => l10n?.syncWizardTitleConnect ?? 'Connect TankSync',
-      SyncSetupStep.credentials => mode == SyncMode.private
-          ? (l10n?.syncSetupTitleYourDatabase ?? 'Your database')
-          : (l10n?.syncSetupTitleJoinGroup ?? 'Join a group'),
-      SyncSetupStep.auth => l10n?.syncSetupTitleAccount ?? 'Your account',
-      SyncSetupStep.adopt => l10n?.syncSetupTitleAccount ?? 'Your account',
-      SyncSetupStep.done => l10n?.syncSuccessTitle ?? 'Successfully connected!',
+      SyncSetupStep.mode => l10n.syncWizardTitleConnect,
+      SyncSetupStep.credentials =>
+        mode == SyncMode.private
+            ? (l10n.syncSetupTitleYourDatabase)
+            : (l10n.syncSetupTitleJoinGroup),
+      SyncSetupStep.auth => l10n.syncSetupTitleAccount,
+      SyncSetupStep.adopt => l10n.syncSetupTitleAccount,
+      SyncSetupStep.done => l10n.syncSuccessTitle,
     };
   }
 
@@ -123,9 +124,16 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
-        'where': 'SyncSetupScreen._onAuthSubmit: connect/sign-in failed'
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.sync,
+          e,
+          st,
+          context: const {
+            'where': 'SyncSetupScreen._onAuthSubmit: connect/sign-in failed',
+          },
+        ),
+      );
       if (mounted) {
         ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
       }
@@ -164,9 +172,16 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
-        'where': 'SyncSetupScreen._onAdopt: adopt connect/sign-in failed'
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.sync,
+          e,
+          st,
+          context: const {
+            'where': 'SyncSetupScreen._onAdopt: adopt connect/sign-in failed',
+          },
+        ),
+      );
       if (mounted) {
         ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
       }
@@ -192,9 +207,19 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
           ref.read(syncSetupControllerProvider.notifier).startAdoption(email);
         }
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'QR code parse failed'}));
+        unawaited(
+          errorLogger.log(
+            ErrorLayer.ui,
+            e,
+            st,
+            context: const {'where': 'QR code parse failed'},
+          ),
+        );
         if (mounted) {
-          SnackBarHelper.showError(context, AppLocalizations.of(context)?.invalidQrCode ?? 'Invalid QR code format');
+          SnackBarHelper.showError(
+            context,
+            AppLocalizations.of(context).invalidQrCode,
+          );
         }
       }
     }
@@ -208,7 +233,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: _onBack,
-        tooltip: AppLocalizations.of(context)?.tooltipBack ?? 'Back',
+        tooltip: AppLocalizations.of(context).tooltipBack,
       ),
       bodyPadding: EdgeInsets.zero,
       body: AnimatedSwitcher(
@@ -226,76 +251,77 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPad),
       children: switch (setup.step) {
         SyncSetupStep.mode => [
-            SyncModeStep(
-              onSelectMode: ctrl.selectMode,
-              onStayOffline: () => Navigator.pop(context),
-            ),
-          ],
+          SyncModeStep(
+            onSelectMode: ctrl.selectMode,
+            onStayOffline: () => Navigator.pop(context),
+          ),
+        ],
         SyncSetupStep.credentials => [
-            ListenableBuilder(
-              listenable: Listenable.merge([_urlController, _keyController]),
-              builder: (context, _) {
-                final canContinue = _urlController.text.trim().isNotEmpty &&
-                    _keyController.text.trim().isNotEmpty;
-                // #1703 — private mode walks the user through creating
-                // their own Supabase database with the guided wizard
-                // flow instead of a bare credentials form. The guide's
-                // final step still collects the URL + key, so an
-                // experienced user can skip ahead and paste existing
-                // credentials.
-                if (setup.selectedMode == SyncMode.private) {
-                  return WizardCreateNew(
-                    currentStep: setup.createDbStep,
-                    urlController: _urlController,
-                    keyController: _keyController,
-                    keyField: AnonKeyField(
-                      controller: _keyController,
-                      showKey: setup.showKey,
-                      onToggleVisibility: ctrl.toggleKeyVisibility,
-                      onChanged: ctrl.touch,
-                    ),
-                    onBack: ctrl.prevCreateDbStep,
-                    onNext: ctrl.nextCreateDbStep,
-                    onContinue: canContinue
-                        ? () => ctrl.goToStep(SyncSetupStep.auth)
-                        : null,
-                  );
-                }
-                return SyncCredentialsStep(
-                  selectedMode: setup.selectedMode,
+          ListenableBuilder(
+            listenable: Listenable.merge([_urlController, _keyController]),
+            builder: (context, _) {
+              final canContinue =
+                  _urlController.text.trim().isNotEmpty &&
+                  _keyController.text.trim().isNotEmpty;
+              // #1703 — private mode walks the user through creating
+              // their own Supabase database with the guided wizard
+              // flow instead of a bare credentials form. The guide's
+              // final step still collects the URL + key, so an
+              // experienced user can skip ahead and paste existing
+              // credentials.
+              if (setup.selectedMode == SyncMode.private) {
+                return WizardCreateNew(
+                  currentStep: setup.createDbStep,
                   urlController: _urlController,
                   keyController: _keyController,
-                  showKey: setup.showKey,
-                  onToggleKeyVisibility: ctrl.toggleKeyVisibility,
-                  onScanQr: _scanQr,
+                  keyField: AnonKeyField(
+                    controller: _keyController,
+                    showKey: setup.showKey,
+                    onToggleVisibility: ctrl.toggleKeyVisibility,
+                    onChanged: ctrl.touch,
+                  ),
+                  onBack: ctrl.prevCreateDbStep,
+                  onNext: ctrl.nextCreateDbStep,
                   onContinue: canContinue
                       ? () => ctrl.goToStep(SyncSetupStep.auth)
                       : null,
-                  // Rebuild handled by ListenableBuilder above; no-op.
-                  onChanged: () {},
                 );
-              },
-            ),
-          ],
+              }
+              return SyncCredentialsStep(
+                selectedMode: setup.selectedMode,
+                urlController: _urlController,
+                keyController: _keyController,
+                showKey: setup.showKey,
+                onToggleKeyVisibility: ctrl.toggleKeyVisibility,
+                onScanQr: _scanQr,
+                onContinue: canContinue
+                    ? () => ctrl.goToStep(SyncSetupStep.auth)
+                    : null,
+                // Rebuild handled by ListenableBuilder above; no-op.
+                onChanged: () {},
+              );
+            },
+          ),
+        ],
         SyncSetupStep.auth => [
-            AuthFormWidget(
-              onSubmit: _onAuthSubmit,
-              isLoading: setup.isLoading,
-              error: setup.error,
-            ),
-          ],
+          AuthFormWidget(
+            onSubmit: _onAuthSubmit,
+            isLoading: setup.isLoading,
+            error: setup.error,
+          ),
+        ],
         SyncSetupStep.adopt => [
-            SyncAdoptionStep(
-              email: setup.adoptEmail ?? '',
-              passwordController: _adoptPasswordController,
-              isLoading: setup.isLoading,
-              error: setup.error,
-              showPassword: setup.showPassword,
-              onTogglePassword: ctrl.togglePasswordVisibility,
-              onJoin: _onAdopt,
-              onUseDifferentAccount: ctrl.cancelAdoption,
-            ),
-          ],
+          SyncAdoptionStep(
+            email: setup.adoptEmail ?? '',
+            passwordController: _adoptPasswordController,
+            isLoading: setup.isLoading,
+            error: setup.error,
+            showPassword: setup.showPassword,
+            onTogglePassword: ctrl.togglePasswordVisibility,
+            onJoin: _onAdopt,
+            onUseDifferentAccount: ctrl.cancelAdoption,
+          ),
+        ],
         SyncSetupStep.done => const [SyncDoneStep()],
       },
     );

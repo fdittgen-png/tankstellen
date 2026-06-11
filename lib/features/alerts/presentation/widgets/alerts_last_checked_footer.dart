@@ -30,12 +30,11 @@ class AlertsLastCheckedFooter extends StatelessWidget {
         final at = snapshot.data;
         final String label;
         if (at == null) {
-          label = l10n?.alertsLastCheckedNever ??
-              "Prices haven't been checked in the background yet";
+          label = l10n.alertsLastCheckedNever;
         } else {
           final locale = Localizations.localeOf(context).toString();
           final when = DateFormat.yMd(locale).add_Hm().format(at.toLocal());
-          label = l10n?.alertsLastChecked(when) ?? 'Last checked: $when';
+          label = l10n.alertsLastChecked(when);
         }
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),

@@ -1596,6 +1596,15 @@
       }
     }
   },
+  "serviceReminderDueNowBody": "{label} is due now.",
+  "@serviceReminderDueNowBody": {
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "example": "Oil change"
+      }
+    }
+  },
   "southKoreaApiKeyRequired": "Register at OPINET to get a free API key",
   "southKoreaApiProvider": "OPINET (KNOC)",
   "chileApiKeyRequired": "Register at CNE to get a free API key",

@@ -41,20 +41,19 @@ class LinkDeviceImportCard extends ConsumerWidget {
                 const Icon(Icons.link, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  l10n?.linkDeviceImportSectionTitle ??
-                      'Import from another device',
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  l10n.linkDeviceImportSectionTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              l10n?.linkDeviceImportDescription ??
-                  'Enter the device code from your other device to import '
-                      'its favorites and alerts.',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              l10n.linkDeviceImportDescription,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 12),
             // ListenableBuilder so the submit button enables/disables based
@@ -70,32 +69,34 @@ class LinkDeviceImportCard extends ConsumerWidget {
                     TextField(
                       controller: codeController,
                       decoration: InputDecoration(
-                        labelText:
-                            l10n?.linkDeviceCodeFieldLabel ?? 'Device code',
-                        hintText: l10n?.linkDeviceCodeFieldHint ??
-                            'Paste the UUID from other device',
+                        labelText: l10n.linkDeviceCodeFieldLabel,
+                        hintText: l10n.linkDeviceCodeFieldHint,
                         prefixIcon: const Icon(Icons.key, size: 18),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     FilledButton.icon(
                       onPressed: (hasText && !uiState.isLinking)
                           ? () => ref
-                              .read(linkDeviceControllerProvider.notifier)
-                              .linkDevice(codeController.text)
+                                .read(linkDeviceControllerProvider.notifier)
+                                .linkDevice(codeController.text)
                           : null,
                       icon: uiState.isLinking
                           ? const SizedBox(
                               width: 16,
                               height: 16,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white))
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
                           : const Icon(Icons.sync),
-                      label: Text(
-                          l10n?.linkDeviceImportButton ?? 'Import data'),
+                      label: Text(l10n.linkDeviceImportButton),
                     ),
                   ],
                 );

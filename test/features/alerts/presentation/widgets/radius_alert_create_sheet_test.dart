@@ -12,11 +12,13 @@ import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dar
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   group('RadiusAlertCreateSheet (#578 phase 2)', () {
-    testWidgets('no longer shows the Germany-only gating note (#2865)',
-        (tester) async {
+    testWidgets('no longer shows the Germany-only gating note (#2865)', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -37,8 +39,9 @@ void main() {
       );
     });
 
-    testWidgets('threshold label uses the centre country currency (#2865)',
-        (tester) async {
+    testWidgets('threshold label uses the centre country currency (#2865)', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -62,8 +65,9 @@ void main() {
       expect(find.text('Threshold (€/L)'), findsNothing);
     });
 
-    testWidgets('save button builds a RadiusAlert and calls add()',
-        (tester) async {
+    testWidgets('save button builds a RadiusAlert and calls add()', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -123,8 +127,9 @@ void main() {
       expect(a.radiusKm, 10);
     });
 
-    testWidgets('save is disabled until label + center are set',
-        (tester) async {
+    testWidgets('save is disabled until label + center are set', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -141,83 +146,95 @@ void main() {
       );
 
       // No label, no center → save must be disabled.
-      final saveButton =
-          tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'));
+      final saveButton = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Save'),
+      );
       expect(saveButton.onPressed, isNull);
     });
 
-    testWidgets('Pick-on-map returns a LatLng and enables Save (#578 phase 3)',
-        (tester) async {
-      final test = standardTestOverrides();
-      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+    testWidgets(
+      'Pick-on-map returns a LatLng and enables Save (#578 phase 3)',
+      (tester) async {
+        final test = standardTestOverrides();
+        when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
-      final fake = _CapturingRadiusAlerts();
+        final fake = _CapturingRadiusAlerts();
 
-      // Stub the map-picker so we do not need to build the
-      // FlutterMap widget tree inside the create-sheet test. The
-      // stub synchronously returns a deterministic LatLng, which is
-      // exactly what a user-confirmed picker would hand back.
-      const picked = LatLng(52.5200, 13.4050);
+        // Stub the map-picker so we do not need to build the
+        // FlutterMap widget tree inside the create-sheet test. The
+        // stub synchronously returns a deterministic LatLng, which is
+        // exactly what a user-confirmed picker would hand back.
+        const picked = LatLng(52.5200, 13.4050);
 
-      await pumpApp(
-        tester,
-        RadiusAlertCreateSheet(
-          idGenerator: () => 'map-id-1',
-          mapPickerOpener: (_) async => picked,
-        ),
-        overrides: [
-          ...test.overrides,
-          radiusAlertsProvider.overrideWith(() => fake),
-          userPositionNullOverride(),
-        ],
-      );
+        await pumpApp(
+          tester,
+          RadiusAlertCreateSheet(
+            idGenerator: () => 'map-id-1',
+            mapPickerOpener: (_) async => picked,
+          ),
+          overrides: [
+            ...test.overrides,
+            radiusAlertsProvider.overrideWith(() => fake),
+            userPositionNullOverride(),
+          ],
+        );
 
-      await tester.enterText(
-        find.widgetWithText(TextField, 'Label (e.g. Home diesel)'),
-        'Berlin diesel',
-      );
-      await tester.pump();
+        await tester.enterText(
+          find.widgetWithText(TextField, 'Label (e.g. Home diesel)'),
+          'Berlin diesel',
+        );
+        await tester.pump();
 
-      // Before picking on the map, Save must still be disabled —
-      // label alone is not enough because no center has been set.
-      FilledButton save = tester
-          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'));
-      expect(save.onPressed, isNull,
-          reason: 'label only → save still disabled before a center exists');
+        // Before picking on the map, Save must still be disabled —
+        // label alone is not enough because no center has been set.
+        FilledButton save = tester.widget<FilledButton>(
+          find.widgetWithText(FilledButton, 'Save'),
+        );
+        expect(
+          save.onPressed,
+          isNull,
+          reason: 'label only → save still disabled before a center exists',
+        );
 
-      // Tap the map-picker button; the stub pops the fake LatLng
-      // straight back into the sheet.
-      await tester.tap(find.text('Pick on map'));
-      await tester.pumpAndSettle();
+        // Tap the map-picker button; the stub pops the fake LatLng
+        // straight back into the sheet.
+        await tester.tap(find.text('Pick on map'));
+        await tester.pumpAndSettle();
 
-      // Save is now enabled because the picker populated the center.
-      save = tester
-          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'));
-      expect(save.onPressed, isNotNull,
-          reason: 'picked LatLng should unlock Save');
+        // Save is now enabled because the picker populated the center.
+        save = tester.widget<FilledButton>(
+          find.widgetWithText(FilledButton, 'Save'),
+        );
+        expect(
+          save.onPressed,
+          isNotNull,
+          reason: 'picked LatLng should unlock Save',
+        );
 
-      // The "Map location" caption is what tells the user which
-      // source is currently bound to the alert.
-      expect(find.text('Map location'), findsOneWidget);
+        // The "Map location" caption is what tells the user which
+        // source is currently bound to the alert.
+        expect(find.text('Map location'), findsOneWidget);
 
-      // Scroll Save into view (the sheet grew with #1012 phase 1).
-      final saveBtn = find.widgetWithText(FilledButton, 'Save');
-      await tester.scrollUntilVisible(
-        saveBtn,
-        100,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(saveBtn);
-      await tester.pumpAndSettle();
+        // Scroll Save into view (the sheet grew with #1012 phase 1).
+        final saveBtn = find.widgetWithText(FilledButton, 'Save');
+        await tester.scrollUntilVisible(
+          saveBtn,
+          100,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(saveBtn);
+        await tester.pumpAndSettle();
 
-      expect(fake.addedAlerts, hasLength(1));
-      final a = fake.addedAlerts.single;
-      expect(a.centerLat, closeTo(52.52, 1e-6));
-      expect(a.centerLng, closeTo(13.405, 1e-6));
-    });
+        expect(fake.addedAlerts, hasLength(1));
+        final a = fake.addedAlerts.single;
+        expect(a.centerLat, closeTo(52.52, 1e-6));
+        expect(a.centerLng, closeTo(13.405, 1e-6));
+      },
+    );
 
-    testWidgets('Pick-on-map cancel keeps the sheet empty (#578 phase 3)',
-        (tester) async {
+    testWidgets('Pick-on-map cancel keeps the sheet empty (#578 phase 3)', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -246,14 +263,14 @@ void main() {
 
       // Save must still be disabled — a cancelled picker must not
       // leave a stale (0,0) center behind.
-      final save = tester
-          .widget<FilledButton>(find.widgetWithText(FilledButton, 'Save'));
+      final save = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Save'),
+      );
       expect(save.onPressed, isNull);
       expect(find.text('Map location'), findsNothing);
     });
 
-    testWidgets(
-        'frequency dropdown writes selected value into the saved alert '
+    testWidgets('frequency dropdown writes selected value into the saved alert '
         '(#1012 phase 1)', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -310,8 +327,7 @@ void main() {
       expect(fake.addedAlerts.single.frequencyPerDay, 4);
     });
 
-    testWidgets(
-        'frequency dropdown defaults to once-a-day when left untouched '
+    testWidgets('frequency dropdown defaults to once-a-day when left untouched '
         '(#1012 phase 1)', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -349,8 +365,9 @@ void main() {
       expect(fake.addedAlerts.single.frequencyPerDay, 1);
     });
 
-    testWidgets('cancel button dismisses without calling add()',
-        (tester) async {
+    testWidgets('cancel button dismisses without calling add()', (
+      tester,
+    ) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
 
@@ -366,6 +383,8 @@ void main() {
             userPositionOverride(lat: 48.85, lng: 2.35),
           ].cast(),
           child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Builder(
               builder: (context) => Scaffold(
                 body: Center(

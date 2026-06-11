@@ -25,10 +25,15 @@ class PriceHistorySection extends ConsumerStatefulWidget {
   final String stationId;
   final Station station;
 
-  const PriceHistorySection({super.key, required this.stationId, required this.station});
+  const PriceHistorySection({
+    super.key,
+    required this.stationId,
+    required this.station,
+  });
 
   @override
-  ConsumerState<PriceHistorySection> createState() => _PriceHistorySectionState();
+  ConsumerState<PriceHistorySection> createState() =>
+      _PriceHistorySectionState();
 }
 
 class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
@@ -45,17 +50,19 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
     final repo = ref.read(priceHistoryRepositoryProvider);
     final station = widget.station;
 
-    await repo.recordPrice(PriceRecord(
-      stationId: widget.stationId,
-      recordedAt: DateTime.now(),
-      e5: station.e5,
-      e10: station.e10,
-      e98: station.e98,
-      diesel: station.diesel,
-      e85: station.e85,
-      lpg: station.lpg,
-      cng: station.cng,
-    ));
+    await repo.recordPrice(
+      PriceRecord(
+        stationId: widget.stationId,
+        recordedAt: DateTime.now(),
+        e5: station.e5,
+        e10: station.e10,
+        e98: station.e98,
+        diesel: station.diesel,
+        e85: station.e85,
+        lpg: station.lpg,
+        cng: station.cng,
+      ),
+    );
 
     // Guard before touching ref after the await — leaving the screen during
     // recordPrice disposes the widget and Riverpod 3's WidgetRef throws
@@ -84,17 +91,21 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
       final rows = await PriceHistorySync.fetch(widget.stationId);
       if (rows.isNotEmpty && mounted) {
         final storageMgmt = ref.read(storageManagementProvider);
-        final records = rows.map((r) => {
-          'stationId': r['station_id'],
-          'recordedAt': r['recorded_at'],
-          'e5': r['e5'],
-          'e10': r['e10'],
-          'diesel': r['diesel'],
-          'e98': r['e98'],
-          'e85': r['e85'],
-          'lpg': r['lpg'],
-          'cng': r['cng'],
-        }).toList();
+        final records = rows
+            .map(
+              (r) => {
+                'stationId': r['station_id'],
+                'recordedAt': r['recorded_at'],
+                'e5': r['e5'],
+                'e10': r['e10'],
+                'diesel': r['diesel'],
+                'e98': r['e98'],
+                'e85': r['e85'],
+                'lpg': r['lpg'],
+                'cng': r['cng'],
+              },
+            )
+            .toList();
         await storageMgmt.savePriceRecords(widget.stationId, records);
         // #3159 — same #2298 guard as _recordAndLoad: the save above can
         // outlive the widget, and invalidating a dead WidgetRef throws.
@@ -103,7 +114,14 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
         }
       }
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'PriceHistory DB fetch failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {'where': 'PriceHistory DB fetch failed'},
+        ),
+      );
     }
     if (mounted) setState(() => _fetchedFromDb = true);
   }
@@ -115,7 +133,13 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
     if (!_recorded && history.isEmpty) {
       return const SizedBox(
         height: 120,
-        child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+        child: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
       );
     }
 
@@ -133,7 +157,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
           alignment: Alignment.centerRight,
           child: TextButton(
             onPressed: () => PriceHistoryRoute(widget.stationId).push<void>(context),
-            child: Text(AppLocalizations.of(context)?.showAllFuelTypes ?? 'Show all fuel types'),
+            child: Text(AppLocalizations.of(context).showAllFuelTypes),
           ),
         ),
       ],

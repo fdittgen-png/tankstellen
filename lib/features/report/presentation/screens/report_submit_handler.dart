@@ -51,17 +51,11 @@ class ReportSubmitHandler {
     final selectedType = form.selectedType;
     if (selectedType == null) return;
     if (selectedType.needsPrice && priceController.text.isEmpty) {
-      SnackBarHelper.showError(
-        context,
-        l10n?.enterValidPrice ?? 'Please enter a valid price',
-      );
+      SnackBarHelper.showError(context, l10n.enterValidPrice);
       return;
     }
     if (selectedType.needsText && textController.text.trim().isEmpty) {
-      SnackBarHelper.showError(
-        context,
-        l10n?.enterCorrection ?? 'Please enter the correction',
-      );
+      SnackBarHelper.showError(context, l10n.enterCorrection);
       return;
     }
 
@@ -80,8 +74,9 @@ class ReportSubmitHandler {
       final price = selectedType.needsPrice
           ? double.tryParse(priceController.text.replaceAll(',', '.'))
           : null;
-      final correctionText =
-          selectedType.needsText ? textController.text.trim() : null;
+      final correctionText = selectedType.needsText
+          ? textController.text.trim()
+          : null;
 
       // #484 — resolve the reporting backends for the current country
       // and config. Before this fix the screen always hit the
@@ -99,22 +94,17 @@ class ReportSubmitHandler {
       // #484 — Tankerkoenig only accepts the 5 original report types.
       // Metadata and extended-fuel types (wrongE85, wrongName, etc.)
       // route to TankSync only, even in Germany with a key set.
-      final canSubmitTankerkoenig = country.code == 'DE' &&
+      final canSubmitTankerkoenig =
+          country.code == 'DE' &&
           apiKey != null &&
           apiKey.isNotEmpty &&
           selectedType.isTankerkoenigSupported;
-      final canSubmitTankSync = TankSyncClient.isConnected &&
-          syncConfig.userId != null;
+      final canSubmitTankSync =
+          TankSyncClient.isConnected && syncConfig.userId != null;
 
       if (!canSubmitTankerkoenig && !canSubmitTankSync) {
         if (context.mounted) {
-          SnackBarHelper.showError(
-            context,
-            l10n?.reportNoBackendAvailable ??
-                'The report could not be sent: no reporting service is '
-                    'configured for this country. Enable TankSync in Settings '
-                    'to send community reports.',
-          );
+          SnackBarHelper.showError(context, l10n.reportNoBackendAvailable);
         }
         return;
       }
@@ -134,8 +124,7 @@ class ReportSubmitHandler {
         // reports carry neither (they don't hit TankSync — the row
         // would fail the check constraint, so we skip).
         final hasPricePayload = selectedType.needsPrice && price != null;
-        final hasTextPayload =
-            selectedType.needsText && correctionText != null;
+        final hasTextPayload = selectedType.needsText && correctionText != null;
         if (hasPricePayload || hasTextPayload) {
           await CommunityReportService.submitReport(
             stationId: stationId,
@@ -152,21 +141,22 @@ class ReportSubmitHandler {
       }
 
       if (context.mounted) {
-        SnackBarHelper.showSuccess(
-          context,
-          l10n?.reportSent ?? 'Report sent. Thank you!',
-        );
+        SnackBarHelper.showSuccess(context, l10n.reportSent);
         context.pop();
       }
     } on ApiException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'ReportSubmitHandler.submit: report submission failed'
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'ReportSubmitHandler.submit: report submission failed',
+          },
+        ),
+      );
       if (context.mounted) {
-        SnackBarHelper.showError(
-          context,
-          '${l10n?.retry ?? "Error"}: ${e.message}',
-        );
+        SnackBarHelper.showError(context, '${l10n.retry}: ${e.message}');
       }
     } finally {
       if (context.mounted) {
@@ -177,7 +167,7 @@ class ReportSubmitHandler {
 
   Future<void> _routeToGitHub(
     ReportType selectedType,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) async {
     final country = ref.read(activeCountryProvider);
     final correction = textController.text.trim();
@@ -185,7 +175,7 @@ class ReportSubmitHandler {
       errorType: 'WrongMetadataReport',
       errorMessage:
           '${selectedType.fuelTypeColumnValue} reported wrong for '
-              'station $stationId: "$correction"',
+          'station $stationId: "$correction"',
       sourceLabel: country.apiProvider ?? country.name,
       countryCode: country.code,
       appVersion: ErrorReporterContext.currentAppVersion(),
@@ -193,13 +183,12 @@ class ReportSubmitHandler {
       locale: ErrorReporterContext.currentLocale(context),
       capturedAt: DateTime.now(),
     );
-    final launched =
-        await (reporter ?? const ErrorReporter()).reportError(context, payload);
+    final launched = await (reporter ?? const ErrorReporter()).reportError(
+      context,
+      payload,
+    );
     if (context.mounted && launched) {
-      SnackBarHelper.showSuccess(
-        context,
-        l10n?.reportSent ?? 'Report sent. Thank you!',
-      );
+      SnackBarHelper.showSuccess(context, l10n.reportSent);
       // Use Navigator.maybePop so the path works both under the
       // real GoRouter shell and under the plain MaterialApp that
       // widget tests use — context.pop() would throw

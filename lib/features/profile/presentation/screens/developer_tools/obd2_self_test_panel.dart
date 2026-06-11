@@ -43,8 +43,9 @@ class Obd2SelfTestPanel extends ConsumerWidget {
 
     final adapters = _pairedAdapters(ref);
     final defaultMac = _defaultMac(ref, adapters);
-    final selectedMac =
-        ref.watch(obd2SelfTestSelectedAdapterProvider(defaultMac));
+    final selectedMac = ref.watch(
+      obd2SelfTestSelectedAdapterProvider(defaultMac),
+    );
     final selectedName = _nameForMac(adapters, selectedMac);
     // #2969 — route the run over the inferred transport of the chosen adapter.
     final selectedTransport = _transportHintForMac(adapters, selectedMac);
@@ -54,7 +55,7 @@ class Obd2SelfTestPanel extends ConsumerWidget {
       children: [
         SectionHeader(
           leadingIcon: Icons.play_circle_outline,
-          title: l?.obd2TestRunTitle ?? 'Run adapter test',
+          title: l.obd2TestRunTitle,
           padding: EdgeInsets.zero,
         ),
         Obd2SelfTestAdapterChoice(
@@ -73,14 +74,15 @@ class Obd2SelfTestPanel extends ConsumerWidget {
             onPressed: running
                 ? null
                 : () => ref
-                    .read(obd2SelfTestControllerProvider.notifier)
-                    .run(
+                      .read(obd2SelfTestControllerProvider.notifier)
+                      .run(
                         targetMac: selectedMac,
                         transportHint: selectedTransport,
                         // #3014 — name the trace headline with the chosen
                         // adapter's human name (already resolved for the row
                         // relabel), not just the redacted MAC.
-                        adapterName: selectedName),
+                        adapterName: selectedName,
+                      ),
             icon: running
                 ? const SizedBox(
                     width: 16,
@@ -88,18 +90,17 @@ class Obd2SelfTestPanel extends ConsumerWidget {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.play_arrow_outlined, size: 18),
-            label: Text(l?.obd2TestRunButton ?? 'Run adapter test'),
+            label: Text(l.obd2TestRunButton),
           ),
         ),
         if (test.phase == Obd2SelfTestPhase.blockedByRecording)
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              l?.obd2TestRunCannotWhileRecording ??
-                  'Stop the active recording before running the adapter test.',
+              l.obd2TestRunCannotWhileRecording,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
           ),
         if (test.phase == Obd2SelfTestPhase.running ||
@@ -154,7 +155,9 @@ class Obd2SelfTestPanel extends ConsumerWidget {
   /// no paired adapter selected / no name match → the run defaults to BLE and
   /// records `no-hint-defaulted-ble`.
   Obd2ConnectTransport? _transportHintForMac(
-      List<Obd2PairedAdapter> adapters, String? mac) {
+    List<Obd2PairedAdapter> adapters,
+    String? mac,
+  ) {
     if (mac == null) return null;
     for (final a in adapters) {
       if (a.mac != mac) continue;
@@ -196,11 +199,7 @@ class Obd2SelfTestPanel extends ConsumerWidget {
 /// One row of the live step list: a status icon (with a11y semanticLabel),
 /// the localised step name, and the trailing latency in ms.
 class _StepRow extends StatelessWidget {
-  const _StepRow({
-    super.key,
-    required this.step,
-    this.connectAdapterName,
-  });
+  const _StepRow({super.key, required this.step, this.connectAdapterName});
 
   final Obd2SelfTestStep step;
 
@@ -219,10 +218,7 @@ class _StepRow extends StatelessWidget {
           _statusIcon(context, l),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              _stepLabel(l),
-              style: theme.textTheme.bodyMedium,
-            ),
+            child: Text(_stepLabel(l), style: theme.textTheme.bodyMedium),
           ),
           if (step.latencyMs != null)
             Text(
@@ -236,7 +232,7 @@ class _StepRow extends StatelessWidget {
     );
   }
 
-  Widget _statusIcon(BuildContext context, AppLocalizations? l) {
+  Widget _statusIcon(BuildContext context, AppLocalizations l) {
     final cs = Theme.of(context).colorScheme;
     if (step.running) {
       return const SizedBox(
@@ -247,47 +243,66 @@ class _StepRow extends StatelessWidget {
     }
     switch (step.status) {
       case Obd2SelfTestStepStatus.ok:
-        return Icon(Icons.check_circle, size: 18, color: cs.primary,
-            semanticLabel: l?.obd2TestStatusOk ?? 'OK');
+        return Icon(
+          Icons.check_circle,
+          size: 18,
+          color: cs.primary,
+          semanticLabel: l.obd2TestStatusOk,
+        );
       case Obd2SelfTestStepStatus.timeout:
-        return Icon(Icons.timer_off, size: 18, color: cs.error,
-            semanticLabel: l?.obd2TestStatusTimeout ?? 'Timed out');
+        return Icon(
+          Icons.timer_off,
+          size: 18,
+          color: cs.error,
+          semanticLabel: l.obd2TestStatusTimeout,
+        );
       case Obd2SelfTestStepStatus.garbage:
-        return Icon(Icons.help_outline, size: 18, color: cs.error,
-            semanticLabel: l?.obd2TestStatusGarbage ?? 'Unreadable reply');
+        return Icon(
+          Icons.help_outline,
+          size: 18,
+          color: cs.error,
+          semanticLabel: l.obd2TestStatusGarbage,
+        );
       case Obd2SelfTestStepStatus.noResponse:
-        return Icon(Icons.do_not_disturb_on_outlined, size: 18,
-            color: cs.onSurfaceVariant,
-            semanticLabel: l?.obd2TestStatusNoResponse ?? 'No response');
+        return Icon(
+          Icons.do_not_disturb_on_outlined,
+          size: 18,
+          color: cs.onSurfaceVariant,
+          semanticLabel: l.obd2TestStatusNoResponse,
+        );
       case Obd2SelfTestStepStatus.fail:
       case Obd2SelfTestStepStatus.skipped:
-        return Icon(Icons.error, size: 18, color: cs.error,
-            semanticLabel: l?.obd2TestStatusFail ?? 'Failed');
+        return Icon(
+          Icons.error,
+          size: 18,
+          color: cs.error,
+          semanticLabel: l.obd2TestStatusFail,
+        );
     }
   }
 
-  String _stepLabel(AppLocalizations? l) {
+  String _stepLabel(AppLocalizations l) {
     switch (step.id) {
       case Obd2SelfTestStepId.scan:
         // #2938 — when the run connected by MAC, the first step is a direct
         // connect, not a scan; relabel it so the trace matches what ran.
         final name = connectAdapterName;
         if (name != null) {
-          return l?.obd2TestStepConnectTo(name) ?? 'Connect to $name';
+          return l.obd2TestStepConnectTo(name);
         }
-        return l?.obd2TestStepScan ?? 'Scan for adapter';
+        return l.obd2TestStepScan;
       case Obd2SelfTestStepId.connect:
-        return l?.obd2TestStepConnect ?? 'Connect & init';
+        return l.obd2TestStepConnect;
       case Obd2SelfTestStepId.info:
-        return l?.obd2TestStepInfo ?? 'Adapter info';
+        return l.obd2TestStepInfo;
       case Obd2SelfTestStepId.supportedPids:
-        return l?.obd2TestStepSupportedPids ?? 'Supported PIDs';
+        return l.obd2TestStepSupportedPids;
       case Obd2SelfTestStepId.sampleReads:
-        return l?.obd2TestStepSampleReads ?? 'Sample reads';
+        return l.obd2TestStepSampleReads;
       case Obd2SelfTestStepId.reconnect:
-        return l?.obd2TestStepReconnect ?? 'Reconnect test';
+        return l.obd2TestStepReconnect;
       case Obd2SelfTestStepId.disconnect:
-        return l?.obd2TestStepDisconnect ?? 'Disconnect';
+        return l.obd2TestStepDisconnect;
     }
   }
 }
@@ -313,32 +328,28 @@ class _SummaryBanner extends StatelessWidget {
     final cs = theme.colorScheme;
     final (bg, fg, icon, headline) = switch (state.verdict) {
       Obd2SelfTestVerdict.passed => (
-          cs.primaryContainer,
-          cs.onPrimaryContainer,
-          Icons.check_circle,
-          l?.obd2TestRunPassed ?? 'Adapter test passed',
-        ),
+        cs.primaryContainer,
+        cs.onPrimaryContainer,
+        Icons.check_circle,
+        l.obd2TestRunPassed,
+      ),
       Obd2SelfTestVerdict.engineOff => (
-          DarkModeColors.warningSurface(context),
-          DarkModeColors.warning(context),
-          Icons.info_outline,
-          l?.obd2TestRunEngineOff ??
-              'Adapter OK — engine off; start the engine to read live data',
-        ),
+        DarkModeColors.warningSurface(context),
+        DarkModeColors.warning(context),
+        Icons.info_outline,
+        l.obd2TestRunEngineOff,
+      ),
       Obd2SelfTestVerdict.failed => (
-          cs.errorContainer,
-          cs.onErrorContainer,
-          Icons.error,
-          l?.obd2TestRunFailed ?? 'Adapter test failed',
-        ),
+        cs.errorContainer,
+        cs.onErrorContainer,
+        Icons.error,
+        l.obd2TestRunFailed,
+      ),
     };
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: AppRadius.lg,
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: AppRadius.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -356,13 +367,11 @@ class _SummaryBanner extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            l?.obd2TestRunSummary(
-                  state.passCount,
-                  state.steps.length,
-                  state.elapsedMs ?? 0,
-                ) ??
-                '${state.passCount} of ${state.steps.length} steps OK · '
-                    '${state.elapsedMs ?? 0} ms',
+            l.obd2TestRunSummary(
+              state.passCount,
+              state.steps.length,
+              state.elapsedMs ?? 0,
+            ),
             style: theme.textTheme.bodySmall?.copyWith(color: fg),
           ),
         ],

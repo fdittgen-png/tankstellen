@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/payment/domain/qr_payment_decoder.dart';
 import 'package:tankstellen/features/payment/presentation/scan_payment_dispatcher.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
   setUp(() {
@@ -24,12 +25,10 @@ void main() {
         const QrPaymentUrl('https://example.com/pay?id=42'),
       );
       expect(outcome, ScanPaymentOutcome.launched);
-      expect(_launchedUris.single.toString(),
-          'https://example.com/pay?id=42');
+      expect(_launchedUris.single.toString(), 'https://example.com/pay?id=42');
     });
 
-    test('QrPaymentAppLink → launcher called with the scheme URI',
-        () async {
+    test('QrPaymentAppLink → launcher called with the scheme URI', () async {
       _launcherReturn = true;
       final outcome = await ScanPaymentDispatcher.handle(
         const QrPaymentAppLink(
@@ -55,8 +54,9 @@ void main() {
     });
 
     test('QrPaymentUnknown → unknown outcome', () async {
-      final outcome =
-          await ScanPaymentDispatcher.handle(const QrPaymentUnknown('???'));
+      final outcome = await ScanPaymentDispatcher.handle(
+        const QrPaymentUnknown('???'),
+      );
       expect(outcome, ScanPaymentOutcome.unknown);
       expect(_launchedUris, isEmpty);
     });
@@ -72,8 +72,8 @@ void main() {
     test('launcher throwing → launchFailed (no crash)', () async {
       ScanPaymentDispatcher.launcher =
           (uri, {mode = LaunchMode.externalApplication}) async {
-        throw Exception('boom');
-      };
+            throw Exception('boom');
+          };
       final outcome = await ScanPaymentDispatcher.handle(
         const QrPaymentUrl('https://example.com'),
       );
@@ -108,12 +108,11 @@ void main() {
       expect(_launchedUris.single.scheme, 'iban');
     });
 
-    test('falls back to clipboard when no scheme handler exists',
-        () async {
+    test('falls back to clipboard when no scheme handler exists', () async {
       ScanPaymentDispatcher.probe = (_) async => false;
       _clipboardWrites.clear();
-      ScanPaymentDispatcher.clipboardWriter =
-          (text) async => _clipboardWrites.add(text);
+      ScanPaymentDispatcher.clipboardWriter = (text) async =>
+          _clipboardWrites.add(text);
 
       final outcome = await ScanPaymentDispatcher.tryLaunchEpc(sample);
       expect(outcome, EpcLaunchOutcome.copiedToClipboard);
@@ -124,19 +123,21 @@ void main() {
 
     test('clipboard failure surfaces as failed outcome', () async {
       ScanPaymentDispatcher.probe = (_) async => false;
-      ScanPaymentDispatcher.clipboardWriter =
-          (_) async => throw Exception('no clipboard');
+      ScanPaymentDispatcher.clipboardWriter = (_) async =>
+          throw Exception('no clipboard');
       final outcome = await ScanPaymentDispatcher.tryLaunchEpc(sample);
       expect(outcome, EpcLaunchOutcome.failed);
     });
 
-    test('missing IBAN → failed (cannot copy or launch anything useful)',
-        () async {
-      ScanPaymentDispatcher.probe = (_) async => false;
-      const noIban = QrPaymentEpc(raw: 'BCD', beneficiary: 'ACME');
-      final outcome = await ScanPaymentDispatcher.tryLaunchEpc(noIban);
-      expect(outcome, EpcLaunchOutcome.failed);
-    });
+    test(
+      'missing IBAN → failed (cannot copy or launch anything useful)',
+      () async {
+        ScanPaymentDispatcher.probe = (_) async => false;
+        const noIban = QrPaymentEpc(raw: 'BCD', beneficiary: 'ACME');
+        final outcome = await ScanPaymentDispatcher.tryLaunchEpc(noIban);
+        expect(outcome, EpcLaunchOutcome.failed);
+      },
+    );
   });
 
   group('buildEpcDialog (#587)', () {
@@ -157,10 +158,7 @@ void main() {
     });
 
     testWidgets('Cancel pops with false', (tester) async {
-      await _pumpEpcDialog(
-        tester,
-        const QrPaymentEpc(raw: ''),
-      );
+      await _pumpEpcDialog(tester, const QrPaymentEpc(raw: ''));
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
       expect(_dialogResult, isFalse);
@@ -174,7 +172,10 @@ final List<Uri> _launchedUris = [];
 final List<String> _clipboardWrites = [];
 bool _launcherReturn = true;
 
-Future<bool> _fakeLauncher(Uri uri, {LaunchMode mode = LaunchMode.externalApplication}) async {
+Future<bool> _fakeLauncher(
+  Uri uri, {
+  LaunchMode mode = LaunchMode.externalApplication,
+}) async {
   _launchedUris.add(uri);
   return _launcherReturn;
 }
@@ -183,11 +184,12 @@ Future<bool> _alwaysTrueProbe(Uri uri) async => true;
 
 bool? _dialogResult;
 
-Future<void> _pumpEpcDialog(
-    WidgetTester tester, QrPaymentEpc epc) async {
+Future<void> _pumpEpcDialog(WidgetTester tester, QrPaymentEpc epc) async {
   _dialogResult = null;
   await tester.pumpWidget(
     MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(
         builder: (outer) => Scaffold(
           body: Center(

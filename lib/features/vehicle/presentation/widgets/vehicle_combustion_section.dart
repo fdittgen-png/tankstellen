@@ -79,36 +79,32 @@ class VehicleCombustionSection extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final raw = fuelTypeController.text.trim();
     final parsed = raw.isEmpty ? null : FuelType.fromString(raw);
-    final currentValue =
-        (parsed != null && _combustionFuels.contains(parsed)) ? parsed : null;
+    final currentValue = (parsed != null && _combustionFuels.contains(parsed))
+        ? parsed
+        : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          l?.vehicleCombustionSectionTitle ?? 'Combustion',
+          l.vehicleCombustionSectionTitle,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
         TextFormField(
           controller: tankController,
-          keyboardType:
-              const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            labelText: l?.vehicleTankLabel ?? 'Tank capacity (L)',
-          ),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: InputDecoration(labelText: l.vehicleTankLabel),
           validator: numberValidator,
         ),
         const SizedBox(height: 8),
         // Epic #3015 — rated engine power (kW), pre-filled from the
         // catalog pick, user-overridable. Helper text shows the live PS
         // equivalent.
-        EnginePowerField(
-          controller: powerKwController,
-        ),
+        EnginePowerField(controller: powerKwController),
         const SizedBox(height: 8),
         NullableFuelTypeDropdown(
           value: currentValue,
-          labelText: l?.vehiclePreferredFuelLabel ?? 'Preferred fuel',
+          labelText: l.vehiclePreferredFuelLabel,
           prefixIcon: const Icon(Icons.local_gas_station),
           options: _combustionFuels,
           onChanged: (v) {
@@ -129,14 +125,8 @@ class VehicleCombustionSection extends StatelessWidget {
           SwitchListTile(
             key: const Key('vehicle_multi_fuel_capable_switch'),
             contentPadding: EdgeInsets.zero,
-            title: Text(
-              l?.vehicleMultiFuelCapableLabel ??
-                  'I may fill up with different fuel types',
-            ),
-            subtitle: Text(
-              l?.vehicleMultiFuelCapableHelper ??
-                  'Tracks which fuel is cheapest per kilometre',
-            ),
+            title: Text(l.vehicleMultiFuelCapableLabel),
+            subtitle: Text(l.vehicleMultiFuelCapableHelper),
             value: multiFuelCapable,
             onChanged: onMultiFuelCapableChanged,
           ),

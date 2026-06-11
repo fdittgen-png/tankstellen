@@ -31,22 +31,19 @@ class SafetyDisclaimerDialog extends StatelessWidget {
         size: 48,
         color: theme.colorScheme.error,
       ),
-      title: Text(l10n?.drivingSafetyTitle ?? 'Safety Notice'),
+      title: Text(l10n.drivingSafetyTitle),
       content: Text(
-        l10n?.drivingSafetyMessage ??
-            'Do not operate the app while driving. '
-                'Pull over to a safe location before interacting with the screen. '
-                'The driver is responsible for safe operation of the vehicle at all times.',
+        l10n.drivingSafetyMessage,
         style: theme.textTheme.bodyLarge,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(l10n?.cancel ?? 'Cancel'),
+          child: Text(l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: Text(l10n?.drivingSafetyAccept ?? 'I understand'),
+          child: Text(l10n.drivingSafetyAccept),
         ),
       ],
     );

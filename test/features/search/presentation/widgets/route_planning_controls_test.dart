@@ -8,6 +8,7 @@ import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_params_provider.dart';
 import 'package:tankstellen/features/search/presentation/widgets/route_planning_controls.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// #2592 — the route-planning controls render three sliders defaulted from
 /// the active profile and write the per-search override providers on drag.
@@ -21,22 +22,27 @@ class _FixedProfile extends ActiveProfile {
 
 void main() {
   group('RoutePlanningControls (#2592)', () {
-    testWidgets('renders three sliders defaulted from the profile',
-        (tester) async {
+    testWidgets('renders three sliders defaulted from the profile', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             activeProfileProvider.overrideWith(
-              () => _FixedProfile(const UserProfile(
-                id: 'p',
-                name: 'P',
-                routeSegmentKm: 200,
-                routeDetourBudgetKm: 8,
-                minRouteSavingPerLiter: 0.05,
-              )),
+              () => _FixedProfile(
+                const UserProfile(
+                  id: 'p',
+                  name: 'P',
+                  routeSegmentKm: 200,
+                  routeDetourBudgetKm: 8,
+                  minRouteSavingPerLiter: 0.05,
+                ),
+              ),
             ),
           ],
           child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: RoutePlanningControls()),
           ),
         ),
@@ -51,26 +57,29 @@ void main() {
       expect(find.text('0.05 €/L'), findsWidgets);
     });
 
-    testWidgets('dragging the segment slider updates the provider',
-        (tester) async {
+    testWidgets('dragging the segment slider updates the provider', (
+      tester,
+    ) async {
       late ProviderContainer container;
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             activeProfileProvider.overrideWith(
-              () => _FixedProfile(const UserProfile(
-                id: 'p',
-                name: 'P',
-                routeSegmentKm: 50,
-              )),
+              () => _FixedProfile(
+                const UserProfile(id: 'p', name: 'P', routeSegmentKm: 50),
+              ),
             ),
           ],
-          child: Consumer(builder: (context, ref, _) {
-            container = ProviderScope.containerOf(context);
-            return const MaterialApp(
-              home: Scaffold(body: RoutePlanningControls()),
-            );
-          }),
+          child: Consumer(
+            builder: (context, ref, _) {
+              container = ProviderScope.containerOf(context);
+              return const MaterialApp(
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                home: Scaffold(body: RoutePlanningControls()),
+              );
+            },
+          ),
         ),
       );
       await tester.pumpAndSettle();

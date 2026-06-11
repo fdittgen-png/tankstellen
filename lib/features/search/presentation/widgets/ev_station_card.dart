@@ -43,8 +43,8 @@ class EVStationCard extends StatelessWidget {
     final evPrice = EvPrice.parse(station.usageCost);
     final priceLabel =
         evPrice.label(
-          perKwhUnit: l10n?.refuelUnitPerKwh ?? '/kWh',
-          perSessionUnit: l10n?.refuelUnitPerSession ?? '/session',
+          perKwhUnit: l10n.refuelUnitPerKwh,
+          perSessionUnit: l10n.refuelUnitPerSession,
         ) ??
         station.usageCost;
 
@@ -165,7 +165,7 @@ class EVStationCard extends StatelessWidget {
               IconButton(
                 icon: Icon(isFavorite ? Icons.star : Icons.star_border),
                 color: isFavorite ? DarkModeColors.warning(context) : null,
-                tooltip: l10n?.favorites ?? 'Favorites',
+                tooltip: l10n.favorites,
                 visualDensity: VisualDensity.compact,
                 onPressed: onFavoriteTap,
               ),

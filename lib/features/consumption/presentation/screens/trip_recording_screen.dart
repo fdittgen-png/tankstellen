@@ -57,10 +57,7 @@ class TripSaveResult {
   final String entryId;
   final TripSummary summary;
 
-  const TripSaveResult({
-    required this.entryId,
-    required this.summary,
-  });
+  const TripSaveResult({required this.entryId, required this.summary});
 }
 
 /// Live view of the app-wide trip recording. The trip itself lives
@@ -230,8 +227,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     messenger.showSnackBar(
       SnackBarHelper.iconatedInfoSnackBar(
         Icons.eco,
-        l?.hapticEcoCoachSnackBarMessage ??
-            'Easy on the throttle — coasting saves more',
+        l.hapticEcoCoachSnackBarMessage,
         key: const Key('hapticEcoCoachSnackBar'),
         duration: const Duration(seconds: 4),
       ),
@@ -281,9 +277,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     messenger.showSnackBar(
       SnackBarHelper.iconatedInfoSnackBar(
         Icons.gps_off,
-        l?.tripRecordingUnpinnedWarning ??
-            'Pin the screen to keep GPS active during the trip '
-                '— Android may throttle GPS during sleep.',
+        l.tripRecordingUnpinnedWarning,
         key: const Key('tripRecordingUnpinnedWarningSnackBar'),
         duration: const Duration(seconds: 8),
       ),
@@ -314,10 +308,8 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           if (!mounted) return;
           final l10n = AppLocalizations.of(context);
           final msg = wasEnabled
-              ? (l10n?.obd2DebugOverlayDisabledSnack ??
-                  'OBD2 diagnostic overlay disabled')
-              : (l10n?.obd2DebugOverlayEnabledSnack ??
-                  'OBD2 diagnostic overlay enabled');
+              ? (l10n.obd2DebugOverlayDisabledSnack)
+              : (l10n.obd2DebugOverlayEnabledSnack);
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(SnackBarHelper.infoSnackBar(msg));
@@ -358,10 +350,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       final l = AppLocalizations.of(context);
       ScaffoldMessenger.maybeOf(context)
         ?..hideCurrentSnackBar()
-        ..showSnackBar(SnackBarHelper.infoSnackBar(
-          l?.tripRecordingDiscardedNoMovement ??
-              'Recording discarded — no movement detected',
-        ));
+        ..showSnackBar(
+          SnackBarHelper.infoSnackBar(l.tripRecordingDiscardedNoMovement),
+        );
     }
     setState(() {
       _stopped = result;
@@ -419,8 +410,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       // build-time listener retries this the moment it goes active.
       if (!recordingState.isActive) return;
       _autoPinEvaluated = true;
-      final vehicleId =
-          ref.read(tripRecordingProvider.notifier).lastTripVehicleId;
+      final vehicleId = ref
+          .read(tripRecordingProvider.notifier)
+          .lastTripVehicleId;
       final profile = ref
           .read(recordingProfileControllerProvider.notifier)
           .effectiveFor(vehicleId);
@@ -432,9 +424,16 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       // A missing Riverpod override in a widget test that pumps this
       // screen without the profile graph must not crash the mount — the
       // safe fallback is "not auto-pinned", matching the default.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'TripRecordingScreen: auto-pin apply failed',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'TripRecordingScreen: auto-pin apply failed',
+          },
+        ),
+      );
     }
   }
 
@@ -459,15 +458,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     final r = _stopped!;
     // Match the id derivation in `TripRecording._saveToHistory` so
     // the popped id resolves to the entry that was just written.
-    final entryId = r.summary.startedAt?.toIso8601String() ??
+    final entryId =
+        r.summary.startedAt?.toIso8601String() ??
         DateTime.now().toIso8601String();
     ref.read(tripRecordingProvider.notifier).reset();
-    Navigator.of(context).pop(
-      TripSaveResult(
-        entryId: entryId,
-        summary: r.summary,
-      ),
-    );
+    Navigator.of(
+      context,
+    ).pop(TripSaveResult(entryId: entryId, summary: r.summary));
   }
 
   void _onDiscard() {
@@ -486,63 +483,59 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   /// effect is visible without waiting for the next drive.
   void _showPinHelp() {
     final l = AppLocalizations.of(context);
-    unawaited(showModalBottomSheet<void>(
-      context: context,
-      builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.push_pin, size: 24),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        l?.tripRecordingPinHelpTitle ?? 'About pin',
-                        style: Theme.of(ctx).textTheme.titleLarge,
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        builder: (ctx) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.push_pin, size: 24),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l.tripRecordingPinHelpTitle,
+                          style: Theme.of(ctx).textTheme.titleLarge,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l?.tripRecordingPinHelpBody ??
-                      'Pin keeps the screen on and hides system bars '
-                          'so the form stays readable on a dashboard '
-                          'mount. Tap again to release. Auto-releases '
-                          'when the trip stops.',
-                ),
-                const SizedBox(height: 8),
-                _AutoPinToggle(
-                  onChanged: (value) async {
-                    await ref
-                        .read(recordingProfileControllerProvider.notifier)
-                        .setAutoPin(value);
-                    // Reflect the opt-in on THIS live screen at once.
-                    if (value && !_pinned) {
-                      if (mounted) setState(() => _pinned = true);
-                      await _enablePin();
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    child: Text(l?.tooltipBack ?? 'Close'),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  Text(l.tripRecordingPinHelpBody),
+                  const SizedBox(height: 8),
+                  _AutoPinToggle(
+                    onChanged: (value) async {
+                      await ref
+                          .read(recordingProfileControllerProvider.notifier)
+                          .setAutoPin(value);
+                      // Reflect the opt-in on THIS live screen at once.
+                      if (value && !_pinned) {
+                        if (mounted) setState(() => _pinned = true);
+                        await _enablePin();
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: Text(l.tooltipBack),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    ));
+          );
+        },
+      ),
+    );
   }
 
   /// #1273 — handle the back-press. If the trip is still recording
@@ -563,9 +556,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         // announce; Key + duration preserved, no visual change).
         messenger.showSnackBar(
           SnackBarHelper.infoSnackBar(
-            l?.tripRecordingResumeHintMessage ??
-                'Recording continues in the background. Tap the red '
-                    'banner at the top of any screen to return.',
+            l.tripRecordingResumeHintMessage,
             key: const Key('tripRecordingResumeHintSnackBar'),
             duration: const Duration(seconds: 5),
           ),
@@ -574,10 +565,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       // Persist the dismissal so the hint never fires twice. Awaited
       // so the test that asserts post-state can read it back without
       // racing the pop.
-      await settings.putSetting(
-        StorageKeys.tripRecordingResumeHintShown,
-        true,
-      );
+      await settings.putSetting(StorageKeys.tripRecordingResumeHintShown, true);
     }
     if (!mounted) return;
     if (Navigator.canPop(context)) {
@@ -607,8 +595,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         previousBand == BrokenMapBand.hardDisable) {
       return;
     }
-    final warned =
-        ref.read(brokenMapWarnedVehiclesProvider.notifier);
+    final warned = ref.read(brokenMapWarnedVehiclesProvider.notifier);
     if (!warned.markIfFirst(vehicleId)) return;
     final messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return;
@@ -616,9 +603,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     // #2173 — plain info through SnackBarHelper (Key + duration kept).
     messenger.showSnackBar(
       SnackBarHelper.infoSnackBar(
-        l?.brokenMapSnackbarUnreliable ??
-            'MAP sensor reads incorrectly — fuel readings may be '
-                '50–80% too low. Try a different adapter.',
+        l.brokenMapSnackbarUnreliable,
         key: const Key('brokenMapWarningSnackBar'),
         duration: const Duration(seconds: 8),
       ),
@@ -706,10 +691,8 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           brokenMapBeliefByVehicleProvider,
           (previous, next) {
             final vehicleId = activeVehicle.id;
-            final prev =
-                previous?[vehicleId]?.pointEstimate ?? 0.0;
-            final curr =
-                next[vehicleId]?.pointEstimate ?? 0.0;
+            final prev = previous?[vehicleId]?.pointEstimate ?? 0.0;
+            final curr = next[vehicleId]?.pointEstimate ?? 0.0;
             if (prev == curr) return;
             _maybeFireBrokenMapSnackbar(
               vehicleId,
@@ -720,23 +703,25 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         );
       }
     } catch (e, st) {
-      debugPrint('TripRecordingScreen broken-MAP listener wiring failed: '
-          '$e\n$st');
+      debugPrint(
+        'TripRecordingScreen broken-MAP listener wiring failed: '
+        '$e\n$st',
+      );
     }
 
     final title = stopped != null
-        ? (l?.tripSummaryTitle ?? 'Trip summary')
+        ? (l.tripSummaryTitle)
         // #2548 — the staged save view's title, the stop-side bookend to
         // the #2274 connecting title.
         : state.isSaving
-            ? (l?.tripRecordingSavingTitle ?? 'Saving trip…')
-            : state.isConnecting
-                // #2274 concern 2 — the connecting view is up while the link
-                // warms; title it accordingly rather than "Recording".
-                ? (l?.tripRecordingConnectingTitle ?? 'Starting recording…')
-                : state.phase == TripRecordingPhase.paused
-                    ? (l?.tripBannerPaused ?? 'Trip paused')
-                    : (l?.tripRecordingTitle ?? 'Recording trip');
+        ? (l.tripRecordingSavingTitle)
+        : state.isConnecting
+        // #2274 concern 2 — the connecting view is up while the link
+        // warms; title it accordingly rather than "Recording".
+        ? (l.tripRecordingConnectingTitle)
+        : state.phase == TripRecordingPhase.paused
+        ? (l.tripBannerPaused)
+        : (l.tripRecordingTitle);
 
     // After stop: show the summary. Until then: live view.
     // #1395 — wrap the title in a GestureDetector so the hidden
@@ -751,14 +736,11 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         behavior: HitTestBehavior.opaque,
         excludeFromSemantics: true,
         onTap: _bumpDebugTapCount,
-        child: Semantics(
-          header: true,
-          child: Text(title),
-        ),
+        child: Semantics(header: true, child: Text(title)),
       ),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
-        tooltip: l?.tooltipBack ?? 'Back',
+        tooltip: l.tooltipBack,
         // Back from the recording screen DOES NOT stop the trip —
         // it stays alive via the provider. The banner is the
         // user's way back in. #1273 — first back-out while
@@ -821,7 +803,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
 
   Widget _buildRecording(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     TripRecordingState state,
   ) {
     // #2548 — staged save-progress: while `stop()` runs, the screen stays
@@ -892,57 +874,54 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-        // #2380 — closest-station radar leads the column; coaching card
-        // moved to the bottom. See [TripRadarCard] for the data sources.
-        const TripRadarCard(),
-        const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.route,
-          label: l?.tripMetricDistance ?? 'Distance',
-          value: r == null
-              ? '—'
-              : '${r.distanceKmSoFar.toStringAsFixed(2)} km',
-        ),
-        const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.speed,
-          label: l?.tripMetricSpeed ?? 'Speed',
-          value: r?.speedKmh == null
-              ? '—'
-              : '${r!.speedKmh!.toStringAsFixed(0)} km/h',
-        ),
-        const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.local_gas_station,
-          label: l?.tripMetricFuelUsed ?? 'Fuel used',
-          // #2391 — measured litres, else the GPS estimator's running
-          // integral with `~` (GPS-only trips no longer show `—` all
-          // drive), else `—`.
-          value: r?.fuelLitersSoFar != null
-              ? '${r!.fuelLitersSoFar!.toStringAsFixed(2)} L'
-              : r?.gpsEstimatedFuelLitersSoFar != null
-                  ? '~${r!.gpsEstimatedFuelLitersSoFar!.toStringAsFixed(2)} L'
-                  : '—',
-        ),
-        const SizedBox(height: 8),
-        // #2391 — Avg card: measured (OBD2, no `~`) vs GPS-only estimate
-        // (`~X.X L/100 km` + calibration-maturity badge + info tooltip).
-        TripAvgConsumptionCard(
-          live: r,
-          brokenMapOverride: brokenMapOverride,
-        ),
-        const BrokenMapDisclaimerChip(),
-        const SizedBox(height: 8),
-        _MetricCard(
-          icon: Icons.timer,
-          label: l?.tripMetricElapsed ?? 'Elapsed',
-          value: r == null ? '—' : _fmtElapsed(r.elapsed),
-        ),
-        const SizedBox(height: 8),
-        // #2380 — instant L/100 km + coaching symbols; moved from the
-        // top to the bottom so the radar card leads the screen.
-        const MinimalDriveSummary(),
-      ],
+          // #2380 — closest-station radar leads the column; coaching card
+          // moved to the bottom. See [TripRadarCard] for the data sources.
+          const TripRadarCard(),
+          const SizedBox(height: 8),
+          _MetricCard(
+            icon: Icons.route,
+            label: l.tripMetricDistance,
+            value: r == null
+                ? '—'
+                : '${r.distanceKmSoFar.toStringAsFixed(2)} km',
+          ),
+          const SizedBox(height: 8),
+          _MetricCard(
+            icon: Icons.speed,
+            label: l.tripMetricSpeed,
+            value: r?.speedKmh == null
+                ? '—'
+                : '${r!.speedKmh!.toStringAsFixed(0)} km/h',
+          ),
+          const SizedBox(height: 8),
+          _MetricCard(
+            icon: Icons.local_gas_station,
+            label: l.tripMetricFuelUsed,
+            // #2391 — measured litres, else the GPS estimator's running
+            // integral with `~` (GPS-only trips no longer show `—` all
+            // drive), else `—`.
+            value: r?.fuelLitersSoFar != null
+                ? '${r!.fuelLitersSoFar!.toStringAsFixed(2)} L'
+                : r?.gpsEstimatedFuelLitersSoFar != null
+                ? '~${r!.gpsEstimatedFuelLitersSoFar!.toStringAsFixed(2)} L'
+                : '—',
+          ),
+          const SizedBox(height: 8),
+          // #2391 — Avg card: measured (OBD2, no `~`) vs GPS-only estimate
+          // (`~X.X L/100 km` + calibration-maturity badge + info tooltip).
+          TripAvgConsumptionCard(live: r, brokenMapOverride: brokenMapOverride),
+          const BrokenMapDisclaimerChip(),
+          const SizedBox(height: 8),
+          _MetricCard(
+            icon: Icons.timer,
+            label: l.tripMetricElapsed,
+            value: r == null ? '—' : _fmtElapsed(r.elapsed),
+          ),
+          const SizedBox(height: 8),
+          // #2380 — instant L/100 km + coaching symbols; moved from the
+          // top to the bottom so the radar card leads the screen.
+          const MinimalDriveSummary(),
+        ],
       ),
     );
   }
@@ -968,14 +947,23 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     } catch (e, st) {
       // A malformed fill-up set must not crash the summary card —
       // but log the cause rather than hiding it silently (#1682).
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'TripRecordingScreen: consumption summary calc failed'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: const {
+            'where': 'TripRecordingScreen: consumption summary calc failed',
+          },
+        ),
+      );
       return null;
     }
   }
 
   Widget _buildSummary(
     BuildContext context,
-    AppLocalizations? l,
+    AppLocalizations l,
     StoppedTripResult r,
   ) {
     final s = r.summary;
@@ -986,19 +974,19 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       children: [
         _MetricCard(
           icon: Icons.route,
-          label: l?.tripMetricDistance ?? 'Distance',
+          label: l.tripMetricDistance,
           value: '${s.distanceKm.toStringAsFixed(2)} km',
         ),
         const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.local_gas_station,
-          label: l?.tripMetricFuelUsed ?? 'Fuel used',
+          label: l.tripMetricFuelUsed,
           value: liters == null ? '—' : '${liters.toStringAsFixed(2)} L',
         ),
         const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.eco,
-          label: l?.tripMetricAvgConsumption ?? 'Avg',
+          label: l.tripMetricAvgConsumption,
           value: s.avgLPer100Km == null
               ? '—'
               : UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: false),
@@ -1006,7 +994,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.speed,
-          label: l?.tripMetricOdometer ?? 'Odometer',
+          label: l.tripMetricOdometer,
           value: endKm == null ? '—' : '${endKm.toStringAsFixed(0)} km',
         ),
         const Spacer(),
@@ -1014,13 +1002,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           key: const Key('tripSaveButton'),
           onPressed: _onSave,
           icon: const Icon(Icons.save),
-          label: Text(l?.tripSaveRecording ?? 'Save trip'),
+          label: Text(l.tripSaveRecording),
         ),
         const SizedBox(height: 8),
         TextButton(
           key: const Key('tripDiscardButton'),
           onPressed: _onDiscard,
-          child: Text(l?.tripDiscard ?? 'Discard'),
+          child: Text(l.tripDiscard),
         ),
       ],
     );
@@ -1045,21 +1033,14 @@ class _AutoPinToggle extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
-    final autoPin =
-        ref.watch(recordingProfileControllerProvider).autoPin;
+    final autoPin = ref.watch(recordingProfileControllerProvider).autoPin;
     return SwitchListTile(
       key: const Key('tripRecordingAutoPinToggle'),
       contentPadding: EdgeInsets.zero,
       value: autoPin,
       onChanged: onChanged,
-      title: Text(
-        l?.tripRecordingAutoPinTitle ?? 'Always pin when recording starts',
-      ),
-      subtitle: Text(
-        l?.tripRecordingAutoPinSubtitle ??
-            'Pin the form automatically every drive instead of tapping '
-                'each time. Uses more battery.',
-      ),
+      title: Text(l.tripRecordingAutoPinTitle),
+      subtitle: Text(l.tripRecordingAutoPinSubtitle),
     );
   }
 }
@@ -1099,7 +1080,8 @@ class _MetricCard extends StatelessWidget {
             Text(
               value,
               style: theme.textTheme.titleLarge?.copyWith(
-                  fontFeatures: const [FontFeature.tabularFigures()]),
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ],
         ),

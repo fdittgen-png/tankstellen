@@ -30,7 +30,7 @@ class SetupHeader extends StatelessWidget {
         Semantics(
           header: true,
           child: Text(
-            l10n?.welcome ?? 'Sparkilo', // i18n-ignore: brand name
+            l10n.welcome, // i18n-ignore: brand name
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -39,7 +39,7 @@ class SetupHeader extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          l10n?.welcomeSubtitle ?? 'Find the cheapest fuel near you.',
+          l10n.welcomeSubtitle,
           style: theme.textTheme.bodyLarge,
           textAlign: TextAlign.center,
         ),

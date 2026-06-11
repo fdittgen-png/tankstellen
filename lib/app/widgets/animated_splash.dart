@@ -76,9 +76,10 @@ class _AnimatedSplashState extends State<AnimatedSplash>
     // Scale: start slightly under-sized so the logo settles in rather than
     // pops. 0.88 → 1.00 over the full duration with a cubic-out curve gives
     // the classic "arrival with inertia" feel.
-    _scale = Tween<double>(begin: 0.88, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
+    _scale = Tween<double>(
+      begin: 0.88,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     // Fade: lead out the first ~28% of the duration (native splash is still
     // visible, no need to cross-fade) and then ramp to full opacity.
     _fade = CurvedAnimation(
@@ -118,7 +119,7 @@ class _AnimatedSplashState extends State<AnimatedSplash>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final loadingLabel = l10n?.splashLoadingLabel ?? 'Loading Sparkilo';
+    final loadingLabel = l10n.splashLoadingLabel;
     return Semantics(
       label: loadingLabel,
       liveRegion: true,
@@ -140,9 +141,7 @@ class _AnimatedSplashState extends State<AnimatedSplash>
                         child: SizedBox(
                           width: 144,
                           height: 144,
-                          child: CustomPaint(
-                            painter: _BrandGlyphPainter(),
-                          ),
+                          child: CustomPaint(painter: _BrandGlyphPainter()),
                         ),
                       ),
                     ),
@@ -157,7 +156,7 @@ class _AnimatedSplashState extends State<AnimatedSplash>
                     FadeTransition(
                       opacity: _fade,
                       child: Text(
-                        l10n?.appTitle ?? 'Sparkilo',
+                        l10n.appTitle,
                         style: const TextStyle(
                           color: AnimatedSplash.logoColor,
                           fontSize: 22,
@@ -293,4 +292,3 @@ class SplashHost extends StatelessWidget {
     );
   }
 }
-

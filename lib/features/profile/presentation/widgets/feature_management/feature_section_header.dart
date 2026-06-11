@@ -47,51 +47,43 @@ class FeatureSectionHeader extends StatelessWidget {
     );
   }
 
-  String _title(AppLocalizations? l, FeatureCategory c) {
+  String _title(AppLocalizations l, FeatureCategory c) {
     switch (c) {
       case FeatureCategory.finding:
-        return l?.featureGroupTitle_finding ?? 'Finding & map';
+        return l.featureGroupTitle_finding;
       case FeatureCategory.prices:
-        return l?.featureGroupTitle_prices ?? 'Prices & alerts';
+        return l.featureGroupTitle_prices;
       case FeatureCategory.radar:
-        return l?.featureGroupTitle_radar ?? 'Fuel Station Radar';
+        return l.featureGroupTitle_radar;
       case FeatureCategory.consumption:
         // The consumption section reuses the renamed Conso group title.
-        return l?.consoFeatureGroupTitle ?? 'Consumption';
+        return l.consoFeatureGroupTitle;
       case FeatureCategory.sync:
-        return l?.featureGroupTitle_sync ?? 'Sync & backup';
+        return l.featureGroupTitle_sync;
       case FeatureCategory.input:
-        return l?.featureGroupTitle_input ?? 'Input & scanning';
+        return l.featureGroupTitle_input;
       case FeatureCategory.developer:
-        return l?.featureGroupTitle_developer ?? 'Developer & experimental';
+        return l.featureGroupTitle_developer;
     }
   }
 
-  String _subtitle(AppLocalizations? l, FeatureCategory c) {
+  String _subtitle(AppLocalizations l, FeatureCategory c) {
     switch (c) {
       case FeatureCategory.finding:
-        return l?.featureGroupDescription_finding ??
-            'Where to fuel up or charge — search, map, routing.';
+        return l.featureGroupDescription_finding;
       case FeatureCategory.prices:
-        return l?.featureGroupDescription_prices ??
-            'Price drops, history, and reporting.';
+        return l.featureGroupDescription_prices;
       case FeatureCategory.radar:
-        return l?.featureGroupDescription_radar ??
-            'Live price nudges as you drive.';
+        return l.featureGroupDescription_radar;
       case FeatureCategory.consumption:
         // The consumption section reuses the renamed Conso group subtitle.
-        return l?.consoFeatureGroupDescription ??
-            'Track your consumption — manual fill-ups, or '
-                'automatic OBD2 trip recording.';
+        return l.consoFeatureGroupDescription;
       case FeatureCategory.sync:
-        return l?.featureGroupDescription_sync ??
-            'Keep your data across devices.';
+        return l.featureGroupDescription_sync;
       case FeatureCategory.input:
-        return l?.featureGroupDescription_input ??
-            'Helpers for logging fill-ups.';
+        return l.featureGroupDescription_input;
       case FeatureCategory.developer:
-        return l?.featureGroupDescription_developer ??
-            'Power-user and contributor tools.';
+        return l.featureGroupDescription_developer;
     }
   }
 }

@@ -59,25 +59,24 @@ class ApproachTestPanel extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Text(
-                    l?.approachOverlaySection ?? 'Approach-station overlay',
+                    l.approachOverlaySection,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
                 if (isSimulating)
                   TextButton.icon(
                     icon: const Icon(Icons.stop_circle_outlined),
-                    label: Text(l?.approachTestStopButton ?? 'Stop test'),
+                    label: Text(l.approachTestStopButton),
                     onPressed: () =>
                         ref.read(approachSimulatorProvider.notifier).clear(),
                   )
                 else
                   FilledButton.tonalIcon(
                     icon: const Icon(Icons.local_gas_station_outlined),
-                    label: Text(
-                      l?.approachTestSimulateButton ?? 'Test approach overlay',
-                    ),
-                    onPressed:
-                        target == null ? null : () => _simulate(ref, target!),
+                    label: Text(l.approachTestSimulateButton),
+                    onPressed: target == null
+                        ? null
+                        : () => _simulate(ref, target!),
                   ),
               ],
             ),
@@ -104,23 +103,18 @@ class _Caption extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final style = Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        );
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+    );
     if (isSimulating && target != null) {
       return Text(
-        l?.approachTestActiveCaption(
-              target!.name.isNotEmpty ? target!.name : target!.street,
-            ) ??
-            'Test active — overlay shows the price for ${target!.name}',
+        l.approachTestActiveCaption(
+          target!.name.isNotEmpty ? target!.name : target!.street,
+        ),
         style: style,
       );
     }
     if (target == null) {
-      return Text(
-        l?.approachTestUnavailable ??
-            'Add a favorite station to test the approach overlay',
-        style: style,
-      );
+      return Text(l.approachTestUnavailable, style: style);
     }
     return Text(
       target!.name.isNotEmpty ? target!.name : target!.street,
