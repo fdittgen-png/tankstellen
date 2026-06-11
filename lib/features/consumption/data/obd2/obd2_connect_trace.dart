@@ -29,6 +29,14 @@ enum Obd2ConnectOrigin {
   /// artefact. When a connect entry point opened the trace first, the
   /// scan joins it as a child instead and this origin never appears.
   pickerScan,
+
+  /// The first auto-record connect after iOS relaunched the app via Core
+  /// Bluetooth state restoration (#3167) — the paired adapter came back
+  /// into range while the app was terminated and the OS woke us in the
+  /// background. Distinguishes a hands-free background resume from a
+  /// user-driven first connect in a field export, so "the relaunch path
+  /// connected / failed" is diagnosable without a debugger attached.
+  stateRestoration,
 }
 
 /// The transport a connect step requested / resolved (#2969). `unknown` is the

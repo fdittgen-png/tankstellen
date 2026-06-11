@@ -86,7 +86,14 @@ void main() {
     // #3146 — re-grandfathered 1087 → 1090: `HealthCounters.init()` joins
     // the storage-phase `Future.wait` (+ its import) so the always-on
     // counter box opens in the foreground isolate only.
-    'lib/app/app_initializer.dart': 1090,
+    // #3167 — re-grandfathered 1090 → 1104: the guarded
+    // `iosStateRestorationServiceProvider.initialize()` call (+ import +
+    // rationale comment) sequenced INSIDE the auto-record orchestrator's
+    // deferred block, so Core Bluetooth state restoration is opted in
+    // before the orchestrator's first FBP touch. The restoration logic
+    // itself lives in the under-cap ios_state_restoration_service.dart /
+    // NEW ios_background_adapter_listener.dart; this is launch glue only.
+    'lib/app/app_initializer.dart': 1104,
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
     // deletion-tombstone fix threads a tombstoned-id set through `merge` and
     // `mergeRows` (fetch + dual-side filter so a delete on another device

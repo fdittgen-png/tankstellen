@@ -8,6 +8,11 @@ import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/android_background_adapter_listener.dart';
 import '../data/obd2/auto_trip_coordinator.dart';
 import '../data/obd2/background_adapter_listener.dart';
+import '../data/obd2/ios_background_adapter_listener.dart';
+import '../data/obd2/ios_state_restoration_provider.dart';
+import '../data/obd2/ios_state_restoration_service.dart';
+import '../data/obd2/obd2_connect_trace.dart';
+import '../data/obd2/obd2_connect_trace_log.dart';
 import '../data/obd2/obd2_connection_service.dart';
 
 part 'auto_record_orchestrator_factories.g.dart';
@@ -25,7 +30,8 @@ part 'auto_record_orchestrator_factories.g.dart';
 typedef BackgroundAdapterListenerFactory = BackgroundAdapterListener
     Function();
 
-/// Default factory: Android in production, an unimplemented stub
+/// Default factory: Android's foreground-service bridge, iOS's Core
+/// Bluetooth state-restoration listener (#3167), an unimplemented stub
 /// elsewhere. Tests override this provider to inject a
 /// [FakeBackgroundAdapterListener] without touching platform-detection
 /// code.
@@ -34,6 +40,15 @@ BackgroundAdapterListenerFactory autoRecordListenerFactory(Ref ref) {
   return () {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return AndroidBackgroundAdapterListener();
+    }
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      // #3167 — hands-free auto-record Phase 3. The keepAlive singleton
+      // restoration service is shared across coordinators on purpose:
+      // `setOptions(restoreState: true)` and the launch-relaunch tag are
+      // process-wide, while each listener arms its own peripheral UUID.
+      return IosBackgroundAdapterListener(
+        restoration: ref.read(iosStateRestorationServiceProvider),
+      );
     }
     return const UnimplementedBackgroundAdapterListener();
   };
@@ -45,10 +60,49 @@ BackgroundAdapterListenerFactory autoRecordListenerFactory(Ref ref) {
 /// out — the coordinator stays idle for that connect cycle and waits
 /// for the next `AdapterConnected`. Tests override this provider to
 /// inject a fake opener that returns a stub service.
+///
+/// #3167 — wrapped in [wrapStateRestorationOrigin] so the FIRST
+/// auto-record connect after a Core Bluetooth background relaunch is
+/// trace-stamped `Obd2ConnectOrigin.stateRestoration`. A no-op on a
+/// normal launch and on Android (the tag is never set there).
 @Riverpod(keepAlive: true)
 Obd2SessionOpener autoRecordSessionOpenerFactory(Ref ref) {
-  return (String mac) async {
-    return ref.read(obd2ConnectionProvider).connectByMac(mac);
+  return wrapStateRestorationOrigin(
+    inner: (String mac) async {
+      return ref.read(obd2ConnectionProvider).connectByMac(mac);
+    },
+    restoration: ref.read(iosStateRestorationServiceProvider),
+  );
+}
+
+/// #3167 — decorate [inner] so the one-shot launch-restoration tag
+/// (set when iOS relaunched the app via Core Bluetooth state
+/// restoration) stamps `Obd2ConnectOrigin.stateRestoration` on the
+/// connect trace of the FIRST auto-record session open of that launch.
+/// Later opens — and every open on a normal launch — run [inner]
+/// untagged, so the service's own default origin applies.
+///
+/// The origin override scopes the supervisor-admitted connect the
+/// opener performs ([Obd2ConnectionService.connectByMac] →
+/// `supervisor.admit`), so the restoration path enters single-flight
+/// admission like every other requester — only its trace label differs.
+///
+/// Exposed (not private) so the unit test can drive it with a fake
+/// restoration service + a fake inner opener without standing up the
+/// whole connection service.
+@visibleForTesting
+Obd2SessionOpener wrapStateRestorationOrigin({
+  required Obd2SessionOpener inner,
+  required IosStateRestorationService restoration,
+}) {
+  return (String mac) {
+    if (restoration.consumeLaunchRestorationTag()) {
+      return Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.stateRestoration,
+        () => inner(mac),
+      );
+    }
+    return inner(mac);
   };
 }
 
