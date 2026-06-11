@@ -79,8 +79,9 @@ class PersistentDataset<T> {
   /// nothing is persisted / it fails to deserialize.
   ///
   /// Synchronous variant — deserializes **on the calling isolate**. Kept for
-  /// callers with small per-key payloads (the ES per-province rows); bulk
-  /// whole-country readers go through [readAsync] (#3154).
+  /// [readWithin] and small-payload test assertions; every production dataset
+  /// reader goes through [readAsync] (#3154; ES moved onto it via the keyed
+  /// mixin in #3156).
   ({T value, Duration age})? read() {
     final entry = _cache.get(_key);
     if (entry == null) return null;
