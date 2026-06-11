@@ -62,10 +62,26 @@
          Functional impact while disabled:
            * Hands-free trip auto-record (already off because BG location is
              gone) calls invokeMethod('start') and gets a graceful failure.
-           * Android Auto integration is unreachable — the Auto host can't
-             find a CarAppService matching the intent-filter.
-         Restore all five lines below the moment the Foreground Service Use
-         form is approved (#1498). -->
+           * Trip GPS streams foreground-only (~5 s background batching, the
+             #3173 reverse parity gap) because geolocator's foreground
+             service may not be requested.
+           * The Android Auto BOUND POI service is unaffected — it ships in
+             the play flavor overlay since #2951 (bound services need no
+             FOREGROUND_SERVICE).
+         RESTORE TRIGGER (#3173) — the restore is mechanised; do NOT edit
+         this file when the Foreground Service Use form is approved. Build
+         with the single define
+             flutter build appbundle ... [dart-define] FGS_FORM_APPROVED=true
+         and build.gradle.kts swaps the flavor overlay to
+         src/play/AndroidManifestFgsApproved.xml (fdroid:
+         src/fdroid/AndroidManifestFgsApproved.xml), which re-declares the
+         FOREGROUND_SERVICE* permissions and the AutoRecordForegroundService.
+         Flavor overlays outrank src/main in the merge, so the two
+         tools:node="remove" guards below keep stripping library-merged
+         permissions from DEFAULT builds without defeating the overlay. The
+         same define flips kGpsRecordingForegroundServiceEnabled on the Dart
+         side, so flag and manifest can never diverge again (#2787 / error
+         log #17). -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
@@ -163,32 +179,16 @@
             </intent-filter>
         </activity>
 
-        <!-- Hands-free trip auto-record foreground service (#1004
-             phase 2b-1) and Android Auto CarAppService — both
-             commented out for the Open Testing release. See the
-             FOREGROUND_SERVICE permission block above for the full
-             rationale (Google Play "Foreground Service Use" form
-             gate); restore alongside the permissions when #1498's
-             form is approved.
-        <service
-            android:name=".autorecord.AutoRecordForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="connectedDevice"/>
-
-        <service
-            android:name=".TankstellenCarAppService"
-            android:exported="true"
-            android:permission="android.permission.FOREGROUND_SERVICE">
-            <intent-filter>
-                <action android:name="androidx.car.app.CarAppService" />
-                <category android:name="androidx.car.app.category.POI" />
-            </intent-filter>
-        </service>
-
-        <meta-data
-            android:name="androidx.car.app.minCarApiLevel"
-            android:value="1" />
-        -->
+        <!-- Hands-free trip auto-record foreground service (#1004 phase
+             2b-1): formerly a commented-out restore point here, now a LIVE
+             declaration in the gated play overlay
+             src/play/AndroidManifestFgsApproved.xml (#3173) — wired in by
+             build.gradle.kts only when the FGS_FORM_APPROVED define is set
+             after the #1498 form clears. See the FOREGROUND_SERVICE
+             permission block above for the trigger. The Android Auto
+             CarAppService that also used to be commented out here shipped
+             independently as a BOUND POI service in the play overlay
+             (#2951) — no FGS needed. -->
 
         <!-- #2413 — re-arm the on-device background price scan after a
              reboot. WorkManager persists periodic work and androidx

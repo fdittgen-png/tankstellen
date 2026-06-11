@@ -1,0 +1,78 @@
+<!--
+  Copyright (c) 2026 Florian DITTGEN
+  SPDX-License-Identifier: MIT
+-->
+
+<!-- #3173 — the FGS-APPROVED variant of the play-flavor manifest overlay.
+
+     NOT used by default. android/app/build.gradle.kts swaps this file in
+     for src/play/AndroidManifest.xml only when the build carries
+     `dash-dash-dart-define FGS_FORM_APPROVED=true` (or env
+     FGS_FORM_APPROVED=1) — i.e. only AFTER Google Play's "Foreground
+     Service Use" form (#1498) has been approved. Until then every build
+     keeps using the sibling manifest and ships with ZERO
+     FOREGROUND_SERVICE* permissions (Play-compliant, no edits.commit 403).
+
+     Keep this file a strict SUPERSET of src/play/AndroidManifest.xml: same
+     Android Auto bound POI service (#2951), PLUS the formerly commented-out
+     restore points from src/main/AndroidManifest.xml:
+
+       * FOREGROUND_SERVICE — base permission for any startForeground();
+         needed by geolocator's GeolocatorLocationService (the trip-GPS
+         un-throttle, #2766) and AutoRecordForegroundService.
+       * FOREGROUND_SERVICE_LOCATION — API 34+ requires the type-specific
+         permission for geolocator's foregroundServiceType="location"
+         service; without it startForeground() throws SecurityException on
+         Android 14+ even with FOREGROUND_SERVICE present.
+       * FOREGROUND_SERVICE_CONNECTED_DEVICE — type-specific permission for
+         AutoRecordForegroundService (foregroundServiceType="connectedDevice",
+         hands-free trip auto-record #1004 phase 2b-1).
+       * AutoRecordForegroundService — the BLE adapter watcher the Dart
+         AndroidBackgroundAdapterListener starts via
+         tankstellen/auto_record/methods.
+
+     These plain declarations are in a flavor overlay, which is
+     HIGHER-priority than src/main in the manifest merge — so they win over
+     main's tools:node="remove" guards (which stay in place to keep the
+     DEFAULT build stripped of library-merged FOREGROUND_SERVICE).
+
+     Deliberately NOT restored here: ACCESS_BACKGROUND_LOCATION. That is a
+     different Play gate (the Sensitive Permissions video declaration, also
+     tracked in #1498) — restore it separately in src/main when that
+     declaration clears. Hands-free auto-record stays Dart-gated on the
+     locationAlways permission either way. -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+
+    <application>
+        <!-- Android Auto v1 (#2951) bound POI service: no android:permission
+             (host trust handled by createHostValidator), no FOREGROUND_SERVICE
+             needed for a bound car-app service — unchanged from the default
+             play overlay. -->
+        <service
+            android:name=".TankstellenCarAppService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.POI" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="1" />
+
+        <!-- Hands-free trip auto-record foreground service (#1004 phase
+             2b-1), restored from the main manifest's former commented-out
+             block. -->
+        <service
+            android:name=".autorecord.AutoRecordForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice"/>
+    </application>
+</manifest>

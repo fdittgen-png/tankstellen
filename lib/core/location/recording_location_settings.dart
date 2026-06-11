@@ -23,14 +23,41 @@ import '../language/language_provider.dart';
 ///
 /// While this is `false` the recorder streams **foreground-only**, which is
 /// reliable because the recording screen pins itself (screen-on by default,
-/// #2785). Flip to `true` **together with** re-adding the manifest
-/// `FOREGROUND_SERVICE` permission once #1498's Play form is approved.
+/// #2785).
 ///
-/// Deliberately `final` (not `const`): a non-const flag keeps the analyzer
-/// from marking the gated `ForegroundNotificationConfig` branch as dead code
-/// while the flag is `false`, so the restore path stays compiled + visible.
-// ignore: prefer_const_declarations
-final bool kGpsRecordingForegroundServiceEnabled = false;
+/// ## The un-throttle trigger (#3173)
+///
+/// The restore is a single build flag, so it ships dark and flips the day
+/// the Play form clears — no code change, no forgotten manifest sibling:
+///
+/// ```
+/// flutter build appbundle --flavor play --dart-define=FGS_FORM_APPROVED=true
+/// ```
+///
+/// The SAME define drives BOTH halves of the restore in lockstep:
+///   1. **Dart** — this flag turns `true`, so [recordingLocationSettings]
+///      passes geolocator the [ForegroundNotificationConfig] (the actual
+///      un-throttle lever) and the Android Auto / auto-record Dart side
+///      finds its native service.
+///   2. **Manifest** — `android/app/build.gradle.kts` decodes the
+///      `dart-defines` Gradle property Flutter forwards and, when the flag
+///      is set, swaps the flavor manifest overlay for the `*FgsApproved`
+///      variant that re-declares the `FOREGROUND_SERVICE*` permissions and
+///      the `AutoRecordForegroundService` (restore points formerly
+///      commented in `AndroidManifest.xml`).
+///
+/// Keeping the two halves on one define removes the historical failure
+/// mode (#2787 / error log #17): flag on + permission absent =
+/// `startForeground` Permission Denial = zero GPS fixes. Without the
+/// define every build stays byte-identical to today's Play-compliant
+/// shape (no `FOREGROUND_SERVICE*` permission in the merged manifest, so
+/// the Open-Testing upload never 403s on the #1498 form).
+///
+/// `bool.fromEnvironment` is opaque to the analyzer, so the gated
+/// `ForegroundNotificationConfig` branch stays compiled + visible (the old
+/// `final`-not-`const` trick is no longer needed).
+const bool kGpsRecordingForegroundServiceEnabled =
+    bool.fromEnvironment('FGS_FORM_APPROVED');
 
 /// #2766 — the platform-specific [LocationSettings] used while a trip is
 /// **actively recording**, so the GPS trace stays fine-grained (~1 s) instead
@@ -99,8 +126,14 @@ LocationSettings approachLocationSettings({TargetPlatform? platform}) {
 LocationSettings recordingLocationSettings({
   required AppLocalizations l10n,
   TargetPlatform? platform,
+  bool? foregroundServiceEnabled,
 }) {
   final target = platform ?? defaultTargetPlatform;
+  // #3173 — test seam: production always follows the build-time define
+  // (which the Gradle side mirrors into the manifest), while unit tests
+  // pin both the throttled and the restored branch explicitly.
+  final fgsEnabled =
+      foregroundServiceEnabled ?? kGpsRecordingForegroundServiceEnabled;
   switch (target) {
     case TargetPlatform.android:
       return AndroidSettings(
@@ -112,11 +145,12 @@ LocationSettings recordingLocationSettings({
         distanceFilter: 0,
         // The un-throttle lever: promote geolocator to a foreground service so
         // the OS stops the ~5 s background batching for the trip. Gated by
-        // [kGpsRecordingForegroundServiceEnabled] — OFF while the manifest
+        // [kGpsRecordingForegroundServiceEnabled] (#3173 trigger:
+        // --dart-define=FGS_FORM_APPROVED=true) — OFF while the manifest
         // FOREGROUND_SERVICE permission is removed (#1498), so we pass `null`
         // and stream foreground-only rather than crash on startForeground
         // (error log #17 / #2787). Title/text are the already-merged ARB keys.
-        foregroundNotificationConfig: kGpsRecordingForegroundServiceEnabled
+        foregroundNotificationConfig: fgsEnabled
             ? ForegroundNotificationConfig(
                 notificationTitle: l10n.tripRecordingGpsNotificationTitle,
                 notificationText: l10n.tripRecordingGpsNotificationText,
