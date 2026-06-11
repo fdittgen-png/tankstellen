@@ -12,6 +12,7 @@ import 'ble_adapter_state_gate.dart';
 import 'elm_byte_channel.dart';
 import 'flutter_blue_plus_elm_channel.dart';
 import 'obd2_connection_errors.dart';
+import 'obd2_scan_governor.dart';
 
 /// Thin façade over flutter_blue_plus for the connection service
 /// (#741). Keeps the plugin API pinned to a small surface we can
@@ -287,6 +288,12 @@ class PluginBluetoothFacade implements BluetoothFacade {
       // often the FIRST BLE call of the session (the direct-by-MAC reconnect
       // path), so it must not be rejected with state `unknown` on iOS.
       await waitForAdapterOn();
+      // #3185 — the seed scan drains the SAME OS scan budget as the full
+      // service scans, so it pays into the same process-wide token bucket.
+      // A dense reconnect episode (seed + fallback scan + user retry) used
+      // to exceed Android's 5-scans/30s throttle, after which every scan
+      // silently returned nothing. Fails open; never throws.
+      await Obd2ScanGovernor.process.admitScanStart(reason: 'scan-seed');
       // withRemoteIds filters the scan to just this MAC (Android: 48-bit MAC,
       // iOS: 128-bit GUID) so the OS surfaces a fresh handle quickly without
       // sweeping the whole BLE neighbourhood.

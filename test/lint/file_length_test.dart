@@ -217,7 +217,17 @@ void main() {
     // registers the adapter-state step-0 probe. The persistence layer
     // lives in the NEW under-cap obd2_connect_trace_persistence.dart.
     // Decomposition still tracked under #2187/#2188.
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 826,
+    // #3185 — re-grandfathered 826 → 899: the single-flight connect
+    // SUPERVISOR + scan GOVERNOR are wired at this chokepoint (the whole
+    // point of #3185 is that admission lives at the ONE place all six
+    // connect owners funnel through): the two fields + ctor params +
+    // provider wiring, the thin `supervisor.admit(...)` shells around the
+    // seven public connect entries (incl. the passive admitPassive +
+    // onPreempt hookup), and the scan() governor gate. The state machines
+    // themselves live in the NEW under-cap obd2_connect_supervisor.dart /
+    // obd2_scan_governor.dart. Decomposition still tracked under
+    // #2187/#2188.
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 899,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one
