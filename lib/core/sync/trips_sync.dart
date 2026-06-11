@@ -154,9 +154,7 @@ class TripsSync {
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) return;
     try {
-      // #3078/#3123 — tombstone-first (journal-backed): the tombstone must
-      // not depend on the row delete succeeding.
-      await DeletionsSync.record('trip_summaries', tripId);
+      await DeletionsSync.record('trip_summaries', tripId); // #3123 first
       await client
           .from('trip_summaries')
           .delete()

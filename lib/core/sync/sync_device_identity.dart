@@ -52,9 +52,9 @@ class SyncDeviceIdentity {
           unawaited(box.put(settingsKey, id));
         }
       }
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('SyncDeviceIdentity: settings box unavailable ($e) — '
-          'using a session-stable id');
+          'using a session-stable id\n$st');
       id = null;
     }
     return _cached = id ?? const Uuid().v4();

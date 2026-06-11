@@ -111,10 +111,14 @@ class DeletionsSync {
   ) async {
     try {
       await t.upsert(table, rows, onConflict: 'user_id,table_name,record_id');
-    } catch (e) {
+    } catch (e, st) {
       if (!_isMissingForensicColumn(e)) rethrow;
-      debugPrint('DeletionsSync: schema predates the #3125 forensic '
-          'columns — retrying tombstone upsert without them');
+      // Surface the outdated-schema signal (the verifier flags it too),
+      // then degrade to a stamp-less write.
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+        'where': 'DeletionsSync: pre-v4 schema — tombstone upsert retried '
+            'without the #3125 forensic columns'
+      }));
       final legacyRows = [
         for (final row in rows)
           {...row}

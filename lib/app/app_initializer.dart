@@ -184,9 +184,7 @@ class AppInitializer {
     _deferPostFirstFrame(() async {
       await CommunityConfig.load();
       await _maybeInitTankSync(storage);
-      // #3126 — one run id threads the launch-time merges below through
-      // the breadcrumb trace, so the exportable error log can reconstruct
-      // what this sync pass uploaded / downloaded per table.
+      // #3126 — one run id threads the launch merges into the trace.
       if (TankSyncClient.client != null) SyncRunTrace.begin('launch');
       // #1541 — run the trip-summaries merge + details retention pass
       // once TankSync is up. No-ops cleanly when the user is signed
