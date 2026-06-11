@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/charging_station.dart';
 import '../../providers/ev_providers.dart';
-import '../screens/ev_station_detail_screen.dart';
 import 'ev_marker_widget.dart';
 
 /// Map layer rendering all charging stations for the given [viewport].
@@ -41,11 +41,10 @@ class _EvMapLayerState extends ConsumerState<EvMapLayer> {
         .map(
           (s) => EvMarkerWidget.buildMarker(
             s,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => EvStationDetailScreen(station: s),
-              ),
-            ),
+            // #3174 — route to the SAME rich detail screen every other EV
+            // entry point uses (search list, favorites, route results),
+            // instead of pushing the now-deleted legacy in-feature copy.
+            onTap: () => context.push('/ev-station', extra: s),
           ),
         )
         .toList();
