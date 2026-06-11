@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../constants/app_constants.dart';
 import '../data/storage_repository.dart';
 import '../logging/error_logger.dart';
 import '../services/service_result.dart';
@@ -31,11 +32,21 @@ class CacheEntry {
   final ServiceSource originalSource;
   final Duration ttl;
 
+  /// The app build that wrote this entry (`AppConstants.appVersion` at
+  /// `put()` time), or `null` for an entry persisted by a build that
+  /// predates the stamp (#3219 follow-up). Cached payloads are PARSED
+  /// output, so an entry written by a different build may embed the very
+  /// parser bug an update just fixed — [CacheManager.getFresh] therefore
+  /// refuses to serve a cross-build entry as fresh (it stays available to
+  /// the stale/offline fallback via [CacheManager.get]).
+  final String? appBuild;
+
   CacheEntry({
     required this.payload,
     required this.storedAt,
     required this.originalSource,
     required this.ttl,
+    this.appBuild,
   });
 
   bool get isExpired => DateTime.now().difference(storedAt) > ttl;
@@ -109,6 +120,9 @@ class CacheManager implements CacheStrategy {
         // #3150 — the enum NAME, not the reorder-fragile index.
         'source': source.name,
         'ttlMs': ttl.inMilliseconds,
+        // #3219 follow-up — stamp the writing build so [getFresh] can
+        // refuse to serve another build's PARSED payload as fresh.
+        'appBuild': AppConstants.appVersion,
       });
     } on FileSystemException catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
@@ -143,6 +157,7 @@ class CacheManager implements CacheStrategy {
       ),
       originalSource: _sourceFrom(raw['source']),
       ttl: Duration(milliseconds: raw['ttlMs'] as int? ?? 300000),
+      appBuild: raw['appBuild'] as String?,
     );
   }
 
@@ -158,11 +173,25 @@ class CacheManager implements CacheStrategy {
     return ServiceSource.cache;
   }
 
-  /// Get data only if the cache entry is still valid (not expired).
+  /// Get data only if the cache entry is still valid (not expired) AND was
+  /// written by THIS app build.
+  ///
+  /// #3219 follow-up — cached payloads are PARSED output (e.g. the
+  /// `serializeStationList` Station JSON), so an entry persisted by an older
+  /// build embeds that build's parser bugs. With FR's 6-hour
+  /// `searchResultTtl`, the #3224 hours fix was invisible after updating:
+  /// the freshly installed build kept serving the PRE-fix build's hour-less
+  /// stations for the same search key until the TTL lapsed — "the fix
+  /// shipped but the phone still shows the bug". A cross-build (or
+  /// unstamped pre-stamp) entry is therefore treated as a fresh-miss —
+  /// forcing one re-fetch + re-parse with the current code — while [get]
+  /// still serves it to the chain's stale/offline fallback, so an update
+  /// never costs the offline backbone.
   @override
   CacheEntry? getFresh(String key) {
     final entry = get(key);
     if (entry == null || entry.isExpired) return null;
+    if (entry.appBuild != AppConstants.appVersion) return null;
     return entry;
   }
 
