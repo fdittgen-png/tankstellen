@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -64,6 +67,10 @@ void main() {
 
   setUp(() {
     mockDio = MockDio();
+    // The constructor stamps the Bearer auth header onto dio.options
+    // (#3200) — give the mock a real BaseOptions to write into.
+    when(() => mockDio.options)
+        .thenReturn(BaseOptions(headers: <String, dynamic>{}));
     service = ChileStationService(apiKey: 'test-key', dio: mockDio);
   });
 
@@ -158,28 +165,62 @@ void main() {
         );
       });
 
-      test('sends API key as a query parameter', () async {
+      test('sends the API key as an Authorization: Bearer header, not a '
+          'query parameter (#3200)', () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([])));
 
         const params = SearchParams(lat: -33.45, lng: -70.67, radiusKm: 5.0);
         await service.searchStations(params);
 
+        // The constructor stamps the Bearer header onto the Dio instance.
+        expect(mockDio.options.headers['Authorization'], 'Bearer test-key');
+
+        // And the call carries the documented v4 path with NO token
+        // query parameter (the old ?token= form 404s live).
         final captured = verify(() => mockDio.get(
-              any(),
-              queryParameters: captureAny(named: 'queryParameters'),
+              captureAny(),
               cancelToken: any(named: 'cancelToken'),
-            )).captured.single as Map<String, dynamic>;
-        expect(captured['token'], 'test-key');
+            )).captured.single as String;
+        expect(captured, isNot(contains('token=')));
+      });
+
+      test('default base URL is the documented v4 estaciones path (#3200)',
+          () {
+        expect(ChileStationService.defaultBaseUrl,
+            'https://api.cne.cl/api/v4/estaciones');
+        expect(ChileStationService.defaultBaseUrl,
+            isNot(contains('combustibles')));
+      });
+
+      test('HTTP-200 auth-error body (live-recorded shape) raises an auth '
+          'ApiException (#3200)', () async {
+        // The live v4 API answers a missing/invalid token with HTTP 200
+        // and a {"status": ...} body — recorded 2026-06-10 in
+        // test/fixtures/cl_cne_v4_auth_error.json.
+        final recorded = jsonDecode(
+          File('test/fixtures/cl_cne_v4_auth_error.json')
+              .readAsStringSync(),
+        );
+        when(() => mockDio.get(
+              any(),
+              cancelToken: any(named: 'cancelToken'),
+            )).thenAnswer((_) async => response(recorded));
+
+        const params = SearchParams(lat: -33.45, lng: -70.67, radiusKm: 5.0);
+        await expectLater(
+          () => service.searchStations(params),
+          throwsA(isA<ApiException>()
+              .having((e) => e.kind, 'kind', FailureKind.auth)
+              .having((e) => e.message, 'message', contains('Token'))),
+        );
       });
 
       test('parses the CNE envelope into Stations with cl- prefix', () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([_cneStation()])));
 
@@ -208,7 +249,6 @@ void main() {
       test('empty data → empty list, not an error', () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([])));
 
@@ -222,7 +262,6 @@ void main() {
           () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
           requestOptions: RequestOptions(),
@@ -246,7 +285,6 @@ void main() {
       test('HTTP 403 is re-raised as ApiException', () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
           requestOptions: RequestOptions(),
@@ -268,7 +306,6 @@ void main() {
       test('network timeout is re-raised as ApiException', () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
           type: DioExceptionType.connectionTimeout,
@@ -285,7 +322,6 @@ void main() {
       test('every parsed station id starts with `cl-`', () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([
               _cneStation(codigo: '000001'),
@@ -308,7 +344,6 @@ void main() {
       test('codigo already prefixed `cl-` is not double-prefixed', () async {
         when(() => mockDio.get(
               any(),
-              queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([
               _cneStation(codigo: 'cl-987654'),

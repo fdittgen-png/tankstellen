@@ -75,13 +75,20 @@ List<Station> parseChileStationsResponse(
     );
   }
 
-  // Propagate a CNE-level error. When auth fails the API usually
-  // returns a JSON body with `error` or `message` set and an HTTP
-  // 401/403 (caught in the service shell), but some proxies return
-  // 200 + error.
-  final errField = parsed['error'] ?? parsed['message'];
+  // Propagate a CNE-level error. The live v4 API answers auth failures
+  // with **HTTP 200** and a `{"status": "Authorization Token not
+  // found"}` / `{"status": "Token is Invalid"}` body (live-recorded
+  // 2026-06-10, #3200 — see test/fixtures/cl_cne_v4_auth_error.json),
+  // so the body, not the HTTP status, is the auth gate. `error` /
+  // `message` shapes are kept for proxies and older deployments.
+  final errField = parsed['error'] ?? parsed['message'] ?? parsed['status'];
   if (errField != null && parsed['data'] == null) {
-    throw ApiException(message: 'CNE error: $errField');
+    final text = errField.toString();
+    final isAuth = text.toLowerCase().contains('token');
+    throw ApiException(
+      message: 'CNE error: $text',
+      kind: isAuth ? FailureKind.auth : FailureKind.unknown,
+    );
   }
 
   final list = parsed['data'];

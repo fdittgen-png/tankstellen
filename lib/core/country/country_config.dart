@@ -481,7 +481,7 @@ class Countries {
     postalCodeRegex: r'^\d{7}$',
     postalCodeLabel: 'Código postal',
     requiresApiKey: true,
-    apiKeyRegistrationUrl: 'https://api.cne.cl/',
+    apiKeyRegistrationUrl: 'https://apidocs.cne.cl/', // #3200 docs portal
     apiProvider: 'CNE Bencina en Linea',
     attribution: 'Datos: Comisión Nacional de Energía (cne.cl)',
     fuelTypes: ['Gasolina 93', 'Gasolina 95', 'Gasolina 97', 'Diésel', 'GLP'],
@@ -495,8 +495,8 @@ class Countries {
     examplePostalCode: '8320000',
     exampleCity: 'Santiago',
     pricePerUnitSuffix: '\$/L',
-    // #1828 — CNE endpoint unverified against the live portal
-    // (#1823). Hidden from the picker.
+    // #3200 — path + Bearer auth match apidocs.cne.cl; hidden until a
+    // registered token confirms the payload shape end-to-end.
     verified: false,
   );
 
