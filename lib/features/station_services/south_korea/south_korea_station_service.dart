@@ -89,29 +89,22 @@ import '../../../core/logging/error_logger.dart';
 /// **Endpoint verification (#3176, live-probed 2026-06-10)**: the
 /// [defaultBaseUrl] path is **confirmed live** — `GET aroundAll.do`
 /// answers HTTP 200 with the documented `RESULT → OIL` envelope, so the
-/// parser contract holds and the path is no longer a guess. Three live
-/// behaviour gaps remain, tracked in #3192 (under epic #3186):
-///
-///   1. **Coordinates**: the live API speaks KATEC (TM128) in and out;
-///      we send/parse WGS84, so a live query can never match a station.
-///   2. **Radius**: the live maximum is 5 000 m; we clamp to 50 km.
-///   3. **Auth param**: the portal documents `certkey`; we send `code` —
-///      and an unknown/invalid key is *silently* answered with an empty
-///      `OIL` array (verified live), never an HTTP 401/403.
-///
-/// Until #3192 lands, [searchStations] degrades gracefully instead of
-/// silently rendering an empty map: an all-products-empty live result
-/// raises an [ApiException] with [FailureKind.unsupported] plus an
-/// `errorLogger` trace, so the service chain surfaces the failure and
-/// field reports carry the real cause (same pattern as the GR fix).
+/// parser contract holds and the path is no longer a guess. The KATEC
+/// coordinate conversion and the 5 000 m radius clamp shipped with
+/// #3192. One live caveat remains (epic #3186): the portal documents
+/// `certkey` while we send `code`, and an unknown/invalid key is
+/// *silently* answered with an empty `OIL` array (verified live), never
+/// an HTTP 401/403 — so an all-products-empty result is ambiguous
+/// between "no stations in radius" and "bad key". [searchStations]
+/// breadcrumbs that case via errorLogger without failing the search.
 class SouthKoreaStationService
     with StationServiceHelpers
     implements StationService {
   /// OPINET "around all" endpoint — radius search by coordinate.
   /// Path live-verified 2026-06-10 (#3176): HTTP 200 + the documented
-  /// `RESULT → OIL` JSON envelope. The remaining live-behaviour gaps
-  /// (KATEC coordinates, 5 km radius cap, `certkey` auth param) are
-  /// tracked in #3192 — see the class doc.
+  /// `RESULT → OIL` JSON envelope. KATEC coordinates + the 5 km radius
+  /// clamp shipped with #3192; the `certkey`-vs-`code` auth question is
+  /// the remaining caveat — see the class doc.
   static const String defaultBaseUrl =
       'https://www.opinet.co.kr/api/aroundAll.do';
 
@@ -198,26 +191,18 @@ class SouthKoreaStationService
         mergeOpinetProductResponse(responses[i].data, byId, entries[i].value);
       }
 
-      // #3176 graceful degradation — until the KATEC coordinate fix
-      // (#3192) lands, the live API can never match a station for the
-      // WGS84 coordinates we send, and an invalid key is silently
-      // answered with the same empty envelope (verified live). An
-      // all-products-empty result is therefore indistinguishable from
-      // the known live breakage, so surface it as a classified failure
-      // with a trace instead of silently rendering an empty map. Remove
-      // this block when #3192 ships the verified coordinate transform.
+      // #3176 — with the KATEC conversion shipped (#3192) an empty merge
+      // is usually a legitimately station-free radius, but OPINET also
+      // answers an INVALID key with the same silent empty envelope
+      // (verified live), so leave a trace for field diagnosis without
+      // failing the search.
       if (byId.isEmpty) {
-        const e = ApiException(
-          message: 'OPINET returned zero stations for every product code — '
-              'expected live breakage: the API speaks KATEC (TM128) '
-              'coordinates and silently ignores invalid keys, so WGS84 '
-              'queries cannot match (#3176; coordinate fix tracked in '
-              '#3192)',
-          kind: FailureKind.unsupported,
-        );
-        unawaited(errorLogger.log(ErrorLayer.other, e, StackTrace.current,
-            context: const {'where': 'KR live search degraded (#3176)'}));
-        throw e;
+        unawaited(errorLogger.log(
+            ErrorLayer.other,
+            Exception('OPINET returned zero stations for every product '
+                'code — empty radius or silently-rejected key (#3176)'),
+            StackTrace.current,
+            context: const {'where': 'KR all-products-empty (#3176)'}));
       }
 
       final stations = byId.values
