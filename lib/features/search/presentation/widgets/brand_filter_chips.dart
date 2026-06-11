@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/brand_registry.dart';
-import '../../domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../../providers/brand_filter_provider.dart';
 
 /// Horizontally scrollable brand filter chips with major brands grouped.

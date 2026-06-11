@@ -32,10 +32,10 @@ import 'package:tankstellen/core/telemetry/upload/trace_uploader.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/route_search/data/cross_border_corridor.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// A country service that always throws — the flaky UK feed.
 class _ThrowingStationService implements StationService {

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 
 /// Catalog-product parsing utilities for the Romanian *Monitorul
 /// Prețurilor* observatory feed (monitorulpreturilor.info, #3193).

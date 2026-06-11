@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/ocr/pump_ocr_config.dart';
 import 'package:tankstellen/features/consumption/data/receipt_parser/receipt_field_extractors.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Per-country [OcrLocaleProfile]s for the currency-aware extraction
 /// tests (#2273). Mirror the bands shipped in `assets/ocr_config`.

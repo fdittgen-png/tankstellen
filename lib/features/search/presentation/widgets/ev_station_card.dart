@@ -8,8 +8,8 @@ import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/ev_price.dart';
-import '../../domain/entities/search_result_item.dart';
+import '../../../../core/domain/ev/ev_price.dart';
+import '../../../../core/domain/search_result_item.dart';
 import 'ev_connector_chips.dart';
 
 class EVStationCard extends StatelessWidget {

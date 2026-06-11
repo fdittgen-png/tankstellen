@@ -3,7 +3,7 @@
 
 import 'package:geolocator/geolocator.dart';
 
-import '../../features/search/domain/entities/station.dart';
+import '../domain/station.dart';
 
 /// State emitted by [ApproachDetector] (#2085 / ADR 0011) — split out of
 /// `approach_detector.dart` so the state hierarchy lives apart from the

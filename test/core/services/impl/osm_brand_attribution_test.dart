@@ -12,7 +12,7 @@
 //   * a single, close, unambiguous POI still attributes correctly.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/impl/osm_brand_enricher.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 import '../../../fakes/fake_hive_storage.dart';
 

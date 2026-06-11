@@ -17,9 +17,9 @@
 ///    matching enums land (e.g. `kerosene`).
 library;
 
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
-import '../../station_detail/domain/opening_hours.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
+import '../../../core/domain/opening_hours.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import 'chile_opening_hours_adapter.dart';

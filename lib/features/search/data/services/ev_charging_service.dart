@@ -7,7 +7,7 @@ import '../../../../core/services/dio_factory.dart';
 import '../../../../core/services/mixins/station_service_helpers.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../ev/data/services/ocm_poi_parser.dart';
-import '../../../ev/domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 
 /// OpenChargeMap API client for EV charging station search.
 ///

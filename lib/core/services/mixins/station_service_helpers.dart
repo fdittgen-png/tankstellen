@@ -3,9 +3,9 @@
 
 import 'package:dio/dio.dart';
 
-import '../../../features/search/data/models/search_params.dart';
-import '../../../features/search/domain/entities/fuel_type.dart';
-import '../../../features/search/domain/entities/station.dart';
+import '../../domain/search_params.dart';
+import '../../domain/fuel_type.dart';
+import '../../domain/station.dart';
 import '../../error/exceptions.dart';
 import '../../utils/geo_utils.dart';
 import '../../utils/station_extensions.dart';

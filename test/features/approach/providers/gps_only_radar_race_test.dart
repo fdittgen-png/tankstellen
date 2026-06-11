@@ -28,9 +28,9 @@ import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/approach_overlay_enabled_provider.dart';
 import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 import '../../../helpers/empty_imu_source.dart';
 import '../../../helpers/silence_error_logger.dart';

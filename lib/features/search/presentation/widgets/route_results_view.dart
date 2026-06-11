@@ -17,8 +17,8 @@ import '../../../favorites/providers/favorites_provider.dart';
 import '../../../route_search/data/cross_border_corridor.dart'
     show fuelForStation;
 import '../../../route_search/providers/route_search_provider.dart';
-import '../../domain/entities/fuel_type.dart';
-import '../../domain/entities/search_result_item.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/search_result_item.dart';
 import '../../providers/ignored_stations_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';

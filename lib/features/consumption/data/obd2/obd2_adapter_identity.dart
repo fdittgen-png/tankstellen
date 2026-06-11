@@ -9,7 +9,7 @@ import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_service.dart';
 import '../../../../core/logging/error_logger.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// Adapter-identity capture + iOS UUID-rotation rematch (#3168).
 ///

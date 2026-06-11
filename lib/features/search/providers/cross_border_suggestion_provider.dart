@@ -13,10 +13,10 @@ import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/utils/num_extensions.dart';
 import '../../../core/utils/station_extensions.dart';
-import '../data/models/search_params.dart';
+import '../../../core/domain/search_params.dart';
 import '../domain/entities/cross_border_suggestion.dart';
-import '../domain/entities/fuel_type.dart';
-import '../domain/entities/station.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 import 'search_provider.dart';
 
 part 'cross_border_suggestion_provider.g.dart';

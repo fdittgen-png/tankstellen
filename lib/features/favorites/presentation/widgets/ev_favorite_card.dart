@@ -8,7 +8,7 @@ import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/station_card_shell.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 
 /// Card for an EV charging station in the favorites list.
 ///

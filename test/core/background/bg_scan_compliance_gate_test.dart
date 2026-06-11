@@ -13,8 +13,8 @@ import 'package:tankstellen/core/services/diagnostics/data_access_trace.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/core/services/station_service_chain.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 import '../../fakes/fake_storage_repository.dart';
 import '../../helpers/silence_error_logger.dart';

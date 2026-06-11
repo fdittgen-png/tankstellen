@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/features/search/domain/search_result_filters.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+import 'package:tankstellen/core/domain/vehicle_profile.dart'
     show ConnectorType;
 
 import '../../../fixtures/charging_stations.dart';

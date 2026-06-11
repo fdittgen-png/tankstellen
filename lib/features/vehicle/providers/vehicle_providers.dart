@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/vehicles_sync.dart';
 import '../data/repositories/vehicle_profile_repository.dart';
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 
 part 'vehicle_providers.g.dart';
 

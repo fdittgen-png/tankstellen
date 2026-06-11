@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// EV-specific portion of the [EditVehicleScreen] form. Owns the battery,
 /// max-charge-power, supported connectors, and SoC range fields. Statelessly

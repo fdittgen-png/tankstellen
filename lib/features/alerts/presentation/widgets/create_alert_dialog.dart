@@ -6,7 +6,7 @@ import '../../../../core/background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../domain/entities/price_alert.dart';
 
 /// Dialog for creating a new price alert from the station detail screen.

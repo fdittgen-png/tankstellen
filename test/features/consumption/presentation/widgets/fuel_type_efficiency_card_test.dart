@@ -6,8 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fuel_type_efficiency_stats.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fuel_type_efficiency_card.dart';
 import 'package:tankstellen/features/consumption/providers/fuel_type_efficiency_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../helpers/pump_app.dart';

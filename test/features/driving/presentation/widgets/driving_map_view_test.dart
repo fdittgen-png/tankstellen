@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_map_view.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 Station _station({
   required String id,

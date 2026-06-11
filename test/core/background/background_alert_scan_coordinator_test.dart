@@ -10,7 +10,7 @@ import 'package:tankstellen/features/alerts/data/radius_alert_runner.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 import 'package:tankstellen/features/alerts/domain/velocity_alert_detector.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// #2415 — the shared scan coordinator. The full [scan] body needs Hive +
 /// platform channels, so here we lock down the pure, platform-neutral

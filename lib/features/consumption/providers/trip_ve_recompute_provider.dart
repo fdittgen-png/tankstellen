@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../domain/trip_ve_recompute.dart';
 import 'trip_history_provider.dart';

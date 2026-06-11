@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import 'station_brand_helpers.dart';
 
 /// Brand logo + station name block at the top of the station detail body.

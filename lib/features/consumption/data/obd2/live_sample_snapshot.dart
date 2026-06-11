@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import 'elm327_protocol.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_service.dart';

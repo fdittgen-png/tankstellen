@@ -11,7 +11,7 @@ import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Station-first entry point for the fill-up form (#715).

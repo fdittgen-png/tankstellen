@@ -10,7 +10,7 @@ import 'package:tankstellen/core/sync/alerts_sync.dart';
 import 'package:tankstellen/core/sync/sync_helper.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../fakes/fake_hive_storage.dart';
 import '../../helpers/silence_error_logger.dart';

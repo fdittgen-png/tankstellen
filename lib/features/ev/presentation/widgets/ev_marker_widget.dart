@@ -7,7 +7,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 
 /// Visual marker representing an EV [ChargingStation] on the flutter_map.
 ///

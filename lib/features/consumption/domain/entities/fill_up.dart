@@ -4,7 +4,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/services/co2_calculator.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 
 part 'fill_up.freezed.dart';
 part 'fill_up.g.dart';

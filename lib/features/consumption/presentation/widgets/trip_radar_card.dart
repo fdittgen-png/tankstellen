@@ -14,8 +14,8 @@ import '../../../approach/providers/radar_candidate_list_provider.dart';
 import '../../../approach/providers/radar_swipe_provider.dart';
 import '../../../profile/providers/effective_fuel_type_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import 'proximity_fill_bar.dart';
 import 'radar_swipe_wrapper.dart';
 

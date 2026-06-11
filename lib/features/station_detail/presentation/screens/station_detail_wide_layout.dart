@@ -7,7 +7,7 @@ import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../widgets/price_history_foldable.dart';
 import '../widgets/station_brand_header.dart';
 import '../widgets/station_detail_app_bar_actions.dart';

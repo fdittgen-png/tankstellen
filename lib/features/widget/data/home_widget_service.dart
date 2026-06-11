@@ -15,7 +15,7 @@ import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
 import '../../profile/data/models/user_profile.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import 'home_widget_json.dart';
 import 'impl/widget_group_id.dart';
 import 'impl/widget_reload_dispatcher.dart';

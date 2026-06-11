@@ -6,7 +6,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/services/impl/flutter_tts_announcement_service.dart';
 import 'package:tankstellen/core/services/voice_announcement_service.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 import '../../../fixtures/stations.dart';
 

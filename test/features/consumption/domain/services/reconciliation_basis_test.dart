@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/domain/services/reconciliation_basis.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Unit tests for [reconciliationBasis] (#2440). The function is PURE —
 /// every test passes window fills + trips directly and asserts on the

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../features/vehicle/domain/entities/vehicle_profile.dart';
+import '../domain/vehicle_profile.dart';
 import 'entity_sync.dart';
 import 'sync_transport.dart';
 

@@ -4,7 +4,7 @@
 import 'package:intl/intl.dart';
 
 import '../country/country_config.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
+import '../domain/fuel_type.dart';
 import 'price_formatter.dart';
 
 /// Formats per-country unit strings: distance (km/mi), volume (L/gal),

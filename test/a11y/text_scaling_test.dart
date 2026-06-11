@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/search/presentation/widgets/all_prices_station_card.dart';
 import 'package:tankstellen/features/search/presentation/widgets/sort_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';

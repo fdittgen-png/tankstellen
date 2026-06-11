@@ -34,8 +34,8 @@ library;
 import 'dart:async';
 import 'dart:convert';
 
-import '../../search/domain/entities/station.dart';
-import '../../search/domain/entities/station_amenity.dart';
+import '../../../core/domain/station.dart';
+import '../../../core/domain/station_amenity.dart';
 import '../../../core/country/country_time.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/logging/error_logger.dart';

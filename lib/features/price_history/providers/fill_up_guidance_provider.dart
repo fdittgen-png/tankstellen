@@ -7,7 +7,7 @@ import '../../../core/country/country_config.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../feature_management/domain/feature_dependency_graph.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../domain/entities/fill_up_guidance.dart';
 import '../domain/services/fill_up_guidance_predictor.dart';
 import 'price_history_provider.dart';

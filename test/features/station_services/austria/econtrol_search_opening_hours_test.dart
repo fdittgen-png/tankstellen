@@ -10,7 +10,7 @@
 // empty hours before #2777.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/station_service_chain_codec.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 
 import '../support/real_service_search.dart';
 

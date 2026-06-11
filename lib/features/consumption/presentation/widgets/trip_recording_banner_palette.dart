@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/contrast_utils.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/fuel_colors.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../providers/trip_recording_phase.dart';
 

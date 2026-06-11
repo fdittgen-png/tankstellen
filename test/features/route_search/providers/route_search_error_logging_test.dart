@@ -11,7 +11,7 @@ import 'package:tankstellen/features/profile/domain/entities/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// #2308 — the three outer catch clauses of `searchAlongRoute` must emit
 /// an `errorLogger` breadcrumb (so an OSRM outage / country-service

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/speed_consumption_histogram.dart';
+import 'package:tankstellen/core/domain/speed_consumption_histogram.dart';
 
 /// Pure value-object tests for [SpeedBand] and
 /// [SpeedConsumptionHistogram] (#1193 phase 1).

@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../search/domain/entities/station.dart';
-import 'opening_hours.dart';
+import '../../../core/domain/station.dart';
+import '../../../core/domain/opening_hours.dart';
 
 /// Synthesises a [WeeklyOpeningHours] from a [StationDetail]'s *legacy*
 /// opening-hours fields (`Station.is24h` + `StationDetail.openingTimes`).

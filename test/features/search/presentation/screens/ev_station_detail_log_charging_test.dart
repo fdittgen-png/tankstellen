@@ -8,7 +8,7 @@ import 'package:tankstellen/features/consumption/presentation/screens/add_chargi
 import 'package:tankstellen/features/consumption/providers/charging_logs_provider.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 import 'package:tankstellen/features/search/presentation/screens/ev_station_detail_screen.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../../fixtures/ev_stations.dart';

@@ -6,7 +6,7 @@ import 'dart:async';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../domain/entities/reference_vehicle.dart';
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import 'repositories/vehicle_profile_repository.dart';
 import 'vehicle_profile_catalog_matcher.dart';
 import '../../../core/logging/error_logger.dart';

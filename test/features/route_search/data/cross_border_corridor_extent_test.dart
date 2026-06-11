@@ -17,7 +17,7 @@ import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/route_search/data/cross_border_corridor.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Minimal [StorageRepository] stub so `buildCorridorServiceMap` can read
 /// `hasApiKey()` without standing up Hive. GB/FR are keyless so the value

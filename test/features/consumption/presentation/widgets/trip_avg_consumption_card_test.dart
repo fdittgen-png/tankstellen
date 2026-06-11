@@ -8,8 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/obd2/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/gps_matrix_maturity_badge.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_avg_consumption_card.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/gps_calibration_matrix.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 

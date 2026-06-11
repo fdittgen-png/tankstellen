@@ -12,7 +12,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/sharing/public_file_exporter.dart';
 import '../../../../ev/domain/entities/charging_log.dart';
-import '../../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../../core/domain/vehicle_profile.dart';
 import '../../../domain/correction_fill_up.dart';
 import '../../../domain/entities/fill_up.dart';
 import '../../trip_dedup.dart';

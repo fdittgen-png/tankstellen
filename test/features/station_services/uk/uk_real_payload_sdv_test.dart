@@ -16,8 +16,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_services/uk/uk_station_service.dart';
 import '../../../helpers/silence_error_logger.dart';
 

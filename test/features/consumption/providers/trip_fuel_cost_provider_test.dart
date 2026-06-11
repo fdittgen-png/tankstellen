@@ -10,7 +10,7 @@ import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/trip_fuel_cost_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Unit tests for `tripFuelCostProvider` (Refs #561).
 ///

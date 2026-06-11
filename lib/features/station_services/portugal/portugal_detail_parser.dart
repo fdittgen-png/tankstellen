@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 
 /// Builds the [Station] for a DGEG `GetDadosPostoMapa` detail response.
 ///

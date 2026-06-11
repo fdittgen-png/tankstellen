@@ -7,7 +7,7 @@ import 'package:tankstellen/features/consumption/data/pump_display_parse_result.
 import 'package:tankstellen/features/consumption/data/receipt_parser.dart';
 import 'package:tankstellen/features/consumption/data/receipt_scan_service.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/bad_scan_report_formatters.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Unit tests for the pure formatting helpers in
 /// [bad_scan_report_formatters.dart]. These functions must stay pure

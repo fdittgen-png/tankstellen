@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/search_result_item.dart';
+import '../../../../core/domain/search_result_item.dart';
 import '../../providers/favorites_provider.dart';
 import '../../providers/merged_favorites_provider.dart';
 import 'ev_favorite_dismissible.dart';

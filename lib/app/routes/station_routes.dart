@@ -11,7 +11,7 @@ import '../../core/data/storage_repository.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../features/ev/data/repositories/ev_station_repository.dart';
-import '../../features/ev/domain/entities/charging_station.dart';
+import '../../core/domain/ev/charging_station.dart';
 import '../../features/ev/providers/ev_providers.dart';
 import '../../features/price_history/presentation/screens/price_history_screen.dart';
 import '../../features/report/presentation/screens/report_screen.dart';

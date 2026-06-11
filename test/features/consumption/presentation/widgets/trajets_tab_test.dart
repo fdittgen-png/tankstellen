@@ -17,7 +17,7 @@ import 'package:tankstellen/features/consumption/presentation/widgets/trajets_re
 import 'package:tankstellen/features/consumption/presentation/widgets/trajets_tab.dart';
 import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
 

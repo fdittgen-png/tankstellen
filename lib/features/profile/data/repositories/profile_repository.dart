@@ -5,7 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/storage_providers.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../models/user_profile.dart';
 
 part 'profile_repository.g.dart';

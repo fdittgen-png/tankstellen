@@ -4,8 +4,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/add_fill_up_warnings.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Unit tests for the #2836 fill-up data-quality warnings — reproduces the
 /// exact failure modes a real backup surfaced: an e10 (petrol) fill-up

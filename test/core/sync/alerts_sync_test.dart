@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/alerts_sync.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Contract tests for [AlertsSync] (#727 extract). The real bidirectional
 /// merge talks to Supabase; a pure unit test can only exercise the

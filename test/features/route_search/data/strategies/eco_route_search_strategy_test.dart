@@ -5,9 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/route_search/data/strategies/eco_route_search_strategy.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// Build a synthetic OSRM `routes[]` JSON entry with the metadata
 /// the strategy actually reads — geometry coordinates, distance,

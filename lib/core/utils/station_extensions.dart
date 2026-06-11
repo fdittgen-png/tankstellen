@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../features/search/domain/entities/fuel_type.dart';
-import '../../features/search/domain/entities/station.dart';
+import '../domain/fuel_type.dart';
+import '../domain/station.dart';
 
 extension StationDisplay on Station {
   /// User-facing station name: brand if meaningful, otherwise street or place.

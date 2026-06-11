@@ -17,7 +17,7 @@ import 'package:tankstellen/features/consumption/providers/gps_only_recording_pi
 import 'package:tankstellen/features/consumption/providers/recording_pipeline.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_phase.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_state.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../helpers/empty_imu_source.dart';

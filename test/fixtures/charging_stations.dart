@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart'
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart'
     show ConnectorType;
 
 /// Canonical test ChargingStation after #560 consolidation. Uses the

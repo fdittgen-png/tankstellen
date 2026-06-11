@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../domain/add_fill_up_warnings.dart';
 
 /// Shows the "Check this fill-up" confirmation dialog (#2836) listing the

@@ -3,7 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../features/search/domain/entities/fuel_type.dart';
+import '../domain/fuel_type.dart';
 import 'country_provider.dart';
 
 part 'fuel_type_picker_provider.g.dart';

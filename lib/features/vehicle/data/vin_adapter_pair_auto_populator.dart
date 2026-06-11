@@ -10,7 +10,7 @@ import '../../consumption/data/obd2/obd2_connection_service.dart';
 import '../../consumption/data/obd2/obd2_read_telemetry.dart';
 import '../../consumption/data/obd2/obd2_service.dart';
 import '../../consumption/data/obd2/obd_adapter_blocklist.dart';
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../domain/entities/vin_data.dart';
 import 'vin_auto_populator.dart';
 import 'vin_decoder.dart';

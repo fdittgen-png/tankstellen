@@ -3,7 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'opening_hours.dart';
+import '../../../core/domain/opening_hours.dart';
 
 part 'open_now.freezed.dart';
 

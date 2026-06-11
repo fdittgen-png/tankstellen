@@ -3,7 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../profile/data/models/user_profile.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../../vehicle/domain/entities/vin_data.dart';
 
 part 'onboarding_wizard_provider.g.dart';

@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import 'price_history_section.dart';
 
 /// Collapsible wrapper around [PriceHistorySection] (#1957).

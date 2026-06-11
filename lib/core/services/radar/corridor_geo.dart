@@ -3,7 +3,7 @@
 
 import 'dart:math' as math;
 
-import '../../../features/search/domain/entities/station.dart';
+import '../../domain/station.dart';
 import '../../utils/geo_utils.dart' as geo;
 
 /// Pure geometry + corrupted-cache detection helpers for the

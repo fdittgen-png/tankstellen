@@ -8,7 +8,7 @@ import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_r
 import 'package:tankstellen/features/vehicle/data/vehicle_profile_catalog_matcher.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_profile_migrator.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/reference_vehicle.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Unit tests for the [VehicleProfileCatalogMigrator] (#950 phase 4).
 ///

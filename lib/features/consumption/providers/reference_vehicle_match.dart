@@ -9,7 +9,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../vehicle/data/vehicle_profile_catalog_matcher.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 
 /// Resolve the bundled-catalog row for [profile] (#1422 phase 1), so the
 /// OBD2 recording controller can use the engine-tech-derived η_v default

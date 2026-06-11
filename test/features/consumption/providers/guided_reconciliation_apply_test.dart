@@ -15,7 +15,7 @@ import 'package:tankstellen/features/consumption/domain/services/reconciliation_
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
 import 'package:tankstellen/features/consumption/providers/pending_reconciliation_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Apply-seam coverage for the guided reconciliation workflow's two

@@ -7,7 +7,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/opening_hours.dart';
+import '../../../../core/domain/opening_hours.dart';
 import 'opening_hours_format.dart';
 import 'opening_hours_status_line.dart';
 

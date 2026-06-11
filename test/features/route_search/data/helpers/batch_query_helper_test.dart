@@ -10,9 +10,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/route_search/data/helpers/batch_query_helper.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 
 void main() {
   group('BatchQueryHelper', () {

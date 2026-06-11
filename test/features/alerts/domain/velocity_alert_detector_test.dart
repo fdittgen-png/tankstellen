@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/alerts/data/models/price_snapshot.dart';
 import 'package:tankstellen/features/alerts/domain/entities/velocity_alert_config.dart';
 import 'package:tankstellen/features/alerts/domain/velocity_alert_detector.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Snapshot-based velocity detector (#579). Pure function. Input:
 /// current nearby station observations + previous [PriceSnapshot]s

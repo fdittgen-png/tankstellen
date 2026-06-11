@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
-import 'package:tankstellen/features/search/domain/entities/station_amenity.dart';
+import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/features/search/providers/brand_filter_provider.dart';
 import 'package:tankstellen/features/search/providers/search_screen_ui_provider.dart';
 

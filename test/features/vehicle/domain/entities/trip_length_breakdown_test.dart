@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/trip_length_breakdown.dart';
+import 'package:tankstellen/core/domain/trip_length_breakdown.dart';
 
 /// Pure value-object tests for [TripLengthBucket] and
 /// [TripLengthBreakdown] (#1193 phase 1).

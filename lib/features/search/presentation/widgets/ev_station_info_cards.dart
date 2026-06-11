@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/charging_station.dart';
-import '../../../ev/domain/entities/ev_access_cost.dart';
-import '../../../ev/domain/entities/ev_price.dart';
+import '../../../../core/domain/ev/charging_station.dart';
+import '../../../../core/domain/ev/ev_access_cost.dart';
+import '../../../../core/domain/ev/ev_price.dart';
 import 'ev_connector_tile.dart';
 
 /// Address card for an EV charging station.

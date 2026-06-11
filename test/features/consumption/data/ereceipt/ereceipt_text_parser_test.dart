@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/ereceipt/ereceipt_text_parser.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// #2838 — the pure-Dart e-receipt TEXT parser. Drives the REAL parsing
 /// stack (`EReceiptTextParser` → `ReceiptParser` → field extractors +

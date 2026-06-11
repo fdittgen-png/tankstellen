@@ -9,10 +9,10 @@ import 'package:tankstellen/features/station_services/france/prix_carburants_sta
 import 'package:tankstellen/core/services/impl/osm_brand_enricher.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 import '../../../fakes/fake_storage_repository.dart';
 import '../../../helpers/silence_error_logger.dart';
 

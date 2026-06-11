@@ -4,7 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_providers.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../data/models/price_record.dart';
 import '../data/repositories/price_history_repository.dart';
 

@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/fuel_type_dropdown.dart';
-import '../../../../features/search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 
 /// Thin wrapper preserved for widget-test compatibility. All real rendering
 /// now lives in [FuelTypeDropdown] so every surface (profile, vehicle,

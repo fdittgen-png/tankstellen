@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station_amenity.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station_amenity.dart';
 
 part 'user_profile.freezed.dart';
 part 'user_profile.g.dart';

@@ -4,8 +4,8 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/country/country_time.dart';
 import '../../../core/error/exceptions.dart';
@@ -16,7 +16,7 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/logging/error_logger.dart';
-import '../../station_detail/domain/opening_hours.dart';
+import '../../../core/domain/opening_hours.dart';
 import '../opening_hours/open_state_from_hours.dart';
 import 'spain_opening_hours_adapter.dart';
 import 'spain_provinces.dart';

@@ -19,8 +19,8 @@
 ///    `RESULT.OIL[]` array into a `Map<UNI_ID, OpinetStationAccumulator>`.
 library;
 
-import '../../search/domain/entities/fuel_type.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/fuel_type.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/utils/geo_utils.dart';
 import 'katec_converter.dart';

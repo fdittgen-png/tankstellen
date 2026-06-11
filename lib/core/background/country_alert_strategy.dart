@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../features/search/data/models/search_params.dart';
-import '../../features/search/domain/entities/station.dart';
+import '../domain/search_params.dart';
+import '../domain/station.dart';
 import '../cache/cache_manager.dart';
 import '../data/storage_repository.dart';
 import '../services/country_service_registry.dart';

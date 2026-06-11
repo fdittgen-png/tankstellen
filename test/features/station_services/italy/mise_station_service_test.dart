@@ -6,7 +6,7 @@ import 'package:tankstellen/core/error/exceptions.dart';
 import 'package:tankstellen/features/station_services/italy/mise_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// Pure-parser + interface-contract tests for [MiseStationService]. Runs
 /// fully offline against checked-in CSV fixtures — no upstream call.

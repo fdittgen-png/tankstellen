@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../../features/search/domain/entities/station.dart';
+import '../domain/station.dart';
 import 'voice_announcement_service.dart';
 import '../../core/logging/error_logger.dart';
 

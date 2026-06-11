@@ -4,8 +4,8 @@
 import 'package:xml/xml.dart';
 
 import '../../../../ev/domain/entities/charging_log.dart';
-import '../../../../search/domain/entities/fuel_type.dart';
-import '../../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../../core/domain/fuel_type.dart';
+import '../../../../../core/domain/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
 import '../../../domain/trip_recorder.dart';
 import '../../trip_history_repository.dart';

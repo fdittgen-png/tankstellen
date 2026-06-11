@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// Drivetrain toggle on the edit-vehicle form — a three-segment
 /// [SegmentedButton] that flips the form between Combustion, Hybrid,

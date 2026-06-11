@@ -3,8 +3,8 @@
 
 import 'package:dio/dio.dart';
 
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';

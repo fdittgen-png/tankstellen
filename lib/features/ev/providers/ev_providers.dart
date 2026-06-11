@@ -9,11 +9,11 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../search/providers/ev_search_provider.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart' show ConnectorType;
+import '../../../core/domain/vehicle_profile.dart' show ConnectorType;
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/repositories/ev_station_repository.dart';
 import '../data/services/open_charge_map_service.dart';
-import '../domain/entities/charging_station.dart';
+import '../../../core/domain/ev/charging_station.dart';
 
 part 'ev_providers.g.dart';
 

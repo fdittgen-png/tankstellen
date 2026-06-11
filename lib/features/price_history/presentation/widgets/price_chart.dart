@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../domain/entities/price_record.dart';
 import 'price_chart_axes.dart';
 

@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_trip_length_aggregator.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/trip_length_breakdown.dart';
+import 'package:tankstellen/core/domain/trip_length_breakdown.dart';
 
 /// Builds a [TripHistoryEntry] carrying only the fields the trip-length
 /// aggregator reads — distance and (optional) fuel — with everything

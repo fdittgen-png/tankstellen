@@ -3,7 +3,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../vehicle/domain/entities/vehicle_profile.dart' show ConnectorType;
+import '../../../core/domain/vehicle_profile.dart' show ConnectorType;
 
 part 'mixed_results_filter_provider.g.dart';
 

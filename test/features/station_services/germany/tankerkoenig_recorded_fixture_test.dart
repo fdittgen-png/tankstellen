@@ -27,7 +27,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/constants/api_constants.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/station_services/germany/tankerkoenig_station_service.dart';
 
 /// Routes `list.php` / `detail.php` to their recorded bodies.

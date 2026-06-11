@@ -7,8 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../consumption/providers/consumption_providers.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../providers/vehicle_providers.dart';
 import '../../../../core/logging/error_logger.dart';
 

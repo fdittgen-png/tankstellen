@@ -5,8 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/features/ev/data/services/fr_irve_price_service.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
-import 'package:tankstellen/features/ev/domain/entities/ev_access_cost.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/ev_access_cost.dart';
 
 class MockDio extends Mock implements Dio {}
 

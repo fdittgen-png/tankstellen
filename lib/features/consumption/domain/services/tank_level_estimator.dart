@@ -3,7 +3,7 @@
 
 import 'package:flutter/foundation.dart';
 
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import '../entities/fill_up.dart';
 

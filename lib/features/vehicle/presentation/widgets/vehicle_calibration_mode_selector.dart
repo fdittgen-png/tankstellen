@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../providers/calibration_mode_providers.dart';
 import '../../providers/vehicle_providers.dart';
 import '../../../../core/logging/error_logger.dart';

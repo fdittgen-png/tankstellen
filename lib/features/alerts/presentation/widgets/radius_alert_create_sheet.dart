@@ -12,7 +12,7 @@ import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../domain/entities/radius_alert.dart';
 import '../../domain/radius_alert_validators.dart';
 import '../../providers/radius_alerts_provider.dart';

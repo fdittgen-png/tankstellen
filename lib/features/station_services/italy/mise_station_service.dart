@@ -3,8 +3,8 @@
 
 import 'package:dio/dio.dart';
 import 'mise_dataset.dart';
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/services/dio_factory.dart';

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
+import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../gps_driving_features.dart';
 import '../gps_driving_features_shares.dart';
 

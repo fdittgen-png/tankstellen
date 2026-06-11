@@ -8,7 +8,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
 import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_detail/presentation/screens/station_detail_screen.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_brand_header.dart';
 import 'package:tankstellen/features/station_detail/providers/station_detail_provider.dart';

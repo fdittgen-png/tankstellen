@@ -13,7 +13,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
 import 'package:tankstellen/features/price_history/providers/price_history_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/price_history_section.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_detail_inline.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_info_section.dart';

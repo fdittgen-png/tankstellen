@@ -4,7 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/impl/demo_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 
 void main() {
   late DemoStationService service;

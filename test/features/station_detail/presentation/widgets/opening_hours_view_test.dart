@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/opening_hours_view.dart';
 
 import '../../../../helpers/pump_app.dart';

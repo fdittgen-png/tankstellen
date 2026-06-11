@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../consumption/domain/trip_recorder.dart';
-import '../domain/entities/speed_consumption_histogram.dart';
+import '../../../core/domain/speed_consumption_histogram.dart';
 
 /// Below this sample count a speed band is excluded from the
 /// histogram's `bands` list. Mirrors the value-object docstring on

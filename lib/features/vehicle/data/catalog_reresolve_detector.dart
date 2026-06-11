@@ -3,7 +3,7 @@
 
 import '../../../core/storage/storage_keys.dart';
 import '../domain/entities/reference_vehicle.dart';
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import 'vehicle_profile_catalog_matcher.dart';
 
 /// Result of a catalog re-resolve check for a single profile (#1396).

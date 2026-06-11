@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../ev/domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 import '../../../ev/presentation/widgets/connector_status_style.dart';
 import 'ev_connector_chips.dart';
 

@@ -13,7 +13,7 @@ import 'package:tankstellen/features/consumption/presentation/widgets/'
     'fill_up_scan_handlers.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/'
     'fill_up_share_scan_handlers.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import '../../../../helpers/silence_error_logger.dart';
 

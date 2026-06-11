@@ -15,8 +15,8 @@ import '../../../price_history/domain/entities/price_record.dart';
 import '../../../price_history/presentation/widgets/price_chart.dart';
 import '../../../price_history/presentation/widgets/price_stats_card.dart';
 import '../../../price_history/providers/price_history_provider.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Price history graph widget that records the current price on init

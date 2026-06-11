@@ -11,7 +11,7 @@ import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/screens/alerts_screen.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/create_alert_dialog.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';

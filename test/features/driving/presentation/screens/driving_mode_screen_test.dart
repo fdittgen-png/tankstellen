@@ -10,8 +10,8 @@ import 'package:tankstellen/features/driving/presentation/screens/driving_mode_s
 import 'package:tankstellen/features/driving/presentation/widgets/driving_bottom_bar.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/driving_station_sheet.dart';
 import 'package:tankstellen/features/driving/presentation/widgets/safety_disclaimer_dialog.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
-import 'package:tankstellen/features/search/domain/entities/search_result_item.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
 import '../../../../fixtures/stations.dart';

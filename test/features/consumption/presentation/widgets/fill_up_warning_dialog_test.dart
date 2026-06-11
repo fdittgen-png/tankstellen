@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/add_fill_up_warnings.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/fill_up_warning_dialog.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for the #2836 fill-up warning dialog — drives the real

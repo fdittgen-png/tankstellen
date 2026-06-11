@@ -11,7 +11,7 @@ import '../../storage/storage_providers.dart';
 import '../../utils/geo_utils.dart' as geo;
 import '../dio_factory.dart';
 import '../../../features/search/domain/entities/brand_registry.dart';
-import '../../../features/search/domain/entities/station.dart';
+import '../../domain/station.dart';
 import '../../../core/logging/error_logger.dart';
 
 part 'osm_brand_enricher.g.dart';

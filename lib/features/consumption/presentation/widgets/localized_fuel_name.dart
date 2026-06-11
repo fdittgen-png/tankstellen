@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 
 /// ARB-localized display name for a [FuelType] (#2887, Epic #2881).
 ///

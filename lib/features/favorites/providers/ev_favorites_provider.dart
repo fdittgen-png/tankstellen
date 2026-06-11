@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../ev/domain/entities/charging_station.dart';
+import '../../../core/domain/ev/charging_station.dart';
 import 'favorites_provider.dart';
 import '../../../core/logging/error_logger.dart';
 

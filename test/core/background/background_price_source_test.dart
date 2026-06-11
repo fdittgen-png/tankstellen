@@ -10,8 +10,8 @@ import 'package:tankstellen/core/services/country_service_registry.dart';
 import 'package:tankstellen/core/services/fuel_service_policy.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 import '../../fakes/fake_storage_repository.dart';
 

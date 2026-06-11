@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../../search/data/models/search_params.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/search_params.dart';
+import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/impl/osm_brand_enricher.dart';
 import 'france_opening_hours_adapter.dart';

@@ -7,7 +7,7 @@ import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/widgets/service_status_banner.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/search/presentation/widgets/fuel_type_selector.dart';
 import 'package:tankstellen/features/search/presentation/widgets/station_card.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/language_selector.dart';

@@ -10,8 +10,8 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/features/station_services/uk/uk_station_service.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Fake HTTP adapter that returns a canned response per URL.

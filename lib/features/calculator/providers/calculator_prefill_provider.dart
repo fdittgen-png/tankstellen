@@ -8,11 +8,11 @@ import '../../../core/utils/station_extensions.dart';
 import '../../consumption/providers/consumption_providers.dart';
 import '../../consumption/providers/trip_history_provider.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 import '../../search/providers/search_filters_provider.dart';
 import '../../search/providers/search_provider.dart';
 import '../../search/providers/selected_station_provider.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 
 part 'calculator_prefill_provider.g.dart';

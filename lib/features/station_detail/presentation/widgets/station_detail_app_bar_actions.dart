@@ -21,7 +21,7 @@ import '../../../feature_management/domain/feature.dart';
 import '../../../payment/domain/qr_payment_decoder.dart';
 import '../../../payment/presentation/scan_payment_dispatcher.dart';
 import '../../../payment/presentation/widgets/unknown_qr_dialog.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../../../sync/presentation/widgets/qr_scanner_screen.dart';
 import '../../providers/station_detail_provider.dart';
 import 'station_brand_helpers.dart';

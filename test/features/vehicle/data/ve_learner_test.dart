@@ -7,7 +7,7 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_repository.dart';
 import 'package:tankstellen/features/vehicle/data/ve_learner.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Seed helper — builds a [TripHistoryEntry] with the handful of
 /// fields the learner actually reads (distance, integrated fuel,

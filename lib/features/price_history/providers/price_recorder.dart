@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/foundation.dart';
-import '../../search/domain/entities/station.dart';
+import '../../../core/domain/station.dart';
 import '../data/models/price_record.dart';
 import '../data/repositories/price_history_repository.dart';
 

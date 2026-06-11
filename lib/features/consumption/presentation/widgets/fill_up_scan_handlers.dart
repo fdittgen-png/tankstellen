@@ -10,7 +10,7 @@ import '../../../../core/feedback/github_issue_reporter.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../data/pump_scan_disposition.dart';
 import '../../data/receipt_scan_service.dart';
 import '../screens/pump_display_camera_screen.dart';

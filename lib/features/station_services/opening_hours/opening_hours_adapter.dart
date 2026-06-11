@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
-import '../../station_detail/domain/opening_hours.dart';
+import '../../../core/domain/opening_hours.dart';
 
 /// Per-country adapter that normalises a provider's raw opening-hours payload
 /// into the common [WeeklyOpeningHours] model.

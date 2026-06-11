@@ -14,7 +14,7 @@ import '../../../core/sync/trips_sync.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/obd2/active_trip_repository.dart';
 import '../data/obd2/obd2_comm_diagnostics.dart';

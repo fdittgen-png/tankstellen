@@ -7,12 +7,12 @@ import '../../../../core/country/country_config.dart';
 import '../../../../core/country/country_time.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/amenity_chips.dart';
 import '../../../search/presentation/widgets/pay_with_app_button.dart';
 import '../../../search/presentation/widgets/payment_method_chips.dart';
 import '../../domain/legacy_opening_hours_bridge.dart';
-import '../../domain/opening_hours.dart';
+import '../../../../core/domain/opening_hours.dart';
 import 'opening_hours_view.dart';
 
 /// Address, opening hours, fuels, services, and location info for a station.

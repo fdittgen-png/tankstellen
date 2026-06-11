@@ -6,7 +6,7 @@ import 'package:tankstellen/core/sync/fill_ups_sync.dart';
 import 'package:tankstellen/core/sync/sync_run_trace.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import 'fake_sync_transport.dart';
 

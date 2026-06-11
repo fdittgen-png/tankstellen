@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/opening_hours.dart';
+import 'package:tankstellen/core/domain/ev/opening_hours.dart';
 
 void main() {
   group('RegularHours', () {

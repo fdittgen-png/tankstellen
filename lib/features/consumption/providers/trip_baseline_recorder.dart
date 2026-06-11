@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/baselines_sync.dart';
 import '../../sync/providers/baseline_sync_enabled_provider.dart';
-import '../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/domain/fuzzy_classifier.dart';
 import '../../vehicle/providers/calibration_mode_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';

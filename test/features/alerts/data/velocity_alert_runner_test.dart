@@ -13,7 +13,7 @@ import 'package:tankstellen/features/alerts/data/velocity_alert_cooldown.dart';
 import 'package:tankstellen/features/alerts/data/velocity_alert_runner.dart';
 import 'package:tankstellen/features/alerts/domain/entities/velocity_alert_config.dart';
 import 'package:tankstellen/features/alerts/domain/velocity_alert_detector.dart';
-import 'package:tankstellen/features/search/domain/entities/fuel_type.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Captures every notification the runner fires. Stand-in for
 /// [LocalNotificationService] — the BG-isolate hook just needs

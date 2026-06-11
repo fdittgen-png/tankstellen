@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../domain/entities/search_mode.dart';
+import '../../../core/domain/search_mode.dart';
 
 part 'search_mode_provider.g.dart';
 

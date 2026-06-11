@@ -10,7 +10,7 @@ import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// #695 — Favorites from countries other than the active profile's country
 /// must still be visible and refreshable. The provider groups favorites

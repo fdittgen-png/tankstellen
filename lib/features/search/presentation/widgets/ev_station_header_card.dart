@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../ev/domain/entities/charging_station.dart';
+import '../../../../core/domain/ev/charging_station.dart';
 
 /// Header card showing status, name, and operator for an EV station.
 class EVStationHeaderCard extends StatelessWidget {

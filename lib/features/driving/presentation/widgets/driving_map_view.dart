@@ -8,8 +8,8 @@ import '../../../../core/utils/price_utils.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../../map/presentation/widgets/station_map_layers.dart';
 import '../../../map/presentation/widgets/station_marker.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 
 /// Full-screen map for driving mode. #3002 (Epic #2997) — driving now renders
 /// on the SHARED [StationMapLayers] stack (the same price-band colours +

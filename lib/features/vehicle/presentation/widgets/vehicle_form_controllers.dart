@@ -4,10 +4,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../search/domain/entities/fuel_type.dart';
+import '../../../../core/domain/fuel_type.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// Bundles the text controllers, focus node, and scalar form state
 /// used by [EditVehicleScreen]. Keeps the screen class focused on

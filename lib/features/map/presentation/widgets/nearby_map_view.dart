@@ -13,8 +13,8 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/search_result_item.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/search_result_item.dart';
 import '../../../search/providers/search_screen_ui_provider.dart';
 import 'station_map_layers.dart';
 

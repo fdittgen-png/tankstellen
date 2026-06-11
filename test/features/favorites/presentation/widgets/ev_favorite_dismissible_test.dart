@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/ev/domain/entities/charging_station.dart';
+import 'package:tankstellen/core/domain/ev/charging_station.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_card.dart';
 import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_dismissible.dart';
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';

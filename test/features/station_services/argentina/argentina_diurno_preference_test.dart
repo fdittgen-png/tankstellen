@@ -11,7 +11,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/station_services/argentina/argentina_station_service.dart';
 
 class _CsvAdapter implements HttpClientAdapter {

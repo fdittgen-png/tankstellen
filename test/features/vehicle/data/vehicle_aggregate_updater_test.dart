@@ -12,9 +12,9 @@ import 'package:tankstellen/features/vehicle/data/repositories/vehicle_profile_r
 import 'package:tankstellen/features/vehicle/data/vehicle_aggregate_updater.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_speed_consumption_aggregator.dart';
 import 'package:tankstellen/features/vehicle/data/vehicle_trip_length_aggregator.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/speed_consumption_histogram.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/trip_length_breakdown.dart';
-import 'package:tankstellen/features/vehicle/domain/entities/vehicle_profile.dart';
+import 'package:tankstellen/core/domain/speed_consumption_histogram.dart';
+import 'package:tankstellen/core/domain/trip_length_breakdown.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 /// Builds a [TripHistoryEntry] with the minimum metadata the aggregator
 /// looks at: distance, fuel, vehicle id. Other summary fields default

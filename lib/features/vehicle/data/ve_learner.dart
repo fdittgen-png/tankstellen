@@ -4,7 +4,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../consumption/data/trip_history_repository.dart';
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 import 'repositories/vehicle_profile_repository.dart';
 
 /// Outcome of a single [VeLearner.reconcileAfterFillUp] update (#815).

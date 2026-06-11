@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/approach_detector.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorite_stations_provider.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/station.dart';
 import '../../providers/approach_simulator_provider.dart';
 import '../../providers/effective_approach_state_provider.dart';
 

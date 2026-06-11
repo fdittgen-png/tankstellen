@@ -3,7 +3,7 @@
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/open_now.dart';
-import '../../domain/opening_hours.dart';
+import '../../../../core/domain/opening_hours.dart';
 
 /// Pure formatting helpers shared by the opening-hours display widgets
 /// (Epic #2707 C2, #2709). Kept separate from the widget tree so the

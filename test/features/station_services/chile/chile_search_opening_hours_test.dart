@@ -9,7 +9,7 @@
 // station renders empty hours on the dominant repeat path.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/station_service_chain_codec.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 import 'package:tankstellen/features/station_services/chile/chile_response_parser.dart';
 
 void main() {

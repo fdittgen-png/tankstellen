@@ -10,8 +10,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/search/data/models/search_params.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/station_services/slovenia/slovenia_station_service.dart';
 
 class _FixtureAdapter implements HttpClientAdapter {

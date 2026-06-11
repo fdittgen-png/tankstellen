@@ -10,7 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../core/notifications/notification_service.dart';
 import '../../../core/storage/hive_boxes.dart';
-import '../../search/domain/entities/fuel_type.dart';
+import '../../../core/domain/fuel_type.dart';
 import '../domain/entities/velocity_alert_config.dart';
 import '../domain/velocity_alert_detector.dart';
 import 'models/price_snapshot.dart';

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../domain/entities/reference_vehicle.dart';
-import '../domain/entities/vehicle_profile.dart';
+import '../../../core/domain/vehicle_profile.dart';
 
 /// Pure utility for matching a [VehicleProfile] against the
 /// [ReferenceVehicle] catalog (#950 phase 4).

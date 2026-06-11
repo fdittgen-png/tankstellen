@@ -3,7 +3,7 @@
 
 import 'dart:async';
 
-import '../../../features/search/domain/entities/station.dart';
+import '../../domain/station.dart';
 
 /// One just-in-time price fetch for a single imminent station — the caller
 /// supplies this, routed through the per-service rate limiter

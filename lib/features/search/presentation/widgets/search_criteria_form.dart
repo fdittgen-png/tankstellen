@@ -10,7 +10,7 @@ import '../../../../core/widgets/help_banner.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../route_search/domain/entities/route_info.dart';
 import '../../../route_search/presentation/widgets/route_input.dart';
-import '../../domain/entities/search_mode.dart';
+import '../../../../core/domain/search_mode.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_screen_ui_provider.dart';

@@ -10,7 +10,7 @@
 // it was RED on master (e4c500bb) and is GREEN after the field serializes.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/station_service_chain_codec.dart';
-import 'package:tankstellen/features/station_detail/domain/opening_hours.dart';
+import 'package:tankstellen/core/domain/opening_hours.dart';
 import 'package:tankstellen/features/station_services/france/prix_carburants_parsers.dart';
 
 void main() {

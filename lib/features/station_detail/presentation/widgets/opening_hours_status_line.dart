@@ -8,7 +8,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/open_now.dart';
-import '../../domain/opening_hours.dart';
+import '../../../../core/domain/opening_hours.dart';
 import 'opening_hours_format.dart';
 
 /// The hero status line of the opening-hours card (Epic #2707 C2, #2709):

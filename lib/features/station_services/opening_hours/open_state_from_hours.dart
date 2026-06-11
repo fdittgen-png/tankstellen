@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../station_detail/domain/open_now.dart';
-import '../../station_detail/domain/opening_hours.dart';
+import '../../../core/domain/opening_hours.dart';
 
 /// Derives the tri-state `Station.isOpen` snapshot from a parsed weekly
 /// schedule at fetch time (#3198).

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/ve_learner.dart';
 import '../../domain/entities/reference_vehicle.dart';
-import '../../domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 
 /// One of the four manual-override calibration fields surfaced by
 /// [CalibrationSection] (#1397).

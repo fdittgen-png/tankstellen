@@ -13,8 +13,8 @@ import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
-import '../../../search/domain/entities/fuel_type.dart';
-import '../../../search/domain/entities/station.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/station_card.dart';
 import '../../providers/favorites_provider.dart';
 

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/app_pill.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/station_amenity.dart';
+import '../../../../core/domain/station_amenity.dart';
 
 /// Displays station amenities as compact icon chips.
 ///

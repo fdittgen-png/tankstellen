@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:geolocator/geolocator.dart';
 
-import '../../features/search/domain/entities/fuel_type.dart';
-import '../../features/search/domain/entities/station.dart';
+import '../domain/fuel_type.dart';
+import '../domain/station.dart';
 import '../logging/error_logger.dart';
 import '../utils/geo_utils.dart' as geo;
 import '../utils/num_extensions.dart';

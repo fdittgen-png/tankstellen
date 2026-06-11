@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/price_history/data/models/price_record.dart';
 import 'package:tankstellen/features/price_history/data/repositories/price_history_repository.dart';
 import 'package:tankstellen/features/price_history/providers/price_recorder.dart';
-import 'package:tankstellen/features/search/domain/entities/station.dart';
+import 'package:tankstellen/core/domain/station.dart';
 
 /// Fake repository that tracks recorded prices and can simulate failures.
 class _FakePriceHistoryRepo implements PriceHistoryRepository {

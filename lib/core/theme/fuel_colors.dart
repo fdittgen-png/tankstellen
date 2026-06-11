@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
-import '../../features/search/domain/entities/fuel_type.dart';
+import '../domain/fuel_type.dart';
 
 /// Distinct colors for each fuel type, for use in charts, badges, and
 /// map markers.

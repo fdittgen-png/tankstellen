@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../../vehicle/domain/entities/gps_calibration_matrix.dart';
-import '../../../vehicle/domain/entities/vehicle_profile.dart';
+import '../../../../core/domain/gps_calibration_matrix.dart';
+import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/obd2/trip_live_reading.dart';
 import '../driving_coaching.dart'
     show DrivingCoachingHint, gpsCoachingHint, recentSamplesWithin;
