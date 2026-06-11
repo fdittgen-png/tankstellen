@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Fallback widget shown when a deep link supplies an id that fails
@@ -25,7 +26,7 @@ Widget invalidIdScreen(BuildContext context, String path) {
           ),
           const SizedBox(height: 16),
           FilledButton(
-            onPressed: () => context.go('/'),
+            onPressed: () => context.go(RoutePaths.search),
             child: Text(l?.home ?? 'Home'),
           ),
         ],

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../../features/carbon/presentation/screens/carbon_dashboard_screen.dart';
 import '../../features/consumption/presentation/screens/add_fill_up_screen.dart';
 import '../../features/consumption/presentation/screens/consumption_statistics_screen.dart';
@@ -14,7 +15,6 @@ import '../../features/consumption/presentation/screens/trip_detail_screen.dart'
 import '../../features/consumption/presentation/screens/trip_recording_screen.dart';
 import '../../features/feature_management/application/feature_flags_provider.dart';
 import '../../features/feature_management/domain/feature.dart';
-import '../../core/domain/fuel_type.dart';
 import 'invalid_id_screen.dart';
 
 /// Routes that drive the "behind-the-wheel" savings lens: consumption logging,
@@ -23,11 +23,11 @@ import 'invalid_id_screen.dart';
 /// file owns every consumption route that pushes on top of the shell.
 List<RouteBase> get consumptionRoutes => [
   GoRoute(
-    path: '/consumption',
+    path: RoutePaths.consumption,
     builder: (context, state) => const ConsumptionScreen(),
   ),
   GoRoute(
-    path: '/carbon',
+    path: RoutePaths.carbon,
     // #1613 — the Carbon dashboard is gated on Feature.carbonDashboard.
     // Guarding the route (not just the entry-point button) means a
     // deep link or restored navigation stack cannot reach the
@@ -39,7 +39,7 @@ List<RouteBase> get consumptionRoutes => [
             .contains(Feature.carbonDashboard);
         if (!enabled) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (context.mounted) context.go('/consumption-tab');
+            if (context.mounted) context.go(RoutePaths.consumptionTab);
           });
           return const SizedBox.shrink();
         }
@@ -51,11 +51,11 @@ List<RouteBase> get consumptionRoutes => [
   // comparison + evolution charts). No feature gate: it re-presents
   // fill-up data the user already sees on the summary card.
   GoRoute(
-    path: '/consumption-stats',
+    path: RoutePaths.consumptionStats,
     builder: (_, _) => const ConsumptionStatisticsPage(),
   ),
   GoRoute(
-    path: '/consumption/pick-station',
+    path: RoutePaths.pickStationForFillUp,
     builder: (_, _) => const PickStationForFillUpScreen(),
   ),
   // #726 — global trip recording view. The recording session
@@ -65,14 +65,14 @@ List<RouteBase> get consumptionRoutes => [
   // re-entered by tapping the banner shown on every screen
   // while a trip is active.
   GoRoute(
-    path: '/trip-recording',
+    path: RoutePaths.tripRecording,
     builder: (_, _) => const TripRecordingScreen(),
   ),
   // #889 — placeholder trip-detail route wired up alongside the
   // new Trajets tab on the Consumption screen. Full detail UI
   // (timeline / per-minute consumption / map) lands in #890.
   GoRoute(
-    path: '/trip/:id',
+    path: RoutePaths.tripPattern,
     builder: (context, state) {
       final id = state.pathParameters['id'];
       if (id == null || id.isEmpty) {
@@ -82,26 +82,18 @@ List<RouteBase> get consumptionRoutes => [
     },
   ),
   GoRoute(
-    path: '/consumption/add',
+    path: RoutePaths.addFillUp,
     builder: (context, state) {
+      // #3135 — the pre-fill payload crosses as the typed [AddFillUpRoute]
+      // itself (it used to be a stringly-keyed Map). A redirect-driven
+      // entry (shared receipt, #2735) carries no extra → bare form.
       final extra = state.extra;
-      String? stationId;
-      String? stationName;
-      FuelType? fuelType;
-      double? pricePerLiter;
-      if (extra is Map) {
-        stationId = extra['stationId']?.toString();
-        stationName = extra['stationName']?.toString();
-        final ft = extra['fuelType'];
-        if (ft is FuelType) fuelType = ft;
-        final price = extra['pricePerLiter'];
-        if (price is num) pricePerLiter = price.toDouble();
-      }
+      final args = extra is AddFillUpRoute ? extra : null;
       return AddFillUpScreen(
-        stationId: stationId,
-        stationName: stationName,
-        preFilledFuelType: fuelType,
-        preFilledPricePerLiter: pricePerLiter,
+        stationId: args?.stationId,
+        stationName: args?.stationName,
+        preFilledFuelType: args?.fuelType,
+        preFilledPricePerLiter: args?.pricePerLiter,
       );
     },
   ),

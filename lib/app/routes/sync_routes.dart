@@ -3,6 +3,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../../features/sync/presentation/screens/auth_screen.dart';
 import '../../features/sync/presentation/screens/data_transparency_screen.dart';
 import '../../features/sync/presentation/screens/link_device_screen.dart';
@@ -13,19 +14,19 @@ import '../../features/sync/presentation/screens/sync_setup_screen.dart';
 /// users who never opt into sync never see them.
 List<RouteBase> get syncRoutes => [
       GoRoute(
-        path: '/sync-setup',
+        path: RoutePaths.syncSetup,
         builder: (context, state) => const SyncSetupScreen(),
       ),
       GoRoute(
-        path: '/link-device',
+        path: RoutePaths.linkDevice,
         builder: (context, state) => const LinkDeviceScreen(),
       ),
       GoRoute(
-        path: '/data-transparency',
+        path: RoutePaths.dataTransparency,
         builder: (context, state) => const DataTransparencyScreen(),
       ),
       GoRoute(
-        path: '/auth',
+        path: RoutePaths.auth,
         builder: (context, state) => const AuthScreen(),
       ),
     ];

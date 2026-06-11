@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../core/navigation/app_routes.dart';
+
 /// Parses a home-widget launch URI into the router path it should push.
 ///
 /// URI contract (set natively by `StationWidgetRenderer.buildActivity`):
@@ -29,5 +31,7 @@ String? widgetUriToPath(Uri? uri) {
   if (uri.host != 'station') return null;
   final id = uri.queryParameters['id'];
   if (id == null || id.isEmpty) return null;
-  return id.startsWith('ocm-') ? '/ev-station/$id' : '/station/$id';
+  return id.startsWith('ocm-')
+      ? RoutePaths.evStationById(id)
+      : RoutePaths.station(id);
 }

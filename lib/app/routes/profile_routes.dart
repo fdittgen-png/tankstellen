@@ -3,6 +3,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../../features/itinerary/presentation/screens/itineraries_screen.dart';
 import '../../features/loyalty/presentation/loyalty_settings_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/developer_tools_screen.dart';
@@ -22,11 +23,11 @@ import '../../features/vehicle/presentation/screens/vehicle_list_screen.dart';
 /// on `Feature.debugMode` so a stale deep-link cannot expose them.
 List<RouteBase> get profileRoutes => [
       GoRoute(
-        path: '/vehicles',
+        path: RoutePaths.vehicles,
         builder: (context, state) => const VehicleListScreen(),
       ),
       GoRoute(
-        path: '/vehicles/edit',
+        path: RoutePaths.editVehicle,
         builder: (context, state) {
           final extra = state.extra;
           final vehicleId = extra is String ? extra : null;
@@ -34,11 +35,11 @@ List<RouteBase> get profileRoutes => [
         },
       ),
       GoRoute(
-        path: '/itineraries',
+        path: RoutePaths.itineraries,
         builder: (context, state) => const ItinerariesScreen(),
       ),
       GoRoute(
-        path: '/privacy-dashboard',
+        path: RoutePaths.privacyDashboard,
         builder: (context, state) => const PrivacyDashboardScreen(),
       ),
       // #897 — dedicated Theme settings screen, pushed from the
@@ -46,42 +47,42 @@ List<RouteBase> get profileRoutes => [
       // the inline bottom sheet so the Theme entry matches the
       // Privacy + Storage card pattern.
       GoRoute(
-        path: '/theme-settings',
+        path: RoutePaths.themeSettings,
         builder: (context, state) => const ThemeSettingsScreen(),
       ),
       // #1120 — fuel-club / loyalty discount settings. Pilot ships
       // with one brand (Total Energies); the screen lists, adds,
       // toggles, and deletes user-entered cards.
       GoRoute(
-        path: '/loyalty-settings',
+        path: RoutePaths.loyaltySettings,
         builder: (context, state) => const LoyaltySettingsScreen(),
       ),
       // #2248 — Developer / Debug tools. Reached from the Settings tile
       // that only renders when `Feature.debugMode` is on; the screens
       // also self-guard on the flag so a stale deep-link is inert.
       GoRoute(
-        path: '/developer-tools',
+        path: RoutePaths.developerTools,
         builder: (context, state) => const DeveloperToolsScreen(),
       ),
       GoRoute(
-        path: '/developer-tools/error-log',
+        path: RoutePaths.developerToolsErrorLog,
         builder: (context, state) => const ErrorLogViewerScreen(),
       ),
       GoRoute(
-        path: '/developer-tools/flags',
+        path: RoutePaths.developerToolsFlags,
         builder: (context, state) => const FeatureFlagDumpScreen(),
       ),
       // #2471 — OBD2 communication-health diagnostics (Epic #2463 TAIL).
       // Self-guards on `Feature.debugMode` like the rest of the dev tools.
       GoRoute(
-        path: '/developer-tools/obd2-health',
+        path: RoutePaths.developerToolsObd2Health,
         builder: (context, state) => const Obd2HealthScreen(),
       ),
       // #2518 — in-app OCR tester (Epic #2516 Child 2): runs the pump /
       // receipt pipeline on a chosen image and shows the block overlay +
       // step trace. Self-guards on `Feature.debugMode` like its siblings.
       GoRoute(
-        path: '/developer-tools/ocr-tester',
+        path: RoutePaths.developerToolsOcrTester,
         builder: (context, state) => const PumpOcrTesterScreen(),
       ),
     ];

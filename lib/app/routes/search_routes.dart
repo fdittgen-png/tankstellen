@@ -3,6 +3,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../../features/alerts/presentation/screens/alerts_screen.dart';
 import '../../features/calculator/presentation/screens/calculator_screen.dart';
 import '../../features/driving/presentation/screens/driving_mode_screen.dart';
@@ -13,15 +14,15 @@ import '../../features/driving/presentation/screens/driving_mode_screen.dart';
 /// any shell branch.
 List<RouteBase> get searchRoutes => [
       GoRoute(
-        path: '/driving',
+        path: RoutePaths.driving,
         builder: (context, state) => const DrivingModeScreen(),
       ),
       GoRoute(
-        path: '/alerts',
+        path: RoutePaths.alerts,
         builder: (context, state) => const AlertsScreen(),
       ),
       GoRoute(
-        path: '/calculator',
+        path: RoutePaths.calculator,
         builder: (context, state) {
           // #2543 — the search-results launch passes the price the
           // user was looking at as `extra` so the calculator opens

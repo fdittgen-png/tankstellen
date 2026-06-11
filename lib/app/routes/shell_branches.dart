@@ -4,6 +4,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../../features/consumption/presentation/screens/consumption_screen.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../features/map/presentation/screens/map_screen.dart';
@@ -32,7 +33,7 @@ List<StatefulShellBranch> get shellBranches => [
         navigatorKey: searchBranchNavigatorKey,
         routes: [
           GoRoute(
-            path: '/',
+            path: RoutePaths.search,
             builder: (context, state) => const SearchScreen(),
           ),
         ],
@@ -40,7 +41,7 @@ List<StatefulShellBranch> get shellBranches => [
       StatefulShellBranch(
         routes: [
           GoRoute(
-            path: '/map',
+            path: RoutePaths.map,
             builder: (context, state) => const MapScreen(),
           ),
         ],
@@ -48,7 +49,7 @@ List<StatefulShellBranch> get shellBranches => [
       StatefulShellBranch(
         routes: [
           GoRoute(
-            path: '/favorites',
+            path: RoutePaths.favorites,
             builder: (context, state) => const FavoritesScreen(),
           ),
         ],
@@ -59,7 +60,7 @@ List<StatefulShellBranch> get shellBranches => [
       StatefulShellBranch(
         routes: [
           GoRoute(
-            path: '/consumption-tab',
+            path: RoutePaths.consumptionTab,
             builder: (_, _) => const ConsumptionScreen(
               section: ConsumptionSection.fuel,
             ),
@@ -69,7 +70,7 @@ List<StatefulShellBranch> get shellBranches => [
       StatefulShellBranch(
         routes: [
           GoRoute(
-            path: '/profile',
+            path: RoutePaths.profile,
             builder: (context, state) => const ProfileScreen(),
           ),
         ],
@@ -80,7 +81,7 @@ List<StatefulShellBranch> get shellBranches => [
       StatefulShellBranch(
         routes: [
           GoRoute(
-            path: '/trajets-tab',
+            path: RoutePaths.trajetsTab,
             builder: (_, _) => const ConsumptionScreen(
               section: ConsumptionSection.trajets,
             ),

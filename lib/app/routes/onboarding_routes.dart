@@ -3,6 +3,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../core/navigation/app_routes.dart';
 import '../../features/consent/presentation/screens/gdpr_consent_screen.dart';
 import '../../features/setup/presentation/screens/onboarding_wizard_screen.dart';
 
@@ -11,11 +12,11 @@ import '../../features/setup/presentation/screens/onboarding_wizard_screen.dart'
 /// [routerProvider] can deep-link straight to either of them.
 List<RouteBase> get onboardingRoutes => [
       GoRoute(
-        path: '/consent',
+        path: RoutePaths.consent,
         builder: (context, state) => const GdprConsentScreen(),
       ),
       GoRoute(
-        path: '/setup',
+        path: RoutePaths.setup,
         builder: (context, state) => const OnboardingWizardScreen(),
       ),
     ];
