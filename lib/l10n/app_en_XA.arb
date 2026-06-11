@@ -1091,6 +1091,8 @@
   "velocityAlertNotificationBody": "⟦{count} šŧáŧîóñš đřóƥƥéđ ƀý úƥ ŧó {cents}¢ îñ ŧĥé łášŧ ĥóúř ···············⟧",
   "radiusAlertGroupedTitle": "⟦{label}: {count} šŧáŧîóñš ≤ {threshold} {currency} ····⟧",
   "radiusAlertGroupedMore": "⟦+ {count} ɱóřé ··⟧",
+  "alertsLastChecked": "⟦Łášŧ çĥéçķéđ: {when} ·····⟧",
+  "alertsLastCheckedNever": "⟦Ƥřîçéš ĥáṽéñ'ŧ ƀééñ çĥéçķéđ îñ ŧĥé ƀáçķǧřóúñđ ýéŧ ··················⟧",
   "alertTargetPriceWithCurrency": "⟦Ŧářǧéŧ ƥřîçé ({currency}) ·····⟧",
   "alertThresholdWithCurrency": "⟦Ŧĥřéšĥółđ ({currency}/Ł) ·····⟧",
   "approachOverlaySection": "⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧",

@@ -23,7 +23,6 @@ import '../notifications/notification_service.dart';
 import '../services/country_service_registry.dart';
 import '../storage/hive_storage.dart';
 import '../storage/storage_keys.dart';
-import '../telemetry/storage/isolate_error_spool.dart';
 import '../utils/json_extensions.dart';
 import 'country_alert_strategy_resolver.dart';
 import 'fuel_price_fields.dart';
@@ -53,7 +52,9 @@ class BackgroundScanRunners {
   /// LPG / CNG / E98 alert in a country whose provider exposes that fuel fires,
   /// and the notification renders in that country's currency. DE e5/e10/diesel
   /// resolution + the euro are unchanged.
-  static Future<void> runPerStationAlerts({
+  /// Returns the number of notifications fired (#3147 — the count feeds
+  /// the coordinator's persisted scan journal).
+  static Future<int> runPerStationAlerts({
     required AlertRepository repo,
     required List<PriceAlert> alerts,
     required Map<String, Map<String, dynamic>> prices,
@@ -70,7 +71,7 @@ class BackgroundScanRunners {
               : 'no active alerts')
           : 'no prices fetched (refresh failed?)';
       debugPrint('BackgroundScanRunners: alert loop skipped — $reason');
-      return;
+      return 0;
     }
 
     final notify = notifier ?? LocalNotificationService();
@@ -119,6 +120,7 @@ class BackgroundScanRunners {
       await repo.saveAlert(alert.copyWith(lastTriggeredAt: now));
     }
     debugPrint('BackgroundScanRunners: $notificationCount alerts triggered');
+    return notificationCount;
   }
 
   /// #579 — velocity detector across nearby stations.
@@ -127,7 +129,8 @@ class BackgroundScanRunners {
   /// the active country ([fallbackCountryCode]), so the detector runs on the
   /// fuel the user's country actually exposes (e.g. an LPG velocity alert in FR)
   /// rather than the DE-only e5/e10/diesel switch.
-  static Future<void> runVelocity({
+  /// Returns 1 when a velocity notification fired, else 0 (#3147).
+  static Future<int> runVelocity({
     required HiveStorage storage,
     required Map<String, Map<String, dynamic>> prices,
     required DateTime now,
@@ -150,7 +153,7 @@ class BackgroundScanRunners {
       if (fuelKey == null) {
         debugPrint('BackgroundScanRunners: velocity skipped — '
             '${config.fuelType.apiValue} not in the active country feed');
-        return;
+        return 0;
       }
       final observations = <VelocityStationObservation>[];
       for (final entry in prices.entries) {
@@ -176,7 +179,7 @@ class BackgroundScanRunners {
       if (observations.isEmpty) {
         debugPrint('BackgroundScanRunners: velocity has no usable '
             'observations');
-        return;
+        return 0;
       }
       final userLat = storage.getSetting(StorageKeys.userPositionLat) as num?;
       final userLng = storage.getSetting(StorageKeys.userPositionLng) as num?;
@@ -189,17 +192,20 @@ class BackgroundScanRunners {
       if (event != null) {
         debugPrint('BackgroundScanRunners: velocity alert '
             '${event.fuelType.apiValue}, count=${event.stationCount}');
+        return 1;
       }
+      return 0;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-        'where': 'BackgroundScanRunners: velocity detector failed'
+      // #3147 bonus — single log call: `errorLogger.log` already routes
+      // to the IsolateErrorSpool when unbound, so the former explicit
+      // `IsolateErrorSpool.enqueue` double-logged every failure (halving
+      // the effective spool depth); context travels in the map instead.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+        'where': 'BackgroundScanRunners: velocity detector failed',
+        'isolateTaskName': 'velocity_detector',
+        'priceCount': prices.length,
       }));
-      await IsolateErrorSpool.enqueue(
-        isolateTaskName: 'velocity_detector',
-        error: e,
-        stack: st,
-        contextMap: <String, dynamic>{'priceCount': prices.length},
-      );
+      return 0;
     }
   }
 
@@ -219,7 +225,8 @@ class BackgroundScanRunners {
   /// country reuse one strategy (and, for bulk, one in-memory dataset). A
   /// centre whose country has no buildable strategy (e.g. the AU stub) yields
   /// no samples this scan.
-  static Future<void> runRadiusAlerts({
+  /// Returns the number of radius alerts fired (#3147).
+  static Future<int> runRadiusAlerts({
     required DateTime now,
     required CountryAlertStrategyResolver resolver,
     required BackgroundNotificationTemplates templates,
@@ -229,7 +236,7 @@ class BackgroundScanRunners {
       final radiusAlerts = await store.list();
       if (radiusAlerts.where((a) => a.enabled).isEmpty) {
         debugPrint('BackgroundScanRunners: no active radius alerts');
-        return;
+        return 0;
       }
       final notifier = LocalNotificationService();
       await notifier.initialize();
@@ -268,15 +275,14 @@ class BackgroundScanRunners {
         },
       );
       debugPrint('BackgroundScanRunners: ${fired.length} radius alerts fired');
+      return fired.length;
     } catch (e, st) {
+      // #3147 bonus — single log call (see [runVelocity]'s catch).
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-        'where': 'BackgroundScanRunners: radius alert runner failed'
+        'where': 'BackgroundScanRunners: radius alert runner failed',
+        'isolateTaskName': 'radius_alerts',
       }));
-      await IsolateErrorSpool.enqueue(
-        isolateTaskName: 'radius_alerts',
-        error: e,
-        stack: st,
-      );
+      return 0;
     }
   }
 }

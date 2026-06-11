@@ -3642,6 +3642,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String alertsLastChecked(String when) {
+    return 'Last checked: $when';
+  }
+
+  @override
+  String get alertsLastCheckedNever =>
+      'Prices haven\'t been checked in the background yet';
+
+  @override
   String alertTargetPriceWithCurrency(String currency) {
     return 'Target price ($currency)';
   }
@@ -11489,6 +11498,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String radiusAlertGroupedMore(String count) {
     return '⟦+ $count ɱóřé ··⟧';
   }
+
+  @override
+  String alertsLastChecked(String when) {
+    return '⟦Łášŧ çĥéçķéđ: $when ·····⟧';
+  }
+
+  @override
+  String get alertsLastCheckedNever =>
+      '⟦Ƥřîçéš ĥáṽéñ\'ŧ ƀééñ çĥéçķéđ îñ ŧĥé ƀáçķǧřóúñđ ýéŧ ··················⟧';
 
   @override
   String alertTargetPriceWithCurrency(String currency) {

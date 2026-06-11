@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../background/alert_scan_journal.dart';
 import '../health_counters.dart';
 import '../models/error_trace.dart';
 import '../pii_scrubber.dart';
@@ -196,6 +197,9 @@ class TraceStorage {
       // country codes / sync-table names / ble.*, never user data).
       'diagnostics': <String, Object?>{
         'healthCounters': healthCounters.exportSnapshot(),
+        // #3147 — the rolling alert-scan journal (ran / skipped+why /
+        // failed, stations fetched, alerts fired), newest first.
+        'alertScanJournal': AlertScanJournal.exportSection(),
       },
     };
     // #3184 — feature-registered sections (e.g. obd2ConnectTraces). A

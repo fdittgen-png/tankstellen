@@ -10,6 +10,7 @@ import '../../features/widget/data/home_widget_service.dart';
 import '../logging/error_logger.dart';
 import '../storage/hive_storage.dart';
 import '../cache/cache_manager.dart';
+import 'alert_scan_journal.dart';
 import 'background_price_history_writer.dart';
 import 'background_price_source.dart';
 import 'background_scan_dedup_store.dart';
@@ -104,11 +105,15 @@ class BackgroundAlertScanCoordinator {
   static const retryBaseDelay = Duration(seconds: 2);
 
   final BackgroundScanDedupStore _dedup;
+  final AlertScanJournal _journal;
 
-  /// Creates a coordinator. [dedup] is injectable so unit tests can drive
-  /// the cooldown gate with a fake/seeded store.
-  BackgroundAlertScanCoordinator({BackgroundScanDedupStore? dedup})
-      : _dedup = dedup ?? BackgroundScanDedupStore();
+  /// Creates a coordinator. [dedup] and [journal] are injectable so unit
+  /// tests can drive the cooldown gate / journal with fakes.
+  BackgroundAlertScanCoordinator({
+    BackgroundScanDedupStore? dedup,
+    AlertScanJournal? journal,
+  })  : _dedup = dedup ?? BackgroundScanDedupStore(),
+        _journal = journal ?? AlertScanJournal();
 
   /// Run one background scan on behalf of [trigger].
   ///
@@ -140,6 +145,11 @@ class BackgroundAlertScanCoordinator {
         debugPrint(
             'BackgroundAlertScanCoordinator: could not acquire Hive lock '
             '(${trigger.tag}), skipping');
+        // #3147 — best-effort: the alerts box is usually NOT open on this
+        // path (the lock holder owns it), so the append may no-op; the
+        // concurrent holder journals its own completed row.
+        await _journal.append(
+            at: at, trigger: trigger.tag, skippedReason: 'hive_lock');
         return false;
       }
 
@@ -153,14 +163,25 @@ class BackgroundAlertScanCoordinator {
         debugPrint(
             'BackgroundAlertScanCoordinator: scan skipped (${trigger.tag}) '
             '— last scan $last is within ${cooldown.inMinutes}m cooldown');
+        await _journal.append(
+            at: at, trigger: trigger.tag, skippedReason: 'cooldown');
         return false;
       }
 
-      await _runScanBody(HiveStorage());
+      final summary = await _runScanBody(HiveStorage());
 
       // Stamp completion only after the body finishes so a crash mid-scan
       // leaves the door open for the next trigger to retry.
       await _dedup.recordScan(now: at, trigger: trigger.tag);
+      // #3147 — persisted audit row: when, what trigger, how many stations
+      // were fetched, how many notifications fired. Rides in the export so
+      // "why didn't I get an alert?" is answerable in the field.
+      await _journal.append(
+        at: at,
+        trigger: trigger.tag,
+        stationsScanned: summary.stationsScanned,
+        alertsFired: summary.alertsFired,
+      );
       return true;
     } catch (e, st) {
       // #3150 — single log call. `errorLogger.log` already routes to the
@@ -171,6 +192,10 @@ class BackgroundAlertScanCoordinator {
         'where': 'BackgroundAlertScanCoordinator: scan failed (${trigger.tag})',
         'isolateTaskName': 'bg_scan_${trigger.tag}',
       }));
+      // #3147 — the error TYPE only (PII-safe), so the journal shows a
+      // failed run distinctly from "no scan ran at all".
+      await _journal.append(
+          at: at, trigger: trigger.tag, error: e.runtimeType.toString());
       return false;
     } finally {
       try {
@@ -188,7 +213,10 @@ class BackgroundAlertScanCoordinator {
   /// once-a-day viewed stations, #2212), record history, evaluate per-
   /// station / velocity / radius alerts, refresh the home widgets. Assumes
   /// Hive is already initialised in this isolate and the lock is held.
-  Future<void> _runScanBody(HiveStorage storage) async {
+  /// Returns the journal counts (#3147): stations with fetched prices +
+  /// total notifications fired across the three runners.
+  Future<({int stationsScanned, int alertsFired})> _runScanBody(
+      HiveStorage storage) async {
     await HiveStorage.loadApiKey();
     final apiKey = storage.getApiKey();
 
@@ -234,7 +262,7 @@ class BackgroundAlertScanCoordinator {
     if (allStationIds.isEmpty) {
       // #609 — users without favorites still need a populated nearest widget.
       await _refreshNearestWidgetFromSearch(storage);
-      return;
+      return (stationsScanned: 0, alertsFired: 0);
     }
 
     // 2. Fetch prices via the registry-driven per-country source (#2862): the
@@ -291,7 +319,7 @@ class BackgroundAlertScanCoordinator {
       await BackgroundPriceHistoryWriter.updateCachedStations(storage, prices);
     }
 
-    await BackgroundScanRunners.runPerStationAlerts(
+    var alertsFired = await BackgroundScanRunners.runPerStationAlerts(
       repo: repo,
       alerts: alerts,
       prices: prices,
@@ -301,7 +329,7 @@ class BackgroundAlertScanCoordinator {
     );
 
     if (prices.isNotEmpty) {
-      await BackgroundScanRunners.runVelocity(
+      alertsFired += await BackgroundScanRunners.runVelocity(
         storage: storage,
         prices: prices,
         now: now,
@@ -310,7 +338,7 @@ class BackgroundAlertScanCoordinator {
       );
     }
 
-    await BackgroundScanRunners.runRadiusAlerts(
+    alertsFired += await BackgroundScanRunners.runRadiusAlerts(
       now: now,
       resolver: resolver,
       templates: templates,
@@ -326,6 +354,8 @@ class BackgroundAlertScanCoordinator {
     // #2866 — dev-gated: snapshot + export this scan's data-access trace so the
     // maintainer reads `aggregates().compliant` per provider (no-op otherwise).
     await tracer.exportIfEnabled();
+
+    return (stationsScanned: prices.length, alertsFired: alertsFired);
   }
 
   /// #609 — nearest-widget refresh from a real search (or legacy fallback).
