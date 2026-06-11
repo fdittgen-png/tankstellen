@@ -24,6 +24,7 @@ import '../core/telemetry/storage/isolate_error_spool.dart';
 import '../core/telemetry/storage/startup_failure_store.dart';
 import '../core/telemetry/storage/trace_storage.dart';
 import '../core/telemetry/trace_recorder.dart';
+import '../core/logging/app_log.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
 import '../core/data/storage_repository.dart';
@@ -228,8 +229,7 @@ class AppInitializer {
         final catalog =
             await container.read(referenceVehicleCatalogProvider.future);
         final matched = await migrator.run(catalog: catalog);
-        debugPrint(
-            'VehicleProfileCatalogMigrator: matched $matched profile(s)');
+        log.info('VehicleProfileCatalogMigrator: matched $matched profile(s)');
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.background, e, st,
             context: {'where': 'vehicleProfileCatalogMigrator'}));
@@ -344,7 +344,12 @@ class AppInitializer {
             try {
               return PiiScrubber.scrubSentryEvent(event);
             } catch (e, st) {
-              debugPrint('Sentry beforeSend scrub failed: $e\n$st');
+              // #3144 — breadcrumb-level (NOT errorLogger): a warn-level
+              // trace from inside beforeSend could recurse through the
+              // Sentry upload path. The breadcrumb still rides inside the
+              // next persisted trace, so the scrub fault is field-visible.
+              log.info('Sentry beforeSend scrub failed: $e\n$st',
+                  tag: 'sentry');
               return event;
             }
           };
@@ -545,13 +550,13 @@ class AppInitializer {
       await Future(() async {
         await TankSyncClient.init(url: url, anonKey: key);
         if (TankSyncClient.client?.auth.currentUser == null) {
-          debugPrint('TankSync: session expired, re-authenticating...');
+          log.info('TankSync: session expired, re-authenticating...');
           await TankSyncClient.signInAnonymously();
         }
         final sessionId = TankSyncClient.client?.auth.currentUser?.id;
         final storedId = storage.getSetting('sync_user_id') as String?;
         if (sessionId != null && sessionId != storedId) {
-          debugPrint('TankSync: userId changed');
+          log.info('TankSync: userId changed');
           await storage.putSetting('sync_user_id', sessionId);
         }
         if (sessionId != null) {
@@ -565,7 +570,7 @@ class AppInitializer {
                 context: {'where': 'maybeInitTankSync users upsert'}));
           }
         }
-        debugPrint('TankSync: ready');
+        log.info('TankSync: ready');
       }).timeout(const Duration(seconds: 8));
     } on TimeoutException catch (e, st) {
       // #3143 — proceeding without sync, but record it: a silent init
@@ -852,7 +857,7 @@ class AppInitializer {
     );
     final recovered = await service.recoverStale();
     if (recovered > 0) {
-      debugPrint(
+      log.info(
           'AppInitializer: recovered $recovered paused trip(s) into history');
     }
   }
@@ -1019,8 +1024,7 @@ class AppInitializer {
         await HiveBoxes.initDeferred();
         final wired = wireAggregatorIntoTripHistory(container);
         if (!wired) {
-          debugPrint(
-              'AppInitializer: vehicle aggregator hook deferred — '
+          log.info('AppInitializer: vehicle aggregator hook deferred — '
               'trip-history box not open yet');
         }
       } catch (e, st) {
@@ -1042,7 +1046,7 @@ class AppInitializer {
         final recorder = container.read(traceRecorderProvider);
         final replayed = await IsolateErrorSpool.drain(recorder);
         if (replayed > 0) {
-          debugPrint(
+          log.info(
               'AppInitializer: drained $replayed isolate error(s) into TraceRecorder');
         }
       } catch (e, st) {
