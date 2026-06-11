@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../app/responsive_search_layout.dart';
+import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/theme/dark_mode_colors.dart';

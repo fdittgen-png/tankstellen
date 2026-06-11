@@ -3,7 +3,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/app/current_shell_branch_provider.dart';
+import 'package:tankstellen/core/navigation/current_shell_branch_provider.dart';
 
 /// #696 — The current-branch provider is what MapScreen listens to in
 /// order to nudge its tile viewport every time the Carte tab becomes

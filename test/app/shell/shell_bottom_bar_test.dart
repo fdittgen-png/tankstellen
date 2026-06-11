@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/routes/shell_branches.dart';
 import 'package:tankstellen/app/shell/notched_bar_border.dart';
-import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
+import 'package:tankstellen/core/navigation/search_fab_action_provider.dart';
 import 'package:tankstellen/app/shell/shell_bottom_bar.dart';
 import 'package:tankstellen/app/shell/shell_nav_item.dart';
 import 'package:tankstellen/core/services/service_result.dart';

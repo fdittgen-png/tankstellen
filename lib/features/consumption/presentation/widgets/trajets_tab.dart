@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/responsive_search_layout.dart';
+import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';

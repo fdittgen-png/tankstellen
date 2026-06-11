@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tankstellen/app/shell/settings_app_bar_action.dart';
+import 'package:tankstellen/core/widgets/settings_app_bar_action.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Tests for the top-right Settings gear that replaced the Settings

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/responsive_search_layout.dart';
+import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/storage/storage_providers.dart';

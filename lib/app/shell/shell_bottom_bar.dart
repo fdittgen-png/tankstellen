@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'notched_bar_border.dart';
-import 'search_fab_action_provider.dart';
+import '../../core/navigation/search_fab_action_provider.dart';
 import 'search_fab_tap.dart';
 import 'shell_nav_item.dart';
 

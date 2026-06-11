@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:tankstellen/app/shell/search_fab_action_provider.dart';
+import 'package:tankstellen/core/navigation/search_fab_action_provider.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/features/profile/providers/profile_provider.dart';

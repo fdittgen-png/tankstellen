@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../app/shell/search_fab_action_provider.dart';
+import '../../../../core/navigation/search_fab_action_provider.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/storage/storage_keys.dart';

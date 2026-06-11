@@ -24,9 +24,16 @@ import 'package:flutter_test/flutter_test.dart';
 ///   * **core → feature** — a file under `lib/core/` importing anything
 ///     under `lib/features/` (the barrel does NOT excuse this direction:
 ///     core must never depend on features at all — epic #3129's goal).
-///
-/// The app shell (`lib/` outside `core/` and `features/`) is out of scope
-/// here — #3133/#3135 own that surface.
+///   * **feature → app shell** (#3133) — a file under `lib/features/`
+///     importing anything under `lib/` OUTSIDE `core/`, `features/` and
+///     `l10n/` (i.e. `lib/app/` + `lib/main.dart`). The shell is the
+///     composition root: it may depend on features, never the other way
+///     round. Shared shell widgets belong in `lib/core/widgets` /
+///     `lib/core/navigation` (#3133 moved responsive_layout,
+///     settings_app_bar_action, current_shell_branch_provider and
+///     search_fab_action_provider there). The shell→feature direction
+///     (`lib/app/routes/` building feature screens) is the composition
+///     root's job and stays out of scope.
 ///
 /// ## Relative-import resolution (the audit's key finding)
 ///
@@ -54,6 +61,8 @@ void main() {
   final featurePairs = <String, int>{};
   // imported feature -> count of lib/core/ files importing it.
   final coreImports = <String, int>{};
+  // importing feature -> count of its imports into the app shell (#3133).
+  final shellImports = <String, int>{};
   final violationLines = <String>[];
 
   // ---------------------------------------------------------------------
@@ -115,7 +124,18 @@ void main() {
           target = normalize('$dir/$uri');
         }
         final toFeature = featureOf(target);
-        if (toFeature == null) continue; // target outside lib/features
+        if (toFeature == null) {
+          // feature → app shell (#3133): lib/ outside core/, features/
+          // and l10n/ is the composition root (lib/app/ + lib/main.dart).
+          if (fromFeature != null &&
+              target.startsWith('lib/') &&
+              !target.startsWith('lib/core/') &&
+              !target.startsWith('lib/l10n/')) {
+            shellImports.update(fromFeature, (v) => v + 1, ifAbsent: () => 1);
+            violationLines.add('$path -> $target');
+          }
+          continue; // target outside lib/features
+        }
         if (fromFeature == toFeature) continue; // intra-feature: fine
 
         if (isCore) {
@@ -205,6 +225,26 @@ void main() {
           'in by updating _coreImportBaseline in the same PR.\n\n'
           'Drift:\n${drift.join('\n')}\n\n'
           'Up-to-date baseline literal:\n${literalOf(coreImports)}',
+    );
+  });
+
+  test('feature → app-shell imports never exceed the (target-zero) baseline',
+      () {
+    final drift = driftOf(shellImports, _shellImportBaseline);
+    expect(
+      drift,
+      isEmpty,
+      reason:
+          'feature → app-shell inverts the composition root: lib/app/ '
+          'composes features, so a feature importing lib/app/ (or '
+          'lib/main.dart) makes the shell unchangeable without touching '
+          'features (#3133). Move the shared widget/provider to '
+          'lib/core/widgets / lib/core/navigation, or navigate via '
+          'go_router\'s context API / RoutePaths instead of app/router.dart. '
+          'A lowered count must be locked in by updating '
+          '_shellImportBaseline in the same PR.\n\n'
+          'Drift:\n${drift.join('\n')}\n\n'
+          'Up-to-date baseline literal:\n${literalOf(shellImports)}',
     );
   });
 
@@ -360,6 +400,20 @@ const _coreImportBaseline = <String, int>{
   'profile': 4,
   'search': 2,
   'station_services': 19,
+};
+
+/// Post-#3133 measurement (2026-06-11): `lib/features/` files importing
+/// the app shell (`lib/` outside `core/`, `features/`, `l10n/`), grouped
+/// by importing feature. Target **0**. ONLY EVER DECREASES.
+// #3133 cut 16 → 3 by moving the shared shell widgets/providers to
+// lib/core/. The 3 survivors all import app/router.dart for
+// `routerProvider` — imperative no-context navigation (the share-receipt
+// handler, the trip-recording banner and the home-widget click listener
+// all run above/without the router's InheritedGoRouter, #1987), which
+// needs a core-owned router seam to break.
+const _shellImportBaseline = <String, int>{
+  'consumption': 2,
+  'widget': 1,
 };
 
 /// Post-#3130 measurement (2026-06-11): bidirectional feature↔feature

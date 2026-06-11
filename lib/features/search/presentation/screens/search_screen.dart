@@ -5,8 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../app/responsive_search_layout.dart';
-import '../../../../app/shell/settings_app_bar_action.dart';
+import '../../../../core/widgets/responsive_layout.dart';
+import '../../../../core/widgets/settings_app_bar_action.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
