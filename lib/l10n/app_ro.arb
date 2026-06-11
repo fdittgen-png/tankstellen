@@ -4736,5 +4736,20 @@
   "@obd2PairingConfirmHint": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "alertsLastChecked": "Last checked: {when}",
+  "@alertsLastChecked": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsLastCheckedNever": "Prices haven't been checked in the background yet",
+  "@alertsLastCheckedNever": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

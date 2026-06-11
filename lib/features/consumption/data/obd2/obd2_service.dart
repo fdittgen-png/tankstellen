@@ -28,6 +28,7 @@ import 'supported_pids_cache.dart';
 import 'supported_pids_probe.dart' show kObd2ProtocolSearchTimeout;
 import 'supported_pids_resolver.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/telemetry/health_counters.dart';
 
 // #3035 — re-export the tri-state `0100` probe outcome so the connection
 // layer (which imports this service) gates `ignitionOff` on [busProbe]
@@ -533,6 +534,10 @@ class Obd2Service implements Obd2RawCommandPort {
       AutoRecordEventKind.connectStarted,
       mac: adapterMac,
     );
+    // #3146 — always-on connect-rate tally (attempts vs successes), so a
+    // slowly-failing adapter is visible in the error-log export even when
+    // the debug-gated comm-diagnostics collector is off.
+    healthCounters.increment('ble.connect.attempts');
     try {
       _adapter = adapter;
       // #2268 concern 2 — a fresh connect resets the wake observation;
@@ -710,6 +715,7 @@ class Obd2Service implements Obd2RawCommandPort {
         mac: adapterMac,
         detail: adapterFirmware,
       );
+      healthCounters.increment('ble.connect.successes'); // #3146
       return true;
     } catch (e, st) {
       // #3181 — a TYPED pairing failure from the channel's setNotify stage
@@ -739,6 +745,7 @@ class Obd2Service implements Obd2RawCommandPort {
         mac: adapterMac,
         detail: e.toString(),
       );
+      healthCounters.increment('ble.connect.failures'); // #3146
       return false;
     }
   }

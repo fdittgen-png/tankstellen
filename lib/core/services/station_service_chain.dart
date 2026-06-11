@@ -206,6 +206,7 @@ class StationServiceChain implements StationService {
       _budget?.recordRequest(countryCode);
       return result;
     } on Exception catch (e, st) {
+      recordDataAccessFailure(countryCode); // #3146 — always-on tally
       // #2296 — log the API-failure path (stack was previously discarded)
       // so a sustained upstream outage leaves a breadcrumb. Non-fatal.
       unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {

@@ -2016,6 +2016,19 @@
       }
     }
   },
+  "alertsLastChecked": "Last checked: {when}",
+  "@alertsLastChecked": {
+    "description": "Footer line on the alerts screen showing when the background alert scan last completed (#3147), so the alert SLA is field-verifiable. {when} is a locale-formatted date + time.",
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "alertsLastCheckedNever": "Prices haven't been checked in the background yet",
+  "@alertsLastCheckedNever": {
+    "description": "Footer line on the alerts screen when no background alert scan has ever completed (#3147)."
+  },
   "alertTargetPriceWithCurrency": "Target price ({currency})",
   "@alertTargetPriceWithCurrency": {
     "description": "Label of the target-price field in the create-alert dialog, parameterised with the station country's currency symbol now that background alerts fire for every country (#2865).",

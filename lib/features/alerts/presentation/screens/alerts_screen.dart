@@ -19,6 +19,7 @@ import '../../providers/alert_provider.dart';
 import '../../providers/radius_alerts_provider.dart';
 import '../widgets/alert_station_picker_sheet.dart';
 import '../widgets/alert_statistics_card.dart';
+import '../widgets/alerts_last_checked_footer.dart';
 import '../widgets/radius_alert_create_sheet.dart';
 
 class AlertsScreen extends ConsumerWidget {
@@ -138,6 +139,10 @@ class _AlertsBody extends ConsumerWidget {
             onRetry: () => ref.invalidate(radiusAlertsProvider),
           ),
         ),
+        // #3147 — "last checked" footer: surfaces the dedup store's
+        // last-completed-scan stamp so a user can verify the background
+        // scan actually runs (the alert-SLA field check).
+        const AlertsLastCheckedFooter(),
       ],
     );
   }

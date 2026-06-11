@@ -3,6 +3,7 @@
 
 import 'dart:collection';
 
+import '../../telemetry/health_counters.dart';
 import '../service_result.dart';
 import 'data_access_event.dart';
 import 'data_access_trace.dart';
@@ -91,6 +92,22 @@ void recordDataAccess(
   int? latencyMicros,
   bool isStale = false,
 }) {
+  // #3146 — always-on production tally (runs BEFORE the dev-recorder
+  // null-guard): every chain outcome bumps a persisted per-day counter
+  // so a silently degrading provider (stale fallbacks creeping up, fresh
+  // hits collapsing) is visible in the error-log export. Names are
+  // low-cardinality + PII-free; the bump is an in-memory map merge.
+  switch (hit) {
+    case DataAccessHit.networkApi:
+      healthCounters.increment('api.${healthCountryTag(country)}.ok');
+    case DataAccessHit.hiveFresh:
+      healthCounters.increment('cache.${healthCountryTag(country)}.freshHits');
+    case DataAccessHit.hiveStale:
+      healthCounters
+          .increment('api.${healthCountryTag(country)}.staleFallbacks');
+    case DataAccessHit.coalesced:
+      break; // a shared in-flight future, not a data-source outcome
+  }
   if (recorder == null) return;
   recorder.add(DataAccessEvent(
     at: DateTime.now(),
@@ -109,3 +126,14 @@ void recordDataAccess(
 /// otherwise null. A free function so chain call sites read
 /// `count: dataAccessResultCount(data)` without a local cast.
 int? dataAccessResultCount(Object? data) => data is List ? data.length : null;
+
+/// #3146 — counter tap for the chain's API-failure path (the catch that
+/// precedes the stale-cache fallback). Lives here, not inline in the
+/// chain, for the same file-length reason as [recordDataAccess].
+void recordDataAccessFailure(String country) =>
+    healthCounters.increment('api.${healthCountryTag(country)}.failures');
+
+/// Normalised low-cardinality country tag for counter names. Legacy
+/// call sites construct the chain with an empty `countryCode`.
+String healthCountryTag(String country) =>
+    country.isEmpty ? 'unknown' : country.toLowerCase();

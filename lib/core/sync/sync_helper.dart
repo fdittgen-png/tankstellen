@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'sync_provider.dart';
 import '../../core/logging/error_logger.dart';
+import '../telemetry/health_counters.dart';
 import '../utils/json_extensions.dart';
 
 /// Shared helper to execute sync operations only when TankSync is connected.
@@ -50,9 +51,14 @@ class SyncHelper {
     try {
       final syncState = ref.read(syncStateProvider);
       if (syncState.enabled) {
+        // #3146 — always-on per-entity run/failure tallies, so a
+        // 1-in-10-failing sync table is visible in the error-log export
+        // (the catch below already traces each individual failure).
+        healthCounters.increment('sync.${context.toLowerCase()}.runs');
         await syncFn();
       }
     } catch (e, st) {
+      healthCounters.increment('sync.${context.toLowerCase()}.failures');
       unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {'where': 'SyncHelper[$context]: sync failed'}));
     }
   }

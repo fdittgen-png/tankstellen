@@ -79,7 +79,14 @@ void main() {
     // #3126 — re-grandfathered 1081 → 1084: the sync-run-id mint
     // (`SyncRunTrace.begin('launch')` + import) before the launch merges,
     // so the per-table sync counts thread under one run id in the trace.
-    'lib/app/app_initializer.dart': 1084,
+    // #3144 — re-grandfathered 1084 → 1087: the leveled-log-facade import
+    // plus the loop-avoidance rationale comment on the Sentry beforeSend
+    // scrub fallback (the 8 remaining info-level debugPrints became
+    // `log.info(...)` roughly line-for-line).
+    // #3146 — re-grandfathered 1087 → 1090: `HealthCounters.init()` joins
+    // the storage-phase `Future.wait` (+ its import) so the always-on
+    // counter box opens in the foreground isolate only.
+    'lib/app/app_initializer.dart': 1090,
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
     // deletion-tombstone fix threads a tombstoned-id set through `merge` and
     // `mergeRows` (fetch + dual-side filter so a delete on another device
@@ -362,7 +369,11 @@ void main() {
     // Obd2PairingRequired onto the active connect trace (first-wins) before
     // the never-throws `false` return flattens it, so `_openAndInit` can
     // rethrow the typed pairing error (+ the trace-log imports + rationale).
-    'lib/features/consumption/data/obd2/obd2_service.dart': 1688,
+    // #3146 — re-grandfathered 1688 → 1689: the three always-on
+    // `healthCounters` connect-rate taps (attempts / successes / failures)
+    // + import + rationale comment, so a slowly-failing BLE adapter is
+    // visible in the error-log export.
+    'lib/features/consumption/data/obd2/obd2_service.dart': 1689,
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
     // error_logger import, −1 line) in favour of a `debugPrint` breadcrumb

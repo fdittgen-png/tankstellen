@@ -3680,6 +3680,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String alertsLastChecked(String when) {
+    return 'Zuletzt geprüft: $when';
+  }
+
+  @override
+  String get alertsLastCheckedNever =>
+      'Preise wurden im Hintergrund noch nicht geprüft';
+
+  @override
   String alertTargetPriceWithCurrency(String currency) {
     return 'Zielpreis ($currency)';
   }

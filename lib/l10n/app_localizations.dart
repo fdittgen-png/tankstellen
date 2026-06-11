@@ -6708,6 +6708,18 @@ abstract class AppLocalizations {
   /// **'+ {count} more'**
   String radiusAlertGroupedMore(String count);
 
+  /// Footer line on the alerts screen showing when the background alert scan last completed (#3147), so the alert SLA is field-verifiable. {when} is a locale-formatted date + time.
+  ///
+  /// In en, this message translates to:
+  /// **'Last checked: {when}'**
+  String alertsLastChecked(String when);
+
+  /// Footer line on the alerts screen when no background alert scan has ever completed (#3147).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices haven\'t been checked in the background yet'**
+  String get alertsLastCheckedNever;
+
   /// Label of the target-price field in the create-alert dialog, parameterised with the station country's currency symbol now that background alerts fire for every country (#2865).
   ///
   /// In en, this message translates to:
