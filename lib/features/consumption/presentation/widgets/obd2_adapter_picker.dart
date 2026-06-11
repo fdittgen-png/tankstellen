@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +12,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/domain/entities/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/obd2/adapter_registry.dart';
+import '../../data/obd2/obd2_adapter_identity.dart';
 import '../../data/obd2/obd2_connection_errors.dart';
 import '../../data/obd2/obd2_connection_service.dart';
 import '../../data/obd2/obd2_pairing_mode.dart';
@@ -344,26 +344,21 @@ class _Obd2AdapterPickerSheetState
   ) async {
     try {
       if (active == null) return;
-      final mac = candidate.candidate.deviceId;
-      final name = candidate.candidate.deviceName.isEmpty
-          ? candidate.profile.displayName
-          : candidate.candidate.deviceName;
-      // #2282 concern 3 — on iOS the `deviceId` IS the CBPeripheral UUID
-      // (flutter_blue_plus surfaces `remoteId.str`, which on iOS is the
-      // per-app peripheral UUID, not a MAC). Capture it so the later iOS
-      // CoreBluetooth state-restoration path has its reconnection key.
-      // On Android `deviceId` is the MAC already stored in
-      // `obd2AdapterMac`, so we leave the iOS-UUID field null there.
-      final uuidIos = Platform.isIOS ? mac : null;
-      if (active.obd2AdapterMac == mac &&
-          active.obd2AdapterName == name &&
-          active.pairedAdapterUuidIos == uuidIos) {
+      // #2282 concern 3 / #3168 — identity capture lives at the data-layer
+      // [Obd2AdapterIdentity] seam: it stores the iOS CBPeripheral UUID
+      // reconnection key when the deviceId is UUID-shaped (and null for an
+      // Android MAC), so this widget no longer branches on the platform
+      // (#2350 ratchet).
+      final identity = Obd2AdapterIdentity.fromCandidate(candidate);
+      if (active.obd2AdapterMac == identity.deviceId &&
+          active.obd2AdapterName == identity.name &&
+          active.pairedAdapterUuidIos == identity.uuidIos) {
         return; // already persisted — skip the redundant write.
       }
       final updated = active.copyWith(
-        obd2AdapterMac: mac,
-        obd2AdapterName: name,
-        pairedAdapterUuidIos: uuidIos,
+        obd2AdapterMac: identity.deviceId,
+        obd2AdapterName: identity.name,
+        pairedAdapterUuidIos: identity.uuidIos,
       );
       await listNotifier.save(updated);
     } catch (e, st) {

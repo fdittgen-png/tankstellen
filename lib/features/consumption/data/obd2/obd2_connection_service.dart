@@ -16,6 +16,7 @@ import 'elm327_adapter.dart';
 import 'elm_byte_channel.dart';
 import 'last_good_adapter_store.dart';
 import 'negotiated_protocol_cache.dart';
+import 'obd2_adapter_identity.dart';
 import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
 import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
@@ -120,6 +121,16 @@ class Obd2ConnectionService {
   /// configs that don't wire it — pairing mode is then never armed.
   final KnownObd2AdaptersStore? knownAdaptersStore;
 
+  /// #3168 — re-persist seam fired when the scan fallback rematches a
+  /// ROTATED iOS CBPeripheral UUID by adapter name (see
+  /// [connectUuidRematched]): the pinned id was absent from a non-empty
+  /// scan, exactly one device advertised the persisted name, and the
+  /// connect to its fresh id SUCCEEDED. The provider wires it to
+  /// [repersistRotatedAdapterIdentity] (vehicle-profile update); null in
+  /// tests / configs that don't wire it — the rematch still connects,
+  /// only the re-persist is skipped.
+  final Obd2AdapterIdentityRotated? onAdapterIdentityRotated;
+
   /// #2906 — settle pause after [_stopScanBeforeConnect] stops the radio and
   /// before a `channel.open()` fires. Android BLE is fragile if a `connect()`
   /// races an active scan still winding down on the radio — a stale scan can
@@ -156,6 +167,7 @@ class Obd2ConnectionService {
     this.activeVehicleKeyFields,
     this.lastGoodAdapterStore,
     this.knownAdaptersStore,
+    this.onAdapterIdentityRotated,
     this.scanSettleDelay = const Duration(milliseconds: 120),
     Obd2ConnectSupervisor? supervisor,
     Obd2ScanGovernor? scanGovernor,
@@ -642,8 +654,12 @@ class Obd2ConnectionService {
         body: () async {
           final stream = scan(timeout: timeout);
           ResolvedObd2Candidate? match;
+          // #3168 — the latest accumulated ranked list, retained for the
+          // UUID-rotation rematch when no exact deviceId match is found.
+          var ranked = const <ResolvedObd2Candidate>[];
           try {
             await for (final batch in stream) {
+              ranked = batch;
               for (final c in batch) {
                 if (c.candidate.deviceId == mac) {
                   match = c;
@@ -656,8 +672,18 @@ class Obd2ConnectionService {
             // No adapters at all in range — fall through to picker.
             return null;
           }
-          if (match == null) return null;
-          return connect(match);
+          if (match != null) return connect(match);
+          // #3168 — exact id absent from a NON-empty scan: on iOS the
+          // pinned CBPeripheral UUID may have ROTATED. Try the name-based
+          // rematch (+ re-persist of the fresh id on success); a no-match
+          // still returns null so the picker fallback is unchanged.
+          return connectUuidRematched(
+            pinnedId: mac,
+            pinnedName: adapterName,
+            ranked: ranked,
+            connect: connect,
+            onIdentityRotated: onAdapterIdentityRotated,
+          );
         },
       ));
 
@@ -889,6 +915,19 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     // start must drain the same bucket. (The default per-instance supervisor
     // is already process-wide here — this provider is a keepAlive singleton.)
     scanGovernor: Obd2ScanGovernor.process,
+    // #3168 — when the scan fallback rematches a ROTATED iOS CBPeripheral
+    // UUID by name, re-persist the fresh id onto every vehicle profile
+    // pinned to the stale one (the user-facing adapter name + every other
+    // preference stay intact). The helper never throws (best-effort), so
+    // the connect that just succeeded can never be derailed.
+    onAdapterIdentityRotated: (
+            {required String staleId, required Obd2AdapterIdentity fresh}) =>
+        repersistRotatedAdapterIdentity(
+      profiles: ref.read(vehicleProfileListProvider),
+      save: ref.read(vehicleProfileListProvider.notifier).save,
+      staleId: staleId,
+      fresh: fresh,
+    ),
     activeVehicleKeyFields: () {
       // Defensive: the vehicle provider must never make a connect throw.
       try {
