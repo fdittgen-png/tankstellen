@@ -4,8 +4,6 @@
 import 'dart:async';
 
 import 'dart:convert';
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:hive/hive.dart' show HiveError;
@@ -19,6 +17,7 @@ import '../../../core/utils/geo_utils.dart' as geo;
 import '../../profile/data/models/user_profile.dart';
 import '../../search/domain/entities/fuel_type.dart';
 import 'home_widget_json.dart';
+import 'impl/widget_group_id.dart';
 import 'impl/widget_reload_dispatcher.dart';
 import 'nearest_widget_data_builder.dart';
 import 'predictive_payload.dart';
@@ -35,28 +34,11 @@ import '../../../core/logging/error_logger.dart';
 /// 2. This service reads cached data -> writes to SharedPreferences via home_widget
 /// 3. Native Android widgets read SharedPreferences -> render UI
 ///
-/// Android: the SharedPreferences file the `home_widget` plugin writes
-/// to. Must match the prefs file that `StationWidgetRenderer.kt` reads
-/// — keep the two literals in lock-step.
-const _androidWidgetGroupId = 'de.tankstellen.fuelprices.widget';
-
-/// iOS: the App Group identifier the WidgetKit extension shares with
-/// the host app. MUST start with `group.` (Apple convention) and
-/// match the entitlements on BOTH targets:
-/// - `ios/Runner/Runner.entitlements`
-/// - `ios/TankstellenWidget/TankstellenWidget.entitlements`
-/// — and `kTankstellenAppGroupId` in
-/// `ios/TankstellenWidget/NearestStationsProvider.swift`. All four
-/// strings break together; keep them in lock-step.
-const _iosWidgetGroupId = 'group.de.tankstellen.tankstellen';
-
-/// Platform-correct widget-data scope. The same `HomeWidget.saveWidgetData`
-/// call goes through this string — Android treats it as the prefs file
-/// name, iOS as an `UserDefaults(suiteName:)` argument backed by the
-/// App Group container. Branching at the source keeps the two
-/// platforms' shared-storage conventions tidy.
-String get _widgetGroupId =>
-    Platform.isIOS ? _iosWidgetGroupId : _androidWidgetGroupId;
+// Platform-correct widget-data scope: Android = the prefs file
+// `StationWidgetRenderer.kt` reads, iOS = the App Group suite the WidgetKit
+// extension shares. #3172 — the `Platform.isIOS` fork + the lock-step
+// constants live in `impl/widget_group_id.dart` (epic-#2332 burn-down).
+//
 // Single provider class (#713) — the widget toggles between favorites
 // and nearest modes internally. The old NearestWidgetProvider receiver
 // was dropped from the manifest.
@@ -497,7 +479,7 @@ class HomeWidgetService {
 
   /// Initialize home_widget group ID. Call once from main.
   static Future<void> init() async {
-    await HomeWidget.setAppGroupId(_widgetGroupId);
+    await HomeWidget.setAppGroupId(platformWidgetGroupId);
   }
 
   /// Publish the user's profile list to SharedPreferences so the Android

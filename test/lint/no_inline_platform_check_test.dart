@@ -50,9 +50,11 @@ void main() {
   // business logic (that's exactly the hole #3163 closed).
   const sanctionedDefaultTargetPlatformSeams = <String>{
     'lib/core/location/recording_location_settings.dart',
-    'lib/features/consumption/data/obd2/flutter_blue_plus_elm_channel.dart',
-    'lib/features/consumption/data/obd2/obd2_connect_by_mac.dart',
     'lib/features/consumption/data/obd2/obd2_connection_service.dart',
+    // #3172 — the consolidated BLE budgets object: the ONE remaining
+    // platform fork for the OBD2 timing budgets (replaced the three
+    // per-file forks in elm_channel / connect_by_mac).
+    'lib/features/consumption/data/obd2/obd2_platform_budgets.dart',
     'lib/features/consumption/data/pip_controller.dart',
     'lib/features/consumption/providers/auto_record_orchestrator_factories.dart',
     'lib/features/setup/providers/onboarding_platform_steps_provider.dart',
@@ -70,12 +72,14 @@ void main() {
   const grandfathered = <String>{
     'lib/core/background/background_price_fetcher_provider.dart',
     'lib/core/feedback/github_issue_reporter/error_reporter_context.dart',
-    'lib/core/sharing/public_file_exporter.dart',
-    'lib/core/telemetry/collectors/device_info_collector.dart',
     // #3168 — obd2_adapter_picker.dart removed: its identity capture moved
     // to the data-layer Obd2AdapterIdentity seam (UUID-shape discriminator,
     // no Platform check).
-    'lib/features/widget/data/home_widget_service.dart',
+    // #3172 — public_file_exporter.dart removed: the Platform.isAndroid
+    // dispatch moved to impl/public_file_exporter_io.dart (epic #2332).
+    // #3172 — home_widget_service.dart removed: the Platform.isIOS group-id
+    // fork moved to impl/widget_group_id.dart (epic #2332).
+    'lib/core/telemetry/collectors/device_info_collector.dart',
   };
 
   // Regex that matches an actual (non-comment) Platform.isXxx call.

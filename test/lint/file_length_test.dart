@@ -254,7 +254,9 @@ void main() {
     // #2187/#2188.
     // (#3168's rematch seam, listed above, adds its 39 lines ON TOP of the
     // #3185 wiring — combined snapshot below.)
-    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 938,
+    // #3172 — +1: the obd2_platform_budgets.dart import (the BLE-budget
+    // consolidation removed two inline forks from this library's part file).
+    'lib/features/consumption/data/obd2/obd2_connection_service.dart': 939,
     // #2969 — grandfathered at 419 (was ~399, right at the cap on master). The
     // scan-path BLE `connect()` timeout bound (FBP could otherwise block ~35 s
     // on a vanished candidate) + the channel-open connect-trace stamp (the one

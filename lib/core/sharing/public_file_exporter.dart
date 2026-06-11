@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'impl/public_file_exporter_io.dart' as impl;
 
 /// Test seam: a function the unit test can install to bypass the
 /// platform-channel / iOS-docs branches and capture writes in a per-test
@@ -33,7 +32,8 @@ String? Function()? debugDownloadsInitialDirectoryOverride;
 /// `getApplicationDocumentsDirectory()/Downloads/` — a path that is
 /// invisible to the Files app on both Android and iOS.
 ///
-/// Platform behaviour:
+/// Platform behaviour (#3172 — the `Platform.isAndroid` dispatch lives in
+/// `impl/public_file_exporter_io.dart`, off the epic-#2332 grandfather list):
 /// - **Android Q+**: writes via `MediaStore.Downloads`, returning a
 ///   `content://` URI. No `WRITE_EXTERNAL_STORAGE` needed.
 /// - **iOS**: writes to `getApplicationDocumentsDirectory()/Downloads/`.
@@ -42,9 +42,6 @@ String? Function()? debugDownloadsInitialDirectoryOverride;
 ///   under Files → On My iPhone → tankstellen.
 class PublicFileExporter {
   PublicFileExporter._();
-
-  static const MethodChannel _channel =
-      MethodChannel('tankstellen/public_files');
 
   /// Writes [bytes] to the user-visible Downloads location and returns
   /// a value suitable for logging / debug display. The display string
@@ -61,18 +58,11 @@ class PublicFileExporter {
     if (override != null) {
       return override(bytes: bytes, fileName: fileName, mimeType: mimeType);
     }
-    if (Platform.isAndroid) {
-      final result = await _channel.invokeMethod<String>('saveBytes', {
-        'fileName': fileName,
-        'mimeType': mimeType,
-        'bytes': bytes,
-      });
-      return result ?? '';
-    }
-    final dir = await _iosDocumentsDownloads();
-    final file = File('${dir.path}${Platform.pathSeparator}$fileName');
-    await file.writeAsBytes(bytes, flush: true);
-    return file.path;
+    return impl.saveBytesToDownloadsImpl(
+      bytes: bytes,
+      fileName: fileName,
+      mimeType: mimeType,
+    );
   }
 
   /// UTF-8 convenience wrapper around [saveBytesToDownloads] for the
@@ -89,13 +79,6 @@ class PublicFileExporter {
     );
   }
 
-  static Future<Directory> _iosDocumentsDownloads() async {
-    final docs = await getApplicationDocumentsDirectory();
-    final dir = Directory('${docs.path}${Platform.pathSeparator}Downloads');
-    await dir.create(recursive: true);
-    return dir;
-  }
-
   /// The directory a document picker should OPEN ON for an import, so the user
   /// lands where exports were saved instead of the (usually empty) "Recents"
   /// tab (#2815). iOS: the same `<docs>/Downloads` the exporter writes to.
@@ -108,12 +91,6 @@ class PublicFileExporter {
   static Future<String?> downloadsInitialDirectory() async {
     final override = debugDownloadsInitialDirectoryOverride;
     if (override != null) return override();
-    if (Platform.isAndroid) return '/storage/emulated/0/Download';
-    try {
-      final dir = await _iosDocumentsDownloads();
-      return dir.path;
-    } on Object {
-      return null;
-    }
+    return impl.downloadsInitialDirectoryImpl();
   }
 }
