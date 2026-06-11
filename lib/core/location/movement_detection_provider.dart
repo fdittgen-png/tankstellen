@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../features/consumption/data/obd2/event_channel_cancel.dart';
+import '../utils/event_channel_cancel.dart';
 import '../logging/error_logger.dart';
 import '../utils/geo_utils.dart';
 import 'geolocator_wrapper.dart';

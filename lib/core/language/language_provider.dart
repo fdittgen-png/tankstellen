@@ -5,8 +5,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../features/profile/providers/profile_provider.dart';
 import '../storage/storage_providers.dart';
+import 'profile_language_bridge.dart';
 
 part 'language_provider.g.dart';
 
@@ -75,10 +75,12 @@ class ActiveLanguage extends _$ActiveLanguage {
 
   @override
   AppLanguage build() {
-    // Priority 1: active profile's language
-    final profile = ref.watch(activeProfileProvider);
-    if (profile?.languageCode != null) {
-      final fromProfile = AppLanguages.byCode(profile!.languageCode!);
+    // Priority 1: active profile's language. Read through the #3134
+    // bridge — core must not import the profile feature; the composition
+    // root binds the real profile read (see profile_language_bridge.dart).
+    final profileCode = ref.watch(profileLanguageCodeProvider);
+    if (profileCode != null) {
+      final fromProfile = AppLanguages.byCode(profileCode);
       if (fromProfile != null) return fromProfile;
     }
 
@@ -96,15 +98,9 @@ class ActiveLanguage extends _$ActiveLanguage {
     final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting(_storageKey, language.code);
 
-    // Update active profile if it exists
-    final profile = ref.read(activeProfileProvider);
-    if (profile != null) {
-      final repo = ref.read(profileRepositoryProvider);
-      await repo.updateProfile(
-        profile.copyWith(languageCode: language.code),
-      );
-      ref.read(activeProfileProvider.notifier).refresh();
-    }
+    // Update the active profile if one exists — through the #3134 write
+    // seam (a no-op when no profile system is bound, e.g. unit tests).
+    await ref.read(profileLanguageWriterProvider)(language.code);
 
     state = language;
   }

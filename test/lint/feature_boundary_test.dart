@@ -331,7 +331,6 @@ const _featurePairBaseline = <String, int>{
   'sync -> vehicle': 2,
   'vehicle -> consumption': 24,
   'vehicle -> profile': 1,
-  'widget -> consumption': 1,
   'widget -> price_history': 2,
   'widget -> profile': 3,
 };
@@ -344,11 +343,11 @@ const _featurePairBaseline = <String, int>{
 // hit ZERO.
 const _coreImportBaseline = <String, int>{
   'alerts': 3,
-  'consumption': 8,
+  'consumption': 6,
   'feature_management': 3,
   'itinerary': 3,
   'map': 1,
-  'profile': 5,
+  'profile': 4,
   'search': 2,
   'station_services': 19,
 };

@@ -10,7 +10,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/router.dart';
-import '../../consumption/data/obd2/event_channel_cancel.dart';
+import '../../../core/utils/event_channel_cancel.dart';
 import 'widget_uri_parser.dart';
 import '../../../core/logging/error_logger.dart';
 

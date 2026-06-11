@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
-import 'event_channel_cancel.dart';
+import '../../../../core/utils/event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'obd2_link_drop_signal.dart';
 import 'obd2_connect_trace.dart';
