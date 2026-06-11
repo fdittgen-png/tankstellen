@@ -203,8 +203,10 @@ class SloveniaStationService with StationServiceHelpers implements StationServic
       lat: lat,
       lng: lng,
       dist: distKm,
+      // #3198 — the single NMB-95 grade lives in e5 only; the old e10
+      // mirror asserted an E10 price goriva.si never publishes (catalog
+      // change in CountryConfig / registry).
       e5: nmb95,
-      e10: nmb95, // Slovenia ships a single 95-octane grade; surface as both
       e98: nmb100 ?? nmb98,
       diesel: dizel,
       dieselPremium: dizelPremium,

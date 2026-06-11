@@ -72,7 +72,10 @@ class FillUpCard extends StatelessWidget {
     // (locale-aware 2 dp + currency symbol) instead of a hand-rolled
     // toStringAsFixed(2) that hardcodes the dot separator.
     final costStr = PriceFormatter.formatTotal(fillUp.totalCost);
-    final ppl = UnitFormatter.formatPricePerUnit(fillUp.pricePerLiter);
+    // #3198 — thread the fill-up's fuel so a per-fuel suffix override
+    // applies (AR GNC is priced per m³, not per litre).
+    final ppl = UnitFormatter.formatPricePerUnit(fillUp.pricePerLiter,
+        fuelType: fillUp.fuelType);
     // #1401 phase 7b — only render the verified-by-adapter chip when
     // both fuel-level captures are present. Either missing → no chip.
     final isVerifiedByAdapter = FillUpVariance.hasAdapterCapture(fillUp);

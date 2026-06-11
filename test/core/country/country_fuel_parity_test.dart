@@ -100,23 +100,29 @@ void main() {
       );
     });
 
-    test('regression: Slovenia exposes e10 + cng in BOTH structures (#2180)',
-        () {
-      // SloveniaStationService surfaces the single 95-octane grade as both
-      // e5 and e10, and maps the goriva.si "cng" key onto Station.cng. The
-      // registry previously omitted both.
-      for (final fuel in const [FuelType.e10, FuelType.cng]) {
-        expect(
-          Countries.slovenia.supportedFuelTypes,
-          contains(fuel),
-          reason: 'SI picker must offer ${fuel.apiValue}',
-        );
-        expect(
-          registrySet('SI'),
-          contains(fuel),
-          reason: 'SI search selector must offer ${fuel.apiValue}',
-        );
-      }
+    test(
+        'regression: Slovenia exposes cng but NOT e10 in BOTH structures '
+        '(#2180/#3198)', () {
+      // SloveniaStationService maps the goriva.si "cng" key onto
+      // Station.cng (#2180). The single NMB-95 grade lives in e5 only:
+      // #3198 removed the e5→e10 mirror, so neither structure may offer
+      // an E10 the feed never publishes.
+      expect(
+        Countries.slovenia.supportedFuelTypes,
+        contains(FuelType.cng),
+        reason: 'SI picker must offer CNG',
+      );
+      expect(
+        registrySet('SI'),
+        contains(FuelType.cng),
+        reason: 'SI search selector must offer CNG',
+      );
+      expect(
+        Countries.slovenia.supportedFuelTypes,
+        isNot(contains(FuelType.e10)),
+        reason: '#3198 — goriva.si publishes no E10 grade',
+      );
+      expect(registrySet('SI'), isNot(contains(FuelType.e10)));
     });
 
     test('regression: Mexico offers e98 (premium grade) not e10 (#2704)', () {
@@ -135,10 +141,23 @@ void main() {
       expect(registrySet('MX'), isNot(contains(FuelType.e10)));
     });
 
-    test('regression: Denmark offers e10 in BOTH structures (#2180)', () {
-      // DenmarkStationService surfaces Blyfri 95 as both e5 and e10.
-      expect(Countries.denmark.supportedFuelTypes, contains(FuelType.e10));
-      expect(registrySet('DK'), contains(FuelType.e10));
+    test(
+        'regression: Denmark offers the real premium grades, NOT e10 '
+        '(#3187/#3198)', () {
+      // #3198 — no DK feed publishes an E10 grade; the old Blyfri-95
+      // mirror is gone. #3187's exact-grade mapping emits Oktan 100 /
+      // V-Power → e98 and V-Power Diesel → dieselPremium instead.
+      expect(
+        Countries.denmark.supportedFuelTypes,
+        isNot(contains(FuelType.e10)),
+      );
+      expect(registrySet('DK'), isNot(contains(FuelType.e10)));
+      for (final fuel in const [FuelType.e98, FuelType.dieselPremium]) {
+        expect(Countries.denmark.supportedFuelTypes, contains(fuel),
+            reason: 'DK picker must offer ${fuel.apiValue}');
+        expect(registrySet('DK'), contains(fuel),
+            reason: 'DK search selector must offer ${fuel.apiValue}');
+      }
     });
 
     test('regression: UK offers e10, drops dieselPremium (#2180)', () {

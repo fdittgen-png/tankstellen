@@ -243,8 +243,8 @@ void main() {
       final s = result.data.first;
       expect(s.id, 'pt-42');
       expect(s.e5, closeTo(1.719, 0.0001));
-      expect(s.e10, closeTo(1.719, 0.0001),
-          reason: 'PT 95 simples is mirrored into e10 for the UI');
+      expect(s.e10, isNull,
+          reason: '#3198 — no e10 mirror: DGEG publishes no E10 grade');
       expect(s.diesel, closeTo(1.599, 0.0001));
     });
 

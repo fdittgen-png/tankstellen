@@ -335,7 +335,8 @@ void main() {
         expect(s.lat, closeTo(55.6761, 0.001));
         expect(s.lng, closeTo(12.5683, 0.001));
         expect(s.e5, closeTo(13.49, 0.01));
-        expect(s.e10, closeTo(13.49, 0.01));
+        expect(s.e10, isNull,
+            reason: '#3198 — no e10 mirror: no DK feed publishes E10');
         expect(s.diesel, closeTo(11.99, 0.01));
         // #3198 — the OK feed carries no open/closed signal: honest unknown.
         expect(s.isOpen, isNull);
@@ -670,9 +671,9 @@ void main() {
       expect(allStations[0].brand, 'OK');
       expect(allStations[1].brand, 'Shell');
 
-      // Verify OK station has both e5 and e10 set to same value
+      // #3198 — the single 95-octane grade lives in e5 only (no mirror).
       expect(allStations[0].e5, closeTo(13.49, 0.01));
-      expect(allStations[0].e10, closeTo(13.49, 0.01));
+      expect(allStations[0].e10, isNull);
       expect(allStations[0].diesel, closeTo(11.99, 0.01));
 
       // Verify Shell station
@@ -824,7 +825,8 @@ class _TestableDenmarkParser {
         lng: lng,
         dist: 0,
         e5: e5,
-        e10: e5,
+        // #3198 — mirrors the real parser: no e10 mirror.
+
         diesel: diesel,
         isOpen: null, // #3198 — mirrors the real parser: no signal
         updatedAt: testFormatIsoTime(r['last_updated_time']?.toString()),
@@ -864,7 +866,8 @@ class _TestableDenmarkParser {
         lng: lng,
         dist: 0,
         e5: e5,
-        e10: e5,
+        // #3198 — mirrors the real parser: no e10 mirror.
+
         diesel: diesel,
         isOpen: null, // #3198 — mirrors the real parser: no signal
         updatedAt: testFormatIsoTime(

@@ -419,7 +419,7 @@ idImpianto|descCarburante|prezzo|isSelf|dtComu
           lng: s.lng,
           dist: 0,
           e5: p?.benzinaSelf ?? p?.benzinaServed,
-          e10: p?.benzinaSelf ?? p?.benzinaServed,
+          // #3198 — mirrors the real parser: no e10 mirror.
           diesel: p?.gasolioSelf ?? p?.gasolioServed,
           lpg: p?.gpl,
           cng: p?.metano,

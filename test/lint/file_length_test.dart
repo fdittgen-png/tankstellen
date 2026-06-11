@@ -99,7 +99,11 @@ void main() {
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
     // lines (below the cap). Removed from the snapshot per the shrink
     // ratchet; the extracted files are all new and under 400.
-    'lib/core/country/country_config.dart': 723,
+    // #3198 — re-grandfathered 723 → 751: the per-fuel price-unit
+    // suffix facility (pricePerUnitSuffixByFuel + pricePerUnitSuffixFor)
+    // and the honest per-country fuel-catalog comments (AT/DK/SI/AR no
+    // longer advertise a phantom E10).
+    'lib/core/country/country_config.dart': 751,
     // #2373 — re-grandfathered 868 → 887: one required `sourceUrl` field
     // added to every per-country FuelServicePolicy row (19 data lines) so
     // the country-service header can link the upstream data source.
@@ -131,7 +135,10 @@ void main() {
     // shared #2866 ProviderRequestBudget (import + one param + two call-site
     // args) so foreground + background share ONE per-provider minInterval gate.
     // Decomposing this god-class is tracked separately (#2187/#2188/#2190).
-    'lib/core/services/country_service_registry.dart': 857,
+    // #3198 — re-grandfathered 857 → 864: AT/DK promoted off
+    // _defaultFuelTypes to explicit lists (phantom-E10 removal + DK's
+    // real premium grades).
+    'lib/core/services/country_service_registry.dart': 864,
     // #2969 — re-grandfathered 500 → 522: the `transportForName` inference
     // (matches a stored adapter name against the profile nameMatchers so the
     // transport-aware self-test takes RFCOMM for a Classic-SPP adapter instead

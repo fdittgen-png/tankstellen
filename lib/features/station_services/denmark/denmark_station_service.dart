@@ -225,8 +225,10 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           lat: lat,
           lng: lng,
           dist: 0,
+          // #3198 — the single Danish 95-octane grade lives in e5 only;
+          // the old e10 mirror asserted an E10 price the feed never
+          // publishes (catalog change in CountryConfig / registry).
           e5: e5,
-          e10: e5,
           e98: e98,
           diesel: diesel,
           // #3198 — the OK feed carries no open/closed signal: honest
@@ -293,8 +295,8 @@ class DenmarkStationService with StationServiceHelpers, CachedDatasetMixin imple
           lat: lat,
           lng: lng,
           dist: 0,
+          // #3198 — no e10 mirror (single 95-octane grade, see above).
           e5: e5,
-          e10: e5,
           e98: e98,
           diesel: diesel,
           dieselPremium: dieselPremium,

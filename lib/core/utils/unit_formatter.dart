@@ -4,6 +4,7 @@
 import 'package:intl/intl.dart';
 
 import '../country/country_config.dart';
+import '../../features/search/domain/entities/fuel_type.dart';
 import 'price_formatter.dart';
 
 /// Formats per-country unit strings: distance (km/mi), volume (L/gal),
@@ -83,10 +84,18 @@ class UnitFormatter {
   /// The caller always passes the value in the country's **primary**
   /// currency unit (EUR/GBP/AUD, not cents). The formatter scales
   /// into pence/cents when the country's suffix requires it.
-  static String formatPricePerUnit(double? price, {String? countryCode}) {
+  ///
+  /// [fuelType] selects a per-fuel suffix override when the country
+  /// defines one (#3198 — AR GNC is priced per m³, not per litre); when
+  /// omitted the country-wide suffix applies.
+  static String formatPricePerUnit(
+    double? price, {
+    String? countryCode,
+    FuelType? fuelType,
+  }) {
     if (price == null || price <= 0) return '--';
     final cfg = _resolve(countryCode);
-    final suffix = cfg.pricePerUnitSuffix;
+    final suffix = cfg.pricePerUnitSuffixFor(fuelType);
     // Sub-unit suffixes (pence, cents) render the price * 100 with
     // a single decimal — matches the UK forecourt "155.9 p/L" and
     // the AU "185.9 c/L" conventions.
@@ -100,8 +109,9 @@ class UnitFormatter {
 
   /// Short-form price-per-unit without value — returns just the
   /// suffix for UI that labels a column or axis ("€/L", "p/L", …).
-  static String pricePerUnitSuffix({String? countryCode}) =>
-      _resolve(countryCode).pricePerUnitSuffix;
+  /// [fuelType] selects a per-fuel override when one exists (#3198).
+  static String pricePerUnitSuffix({String? countryCode, FuelType? fuelType}) =>
+      _resolve(countryCode).pricePerUnitSuffixFor(fuelType);
 
   /// Format an average / instantaneous consumption value with its
   /// unit mask — `L/100 km` for combustion, `kWh/100 km` for EV.

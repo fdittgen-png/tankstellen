@@ -66,15 +66,15 @@ void main() {
     // flagged full, degenerate FR 01:00-01:00 sentinel ranges, a
     // publicHoliday-only schedule) and assert the call returns normally.
     test('never throws on degenerate or adversarial schedules', () {
-      final degenerate = WeeklyOpeningHours(
+      const degenerate = WeeklyOpeningHours(
         days: [
           DayHours(
             day: OpeningDay.mon,
             state: DayState.openRanges,
             // The FR `01:00-01:00` no-interval sentinel.
-            ranges: const [TimeRange(startMinutes: 60, endMinutes: 60)],
+            ranges: [TimeRange(startMinutes: 60, endMinutes: 60)],
           ),
-          const DayHours(day: OpeningDay.publicHoliday, state: DayState.closed),
+          DayHours(day: OpeningDay.publicHoliday, state: DayState.closed),
         ],
         availability: OpeningHoursAvailability.full,
       );
@@ -89,8 +89,8 @@ void main() {
 
     test('an overnight wrap from yesterday counts as open', () {
       // Tue 22:00 - Wed 04:00; probe Wednesday 03:00.
-      final overnight = WeeklyOpeningHours(
-        days: const [
+      const overnight = WeeklyOpeningHours(
+        days: [
           DayHours(
             day: OpeningDay.tue,
             state: DayState.openRanges,

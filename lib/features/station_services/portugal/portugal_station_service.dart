@@ -252,10 +252,10 @@ class PortugalStationService
         lat: row.lat,
         lng: row.lng,
         dist: dist,
+        // #3198 — 95 simples lives in e5 only; the old e10 mirror
+        // asserted an E10 price DGEG never publishes (PT's catalog never
+        // offered e10 in the picker, so nothing user-facing is lost).
         e5: row.gasolina95,
-        // Portugal reports 95 simples as the single "petrol" — mirror it
-        // into e10 so the UI shows something for E10-preferred users.
-        e10: row.gasolina95,
         e98: row.gasolina98,
         diesel: row.gasoleo,
         lpg: row.gpl,

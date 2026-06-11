@@ -100,8 +100,10 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
           lat: s.lat,
           lng: s.lng,
           dist: roundedDistance(params.lat, params.lng, s.lat, s.lng),
+          // #3198 — Benzina lives in e5 only; the old e10 mirror asserted
+          // an E10 price MIMIT never publishes (IT's catalog never offered
+          // e10 in the picker, so nothing user-facing is lost).
           e5: prices?.benzinaSelf ?? prices?.benzinaServed,
-          e10: prices?.benzinaSelf ?? prices?.benzinaServed,
           e98: prices?.benzinaPremiumSelf ?? prices?.benzinaPremiumServed,
           diesel: prices?.gasolioSelf ?? prices?.gasolioServed,
           dieselPremium:
