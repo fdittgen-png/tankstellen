@@ -3,50 +3,45 @@
 
 import '../../search/domain/entities/fuel_type.dart';
 
-/// Observatory `prices.{key}` parsing utilities for the Romanian
-/// *Monitorul Prețurilor la Carburanți* feed.
+/// Catalog-product parsing utilities for the Romanian *Monitorul
+/// Prețurilor* observatory feed (monitorulpreturilor.info, #3193).
 ///
-/// Single source of truth for how the upstream `pretcarburant.ro`
-/// fuel-key strings map onto canonical [FuelType] values, plus the
-/// RON-per-litre parser that filters out junk (zero, negative,
-/// non-numeric).
+/// Single source of truth for how the observatory's gas-catalog product
+/// ids map onto canonical [FuelType] values, plus the RON-per-litre
+/// parser that filters out junk (zero, negative, non-numeric).
 ///
-/// Mirrors the shape of `GreeceObservatoryKeys` so the two
-/// scrape-driven country services parse prices the same way.
+/// The id table mirrors the live `GET /pmonsvc/Gas/GetGasProductsFromCatalog`
+/// response (recorded 2026-06-10):
+///
+/// ```json
+/// { "Items": [
+///   { "id": "11", "name": "Benzină standard" },
+///   { "id": "12", "name": "Benzină premium" },
+///   { "id": "21", "name": "Motorină standard" },
+///   { "id": "22", "name": "Motorină premium" },
+///   { "id": "31", "name": "GPL" },
+///   { "id": "41", "name": "Încărcare Electrică" }
+/// ] }
+/// ```
+///
+/// `41` (EV charging) is intentionally unmapped — electric coverage
+/// comes from OpenChargeMap, not the fuel observatory.
 class RomaniaObservatoryKeys {
   RomaniaObservatoryKeys._();
 
-  /// Observatory fuel-key → canonical [FuelType]. Kept lowercase so
-  /// the lookup is case-insensitive against upstream drift.
-  static const Map<String, FuelType> fuelForObservatoryKey = {
-    'benzina_standard': FuelType.e5,
-    'benzina_premium': FuelType.e98,
-    'motorina_standard': FuelType.diesel,
-    'motorina_premium': FuelType.dieselPremium,
-    'gpl': FuelType.lpg,
+  /// Observatory gas-catalog product id → canonical [FuelType].
+  static const Map<String, FuelType> fuelForCatalogProductId = {
+    '11': FuelType.e5, // Benzină standard
+    '12': FuelType.e98, // Benzină premium
+    '21': FuelType.diesel, // Motorină standard
+    '22': FuelType.dieselPremium, // Motorină premium
+    '31': FuelType.lpg, // GPL
   };
 
-  /// Case-insensitive lookup for the observatory fuel-key. Returns
-  /// `null` for unknown keys.
-  static FuelType? lookup(String key) =>
-      fuelForObservatoryKey[key.toLowerCase()];
-
-  /// Parse the upstream `prices: { ... }` map into a [FuelType] →
-  /// RON-per-litre map. Unknown keys, zero / negative prices, and
-  /// non-numeric prices are silently filtered out.
-  static Map<FuelType, double> parsePrices(dynamic rawPrices) {
-    final out = <FuelType, double>{};
-    if (rawPrices is! Map) return out;
-    for (final entry in rawPrices.entries) {
-      final key = entry.key.toString();
-      final fuel = lookup(key);
-      if (fuel == null) continue; // unknown / intentionally dropped
-      final price = parseLeiPerLitre(entry.value);
-      if (price == null) continue;
-      out[fuel] = price;
-    }
-    return out;
-  }
+  /// Lookup for an observatory catalog product id. Returns `null` for
+  /// unknown / intentionally dropped ids (e.g. `41` EV charging).
+  static FuelType? lookup(String catalogProductId) =>
+      fuelForCatalogProductId[catalogProductId.trim()];
 
   /// Romanian pump prices are RON (lei) per litre with up to three
   /// decimals (e.g. `7.259`). Accepts `num` and numeric strings.

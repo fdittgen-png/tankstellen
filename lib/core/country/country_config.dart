@@ -535,13 +535,15 @@ class Countries {
     verified: false,
   );
 
-  /// Romania — *Monitorul Prețurilor la Carburanți* (pretcarburant.ro),
-  /// the Competition Council + ANPC joint observatory (#577). Romanian
-  /// law mandates 15-minute price updates from every retailer and ~1 500
-  /// stations are covered (Petrom / OMV / Rompetrol / MOL / Lukoil /
-  /// Socar). The feed is public — no key required. Fuels: Benzină
-  /// Standard (→ e5), Benzină Premium (→ e98), Motorină Standard
-  /// (→ diesel), Motorină Premium (→ diesel premium), GPL (→ lpg).
+  /// Romania — *Monitorul Prețurilor*, the Competition Council's
+  /// official price observatory at monitorulpreturilor.info (#577,
+  /// rebased onto the real observatory in #3193 — the old
+  /// pretcarburant.ro endpoint was a third-party 404). ~1 500 stations
+  /// covered (Petrom / OMV / Rompetrol / MOL / Lukoil / Socar). The
+  /// feed is public — no key required. Fuels (catalog ids): Benzină
+  /// standard 11 (→ e5), Benzină premium 12 (→ e98), Motorină standard
+  /// 21 (→ diesel), Motorină premium 22 (→ diesel premium), GPL 31
+  /// (→ lpg).
   static const romania = CountryConfig(
     code: 'RO',
     name: 'România',
@@ -555,7 +557,7 @@ class Countries {
     requiresApiKey: false,
     apiProvider: 'Monitorul Prețurilor',
     attribution:
-        'Date: Consiliul Concurenței + ANPC — pretcarburant.ro',
+        'Date: Consiliul Concurenței — monitorulpreturilor.info',
     fuelTypes: [
       'Benzină Standard',
       'Benzină Premium',
@@ -574,8 +576,8 @@ class Countries {
     examplePostalCode: '010101',
     exampleCity: 'București',
     pricePerUnitSuffix: 'lei/L',
-    // #1828 — no documented public API; best-guess endpoint,
-    // unverified end-to-end. Hidden from the picker.
+    // #3193 — rebased onto the real monitorulpreturilor.info backend;
+    // hidden until the maintainer field-verifies, then flip to true.
     verified: false,
   );
 

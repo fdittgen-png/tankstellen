@@ -4319,7 +4319,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Drevet av pretcarburant.ro (Konkurranserådet + ANPC)';
+      'Drevet av monitorulpreturilor.info (Konkurranserådet + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

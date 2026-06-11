@@ -1163,7 +1163,7 @@
   "greeceApiProvider": "Παρατηρητήριο Τιμών (Ελλάδα)",
   "greeceCommunityApiNotice": "Τροφοδοτείται από το API fuelpricesgr που συντηρεί η κοινότητα",
   "romaniaApiProvider": "Monitorul Prețurilor (Ρουμανία)",
-  "romaniaScrapingNotice": "Τροφοδοτείται από το pretcarburant.ro (Συμβούλιο Ανταγωνισμού + ANPC)",
+  "romaniaScrapingNotice": "Τροφοδοτείται από το monitorulpreturilor.info (Συμβούλιο Ανταγωνισμού + ANPC)",
   "crossBorderCheaper": "Σταθμοί {country} {km} km μακριά — {price}€/L φθηνότεροι",
   "crossBorderTapToSwitch": "Πατήστε για εναλλαγή χώρας",
   "crossBorderDismissTooltip": "Απόρριψη",

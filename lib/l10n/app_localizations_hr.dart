@@ -4330,7 +4330,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Pokreće pretcarburant.ro (Vijeće za tržišno natjecanje + ANPC)';
+      'Pokreće monitorulpreturilor.info (Vijeće za tržišno natjecanje + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

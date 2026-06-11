@@ -1163,7 +1163,7 @@
   "greeceApiProvider": "Paratiritirio Timon (Hellas)",
   "greeceCommunityApiNotice": "Drevet av det fellesskapsvedigeholdne fuelpricesgr API",
   "romaniaApiProvider": "Monitorul Prețurilor (Romania)",
-  "romaniaScrapingNotice": "Drevet av pretcarburant.ro (Konkurranserådet + ANPC)",
+  "romaniaScrapingNotice": "Drevet av monitorulpreturilor.info (Konkurranserådet + ANPC)",
   "crossBorderCheaper": "{country}-stasjoner {km} km unna — €{price}/L billigere",
   "crossBorderTapToSwitch": "Trykk for å bytte land",
   "crossBorderDismissTooltip": "Lukk",

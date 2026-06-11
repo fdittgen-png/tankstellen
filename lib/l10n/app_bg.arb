@@ -1163,7 +1163,7 @@
   "greeceApiProvider": "Paratiritirio Timon (Гърция)",
   "greeceCommunityApiNotice": "Работи с поддържания от общността fuelpricesgr API",
   "romaniaApiProvider": "Monitorul Prețurilor (Румъния)",
-  "romaniaScrapingNotice": "Работи с pretcarburant.ro (Съвет за конкуренция + ANPC)",
+  "romaniaScrapingNotice": "Работи с monitorulpreturilor.info (Съвет за конкуренция + ANPC)",
   "crossBorderCheaper": "Станции в {country} на {km} км разстояние — €{price}/л по-евтино",
   "crossBorderTapToSwitch": "Докоснете за смяна на държава",
   "crossBorderDismissTooltip": "Затвори",

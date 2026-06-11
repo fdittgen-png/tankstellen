@@ -4322,7 +4322,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Toteutettu pretcarburant.ro:n avulla (kilpailuneuvosto + ANPC)';
+      'Toteutettu monitorulpreturilor.info:n avulla (kilpailuneuvosto + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

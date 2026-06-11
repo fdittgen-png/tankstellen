@@ -4336,7 +4336,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get romaniaScrapingNotice =>
-      'Mogelijk gemaakt door pretcarburant.ro (Mededingingsraad + ANPC)';
+      'Mogelijk gemaakt door monitorulpreturilor.info (Mededingingsraad + ANPC)';
 
   @override
   String crossBorderCheaper(String country, String km, String price) {

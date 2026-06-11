@@ -7783,7 +7783,7 @@ abstract class AppLocalizations {
   /// No description provided for @romaniaScrapingNotice.
   ///
   /// In en, this message translates to:
-  /// **'Powered by pretcarburant.ro (Competition Council + ANPC)'**
+  /// **'Powered by monitorulpreturilor.info (Competition Council + ANPC)'**
   String get romaniaScrapingNotice;
 
   /// Banner shown when stations across the border are cheaper than local prices.
