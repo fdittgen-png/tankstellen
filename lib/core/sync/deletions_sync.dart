@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
 import 'pending_deletions_journal.dart';
+import 'sync_device_identity.dart';
 import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
 
@@ -30,6 +31,13 @@ import '../../core/logging/error_logger.dart';
 /// [fetchTombstonedIds] drains the journal first and unions any
 /// still-pending ids into its result, so a journaled delete is honoured
 /// locally even while the server write keeps failing.
+///
+/// **#3125 forensics:** each tombstone row is stamped with the writing
+/// install's `device_id` + `app_version` (see [SyncDeviceIdentity]), so a
+/// multi-device account can answer *which* device deleted a record and on
+/// which build. A pre-v4 self-host schema without those columns is detected
+/// and retried without the stamps — old schemas keep working tombstones
+/// (minus forensics) until the wizard SQL is re-run.
 class DeletionsSync {
   DeletionsSync._();
 
@@ -74,14 +82,13 @@ class DeletionsSync {
               'table_name': tableName,
               'record_id': id,
               'deleted_at': now,
+              // #3125 — forensic origin stamps (see class doc).
+              'device_id': SyncDeviceIdentity.deviceId,
+              'app_version': SyncDeviceIdentity.appVersion,
             })
         .toList();
     try {
-      await t.upsert(
-        table,
-        rows,
-        onConflict: 'user_id,table_name,record_id',
-      );
+      await _upsertTombstones(t, rows);
       // Confirmed server-side → the journal entry has served its purpose.
       await PendingDeletionsJournal.removeAll(tableName, ids);
       debugPrint('DeletionsSync.record: ${ids.length} tombstone(s) '
@@ -92,6 +99,45 @@ class DeletionsSync {
           context: const {'where': 'DeletionsSync.record FAILED'}));
       return false;
     }
+  }
+
+  /// Upsert [rows] with the #3125 forensic columns; a self-host schema
+  /// that predates v4 rejects the unknown payload keys (PGRST204), so
+  /// retry once without them rather than breaking tombstones outright.
+  /// The schema verifier separately flags the outdated schema.
+  static Future<void> _upsertTombstones(
+    SyncTransport t,
+    List<Map<String, dynamic>> rows,
+  ) async {
+    try {
+      await t.upsert(table, rows, onConflict: 'user_id,table_name,record_id');
+    } catch (e) {
+      if (!_isMissingForensicColumn(e)) rethrow;
+      debugPrint('DeletionsSync: schema predates the #3125 forensic '
+          'columns — retrying tombstone upsert without them');
+      final legacyRows = [
+        for (final row in rows)
+          {...row}
+            ..remove('device_id')
+            ..remove('app_version'),
+      ];
+      await t.upsert(
+        table,
+        legacyRows,
+        onConflict: 'user_id,table_name,record_id',
+      );
+    }
+  }
+
+  /// Whether [error] is PostgREST's "unknown column in payload" rejection
+  /// (code `PGRST204`) for one of the #3125 forensic columns.
+  static bool _isMissingForensicColumn(Object error) {
+    final message = error.toString();
+    if (!message.contains('device_id') && !message.contains('app_version')) {
+      return false;
+    }
+    return message.contains('PGRST204') ||
+        message.toLowerCase().contains('column');
   }
 
   /// Replay every journaled-but-unconfirmed tombstone (#3123). Called at

@@ -25,7 +25,9 @@ import 'schema_sql_policies.dart';
 /// and warns when a self-hoster's recorded version is older — turning what
 /// used to be silent per-table breakage into a clear "re-run the setup SQL"
 /// signal. See `SchemaVerifier.checkSchemaVersion`.
-const int kSupabaseSchemaVersion = 3;
+/// v4 (#3125): `deletions.device_id` + `deletions.app_version` forensic
+/// columns (which install deleted a record, on which build).
+const int kSupabaseSchemaVersion = 4;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -255,12 +257,29 @@ CREATE TABLE IF NOT EXISTS public.deletions (
   table_name TEXT NOT NULL,
   record_id TEXT NOT NULL,
   deleted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  device_id TEXT,
+  app_version TEXT,
   UNIQUE(user_id, table_name, record_id)
 );
 CREATE INDEX IF NOT EXISTS deletions_user_table_idx
   ON public.deletions(user_id, table_name);
 ''',
 };
+
+/// Idempotent column adds for tables that may pre-exist with an older
+/// shape. [buildMigrationSql] SKIPS the `CREATE TABLE` block of any table
+/// the verifier already found, so a column added to an existing table
+/// would never reach a self-hoster who re-runs the wizard — these `ALTER
+/// TABLE … ADD COLUMN IF NOT EXISTS` statements are emitted
+/// **unconditionally** (like the RLS/RPC blocks) to close that gap.
+///
+/// v4 (#3125): forensic origin stamps on tombstones.
+const String upgradeSql = '''
+ALTER TABLE public.deletions
+  ADD COLUMN IF NOT EXISTS device_id TEXT;
+ALTER TABLE public.deletions
+  ADD COLUMN IF NOT EXISTS app_version TEXT;
+''';
 
 /// Builds the wizard SQL. [schema] maps table name → already-exists; a table
 /// already present is skipped for the CREATE TABLE block (but RLS/RPCs are
@@ -280,6 +299,7 @@ String buildMigrationSql(Map<String, bool> schema) {
   }
 
   buffer
+    ..writeln(upgradeSql)
     ..writeln(rlsSql)
     ..writeln(rpcSql)
     ..writeln(_metaSql);

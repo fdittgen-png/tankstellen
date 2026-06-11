@@ -9,6 +9,7 @@ import '../../features/vehicle/domain/entities/vehicle_profile.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_device_identity.dart';
 import 'sync_helper.dart';
 import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
@@ -87,7 +88,14 @@ class VehiclesSync {
             .map((v) => {
                   'id': v.id,
                   'user_id': t.userId,
-                  'data': v.toJson(),
+                  // #3125 — forensic origin stamps ride INSIDE the JSONB
+                  // blob (sync-transparent: decode ignores unknown keys,
+                  // every re-upload re-stamps with the writing device).
+                  'data': {
+                    ...v.toJson(),
+                    'device_id': SyncDeviceIdentity.deviceId,
+                    'app_version': SyncDeviceIdentity.appVersion,
+                  },
                   // Carry the local edit stamp so the next LWW compare
                   // sees equal stamps (skip). Legacy unstamped profiles
                   // fall back to upload time.

@@ -9,6 +9,7 @@ import '../../features/consumption/domain/entities/fill_up.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'supabase_client.dart';
+import 'sync_device_identity.dart';
 import 'sync_helper.dart';
 import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
@@ -87,7 +88,14 @@ class FillUpsSync {
                   'user_id': t.userId,
                   'vehicle_id': f.vehicleId,
                   'recorded_at': f.date.toIso8601String(),
-                  'data': f.toJson(),
+                  // #3125 — forensic origin stamps ride INSIDE the JSONB
+                  // blob (sync-transparent: decode ignores unknown keys,
+                  // every re-upload re-stamps with the writing device).
+                  'data': {
+                    ...f.toJson(),
+                    'device_id': SyncDeviceIdentity.deviceId,
+                    'app_version': SyncDeviceIdentity.appVersion,
+                  },
                   // Carry the local edit stamp so the next LWW compare
                   // sees equal stamps (skip) instead of a phantom-newer
                   // server row. Legacy unstamped records fall back to
