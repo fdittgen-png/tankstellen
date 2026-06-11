@@ -20,6 +20,7 @@ import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
 import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
 import 'obd2_connect_classifier.dart';
+import 'obd2_connect_supervisor.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
@@ -27,6 +28,7 @@ import 'obd2_known_adapters_store.dart';
 import 'obd2_pairing_mode.dart';
 import 'obd2_permissions.dart';
 import 'obd2_read_telemetry.dart';
+import 'obd2_scan_governor.dart';
 import 'obd2_service.dart';
 import 'supported_pids_cache.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -127,6 +129,22 @@ class Obd2ConnectionService {
   /// observed-safe ~120 ms.
   final Duration scanSettleDelay;
 
+  /// #3185 — single-flight connect ADMISSION. Every public connect entry
+  /// threads through it, so the six historical connect owners (picker
+  /// pinned fast-path, recording pre-warm, auto-record orchestrator,
+  /// trip-independent reconnect, in-trip ReconnectConnector, VIN reader)
+  /// are demoted to REQUESTERS — a second entrant queues instead of
+  /// tearing the first's half-open GATT down mid-handshake. Per-instance,
+  /// which IS per-process in production (this service is a keepAlive
+  /// singleton); tests get isolated instances.
+  final Obd2ConnectSupervisor supervisor;
+
+  /// #3185 — process-wide scan-start token bucket (the production provider
+  /// wires [Obd2ScanGovernor.process], shared with the facade's scan-seed),
+  /// so a dense connect episode can't trip Android's silent 5-scans/30s
+  /// throttle. Tests default to a fresh isolated bucket.
+  final Obd2ScanGovernor scanGovernor;
+
   Obd2ConnectionService({
     required this.registry,
     required this.permissions,
@@ -139,7 +157,10 @@ class Obd2ConnectionService {
     this.lastGoodAdapterStore,
     this.knownAdaptersStore,
     this.scanSettleDelay = const Duration(milliseconds: 120),
-  });
+    Obd2ConnectSupervisor? supervisor,
+    Obd2ScanGovernor? scanGovernor,
+  })  : supervisor = supervisor ?? Obd2ConnectSupervisor(),
+        scanGovernor = scanGovernor ?? Obd2ScanGovernor();
 
   /// #3103 — whether this device can discover Bluetooth-CLASSIC (SPP)
   /// adapters at all. True only when a Classic facade is wired, which the
@@ -173,6 +194,12 @@ class Obd2ConnectionService {
       if (state != Obd2PermissionState.granted) {
         throw const Obd2PermissionDenied();
       }
+
+      // #3185 — pace the radio scan start through the governor so a dense
+      // connect episode (scan-seed + fallback scans + user retry) can't trip
+      // Android's silent 5-scans/30s throttle. Fails open; a throttle pause
+      // is stamped on the trace as a `scan-throttle` step.
+      await scanGovernor.admitScanStart(reason: 'service-scan');
 
       final accumulated = <String, Obd2AdapterCandidate>{};
 
@@ -278,7 +305,20 @@ class Obd2ConnectionService {
   /// runs the ELM327 init, returns the ready service. Surfaces
   /// [Obd2AdapterUnresponsive] when init fails (channel is closed
   /// before the error is rethrown).
-  Future<Obd2Service> connect(ResolvedObd2Candidate candidate) async {
+  ///
+  /// #3185 — like every public connect entry, runs under the single-flight
+  /// [supervisor]: a concurrent caller queues instead of racing. A nested
+  /// re-entry (the scan fallback of a by-MAC connect lands here) runs
+  /// inline inside the outer admission.
+  Future<Obd2Service> connect(ResolvedObd2Candidate candidate) =>
+      supervisor.admit(
+        owner: 'connect',
+        attempt: () => _connectTraced(candidate),
+      );
+
+  /// The pre-#3185 [connect] body (trace open/outcome wrap around
+  /// [_connectResolved]); kept verbatim so admission stays a thin shell.
+  Future<Obd2Service> _connectTraced(ResolvedObd2Candidate candidate) async {
     // #2969 — open (or join) a connect trace for the scan-based path. A child
     // when an outer by-MAC/best trace is already open (so the whole attempt is
     // ONE trace); the root when `connect(candidate)` is the entry (the
@@ -511,7 +551,13 @@ class Obd2ConnectionService {
   /// candidate is cached (e.g. the user hasn't scanned yet this
   /// session). Useful for the "first in-car test" flow that skips
   /// the picker UI (#742).
-  Future<Obd2Service?> connectBest() async {
+  ///
+  /// #3185 — single-flight admitted (see [connect]); the inner
+  /// `connect(candidate)` re-entry runs inline inside this admission.
+  Future<Obd2Service?> connectBest() =>
+      supervisor.admit(owner: 'connectBest', attempt: _connectBestTraced);
+
+  Future<Obd2Service?> _connectBestTraced() async {
     // #2969 — connectBest() was the silent dead-end: an empty `_lastRanked`
     // returned null with NO trace, so the user's "it won't connect" left
     // nothing. Open a trace at the entry so even the no-candidate case is
@@ -583,7 +629,7 @@ class Obd2ConnectionService {
     Duration timeout = const Duration(seconds: 5),
     String? adapterName,
   }) =>
-      _traced(
+      _supervised('connectByMac', () => _traced(
         origin: Obd2ConnectOrigin.firstConnect,
         mac: mac,
         adapterName: adapterName,
@@ -613,7 +659,7 @@ class Obd2ConnectionService {
           if (match == null) return null;
           return connect(match);
         },
-      );
+      ));
 
   /// Direct-connect-by-MAC, NO scan (#2242). See [_connectByMacDirect] for the
   /// full contract. A thin INSTANCE method (not an `extension`) so test fakes
@@ -635,26 +681,26 @@ class Obd2ConnectionService {
     bool fallbackToScan = true,
     String? adapterName,
   }) =>
-      _traced(
+      _supervised('connectByMacDirect', () => _traced(
         origin: Obd2ConnectOrigin.firstConnect,
         mac: mac,
         adapterName: adapterName, // #3014 — name the BLE by-MAC attempt
         requestedTransport: Obd2ConnectTransport.ble,
         body: () => _connectByMacDirect(this, mac,
             timeout: timeout, fallbackToScan: fallbackToScan),
-      );
+      ));
 
   /// Direct-connect-by-MAC over Bluetooth **CLASSIC** SPP, NO scan (#2565).
   /// See [_connectByMacClassicDirect]. Thin overridable instance method.
   Future<Obd2Service?> connectByMacClassicDirect(String mac,
           {String? adapterName}) =>
-      _traced(
+      _supervised('connectByMacClassicDirect', () => _traced(
         origin: Obd2ConnectOrigin.firstConnect,
         mac: mac,
         adapterName: adapterName, // #3014 — name the Classic by-MAC attempt
         requestedTransport: Obd2ConnectTransport.classic,
         body: () => _connectByMacClassicDirect(this, mac),
-      );
+      ));
 
   /// #3025 / Epic #3013 — TRANSPORT-AWARE direct-connect-by-MAC for the
   /// FIRST-connect / pinned-adapter path. The single entry the cold connect
@@ -689,19 +735,41 @@ class Obd2ConnectionService {
     String? adapterName,
     bool fallbackToScan = true,
   }) =>
-      _connectByMacTransportAware(this, mac,
-          adapterName: adapterName, fallbackToScan: fallbackToScan);
+      _supervised(
+          'connectByMacTransportAware',
+          () => _connectByMacTransportAware(this, mac,
+              adapterName: adapterName, fallbackToScan: fallbackToScan));
 
   /// Passive autoConnect reconnect (#2261 concern 2). See
   /// [_connectByMacPassive]. Thin overridable instance method.
+  ///
+  /// #3185 — admitted as a PASSIVE attempt: the unbounded autoConnect wait
+  /// SKIPS its cycle (returns null, the scanner keeps its cadence) when any
+  /// other attempt is in flight, and while it holds the slot an arriving
+  /// active requester preempts it via [_teardownLastDirectChannel] (closing
+  /// the passive channel unwinds the wait) — so a parked-car wait can never
+  /// starve a user-initiated connect.
   Future<Obd2Service?> connectByMacPassive(String mac, {String? adapterName}) =>
-      _traced(
-        origin: Obd2ConnectOrigin.liveReconnect,
-        mac: mac,
-        adapterName: adapterName, // #3014 — name the passive reconnect attempt
-        requestedTransport: Obd2ConnectTransport.ble,
-        body: () => _connectByMacPassive(this, mac),
+      supervisor.admitPassive(
+        owner: 'connectByMacPassive',
+        onPreempt: _teardownLastDirectChannel,
+        attempt: () => _traced(
+          origin: Obd2ConnectOrigin.liveReconnect,
+          mac: mac,
+          adapterName: adapterName, // #3014 — name the passive attempt
+          requestedTransport: Obd2ConnectTransport.ble,
+          body: () => _connectByMacPassive(this, mac),
+        ),
       );
+
+  /// #3185 — single-flight shell every ACTIVE public connect entry threads
+  /// through (see [supervisor]). Kept as one helper so the entries stay
+  /// thin and the admission policy lives in exactly one place.
+  Future<Obd2Service?> _supervised(
+    String owner,
+    Future<Obd2Service?> Function() body,
+  ) =>
+      supervisor.admit(owner: owner, attempt: body);
 
   /// #3014 — map a nullable registry [BluetoothTransport] hint onto the trace's
   /// [Obd2ConnectTransport] (null ⇒ `unknown`, the honest no-hint state).
@@ -816,6 +884,11 @@ Obd2ConnectionService obd2Connection(Ref ref) {
     // pairing budget for a never-bonded adapter (OBDLink CX).
     knownAdaptersStore:
         KnownObd2AdaptersStore(ref.watch(settingsStorageProvider)),
+    // #3185 — share the PROCESS-wide scan token bucket with the facade's
+    // scan-seed: the Android 5-scans/30s throttle is per app, so every scan
+    // start must drain the same bucket. (The default per-instance supervisor
+    // is already process-wide here — this provider is a keepAlive singleton.)
+    scanGovernor: Obd2ScanGovernor.process,
     activeVehicleKeyFields: () {
       // Defensive: the vehicle provider must never make a connect throw.
       try {

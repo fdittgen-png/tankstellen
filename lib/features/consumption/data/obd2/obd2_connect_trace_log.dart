@@ -67,6 +67,15 @@ class Obd2ConnectTraceLog {
   /// never throws; null until the persistence layer initialises.
   static void Function(Obd2ConnectTrace trace)? onTracePersist;
 
+  /// #3185 — one-shot supervisor-admission note, set by
+  /// [Obd2ConnectSupervisor] when a connect requester had to WAIT for the
+  /// single-flight slot (or preempted a passive holder), consumed by the
+  /// next ROOT [beginTrace] into a `supervisor-admission` step. Admission
+  /// necessarily happens BEFORE the attempt opens its trace (a trace opened
+  /// while the holder's is live would merge into it as a child), so the
+  /// hand-over is this one-shot note rather than a direct addStep.
+  static String? pendingAdmissionNote;
+
   /// #3184(d) — adapter-radio-state probe, registered by the plugin-wiring
   /// layer (`obd2Connection` provider: `FlutterBluePlus.adapterStateNow`).
   /// When set, every ROOT trace opens with an `adapter-state` step 0 — the
@@ -188,6 +197,17 @@ class Obd2ConnectTraceLog {
       handle.setTransportDecisionReason(_decisionReasonOverride!);
     }
     _active = handle;
+    // #3185 — surface the supervisor-admission wait (if any) as an early
+    // step of the attempt it delayed, so a field export explains the gap.
+    final admissionNote = pendingAdmissionNote;
+    pendingAdmissionNote = null;
+    if (admissionNote != null) {
+      handle.addStep(
+        label: 'supervisor-admission',
+        status: Obd2ConnectStepStatus.ok,
+        detail: admissionNote,
+      );
+    }
     // #3184(d) — step 0 of every ROOT trace: the adapter radio state at
     // the moment the scan/connect began. Best-effort; a throwing probe
     // must never derail the connect that follows (#1103).
@@ -313,6 +333,7 @@ class Obd2ConnectTraceLog {
     _seq = 0;
     adapterStateProbe = null;
     onTracePersist = null;
+    pendingAdmissionNote = null;
   }
 
   /// Test seam — inject a deterministic clock. Pass null to restore
