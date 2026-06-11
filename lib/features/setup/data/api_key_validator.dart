@@ -29,7 +29,7 @@ class ApiKeyValidator {
 
   Future<ApiKeyValidationResult> validate(String apiKey) async {
     try {
-      final response = await _dio.get('/list.php', queryParameters: {
+      final response = await _dio.get<dynamic>('/list.php', queryParameters: {
         'lat': ApiConstants.testLatitude,
         'lng': ApiConstants.testLongitude,
         'rad': 1,

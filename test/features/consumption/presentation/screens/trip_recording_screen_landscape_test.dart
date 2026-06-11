@@ -64,7 +64,7 @@ void main() {
 
   List<Object> bodyOverrides() => [
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-        recordingProfileOverride(),
+        recordingProfileOverride() as Object,
         effectiveApproachStateProvider.overrideWithValue(
           const ApproachInRadius(station: station, distanceMeters: 250),
         ),

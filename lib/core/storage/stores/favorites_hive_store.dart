@@ -20,7 +20,7 @@ import '../storage_keys.dart';
 /// ignored station IDs, and station ratings.
 class FavoritesHiveStore
     implements FavoriteStorage, EvFavoriteStorage, IgnoredStorage, RatingStorage {
-  Box get _favorites => Hive.box(HiveBoxes.favorites);
+  Box<dynamic> get _favorites => Hive.box(HiveBoxes.favorites);
 
   // Favorites
   @override

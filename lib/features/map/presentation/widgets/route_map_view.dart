@@ -164,7 +164,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             center: center,
             zoom: zoom,
             searchRadiusKm: 5,
-            selectedFuel: widget.selectedFuel,
+            selectedFuel: widget.selectedFuel as FuelType,
             showRecenterButton: true,
             // #2755 — recenter refits to the same full-route bounds the
             // camera was framed to, never the (changing) station subset.

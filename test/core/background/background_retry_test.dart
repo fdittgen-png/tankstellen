@@ -164,7 +164,7 @@ void main() {
 
     test('returns data on first success', () async {
       adapter.responses = [
-        _MockResponse(data: {'ok': true, 'prices': {}}, statusCode: 200),
+        _MockResponse(data: {'ok': true, 'prices': <dynamic, dynamic>{}}, statusCode: 200),
       ];
 
       final result = await fetchWithRetry(

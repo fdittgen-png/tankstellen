@@ -114,7 +114,7 @@ void main() {
           'items': [
             {
               'facility_number': '1001',
-              'prices': [],
+              'prices': <dynamic>[],
             },
           ],
         };
@@ -165,7 +165,7 @@ void main() {
             {
               'facility_number': '1001',
               'coordinates': {'latitude': 55.5, 'longitude': 12.5},
-              'prices': [],
+              'prices': <dynamic>[],
               'street': 'TestStreet',
               'house_number': null,
               'city': 'TestCity',
@@ -216,7 +216,7 @@ void main() {
           {
             'stationId': 'S1',
             'coordinates': {'latitude': '55.5', 'longitude': '12.5'},
-            'prices': [],
+            'prices': <dynamic>[],
           },
         ];
 
@@ -245,7 +245,7 @@ void main() {
           {
             'stationId': 'S1',
             'coordinates': <String, dynamic>{},
-            'prices': [],
+            'prices': <dynamic>[],
           },
         ];
 
@@ -348,7 +348,7 @@ void main() {
             {
               'facility_number': '1001',
               'coordinates': {'latitude': 0, 'longitude': 0},
-              'prices': [],
+              'prices': <dynamic>[],
             },
           ],
         };
@@ -372,7 +372,7 @@ void main() {
           'items': [
             {
               'coordinates': {'latitude': 55.5, 'longitude': 12.5},
-              'prices': [],
+              'prices': <dynamic>[],
             },
           ],
         };
@@ -453,7 +453,7 @@ void main() {
           {
             'stationId': 'S1',
             'coordinates': {'latitude': '0', 'longitude': '0'},
-            'prices': [],
+            'prices': <dynamic>[],
           },
         ];
 
@@ -471,7 +471,7 @@ void main() {
           {
             'stationId': 'S1',
             'coordinates': {'latitude': '55.5', 'longitude': '12.5'},
-            'prices': [],
+            'prices': <dynamic>[],
           },
         ];
 
@@ -725,13 +725,13 @@ void main() {
           {
             'facility_number': '1001',
             'coordinates': {'latitude': 55.80, 'longitude': 12.50},
-            'prices': [],
+            'prices': <dynamic>[],
             'city': 'Far',
           },
           {
             'facility_number': '1002',
             'coordinates': {'latitude': 55.68, 'longitude': 12.57},
-            'prices': [],
+            'prices': <dynamic>[],
             'city': 'Near',
           },
         ],
@@ -774,7 +774,7 @@ void main() {
           {
             'facility_number': '1001',
             'coordinates': {'latitude': 55.5, 'longitude': 12.5},
-            'prices': [],
+            'prices': <dynamic>[],
             'last_updated_time': '2026-03-29T14:30:00Z',
           },
         ],

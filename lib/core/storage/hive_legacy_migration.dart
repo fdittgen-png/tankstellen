@@ -24,7 +24,7 @@ class HiveLegacyMigration {
   static Future<void> migrateLegacyPlaintextBox(
       String boxName, HiveAesCipher cipher) async {
     try {
-      final box = await Hive.openBox(boxName, encryptionCipher: cipher);
+      final box = await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
       await box.close();
       return; // Already encrypted, or a fresh install.
     } catch (_) {
@@ -56,7 +56,7 @@ class HiveLegacyMigration {
 
     await Hive.deleteBoxFromDisk(boxName);
     final encryptedBox =
-        await Hive.openBox(boxName, encryptionCipher: cipher);
+        await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
     if (entries.isNotEmpty) {
       await encryptedBox.putAll(entries);
     }

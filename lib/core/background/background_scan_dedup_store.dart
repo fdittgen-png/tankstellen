@@ -45,7 +45,7 @@ class BackgroundScanDedupStore {
   /// recent refresh.
   static const String lastTriggerKey = 'bg_scan_last_trigger';
 
-  Box? _boxOrNull() {
+  Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.alerts)) return null;
       return Hive.box(HiveBoxes.alerts);

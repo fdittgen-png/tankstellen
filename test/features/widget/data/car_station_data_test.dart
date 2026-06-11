@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:convert';
+import 'dart:ui' show Color;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/price_band_colors.dart';
@@ -41,7 +42,7 @@ void main() {
         isOpen: true,
       );
 
-  int argb(c) {
+  int argb(Color c) {
     int ch(double v) => (v * 255.0).round() & 0xff;
     return (ch(c.a) << 24) | (ch(c.r) << 16) | (ch(c.g) << 8) | ch(c.b);
   }

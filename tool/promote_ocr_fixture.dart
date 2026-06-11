@@ -261,9 +261,9 @@ String _renderTest({
   required String slug,
   required String packagePath,
   required String? country,
-  required Map? profileJson,
+  required Map<dynamic, dynamic>? profileJson,
   required List<_Block> blocks,
-  required Map expected,
+  required Map<dynamic, dynamic> expected,
   required String? imageRef,
   required String? capturedAt,
 }) {
@@ -377,7 +377,7 @@ String _renderTest({
 /// Maps the package's `expected.derived` field-name list (which uses the
 /// result keys `totalCost`/`liters`/`pricePerLiter`) onto [PumpField]
 /// enum-value names, ignoring any unknown entry. Empty when absent.
-List<String> _derivedPumpFields(Map expected) {
+List<String> _derivedPumpFields(Map<dynamic, dynamic> expected) {
   final raw = expected['derived'];
   if (raw is! List) return const [];
   const mapping = {

@@ -17,11 +17,11 @@ void main() {
       ]);
       final dio = _dioWith(adapter);
 
-      final first = await dio.get<Map>('https://x.test/data');
+      final first = await dio.get<Map<dynamic, dynamic>>('https://x.test/data');
       expect(first.statusCode, 200);
       expect(first.data, {'price': 1.5});
 
-      final second = await dio.get<Map>('https://x.test/data');
+      final second = await dio.get<Map<dynamic, dynamic>>('https://x.test/data');
       // 304 is transparently turned into a 200 carrying the cached body.
       expect(second.statusCode, 200);
       expect(second.data, {'price': 1.5});
@@ -39,8 +39,8 @@ void main() {
       ]);
       final dio = _dioWith(adapter);
 
-      await dio.get<Map>('https://x.test/feed');
-      final second = await dio.get<Map>('https://x.test/feed');
+      await dio.get<Map<dynamic, dynamic>>('https://x.test/feed');
+      final second = await dio.get<Map<dynamic, dynamic>>('https://x.test/feed');
 
       expect(adapter.requests[1].headers['If-Modified-Since'], lastMod);
       expect(second.data, {'n': 1});
@@ -53,8 +53,8 @@ void main() {
       ]);
       final dio = _dioWith(adapter);
 
-      final a = await dio.get<Map>('https://x.test/s?q=a');
-      final b = await dio.get<Map>('https://x.test/s?q=b');
+      final a = await dio.get<Map<dynamic, dynamic>>('https://x.test/s?q=a');
+      final b = await dio.get<Map<dynamic, dynamic>>('https://x.test/s?q=b');
       expect(a.data, {'q': 'a'});
       expect(b.data, {'q': 'b'});
       // Neither request revalidated the other's entry.
@@ -70,12 +70,12 @@ void main() {
       ]);
       final dio = _dioWith(adapter);
 
-      final first = await dio.get<Map>('https://x.test/data');
+      final first = await dio.get<Map<dynamic, dynamic>>('https://x.test/data');
       expect(first.data, {'price': 2.0});
 
       // Network drops on the next call — the cached body is served instead of
       // throwing.
-      final second = await dio.get<Map>('https://x.test/data');
+      final second = await dio.get<Map<dynamic, dynamic>>('https://x.test/data');
       expect(second.statusCode, 200);
       expect(second.data, {'price': 2.0});
       expect(second.extra['tankstellen.conditionalGet'], 'offline');
@@ -86,7 +86,7 @@ void main() {
       final dio = _dioWith(adapter);
 
       await expectLater(
-        dio.get<Map>('https://x.test/cold'),
+        dio.get<Map<dynamic, dynamic>>('https://x.test/cold'),
         throwsA(isA<DioException>()),
       );
     });
@@ -98,9 +98,9 @@ void main() {
       ]);
       final dio = _dioWith(adapter);
 
-      await dio.get<Map>('https://x.test/data');
+      await dio.get<Map<dynamic, dynamic>>('https://x.test/data');
       await expectLater(
-        dio.get<Map>('https://x.test/data'),
+        dio.get<Map<dynamic, dynamic>>('https://x.test/data'),
         throwsA(isA<DioException>()),
       );
     });
@@ -123,9 +123,9 @@ void main() {
         ..httpClientAdapter = adapter
         ..interceptors.add(interceptor);
 
-      await dio.get<Map>('https://x.test/a');
-      await dio.get<Map>('https://x.test/b');
-      await dio.get<Map>('https://x.test/c');
+      await dio.get<Map<dynamic, dynamic>>('https://x.test/a');
+      await dio.get<Map<dynamic, dynamic>>('https://x.test/b');
+      await dio.get<Map<dynamic, dynamic>>('https://x.test/c');
       expect(interceptor.cacheSize, 2);
     });
   });

@@ -192,8 +192,10 @@ class LuxembourgStationService
 
     try {
       final responses = await Future.wait([
-        _dio.get('$_baseUrl/$essenceFlow/$_query', cancelToken: cancelToken),
-        _dio.get('$_baseUrl/$dieselFlow/$_query', cancelToken: cancelToken),
+        _dio.get<dynamic>('$_baseUrl/$essenceFlow/$_query',
+            cancelToken: cancelToken),
+        _dio.get<dynamic>('$_baseUrl/$dieselFlow/$_query',
+            cancelToken: cancelToken),
       ]);
 
       final latest = <String, LustatObservation>{};

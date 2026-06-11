@@ -82,7 +82,7 @@ void main() {
     group('searchStations', () {
       test('fans out one call per catalog product and merges by station id',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -110,7 +110,7 @@ void main() {
 
         expect(result.source, ServiceSource.romaniaApi);
         // Five calls, one per catalog product id.
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               any(),
               queryParameters: captureAny(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -146,7 +146,7 @@ void main() {
 
       test('every station id carries the ro- prefix for currency routing',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -159,7 +159,7 @@ void main() {
       });
 
       test('clamps an absurd radius to the 30 km buffer ceiling', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -171,7 +171,7 @@ void main() {
         const huge = SearchParams(lat: 44.43, lng: 26.10, radiusKm: 10000);
         await service.searchStations(huge);
 
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               any(),
               queryParameters: captureAny(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -181,7 +181,7 @@ void main() {
 
       test('bare empty-list body (live-verified backend quirk) → empty '
           'result, not an error', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -194,7 +194,7 @@ void main() {
 
       test('backend exception envelope raises ApiException', () async {
         // Live-recorded WebAPI error shape (Npgsql error, 2026-06-10).
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -216,7 +216,7 @@ void main() {
       });
 
       test('network failure is re-raised as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -233,7 +233,7 @@ void main() {
 
       test('HTTP 404 surfaces the status code (the failure mode that '
           'killed the old endpoint)', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),

@@ -51,7 +51,7 @@ class EVChargingService with StationServiceHelpers {
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         _baseUrl,
         queryParameters: {
           'output': 'json',

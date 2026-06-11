@@ -107,7 +107,7 @@ class LocationSearchService {
 
     // Rate-limiting is handled by DioFactory's RateLimitInterceptor (#2315).
     try {
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         '/search',
         queryParameters: {
           'q': query,

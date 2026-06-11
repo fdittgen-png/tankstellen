@@ -27,7 +27,7 @@ Map<String, dynamic> compactSummaryJson(TripHistoryEntry entry) {
 Map<String, dynamic> tripDetailsJson(TripHistoryEntry entry) {
   final json = entry.toJson();
   return {
-    'samples': json['samples'] ?? const [],
-    'gpsd': json['gpsd'] ?? const [],
+    'samples': json['samples'] ?? const <dynamic>[],
+    'gpsd': json['gpsd'] ?? const <dynamic>[],
   };
 }

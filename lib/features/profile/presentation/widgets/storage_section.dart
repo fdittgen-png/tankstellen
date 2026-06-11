@@ -300,7 +300,7 @@ class StorageSection extends ConsumerWidget {
       PaintingBinding.instance.imageCache.clear();
       PaintingBinding.instance.imageCache.clearLiveImages();
       for (final boxName in ['settings', 'favorites', 'profiles']) {
-        final box = Hive.box(boxName);
+        final box = Hive.box<dynamic>(boxName);
         await box.clear();
       }
       if (!ctx.mounted) return; // #3159 — see _clearCache.

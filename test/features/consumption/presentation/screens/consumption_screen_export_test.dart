@@ -52,8 +52,8 @@ class _RecordingExporter extends FullBackupExporter {
   Future<FullBackupExportResult> export({
     required List<VehicleProfile> vehicles,
     required List<FillUp> fillUps,
-    required List trips,
-    required List chargingLogs,
+    required List<dynamic> trips,
+    required List<dynamic> chargingLogs,
   }) async {
     callCount++;
     lastFillUps = fillUps;
@@ -74,8 +74,8 @@ class _ThrowingExporter extends FullBackupExporter {
   Future<FullBackupExportResult> export({
     required List<VehicleProfile> vehicles,
     required List<FillUp> fillUps,
-    required List trips,
-    required List chargingLogs,
+    required List<dynamic> trips,
+    required List<dynamic> chargingLogs,
   }) async {
     throw StateError('share-sheet refused');
   }
@@ -91,8 +91,8 @@ class _SavedExporter extends FullBackupExporter {
   Future<FullBackupExportResult> export({
     required List<VehicleProfile> vehicles,
     required List<FillUp> fillUps,
-    required List trips,
-    required List chargingLogs,
+    required List<dynamic> trips,
+    required List<dynamic> chargingLogs,
   }) async {
     return const FullBackupExportResult(
       filePath: '/tmp/tankstellen_backup_2026.zip',

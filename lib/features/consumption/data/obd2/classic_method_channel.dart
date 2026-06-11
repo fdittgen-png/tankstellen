@@ -29,7 +29,7 @@ class Obd2ClassicMethodChannel {
     final raw = await _methodChannel.invokeListMethod<dynamic>('bondedDevices')
         ?? const [];
     return raw
-        .whereType<Map>()
+        .whereType<Map<dynamic, dynamic>>()
         .map((m) => ClassicBondedDevice(
               address: m['address'] as String? ?? '',
               name: m['name'] as String? ?? '',

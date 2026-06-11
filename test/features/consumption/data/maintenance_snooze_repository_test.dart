@@ -22,13 +22,13 @@ void main() {
     setUp(() async {
       tmpDir = Directory.systemTemp.createTempSync('snooze_repo_test_');
       Hive.init(tmpDir.path);
-      await Hive.openBox(HiveBoxes.settings);
+      await Hive.openBox<dynamic>(HiveBoxes.settings);
     });
 
     tearDown(() async {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).clear();
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).clear();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
       await Hive.close();
       tmpDir.deleteSync(recursive: true);
@@ -188,7 +188,7 @@ void main() {
       );
       // The underlying key is gone from the box.
       expect(
-        Hive.box(HiveBoxes.settings)
+        Hive.box<dynamic>(HiveBoxes.settings)
             .containsKey(repo.keyFor(MaintenanceSignal.idleRpmCreep)),
         isFalse,
       );
@@ -207,7 +207,7 @@ void main() {
       );
       // Drop an unrelated key into the same box; clearAll must NOT touch
       // it — the repo only owns the maintenance.snooze.* prefix.
-      final box = Hive.box(HiveBoxes.settings);
+      final box = Hive.box<dynamic>(HiveBoxes.settings);
       await box.put('unrelated.key', 'keep me');
 
       await repo.clearAll();
@@ -247,7 +247,7 @@ void main() {
       // Manually poison the storage with a non-ISO-8601 string. The
       // repository must treat this as "not snoozed" rather than
       // permanently silencing the signal.
-      await Hive.box(HiveBoxes.settings).put(
+      await Hive.box<dynamic>(HiveBoxes.settings).put(
         repo.keyFor(MaintenanceSignal.idleRpmCreep),
         'not a date',
       );
@@ -282,8 +282,8 @@ void main() {
 
     tearDown(() async {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).clear();
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).clear();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
       await Hive.close();
       tmpDir.deleteSync(recursive: true);
@@ -320,9 +320,9 @@ void main() {
       );
 
       // Now open the settings box and confirm nothing leaked through.
-      await Hive.openBox(HiveBoxes.settings);
+      await Hive.openBox<dynamic>(HiveBoxes.settings);
       expect(
-        Hive.box(HiveBoxes.settings)
+        Hive.box<dynamic>(HiveBoxes.settings)
             .containsKey(repo.keyFor(MaintenanceSignal.idleRpmCreep)),
         isFalse,
       );

@@ -34,6 +34,14 @@ plugins:
       provider_parameters: false
 
 analyzer:
+  # Strict language modes (#3160) — the project paid for implicit-dynamic
+  # casts twice (#2296, #2311 in the Hive/JSON codec layer); these make
+  # implicit downcasts, raw generic types and uninferable invocations
+  # compile-time diagnostics instead of runtime surprises.
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
   errors:
     # freezed uses @JsonKey on constructor parameters, which the analyzer
     # flags as invalid. This is a known false positive with freezed.

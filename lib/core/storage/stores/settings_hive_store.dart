@@ -13,7 +13,7 @@ import '../storage_keys.dart';
 /// Manages app settings (plain Hive) and API keys (FlutterSecureStorage
 /// with in-memory cache for synchronous reads).
 class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
-  Box get _settings => Hive.box(HiveBoxes.settings);
+  Box<dynamic> get _settings => Hive.box(HiveBoxes.settings);
 
   // API Key — stored in platform secure enclave, NOT in plain Hive.
   static const _secureStorage = FlutterSecureStorage();
@@ -104,7 +104,7 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
     if (_supabaseAnonKeyCache != null) return;
 
     // One-time migration from plain Hive settings.
-    final box = Hive.box(HiveBoxes.settings);
+    final box = Hive.box<dynamic>(HiveBoxes.settings);
     final legacy = box.get(StorageKeys.supabaseAnonKey) as String?;
     if (legacy != null && legacy.isNotEmpty) {
       await _secureStorage.write(

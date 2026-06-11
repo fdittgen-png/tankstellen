@@ -147,7 +147,7 @@ class ConfigVerificationWidget extends ConsumerWidget {
             'Email account enables cross-device access')
         : (l?.configAuthNoteAnonymous ??
             'Anonymous account — data tied to this device');
-    final summaryBody = syncConfig.isConfigured
+    final summaryBody = syncConfig.isConfigured as bool
         ? (l?.configPrivacySummarySynced(authNote) ??
             '• Favorites, alerts, and ignored stations are synced to your '
                 'private database\n'

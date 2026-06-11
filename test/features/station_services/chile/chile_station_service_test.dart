@@ -167,7 +167,7 @@ void main() {
 
       test('sends the API key as an Authorization: Bearer header, not a '
           'query parameter (#3200)', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([])));
@@ -180,7 +180,7 @@ void main() {
 
         // And the call carries the documented v4 path with NO token
         // query parameter (the old ?token= form 404s live).
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               captureAny(),
               cancelToken: any(named: 'cancelToken'),
             )).captured.single as String;
@@ -204,7 +204,7 @@ void main() {
           File('test/fixtures/cl_cne_v4_auth_error.json')
               .readAsStringSync(),
         );
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(recorded));
@@ -219,7 +219,7 @@ void main() {
       });
 
       test('parses the CNE envelope into Stations with cl- prefix', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([_cneStation()])));
@@ -247,7 +247,7 @@ void main() {
       });
 
       test('empty data → empty list, not an error', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([])));
@@ -260,7 +260,7 @@ void main() {
 
       test('HTTP 401 is re-raised as ApiException with clear message',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
@@ -283,7 +283,7 @@ void main() {
       });
 
       test('HTTP 403 is re-raised as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
@@ -304,7 +304,7 @@ void main() {
       });
 
       test('network timeout is re-raised as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
@@ -320,7 +320,7 @@ void main() {
       });
 
       test('every parsed station id starts with `cl-`', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([
@@ -342,7 +342,7 @@ void main() {
       });
 
       test('codigo already prefixed `cl-` is not double-prefixed', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([

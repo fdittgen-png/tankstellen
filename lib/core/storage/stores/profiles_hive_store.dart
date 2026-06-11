@@ -12,8 +12,8 @@ import '../storage_keys.dart';
 /// Manages user search profiles (country, fuel type, radius, etc.).
 /// Profile data is stored in an encrypted Hive box.
 class ProfilesHiveStore implements ProfileStorage {
-  Box get _profiles => Hive.box(HiveBoxes.profiles);
-  Box get _settings => Hive.box(HiveBoxes.settings);
+  Box<dynamic> get _profiles => Hive.box(HiveBoxes.profiles);
+  Box<dynamic> get _settings => Hive.box(HiveBoxes.settings);
 
   @override
   String? getActiveProfileId() =>

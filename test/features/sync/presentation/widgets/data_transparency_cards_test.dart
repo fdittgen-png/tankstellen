@@ -86,7 +86,7 @@ void main() {
         const SyncedDataCard(data: {
           'favorites': [1, 2, 3],
           'alerts': [1],
-          'push_tokens': [],
+          'push_tokens': <dynamic>[],
           'reports': [1, 2],
           'trip_summaries': [1, 2, 2, 4, 5, 6, 7], // 7 trips
         }),
@@ -108,9 +108,9 @@ void main() {
         tester,
         const SyncedDataCard(data: {
           'favorites': [1],
-          'alerts': [],
-          'push_tokens': [],
-          'reports': [],
+          'alerts': <dynamic>[],
+          'push_tokens': <dynamic>[],
+          'reports': <dynamic>[],
           // intentionally no trip_summaries key
         }),
       );

@@ -10,6 +10,7 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/user_profile.dart';
 import '../../providers/profile_provider.dart';
 
 /// GPS position management section for the profile/settings screen.
@@ -107,7 +108,7 @@ class LocationSectionWidget extends ConsumerWidget {
   }
 
   Widget _buildAutoUpdateToggle(WidgetRef ref, ThemeData theme,
-      dynamic activeProfile, AppLocalizations? l) {
+      UserProfile? activeProfile, AppLocalizations? l) {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(
@@ -123,7 +124,8 @@ class LocationSectionWidget extends ConsumerWidget {
       value: activeProfile?.autoUpdatePosition ?? false,
       onChanged: (value) {
         if (activeProfile != null) {
-          final updated = activeProfile.copyWith(autoUpdatePosition: value);
+          final updated =
+              activeProfile.copyWith(autoUpdatePosition: value);
           ref.read(profileRepositoryProvider).updateProfile(updated);
           ref.invalidate(allProfilesProvider);
           ref.invalidate(activeProfileProvider);

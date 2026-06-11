@@ -68,7 +68,7 @@ void main() {
       overrides: [
         tripRecordingProvider.overrideWith(_LiveFakeTripRecording.new),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
         // Fake provider override pushing an in-radius approach hit —
         // the radar card renders this station directly (no GPS / search
         // chain needed) at the top of the column.
@@ -112,7 +112,7 @@ void main() {
       overrides: [
         tripRecordingProvider.overrideWith(_LiveFakeTripRecording.new),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
         effectiveApproachStateProvider.overrideWithValue(null),
         effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
         radarCandidateListProvider.overrideWith((ref) async => const []),

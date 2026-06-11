@@ -51,7 +51,7 @@ class ReportService {
     }
 
     try {
-      final response = await _dio.post(
+      final response = await _dio.post<dynamic>(
         ApiConstants.complaintEndpoint,
         data: {
           'id': stationId,

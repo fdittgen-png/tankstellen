@@ -143,7 +143,7 @@ void main() {
 
       final result = classifySearchError(err, stack);
 
-      expect(result, isA<AsyncError>());
+      expect(result, isA<AsyncError<dynamic>>());
       expect(result!.error, same(err));
       expect(result.stackTrace, same(stack));
     });
@@ -157,7 +157,7 @@ void main() {
 
       final result = classifySearchError(err, stack);
 
-      expect(result, isA<AsyncError>());
+      expect(result, isA<AsyncError<dynamic>>());
       expect(result!.error, same(err));
     });
 
@@ -168,7 +168,7 @@ void main() {
 
       final result = classifySearchError(err, stack);
 
-      expect(result, isA<AsyncError>());
+      expect(result, isA<AsyncError<dynamic>>());
       expect(result!.error, same(err));
       expect(result.stackTrace, same(stack));
     });
@@ -178,7 +178,7 @@ void main() {
 
       final result = classifySearchError(err, stack);
 
-      expect(result, isA<AsyncError>());
+      expect(result, isA<AsyncError<dynamic>>());
       expect(result!.error, same(err));
     });
 
@@ -189,7 +189,7 @@ void main() {
 
       final result = classifySearchError(err, stack);
 
-      expect(result, isA<AsyncError>());
+      expect(result, isA<AsyncError<dynamic>>());
       expect(result!.error, same(err));
       expect(result.stackTrace, same(stack));
     });

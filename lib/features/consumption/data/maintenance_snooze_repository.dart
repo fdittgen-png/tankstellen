@@ -42,7 +42,7 @@ class MaintenanceSnoozeRepository {
   /// provider read the same value.
   static const Duration defaultSnoozeDuration = Duration(days: 30);
 
-  Box? _boxOrNull() {
+  Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);

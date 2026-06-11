@@ -24,7 +24,7 @@ import '../hive_boxes.dart';
 /// `VelocityAlertCooldown`). The root close-site is fixed in
 /// [HiveBoxes.closeIsolateBoxes]; this is the belt-and-braces reader guard.
 class CacheHiveStore implements CacheStorage, ItineraryStorage {
-  Box? _boxOrNull() {
+  Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.cache)) return null;
       return Hive.box(HiveBoxes.cache);

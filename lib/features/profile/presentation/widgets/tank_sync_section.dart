@@ -272,7 +272,7 @@ class TankSyncSection extends ConsumerWidget {
   }
 
   void _showQrShare(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => Dialog(
         child: Padding(

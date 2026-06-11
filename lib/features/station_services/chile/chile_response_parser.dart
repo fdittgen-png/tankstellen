@@ -108,7 +108,7 @@ List<Station> parseChileStationsResponse(
 // ──────────────────────────────────────────────────────────────────────
 
 Station? _parseOneStation(
-  Map raw, {
+  Map<dynamic, dynamic> raw, {
   required double fromLat,
   required double fromLng,
 }) {
@@ -167,7 +167,7 @@ Station? _parseOneStation(
   );
 }
 
-Map<FuelType, double> _parsePrices(Map raw) {
+Map<FuelType, double> _parsePrices(Map<dynamic, dynamic> raw) {
   final out = <FuelType, double>{};
   final precios = raw['precios'];
   if (precios is! Map) return out;
@@ -231,14 +231,14 @@ double? _parseDouble(dynamic raw) {
   return null;
 }
 
-Map? _coerceMap(dynamic data) {
+Map<dynamic, dynamic>? _coerceMap(dynamic data) {
   if (data is Map) return data;
   return null;
 }
 
 /// CNE nests the distributor under `distribuidor.nombre`; older
 /// payloads use a flat `distribuidor` string. Accept both.
-String _parseBrand(Map raw) {
+String _parseBrand(Map<dynamic, dynamic> raw) {
   final dist = raw['distribuidor'];
   if (dist is Map) {
     final n = dist['nombre']?.toString().trim();
@@ -251,7 +251,7 @@ String _parseBrand(Map raw) {
   return 'Independent';
 }
 
-String _joinStreet(Map raw) {
+String _joinStreet(Map<dynamic, dynamic> raw) {
   final calle = raw['direccion_calle']?.toString().trim() ?? '';
   final numero = raw['direccion_numero']?.toString().trim() ?? '';
   if (calle.isEmpty && numero.isEmpty) return '';
@@ -264,7 +264,7 @@ String _joinStreet(Map raw) {
 /// `horario_atencion` field often reads `"24_horas"` or a free-text
 /// schedule. We treat stations as open by default and fall back to
 /// `false` only when the field explicitly says `cerrado`.
-bool _isOpen(Map raw) {
+bool _isOpen(Map<dynamic, dynamic> raw) {
   final h = raw['horario_atencion']?.toString().toLowerCase().trim();
   if (h == null || h.isEmpty) return true;
   if (h.contains('cerrado')) return false;

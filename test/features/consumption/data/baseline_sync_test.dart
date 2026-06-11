@@ -106,7 +106,7 @@ void main() {
     });
 
     test('empty payload → 0', () {
-      expect(totalSampleCount({'version': 1, 'perSituation': {}}), 0);
+      expect(totalSampleCount({'version': 1, 'perSituation': <dynamic, dynamic>{}}), 0);
     });
   });
 

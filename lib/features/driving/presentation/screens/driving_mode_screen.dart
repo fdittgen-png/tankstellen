@@ -126,7 +126,7 @@ class _DrivingModeScreenState extends ConsumerState<DrivingModeScreen> {
     Station station,
     FuelType fuelType,
   ) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       builder: (_) => DrivingStationSheet(
         station: station,

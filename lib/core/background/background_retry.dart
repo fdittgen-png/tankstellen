@@ -25,7 +25,7 @@ Future<Map<String, dynamic>?> fetchWithRetry({
 }) async {
   for (var attempt = 0; attempt < config.maxAttempts; attempt++) {
     try {
-      final response = await dio.get(
+      final response = await dio.get<dynamic>(
         url,
         queryParameters: queryParameters,
       );

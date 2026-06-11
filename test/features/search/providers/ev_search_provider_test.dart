@@ -64,7 +64,7 @@ void main() {
           .searchNearby(lat: 48.85, lng: 2.35, radiusKm: 10);
 
       final state = container.read(eVSearchStateProvider);
-      expect(state, isA<AsyncError>());
+      expect(state, isA<AsyncError<dynamic>>());
       expect(state.error, isA<NoEvApiKeyException>());
     });
 
@@ -78,7 +78,7 @@ void main() {
           .searchNearby(lat: 0, lng: 0, radiusKm: 5);
 
       final state = container.read(eVSearchStateProvider);
-      expect(state, isA<AsyncError>());
+      expect(state, isA<AsyncError<dynamic>>());
       expect(state.error, isA<NoEvApiKeyException>());
     });
 
@@ -104,7 +104,7 @@ void main() {
       await notifier.searchNearby(lat: 1, lng: 1, radiusKm: 5);
 
       final state = container.read(eVSearchStateProvider);
-      expect(state, isA<AsyncError>());
+      expect(state, isA<AsyncError<dynamic>>());
     });
   });
 }

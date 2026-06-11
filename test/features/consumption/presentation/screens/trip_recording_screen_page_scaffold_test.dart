@@ -51,7 +51,7 @@ Future<void> _pumpRecordingScreen(WidgetTester tester) async {
         () => _FakeTripRecording(_recordingState()),
       ),
       wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
     ],
   );
 }

@@ -182,7 +182,8 @@ class _MitecoFixtureAdapter implements HttpClientAdapter {
     final id = options.uri.path.split('/').last; // …/FiltroProvincia/<id>
     final body = id == '08'
         ? _province08Body
-        : jsonEncode({'ResultadoConsulta': 'OK', 'ListaEESSPrecio': const []});
+        : jsonEncode(
+            {'ResultadoConsulta': 'OK', 'ListaEESSPrecio': const <dynamic>[]});
     return ResponseBody.fromBytes(utf8.encode(body), 200, headers: {
       Headers.contentTypeHeader: ['application/json'],
     });

@@ -111,7 +111,7 @@ void main() {
         );
         final result = await service.searchStations(params);
         expect(result.source, ServiceSource.prixCarburantsApi);
-        expect(result.data, isA<List>());
+        expect(result.data, isA<List<dynamic>>());
       });
 
       test('returns empty list for coordinates far from France', () async {
@@ -176,7 +176,7 @@ void main() {
         'services_service': ['Lavage automatique', 'DAB'],
         'horaires_automate_24_24': 'Oui',
         'carburants_disponibles': ['Gazole', 'SP95', 'E10'],
-        'carburants_indisponibles': [],
+        'carburants_indisponibles': <dynamic>[],
         'pop': 'R',
         'departement': 'Hérault',
         'region': 'Occitanie',
@@ -833,7 +833,7 @@ void main() {
       // First request (CP query) returns results
       adapter.addResponse(makeApiResponse('75012', 3));
       // Second request (geo follow-up for neighboring postal codes — #315)
-      adapter.addResponse({'results': const []});
+      adapter.addResponse({'results': const <dynamic>[]});
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -857,7 +857,7 @@ void main() {
     test('falls back to geo query when postal code returns empty', () async {
       final adapter = _TrackingMockAdapter();
       // First request (CP query) returns empty
-      adapter.addResponse({'results': []});
+      adapter.addResponse({'results': <dynamic>[]});
       // Second request (geo query) returns results
       adapter.addResponse(makeApiResponse('75012', 2));
 
@@ -902,7 +902,7 @@ void main() {
       // to the cp query when valid coordinates are present.
       final adapter = _TrackingMockAdapter();
       adapter.addResponse(makeApiResponse('34120', 5));
-      adapter.addResponse({'results': const []}); // geo follow-up
+      adapter.addResponse({'results': const <dynamic>[]}); // geo follow-up
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -989,7 +989,7 @@ void main() {
     test('postal-code path filters stations by radius (regression #298)', () async {
       final adapter = _TrackingMockAdapter()
         ..addResponse(scatteredStations('34120'))
-        ..addResponse({'results': const []}); // geo follow-up returns nothing extra
+        ..addResponse({'results': const <dynamic>[]}); // geo follow-up returns nothing extra
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -1013,9 +1013,9 @@ void main() {
     test('postal-code path with different radii returns different result counts (#298)', () async {
       final adapter = _TrackingMockAdapter()
         ..addResponse(scatteredStations('34120'))
-        ..addResponse({'results': const []}) // geo follow-up for narrow
+        ..addResponse({'results': const <dynamic>[]}) // geo follow-up for narrow
         ..addResponse(scatteredStations('34120'))
-        ..addResponse({'results': const []}); // geo follow-up for wide
+        ..addResponse({'results': const <dynamic>[]}); // geo follow-up for wide
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -1036,7 +1036,7 @@ void main() {
 
     test('geo path preserves decimal radius (no integer rounding) (#298)', () async {
       final adapter = _TrackingMockAdapter()
-        ..addResponse({'results': []});
+        ..addResponse({'results': <dynamic>[]});
 
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
@@ -1380,7 +1380,7 @@ void main() {
 
     test('caps the batch at 10 ids', () async {
       final adapter = _TrackingMockAdapter()
-        ..addResponse({'results': const []});
+        ..addResponse({'results': const <dynamic>[]});
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
 
@@ -1411,7 +1411,7 @@ void main() {
     });
 
     test('injected baseUrl is used as the request URL', () async {
-      final adapter = _TrackingMockAdapter()..addResponse({'results': const []});
+      final adapter = _TrackingMockAdapter()..addResponse({'results': const <dynamic>[]});
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(
         dio: dio,
@@ -1432,7 +1432,7 @@ void main() {
     });
 
     test('defaults to defaultBaseUrl when baseUrl is omitted', () async {
-      final adapter = _TrackingMockAdapter()..addResponse({'results': const []});
+      final adapter = _TrackingMockAdapter()..addResponse({'results': const <dynamic>[]});
       final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
       final svc = PrixCarburantsStationService(dio: dio);
 

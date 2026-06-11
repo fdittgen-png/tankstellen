@@ -166,7 +166,7 @@ Future<void> _pumpRecordingScreen(
         () => _LiveFakeTripRecording(live),
       ),
       wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
       hapticEcoCoachLifecycleProvider
           .overrideWith(() => _FakeHapticEcoCoachLifecycle(coachEvents)),
       activeVehicleProfileProvider

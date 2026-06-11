@@ -219,7 +219,7 @@ void main() {
       expect(
         () => adapter.parse({
           'openingTimes': [
-            {'text': null, 'start': 123, 'end': const []},
+            {'text': null, 'start': 123, 'end': const <dynamic>[]},
             'not even a map',
           ],
           'wholeDay': 'maybe',

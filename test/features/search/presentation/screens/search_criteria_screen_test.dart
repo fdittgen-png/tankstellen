@@ -181,7 +181,7 @@ void main() {
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
       // #1792 — open-only, amenities and brands have no UserProfile
       // field; they persist device-locally via putSetting.
-      when(() => test.mockStorage.putSetting(any(), any()))
+      when(() => test.mockStorage.putSetting(any(), any<dynamic>()))
           .thenAnswer((_) async {});
 
       const initialProfile = UserProfile(
@@ -238,7 +238,7 @@ void main() {
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
-      when(() => test.mockStorage.putSetting(any(), any()))
+      when(() => test.mockStorage.putSetting(any(), any<dynamic>()))
           .thenAnswer((_) async {});
 
       const initialProfile = UserProfile(id: 'p1', name: 'Standard');

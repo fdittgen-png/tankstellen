@@ -49,12 +49,12 @@ class PendingDeletionsJournal {
   static Future<void> Function(String json) persist = _persistToSettings;
 
   static String? _loadFromSettings() => Hive.isBoxOpen(HiveBoxes.settings)
-      ? Hive.box(HiveBoxes.settings).get(settingsKey) as String?
+      ? Hive.box<dynamic>(HiveBoxes.settings).get(settingsKey) as String?
       : null;
 
   static Future<void> _persistToSettings(String json) async {
     if (!Hive.isBoxOpen(HiveBoxes.settings)) return;
-    await Hive.box(HiveBoxes.settings).put(settingsKey, json);
+    await Hive.box<dynamic>(HiveBoxes.settings).put(settingsKey, json);
   }
 
   /// Restore the real Hive-backed seams after a test injected fakes.

@@ -46,7 +46,7 @@ void main() {
     // Give the poll loop one real tick so the TripRecorder captures
     // at least one sample — without it, startedAt never gets set and
     // the history save path short-circuits.
-    await Future.delayed(const Duration(milliseconds: 50));
+    await Future<dynamic>.delayed(const Duration(milliseconds: 50));
     await notifier.stop();
 
     final repo = container.read(tripHistoryRepositoryProvider);

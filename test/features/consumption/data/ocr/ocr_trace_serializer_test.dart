@@ -80,7 +80,7 @@ void main() {
     expect((decoded['mlkit'] as Map)['blocks'], isList);
     expect(decoded['classification'], isList);
     expect(decoded['anchors'], isList);
-    expect(decoded['confidence'], isA<Map>());
+    expect(decoded['confidence'], isA<Map<dynamic, dynamic>>());
     expect((decoded['gate'] as Map)['reason'], 'consistent');
     expect((decoded['gate'] as Map)['checks'], isList);
     final result = decoded['result'] as Map;
@@ -126,7 +126,7 @@ void main() {
     final decoded =
         jsonDecode(formatOcrTracePackageJson(recorder.build())) as Map;
     expect(decoded['schema'], 1);
-    expect(decoded['crossCheck'], isA<Map>());
+    expect(decoded['crossCheck'], isA<Map<dynamic, dynamic>>());
   });
 
   group('includeImage (#2853 — clipboard TransactionTooLargeException)', () {

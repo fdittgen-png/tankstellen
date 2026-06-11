@@ -63,7 +63,7 @@ void main() {
       await fakeStorage.setIgnoredIds(['c']);
       await fakeStorage.setRating('d', 4);
       for (var i = 0; i < 10; i++) {
-        await fakeStorage.cacheData('k$i', {});
+        await fakeStorage.cacheData('k$i', <dynamic, dynamic>{});
       }
       await fakeStorage.savePriceRecords('s1', [
         {'a': 1},

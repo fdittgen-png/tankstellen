@@ -38,10 +38,10 @@ void main() {
 
   setUp(() async {
     if (Hive.isBoxOpen(HiveBoxes.settings)) {
-      await Hive.box(HiveBoxes.settings).close();
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
     }
-    await Hive.openBox(HiveBoxes.settings);
-    await Hive.box(HiveBoxes.settings).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.settings);
+    await Hive.box<dynamic>(HiveBoxes.settings).clear();
   });
 
   tearDownAll(() async {
@@ -171,7 +171,7 @@ void main() {
       );
 
       // Box must be empty before the tap.
-      final box = Hive.box(HiveBoxes.settings);
+      final box = Hive.box<dynamic>(HiveBoxes.settings);
       expect(box.length, 0,
           reason: 'No snooze key should exist before user interaction');
 

@@ -99,7 +99,7 @@ void main() {
       ),
     ];
 
-    AsyncValue resultFor(List<Station> stations) => AsyncValue.data(
+    AsyncValue<dynamic> resultFor(List<Station> stations) => AsyncValue.data(
           ServiceResult(
             data: stations.map((s) => FuelStationResult(s)).toList(),
             source: ServiceSource.tankerkoenigApi,
@@ -108,7 +108,7 @@ void main() {
         );
 
     Widget viewFor(
-      AsyncValue searchState,
+      AsyncValue<dynamic> searchState,
       _CountingMapController controller,
     ) =>
         SizedBox(
@@ -307,8 +307,8 @@ class _CountingMapController extends MapControllerImpl {
 /// NearbyMapView, so a test can drive a genuine (or value-equal) rebuild.
 class _Rebuildable extends StatefulWidget {
   final _CountingMapController controller;
-  final Widget Function(AsyncValue, _CountingMapController) viewFor;
-  final AsyncValue initial;
+  final Widget Function(AsyncValue<dynamic>, _CountingMapController) viewFor;
+  final AsyncValue<dynamic> initial;
 
   const _Rebuildable({
     required this.controller,
@@ -321,9 +321,9 @@ class _Rebuildable extends StatefulWidget {
 }
 
 class _RebuildableState extends State<_Rebuildable> {
-  late AsyncValue _state = widget.initial;
+  late AsyncValue<dynamic> _state = widget.initial;
 
-  void show(AsyncValue next) => setState(() => _state = next);
+  void show(AsyncValue<dynamic> next) => setState(() => _state = next);
 
   @override
   Widget build(BuildContext context) =>

@@ -702,7 +702,7 @@ void main() {
                 'r': 1200.0,
               },
             ],
-            'gpsd': const [],
+            'gpsd': const <dynamic>[],
           };
         };
 

@@ -258,7 +258,7 @@ void main() {
       container = createContainer();
       final state = container.read(favoriteStationsProvider);
 
-      expect(state, isA<AsyncData>());
+      expect(state, isA<AsyncData<dynamic>>());
       expect(state.value!.data, isEmpty);
     });
 

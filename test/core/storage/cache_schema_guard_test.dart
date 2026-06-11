@@ -158,14 +158,14 @@ void main() {
     setUp(() async {
       tmp = await Directory.systemTemp.createTemp('cache_evict_test');
       Hive.init(tmp.path);
-      await Hive.openBox(HiveBoxes.cache);
+      await Hive.openBox<dynamic>(HiveBoxes.cache);
       await Hive.openBox<int>(HiveBoxes.boxSchema);
       // The other encrypted-box stamps the migration loop touches.
-      await Hive.openBox(HiveBoxes.settings);
-      await Hive.openBox(HiveBoxes.favorites);
-      await Hive.openBox(HiveBoxes.profiles);
-      await Hive.openBox(HiveBoxes.priceHistory);
-      await Hive.openBox(HiveBoxes.alerts);
+      await Hive.openBox<dynamic>(HiveBoxes.settings);
+      await Hive.openBox<dynamic>(HiveBoxes.favorites);
+      await Hive.openBox<dynamic>(HiveBoxes.profiles);
+      await Hive.openBox<dynamic>(HiveBoxes.priceHistory);
+      await Hive.openBox<dynamic>(HiveBoxes.alerts);
     });
 
     tearDown(() async {
@@ -176,7 +176,7 @@ void main() {
     test('an OLD-format cached search blob stamped at the old version is '
         'evicted (reads as a miss) after the bump, while saved itineraries '
         'and other user data survive', () async {
-      final cacheBox = Hive.box(HiveBoxes.cache);
+      final cacheBox = Hive.box<dynamic>(HiveBoxes.cache);
       final schema = Hive.box<int>(HiveBoxes.boxSchema);
 
       // Pre-#2922 on-disk state: the cache stamped at the OLD schema version,
@@ -223,11 +223,11 @@ void main() {
         {'id': 'i1', 'name': 'Summer trip'},
       ]);
       // User data in OTHER boxes — MUST survive.
-      final favorites = Hive.box(HiveBoxes.favorites);
+      final favorites = Hive.box<dynamic>(HiveBoxes.favorites);
       await favorites.put('fav1', {'id': 'station-7'});
-      final settings = Hive.box(HiveBoxes.settings);
+      final settings = Hive.box<dynamic>(HiveBoxes.settings);
       await settings.put('theme', 'dark');
-      final profiles = Hive.box(HiveBoxes.profiles);
+      final profiles = Hive.box<dynamic>(HiveBoxes.profiles);
       await profiles.put('p1', {'name': 'Me'});
 
       // Run the migration the same way init() does.
@@ -253,7 +253,7 @@ void main() {
 
     test('a fresh install (no stamps) is stamped at the current version and '
         'evicts nothing', () async {
-      final cacheBox = Hive.box(HiveBoxes.cache);
+      final cacheBox = Hive.box<dynamic>(HiveBoxes.cache);
       final schema = Hive.box<int>(HiveBoxes.boxSchema);
 
       // No stamps yet (fresh install). A search entry already in the cache
@@ -270,7 +270,7 @@ void main() {
 
     test('an up-to-date cache (already at current version) is left untouched',
         () async {
-      final cacheBox = Hive.box(HiveBoxes.cache);
+      final cacheBox = Hive.box<dynamic>(HiveBoxes.cache);
       final schema = Hive.box<int>(HiveBoxes.boxSchema);
 
       await schema.put(HiveBoxes.cache, HiveBoxes.currentSchemaVersion);

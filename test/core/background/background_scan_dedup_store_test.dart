@@ -21,10 +21,10 @@ void main() {
 
   setUp(() async {
     if (Hive.isBoxOpen(HiveBoxes.alerts)) {
-      await Hive.box(HiveBoxes.alerts).close();
+      await Hive.box<dynamic>(HiveBoxes.alerts).close();
     }
-    await Hive.openBox(HiveBoxes.alerts);
-    await Hive.box(HiveBoxes.alerts).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.alerts);
+    await Hive.box<dynamic>(HiveBoxes.alerts).clear();
   });
 
   tearDownAll(() async {
@@ -71,7 +71,7 @@ void main() {
       final store = BackgroundScanDedupStore();
       await store.recordScan(now: t0, trigger: 'ios_bg_refresh');
       expect(await store.lastScanAt(), t0);
-      final box = Hive.box(HiveBoxes.alerts);
+      final box = Hive.box<dynamic>(HiveBoxes.alerts);
       expect(box.get(BackgroundScanDedupStore.lastTriggerKey), 'ios_bg_refresh');
     });
 

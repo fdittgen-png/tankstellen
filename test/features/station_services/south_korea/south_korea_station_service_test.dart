@@ -127,7 +127,7 @@ void main() {
           () async {
         // OPINET returns one product per call; the service fires four
         // requests (e5, e98, diesel, lpg) and merges results by station.
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -184,7 +184,7 @@ void main() {
         var inFlight = 0;
         var maxInFlight = 0;
 
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -224,7 +224,7 @@ void main() {
 
       test('sends API key and KATEC-projected coordinates in query '
           'parameters (#3192)', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -235,7 +235,7 @@ void main() {
         // this test only asserts on the outgoing parameters.
         await service.searchStations(params);
 
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               any(),
               queryParameters: captureAny(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -256,7 +256,7 @@ void main() {
 
       test('clamps radius to the documented 5 km OPINET ceiling (#3192)',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -267,7 +267,7 @@ void main() {
         // this test only asserts on the outgoing parameters.
         await service.searchStations(params);
 
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               any(),
               queryParameters: captureAny(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -283,7 +283,7 @@ void main() {
         // usually a station-free radius. OPINET still answers an INVALID
         // key with the same silent empty envelope, so the service leaves
         // an errorLogger trace, but it must NOT fail the search.
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -296,7 +296,7 @@ void main() {
 
       test('HTTP 401 is re-raised as ApiException with clear message',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -320,7 +320,7 @@ void main() {
       });
 
       test('HTTP 403 is re-raised as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -342,7 +342,7 @@ void main() {
       });
 
       test('network timeout is re-raised as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -359,7 +359,7 @@ void main() {
       });
 
       test('every parsed station id starts with `kr-`', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),

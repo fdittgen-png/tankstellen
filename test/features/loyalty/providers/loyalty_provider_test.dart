@@ -74,7 +74,7 @@ void main() {
       // Make absolutely sure the box is closed before we read the
       // provider.
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
 
       final c = makeContainer();
@@ -93,11 +93,11 @@ void main() {
       'returns a non-null LoyaltyCardRepository when the box is open',
       () async {
         if (!Hive.isBoxOpen(HiveBoxes.settings)) {
-          await Hive.openBox(HiveBoxes.settings);
+          await Hive.openBox<dynamic>(HiveBoxes.settings);
         }
         addTearDown(() async {
           if (Hive.isBoxOpen(HiveBoxes.settings)) {
-            await Hive.box(HiveBoxes.settings).close();
+            await Hive.box<dynamic>(HiveBoxes.settings).close();
           }
         });
 
@@ -116,16 +116,16 @@ void main() {
   group('LoyaltyCards (Hive open)', () {
     setUp(() async {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
-      await Hive.openBox(HiveBoxes.settings);
-      await Hive.box(HiveBoxes.settings).clear();
+      await Hive.openBox<dynamic>(HiveBoxes.settings);
+      await Hive.box<dynamic>(HiveBoxes.settings).clear();
     });
 
     tearDown(() async {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).clear();
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).clear();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
     });
 
@@ -321,7 +321,7 @@ void main() {
   group('LoyaltyCards (Hive closed → repo is null)', () {
     setUp(() async {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
     });
 
@@ -386,16 +386,16 @@ void main() {
   group('activeDiscountByBrandProvider', () {
     setUp(() async {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
-      await Hive.openBox(HiveBoxes.settings);
-      await Hive.box(HiveBoxes.settings).clear();
+      await Hive.openBox<dynamic>(HiveBoxes.settings);
+      await Hive.box<dynamic>(HiveBoxes.settings).clear();
     });
 
     tearDown(() async {
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).clear();
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).clear();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
     });
 
@@ -767,7 +767,7 @@ void main() {
       // returns null, so the cards list is const [] and the derived
       // map collapses to an empty map.
       if (Hive.isBoxOpen(HiveBoxes.settings)) {
-        await Hive.box(HiveBoxes.settings).close();
+        await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
 
       final c = makeContainer();

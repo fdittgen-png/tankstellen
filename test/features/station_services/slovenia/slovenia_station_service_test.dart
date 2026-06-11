@@ -103,7 +103,7 @@ void main() {
 
     group('searchStations', () {
       test('parses a canonical goriva.si response', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -142,7 +142,7 @@ void main() {
       });
 
       test('builds the correct query parameters (radius in meters)', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -155,7 +155,7 @@ void main() {
         );
         await service.searchStations(params);
 
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               any(),
               queryParameters: captureAny(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -167,7 +167,7 @@ void main() {
       });
 
       test('clamps unrealistic radius values', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -180,7 +180,7 @@ void main() {
         );
         await service.searchStations(params);
 
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               any(),
               queryParameters: captureAny(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -189,7 +189,7 @@ void main() {
       });
 
       test('returns empty list for empty results array', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -202,7 +202,7 @@ void main() {
       });
 
       test('returns empty list for non-map response', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -214,7 +214,7 @@ void main() {
       });
 
       test('wraps DioException as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -231,7 +231,7 @@ void main() {
       });
 
       test('sort by price sorts cheapest e5 first', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -268,7 +268,7 @@ void main() {
         // goriva.si search would still have returned them (the upstream
         // query is server-side). filterByRadius should then fall back
         // to the top-N nearest so the user never sees an empty list.
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
@@ -419,7 +419,7 @@ void main() {
 
       test('returns empty list when results is not a list', () {
         expect(service.parseResponse({'results': 'nope'}), isEmpty);
-        expect(service.parseResponse({}), isEmpty);
+        expect(service.parseResponse(<dynamic, dynamic>{}), isEmpty);
       });
     });
 

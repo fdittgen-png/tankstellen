@@ -102,7 +102,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
 
     // Trigger route search with saved waypoints. #1602 — the search
     // corridor is the active profile's detour budget.
-    final fuelType = FuelType.fromString(it.fuelType);
+    final fuelType = FuelType.fromString(it.fuelType as String);
     final detourBudgetKm =
         ref.read(activeProfileProvider)?.routeDetourBudgetKm ?? 5.0;
     ref.read(routeSearchStateProvider.notifier).searchAlongRoute(
@@ -114,7 +114,7 @@ class _ItinerariesScreenState extends ConsumerState<ItinerariesScreen> {
     // Navigate to search screen
     context.go('/');
 
-    SnackBarHelper.show(context, AppLocalizations.of(context)?.loadingRoute(it.name) ?? 'Loading route: ${it.name}');
+    SnackBarHelper.show(context, AppLocalizations.of(context)?.loadingRoute(it.name as String) ?? 'Loading route: ${it.name}');
   }
 
   String _formatDate(DateTime dt) {

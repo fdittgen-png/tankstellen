@@ -634,7 +634,7 @@ class Obd2Service implements Obd2RawCommandPort {
         // back-to-back command can race the reset. The adapter still
         // owns the actual settle duration via [postResetDelay].
         if (_isResetCommand(sequence[i])) {
-          await Future.delayed(adapter.postResetDelay);
+          await Future<void>.delayed(adapter.postResetDelay);
         }
       }
 

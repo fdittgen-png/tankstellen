@@ -14,7 +14,7 @@ void main() {
     testWidgets('shows banner on first open', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.getSetting('test_banner')).thenReturn(null);
-      when(() => test.mockStorage.putSetting(any(), any()))
+      when(() => test.mockStorage.putSetting(any(), any<dynamic>()))
           .thenAnswer((_) async {});
 
       await pumpApp(
@@ -50,7 +50,7 @@ void main() {
     testWidgets('dismissing banner stores the flag', (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.getSetting('test_banner')).thenReturn(null);
-      when(() => test.mockStorage.putSetting(any(), any()))
+      when(() => test.mockStorage.putSetting(any(), any<dynamic>()))
           .thenAnswer((_) async {});
 
       await pumpApp(

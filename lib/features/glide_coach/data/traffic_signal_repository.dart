@@ -129,7 +129,7 @@ class TrafficSignalRepository {
 
     try {
       return signalsRaw
-          .whereType<Map>()
+          .whereType<Map<dynamic, dynamic>>()
           .map((e) => TrafficSignal.fromJson(e.cast<String, dynamic>()))
           .toList(growable: false);
     } catch (e, st) {

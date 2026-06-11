@@ -55,7 +55,7 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
     CancelToken? cancelToken,
   }) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         ApiConstants.listEndpoint,
         queryParameters: {
           'lat': params.lat,
@@ -109,7 +109,7 @@ class TankerkoenigStationService with StationServiceHelpers implements StationSe
     String stationId,
   ) async {
     try {
-      final response = await _dio.get(
+      final response = await _dio.get<dynamic>(
         ApiConstants.detailEndpoint,
         // #753 — accept either `de-<uuid>` (new prefix) or a bare UUID
         // (legacy favorite from before the prefix scheme); the upstream

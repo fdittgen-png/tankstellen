@@ -374,7 +374,7 @@ void main() {
 
     test('migrates a plaintext box into an encrypted box, preserving '
         'every entry', () async {
-      final plain = await Hive.openBox('mig_data');
+      final plain = await Hive.openBox<dynamic>('mig_data');
       await plain.put('city', 'Lyon');
       await plain.put('count', 7);
 
@@ -382,19 +382,19 @@ void main() {
 
       // The box is now encrypted and the data survived intact.
       final encrypted =
-          await Hive.openBox('mig_data', encryptionCipher: cipher);
+          await Hive.openBox<dynamic>('mig_data', encryptionCipher: cipher);
       expect(encrypted.get('city'), 'Lyon');
       expect(encrypted.get('count'), 7);
       await encrypted.close();
     });
 
     test('an empty plaintext box migrates without error', () async {
-      final plain = await Hive.openBox('mig_empty');
+      final plain = await Hive.openBox<dynamic>('mig_empty');
 
       await HiveBoxes.migrateToEncryptedForTest('mig_empty', plain, cipher);
 
       final encrypted =
-          await Hive.openBox('mig_empty', encryptionCipher: cipher);
+          await Hive.openBox<dynamic>('mig_empty', encryptionCipher: cipher);
       expect(encrypted.isEmpty, isTrue);
       await encrypted.close();
     });

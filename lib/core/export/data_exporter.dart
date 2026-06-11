@@ -266,7 +266,7 @@ class DataExporter {
     final raw = _storage.getSetting('fillUps');
     if (raw is List) {
       return raw
-          .whereType<Map>()
+          .whereType<Map<dynamic, dynamic>>()
           .map((e) => e.cast<String, dynamic>())
           .toList(growable: false);
     }

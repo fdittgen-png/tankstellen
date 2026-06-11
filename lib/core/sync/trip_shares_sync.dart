@@ -112,7 +112,7 @@ class TripSharesSync {
       return TripShareResult.notAuthenticated;
     }
     try {
-      final resolved = await client.rpc(
+      final resolved = await client.rpc<dynamic>(
         'resolve_share_recipient',
         params: {'recipient_email': recipientEmail},
       );
@@ -178,7 +178,7 @@ class TripSharesSync {
       return false;
     }
     try {
-      final claimed = await client.rpc(
+      final claimed = await client.rpc<dynamic>(
         'claim_trip_share',
         params: {'token': token},
       );

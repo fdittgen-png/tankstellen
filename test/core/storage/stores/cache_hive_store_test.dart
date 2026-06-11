@@ -106,7 +106,7 @@ void main() {
       expect(store.getCachedData('k1'), isNotNull);
 
       // Simulate closeIsolateBoxes() closing the live handle.
-      await Hive.box(HiveBoxes.cache).close();
+      await Hive.box<dynamic>(HiveBoxes.cache).close();
 
       expect(() => store.getCachedData('k1'), returnsNormally);
       expect(store.getCachedData('k1'), isNull);
@@ -120,7 +120,7 @@ void main() {
       await store.saveItineraries([
         {'id': 'i1', 'name': 'Trip'},
       ]);
-      await Hive.box(HiveBoxes.cache).close();
+      await Hive.box<dynamic>(HiveBoxes.cache).close();
 
       expect(() => store.getItineraries(), returnsNormally);
       expect(store.getItineraries(), isEmpty);
@@ -130,7 +130,7 @@ void main() {
 
     test('cacheData is a silent no-op on a closed box (never throws)',
         () async {
-      await Hive.box(HiveBoxes.cache).close();
+      await Hive.box<dynamic>(HiveBoxes.cache).close();
 
       await expectLater(store.cacheData('k', {'x': 1}), completes);
 
@@ -139,7 +139,7 @@ void main() {
 
     test('saveItineraries / clearCache / deleteCacheEntry no-op on a '
         'closed box', () async {
-      await Hive.box(HiveBoxes.cache).close();
+      await Hive.box<dynamic>(HiveBoxes.cache).close();
 
       await expectLater(store.saveItineraries(const []), completes);
       await expectLater(store.clearCache(), completes);

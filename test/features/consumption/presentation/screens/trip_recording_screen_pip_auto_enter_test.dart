@@ -94,7 +94,7 @@ void main() {
       overrides: [
         tripRecordingProvider.overrideWith(() => _ActiveTripRecording()),
         wakelockFacadeProvider.overrideWithValue(_FakeWakelockFacade()),
-      recordingProfileOverride(),
+      recordingProfileOverride() as Object,
         pipControllerProvider.overrideWithValue(pip),
       ],
     );

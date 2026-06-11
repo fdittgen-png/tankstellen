@@ -137,7 +137,7 @@ class VelocityAlertRunner {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) {
         return VelocityAlertConfig.defaults();
       }
-      final raw = Hive.box(HiveBoxes.settings).get(configKey);
+      final raw = Hive.box<dynamic>(HiveBoxes.settings).get(configKey);
       if (raw is String && raw.isNotEmpty) {
         final decoded = jsonDecode(raw);
         if (decoded is Map) {
@@ -160,7 +160,7 @@ class VelocityAlertRunner {
       debugPrint('VelocityAlertRunner.saveConfig: settings box closed');
       return;
     }
-    await Hive.box(HiveBoxes.settings)
+    await Hive.box<dynamic>(HiveBoxes.settings)
         .put(configKey, jsonEncode(config.toJson()));
   }
 

@@ -88,12 +88,12 @@ void main() {
         expect(result.errors, hasLength(1));
         expect(result.errors.single.kind, FailureKind.unsupported);
         expect(result.errors.single.message, contains('#3194'));
-        verifyNever(() => mockDio.get(
+        verifyNever(() => mockDio.get<dynamic>(
               any(),
               queryParameters: any(named: 'queryParameters'),
               cancelToken: any(named: 'cancelToken'),
             ));
-        verifyNever(() => mockDio.get(
+        verifyNever(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             ));
@@ -101,7 +101,7 @@ void main() {
 
       test('a self-hosted baseUrl bypasses the short-circuit and fetches',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([])));
@@ -112,7 +112,7 @@ void main() {
         final result = await service.searchStations(params);
 
         expect(result.source, ServiceSource.greeceApi);
-        verify(() => mockDio.get(
+        verify(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).called(greaterThan(0));
@@ -194,7 +194,7 @@ void main() {
     group('searchStations', () {
       test('builds stations for the nearest prefectures from Athens',
           () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([_priceResponse()])));
@@ -224,7 +224,7 @@ void main() {
       });
 
       test('fetches exactly 4 closest prefectures (not all 8)', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([_priceResponse()])));
@@ -232,14 +232,14 @@ void main() {
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         await service.searchStations(params);
 
-        verify(() => mockDio.get(
+        verify(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).called(4);
       });
 
       test('targets the /data/daily/prefecture/{name} path', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(_envelope([_priceResponse()])));
@@ -247,7 +247,7 @@ void main() {
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         await service.searchStations(params);
 
-        final captured = verify(() => mockDio.get(
+        final captured = verify(() => mockDio.get<dynamic>(
               captureAny(),
               cancelToken: any(named: 'cancelToken'),
             )).captured;
@@ -261,7 +261,7 @@ void main() {
       });
 
       test('HTTP 401 is re-raised as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
@@ -282,7 +282,7 @@ void main() {
       });
 
       test('HTTP 403 is re-raised as ApiException', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
@@ -305,7 +305,7 @@ void main() {
       test(
           'network timeout on every prefecture surfaces ApiException to '
           'the fallback chain', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
@@ -324,7 +324,7 @@ void main() {
           'partial failures (some prefectures up, some down) still return '
           'data with accumulated errors', () async {
         var callCount = 0;
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async {
@@ -347,7 +347,7 @@ void main() {
       });
 
       test('empty list for a prefecture drops that entry silently', () async {
-        when(() => mockDio.get(
+        when(() => mockDio.get<dynamic>(
               any(),
               cancelToken: any(named: 'cancelToken'),
             )).thenAnswer((_) async => response(<Map<String, dynamic>>[]));

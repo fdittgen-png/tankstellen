@@ -7,11 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
+import '../../../search/domain/entities/fuel_type.dart';
 import '../../../search/domain/entities/search_result_item.dart';
 import '../../../search/providers/search_screen_ui_provider.dart';
 import 'station_map_layers.dart';
@@ -26,7 +28,7 @@ import 'station_map_layers.dart';
 /// the map whenever a fallback fired — a permanent ~32 dp tax on
 /// every "stations were fetched via the secondary API" session.
 class NearbyMapView extends ConsumerStatefulWidget {
-  final AsyncValue searchState;
+  final AsyncValue<dynamic> searchState;
   final dynamic selectedFuel;
   final double searchRadiusKm;
   final MapController mapController;
@@ -139,7 +141,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
                     center: center,
                     zoom: zoom,
                     searchRadiusKm: searchRadiusKm,
-                    selectedFuel: selectedFuel,
+                    selectedFuel: selectedFuel as FuelType,
                     sortMode: sortMode,
                     // #2998 — adopt the maintainer-loved radar grammar
                     // (#2939): proximity-cluster EVERY result set with the
@@ -189,7 +191,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
   Widget _buildInfoBar(
     BuildContext context,
     AppLocalizations? l10n,
-    List stations,
+    List<dynamic> stations,
     dynamic result,
   ) {
     final theme = Theme.of(context);
@@ -218,7 +220,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
           ),
           const Spacer(),
           Text(
-            result.freshnessLabel,
+            result.freshnessLabel as String,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -253,7 +255,7 @@ class _OverlayBanner extends StatelessWidget {
         elevation: 4,
         borderRadius: BorderRadius.circular(8),
         clipBehavior: Clip.antiAlias,
-        child: ServiceStatusBanner(result: result),
+        child: ServiceStatusBanner(result: result as ServiceResult<dynamic>),
       ),
     );
   }

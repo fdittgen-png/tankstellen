@@ -44,10 +44,10 @@ void main() {
   setUp(() async {
     // Fresh settings box per test — mirrors the RadiusAlertStore test.
     if (Hive.isBoxOpen(HiveBoxes.settings)) {
-      await Hive.box(HiveBoxes.settings).close();
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
     }
-    await Hive.openBox(HiveBoxes.settings);
-    await Hive.box(HiveBoxes.settings).clear();
+    await Hive.openBox<dynamic>(HiveBoxes.settings);
+    await Hive.box<dynamic>(HiveBoxes.settings).clear();
   });
 
   tearDownAll(() async {
@@ -133,7 +133,7 @@ void main() {
         () async {
       // The settings box carries lots of unrelated payloads — user
       // prefs, last filter, etc. list() must filter by key prefix.
-      final box = Hive.box(HiveBoxes.settings);
+      final box = Hive.box<dynamic>(HiveBoxes.settings);
       await box.put('theme', 'dark');
       await box.put('user_locale', 'fr');
 
@@ -162,12 +162,12 @@ void main() {
     });
 
     test('list returns empty when the settings box is closed', () async {
-      await Hive.box(HiveBoxes.settings).close();
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
 
       final store = ChargingLogStore();
       expect(await store.list(), isEmpty);
       // Restore for teardown
-      await Hive.openBox(HiveBoxes.settings);
+      await Hive.openBox<dynamic>(HiveBoxes.settings);
     });
   });
 }

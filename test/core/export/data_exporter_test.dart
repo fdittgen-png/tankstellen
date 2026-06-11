@@ -81,7 +81,7 @@ void main() {
       expect((json['alerts'] as List).length, 1);
       expect((json['fillUps'] as List).length, 1);
       expect((json['fillUps'] as List).first['liters'], 42.5);
-      expect((json['priceHistory'] as Map)['s1'], isA<List>());
+      expect((json['priceHistory'] as Map)['s1'], isA<List<dynamic>>());
     });
   });
 

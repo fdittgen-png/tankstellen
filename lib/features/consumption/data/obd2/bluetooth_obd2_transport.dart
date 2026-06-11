@@ -185,7 +185,7 @@ class BluetoothObd2Transport
     }
     _subscription = _channel.incoming.listen(
       _onBytes,
-      onError: (e, st) {
+      onError: (Object e, StackTrace st) {
         debugPrint('BluetoothObd2Transport: channel error: $e');
         _failPending(e);
       },

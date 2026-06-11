@@ -246,7 +246,7 @@ class _Obd2AdapterPickerSheetState
           if (list.isNotEmpty) _phase = _Phase.selecting;
         });
       },
-      onError: (e, _) {
+      onError: (Object e, _) {
         if (!mounted || e is! Obd2ConnectionError) return;
         setState(() {
           _error = e;

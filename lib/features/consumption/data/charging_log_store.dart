@@ -36,7 +36,7 @@ class ChargingLogStore {
   /// without importing this class.
   static const String keyPrefix = 'charging_log:';
 
-  Box? _boxOrNull() {
+  Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.settings)) return null;
       return Hive.box(HiveBoxes.settings);

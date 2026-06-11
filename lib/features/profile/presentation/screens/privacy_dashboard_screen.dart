@@ -331,7 +331,7 @@ class _PrivacyDashboardScreenState
     await storageMgmt.clearPriceHistory();
     await storageMgmt.deleteApiKey();
     for (final boxName in ['settings', 'favorites', 'profiles']) {
-      final box = Hive.box(boxName);
+      final box = Hive.box<dynamic>(boxName);
       await box.clear();
     }
     if (mounted) {
