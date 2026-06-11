@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Recorded 2026-06-11 from https://publicacionexterna.azurewebsites.net/publicaciones/prices — the matching price rows for mx_cre_places_slice.xml, structure untouched (#3197) -->
+<places>
+<place place_id="2267">
+    <gas_price type="regular">24.49</gas_price>
+    <gas_price type="premium">29.69</gas_price>
+  </place>
+<place place_id="2319">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">28.69</gas_price>
+  </place>
+<place place_id="2390">
+    <gas_price type="regular">22.89</gas_price>
+    <gas_price type="premium">25.99</gas_price>
+  </place>
+<place place_id="2663">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">29.19</gas_price>
+  </place>
+<place place_id="2689">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">28.99</gas_price>
+  </place>
+<place place_id="2715">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">28.99</gas_price>
+  </place>
+<place place_id="2743">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">28.49</gas_price>
+  </place>
+<place place_id="2777">
+    <gas_price type="regular">22.77</gas_price>
+    <gas_price type="premium">27.59</gas_price>
+  </place>
+<place place_id="2794">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">28.49</gas_price>
+  </place>
+<place place_id="2807">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">29.19</gas_price>
+    <gas_price type="diesel">27</gas_price>
+  </place>
+<place place_id="2818">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">28.99</gas_price>
+    <gas_price type="diesel">27</gas_price>
+  </place>
+<place place_id="2820">
+    <gas_price type="regular">23.69</gas_price>
+    <gas_price type="premium">28.39</gas_price>
+  </place>
+<place place_id="2884">
+    <gas_price type="regular">23.99</gas_price>
+    <gas_price type="premium">29.29</gas_price>
+    <gas_price type="diesel">26.99</gas_price>
+  </place>
+<place place_id="2939">
+    <gas_price type="regular">22.95</gas_price>
+    <gas_price type="premium">26.97</gas_price>
+  </place>
+<place place_id="2975">
+    <gas_price type="regular">23.61</gas_price>
+    <gas_price type="premium">28.19</gas_price>
+    <gas_price type="diesel">26.99</gas_price>
+  </place>
+</places>

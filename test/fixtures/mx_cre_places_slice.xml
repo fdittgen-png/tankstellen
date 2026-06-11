@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Recorded 2026-06-11 from https://publicacionexterna.azurewebsites.net/publicaciones/places — trimmed to 15 CDMX-area stations, structure untouched (#3197) -->
+<places>
+<place place_id="2267">
+    <name>PETROMAX SA DE CV</name>
+    <cre_id>PL/537/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.10912</x>
+      <y>19.47922</y>
+    </location>
+  </place>
+<place place_id="2319">
+    <name>SEVEN SERVICE SA DE CV</name>
+    <cre_id>PL/895/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.16319</x>
+      <y>19.4423</y>
+    </location>
+  </place>
+<place place_id="2390">
+    <name>GPDC ESTACIONES DE SERVICIO SA DE CV</name>
+    <cre_id>PL/787/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.17616</x>
+      <y>19.4153</y>
+    </location>
+  </place>
+<place place_id="2663">
+    <name>OPERADORA DE ESTACIONES GL S DE RL DE CV</name>
+    <cre_id>PL/1401/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.10221</x>
+      <y>19.41709</y>
+    </location>
+  </place>
+<place place_id="2689">
+    <name>GPDC ESTACIONES DE SERVICIO SA DE CV</name>
+    <cre_id>PL/1466/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.15879</x>
+      <y>19.38143</y>
+    </location>
+  </place>
+<place place_id="2715">
+    <name>GPDC ESTACIONES DE SERVICIO SA DE CV</name>
+    <cre_id>PL/1444/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.17624</x>
+      <y>19.43496</y>
+    </location>
+  </place>
+<place place_id="2743">
+    <name>SERVICIO BEGONIA SA DE CV</name>
+    <cre_id>PL/1467/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.17788</x>
+      <y>19.46247</y>
+    </location>
+  </place>
+<place place_id="2777">
+    <name>SERVICIO MACARMEX S. A.</name>
+    <cre_id>PL/1035/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.10468</x>
+      <y>19.44016</y>
+    </location>
+  </place>
+<place place_id="2794">
+    <name>SERVICIO ORDAZ Y CARABALLO SA</name>
+    <cre_id>PL/1211/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.1657</x>
+      <y>19.47119</y>
+    </location>
+  </place>
+<place place_id="2807">
+    <name>ESTACION DE SERVICIO NUEVO MILENIO S DE RL DE CV</name>
+    <cre_id>PL/1000/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.08612</x>
+      <y>19.44235</y>
+    </location>
+  </place>
+<place place_id="2818">
+    <name>SERVICIO DANIELA SA DE CV</name>
+    <cre_id>PL/941/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.13982</x>
+      <y>19.38429</y>
+    </location>
+  </place>
+<place place_id="2820">
+    <name>ESTACION DE SERVICIO ESTADIO, S.A. DE C.V. (E0057)</name>
+    <cre_id>PL/1012/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.15987</x>
+      <y>19.41204</y>
+    </location>
+  </place>
+<place place_id="2884">
+    <name>GRAFEL SA</name>
+    <cre_id>PL/1308/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.15749</x>
+      <y>19.46442</y>
+    </location>
+  </place>
+<place place_id="2939">
+    <name>SERVICIO GASOLINERO XOLA SA DE CV</name>
+    <cre_id>PL/1156/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.15357</x>
+      <y>19.39553</y>
+    </location>
+  </place>
+<place place_id="2975">
+    <name>GASOLINERA EL RUEDO SA DE CV</name>
+    <cre_id>PL/952/EXP/ES/2015</cre_id>
+    <location>
+      <x>-99.14684</x>
+      <y>19.47433</y>
+    </location>
+  </place>
+</places>

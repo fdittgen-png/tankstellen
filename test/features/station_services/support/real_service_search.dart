@@ -101,6 +101,27 @@ Future<List<Station>> searchMitecoStations(
 /// E-Control queries DIE then SUP; [dieselRecords] answers the DIE query and
 /// [superRecords] the SUP query (defaults to [dieselRecords] when omitted, so a
 /// single station list carries both prices like a typical OMV).
+/// Drive the REAL [EControlStationService.searchStations] over two RAW
+/// recorded response bodies (#3197) — [dieselBody] answers the DIE query and
+/// [superBody] the SUP query, byte-for-byte as the live API sent them.
+Future<List<Station>> searchEcontrolRecordedStations({
+  required String dieselBody,
+  required String superBody,
+  double lat = 48.2,
+  double lng = 16.37,
+  double radiusKm = 10.0,
+}) async {
+  final dio = Dio()
+    ..httpClientAdapter = FuelTypeAdapter(
+      (fuelType) => fuelType == 'SUP' ? superBody : dieselBody,
+    );
+  final service = EControlStationService(dio: dio);
+  final result = await service.searchStations(
+    SearchParams(lat: lat, lng: lng, radiusKm: radiusKm),
+  );
+  return result.data;
+}
+
 Future<List<Station>> searchEcontrolStations(
   List<Map<String, dynamic>> dieselRecords, {
   List<Map<String, dynamic>>? superRecords,
