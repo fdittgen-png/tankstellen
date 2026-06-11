@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../utils/json_extensions.dart';
-import 'supabase_client.dart';
+import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Deletion tombstones (#3078, Epic #3075).
@@ -37,35 +37,42 @@ class DeletionsSync {
 
   /// Batch analogue of [record] — one round-trip for many ids of the same
   /// [tableName]. No-op when the id list is empty or unauthenticated.
-  static Future<void> recordAll(
+  ///
+  /// Returns `true` when the tombstone upsert reached the server, `false`
+  /// when it was skipped (unauthenticated) or failed transiently — the
+  /// #3123 journal keeps the entry queued in that case.
+  static Future<bool> recordAll(
     String tableName,
-    Iterable<String> recordIds,
-  ) async {
+    Iterable<String> recordIds, {
+    SyncTransport? transport,
+  }) async {
     final ids = recordIds.toList();
-    if (ids.isEmpty) return;
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return;
+    if (ids.isEmpty) return true;
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) return false;
 
     final now = DateTime.now().toUtc().toIso8601String();
     final rows = ids
         .map((id) => {
-              'user_id': userId,
+              'user_id': t.userId,
               'table_name': tableName,
               'record_id': id,
               'deleted_at': now,
             })
         .toList();
     try {
-      await client.from(table).upsert(
-            rows,
-            onConflict: 'user_id,table_name,record_id',
-          );
+      await t.upsert(
+        table,
+        rows,
+        onConflict: 'user_id,table_name,record_id',
+      );
       debugPrint('DeletionsSync.record: ${ids.length} tombstone(s) '
           'for "$tableName"');
+      return true;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'DeletionsSync.record FAILED'}));
+      return false;
     }
   }
 
@@ -73,16 +80,18 @@ class DeletionsSync {
   /// [tableName]. Returns an empty set when unauthenticated or on failure —
   /// the caller then simply skips the tombstone filter (degrades to the old
   /// union behaviour rather than dropping rows it shouldn't).
-  static Future<Set<String>> fetchTombstonedIds(String tableName) async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) return {};
+  static Future<Set<String>> fetchTombstonedIds(
+    String tableName, {
+    SyncTransport? transport,
+  }) async {
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) return {};
     try {
-      final rows = await client
-          .from(table)
-          .select('record_id')
-          .eq('user_id', userId)
-          .eq('table_name', tableName);
+      final rows = await t.select(
+        table,
+        'record_id',
+        filters: {'table_name': tableName},
+      );
       return rows
           .map((r) => r.getString('record_id'))
           .whereType<String>()

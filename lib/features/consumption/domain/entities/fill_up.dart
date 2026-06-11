@@ -86,6 +86,16 @@ abstract class FillUp with _$FillUp {
     /// computed quotient. Existing fill-ups deserialise with null so
     /// historical data keeps working.
     double? scannedPricePerLiter,
+
+    /// When this fill-up was last created/edited on a device, in UTC
+    /// (#3122). The last-write-wins sync merge compares it against the
+    /// server row's `updated_at` to decide which side's copy of a
+    /// both-sides id wins. Stamped by the `FillUpList` mutation paths;
+    /// `null` for records last written before LWW shipped — the merge
+    /// then skips the record (no propagation, no clobbering) until its
+    /// next edit stamps it. Travels inside the JSONB `data` blob, so no
+    /// server schema change is needed.
+    DateTime? updatedAt,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);

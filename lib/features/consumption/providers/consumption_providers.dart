@@ -238,9 +238,12 @@ class FillUpList extends _$FillUpList {
     final repo = ref.read(fillUpRepositoryProvider);
     final previous = _previousFillUpFor(fillUp, repo.getAll());
     final linkedIds = _linkedTripIdsForWholeWindow(fillUp);
-    final linked = fillUp.linkedTripIds.isEmpty
-        ? fillUp.copyWith(linkedTripIds: linkedIds)
-        : fillUp;
+    // #3122 — stamp the local edit time (UTC) so the LWW sync merge can
+    // propagate this record to other devices.
+    final linked = (fillUp.linkedTripIds.isEmpty
+            ? fillUp.copyWith(linkedTripIds: linkedIds)
+            : fillUp)
+        .copyWith(updatedAt: DateTime.now().toUtc());
     await repo.save(linked);
     // Re-link any partials in the open window so they share the
     // closing plein's trip set. No-op when [linked] is itself a
@@ -411,7 +414,11 @@ class FillUpList extends _$FillUpList {
           merged.toSet().difference(f.linkedTripIds.toSet()).isEmpty) {
         continue;
       }
-      await repo.save(f.copyWith(linkedTripIds: merged));
+      // #3122 — the trip-link set changed: stamp so LWW propagates it.
+      await repo.save(f.copyWith(
+        linkedTripIds: merged,
+        updatedAt: DateTime.now().toUtc(),
+      ));
     }
   }
 
@@ -538,7 +545,8 @@ class FillUpList extends _$FillUpList {
   /// ([reconciliationBasis] residual == 0).
   Future<void> applyReconciliation(FillUp correction) async {
     final repo = ref.read(fillUpRepositoryProvider);
-    await repo.save(correction);
+    // #3122 — a consented correction is a local edit: stamp it for LWW.
+    await repo.save(correction.copyWith(updatedAt: DateTime.now().toUtc()));
     state = repo.getAll();
     ref.read(pendingReconciliationsProvider.notifier).set(null);
   }
@@ -876,8 +884,13 @@ class FillUpList extends _$FillUpList {
       );
       if (updated == null) return;
 
+      // #3122 — the calibration refinement is a real local modification:
+      // stamp it so the LWW sync merge propagates (and protects) it.
       await vehicleRepo.save(
-        vehicle.copyWith(gpsCalibration: updated),
+        vehicle.copyWith(
+          gpsCalibration: updated,
+          updatedAt: DateTime.now().toUtc(),
+        ),
       );
       ref.invalidate(vehicleProfileListProvider);
     } catch (e, st) {
@@ -886,9 +899,12 @@ class FillUpList extends _$FillUpList {
   }
 
   /// Persist edits to an existing fill-up (matched by id) and refresh.
+  ///
+  /// #3122 — stamps `updatedAt` (UTC) so the LWW sync merge propagates
+  /// the edit to other devices instead of letting it diverge forever.
   Future<void> update(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
-    await repo.save(fillUp);
+    await repo.save(fillUp.copyWith(updatedAt: DateTime.now().toUtc()));
     state = repo.getAll();
   }
 
@@ -921,27 +937,31 @@ class FillUpList extends _$FillUpList {
     return added;
   }
 
-  /// Pull the user's server fill-ups and **persist the server-only ones
-  /// into local storage** (#3077).
+  /// Pull the user's server fill-ups and **persist the server-side
+  /// changes into local storage** (#3077, #3122).
   ///
   /// [FillUpsSync.merge] uploads local-only rows AND returns the union
-  /// (`[...local, ...downloaded]`). Previously the only caller was the
-  /// manual device-link flow, so a fill-up logged on another device never
-  /// reached this one on connect / launch. We now keep only the server-only
-  /// entries (local wins on id collision — an in-flight local edit is never
-  /// clobbered) and add them via [mergeFrom]. Returns the count of
-  /// newly-persisted (downloaded) fill-ups.
+  /// (`[...local, ...downloaded]`) with last-write-wins applied to ids
+  /// present on both sides (#3122). We persist every returned entry that
+  /// differs from the local copy: server-only rows (the #3077 pull) and
+  /// server-newer overwrites (the #3122 LWW download); equal entries are
+  /// skipped via [mergeFrom]'s overwrite-by-id. Returns the count of
+  /// newly-added (previously unknown) fill-ups.
   ///
   /// The caller owns the consent gate — this is invoked behind the
   /// trip-data sync gate (fill-ups are trip-data adjacent). [mergeFn]
   /// defaults to the real sync and is injectable for unit tests.
   Future<int> pullFromServer({FillUpsMergeFn mergeFn = FillUpsSync.merge}) async {
     final repo = ref.read(fillUpRepositoryProvider);
-    final localIds = repo.getAll().map((f) => f.id).toSet();
+    final localById = {for (final f in repo.getAll()) f.id: f};
     final merged = await mergeFn(repo.getAll());
-    final serverOnly = merged.where((f) => !localIds.contains(f.id)).toList();
-    if (serverOnly.isEmpty) return 0;
-    return mergeFrom(serverOnly);
+    // #3077 server-only pulls + #3122 server-newer LWW overwrites both
+    // differ from the local copy; untouched (and local-newer, already
+    // re-uploaded) entries compare equal and are skipped, so an in-flight
+    // local edit is never clobbered.
+    final changed = merged.where((f) => localById[f.id] != f).toList();
+    if (changed.isEmpty) return 0;
+    return mergeFrom(changed);
   }
 }
 

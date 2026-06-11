@@ -632,7 +632,11 @@ void main() {
     // on id collision) + the `FillUpsMergeFn` typedef + the fill_ups_sync
     // import. Sibling of the existing device-link `mergeFrom`. Decomposition
     // of this god-class is tracked #2187/#2188.
-    'lib/features/consumption/providers/consumption_providers.dart': 1005,
+    // #3122 — re-grandfathered 1005 → 1025: the LWW `updatedAt` stamps on
+    // the five fill-up/vehicle mutation paths + the changed-entry filter in
+    // `pullFromServer` (server-newer overwrites). Decomposition is still
+    // tracked #2187/#2188.
+    'lib/features/consumption/providers/consumption_providers.dart': 1025,
     // #2509 — re-grandfathered 1180 → 1217: the persist guard in
     // `_saveToHistory` was tightened from the buggy disjunction
     // (`startedAt == null || distance < 0.01`, which silently discarded a
@@ -735,7 +739,9 @@ void main() {
     // documentation block (the per-fuel comparison flag, Epic #2881).
     // #3015 — re-grandfathered 470 → 480: the enginePowerKw field + its
     // documentation block (catalog-pre-filled rated power, Epic #3015).
-    'lib/features/vehicle/domain/entities/vehicle_profile.dart': 480,
+    // #3122 — re-grandfathered 480 → 491: the LWW `updatedAt` stamp field
+    // + its documentation block (last-write-wins edit propagation).
+    'lib/features/vehicle/domain/entities/vehicle_profile.dart': 491,
     // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
     // receives a directFuelRateSupported flag computed from the vehicle's
     // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE

@@ -27,6 +27,9 @@ _FillUp _$FillUpFromJson(Map<String, dynamic> json) => _FillUp(
   fuelLevelBeforeL: (json['fuelLevelBeforeL'] as num?)?.toDouble(),
   fuelLevelAfterL: (json['fuelLevelAfterL'] as num?)?.toDouble(),
   scannedPricePerLiter: (json['scannedPricePerLiter'] as num?)?.toDouble(),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
@@ -46,4 +49,5 @@ Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
   'fuelLevelBeforeL': instance.fuelLevelBeforeL,
   'fuelLevelAfterL': instance.fuelLevelAfterL,
   'scannedPricePerLiter': instance.scannedPricePerLiter,
+  'updatedAt': instance.updatedAt?.toIso8601String(),
 };

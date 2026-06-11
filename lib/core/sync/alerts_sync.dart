@@ -10,6 +10,7 @@ import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
 import 'supabase_client.dart';
 import 'sync_helper.dart';
+import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Price-alert sync with Supabase, pulled out of [SyncService] (#727).
@@ -22,26 +23,38 @@ import '../../core/logging/error_logger.dart';
 ///
 /// Unauthenticated / offline paths return the input list unchanged —
 /// the alert UI keeps working on pure-local state.
+///
+/// **#3122 LWW deferral:** unlike `fill_ups` / `vehicles`, the `alerts`
+/// table carries neither a JSONB `data` blob nor an `updated_at` column,
+/// so there is no server-side stamp to compare a local edit against —
+/// adding one is a new explicit column, i.e. a self-host schema change
+/// (HARD RULE 5: wizard SQL + verifier + `kSupabaseSchemaVersion` bump).
+/// Per that rule this stays a pure id-union merge for now; edit
+/// propagation for alerts is deferred to the sync epic alongside the
+/// schema-version bump.
 class AlertsSync {
   AlertsSync._();
 
   /// Merge [localAlerts] with the user's `alerts` rows on Supabase.
   /// Returns the superset ([local] + server-only downloaded).
-  static Future<List<PriceAlert>> merge(List<PriceAlert> localAlerts) async {
-    final client = TankSyncClient.client;
-    final userId = client?.auth.currentUser?.id;
-    if (client == null || userId == null) {
+  /// [transport] is injectable for tests.
+  static Future<List<PriceAlert>> merge(
+    List<PriceAlert> localAlerts, {
+    SyncTransport? transport,
+  }) async {
+    final t = transport ?? SupabaseSyncTransport.currentOrNull();
+    if (t == null) {
       debugPrint('AlertsSync.merge: not authenticated');
       return localAlerts;
     }
 
     try {
-      final serverRows =
-          await client.from('alerts').select().eq('user_id', userId);
+      final serverRows = await t.select('alerts', '*');
       // #3121 — drop tombstoned ids from BOTH sides before the union so a
       // deleted alert can't resurrect through the launch pull or another
       // device's still-local copy (same seam as favorites/ignored, #3078).
-      final tombstoned = await DeletionsSync.fetchTombstonedIds('alerts');
+      final tombstoned =
+          await DeletionsSync.fetchTombstonedIds('alerts', transport: t);
       final liveServerRows = SyncHelper.removeTombstoned(
         serverRows,
         tombstoned,
@@ -65,7 +78,7 @@ class AlertsSync {
         final rows = localOnly
             .map((a) => {
                   'id': a.id,
-                  'user_id': userId,
+                  'user_id': t.userId,
                   'station_id': a.stationId,
                   'station_name': a.stationName,
                   'fuel_type': a.fuelType.name,
@@ -74,7 +87,7 @@ class AlertsSync {
                   'created_at': a.createdAt.toUtc().toIso8601String(),
                 })
             .toList();
-        await client.from('alerts').upsert(rows, onConflict: 'id');
+        await t.upsert('alerts', rows, onConflict: 'id');
         debugPrint('AlertsSync.merge: uploaded ${localOnly.length} alerts');
       }
 

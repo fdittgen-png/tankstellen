@@ -383,6 +383,17 @@ abstract class VehicleProfile with _$VehicleProfile {
     /// coverage continue to use the OBD2 path; the GPS matrix is
     /// only consulted when the trajet's `obd2CoverageRatio < 0.95`.
     GpsCalibrationMatrix? gpsCalibration,
+
+    /// When this profile was last created/edited on a device, in UTC
+    /// (#3122). The last-write-wins sync merge compares it against the
+    /// server row's `updated_at` to decide which side's copy of a
+    /// both-sides id wins. Stamped by the `VehicleProfileList` mutation
+    /// paths (and the calibration writers); `null` for profiles last
+    /// written before LWW shipped — the merge then skips the record (no
+    /// propagation, no clobbering) until its next edit stamps it.
+    /// Travels inside the JSONB `data` blob: a sync-transparent
+    /// field-add, no Supabase schema change.
+    DateTime? updatedAt,
   }) = _VehicleProfile;
 
   factory VehicleProfile.fromJson(Map<String, dynamic> json) =>
