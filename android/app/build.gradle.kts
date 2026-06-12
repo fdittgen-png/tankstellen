@@ -303,7 +303,13 @@ fdroidExcludedConfigs.forEach { configName ->
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("androidx.car.app:app:1.4.0")
+    // Android Auto v2 PHASE-3 (#2990) — 1.7.0 (≥ the 1.7.0-rc01 the issue
+    // requires) stabilises the in-car location-permission flow
+    // (CarContext.requestPermissions) the live in-car GPS slice relies on.
+    // Phase-1 deliberately stayed on 1.4.0. androidx.car.app is a plain
+    // androidx artifact (GMS-free), so the fdroid flavor is unaffected — the
+    // car components are only registered in the play source-set manifest.
+    implementation("androidx.car.app:app:1.7.0")
     // #2412 / #2413 — BootReceiver + the widget-refresh trigger enqueue a
     // WorkManager one-off directly (androidx.work.*). The workmanager plugin
     // pulls work-runtime in as `implementation`, which Gradle does not expose
@@ -316,7 +322,7 @@ dependencies {
     // (MenuScreen/SearchScreen/RadarScreen) drive androidx.car.app's
     // ScreenController under Robolectric, so they need a real CarContext +
     // merged Android resources.
-    testImplementation("androidx.car.app:app-testing:1.4.0")
+    testImplementation("androidx.car.app:app-testing:1.7.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.12.2")
     testImplementation("androidx.test:core:1.6.1")

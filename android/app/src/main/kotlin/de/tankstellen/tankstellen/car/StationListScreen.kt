@@ -3,6 +3,7 @@
 
 package de.tankstellen.tankstellen.car
 
+import android.location.Location
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
 import androidx.car.app.model.Action
@@ -17,6 +18,8 @@ import androidx.car.app.model.PlaceListMapTemplate
 import androidx.car.app.model.PlaceMarker
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 
 /**
  * Android Auto base car screen that renders a station list as a
@@ -73,6 +76,13 @@ abstract class StationListScreen(carContext: CarContext) : Screen(carContext) {
     protected open val liveSource: CarLiveSource = CarDataBridge
 
     /**
+     * The live in-car fix feed (v2 phase-3 slice 4, #2990). Defaults to the
+     * real [CarLocationSource]; overridable so a Robolectric test can inject a
+     * fake (the real source wraps the platform LocationManager).
+     */
+    protected open val fixUpdates: CarFixUpdates = CarLocationSource
+
+    /**
      * The latest LIVE list, or null before any live result has arrived. When
      * non-null it takes precedence over the snapshot in [onGetTemplate].
      * Mutated only on the main thread (the bridge callback), then [invalidate].
@@ -81,6 +91,31 @@ abstract class StationListScreen(carContext: CarContext) : Screen(carContext) {
 
     /** True once a live fetch has completed (success OR fault). */
     private var liveAttempted = false
+
+    /**
+     * A first (or significantly-moved) live in-car fix arrived (#2990):
+     * re-arm the fetch and invalidate so the next render searches around the
+     * fresh position — this is what heals a cold-start `no_gps` empty-state
+     * the moment the in-car GPS locks. Delivered on the main thread.
+     */
+    private val fixListener: (Location) -> Unit = {
+        liveAttempted = false
+        invalidate()
+    }
+
+    init {
+        // Subscribe to live-fix updates only while this screen is visible and
+        // only when it actually fetches live data.
+        lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                if (liveFetchEnabled) fixUpdates.addListener(fixListener)
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                fixUpdates.removeListener(fixListener)
+            }
+        })
+    }
 
     override fun onGetTemplate(): Template {
         val snapshot = CarStation.read(carContext, prefsKey)
