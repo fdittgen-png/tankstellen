@@ -214,6 +214,11 @@ void main() {
     });
 
     test('Denmark — OK API is reachable and returns stations', () async {
+      // #3115/#3222 — this endpoint rotated onto Let's Encrypt's new ISRG
+      // Root YR hierarchy on 2026-06-09 and the runner's stale CA bundle
+      // failed the handshake nightly; `retryingDio` now anchors the pinned
+      // Root YR (see network_retry.dart) so it verifies like a current
+      // platform store.
       final response = await dio.get<dynamic>(
         'https://mobility-prices.ok.dk/api/v1/fuel-prices',
       );
