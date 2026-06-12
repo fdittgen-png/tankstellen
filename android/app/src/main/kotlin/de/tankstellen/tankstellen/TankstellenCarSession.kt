@@ -9,6 +9,7 @@ import androidx.car.app.Session
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import de.tankstellen.tankstellen.car.CarDataBridge
+import de.tankstellen.tankstellen.car.CarLocationSource
 import de.tankstellen.tankstellen.car.MenuScreen
 
 /**
@@ -23,8 +24,14 @@ import de.tankstellen.tankstellen.car.MenuScreen
  * on Session DESTROYED, via a [DefaultLifecycleObserver] on the session
  * lifecycle. The engine therefore lives ONLY for the duration of the bound car
  * connection — never in a started / foreground service — preserving the #1498
- * FGS-avoidance. The Search screen fetches live through it; Radar stays on the
- * v1 SharedPreferences snapshot this slice (slice 2 wires its live fetch).
+ * FGS-avoidance. Both Search and Radar fetch live through it.
+ *
+ * ## Live in-car GPS lifecycle (v2 PHASE-3 / slice 4, #2990)
+ * The session also owns [CarLocationSource]: started on Session CREATED
+ * (which primes the location permission IN-CAR via
+ * `CarContext.requestPermissions` when it isn't already granted) and stopped
+ * on Session DESTROYED — location runs ONLY while an Auto session is active,
+ * still with zero foreground services.
  */
 class TankstellenCarSession : Session() {
     init {
@@ -32,9 +39,11 @@ class TankstellenCarSession : Session() {
             override fun onCreate(owner: LifecycleOwner) {
                 // carContext is available once the session is created.
                 CarDataBridge.create(carContext)
+                CarLocationSource.start(carContext)
             }
 
             override fun onDestroy(owner: LifecycleOwner) {
+                CarLocationSource.stop()
                 CarDataBridge.destroy()
             }
         })

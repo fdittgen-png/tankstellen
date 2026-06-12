@@ -99,6 +99,17 @@ object CarDataBridge : CarLiveSource {
     // i18n-ignore: protocol sentinel, not user-facing text.
     private const val NO_GPS = "no_gps"
 
+    /** Live in-car fix argument keys (v2 phase-3 slice 4, #2990) — the Dart
+     *  `CarDataService.liveFixFromArgs` counterpart. */
+    // i18n-ignore: protocol tokens, not user-facing text.
+    private const val ARG_LAT = "lat"
+    // i18n-ignore: protocol token, not user-facing text.
+    private const val ARG_LNG = "lng"
+    // i18n-ignore: protocol token, not user-facing text.
+    private const val ARG_ACCURACY_M = "accuracyM"
+    // i18n-ignore: protocol token, not user-facing text.
+    private const val ARG_AGE_MS = "ageMs"
+
     /**
      * Hard ceiling on a single fetch round-trip (engine spin-up + Dart work +
      * channel reply). Kept above the Dart side's own 7 s fetch timeout so the
@@ -212,7 +223,21 @@ object CarDataBridge : CarLiveSource {
         val timeout = Runnable { finish(null) }
         mainHandler.postDelayed(timeout, FETCH_TIMEOUT_MS)
 
-        ch.invokeMethod(method, null, object : MethodChannel.Result {
+        // Live in-car fix (v2 phase-3 slice 4, #2990): when CarLocationSource
+        // has one, attach it so the Dart producer searches around the LIVE
+        // position; null args keep the phase-1 persisted-fix behaviour (the
+        // offline / permission-denied fallback).
+        val fix = CarLocationSource.latestFix
+        val args: Map<String, Any>? = fix?.let {
+            mapOf(
+                ARG_LAT to it.latitude,
+                ARG_LNG to it.longitude,
+                ARG_ACCURACY_M to it.accuracy.toDouble(),
+                ARG_AGE_MS to (System.currentTimeMillis() - it.time),
+            )
+        }
+
+        ch.invokeMethod(method, args, object : MethodChannel.Result {
             override fun success(result: Any?) {
                 mainHandler.removeCallbacks(timeout)
                 val json = result as? String

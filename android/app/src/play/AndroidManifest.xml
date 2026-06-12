@@ -20,15 +20,19 @@
          Why this ships WITHOUT the #1498 "Foreground Service Use" form:
          A POI CarAppService rendering PlaceListMapTemplate is a BOUND service.
          The Android Auto / Automotive host binds it through the car-app
-         framework; it does NOT start itself as a foreground service, and it
-         reads its station data from SharedPreferences (written by the Flutter
-         app), so it accesses no runtime location in the car process. Per
-         Google's POI manifest example (the car-app-library-fundamentals
-         codelab on developer.android.com) the service carries NO
-         android:permission and the app declares NO FOREGROUND_SERVICE
-         permission for it. Host trust is enforced in code by
-         TankstellenCarAppService.createHostValidator(), not a manifest
-         bind-permission (androidx.car.app 1.4.0 defines no BIND permission).
+         framework; it does NOT start itself as a foreground service. Since
+         v2 phase-3 (#2990) the session DOES acquire live while-in-use
+         location (CarLocationSource, platform LocationManager) — which needs
+         no FGS either: a bound car app displayed on the head unit counts as
+         "in use", per Google's car-app location guidance (the places /
+         navigation samples request ACCESS_FINE_LOCATION via
+         CarContext.requestPermissions and use LocationManager in the bound
+         Session). Per Google's POI manifest example (the
+         car-app-library-fundamentals codelab on developer.android.com) the
+         service carries NO android:permission and the app declares NO
+         FOREGROUND_SERVICE permission for it. Host trust is enforced in code
+         by TankstellenCarAppService.createHostValidator(), not a manifest
+         bind-permission (androidx.car.app defines no BIND permission).
 
          The FOREGROUND_SERVICE permissions stay stripped with
          tools:node="remove" in the MAIN manifest (androidx.work:work-runtime

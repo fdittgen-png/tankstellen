@@ -16,12 +16,12 @@ import '../../core/data/storage_repository.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/services/country_service_registry.dart';
 import '../../core/storage/hive_storage.dart';
-import '../../core/storage/storage_keys.dart';
-import '../../core/utils/geo_utils.dart' show isUsableCoord;
 import '../../core/domain/search_params.dart';
-import '../../core/domain/fuel_type.dart';
 import '../../core/domain/station.dart';
 import '../widget/data/car_station_data.dart';
+import 'car_fix_store.dart';
+
+export 'car_fix_store.dart' show kNoGpsMarker;
 
 /// Android Auto v2 — PHASE-1 (#2947 / epic #2946): the headless Flutter entry
 /// point the native [CarDataBridge] runs to fetch LIVE in-car Search AND Radar
@@ -41,11 +41,18 @@ import '../widget/data/car_station_data.dart';
 /// radar shape); they differ ONLY in the snapshot key refreshed
 /// ([CarStationData.searchKey] / [CarStationData.radarKey]).
 ///
-/// ## Persisted-fix GPS only (never a live lock)
-/// The contract (#2947) is the persisted last-known fix the nearest-widget
+/// ## Live in-car fix first, persisted fix as the fallback (#2990, phase-3)
+/// Phase-1 (#2947) used ONLY the persisted last-known fix the nearest-widget
 /// builder reads — `StorageKeys.userPositionLat/Lng` with the #2872
-/// [isUsableCoord] guard. No live GPS in the car process in phase-1 (that + the
-/// `requestPermissions` flow is a later phase), so this never blocks; an absent
+/// [isUsableCoord] guard — which goes stale on Automotive OS / when the phone
+/// app was never opened. Phase-3 slice 4 (#2990) has the native
+/// `CarLocationSource` acquire a LIVE fix inside the bound session (in-car
+/// permission priming via `CarContext.requestPermissions`, androidx.car.app
+/// 1.7.0) and attach it as `{lat,lng,accuracyM,ageMs}` arguments on the SAME
+/// fetch methods. A usable live fix wins and is persisted back (source `car`)
+/// so the fallback — and the nearest widget — stay fresh; absent / poisoned
+/// args fall back to the persisted fix exactly as before (the offline /
+/// permission-denied path). Neither path ever blocks on a GPS lock; an absent
 /// / poisoned fix returns [kNoGpsMarker] and the screen keeps its snapshot.
 ///
 /// ## Live fetch path — bulk-country-correct + never throws
@@ -84,11 +91,9 @@ const String kCarMethodFetchRadar = 'fetchRadar';
 // i18n-ignore: protocol token, not user-facing text.
 const String kCarMethodGetUserLocation = 'getUserLocation';
 
-/// Sentinel the entry point returns (in place of a JSON list) when there is
-/// no usable persisted GPS fix — the native screen keeps its snapshot /
-/// shows the `car_empty_no_gps` message rather than blanking.
-// i18n-ignore: protocol sentinel, not user-facing text.
-const String kNoGpsMarker = 'no_gps';
+// kNoGpsMarker (the "no usable GPS fix" protocol sentinel) lives in
+// car_fix_store.dart since #2990 and is re-exported below so this file stays
+// the single import for the channel contract.
 
 /// Hard ceiling on the live fetch's own work, independent of the native
 /// bridge's own timeout. Keeps a slow provider from holding the engine open.
@@ -107,9 +112,9 @@ void carDataMain() {
   channel.setMethodCallHandler((call) async {
     switch (call.method) {
       case kCarMethodFetchSearch:
-        return service.fetchSearch();
+        return service.fetchSearch(args: call.arguments);
       case kCarMethodFetchRadar:
-        return service.fetchRadar();
+        return service.fetchRadar(args: call.arguments);
       case kCarMethodGetUserLocation:
         return service.getUserLocation();
       default:
@@ -175,23 +180,33 @@ class CarDataService {
       HomeWidget.saveWidgetData(key, value);
 
   /// Handle [kCarMethodFetchSearch] — see [_fetch]; refreshes
-  /// [CarStationData.searchKey]. Never throws.
-  Future<String> fetchSearch() =>
-      _fetch(CarStationData.searchKey, 'fetchSearch');
+  /// [CarStationData.searchKey]. [args] is the optional live in-car fix the
+  /// native bridge attaches, parsed by [carLiveFixFromArgs] (#2990). Never
+  /// throws.
+  Future<String> fetchSearch({Object? args}) =>
+      _fetch(CarStationData.searchKey, 'fetchSearch',
+          liveFix: carLiveFixFromArgs(args));
 
   /// Handle [kCarMethodFetchRadar] (v2 phase-1 slice 2, #2947) — the SAME live
   /// producer as [fetchSearch] (nearest priced stations within the active radius,
   /// distance-sorted + capped — the v1 in-app radar shape), refreshing
-  /// [CarStationData.radarKey] instead. Never throws.
-  Future<String> fetchRadar() =>
-      _fetch(CarStationData.radarKey, 'fetchRadar');
+  /// [CarStationData.radarKey] instead. [args] is the optional live in-car fix
+  /// the native bridge attaches, parsed by [carLiveFixFromArgs] (#2990). Never
+  /// throws.
+  Future<String> fetchRadar({Object? args}) =>
+      _fetch(CarStationData.radarKey, 'fetchRadar',
+          liveFix: carLiveFixFromArgs(args));
 
   /// Shared Hive-lock + isolate-init wrapper behind [fetchSearch] / [fetchRadar]:
   /// open Hive under the isolate lock, load the API key, run [_resolveJson] for
   /// [snapshotKey] ([where] tags the error-log context), and ALWAYS close the
   /// boxes in `finally`. Never throws — any fault returns [kNoGpsMarker] so the
   /// screen degrades to its snapshot / empty-state.
-  Future<String> _fetch(String snapshotKey, String where) async {
+  Future<String> _fetch(
+    String snapshotKey,
+    String where, {
+    ({double lat, double lng})? liveFix,
+  }) async {
     HiveIsolateLock? lock;
     try {
       lock = await HiveIsolateLock.create();
@@ -203,7 +218,8 @@ class CarDataService {
       await HiveStorage.initInIsolate();
       await HiveStorage.loadApiKey();
       final storage = HiveStorage();
-      return await _resolveJson(storage, snapshotKey, apiKey: storage.getApiKey())
+      return await _resolveJson(storage, snapshotKey,
+              apiKey: storage.getApiKey(), liveFix: liveFix)
           .timeout(_fetchTimeout, onTimeout: () => kNoGpsMarker);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
@@ -230,7 +246,7 @@ class CarDataService {
       lock = await HiveIsolateLock.create();
       if (!await lock.acquire()) return const {'source': kNoGpsMarker};
       await HiveStorage.initInIsolate();
-      return readUserLocation(HiveStorage());
+      return readCarUserLocation(HiveStorage());
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
         'where': 'CarDataService.getUserLocation',
@@ -252,8 +268,10 @@ class CarDataService {
   Future<String> resolveSearchJson(
     StorageRepository storage, {
     String? apiKey,
+    ({double lat, double lng})? liveFix,
   }) =>
-      _resolveJson(storage, CarStationData.searchKey, apiKey: apiKey);
+      _resolveJson(storage, CarStationData.searchKey,
+          apiKey: apiKey, liveFix: liveFix);
 
   /// Pure resolution of the live Radar JSON — see [_resolveJson]. Identical
   /// producer to [resolveSearchJson] (same fix + country + profile radius/fuel +
@@ -264,13 +282,19 @@ class CarDataService {
   Future<String> resolveRadarJson(
     StorageRepository storage, {
     String? apiKey,
+    ({double lat, double lng})? liveFix,
   }) =>
-      _resolveJson(storage, CarStationData.radarKey, apiKey: apiKey);
+      _resolveJson(storage, CarStationData.radarKey,
+          apiKey: apiKey, liveFix: liveFix);
 
-  /// Pure resolution used by both the live handlers and the unit tests: read
-  /// the persisted fix (with the #2872 guard), resolve the active country +
+  /// Pure resolution used by both the live handlers and the unit tests: take
+  /// the live in-car fix when one was attached (#2990), else read the
+  /// persisted fix (with the #2872 guard); resolve the active country +
   /// profile, run a LIVE radius [CountryAlertStrategy.searchArea], encode with
   /// [CarStationData.encode], and refresh [snapshotKey] on a non-empty result.
+  /// A live fix is also persisted back (source `car`, best-effort) so the
+  /// persisted fallback — and everything else that reads it, e.g. the nearest
+  /// widget — stays fresh while driving.
   /// Returns [kNoGpsMarker] when no usable fix exists; an empty `[]` when the
   /// fix is good but the search returned nothing or faulted (the screen keeps
   /// its snapshot). Never throws.
@@ -278,15 +302,20 @@ class CarDataService {
     StorageRepository storage,
     String snapshotKey, {
     String? apiKey,
+    ({double lat, double lng})? liveFix,
   }) async {
-    final fix = _persistedFix(storage);
+    final fix = liveFix ?? readPersistedCarFix(storage);
     if (fix == null) return kNoGpsMarker;
+
+    if (liveFix != null) {
+      await persistCarFix(storage, liveFix);
+    }
 
     final country = CountryServiceRegistry.countryForLatLng(fix.lat, fix.lng) ??
         (storage.getSetting('active_country_code') as String?) ??
         'DE';
 
-    final profile = _activeProfile(storage);
+    final profile = activeCarProfile(storage);
     final budget = ProviderRequestBudget(storage);
     final strategy = _strategyFactory(
       country,
@@ -334,70 +363,4 @@ class CarDataService {
     return json;
   }
 
-  /// The `{lat,lng,source,updatedAtMs}` location payload, or `{source:no_gps}`.
-  @visibleForTesting
-  Map<String, dynamic> readUserLocation(StorageRepository storage) {
-    final fix = _persistedFix(storage);
-    if (fix == null) return const {'source': kNoGpsMarker};
-    return <String, dynamic>{
-      'lat': fix.lat,
-      'lng': fix.lng,
-      'source': (storage.getSetting(StorageKeys.userPositionSource) as String?) ??
-          'persisted',
-      'updatedAtMs': _updatedAtMs(storage),
-    };
-  }
-
-  /// Read the persisted fix the same way the nearest-widget builder does, then
-  /// apply the #2872 [isUsableCoord] guard so a `(0,0)` / one-axis / NaN fix is
-  /// rejected (returns null → the caller emits [kNoGpsMarker]).
-  ({double lat, double lng})? _persistedFix(StorageRepository storage) {
-    final lat =
-        (storage.getSetting(StorageKeys.userPositionLat) as num?)?.toDouble();
-    final lng =
-        (storage.getSetting(StorageKeys.userPositionLng) as num?)?.toDouble();
-    if (lat == null || lng == null) return null;
-    if (!isUsableCoord(lat, lng)) return null;
-    return (lat: lat, lng: lng);
-  }
-
-  int? _updatedAtMs(StorageRepository storage) {
-    final raw = storage.getSetting(StorageKeys.userPositionTimestamp);
-    if (raw is int) return raw;
-    if (raw is num) return raw.toInt();
-    if (raw is String) {
-      final parsed = DateTime.tryParse(raw);
-      if (parsed != null) return parsed.millisecondsSinceEpoch;
-      return int.tryParse(raw);
-    }
-    return null;
-  }
-
-  /// Active-profile radius + fuel, mirroring the nearest-widget builder's
-  /// `_activeProfile` (default 10 km / E10 when no profile is set).
-  _CarProfile _activeProfile(StorageRepository storage) {
-    final id = storage.getActiveProfileId();
-    if (id == null) return const _CarProfile();
-    final raw = storage.getProfile(id);
-    if (raw == null) return const _CarProfile();
-    final radius = (raw['defaultSearchRadius'] as num?)?.toDouble() ?? 10.0;
-    FuelType fuel = FuelType.e10;
-    final key = raw['preferredFuelType']?.toString();
-    if (key != null) {
-      try {
-        fuel = FuelType.fromString(key);
-      // #3164 — kept: preference validation; unknown fuel key falls back.
-      } catch (e, st) { // ignore: unused_catch_stack
-        debugPrint('CarDataService: unknown preferred fuel "$key": $e');
-      }
-    }
-    return _CarProfile(radiusKm: radius, fuelType: fuel);
-  }
-}
-
-/// Active-profile snapshot for one car fetch.
-class _CarProfile {
-  final double radiusKm;
-  final FuelType fuelType;
-  const _CarProfile({this.radiusKm = 10.0, this.fuelType = FuelType.e10});
 }

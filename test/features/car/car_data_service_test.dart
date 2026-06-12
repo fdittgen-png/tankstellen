@@ -20,6 +20,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/car/car_data_service.dart';
+import 'package:tankstellen/features/car/car_fix_store.dart';
 import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/core/domain/station.dart';
 
@@ -191,8 +192,7 @@ void main() {
 
     test('getUserLocation returns no_gps when the fix is poisoned', () {
       final storage = FakeStorageRepository();
-      final service = CarDataService();
-      expect(service.readUserLocation(storage), {'source': kNoGpsMarker});
+      expect(readCarUserLocation(storage), {'source': kNoGpsMarker});
     });
   });
 
@@ -220,7 +220,7 @@ void main() {
       unawaited(storage.inner.putSetting(StorageKeys.userPositionLat, 48.8566));
       unawaited(storage.inner.putSetting(StorageKeys.userPositionLng, 2.3522));
       unawaited(storage.inner.putSetting(StorageKeys.userPositionSource, 'gps'));
-      final loc = CarDataService().readUserLocation(storage);
+      final loc = readCarUserLocation(storage);
       expect(loc['lat'], 48.8566);
       expect(loc['lng'], 2.3522);
       expect(loc['source'], 'gps');
@@ -400,6 +400,113 @@ void main() {
       expect(byId['de-1']!['address'], 'Hauptstr. 1, 10115 Berlin');
       // No street → city only, no orphan comma (#2704 collapsing).
       expect(byId['de-2']!['address'], '10117 Berlin');
+    });
+  });
+
+  // ── v2 PHASE-3 SLICE 4 (#2990) — LIVE in-car fix over the same channel ─────
+
+  group('live in-car fix (#2990) — wins over the persisted fix', () {
+    test('a stale persisted fix is overridden + persisted back as source car',
+        () async {
+      final storage = FakeStorageRepository();
+      // Stale persisted fix far away (Hamburg) — phase-1 would search there.
+      await storage.putSetting(StorageKeys.userPositionLat, 53.5511);
+      await storage.putSetting(StorageKeys.userPositionLng, 9.9937);
+      await _seedProfile(storage, radiusKm: 8, fuel: 'e10');
+
+      // Stations exist only around BERLIN, where the car actually is.
+      final deDataset = _RecordedDataset(
+        ServiceSource.tankerkoenigApi,
+        [
+          _row('de-1', 'Aral', 52.521, 13.401, e10: 1.799),
+          _row('de-2', 'Shell', 52.516, 13.420, e10: 1.829),
+        ],
+      );
+      final service = CarDataService(
+        strategyFactory: _polledFactory('DE', deDataset),
+        writeSnapshot: (_, _) async {},
+      );
+
+      final json = await service.resolveSearchJson(
+        storage,
+        apiKey: 'k',
+        liveFix: (lat: 52.52, lng: 13.405),
+      );
+      final rows = (jsonDecode(json) as List).cast<Map<String, dynamic>>();
+
+      // Searched around the LIVE Berlin fix, not the stale Hamburg one.
+      expect(rows.map((r) => r['id']).toSet(), {'de-1', 'de-2'},
+          reason: 'the live in-car fix must drive the radius search');
+
+      // The live fix refreshed the persisted fallback (source `car`).
+      expect(storage.getSetting(StorageKeys.userPositionLat), 52.52);
+      expect(storage.getSetting(StorageKeys.userPositionLng), 13.405);
+      expect(storage.getSetting(StorageKeys.userPositionSource), 'car');
+      expect(storage.getSetting(StorageKeys.userPositionTimestamp), isNotNull);
+    });
+
+    test('cold start: NO persisted fix + a live fix → priced list (not no_gps)',
+        () async {
+      final storage = FakeStorageRepository();
+      await _seedProfile(storage, radiusKm: 8, fuel: 'e10');
+      final service = CarDataService(
+        strategyFactory: _polledFactory('DE', _RecordedDataset(
+          ServiceSource.tankerkoenigApi,
+          [_row('de-1', 'Aral', 52.521, 13.401, e10: 1.799)],
+        )),
+        writeSnapshot: (_, _) async {},
+      );
+
+      // The Automotive-OS / never-opened-phone-app scenario the issue fixes:
+      // no persisted fix exists, but the in-car GPS has one.
+      final json = await service.resolveRadarJson(
+        storage,
+        apiKey: 'k',
+        liveFix: (lat: 52.52, lng: 13.405),
+      );
+      final rows = (jsonDecode(json) as List).cast<Map<String, dynamic>>();
+      expect(rows.map((r) => r['id']), ['de-1']);
+    });
+
+    test('carLiveFixFromArgs — parses the bridge payload, guards bad fixes',
+        () {
+      // The native CarDataBridge payload shape.
+      expect(
+        carLiveFixFromArgs(
+            {'lat': 52.52, 'lng': 13.405, 'accuracyM': 12.0, 'ageMs': 900}),
+        (lat: 52.52, lng: 13.405),
+      );
+      // Absent / malformed args → persisted-fix fallback.
+      expect(carLiveFixFromArgs(null), isNull);
+      expect(carLiveFixFromArgs('garbage'), isNull);
+      expect(carLiveFixFromArgs({'lat': 52.52}), isNull);
+      // A degenerate (0,0) live fix is rejected by the #2872 guard.
+      expect(carLiveFixFromArgs({'lat': 0.0, 'lng': 0.0}), isNull);
+    });
+
+    test('a poisoned live fix falls back to the persisted fix', () async {
+      final storage = FakeStorageRepository();
+      await storage.putSetting(StorageKeys.userPositionLat, 52.52);
+      await storage.putSetting(StorageKeys.userPositionLng, 13.405);
+      await _seedProfile(storage, radiusKm: 8, fuel: 'e10');
+      final service = CarDataService(
+        strategyFactory: _polledFactory('DE', _RecordedDataset(
+          ServiceSource.tankerkoenigApi,
+          [_row('de-1', 'Aral', 52.521, 13.401, e10: 1.799)],
+        )),
+        writeSnapshot: (_, _) async {},
+      );
+
+      final json = await service.resolveSearchJson(
+        storage,
+        apiKey: 'k',
+        // The guard rejects (0,0) → null → the persisted Berlin fix applies.
+        liveFix: carLiveFixFromArgs({'lat': 0.0, 'lng': 0.0}),
+      );
+      final rows = (jsonDecode(json) as List).cast<Map<String, dynamic>>();
+      expect(rows.map((r) => r['id']), ['de-1']);
+      // The persisted source tag must NOT be clobbered to `car` on fallback.
+      expect(storage.getSetting(StorageKeys.userPositionSource), isNot('car'));
     });
   });
 }
