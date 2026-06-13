@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'elm327_vin_parser.dart';
+
 /// ELM327 response parsers — pure string→value decoders for Mode 01,
 /// Mode 09 and Mode 22 responses.
 ///
@@ -459,47 +461,13 @@ class Elm327Parsers {
     }
   }
 
-  /// Parse the ASCII VIN from a Mode 09 PID 02 response. ELM frames
-  /// the 17-byte VIN across 4–5 CAN frames, each prefixed with the
-  /// 3-byte header `49 02 NN` (where NN is a frame counter).
+  /// Parse the ASCII VIN from a Mode 09 PID 02 response.
   ///
-  /// We concatenate the hex payload and decode as ASCII, skipping:
-  /// - frame-header bytes (0x49 'I' — not a valid VIN char anyway,
-  ///   VIN excludes I/O/Q to avoid confusion with 1/0);
-  /// - padding zeros;
-  /// - any other non-printable byte.
-  ///
-  /// Returns the last 17 printable characters, which is the VIN for
-  /// well-formed responses. Returns null on NO DATA or < 17 chars. (#719)
-  /// NB: real multiline responses leak ISO-TP line-number digits into the
-  /// charset, so a framing-aware parse is tracked with the VIN fallback #3278.
-  static String? parseVin(String raw) {
-    final clean = cleanResponse(raw);
-    if (clean == null) return null;
-    final tokens =
-        clean.split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
-    final chars = <int>[];
-    for (final token in tokens) {
-      final byte = int.tryParse(token, radix: 16);
-      if (byte == null) continue;
-      // Digits 0-9.
-      if (byte >= 0x30 && byte <= 0x39) {
-        chars.add(byte);
-        continue;
-      }
-      // Upper-case letters A-Z, except I/O/Q (reserved — the 'I' that
-      // appears in frame headers is excluded by this rule).
-      if (byte >= 0x41 &&
-          byte <= 0x5A &&
-          byte != 0x49 &&
-          byte != 0x4F &&
-          byte != 0x51) {
-        chars.add(byte);
-      }
-    }
-    if (chars.length < 17) return null;
-    return String.fromCharCodes(chars.sublist(chars.length - 17));
-  }
+  /// #3278/#3279 — delegates to the framing-aware [Elm327VinParser], which
+  /// correctly handles the real multi-frame `49 02 NN` framing (the old "last
+  /// 17 chars" heuristic returned a wrong-but-plausible VIN on multiline
+  /// replies). Returns null on NO DATA or fewer than 17 VIN characters.
+  static String? parseVin(String raw) => Elm327VinParser.parse(raw);
 
   static List<int>? _parseMode22Body(
     String raw,
