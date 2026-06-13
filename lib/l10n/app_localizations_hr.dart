@@ -7502,6 +7502,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Prikačivanje drži ekran uključenim — troši više baterije';
 

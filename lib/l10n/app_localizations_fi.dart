@@ -7477,6 +7477,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Kiinnittäminen pitää näytön päällä — kuluttaa enemmän akkua';
 

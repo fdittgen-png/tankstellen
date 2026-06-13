@@ -7522,6 +7522,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'A rögzítés bekapcsolva tartja a képernyőt — több akkumulátort használ';
 

@@ -171,6 +171,45 @@ void main() {
     });
 
     testWidgets(
+        'while a run is initialising the pill shows a spinner + "Searching…" '
+        'so the user sees the radar is working (#3290)', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      // `settle: false` — the spinner animates forever, so pumpAndSettle would
+      // hang; a single frame is enough to assert the first paint.
+      await pumpApp(
+        tester,
+        const RadarSearchFab(),
+        overrides: [
+          ...test.overrides,
+          radarSearchProvider.overrideWith(_InitialisingRadar.new),
+        ].cast(),
+        settle: false,
+      );
+
+      // A working spinner + "Searching…" — NOT the silent flip to "Stop radar"
+      // or "Start" that gave no sign the scan was running.
+      expect(find.text('Searching…'), findsOneWidget);
+      expect(
+          find.descendant(
+            of: find.byType(FloatingActionButton),
+            matching: find.byType(CircularProgressIndicator),
+          ),
+          findsOneWidget);
+      expect(find.text('Stop radar'), findsNothing);
+      expect(find.text('Start fuel station radar'), findsNothing);
+      expect(find.widgetWithIcon(FloatingActionButton, Icons.stop_circle),
+          findsNothing);
+
+      // It stays tappable so the user can cancel mid-scan — dismiss flips it
+      // back to the idle start treatment (no spinner left to animate).
+      await tester.tap(find.byKey(const Key('radarSearchButton')));
+      await tester.pump();
+      expect(find.text('Start fuel station radar'), findsOneWidget);
+    });
+
+    testWidgets(
         'when the radar is active the pill flips to a stop treatment that '
         'dismisses it', (tester) async {
       final test = standardTestOverrides();
@@ -274,5 +313,17 @@ class _ActiveRadar extends RadarSearch {
   RadarSearchState build() => RadarSearchState(
         active: true,
         stations: AsyncData<List<Station>>(_stations),
+      );
+}
+
+/// #3290 — an active radar still acquiring its first fix: `locating` true with
+/// the list still loading. The pill must render the spinner + "Searching…"
+/// rather than the bare "Stop radar" treatment.
+class _InitialisingRadar extends RadarSearch {
+  @override
+  RadarSearchState build() => const RadarSearchState(
+        active: true,
+        locating: true,
+        stations: AsyncLoading<List<Station>>(),
       );
 }

@@ -13024,6 +13024,12 @@ abstract class AppLocalizations {
   /// **'Updating your location…'**
   String get radarUpdatingLocation;
 
+  /// Label on the Fuel Station Radar launch button while a scan is initialising — the GPS fix is being acquired and/or the first station list is loading — so the user sees the radar is working rather than a button that silently flipped to 'Stop' (#3290).
+  ///
+  /// In en, this message translates to:
+  /// **'Searching…'**
+  String get radarSearching;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

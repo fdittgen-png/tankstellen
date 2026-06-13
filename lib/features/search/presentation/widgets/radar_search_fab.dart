@@ -30,9 +30,33 @@ class RadarSearchFab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final active = ref.watch(radarSearchProvider).active;
+    final radar = ref.watch(radarSearchProvider);
+    final active = radar.active;
 
-    final label = active ? (l10n.stopRadar) : (l10n.fuelStationRadarStart);
+    // #3290 — while a run is initialising (acquiring the first GPS fix, or the
+    // first station list is still loading) the pill shows a spinner + a
+    // "Searching…" label so the user sees the radar is WORKING. Previously the
+    // pill flipped straight from "Start" to "Stop radar" with no progress sign,
+    // so a scan that takes a few seconds (cold GPS lock + first fetch) read as a
+    // button that did nothing. The pill stays tappable throughout so the user
+    // can still cancel mid-scan.
+    final initializing = active && (radar.locating || radar.stations.isLoading);
+
+    final String label;
+    final Widget icon;
+    if (!active) {
+      label = l10n.fuelStationRadarStart;
+      icon = const Icon(Icons.radar);
+    } else if (initializing) {
+      label = l10n.radarSearching;
+      icon = const SizedBox.square(
+        dimension: 18,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    } else {
+      label = l10n.stopRadar;
+      icon = const Icon(Icons.stop_circle);
+    }
 
     return FloatingActionButton.extended(
       key: const Key('radarSearchButton'),
@@ -46,7 +70,7 @@ class RadarSearchFab extends ConsumerWidget {
           unawaited(notifier.runRadar());
         }
       },
-      icon: Icon(active ? Icons.stop_circle : Icons.radar),
+      icon: icon,
       label: Text(label),
     );
   }

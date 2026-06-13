@@ -7521,6 +7521,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Piespraušana patur ekrānu ieslēgtu — patērē vairāk akumulatora';
 

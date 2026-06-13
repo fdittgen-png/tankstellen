@@ -7541,6 +7541,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Η καρφίτσωση κρατά την οθόνη αναμμένη — χρησιμοποιεί περισσότερη μπαταρία';
 
