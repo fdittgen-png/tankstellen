@@ -146,15 +146,44 @@ class Obd2ConnectTraceHandle {
   /// log it before the trace finalises.
   String? get adapterName => _root._adapterName;
 
-  /// Stamp the terminal [outcome] — FIRST-TERMINAL-WINS (#2969 correction 3).
-  /// A second call (a fallback's own outcome) is IGNORED for the primary
-  /// outcome; record fallback progress via [addStep] instead. This is
-  /// load-bearing: `_connectByMacDirect` swallows the BLE 4 s timeout and
-  /// silently re-runs `scan()`, so without first-wins the real wrong-transport
-  /// `gattTimeout` would be overwritten by the fallback's `scanEmpty`.
+  /// Channel-open transients the #3179 transport retry loop retries. A later
+  /// terminal may supersede one of these (#3243) — see [setOutcome].
+  static const Set<Obd2ConnectOutcome> _retriedTransients = {
+    Obd2ConnectOutcome.gattTimeout,
+    Obd2ConnectOutcome.gatt133,
+    Obd2ConnectOutcome.serviceNotFound,
+    Obd2ConnectOutcome.rfcommOpenFail,
+  };
+
+  /// Stamp the terminal [outcome] — FIRST-TERMINAL-WINS (#2969 correction 3),
+  /// with two upgrade exceptions (#3243).
+  ///
+  /// A second call (a fallback's own outcome) is normally IGNORED; record
+  /// fallback progress via [addStep] instead. This is load-bearing:
+  /// `_connectByMacDirect` swallows the BLE 4 s timeout and silently re-runs
+  /// `scan()`, so without first-wins the real wrong-transport `gattTimeout`
+  /// would be overwritten by the fallback's `scanEmpty`.
+  ///
+  /// #3243 — but the #3179 transport loop RETRIES the channel-open transients
+  /// ([_retriedTransients]): attempt-1 stamps e.g. `gattTimeout` first, then
+  /// attempt-2 resolves. Two upgrades therefore override a prior transient:
+  ///  - a later `success` — the connect ultimately worked (exporting the
+  ///    transient for a WORKING connect was the bug); and
+  ///  - a later `pairingRequired` — so attempt-2's bond-window signal isn't
+  ///    masked by attempt-1's transient, and the caller surfaces the actionable
+  ///    "power-cycle within 5 min" guidance instead of a scan-fallback re-dial.
+  /// The `gattTimeout`-vs-`scanEmpty` first-wins is preserved (`scanEmpty` is
+  /// not an upgrade outcome).
   void setOutcome(Obd2ConnectOutcome outcome, {String? failureDetail}) {
     final root = _root;
-    if (root._outcome != null) return;
+    final prior = root._outcome;
+    if (prior != null) {
+      final upgrades = prior != Obd2ConnectOutcome.success &&
+          (outcome == Obd2ConnectOutcome.success ||
+              (outcome == Obd2ConnectOutcome.pairingRequired &&
+                  _retriedTransients.contains(prior)));
+      if (!upgrades) return;
+    }
     root._outcome = outcome;
     root._failureDetail = failureDetail;
   }
