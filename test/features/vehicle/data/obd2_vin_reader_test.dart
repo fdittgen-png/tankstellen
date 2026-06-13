@@ -24,6 +24,11 @@ import 'package:tankstellen/features/vehicle/data/obd2_vin_reader.dart';
 ///   4. timeout — sendCommand future doesn't resolve before [timeout].
 ///   5. io — any other thrown error propagates as
 ///      [ObdVinFailureReason.io].
+/// Encode an ASCII string as space-separated hex bytes (for VIN fixtures).
+String _hexBytes(String s) => s.codeUnits
+    .map((c) => c.toRadixString(16).padLeft(2, '0').toUpperCase())
+    .join(' ');
+
 void main() {
   // Wire the global errorLogger to an in-memory recorder so the
   // failure-path branches don't try to spool through Hive (which is
@@ -57,10 +62,31 @@ void main() {
       final result = await reader.read();
 
       expect(result.isSuccess, isTrue);
-      // `parseVin` returns the last 17 printable characters — exactly
-      // the VIN encoded in the fake response.
-      expect(result.vin, hasLength(17));
+      // #3278 — the framing-aware parser decodes the EXACT VIN (the old
+      // last-17 heuristic returned the wrong 17 chars here: 3LCBMB2CS26189239).
+      expect(result.vin, 'VF3LCBMB2CS261892');
       expect(result.failure, isNull);
+    });
+
+    test(
+        'falls back to UDS 22 F1 90 when Mode 09 returns NO DATA — decodes the '
+        'VIN many European ECUs only expose via UDS (#3278)', () async {
+      // The fake answers NO DATA to anything but the UDS command, so Mode 09
+      // (0902) misses and the reader must fall back to 22 F1 90.
+      const vin = 'ZFA31200003456789'; // Fiat-style, 17 chars, no I/O/Q
+      final udsResponse = '62 F1 90 ${_hexBytes(vin)}>';
+      final transport = _FakeTransport.forCommand(
+        Elm327Protocol.vinCommandUds,
+        udsResponse,
+      );
+      final reader = Obd2VinReader(service: Obd2Service(transport));
+      await transport.connect();
+
+      final result = await reader.read();
+
+      expect(result.isSuccess, isTrue,
+          reason: 'the UDS fallback resolved the VIN Mode 09 could not');
+      expect(result.vin, vin);
     });
 
     test(

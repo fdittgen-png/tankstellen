@@ -308,6 +308,11 @@ class Elm327Commands {
   /// support the standard PID A6 (#719).
   static const vinCommand = '0902\r';
 
+  /// UDS ReadDataByIdentifier for the VIN (ISO 14229 DID F190), the European
+  /// fallback for ECUs that don't implement the J1979 Mode 09 VIN service
+  /// (#3278). Response: `62 F1 90 <17 ASCII bytes>`.
+  static const vinCommandUds = '22F190\r';
+
   /// Manufacturer odometer PID catalog, keyed by coarse brand. Each
   /// entry is the full "22 XX YY" command and the byte-length class
   /// its response follows (#719).

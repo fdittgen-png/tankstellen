@@ -35,8 +35,24 @@
 class Elm327VinParser {
   const Elm327VinParser._();
 
-  /// Decode the VIN, or null on NO DATA / fewer than 17 VIN characters.
-  static String? parse(String raw) {
+  /// The Mode 09 PID 02 (`0902`, J1979) response echo: `49 02`.
+  static const List<int> _mode09Echo = [0x49, 0x02];
+
+  /// The UDS ReadDataByIdentifier (`22 F1 90`, ISO 14229) response echo:
+  /// `62 F1 90` — the European fallback for ECUs without J1979 Mode 09 (#3278).
+  static const List<int> _udsEcho = [0x62, 0xF1, 0x90];
+
+  /// Decode a Mode 09 PID 02 (`0902`) VIN, or null on NO DATA / < 17 chars.
+  static String? parse(String raw) => _decode(raw, _mode09Echo);
+
+  /// Decode a UDS `22 F1 90` VIN response (`62 F1 90 <17 ASCII>`), or null
+  /// (#3278) — the fallback for European ECUs that don't implement Mode 09.
+  static String? parseUds(String raw) => _decode(raw, _udsEcho);
+
+  /// Decode the VIN by anchoring past the response [echo], then taking the
+  /// FIRST 17 VIN-charset bytes that follow (skipping any count byte, padding
+  /// and per-frame echoes). Returns null on NO DATA / fewer than 17 chars.
+  static String? _decode(String raw, List<int> echo) {
     final cleaned = _clean(raw);
     if (cleaned == null) return null;
 
@@ -49,14 +65,16 @@ class Elm327VinParser {
       if (b != null && b >= 0 && b <= 0xFF) bytes.add(b);
     }
 
-    // Anchor past the `49 02` (Mode 09 / PID 02) echo when present, so the
-    // item-count byte + any pre-VIN framing are skipped; otherwise scan from 0.
+    // Anchor past the response echo when present, so the item-count byte + any
+    // pre-VIN framing are skipped; otherwise scan from the start.
     var start = 0;
-    for (var i = 0; i + 1 < bytes.length; i++) {
-      if (bytes[i] == 0x49 && bytes[i + 1] == 0x02) {
-        start = i + 2;
-        break;
+    outer:
+    for (var i = 0; i + echo.length <= bytes.length; i++) {
+      for (var j = 0; j < echo.length; j++) {
+        if (bytes[i + j] != echo[j]) continue outer;
       }
+      start = i + echo.length;
+      break;
     }
 
     // Take the FIRST 17 VIN-charset bytes from the anchor — the count byte,
