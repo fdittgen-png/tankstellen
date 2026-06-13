@@ -173,11 +173,13 @@ class PluginBluetoothFacade implements BluetoothFacade {
     if (!controller.isClosed) controller.add(results);
   }
 
-  /// Recognise the platform-channel rejection FlutterBluePlus emits
-  /// when the OS Bluetooth radio is disabled. The exact wording comes
-  /// from `flutter_blue_plus_android`; matched case-insensitively
-  /// against a substring so a future plugin update''s phrasing tweak
-  /// does not silently downgrade us to the generic-error path.
+  /// Recognise that a scan/connect failed because the OS Bluetooth radio is
+  /// off. #3273 — the primary signal is the TYPED, language-independent adapter
+  /// state ([FlutterBluePlus.adapterStateNow]); the English-substring match is
+  /// kept only as a backstop for the race where the error arrives before the
+  /// adapter state flips. (FBP is pinned at 1.36.8 — the 2.x typed-error API is
+  /// off-limits per the proprietary-license decision #2072 — so this is the
+  /// most robust signal available without a version bump.)
   @visibleForTesting
   static bool debugLooksBluetoothOff(Object e) => _looksBluetoothOff(e);
 
@@ -189,8 +191,26 @@ class PluginBluetoothFacade implements BluetoothFacade {
   static Object debugMapBluetoothError(Object e) => _mapBluetoothError(e);
 
   static bool _looksBluetoothOff(Object e) {
-    if (e is! PlatformException) return false;
-    final msg = (e.message ?? '').toLowerCase();
+    // #3273 — primary, typed signal: FBP's cached last-known adapter state (no
+    // platform call), independent of any error wording / localization. Guarded
+    // so a harness without the FBP binding falls through to the backstop below
+    // rather than throwing.
+    try {
+      if (FlutterBluePlus.adapterStateNow == BluetoothAdapterState.off) {
+        return true;
+      }
+    } on Object {
+      // ignore: silent_catch — no FBP binding (unit test): fall through to the
+      // wording backstop; this probe is best-effort and must never throw here.
+    }
+    // Backstop: the platform-channel rejection WORDING, for the race where the
+    // error surfaces before adapterStateNow flips to off. Restricted to the BLE
+    // exception types — now incl. FlutterBluePlusException, which the old code
+    // missed (it only matched PlatformException) — so an arbitrary object /
+    // raw string that merely happens to contain the wording is NOT treated as
+    // a radio-off signal.
+    if (e is! PlatformException && e is! FlutterBluePlusException) return false;
+    final msg = e.toString().toLowerCase();
     return msg.contains('must be turned on') ||
         msg.contains('bluetooth must be on') ||
         msg.contains('bluetooth_off');
