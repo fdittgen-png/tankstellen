@@ -5,15 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../data/sparkilo_tile_layer.dart';
 import 'station_map_geometry.dart';
-import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/sort_selector.dart';
 import 'map_zoom_controls.dart';
 import 'price_legend.dart';
 import 'station_cluster_layers.dart';
+import 'station_map_body.dart';
 import 'station_marker.dart';
 import 'station_marker_model_builder.dart';
 
@@ -304,149 +303,32 @@ class _StationMapLayersState extends State<StationMapLayers> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Stack(
       children: [
-        FlutterMap(
+        // #3233 — the FlutterMap layer tree is the presentational
+        // [StationMapBody]; this widget keeps only the memoised marker model
+        // + the camera-fit lifecycle and feeds them down.
+        StationMapBody(
           mapController: widget.mapController,
-          options: MapOptions(
-            initialCenter: widget.center,
-            initialZoom: widget.zoom,
-            // #2399 — frame the camera target during the FIRST layout
-            // pass, not via a post-frame `fitCamera`. The old post-frame
-            // fit raced the (now-deleted) cold-start reset window and
-            // could land on a degenerate viewport. Positioning the
-            // camera as part of layout means the very first tile fetch
-            // already targets the right viewport — no reset needed.
-            // #2755 — `_fitBounds` is the explicit [cameraFitBounds] (route
-            // mode: the full itinerary) when supplied, else the search
-            // circle (nearby mode, unchanged).
-            initialCameraFit: CameraFit.bounds(
-              bounds: _fitBounds,
-              padding: const EdgeInsets.all(32),
-            ),
-            // #2399 — keep the FlutterMap (and its loaded tiles) alive
-            // when offstage in an IndexedStack so a tab flip back to the
-            // map doesn't tear down + cold-rebuild the tile pipeline.
-            keepAlive: true,
-            onMapReady: () {
-              if (mounted) _mapReady = true;
-            },
-            // #1457 — clamp the camera to the tile-layer's max zoom (19)
-            // so a programmatic `move(camera.zoom + 1)` past 19 doesn't
-            // leave the user staring at a grey viewport (tiles only
-            // render up to maxNativeZoom). The default flutter_map
-            // MapOptions.maxZoom is 25 — that lets the camera stride
-            // past where there are tiles to draw, which looks broken to
-            // the user. Min clamp guards against accidental zoom-out
-            // beyond the world wrap.
-            minZoom: StationMapGeometry.minZoom,
-            maxZoom: StationMapGeometry.maxZoom,
-            // #3002 — the DRIVING map passes its restricted gesture set (no
-            // pinch); every other map keeps the default all-gestures option.
-            interactionOptions: widget.interactionOptions ??
-                const InteractionOptions(flags: InteractiveFlag.all),
-            // #3002 — driving wires a background-tap to its auto-lock reset.
-            onTap: widget.onMapTap == null
-                ? null
-                : (_, _) => widget.onMapTap!(),
-          ),
-          children: [
-            // #2398 — the SINGLE hardened tile path. No inline TileLayer,
-            // no reset stream: the cold-start reset storm that evicted
-            // tiles before they painted is gone. `SparkiloTileLayer`
-            // owns its retry provider lifecycle and uses the upstream
-            // default `abortObsoleteRequests: true`, unified with every
-            // other map surface.
-            const SparkiloTileLayer(key: ValueKey('main-tiles')),
-            // Route polyline (if in route search mode)
-            if (widget.routePolyline != null &&
-                widget.routePolyline!.isNotEmpty)
-              PolylineLayer(
-                polylines: [
-                  Polyline(
-                    points: widget.routePolyline!,
-                    color: theme.colorScheme.primary,
-                    strokeWidth: 4.0,
-                  ),
-                ],
-              ),
-            // Search radius circle
-            if (widget.showSearchRadius)
-              CircleLayer(
-                circles: [
-                  CircleMarker(
-                    point: widget.center,
-                    radius: widget.searchRadiusKm * 1000,
-                    useRadiusInMeter: true,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                    borderColor:
-                        theme.colorScheme.primary.withValues(alpha: 0.3),
-                    borderStrokeWidth: 2,
-                  ),
-                ],
-              ),
-            // Center marker
-            MarkerLayer(
-              markers: [
-                Marker(
-                  point: widget.center,
-                  width: 20,
-                  height: 20,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            // Station markers (#1774 — `_markers` is memoised). Modes:
-            //  - #3000 `clusterAlways` + `excludeSelectedFromClustering`
-            //    (route map): SELECTED stations stay un-clustered as full
-            //    pills on top, the rest fold into the cheapest cluster — so
-            //    the Best/All multi-select + list↔map 1:1 survive;
-            //  - #2939 `clusterAlways` (radar / Nearby): proximity-cluster
-            //    EVERY set with the cheapest-labelled badge;
-            //  - legacy huge set (≥ clusterThreshold): bare count cluster;
-            //  - legacy bounded set (#2510): plain [MarkerLayer], emphasis.
-            if (_markers.isNotEmpty)
-              if (widget.clusterAlways &&
-                  widget.excludeSelectedFromClustering)
-                ...selectionPartitionedClusterLayers(
-                  markers: _markers,
-                  metaOf: (m) => _markerMeta[m],
-                  priceRange: _priceRange,
-                  selectedIds:
-                      widget.selectedStationIds ?? const <String>{},
-                )
-              else if (widget.clusterAlways)
-                cheapestLabelledClusterLayer(
-                  markers: _markers,
-                  metaOf: (m) => _markerMeta[m],
-                  priceRange: _priceRange,
-                  selectedIds:
-                      widget.selectedStationIds ?? const <String>{},
-                )
-              else if (widget.stations.length >=
-                  StationMapGeometry.clusterThreshold)
-                countClusterLayer(markers: _markers, theme: theme)
-              else
-                MarkerLayer(markers: _markers),
-            // Extra layers (e.g. EV overlay)
-            ...widget.extraLayers,
-            // Attribution — localized OSM credit (#2402).
-            const OsmAttribution(),
-          ],
+          center: widget.center,
+          zoom: widget.zoom,
+          fitBounds: _fitBounds,
+          onMapReady: () {
+            if (mounted) _mapReady = true;
+          },
+          interactionOptions: widget.interactionOptions,
+          onMapTap: widget.onMapTap,
+          routePolyline: widget.routePolyline,
+          showSearchRadius: widget.showSearchRadius,
+          searchRadiusKm: widget.searchRadiusKm,
+          markers: _markers,
+          markerMeta: _markerMeta,
+          priceRange: _priceRange,
+          clusterAlways: widget.clusterAlways,
+          excludeSelectedFromClustering: widget.excludeSelectedFromClustering,
+          selectedStationIds: widget.selectedStationIds,
+          stationCount: widget.stations.length,
+          extraLayers: widget.extraLayers,
         ),
         // Zoom controls — #3002: hidden on the driving map, which has its own
         // oversized bottom bar.
