@@ -94,16 +94,19 @@ Stream<ApproachState> approachState(Ref ref) {
       // bare high-accuracy settings (unchanged).
       locationSettings: approachLocationSettings(),
     ),
-    fetchStations: (lat, lng, radiusKm, fuelTypeApiValue) async {
+    fetchStations: (lat, lng, radiusKm, fuelTypeApiValue,
+        {double? headingDegrees}) async {
       try {
         // Cached corridor locations (tier-1) + JIT price for the imminent
         // station(s) (tier-3). Zero network when the tile is already cached
-        // and no imminent station needs a price refresh.
+        // and no imminent station needs a price refresh. #3256 — forward the
+        // detector's live heading so the corridor prefetches the tile ahead.
         return await radar.fetchStations(
           lat,
           lng,
           radiusKm,
           fuelTypeApiValue,
+          headingDegrees: headingDegrees,
         );
       } on Object catch (e, st) {
         // #2297 — the detector treats this as "no stations in radius" and
