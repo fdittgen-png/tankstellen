@@ -266,7 +266,6 @@ class TripRecordingBanner extends ConsumerWidget {
           distanceMeters: radarStation.dist > 0
               ? radarStation.dist * 1000.0
               : null,
-          kmCaption: true,
           radiusMeters: radiusMeters,
           onBodyTap: onBodyTap,
         );

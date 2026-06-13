@@ -203,16 +203,14 @@ class RadarCard extends StatelessWidget {
     final priceText = price != null ? PriceFormatter.formatPrice(price) : '--';
     final name = station.name.isNotEmpty ? station.name : station.brand;
 
-    // In-radius shows sub-km precision (metres); the fallback radar page-set
-    // shows km — the great-circle distance the driver still has to cover
-    // (#2661).
+    // #3258 — route through the SSoT distance formatter so the radar surface
+    // matches the search/favorites cards: GB renders miles (and sub-km shows
+    // metres/yards), instead of hardcoding km. formatDistance already shows
+    // metres under 1 km and km above, so the in-radius vs fallback precision
+    // split collapses into one unit-aware call.
     final String? distanceLabel = distanceMeters == null
         ? null
-        : live
-        ? (l.approachStationDistance(distanceMeters!.toStringAsFixed(0)))
-        : (l.fuelStationRadarDistanceKm(
-            (distanceMeters! / 1000.0).toStringAsFixed(1),
-          ));
+        : PriceFormatter.formatDistance(distanceMeters! / 1000.0);
     final subtitleParts = <String>[fuel.displayName, ?distanceLabel];
 
     // Tap → hand the station's coords to the SSoT navigation util, which

@@ -198,17 +198,14 @@ LiveActivityContent? buildLiveActivityContent({
 
   LiveActivityContent approachContent(
     Station station,
-    double? distMeters, {
-    required bool kmCaption,
-  }) {
+    double? distMeters,
+  ) {
     final price = station.priceFor(fuel);
+    // #3258 — SSoT unit-aware distance (GB → miles, sub-km → metres/yards),
+    // consistent with the search cards instead of hardcoding km.
     final String? stationDistanceText = distMeters == null
         ? null
-        : kmCaption
-        ? (l.fuelStationRadarDistanceKm(
-            (distMeters / 1000.0).toStringAsFixed(1),
-          ))
-        : (l.approachStationDistance(distMeters.toStringAsFixed(0)));
+        : PriceFormatter.formatDistance(distMeters / 1000.0);
     return LiveActivityContent(
       mode: LiveActivityMode.approach,
       paused: paused,
@@ -228,24 +225,19 @@ LiveActivityContent? buildLiveActivityContent({
     );
   }
 
-  // 1 — in-radius / leaving wins (locked target, metres caption).
+  // 1 — in-radius / leaving wins (locked target).
   if (approach is ApproachInRadius) {
-    return approachContent(
-      approach.station,
-      approach.distanceMeters,
-      kmCaption: false,
-    );
+    return approachContent(approach.station, approach.distanceMeters);
   }
   if (approach is ApproachLeaving) {
-    return approachContent(approach.lastStation, null, kmCaption: false);
+    return approachContent(approach.lastStation, null);
   }
 
-  // 2 — polling radar hit (km caption — surfaces earlier than the fence).
+  // 2 — polling radar hit (surfaces earlier than the fence).
   if (radarStation != null) {
     return approachContent(
       radarStation,
       radarStation.dist > 0 ? radarStation.dist * 1000.0 : null,
-      kmCaption: true,
     );
   }
 
