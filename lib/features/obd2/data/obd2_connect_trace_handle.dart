@@ -178,10 +178,16 @@ class Obd2ConnectTraceHandle {
     final root = _root;
     final prior = root._outcome;
     if (prior != null) {
-      final upgrades = prior != Obd2ConnectOutcome.success &&
+      // A later success / pairingRequired upgrades a prior outcome ONLY when
+      // that prior is a RETRIED channel-open transient (#3243). It must NOT
+      // override a considered terminal — notably `ignitionOff`, which a
+      // SUCCESSFUL init stamps after finding a silent bus (#3009): a later
+      // generic `success` stamp on the same connect would otherwise mask the
+      // engine-off diagnosis. `scanEmpty`, `permissionDenied`, `bluetoothOff`
+      // etc. are likewise preserved.
+      final upgrades = _retriedTransients.contains(prior) &&
           (outcome == Obd2ConnectOutcome.success ||
-              (outcome == Obd2ConnectOutcome.pairingRequired &&
-                  _retriedTransients.contains(prior)));
+              outcome == Obd2ConnectOutcome.pairingRequired);
       if (!upgrades) return;
     }
     root._outcome = outcome;

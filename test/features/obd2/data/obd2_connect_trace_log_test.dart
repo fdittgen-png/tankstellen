@@ -120,6 +120,21 @@ void main() {
           Obd2ConnectOutcome.scanEmpty);
     });
 
+    test('#3243 a later success does NOT override ignitionOff '
+        '(engine-off diagnosis preserved, #3009)', () {
+      // The #3009 engine-off path: a SUCCESSFUL init finds a silent bus and
+      // stamps ignitionOff; a later generic success stamp on the same connect
+      // must NOT mask it. (ignitionOff is not a retried channel-open transient.)
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect);
+      h.setOutcome(Obd2ConnectOutcome.ignitionOff);
+      h.setOutcome(Obd2ConnectOutcome.success);
+      Obd2ConnectTraceLog.endTrace(h);
+
+      expect(Obd2ConnectTraceLog.snapshot().single.outcome,
+          Obd2ConnectOutcome.ignitionOff);
+    });
+
     test('#3243 a real success is never overwritten by a later failure', () {
       final h = Obd2ConnectTraceLog.beginTrace(
           origin: Obd2ConnectOrigin.firstConnect);
