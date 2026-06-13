@@ -1,23 +1,21 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../data/sparkilo_tile_layer.dart';
-import '../../../../core/utils/price_utils.dart';
 import 'station_map_geometry.dart';
 import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/presentation/widgets/sort_selector.dart';
+import 'map_zoom_controls.dart';
 import 'price_legend.dart';
 import 'station_cluster_layers.dart';
 import 'station_marker.dart';
+import 'station_marker_model_builder.dart';
 
 /// Camera zoom bounds (#1457). Top end matches the OSM tile cap so a
 /// `move(camera.zoom + 1)` past the cap doesn't park the user on a
@@ -225,81 +223,26 @@ class _StationMapLayersState extends State<StationMapLayers> {
       StationMapGeometry.boundsForRadius(widget.center, widget.searchRadiusKm);
 
   /// Recompute the memoised price range + marker list from the current
-  /// widget inputs.
+  /// widget inputs. #3233 — the pricing / emphasis / ordering / build pipeline
+  /// is the pure [StationMarkerModelBuilder]; this only latches its result.
   void _recomputeMarkers() {
-    // #2510 — colour by the SELECTED-fuel price (the same strict
-    // resolution the list uses), not a fallback chain. A station without
-    // the selected fuel paints grey ("--") instead of being re-coloured
-    // by E10's price. #2631 — when a cross-border resolver is set, each
-    // station's price is taken for ITS country fuel, so the colour range
-    // is computed over those resolved prices to keep colour ↔ price aligned.
-    final resolver = widget.fuelResolver;
-    _priceRange = resolver == null
-        ? priceRange(widget.stations, widget.selectedFuel)
-        : resolvedPriceRangeWith(widget.stations, resolver);
-    final ids = widget.selectedStationIds;
-    final hasSelection = ids != null && ids.isNotEmpty;
-
-    // #2510 — emphasis: the top-ranked stations per the active sort
-    // (cheapest for a price sort, closest otherwise) keep the full price
-    // bubble; the rest render as compact price-band dots so a bounded
-    // result set stays fully visible without the bubbles overlapping into
-    // an illegible pile. The set is small, so a Set lookup is cheap.
-    final emphasized = StationMapGeometry.rankForEmphasis(
-      widget.stations,
-      widget.selectedFuel,
+    final model = StationMarkerModelBuilder.build(
+      context: context,
+      stations: widget.stations,
+      selectedFuel: widget.selectedFuel,
+      selectedStationIds: widget.selectedStationIds,
       byPrice: widget.sortMode == SortMode.price ||
           widget.sortMode == SortMode.priceDistance,
-    ).take(StationMapGeometry.emphasisCount).map((s) => s.id).toSet();
-
-    // #2434 — order so the cheapest (green) marker paints ON TOP of the
-    // more-expensive ones it overlaps. The marker layer paints in
-    // source-list order (later = on top), so we sort price-descending:
-    // expensive at the bottom, cheapest last/on top, price-less markers
-    // beneath everything. Same price the marker is coloured by.
-    final ordered = StationMapGeometry.orderedByPriceForPainting(
-      widget.stations,
-      widget.selectedFuel,
-      fuelResolver: resolver,
+      clusterAlways: widget.clusterAlways,
+      fuelResolver: widget.fuelResolver,
+      onStationTap: widget.onStationTap,
+      markerVariant: widget.markerVariant,
     );
-
-    // #2939 — in clusterAlways mode the clustering de-overlaps the pane, so a
-    // SINGLETON keeps its full price pill (never a dot); only clustered members
-    // roll up into the cheapest-price badge. The emphasis-dot scheme stays for
-    // the legacy non-clustered surfaces.
-    // #2974 — a marker tap that selects its list row also fires a selection
-    // tick (selectionClick only). Null on the default push-to-detail map → no
-    // haptic; the route push owns its own feedback.
-    final onTap = widget.onStationTap == null
-        ? null
-        : (String id) {
-            unawaited(HapticFeedback.selectionClick());
-            widget.onStationTap!(id);
-          };
-    _markerMeta.clear();
-    _markers = ordered.map((station) {
-      final isPastel = hasSelection && !ids.contains(station.id);
-      final isSelected = hasSelection && ids.contains(station.id);
-      final marker = StationMarkerBuilder.build(
-        context,
-        station,
-        widget.selectedFuel,
-        _priceRange.$1,
-        _priceRange.$2,
-        pastel: isPastel,
-        compact: !widget.clusterAlways && !emphasized.contains(station.id),
-        selected: isSelected,
-        onTap: onTap == null ? null : () => onTap(station.id),
-        fuelResolver: resolver,
-        variant: widget.markerVariant,
-      );
-      _markerMeta[marker] = (
-        id: station.id,
-        price: priceForFuelType(
-            station, resolver != null ? resolver(station) : widget.selectedFuel),
-      );
-      return marker;
-    }).toList();
+    _markers = model.markers;
+    _priceRange = model.priceRange;
+    _markerMeta
+      ..clear()
+      ..addAll(model.meta);
   }
 
   @override
@@ -508,49 +451,12 @@ class _StationMapLayersState extends State<StationMapLayers> {
         // Zoom controls — #3002: hidden on the driving map, which has its own
         // oversized bottom bar.
         if (widget.showZoomControls)
-          Positioned(
-            right: 16,
-            top: 16,
-            child: Column(
-              children: [
-                ZoomButton(
-                  icon: Icons.add,
-                  onPressed: () {
-                    // #1457 — clamp to [StationMapGeometry.minZoom, StationMapGeometry.maxZoom]. Without
-                    // the clamp, a + tap at the cap silently no-ops AND
-                    // pushes the camera to a zoom level with no tiles
-                    // (the user sees a grey screen and assumes the button
-                    // is broken). The clamp turns it into a graceful
-                    // no-op AT the cap — the visible feedback is "I'm
-                    // already at max zoom" instead of "the button is
-                    // dead".
-                    final z = (widget.mapController.camera.zoom + 1)
-                        .clamp(StationMapGeometry.minZoom, StationMapGeometry.maxZoom);
-                    widget.mapController
-                        .move(widget.mapController.camera.center, z);
-                  },
-                ),
-                const SizedBox(height: 8),
-                ZoomButton(
-                  icon: Icons.remove,
-                  onPressed: () {
-                    final z = (widget.mapController.camera.zoom - 1)
-                        .clamp(StationMapGeometry.minZoom, StationMapGeometry.maxZoom);
-                    widget.mapController
-                        .move(widget.mapController.camera.center, z);
-                  },
-                ),
-                if (widget.showRecenterButton) ...[
-                  const SizedBox(height: 8),
-                  ZoomButton(
-                    icon: Icons.my_location,
-                    onPressed: widget.onRecenter ??
-                        () => widget.mapController
-                            .move(widget.center, widget.zoom),
-                  ),
-                ],
-              ],
-            ),
+          MapZoomControls(
+            mapController: widget.mapController,
+            center: widget.center,
+            zoom: widget.zoom,
+            showRecenterButton: widget.showRecenterButton,
+            onRecenter: widget.onRecenter,
           ),
         // Price legend — #3002: hidden on the driving map so it never sits
         // under the oversized driving bottom bar.

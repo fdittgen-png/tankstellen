@@ -900,10 +900,16 @@ void main() {
     // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3233.
     // #3233 — ratcheted DOWN 700 → 565: the pure geometry + marker-ranking
     // statics (zoom/bounds/centroid + orderedByPriceForPainting/rankForEmphasis
-    // + their consts) were extracted to `station_map_geometry.dart`. First
-    // slice; the in-widget marker BUILDER (`_recomputeMarkers`) is the next.
+    // + their consts) were extracted to `station_map_geometry.dart`.
+    // #3233 — ratcheted DOWN 565 → 472: the marker-model builder
+    // (`_recomputeMarkers`'s price/emphasis/order/build pipeline →
+    // `station_marker_model_builder.dart`, the pure `StationMarkerModelBuilder`)
+    // and the top-right zoom/recenter control column (→ `map_zoom_controls.dart`,
+    // `MapZoomControls`). The remaining FlutterMap children tree is coupled to
+    // the memoised `_markers`/`_markerMeta`/`_priceRange` state, so the final
+    // slice is a stateful sub-view extraction; #3233 stays referenced for it.
     'lib/features/map/presentation/widgets/station_map_layers.dart': (
-      lines: 565,
+      lines: 472,
       bumps: 8,
       decompositionIssue: 3233,
     ),
