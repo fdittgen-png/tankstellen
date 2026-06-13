@@ -15,6 +15,7 @@ import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import 'uk_fuel_finder_auth.dart';
 import 'uk_station_service.dart';
 
 /// UK CMA / Fuel Finder **bulk-file** fuel-price service (#2277).
@@ -47,30 +48,43 @@ class UkCmaBulkStationService
   final Dio _dio;
   final String _consolidatedUrl;
 
+  /// #3190 — OAuth 2.0 client-credentials token source for the statutory Fuel
+  /// Finder API. Null on the pre-credentials path (no GOV.UK One Login client
+  /// configured yet) → the consolidated request goes out unauthenticated, as
+  /// before. When set, each download carries a `Bearer` token (fetched +
+  /// cached by [UkFuelFinderAuth]); a 401 invalidates the token and retries
+  /// once.
+  final UkFuelFinderAuth? _auth;
+
   /// Disk persistence (read-through). When a [CacheStrategy] is supplied (the
   /// registry factory passes the shared CacheManager) the parsed consolidated
   /// record list is persisted to Hive so it survives a cold start and works
   /// offline. Null in the pure-in-memory parser tests.
   final PersistentDataset<List<Map<String, dynamic>>>? _persistent;
 
-  /// Default consolidated CMA / Fuel Finder download. Published twice daily
-  /// under the gov.uk Fuel Finder scheme; one file covers every forecourt.
-  /// Overridable so the subscription-issued URL (or an OAuth2-fronted variant)
-  /// drops in without touching the parse/persist/filter logic.
+  /// Default consolidated Fuel Finder download (#3190). The statutory Fuel
+  /// Finder Scheme (Motor Fuel Price (Open Data) Regulations 2025) replaced the
+  /// withdrawn voluntary CMA scheme on 2026-05-01; its public API lives on the
+  /// gov.uk developer portal. One consolidated file covers every forecourt.
+  /// Overridable so the exact `/public-api` price-list path — which must be
+  /// confirmed against the registered API docs — drops in without touching the
+  /// parse/persist/filter logic.
   // i18n-ignore: gov.uk data endpoint URL, not user-facing text
   static const String defaultConsolidatedUrl =
-      'https://www.fuel-finder.service.gov.uk/api/v1/prices/latest';
+      'https://developer.fuel-finder.service.gov.uk/public-api/v1/prices/latest';
 
   UkCmaBulkStationService({
     Dio? dio,
     String? consolidatedUrl,
     CacheStrategy? cache,
+    UkFuelFinderAuth? auth,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(seconds: 30),
               responseType: ResponseType.json,
             ),
+        _auth = auth,
         _consolidatedUrl = consolidatedUrl ?? defaultConsolidatedUrl,
         _persistent = cache == null
             ? null
@@ -150,13 +164,47 @@ class UkCmaBulkStationService
   /// Download + extract the consolidated record list. Tolerates the two
   /// standardized envelope shapes (`{stations:[...]}` / `{data:[...]}`) and a
   /// bare top-level list.
+  ///
+  /// #3190 — when an [UkFuelFinderAuth] is configured the request carries a
+  /// `Bearer` token; a 401 (token rotated / revoked server-side) invalidates
+  /// the cached token and retries ONCE with a fresh one before giving up.
   Future<List<Map<String, dynamic>>> _downloadConsolidated({
     CancelToken? cancelToken,
   }) async {
+    final auth = _auth;
+    if (auth == null) {
+      final response = await _dio.get<dynamic>(
+        _consolidatedUrl,
+        cancelToken: cancelToken,
+        options: Options(responseType: ResponseType.json),
+      );
+      return extractConsolidatedRecords(response.data);
+    }
+
+    try {
+      return await _authedDownload(auth, cancelToken: cancelToken);
+    } on DioException catch (e) { // ignore: catch_no_st — rethrow preserves the stack; the 401 branch retries
+      if (e.response?.statusCode == 401) {
+        // Stale/rotated token — drop it and retry once with a fresh one.
+        auth.invalidate();
+        return _authedDownload(auth, cancelToken: cancelToken);
+      }
+      rethrow;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _authedDownload(
+    UkFuelFinderAuth auth, {
+    CancelToken? cancelToken,
+  }) async {
+    final token = await auth.accessToken(cancelToken: cancelToken);
     final response = await _dio.get<dynamic>(
       _consolidatedUrl,
       cancelToken: cancelToken,
-      options: Options(responseType: ResponseType.json),
+      options: Options(
+        responseType: ResponseType.json,
+        headers: {'Authorization': 'Bearer $token'},
+      ),
     );
     return extractConsolidatedRecords(response.data);
   }

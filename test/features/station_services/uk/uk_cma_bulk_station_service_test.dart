@@ -9,6 +9,7 @@ import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/services/station_service.dart';
 import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/features/station_services/uk/uk_cma_bulk_station_service.dart';
+import 'package:tankstellen/features/station_services/uk/uk_fuel_finder_auth.dart';
 import 'package:tankstellen/features/station_services/uk/uk_station_service.dart';
 
 /// #2277 — the UK consolidated CMA bulk-file path: ONE download, persisted,
@@ -206,4 +207,109 @@ void main() {
       expect(bulkResult.data.first.e5, legacy.first.e5);
     });
   });
+
+  group('OAuth2 client-credentials auth (#3190)', () {
+    test('fetches a token then sends the consolidated GET with a Bearer header',
+        () async {
+      final adapter = _OAuthRoutingAdapter(
+        consolidatedBody: _consolidated([
+          _record(siteId: 'gb-1', brand: 'BP', lat: 51.5, lng: -0.12),
+        ]),
+      );
+      final dio = Dio()..httpClientAdapter = adapter;
+      final auth = UkFuelFinderAuth(
+        dio: dio,
+        tokenUrl: 'https://developer.fuel-finder.service.gov.uk/oauth/token',
+        clientId: 'client-abc',
+        clientSecret: 'secret-xyz',
+      );
+      final bulk = UkCmaBulkStationService(dio: dio, auth: auth);
+
+      final result = await bulk.searchStations(_london);
+
+      expect(result.data, isNotEmpty);
+      // Token POST happened, then the data GET carried the Bearer token.
+      expect(adapter.tokenRequests, 1);
+      expect(adapter.dataAuthHeaders, ['Bearer tok-1']);
+    });
+
+    test('on a 401 it invalidates the token and retries the download once',
+        () async {
+      final adapter = _OAuthRoutingAdapter(
+        consolidatedBody: _consolidated([
+          _record(siteId: 'gb-1', brand: 'BP', lat: 51.5, lng: -0.12),
+        ]),
+        failDataOnceWith401: true,
+      );
+      final dio = Dio()..httpClientAdapter = adapter;
+      final auth = UkFuelFinderAuth(
+        dio: dio,
+        tokenUrl: 'https://developer.fuel-finder.service.gov.uk/oauth/token',
+        clientId: 'c',
+        clientSecret: 's',
+      );
+      final bulk = UkCmaBulkStationService(dio: dio, auth: auth);
+
+      final result = await bulk.searchStations(_london);
+
+      // The 401 forced a fresh token (2 token fetches) and the retry succeeded.
+      expect(result.data, isNotEmpty);
+      expect(adapter.tokenRequests, 2);
+      expect(adapter.dataAuthHeaders, ['Bearer tok-1', 'Bearer tok-2']);
+    });
+  });
+}
+
+/// Routes the OAuth2 token POST vs the consolidated data GET by path, captures
+/// the data request's Authorization header, and can fail the first data GET
+/// with a 401 to exercise the invalidate-and-retry path.
+class _OAuthRoutingAdapter implements HttpClientAdapter {
+  _OAuthRoutingAdapter({
+    required this.consolidatedBody,
+    this.failDataOnceWith401 = false,
+  });
+
+  final String consolidatedBody;
+  final bool failDataOnceWith401;
+
+  int tokenRequests = 0;
+  final List<String> dataAuthHeaders = [];
+  bool _dataFailed = false;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    final isToken = options.path.contains('/oauth/token');
+    if (isToken) {
+      tokenRequests++;
+      return ResponseBody.fromString(
+        jsonEncode({'access_token': 'tok-$tokenRequests', 'expires_in': 3600}),
+        200,
+        headers: {
+          Headers.contentTypeHeader: ['application/json'],
+        },
+      );
+    }
+    // Data GET — record the bearer the service attached.
+    dataAuthHeaders.add(options.headers['Authorization']?.toString() ?? '');
+    if (failDataOnceWith401 && !_dataFailed) {
+      _dataFailed = true;
+      return ResponseBody.fromString('{}', 401, headers: {
+        Headers.contentTypeHeader: ['application/json'],
+      });
+    }
+    return ResponseBody.fromString(
+      consolidatedBody,
+      200,
+      headers: {
+        Headers.contentTypeHeader: ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
