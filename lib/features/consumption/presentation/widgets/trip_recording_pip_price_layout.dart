@@ -38,10 +38,6 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
   /// Null hides the caption (the fill bar collapses too).
   final double? distanceMeters;
 
-  /// When true the caption reads in kilometres (the radar/polling variant,
-  /// #2661); when false it reads in metres (the in-radius variant, #2084).
-  final bool kmCaption;
-
   /// Radar radius in metres (`profile.approachRadiusKm * 1000`) — the
   /// proximity fill bar's "indicated radius". Null collapses the bar.
   final double? radiusMeters;
@@ -59,7 +55,6 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
     required this.backgroundColor,
     required this.foregroundColor,
     required this.distanceMeters,
-    required this.kmCaption,
     required this.radiusMeters,
     this.onBodyTap,
   });
@@ -72,11 +67,10 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
     final fuelLabel = fuel.displayName;
     final distance = distanceMeters;
 
-    final String? distanceText = distance == null
-        ? null
-        : kmCaption
-        ? (l.fuelStationRadarDistanceKm((distance / 1000.0).toStringAsFixed(1)))
-        : (l.approachStationDistance(distance.toStringAsFixed(0)));
+    // #3258 — SSoT unit-aware distance (GB → miles, sub-km → metres/yards),
+    // matching the search cards instead of hardcoding km.
+    final String? distanceText =
+        distance == null ? null : PriceFormatter.formatDistance(distance / 1000.0);
 
     final content = Column(
       mainAxisSize: MainAxisSize.min,

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
@@ -215,8 +216,11 @@ void main() {
       // Leads with the station price + name (not L/100 km consumption).
       expect(find.text('Carrefour Pézenas'), findsOneWidget);
       expect(find.text('L/100 km'), findsNothing);
-      // Distance reads in KM (not metres).
-      expect(find.textContaining('2.4 km'), findsOneWidget);
+      // #3258 — distance reads in km via the SSoT unit-aware formatter (the
+      // locale decimal separator, GB→mi, are handled there) — not metres, and
+      // no hardcoded "km away".
+      expect(find.textContaining(PriceFormatter.formatDistance(2.4)),
+          findsOneWidget);
       expect(find.textContaining(' m away'), findsNothing);
     });
 

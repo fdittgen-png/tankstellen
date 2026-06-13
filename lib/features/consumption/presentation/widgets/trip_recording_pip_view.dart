@@ -103,7 +103,6 @@ class TripRecordingPipView extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         distanceMeters: dist,
-        kmCaption: false,
         radiusMeters: radiusMeters,
         onBodyTap: onBodyTap,
       );
@@ -119,7 +118,6 @@ class TripRecordingPipView extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         distanceMeters: radarDistanceMeters,
-        kmCaption: true,
         radiusMeters: radiusMeters,
         onBodyTap: onBodyTap,
       );

@@ -199,7 +199,9 @@ void main() {
       expect(content.stationName, 'ARAL Hauptstr.');
       expect(content.priceText, PriceFormatter.formatPrice(1.789));
       expect(content.fuelLabel, FuelType.e10.displayName);
-      expect(content.stationDistanceText, l10nEn.approachStationDistance('450'));
+      // #3258 — radar distance now routes through the SSoT unit-aware
+      // formatter (GB→mi, sub-km→m/yd), matching the search cards.
+      expect(content.stationDistanceText, PriceFormatter.formatDistance(0.45));
       expect(content.progress, RadarCloseness.fillFor(450, 3000));
     });
 
@@ -237,7 +239,7 @@ void main() {
       final content = build(radarStation: station(dist: 1.2))!;
 
       expect(content.mode, LiveActivityMode.approach);
-      expect(content.stationDistanceText, l10nEn.fuelStationRadarDistanceKm('1.2'));
+      expect(content.stationDistanceText, PriceFormatter.formatDistance(1.2)); // #3258
       expect(content.progress, RadarCloseness.fillFor(1200, 3000));
       // The consumption hero stays populated for the expanded island.
       expect(content.bigFigure, isNotEmpty);
@@ -254,7 +256,7 @@ void main() {
         radarStation: station(dist: 1.2),
         radiusMeters: null,
       )!;
-      expect(content.stationDistanceText, l10nEn.fuelStationRadarDistanceKm('1.2'));
+      expect(content.stationDistanceText, PriceFormatter.formatDistance(1.2)); // #3258
       expect(content.progress, isNull);
     });
   });
