@@ -76,6 +76,61 @@ void main() {
       expect(trace.failureDetail, 'timed out');
     });
 
+    test('#3243 a later SUCCESS upgrades a prior retried transient '
+        '(fail-once-then-succeed exports success)', () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+        origin: Obd2ConnectOrigin.firstConnect,
+        mac: 'AA:BB:CC:DD:EE:FF',
+        requestedTransport: Obd2ConnectTransport.ble,
+      );
+      // Attempt 1 hits a channel-open transient the #3179 loop retries.
+      h.setOutcome(Obd2ConnectOutcome.gattTimeout, failureDetail: 'timed out');
+      // Attempt 2 connects — the trace must export success, not the transient.
+      h.setOutcome(Obd2ConnectOutcome.success);
+      Obd2ConnectTraceLog.endTrace(h);
+
+      expect(Obd2ConnectTraceLog.snapshot().single.outcome,
+          Obd2ConnectOutcome.success);
+    });
+
+    test('#3243 a later pairingRequired upgrades a prior retried transient '
+        '(the bond-window signal is not masked)', () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+        origin: Obd2ConnectOrigin.firstConnect,
+        mac: 'AA:BB:CC:DD:EE:FF',
+        requestedTransport: Obd2ConnectTransport.ble,
+      );
+      h.setOutcome(Obd2ConnectOutcome.gatt133, failureDetail: '133');
+      h.setOutcome(Obd2ConnectOutcome.pairingRequired);
+      Obd2ConnectTraceLog.endTrace(h);
+
+      expect(Obd2ConnectTraceLog.snapshot().single.outcome,
+          Obd2ConnectOutcome.pairingRequired);
+    });
+
+    test('#3243 pairingRequired does NOT supersede a non-retried terminal '
+        '(scanEmpty first-wins preserved)', () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect);
+      h.setOutcome(Obd2ConnectOutcome.scanEmpty);
+      h.setOutcome(Obd2ConnectOutcome.pairingRequired);
+      Obd2ConnectTraceLog.endTrace(h);
+
+      expect(Obd2ConnectTraceLog.snapshot().single.outcome,
+          Obd2ConnectOutcome.scanEmpty);
+    });
+
+    test('#3243 a real success is never overwritten by a later failure', () {
+      final h = Obd2ConnectTraceLog.beginTrace(
+          origin: Obd2ConnectOrigin.firstConnect);
+      h.setOutcome(Obd2ConnectOutcome.success);
+      h.setOutcome(Obd2ConnectOutcome.gattTimeout);
+      Obd2ConnectTraceLog.endTrace(h);
+
+      expect(Obd2ConnectTraceLog.snapshot().single.outcome,
+          Obd2ConnectOutcome.success);
+    });
+
     test('setOutcomeFromError classifies + keeps the raw toString detail', () {
       final h = Obd2ConnectTraceLog.beginTrace(
           origin: Obd2ConnectOrigin.liveReconnect);
