@@ -945,10 +945,13 @@ void main() {
     // +1 (#3161): the `discarded_futures` burn-down added the lint-mandated
     // `import 'dart:async';` line for the `unawaited(...)` wrap of the
     // marker-tap HapticFeedback call. No new logic.
-    // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3233
-    // (marker-model builder out of the widget).
+    // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3233.
+    // #3233 — ratcheted DOWN 700 → 565: the pure geometry + marker-ranking
+    // statics (zoom/bounds/centroid + orderedByPriceForPainting/rankForEmphasis
+    // + their consts) were extracted to `station_map_geometry.dart`. First
+    // slice; the in-widget marker BUILDER (`_recomputeMarkers`) is the next.
     'lib/features/map/presentation/widgets/station_map_layers.dart': (
-      lines: 700,
+      lines: 565,
       bumps: 8,
       decompositionIssue: 3233,
     ),

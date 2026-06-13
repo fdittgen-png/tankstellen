@@ -17,6 +17,7 @@ import '../../../ev/providers/ev_providers.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_result_item.dart';
 import '../../../search/providers/search_screen_ui_provider.dart';
+import 'station_map_geometry.dart';
 import 'station_map_layers.dart';
 
 /// Displays a map of nearby stations from the current search results.
@@ -100,11 +101,11 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
         // the screen empty (#692). Fall back to userPos only when the
         // result set is empty (no station centroid to compute).
         final center = stations.isNotEmpty
-            ? StationMapLayers.centerOf(stations)
+            ? StationMapGeometry.centerOf(stations)
             : (userPos != null
                   ? LatLng(userPos.lat, userPos.lng)
                   : const LatLng(0, 0));
-        final zoom = StationMapLayers.zoomForRadius(searchRadiusKm);
+        final zoom = StationMapGeometry.zoomForRadius(searchRadiusKm);
 
         final evLat = center.latitude;
         final evLng = center.longitude;
@@ -127,7 +128,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
         // changed search centre. The old per-build post-frame `fitCamera`
         // here raced the (now-deleted) cold-start reset window and is
         // gone. `bounds` is still computed for the recenter button.
-        final bounds = StationMapLayers.boundsForRadius(center, searchRadiusKm);
+        final bounds = StationMapGeometry.boundsForRadius(center, searchRadiusKm);
 
         return Stack(
           children: [

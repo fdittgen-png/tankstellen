@@ -20,6 +20,7 @@ import '../../../search/providers/search_mode_provider.dart';
 import '../../../search/providers/search_provider.dart';
 import '../../../search/providers/search_screen_ui_provider.dart';
 import '../../../search/providers/selected_station_provider.dart';
+import 'station_map_geometry.dart';
 import 'station_map_layers.dart';
 
 /// A reusable map widget that displays station markers in the split-screen
@@ -150,7 +151,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
     // radius (and a sparse one larger), so the radius zoom framed the wrong
     // viewport in the narrow split pane.
     final bounds = _boundsOf(stations);
-    final center = StationMapLayers.centerOf(stations);
+    final center = StationMapGeometry.centerOf(stations);
 
     // #2939 — two-way sync: emphasise the selected row's marker, and a marker
     // tap selects its row (keeping the map visible) instead of navigating.
@@ -160,7 +161,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
       mapController: _mapController,
       stations: stations,
       center: center,
-      zoom: StationMapLayers.zoomForRadius(searchRadius),
+      zoom: StationMapGeometry.zoomForRadius(searchRadius),
       searchRadiusKm: searchRadius,
       selectedFuel: selectedFuel,
       sortMode: sortMode,

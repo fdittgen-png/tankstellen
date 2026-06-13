@@ -12,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/map/presentation/widgets/nearby_map_view.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_map_geometry.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/search_result_item.dart';
@@ -195,8 +196,8 @@ void main() {
 
         // And the first-paint fit target IS the search circle around the
         // station centroid at the 19 km radius — not a route bound.
-        final expected = StationMapLayers.boundsForRadius(
-          StationMapLayers.centerOf(parisStations),
+        final expected = StationMapGeometry.boundsForRadius(
+          StationMapGeometry.centerOf(parisStations),
           19,
         );
         final flutterMap = tester.widget<FlutterMap>(find.byType(FlutterMap));
