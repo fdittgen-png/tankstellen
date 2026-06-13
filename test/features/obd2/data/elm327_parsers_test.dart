@@ -941,11 +941,15 @@ void main() {
       expect(Elm327Parsers.parseVin('NO DATA'), isNull);
     });
 
-    test('returns LAST 17 chars when more than 17 valid chars present', () {
-      // 20 valid chars - parser keeps the trailing 17.
-      const tail = 'WVWZZZ1KZ8W123456';
-      final extraThenVin = hex('AAA$tail');
-      expect(Elm327Parsers.parseVin(extraThenVin), tail);
+    test('takes the FIRST 17 VIN bytes after the 49 02 echo, ignoring trailing '
+        'padding (#3278 — not the old wrong "last 17")', () {
+      // The real multi-frame case: the VIN is the 17 bytes right after the
+      // `49 02 01` echo; the trailing bytes (`39` + padding) are NOT part of
+      // it. The old last-17 heuristic slid past the VIN into that tail and
+      // returned a wrong-but-plausible 17 chars.
+      const vin = 'WVWZZZ1KZ8W123456';
+      final response = '49 02 01 ${hex(vin)} 39 00 00 00 00';
+      expect(Elm327Parsers.parseVin(response), vin);
     });
   });
 
