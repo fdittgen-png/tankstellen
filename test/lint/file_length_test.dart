@@ -929,20 +929,13 @@ void main() {
     // dropped to ~168 content lines (below the cap). Removed from the
     // snapshot per the shrink ratchet; every extracted file is new and
     // under 400.
-    // #2885 — +17: the multiFuelCapable combustion field + its
-    // documentation block (the per-fuel comparison flag, Epic #2881).
-    // #3015 — re-grandfathered 470 → 480: the enginePowerKw field + its
-    // documentation block (catalog-pre-filled rated power, Epic #3015).
-    // #3122 — re-grandfathered 480 → 491: the LWW `updatedAt` stamp field
-    // + its documentation block (last-write-wins edit propagation).
-    // 3 bumps — decomposition forced (#3141), tracked by the OPEN #3234
-    // (vehicle god-files). #3130 — path-only update: moved to the shared
-    // domain kernel (lib/core/domain/), same grandfathered length.
-    'lib/core/domain/vehicle_profile.dart': (
-      lines: 491,
-      bumps: 3,
-      decompositionIssue: 3234,
-    ),
+    // #3234 — vehicle_profile.dart decomposed (491 → 377): the powertrain /
+    // calibration-mode / connector enums and their enum-only JSON converters
+    // moved into vehicle_enums.dart (132, re-exported for backward compat), so
+    // the freezed entity file holds only the model + ChargingPreferences and
+    // drops below the cap. Removed from the snapshot per the shrink ratchet;
+    // vehicle_enums.dart is new and under 400. The sibling edit_vehicle_screen
+    // decomposition stays tracked by the (still-open) #3234.
     // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
     // receives a directFuelRateSupported flag computed from the vehicle's
     // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE
