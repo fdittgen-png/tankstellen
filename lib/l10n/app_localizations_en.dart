@@ -7440,6 +7440,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 
@@ -15433,6 +15436,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get radarUpdatingLocation => '⟦Úƥđáŧîñǧ ýóúř łóçáŧîóñ… ·········⟧';
+
+  @override
+  String get radarSearching => '⟦Šéářçĥîñǧ… ····⟧';
 
   @override
   String get tripRecordingPinTooltip =>

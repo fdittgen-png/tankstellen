@@ -7501,6 +7501,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Vastpinnen houdt het scherm aan — verbruikt meer batterij';
 

@@ -7522,6 +7522,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get radarUpdatingLocation => 'Standort wird aktualisiert…';
 
   @override
+  String get radarSearching => 'Suche läuft…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 

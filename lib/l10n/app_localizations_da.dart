@@ -7476,6 +7476,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fastgørelse holder skærmen tændt — bruger mere batteri';
 

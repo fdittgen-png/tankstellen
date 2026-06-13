@@ -4895,5 +4895,10 @@
   "@radarUpdatingLocation": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "radarSearching": "Searching…",
+  "@radarSearching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

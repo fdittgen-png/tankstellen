@@ -7507,6 +7507,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Przypięcie utrzymuje ekran włączony — zużywa więcej baterii';
 

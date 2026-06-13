@@ -7484,6 +7484,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Priklepanje ohranja zaslon vklopljen — porablja več baterije';
 

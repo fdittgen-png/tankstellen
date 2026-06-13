@@ -135,10 +135,19 @@ class RadarSearch extends _$RadarSearch {
     // is swallowed, keeping the radar usable off the persisted/refreshed fix).
     _subscribeGps();
 
+    // #3290 — kick the fresh GPS fix CONCURRENTLY with the provisional corridor
+    // paint instead of strictly after it. The cold one-shot lock and the first
+    // corridor fetch then overlap, so the authoritative (in-radius) scan lands
+    // ~one network round-trip sooner. `persisted` is read BEFORE the refresh so
+    // the provisional paint still uses the last-known point even if the fresh
+    // fix resolves first. Best-effort: a denied / timed-out fix keeps the
+    // persisted point (offline runs still scan the last spot).
+    final persisted = ref.read(userPositionProvider);
+    final gpsRefresh = _refreshGps();
+
     // #3267 — instant first paint from the last-known position (corridor-only,
     // no in-radius merge yet) so the user sees something immediately while the
     // fresh fix resolves, rather than a blank, blocked screen.
-    final persisted = ref.read(userPositionProvider);
     if (persisted != null) {
       state = state.copyWith(active: true, locating: true);
       await _scan(
@@ -155,18 +164,10 @@ class RadarSearch extends _$RadarSearch {
       );
     }
 
-    // #2806 — refresh the live GPS fix, exactly as the regular search does, so
-    // the authoritative scan is around the user's CURRENT spot, not a position
-    // minutes behind them. Best-effort: keep the persisted point if the fix is
-    // denied / times out, so an offline run still scans the last spot.
-    Object? gpsError;
-    StackTrace? gpsStack;
-    try {
-      await ref.read(userPositionProvider.notifier).updateFromGps();
-    } catch (e, st) {
-      gpsError = e;
-      gpsStack = st;
-    }
+    // #2806 — the authoritative scan must be around the user's CURRENT spot,
+    // not a position minutes behind them, so wait for the (already in-flight)
+    // fresh fix before the in-radius merge.
+    final (:gpsError, :gpsStack) = await gpsRefresh;
 
     final pos = ref.read(userPositionProvider);
     if (pos == null) {
@@ -195,6 +196,20 @@ class RadarSearch extends _$RadarSearch {
       heading: geo.sanitizedHeading(_lastFix?.heading),
       silent: false,
     );
+  }
+
+  /// Refresh the persisted position from a fresh one-shot GPS fix, capturing
+  /// any failure instead of throwing so it can run concurrently with the
+  /// provisional paint (#3290). A denied / timed-out fix is non-fatal — the
+  /// caller falls back to the persisted point, or surfaces the error (#3042)
+  /// only when there is no position to scan around at all.
+  Future<({Object? gpsError, StackTrace? gpsStack})> _refreshGps() async {
+    try {
+      await ref.read(userPositionProvider.notifier).updateFromGps();
+      return (gpsError: null, gpsStack: null);
+    } catch (e, st) {
+      return (gpsError: e, gpsStack: st);
+    }
   }
 
   /// Open the live GPS subscription if it isn't already. Never throws — a

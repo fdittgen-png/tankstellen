@@ -7555,6 +7555,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get radarUpdatingLocation => 'Updating your location…';
 
   @override
+  String get radarSearching => 'Searching…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'L\'épinglage garde l\'écran allumé — consomme plus de batterie';
 
