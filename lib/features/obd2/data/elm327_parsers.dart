@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'elm327_decode_util.dart';
 import 'elm327_vin_parser.dart';
 
 /// ELM327 response parsers — pure string→value decoders for Mode 01,
@@ -86,7 +87,7 @@ class Elm327Parsers {
     final clean = cleanResponse(raw);
     if (clean == null) return null;
 
-    final bytes = _parseHexBytes(clean);
+    final bytes = parseElmHexBytes(clean);
     if (bytes.length < 3 || bytes[0] != 0x41 || bytes[1] != 0x0D) return null;
 
     return bytes[2]; // Speed in km/h (0-255)
@@ -98,7 +99,7 @@ class Elm327Parsers {
     final clean = cleanResponse(raw);
     if (clean == null) return null;
 
-    final bytes = _parseHexBytes(clean);
+    final bytes = parseElmHexBytes(clean);
     if (bytes.length < 4 || bytes[0] != 0x41 || bytes[1] != 0x0C) return null;
 
     return ((bytes[2] * 256) + bytes[3]) / 4.0;
@@ -110,17 +111,11 @@ class Elm327Parsers {
     final clean = cleanResponse(raw);
     if (clean == null) return null;
 
-    final bytes = _parseHexBytes(clean);
+    final bytes = parseElmHexBytes(clean);
     if (bytes.length < 4 || bytes[0] != 0x41 || bytes[1] != 0x31) return null;
 
     return (bytes[2] * 256) + bytes[3];
   }
-
-  /// #3275 — only (0, 2,000,000] km is a real odometer; a 0 sentinel or a
-  /// saturated frame (~429M km) must not corrupt downstream distance/fuel math.
-  static const double _maxPlausibleOdometerKm = 2000000.0;
-  static bool _plausibleOdometerKm(double km) =>
-      km.isFinite && km > 0 && km <= _maxPlausibleOdometerKm;
 
   /// Parse odometer from Mode 01 PID A6 response.
   /// Response format: "41 A6 XX YY ZZ WW" where odometer = value / 10 km.
@@ -128,12 +123,12 @@ class Elm327Parsers {
     final clean = cleanResponse(raw);
     if (clean == null) return null;
 
-    final bytes = _parseHexBytes(clean);
+    final bytes = parseElmHexBytes(clean);
     if (bytes.length < 6 || bytes[0] != 0x41 || bytes[1] != 0xA6) return null;
 
     final value = (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
     final km = value / 10.0; // Odometer in km (1/10 km resolution)
-    return _plausibleOdometerKm(km) ? km : null;
+    return isPlausibleOdometerKm(km) ? km : null;
   }
 
   /// Parse calculated engine load from Mode 01 PID 04 response (#717).
@@ -353,57 +348,10 @@ class Elm327Parsers {
   }) {
     final clean = cleanResponse(raw);
     if (clean == null) return null;
-    final bytes = _parseHexBytes(clean);
+    final bytes = parseElmHexBytes(clean);
     if (bytes.length < minBytes) return null;
     if (bytes[0] != 0x41 || bytes[1] != expectedPid) return null;
     return bytes;
-  }
-
-  /// Parse a 3-byte (big-endian, km) manufacturer odometer — used by
-  /// VW group (22 22 03), BMW (22 30 16), Renault (22 21 02), etc.
-  /// Expected response: `62 PH PL A B C` → km = (A*65536)+(B*256)+C.
-  /// Returns null on NO DATA or a PID-echo mismatch. (#719)
-  static double? parseMfgOdometer3Byte(
-    String raw, {
-    required int expectedPidHi,
-    required int expectedPidLo,
-  }) {
-    final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
-        minBytes: 6);
-    if (bytes == null) return null;
-    final km = ((bytes[3] << 16) | (bytes[4] << 8) | bytes[5]).toDouble();
-    return _plausibleOdometerKm(km) ? km : null; // #3275
-  }
-
-  /// Parse a 2-byte (big-endian, km) manufacturer odometer — used by
-  /// Mercedes (22 F1 5B), PSA (22 D1 01). Expected response:
-  /// `62 PH PL A B` → km = (A*256)+B. (#719)
-  static double? parseMfgOdometer2Byte(
-    String raw, {
-    required int expectedPidHi,
-    required int expectedPidLo,
-  }) {
-    final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
-        minBytes: 5);
-    if (bytes == null) return null;
-    final km = ((bytes[3] << 8) | bytes[4]).toDouble();
-    return _plausibleOdometerKm(km) ? km : null; // #3275
-  }
-
-  /// Parse a Ford-style 2-byte miles-times-10 odometer (22 40 4D).
-  /// Response: `62 40 4D A B` → miles_x10 = (A*256)+B. The raw value
-  /// is miles × 10, so divide by 10 before converting to km. (#719)
-  static double? parseMfgOdometerMilesTimes10(
-    String raw, {
-    required int expectedPidHi,
-    required int expectedPidLo,
-  }) {
-    final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
-        minBytes: 5);
-    if (bytes == null) return null;
-    final milesTimes10 = (bytes[3] << 8) | bytes[4];
-    final km = (milesTimes10 / 10.0) * 1.609344;
-    return _plausibleOdometerKm(km) ? km : null; // #3275
   }
 
   /// Parse fuel type from Mode 01 PID 51 response (#1399).
@@ -468,52 +416,4 @@ class Elm327Parsers {
   /// 17 chars" heuristic returned a wrong-but-plausible VIN on multiline
   /// replies). Returns null on NO DATA or fewer than 17 VIN characters.
   static String? parseVin(String raw) => Elm327VinParser.parse(raw);
-
-  static List<int>? _parseMode22Body(
-    String raw,
-    int expectedPidHi,
-    int expectedPidLo, {
-    required int minBytes,
-  }) {
-    final clean = cleanResponse22(raw);
-    if (clean == null) return null;
-    final bytes = _parseHexBytes(clean);
-    if (bytes.length < minBytes) return null;
-    if (bytes[0] != 0x62 ||
-        bytes[1] != expectedPidHi ||
-        bytes[2] != expectedPidLo) {
-      return null;
-    }
-    return bytes;
-  }
-
-  /// Mode 22 response cleaner. Same as [cleanResponse] but anchors on
-  /// the "62" Mode 22 echo instead of "41".
-  static String? cleanResponse22(String raw) {
-    final cleaned = raw
-        .replaceAll('>', '')
-        .replaceAll('\r', ' ')
-        .replaceAll('\n', ' ')
-        .trim();
-    if (cleaned.isEmpty ||
-        cleaned.contains('NO DATA') ||
-        cleaned.contains('UNABLE TO CONNECT') ||
-        cleaned.contains('ERROR') ||
-        cleaned.contains('?')) {
-      return null;
-    }
-    final idx = cleaned.indexOf('62');
-    if (idx >= 0) return cleaned.substring(idx).trim();
-    return cleaned;
-  }
-
-  /// Parse hex string "41 0D FF" into list of byte values [0x41, 0x0D, 0xFF].
-  static List<int> _parseHexBytes(String hex) {
-    return hex
-        .split(RegExp(r'\s+'))
-        .where((s) => s.isNotEmpty)
-        .map((s) => int.tryParse(s, radix: 16))
-        .whereType<int>()
-        .toList();
-  }
 }
