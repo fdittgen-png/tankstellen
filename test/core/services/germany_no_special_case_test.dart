@@ -21,6 +21,9 @@ void main() {
   // builder so the foreground + background isolate share one path. The #425
   // "no Germany special case" intent now lives here.
   late String builderSource;
+  // #3232 — the registry's entry rows moved into country_service_data.dart;
+  // the entry-existence assertions read it directly now.
+  late String dataSource;
 
   setUpAll(() {
     providersSource =
@@ -31,6 +34,8 @@ void main() {
     builderSource =
         File('lib/core/services/country_raw_service_builder.dart')
             .readAsStringSync();
+    dataSource =
+        File('lib/core/services/country_service_data.dart').readAsStringSync();
   });
 
   group('service_providers.dart no longer special-cases any country', () {
@@ -100,16 +105,17 @@ void main() {
     test('every supported country still has a registry entry', () {
       // Sanity check that the const list still holds the full set after
       // the refactor, since assertAllCountriesRegistered runs only at
-      // app startup (in debug mode).
+      // app startup (in debug mode). #3232 — the rows live in
+      // country_service_data.dart now (kCountryServiceEntries).
       const expected = [
         'DE', 'FR', 'AT', 'ES', 'IT', 'DK', 'AR',
         'PT', 'GB', 'AU', 'MX',
       ];
       for (final code in expected) {
         expect(
-          registrySource,
+          dataSource,
           contains("countryCode: '$code'"),
-          reason: '$code entry missing from CountryServiceRegistry',
+          reason: '$code entry missing from kCountryServiceEntries',
         );
       }
     });

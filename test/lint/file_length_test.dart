@@ -171,47 +171,13 @@ void main() {
       bumps: 1,
       decompositionIssue: null,
     ),
-    // #2373 — re-grandfathered 868 → 887: one required `sourceUrl` field
-    // added to every per-country FuelServicePolicy row (19 data lines) so
-    // the country-service header can link the upstream data source.
-    // #2621 — re-grandfathered 887 → 909: the order-independent
-    // `entriesByLatLng` (a `sync*` yielding EVERY box that contains a point,
-    // not just the first declared) + its dartdoc, plus `entryByLatLng`
-    // refactored to delegate to it. Fixes the FR-shadows-Catalonia bbox bug
-    // that left cross-border routes with zero Spanish stations. Decomposition
-    // of this registry is tracked separately by #2187/#2188.
-    // #2704 — re-grandfathered 909 → 916: MX's availableFuelTypes was made
-    // explicit ([e5, e98, diesel, electric, all]) instead of _defaultFuelTypes
-    // (which carries the wrong e10), with a 4-line rationale comment. Premium
-    // is MX's high-octane grade, not the European e10 blend. Decomposition of
-    // this registry is tracked separately by #2187/#2188.
-    // #2824 — re-grandfathered 916 → 921: buildService reads the dev-only
-    // data-access tracer (dataAccessRecorderProvider), notes the country's
-    // configured rate-limit interval, and threads the recorder into the
-    // StationServiceChain. The tap is null in production (zero overhead);
-    // these 5 lines are the registry's only data-access wiring and can't move
-    // out without re-introducing a Germany-style special case the registry
-    // exists to eliminate. Decomposition still tracked by #2187/#2188.
-    // #2861 — shrunk 921 → 852: the 17 per-entry `createService(Ref)` factory
-    // functions + the entry's `createService` field moved into the single,
-    // Riverpod-free `buildRawCountryService` (country_raw_service_builder.dart)
-    // so the foreground (buildService) and the WorkManager background isolate
-    // (buildBackgroundService) share ONE construction path. Snapshot lowered
-    // to keep the debt baseline honest.
-    // #2866 — re-grandfathered 852 → 857: both construction paths now thread the
-    // shared #2866 ProviderRequestBudget (import + one param + two call-site
-    // args) so foreground + background share ONE per-provider minInterval gate.
-    // Decomposing this god-class is tracked separately (#2187/#2188/#2190).
-    // #3198 — re-grandfathered 857 → 864: AT/DK promoted off
-    // _defaultFuelTypes to explicit lists (phantom-E10 removal + DK's
-    // real premium grades).
-    // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3232
-    // (data rows out of the registry; successor to closed #2187/#2188).
-    'lib/core/services/country_service_registry.dart': (
-      lines: 864,
-      bumps: 6,
-      decompositionIssue: 3232,
-    ),
+    // #3232 — country_service_registry.dart decomposed (864 → 241): the data
+    // rows moved out into country_service_data.dart (entries + kDefaultFuelTypes,
+    // 316) + country_service_policies.dart (the per-service FuelServicePolicy
+    // consts, 277), and CountryServiceEntry into country_service_entry.dart (90,
+    // re-exported for backward compat). The registry file now holds only the
+    // lookups + service builders, below the cap. Removed from the snapshot per
+    // the shrink ratchet; the extracted files are all new and under 400.
     // #2969 — re-grandfathered 500 → 522: the `transportForName` inference
     // (matches a stored adapter name against the profile nameMatchers so the
     // transport-aware self-test takes RFCOMM for a Classic-SPP adapter instead
