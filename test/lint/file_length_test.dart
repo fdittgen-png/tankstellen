@@ -372,29 +372,15 @@ void main() {
       bumps: 0,
       decompositionIssue: null,
     ),
-    // #2456 — re-grandfathered 457 → 481: two new pure parsers,
-    // `parseBaroPressureKpa` (PID 0x33) and `parseCommandedEquivalenceRatio`
-    // (PID 0x44, commanded λ), each with their dartdoc, so the
-    // fuel-rate estimator can use the ECU's real mixture + ambient
-    // air-density instead of the assumed-stoich AFR / sea-level pressure.
-    // #2458/#2459 — re-grandfathered 481 → 538: nine new pure parsers,
-    // each with dartdoc — bank-2 trims (0x08/0x09), absolute load (0x43),
-    // accelerator-pedal D/E/F (0x49/0x4A/0x4B), engine-oil (0x5C) +
-    // ambient-air (0x46) temps. All trivial decoders reusing the existing
-    // `_parseFuelTrim` / `_parse1BytePercent` / `_parseModeOneBody`
-    // plumbing. Decomposition tracked separately by #2187/#2188.
-    // #3275 — bumped 538 → 551 for the `_plausibleOdometerKm` odometer gate.
-    // #3278/#3279 — ratcheted DOWN 551 → 519 (VIN decoder →
-    // `elm327_vin_parser.dart`) → 419 (Mode 22 manufacturer odometer parsers →
-    // `elm327_mode22_parsers.dart`, + shared `parseElmHexBytes` /
-    // `isPlausibleOdometerKm` → `elm327_decode_util.dart`). Two #3279 slices
-    // done; the remaining Mode 01 bulk keeps it just over the 400 norm, so the
-    // decomposition issue stays referenced for the final slice.
-    'lib/features/obd2/data/elm327_parsers.dart': (
-      lines: 419,
-      bumps: 3,
-      decompositionIssue: 3279,
-    ),
+    // #3279 — elm327_parsers.dart decomposed below the cap (419 → 345): the
+    // final slice moved the shared decode plumbing — `cleanResponse`
+    // (→ `cleanElmResponse`), the Mode 01 framing helper `_parseModeOneBody`
+    // (→ `parseModeOneBody`), and the PID-0x51 `fuelTypeCodeToProfileKey` map —
+    // into `elm327_decode_util.dart` (now 115), next to the
+    // `parseElmHexBytes` / `isPlausibleOdometerKm` helpers the earlier slices
+    // moved there. `Elm327Parsers.cleanResponse` stays as a thin delegating
+    // stub for its public callers. Removed from the snapshot per the shrink
+    // ratchet; the util stays well under 400.
     // #2456 — re-grandfathered 471 → 524: the live integrator gained λ
     // (PID 0x44, 2 Hz) + baro (PID 0x33, 0.5 Hz) supportsPid-gated
     // subscriptions and threads both into the MAF + speed-density fuel

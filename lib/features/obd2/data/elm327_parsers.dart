@@ -16,28 +16,11 @@ class Elm327Parsers {
   ///
   /// Strips whitespace, '>', echo, and extracts the hex payload.
   /// Returns null if the response indicates an error or no data.
-  static String? cleanResponse(String raw) {
-    final cleaned = raw
-        .replaceAll('>', '')
-        .replaceAll('\r', ' ')
-        .replaceAll('\n', ' ')
-        .trim();
-
-    if (cleaned.isEmpty ||
-        cleaned.contains('NO DATA') ||
-        cleaned.contains('UNABLE TO CONNECT') ||
-        cleaned.contains('ERROR') ||
-        cleaned.contains('?')) {
-      return null;
-    }
-
-    // Remove echo (command echo before response)
-    // Response starts with "41" for Mode 01 responses
-    final idx = cleaned.indexOf('41');
-    if (idx >= 0) return cleaned.substring(idx).trim();
-
-    return cleaned;
-  }
+  ///
+  /// #3279 — delegates to the shared [cleanElmResponse] in
+  /// `elm327_decode_util.dart`; kept here as the stable public entry point the
+  /// protocol layer + tests call.
+  static String? cleanResponse(String raw) => cleanElmResponse(raw);
 
   /// Parse the ELM327 `ATDPN` (describe-protocol-number) reply into the
   /// bare protocol digit, stripping the leading `A` auto-flag (#2261
@@ -150,7 +133,7 @@ class Elm327Parsers {
   /// Parse engine fuel rate from Mode 01 PID 5E response (#717).
   /// Formula: L/h = ((A × 256) + B) × 0.05. Response: "41 5E XX YY".
   static double? parseFuelRateLPerHour(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x5E, minBytes: 4);
+    final bytes = parseModeOneBody(raw, 0x5E, minBytes: 4);
     if (bytes == null) return null;
     return ((bytes[2] * 256) + bytes[3]) * 0.05;
   }
@@ -158,7 +141,7 @@ class Elm327Parsers {
   /// Parse mass air flow from Mode 01 PID 10 response (#717).
   /// Formula: g/s = ((A × 256) + B) × 0.01. Response: "41 10 XX YY".
   static double? parseMafGramsPerSecond(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x10, minBytes: 4);
+    final bytes = parseModeOneBody(raw, 0x10, minBytes: 4);
     if (bytes == null) return null;
     return ((bytes[2] * 256) + bytes[3]) * 0.01;
   }
@@ -169,7 +152,7 @@ class Elm327Parsers {
   /// 30–40 kPa, wide-open throttle approaches atmospheric (~100 kPa)
   /// on NA engines, and up to 200+ kPa on turbocharged engines.
   static double? parseManifoldPressureKpa(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x0B, minBytes: 3);
+    final bytes = parseModeOneBody(raw, 0x0B, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2].toDouble();
   }
@@ -180,7 +163,7 @@ class Elm327Parsers {
   /// of altitude, so a 1500 m pass reads ~84 kPa. Feeds the speed-density
   /// air-mass term so altitude / weather scale the air charge correctly.
   static double? parseBaroPressureKpa(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x33, minBytes: 3);
+    final bytes = parseModeOneBody(raw, 0x33, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2].toDouble();
   }
@@ -193,7 +176,7 @@ class Elm327Parsers {
   /// `stoichAFR × λ`, which the fuel-rate estimator uses in place of the
   /// assumed-stoich AFR when this PID is available.
   static double? parseCommandedEquivalenceRatio(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x44, minBytes: 4);
+    final bytes = parseModeOneBody(raw, 0x44, minBytes: 4);
     if (bytes == null) return null;
     return ((bytes[2] * 256) + bytes[3]) / 32768.0;
   }
@@ -202,7 +185,7 @@ class Elm327Parsers {
   /// Formula: °C = A − 40 (single byte). Response: "41 0F XX". Range
   /// −40 °C to 215 °C covers every drivable condition the sensor sees.
   static double? parseIntakeAirTempCelsius(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x0F, minBytes: 3);
+    final bytes = parseModeOneBody(raw, 0x0F, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2].toDouble() - 40.0;
   }
@@ -213,7 +196,7 @@ class Elm327Parsers {
   /// 215 °C. Used by the cold-start surcharge heuristic to flag trips
   /// whose ECT never reached operating temperature.
   static double? parseCoolantTempCelsius(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x05, minBytes: 3);
+    final bytes = parseModeOneBody(raw, 0x05, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2].toDouble() - 40.0;
   }
@@ -248,14 +231,14 @@ class Elm327Parsers {
   /// Shared fuel-trim decoder used by PIDs 06 / 07 / 08 / 09. Returns
   /// null on NO DATA.
   static double? _parseFuelTrim(String raw, int expectedPid) {
-    final bytes = _parseModeOneBody(raw, expectedPid, minBytes: 3);
+    final bytes = parseModeOneBody(raw, expectedPid, minBytes: 3);
     if (bytes == null) return null;
     return (bytes[2] - 128) * 100.0 / 128.0;
   }
 
   /// Helper for every "1 byte, scaled to percent" PID (04, 11, 2F).
   static double? _parse1BytePercent(String raw, int expectedPid) {
-    final bytes = _parseModeOneBody(raw, expectedPid, minBytes: 3);
+    final bytes = parseModeOneBody(raw, expectedPid, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2] * 100.0 / 255.0;
   }
@@ -283,7 +266,7 @@ class Elm327Parsers {
   /// engines under positive manifold pressure (a clean high-load proxy).
   /// Two-byte response: "41 43 XX YY".
   static double? parseAbsoluteLoad(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x43, minBytes: 4);
+    final bytes = parseModeOneBody(raw, 0x43, minBytes: 4);
     if (bytes == null) return null;
     return ((bytes[2] * 256) + bytes[3]) * 100.0 / 255.0;
   }
@@ -292,7 +275,7 @@ class Elm327Parsers {
   /// Formula: °C = A − 40 (single byte) — same encoding as coolant / IAT.
   /// Response: "41 5C XX".
   static double? parseEngineOilTempCelsius(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x5C, minBytes: 3);
+    final bytes = parseModeOneBody(raw, 0x5C, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2].toDouble() - 40.0;
   }
@@ -300,7 +283,7 @@ class Elm327Parsers {
   /// Parse ambient air temperature from Mode 01 PID 46 response (#2459).
   /// Formula: °C = A − 40 (single byte). Response: "41 46 XX".
   static double? parseAmbientAirTempCelsius(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x46, minBytes: 3);
+    final bytes = parseModeOneBody(raw, 0x46, minBytes: 3);
     if (bytes == null) return null;
     return bytes[2].toDouble() - 40.0;
   }
@@ -321,7 +304,7 @@ class Elm327Parsers {
   /// next range also supported?"; callers use that to decide whether
   /// to query the next `01 {next_group}` command.
   static Set<int>? parseSupportedPidsBitmap(String raw, int groupBase) {
-    final bytes = _parseModeOneBody(raw, groupBase, minBytes: 6);
+    final bytes = parseModeOneBody(raw, groupBase, minBytes: 6);
     if (bytes == null) return null;
     final supported = <int>{};
     // Iterate the four payload bytes, most-significant bit first.
@@ -338,75 +321,18 @@ class Elm327Parsers {
     return supported;
   }
 
-  /// Shared plumbing: clean the response, verify the Mode 01 echo
-  /// + expected PID, and return the byte array — or null when the
-  /// response is missing / malformed.
-  static List<int>? _parseModeOneBody(
-    String raw,
-    int expectedPid, {
-    required int minBytes,
-  }) {
-    final clean = cleanResponse(raw);
-    if (clean == null) return null;
-    final bytes = parseElmHexBytes(clean);
-    if (bytes.length < minBytes) return null;
-    if (bytes[0] != 0x41 || bytes[1] != expectedPid) return null;
-    return bytes;
-  }
-
   /// Parse fuel type from Mode 01 PID 51 response (#1399).
   ///
   /// Single-byte response per SAE-J1979 Table 6 — maps to the project's
-  /// `preferredFuelType` enum strings. The ECU truth wins over offline
-  /// WMI / online vPIC during the VIN-driven adapter-pair auto-population
-  /// flow because PID 0x51 reports what the ECU is actually configured
-  /// for at runtime, not what a reference table thinks the model ships
-  /// with.
-  ///
-  /// Recognised codes:
-  ///   0x01 → 'petrol'  (Gasoline)
-  ///   0x04 → 'diesel'  (Diesel)
-  ///   0x05 → 'lpg'     (Liquefied Petroleum Gas)
-  ///   0x06 → 'cng'     (Compressed Natural Gas)
-  ///   0x08 → 'electric'
-  ///   0x09 → 'petrol'  (Hybrid Gasoline — the combustion side is petrol)
-  ///   0x0A → 'petrol'  (Hybrid Ethanol — close enough, default petrol)
-  ///   0x0B → 'diesel'  (Hybrid Diesel)
-  ///   0x0C → 'electric' (Hybrid Electric — predominantly electric)
-  ///   0x0D → 'petrol'  (Hybrid mixed combustion-only)
-  ///
-  /// Other / reserved / unknown codes return null so the caller falls
-  /// back to other signals.
+  /// `preferredFuelType` enum strings via the shared [fuelTypeCodeToProfileKey]
+  /// (`elm327_decode_util.dart`). The ECU truth wins over offline WMI / online
+  /// vPIC during the VIN-driven adapter-pair auto-population flow because PID
+  /// 0x51 reports what the ECU is actually configured for at runtime, not what
+  /// a reference table thinks the model ships with.
   static String? parseFuelType(String raw) {
-    final bytes = _parseModeOneBody(raw, 0x51, minBytes: 3);
+    final bytes = parseModeOneBody(raw, 0x51, minBytes: 3);
     if (bytes == null) return null;
     return fuelTypeCodeToProfileKey(bytes[2]);
-  }
-
-  /// Map an SAE-J1979 PID 0x51 fuel-type byte to the project's
-  /// `preferredFuelType` enum strings ("petrol", "diesel", ...).
-  /// Visible to tests and to the obd2_service so it can re-use the
-  /// mapping when reading the value through a different path.
-  static String? fuelTypeCodeToProfileKey(int code) {
-    switch (code) {
-      case 0x01:
-      case 0x09: // hybrid gasoline
-      case 0x0A: // hybrid ethanol
-      case 0x0D: // hybrid mixed
-        return 'petrol';
-      case 0x04:
-      case 0x0B: // hybrid diesel
-        return 'diesel';
-      case 0x05:
-        return 'lpg';
-      case 0x06:
-        return 'cng';
-      case 0x08:
-      case 0x0C: // hybrid electric
-        return 'electric';
-      default:
-        return null;
-    }
   }
 
   /// Parse the ASCII VIN from a Mode 09 PID 02 response.
