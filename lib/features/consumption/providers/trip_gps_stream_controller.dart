@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
+import '../../../core/location/recording_location_settings.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../glide_coach/domain/entities/glide_coach_advice.dart';
@@ -50,9 +51,11 @@ class TripGpsStreamController {
   ///
   /// No-op when [Feature.gpsTripPath] is disabled — the user can still
   /// turn it off from Feature management, and the flag-off path never
-  /// touches the Geolocator plugin (zero battery cost). When the flag
-  /// is on we open the stream at [LocationAccuracy.high] because the
-  /// eventual heatmap (Phase 3) wants ~10 m precision.
+  /// touches the Geolocator plugin (zero battery cost). When the flag is on we
+  /// open the SHARED, recording-promoted source (#3249) — the same fine-cadence
+  /// foreground-service stream the GPS-only recorder uses — so OBD2 trips get
+  /// the 1 s Android cadence + iOS background updates, not the bare-settings
+  /// 5 s / background-off defaults.
   ///
   /// #1981 — before opening the stream we ensure foreground location
   /// permission: `getPositionStream` does not prompt, so without a
@@ -78,11 +81,23 @@ class TripGpsStreamController {
           permission != LocationPermission.always) {
         return;
       }
+      // #3249 — route the OBD2-trip GPS through the SHARED, recording-promoted
+      // source, exactly like the GPS-only recorder
+      // (gps_only_recording_pipeline.dart). The previous bare
+      // `getPositionStream(LocationSettings(high))` (a) let geolocator_android
+      // default the interval to 5 s — so OBD2 trips got 5 s GPS even
+      // foregrounded and the #3173 foreground-service un-throttle never
+      // reached them — and (b) mapped to `allowsBackgroundLocationUpdates=NO`
+      // on iOS, so a backgrounded OBD2 trip lost GPS (null lat/lng → polyline
+      // holes). recordingLocationSettingsForRef carries the 1 s Android
+      // cadence + iOS background updates, and `recording: true` makes this
+      // consumer's fine cadence win the shared upstream (the same #2646/#2766
+      // path), so it no longer races the ApproachDetector for the platform
+      // stream.
       _gpsSub = geolocator
-          .getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
+          .sharedPositionStream(
+        recording: true,
+        locationSettings: recordingLocationSettingsForRef(_ref),
       )
           .listen(
         (pos) {
