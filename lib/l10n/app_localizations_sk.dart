@@ -7499,6 +7499,12 @@ class AppLocalizationsSk extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Výsledok radaru čerpacích staníc';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pripnutie udržuje obrazovku zapnutú — vyčerpáva viac batérie';
 

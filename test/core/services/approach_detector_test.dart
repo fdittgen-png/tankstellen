@@ -118,7 +118,7 @@ void main() {
     });
 
     Future<void> setUpDetector({
-      required Future<List<Station>> Function(double, double, double, String)
+      required Future<List<Station>> Function(double, double, double, String, {double? headingDegrees})
           fetch,
       ApproachPriceMode priceMode = ApproachPriceMode.nearest,
     }) async {
@@ -137,7 +137,7 @@ void main() {
     }
 
     test('first GPS emit transitions Idle → Polling', () async {
-      await setUpDetector(fetch: (_, _, _, _) async => []);
+      await setUpDetector(fetch: (_, _, _, _, {headingDegrees}) async => []);
       gps.add(_pos(48.0, 2.0, speedMps: 25));
       await Future<void>.delayed(Duration.zero);
       expect(emitted, isNotEmpty);
@@ -146,7 +146,7 @@ void main() {
 
     test('nearest mode locks onto the first station crossed', () async {
       var callCount = 0;
-      Future<List<Station>> fetch(double lat, double lng, double r, String _) async {
+      Future<List<Station>> fetch(double lat, double lng, double r, String _, {double? headingDegrees}) async {
         callCount++;
         return [
           _station(id: 'A', lat: lat, lng: lng), // exactly on us — 0 m
@@ -180,7 +180,7 @@ void main() {
       final gps = StreamController<Position>.broadcast();
       final det = ApproachDetector(
         gpsStream: gps.stream,
-        fetchStations: (_, _, _, _) async => const <Station>[],
+        fetchStations: (_, _, _, _, {headingDegrees}) async => const <Station>[],
         config: const ApproachDetectorConfig(
           radiusMeters: 1000,
           priceMode: ApproachPriceMode.nearest,
@@ -236,7 +236,7 @@ void main() {
         final gps = StreamController<Position>.broadcast();
         final det = ApproachDetector(
           gpsStream: gps.stream,
-          fetchStations: (_, _, _, _) async => stations,
+          fetchStations: (_, _, _, _, {headingDegrees}) async => stations,
           config: const ApproachDetectorConfig(
             radiusMeters: 1000,
             priceMode: ApproachPriceMode.cheapestInRadius,
@@ -286,7 +286,7 @@ void main() {
         final gps = StreamController<Position>.broadcast();
         final det = ApproachDetector(
           gpsStream: gps.stream,
-          fetchStations: (_, _, _, _) async => stations,
+          fetchStations: (_, _, _, _, {headingDegrees}) async => stations,
           config: const ApproachDetectorConfig(
             radiusMeters: 1000,
             priceMode: ApproachPriceMode.nearest,
@@ -324,7 +324,7 @@ void main() {
         final gps = StreamController<Position>.broadcast();
         final det = ApproachDetector(
           gpsStream: gps.stream,
-          fetchStations: (_, _, _, _) async => stations,
+          fetchStations: (_, _, _, _, {headingDegrees}) async => stations,
           config: const ApproachDetectorConfig(
             radiusMeters: 1000,
             priceMode: ApproachPriceMode.nearest,
@@ -367,7 +367,7 @@ void main() {
         final gps = StreamController<Position>.broadcast();
         final det = ApproachDetector(
           gpsStream: gps.stream,
-          fetchStations: (_, _, _, _) async {
+          fetchStations: (_, _, _, _, {headingDegrees}) async {
             fetchCount++;
             return [station];
           },

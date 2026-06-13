@@ -4782,5 +4782,15 @@
         "example": "Oil change"
       }
     }
+  },
+  "radarAcquiringLocation": "Finding your location…",
+  "@radarAcquiringLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radarUpdatingLocation": "Updating your location…",
+  "@radarUpdatingLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

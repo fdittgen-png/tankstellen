@@ -7512,6 +7512,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Risultato radar stazioni di servizio';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fissare mantiene lo schermo acceso — consuma più batteria';
 

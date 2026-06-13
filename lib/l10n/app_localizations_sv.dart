@@ -7466,6 +7466,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Bensinmack-radarresultat';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Nålning håller skärmen på – förbrukar mer batteri';
 

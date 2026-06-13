@@ -7471,6 +7471,12 @@ class AppLocalizationsFi extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Asematutkan tulos';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Kiinnittäminen pitää näytön päällä — kuluttaa enemmän akkua';
 

@@ -7516,6 +7516,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Töltőállomás-radar eredménye';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'A rögzítés bekapcsolva tartja a képernyőt — több akkumulátort használ';
 

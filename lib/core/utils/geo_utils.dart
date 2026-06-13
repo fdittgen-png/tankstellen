@@ -77,6 +77,20 @@ double distanceMeters(double lat1, double lng1, double lat2, double lng2) {
   return earthRadiusMeters * 2 * atan2(sqrt(a), sqrt(1 - a));
 }
 
+/// A GPS heading sanitized for the corridor tile-ahead prefetch (#3256).
+///
+/// `geolocator` reports `Position.heading` as degrees clockwise from true
+/// north, but emits a sentinel (a negative value or `NaN`) when the device
+/// can't resolve a course — typically at a standstill, or on the very first
+/// fix. The corridor cache prefetches the tile ahead ONLY when handed a
+/// non-null heading, so a sentinel must map to `null` (skip the prefetch)
+/// rather than a bogus due-north/southward bearing that prefetches the wrong
+/// neighbouring tile. A valid value is normalised into `[0, 360)`.
+double? sanitizedHeading(double? heading) {
+  if (heading == null || !heading.isFinite || heading < 0) return null;
+  return heading % 360;
+}
+
 /// Computes how far along a polyline a given point is (in km from start).
 ///
 /// Walks the polyline segments, accumulating distance. Returns the cumulative

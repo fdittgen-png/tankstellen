@@ -7549,6 +7549,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Résultat du radar de stations-service';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'L\'épinglage garde l\'écran allumé — consomme plus de batterie';
 

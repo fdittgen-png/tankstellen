@@ -90,8 +90,9 @@ class ApproachDetector {
     double lat,
     double lng,
     double radiusKm,
-    String fuelType,
-  ) _fetchStations;
+    String fuelType, {
+    double? headingDegrees,
+  }) _fetchStations;
   final ApproachDetectorConfig _config;
   final StreamController<ApproachState> _out =
       StreamController<ApproachState>.broadcast();
@@ -111,8 +112,9 @@ class ApproachDetector {
       double lat,
       double lng,
       double radiusKm,
-      String fuelType,
-    ) fetchStations,
+      String fuelType, {
+      double? headingDegrees,
+    }) fetchStations,
     required ApproachDetectorConfig config,
   })  : _gps = gpsStream,
         _fetchStations = fetchStations,
@@ -244,6 +246,10 @@ class ApproachDetector {
         gps.longitude,
         _config.radiusMeters / 1000.0,
         _config.fuelTypeApiValue,
+        // #3256 — thread the live heading so the corridor cache prefetches the
+        // tile ahead before the driver crosses into it (a standstill/first-fix
+        // sentinel maps to null = no prefetch).
+        headingDegrees: geo.sanitizedHeading(gps.heading),
       );
       final inRadius = stations
           .map((s) => (

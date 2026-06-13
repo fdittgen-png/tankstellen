@@ -7464,6 +7464,12 @@ class AppLocalizationsEt extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Tankla radari tulemus';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Kinnitamine hoiab ekraani peal — kasutab rohkem akut';
 

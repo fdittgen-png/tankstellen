@@ -7470,6 +7470,12 @@ class AppLocalizationsDa extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Tankstationsradar-resultat';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fastgørelse holder skærmen tændt — bruger mere batteri';
 

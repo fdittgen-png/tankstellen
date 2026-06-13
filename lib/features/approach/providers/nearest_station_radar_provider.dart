@@ -1,15 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:collection/collection.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/domain/station.dart';
 import '../../../core/services/approach_detector.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
-import '../../../core/utils/station_extensions.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
-import '../../../core/domain/station.dart';
+import '../../../core/services/radar/radar_ranking.dart';
 import 'effective_approach_state_provider.dart';
 import 'fuel_station_radar_provider.dart';
 
@@ -75,36 +74,21 @@ Future<Station?> nearestStationRadar(Ref ref) async {
       gps.longitude,
       profile.approachRadiusKm,
       fuel.apiValue,
+      // #3256 — thread the live heading so the corridor cache prefetches the
+      // tile ahead; a standstill/first-fix sentinel maps to null (no prefetch).
+      headingDegrees: geo.sanitizedHeading(gps.heading),
     );
-    // The corridor set is cached in fetch order, not distance order — sort
-    // by distance from the live fix, then surface the nearest station that
-    // actually carries a price for the effective fuel (a non-null, positive
-    // [priceFor]) so the card never shows a `--` price the driver can't
-    // compare (#2583). `null` when none in range is priced.
-    final sorted = stations.toList(growable: false)
-      ..sort((a, b) => geo
-          .distanceMeters(gps.latitude, gps.longitude, a.lat, a.lng)
-          .compareTo(
-            geo.distanceMeters(gps.latitude, gps.longitude, b.lat, b.lng),
-          ));
-    final nearest = sorted.firstWhereOrNull((s) {
-      final price = s.priceFor(fuel);
-      return price != null && price > 0;
-    });
-    if (nearest == null) return null;
-    // #2808 — re-stamp the LIVE distance (km) from the current fix. The
-    // corridor station carries a `dist` frozen at the corridor-fetch centre
-    // (stamped once at parse time), so without this the PiP proximity bar +
-    // distance caption never move as the driver approaches. Mirrors the
-    // on-search radar (radar_search_provider.dart).
-    final distKm = geo.distanceMeters(
-          gps.latitude,
-          gps.longitude,
-          nearest.lat,
-          nearest.lng,
-        ) /
-        1000.0;
-    return nearest.copyWith(dist: distKm);
+    // #3267 — the single distance-ranking authority: dedup, drop forecourts
+    // unpriced for the effective fuel (#2583), re-stamp the LIVE distance off
+    // the current fix (#2808 — the corridor `dist` is frozen at fetch time so
+    // without this the PiP bar + caption never move) and return the nearest.
+    // `null` when nothing in range is priced.
+    return RadarRanking.nearestPriced(
+      stations,
+      lat: gps.latitude,
+      lng: gps.longitude,
+      fuel: fuel,
+    );
   } on Object {
     // Radar / chain failure — treat as "no station nearby". The provider
     // re-runs on the next approach-state tick.

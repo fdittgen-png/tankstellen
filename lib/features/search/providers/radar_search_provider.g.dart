@@ -8,57 +8,93 @@ part of 'radar_search_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// The on-search Fuel Station Radar (#2659).
+/// The on-search Fuel Station Radar (#2659 / #3267).
 ///
-/// A one-shot radar fetch around the user's CURRENT position
-/// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
-/// the trip-only shared GPS stream), surfaced in the search results list like
-/// a regular search. It reuses the #2661 radar data layer
-/// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
-/// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
-/// in-radius fetch so the result is always a superset of the regular search
-/// (#2806).
+/// A **live** radar around the user's current position, surfaced in the search
+/// results list like a regular search. Unlike its one-shot predecessor, it
+/// subscribes to a foreground GPS stream ([radarSearchLocationSettings]) while
+/// active and re-stamps each station's distance on every fix, so the distance
+/// captions + the closeness bars tick down as the driver approaches — the SAME
+/// live-distance behaviour the trip radar gets from the approach detector. The
+/// distance/dedup/fuel-filter/sort is the shared [RadarRanking] authority, so
+/// both surfaces rank identically (#3267).
 ///
-/// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
-/// approach detector: those only fire while a trip records (gated on
-/// `ApproachPolling`). This provider runs on demand from the search screen, with
-/// no geofence polling and no second `ApproachDetector` / `PipController`.
+/// It reuses the #2661 radar data layer ([fuelStationRadarProvider]) — the
+/// tier-1 corridor location cache (1 h) + tier-3 JIT price cache (5 min) — for
+/// the wide net, and merges a direct in-radius fetch so the result is always a
+/// superset of the regular search (#2806). That in-radius merge runs through
+/// the shared, movement+time-gated [radarInRadiusCacheProvider] (#3254), so a
+/// moving user re-queries the chain at most once per the provider's
+/// `minInterval` instead of once per fix; between fetches the distance still
+/// updates live off the cached set with **zero** network.
+///
+/// ### Fast, non-blocking init (#3267)
+///
+/// On [runRadar] the radar paints immediately from the persisted last-known
+/// position (corridor-only, [locating] = true) so the user never stares at a
+/// blank screen through the cold GPS fix, then re-scans authoritatively once
+/// the fresh fix lands. The GPS subscription and the corridor fetch progress
+/// concurrently rather than strictly serially.
 
 @ProviderFor(RadarSearch)
 final radarSearchProvider = RadarSearchProvider._();
 
-/// The on-search Fuel Station Radar (#2659).
+/// The on-search Fuel Station Radar (#2659 / #3267).
 ///
-/// A one-shot radar fetch around the user's CURRENT position
-/// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
-/// the trip-only shared GPS stream), surfaced in the search results list like
-/// a regular search. It reuses the #2661 radar data layer
-/// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
-/// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
-/// in-radius fetch so the result is always a superset of the regular search
-/// (#2806).
+/// A **live** radar around the user's current position, surfaced in the search
+/// results list like a regular search. Unlike its one-shot predecessor, it
+/// subscribes to a foreground GPS stream ([radarSearchLocationSettings]) while
+/// active and re-stamps each station's distance on every fix, so the distance
+/// captions + the closeness bars tick down as the driver approaches — the SAME
+/// live-distance behaviour the trip radar gets from the approach detector. The
+/// distance/dedup/fuel-filter/sort is the shared [RadarRanking] authority, so
+/// both surfaces rank identically (#3267).
 ///
-/// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
-/// approach detector: those only fire while a trip records (gated on
-/// `ApproachPolling`). This provider runs on demand from the search screen, with
-/// no geofence polling and no second `ApproachDetector` / `PipController`.
+/// It reuses the #2661 radar data layer ([fuelStationRadarProvider]) — the
+/// tier-1 corridor location cache (1 h) + tier-3 JIT price cache (5 min) — for
+/// the wide net, and merges a direct in-radius fetch so the result is always a
+/// superset of the regular search (#2806). That in-radius merge runs through
+/// the shared, movement+time-gated [radarInRadiusCacheProvider] (#3254), so a
+/// moving user re-queries the chain at most once per the provider's
+/// `minInterval` instead of once per fix; between fetches the distance still
+/// updates live off the cached set with **zero** network.
+///
+/// ### Fast, non-blocking init (#3267)
+///
+/// On [runRadar] the radar paints immediately from the persisted last-known
+/// position (corridor-only, [locating] = true) so the user never stares at a
+/// blank screen through the cold GPS fix, then re-scans authoritatively once
+/// the fresh fix lands. The GPS subscription and the corridor fetch progress
+/// concurrently rather than strictly serially.
 final class RadarSearchProvider
     extends $NotifierProvider<RadarSearch, RadarSearchState> {
-  /// The on-search Fuel Station Radar (#2659).
+  /// The on-search Fuel Station Radar (#2659 / #3267).
   ///
-  /// A one-shot radar fetch around the user's CURRENT position
-  /// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
-  /// the trip-only shared GPS stream), surfaced in the search results list like
-  /// a regular search. It reuses the #2661 radar data layer
-  /// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
-  /// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
-  /// in-radius fetch so the result is always a superset of the regular search
-  /// (#2806).
+  /// A **live** radar around the user's current position, surfaced in the search
+  /// results list like a regular search. Unlike its one-shot predecessor, it
+  /// subscribes to a foreground GPS stream ([radarSearchLocationSettings]) while
+  /// active and re-stamps each station's distance on every fix, so the distance
+  /// captions + the closeness bars tick down as the driver approaches — the SAME
+  /// live-distance behaviour the trip radar gets from the approach detector. The
+  /// distance/dedup/fuel-filter/sort is the shared [RadarRanking] authority, so
+  /// both surfaces rank identically (#3267).
   ///
-  /// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
-  /// approach detector: those only fire while a trip records (gated on
-  /// `ApproachPolling`). This provider runs on demand from the search screen, with
-  /// no geofence polling and no second `ApproachDetector` / `PipController`.
+  /// It reuses the #2661 radar data layer ([fuelStationRadarProvider]) — the
+  /// tier-1 corridor location cache (1 h) + tier-3 JIT price cache (5 min) — for
+  /// the wide net, and merges a direct in-radius fetch so the result is always a
+  /// superset of the regular search (#2806). That in-radius merge runs through
+  /// the shared, movement+time-gated [radarInRadiusCacheProvider] (#3254), so a
+  /// moving user re-queries the chain at most once per the provider's
+  /// `minInterval` instead of once per fix; between fetches the distance still
+  /// updates live off the cached set with **zero** network.
+  ///
+  /// ### Fast, non-blocking init (#3267)
+  ///
+  /// On [runRadar] the radar paints immediately from the persisted last-known
+  /// position (corridor-only, [locating] = true) so the user never stares at a
+  /// blank screen through the cold GPS fix, then re-scans authoritatively once
+  /// the fresh fix lands. The GPS subscription and the corridor fetch progress
+  /// concurrently rather than strictly serially.
   RadarSearchProvider._()
     : super(
         from: null,
@@ -86,23 +122,35 @@ final class RadarSearchProvider
   }
 }
 
-String _$radarSearchHash() => r'f6256739953e784dee6b94ea5f0b55f8ce6592c9';
+String _$radarSearchHash() => r'55f444f30916d2a36f7c4691ec522b8b568a7f59';
 
-/// The on-search Fuel Station Radar (#2659).
+/// The on-search Fuel Station Radar (#2659 / #3267).
 ///
-/// A one-shot radar fetch around the user's CURRENT position
-/// ([userPositionProvider], refreshed from live GPS on each run — #2806 — NOT
-/// the trip-only shared GPS stream), surfaced in the search results list like
-/// a regular search. It reuses the #2661 radar data layer
-/// ([fuelStationRadarProvider]) — the tier-1 corridor location cache (1 h) +
-/// tier-3 JIT price cache (5 min) — for the wide net, and merges a direct
-/// in-radius fetch so the result is always a superset of the regular search
-/// (#2806).
+/// A **live** radar around the user's current position, surfaced in the search
+/// results list like a regular search. Unlike its one-shot predecessor, it
+/// subscribes to a foreground GPS stream ([radarSearchLocationSettings]) while
+/// active and re-stamps each station's distance on every fix, so the distance
+/// captions + the closeness bars tick down as the driver approaches — the SAME
+/// live-distance behaviour the trip radar gets from the approach detector. The
+/// distance/dedup/fuel-filter/sort is the shared [RadarRanking] authority, so
+/// both surfaces rank identically (#3267).
 ///
-/// Deliberately distinct from the trip-gated `nearestStationRadarProvider` /
-/// approach detector: those only fire while a trip records (gated on
-/// `ApproachPolling`). This provider runs on demand from the search screen, with
-/// no geofence polling and no second `ApproachDetector` / `PipController`.
+/// It reuses the #2661 radar data layer ([fuelStationRadarProvider]) — the
+/// tier-1 corridor location cache (1 h) + tier-3 JIT price cache (5 min) — for
+/// the wide net, and merges a direct in-radius fetch so the result is always a
+/// superset of the regular search (#2806). That in-radius merge runs through
+/// the shared, movement+time-gated [radarInRadiusCacheProvider] (#3254), so a
+/// moving user re-queries the chain at most once per the provider's
+/// `minInterval` instead of once per fix; between fetches the distance still
+/// updates live off the cached set with **zero** network.
+///
+/// ### Fast, non-blocking init (#3267)
+///
+/// On [runRadar] the radar paints immediately from the persisted last-known
+/// position (corridor-only, [locating] = true) so the user never stares at a
+/// blank screen through the cold GPS fix, then re-scans authoritatively once
+/// the fresh fix lands. The GPS subscription and the corridor fetch progress
+/// concurrently rather than strictly serially.
 
 abstract class _$RadarSearch extends $Notifier<RadarSearchState> {
   RadarSearchState build();
@@ -123,19 +171,28 @@ abstract class _$RadarSearch extends $Notifier<RadarSearchState> {
 }
 
 /// The nearest priced radar station, or null. Feeds the small-window PiP tile
-/// (#2677) the same way `nearestStationRadarProvider` feeds the trip PiP.
+/// (#2677) the same way `nearestStationRadarProvider` feeds the trip PiP. Now
+/// carries the LIVE distance (the list it reads is re-stamped on every GPS
+/// fix), so the tile's distance + closeness bar move as the user approaches —
+/// fixing the frozen-snapshot distance #3255 flagged.
 
 @ProviderFor(radarSearchNearest)
 final radarSearchNearestProvider = RadarSearchNearestProvider._();
 
 /// The nearest priced radar station, or null. Feeds the small-window PiP tile
-/// (#2677) the same way `nearestStationRadarProvider` feeds the trip PiP.
+/// (#2677) the same way `nearestStationRadarProvider` feeds the trip PiP. Now
+/// carries the LIVE distance (the list it reads is re-stamped on every GPS
+/// fix), so the tile's distance + closeness bar move as the user approaches —
+/// fixing the frozen-snapshot distance #3255 flagged.
 
 final class RadarSearchNearestProvider
     extends $FunctionalProvider<Station?, Station?, Station?>
     with $Provider<Station?> {
   /// The nearest priced radar station, or null. Feeds the small-window PiP tile
-  /// (#2677) the same way `nearestStationRadarProvider` feeds the trip PiP.
+  /// (#2677) the same way `nearestStationRadarProvider` feeds the trip PiP. Now
+  /// carries the LIVE distance (the list it reads is re-stamped on every GPS
+  /// fix), so the tile's distance + closeness bar move as the user approaches —
+  /// fixing the frozen-snapshot distance #3255 flagged.
   RadarSearchNearestProvider._()
     : super(
         from: null,

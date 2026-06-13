@@ -7535,6 +7535,12 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αποτέλεσμα Ραντάρ Πρατηρίου Καυσίμων';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Η καρφίτσωση κρατά την οθόνη αναμμένη — χρησιμοποιεί περισσότερη μπαταρία';
 
