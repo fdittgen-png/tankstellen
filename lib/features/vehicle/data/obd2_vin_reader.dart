@@ -28,8 +28,9 @@ class ObdVinResult {
 
 /// Why an [Obd2VinReader.read] call failed (#1162).
 enum ObdVinFailureReason {
-  /// ELM responded with `NO DATA` / `?` / empty — the ECU does not
-  /// implement Mode 09 PID 02. Most pre-2005 vehicles fall here.
+  /// ELM responded with `NO DATA` / `?` / empty — the ECU implements
+  /// neither the J1979 Mode 09 PID 02 nor the UDS `22 F1 90` VIN service
+  /// (#3278). Most pre-2005 vehicles fall here.
   unsupported,
 
   /// Bytes came back but [Elm327Protocol.parseVin] could not decode a
@@ -84,17 +85,47 @@ class Obd2VinReader {
   /// [ErrorLayer.background] so issues are diagnosable; never throws
   /// to the caller.
   Future<ObdVinResult> read() async {
+    // J1979 Mode 09 PID 02 first.
+    final primary = await _attempt(
+      Elm327Protocol.vinCommand,
+      Elm327Protocol.parseVin,
+    );
+    if (primary.isSuccess) return primary;
+
+    // #3278 — UDS 22 F1 90 (ISO 14229) fallback. Many European ECUs (e.g.
+    // Fiat) don't implement the standard Mode 09 VIN service but answer the
+    // UDS DID. Only fall back when the ECU actually ANSWERED no/odd VIN
+    // (unsupported / malformed) — a timeout or io means the link itself is
+    // unhealthy, so a second command would just pile onto a bad connection.
+    if (primary.failure == ObdVinFailureReason.unsupported ||
+        primary.failure == ObdVinFailureReason.malformed) {
+      final fallback = await _attempt(
+        Elm327Protocol.vinCommandUds,
+        Elm327Protocol.parseVinUds,
+      );
+      if (fallback.isSuccess) return fallback;
+    }
+
+    // Neither path resolved a VIN — surface the primary (Mode 09) reason,
+    // the more informative classification for the UI.
+    return primary;
+  }
+
+  /// Send one VIN [command] and decode it with [parse]. Never throws — every
+  /// error path returns a typed [ObdVinResult.failure].
+  Future<ObdVinResult> _attempt(
+    String command,
+    String? Function(String raw) parse,
+  ) async {
     try {
-      final raw = await service
-          .sendCommand(Elm327Protocol.vinCommand)
-          .timeout(timeout);
-      final parsed = Elm327Protocol.parseVin(raw);
+      final raw = await service.sendCommand(command).timeout(timeout);
+      final parsed = parse(raw);
       if (parsed != null && parsed.isNotEmpty) {
         return ObdVinResult.success(parsed);
       }
-      // parseVin returns null on NO DATA / ? / empty cleaned response
-      // and on bytes-but-fewer-than-17-printable-chars. Distinguish:
-      //   - empty / NO DATA / ? → unsupported (pre-2005 ECU)
+      // parse() returns null on NO DATA / ? / empty cleaned response and on
+      // bytes-but-fewer-than-17-printable-chars. Distinguish:
+      //   - empty / NO DATA / ? → unsupported (ECU lacks this VIN service)
       //   - anything else → malformed (frame corruption)
       if (_looksUnsupported(raw)) {
         return const ObdVinResult.failure(ObdVinFailureReason.unsupported);
@@ -105,7 +136,7 @@ class Obd2VinReader {
         ErrorLayer.background,
         e,
         st,
-        context: const {'op': 'obd2VinReader.read', 'reason': 'timeout'},
+        context: {'op': 'obd2VinReader.read', 'reason': 'timeout', 'cmd': command},
       );
       return const ObdVinResult.failure(ObdVinFailureReason.timeout);
     } catch (e, st) {
@@ -113,7 +144,7 @@ class Obd2VinReader {
         ErrorLayer.background,
         e,
         st,
-        context: const {'op': 'obd2VinReader.read', 'reason': 'io'},
+        context: {'op': 'obd2VinReader.read', 'reason': 'io', 'cmd': command},
       );
       return const ObdVinResult.failure(ObdVinFailureReason.io);
     }

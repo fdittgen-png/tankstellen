@@ -26,6 +26,7 @@ library;
 
 import 'elm327_commands.dart';
 import 'elm327_parsers.dart';
+import 'elm327_vin_parser.dart';
 
 export 'elm327_commands.dart';
 export 'elm327_parsers.dart';
@@ -94,6 +95,7 @@ class Elm327Protocol {
   static const ambientAirTempCommand = Elm327Commands.ambientAirTempCommand;
   static const fuelTypeCommand = Elm327Commands.fuelTypeCommand;
   static const vinCommand = Elm327Commands.vinCommand;
+  static const vinCommandUds = Elm327Commands.vinCommandUds;
   static const mfgOdometerCatalog = Elm327Commands.mfgOdometerCatalog;
 
   // ---------------------------------------------------------------------------
@@ -213,6 +215,9 @@ class Elm327Protocol {
       );
 
   static String? parseVin(String raw) => Elm327Parsers.parseVin(raw);
+  // Routed straight to the VIN parser (not via Elm327Parsers) to keep the
+  // line-capped parser file unchanged — #3279.
+  static String? parseVinUds(String raw) => Elm327VinParser.parseUds(raw);
 
   static String? parseFuelType(String raw) =>
       Elm327Parsers.parseFuelType(raw);

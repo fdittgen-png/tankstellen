@@ -63,4 +63,33 @@ void main() {
       );
     });
   });
+
+  group('Elm327VinParser.parseUds (22 F1 90)', () {
+    test('decodes the VIN after the 62 F1 90 echo (#3278)', () {
+      // ISO 14229 ReadDataByIdentifier response: `62 F1 90 <17 ASCII>`.
+      const vin = 'ZFA31200003456789'; // Fiat-style, 17 chars, no I/O/Q
+      expect(Elm327VinParser.parseUds('62 F1 90 ${hex(vin)}>'), vin);
+    });
+
+    test('decodes a multi-frame UDS response with trailing padding', () {
+      const vin = 'ZFA31200003456789';
+      const response = '014\r\n0: 62 F1 90 5A 46 41\r\n'
+          '1: 33 31 32 30 30 30 30\r\n'
+          '2: 33 34 35 36 37 38 39\r\n'
+          '3: 00 00 00 00 00 00 00\r\n>';
+      expect(Elm327VinParser.parseUds(response), vin);
+    });
+
+    test('returns null on NO DATA (ECU lacks the UDS DID too)', () {
+      expect(Elm327VinParser.parseUds('NO DATA\r\n>'), isNull);
+    });
+
+    test('a Mode 09 (49 02) response is NOT matched by the UDS echo', () {
+      // Guards the anchor: the UDS parser must not accidentally decode a
+      // Mode 09 reply (no 62 F1 90 echo) — it scans from 0 and would need 17
+      // VIN chars; here the 49 02 echo bytes are non-VIN so it still works,
+      // but a too-short one returns null.
+      expect(Elm327VinParser.parseUds('62 F1 90 41 42 43>'), isNull);
+    });
+  });
 }
