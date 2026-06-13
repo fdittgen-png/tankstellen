@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-import 'dart:math' as math;
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -12,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../data/sparkilo_tile_layer.dart';
 import '../../../../core/utils/price_utils.dart';
+import 'station_map_geometry.dart';
 import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
@@ -23,10 +22,6 @@ import 'station_marker.dart';
 /// Camera zoom bounds (#1457). Top end matches the OSM tile cap so a
 /// `move(camera.zoom + 1)` past the cap doesn't park the user on a
 /// grey viewport with no tiles to draw. Bottom end is conservative —
-/// flutter_map wraps the world at zoom 0, but anything below ~3 puts
-/// every pin in a single pixel which is unhelpful UX.
-const double _kMinZoom = 3.0;
-const double _kMaxZoom = 19.0;
 
 /// Shared map widget containing all layers: tiles, search radius circle,
 /// center marker, station markers with clustering, attribution, zoom
@@ -183,139 +178,6 @@ class StationMapLayers extends StatefulWidget {
   @override
   State<StationMapLayers> createState() => _StationMapLayersState();
 
-  /// Camera zoom bounds for the +/− button handlers + the [MapOptions]
-  /// camera constraints. Aligned with the OSM tile cap (`maxNativeZoom: 19`)
-  /// so a programmatic zoom-in past the cap doesn't park the camera at
-  /// a level with no tiles to render. The min is conservative — flutter_map
-  /// itself wraps the world at zoom 0, but anything below ~3 puts every
-  /// pin in a single pixel, which is unhelpful UX. Per #1457.
-  @visibleForTesting
-  static const double minZoom = _kMinZoom;
-  @visibleForTesting
-  static const double maxZoom = _kMaxZoom;
-
-  /// Calculate zoom level from search radius.
-  static double zoomForRadius(double radiusKm) {
-    if (radiusKm <= 5) return 13;
-    if (radiusKm <= 10) return 12;
-    if (radiusKm <= 15) return 11;
-    if (radiusKm <= 25) return 10;
-    return 9;
-  }
-
-  /// Compute the [LatLngBounds] of a circle of [radiusKm] around [center].
-  ///
-  /// Uses a flat-earth approximation that is accurate enough for the
-  /// search radii we deal with (< 100 km). 1 degree latitude is ~111 km;
-  /// the longitude degree shrinks with the cosine of the latitude.
-  static LatLngBounds boundsForRadius(LatLng center, double radiusKm) {
-    const double kmPerLatDegree = 111.0;
-    final double latDelta = radiusKm / kmPerLatDegree;
-    final double cosLat = math.cos(center.latitude * math.pi / 180.0).abs();
-    // Guard against the poles where cos(lat) approaches zero.
-    final double safeCos = cosLat < 0.01 ? 0.01 : cosLat;
-    final double lngDelta = radiusKm / (kmPerLatDegree * safeCos);
-    final double south = (center.latitude - latDelta).clamp(-90.0, 90.0);
-    final double north = (center.latitude + latDelta).clamp(-90.0, 90.0);
-    final double west = (center.longitude - lngDelta).clamp(-180.0, 180.0);
-    final double east = (center.longitude + lngDelta).clamp(-180.0, 180.0);
-    return LatLngBounds(
-      LatLng(south, west),
-      LatLng(north, east),
-    );
-  }
-
-  /// Calculate center point from a list of stations.
-  static LatLng centerOf(List<Station> stations) {
-    double sumLat = 0, sumLng = 0;
-    for (final s in stations) {
-      sumLat += s.lat;
-      sumLng += s.lng;
-    }
-    return LatLng(sumLat / stations.length, sumLng / stations.length);
-  }
-
-  /// Order [stations] so that, when their markers are handed to the
-  /// marker layer, the CHEAPEST (green/günstig) marker is painted ON
-  /// TOP of any more-expensive (orange/red) markers it overlaps (#2434).
-  ///
-  /// flutter_map paints markers in the order of the source list — a marker
-  /// LATER in the list is painted on top of earlier ones. So the rule is:
-  ///   - sort by the SELECTED-fuel price (`station.priceFor(selectedFuel)`)
-  ///     — the SAME price the marker is COLOURED by and the SAME strict
-  ///     resolution the search list uses (#2510, reverting the #2400
-  ///     fallback chain) — DESCENDING: most expensive first (painted at
-  ///     the bottom), cheapest last (painted on top), so colour and
-  ///     stacking always agree;
-  ///   - markers with NO selected-fuel price (the grey "--" bubble) sort
-  ///     to the very FRONT (the bottom of the stack) so a price-less
-  ///     marker can never cover a real green one.
-  ///
-  /// Returns a NEW list; the input is not mutated. A stable sort keeps the
-  /// relative order of equal-priced stations.
-  static List<Station> orderedByPriceForPainting(
-    List<Station> stations,
-    FuelType selectedFuel, {
-    FuelType Function(Station)? fuelResolver,
-  }) {
-    // A null selected-fuel price is treated as the most-expensive bucket
-    // (+infinity) so, under a descending sort, it lands first → painted
-    // at the very bottom, beneath every priced marker. #2631 — when a
-    // cross-border resolver is set, the key is each station's OWN country
-    // fuel price so the cheapest ES (E10) marker still paints on top.
-    double sortKey(Station s) =>
-        priceForFuelType(s, fuelResolver != null ? fuelResolver(s) : selectedFuel) ??
-        double.infinity;
-    final ordered = List<Station>.of(stations);
-    // Descending: highest price first (bottom), lowest last (top).
-    mergeSort<Station>(ordered,
-        compare: (a, b) => sortKey(b).compareTo(sortKey(a)));
-    return ordered;
-  }
-
-  /// How many top-ranked stations keep their full price label; the rest
-  /// render as compact price-band dots (#2510). Small enough that the
-  /// emphasized bubbles stay legible at the search zoom, large enough to
-  /// surface the handful of stations a driver actually compares.
-  @visibleForTesting
-  static const int emphasisCount = 4;
-
-  /// At or above this many stations a NON-[clusterAlways] map falls back to
-  /// count-clustering (#2510): a bounded nearby search stays well under this,
-  /// only a genuinely huge / zoomed-far set collapses into tappable clusters.
-  @visibleForTesting
-  static const int clusterThreshold = 80;
-
-  /// Rank [stations] for marker EMPHASIS per the active [sortMode] (#2510):
-  /// the cheapest stations first for a price-oriented sort, the closest
-  /// first otherwise. The first [StationMapLayers.emphasisCount] entries
-  /// get the full price bubble; the rest become compact dots. Stations
-  /// without a comparable value sort last so they never steal emphasis
-  /// from a station that has a real price/distance.
-  ///
-  /// Returns a NEW list; the input is not mutated. Stable for ties.
-  static List<Station> rankForEmphasis(
-    List<Station> stations,
-    FuelType selectedFuel,
-    SortMode sortMode,
-  ) {
-    final ranked = List<Station>.of(stations);
-    final byPrice =
-        sortMode == SortMode.price || sortMode == SortMode.priceDistance;
-    int compare(Station a, Station b) {
-      if (byPrice) {
-        // Cheapest first; price-less stations sort last (sentinel handled
-        // inside compareByPrice).
-        return compareByPrice(a, b, selectedFuel);
-      }
-      // Closest first for distance / 24h / rating / name sorts — distance
-      // is the universally available, savings-relevant tie-breaker.
-      return a.dist.compareTo(b.dist);
-    }
-
-    mergeSort<Station>(ranked, compare: compare);
-    return ranked;
-  }
 }
 
 class _StationMapLayersState extends State<StationMapLayers> {
@@ -360,7 +222,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
   /// pre-#2755 behaviour.
   LatLngBounds get _fitBounds =>
       widget.cameraFitBounds ??
-      StationMapLayers.boundsForRadius(widget.center, widget.searchRadiusKm);
+      StationMapGeometry.boundsForRadius(widget.center, widget.searchRadiusKm);
 
   /// Recompute the memoised price range + marker list from the current
   /// widget inputs.
@@ -383,18 +245,19 @@ class _StationMapLayersState extends State<StationMapLayers> {
     // bubble; the rest render as compact price-band dots so a bounded
     // result set stays fully visible without the bubbles overlapping into
     // an illegible pile. The set is small, so a Set lookup is cheap.
-    final emphasized = StationMapLayers.rankForEmphasis(
+    final emphasized = StationMapGeometry.rankForEmphasis(
       widget.stations,
       widget.selectedFuel,
-      widget.sortMode,
-    ).take(StationMapLayers.emphasisCount).map((s) => s.id).toSet();
+      byPrice: widget.sortMode == SortMode.price ||
+          widget.sortMode == SortMode.priceDistance,
+    ).take(StationMapGeometry.emphasisCount).map((s) => s.id).toSet();
 
     // #2434 — order so the cheapest (green) marker paints ON TOP of the
     // more-expensive ones it overlaps. The marker layer paints in
     // source-list order (later = on top), so we sort price-descending:
     // expensive at the bottom, cheapest last/on top, price-less markers
     // beneath everything. Same price the marker is coloured by.
-    final ordered = StationMapLayers.orderedByPriceForPainting(
+    final ordered = StationMapGeometry.orderedByPriceForPainting(
       widget.stations,
       widget.selectedFuel,
       fuelResolver: resolver,
@@ -535,8 +398,8 @@ class _StationMapLayersState extends State<StationMapLayers> {
             // past where there are tiles to draw, which looks broken to
             // the user. Min clamp guards against accidental zoom-out
             // beyond the world wrap.
-            minZoom: _kMinZoom,
-            maxZoom: _kMaxZoom,
+            minZoom: StationMapGeometry.minZoom,
+            maxZoom: StationMapGeometry.maxZoom,
             // #3002 — the DRIVING map passes its restricted gesture set (no
             // pinch); every other map keeps the default all-gestures option.
             interactionOptions: widget.interactionOptions ??
@@ -632,7 +495,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
                       widget.selectedStationIds ?? const <String>{},
                 )
               else if (widget.stations.length >=
-                  StationMapLayers.clusterThreshold)
+                  StationMapGeometry.clusterThreshold)
                 countClusterLayer(markers: _markers, theme: theme)
               else
                 MarkerLayer(markers: _markers),
@@ -653,7 +516,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
                 ZoomButton(
                   icon: Icons.add,
                   onPressed: () {
-                    // #1457 — clamp to [_kMinZoom, _kMaxZoom]. Without
+                    // #1457 — clamp to [StationMapGeometry.minZoom, StationMapGeometry.maxZoom]. Without
                     // the clamp, a + tap at the cap silently no-ops AND
                     // pushes the camera to a zoom level with no tiles
                     // (the user sees a grey screen and assumes the button
@@ -662,7 +525,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
                     // already at max zoom" instead of "the button is
                     // dead".
                     final z = (widget.mapController.camera.zoom + 1)
-                        .clamp(_kMinZoom, _kMaxZoom);
+                        .clamp(StationMapGeometry.minZoom, StationMapGeometry.maxZoom);
                     widget.mapController
                         .move(widget.mapController.camera.center, z);
                   },
@@ -672,7 +535,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
                   icon: Icons.remove,
                   onPressed: () {
                     final z = (widget.mapController.camera.zoom - 1)
-                        .clamp(_kMinZoom, _kMaxZoom);
+                        .clamp(StationMapGeometry.minZoom, StationMapGeometry.maxZoom);
                     widget.mapController
                         .move(widget.mapController.camera.center, z);
                   },

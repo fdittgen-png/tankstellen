@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/features/map/data/sparkilo_tile_layer.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_cluster_layers.dart';
+import 'package:tankstellen/features/map/presentation/widgets/station_map_geometry.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_layers.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_marker.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
@@ -16,21 +17,21 @@ import 'package:tankstellen/features/search/presentation/widgets/sort_selector.d
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 void main() {
-  group('StationMapLayers.zoomForRadius', () {
+  group('StationMapGeometry.zoomForRadius', () {
     test('returns appropriate zoom levels for radius buckets', () {
-      expect(StationMapLayers.zoomForRadius(2), 13);
-      expect(StationMapLayers.zoomForRadius(5), 13);
-      expect(StationMapLayers.zoomForRadius(10), 12);
-      expect(StationMapLayers.zoomForRadius(15), 11);
-      expect(StationMapLayers.zoomForRadius(25), 10);
-      expect(StationMapLayers.zoomForRadius(50), 9);
+      expect(StationMapGeometry.zoomForRadius(2), 13);
+      expect(StationMapGeometry.zoomForRadius(5), 13);
+      expect(StationMapGeometry.zoomForRadius(10), 12);
+      expect(StationMapGeometry.zoomForRadius(15), 11);
+      expect(StationMapGeometry.zoomForRadius(25), 10);
+      expect(StationMapGeometry.zoomForRadius(50), 9);
     });
   });
 
-  group('StationMapLayers.boundsForRadius', () {
+  group('StationMapGeometry.boundsForRadius', () {
     test('returns bounds that contain the input point', () {
       const center = LatLng(48.8566, 2.3522); // Paris
-      final bounds = StationMapLayers.boundsForRadius(center, 10);
+      final bounds = StationMapGeometry.boundsForRadius(center, 10);
 
       // The input point lies inside the bounds and is close to the midpoint.
       expect(bounds.contains(center), isTrue);
@@ -40,7 +41,7 @@ void main() {
 
     test('latitude delta matches ~1 degree per 111 km', () {
       const center = LatLng(0, 0); // equator
-      final bounds = StationMapLayers.boundsForRadius(center, 111);
+      final bounds = StationMapGeometry.boundsForRadius(center, 111);
       // 111 km north of equator => roughly +1 degree latitude.
       expect(bounds.north, closeTo(1.0, 0.05));
       expect(bounds.south, closeTo(-1.0, 0.05));
@@ -53,8 +54,8 @@ void main() {
       // underlying flat-earth approximation.
       const equator = LatLng(0, 0);
       const north = LatLng(60, 0);
-      final eqBounds = StationMapLayers.boundsForRadius(equator, 50);
-      final nBounds = StationMapLayers.boundsForRadius(north, 50);
+      final eqBounds = StationMapGeometry.boundsForRadius(equator, 50);
+      final nBounds = StationMapGeometry.boundsForRadius(north, 50);
       // Raw east/west around longitude 0 => half-width equals east.
       final eqLngHalfWidth = eqBounds.east;
       final nLngHalfWidth = nBounds.east;
@@ -64,8 +65,8 @@ void main() {
 
     test('bounds expand monotonically with radius', () {
       const center = LatLng(48.8566, 2.3522);
-      final small = StationMapLayers.boundsForRadius(center, 5);
-      final big = StationMapLayers.boundsForRadius(center, 25);
+      final small = StationMapGeometry.boundsForRadius(center, 5);
+      final big = StationMapGeometry.boundsForRadius(center, 25);
 
       expect(big.north, greaterThan(small.north));
       expect(big.south, lessThan(small.south));
@@ -75,7 +76,7 @@ void main() {
 
     test('handles near-pole positions without dividing by zero', () {
       const center = LatLng(89.99, 0);
-      final bounds = StationMapLayers.boundsForRadius(center, 10);
+      final bounds = StationMapGeometry.boundsForRadius(center, 10);
       // Just assert we get a sensible (non-NaN, non-infinite) result.
       expect(bounds.east.isFinite, isTrue);
       expect(bounds.west.isFinite, isTrue);
@@ -93,14 +94,14 @@ void main() {
       // with no tiles to draw, producing the "+ button does nothing"
       // symptom that triggered #1457. Tile cap and camera cap MUST be
       // updated together if either ever changes.
-      expect(StationMapLayers.maxZoom, 19.0);
+      expect(StationMapGeometry.maxZoom, 19.0);
     });
 
     test('minZoom keeps every pin from collapsing into a single pixel', () {
       // Zoom 3 shows a continent-scale viewport; below that, station
       // markers cluster into a single illegible blob and the search
       // affordances stop being meaningful.
-      expect(StationMapLayers.minZoom, 3.0);
+      expect(StationMapGeometry.minZoom, 3.0);
     });
 
     test('the clamp expression in the +/− handlers is well-formed', () {
@@ -110,26 +111,26 @@ void main() {
       // tap-at-the-cap into a graceful no-op (camera stays at the
       // bound) instead of pushing past where there are tiles.
       double inc(double current) => (current + 1).clamp(
-        StationMapLayers.minZoom,
-        StationMapLayers.maxZoom,
+        StationMapGeometry.minZoom,
+        StationMapGeometry.maxZoom,
       );
       double dec(double current) => (current - 1).clamp(
-        StationMapLayers.minZoom,
-        StationMapLayers.maxZoom,
+        StationMapGeometry.minZoom,
+        StationMapGeometry.maxZoom,
       );
       // Below the cap → increment normally.
       expect(inc(13.0), 14.0);
       expect(dec(13.0), 12.0);
       // At the upper cap → + becomes a no-op, − still moves.
-      expect(inc(StationMapLayers.maxZoom), StationMapLayers.maxZoom);
-      expect(dec(StationMapLayers.maxZoom), StationMapLayers.maxZoom - 1.0);
+      expect(inc(StationMapGeometry.maxZoom), StationMapGeometry.maxZoom);
+      expect(dec(StationMapGeometry.maxZoom), StationMapGeometry.maxZoom - 1.0);
       // At the lower cap → − becomes a no-op, + still moves.
-      expect(dec(StationMapLayers.minZoom), StationMapLayers.minZoom);
-      expect(inc(StationMapLayers.minZoom), StationMapLayers.minZoom + 1.0);
+      expect(dec(StationMapGeometry.minZoom), StationMapGeometry.minZoom);
+      expect(inc(StationMapGeometry.minZoom), StationMapGeometry.minZoom + 1.0);
       // Past the upper cap (e.g. via prior pinch-zoom that escaped
       // the camera before #1457 set MapOptions.maxZoom) → the next
       // tap snaps back to the cap rather than pushing further.
-      expect(inc(25.0), StationMapLayers.maxZoom);
+      expect(inc(25.0), StationMapGeometry.maxZoom);
     });
   });
 
@@ -234,7 +235,7 @@ void main() {
     });
   });
 
-  group('StationMapLayers.orderedByPriceForPainting (#2434)', () {
+  group('StationMapGeometry.orderedByPriceForPainting (#2434)', () {
     // The (cluster) layer paints in source-list order — a marker LATER
     // in the list paints ON TOP of earlier ones. The helper must order
     // stations so the cheapest (green) marker ends up LAST (top) and a
@@ -261,7 +262,7 @@ void main() {
       final expensive = station('expensive', diesel: 1.90);
 
       // Feed them in an arbitrary order.
-      final ordered = StationMapLayers.orderedByPriceForPainting([
+      final ordered = StationMapGeometry.orderedByPriceForPainting([
         mid,
         expensive,
         cheap,
@@ -280,7 +281,7 @@ void main() {
       final expensive = station('expensive', diesel: 1.90);
       final noPrice = station('noprice'); // no diesel, no fallback fuel
 
-      final ordered = StationMapLayers.orderedByPriceForPainting([
+      final ordered = StationMapGeometry.orderedByPriceForPainting([
         cheap,
         noPrice,
         expensive,
@@ -309,7 +310,7 @@ void main() {
       final dieselPriced = station('diesel-priced', diesel: 1.95);
       final e10Only = station('e10-only', e10: 1.40);
 
-      final ordered = StationMapLayers.orderedByPriceForPainting([
+      final ordered = StationMapGeometry.orderedByPriceForPainting([
         dieselPriced,
         e10Only,
       ], FuelType.diesel);
@@ -323,7 +324,7 @@ void main() {
     test('is a pure function — does not mutate the input list', () {
       final input = [station('a', diesel: 1.90), station('b', diesel: 1.50)];
       final before = input.map((s) => s.id).toList();
-      StationMapLayers.orderedByPriceForPainting(input, FuelType.diesel);
+      StationMapGeometry.orderedByPriceForPainting(input, FuelType.diesel);
       expect(
         input.map((s) => s.id).toList(),
         before,
@@ -334,7 +335,7 @@ void main() {
     test('is stable for equal prices (preserves relative order)', () {
       final first = station('first', diesel: 1.70);
       final second = station('second', diesel: 1.70);
-      final ordered = StationMapLayers.orderedByPriceForPainting([
+      final ordered = StationMapGeometry.orderedByPriceForPainting([
         first,
         second,
       ], FuelType.diesel);
@@ -347,7 +348,7 @@ void main() {
   // "4"/"2"/"3" count bubbles + one stray marker, HIDING the results. The
   // bounded set must now render every station as its OWN marker (a plain
   // [MarkerLayer]); clustering is kept only as a fallback for a genuinely
-  // huge / zoomed-far set (>= [StationMapLayers.clusterThreshold]).
+  // huge / zoomed-far set (>= [StationMapGeometry.clusterThreshold]).
   group('StationMapLayers de-clustering (#2510)', () {
     List<Station> nStations(int n) => List.generate(
       n,
@@ -446,8 +447,8 @@ void main() {
         final dots = stationMarkers
             .where((m) => m.width == kStationDotSize)
             .length;
-        expect(fullBubbles, StationMapLayers.emphasisCount);
-        expect(dots, 10 - StationMapLayers.emphasisCount);
+        expect(fullBubbles, StationMapGeometry.emphasisCount);
+        expect(dots, 10 - StationMapGeometry.emphasisCount);
       },
     );
 
@@ -462,7 +463,7 @@ void main() {
       'a genuinely huge set (>= clusterThreshold) still falls back to '
       'clustering',
       (tester) async {
-        await pumpWith(tester, nStations(StationMapLayers.clusterThreshold));
+        await pumpWith(tester, nStations(StationMapGeometry.clusterThreshold));
         expect(find.byType(MarkerClusterLayerWidget), findsOneWidget);
       },
     );
