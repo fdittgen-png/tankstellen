@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/obd2/data/elm327_mode22_parsers.dart';
 import 'package:tankstellen/features/obd2/data/elm327_parsers.dart';
 
 /// Pure-logic coverage for [Elm327Parsers] — every public static parser
@@ -63,42 +64,42 @@ void main() {
 
   group('cleanResponse22', () {
     test('empty string returns null', () {
-      expect(Elm327Parsers.cleanResponse22(''), isNull);
+      expect(Elm327Mode22Parsers.cleanResponse22(''), isNull);
     });
 
     test('NO DATA returns null', () {
-      expect(Elm327Parsers.cleanResponse22('NO DATA'), isNull);
+      expect(Elm327Mode22Parsers.cleanResponse22('NO DATA'), isNull);
     });
 
     test('UNABLE TO CONNECT returns null', () {
-      expect(Elm327Parsers.cleanResponse22('UNABLE TO CONNECT'), isNull);
+      expect(Elm327Mode22Parsers.cleanResponse22('UNABLE TO CONNECT'), isNull);
     });
 
     test('ERROR returns null', () {
-      expect(Elm327Parsers.cleanResponse22('ERROR'), isNull);
+      expect(Elm327Mode22Parsers.cleanResponse22('ERROR'), isNull);
     });
 
     test('? returns null', () {
-      expect(Elm327Parsers.cleanResponse22('?'), isNull);
+      expect(Elm327Mode22Parsers.cleanResponse22('?'), isNull);
     });
 
     test('anchors to 62 (drops Mode 22 command echo)', () {
       expect(
-        Elm327Parsers.cleanResponse22('22 22 03 62 22 03 00 27 10'),
+        Elm327Mode22Parsers.cleanResponse22('22 22 03 62 22 03 00 27 10'),
         '62 22 03 00 27 10',
       );
     });
 
     test('returns cleaned string when no 62 echo present', () {
       expect(
-        Elm327Parsers.cleanResponse22('00 0B FF'),
+        Elm327Mode22Parsers.cleanResponse22('00 0B FF'),
         '00 0B FF',
       );
     });
 
     test('strips > prompt', () {
       expect(
-        Elm327Parsers.cleanResponse22('62 F1 5B 00 64\r\n>'),
+        Elm327Mode22Parsers.cleanResponse22('62 F1 5B 00 64\r\n>'),
         '62 F1 5B 00 64',
       );
     });
@@ -726,7 +727,7 @@ void main() {
     test('62 22 03 00 27 10 -> 10000.0 km (VW group)', () {
       // 0x002710 = 10000.
       expect(
-        Elm327Parsers.parseMfgOdometer3Byte(
+        Elm327Mode22Parsers.parseMfgOdometer3Byte(
           '62 22 03 00 27 10',
           expectedPidHi: 0x22,
           expectedPidLo: 0x03,
@@ -739,7 +740,7 @@ void main() {
       // 0xFFFFFF = 16,777,215 km — well past any real car (cap 2,000,000 km),
       // so a saturated clone frame is rejected rather than surfaced.
       expect(
-        Elm327Parsers.parseMfgOdometer3Byte(
+        Elm327Mode22Parsers.parseMfgOdometer3Byte(
           '62 22 03 FF FF FF',
           expectedPidHi: 0x22,
           expectedPidLo: 0x03,
@@ -750,7 +751,7 @@ void main() {
 
     test('wrong PID-Hi returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometer3Byte(
+        Elm327Mode22Parsers.parseMfgOdometer3Byte(
           '62 22 03 00 27 10',
           expectedPidHi: 0x30,
           expectedPidLo: 0x03,
@@ -761,7 +762,7 @@ void main() {
 
     test('wrong PID-Lo returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometer3Byte(
+        Elm327Mode22Parsers.parseMfgOdometer3Byte(
           '62 22 03 00 27 10',
           expectedPidHi: 0x22,
           expectedPidLo: 0x99,
@@ -772,7 +773,7 @@ void main() {
 
     test('short response returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometer3Byte(
+        Elm327Mode22Parsers.parseMfgOdometer3Byte(
           '62 22 03 00 27',
           expectedPidHi: 0x22,
           expectedPidLo: 0x03,
@@ -783,7 +784,7 @@ void main() {
 
     test('NO DATA returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometer3Byte(
+        Elm327Mode22Parsers.parseMfgOdometer3Byte(
           'NO DATA',
           expectedPidHi: 0x22,
           expectedPidLo: 0x03,
@@ -796,7 +797,7 @@ void main() {
   group('parseMfgOdometer2Byte', () {
     test('62 F1 5B 00 64 -> 100.0 km (Mercedes)', () {
       expect(
-        Elm327Parsers.parseMfgOdometer2Byte(
+        Elm327Mode22Parsers.parseMfgOdometer2Byte(
           '62 F1 5B 00 64',
           expectedPidHi: 0xF1,
           expectedPidLo: 0x5B,
@@ -807,7 +808,7 @@ void main() {
 
     test('62 D1 01 FF FF -> 65535.0 km (PSA)', () {
       expect(
-        Elm327Parsers.parseMfgOdometer2Byte(
+        Elm327Mode22Parsers.parseMfgOdometer2Byte(
           '62 D1 01 FF FF',
           expectedPidHi: 0xD1,
           expectedPidLo: 0x01,
@@ -818,7 +819,7 @@ void main() {
 
     test('wrong PID returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometer2Byte(
+        Elm327Mode22Parsers.parseMfgOdometer2Byte(
           '62 F1 5B 00 64',
           expectedPidHi: 0xF1,
           expectedPidLo: 0x99,
@@ -829,7 +830,7 @@ void main() {
 
     test('short response returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometer2Byte(
+        Elm327Mode22Parsers.parseMfgOdometer2Byte(
           '62 F1 5B 00',
           expectedPidHi: 0xF1,
           expectedPidLo: 0x5B,
@@ -842,7 +843,7 @@ void main() {
   group('parseMfgOdometerMilesTimes10', () {
     test('62 40 4D 00 64 -> ~16.09344 km (Ford-style miles*10)', () {
       // (0x0064 = 100) / 10 * 1.609344 = 10 mi * 1.609344 = 16.09344 km
-      final result = Elm327Parsers.parseMfgOdometerMilesTimes10(
+      final result = Elm327Mode22Parsers.parseMfgOdometerMilesTimes10(
         '62 40 4D 00 64',
         expectedPidHi: 0x40,
         expectedPidLo: 0x4D,
@@ -855,7 +856,7 @@ void main() {
       // #3275 — a 0 km/mi odometer is rejected as a no-data sentinel rather
       // than surfaced as a real reading.
       expect(
-        Elm327Parsers.parseMfgOdometerMilesTimes10(
+        Elm327Mode22Parsers.parseMfgOdometerMilesTimes10(
           '62 40 4D 00 00',
           expectedPidHi: 0x40,
           expectedPidLo: 0x4D,
@@ -866,7 +867,7 @@ void main() {
 
     test('wrong PID returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometerMilesTimes10(
+        Elm327Mode22Parsers.parseMfgOdometerMilesTimes10(
           '62 40 4D 00 64',
           expectedPidHi: 0xAA,
           expectedPidLo: 0x4D,
@@ -877,7 +878,7 @@ void main() {
 
     test('short response returns null', () {
       expect(
-        Elm327Parsers.parseMfgOdometerMilesTimes10(
+        Elm327Mode22Parsers.parseMfgOdometerMilesTimes10(
           '62 40 4D 00',
           expectedPidHi: 0x40,
           expectedPidLo: 0x4D,

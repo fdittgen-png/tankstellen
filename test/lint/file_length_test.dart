@@ -418,12 +418,14 @@ void main() {
     // `_parseFuelTrim` / `_parse1BytePercent` / `_parseModeOneBody`
     // plumbing. Decomposition tracked separately by #2187/#2188.
     // #3275 — bumped 538 → 551 for the `_plausibleOdometerKm` odometer gate.
-    // #3278/#3279 — ratcheted DOWN 551 → 519: the Mode 09 VIN decoder was
-    // extracted to `elm327_vin_parser.dart` (a framing-aware parse that fixes
-    // the multiline wrong-VIN bug). First slice of the #3279 decomposition;
-    // the Mode 22 manufacturer slice is still pending there.
+    // #3278/#3279 — ratcheted DOWN 551 → 519 (VIN decoder →
+    // `elm327_vin_parser.dart`) → 419 (Mode 22 manufacturer odometer parsers →
+    // `elm327_mode22_parsers.dart`, + shared `parseElmHexBytes` /
+    // `isPlausibleOdometerKm` → `elm327_decode_util.dart`). Two #3279 slices
+    // done; the remaining Mode 01 bulk keeps it just over the 400 norm, so the
+    // decomposition issue stays referenced for the final slice.
     'lib/features/obd2/data/elm327_parsers.dart': (
-      lines: 519,
+      lines: 419,
       bumps: 3,
       decompositionIssue: 3279,
     ),

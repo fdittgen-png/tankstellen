@@ -26,6 +26,7 @@ library;
 
 import 'elm327_commands.dart';
 import 'elm327_parsers.dart';
+import 'elm327_mode22_parsers.dart';
 import 'elm327_vin_parser.dart';
 
 export 'elm327_commands.dart';
@@ -186,7 +187,7 @@ class Elm327Protocol {
     required int expectedPidHi,
     required int expectedPidLo,
   }) =>
-      Elm327Parsers.parseMfgOdometer3Byte(
+      Elm327Mode22Parsers.parseMfgOdometer3Byte(
         raw,
         expectedPidHi: expectedPidHi,
         expectedPidLo: expectedPidLo,
@@ -197,7 +198,7 @@ class Elm327Protocol {
     required int expectedPidHi,
     required int expectedPidLo,
   }) =>
-      Elm327Parsers.parseMfgOdometer2Byte(
+      Elm327Mode22Parsers.parseMfgOdometer2Byte(
         raw,
         expectedPidHi: expectedPidHi,
         expectedPidLo: expectedPidLo,
@@ -208,7 +209,7 @@ class Elm327Protocol {
     required int expectedPidHi,
     required int expectedPidLo,
   }) =>
-      Elm327Parsers.parseMfgOdometerMilesTimes10(
+      Elm327Mode22Parsers.parseMfgOdometerMilesTimes10(
         raw,
         expectedPidHi: expectedPidHi,
         expectedPidLo: expectedPidLo,
@@ -223,5 +224,5 @@ class Elm327Protocol {
       Elm327Parsers.parseFuelType(raw);
 
   static String? cleanResponse22(String raw) =>
-      Elm327Parsers.cleanResponse22(raw);
+      Elm327Mode22Parsers.cleanResponse22(raw);
 }
