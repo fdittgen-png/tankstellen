@@ -12,6 +12,7 @@ import '../../../../core/utils/event_channel_cancel.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_read_timeout.dart';
 import 'obd2_transport.dart';
+import 'response_frame_buffer.dart';
 
 /// #2906 — whether a `channel.open()` failure is a transient worth retrying:
 /// a slow/flaky adapter ([TimeoutException]), a typed recoverable disconnect
@@ -72,7 +73,8 @@ class BluetoothObd2Transport
   final ElmByteChannel _channel;
   final Duration _readTimeout;
   StreamSubscription<List<int>>? _subscription;
-  final StringBuffer _buffer = StringBuffer();
+  // #3276 — accumulates response bytes until '>', with a hard size cap.
+  final ResponseFrameBuffer _frame = ResponseFrameBuffer();
   Completer<String>? _pending;
   bool _connected = false;
 
@@ -126,13 +128,13 @@ class BluetoothObd2Transport
     // #2524 — reset any state a previous link left behind so a reused or
     // half-dead instance can't carry stale pending into the fresh link. A
     // dropped session that never ran `disconnect()` can leave `_pending`
-    // pointing at a never-completing completer and `_buffer` holding a
+    // pointing at a never-completing completer and the frame buffer holding a
     // partial response; either one would poison the first command on the
     // new channel (the concurrent-sendCommand guard, or a corrupt parse).
     // Fail (not just drop) any stranded pending so a caller awaiting it
     // unblocks instead of hanging forever.
     _failPending(StateError('Transport reconnecting'));
-    _buffer.clear();
+    _frame.clear();
     // #2906 — the channel open is the #1 fragility point: a transient BLE
     // GATT-133 / Classic rfcomm-open-fail used to abort the whole connect with
     // ZERO retry (the existing _withConnectRetry only wraps the ELM send
@@ -276,7 +278,7 @@ class BluetoothObd2Transport
     _subscription = null;
     await _channel.close();
     _failPending(StateError('Transport closed'));
-    _buffer.clear();
+    _frame.clear();
     _swallowNextFrame = false; // #2889 — never carry a latch across links.
   }
 
@@ -319,7 +321,7 @@ class BluetoothObd2Transport
     final timeout = readTimeoutOverride ??
         (cls.timeout > _readTimeout ? _readTimeout : cls.timeout);
 
-    _buffer.clear();
+    _frame.clear();
     final completer = Completer<String>();
     _pending = completer;
     // Clear `_pending` on EVERY exit — success, timeout *or* a throwing
@@ -360,17 +362,16 @@ class BluetoothObd2Transport
   }
 
   void _onBytes(List<int> chunk) {
-    _buffer.write(String.fromCharCodes(chunk));
-    final content = _buffer.toString();
-    final promptIdx = content.indexOf('>');
-    if (promptIdx < 0) return;
-    final body = content.substring(0, promptIdx);
-    _buffer.clear();
-    // If more chunks arrived past the prompt (rare but legal), keep
-    // them for the next read.
-    if (promptIdx + 1 < content.length) {
-      _buffer.write(content.substring(promptIdx + 1));
+    final outcome = _frame.add(chunk);
+    if (outcome == FrameOutcome.needMore) return;
+    // #3276 — accumulation crossed the cap with no prompt (a runaway clone):
+    // fail the command fast + arm the swallow latch so a late '>' is dropped.
+    if (outcome == FrameOutcome.overflow) {
+      _swallowNextFrame = true;
+      _failPending(StateError('ELM327 response exceeded the buffer cap'));
+      return;
     }
+    final body = _frame.body!;
     final completer = _pending;
     _pending = null;
     // #2889 — resync after a per-command timeout. When the latch is armed
