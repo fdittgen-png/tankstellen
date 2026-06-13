@@ -162,15 +162,12 @@ void main() {
     // BackgroundPriceHistoryWriter, so the file dropped from 782 to ~246
     // lines (below the cap). Removed from the snapshot per the shrink
     // ratchet; the extracted files are all new and under 400.
-    // #3198 — re-grandfathered 723 → 751: the per-fuel price-unit
-    // suffix facility (pricePerUnitSuffixByFuel + pricePerUnitSuffixFor)
-    // and the honest per-country fuel-catalog comments (AT/DK/SI/AR no
-    // longer advertise a phantom E10).
-    'lib/core/country/country_config.dart': (
-      lines: 751,
-      bumps: 1,
-      decompositionIssue: null,
-    ),
+    // #3296 — country_config.dart decomposed (751 → 284): the 17 per-country
+    // CountryConfig data rows moved to country_config_data_core.dart (pre-v4.1.0
+    // set, 189) + country_config_data_extended.dart (v4.1.0+, 329); each
+    // `Countries.<name>` is now a const alias of the matching `k<Name>`, so the
+    // ~86 importers + every `Countries.germany`-style call site are unchanged.
+    // Removed from the snapshot per the shrink ratchet; both data files < 400.
     // #3232 — country_service_registry.dart decomposed (864 → 241): the data
     // rows moved out into country_service_data.dart (entries + kDefaultFuelTypes,
     // 316) + country_service_policies.dart (the per-service FuelServicePolicy
