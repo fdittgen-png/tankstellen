@@ -151,6 +151,44 @@ void main() {
     });
 
     test(
+        '#3249 — the OBD2-trip GPS opens with the un-throttled RECORDING '
+        'settings (shared source), not the bare 5 s defaults', () async {
+      final fakeGeo = _RecordingGeolocator();
+      final container = ProviderContainer(overrides: [
+        geolocatorWrapperProvider.overrideWithValue(fakeGeo),
+        imuSensorSourceProvider.overrideWithValue(EmptyImuSource()),
+      ]);
+      addTearDown(container.dispose);
+      addTearDown(fakeGeo.dispose);
+
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.obd2TripRecording);
+      await container
+          .read(featureFlagsProvider.notifier)
+          .enable(Feature.gpsTripPath);
+
+      final service = Obd2Service(FakeObd2Transport(_elmOk()));
+      await service.connect();
+      final notifier = container.read(tripRecordingProvider.notifier);
+      await notifier.start(service);
+      await Future<void>.delayed(Duration.zero);
+
+      // The stream was opened (via the shared source) with the recorder's
+      // fine cadence — on the (Android) test platform that's an AndroidSettings
+      // with a 1 s interval + high accuracy, NOT a bare LocationSettings whose
+      // geolocator_android default is 5 s. (recordingLocationSettingsForRef.)
+      final settings = fakeGeo.lastSettings;
+      expect(settings, isA<AndroidSettings>(),
+          reason: 'OBD2 GPS must use the platform recording settings (#3249)');
+      expect((settings! as AndroidSettings).intervalDuration,
+          const Duration(seconds: 1));
+      expect(settings.accuracy, LocationAccuracy.high);
+
+      await notifier.stop();
+    });
+
+    test(
         'flag ON but Geolocator stream errors mid-trip — error is '
         'logged + swallowed; the trip recording continues; subsequent '
         'samples carry whatever was in the latch (or null)', () async {
@@ -373,6 +411,10 @@ Position _pos(
 class _RecordingGeolocator extends GeolocatorWrapper {
   int positionStreamCallCount = 0;
   LocationAccuracy? lastAccuracy;
+  // #3249 — the full settings the OBD2-trip GPS path opened with (through the
+  // shared source), so a test can assert it uses the un-throttled recording
+  // settings, not the bare 5 s defaults.
+  LocationSettings? lastSettings;
   // Re-created on each getPositionStream call so onListen / onCancel
   // hooks accurately reflect whether the production code is currently
   // subscribed (a single shared controller would conflate the two).
@@ -394,6 +436,7 @@ class _RecordingGeolocator extends GeolocatorWrapper {
   Stream<Position> getPositionStream({LocationSettings? locationSettings}) {
     positionStreamCallCount++;
     lastAccuracy = locationSettings?.accuracy;
+    lastSettings = locationSettings;
     // Close any prior controller so the analyzer's `close_sinks`
     // lint stays quiet across re-subscribes.
     final prev = _controller;

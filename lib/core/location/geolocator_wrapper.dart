@@ -289,6 +289,17 @@ class _SharedPositionSource {
     _openUpstream(settings);
     // Cancel the superseded coarse subscription after the fine one is live so
     // there is no gap in fixes; the broadcast bus + `_last` replay bridge it.
+    //
+    // #3249 — KNOWN LIMITATION (verified against geolocator 14.0.2): opening
+    // the new stream BEFORE cancelling the old means geolocator_android can
+    // hand back its CACHED first-caller stream (the coarse one), so the
+    // "recorder cadence wins on a late join" guarantee above is not reliable
+    // when a coarse consumer opened the channel first. The correct fix is
+    // cancel-THEN-reopen (accepting a brief fix gap that `_last` replay
+    // bridges), but it changes the live GPS continuity of every trip and so
+    // needs on-device validation before shipping — deliberately deferred (the
+    // #3249 primary fix routes the recorder to `recording: true`, which wins
+    // when it opens the channel first, the common case).
     unawaited(old?.safeCancel());
   }
 
