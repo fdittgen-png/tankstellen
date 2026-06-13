@@ -838,78 +838,15 @@ void main() {
       bumps: 0,
       decompositionIssue: null,
     ),
+    // #3233 — station_map_layers.dart graduated (700 → 354, below the cap):
+    // the pure geometry/marker-ranking statics → station_map_geometry.dart
+    // (#3289), the marker-model pipeline → station_marker_model_builder.dart +
+    // the zoom controls → map_zoom_controls.dart (#3295), and the FlutterMap
+    // layer tree → station_map_body.dart (the presentational StationMapBody,
+    // this PR). The widget now holds only the memoised marker model + the
+    // camera-fit lifecycle. Removed from the snapshot per the shrink ratchet;
+    // every extracted file is new and under 400.
     // #2510 — re-grandfathered 544 → 562: the nearby-search map no longer
-    // hides results behind count-clusters. Adds the `rankForEmphasis`
-    // helper + two `@visibleForTesting` constants (emphasisCount,
-    // clusterThreshold) and the de-clustering branch (a bounded set renders
-    // a plain MarkerLayer with the top-ranked stations emphasized; only a
-    // huge/zoomed-far set falls back to clustering). Net +18 is the helper,
-    // the constants and their dartdoc. Decomposition tracked by #2187/#2188.
-    // #2532 — re-grandfathered 562 → 574: the optional `onStationTap` field
-    // (so a wide-screen marker tap selects into the side panel instead of
-    // pushing the route) + its dartdoc, its constructor param, its pass-down
-    // in `_recomputeMarkers`, and the `didUpdateWidget` identity guard that
-    // rebuilds markers on a changed callback. Decomposition tracked by
-    // #2187/#2188.
-    // #2547 — tightened 574 → 562: the #2547 revert removed that
-    // `onStationTap` field (the map now takes the full horizontal width on
-    // wide/landscape — no side panel), so the marker tap is back to its
-    // pre-#2532 `/station/:id` push and the field + its plumbing are gone.
-    // #2631 — re-grandfathered 562 → 604: the optional cross-border
-    // `fuelResolver` field + its dartdoc, its constructor param + the
-    // `didUpdateWidget` identity guard, the resolver thread-through in
-    // `orderedByPriceForPainting` + `_recomputeMarkers`, and the small
-    // `_resolvedRange` helper that colours cross-border markers by each
-    // station's own country fuel. Lets a Spanish station show its E10 price
-    // instead of '--' on an E85 route. Decomposition tracked by #2187/#2188.
-    // #2755 — re-grandfathered 604 → 622: the optional `cameraFitBounds`
-    // field + its dartdoc and constructor param, plus the `_fitBounds`
-    // getter / `initialCameraFit` substitution that frames the explicit
-    // bounds (route mode: the full itinerary) instead of the search circle.
-    // Null path unchanged (nearby mode). Decomposition tracked by #2187/#2188.
-    // #2974 — re-grandfathered 622 → 625: the marker-selection haptic wraps
-    // the onStationTap callback once (3 lines: the selectionClick + the
-    // delegate + its dartdoc) so a marker tap that selects a list row buzzes
-    // like the other everyday tap surfaces. Decomposition still #2187/#2188.
-    // #3000 — re-grandfathered 625 → 654 (Epic #2997): selection-aware
-    // clustering for the route map. The partition LOGIC was extracted to
-    // `selectionPartitionedClusterLayers` in station_cluster_layers.dart (per
-    // the file-length rule, a helper over grandfathering); the residual growth
-    // here is the widget's own irreducible API — the `excludeSelectedFromClustering`
-    // flag + its dartdoc, its constructor param, the build-tree branch that
-    // spreads the partitioned layers, and the `markerMetaForTesting` seam that
-    // lets a test assert a clustered cross-border station carries its resolved
-    // price. None of these can move off the widget. Decomposition of this
-    // god-class is still tracked by #2187/#2188.
-    // #3002 — re-grandfathered 654 → 699 (Epic #2997, final child): the DRIVING
-    // map adopts the shared stack. The growth is the widget's own irreducible
-    // additive API — five new props + their dartdocs (`markerVariant`,
-    // `interactionOptions`, `onMapTap`, `showZoomControls`, `showLegend`), their
-    // constructor params, the variant threaded into the `StationMarkerBuilder`
-    // call, and the two `if (...)` guards that gate the zoom controls + legend
-    // off for driving. The big driver-legible marker BODY lives in
-    // `station_marker.dart` (the `_drivingMarker` content variant), not here, so
-    // nothing further can move off this widget. Decomposition of this god-class
-    // is still tracked by #2187/#2188.
-    // +1 (#3161): the `discarded_futures` burn-down added the lint-mandated
-    // `import 'dart:async';` line for the `unawaited(...)` wrap of the
-    // marker-tap HapticFeedback call. No new logic.
-    // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3233.
-    // #3233 — ratcheted DOWN 700 → 565: the pure geometry + marker-ranking
-    // statics (zoom/bounds/centroid + orderedByPriceForPainting/rankForEmphasis
-    // + their consts) were extracted to `station_map_geometry.dart`.
-    // #3233 — ratcheted DOWN 565 → 472: the marker-model builder
-    // (`_recomputeMarkers`'s price/emphasis/order/build pipeline →
-    // `station_marker_model_builder.dart`, the pure `StationMarkerModelBuilder`)
-    // and the top-right zoom/recenter control column (→ `map_zoom_controls.dart`,
-    // `MapZoomControls`). The remaining FlutterMap children tree is coupled to
-    // the memoised `_markers`/`_markerMeta`/`_priceRange` state, so the final
-    // slice is a stateful sub-view extraction; #3233 stays referenced for it.
-    'lib/features/map/presentation/widgets/station_map_layers.dart': (
-      lines: 472,
-      bumps: 8,
-      decompositionIssue: 3233,
-    ),
     // #2681 — feature_management_section.dart graduated: the #2681 ordered-
     // category reorg decomposed the 718-line god-class into the
     // widgets/feature_management/ folder (conso_feature_card.dart,
