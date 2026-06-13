@@ -114,6 +114,12 @@ class Elm327Parsers {
     return (bytes[2] * 256) + bytes[3];
   }
 
+  /// #3275 — only (0, 2,000,000] km is a real odometer; a 0 sentinel or a
+  /// saturated frame (~429M km) must not corrupt downstream distance/fuel math.
+  static const double _maxPlausibleOdometerKm = 2000000.0;
+  static bool _plausibleOdometerKm(double km) =>
+      km.isFinite && km > 0 && km <= _maxPlausibleOdometerKm;
+
   /// Parse odometer from Mode 01 PID A6 response.
   /// Response format: "41 A6 XX YY ZZ WW" where odometer = value / 10 km.
   static double? parseOdometer(String raw) {
@@ -124,7 +130,8 @@ class Elm327Parsers {
     if (bytes.length < 6 || bytes[0] != 0x41 || bytes[1] != 0xA6) return null;
 
     final value = (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
-    return value / 10.0; // Odometer in km (1/10 km resolution)
+    final km = value / 10.0; // Odometer in km (1/10 km resolution)
+    return _plausibleOdometerKm(km) ? km : null;
   }
 
   /// Parse calculated engine load from Mode 01 PID 04 response (#717).
@@ -362,8 +369,8 @@ class Elm327Parsers {
     final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
         minBytes: 6);
     if (bytes == null) return null;
-    final value = (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
-    return value.toDouble();
+    final km = ((bytes[3] << 16) | (bytes[4] << 8) | bytes[5]).toDouble();
+    return _plausibleOdometerKm(km) ? km : null; // #3275
   }
 
   /// Parse a 2-byte (big-endian, km) manufacturer odometer — used by
@@ -377,8 +384,8 @@ class Elm327Parsers {
     final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
         minBytes: 5);
     if (bytes == null) return null;
-    final value = (bytes[3] << 8) | bytes[4];
-    return value.toDouble();
+    final km = ((bytes[3] << 8) | bytes[4]).toDouble();
+    return _plausibleOdometerKm(km) ? km : null; // #3275
   }
 
   /// Parse a Ford-style 2-byte miles-times-10 odometer (22 40 4D).
@@ -393,7 +400,8 @@ class Elm327Parsers {
         minBytes: 5);
     if (bytes == null) return null;
     final milesTimes10 = (bytes[3] << 8) | bytes[4];
-    return (milesTimes10 / 10.0) * 1.609344;
+    final km = (milesTimes10 / 10.0) * 1.609344;
+    return _plausibleOdometerKm(km) ? km : null; // #3275
   }
 
   /// Parse fuel type from Mode 01 PID 51 response (#1399).
@@ -463,6 +471,8 @@ class Elm327Parsers {
   ///
   /// Returns the last 17 printable characters, which is the VIN for
   /// well-formed responses. Returns null on NO DATA or < 17 chars. (#719)
+  /// NB: real multiline responses leak ISO-TP line-number digits into the
+  /// charset, so a framing-aware parse is tracked with the VIN fallback #3278.
   static String? parseVin(String raw) {
     final clean = cleanResponse(raw);
     if (clean == null) return null;

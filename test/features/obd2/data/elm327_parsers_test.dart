@@ -191,16 +191,21 @@ void main() {
       );
     });
 
-    test('41 A6 00 00 00 00 -> 0.0 km', () {
-      expect(Elm327Parsers.parseOdometer('41 A6 00 00 00 00'), 0.0);
+    test('41 A6 00 00 00 00 -> null (0 is a no-data sentinel, #3275)', () {
+      // #3275 — a 0 km odometer is useless as a distance fallback and far more
+      // likely a no-data sentinel than a genuine brand-new car, so reject it.
+      expect(Elm327Parsers.parseOdometer('41 A6 00 00 00 00'), isNull);
     });
 
-    test('41 A6 FF FF FF FF -> 429496729.5 km', () {
-      // 0xFFFFFFFF = 4294967295; / 10 = 429496729.5
-      expect(
-        Elm327Parsers.parseOdometer('41 A6 FF FF FF FF'),
-        429496729.5,
-      );
+    test('41 A6 FF FF FF FF -> null (saturated/implausible, #3275)', () {
+      // 0xFFFFFFFF / 10 = 429,496,729.5 km — no car reaches 2,000,000 km, so a
+      // saturated clone frame must not corrupt the distance-to-fuel ratio.
+      expect(Elm327Parsers.parseOdometer('41 A6 FF FF FF FF'), isNull);
+    });
+
+    test('41 A6 00 1E 84 80 -> 200000.0 km (high but plausible, #3275)', () {
+      // 0x001E8480 = 2,000,000; / 10 = 200,000 km — under the cap, still parses.
+      expect(Elm327Parsers.parseOdometer('41 A6 00 1E 84 80'), 200000.0);
     });
 
     test('5-byte response (too short) returns null', () {
@@ -730,14 +735,16 @@ void main() {
       );
     });
 
-    test('62 22 03 FF FF FF -> 16777215.0 km', () {
+    test('62 22 03 FF FF FF -> null (saturated/implausible, #3275)', () {
+      // 0xFFFFFF = 16,777,215 km — well past any real car (cap 2,000,000 km),
+      // so a saturated clone frame is rejected rather than surfaced.
       expect(
         Elm327Parsers.parseMfgOdometer3Byte(
           '62 22 03 FF FF FF',
           expectedPidHi: 0x22,
           expectedPidLo: 0x03,
         ),
-        16777215.0,
+        isNull,
       );
     });
 
@@ -844,14 +851,16 @@ void main() {
       expect(result!, closeTo(16.09344, 0.0001));
     });
 
-    test('zero -> 0.0 km', () {
+    test('zero -> null (0 is a no-data sentinel, #3275)', () {
+      // #3275 — a 0 km/mi odometer is rejected as a no-data sentinel rather
+      // than surfaced as a real reading.
       expect(
         Elm327Parsers.parseMfgOdometerMilesTimes10(
           '62 40 4D 00 00',
           expectedPidHi: 0x40,
           expectedPidLo: 0x4D,
         ),
-        0.0,
+        isNull,
       );
     });
 

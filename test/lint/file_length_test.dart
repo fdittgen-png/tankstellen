@@ -417,10 +417,14 @@ void main() {
     // ambient-air (0x46) temps. All trivial decoders reusing the existing
     // `_parseFuelTrim` / `_parse1BytePercent` / `_parseModeOneBody`
     // plumbing. Decomposition tracked separately by #2187/#2188.
+    // #3275 — re-grandfathered 538 → 551: the `_plausibleOdometerKm` gate on
+    // the four odometer parsers (rejects a saturated/garbage frame before it
+    // corrupts downstream distance/fuel math). bumps→3 ⇒ decomposition is now
+    // mandatory and tracked by #3279 (split the Mode 22 manufacturer slice).
     'lib/features/obd2/data/elm327_parsers.dart': (
-      lines: 538,
-      bumps: 2,
-      decompositionIssue: null,
+      lines: 551,
+      bumps: 3,
+      decompositionIssue: 3279,
     ),
     // #2456 — re-grandfathered 471 → 524: the live integrator gained λ
     // (PID 0x44, 2 Hz) + baro (PID 0x33, 0.5 Hz) supportsPid-gated
