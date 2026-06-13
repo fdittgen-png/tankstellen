@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
 import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
@@ -80,6 +81,30 @@ void main() {
 
     test('handles a PlatformException with a null message gracefully', () {
       final ex = PlatformException(code: 'startScan');
+      expect(PluginBluetoothFacade.debugLooksBluetoothOff(ex), isFalse);
+    });
+
+    test('matches a FlutterBluePlusException carrying the off wording (#3273)',
+        () {
+      // The old code only matched PlatformException, so FBP's OWN typed
+      // exception slipped through to the generic-error path. It must now be
+      // recognised as a radio-off signal.
+      final ex = FlutterBluePlusException(
+        ErrorPlatform.android,
+        'startScan',
+        null,
+        'Bluetooth must be turned on',
+      );
+      expect(PluginBluetoothFacade.debugLooksBluetoothOff(ex), isTrue);
+    });
+
+    test('rejects an unrelated FlutterBluePlusException (#3273)', () {
+      final ex = FlutterBluePlusException(
+        ErrorPlatform.android,
+        'writeCharacteristic',
+        6,
+        'device is not connected',
+      );
       expect(PluginBluetoothFacade.debugLooksBluetoothOff(ex), isFalse);
     });
   });
