@@ -63,7 +63,11 @@ void main() {
     'lib/features/consumption/providers/consumption_providers.dart',
     'lib/features/vehicle/data/obd2_vin_reader.dart',
     'lib/features/vehicle/data/vin_adapter_pair_auto_populator.dart',
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart',
+    // #3234 — the never-throws adapter-persist / auto-population boundaries
+    // moved verbatim from edit_vehicle_screen.dart into its `_VehicleEditActions`
+    // part mixin; the grandfather entry follows the code (a file move, not a new
+    // untested boundary — net count unchanged).
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen_actions.dart',
   };
 
   // Matches a `///` doc comment line that documents a never-throws

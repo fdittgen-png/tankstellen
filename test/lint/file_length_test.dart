@@ -862,28 +862,14 @@ void main() {
     // drops below the cap. Removed from the snapshot per the shrink ratchet;
     // vehicle_enums.dart is new and under 400. The sibling edit_vehicle_screen
     // decomposition stays tracked by the (still-open) #3234.
-    // #2837 — re-grandfathered 806 → 817: the η_v calibration card now
-    // receives a directFuelRateSupported flag computed from the vehicle's
-    // recorded trips (vehicleReportsDirectFuelRate), so the irrelevant VE
-    // UI hides on PID-5E cars. Decomposition tracked under #2187/#2188.
-    // #2885 — +11: the multiFuelCapable form state + its load / save /
-    // drivetrain-section wiring.
-    // #2960 — re-grandfathered 828 → 878: the adapter pair / forget handler
-    // now persists IN PLACE via a dedicated `_persistAdapterChange` helper
-    // (build profile from live controllers + save + syncActiveProfile,
-    // wrapped never-throws) instead of routing through `_save`, whose
-    // trailing `Navigator.pop()` closed the whole Edit-vehicle form on every
-    // add/remove. Decomposition tracked under #2187/#2188.
-    // #3015 — +1: thread the powerKwController into VehicleDrivetrainSection
-    // for the catalog-pre-filled engine-power field. Decomposition tracked
-    // under #2187/#2188.
-    // 4 bumps — decomposition forced (#3141), tracked by the OPEN #3234
-    // (per-section form-state extraction).
-    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': (
-      lines: 879,
-      bumps: 4,
-      decompositionIssue: 3234,
-    ),
+    // #3234 — edit_vehicle_screen.dart graduated (879 → 308, below the cap):
+    // the imperative form actions + the mutable form state moved into the
+    // `_VehicleEditActions` part mixin (edit_vehicle_screen_actions.dart, 358),
+    // and the form body (the PageScaffold + section-card stack) into the
+    // presentational VehicleEditForm (vehicle_edit_form.dart, 281). The screen
+    // now holds only the load/dispose lifecycle, the prepop `ref.listen`, the
+    // discard `PopScope`, and `build`. Removed from the snapshot per the shrink
+    // ratchet; both new files are under 400. Closes the #3234 decomposition.
     'lib/features/vehicle/presentation/widgets/auto_record_section.dart': (
       lines: 830,
       bumps: 0,

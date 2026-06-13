@@ -8,15 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../core/widgets/discard_changes_dialog.dart';
-import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../consumption/domain/direct_fuel_rate_detector.dart';
-import '../../../consumption/presentation/widgets/broken_map_widgets.dart';
-import '../../../consumption/providers/trip_history_provider.dart';
 import '../../data/obd2_vin_reader.dart';
-import '../../data/reference_vehicle_catalog_provider.dart';
-import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
@@ -24,24 +18,19 @@ import '../../providers/obd2_vin_reader_provider.dart';
 import '../../providers/vehicle_providers.dart';
 import '../../providers/vin_adapter_pair_auto_populator_provider.dart';
 import '../../providers/vin_decoder_provider.dart';
-import '../widgets/auto_record_section.dart';
-import '../widgets/calibration_section.dart';
-import '../widgets/obd2_capability_section.dart';
 import '../widgets/reference_vehicle_picker.dart';
 import '../widgets/ve_reset_confirm_dialog.dart';
-import '../widgets/vehicle_drivetrain_section.dart';
-import '../widgets/vehicle_extras_section.dart';
+import '../widgets/vehicle_edit_form.dart';
 import '../widgets/vehicle_form_controllers.dart';
-import '../widgets/vehicle_header.dart';
-import '../widgets/vehicle_identity_section.dart';
 import '../widgets/vehicle_save_actions.dart';
-import '../widgets/vehicle_save_bar.dart';
 import '../widgets/vin_confirm_dialog.dart';
 import '../widgets/vin_info_sheet.dart';
 import '../../../../core/logging/error_logger.dart';
 
+part 'edit_vehicle_screen_actions.dart';
+
 /// Sentinel for the four "leave alone" arguments on
-/// [_EditVehicleScreenState._saveCalibrationOverride] — `null` is a
+/// [_VehicleEditActions._saveCalibrationOverride] — `null` is a
 /// valid override value (clears the manual override) so a separate
 /// marker is needed to distinguish "don't touch" from "set to null".
 const Object _kSentinel = Object();
@@ -59,8 +48,10 @@ class EditVehicleScreen extends ConsumerStatefulWidget {
 }
 
 class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, _VehicleEditActions {
+  @override
   final _formKey = GlobalKey<FormState>();
+  @override
   final _ctrl = VehicleFormControllers();
 
   // #1400 — anchors the OBD2 adapter card in the scrollable so the
@@ -81,51 +72,11 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
   // 1 s end-to-end (500 ms each way).
   late final AnimationController _obd2HighlightController;
 
-  // #710 — combustion default; user can flip to Hybrid/Electric.
-  VehicleType _type = VehicleType.combustion;
-  // #2885 — multi-fuel capability flag. Loaded from the profile,
-  // surfaced (and toggleable) only when the preferred fuel is E10 / E85.
-  bool _multiFuelCapable = false;
-  final Set<ConnectorType> _connectors = {};
-  String? _existingId;
-  String? _adapterMac;
-  String? _adapterName;
-  // #1328 — `_loadExisting()` runs in a postFrameCallback so it sees a
-  // snapshot of `vehicleProfileListProvider` that may still be empty
-  // while Hive is resolving (the provider is sync but the underlying
-  // settings storage may rebuild). When that happens the VIN field
-  // (and every other controller) stays blank. We belt-and-suspender the
-  // initial path by also listening to provider transitions in `build()`
-  // and re-running the load if the form is editing an existing profile
-  // that hasn't been hydrated yet. This flag flips to true after the
-  // first successful load so subsequent provider updates (e.g. from
-  // `_save()` writing the freshest profile) don't clobber user edits.
-  bool _hasInitiallyLoaded = false;
-
-  // #812 phase 2 — engine params populated by the VIN decoder;
-  // carried through _save for phase-3 OBD2 math.
-  int? _engineDisplacementCc;
-  int? _engineCylinders;
-  int? _curbWeightKg;
-
-  // True while the vPIC request is in flight → VIN field spinner.
-  bool _decodingVin = false;
-
-  // True while an OBD2 Mode 09 PID 02 read is in flight (#1162).
-  // Disables the "Read VIN from car" button and shows a spinner so
-  // the user has visible feedback during the bounded ~3 s window.
-  bool _readingVinFromCar = false;
-
-  // #1372 phase 3 — the catalog row the user picked via
-  // [ReferenceVehiclePicker]. Non-null only on the new-vehicle path
-  // (the picker button is hidden for existing vehicles to avoid
-  // silently overwriting user tweaks). When set, `_save` threads it
-  // into `buildProfile` so the freshly-minted profile carries the
-  // catalog's `volumetricEfficiency`, `make`, `model`, `year`,
-  // `referenceVehicleId`, and `engineDisplacementCc` from the get-go.
-  // The user can still edit any controller-backed field before
-  // tapping Save; tapping the picker again replaces the prior pick.
-  ReferenceVehicle? _pickedReferenceVehicle;
+  // #3234 — the mutable form state (_type / _connectors / _adapterMac / the
+  // VIN-decode + engine scalars / the busy flags / the picked catalog row) and
+  // the imperative actions that read+write it now live in the `_VehicleEditActions`
+  // part mixin; `build` + the load path below reference them as inherited
+  // members, unchanged.
 
   @override
   void initState() {
@@ -248,355 +199,6 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     await _obd2HighlightController.reverse();
   }
 
-  /// Open the VIN explanation sheet (#895). Restores focus on dismiss
-  /// so TalkBack users don't lose their place.
-  Future<void> _showVinInfo() async {
-    await VinInfoSheet.show(context);
-    if (!mounted) return;
-    _ctrl.vinFocusNode.requestFocus();
-  }
-
-  /// Shared validator for optional numeric inputs. Empty is fine
-  /// (→ null); non-empty must parse.
-  String? _validateOptionalNumber(String? v) {
-    if (v == null || v.trim().isEmpty) return null;
-    final parsed = double.tryParse(v.trim().replaceAll(',', '.'));
-    if (parsed != null) return null;
-    return AppLocalizations.of(context).fieldInvalidNumber;
-  }
-
-  Future<void> _save() async {
-    final form = _formKey.currentState;
-    if (form == null || !form.validate()) return;
-    // #1226 — read the freshest persisted profile from the provider
-    // and pass it as `existing:` so `buildProfile` can `copyWith` over
-    // it. This preserves every non-form field (calibrationMode,
-    // autoRecord & friends, runtime-calibrated η_v,
-    // driving-stats aggregates, VIN-decode metadata, ...) verbatim and
-    // closes the bug class behind #1217 / #1221 (which was a minimum-
-    // scope thread-through for `calibrationMode` only).
-    final id = _existingId;
-    final existing = id == null
-        ? null
-        : ref
-            .read(vehicleProfileListProvider)
-            .where((v) => v.id == id)
-            .firstOrNull;
-    final profile = _ctrl.buildProfile(
-      existing: existing,
-      type: _type,
-      connectors: _connectors,
-      adapterMac: _adapterMac,
-      adapterName: _adapterName,
-      engineDisplacementCc: _engineDisplacementCc,
-      engineCylinders: _engineCylinders,
-      curbWeightKg: _curbWeightKg,
-      multiFuelCapable: _multiFuelCapable,
-      referenceVehicle: _pickedReferenceVehicle,
-    );
-    await ref.read(vehicleProfileListProvider.notifier).save(profile);
-    await ref.syncActiveProfile(profile);
-    if (!mounted) return;
-    Navigator.of(context).pop();
-  }
-
-  /// Open the reference catalog picker (#1372 phase 3) and apply the
-  /// user's selection. New-vehicle path only — the button is hidden
-  /// when editing an existing profile so a tap doesn't silently
-  /// overwrite the user's tweaks.
-  ///
-  /// On selection:
-  ///   * `_ctrl.applyReferenceVehicle(...)` writes the catalog values
-  ///     into the text controllers (`name`, `preferredFuelType`).
-  ///   * Scalar engine state (`_engineDisplacementCc`) is overwritten
-  ///     with the catalog row's value so the OBD-II layer can use it
-  ///     immediately on the first trip.
-  ///   * The picked entry itself is stashed in
-  ///     [_pickedReferenceVehicle] so `_save` can thread the
-  ///     catalog-only metadata (slug, volumetricEfficiency, make,
-  ///     model, year) into the new profile via `buildProfile`.
-  ///
-  /// A second tap on the picker overwrites the prior pick — same flow,
-  /// no special handling.
-  Future<void> _openCatalogPicker() async {
-    final picked = await ReferenceVehiclePicker.show(context);
-    if (picked == null || !mounted) return;
-    setState(() {
-      _ctrl.applyReferenceVehicle(picked);
-      _engineDisplacementCc = picked.displacementCc;
-      _pickedReferenceVehicle = picked;
-    });
-  }
-
-  /// Decode the current VIN (#812 phase 2). Success → confirm dialog
-  /// → optional auto-fill. Invalid → snackbar; dialog is skipped.
-  Future<void> _decodeVin() async {
-    final l = AppLocalizations.of(context);
-    final vin = _ctrl.vinController.text.trim();
-    if (vin.isEmpty) {
-      SnackBarHelper.show(
-          context, l.vinInvalidFormat);
-      return;
-    }
-
-    setState(() => _decodingVin = true);
-    VinData? decoded;
-    try {
-      decoded = await ref.read(decodedVinProvider(vin).future);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {'where': 'EditVehicleScreen: VIN decode failed'}));
-    }
-    if (!mounted) return;
-    setState(() => _decodingVin = false);
-
-    if (decoded == null || decoded.source == VinDataSource.invalid) {
-      if (!mounted) return;
-      SnackBarHelper.showError(
-        context,
-        decoded == null
-            ? (l.vinDecodeError)
-            : (l.vinInvalidFormat),
-      );
-      return;
-    }
-
-    final outcome = await VinConfirmDialog.show(context, decoded);
-    if (!mounted) return;
-    if (outcome == VinConfirmOutcome.confirm) _applyDecodedVin(decoded);
-  }
-
-  /// Copy non-null engine fields from [data] (#812 phase 2).
-  /// Displacement: L → cc. Curb weight ≈ GVWR / 2.205 (vPIC has no
-  /// payload field, so GVWR is the best proxy for now).
-  void _applyDecodedVin(VinData data) {
-    setState(() {
-      if (data.displacementL != null) {
-        _engineDisplacementCc = (data.displacementL! * 1000).round();
-      }
-      if (data.cylinderCount != null) _engineCylinders = data.cylinderCount;
-      if (data.gvwrLbs != null) {
-        _curbWeightKg = (data.gvwrLbs! / 2.205).round();
-      }
-    });
-  }
-
-  /// Read the VIN from the paired OBD2 adapter (#1162). On success,
-  /// sets the VIN text field; the existing decoder hook (#812 phase 2)
-  /// can then be triggered manually by the user — we don't auto-fire
-  /// it because the user may want to verify the value first. On any
-  /// failure, surfaces a localized snackbar and leaves the field
-  /// editable.
-  Future<void> _readVinFromCar() async {
-    final l = AppLocalizations.of(context);
-    // #1339 — gate on the adapter-selection field (`obd2AdapterMac`,
-    // surfaced here as `_adapterMac`). VIN reading via Mode 09 PID 02
-    // only needs an adapter to talk to.
-    final mac = _adapterMac;
-    if (mac == null || mac.isEmpty) return;
-
-    setState(() => _readingVinFromCar = true);
-    final result = await ref
-        .read(vinReaderServiceProvider)
-        .readVin(pairedAdapterMac: mac);
-    if (!mounted) return;
-    setState(() => _readingVinFromCar = false);
-
-    if (result.isSuccess) {
-      _ctrl.vinController.text = result.vin!;
-      return;
-    }
-
-    final message = result.failure == ObdVinFailureReason.unsupported
-        ? (l.vehicleReadVinFailedUnsupportedSnackbar)
-        : (l.vehicleReadVinFailedGenericSnackbar);
-    SnackBarHelper.show(context, message);
-  }
-
-  /// #2960 — adapter pair / forget handler. Persists the new adapter
-  /// state **in place** and rebuilds the adapter section WITHOUT
-  /// popping the Edit-vehicle route. Earlier this routed through
-  /// [_save], whose trailing `Navigator.pop()` closed the whole form
-  /// on every add/remove (the user was bounced out and had to reopen
-  /// it). The pair picker (a modal sheet) closes itself; the parent
-  /// screen must stay open so the user can keep editing.
-  void _onAdapterChanged(String? name, String? mac) {
-    setState(() {
-      _adapterName = name;
-      _adapterMac = mac;
-    });
-    // Persist the adapter change without tearing down the form. Unsaved
-    // form edits (tank capacity, preferred fuel, the multi-fuel toggle,
-    // name, VIN, …) are carried through because [_persistAdapterChange]
-    // builds the profile from the live controllers — same as Save would.
-    unawaited(_persistAdapterChange());
-    // #1399 — fire-and-forget VIN-driven auto-population. Only runs
-    // when an adapter was just PAIRED (not unpaired) and we have an
-    // existing profile id to write the detected fields onto. The
-    // populator is silent on every error path; the only user-facing
-    // surface is an optional "Detected: ... Apply?" snackbar when the
-    // decoded values disagree with values the user has entered.
-    if (mac != null && mac.isNotEmpty) {
-      unawaited(_runAutoPopulationAfterPair(mac));
-    }
-  }
-
-  /// #2960 — persist the current form state (including the just-changed
-  /// adapter MAC / name) to the vehicle provider WITHOUT popping the
-  /// route. This is the adapter-section counterpart to [_save] minus
-  /// the form-validation gate and the trailing `Navigator.pop()`: a
-  /// pair / forget should always land even while another field is
-  /// mid-edit, and it must never close the screen. New-vehicle path
-  /// (no `_existingId`) no-ops — the adapter section isn't shown until
-  /// a vehicle has been saved. Never throws.
-  Future<void> _persistAdapterChange() async {
-    final id = _existingId;
-    if (id == null) return;
-    try {
-      final existing = ref
-          .read(vehicleProfileListProvider)
-          .where((v) => v.id == id)
-          .firstOrNull;
-      if (existing == null) return;
-      final profile = _ctrl.buildProfile(
-        existing: existing,
-        type: _type,
-        connectors: _connectors,
-        adapterMac: _adapterMac,
-        adapterName: _adapterName,
-        engineDisplacementCc: _engineDisplacementCc,
-        engineCylinders: _engineCylinders,
-        curbWeightKg: _curbWeightKg,
-        multiFuelCapable: _multiFuelCapable,
-        referenceVehicle: _pickedReferenceVehicle,
-      );
-      await ref.read(vehicleProfileListProvider.notifier).save(profile);
-      if (!mounted) return;
-      await ref.syncActiveProfile(profile);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st, context: const {
-        'where': 'EditVehicleScreen: adapter-change persist failed',
-      }));
-    }
-  }
-
-  /// #1399 — run the post-pair auto-population flow. Always returns
-  /// quickly (the orchestrator owns the connect/disconnect lifecycle
-  /// and a bounded timeout); never throws.
-  Future<void> _runAutoPopulationAfterPair(String pairedAdapterMac) async {
-    final id = _existingId;
-    if (id == null) return;
-    final populator = ref.read(vinAdapterPairAutoPopulatorProvider);
-    final existing = ref
-        .read(vehicleProfileListProvider)
-        .where((v) => v.id == id)
-        .firstOrNull;
-    if (existing == null) return;
-
-    final outcome = await populator.run(
-      pairedAdapterMac: pairedAdapterMac,
-      profile: existing,
-    );
-    if (!mounted) return;
-
-    final updated = outcome.profile;
-    if (updated == null) return;
-
-    // Persist the merged profile + reload local form state so the
-    // "(detected)" badges reflect the fresh detected-* values and any
-    // auto-filled user fields (make/model/year/displacement/fuelType)
-    // show up immediately in the controllers.
-    await ref.read(vehicleProfileListProvider.notifier).save(updated);
-    if (!mounted) return;
-    setState(() {
-      _engineDisplacementCc = updated.engineDisplacementCc;
-      _engineCylinders = updated.engineCylinders;
-      _curbWeightKg = updated.curbWeightKg;
-      // The form controllers re-read the canonical profile via the
-      // load() helper so VIN / preferredFuelType etc. land in the
-      // text fields as well.
-      _ctrl.load(updated);
-    });
-
-    final summary = outcome.conflictSummary;
-    if (summary == null) return;
-    final l = AppLocalizations.of(context);
-    SnackBarHelper.show(
-      context,
-      l.vehicleDetectedFromVinSnackbar(summary),
-      action: SnackBarAction(
-        label: l.vehicleDetectedFromVinApply,
-        onPressed: () => _applyDetectedConflicts(updated),
-      ),
-    );
-  }
-
-  /// #1399 — overwrite the user-entered fields with the detected-*
-  /// values when they disagree, after the user explicitly tapped
-  /// "Apply" on the conflict snackbar.
-  Future<void> _applyDetectedConflicts(VehicleProfile profile) async {
-    final overwritten = profile.copyWith(
-      make: profile.detectedMake ?? profile.make,
-      model: profile.detectedModel ?? profile.model,
-      year: profile.detectedYear ?? profile.year,
-      engineDisplacementCc:
-          profile.detectedEngineDisplacementCc ?? profile.engineDisplacementCc,
-      preferredFuelType:
-          profile.detectedFuelType ?? profile.preferredFuelType,
-    );
-    await ref.read(vehicleProfileListProvider.notifier).save(overwritten);
-    if (!mounted) return;
-    setState(() {
-      _engineDisplacementCc = overwritten.engineDisplacementCc;
-      _ctrl.load(overwritten);
-    });
-  }
-
-  /// #815 — confirm-dialog → write default η_v (0.85), reset samples.
-  Future<void> _resetVolumetricEfficiency() async {
-    final id = _existingId;
-    if (id == null) return;
-    final confirmed = await VeResetConfirmDialog.show(context);
-    if (confirmed != true || !mounted) return;
-    await ref.resetVolumetricEfficiency(id);
-  }
-
-  /// #1397 — persist a single calibration-override field. Reads the
-  /// freshest profile from the provider so the copyWith doesn't clobber
-  /// fields the user changed in another section since the form last
-  /// loaded.
-  Future<void> _saveCalibrationOverride({
-    Object? manualEngineDisplacementCcOverride = _kSentinel,
-    Object? manualVolumetricEfficiencyOverride = _kSentinel,
-    Object? manualAfrOverride = _kSentinel,
-    Object? manualFuelDensityGPerLOverride = _kSentinel,
-  }) async {
-    final id = _existingId;
-    if (id == null) return;
-    final existing = ref
-        .read(vehicleProfileListProvider)
-        .where((v) => v.id == id)
-        .firstOrNull;
-    if (existing == null) return;
-    final updated = existing.copyWith(
-      manualEngineDisplacementCcOverride:
-          identical(manualEngineDisplacementCcOverride, _kSentinel)
-              ? existing.manualEngineDisplacementCcOverride
-              : manualEngineDisplacementCcOverride as double?,
-      manualVolumetricEfficiencyOverride:
-          identical(manualVolumetricEfficiencyOverride, _kSentinel)
-              ? existing.manualVolumetricEfficiencyOverride
-              : manualVolumetricEfficiencyOverride as double?,
-      manualAfrOverride: identical(manualAfrOverride, _kSentinel)
-          ? existing.manualAfrOverride
-          : manualAfrOverride as double?,
-      manualFuelDensityGPerLOverride:
-          identical(manualFuelDensityGPerLOverride, _kSentinel)
-              ? existing.manualFuelDensityGPerLOverride
-              : manualFuelDensityGPerLOverride as double?,
-    );
-    await ref.read(vehicleProfileListProvider.notifier).save(updated);
-  }
-
   /// Brand-accent colour from the vehicle name. Falls back to the
   /// theme primary when no brand matches. The brand mapper is shared
   /// with fuel stations — overlap is rare but harmless.
@@ -612,7 +214,6 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context);
     final isEdit = _existingId != null || widget.vehicleId != null;
     final accent = _brandAccent(context);
 
@@ -638,230 +239,59 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
     // #1693 — guard unsaved vehicle edits. `canPop` blocks the system
     // back gesture and the AppBar back button (both route through
     // `Navigator.maybePop`); the imperative `pop()` in the save path
-    // is unaffected.
+    // is unaffected. The form body itself is the presentational
+    // [VehicleEditForm] (#3234) — the State feeds it the live form values +
+    // pre-built `setState`/action callbacks.
     return PopScope(
       canPop: !_ctrl.isDirty,
       onPopInvokedWithResult: _onPopInvoked,
-      child: PageScaffold(
-      title: isEdit
-          ? (l.vehicleEditTitle)
-          : (l.vehicleAddTitle),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.check),
-          tooltip: l.save,
-          onPressed: _save,
-        ),
-      ],
-      bodyPadding: EdgeInsets.zero,
-      body: Form(
-        key: _formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: ListView(
-          controller: _scrollController,
-          padding: EdgeInsets.fromLTRB(16, 16, 16,
-              MediaQuery.of(context).viewPadding.bottom + 96),
-          children: [
-            // Big brand-tinted header — #751 §3.
-            VehicleHeader(
-              name: _ctrl.nameController.text,
-              accent: accent,
-              type: _type,
-            ),
-            const SizedBox(height: 16),
-            // #1372 phase 3 — reference-catalog picker entry point.
-            // Visible only when creating a new vehicle (gated on
-            // `widget.vehicleId == null` AND no successful prior load).
-            // Hiding it in edit mode prevents a tap from silently
-            // overwriting the user's manually-tweaked fields.
-            if (!isEdit) ...[
-              OutlinedButton.icon(
-                onPressed: _openCatalogPicker,
-                icon: const Icon(Icons.directions_car_outlined),
-                label: Text(
-                  l.pickerButtonLabel,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l.pickerHelpText,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurfaceVariant,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-            ],
-            // Card 1: Identity (name + VIN).
-            VehicleIdentitySection(
-              nameController: _ctrl.nameController,
-              vinController: _ctrl.vinController,
-              vinFocus: _ctrl.vinFocusNode,
-              accent: accent,
-              decodingVin: _decodingVin,
-              onDecodeVin: _decodeVin,
-              onShowVinInfo: _showVinInfo,
-              // #1328 — always show the "Read VIN from car" button. When
-              // no adapter is selected we pass `onReadVinFromCar = null`
-              // (which renders the button visibly disabled with a hint)
-              // so users discover the feature even before pairing.
-              // #1339 — "selected" here is the `obd2AdapterMac` state
-              // (`_adapterMac`); VIN reading only needs an adapter to
-              // talk to.
-              adapterMac: _adapterMac,
-              onReadVinFromCar:
-                  (_adapterMac != null && _adapterMac!.isNotEmpty)
-                      ? _readVinFromCar
-                      : null,
-              readingVinFromCar: _readingVinFromCar,
-            ),
-            const SizedBox(height: 16),
-            // Card 2: Drivetrain (type + type-specific fields).
-            VehicleDrivetrainSection(
-              type: _type,
-              onTypeChanged: (t) => setState(() => _type = t),
-              accent: accent,
-              batteryController: _ctrl.batteryController,
-              maxChargingKwController: _ctrl.maxChargingKwController,
-              minSocController: _ctrl.minSocController,
-              maxSocController: _ctrl.maxSocController,
-              connectors: _connectors,
-              onToggleConnector: (c) => setState(() {
-                if (_connectors.contains(c)) {
-                  _connectors.remove(c);
-                } else {
-                  _connectors.add(c);
-                }
-              }),
-              tankController: _ctrl.tankController,
-              fuelTypeController: _ctrl.fuelTypeController,
-              powerKwController: _ctrl.powerKwController,
-              multiFuelCapable: _multiFuelCapable,
-              onMultiFuelCapableChanged: (v) =>
-                  setState(() => _multiFuelCapable = v),
-              // #2885 — rebuild so the multi-fuel switch shows / hides as
-              // the preferred fuel moves in and out of the E10 / E85 set.
-              onFuelTypeChanged: (_) => setState(() {}),
-              numberValidator: _validateOptionalNumber,
-            ),
-            // Extras for saved vehicles — adapter, baselines, VE
-            // reset, service reminders. All need a stable id.
-            // Spread a List<Widget> instead of wrapping in a Column
-            // so tester.scrollUntilVisible still works on the rows
-            // below the fold (see feedback_ci_column_in_listview.md).
-            if (_existingId != null) ...[
-              ...VehicleExtrasSection.build(
-                context: context,
-                vehicleId: _existingId!,
-                adapterMac: _adapterMac,
-                adapterName: _adapterName,
-                onAdapterPaired: (name, mac) => _onAdapterChanged(name, mac),
-                onAdapterForget: () => _onAdapterChanged(null, null),
-                onResetVolumetricEfficiency: _resetVolumetricEfficiency,
-                currentOdometerKm: ref.latestOdometerKm(_existingId!),
-                obd2CardKey: _obd2CardKey,
-                obd2HighlightAnimation: _obd2HighlightController,
-              ),
-              // Card: hands-free auto-record settings (#1004 phase 6).
-              // Spread alongside the extras list so the host ListView
-              // owns scroll virtualisation for the row.
-              // #1400 — the auto-record card's "Pair an adapter in the
-              // section below" link calls back into the screen so we
-              // can `Scrollable.ensureVisible` the canonical OBD2 card
-              // and pulse its border. The link replaces the duplicate
-              // orange-tinted "Pair an adapter" button that lived in
-              // the auto-record card before #1400.
-              const SizedBox(height: 16),
-              AutoRecordSection(
-                vehicleId: _existingId!,
-                onScrollToObd2Card: _scrollToAndHighlightObd2Card,
-              ),
-              // #1401 phase 6 — adapter capability tier card. Renders
-              // nothing when no adapter is connected (collapsed via
-              // [SizedBox.shrink] inside the widget) so it doesn't
-              // pad the layout for users who haven't paired anything.
-              const SizedBox(height: 16),
-              const Obd2CapabilitySection(),
-              // #1622 — broken-MAP belief + adapter-blocklist
-              // diagnostics card. Collapses to [SizedBox.shrink] when
-              // there is nothing observed and nothing blocklisted, so
-              // it costs no layout space for the common healthy case.
-              const SizedBox(height: 16),
-              BrokenMapDiagnosticsCard(vehicleId: _existingId),
-              const SizedBox(height: 16),
-              // #1397 — collapsed-by-default expansion tile that lets
-              // users override the four physics constants the OBD2
-              // estimator uses (displacement, η_v, AFR, fuel density).
-              // Each row labels its source so users know whether the
-              // value came from VIN decode / catalog / default / their
-              // own keyboard. The auto-learner (#815) writes back into
-              // `volumetricEfficiency`; the readout panel + reset
-              // button surface its state.
-              Builder(builder: (context) {
-                final profile = ref
-                    .watch(vehicleProfileListProvider)
-                    .where((v) => v.id == _existingId)
-                    .firstOrNull;
-                if (profile == null) return const SizedBox.shrink();
-                // #1422 phase 2 — resolve the matching ReferenceVehicle
-                // (by stored slug, or via the matcher as a fallback)
-                // so the η_v helper-text origin tag can show the
-                // engine-tech basis. The catalog provider is keep-alive,
-                // so this watch is cheap.
-                final catalog = ref
-                        .watch(referenceVehicleCatalogProvider)
-                        .value ??
-                    const <ReferenceVehicle>[];
-                ReferenceVehicle? referenceVehicle;
-                if (profile.referenceVehicleId != null) {
-                  for (final entry in catalog) {
-                    if (VehicleProfileCatalogMatcher.slugFor(entry) ==
-                        profile.referenceVehicleId) {
-                      referenceVehicle = entry;
-                      break;
-                    }
-                  }
-                }
-                referenceVehicle ??= VehicleProfileCatalogMatcher.bestMatch(
-                  profile: profile,
-                  catalog: catalog,
-                );
-                // #2837 — when this vehicle's recorded trips show it
-                // reports fuel rate directly (PID 5E / MAF), the η_v
-                // calibration is irrelevant; de-emphasise that UI.
-                final directFuelRate = vehicleReportsDirectFuelRate(
-                  ref.watch(tripHistoryRepositoryProvider)?.loadAll() ??
-                      const [],
-                  vehicleId: profile.id,
-                );
-                return CalibrationSection(
-                  profile: profile,
-                  referenceVehicle: referenceVehicle,
-                  directFuelRateSupported: directFuelRate,
-                  onDisplacementChanged: (v) => _saveCalibrationOverride(
-                    manualEngineDisplacementCcOverride: v,
-                  ),
-                  onVolumetricEfficiencyChanged: (v) =>
-                      _saveCalibrationOverride(
-                    manualVolumetricEfficiencyOverride: v,
-                  ),
-                  onAfrChanged: (v) =>
-                      _saveCalibrationOverride(manualAfrOverride: v),
-                  onFuelDensityChanged: (v) => _saveCalibrationOverride(
-                    manualFuelDensityGPerLOverride: v,
-                  ),
-                  onResetLearner: _resetVolumetricEfficiency,
-                );
-              }),
-            ],
-          ],
-        ),
-      ),
-      // Pinned bottom Save (#751 §3) — always in the tree regardless
-      // of scroll, which tests and TalkBack rely on.
-      bottomNavigationBar: VehicleSaveBar(onSave: _save),
+      child: VehicleEditForm(
+        formKey: _formKey,
+        scrollController: _scrollController,
+        isEdit: isEdit,
+        accent: accent,
+        ctrl: _ctrl,
+        type: _type,
+        onTypeChanged: (t) => setState(() => _type = t),
+        decodingVin: _decodingVin,
+        onDecodeVin: _decodeVin,
+        onShowVinInfo: _showVinInfo,
+        adapterMac: _adapterMac,
+        onReadVinFromCar: (_adapterMac != null && _adapterMac!.isNotEmpty)
+            ? _readVinFromCar
+            : null,
+        readingVinFromCar: _readingVinFromCar,
+        connectors: _connectors,
+        onToggleConnector: (c) => setState(() {
+          if (_connectors.contains(c)) {
+            _connectors.remove(c);
+          } else {
+            _connectors.add(c);
+          }
+        }),
+        multiFuelCapable: _multiFuelCapable,
+        onMultiFuelCapableChanged: (v) =>
+            setState(() => _multiFuelCapable = v),
+        onFuelTypeChanged: (_) => setState(() {}),
+        numberValidator: _validateOptionalNumber,
+        existingId: _existingId,
+        adapterName: _adapterName,
+        onAdapterPaired: _onAdapterChanged,
+        onAdapterForget: () => _onAdapterChanged(null, null),
+        onResetVolumetricEfficiency: _resetVolumetricEfficiency,
+        obd2CardKey: _obd2CardKey,
+        obd2HighlightAnimation: _obd2HighlightController,
+        onScrollToObd2Card: _scrollToAndHighlightObd2Card,
+        onOpenCatalogPicker: _openCatalogPicker,
+        onSave: _save,
+        onDisplacementChanged: (v) =>
+            _saveCalibrationOverride(manualEngineDisplacementCcOverride: v),
+        onVolumetricEfficiencyChanged: (v) =>
+            _saveCalibrationOverride(manualVolumetricEfficiencyOverride: v),
+        onAfrChanged: (v) => _saveCalibrationOverride(manualAfrOverride: v),
+        onFuelDensityChanged: (v) =>
+            _saveCalibrationOverride(manualFuelDensityGPerLOverride: v),
+        onResetLearner: _resetVolumetricEfficiency,
       ),
     );
   }
