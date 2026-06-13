@@ -65,7 +65,15 @@ class SearchResultsContent extends ConsumerWidget {
           // distinct from the loading shimmer and the error banner, so the
           // user knows the scan FINISHED and found nothing — not that it's
           // still searching (the old bare "0 stations" + blank was ambiguous).
+          // #3267 — but while a fresh fix is still resolving ([locating]) an
+          // empty provisional scan is NOT "found nothing"; show the acquiring
+          // state so the empty result doesn't flicker in before the live fix.
           if (stations.isEmpty) {
+            if (radar.locating) {
+              return _RadarLocatingState(
+                message: l10n.radarAcquiringLocation,
+              );
+            }
             return _RadarEmptyState(
               onRetry: () => ref.read(radarSearchProvider.notifier).runRadar(),
             );
@@ -75,12 +83,24 @@ class SearchResultsContent extends ConsumerWidget {
             source: ServiceSource.cache,
             fetchedAt: DateTime.now(),
           );
-          return SearchResultsList(
+          final list = SearchResultsList(
             result: radarResult,
             onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
           );
+          // #3267 — while painting from the last-known position, a thin banner
+          // tells the user the spot is being refreshed (instead of silently
+          // showing stale-position distances), and clears once the live fix
+          // lands and the list re-ranks.
+          if (!radar.locating) return list;
+          return Column(
+            children: [
+              _RadarUpdatingBanner(message: l10n.radarUpdatingLocation),
+              Expanded(child: list),
+            ],
+          );
         },
-        loading: () => const ShimmerStationList(),
+        loading: () =>
+            _RadarLocatingState(message: l10n.radarAcquiringLocation),
         error: (error, stackTrace) => ServiceChainErrorWidget(
           error: error,
           onRetry: () => ref.read(radarSearchProvider.notifier).runRadar(),
@@ -178,6 +198,85 @@ class _RadarEmptyState extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// #3267 — the on-search radar's "acquiring the first GPS fix" state: a centred
+/// spinner + caption shown when the radar is active but has no position yet to
+/// scan around (a fresh install, or a cold first fix with no last-known point).
+/// Visually distinct from the empty state (scan finished, found nothing) so the
+/// user knows the radar is still warming up, not done.
+class _RadarLocatingState extends StatelessWidget {
+  const _RadarLocatingState({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(strokeWidth: 3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// #3267 — a thin banner above the radar results while a fresh GPS fix is still
+/// resolving. The list below is painted from the last-known position (so the
+/// user sees results instantly), and this strip signals the spot is being
+/// refreshed; it clears once the live fix lands and the list re-ranks.
+class _RadarUpdatingBanner extends StatelessWidget {
+  const _RadarUpdatingBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      color: theme.colorScheme.surfaceContainerHighest,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

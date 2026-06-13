@@ -7478,6 +7478,12 @@ class AppLocalizationsSl extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Rezultat radarja bencinski servis';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Priklepanje ohranja zaslon vklopljen — porablja več baterije';
 

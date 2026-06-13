@@ -7509,6 +7509,12 @@ class AppLocalizationsLt extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Degalinių radaro rezultatas';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Prisegimas palaiko ekraną įjungtą — naudoja daugiau baterijos';
 

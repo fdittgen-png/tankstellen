@@ -7496,6 +7496,12 @@ class AppLocalizationsHr extends AppLocalizations {
       'Rezultat radara benzinskih postaja';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Prikačivanje drži ekran uključenim — troši više baterije';
 

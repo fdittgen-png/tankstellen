@@ -123,6 +123,49 @@ LocationSettings approachLocationSettings({TargetPlatform? platform}) {
   }
 }
 
+/// #3267 — the [LocationSettings] for the **on-search** Fuel Station Radar's
+/// live position stream, the foreground sibling of [approachLocationSettings].
+///
+/// The on-search radar is an affordance the user is actively looking at —
+/// never a backgrounded trip — so unlike the recorder/approach profiles this
+/// one does **not** request background updates or a foreground service. It is
+/// the light profile:
+///
+///   * `medium` accuracy — cell/wifi-assisted, the same ~100 m the #3116 fast
+///     first fix uses; ample for a km-scale radar and far cheaper than the
+///     satellite lock the user would otherwise wait on;
+///   * `distanceFilter: 25` m — only re-emit (and re-rank) after a meaningful
+///     move, so a parked/idle user doesn't spin the CPU re-ranking identical
+///     fixes while a moving one still ticks the distance down smoothly;
+///   * iOS `pauseLocationUpdatesAutomatically: false` — the #3112 lesson: a
+///     bare `LocationSettings` lets CoreLocation auto-pause the stream when it
+///     thinks the user stopped, freezing the live distance. Updates keep
+///     flowing while the radar is on, but `allowBackgroundLocationUpdates`
+///     stays off (foreground-only).
+LocationSettings radarSearchLocationSettings({TargetPlatform? platform}) {
+  switch (platform ?? defaultTargetPlatform) {
+    case TargetPlatform.iOS:
+      return AppleSettings(
+        accuracy: LocationAccuracy.medium,
+        activityType: ActivityType.otherNavigation,
+        pauseLocationUpdatesAutomatically: false,
+        allowBackgroundLocationUpdates: false,
+        distanceFilter: 25,
+      );
+    case TargetPlatform.android:
+      return AndroidSettings(
+        accuracy: LocationAccuracy.medium,
+        distanceFilter: 25,
+        intervalDuration: const Duration(seconds: 3),
+      );
+    default:
+      return const LocationSettings(
+        accuracy: LocationAccuracy.medium,
+        distanceFilter: 25,
+      );
+  }
+}
+
 LocationSettings recordingLocationSettings({
   required AppLocalizations l10n,
   TargetPlatform? platform,

@@ -3,17 +3,15 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/domain/station.dart';
 import '../../../core/services/approach_detector.dart';
-import '../../../core/services/service_providers.dart';
 import '../../../core/utils/geo_utils.dart' as geo;
-import '../../../core/utils/station_extensions.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
-import '../../../core/domain/search_params.dart';
-import '../../../core/domain/fuel_type.dart';
-import '../../../core/domain/station.dart';
+import '../../../core/services/radar/radar_ranking.dart';
 import 'effective_approach_state_provider.dart';
 import 'fuel_station_radar_provider.dart';
+import '../../../core/services/radar/radar_in_radius_cache_provider.dart';
 
 part 'radar_candidate_list_provider.g.dart';
 
@@ -89,98 +87,45 @@ Future<List<Station>> radarCandidateList(Ref ref) async {
     // Cache-first corridor (tier-1) + JIT price for the imminent station(s)
     // (tier-3), at the user's default radar radius — the same envelope the
     // in-radius detector polls with. Zero network on a warm tile / a
-    // bulk-file country.
+    // bulk-file country. #3256 — thread the live heading so the cache
+    // prefetches the tile ahead before the driver crosses into it.
     final corridor = await radar.fetchStations(
       gps.latitude,
       gps.longitude,
       profile.approachRadiusKm,
       fuel.apiValue,
+      headingDegrees: geo.sanitizedHeading(gps.heading),
     );
 
     // #2965 — merge a DIRECT in-radius search so the candidate set is always a
     // SUPERSET of the in-radius search (mirrors the on-search radar's #2806
-    // rescue). The corridor's polled source is row-capped with no distance
-    // ordering, so in a dense area the genuinely-nearest forecourt can be
-    // truncated out and this card would show "no station nearby" while a priced
-    // station is metres away. Best-effort: corridor-only on failure.
-    final inRadius = await _inRadiusStations(
-      ref,
-      gps.latitude,
-      gps.longitude,
-      profile.approachRadiusKm,
-      fuel,
-    );
+    // rescue): the corridor's polled source is row-capped with no distance
+    // ordering, so a dense area can truncate out the genuinely-nearest
+    // forecourt. #3254 — this merge is now movement+time-gated, so it issues
+    // at most one chain search per the provider's minInterval (not one per
+    // poll), and reuses its cached merge in between — bounding the rate-limit
+    // queue a moving car used to flood.
+    final inRadius = await ref.read(radarInRadiusCacheProvider).stationsNear(
+          gps.latitude,
+          gps.longitude,
+          profile.approachRadiusKm,
+        );
 
-    // Dedup by id, the in-radius row winning — it carries the freshest per-fuel
-    // price/distance. Then keep only stations the driver can actually price-
-    // compare (a non-null, positive [priceFor] for the effective fuel) so a
-    // swipe never lands on a `--` price row (#2583), and distance-sort from the
-    // live fix (the corridor is cached in fetch order, not distance order).
-    final byId = <String, Station>{
-      for (final s in corridor) s.id: s,
-      for (final s in inRadius) s.id: s,
-    };
-    final priced = byId.values
-        .where((s) {
-          final price = s.priceFor(fuel);
-          return price != null && price > 0;
-        })
-        .toList(growable: false)
-      ..sort((a, b) => geo
-          .distanceMeters(gps.latitude, gps.longitude, a.lat, a.lng)
-          .compareTo(
-            geo.distanceMeters(gps.latitude, gps.longitude, b.lat, b.lng),
-          ));
-    // #2808 — re-stamp each row's LIVE distance (km) from the current fix.
-    // The corridor stations carry a `dist` frozen at the corridor-fetch
-    // centre, so without this the swipe-card proximity bar + caption never
-    // move as the driver approaches. Mirrors the on-search radar.
-    return [
-      for (final s in priced)
-        s.copyWith(
-          dist: geo.distanceMeters(
-                gps.latitude,
-                gps.longitude,
-                s.lat,
-                s.lng,
-              ) /
-              1000.0,
-        ),
-    ];
+    // #3267 — the single distance-ranking authority: dedup (the in-radius row
+    // wins — freshest per-fuel price/distance), keep only stations priced for
+    // the effective fuel so a swipe never lands on a `--` row (#2583), live-
+    // stamp each row's distance off the current fix (#2808 — the corridor
+    // `dist` is frozen at fetch time) and distance-sort nearest-first.
+    return RadarRanking.rank(
+      [...corridor, ...inRadius],
+      lat: gps.latitude,
+      lng: gps.longitude,
+      fuel: fuel,
+      requirePrice: true,
+    );
   } on Object {
     // Radar / chain failure — treat as "no stations nearby". The provider
     // re-runs on the next approach-state tick.
     return const [];
-  }
-}
-
-/// A direct in-radius station fetch around the live fix (#2965), mirroring the
-/// regular search + the on-search radar's `_inRadiusStations`, so the candidate
-/// list is a superset of the in-radius search and a dense-corridor row cap can
-/// never truncate out the genuinely-nearest forecourt.
-///
-/// **Never throws.** Returns `const []` on any failure (offline, rate-limit, a
-/// service that doesn't support geo search) so the candidate list degrades to
-/// its cached corridor rather than collapsing the card.
-Future<List<Station>> _inRadiusStations(
-  Ref ref,
-  double lat,
-  double lng,
-  double radiusKm,
-  FuelType fuel,
-) async {
-  try {
-    final result = await ref.read(stationServiceProvider).searchStations(
-          SearchParams(
-            lat: lat,
-            lng: lng,
-            radiusKm: radiusKm,
-            fuelType: fuel,
-            sortBy: SortBy.distance,
-          ),
-        );
-    return result.data;
-  } on Object {
-    return const <Station>[];
   }
 }

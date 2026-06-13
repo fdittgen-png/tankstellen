@@ -7523,6 +7523,12 @@ class AppLocalizationsRo extends AppLocalizations {
       'Rezultat Radar stații de carburant';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fixarea menține ecranul aprins — consumă mai multă baterie';
 

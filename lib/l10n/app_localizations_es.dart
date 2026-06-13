@@ -7523,6 +7523,12 @@ class AppLocalizationsEs extends AppLocalizations {
       'Resultado del Radar de gasolineras';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fijar mantiene la pantalla encendida: consume más batería';
 

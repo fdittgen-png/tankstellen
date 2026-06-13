@@ -210,4 +210,4 @@ final class RadarCandidateListProvider
 }
 
 String _$radarCandidateListHash() =>
-    r'ba7871184e8eca320d6ffd2949658d0e707c51f1';
+    r'319e230c75f4669b9c98ef2a7e935f1361a44d46';

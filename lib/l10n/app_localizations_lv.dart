@@ -7515,6 +7515,12 @@ class AppLocalizationsLv extends AppLocalizations {
       'Degvielas staciju radara rezultāts';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Piespraušana patur ekrānu ieslēgtu — patērē vairāk akumulatora';
 

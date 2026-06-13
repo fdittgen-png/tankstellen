@@ -7527,6 +7527,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'Resultado do Radar de Postos de Combustível';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fixar mantém o ecrã ligado — usa mais bateria';
 

@@ -13012,6 +13012,18 @@ abstract class AppLocalizations {
   /// **'Fuel Station Radar result'**
   String get fuelStationRadarResultBadge;
 
+  /// Status shown while the on-search Fuel Station Radar acquires the first GPS fix and has no last-known position to scan around yet (#3267).
+  ///
+  /// In en, this message translates to:
+  /// **'Finding your location…'**
+  String get radarAcquiringLocation;
+
+  /// Status banner shown above the on-search Fuel Station Radar results while a fresh GPS fix is still resolving — the list is painted from the last-known position and refreshes once the live fix lands (#3267).
+  ///
+  /// In en, this message translates to:
+  /// **'Updating your location…'**
+  String get radarUpdatingLocation;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

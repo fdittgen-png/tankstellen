@@ -7434,6 +7434,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Fuel Station Radar result';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 
@@ -15421,6 +15427,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get fuelStationRadarResultBadge =>
       '⟦Ƒúéł Šŧáŧîóñ Řáđář řéšúłŧ ··········⟧';
+
+  @override
+  String get radarAcquiringLocation => '⟦Ƒîñđîñǧ ýóúř łóçáŧîóñ… ·········⟧';
+
+  @override
+  String get radarUpdatingLocation => '⟦Úƥđáŧîñǧ ýóúř łóçáŧîóñ… ·········⟧';
 
   @override
   String get tripRecordingPinTooltip =>

@@ -7482,6 +7482,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Výsledek Radaru čerpacích stanic';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Připnutí udržuje obrazovku zapnutou — spotřebuje více baterie';
 

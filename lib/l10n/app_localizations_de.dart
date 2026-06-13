@@ -7516,6 +7516,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fuelStationRadarResultBadge => 'Tankstellen-Radar-Ergebnis';
 
   @override
+  String get radarAcquiringLocation => 'Standort wird ermittelt…';
+
+  @override
+  String get radarUpdatingLocation => 'Standort wird aktualisiert…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 

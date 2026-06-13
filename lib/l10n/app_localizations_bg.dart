@@ -7533,6 +7533,12 @@ class AppLocalizationsBg extends AppLocalizations {
       'Резултат от радара за бензиностанции';
 
   @override
+  String get radarAcquiringLocation => 'Finding your location…';
+
+  @override
+  String get radarUpdatingLocation => 'Updating your location…';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Закачането задържа екрана включен — изразходва повече батерия';
 

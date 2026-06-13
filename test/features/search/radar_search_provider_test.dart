@@ -1,10 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
+import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/services/mixins/station_service_helpers.dart';
 import 'package:tankstellen/core/services/radar/corridor_location_cache.dart';
@@ -133,11 +137,16 @@ class _FakeStationService implements StationService {
   final List<Station> _inRadius;
   final bool throws;
 
+  /// How many direct in-radius searches the radar issued — the #3254 gate
+  /// assertion checks this stays bounded as the user moves.
+  int searchCalls = 0;
+
   @override
   Future<ServiceResult<List<Station>>> searchStations(
     SearchParams params, {
     CancelToken? cancelToken,
   }) async {
+    searchCalls++;
     if (throws) throw StateError('in-radius fetch failed');
     return ServiceResult(
       data: _inRadius,
@@ -157,6 +166,42 @@ class _FakeStationService implements StationService {
       throw UnimplementedError();
 }
 
+/// A [GeolocatorWrapper] whose live position stream the test drives by hand —
+/// the on-search radar now subscribes to it for live distance re-stamping
+/// (#3267). Default-empty so the existing one-shot assertions are unaffected.
+class _FakeGeolocator extends GeolocatorWrapper {
+  _FakeGeolocator(this.controller);
+  final StreamController<Position> controller;
+
+  @override
+  Stream<Position> getPositionStream({LocationSettings? locationSettings}) =>
+      controller.stream;
+}
+
+/// A [GeolocatorWrapper] whose position stream THROWS synchronously on
+/// subscribe — models a platform-less / location-off device. The on-search
+/// radar's `_subscribeGps` documents a never-throws contract: it must swallow
+/// this and keep the radar usable off the persisted / refreshed fix (#3267).
+class _ThrowingGeolocator extends GeolocatorWrapper {
+  @override
+  Stream<Position> getPositionStream({LocationSettings? locationSettings}) =>
+      throw StateError('no platform location stream');
+}
+
+/// A real-shaped [Position] for the live GPS stream.
+Position _pos(double lat, double lng, {double heading = 90}) => Position(
+      latitude: lat,
+      longitude: lng,
+      timestamp: DateTime.now(),
+      accuracy: 5,
+      altitude: 0,
+      altitudeAccuracy: 0,
+      heading: heading,
+      headingAccuracy: 0,
+      speed: 0,
+      speedAccuracy: 0,
+    );
+
 ProviderContainer _container({
   required ({double lat, double lng})? position,
   required List<Station> corridor,
@@ -166,6 +211,8 @@ ProviderContainer _container({
   ({double lat, double lng})? refreshTo,
   FuelType fuel = FuelType.e10,
   double radiusKm = 10.0,
+  StreamController<Position>? gps,
+  _FakeStationService? service,
 }) =>
     ProviderContainer(
       overrides: [
@@ -181,7 +228,13 @@ ProviderContainer _container({
         searchRadiusProvider.overrideWith(() => _FixedRadius(radiusKm)),
         fuelStationRadarProvider.overrideWithValue(_recordedRadar(corridor)),
         stationServiceProvider.overrideWithValue(
-          _FakeStationService(inRadius, throws: inRadiusThrows),
+          service ?? _FakeStationService(inRadius, throws: inRadiusThrows),
+        ),
+        // The on-search radar subscribes to the live GPS stream (#3267).
+        // A broadcast controller the test can push fixes into; default-empty
+        // (never emits) for the one-shot assertions.
+        geolocatorWrapperProvider.overrideWithValue(
+          _FakeGeolocator(gps ?? StreamController<Position>.broadcast()),
         ),
       ],
     );
@@ -427,6 +480,123 @@ void main() {
       // where NEAR is ~130 km away and would sort after FAR1.
       expect(list.first.id, 'NEAR');
       expect(list.first.dist, lessThan(0.1));
+    });
+  });
+
+  group('RadarSearch — live distance updates (#3267)', () {
+    test(
+        'a live GPS fix re-stamps distance closer as the user approaches '
+        '(no longer a frozen one-shot)', () async {
+      // One station ~5.5 km north of the user's start. As the user drives
+      // toward it the live stream must re-stamp the distance DOWN — the core
+      // bug: the on-search radar used to stamp distance once and freeze it.
+      final gps = StreamController<Position>.broadcast();
+      addTearDown(gps.close);
+      final container = _container(
+        position: (lat: 48.0, lng: 2.0),
+        corridor: [_station('AHEAD', 48.05, 2.0, e10: 1.65)],
+        gps: gps,
+      );
+      addTearDown(container.dispose);
+      // Keep the autoDispose provider alive across pumps, as the search screen
+      // does by watching it (else it disposes between reads and resets to idle).
+      addTearDown(container.listen(radarSearchProvider, (_, _) {}).close);
+
+      await container.read(radarSearchProvider.notifier).runRadar();
+      final startDist =
+          container.read(radarSearchProvider).stations.value!.first.dist;
+      expect(startDist, greaterThan(5.0),
+          reason: 'AHEAD starts ~5.5 km away');
+
+      // Drive halfway toward it.
+      gps.add(_pos(48.025, 2.0));
+      await pumpEventQueue();
+
+      final midDist =
+          container.read(radarSearchProvider).stations.value!.first.dist;
+      expect(midDist, lessThan(startDist),
+          reason: 'distance ticks DOWN on a live fix, not frozen');
+      expect(midDist, greaterThan(2.0));
+
+      // Arrive next to it.
+      gps.add(_pos(48.05, 2.0));
+      await pumpEventQueue();
+
+      final endDist =
+          container.read(radarSearchProvider).stations.value!.first.dist;
+      expect(endDist, lessThan(0.2),
+          reason: 'at the station the live distance is ~0');
+      // The derived PiP-tile nearest carries the SAME live distance (#3255).
+      expect(container.read(radarSearchNearestProvider)!.dist, lessThan(0.2));
+    });
+
+    test(
+        'live re-rank between fixes issues NO extra in-radius chain search '
+        'while inside the cache cell (#3254 gate)', () async {
+      final gps = StreamController<Position>.broadcast();
+      addTearDown(gps.close);
+      final service = _FakeStationService(const []);
+      final container = _container(
+        position: (lat: 48.0, lng: 2.0),
+        corridor: [_station('AHEAD', 48.05, 2.0, e10: 1.65)],
+        service: service,
+        gps: gps,
+      );
+      addTearDown(container.dispose);
+      addTearDown(container.listen(radarSearchProvider, (_, _) {}).close);
+
+      await container.read(radarSearchProvider.notifier).runRadar();
+      final afterRun = service.searchCalls;
+      expect(afterRun, 1, reason: 'one authoritative in-radius search on run');
+
+      // Several sub-cell jitters (<111 m) — the live distance still updates off
+      // the cached set, but NOT one chain search per fix.
+      for (final dLat in [0.0001, 0.0002, 0.0003, 0.0004]) {
+        gps.add(_pos(48.0 + dLat, 2.0));
+        await pumpEventQueue();
+      }
+      expect(service.searchCalls, afterRun,
+          reason: 'in-cell fixes reuse the gated merge — no new chain search');
+    });
+
+    test(
+        '_subscribeGps never throws — a platform-less position stream is '
+        'swallowed and the radar still scans (#3267 never-throws contract)',
+        () async {
+      final container = ProviderContainer(overrides: [
+        userPositionProvider
+            .overrideWith(() => _FixedUserPosition(48.0, 2.0)),
+        selectedFuelTypeProvider.overrideWith(() => _FixedFuelType(FuelType.e10)),
+        searchRadiusProvider.overrideWith(() => _FixedRadius(10.0)),
+        fuelStationRadarProvider.overrideWithValue(
+          _recordedRadar([_station('NEAR', 48.0, 2.0, e10: 1.5)]),
+        ),
+        stationServiceProvider
+            .overrideWithValue(_FakeStationService(const [])),
+        // The GPS stream throws on subscribe — the fault injected here.
+        geolocatorWrapperProvider.overrideWithValue(_ThrowingGeolocator()),
+      ]);
+      addTearDown(container.dispose);
+
+      // The throwing stream must NOT propagate out of runRadar.
+      await expectLater(
+        container.read(radarSearchProvider.notifier).runRadar(),
+        completes,
+      );
+      // …and the radar still scanned off the persisted / refreshed fix.
+      expect(container.read(radarSearchProvider).stations.value, isNotEmpty);
+    });
+
+    test('locating flips false once the fresh fix lands', () async {
+      final container = _container(
+        position: (lat: 48.0, lng: 2.0),
+        corridor: [_station('NEAR', 48.0, 2.0, e10: 1.5)],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(radarSearchProvider.notifier).runRadar();
+      expect(container.read(radarSearchProvider).locating, isFalse,
+          reason: 'authoritative scan around the fresh fix clears locating');
     });
   });
 }

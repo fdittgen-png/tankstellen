@@ -30,5 +30,13 @@
   "fuelStationRadarResultBadge": "Tankstellen-Radar-Ergebnis",
   "@fuelStationRadarResultBadge": {
     "description": "Label of the grey summary-bar chip shown above the results list while the on-search Fuel Station Radar owns the results, replacing the radius chip to signal the list is a radar scan rather than a regular search (#2676)."
+  },
+  "radarAcquiringLocation": "Standort wird ermittelt…",
+  "@radarAcquiringLocation": {
+    "description": "Status shown while the on-search Fuel Station Radar acquires the first GPS fix and has no last-known position to scan around yet (#3267)."
+  },
+  "radarUpdatingLocation": "Standort wird aktualisiert…",
+  "@radarUpdatingLocation": {
+    "description": "Status banner shown above the on-search Fuel Station Radar results while a fresh GPS fix is still resolving — the list is painted from the last-known position and refreshes once the live fix lands (#3267)."
   }
 }

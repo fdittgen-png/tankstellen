@@ -2131,6 +2131,8 @@
   "fuelStationRadarStart": "⟦Šŧářŧ ƒúéł šŧáŧîóñ řáđář ·········⟧",
   "stopRadar": "⟦Šŧóƥ řáđář ····⟧",
   "fuelStationRadarResultBadge": "⟦Ƒúéł Šŧáŧîóñ Řáđář řéšúłŧ ··········⟧",
+  "radarAcquiringLocation": "⟦Ƒîñđîñǧ ýóúř łóçáŧîóñ… ·········⟧",
+  "radarUpdatingLocation": "⟦Úƥđáŧîñǧ ýóúř łóçáŧîóñ… ·········⟧",
   "tripRecordingPinTooltip": "⟦Ƥîññîñǧ ķééƥš ŧĥé šçřééñ óñ — úšéš ɱóřé ƀáŧŧéřý ·················⟧",
   "tripRecordingPinSemanticOn": "⟦Úñƥîñ řéçóřđîñǧ ƒóřɱ ········⟧",
   "tripRecordingPinSemanticOff": "⟦Ƥîñ řéçóřđîñǧ ƒóřɱ ·······⟧",
