@@ -67,11 +67,15 @@ void main() {
     expect(roundTripped.is24h, isTrue);
   });
 
-  test('a genuinely hours-less FR record (all 01:00-01:00, automate off) '
-      'round-trips as not-available — honest, not a parse loss', () {
-    // The REAL 34120007 (18 AVENUE DE VERDUN, Pézenas) record: every day is
-    // the degenerate `01.00-01.00` sentinel and the automate flag is off, so
-    // the source genuinely carries NO usable hours.
+  test('an all-`01:00-01:00` FR record (open==close every day) round-trips as '
+      'open24h — the hours the official site shows, NOT "non disponibles" '
+      '(#3308 regression)', () {
+    // The REAL 34120007 (18 AVENUE DE VERDUN, Pézenas / STATION SERVICE PEZENAS
+    // | ENI) record: every day is `01.00-01.00` (open==close). The official
+    // prix-carburants site renders these as the day's hours ("Lundi : 01h-01h
+    // …"), so the app MUST show hours too. We previously dropped open==close as
+    // a "degenerate sentinel" → all days unknown → "Horaires d'ouverture non
+    // disponibles". Now it resolves to open24h (the round-the-clock convention).
     final record = <String, dynamic>{
       'id': '34120007',
       'geom': <String, dynamic>{'lat': 43.46, 'lon': 3.42},
@@ -87,11 +91,13 @@ void main() {
     };
     final parsed = parsePrixCarburantsStation(record, 43.46, 3.42);
     final oh = Station.fromJson(parsed!.toJson()).openingHours;
-    // No staffed ranges anywhere — every day is the degenerate sentinel.
-    final anyOpen = kRegularWeekdays
-        .any((d) => oh?.dayFor(d)?.state == DayState.openRanges);
-    expect(anyOpen, isFalse,
-        reason: 'the source data has no real intervals for this station — '
-            '"non disponibles" is the honest render, not a parse regression');
+    expect(oh, isNotNull);
+    // Every day open24h — survives the round-trip, renders as hours not
+    // "non disponibles".
+    for (final d in kRegularWeekdays) {
+      expect(oh!.dayFor(d)?.state, DayState.open24h,
+          reason: 'open==close is the 24h convention the official site shows');
+    }
+    expect(oh!.availability, isNot(OpeningHoursAvailability.notProvided));
   });
 }

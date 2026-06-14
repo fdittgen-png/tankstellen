@@ -183,7 +183,8 @@ void main() {
       expect(out.days, hasLength(2));
     });
 
-    test('01:00-01:00 degenerate sentinel → unknown, range dropped', () {
+    test('01:00-01:00 open==close → open24h (the round-the-clock convention '
+        'the official prix-carburants site renders), no kept range (#3308)', () {
       final out = adapter.parse({
         'horaires_jour': 'Lundi01.00-01.00, Mardi08.00-18.00',
         'horaires_automate_24_24': 'Non',
@@ -191,8 +192,11 @@ void main() {
 
       final monday = out.dayFor(OpeningDay.mon);
       expect(monday, isNotNull);
-      // Not a real interval, not 24h — explicitly unknown with no rendered range.
-      expect(monday!.state, DayState.unknown);
+      // #3308 — open==close is the feed's 24h convention; the official site
+      // shows it as the day's hours (`01h-01h`), so we render open24h instead
+      // of dropping it to unknown (which hid it as "non disponibles"). The
+      // literal interval is not kept as a range — the day IS the 24h state.
+      expect(monday!.state, DayState.open24h);
       expect(monday.ranges, isEmpty);
 
       final tuesday = out.dayFor(OpeningDay.tue);
