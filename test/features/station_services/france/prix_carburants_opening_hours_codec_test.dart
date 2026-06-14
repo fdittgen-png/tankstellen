@@ -100,4 +100,67 @@ void main() {
     }
     expect(oh!.availability, isNot(OpeningHoursAvailability.notProvided));
   });
+
+  test('an automate-24/24 FR record with no boutique schedule round-trips as '
+      'all-week 24h with the automate flag (#3308 trio)', () {
+    // The REAL 34550002 (INTERMARCHE BESSAN, Route st thibéry): the official
+    // site shows "Automate : 24/24" + "Horaires boutique/guichet : Non
+    // renseigné". The feed carries `horaires_jour: "Automate-24-24"` (no per-day
+    // ranges) + `horaires_automate_24_24: "Oui"`, so the whole week is the
+    // pump-only 24/7 fallback — open24h every day, NOT "non disponibles".
+    final record = <String, dynamic>{
+      'id': '34550002',
+      'geom': <String, dynamic>{'lat': 43.41, 'lon': 3.40},
+      'adresse': 'Route st thibéry',
+      'ville': 'Bessan',
+      'cp': '34550',
+      'gazole_prix': 1.809,
+      'horaires_automate_24_24': 'Oui',
+      'horaires_jour': 'Automate-24-24',
+    };
+    final parsed = parsePrixCarburantsStation(record, 43.41, 3.40);
+    final oh = Station.fromJson(parsed!.toJson()).openingHours;
+    expect(oh, isNotNull);
+    expect(oh!.automate24h, isTrue);
+    for (final d in kRegularWeekdays) {
+      expect(oh.dayFor(d)?.state, DayState.open24h);
+    }
+    expect(oh.availability, isNot(OpeningHoursAvailability.notProvided));
+  });
+
+  test('an automate-24/24 FR record WITH a staffed boutique schedule keeps the '
+      'staffed hours + Sunday closed + the automate flag (#3308 trio)', () {
+    // The REAL 34120008 (SARL L\'ATELIER - STATION ESSO, 28 Faubourg des
+    // cordeliers): the official site shows "Automate : 24/24" AND Mon–Fri
+    // 07h-18h30, Sat 08h-14h, Dimanche Fermé. The staffed hours must be KEPT
+    // (not collapsed to all-24h), the automate surfaced as a flag, Sunday
+    // closed — all surviving the JSON round-trip.
+    final record = <String, dynamic>{
+      'id': '34120008',
+      'geom': <String, dynamic>{'lat': 43.4607, 'lon': 3.4203},
+      'adresse': '28 Faubourg des cordeliers, route de Montpellier',
+      'ville': 'Pézenas',
+      'cp': '34120',
+      'sp95_prix': 1.995,
+      'horaires_automate_24_24': 'Oui',
+      'horaires_jour':
+          'Automate-24-24, Lundi07.00-18.30, Mardi07.00-18.30, '
+              'Mercredi07.00-18.30, Jeudi07.00-18.30, Vendredi07.00-18.30, '
+              'Samedi08.00-14.00, Dimanche',
+    };
+    final parsed = parsePrixCarburantsStation(record, 43.46, 3.42);
+    final oh = Station.fromJson(parsed!.toJson()).openingHours;
+    expect(oh, isNotNull);
+    expect(oh!.automate24h, isTrue);
+    expect(oh.dayFor(OpeningDay.mon)?.state, DayState.openRanges);
+    expect(oh.dayFor(OpeningDay.mon)?.ranges.first.startMinutes, 7 * 60);
+    expect(oh.dayFor(OpeningDay.mon)?.ranges.first.endMinutes, 18 * 60 + 30);
+    expect(oh.dayFor(OpeningDay.sat)?.ranges.first.startMinutes, 8 * 60);
+    expect(oh.dayFor(OpeningDay.sat)?.ranges.first.endMinutes, 14 * 60);
+    expect(oh.dayFor(OpeningDay.sun)?.state, DayState.closed);
+    // Staffed hours survived — NOT collapsed to all-week 24h.
+    final allOpen24 =
+        kRegularWeekdays.every((d) => oh.dayFor(d)?.state == DayState.open24h);
+    expect(allOpen24, isFalse);
+  });
 }
