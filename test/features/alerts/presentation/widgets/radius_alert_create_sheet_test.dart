@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tankstellen/core/country/country_config.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/radius_alert_create_sheet.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/radius_alert_form_fields.dart';
 import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -37,6 +40,34 @@ void main() {
         find.byKey(const Key('radius_alert_germany_only_note')),
         findsNothing,
       );
+    });
+
+    testWidgets('fuel dropdown follows the ACTIVE country before a centre is '
+        'picked, not hardcoded Germany (#3333)', (tester) async {
+      // Active country = France. Before any centre is bound the sheet must
+      // offer FRANCE's evaluable fuels (E85 / GPLc included), not the German
+      // e5/e10/diesel trio that the old `Countries.germany` default forced.
+      final test = standardTestOverrides(country: Countries.france);
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+
+      await pumpApp(
+        tester,
+        const RadiusAlertCreateSheet(),
+        overrides: [
+          ...test.overrides,
+          radiusAlertsProvider.overrideWith(_CapturingRadiusAlerts.new),
+        ],
+      );
+
+      final field = tester.widget<RadiusAlertFuelTypeField>(
+        find.byType(RadiusAlertFuelTypeField),
+      );
+      expect(field.evaluableFuels, contains(FuelType.e85),
+          reason: 'France sells E85 — it must be offerable without first '
+              'picking a French centre');
+      expect(field.evaluableFuels, contains(FuelType.lpg));
+      expect(field.evaluableFuels.length, greaterThan(3),
+          reason: 'more than the German e5/e10/diesel trio');
     });
 
     testWidgets('threshold label uses the centre country currency (#2865)', (

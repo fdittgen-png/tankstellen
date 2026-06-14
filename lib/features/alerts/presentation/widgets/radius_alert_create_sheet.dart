@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
+import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -149,15 +150,17 @@ class _RadiusAlertCreateSheetState
   /// The country the alert's centre falls in (#2865) — resolved from the
   /// picked coordinates via the registry's bounding boxes, exactly like
   /// the background radius runner. Before a centre is set the form has no
-  /// location yet, so it falls back to the default country (preserving the
-  /// historical euro labels). Updates live as the user picks GPS / a map
-  /// point; the parent re-`build`s on every centre change.
+  /// location yet, so it falls back to the user's ACTIVE country (#3333) —
+  /// not a hardcoded Germany, which limited a French user's fuel dropdown to
+  /// the German e5/e10/diesel trio (E85 / SP98 / GPLc were missing). Updates
+  /// live as the user picks GPS / a map point; the parent re-`build`s on
+  /// every centre change.
   String get _centerCountry {
     final lat = _centerLat;
     final lng = _centerLng;
-    if (lat == null || lng == null) return Countries.germany.code;
-    return CountryServiceRegistry.countryForLatLng(lat, lng) ??
-        Countries.germany.code;
+    final fallback = ref.read(activeCountryProvider).code;
+    if (lat == null || lng == null) return fallback;
+    return CountryServiceRegistry.countryForLatLng(lat, lng) ?? fallback;
   }
 
   /// Currency symbol for the centre's country (#2865) — used on the
