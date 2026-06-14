@@ -42,9 +42,23 @@ class Obd2LinkDropSignal {
   /// onError / onDone / disconnect-edge handlers. Best-effort: a closed
   /// controller (only in a torn-down test) is ignored silently — a drop
   /// signal is advisory, never load-bearing on its own.
-  void notifyDrop({required String transportKind, String? mac}) {
+  ///
+  /// #3346 — [reason] is a stable, low-cardinality tag for WHY the link
+  /// dropped (`ble-disconnect-edge`, `classic-socket-error`,
+  /// `classic-socket-done`, `classic-write-failed`). It is carried into the
+  /// reconnect-episode breadcrumb so a field export answers the first
+  /// question — *what killed the link* — without a debugger attached.
+  void notifyDrop({
+    required String transportKind,
+    String? mac,
+    String reason = 'unspecified',
+  }) {
     if (_controller.isClosed) return;
-    _controller.add(Obd2LinkDropEvent(transportKind: transportKind, mac: mac));
+    _controller.add(Obd2LinkDropEvent(
+      transportKind: transportKind,
+      mac: mac,
+      reason: reason,
+    ));
   }
 }
 
@@ -56,9 +70,17 @@ class Obd2LinkDropEvent {
   /// MAC of the link that dropped, when the channel knows it.
   final String? mac;
 
-  const Obd2LinkDropEvent({required this.transportKind, this.mac});
+  /// #3346 — a stable, low-cardinality tag for WHY the link dropped, set at
+  /// the channel drop site. Defaults to `'unspecified'` for older callers.
+  final String reason;
+
+  const Obd2LinkDropEvent({
+    required this.transportKind,
+    this.mac,
+    this.reason = 'unspecified',
+  });
 
   @override
-  String toString() =>
-      'Obd2LinkDropEvent(transportKind: $transportKind, mac: $mac)';
+  String toString() => 'Obd2LinkDropEvent(transportKind: $transportKind, '
+      'mac: $mac, reason: $reason)';
 }
