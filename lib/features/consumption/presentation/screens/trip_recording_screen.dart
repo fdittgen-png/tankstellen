@@ -829,6 +829,13 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         child: TripStartProgress(
           key: const Key('tripRecordingConnectingProgress'),
           stage: state.connectStage ?? TripStartStage.connectingAdapter,
+          // #3335 — let the user bail out of a stuck/slow init: reset to idle
+          // (the coordinator's pre-start guard tears down any link that lands
+          // after this) and leave the recording screen so they can retry.
+          onCancel: () {
+            ref.read(tripRecordingProvider.notifier).cancelConnecting();
+            if (Navigator.canPop(context)) Navigator.of(context).pop();
+          },
         ),
       );
     }

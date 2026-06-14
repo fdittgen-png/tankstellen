@@ -197,6 +197,44 @@ void main() {
     expect(errors, isEmpty);
     expect(recording.startCallCount, 1);
   });
+
+  testWidgets(
+      '#3335 — Cancel during connect: a link that lands after the user backed '
+      'out is torn down and NO trip is started', (tester) async {
+    // Healthy bus, but the user hits Cancel (cancelConnecting → idle) while
+    // the BLE connect is in flight. The connect then completes; the
+    // coordinator must NOT start a trip and must disconnect the orphan link.
+    final service = _FakeObd2Service(
+      busAnswered: true,
+      busProbe: Obd2BusProbeResult.answered,
+    );
+    final coordinator = RecordingStartCoordinator();
+    final errors = <Object>[];
+    late _SpyTripRecording recording;
+
+    await withRef(tester, _SpyTripRecording.new, (ref, notifier) async {
+      recording = notifier;
+      notifier.enterConnecting();
+      await coordinator.connectAndStart(
+        ref,
+        notifier: notifier,
+        // Simulate the user tapping Cancel mid-connect: the session leaves the
+        // connecting phase just before the link comes up.
+        openPicker: () async {
+          notifier.cancelConnecting();
+          return service;
+        },
+        onConnectionError: errors.add,
+        isMounted: () => true,
+      );
+    });
+
+    expect(errors, isEmpty, reason: 'a cancel is not a connection error');
+    expect(recording.startCallCount, 0,
+        reason: 'no trip may start once the user has cancelled');
+    expect(service.disconnectCallCount, 1,
+        reason: 'the orphaned link must be torn down');
+  });
 }
 
 /// Spy [TripRecording] that records the calls the coordinator makes. The
