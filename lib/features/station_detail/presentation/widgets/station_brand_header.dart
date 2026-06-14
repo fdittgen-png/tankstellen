@@ -1,8 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/geo_utils.dart';
+import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/brand_logo.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
@@ -92,6 +96,24 @@ class StationBrandHeader extends StatelessWidget {
               ],
             ),
           ),
+          // #3344 — a navigate button glued to the address: the spot the user
+          // is reading the location is the most natural place to reach for
+          // "take me there". Same behaviour as the directions FAB (#3337) —
+          // opens the device's default maps app at the station. Only shown when
+          // the coordinates are usable (an unusable pin can't be navigated to).
+          if (isUsableCoord(station.lat, station.lng))
+            IconButton.filledTonal(
+              key: const Key('station_address_navigate'),
+              tooltip: l10n.navigate,
+              icon: const Icon(Icons.directions),
+              onPressed: () => unawaited(
+                NavigationUtils.openInMaps(
+                  station.lat,
+                  station.lng,
+                  label: hasRealBrand(station) ? station.brand : station.street,
+                ),
+              ),
+            ),
         ],
       ),
     );
