@@ -786,8 +786,13 @@ void main() {
     // tracked #2187/#2188.
     // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3138
     // (this providers file / FillUpList is named in that issue).
+    // #3138 — ratcheted DOWN 1025 → 938: the duplicated plein-to-plein window
+    // math in the FillUpList notifier's `_linkedTripIdsForWholeWindow` +
+    // `_relinkOpenWindow` moved into the pure, unit-tested FillUpTripLinker
+    // (domain/services/fill_up_trip_linker.dart). First #3138 slice; the
+    // trips/fillups feature split is the remaining work.
     'lib/features/consumption/providers/consumption_providers.dart': (
-      lines: 1025,
+      lines: 938,
       bumps: 5,
       decompositionIssue: 3138,
     ),
