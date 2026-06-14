@@ -27,13 +27,17 @@ class OsmBrandEnricher {
   final SettingsStorage _storage;
   final Map<String, String> _sessionCache = {};
 
-  OsmBrandEnricher(this._storage);
+  /// Rate-limiting is handled by DioFactory's RateLimitInterceptor (#2315).
+  /// Injectable (#3327) so the enrichment/negative-cache path is testable
+  /// without hitting the live Nominatim endpoint.
+  final Dio _dio;
 
-  // Rate-limiting is handled by DioFactory's RateLimitInterceptor (#2315).
-  static final _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 10),
-  );
+  OsmBrandEnricher(this._storage, {Dio? dio})
+      : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 8),
+              receiveTimeout: const Duration(seconds: 10),
+            );
 
   Future<List<Station>> enrich(
     List<Station> stations, {
@@ -43,7 +47,10 @@ class OsmBrandEnricher {
 
     var result = _applyCachedBrands(stations);
 
-    final uncached = result.where(_needsBrand).toList();
+    // #3327 — exclude stations we've already resolved to "no OSM brand" (the
+    // negative cache) so we don't re-hit Nominatim for them on every search.
+    final uncached =
+        result.where((s) => _needsBrand(s) && !_isNegativelyCached(s)).toList();
     if (uncached.isEmpty) return result;
 
     await _fetchBrandsFromNominatim(stations, cancelToken: cancelToken);
@@ -52,11 +59,24 @@ class OsmBrandEnricher {
     return result;
   }
 
+  /// #3327 — sentinel stored in the brand cache for a station that OSM has no
+  /// usable brand for. A real brand can never be this (it carries a control
+  /// char), and it's handled explicitly before sanitisation on read, so it
+  /// only ever means "resolved: no brand — don't re-query".
+  @visibleForTesting
+  static const String noBrandMarker = ' __no_osm_brand__';
+
   bool _needsBrand(Station s) =>
       s.brand.isEmpty ||
       s.brand == 'Station' || // legacy value from before #482
       s.brand == BrandRegistry.independentLabel ||
       s.brand == 'Autoroute';
+
+  /// Whether [s] has been negatively cached (#3327) — enrichment previously
+  /// found no OSM brand, so it must not be re-queried.
+  bool _isNegativelyCached(Station s) =>
+      _sessionCache[s.id] == noBrandMarker ||
+      _storage.getSetting('brand_${s.id}') == noBrandMarker;
 
   Future<void> _fetchBrandsFromNominatim(
     List<Station> stations, {
@@ -108,13 +128,21 @@ class OsmBrandEnricher {
         // gated by _needsBrand, but a future caller must not be able to
         // overwrite a real brand from a neighbouring POI).
         if (!_needsBrand(s)) continue;
+        // #3327 — already resolved as no-brand; don't re-write the marker.
+        if (_isNegativelyCached(s)) continue;
         final nearest = attributeBrandPoi(s.lat, s.lng, pois);
-        if (nearest != null) {
-          final sanitized = sanitizeOsmBrand(nearest.name);
-          if (sanitized != null) {
-            _sessionCache[s.id] = sanitized;
-            writes.add(_storage.putSetting('brand_${s.id}', sanitized));
-          }
+        final sanitized =
+            nearest != null ? sanitizeOsmBrand(nearest.name) : null;
+        if (sanitized != null) {
+          _sessionCache[s.id] = sanitized;
+          writes.add(_storage.putSetting('brand_${s.id}', sanitized));
+        } else {
+          // #3327 — negative cache: no usable OSM brand for this station.
+          // Record the miss so it isn't re-queried on every search (same
+          // forever-cache semantics as a positive hit; the displayed brand
+          // stays the independent/sentinel label).
+          _sessionCache[s.id] = noBrandMarker;
+          writes.add(_storage.putSetting('brand_${s.id}', noBrandMarker));
         }
       }
       if (writes.isNotEmpty) await Future.wait(writes);
@@ -125,8 +153,15 @@ class OsmBrandEnricher {
     return stations.map((s) {
       if (!_needsBrand(s)) return s;
       final cached = _sessionCache[s.id];
+      // #3327 — resolved as "no OSM brand": keep the station as-is (don't
+      // stamp the marker as a brand) and don't re-query.
+      if (cached == noBrandMarker) return s;
       if (cached != null) return s.copyWith(brand: cached);
       final persisted = _storage.getSetting('brand_${s.id}');
+      if (persisted == noBrandMarker) {
+        _sessionCache[s.id] = noBrandMarker; // promote to session cache
+        return s;
+      }
       if (persisted is String) {
         // Validate on read — anything that fails sanitisation (empty,
         // too short, "ff", phone-number-looking, etc.) is treated as

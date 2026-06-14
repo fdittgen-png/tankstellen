@@ -4,19 +4,18 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import '../../../core/domain/search_params.dart';
 import '../../../core/domain/station.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/services/impl/osm_brand_enricher.dart';
 import 'france_opening_hours_adapter.dart';
 import 'prix_carburants_parsers.dart' as parser;
-import '../../../core/network/dio_offline.dart';
-import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../core/services/dio_factory.dart';
 import '../../../core/services/mixins/station_service_helpers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/services/brand_enrich_budget.dart';
+import 'prix_carburants_queries.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Real French fuel price data from Prix-Carburants (gouv.fr).
@@ -37,16 +36,24 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
   final Dio _dio;
   final String _baseUrl;
 
+  /// #3326 — how long the search path will wait for OSM brand enrichment
+  /// before returning the (already-fetched) stations and letting enrichment
+  /// finish in the background. Keeps a cold-cache Nominatim lookup from
+  /// gating the radar's first paint. Injectable for tests.
+  final Duration _enrichBudget;
+
   PrixCarburantsStationService({
     OsmBrandEnricher? enricher,
     Dio? dio,
     String? baseUrl,
+    Duration enrichBudget = const Duration(seconds: 2),
   })  : _enricher = enricher,
         _dio = dio ?? DioFactory.create(
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 15),
         ),
-        _baseUrl = baseUrl ?? defaultBaseUrl;
+        _baseUrl = baseUrl ?? defaultBaseUrl,
+        _enrichBudget = enrichBudget;
 
   static const String defaultBaseUrl =
       'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets'
@@ -74,10 +81,10 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       //    cap results at the village's own ~5 stations regardless of
       //    radius — bug #315.
       // 3. Merge and dedupe by station id.
-      final cpResults = await _queryByPostalCode(params.postalCode!, cancelToken: cancelToken);
+      final cpResults = await queryPrixCarburantsByPostalCode(_dio, _baseUrl, params.postalCode!, cancelToken: cancelToken);
 
       if (hasValidCoords) {
-        final geoResults = await _queryByGeo(params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
+        final geoResults = await queryPrixCarburantsByGeo(_dio, _baseUrl, params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
         allResults = _mergeById(cpResults, geoResults);
       } else {
         allResults = cpResults;
@@ -90,7 +97,7 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       }
     } else {
       // GPS / coordinate search: geo query is the only option
-      allResults = await _queryByGeo(params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
+      allResults = await queryPrixCarburantsByGeo(_dio, _baseUrl, params.lat, params.lng, params.radiusKm, cancelToken: cancelToken);
     }
 
     // Parse all results into Station objects
@@ -120,10 +127,15 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
       );
     }
 
-    // Enrich with brand names from OpenStreetMap (best-effort)
-    final enriched = _enricher != null
-        ? await _enricher.enrich(stations, cancelToken: cancelToken)
-        : stations;
+    // #3326 — enrich brands without gating the radar's first paint: return
+    // the (already-fetched) stations once the budget elapses and let
+    // enrichment finish in the background. See [enrichWithinBudget].
+    final enriched = await enrichWithinBudget(
+      _enricher,
+      stations,
+      budget: _enrichBudget,
+      cancelToken: cancelToken,
+    );
 
     return ServiceResult(
       data: enriched,
@@ -132,85 +144,6 @@ class PrixCarburantsStationService with StationServiceHelpers implements Station
     );
   }
 
-  Future<List<Map<String, dynamic>>> _queryByPostalCode(String cp, {CancelToken? cancelToken}) async {
-    try {
-      final response = await _dio.get<dynamic>(_baseUrl, queryParameters: {
-        'where': "cp='$cp'",
-        'limit': 50,
-      }, cancelToken: cancelToken);
-      return parser.extractPrixCarburantsResults(response.data);
-    } on DioException catch (e, st) {
-      // #2524 — an OFFLINE failure (no network) is expected and already
-      // handled (returns []), so it must NOT pollute the user error spool.
-      // Drop it to a debugPrint; only a real API error (4xx/5xx, malformed
-      // response) is worth an ERROR trace.
-      if (_isOffline(e)) {
-        debugPrint('Prix-Carburants ZIP fetch skipped — offline ($e)');
-        return [];
-      }
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants ZIP fetch failed'}));
-      return [];
-    }
-  }
-
-
-  Future<List<Map<String, dynamic>>> _queryByGeo(
-    double lat, double lng, double radiusKm, {CancelToken? cancelToken}
-  ) async {
-    // Use within_distance with km unit — the distance() function with meters
-    // is unreliable on this API and often returns 0 results. Preserve one
-    // decimal of precision so sub-km radius selections aren't silently
-    // rounded to the nearest integer.
-    final radiusStr = radiusKm.toStringAsFixed(1);
-    // #2966 — order the corridor server-side by distance so the `limit: 50`
-    // slice keeps the NEAREST 50, not an arbitrary 50. Without it a dense
-    // corridor (e.g. 140 stations within 10 km of central Paris) returns an
-    // un-distance-ordered subset and the genuinely-nearest forecourt can be
-    // truncated out entirely — the server-side root cause behind the radar /
-    // closeness / in-trip "missing nearest station" symptoms (deferred #2813
-    // dense case; #2806 / #2965 in-radius merges become belt-and-braces). The
-    // old `distance()` "0 results" note was the metres form; the validated v2.1
-    // ODSQL `order_by=distance(geom,geom'POINT(lon lat)')` form (lon-lat order)
-    // is accepted live and returns rows nearest-first — it changes only the
-    // ordering / cap survival, never which stations are in-radius (still gated
-    // by the unchanged `within_distance` filter).
-    final point = "geom'POINT($lng $lat)'";
-    try {
-      final response = await _dio.get<dynamic>(_baseUrl, queryParameters: {
-        'where': 'within_distance(geom,$point,${radiusStr}km)',
-        'order_by': 'distance(geom,$point)',
-        'limit': 50,
-      }, cancelToken: cancelToken);
-      return parser.extractPrixCarburantsResults(response.data);
-    } on DioException catch (e, st) {
-      // #2524 — see [_queryByPostalCode]: an offline failure is expected and
-      // swallowed (returns []); only a real API error gets an ERROR trace.
-      if (_isOffline(e)) {
-        // #2745 — the field trace #1 was a `DioException[unknown]` wrapping
-        // an `HttpException('Software caused connection abort')` from
-        // data.economie.gouv.fr while the device was offline. Drop it to a
-        // diagnostic breadcrumb (still triageable from any surviving trace)
-        // instead of an ERROR — it is an expected no-network condition.
-        BreadcrumbCollector.add(
-          'Prix-Carburants geo fetch skipped — offline',
-          detail: 'lat=$lat lng=$lng type=${e.type}',
-        );
-        debugPrint('Prix-Carburants geo fetch skipped — offline ($e)');
-        return [];
-      }
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Prix-Carburants geo fetch failed'}));
-      return [];
-    }
-  }
-
-  /// Whether [e] is an offline / no-network failure rather than a real
-  /// API error (#2524). Delegates to the shared [isOfflineError] classifier
-  /// (#2703/#2745) so this and the trace-recorder de-noise gate classify
-  /// offline transients identically and can't drift. #2745 broadened from
-  /// [isOfflineDioException] to [isOfflineError] so a `DioException[unknown]`
-  /// wrapping an `HttpException` connection-abort (the field trace #1) is
-  /// recognised as offline at the call site too.
-  static bool _isOffline(DioException e) => isOfflineError(e);
 
   /// Merge two raw API result lists, deduplicating by station id.
   /// Stations from [primary] win when an id collides.

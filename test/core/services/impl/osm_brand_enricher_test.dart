@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/impl/osm_brand_enricher.dart';
 import 'package:tankstellen/core/domain/station.dart';
@@ -138,4 +141,102 @@ void main() {
       expect(fakeStorage.getSetting('brand_s2'), 'Shell');
     });
   });
+
+  group('negative cache (#3327)', () {
+    test('a station with no OSM match is negatively cached, not re-queried',
+        () async {
+      // Nominatim responds with an empty list → no POI matches any station.
+      final adapter = _NominatimAdapter(body: <dynamic>[]);
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = OsmBrandEnricher(fakeStorage, dio: dio);
+
+      final result = await svc.enrich([makeStation(id: '1')]);
+
+      // No brand found → station unchanged, AND the miss is cached.
+      expect(result.single.brand, '');
+      expect(fakeStorage.getSetting('brand_1'), OsmBrandEnricher.noBrandMarker);
+      expect(adapter.calls, 1);
+
+      // Second enrich: the station is negatively cached → NO Nominatim call.
+      final result2 = await svc.enrich([makeStation(id: '1')]);
+      expect(result2.single.brand, '');
+      expect(adapter.calls, 1,
+          reason: 'must not re-query a negatively cached station');
+    });
+
+    test('a station negatively cached on DISK (fresh session) is not '
+        're-queried', () async {
+      await fakeStorage.putSetting('brand_1', OsmBrandEnricher.noBrandMarker);
+      // Adapter throws if hit — proving no network call is made.
+      final adapter = _NominatimAdapter(throwIfCalled: true);
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = OsmBrandEnricher(fakeStorage, dio: dio);
+
+      final result = await svc.enrich([makeStation(id: '1')]);
+
+      expect(result.single.brand, '', reason: 'still shows no brand');
+      expect(adapter.calls, 0,
+          reason: 'disk negative cache short-circuits the fetch');
+    });
+
+    test('the negative marker is never shown as a brand', () async {
+      await fakeStorage.putSetting('brand_1', OsmBrandEnricher.noBrandMarker);
+      final svc = OsmBrandEnricher(fakeStorage);
+      final result = await svc.enrich([makeStation(id: '1')]);
+      expect(result.single.brand, isNot(OsmBrandEnricher.noBrandMarker));
+      expect(result.single.brand, '');
+    });
+
+    test('a real OSM match still wins (negative cache only applies to misses)',
+        () async {
+      final adapter = _NominatimAdapter(body: <dynamic>[
+        {'name': 'Total', 'lat': '48.8', 'lon': '2.3'},
+      ]);
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = OsmBrandEnricher(fakeStorage, dio: dio);
+
+      final result =
+          await svc.enrich([makeStation(id: '1', lat: 48.8, lng: 2.3)]);
+      expect(result.single.brand, isNot(OsmBrandEnricher.noBrandMarker));
+      expect(fakeStorage.getSetting('brand_1'),
+          isNot(OsmBrandEnricher.noBrandMarker));
+    });
+  });
+}
+
+/// Minimal Nominatim `HttpClientAdapter` stub (#3327): returns a fixed JSON
+/// list and counts calls, so the enrichment / negative-cache path is testable
+/// without the live endpoint.
+class _NominatimAdapter implements HttpClientAdapter {
+  _NominatimAdapter({this.body = const <dynamic>[], this.throwIfCalled = false});
+
+  final List<dynamic> body;
+  final bool throwIfCalled;
+  int calls = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    calls++;
+    if (throwIfCalled) {
+      throw DioException(
+        requestOptions: options,
+        type: DioExceptionType.unknown,
+        error: 'Nominatim must not be called',
+      );
+    }
+    return ResponseBody.fromString(
+      jsonEncode(body),
+      200,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
 }
