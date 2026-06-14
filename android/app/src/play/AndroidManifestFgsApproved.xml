@@ -48,6 +48,14 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+    <!-- #3313 — lets the recording FGS prompt for a battery-optimization
+         exemption so a long drive survives Doze / aggressive OEM
+         task-killers (a foreground service alone does not stop Doze
+         CPU-sleep). Normal install-time permission; Play accepts the
+         "persistent peripheral-device connection" (OBD2) justification.
+         Shipped only in this FGS-approved overlay so default builds stay
+         clean. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application>
         <!-- Android Auto v1 (#2951) bound POI service: no android:permission
