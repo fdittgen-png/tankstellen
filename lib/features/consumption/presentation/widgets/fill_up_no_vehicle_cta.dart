@@ -24,13 +24,27 @@ class FillUpNoVehicleCta extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    // #3311 — guard the pop: this CTA owns the whole Add-Fill-up screen,
+    // which is reached both by a push (poppable) AND as the "Carburant"
+    // tab root (nothing to pop). An unguarded `context.pop()` on the tab
+    // root threw `GoError: There is nothing to pop` (7 traces in one
+    // session). Only show the back affordance when there's something to pop.
+    // Use `GoRouter.maybeOf` (not `context.canPop()`, which asserts a
+    // GoRouter ancestor): the screen is also mounted under a bare MaterialApp
+    // in widget tests, where building must not throw "No GoRouter found".
+    final router = GoRouter.maybeOf(context);
+    final canPop = router?.canPop() ?? false;
     return PageScaffold(
       title: l.addFillUp,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        tooltip: l.tooltipBack,
-        onPressed: () => context.pop(),
-      ),
+      leading: canPop
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              tooltip: l.tooltipBack,
+              onPressed: () {
+                if (router?.canPop() ?? false) router!.pop();
+              },
+            )
+          : null,
       bodyPadding: const EdgeInsets.all(32),
       body: Center(
         child: Column(

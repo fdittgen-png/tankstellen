@@ -141,8 +141,12 @@ void main() {
     // _initStorage, _maybeInitTankSync, _installErrorHandlers,
     // _stashWidgetLaunchUri, the Sentry gate and the #3149 replay.
     // Snapshot lowered to lock the shrink in (a shrink never bumps).
+    // #3311 — 724 → 698: the three global-error de-noise predicates
+    // (isTileFetchNoise / isHandledImageNetworkNoise / isBenignStreamCancel)
+    // moved out to core/logging/error_log_denoise.dart (top-level, pure,
+    // independently tested); _installErrorHandlers now just calls them.
     'lib/app/app_initializer.dart': (
-      lines: 724,
+      lines: 698,
       bumps: 14,
       decompositionIssue: 3139,
     ),
