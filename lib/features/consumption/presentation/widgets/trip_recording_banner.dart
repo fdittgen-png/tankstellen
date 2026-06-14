@@ -173,7 +173,15 @@ class TripRecordingBanner extends ConsumerWidget {
             ),
           ),
           // #3019 — trip-independent reconnect surface (reconnecting / retry).
-          const Obd2ReconnectRetryBanner(),
+          // #3306 — AnimatedSize so the strip slides in/out smoothly instead of
+          // jolting the screen below it every time the reconnect loop flips
+          // state (reconnecting ⇄ failed ⇄ idle) — the "flickering form" report.
+          const AnimatedSize(
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            alignment: Alignment.topCenter,
+            child: Obd2ReconnectRetryBanner(),
+          ),
           Expanded(child: child),
         ],
       );
@@ -227,12 +235,23 @@ class TripRecordingBanner extends ConsumerWidget {
         // #797 phase 2 — BT-drop pause banner. Zero-height unless the
         // provider is in pausedDueToDrop; self-watches its slice of
         // the state so the main banner above doesn't rebuild on
-        // drop/resume transitions.
-        const Obd2PauseBanner(),
+        // drop/resume transitions. #3306 — AnimatedSize for the same smooth
+        // slide-in as the idle reconnect strip (no jolt on drop/resume).
+        const AnimatedSize(
+          duration: Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          alignment: Alignment.topCenter,
+          child: Obd2PauseBanner(),
+        ),
         // #2565 — GPS-degraded banner (OBD2 dropped, GPS alive — still
         // recording). Mutually exclusive with the pause banner above;
         // zero-height unless the provider is in degradedGpsOnly.
-        const GpsDegradedBanner(),
+        const AnimatedSize(
+          duration: Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          alignment: Alignment.topCenter,
+          child: GpsDegradedBanner(),
+        ),
         Expanded(child: child),
       ],
     );
