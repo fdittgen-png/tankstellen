@@ -1443,6 +1443,63 @@ void main() {
       expect(adapter.lastRequestUri, startsWith('https://data.economie.gouv.fr'));
     });
   });
+
+  group('searchStations brand-enrichment budget (#3326)', () {
+    Map<String, dynamic> geoResponse() => {
+          'results': [
+            {
+              'id': '1',
+              'adresse': 'RUE DU PORT',
+              'ville': 'SETE',
+              'cp': '34200',
+              'geom': {'lat': 43.3, 'lon': 3.5},
+              'e85_prix': 0.899,
+            },
+          ],
+        };
+
+    test('returns the (un-enriched) geo stations without waiting for a slow '
+        'brand lookup — the radar paints immediately', () async {
+      final adapter = _TrackingMockAdapter()..addResponse(geoResponse());
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final slow = _SlowEnricher(delay: const Duration(milliseconds: 400));
+      final svc = PrixCarburantsStationService(
+        dio: dio,
+        enricher: slow,
+        enrichBudget: const Duration(milliseconds: 10),
+      );
+
+      final sw = Stopwatch()..start();
+      final result =
+          await svc.searchStations(const SearchParams(lat: 43.3, lng: 3.5, radiusKm: 10.0));
+      sw.stop();
+
+      expect(result.data, isNotEmpty, reason: 'geo stations available at once');
+      expect(result.data.first.brand, isNot('SLOW-BRAND'),
+          reason: 'budget elapsed before the slow enricher resolved');
+      expect(slow.enrichCalls, 1,
+          reason: 'enrichment still fires (warms the cache in the background)');
+      expect(sw.elapsed, lessThan(const Duration(milliseconds: 250)),
+          reason: 'must NOT block on the 400ms enrichment');
+    });
+
+    test('a fast enricher still enriches within the budget', () async {
+      final adapter = _TrackingMockAdapter()..addResponse(geoResponse());
+      final dio = Dio(BaseOptions(baseUrl: ''))..httpClientAdapter = adapter;
+      final svc = PrixCarburantsStationService(
+        dio: dio,
+        enricher: _FakeBrandEnricher(brand: 'Total Access'),
+        enrichBudget: const Duration(seconds: 2),
+      );
+
+      final result =
+          await svc.searchStations(const SearchParams(lat: 43.3, lng: 3.5, radiusKm: 10.0));
+
+      expect(result.data, isNotEmpty);
+      expect(result.data.first.brand, 'Total Access',
+          reason: 'fast enrichment resolves within budget → brand shown');
+    });
+  });
 }
 
 /// Test [OsmBrandEnricher] that resolves a fixed [brand] for every station
@@ -1466,6 +1523,26 @@ class _FakeBrandEnricher extends OsmBrandEnricher {
     final resolved = brand;
     if (resolved == null) return stations;
     return stations.map((s) => s.copyWith(brand: resolved)).toList();
+  }
+}
+
+/// #3326 — an enricher that stamps 'SLOW-BRAND' but only after [delay], so the
+/// search path's enrich-budget race can be exercised: the result must come
+/// back BEFORE this resolves.
+class _SlowEnricher extends OsmBrandEnricher {
+  _SlowEnricher({required this.delay}) : super(FakeStorageRepository());
+
+  final Duration delay;
+  int enrichCalls = 0;
+
+  @override
+  Future<List<Station>> enrich(
+    List<Station> stations, {
+    CancelToken? cancelToken,
+  }) async {
+    enrichCalls++;
+    await Future<void>.delayed(delay);
+    return stations.map((s) => s.copyWith(brand: 'SLOW-BRAND')).toList();
   }
 }
 
