@@ -751,8 +751,10 @@ void main() {
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block
     // (+ its dart:async / error_logger imports) in favour of
     // `MapOptions.initialCameraFit`, fixing the grey-tile cold-start race.
+    // #3316 — shrank 450 → 412: the finite-point filter + zero-span bounds
+    // padding moved to the pure trip_path_geometry.dart helper.
     'lib/features/consumption/presentation/widgets/trip_path_map_card.dart': (
-      lines: 450,
+      lines: 412,
       bumps: 0,
       decompositionIssue: null,
     ),
