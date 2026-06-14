@@ -66,14 +66,13 @@ class SearchResultsContent extends ConsumerWidget {
           // user knows the scan FINISHED and found nothing — not that it's
           // still searching (the old bare "0 stations" + blank was ambiguous).
           // #3267 — but while a fresh fix is still resolving ([locating]) an
-          // empty provisional scan is NOT "found nothing"; show the acquiring
-          // state so the empty result doesn't flicker in before the live fix.
+          // empty provisional scan is NOT "found nothing", so it must NOT show
+          // the empty state yet. #3302 — the centred "Finding your location…"
+          // panel was removed (it duplicated the FAB's "Searching…" pill, which
+          // is the awareness affordance now); the results area just stays blank
+          // until the first fix lands and the list paints.
           if (stations.isEmpty) {
-            if (radar.locating) {
-              return _RadarLocatingState(
-                message: l10n.radarAcquiringLocation,
-              );
-            }
+            if (radar.locating) return const SizedBox.shrink();
             return _RadarEmptyState(
               onRetry: () => ref.read(radarSearchProvider.notifier).runRadar(),
             );
@@ -99,8 +98,9 @@ class SearchResultsContent extends ConsumerWidget {
             ],
           );
         },
-        loading: () =>
-            _RadarLocatingState(message: l10n.radarAcquiringLocation),
+        // #3302 — blank while the first scan loads; the FAB's "Searching…"
+        // pill is the progress affordance (no centred panel).
+        loading: () => const SizedBox.shrink(),
         error: (error, stackTrace) => ServiceChainErrorWidget(
           error: error,
           onRetry: () => ref.read(radarSearchProvider.notifier).runRadar(),
@@ -195,45 +195,6 @@ class _RadarEmptyState extends StatelessWidget {
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: Text(l10n.retry),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// #3267 — the on-search radar's "acquiring the first GPS fix" state: a centred
-/// spinner + caption shown when the radar is active but has no position yet to
-/// scan around (a fresh install, or a cold first fix with no last-known point).
-/// Visually distinct from the empty state (scan finished, found nothing) so the
-/// user knows the radar is still warming up, not done.
-class _RadarLocatingState extends StatelessWidget {
-  const _RadarLocatingState({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              width: 28,
-              height: 28,
-              child: CircularProgressIndicator(strokeWidth: 3),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
