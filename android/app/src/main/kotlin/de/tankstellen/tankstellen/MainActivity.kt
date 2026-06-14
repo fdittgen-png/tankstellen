@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.util.Rational
 import de.tankstellen.tankstellen.autorecord.BackgroundAdapterChannel
+import de.tankstellen.tankstellen.autorecord.CompanionDeviceAssociator
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -49,6 +50,13 @@ class MainActivity : FlutterActivity() {
         // foreground service that the channel starts on demand owns
         // its own GATT client.
         BackgroundAdapterChannel.registerWith(flutterEngine, applicationContext)
+
+        // #3320 (Epic #3314) — Companion-Device-Manager association bridge.
+        // Activity-coupled (the association dialog launches via an
+        // IntentSender), so it lives on the Activity unlike the context-only
+        // BackgroundAdapterChannel. Inert below API 34 / without the CDM
+        // feature, and only ever driven behind the Dart FGS gate.
+        CompanionDeviceAssociator(this).registerWith(flutterEngine)
 
         // Public file-export bridge (#2014). Routes exports to the
         // device's MediaStore.Downloads collection so the user can
