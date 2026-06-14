@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
@@ -21,6 +20,7 @@ import '../core/telemetry/health_counters.dart';
 import '../core/telemetry/storage/startup_failure_store.dart';
 import '../core/telemetry/storage/trace_storage.dart';
 import '../core/logging/app_log.dart';
+import '../core/logging/error_log_denoise.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
 import '../core/perf/startup_timer.dart';
@@ -593,8 +593,9 @@ class AppInitializer {
     // Capture Flutter framework errors (build, layout, paint).
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
-      if (_isTileFetchNoise(details.exception) ||
-          isBenignStreamCancel(details.exception)) {
+      if (isTileFetchNoise(details.exception) ||
+          isBenignStreamCancel(details.exception) ||
+          isHandledImageNetworkNoise(details.library, details.exception)) {
         return;
       }
       unawaited(errorLogger.log(
@@ -610,7 +611,7 @@ class AppInitializer {
     };
     // Capture async / platform errors that escape the framework.
     PlatformDispatcher.instance.onError = (error, stack) {
-      if (_isTileFetchNoise(error) || isBenignStreamCancel(error)) return true;
+      if (isTileFetchNoise(error) || isBenignStreamCancel(error)) return true;
       // #3150 — context so a dispatcher-caught trace is distinguishable
       // from a bare errorLogger call site.
       unawaited(errorLogger.log(ErrorLayer.other, error, stack,
@@ -618,33 +619,6 @@ class AppInitializer {
       return true;
     };
   }
-
-  /// Whether [error] is a transient network failure from the OSM tile
-  /// pipeline. flutter_map's `RetryNetworkTileProvider` already retries
-  /// and shows an error tile; the global error log shouldn't also
-  /// record these as crashes — they pollute the report with offline /
-  /// flaky-network noise (17 entries in a single session on a mobile
-  /// device, observed 2026-05-27). Cancellation aborts (#930) are
-  /// classed as noise too.
-  static bool _isTileFetchNoise(Object error) {
-    final msg = error.toString().toLowerCase();
-    final isTileUrl = msg.contains('tile.openstreetmap.org');
-    if (isTileUrl) return true;
-    // SocketException with a host-lookup failure on any host is
-    // offline noise. The wrapping FlutterError shows it as "Failed
-    // host lookup".
-    if (msg.contains('failed host lookup')) return true;
-    return false;
-  }
-
-  /// Benign EventChannel teardown ("No active stream to cancel"), a lifecycle
-  /// race that safeCancel covers at app sites but can escape via plugins —
-  /// never a real crash, must not pollute the error log (#2772).
-  @visibleForTesting
-  static bool isBenignStreamCancel(Object error) =>
-      error is PlatformException &&
-      (error.message?.toLowerCase().contains('no active stream to cancel') ??
-          false);
 
   static void _launch(
     ProviderContainer container,
