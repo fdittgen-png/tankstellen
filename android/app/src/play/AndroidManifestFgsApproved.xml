@@ -56,6 +56,22 @@
          Shipped only in this FGS-approved overlay so default builds stay
          clean. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <!-- #3320 (Epic #3314) — Companion Device Manager association with the
+         OBD2 dongle. The association grants
+         REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND, the
+         documented exemption that lets CompanionPresenceService start the
+         connectedDevice AutoRecordForegroundService from the background when
+         the paired dongle comes into range — WITHOUT ACCESS_BACKGROUND_LOCATION
+         (that gate, #1498, only blocks the GPS half). REQUEST_COMPANION_RUN_IN
+         _BACKGROUND keeps the association observable in the background. Both are
+         normal install-time permissions, shipped only in this FGS-approved
+         overlay. companion_device_setup is not required (graceful no-op on a
+         device/ROM without CDM). -->
+    <uses-feature
+        android:name="android.software.companion_device_setup"
+        android:required="false"/>
+    <uses-permission android:name="android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND"/>
+    <uses-permission android:name="android.permission.REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND"/>
 
     <application>
         <!-- Android Auto v1 (#2951) bound POI service: no android:permission
@@ -82,5 +98,21 @@
             android:name=".autorecord.AutoRecordForegroundService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice"/>
+
+        <!-- #3320 — the system binds this CompanionDeviceService when an
+             associated dongle appears/disappears (CDM presence observation).
+             onDeviceAppeared starts the connectedDevice AutoRecordForegroundService
+             from the background under the CDM FGS-start exemption. The
+             BIND_COMPANION_DEVICE_SERVICE permission + the
+             android.companion.CompanionDeviceService intent-filter are the
+             system-required wiring. -->
+        <service
+            android:name=".autorecord.CompanionPresenceService"
+            android:exported="true"
+            android:permission="android.permission.BIND_COMPANION_DEVICE_SERVICE">
+            <intent-filter>
+                <action android:name="android.companion.CompanionDeviceService" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>
