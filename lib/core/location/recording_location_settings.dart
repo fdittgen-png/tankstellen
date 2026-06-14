@@ -170,6 +170,7 @@ LocationSettings recordingLocationSettings({
   required AppLocalizations l10n,
   TargetPlatform? platform,
   bool? foregroundServiceEnabled,
+  bool coarse = false,
 }) {
   final target = platform ?? defaultTargetPlatform;
   // #3173 — test seam: production always follows the build-time define
@@ -180,12 +181,19 @@ LocationSettings recordingLocationSettings({
   switch (target) {
     case TargetPlatform.android:
       return AndroidSettings(
-        accuracy: LocationAccuracy.high,
+        // #3319 — when the motion gate has detected a stationary stretch we
+        // back the receiver off (medium accuracy, 5 s interval, 25 m gate)
+        // to save battery. A coarse fix still arrives, so resumed motion
+        // re-fines the stream. The FGS config is kept either way so the
+        // service (and its wake lock) stays alive across the quiet period.
+        accuracy:
+            coarse ? LocationAccuracy.medium : LocationAccuracy.high,
         // Self-bounded fine cadence: ask for a fix every second and let
         // every one through (no distance gate) so the trace stays dense
         // even at a standstill / in stop-and-go traffic.
-        intervalDuration: const Duration(seconds: 1),
-        distanceFilter: 0,
+        intervalDuration:
+            coarse ? const Duration(seconds: 5) : const Duration(seconds: 1),
+        distanceFilter: coarse ? 25 : 0,
         // The un-throttle lever: promote geolocator to a foreground service so
         // the OS stops the ~5 s background batching for the trip. Gated by
         // [kGpsRecordingForegroundServiceEnabled] (#3173 trigger:
@@ -231,6 +239,7 @@ LocationSettings recordingLocationSettings({
 LocationSettings recordingLocationSettingsForRef(
   Ref ref, {
   TargetPlatform? platform,
+  bool coarse = false,
 }) {
   String code;
   try {
@@ -244,5 +253,5 @@ LocationSettings recordingLocationSettingsForRef(
   } catch (_) {
     l10n = lookupAppLocalizations(const ui.Locale('en'));
   }
-  return recordingLocationSettings(l10n: l10n, platform: platform);
+  return recordingLocationSettings(l10n: l10n, platform: platform, coarse: coarse);
 }

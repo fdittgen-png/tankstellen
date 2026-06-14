@@ -6,8 +6,6 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/location/geolocator_wrapper.dart';
-import '../../../core/location/recording_location_settings.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/sensors/imu_sample.dart';
 import '../../../core/sensors/imu_sensor_source.dart';
@@ -22,6 +20,7 @@ import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/services/imu_event_detector.dart';
 import '../domain/trip_recorder.dart';
+import 'motion_gated_gps_source.dart';
 import 'recording_pipeline.dart';
 import 'trip_recording_phase.dart';
 import 'trip_recording_state.dart';
@@ -79,7 +78,11 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   /// Pure accumulator — same recorder the OBD2 path uses, so the
   /// distance / harsh-event / idle integration is byte-identical.
   TripRecorder? _recorder;
-  StreamSubscription<Position>? _sub;
+
+  /// #3319 — owns the recording GPS subscription and motion-gates its cadence
+  /// (fine while moving, coarse once stationary). Null between trips; opened
+  /// on [start], cancelled on [stop].
+  MotionGatedGpsSource? _gpsSource;
   final List<TripSample> _samples = [];
   DateTime? _startedAt;
 
@@ -149,21 +152,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // coarse settings. The notification copy comes from the already-merged
     // ARB keys, resolved for the active in-app language without a
     // BuildContext (this runs from the notifier, not a widget).
-    final geo = _ref.read(geolocatorWrapperProvider);
-    _sub = geo
-        .sharedPositionStream(
-          recording: true,
-          locationSettings: recordingLocationSettingsForRef(_ref),
-        )
-        .listen(
-          _onPosition,
-          onError: (Object e, StackTrace st) {
-            unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-                context: const {
-                  'where': 'GpsOnlyRecordingPipeline.start: stream error'
-                }));
-          },
-        );
+    _gpsSource = MotionGatedGpsSource(ref: _ref, onPosition: _onPosition)
+      ..start();
     // #2760 — attach IMU sensor fusion (this dongle-less pipeline ONLY).
     // The detector feeds confirmed accel/brake episodes onto the SAME live
     // harsh-event bus the OBD2 / GPS-speed paths use (mirroring the recorder's
@@ -218,6 +208,9 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // min-speed gate and accel-vs-brake direction classification track the
     // real vehicle speed (the inertial stream alone has no speed).
     _imuDetector?.currentSpeedKmh = sample.speedKmh;
+    // #3319 — motion-gate the receiver (FGS-approved builds only).
+    _gpsSource?.onSpeed(
+        sample.speedKmh, DateTime.now().difference(startedAt));
     // #2653 — a GPS-only trip's speed is the device's Doppler ground
     // speed (genuine ~1 Hz, not 1 km/h-quantised dead reckoning), so it
     // is differentiable; the detector's accuracy + min-speed +
@@ -253,8 +246,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   @override
   Future<StoppedTripResult> stop({bool automatic = false}) async {
     final recorder = _recorder;
-    await _sub?.cancel();
-    _sub = null;
+    await _gpsSource?.cancel();
+    _gpsSource = null;
     // #2760 — tear down the IMU stream alongside the GPS one so no inertial
     // subscription survives between trips (the battery / lifecycle bound).
     await _imuSub?.cancel();
