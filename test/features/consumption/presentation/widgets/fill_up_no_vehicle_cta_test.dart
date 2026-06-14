@@ -132,4 +132,21 @@ void main() {
     expect(find.byKey(senderHome), findsOneWidget,
         reason: 'And we land back on the home route');
   });
+
+  testWidgets(
+      'as the tab root (nothing to pop) it shows NO back-arrow and never '
+      'throws GoError "nothing to pop" (#3311)', (tester) async {
+    // initial = the CTA itself → it IS the root, so there is nothing to pop.
+    await pumpCta(tester, initial: '/fill-up/no-vehicle');
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(ctaLanding), findsOneWidget);
+    // No back affordance when the route can't be popped — guarded so the old
+    // unguarded `context.pop()` (7 GoError traces in one session) can't fire.
+    expect(find.byTooltip('Back'), findsNothing,
+        reason: 'no back-arrow on the tab root — nothing to pop');
+    expect(find.byIcon(Icons.arrow_back), findsNothing);
+    // The screen still rendered fine (no thrown GoError took it down).
+    expect(find.text('Add a vehicle first'), findsOneWidget);
+  });
 }

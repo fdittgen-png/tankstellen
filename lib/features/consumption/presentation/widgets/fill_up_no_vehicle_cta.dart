@@ -26,11 +26,20 @@ class FillUpNoVehicleCta extends StatelessWidget {
     final theme = Theme.of(context);
     return PageScaffold(
       title: l.addFillUp,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        tooltip: l.tooltipBack,
-        onPressed: () => context.pop(),
-      ),
+      // #3311 — guard the pop: this CTA owns the whole Add-Fill-up screen,
+      // which is reached both by a push (poppable) AND as the "Carburant"
+      // tab root (nothing to pop). An unguarded `context.pop()` on the tab
+      // root threw `GoError: There is nothing to pop` (7 traces in one
+      // session). Only show the back affordance when there's something to pop.
+      leading: context.canPop()
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              tooltip: l.tooltipBack,
+              onPressed: () {
+                if (context.canPop()) context.pop();
+              },
+            )
+          : null,
       bodyPadding: const EdgeInsets.all(32),
       body: Center(
         child: Column(
