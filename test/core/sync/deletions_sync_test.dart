@@ -37,4 +37,42 @@ void main() {
       expect(await DeletionsSync.fetchTombstonedIds('itineraries'), isEmpty);
     });
   });
+
+  group('isDeletionsTableAbsent (#3331)', () {
+    test('the field PGRST205 message is classified as table-absent', () {
+      final err = Exception(
+        'PostgrestException(message: Could not find the table '
+        "'public.deletions' in the schema cache, code: PGRST205, "
+        "details: Not Found, hint: Perhaps you meant 'public.ignored_stations')",
+      );
+      expect(DeletionsSync.isDeletionsTableAbsent(err), isTrue);
+    });
+
+    test('the find-table/schema-cache phrasing (no code) still matches', () {
+      final err = Exception(
+        "Could not find the table 'public.deletions' in the schema cache",
+      );
+      expect(DeletionsSync.isDeletionsTableAbsent(err), isTrue);
+    });
+
+    test('a PGRST205 for a DIFFERENT table is not classified', () {
+      final err = Exception(
+        "Could not find the table 'public.widgets' in the schema cache PGRST205",
+      );
+      expect(DeletionsSync.isDeletionsTableAbsent(err), isFalse);
+    });
+
+    test('the PGRST204 missing-column case is NOT table-absent', () {
+      final err = Exception(
+        "PostgrestException(message: Could not find the 'device_id' column "
+        "of 'deletions', code: PGRST204)",
+      );
+      expect(DeletionsSync.isDeletionsTableAbsent(err), isFalse);
+    });
+
+    test('a generic sync error is not classified as table-absent', () {
+      expect(DeletionsSync.isDeletionsTableAbsent(Exception('network down')),
+          isFalse);
+    });
+  });
 }

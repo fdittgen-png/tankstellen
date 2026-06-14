@@ -10,6 +10,7 @@ import 'pending_deletions_journal.dart';
 import 'sync_device_identity.dart';
 import 'sync_transport.dart';
 import '../../core/logging/error_logger.dart';
+import '../telemetry/collectors/breadcrumb_collector.dart';
 
 /// Deletion tombstones (#3078, Epic #3075).
 ///
@@ -95,10 +96,24 @@ class DeletionsSync {
           'for "$tableName"');
       return true;
     } catch (e, st) {
+      if (isDeletionsTableAbsent(e)) {
+        _breadcrumbDeletionsAbsent();
+        return false;
+      }
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'DeletionsSync.record FAILED'}));
       return false;
     }
+  }
+
+  /// #3331 — one actionable breadcrumb (NOT an ERROR trace) for the
+  /// outdated-self-host-schema case, so it doesn't flood the error log.
+  static void _breadcrumbDeletionsAbsent() {
+    BreadcrumbCollector.add(
+      'sync: deletions table absent',
+      detail: 'self-host TankSync schema predates the deletion-tombstones '
+          'migration — re-run the wizard SQL to enable cross-device deletes',
+    );
   }
 
   /// Upsert [rows] with the #3125 forensic columns; a self-host schema
@@ -144,6 +159,21 @@ class DeletionsSync {
         message.toLowerCase().contains('column');
   }
 
+  /// #3331 — whether [error] is a PGRST205 "the `deletions` table doesn't
+  /// exist" failure: a self-host TankSync schema that predates the
+  /// deletion-tombstones migration. `deletions` is OPTIONAL, so the verifier
+  /// doesn't flag its absence, yet every entity sync calls
+  /// [fetchTombstonedIds] — so an outdated self-host would flood the error
+  /// log. Classify it to breadcrumb (actionable) instead of ERROR-logging.
+  @visibleForTesting
+  static bool isDeletionsTableAbsent(Object error) {
+    final message = error.toString().toLowerCase();
+    final missingTable = message.contains('pgrst205') ||
+        (message.contains('could not find the table') &&
+            message.contains('schema cache'));
+    return missingTable && message.contains('deletions');
+  }
+
   /// Replay every journaled-but-unconfirmed tombstone (#3123). Called at
   /// the start of [fetchTombstonedIds] so pending tombstones land
   /// server-side *before* the caller's union merge runs. Never throws —
@@ -184,6 +214,10 @@ class DeletionsSync {
         ...PendingDeletionsJournal.pendingIds(tableName),
       };
     } catch (e, st) {
+      if (isDeletionsTableAbsent(e)) {
+        _breadcrumbDeletionsAbsent();
+        return PendingDeletionsJournal.pendingIds(tableName);
+      }
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: const {'where': 'DeletionsSync.fetchTombstonedIds FAILED'}));
       return PendingDeletionsJournal.pendingIds(tableName);
