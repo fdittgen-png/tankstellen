@@ -8,7 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/navigation/app_routes.dart';
-import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -26,8 +25,9 @@ import '../../../sync/presentation/widgets/qr_scanner_screen.dart';
 import '../../providers/station_detail_provider.dart';
 import 'station_brand_helpers.dart';
 
-/// AppBar actions cluster for [StationDetailScreen]: directions, create
-/// price alert, scan payment QR, report price, favorite toggle.
+/// AppBar actions cluster for [StationDetailScreen]: create price alert,
+/// scan payment QR, report price, favorite toggle. (Directions moved to the
+/// prominent [StationDirectionsFab] in #3337.)
 ///
 /// Extracted so the screen stays under the 300-LOC cap (#563). Public
 /// behaviour is identical to the previous inline implementation —
@@ -51,22 +51,9 @@ class StationDetailAppBarActions extends ConsumerWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          icon: const Icon(Icons.directions),
-          onPressed: () {
-            final s = station;
-            if (s != null) {
-              unawaited(
-                NavigationUtils.openInMaps(
-                  s.lat,
-                  s.lng,
-                  label: hasRealBrand(s) ? s.brand : s.street,
-                ),
-              );
-            }
-          },
-          tooltip: l10n.navigate,
-        ),
+        // #3337 — directions moved out of this icon cluster to a prominent
+        // labelled FAB ([StationDirectionsFab]); users couldn't find the
+        // small icon here.
         IconButton(
           icon: const Icon(Icons.notifications_outlined),
           onPressed: () => _showCreateAlertDialog(context, ref),

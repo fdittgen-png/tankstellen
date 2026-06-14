@@ -9,6 +9,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
 import '../widgets/price_history_foldable.dart';
+import '../widgets/station_directions_fab.dart';
 import '../widgets/station_brand_header.dart';
 import '../widgets/station_detail_app_bar_actions.dart';
 import '../widgets/station_info_section.dart';
@@ -72,6 +73,9 @@ class StationDetailWideLayout extends StatelessWidget {
       actions: [
         StationDetailAppBarActions(stationId: stationId, station: station),
       ],
+      // #3337 — directions is now the prominent labelled FAB (was a small,
+      // hard-to-find AppBar icon).
+      floatingActionButton: StationDirectionsFab(station: station),
       bodyPadding: EdgeInsets.zero,
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
