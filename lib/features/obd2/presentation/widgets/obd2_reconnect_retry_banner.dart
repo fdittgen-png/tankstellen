@@ -31,6 +31,13 @@ import '../../providers/obd2_reconnect_provider.dart';
 ///
 /// Renders zero-height in every other state (idle / connected), so it is
 /// safe to drop into any always-on chrome.
+///
+/// #3306 — restyled to the app's compact status-strip convention
+/// ([ServiceStatusBanner]): a full-width [Container] strip carrying the
+/// container colour + a leading icon/spinner + the message + an inline action,
+/// instead of a bulky [MaterialBanner] (which read as a detached system
+/// surface, unlike the rest of the app). The host wraps it in an `AnimatedSize`
+/// so the strip slides in/out smoothly instead of jumping the screen below it.
 class Obd2ReconnectRetryBanner extends ConsumerWidget {
   const Obd2ReconnectRetryBanner({super.key});
 
@@ -55,6 +62,46 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
     }
   }
 
+  /// The shared app-consistent status strip (mirrors [ServiceStatusBanner]'s
+  /// full-width container convention): a [SafeArea]-topped strip with the
+  /// container colour, a leading glyph, the message, and an optional inline
+  /// action.
+  Widget _strip({
+    required Key key,
+    required Color background,
+    required Color foreground,
+    required Widget leading,
+    required String message,
+    required ThemeData theme,
+    Widget? action,
+  }) {
+    return Container(
+      key: key,
+      width: double.infinity,
+      color: background,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(width: 20, height: 20, child: Center(child: leading)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  message,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: foreground),
+                ),
+              ),
+              if (action != null) ...[const SizedBox(width: 8), action],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _reconnectingBanner(
     ThemeData theme,
     AppLocalizations l,
@@ -64,23 +111,19 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
     final text = hasName
         ? (l.obd2ReconnectInProgressNamed(adapterName))
         : (l.obd2ReconnectInProgress);
-    return MaterialBanner(
+    final fg = theme.colorScheme.onSecondaryContainer;
+    return _strip(
       key: const Key('obd2ReconnectingBanner'),
-      backgroundColor: theme.colorScheme.secondaryContainer,
-      contentTextStyle: TextStyle(
-        color: theme.colorScheme.onSecondaryContainer,
-      ),
+      theme: theme,
+      background: theme.colorScheme.secondaryContainer,
+      foreground: fg,
       leading: SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: theme.colorScheme.onSecondaryContainer,
-        ),
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(strokeWidth: 2, color: fg),
       ),
-      content: Text(text),
+      message: text,
       // No action: the loop is in flight; the user just waits.
-      actions: const [SizedBox.shrink()],
     );
   }
 
@@ -90,22 +133,20 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
     ThemeData theme,
     AppLocalizations l,
   ) {
-    return MaterialBanner(
+    final fg = theme.colorScheme.onErrorContainer;
+    return _strip(
       key: const Key('obd2ReconnectFailedBanner'),
-      backgroundColor: theme.colorScheme.errorContainer,
-      contentTextStyle: TextStyle(color: theme.colorScheme.onErrorContainer),
-      leading: Icon(
-        Icons.bluetooth_disabled,
-        color: theme.colorScheme.onErrorContainer,
+      theme: theme,
+      background: theme.colorScheme.errorContainer,
+      foreground: fg,
+      leading: Icon(Icons.bluetooth_disabled, size: 20, color: fg),
+      message: l.obd2ReconnectFailedBody,
+      action: TextButton(
+        key: const Key('obd2ReconnectRetryButton'),
+        style: TextButton.styleFrom(foregroundColor: fg),
+        onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
+        child: Text(l.obd2ReconnectRetry),
       ),
-      content: Text(l.obd2ReconnectFailedBody),
-      actions: [
-        TextButton(
-          key: const Key('obd2ReconnectRetryButton'),
-          onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
-          child: Text(l.obd2ReconnectRetry),
-        ),
-      ],
     );
   }
 
@@ -122,22 +163,20 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
     ThemeData theme,
     AppLocalizations l,
   ) {
-    return MaterialBanner(
+    final fg = theme.colorScheme.onTertiaryContainer;
+    return _strip(
       key: const Key('obd2ReconnectEngineOffBanner'),
-      backgroundColor: theme.colorScheme.tertiaryContainer,
-      contentTextStyle: TextStyle(color: theme.colorScheme.onTertiaryContainer),
-      leading: Icon(
-        Icons.power_settings_new,
-        color: theme.colorScheme.onTertiaryContainer,
+      theme: theme,
+      background: theme.colorScheme.tertiaryContainer,
+      foreground: fg,
+      leading: Icon(Icons.power_settings_new, size: 20, color: fg),
+      message: l.obdAdapterUnresponsive,
+      action: TextButton(
+        key: const Key('obd2ReconnectEngineOffRetryButton'),
+        style: TextButton.styleFrom(foregroundColor: fg),
+        onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
+        child: Text(l.obd2ReconnectRetry),
       ),
-      content: Text(l.obdAdapterUnresponsive),
-      actions: [
-        TextButton(
-          key: const Key('obd2ReconnectEngineOffRetryButton'),
-          onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
-          child: Text(l.obd2ReconnectRetry),
-        ),
-      ],
     );
   }
 }
