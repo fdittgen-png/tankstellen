@@ -24,6 +24,7 @@ import '../domain/entities/trip_start_stage.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_recording_pipeline.dart';
+import 'recording_battery_exemption.dart';
 import 'recording_pipeline.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
@@ -369,6 +370,11 @@ class TripRecording extends _$TripRecording {
     // never locks recording out permanently.
     if (state.isActive || _startInProgress) return;
     _startInProgress = true;
+    if (!automatic) {
+      // #3313 — manual (foreground) start: prompt once, FGS-gated. Auto
+      // starts skip it (may be backgrounded; the dialog can't show).
+      unawaited(ref.read(recordingBatteryExemptionProvider).maybePrompt());
+    }
     try {
       await _startInternal(service, automatic: automatic);
     } finally {
@@ -1125,6 +1131,7 @@ class TripRecording extends _$TripRecording {
       return StartTripOutcome.alreadyActive;
     }
     _startInProgress = true;
+    unawaited(ref.read(recordingBatteryExemptionProvider).maybePrompt()); // #3313
     try {
       final pipeline = GpsOnlyRecordingPipeline(
         ref: ref,

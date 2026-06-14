@@ -24,10 +24,17 @@
      geolocator's foregroundServiceType="location" service). No Android
      Auto components (the Auto host is GMS, absent from the GMS-free fdroid
      build) and no AutoRecordForegroundService / CONNECTED_DEVICE here —
-     extending hands-free auto-record to fdroid is a separate decision. -->
+     extending hands-free auto-record to fdroid is a separate decision.
+
+     #3313 — REQUEST_IGNORE_BATTERY_OPTIMIZATIONS lets the recording FGS
+     prompt the user to be whitelisted from battery optimization, so a long
+     drive survives Doze / aggressive OEM task-killers (a foreground service
+     alone does not stop Doze CPU-sleep). Normal install-time permission,
+     shipped only in this FGS-approved overlay so default builds stay clean. -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 </manifest>

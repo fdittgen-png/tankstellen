@@ -37,6 +37,15 @@ class StorageKeys {
   static const String consentSyncTrips = 'consent_sync_trips';
 
   static const String swipeTutorialShown = 'swipe_tutorial_shown';
+
+  /// #3313 — set once we've prompted the user to exempt the app from
+  /// battery optimization (so a recording foreground service survives
+  /// Doze / aggressive OEM task-killers on long drives). One-time: set
+  /// the first time a recording FGS starts, never re-prompted, so a
+  /// declined dialog doesn't nag. Only ever consulted in FGS-approved
+  /// builds (`kGpsRecordingForegroundServiceEnabled`).
+  static const String batteryOptExemptionAsked = 'battery_opt_exemption_asked';
+
   static const String consumptionLog = 'consumption_log';
   static const String vehicleProfiles = 'vehicle_profiles';
   static const String activeVehicleProfileId = 'active_vehicle_profile_id';
