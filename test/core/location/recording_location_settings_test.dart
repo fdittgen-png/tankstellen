@@ -114,6 +114,36 @@ void main() {
       });
     });
 
+    group('#3319 — coarse (stationary) profile', () {
+      test('Android coarse → backed-off cadence (5 s / 25 m / medium) but '
+          'the FGS config is kept alive', () {
+        final coarse = recordingLocationSettings(
+          l10n: l10n,
+          platform: TargetPlatform.android,
+          foregroundServiceEnabled: true,
+          coarse: true,
+        ) as AndroidSettings;
+
+        expect(coarse.intervalDuration, const Duration(seconds: 5),
+            reason: 'back the receiver off while parked');
+        expect(coarse.distanceFilter, 25);
+        expect(coarse.accuracy, LocationAccuracy.medium);
+        expect(coarse.foregroundNotificationConfig, isNotNull,
+            reason: 'the FGS (and its wake lock) must stay alive across the '
+                'stationary stretch so it can re-fine on resumed motion');
+      });
+
+      test('Android fine (coarse:false) keeps the 1 s / 0 / high cadence', () {
+        final fine = recordingLocationSettings(
+          l10n: l10n,
+          platform: TargetPlatform.android,
+        ) as AndroidSettings;
+        expect(fine.intervalDuration, const Duration(seconds: 1));
+        expect(fine.distanceFilter, 0);
+        expect(fine.accuracy, LocationAccuracy.high);
+      });
+    });
+
     test('iOS → AppleSettings: automotiveNavigation + background updates', () {
       final settings = recordingLocationSettings(
         l10n: l10n,
