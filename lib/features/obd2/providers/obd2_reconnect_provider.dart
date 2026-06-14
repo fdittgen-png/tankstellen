@@ -8,7 +8,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../data/last_good_adapter_store.dart';
+import '../data/obd2_comm_diagnostics.dart';
+import '../data/obd2_connect_trace.dart';
+import '../data/obd2_connect_trace_log.dart';
 import '../data/obd2_connection_service.dart';
 import '../data/obd2_link_drop_signal.dart';
 import '../data/obd2_reconnect_controller.dart';
@@ -51,8 +55,14 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     // #3019 — subscribe to the PROACTIVE link-drop signal both channels emit
     // the instant a link dies (BLE disconnect edge / Classic socket close), so
     // a drop while idle / between trips still starts the bounded backoff loop.
-    _dropSub = Obd2LinkDropSignal.instance.drops.listen((_) {
-      _controller?.notifyDropped();
+    _dropSub = Obd2LinkDropSignal.instance.drops.listen((e) {
+      // #3346 — carry WHY the link dropped (and on which transport) into the
+      // controller so the reconnect-episode breadcrumb records it.
+      _controller?.notifyDropped(
+        reason: e.reason,
+        transportKind: e.transportKind,
+        mac: e.mac,
+      );
     });
     ref.onDispose(() {
       unawaited(_dropSub?.cancel());
@@ -91,8 +101,44 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     );
     // Republish every transition into the Riverpod state so the UI rebuilds.
     controller.onState = (s) => state = s;
+    // #3346 — route the reconnect-EPISODE breadcrumbs (drop reason, each
+    // attempt's path/outcome/latency, backoff, terminal) into the exported
+    // channels: the always-on BreadcrumbCollector (rides every error trace)
+    // + the developer-mode comm-diagnostics reconnect reservoir.
+    controller.onTrace = _trace;
     return controller;
   }
+
+  /// #3346 — fan one reconnect-episode event out to the exported telemetry
+  /// channels. Best-effort: the controller already guards this against throws.
+  void _trace(String event, Map<String, Object?> data) {
+    BreadcrumbCollector.add('obd2-reconnect: $event', detail: _fmt(data));
+    // Feed the gated comm-diagnostics reconnect counters so the developer-mode
+    // health screen's reservoir reflects real reconnect activity, not just
+    // first-connects.
+    final diag = Obd2CommDiagnostics.instance;
+    if (!diag.enabled) return;
+    switch (event) {
+      case 'attempt-start':
+        diag.noteConnectionEvent(attempt: true);
+      case 'connected':
+        final ms = data['episodeMs'];
+        diag.noteConnectionEvent(
+          success: true,
+          visibleReconnect: true,
+          timeToReconnectMs: ms is int ? ms : null,
+        );
+      case 'terminal-failed':
+        diag.noteConnectionEvent(failureReason: 'reconnect-exhausted');
+      case 'terminal-engine-off':
+        diag.noteConnectionEvent(failureReason: 'reconnect-engine-off');
+    }
+  }
+
+  /// Render a flat breadcrumb map as a compact `k=v` string (stable key
+  /// order is not required — a field reader scans for the tokens).
+  static String _fmt(Map<String, Object?> data) =>
+      data.entries.map((e) => '${e.key}=${e.value}').join(' ');
 
   /// Report a detected connection drop — the trip-INDEPENDENT entry point.
   /// Safe to call from anywhere a drop is observed (the proactive Classic
@@ -118,9 +164,17 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     LastGoodAdapter pinned,
   ) async {
     try {
-      final svc = pinned.isClassic
-          ? await connection.connectByMacClassicDirect(pinned.mac)
-          : await connection.connectByMacDirect(pinned.mac, fallbackToScan: false);
+      // #3346 — stamp the per-attempt connect trace as a liveReconnect (not a
+      // firstConnect), so the persisted, exported connect-trace ring tells a
+      // silent mid-drive reconnect apart from a user-driven first connect.
+      final svc = await Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.liveReconnect,
+        () => pinned.isClassic
+            ? connection.connectByMacClassicDirect(pinned.mac)
+            : connection.connectByMacDirect(pinned.mac, fallbackToScan: false),
+        transportDecisionReason:
+            pinned.isClassic ? 'reconnect-pinned-classic' : 'reconnect-pinned-ble',
+      );
       return _onResult(svc);
     } catch (e, st) {
       _logSeam('pinned', e, st);
@@ -137,9 +191,13 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     LastGoodAdapter? pinned,
   ) async {
     try {
-      final svc = pinned != null
-          ? await connection.connectByMac(pinned.mac)
-          : await connection.connectBest();
+      final svc = await Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.liveReconnect,
+        () => pinned != null
+            ? connection.connectByMac(pinned.mac)
+            : connection.connectBest(),
+        transportDecisionReason: 'reconnect-rescan',
+      );
       return _onResult(svc);
     } catch (e, st) {
       _logSeam('rescan', e, st);

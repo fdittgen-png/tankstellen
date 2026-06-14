@@ -182,7 +182,7 @@ class ClassicElmChannel implements ElmByteChannel {
         // rather than the drop being discovered only LAZILY on the next
         // `write()` (which never comes when idle / between trips). The in-trip
         // typed-disconnect handling below is unchanged.
-        _signalDrop();
+        _signalDrop(reason: 'classic-socket-error'); // #3346
         // #2295 — forward the socket error onto the byte stream so the
         // transport's pending `sendCommand` completer fails IMMEDIATELY
         // (via `_failPending`) instead of waiting out the read timeout,
@@ -199,7 +199,7 @@ class ClassicElmChannel implements ElmByteChannel {
         _open = false;
         // #3019 — a clean socket `done` is also a drop (some stacks close the
         // reader instead of erroring it). Same proactive signal.
-        _signalDrop();
+        _signalDrop(reason: 'classic-socket-done'); // #3346
       },
     );
     _open = true;
@@ -232,7 +232,7 @@ class ClassicElmChannel implements ElmByteChannel {
       // must ALSO emit the #3019 proactive link-drop signal, or the
       // trip-independent reconnect controller stays asleep until the next
       // write that never comes. The reader onError/onDone paths already do.
-      _signalDrop();
+      _signalDrop(reason: 'classic-write-failed'); // #3346
       debugPrint('ClassicElmChannel: write failed — reclassifying as a '
           'recoverable disconnect (#2671): $e\n$st');
       throw const Obd2DisconnectedException(
@@ -257,12 +257,14 @@ class ClassicElmChannel implements ElmByteChannel {
 
   /// #3019 — emit the proactive Classic link-drop signal once per unexpected
   /// drop. A deliberate [close] (the `_closing` guard) is a normal teardown,
-  /// not a drop, so it never reaches here.
-  void _signalDrop() {
+  /// not a drop, so it never reaches here. #3346 — [reason] tags WHICH edge
+  /// noticed the drop (socket error / socket done / lazy write failure) so the
+  /// reconnect-episode breadcrumb records it.
+  void _signalDrop({required String reason}) {
     if (_closing || _dropSignalled) return;
     _dropSignalled = true;
     Obd2LinkDropSignal.instance
-        .notifyDrop(transportKind: 'classic', mac: address);
+        .notifyDrop(transportKind: 'classic', mac: address, reason: reason);
   }
 
   @override

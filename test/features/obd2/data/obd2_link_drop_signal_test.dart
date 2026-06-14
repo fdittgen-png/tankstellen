@@ -22,6 +22,27 @@ void main() {
       await sub.cancel();
     });
 
+    test('#3346 — the drop event carries the WHY (reason) when given',
+        () async {
+      final events = <Obd2LinkDropEvent>[];
+      final sub = Obd2LinkDropSignal.instance.drops.listen(events.add);
+
+      Obd2LinkDropSignal.instance.notifyDrop(
+        transportKind: 'classic',
+        mac: 'AA:BB',
+        reason: 'classic-socket-error',
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events.single.reason, 'classic-socket-error');
+      await sub.cancel();
+    });
+
+    test('#3346 — reason defaults to "unspecified" for older callers', () {
+      const event = Obd2LinkDropEvent(transportKind: 'ble');
+      expect(event.reason, 'unspecified');
+    });
+
     test('multiple listeners both receive a drop (broadcast)', () async {
       var a = 0;
       var b = 0;

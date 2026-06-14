@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'last_good_adapter_store.dart';
+import 'obd2_reconnect_episode_tracer.dart';
 
 /// Coarse lifecycle state of the trip-INDEPENDENT auto-reconnect
 /// controller (#3019 / Epic #3013 phase 3).
@@ -120,11 +121,17 @@ class Obd2ReconnectController {
   /// Emitted on every state transition so a notifier / widget can react.
   void Function(Obd2ReconnectState state)? onState;
 
+  /// #3346 — owns the episode breadcrumb emission + timing. The provider wires
+  /// its sink to [BreadcrumbCollector] + [Obd2CommDiagnostics] in production.
+  final Obd2ReconnectEpisodeTracer _tracer;
+
   Obd2ReconnectController({
     required LastGoodAdapterStore pinStore,
     required PinnedConnectAttempt pinnedConnect,
     required RescanConnectAttempt rescanConnect,
     this.onState,
+    Obd2ReconnectTraceSink? onTrace,
+    DateTime Function()? now,
     int maxAttempts = 6,
     Duration initialBackoff = const Duration(seconds: 2),
     Duration maxBackoff = const Duration(seconds: 60),
@@ -133,11 +140,15 @@ class Obd2ReconnectController {
         _pinStore = pinStore,
         _pinnedConnect = pinnedConnect,
         _rescanConnect = rescanConnect,
+        _tracer = Obd2ReconnectEpisodeTracer(onTrace: onTrace, now: now),
         _maxAttempts = maxAttempts,
         _initialBackoff = initialBackoff,
         _maxBackoff = maxBackoff,
         _firstAttemptDelay = firstAttemptDelay,
         _currentBackoff = initialBackoff;
+
+  /// #3346 — wire / detach the episode breadcrumb sink after construction.
+  set onTrace(Obd2ReconnectTraceSink? sink) => _tracer.onTrace = sink;
 
   Obd2ReconnectState _state = Obd2ReconnectState.idle;
   Duration _currentBackoff;
@@ -173,6 +184,7 @@ class Obd2ReconnectController {
   /// reconnect). Cancels any in-flight loop and clears the counters so the
   /// next drop starts a clean episode.
   void notifyConnected() {
+    _tracer.connected(_attempts + 1);
     _timer?.cancel();
     _timer = null;
     _attempts = 0;
@@ -185,10 +197,26 @@ class Obd2ReconnectController {
   /// point. Starts the bounded backoff loop. Idempotent: a second call
   /// while already reconnecting is a no-op so the (possibly multiple) drop
   /// signals a single physical disconnect raises don't stack loops.
-  void notifyDropped() {
-    if (_state == Obd2ReconnectState.reconnecting) return;
+  void notifyDropped({
+    String reason = 'unspecified',
+    String? transportKind,
+    String? mac,
+  }) {
+    if (_state == Obd2ReconnectState.reconnecting) {
+      // A second drop signal for the same physical disconnect — record it so
+      // a field export shows the channels fired more than once, but don't
+      // restart the episode (idempotent, #3019).
+      _tracer.dropIgnored(reason: reason, transport: transportKind);
+      return;
+    }
     _attempts = 0;
     _currentBackoff = _initialBackoff;
+    _tracer.dropReceived(
+      reason: reason,
+      transport: transportKind,
+      mac: mac,
+      hadPin: _pinStore.recall() != null,
+    );
     _transition(Obd2ReconnectState.reconnecting);
     _scheduleNext(_firstAttemptDelay);
   }
@@ -206,6 +234,7 @@ class Obd2ReconnectController {
     }
     _attempts = 0;
     _currentBackoff = _initialBackoff;
+    _tracer.retry(_state.name);
     _transition(Obd2ReconnectState.reconnecting);
     _scheduleNext(_firstAttemptDelay);
   }
@@ -233,24 +262,47 @@ class Obd2ReconnectController {
     // which it isn't built for. Cheap guard (mirrors the in-trip scanner).
     if (_cycleInFlight || _state != Obd2ReconnectState.reconnecting) return;
     _cycleInFlight = true;
+    final attemptNo = _attempts + 1;
     try {
       final pinned = _pinStore.recall();
+      _tracer.attemptStart(
+        attempt: attemptNo,
+        maxAttempts: _maxAttempts,
+        hasPin: pinned != null,
+      );
       // 1) PINNED FAST PATH (transport-correct direct connect, no scan).
-      var result = pinned == null
-          ? Obd2ReconnectAttemptResult.notFound
-          : await _safely(() => _pinnedConnect(pinned));
+      var result = Obd2ReconnectAttemptResult.notFound;
+      if (pinned == null) {
+        _tracer.pinnedSkipped(attemptNo);
+      } else {
+        final t0 = _tracer.now();
+        result = await _safely(() => _pinnedConnect(pinned));
+        _tracer.pinnedResult(
+          attempt: attemptNo,
+          result: result.name,
+          start: t0,
+          transport: pinned.transportKind,
+        );
+      }
       if (_state != Obd2ReconnectState.reconnecting) return; // stop() raced
       // #3035 — a CONFIRMED engine-off on the pinned path is terminal: the
       // adapter re-connected fine, the ECU is just silent. Re-scanning can't
       // wake a parked car, so STOP here (no rescan, no backoff burst) rather
       // than looping reconnect→engine-off→teardown.
       if (result == Obd2ReconnectAttemptResult.engineOff) {
+        _tracer.terminal('terminal-engine-off', attemptNo);
         _transition(Obd2ReconnectState.terminalEngineOff);
         return;
       }
       // 2) RE-SCAN FALLBACK — only when the pinned path didn't land.
       if (result != Obd2ReconnectAttemptResult.connected) {
+        final t0 = _tracer.now();
         result = await _safely(() => _rescanConnect(pinned));
+        _tracer.rescanResult(
+          attempt: attemptNo,
+          result: result.name,
+          start: t0,
+        );
         if (_state != Obd2ReconnectState.reconnecting) return;
       }
       if (result == Obd2ReconnectAttemptResult.connected) {
@@ -259,6 +311,7 @@ class Obd2ReconnectController {
       }
       // #3035 — the re-scan path can also land on a confirmed engine-off.
       if (result == Obd2ReconnectAttemptResult.engineOff) {
+        _tracer.terminal('terminal-engine-off', attemptNo);
         _transition(Obd2ReconnectState.terminalEngineOff);
         return;
       }
@@ -275,9 +328,14 @@ class Obd2ReconnectController {
     if (_attempts >= _maxAttempts) {
       _timer?.cancel();
       _timer = null;
+      _tracer.terminal('terminal-failed', _attempts);
       _transition(Obd2ReconnectState.terminalFailed);
       return;
     }
+    _tracer.backoffScheduled(
+      nextAttempt: _attempts + 1,
+      delayMs: _currentBackoff.inMilliseconds,
+    );
     _scheduleNext(_currentBackoff);
     _doubleBackoff();
   }
@@ -313,5 +371,6 @@ class Obd2ReconnectController {
     _timer?.cancel();
     _timer = null;
     onState = null;
+    _tracer.dispose();
   }
 }

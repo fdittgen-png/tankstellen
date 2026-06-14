@@ -208,8 +208,11 @@ class FlutterBluePlusElmChannel
     // disconnect is never misread as a drop.
     if (!_closing && !_dropSignalled) {
       _dropSignalled = true;
-      Obd2LinkDropSignal.instance
-          .notifyDrop(transportKind: 'ble', mac: _device.remoteId.str);
+      Obd2LinkDropSignal.instance.notifyDrop(
+        transportKind: 'ble',
+        mac: _device.remoteId.str,
+        reason: 'ble-disconnect-edge', // #3346
+      );
     }
     if (_incoming.isClosed) return;
     _incoming.addError(const Obd2DisconnectedException());
