@@ -59,6 +59,20 @@ object Obd2ClassicPlugin {
     private const val MAX_RFCOMM_ATTEMPTS = 3
     private const val RFCOMM_RETRY_BASE_MS = 150L
 
+    /** #3348 — per-attempt watchdog for the blocking `BluetoothSocket.connect()`.
+     *  `connect()` has NO timeout: when the adapter's single RFCOMM channel is
+     *  still held by a just-dropped session it blocks for the OS default
+     *  (~20–40 s) before throwing `read failed … read ret: -1`. Across the
+     *  secure×3 + insecure + reflection ladder that turned every RECONNECT into
+     *  an 80–120 s hang (field exports, #3346). A watchdog that `close()`s the
+     *  socket after this budget makes the blocking `connect()` throw at once, so
+     *  a failing rung fails FAST and the Dart-side reconnect controller's
+     *  exponential backoff (2→60 s) spaces attempts enough for the adapter to
+     *  release its channel — bounded, responsive tries instead of a 2-min freeze.
+     *  7 s comfortably clears a healthy connect (a full self-test incl. ELM init
+     *  is ~3 s). */
+    private const val RFCOMM_CONNECT_TIMEOUT_MS = 7000L
+
     private var socket: BluetoothSocket? = null
     private var readerThread: Thread? = null
     private val readerRunning = AtomicBoolean(false)
@@ -227,12 +241,41 @@ object Obd2ClassicPlugin {
      *  on success, or close it on failure. Returns null on success, or the
      *  IOException message on failure (#2969 — was a bare Boolean). */
     private fun tryConnectSocket(s: BluetoothSocket, attempt: Int): String? {
+        // #3348 — bound the blocking connect() with a watchdog. `connect()` has
+        // no timeout; closing the socket from another thread is the documented
+        // way to abort it (it throws immediately). The watchdog only fires when
+        // connect() overruns the budget, so a healthy connect is untouched.
+        val settled = AtomicBoolean(false)
+        val watchdog = thread(name = "obd2-classic-connect-watchdog-$attempt") {
+            try {
+                Thread.sleep(RFCOMM_CONNECT_TIMEOUT_MS)
+            } catch (_: InterruptedException) {
+                return@thread // connect finished first; watchdog cancelled
+            }
+            if (settled.compareAndSet(false, true)) {
+                Log.w(TAG, "connect: RFCOMM open exceeded ${RFCOMM_CONNECT_TIMEOUT_MS}ms" +
+                    " (attempt $attempt) — aborting socket")
+                try { s.close() } catch (_: IOException) {}
+            }
+        }
         return try {
             s.connect()
+            // Won the race: cancel the watchdog before it can abort us.
+            if (!settled.compareAndSet(false, true)) {
+                // The watchdog already closed the socket the instant before
+                // connect() returned — treat as a timeout, not a live link.
+                watchdog.interrupt()
+                try { s.close() } catch (_: IOException) {}
+                return "RFCOMM open timed out after ${RFCOMM_CONNECT_TIMEOUT_MS}ms" +
+                    " (attempt $attempt)"
+            }
+            watchdog.interrupt()
             socket = s
             startReader()
             null
         } catch (e: IOException) {
+            settled.set(true)
+            watchdog.interrupt()
             Log.w(TAG, "connect: RFCOMM open failed (attempt $attempt)", e)
             try { s.close() } catch (_: IOException) {}
             if (socket === s) socket = null
