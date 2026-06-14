@@ -6909,6 +6909,12 @@ class AppLocalizationsBg extends AppLocalizations {
       'Закрепвайте радара автоматично всеки път вместо да докосвате. Изразходва повече батерия.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Честота на проверка';
 
   @override

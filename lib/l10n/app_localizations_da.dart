@@ -6852,6 +6852,12 @@ class AppLocalizationsDa extends AppLocalizations {
       'Fastgør radaren automatisk hver gang i stedet for at trykke hver gang. Bruger mere batteri.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Tjekfrekvens';
 
   @override

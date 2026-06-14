@@ -6861,6 +6861,12 @@ class AppLocalizationsSl extends AppLocalizations {
       'Radar se samodejno pritrdi vsakič namesto da tapnete vsak krat. Porabi več baterije.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Pogostost preverjanja';
 
   @override

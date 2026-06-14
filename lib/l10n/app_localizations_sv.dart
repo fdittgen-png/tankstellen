@@ -6848,6 +6848,12 @@ class AppLocalizationsSv extends AppLocalizations {
       'Nåla radarn automatiskt varje gång istället för att trycka varje gång. Använder mer batteri.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Kontrollfrekvens';
 
   @override

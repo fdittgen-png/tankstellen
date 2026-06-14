@@ -6896,6 +6896,12 @@ class AppLocalizationsHu extends AppLocalizations {
       'Automatikusan rögzíti a radart minden alkalommal, ahelyett, hogy minden alkalommal meg kellene érinteni. Több akkumulátort használ.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Ellenőrzési gyakoriság';
 
   @override

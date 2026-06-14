@@ -6903,6 +6903,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'Fixa o radar automaticamente de cada vez em vez de tocar cada vez. Usa mais bateria.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frequência de verificação';
 
   @override

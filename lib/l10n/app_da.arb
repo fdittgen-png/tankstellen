@@ -4797,5 +4797,15 @@
   "@radarSearching": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "radarScopeShowScope": "Radar view",
+  "@radarScopeShowScope": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "radarScopeShowList": "List view",
+  "@radarScopeShowList": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -6919,6 +6919,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Épingler le radar automatiquement à chaque fois au lieu d\'appuyer à chaque fois. Consomme plus de batterie.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Fréquence de vérification';
 
   @override

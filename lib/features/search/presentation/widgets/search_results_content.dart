@@ -1,18 +1,25 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/search_mode.dart';
 import '../../../../core/domain/search_result_item.dart';
+import '../../providers/radar_scope_mode_provider.dart';
 import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
+import 'radar_scope_view.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
 
@@ -86,15 +93,41 @@ class SearchResultsContent extends ConsumerWidget {
             result: radarResult,
             onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
           );
+          // #3342 — a second visualization of the SAME station set: a green
+          // PPI radar scope (rotating sweep + a blip per station by distance
+          // and bearing). The toggle only swaps the view, it never re-scans,
+          // and is only offered when we have a usable centre to place blips
+          // around. Defaults to the list.
+          final scopeMode = ref.watch(radarScopeModeProvider);
+          final userPos = ref.watch(userPositionProvider);
+          final canScope =
+              userPos != null && isUsableCoord(userPos.lat, userPos.lng);
+          final Widget body;
+          if (scopeMode && canScope) {
+            body = SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: RadarScopeView(
+                stations: stations,
+                centerLat: userPos.lat,
+                centerLng: userPos.lng,
+                rangeKm: ref.watch(searchRadiusProvider),
+                onStationTap: (s) =>
+                    unawaited(StationDetailRoute(s.id).push<void>(context)),
+              ),
+            );
+          } else {
+            body = list;
+          }
           // #3267 — while painting from the last-known position, a thin banner
           // tells the user the spot is being refreshed (instead of silently
           // showing stale-position distances), and clears once the live fix
           // lands and the list re-ranks.
-          if (!radar.locating) return list;
           return Column(
             children: [
-              _RadarUpdatingBanner(message: l10n.radarUpdatingLocation),
-              Expanded(child: list),
+              if (canScope) _RadarViewToggle(scopeMode: scopeMode),
+              if (radar.locating)
+                _RadarUpdatingBanner(message: l10n.radarUpdatingLocation),
+              Expanded(child: body),
             ],
           );
         },
@@ -147,6 +180,34 @@ class SearchResultsContent extends ConsumerWidget {
         stackTrace: stackTrace,
         searchContext:
             'Station search (${ref.read(selectedFuelTypeProvider).apiValue})',
+      ),
+    );
+  }
+}
+
+/// #3342 — a right-aligned button toggling the radar results between the
+/// distance-sorted list and the green PPI radar-scope view. Only shown when a
+/// usable centre exists (so the scope can place blips). Reads the toggle so its
+/// icon/label reflect the current view.
+class _RadarViewToggle extends ConsumerWidget {
+  const _RadarViewToggle({required this.scopeMode});
+
+  final bool scopeMode;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final label = scopeMode ? l10n.radarScopeShowList : l10n.radarScopeShowScope;
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: TextButton.icon(
+          key: const Key('radar_view_toggle'),
+          onPressed: () => ref.read(radarScopeModeProvider.notifier).toggle(),
+          icon: Icon(scopeMode ? Icons.list : Icons.radar, size: 20),
+          label: Text(label),
+        ),
       ),
     );
   }

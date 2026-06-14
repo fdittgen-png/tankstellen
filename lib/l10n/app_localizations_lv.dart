@@ -6892,6 +6892,12 @@ class AppLocalizationsLv extends AppLocalizations {
       'Piespraust radaru automātiski katru reizi, nevis katru reizi pieskarties. Izmanto vairāk akumulatora.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Pārbaudes biežums';
 
   @override

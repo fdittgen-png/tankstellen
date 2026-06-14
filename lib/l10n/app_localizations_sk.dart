@@ -6880,6 +6880,12 @@ class AppLocalizationsSk extends AppLocalizations {
       'Radar sa automaticky pripína zakaždým namiesto manuálneho klepnutia. Spotrebúva viac batérie.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frekvencia kontrol';
 
   @override

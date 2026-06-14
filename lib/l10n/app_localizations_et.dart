@@ -6849,6 +6849,12 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kinnita radar automaatselt iga kord, selle asemel et iga kord puudutada. Kasutab rohkem akut.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Kontrollimissagedus';
 
   @override
