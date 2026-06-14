@@ -30,10 +30,15 @@ import '../opening_hours/opening_hours_adapter.dart';
 /// 3. **A day name with NO range** — a bare `Lundi` / a trailing `Dimanche`
 ///    means *closed that day* (Prix-Carburants `Fermé`). It resolves to
 ///    [DayState.closed], never dropped (#2742).
-/// 4. **The `01:00-01:00` degenerate sentinel** — the feed emits an
-///    open==close range to mean "no real interval". A day whose only token is
-///    such a range resolves to [DayState.unknown] (the literal range is
-///    dropped), never a real interval and never 24h ([TimeRange.isDegenerate]).
+/// 4. **The `01:00-01:00` round-the-clock convention** — the feed emits an
+///    open==close range (`ouverture == fermeture`, e.g. `01.00-01.00`) to mean
+///    the day is open continuously. The official prix-carburants site renders
+///    those days as their hours (it shows `01h-01h`), NOT as "closed", so a day
+///    whose only token is such a range resolves to [DayState.open24h] — not
+///    dropped to [DayState.unknown] (#3308: doing so hid hours the source
+///    publishes, rendering "Horaires d'ouverture non disponibles"). The literal
+///    interval is still not kept as a range ([TimeRange.isDegenerate]); the day
+///    is the 24h state instead.
 /// 5. **Split shifts / lunch breaks** — a day publishes two ranges joined by
 ///    ` et ` (`Lundi 08.00-12.00 et 14.00-18.00`) or, rarely, as two same-day
 ///    entries; both ranges coalesce into that day's [DayHours.ranges].
@@ -103,10 +108,11 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
       // `Lundi 08.00-12.00 et 14.00-18.00` (split shift) uniformly.
       final matches = _dayWordRe.allMatches(trimmed).toList();
       // Per-day accumulators. `closed` = a bare day token with no clock at
-      // all; `unknown` = a day whose only clock was the degenerate sentinel.
+      // all; `roundTheClock` = a day whose only clock was an open==close range
+      // (#3308: the feed's 24h convention — open24h, not "no interval").
       final ranges = <OpeningDay, List<TimeRange>>{};
       final closed = <OpeningDay>{};
-      final degenerateOnly = <OpeningDay>{};
+      final roundTheClock = <OpeningDay>{};
 
       for (var i = 0; i < matches.length; i++) {
         final m = matches[i];
@@ -126,7 +132,10 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
             endHour: int.parse(c.group(3)!),
             endMinute: int.parse(c.group(4)!),
           );
-          // Degenerate `01:00-01:00` carries no real interval — drop it.
+          // #3308 — an open==close range (`01:00-01:00`) is the feed's
+          // round-the-clock convention, not a real interval — don't keep it as
+          // a range, but DO mark the day open24h below (the official site shows
+          // these as hours, so we must too).
           if (range.isDegenerate) continue;
           sawUsable = true;
           (ranges[day] ??= <TimeRange>[]).add(range);
@@ -135,8 +144,8 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
         if (sawUsable) {
           continue; // real ranges recorded above
         } else if (sawClock) {
-          // Only a degenerate sentinel → "no real interval" → unknown.
-          degenerateOnly.add(day);
+          // #3308 — only an open==close range → open the whole day (24h).
+          roundTheClock.add(day);
         } else {
           // Bare day name, no clock at all → closed (Fermé).
           closed.add(day);
@@ -152,15 +161,20 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
           );
         } else if (closed.contains(day)) {
           days.add(DayHours(day: day, state: DayState.closed));
-        } else if (degenerateOnly.contains(day)) {
-          days.add(DayHours(day: day, state: DayState.unknown));
+        } else if (roundTheClock.contains(day)) {
+          // #3308 — open==close → the day is open 24h.
+          days.add(DayHours(day: day, state: DayState.open24h));
         }
         // else: omitted → implicitly unknown (left out of `days`).
       }
 
-      // Whether any staffed signal at all was resolved (open/closed/unknown).
+      // Whether any staffed signal at all was resolved (open/closed/24h).
       final hasSchedule = days.isNotEmpty;
-      final hasStaffedRanges = days.any((d) => d.state == DayState.openRanges);
+      // #3308 — an open24h day is a real "open" signal too, so an automate
+      // station that ALSO publishes open24h boutique days keeps that schedule
+      // rather than collapsing to the pump-only all-week 24h fallback below.
+      final hasStaffedRanges = days.any((d) =>
+          d.state == DayState.openRanges || d.state == DayState.open24h);
 
       // Automate-only: the flag is set but the feed gave no real staffed
       // ranges (every day is closed/unknown/omitted) → pump-only 24/7.
