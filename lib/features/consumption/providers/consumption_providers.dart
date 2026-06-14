@@ -28,6 +28,7 @@ import '../domain/entities/fill_up.dart';
 import '../domain/entities/pending_reconciliation.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/services/eco_score_calculator.dart';
+import '../domain/services/fill_up_trip_linker.dart';
 import '../domain/services/gps_matrix_reconciler.dart';
 import '../domain/services/reconciler.dart';
 import '../domain/trip_recorder.dart';
@@ -286,64 +287,15 @@ class FillUpList extends _$FillUpList {
   /// the trip-history repository isn't available, or no trips fall
   /// in the window.
   List<String> _linkedTripIdsForWholeWindow(FillUp fillUp) {
-    final vehicleId = fillUp.vehicleId;
-    if (vehicleId == null) return const <String>[];
+    // #3138 — the plein-to-plein window math is the pure [FillUpTripLinker];
+    // the notifier only supplies the loaded trip history + sibling fills.
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return const <String>[];
-    final history = repo.loadAll();
-    final fillRepo = ref.read(fillUpRepositoryProvider);
-    final allFills = fillRepo
-        .getAll()
-        .where(
-          (f) =>
-              f.vehicleId == vehicleId &&
-              f.id != fillUp.id &&
-              !f.isCorrection,
-        )
-        .toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
-
-    FillUp? previousPlein;
-    for (final f in allFills) {
-      if (!f.date.isBefore(fillUp.date)) continue;
-      if (!f.isFullTank) continue;
-      if (previousPlein == null || f.date.isAfter(previousPlein.date)) {
-        previousPlein = f;
-      }
-    }
-
-    // Window lower bound:
-    //   - prior plein → strictly after that plein's date
-    //   - no prior plein but earlier same-vehicle fills exist → at-or-
-    //     after the earliest such fill (inclusive)
-    //   - no prior fills at all → no lower bound (everything before
-    //     this fill qualifies, matching the legacy #888 semantics)
-    DateTime? windowStart;
-    bool inclusiveLower = true;
-    if (previousPlein != null) {
-      windowStart = previousPlein.date;
-      inclusiveLower = false;
-    } else if (allFills.isNotEmpty) {
-      windowStart = allFills.first.date;
-      inclusiveLower = true;
-    }
-    final upperBound = fillUp.date;
-
-    final matches = <TripHistoryEntry>[];
-    for (final entry in history) {
-      if (entry.vehicleId != vehicleId) continue;
-      final when = entry.summary.startedAt;
-      if (when == null) continue;
-      if (windowStart != null) {
-        final afterStart = inclusiveLower
-            ? !when.isBefore(windowStart)
-            : when.isAfter(windowStart);
-        if (!afterStart) continue;
-      }
-      if (when.isAfter(upperBound)) continue;
-      matches.add(entry);
-    }
-    return matches.map((e) => e.id).toList(growable: false);
+    return const FillUpTripLinker().linkedTripIdsInWindow(
+      fillUp: fillUp,
+      history: repo.loadAll(),
+      allFills: ref.read(fillUpRepositoryProvider).getAll(),
+    );
   }
 
   /// After saving [closing], propagate its `linkedTripIds` to every
@@ -359,53 +311,13 @@ class FillUpList extends _$FillUpList {
   /// cover the open window so the prior partial picks up the new
   /// trips.
   Future<void> _relinkOpenWindow(FillUp closing) async {
-    final vehicleId = closing.vehicleId;
-    if (vehicleId == null) return;
     final repo = ref.read(fillUpRepositoryProvider);
-    final allFills = repo
-        .getAll()
-        .where(
-          (f) =>
-              f.vehicleId == vehicleId &&
-              f.id != closing.id &&
-              !f.isCorrection,
-        )
-        .toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
-
-    FillUp? previousPlein;
-    for (final f in allFills) {
-      if (!f.date.isBefore(closing.date)) continue;
-      if (!f.isFullTank) continue;
-      if (previousPlein == null || f.date.isAfter(previousPlein.date)) {
-        previousPlein = f;
-      }
-    }
-
-    DateTime? windowStart;
-    bool inclusiveLower = true;
-    if (previousPlein != null) {
-      windowStart = previousPlein.date;
-      inclusiveLower = false;
-    } else if (allFills.isNotEmpty) {
-      windowStart = allFills.first.date;
-      inclusiveLower = true;
-    }
-    final upperBound = closing.date;
-
-    bool inWindow(DateTime when) {
-      if (windowStart != null) {
-        final afterStart = inclusiveLower
-            ? !when.isBefore(windowStart)
-            : when.isAfter(windowStart);
-        if (!afterStart) return false;
-      }
-      return !when.isAfter(upperBound);
-    }
-
+    // #3138 — same window math as [_linkedTripIdsForWholeWindow], via the
+    // shared [FillUpTripLinker]: the partials in [closing]'s open window.
+    final inWindow = const FillUpTripLinker()
+        .siblingsInWindow(fillUp: closing, allFills: repo.getAll());
     final newIds = closing.linkedTripIds;
-    for (final f in allFills) {
-      if (!inWindow(f.date)) continue;
+    for (final f in inWindow) {
       // Merge — preserve any pre-existing ids, add the new set.
       final merged = <String>{...f.linkedTripIds, ...newIds}.toList();
       if (merged.length == f.linkedTripIds.length &&
