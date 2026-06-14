@@ -85,6 +85,15 @@ class EvPrice {
   }
 
   static final _amount = RegExp(r'(\d+(?:[.,]\d+)?)');
+
+  /// #3340 — the amount ATTACHED to a per-kWh unit (`0,40 €/kWh`,
+  /// `0.49 EUR/kWh`, `€0,50/kWh`, `0.40 kw/h`). Anchoring on the unit means a
+  /// multi-component tariff like `"0,1008 €/min …, 0,4008 €/kWh"` yields the
+  /// €/kWh figure (0.4008), not the first (per-minute) number in the string.
+  /// Matches against the already-lowercased text.
+  static final _perKwhAmount = RegExp(
+    r'(\d+(?:[.,]\d+)?)\s*(?:€|eur|£|gbp|\$|usd|chf|kr|zł|pln)?\s*(?:/|per)?\s*kw\s*/?\s*h',
+  );
   static const _freeWords = <String>[
     'free', 'gratis', 'gratuit', 'kostenlos', 'gratuito', 'gratuita',
     'bezpłatn', 'ingyenes', 'nemokama', 'zdarma', 'besplatno',
@@ -108,26 +117,34 @@ class EvPrice {
 
     final low = raw.toLowerCase();
     final currency = _detectCurrency(low);
+
+    // #3340 — per-kWh first, using the amount ATTACHED to the kWh unit so a
+    // multi-component string ("0,1008 €/min …, 0,4008 €/kWh") reports the
+    // €/kWh figure, not the first (per-minute) number.
+    final perKwhMatch = _perKwhAmount.firstMatch(low);
+    if (perKwhMatch != null) {
+      final perKwhAmount =
+          double.tryParse(perKwhMatch.group(1)!.replaceAll(',', '.'));
+      if (perKwhAmount != null && perKwhAmount > 0) {
+        return EvPrice(
+          kind: EvPriceKind.perKwh,
+          amount: perKwhAmount,
+          currency: currency,
+          raw: raw,
+        );
+      }
+    }
+
     final amountMatch = _amount.firstMatch(raw);
     final amount = amountMatch == null
         ? null
         : double.tryParse(amountMatch.group(1)!.replaceAll(',', '.'));
 
-    final perKwh = low.contains('kwh') || low.contains('kw/h') ||
-        low.contains('/kw');
     final perSession = low.contains('session') ||
         low.contains('charge') ||
         low.contains('flat') ||
         low.contains('par recharge');
 
-    if (amount != null && amount > 0 && perKwh) {
-      return EvPrice(
-        kind: EvPriceKind.perKwh,
-        amount: amount,
-        currency: currency,
-        raw: raw,
-      );
-    }
     if (amount != null && amount > 0 && perSession) {
       return EvPrice(
         kind: EvPriceKind.perSession,
@@ -138,7 +155,7 @@ class EvPrice {
     }
     // No structured price — a "free" wording (or a bare 0) means free.
     final saysFree = _freeWords.any(low.contains);
-    if (saysFree || (amount == 0 && !perKwh && !perSession)) {
+    if (saysFree || (amount == 0 && !perSession)) {
       return EvPrice(kind: EvPriceKind.free, raw: raw);
     }
     return EvPrice(kind: EvPriceKind.unknown, raw: raw);
