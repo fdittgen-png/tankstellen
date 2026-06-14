@@ -20,7 +20,12 @@ export '../../domain/entities/trip_start_stage.dart' show TripStartStage;
 class TripStartProgress extends StatefulWidget {
   final TripStartStage stage;
 
-  const TripStartProgress({super.key, required this.stage});
+  /// #3335 — when non-null, a "Cancel" affordance is shown so the user can
+  /// interrupt a stuck/slow OBD2 initialization and retry later without
+  /// restarting the app. Null hides the button (e.g. legacy inline use).
+  final VoidCallback? onCancel;
+
+  const TripStartProgress({super.key, required this.stage, this.onCancel});
 
   @override
   State<TripStartProgress> createState() => _TripStartProgressState();
@@ -120,6 +125,22 @@ class _TripStartProgressState extends State<TripStartProgress>
                 color: theme.colorScheme.onPrimaryContainer,
               ),
             ),
+            // #3335 — escape hatch for a stuck / slow init. Interrupts the
+            // connect and returns to idle so the user can retry.
+            if (widget.onCancel != null) ...[
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  key: const Key('trip_start_progress_cancel'),
+                  onPressed: widget.onCancel,
+                  style: TextButton.styleFrom(
+                    foregroundColor: theme.colorScheme.onPrimaryContainer,
+                  ),
+                  child: Text(l.cancel),
+                ),
+              ),
+            ],
           ],
         ),
       ),

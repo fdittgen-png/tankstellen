@@ -170,6 +170,14 @@ class RecordingStartCoordinator {
         unawaited(service.disconnect());
         return;
       }
+      // #3335 — the user may have hit Cancel on the connecting card while
+      // the BLE connect was in flight. If the session is no longer
+      // connecting, tear the freshly-linked service down and do NOT start a
+      // trip they backed out of.
+      if (!ref.read(tripRecordingProvider).isConnecting) {
+        unawaited(service.disconnect());
+        return;
+      }
       notifier.setConnectStage(TripStartStage.readingVehicleData);
       await notifier.start(service);
       notifier.setConnectStage(TripStartStage.startingRecording);
