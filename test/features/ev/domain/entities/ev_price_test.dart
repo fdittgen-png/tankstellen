@@ -29,6 +29,24 @@ void main() {
     test('a non-EUR currency is detected — "0.30 GBP/kWh"', () {
       expect(EvPrice.parse('0.30 GBP/kWh').currency, 'GBP');
     });
+
+    test('#3340 — a multi-component FR tariff reports the €/kWh figure, NOT '
+        'the leading €/min (parking) amount', () {
+      final p = EvPrice.parse(
+        '0,1008 €/min pour le stationnement (07-22, > 3 h), '
+        '0,1008 €/min pour la recharge (07-22, > 3 h), 0,4008 €/kWh',
+      );
+      expect(p.kind, EvPriceKind.perKwh);
+      expect(p.amount, 0.4008,
+          reason: 'must anchor on the /kWh unit, not the first number');
+      expect(p.currency, 'EUR');
+    });
+
+    test('#3340 — "0,40 €/kWh" (comma, attached unit) → perKwh 0.40', () {
+      final p = EvPrice.parse('0,40 €/kWh');
+      expect(p.kind, EvPriceKind.perKwh);
+      expect(p.amount, 0.40);
+    });
   });
 
   group('EvPrice.parse — per-session tariffs', () {
