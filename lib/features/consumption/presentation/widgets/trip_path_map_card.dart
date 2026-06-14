@@ -17,8 +17,9 @@ import 'trip_path_geometry.dart';
 // Phase 3 thresholds (#1374) — fixed defaults.
 //
 // The GPS-path heatmap colours each segment by its instantaneous
-// L/100 km, computed from the OBD-II `fuelRateLPerHour` and `speedKmh`
-// at the segment's start sample. Three buckets:
+// L/100 km, computed from `fuelRateLPerHour` — or, when absent (GPS-only /
+// OBD2-no-PID), the GPS estimate `estimatedFuelRateLPerHour` (#3329) — and
+// `speedKmh` at the segment's start sample. Three buckets:
 //
 //   * efficient   < 6.0 L/100 km  → DarkModeColors.success (green)
 //   * borderline  6.0 ≤ x < 10.0  → DarkModeColors.warning (orange)
@@ -27,11 +28,9 @@ import 'trip_path_geometry.dart';
 // Two safety gates classify a segment as efficient regardless of
 // computed L/100 km:
 //
-//   * `fuelRateLPerHour == null` — legacy / partial samples (no
-//     PID 5E and no MAF fallback) shouldn't paint red just because
-//     fuel rate wasn't measured.
-//   * `speedKmh < 5.0` — too-slow segments produce divide-by-near-
-//     zero L/100 km that's meaningless for coaching (creep, idle).
+//   * neither a measured rate nor an estimate — shouldn't paint red just
+//     because consumption wasn't known.
+//   * `speedKmh < 5.0` — too-slow segments give meaningless L/100 km.
 //
 // These thresholds are intentionally fixed; a future PR could derive
 // them per-vehicle from the consumption profile (tracked separately).
@@ -165,7 +164,9 @@ class _TripPathMapState extends State<_TripPathMap> {
   /// [_SegmentBucket.efficient] so legacy / idle samples don't paint
   /// red.
   static _SegmentBucket _classify(TripDetailSample start) {
-    final fuelRate = start.fuelRateLPerHour;
+    // #3329 — fall back to the GPS fuel ESTIMATE (GPS-only / OBD2-no-PID) so
+    // the route is coloured by estimated consumption, not painted all green.
+    final fuelRate = start.fuelRateLPerHour ?? start.estimatedFuelRateLPerHour;
     final speed = start.speedKmh;
     if (fuelRate == null || speed < _kMinClassifiableSpeedKmh) {
       return _SegmentBucket.efficient;
