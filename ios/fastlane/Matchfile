@@ -9,7 +9,18 @@ git_url("git@github.com:fdittgen-png/tankstellen-ios-certs.git")
 storage_mode("git")
 
 type("appstore")
-app_identifier(["de.tankstellen.tankstellen"])
+# Both signed targets must be covered, or the App Store archive fails with
+# "No profile for ... matching 'match AppStore <id>'". The WidgetKit
+# extension (TankstellenWidget) is a separate code-signed target with its own
+# App ID, so it needs its own match profile alongside the host app. Both App
+# IDs must have the App Groups capability enabled in the Apple Developer
+# Portal (they share `group.de.tankstellen.tankstellen` for the host↔widget
+# UserDefaults bridge) so the regenerated profiles carry the
+# `com.apple.security.application-groups` entitlement.
+app_identifier([
+  "de.tankstellen.tankstellen",
+  "de.tankstellen.tankstellen.TankstellenWidget",
+])
 team_id("C4Y5RDF8P9")
 
 # CI must always run match in readonly mode — only humans on a trusted
