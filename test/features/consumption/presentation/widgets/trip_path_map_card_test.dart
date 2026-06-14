@@ -385,4 +385,41 @@ void main() {
       expect(flutterMap.options.initialCameraFit, isNotNull);
     });
   });
+
+  group('TripPathMapCard — non-finite / degenerate guard (#3316)', () {
+    testWidgets('NaN / Infinity coords are dropped, the map still builds',
+        (tester) async {
+      // A field export crashed MarkerLayer (Crs.checkLatLng) on a NaN
+      // LatLng. The finite subset must still render, no exception thrown.
+      final samples = [
+        _sample(sec: 0, lat: 43.46, lng: 3.43),
+        _sample(sec: 1, lat: double.nan, lng: 3.44),
+        _sample(sec: 2, lat: 43.48, lng: double.infinity),
+        _sample(sec: 3, lat: 43.49, lng: 3.46),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(FlutterMap), findsOneWidget);
+    });
+
+    testWidgets(
+        'all-identical points (a stationary trip) build without an infinite '
+        'CameraFit zoom', (tester) async {
+      // Every fix at the same coordinate → zero-span bounds → the old
+      // CameraFit computed an infinite fit-zoom that _clampToNativeZoom
+      // turned into Infinity.toInt() → UnsupportedError.
+      final samples = [
+        _sample(sec: 0, lat: 43.46, lng: 3.43),
+        _sample(sec: 1, lat: 43.46, lng: 3.43),
+        _sample(sec: 2, lat: 43.46, lng: 3.43),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(FlutterMap), findsOneWidget);
+    });
+  });
 }

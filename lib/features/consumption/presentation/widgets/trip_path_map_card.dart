@@ -11,6 +11,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../data/driving_insights_hard_accel_indices.dart';
 import 'trip_detail_charts.dart';
+import 'trip_path_geometry.dart';
 
 // ---------------------------------------------------------------------------
 // Phase 3 thresholds (#1374) — fixed defaults.
@@ -69,20 +70,12 @@ class TripPathMapCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Build the parallel lists of (LatLng, source-sample) so the inner
-    // map can colour segments by the source sample's telemetry. Half-
-    // set fixes are dropped — the recorder writes the lat/lng pair
-    // atomically (see `TripSample` doc) but the type still allows it,
-    // so be defensive at the read site.
-    final points = <LatLng>[];
-    final pointSamples = <TripDetailSample>[];
-    for (final s in samples) {
-      final lat = s.latitude;
-      final lng = s.longitude;
-      if (lat != null && lng != null) {
-        points.add(LatLng(lat, lng));
-        pointSamples.add(s);
-      }
-    }
+    // map can colour segments by the source sample's telemetry. Null AND
+    // non-finite fixes are dropped (#3316) — a NaN/Infinity coordinate
+    // crashes flutter_map's MarkerLayer via Crs.checkLatLng.
+    final built = buildTripPathPoints(samples);
+    final points = built.points;
+    final pointSamples = built.samples;
     if (points.isEmpty) {
       // No GPS coords at all — skip the card entirely per the issue's
       // Phase 2 spec ("legacy trips, opted-out trips"). Rendering an
@@ -149,30 +142,16 @@ class _TripPathMapState extends State<_TripPathMap> {
   late final MapController _mapController = MapController();
 
   /// Pre-computed bounds for the polyline, fed to
-  /// [MapOptions.initialCameraFit]. Single-point polylines fall back to a
-  /// degenerate bounds box centered on the point (see [_computeBounds]) so
-  /// `CameraFit.bounds` centres on the point at a sane zoom rather than
-  /// dividing by zero.
-  late final LatLngBounds _bounds = _computeBounds(widget.points);
+  /// [MapOptions.initialCameraFit]. Any near-zero span (single point, or
+  /// every fix at the same coordinate — a stationary / sub-100 m trip) is
+  /// padded by [tripPathBounds] so `CameraFit.bounds` never computes an
+  /// infinite fit-zoom (#3316).
+  late final LatLngBounds _bounds = tripPathBounds(widget.points);
 
   /// Pre-fit fallback centre used by [MapOptions.initialCenter] for the
   /// degenerate case where layout hasn't run yet; `initialCameraFit`
   /// frames the real viewport on the first layout pass.
   late final LatLng _initialCenter = _bounds.center;
-
-  static LatLngBounds _computeBounds(List<LatLng> points) {
-    if (points.length == 1) {
-      // Single-point polyline — synthesize a tiny bounds box around
-      // the point so flutter_map's CameraFit doesn't divide-by-zero.
-      final p = points.first;
-      const eps = 0.0005; // ~50 m at the equator; fine for any latitude
-      return LatLngBounds(
-        LatLng(p.latitude - eps, p.longitude - eps),
-        LatLng(p.latitude + eps, p.longitude + eps),
-      );
-    }
-    return LatLngBounds.fromPoints(points);
-  }
 
   @override
   void dispose() {
