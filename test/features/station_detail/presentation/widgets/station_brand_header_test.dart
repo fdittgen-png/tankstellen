@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/search/domain/entities/brand_registry.dart';
 import 'package:tankstellen/core/domain/station.dart';
@@ -103,6 +104,40 @@ void main() {
 
       expect(find.text('Only Street'), findsOneWidget,
           reason: 'street is the last-resort headline');
+    });
+
+    testWidgets(
+        '#3344 a navigate button sits next to the address for a usable station',
+        (tester) async {
+      await pumpApp(tester, const StationBrandHeader(station: testStation));
+
+      final button = find.byKey(const Key('station_address_navigate'));
+      expect(button, findsOneWidget);
+      expect(
+        find.descendant(of: button, matching: find.byIcon(Icons.directions)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+        '#3344 the navigate button is hidden when coordinates are unusable',
+        (tester) async {
+      const noCoords = Station(
+        id: 'bare',
+        name: '',
+        brand: '',
+        street: 'Only Street',
+        postCode: '00000',
+        place: 'Nowhere',
+        lat: 0,
+        lng: 0,
+        isOpen: true,
+      );
+
+      await pumpApp(tester, const StationBrandHeader(station: noCoords));
+
+      expect(find.byKey(const Key('station_address_navigate')), findsNothing,
+          reason: 'an unusable (0,0) pin cannot be navigated to');
     });
   });
 }
