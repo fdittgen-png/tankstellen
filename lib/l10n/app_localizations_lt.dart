@@ -6890,6 +6890,12 @@ class AppLocalizationsLt extends AppLocalizations {
       'Radarą prisegti automatiškai kiekvieną kartą, o ne liesti kiekvieną kartą. Naudoja daugiau akumuliatoriaus.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Patikrinimo dažnis';
 
   @override

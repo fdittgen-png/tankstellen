@@ -6909,6 +6909,12 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αυτόματο καρφίτσωμα ραντάρ κάθε φορά αντί να πατάτε κάθε φορά. Χρησιμοποιεί περισσότερη μπαταρία.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Συχνότητα ελέγχου';
 
   @override

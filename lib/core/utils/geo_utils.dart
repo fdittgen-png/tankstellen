@@ -77,6 +77,22 @@ double distanceMeters(double lat1, double lng1, double lat2, double lng2) {
   return earthRadiusMeters * 2 * atan2(sqrt(a), sqrt(1 - a));
 }
 
+/// Initial great-circle bearing from `(lat1,lng1)` to `(lat2,lng2)`, in
+/// degrees clockwise from true north, normalised to `[0, 360)` (#3342).
+///
+/// Used by the radar-scope view to place a station blip at the correct angle
+/// around the user. Returns 0 for a zero-distance / identical point.
+double bearingDegrees(double lat1, double lng1, double lat2, double lng2) {
+  final phi1 = lat1 * pi / 180;
+  final phi2 = lat2 * pi / 180;
+  final dLng = (lng2 - lng1) * pi / 180;
+  final y = sin(dLng) * cos(phi2);
+  final x = cos(phi1) * sin(phi2) - sin(phi1) * cos(phi2) * cos(dLng);
+  if (y == 0 && x == 0) return 0;
+  final deg = atan2(y, x) * 180 / pi;
+  return (deg + 360) % 360;
+}
+
 /// A GPS heading sanitized for the corridor tile-ahead prefetch (#3256).
 ///
 /// `geolocator` reports `Position.heading` as degrees clockwise from true

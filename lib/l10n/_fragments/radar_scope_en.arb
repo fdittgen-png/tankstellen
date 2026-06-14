@@ -1,0 +1,10 @@
+{
+  "radarScopeShowScope": "Radar view",
+  "@radarScopeShowScope": {
+    "description": "Tooltip / accessibility label for the button that switches the Fuel Station Radar results from the distance-sorted list to the PPI radar-scope view (#3342) — a green radar face with a rotating sweep and a blip per station."
+  },
+  "radarScopeShowList": "List view",
+  "@radarScopeShowList": {
+    "description": "Tooltip / accessibility label for the button that switches the Fuel Station Radar results back from the radar-scope view to the distance-sorted list (#3342)."
+  }
+}

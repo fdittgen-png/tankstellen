@@ -6901,6 +6901,12 @@ class AppLocalizationsRo extends AppLocalizations {
       'Fixați radarul automat de fiecare dată în loc să apăsați de fiecare dată. Consumă mai multă baterie.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frecvența verificărilor';
 
   @override

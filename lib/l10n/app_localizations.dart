@@ -11922,6 +11922,18 @@ abstract class AppLocalizations {
   /// **'Pin the radar automatically every time instead of tapping each time. Uses more battery.'**
   String get radarAutoPinSubtitle;
 
+  /// Tooltip / accessibility label for the button that switches the Fuel Station Radar results from the distance-sorted list to the PPI radar-scope view (#3342) — a green radar face with a rotating sweep and a blip per station.
+  ///
+  /// In en, this message translates to:
+  /// **'Radar view'**
+  String get radarScopeShowScope;
+
+  /// Tooltip / accessibility label for the button that switches the Fuel Station Radar results back from the radar-scope view to the distance-sorted list (#3342).
+  ///
+  /// In en, this message translates to:
+  /// **'List view'**
+  String get radarScopeShowList;
+
   /// Label of the per-alert frequency dropdown (#1012 phase 1) — chooses how often the background runner re-evaluates this radius alert.
   ///
   /// In en, this message translates to:

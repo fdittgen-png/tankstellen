@@ -6875,6 +6875,12 @@ class AppLocalizationsHr extends AppLocalizations {
       'Automatski prikači radar svaki put umjesto da ga svaki put dodirnete. Troši više baterije.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Učestalost provjere';
 
   @override

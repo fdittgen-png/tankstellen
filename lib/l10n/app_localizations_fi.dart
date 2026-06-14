@@ -6850,6 +6850,12 @@ class AppLocalizationsFi extends AppLocalizations {
       'Kiinnitä tutka automaattisesti joka kerta sen sijaan, että napautat. Kuluttaa enemmän akkua.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Tarkistustiheys';
 
   @override

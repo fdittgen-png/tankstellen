@@ -6881,6 +6881,12 @@ class AppLocalizationsPl extends AppLocalizations {
       'Przypinaj radar automatycznie za każdym razem zamiast klikać za każdym razem. Zużywa więcej baterii.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Częstotliwość sprawdzania';
 
   @override

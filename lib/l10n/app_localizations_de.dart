@@ -6889,6 +6889,12 @@ class AppLocalizationsDe extends AppLocalizations {
       'Den Radar jedes Mal automatisch anpinnen, statt jedes Mal zu tippen. Verbraucht mehr Akku.';
 
   @override
+  String get radarScopeShowScope => 'Radaransicht';
+
+  @override
+  String get radarScopeShowList => 'Listenansicht';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Prüfintervall';
 
   @override

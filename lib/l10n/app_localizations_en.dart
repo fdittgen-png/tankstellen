@@ -6818,6 +6818,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Pin the radar automatically every time instead of tapping each time. Uses more battery.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Check frequency';
 
   @override
@@ -14796,6 +14802,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get radarAutoPinSubtitle =>
       '⟦Ƥîñ ŧĥé řáđář áúŧóɱáŧîçáłłý éṽéřý ŧîɱé îñšŧéáđ óƒ ŧáƥƥîñǧ éáçĥ ŧîɱé. Úšéš ɱóřé ƀáŧŧéřý. ································⟧';
+
+  @override
+  String get radarScopeShowScope => '⟦Řáđář ṽîéŵ ····⟧';
+
+  @override
+  String get radarScopeShowList => '⟦Łîšŧ ṽîéŵ ····⟧';
 
   @override
   String get alertsRadiusFrequencyLabel => '⟦Çĥéçķ ƒřéɋúéñçý ······⟧';

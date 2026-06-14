@@ -6863,6 +6863,12 @@ class AppLocalizationsCs extends AppLocalizations {
       'Radar se připne automaticky při každém spuštění místo ručního klepání. Spotřebovává více baterie.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Frekvence kontroly';
 
   @override

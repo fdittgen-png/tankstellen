@@ -6874,6 +6874,12 @@ class AppLocalizationsNl extends AppLocalizations {
       'De radar automatisch elke keer vastpinnen in plaats van elke keer te tikken. Verbruikt meer batterij.';
 
   @override
+  String get radarScopeShowScope => 'Radar view';
+
+  @override
+  String get radarScopeShowList => 'List view';
+
+  @override
   String get alertsRadiusFrequencyLabel => 'Controlefrequentie';
 
   @override
