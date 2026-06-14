@@ -227,6 +227,14 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // live reading should carry then; the #2391 Avg + Fuel-used cards read
     // the smoother running figures it carries.
     final estimate = _estimateFolder?.fold(sample) ?? GpsLiveEstimate.none;
+    // #3329 — stamp the per-fix GPS fuel estimate (as L/h, the form
+    // Obd2GpsEstimateFallback uses) onto the persisted sample so the trip-path
+    // heatmap colours a GPS-only route by consumption instead of all-green.
+    final instant = estimate.instantLPer100Km;
+    if (instant != null && sample.speedKmh > 0 && _samples.isNotEmpty) {
+      _samples[_samples.length - 1] =
+          _samples.last.copyWithEstimatedFuelRate(instant / 100.0 * sample.speedKmh);
+    }
     final coaching = estimate.coachingHint;
     _host.state = _host.state.copyWith(
       phase: TripRecordingPhase.recording,

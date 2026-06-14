@@ -34,11 +34,13 @@ TripDetailSample _sample({
   double? lat,
   double? lng,
   double? fuelRate,
+  double? estFuelRate,
 }) {
   return TripDetailSample(
     timestamp: DateTime.utc(2026, 5, 3, 10, 0, sec),
     speedKmh: speed,
     fuelRateLPerHour: fuelRate,
+    estimatedFuelRateLPerHour: estFuelRate,
     latitude: lat,
     longitude: lng,
   );
@@ -168,6 +170,52 @@ void main() {
       expect(find.byType(FlutterMap), findsOneWidget);
       final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
       expect(layer.polylines, isEmpty);
+    });
+  });
+
+  group('TripPathMapCard — GPS-only estimate heatmap (#3329)', () {
+    testWidgets(
+        'a GPS-only trip (no OBD2 rate) is coloured by the GPS fuel ESTIMATE '
+        '— not painted all green', (tester) async {
+      // GPS-only samples carry NO measured fuelRateLPerHour, but DO carry the
+      // per-fix GPS estimate (estimatedFuelRateLPerHour). L/100 km =
+      // estFuelRate / speed * 100, same buckets:
+      //   * efficient   speed=60, est=3.0 → 5.0  (< 6)
+      //   * wasteful    speed=60, est=7.2 → 12.0 (≥ 10)  ← the climb
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 60, estFuelRate: 3.0),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60, estFuelRate: 3.0),
+        _sample(sec: 2, lat: 43.42, lng: 3.42, speed: 60, estFuelRate: 7.2),
+        _sample(sec: 3, lat: 43.43, lng: 3.43, speed: 60, estFuelRate: 7.2),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      final ctx = tester.element(find.byType(FlutterMap));
+      final colors = layer.polylines.map((p) => p.color).toSet();
+
+      expect(colors.length, greaterThan(1),
+          reason: 'must NOT be uniformly green — the estimate varies');
+      expect(colors, contains(DarkModeColors.error(ctx)),
+          reason: 'the high-consumption (climb) stretch is wasteful/red');
+      expect(colors, contains(DarkModeColors.success(ctx)));
+    });
+
+    testWidgets('a real OBD2 rate still wins over the estimate', (tester) async {
+      // fuelRate present (efficient) but estFuelRate would be wasteful — the
+      // measured rate must take precedence.
+      final samples = [
+        _sample(sec: 0, lat: 43.40, lng: 3.40, speed: 60, fuelRate: 3.0, estFuelRate: 7.2),
+        _sample(sec: 1, lat: 43.41, lng: 3.41, speed: 60, fuelRate: 3.0, estFuelRate: 7.2),
+      ];
+
+      await pumpApp(tester, TripPathMapCard(samples: samples));
+
+      final layer = tester.widget<PolylineLayer>(find.byType(PolylineLayer));
+      final ctx = tester.element(find.byType(FlutterMap));
+      expect(layer.polylines.single.color, DarkModeColors.success(ctx),
+          reason: 'measured fuelRateLPerHour wins; 3.0/60*100 = 5.0 → efficient');
     });
   });
 
