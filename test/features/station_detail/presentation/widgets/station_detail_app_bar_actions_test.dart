@@ -26,7 +26,7 @@ class _FlagsWithout extends FeatureFlags {
 
 void main() {
   group('StationDetailAppBarActions', () {
-    testWidgets('renders the five action buttons with tooltips',
+    testWidgets('renders the four action buttons with tooltips (#3337)',
         (tester) async {
       await pumpApp(
         tester,
@@ -40,8 +40,9 @@ void main() {
         ],
       );
 
-      // Five icon buttons: directions, alert, scan QR, report, favorite.
-      expect(find.byIcon(Icons.directions), findsOneWidget);
+      // Four icon buttons: alert, scan QR, report, favorite. (#3337 moved
+      // directions out of this cluster to the prominent StationDirectionsFab.)
+      expect(find.byIcon(Icons.directions), findsNothing);
       expect(find.byIcon(Icons.notifications_outlined), findsOneWidget);
       expect(find.byIcon(Icons.qr_code_scanner), findsOneWidget);
       expect(find.byIcon(Icons.flag_outlined), findsOneWidget);
@@ -113,7 +114,8 @@ void main() {
       expect(find.byKey(const Key('report_price')), findsNothing);
       expect(find.byIcon(Icons.qr_code_scanner), findsNothing);
       expect(find.byIcon(Icons.flag_outlined), findsNothing);
-      expect(find.byIcon(Icons.directions), findsOneWidget);
+      expect(find.byIcon(Icons.directions), findsNothing,
+          reason: 'directions is the FAB now, not an app-bar icon (#3337)');
       expect(find.byIcon(Icons.notifications_outlined), findsOneWidget);
     });
   });

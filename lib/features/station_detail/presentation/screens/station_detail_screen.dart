@@ -11,6 +11,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
+import '../widgets/station_directions_fab.dart';
 import '../../providers/station_detail_provider.dart';
 import '../widgets/price_history_foldable.dart';
 import '../widgets/station_brand_header.dart';
@@ -125,6 +126,9 @@ class _StationDetailLoaded extends StatelessWidget {
     final bottomPadding = MediaQuery.of(context).viewPadding.bottom;
 
     return Scaffold(
+      // #3337 — surface "directions" as a prominent labelled FAB; it was a
+      // small AppBar icon users struggled to find.
+      floatingActionButton: StationDirectionsFab(station: station),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
