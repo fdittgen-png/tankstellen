@@ -33,6 +33,7 @@ class RadarSearchState {
     required this.active,
     this.locating = false,
     required this.stations,
+    this.heading,
   });
 
   /// `true` once a radar run has resolved and the results list should render
@@ -48,6 +49,13 @@ class RadarSearchState {
   /// The radar's distance-sorted, priced station list (loading/data/error).
   final AsyncValue<List<Station>> stations;
 
+  /// #3354 — the latest live GPS course (degrees clockwise from North),
+  /// `null` until the first moving fix. The radar-scope view rotates so this
+  /// direction points UP ("heading-up"). Kept last-known when the user stops
+  /// (a standstill fix has no course), so the scope holds the travel direction
+  /// instead of snapping back to North.
+  final double? heading;
+
   static const RadarSearchState idle = RadarSearchState(
     active: false,
     locating: false,
@@ -58,11 +66,14 @@ class RadarSearchState {
     bool? active,
     bool? locating,
     AsyncValue<List<Station>>? stations,
+    double? heading,
   }) =>
       RadarSearchState(
         active: active ?? this.active,
         locating: locating ?? this.locating,
         stations: stations ?? this.stations,
+        // Keep-last: a standstill fix (null course) holds the travel direction.
+        heading: heading ?? this.heading,
       );
 }
 
@@ -317,7 +328,11 @@ class RadarSearch extends _$RadarSearch {
     final fuel = ref.read(selectedFuelTypeProvider);
     final ranked = RadarRanking.rank(_lastRaw, lat: lat, lng: lng, fuel: fuel);
     unawaited(carWriter.writeRadar(ranked, fuel));
-    state = state.copyWith(stations: AsyncData<List<Station>>(ranked));
+    // #3354 — stamp the live course so the scope can orient heading-up.
+    state = state.copyWith(
+      stations: AsyncData<List<Station>>(ranked),
+      heading: geo.sanitizedHeading(_lastFix?.heading),
+    );
   }
 
   /// Dismiss the radar result and hand the results list back to the regular

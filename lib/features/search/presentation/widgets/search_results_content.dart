@@ -111,6 +111,8 @@ class SearchResultsContent extends ConsumerWidget {
                 centerLat: userPos.lat,
                 centerLng: userPos.lng,
                 rangeKm: ref.watch(searchRadiusProvider),
+                fuelType: ref.watch(selectedFuelTypeProvider),
+                headingDeg: radar.heading,
                 onStationTap: (s) =>
                     unawaited(StationDetailRoute(s.id).push<void>(context)),
               ),

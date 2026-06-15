@@ -122,7 +122,7 @@ final class RadarSearchProvider
   }
 }
 
-String _$radarSearchHash() => r'6915d5a189620edc8479072f08a23d7eecddd521';
+String _$radarSearchHash() => r'1aebbdcc66b59606cd957d916336782ba663c648';
 
 /// The on-search Fuel Station Radar (#2659 / #3267).
 ///
