@@ -154,6 +154,7 @@ jobs:
         run: |
           flutter build appbundle --release --flavor play \
             --build-number=${{ needs.pre-check.outputs.build_number }} \
+            --dart-define=FGS_FORM_APPROVED=true \
             --obfuscate --split-debug-info=build/symbols
 
       # Per-ABI APKs were dropped from the public nightly release on
