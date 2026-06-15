@@ -126,6 +126,31 @@ void main() {
       expect(result.score, lessThanOrEqualTo(85));
     });
 
+    test('#3350 — the score carries the SAME count that drove the penalty', () {
+      // 5 sample-derived hard accels, no override (the OBD2 / IMU-inactive
+      // path). The penalty caps at 15, and the score must report the count it
+      // used (5) — so a downstream export can never show penalty>0 with count 0.
+      var t = start;
+      final samples = <TripSample>[];
+      for (var i = 0; i < 5; i++) {
+        samples.add(TripSample(timestamp: t, speedKmh: 0, rpm: 1000));
+        t = t.add(const Duration(seconds: 2));
+        samples.add(TripSample(timestamp: t, speedKmh: 50, rpm: 2500));
+        t = t.add(const Duration(seconds: 10));
+        samples.add(TripSample(timestamp: t, speedKmh: 50, rpm: 2000));
+        t = t.add(const Duration(seconds: 1));
+      }
+      final derived = computeDrivingScore(samples);
+      expect(derived.hardAccelPenalty, greaterThan(0));
+      expect(derived.hardAccelEvents, 5,
+          reason: 'the stored count is the one the penalty was computed from');
+
+      // An explicit override wins and is the count reported, too.
+      final overridden =
+          computeDrivingScore(samples, hardAccelEventsOverride: 2);
+      expect(overridden.hardAccelEvents, 2);
+    });
+
     test('hardAccelPenalty caps at 15 even with 10 events', () {
       var t = start;
       final samples = <TripSample>[];

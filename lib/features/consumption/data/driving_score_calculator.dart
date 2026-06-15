@@ -274,6 +274,9 @@ DrivingScore computeDrivingScoreFromSummary(
     idlingPenalty: idlingPenalty,
     hardAccelPenalty: hardAccelPenalty,
     hardBrakePenalty: hardBrakePenalty,
+    // #3350 — the summary path's penalties come straight from these counts.
+    hardAccelEvents: summary.harshAccelerations,
+    hardBrakeEvents: summary.harshBrakes,
     highRpmPenalty: highRpmPenalty,
     fullThrottlePenalty: 0,
     luggingPenalty: luggingPenalty,

@@ -199,6 +199,10 @@ class _Accumulators {
       idlingPenalty: idlingPenalty,
       hardAccelPenalty: hardAccelPenalty,
       hardBrakePenalty: hardBrakePenalty,
+      // #3350 — carry the EXACT episode counts these penalties were computed
+      // from, so the breakdown/export can never show a mismatched count.
+      hardAccelEvents: hardAccelEvents,
+      hardBrakeEvents: hardBrakeEvents,
       highRpmPenalty: highRpmPenalty,
       fullThrottlePenalty: fullThrottlePenalty,
       pedalVelocityPenalty: pedalVelocityPenalty,

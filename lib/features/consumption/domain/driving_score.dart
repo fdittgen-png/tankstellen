@@ -68,6 +68,18 @@ class DrivingScore {
   /// (≤ -3.5 m/s²), per 100 km.
   final double hardBrakePenalty;
 
+  /// #3350 — the hard-acceleration episode COUNT that actually produced
+  /// [hardAccelPenalty] (the resolved `hardAccelEventsOverride ?? sample-gate`
+  /// figure). Carried on the score so a breakdown / export always shows the
+  /// count that drove the penalty — never a different source that could read
+  /// as a phantom (penalty>0 with count 0). The inertial-sensor truth lives
+  /// separately on the summary's `imuHardAccelCount`.
+  final int hardAccelEvents;
+
+  /// #3350 — the hard-braking episode COUNT that produced [hardBrakePenalty].
+  /// See [hardAccelEvents].
+  final int hardBrakeEvents;
+
   /// Score-points subtracted because of time spent at full throttle
   /// (pedal — else throttle — ≥ 90 %). **Now fires** (#2460): the
   /// persisted pedal/throttle drives it. Capped.
@@ -135,6 +147,8 @@ class DrivingScore {
     required this.hardBrakePenalty,
     required this.highRpmPenalty,
     required this.fullThrottlePenalty,
+    this.hardAccelEvents = 0,
+    this.hardBrakeEvents = 0,
     this.pedalVelocityPenalty = 0,
     this.luggingPenalty = 0,
     this.hardShiftPenalty = 0,
@@ -168,6 +182,8 @@ class DrivingScore {
         other.idlingPenalty == idlingPenalty &&
         other.hardAccelPenalty == hardAccelPenalty &&
         other.hardBrakePenalty == hardBrakePenalty &&
+        other.hardAccelEvents == hardAccelEvents &&
+        other.hardBrakeEvents == hardBrakeEvents &&
         other.highRpmPenalty == highRpmPenalty &&
         other.fullThrottlePenalty == fullThrottlePenalty &&
         other.pedalVelocityPenalty == pedalVelocityPenalty &&
@@ -186,6 +202,8 @@ class DrivingScore {
         idlingPenalty,
         hardAccelPenalty,
         hardBrakePenalty,
+        hardAccelEvents,
+        hardBrakeEvents,
         highRpmPenalty,
         fullThrottlePenalty,
         pedalVelocityPenalty,
@@ -203,8 +221,8 @@ class DrivingScore {
       'score: $score, '
       'class: ${styleClass.name}, '
       'idling: ${idlingPenalty.toStringAsFixed(1)}, '
-      'hardAccel: ${hardAccelPenalty.toStringAsFixed(1)}, '
-      'hardBrake: ${hardBrakePenalty.toStringAsFixed(1)}, '
+      'hardAccel: ${hardAccelPenalty.toStringAsFixed(1)} (${hardAccelEvents}x), '
+      'hardBrake: ${hardBrakePenalty.toStringAsFixed(1)} (${hardBrakeEvents}x), '
       'highRpm: ${highRpmPenalty.toStringAsFixed(1)}, '
       'fullThrottle: ${fullThrottlePenalty.toStringAsFixed(1)}, '
       'pedalVel: ${pedalVelocityPenalty.toStringAsFixed(1)}, '
