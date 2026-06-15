@@ -94,5 +94,67 @@ void main() {
       expect(blip.unitDx, closeTo(0, 0.02));
       expect(blip.unitDy, lessThan(0)); // North = up = negative y
     });
+
+    test('#3354 — priceOf stamps each blip with its fuel price', () {
+      final blips = radarScopeBlips(
+        [station('a', 52.1, 13.0)],
+        52.0,
+        13.0,
+        20,
+        priceOf: (s) => 1.799,
+      );
+      expect(blips.single.price, 1.799);
+    });
+  });
+
+  group('#3354 — heading-up rotation', () {
+    test('driving north keeps a due-north blip at the top (−y)', () {
+      final blip =
+          radarScopeBlips([station('a', 52.1, 13.0)], 52.0, 13.0, 20).single;
+      final o = blip.unitOffset(headingDeg: 0);
+      expect(o.dx, closeTo(0, 0.02));
+      expect(o.dy, lessThan(0));
+    });
+
+    test('driving east rotates a due-north blip to the LEFT (−x)', () {
+      final blip =
+          radarScopeBlips([station('a', 52.1, 13.0)], 52.0, 13.0, 20).single;
+      final o = blip.unitOffset(headingDeg: 90);
+      expect(o.dx, lessThan(0)); // North is now to the driver's left
+      expect(o.dy, closeTo(0, 0.02));
+    });
+  });
+
+  group('#3354 — aggregateOverlapping (lowest price wins)', () {
+    test('overlapping blips collapse to the cheapest, with a count', () {
+      final blips = radarScopeBlips(
+        [
+          station('pricey', 52.100, 13.0),
+          station('cheap', 52.1005, 13.0001), // ~essentially the same spot
+        ],
+        52.0,
+        13.0,
+        20,
+        priceOf: (s) => s.id == 'cheap' ? 1.599 : 1.899,
+      );
+      final agg = aggregateOverlapping(blips, minSeparation: 0.2);
+      expect(agg, hasLength(1));
+      expect(agg.single.station.id, 'cheap');
+      expect(agg.single.price, 1.599);
+      expect(agg.single.aggregatedCount, 2);
+    });
+
+    test('well-separated blips are NOT merged', () {
+      final blips = radarScopeBlips(
+        [station('n', 52.15, 13.0), station('s', 51.85, 13.0)],
+        52.0,
+        13.0,
+        40,
+        priceOf: (s) => 1.7,
+      );
+      final agg = aggregateOverlapping(blips, minSeparation: 0.16);
+      expect(agg, hasLength(2));
+      expect(agg.every((b) => b.aggregatedCount == 1), isTrue);
+    });
   });
 }
