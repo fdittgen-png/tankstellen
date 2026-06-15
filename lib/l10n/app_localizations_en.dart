@@ -7623,6 +7623,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stationUnbrandedTitle => 'Unbranded station';
 
   @override
+  String get unsupportedRegionTitle => 'Not available in your region yet';
+
+  @override
+  String get unsupportedRegionBody =>
+      'We don\'t have fuel prices for your country yet, so results may be empty or from another country. You can still pick a supported country in the search settings.';
+
+  @override
+  String get unsupportedRegionDismiss => 'Got it';
+
+  @override
+  String get configureCountryTitle => 'Set your country';
+
+  @override
+  String get configureCountryBody =>
+      'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'I may fill up with different fuel types';
 
@@ -15632,6 +15649,24 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get stationUnbrandedTitle => '⟦Úñƀřáñđéđ šŧáŧîóñ ·······⟧';
+
+  @override
+  String get unsupportedRegionTitle =>
+      '⟦Ñóŧ áṽáîłáƀłé îñ ýóúř řéǧîóñ ýéŧ ············⟧';
+
+  @override
+  String get unsupportedRegionBody =>
+      '⟦Ŵé đóñ\'ŧ ĥáṽé ƒúéł ƥřîçéš ƒóř ýóúř çóúñŧřý ýéŧ, šó řéšúłŧš ɱáý ƀé éɱƥŧý óř ƒřóɱ áñóŧĥéř çóúñŧřý. Ýóú çáñ šŧîłł ƥîçķ á šúƥƥóřŧéđ çóúñŧřý îñ ŧĥé šéářçĥ šéŧŧîñǧš. ·························································⟧';
+
+  @override
+  String get unsupportedRegionDismiss => '⟦Ǧóŧ îŧ ··⟧';
+
+  @override
+  String get configureCountryTitle => '⟦Šéŧ ýóúř çóúñŧřý ······⟧';
+
+  @override
+  String get configureCountryBody =>
+      '⟦Ýóúř çóúñŧřý îš šúƥƥóřŧéđ, ƀúŧ îŧ îšñ\'ŧ šéŧ úƥ ýéŧ — šó ƥřîçéš ɱáý ƀé ƒřóɱ áñóŧĥéř çóúñŧřý. Çĥóóšé ýóúř çóúñŧřý îñ ŧĥé šéářçĥ šéŧŧîñǧš ŧó šéé łóçáł ƥřîçéš. ·······················································⟧';
 
   @override
   String get vehicleMultiFuelCapableLabel =>

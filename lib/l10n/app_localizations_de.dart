@@ -7707,6 +7707,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get stationUnbrandedTitle => 'Tankstelle ohne Marke';
 
   @override
+  String get unsupportedRegionTitle => 'In deiner Region noch nicht verfügbar';
+
+  @override
+  String get unsupportedRegionBody =>
+      'Für dein Land haben wir noch keine Spritpreise, daher können die Ergebnisse leer sein oder aus einem anderen Land stammen. Du kannst in den Sucheinstellungen weiterhin ein unterstütztes Land auswählen.';
+
+  @override
+  String get unsupportedRegionDismiss => 'Verstanden';
+
+  @override
+  String get configureCountryTitle => 'Land festlegen';
+
+  @override
+  String get configureCountryBody =>
+      'Dein Land wird unterstützt, ist aber noch nicht eingerichtet – daher stammen die Preise möglicherweise aus einem anderen Land. Wähle dein Land in den Sucheinstellungen, um lokale Preise zu sehen.';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'Ich tanke eventuell verschiedene Kraftstoffarten';
 

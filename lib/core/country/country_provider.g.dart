@@ -60,3 +60,69 @@ abstract class _$ActiveCountry extends $Notifier<CountryConfig> {
     element.handleCreate(ref, build);
   }
 }
+
+/// #3361 — `true` when the user has EXPLICITLY configured their country — an
+/// active-profile country, or the legacy saved `active_country_code` setting —
+/// vs the app having fallen back to locale detection in [ActiveCountry.build].
+///
+/// Lives here, not in the `location_coverage` classifier, on purpose: reading
+/// the profile is already this file's concern, so the country↔profile coupling
+/// stays put and the coverage classifier needs no cross-feature import.
+
+@ProviderFor(countryExplicitlyConfigured)
+final countryExplicitlyConfiguredProvider =
+    CountryExplicitlyConfiguredProvider._();
+
+/// #3361 — `true` when the user has EXPLICITLY configured their country — an
+/// active-profile country, or the legacy saved `active_country_code` setting —
+/// vs the app having fallen back to locale detection in [ActiveCountry.build].
+///
+/// Lives here, not in the `location_coverage` classifier, on purpose: reading
+/// the profile is already this file's concern, so the country↔profile coupling
+/// stays put and the coverage classifier needs no cross-feature import.
+
+final class CountryExplicitlyConfiguredProvider
+    extends $FunctionalProvider<bool, bool, bool>
+    with $Provider<bool> {
+  /// #3361 — `true` when the user has EXPLICITLY configured their country — an
+  /// active-profile country, or the legacy saved `active_country_code` setting —
+  /// vs the app having fallen back to locale detection in [ActiveCountry.build].
+  ///
+  /// Lives here, not in the `location_coverage` classifier, on purpose: reading
+  /// the profile is already this file's concern, so the country↔profile coupling
+  /// stays put and the coverage classifier needs no cross-feature import.
+  CountryExplicitlyConfiguredProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'countryExplicitlyConfiguredProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$countryExplicitlyConfiguredHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return countryExplicitlyConfigured(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$countryExplicitlyConfiguredHash() =>
+    r'3f624fd57b6883384dbc78127142689015443805';
