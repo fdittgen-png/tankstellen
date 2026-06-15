@@ -20,6 +20,12 @@ updates:
     ignore:
       - dependency-name: "flutter_blue_plus"
         update-types: ["version-update:semver-major"]
+      # `riverpod_lint` is pinned EXACTLY (pubspec.yaml): each release pins one
+      # riverpod version, and 3.1.4 forces `riverpod: 3.3.2`, which fails
+      # version-solving against the locked riverpod 3.x graph (#3352 — the bump
+      # red-CI'd the whole minor-and-patch group). Hold it until the riverpod
+      # 3.x line is intentionally moved in lockstep.
+      - dependency-name: "riverpod_lint"
 
   - package-ecosystem: "github-actions"
     directory: "/"
