@@ -31,6 +31,7 @@ import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
 import '../widgets/demo_mode_banner.dart';
+import '../widgets/unsupported_region_notice.dart';
 import '../widgets/radar_pin_help_sheet.dart';
 import '../widgets/radar_screen_pin_mixin.dart';
 import '../widgets/radar_search_fab.dart';
@@ -328,6 +329,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     return Column(
       children: [
         DemoModeBanner(country: country, corridorCountryCodes: corridorCodes),
+        // #3361 — honest "no coverage for your country" notice (replaces the
+        // silent fall-back to Germany that read as a geo-restriction).
+        const UnsupportedRegionNotice(),
         // Compact summary bar — top-level entry point for editing criteria.
         const SearchSummaryBar(),
         UserPositionBar(

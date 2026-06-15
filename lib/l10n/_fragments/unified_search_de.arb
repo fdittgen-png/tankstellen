@@ -11,5 +11,10 @@
   "favoriteRemove": "Aus Favoriten entfernen",
   "loyaltyRawPriceTooltip": "Roh: {price}",
   "routeDataSourceMulti": "{sources}",
-  "stationUnbrandedTitle": "Tankstelle ohne Marke"
+  "stationUnbrandedTitle": "Tankstelle ohne Marke",
+  "unsupportedRegionTitle": "In deiner Region noch nicht verfügbar",
+  "unsupportedRegionBody": "Für dein Land haben wir noch keine Spritpreise, daher können die Ergebnisse leer sein oder aus einem anderen Land stammen. Du kannst in den Sucheinstellungen weiterhin ein unterstütztes Land auswählen.",
+  "unsupportedRegionDismiss": "Verstanden",
+  "configureCountryTitle": "Land festlegen",
+  "configureCountryBody": "Dein Land wird unterstützt, ist aber noch nicht eingerichtet – daher stammen die Preise möglicherweise aus einem anderen Land. Wähle dein Land in den Sucheinstellungen, um lokale Preise zu sehen."
 }

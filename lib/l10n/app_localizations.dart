@@ -13336,6 +13336,36 @@ abstract class AppLocalizations {
   /// **'Unbranded station'**
   String get stationUnbrandedTitle;
 
+  /// Title of the dismissible banner shown on the search screen when the user's GPS-detected country has no fuel-price provider (#3361). Explains the lack of nearby prices is a coverage gap, not a bug.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available in your region yet'**
+  String get unsupportedRegionTitle;
+
+  /// Body of the unsupported-region banner (#3361). Tells the user fuel-price data isn't available for their detected country and that they can manually choose a supported country.
+  ///
+  /// In en, this message translates to:
+  /// **'We don\'t have fuel prices for your country yet, so results may be empty or from another country. You can still pick a supported country in the search settings.'**
+  String get unsupportedRegionBody;
+
+  /// Dismiss button on the unsupported-region banner (#3361).
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get unsupportedRegionDismiss;
+
+  /// Title of the dismissible banner shown when the user's detected country IS supported but they haven't configured it (#3361), so the app is showing another country's prices.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your country'**
+  String get configureCountryTitle;
+
+  /// Body of the configure-country banner (#3361). Tells the user their country is supported but unconfigured, and to set it in the search settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.'**
+  String get configureCountryBody;
+
   /// Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885).
   ///
   /// In en, this message translates to:

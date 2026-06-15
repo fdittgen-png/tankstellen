@@ -7716,6 +7716,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get stationUnbrandedTitle => 'Unbranded station';
 
   @override
+  String get unsupportedRegionTitle => 'Not available in your region yet';
+
+  @override
+  String get unsupportedRegionBody =>
+      'We don\'t have fuel prices for your country yet, so results may be empty or from another country. You can still pick a supported country in the search settings.';
+
+  @override
+  String get unsupportedRegionDismiss => 'Got it';
+
+  @override
+  String get configureCountryTitle => 'Set your country';
+
+  @override
+  String get configureCountryBody =>
+      'Your country is supported, but it isn\'t set up yet — so prices may be from another country. Choose your country in the search settings to see local prices.';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'I may fill up with different fuel types';
 

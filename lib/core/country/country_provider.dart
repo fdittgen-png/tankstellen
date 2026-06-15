@@ -78,3 +78,20 @@ class ActiveCountry extends _$ActiveCountry {
     }
   }
 }
+
+/// #3361 — `true` when the user has EXPLICITLY configured their country — an
+/// active-profile country, or the legacy saved `active_country_code` setting —
+/// vs the app having fallen back to locale detection in [ActiveCountry.build].
+///
+/// Lives here, not in the `location_coverage` classifier, on purpose: reading
+/// the profile is already this file's concern, so the country↔profile coupling
+/// stays put and the coverage classifier needs no cross-feature import.
+@riverpod
+bool countryExplicitlyConfigured(Ref ref) {
+  final profile = ref.watch(activeProfileProvider);
+  if (profile?.countryCode != null) return true;
+  final saved = ref
+      .watch(storageRepositoryProvider)
+      .getSetting(ActiveCountry._storageKey);
+  return saved != null;
+}
