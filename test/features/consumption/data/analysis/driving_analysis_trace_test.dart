@@ -54,6 +54,8 @@ const DrivingScore _score = DrivingScore(
   idlingPenalty: 2,
   hardAccelPenalty: 6,
   hardBrakePenalty: 4,
+  hardAccelEvents: 2,
+  hardBrakeEvents: 1,
   highRpmPenalty: 0,
   fullThrottlePenalty: 0,
 );
@@ -127,11 +129,10 @@ void main() {
       expect(score['styleClass'], _score.styleClass.name);
       expect(score['hardAccelPenalty'], 6);
       expect(score['hardBrakePenalty'], 4);
-      // #3029 — the score block now exports the counts that DRIVE the
-      // penalties (summary.harshAccelerations/harshBrakes), so a penalty
-      // always has a visible matching count.
-      expect(score['hardAccelCount'], 0);
-      expect(score['hardBrakeCount'], 0);
+      // #3350 — the score block exports the counts the penalties were computed
+      // from, read straight off the score so they always match.
+      expect(score['hardAccelCount'], 2);
+      expect(score['hardBrakeCount'], 1);
 
       final lessons = json['lessons'] as List<dynamic>;
       expect(lessons, hasLength(1));
@@ -140,34 +141,38 @@ void main() {
     });
 
     test(
-        '#3029 — the score block\'s harsh counts are the penalty drivers '
-        '(non-zero penalty ⟺ non-zero count)', () {
-      // A real-OBD2-speed trip with genuine harsh events: the exported
-      // score-block counts must match summary.harshAccelerations/harshBrakes
-      // (what the penalty is computed from), NOT the imu.*Count scalars —
-      // so the export is internally consistent (penalty>0 has a count>0).
+        '#3350 — the score block\'s harsh counts are the penalty drivers '
+        '(read off the score), even when the summary figure is a suppressed 0',
+        () {
+      // Reproduces the field bug: an OBD2 trip with the IMU INACTIVE. The
+      // summary's harshAccelerations fell back to the recorder's
+      // GPS-suppressed HarshEventDetector → 0, but the SCORE's penalty was
+      // driven by the sample-derived gate (12 accel / 5 brake episodes). Before
+      // #3350 the export read the summary (0), so a 15-pt penalty showed
+      // alongside count 0 — a phantom. Now it reads the score's own resolved
+      // counts, so count ⟺ penalty by construction.
       final summary = TripSummary(
-        distanceKm: 20,
+        distanceKm: 109,
         maxRpm: 3000,
         highRpmSeconds: 0,
         idleSeconds: 0,
-        harshBrakes: 2,
-        harshAccelerations: 3,
+        harshBrakes: 0, // suppressed → would contradict the penalty
+        harshAccelerations: 0,
         startedAt: DateTime.utc(2026, 6, 3, 10),
-        endedAt: DateTime.utc(2026, 6, 3, 10, 25),
-        distanceSource: 'real',
+        endedAt: DateTime.utc(2026, 6, 3, 11),
+        distanceSource: 'gps',
         kind: TripKind.gpsPlusObd2,
-        // IMU never ran — its scalars are 0 and would CONTRADICT the
-        // penalty if the export used them as the count.
         imuActive: false,
         imuHardAccelCount: 0,
         imuHardBrakeCount: 0,
       );
       const score = DrivingScore(
-        score: 70,
+        score: 33,
         idlingPenalty: 0,
-        hardAccelPenalty: 9,
-        hardBrakePenalty: 6,
+        hardAccelPenalty: 15,
+        hardBrakePenalty: 15,
+        hardAccelEvents: 12, // the count that ACTUALLY drove the penalty
+        hardBrakeEvents: 5,
         highRpmPenalty: 0,
         fullThrottlePenalty: 0,
       );
@@ -180,15 +185,15 @@ void main() {
 
       final scoreBlock = json['score'] as Map<String, dynamic>;
       final imu = json['imu'] as Map<String, dynamic>;
-      // The penalty drivers are the harsh counts, not the IMU scalars.
-      expect(scoreBlock['hardAccelCount'], 3);
-      expect(scoreBlock['hardBrakeCount'], 2);
-      expect(scoreBlock['hardAccelPenalty'], 9);
-      expect(scoreBlock['hardBrakePenalty'], 6);
+      // The score block reports the penalty-driving counts, NOT the summary 0.
+      expect(scoreBlock['hardAccelCount'], 12);
+      expect(scoreBlock['hardBrakeCount'], 5);
+      expect(scoreBlock['hardAccelPenalty'], 15);
+      expect(scoreBlock['hardBrakePenalty'], 15);
       // The IMU truth block is unchanged (still the inertial scalars).
       expect(imu['hardAccelCount'], 0);
       expect(imu['hardBrakeCount'], 0);
-      // Invariant: a non-zero penalty has a non-zero score-block count.
+      // Invariant: a non-zero penalty always has a non-zero score-block count.
       expect(scoreBlock['hardAccelCount'], greaterThan(0));
       expect(scoreBlock['hardBrakeCount'], greaterThan(0));
     });
