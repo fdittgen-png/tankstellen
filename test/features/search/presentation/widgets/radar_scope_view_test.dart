@@ -95,7 +95,8 @@ void main() {
             centerLng: 13.0,
             rangeKm: 20,
             fuelType: FuelType.e10,
-            headingDeg: 90, // driving east → North rotates to the left
+            // No compass override in tests → falls back to this GPS course.
+            gpsCourseDeg: 90, // driving east → North rotates to the left
             onStationTap: (s) => tapped = s,
           ),
         ),

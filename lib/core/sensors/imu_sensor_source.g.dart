@@ -96,3 +96,53 @@ final class ImuSensorSourceProvider
 }
 
 String _$imuSensorSourceHash() => r'0df5d3689f54a0056b9cd4adf97a0146aa3ee606';
+
+/// #3364 — the device compass heading (degrees clockwise from magnetic north),
+/// smoothed + throttled. autoDispose: the magnetometer only spins while a
+/// consumer (the radar scope) is on screen, so it costs nothing otherwise.
+/// Degrades to a quiet stream when the device has no magnetometer / the plugin
+/// isn't bound (unit tests), so the scope just falls back to North-up.
+
+@ProviderFor(compassHeading)
+final compassHeadingProvider = CompassHeadingProvider._();
+
+/// #3364 — the device compass heading (degrees clockwise from magnetic north),
+/// smoothed + throttled. autoDispose: the magnetometer only spins while a
+/// consumer (the radar scope) is on screen, so it costs nothing otherwise.
+/// Degrades to a quiet stream when the device has no magnetometer / the plugin
+/// isn't bound (unit tests), so the scope just falls back to North-up.
+
+final class CompassHeadingProvider
+    extends $FunctionalProvider<AsyncValue<double>, double, Stream<double>>
+    with $FutureModifier<double>, $StreamProvider<double> {
+  /// #3364 — the device compass heading (degrees clockwise from magnetic north),
+  /// smoothed + throttled. autoDispose: the magnetometer only spins while a
+  /// consumer (the radar scope) is on screen, so it costs nothing otherwise.
+  /// Degrades to a quiet stream when the device has no magnetometer / the plugin
+  /// isn't bound (unit tests), so the scope just falls back to North-up.
+  CompassHeadingProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'compassHeadingProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$compassHeadingHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<double> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<double> create(Ref ref) {
+    return compassHeading(ref);
+  }
+}
+
+String _$compassHeadingHash() => r'3c0e3dcfe8d0ece12ec1353e1cce953ba095728b';
