@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/service_result.dart';
+import 'header_icon_button.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/utils/price_utils.dart';
@@ -52,10 +53,17 @@ class SearchResultsList extends ConsumerStatefulWidget {
   final ServiceResult<List<SearchResultItem>> result;
   final VoidCallback onRefresh;
 
+  /// #3366 — when non-null, a small radar-scope toggle icon appears in the
+  /// header next to the list/map icons (the Fuel Station Radar is active and a
+  /// usable centre exists). Tapping it switches to the PPI radar-scope view.
+  /// Null for an ordinary search (no scope to offer).
+  final VoidCallback? onRadarToggle;
+
   const SearchResultsList({
     super.key,
     required this.result,
     required this.onRefresh,
+    this.onRadarToggle,
   });
 
   @override
@@ -127,59 +135,44 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
               ),
               _ViewToggleButton(),
               const SizedBox(width: 4),
-              Semantics(
-                label: l10n.showOnMapSemanticLabel,
-                button: true,
-                child: InkWell(
-                  onTap: () => context.go(RoutePaths.map),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    child: Icon(Icons.map, size: 18,
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                ),
+              HeaderIconButton(
+                icon: Icons.map,
+                semanticsLabel: l10n.showOnMapSemanticLabel,
+                onTap: () => context.go(RoutePaths.map),
               ),
               const SizedBox(width: 4),
-              // #2682 — the Fuel Station Radar launch affordance moved out of
-              // this header (the cramped #2675 IconButton) to a "Start
-              // recording"-style extended-FAB pill (`RadarSearchFab`) floated
-              // bottom-right by the search screen, clear of the central search
-              // FAB + bottom nav.
-              // #1613 — gated entry point for the fuel-cost Calculator.
-              // The /calculator route exists but had no navigation entry
-              // point anywhere in lib/; this affordance makes it
-              // reachable when Feature.fuelCalculator is enabled.
+              // #3366 — compact radar-scope toggle, sat with the list/map view
+              // icons (replaces the space-hungry "Radar view" text button).
+              // Only present when the caller offers it (radar active + usable
+              // centre).
+              if (widget.onRadarToggle != null) ...[
+                HeaderIconButton(
+                  key: const Key('radar_view_toggle'),
+                  icon: Icons.radar,
+                  semanticsLabel: l10n.radarScopeShowScope,
+                  onTap: widget.onRadarToggle!,
+                ),
+                const SizedBox(width: 4),
+              ],
+              // #2682 — the radar LAUNCH affordance is a bottom-right FAB
+              // (`RadarSearchFab`), not here. #1613 — gated fuel-cost
+              // Calculator entry point (#2543 pre-fills the cheapest price).
               if (ref
                   .watch(enabledFeaturesProvider)
                   .contains(Feature.fuelCalculator)) ...[
-                Semantics(
-                  label: l10n.fuelCostCalculator,
-                  button: true,
-                  child: InkWell(
-                    // #2543 — carry the cheapest visible price for the
-                    // selected fuel into the calculator so it opens
-                    // pre-filled. Null when no station has a price.
-                    onTap: () {
-                      final fuel = ref.read(selectedFuelTypeProvider);
-                      final (minP, _) = priceRange(
-                        _fuelStationsFrom(result.data),
-                        fuel,
-                        requirePositive: true,
-                      );
-                      CalculatorRoute(
-                        initialPrice: minP > 0 ? minP : null,
-                      ).go(context);
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      child: Icon(Icons.calculate,
-                          size: 18,
-                          color: Theme.of(context).colorScheme.primary),
-                    ),
-                  ),
+                HeaderIconButton(
+                  icon: Icons.calculate,
+                  semanticsLabel: l10n.fuelCostCalculator,
+                  onTap: () {
+                    final fuel = ref.read(selectedFuelTypeProvider);
+                    final (minP, _) = priceRange(
+                      _fuelStationsFrom(result.data),
+                      fuel,
+                      requirePositive: true,
+                    );
+                    CalculatorRoute(initialPrice: minP > 0 ? minP : null)
+                        .go(context);
+                  },
                 ),
                 const SizedBox(width: 4),
               ],
