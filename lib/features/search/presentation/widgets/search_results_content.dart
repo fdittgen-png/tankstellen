@@ -89,32 +89,51 @@ class SearchResultsContent extends ConsumerWidget {
             source: ServiceSource.cache,
             fetchedAt: DateTime.now(),
           );
-          final list = SearchResultsList(
-            result: radarResult,
-            onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
-          );
           // #3342 — a second visualization of the SAME station set: a green
-          // PPI radar scope (rotating sweep + a blip per station by distance
-          // and bearing). The toggle only swaps the view, it never re-scans,
-          // and is only offered when we have a usable centre to place blips
-          // around. Defaults to the list.
+          // PPI radar scope (rotating sweep + a chip per station by distance
+          // and bearing). The toggle only swaps the view, never re-scans, and
+          // is offered only when we have a usable centre to place blips around.
+          // #3366 — the toggle is now a small icon: into the list's header
+          // (next to list/map), and a "back to list" icon on the scope itself,
+          // replacing the space-hungry "Radar view" text button.
           final scopeMode = ref.watch(radarScopeModeProvider);
           final userPos = ref.watch(userPositionProvider);
           final canScope =
               userPos != null && isUsableCoord(userPos.lat, userPos.lng);
+          void toggleScope() =>
+              ref.read(radarScopeModeProvider.notifier).toggle();
+          final list = SearchResultsList(
+            result: radarResult,
+            onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
+            onRadarToggle: canScope ? toggleScope : null,
+          );
           final Widget body;
           if (scopeMode && canScope) {
             body = SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: RadarScopeView(
-                stations: stations,
-                centerLat: userPos.lat,
-                centerLng: userPos.lng,
-                rangeKm: ref.watch(searchRadiusProvider),
-                fuelType: ref.watch(selectedFuelTypeProvider),
-                gpsCourseDeg: radar.heading,
-                onStationTap: (s) =>
-                    unawaited(StationDetailRoute(s.id).push<void>(context)),
+              child: Stack(
+                children: [
+                  RadarScopeView(
+                    stations: stations,
+                    centerLat: userPos.lat,
+                    centerLng: userPos.lng,
+                    rangeKm: ref.watch(searchRadiusProvider),
+                    fuelType: ref.watch(selectedFuelTypeProvider),
+                    gpsCourseDeg: radar.heading,
+                    onStationTap: (s) =>
+                        unawaited(StationDetailRoute(s.id).push<void>(context)),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton.filledTonal(
+                      key: const Key('radar_view_to_list'),
+                      tooltip: l10n.radarScopeShowList,
+                      icon: const Icon(Icons.list, size: 20),
+                      onPressed: toggleScope,
+                    ),
+                  ),
+                ],
               ),
             );
           } else {
@@ -126,7 +145,6 @@ class SearchResultsContent extends ConsumerWidget {
           // lands and the list re-ranks.
           return Column(
             children: [
-              if (canScope) _RadarViewToggle(scopeMode: scopeMode),
               if (radar.locating)
                 _RadarUpdatingBanner(message: l10n.radarUpdatingLocation),
               Expanded(child: body),
@@ -182,34 +200,6 @@ class SearchResultsContent extends ConsumerWidget {
         stackTrace: stackTrace,
         searchContext:
             'Station search (${ref.read(selectedFuelTypeProvider).apiValue})',
-      ),
-    );
-  }
-}
-
-/// #3342 — a right-aligned button toggling the radar results between the
-/// distance-sorted list and the green PPI radar-scope view. Only shown when a
-/// usable centre exists (so the scope can place blips). Reads the toggle so its
-/// icon/label reflect the current view.
-class _RadarViewToggle extends ConsumerWidget {
-  const _RadarViewToggle({required this.scopeMode});
-
-  final bool scopeMode;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    final label = scopeMode ? l10n.radarScopeShowList : l10n.radarScopeShowScope;
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: TextButton.icon(
-          key: const Key('radar_view_toggle'),
-          onPressed: () => ref.read(radarScopeModeProvider.notifier).toggle(),
-          icon: Icon(scopeMode ? Icons.list : Icons.radar, size: 20),
-          label: Text(label),
-        ),
       ),
     );
   }
