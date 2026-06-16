@@ -4,9 +4,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
+import '../../../../core/sensors/imu_sensor_source.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import 'radar_scope_geometry.dart';
@@ -18,9 +20,15 @@ import 'radar_scope_geometry.dart';
 ///
 /// #3354 — the scope shows the PRICE for the active fuel type instead of a bare
 /// dot (overlapping chips collapse to the cheapest), the cheapest in view is
-/// highlighted, and the whole scope orients HEADING-UP: a station ahead of the
-/// driver sits at the top. Falls back to North-up when no course is known.
-class RadarScopeView extends StatefulWidget {
+/// highlighted, and the whole scope orients HEADING-UP: the direction you face
+/// is at the top.
+///
+/// #3364 — the orientation now follows the DEVICE COMPASS
+/// ([compassHeadingProvider], magnetometer) so it tracks the phone pointing in
+/// different directions even at a standstill — a real radar. GPS course
+/// ([gpsCourseDeg]) is the fallback when no compass is available (it only
+/// exists while moving), and North-up the last resort.
+class RadarScopeView extends ConsumerStatefulWidget {
   const RadarScopeView({
     super.key,
     required this.stations,
@@ -28,7 +36,7 @@ class RadarScopeView extends StatefulWidget {
     required this.centerLng,
     required this.rangeKm,
     required this.fuelType,
-    this.headingDeg,
+    this.gpsCourseDeg,
     this.onStationTap,
   });
 
@@ -40,9 +48,9 @@ class RadarScopeView extends StatefulWidget {
   /// Active fuel type — the price shown per station (#3354).
   final FuelType fuelType;
 
-  /// Live GPS course (deg clockwise from North); when non-null the scope
-  /// rotates so this direction points up. Null → North-up (#3354).
-  final double? headingDeg;
+  /// Live GPS course (deg clockwise from North) — the FALLBACK orientation when
+  /// the device has no compass reading yet. Null → North-up (#3364).
+  final double? gpsCourseDeg;
 
   final void Function(Station station)? onStationTap;
 
@@ -55,10 +63,10 @@ class RadarScopeView extends StatefulWidget {
   static const double clusterSeparation = 0.18;
 
   @override
-  State<RadarScopeView> createState() => _RadarScopeViewState();
+  ConsumerState<RadarScopeView> createState() => _RadarScopeViewState();
 }
 
-class _RadarScopeViewState extends State<RadarScopeView>
+class _RadarScopeViewState extends ConsumerState<RadarScopeView>
     with SingleTickerProviderStateMixin {
   late final AnimationController _sweep = AnimationController(
     vsync: this,
@@ -95,7 +103,10 @@ class _RadarScopeViewState extends State<RadarScopeView>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final blips = _blips();
-    final heading = widget.headingDeg ?? 0;
+    // #3364 — compass-first (tracks the phone pointing), GPS course as the
+    // fallback (driving), North-up the last resort.
+    final heading =
+        ref.watch(compassHeadingProvider).value ?? widget.gpsCourseDeg ?? 0;
     // The cheapest priced station in view — highlighted on the scope.
     double? cheapest;
     for (final b in blips) {

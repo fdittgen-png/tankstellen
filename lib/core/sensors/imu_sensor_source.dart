@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
+import 'compass_heading.dart';
 import 'imu_sample.dart';
 
 part 'imu_sensor_source.g.dart';
@@ -29,6 +30,15 @@ part 'imu_sensor_source.g.dart';
 ImuSensorSource imuSensorSource(Ref ref) {
   return ImuSensorSource();
 }
+
+/// #3364 — the device compass heading (degrees clockwise from magnetic north),
+/// smoothed + throttled. autoDispose: the magnetometer only spins while a
+/// consumer (the radar scope) is on screen, so it costs nothing otherwise.
+/// Degrades to a quiet stream when the device has no magnetometer / the plugin
+/// isn't bound (unit tests), so the scope just falls back to North-up.
+@riverpod
+Stream<double> compassHeading(Ref ref) =>
+    ref.watch(imuSensorSourceProvider).compassHeadingStream();
 
 class ImuSensorSource {
   /// A fused ~50 Hz stream of gravity-removed linear acceleration +
@@ -108,6 +118,83 @@ class ImuSensorSource {
           await gyroSub?.cancel();
         } catch (_) {
           // ignore: silent_catch — A subscription that failed to set up cleanly may also throw on
+          // cancel; nothing to recover.
+        }
+        if (!out.isClosed) await out.close();
+      },
+    );
+    return out.stream;
+  }
+
+  /// #3364 — the device compass heading (degrees clockwise from magnetic
+  /// north), tilt-compensated by fusing the RAW accelerometer (gravity) with
+  /// the magnetometer. Smoothed ([CompassSmoother]) so the scope doesn't
+  /// jitter, and throttled to emit at most ~every [_emitGapMs] and only when
+  /// the heading moved ≥ [_emitDeltaDeg] — bounding the rebuilds the scope does.
+  ///
+  /// Degrades to a quiet stream when the sensors / plugin are unavailable
+  /// (a device with no magnetometer, or a unit-test host), exactly like
+  /// [stream]: the caller then falls back to North-up.
+  Stream<double> compassHeadingStream() {
+    const emitGapMs = 100;
+    const emitDeltaDeg = 1.0;
+    final smoother = CompassSmoother();
+    var lastAx = 0.0, lastAy = 0.0, lastAz = 0.0;
+    var hasAccel = false;
+    double? lastEmit;
+    var lastEmitMs = 0;
+    StreamSubscription<AccelerometerEvent>? accelSub;
+    StreamSubscription<MagnetometerEvent>? magSub;
+
+    // ignore: close_sinks
+    late final StreamController<double> out;
+    out = StreamController<double>(
+      onListen: () {
+        try {
+          // RAW accelerometer (gravity included) — the compass needs the
+          // gravity vector, unlike the harsh-event stream's userAccelerometer.
+          accelSub = accelerometerEventStream(
+            samplingPeriod: SensorInterval.uiInterval,
+          ).listen((e) {
+            lastAx = e.x;
+            lastAy = e.y;
+            lastAz = e.z;
+            hasAccel = true;
+          }, onError: (Object _) {});
+          magSub = magnetometerEventStream(
+            samplingPeriod: SensorInterval.uiInterval,
+          ).listen(
+            (e) {
+              if (out.isClosed || !hasAccel) return;
+              final az =
+                  azimuthFromVectors(lastAx, lastAy, lastAz, e.x, e.y, e.z);
+              if (az == null) return;
+              final heading = smoother.add(az);
+              final nowMs = DateTime.now().millisecondsSinceEpoch;
+              if (lastEmit != null &&
+                  nowMs - lastEmitMs < emitGapMs &&
+                  CompassSmoother.delta(heading, lastEmit!) < emitDeltaDeg) {
+                return;
+              }
+              lastEmit = heading;
+              lastEmitMs = nowMs;
+              out.add(heading);
+            },
+            onError: (Object err, StackTrace st) {
+              if (!out.isClosed) out.addError(err, st);
+            },
+          );
+        } catch (_) {
+          // ignore: silent_catch — magnetometer unavailable; stay quiet so the
+          // scope falls back to North-up rather than crashing.
+        }
+      },
+      onCancel: () async {
+        try {
+          await accelSub?.cancel();
+          await magSub?.cancel();
+        } catch (_) {
+          // ignore: silent_catch — a half-set-up subscription may throw on
           // cancel; nothing to recover.
         }
         if (!out.isClosed) await out.close();
