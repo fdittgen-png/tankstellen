@@ -136,7 +136,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // vehicle's engine power (a small engine wastes proportionally more for
     // the same hard pull). Trips aren't tagged with a vehicle, so the
     // currently-active profile is the source; null power → unchanged.
-    return analyzeTrip(tripSamples, enginePowerKw: _activeEnginePowerKw());
+    // #3368 — a virtual dead-reckoning trip's quantised speed manufactures
+    // phantom harsh events; suppress them in the lessons just like the score.
+    return analyzeTrip(tripSamples,
+        enginePowerKw: _activeEnginePowerKw(),
+        suppressSpeedHarsh: widget.entry.summary.isVirtualSource);
   }
 
   /// The active vehicle's engine power (kW) for the power-aware hard-accel
@@ -181,6 +185,9 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
       hardAccelEventsOverride: useImu ? summary.harshAccelerations : null,
       hardBrakeEventsOverride: useImu ? summary.harshBrakes : null,
       enginePowerKw: _activeEnginePowerKw(),
+      // #3368 — suppress the noisy virtual-odometer speed derivative (phantom
+      // harsh events) unless the IMU supplied real counts above.
+      suppressSpeedHarsh: summary.isVirtualSource,
     );
   }
 

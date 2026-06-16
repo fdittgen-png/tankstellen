@@ -38,6 +38,14 @@ class TripSummary {
   /// trips before this flag landed keep that honest label.
   final String distanceSource;
 
+  /// #3368 — true for a `virtual` (dead-reckoning odometer) trip, whose
+  /// 1 km/h-quantised speed manufactures phantom harsh-accel/brake events when
+  /// differentiated. Score + lessons suppress speed-derived harsh events for
+  /// it (mirrors the recorder's HarshEventDetector). Literal mirrors
+  /// `kDistanceSourceVirtual` (kept local to avoid a domain→obd2 import; same
+  /// value as this field's own default above).
+  bool get isVirtualSource => distanceSource == 'virtual';
+
   /// Whether this trip likely paid a cold-start fuel surcharge
   /// (#1262 phase 2). Flipped true when the coolant temperature
   /// telemetry suggests the engine was warming up for a meaningful

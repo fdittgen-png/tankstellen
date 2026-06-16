@@ -92,6 +92,7 @@ const int _topN = 3;
 List<DrivingInsight> analyzeTrip(
   List<TripSample> samples, {
   int? enginePowerKw,
+  bool suppressSpeedHarsh = false,
 }) {
   if (samples.length < 2) return const [];
 
@@ -110,6 +111,9 @@ List<DrivingInsight> analyzeTrip(
 
   // Hard-accel EPISODES via the ONE shared gate (#2667) — same count the
   // harsh detector, the score, and the GPS features report.
+  // #3368 — suppress harsh-event derivation for a `virtual` dead-reckoning
+  // trip (its quantised speed manufactures phantom events), matching the score
+  // + the recorder's HarshEventDetector so the lesson agrees.
   final accelCounts = countAccelEvents([
     for (final s in sorted)
       AccelSamplePoint(
@@ -117,7 +121,7 @@ List<DrivingInsight> analyzeTrip(
         speedKmh: s.speedKmh,
         hAccuracyM: s.hAccuracyM,
       ),
-  ]);
+  ], suppress: suppressSpeedHarsh);
   final hardAccelEvents = accelCounts.accelEvents;
   final hardAccelTotalDt = accelCounts.accelSeconds;
 

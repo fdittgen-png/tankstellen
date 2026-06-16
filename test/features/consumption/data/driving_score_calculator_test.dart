@@ -151,6 +151,26 @@ void main() {
       expect(overridden.hardAccelEvents, 2);
     });
 
+    test('#3368 — suppressSpeedHarsh zeroes the speed-derived harsh events '
+        '(virtual dead-reckoning trip)', () {
+      // The SAME 5 hard-accel manoeuvres that cap the penalty above…
+      var t = start;
+      final samples = <TripSample>[];
+      for (var i = 0; i < 5; i++) {
+        samples.add(TripSample(timestamp: t, speedKmh: 0, rpm: 1000));
+        t = t.add(const Duration(seconds: 2));
+        samples.add(TripSample(timestamp: t, speedKmh: 50, rpm: 2500));
+        t = t.add(const Duration(seconds: 10));
+        samples.add(TripSample(timestamp: t, speedKmh: 50, rpm: 2000));
+        t = t.add(const Duration(seconds: 1));
+      }
+      // …vanish when the speed signal is unfit (virtual odometer).
+      final suppressed = computeDrivingScore(samples, suppressSpeedHarsh: true);
+      expect(suppressed.hardAccelPenalty, 0);
+      expect(suppressed.hardAccelEvents, 0);
+      expect(suppressed.hardBrakePenalty, 0);
+    });
+
     test('hardAccelPenalty caps at 15 even with 10 events', () {
       var t = start;
       final samples = <TripSample>[];
