@@ -10,6 +10,7 @@ import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -100,41 +101,56 @@ class SearchResultsContent extends ConsumerWidget {
           final userPos = ref.watch(userPositionProvider);
           final canScope =
               userPos != null && isUsableCoord(userPos.lat, userPos.lng);
+          // #3372 — in landscape the list drops its sort/filter rows for room.
+          final wide = isWideScreen(context);
           void toggleScope() =>
               ref.read(radarScopeModeProvider.notifier).toggle();
           final list = SearchResultsList(
             result: radarResult,
             onRefresh: () => ref.read(radarSearchProvider.notifier).runRadar(),
             onRadarToggle: canScope ? toggleScope : null,
+            hideSortAndFilter: wide,
           );
           final Widget body;
           if (scopeMode && canScope) {
-            body = SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Stack(
-                children: [
-                  RadarScopeView(
-                    stations: stations,
-                    centerLat: userPos.lat,
-                    centerLng: userPos.lng,
-                    rangeKm: ref.watch(searchRadiusProvider),
-                    fuelType: ref.watch(selectedFuelTypeProvider),
-                    gpsCourseDeg: radar.heading,
-                    onStationTap: (s) =>
-                        unawaited(StationDetailRoute(s.id).push<void>(context)),
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton.filledTonal(
-                      key: const Key('radar_view_to_list'),
-                      tooltip: l10n.radarScopeShowList,
-                      icon: const Icon(Icons.list, size: 20),
-                      onPressed: toggleScope,
+            // #3372 — the scope fills the whole pane (centred AspectRatio in
+            // the bounded area, so it's the largest square that fits — 100% of
+            // the short dimension), and is pinch-zoom + pan-able. The "back to
+            // list" icon floats top-right over the pane.
+            body = Stack(
+              children: [
+                Positioned.fill(
+                  child: InteractiveViewer(
+                    minScale: 1,
+                    maxScale: 4,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(wide ? 8 : 16),
+                        child: RadarScopeView(
+                          stations: stations,
+                          centerLat: userPos.lat,
+                          centerLng: userPos.lng,
+                          rangeKm: ref.watch(searchRadiusProvider),
+                          fuelType: ref.watch(selectedFuelTypeProvider),
+                          gpsCourseDeg: radar.heading,
+                          onStationTap: (s) => unawaited(
+                              StationDetailRoute(s.id).push<void>(context)),
+                        ),
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: IconButton.filledTonal(
+                    key: const Key('radar_view_to_list'),
+                    tooltip: l10n.radarScopeShowList,
+                    icon: const Icon(Icons.list, size: 20),
+                    onPressed: toggleScope,
+                  ),
+                ),
+              ],
             );
           } else {
             body = list;
