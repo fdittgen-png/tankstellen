@@ -99,12 +99,13 @@ jobs:
         run: flutter pub get
 
       - name: Build AAB (play flavor, run-counter build number)
-        # #3173 — FGS_FORM_APPROVED=true ships the GPS foreground service: the
-        # Dart flag hands geolocator the ForegroundNotificationConfig AND the
-        # gradle overlay re-declares FOREGROUND_SERVICE*. Requires the Play
-        # "Foreground Service Use" form to be approved (#1498), else this upload
-        # 403s.
-        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} --dart-define=FGS_FORM_APPROVED=true
+        # #3375 — ship DARK: NO --dart-define=FGS_FORM_APPROVED here. The GPS
+        # foreground service (#3173) stays code-merged but gated off, because
+        # the Play "Foreground Service Use" form (#1498) is not yet approved —
+        # uploading the FGS bundle before then 403s ("you must let us know
+        # whether your app uses any Foreground Service permissions"). Re-add the
+        # define once the form clears.
+        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
 
       - name: Clean up decoded keystore
         if: always()
