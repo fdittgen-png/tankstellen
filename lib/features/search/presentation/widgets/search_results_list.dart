@@ -59,11 +59,17 @@ class SearchResultsList extends ConsumerStatefulWidget {
   /// Null for an ordinary search (no scope to offer).
   final VoidCallback? onRadarToggle;
 
+  /// #3372 — hide the sort selector + brand/mixed filter rows (the landscape
+  /// radar list wants maximum vertical room — just the count/view header + the
+  /// station cards). The header row (count + view-mode + radar toggle) stays.
+  final bool hideSortAndFilter;
+
   const SearchResultsList({
     super.key,
     required this.result,
     required this.onRefresh,
     this.onRadarToggle,
+    this.hideSortAndFilter = false,
   });
 
   @override
@@ -184,19 +190,23 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
         // #494 — same swipe-hint banner as the favorites screen. Shows
         // once until the user taps "Got it", then stays dismissed.
         const SwipeTutorialBanner(),
-        SortSelector(
-          selected: sortMode,
-          onChanged: (mode) =>
-              ref.read(selectedSortModeProvider.notifier).set(mode),
-        ),
-        _CollapsibleBrandFilters(
-          stations: _fuelStationsFrom(result.data)
-              .where((s) => !ignoredIds.contains(s.id))
-              .toList(),
-        ),
-        // #1784 — Fuel/EV/Both kind selector + EV connector & power
-        // filters. Renders nothing for a fuel-only result set.
-        const MixedResultsFilterChips(),
+        // #3372 — the landscape radar list drops the sort + filter rows for
+        // vertical room (the header keeps the radar/list/map toggles).
+        if (!widget.hideSortAndFilter) ...[
+          SortSelector(
+            selected: sortMode,
+            onChanged: (mode) =>
+                ref.read(selectedSortModeProvider.notifier).set(mode),
+          ),
+          _CollapsibleBrandFilters(
+            stations: _fuelStationsFrom(result.data)
+                .where((s) => !ignoredIds.contains(s.id))
+                .toList(),
+          ),
+          // #1784 — Fuel/EV/Both kind selector + EV connector & power
+          // filters. Renders nothing for a fuel-only result set.
+          const MixedResultsFilterChips(),
+        ],
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async => onRefresh(),

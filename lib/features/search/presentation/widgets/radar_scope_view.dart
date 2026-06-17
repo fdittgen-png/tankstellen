@@ -70,7 +70,7 @@ class _RadarScopeViewState extends ConsumerState<RadarScopeView>
     with SingleTickerProviderStateMixin {
   late final AnimationController _sweep = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 4),
+    duration: const Duration(seconds: 8), // #3372 — slower, calmer sweep
   )..repeat();
 
   // Scope palette — a dark-green PPI face so the green grid/chips and the
