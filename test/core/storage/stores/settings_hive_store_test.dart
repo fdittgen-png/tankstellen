@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/stores/settings_hive_store.dart';
 
@@ -148,6 +149,31 @@ void main() {
       await store.setEvApiKey('ev-custom');
       expect(store.getEvApiKey(), 'ev-custom');
       expect(store.hasCustomEvApiKey(), isTrue);
+    });
+  });
+
+  group('Resilience — settings box closed (#3370 / #3377)', () {
+    // A write racing app teardown (background-scan `closeIsolateBoxes`, OBD2
+    // disconnect at shutdown) must NEVER surface a `FileSystemException: File
+    // closed` to PlatformDispatcher.onError — it is dropped silently because
+    // the app is going away. These guard the never-throw contract.
+
+    test('putSetting drops silently when the box is closed (no throw)',
+        () async {
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
+      await expectLater(store.putSetting('k', 'v'), completes);
+    });
+
+    test('skipSetup drops silently when the box is closed (no throw)',
+        () async {
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
+      await expectLater(store.skipSetup(), completes);
+    });
+
+    test('resetSetupSkip drops silently when the box is closed (no throw)',
+        () async {
+      await Hive.box<dynamic>(HiveBoxes.settings).close();
+      await expectLater(store.resetSetupSkip(), completes);
     });
   });
 

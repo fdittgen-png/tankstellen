@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -135,15 +138,39 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   dynamic getSetting(String key) => _settings.get(key);
 
   @override
-  Future<void> putSetting(String key, dynamic value) async {
-    // #3370 — best-effort: a settings write racing app teardown (the box is
-    // already closed — e.g. a fire-and-forget `markKnownGood` during an OBD2
-    // disconnect at shutdown) must NOT throw an uncaught
-    // `FileSystemException: File closed` to PlatformDispatcher.onError. The
-    // value is simply dropped — the app is going away. This is the root of the
-    // recurring "File closed, settings.hive" field reports.
+  Future<void> putSetting(String key, dynamic value) =>
+      _guardedWrite('putSetting', () => _settings.put(key, value));
+
+  /// Run [write] against the settings box, swallowing the benign teardown
+  /// race where the box is (or becomes) closed.
+  ///
+  /// #3370 — a settings write racing app teardown (the box already closed —
+  /// e.g. a fire-and-forget `markKnownGood` during an OBD2 disconnect at
+  /// shutdown) must NOT throw an uncaught `FileSystemException: File closed`
+  /// to PlatformDispatcher.onError. The value is simply dropped — the app is
+  /// going away. This is the root of the recurring "File closed, settings.hive"
+  /// field reports.
+  ///
+  /// #3377 — the [Hive.isBoxOpen] guard alone is a point-in-time check: the
+  /// box can still close DURING the awaited file write (a background-scan
+  /// `HiveBoxes.closeIsolateBoxes` interleaving the async append), so we also
+  /// catch the `FileSystemException` the write itself can throw — the same
+  /// belt-and-braces degrade `CacheManager.put` uses (#2670).
+  Future<void> _guardedWrite(
+    String label,
+    Future<void> Function() write,
+  ) async {
     if (!Hive.isBoxOpen(HiveBoxes.settings)) return;
-    await _settings.put(key, value);
+    try {
+      await write();
+      // Benign teardown race — the box closed mid-write and the app is going
+      // away, so the stack is useless; we only drop the value.
+      // ignore: catch_no_st
+    } on FileSystemException catch (e) {
+      debugPrint(
+          'SettingsHiveStore.$label: settings box closed mid-write, '
+          'dropping ($e)');
+    }
   }
 
   // Setup completion — tracks whether the onboarding wizard has been completed
@@ -158,10 +185,10 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   bool get isSetupSkipped => _settings.get(StorageKeys.setupSkipped) == true;
 
   @override
-  Future<void> skipSetup() =>
-      _settings.put(StorageKeys.setupSkipped, true);
+  Future<void> skipSetup() => _guardedWrite(
+      'skipSetup', () => _settings.put(StorageKeys.setupSkipped, true));
 
   @override
-  Future<void> resetSetupSkip() =>
-      _settings.delete(StorageKeys.setupSkipped);
+  Future<void> resetSetupSkip() => _guardedWrite(
+      'resetSetupSkip', () => _settings.delete(StorageKeys.setupSkipped));
 }
