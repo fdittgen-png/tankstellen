@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../../background/fuel_price_fields.dart';
 import '../../../../core/country/country_config.dart';
 import '../../../../core/utils/price_formatter.dart';
@@ -185,7 +186,11 @@ class _CreateAlertDialogState extends State<CreateAlertDialog> {
     final price = double.parse(_priceController.text.replaceAll(',', '.'));
 
     final alert = PriceAlert(
-      id: '${widget.stationId}_${_selectedFuelType.apiValue}_${DateTime.now().millisecondsSinceEpoch}',
+      // #3370 — a real UUID so the alert round-trips the Supabase `alerts.id`
+      // uuid column. The old `stationId_fuel_ts` composite failed sync with
+      // 22P02 (the id is just an identifier — stationId/fuelType live in their
+      // own fields — so a uuid is a safe swap).
+      id: const Uuid().v4(),
       stationId: widget.stationId,
       stationName: widget.stationName,
       fuelType: _selectedFuelType,

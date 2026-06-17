@@ -35,5 +35,29 @@ void main() {
       final result = await AlertsSync.merge(const <PriceAlert>[]);
       expect(result, isEmpty);
     });
+
+    test('#3370 — a non-UUID (legacy) alert is KEPT local-only, never dropped',
+        () async {
+      final uuidAlert = PriceAlert(
+        id: '11111111-1111-4111-8111-111111111111',
+        stationId: 'st-1',
+        stationName: 'UUID Station',
+        fuelType: FuelType.e10,
+        targetPrice: 1.70,
+        createdAt: DateTime(2026, 4, 21),
+      );
+      final legacy = PriceAlert(
+        id: 'st-2_e10_1718000000000', // old composite id — not a uuid
+        stationId: 'st-2',
+        stationName: 'Legacy Station',
+        fuelType: FuelType.e10,
+        targetPrice: 1.65,
+        createdAt: DateTime(2026, 4, 21),
+      );
+      final result = await AlertsSync.merge([uuidAlert, legacy]);
+      // Both survive the merge — the legacy non-UUID alert can't sync to the
+      // uuid column, but it must stay visible on this device (#3370).
+      expect(result.map((a) => a.id), containsAll([uuidAlert.id, legacy.id]));
+    });
   });
 }
