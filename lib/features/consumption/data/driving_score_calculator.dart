@@ -157,6 +157,7 @@ DrivingScore computeDrivingScore(
   int? hardAccelEventsOverride,
   int? hardBrakeEventsOverride,
   int? enginePowerKw,
+  bool suppressSpeedHarsh = false,
 }) {
   if (samples.length < 2) return DrivingScore.perfect;
 
@@ -179,6 +180,11 @@ DrivingScore computeDrivingScore(
   // the score agrees with the harsh detector, the insights, and the GPS
   // features on what counts as a single physical event (the accumulator no
   // longer over-counts a multi-interval manoeuvre once per interval).
+  // #3368 — a `virtual` dead-reckoning trip has a 1 km/h-quantised speed whose
+  // derivative manufactures phantom harsh events; the recorder already
+  // suppresses its HarshEventDetector for it, so suppress the score's gate too
+  // rather than re-deriving the same artefacts (23/23 phantom events, field
+  // export). GPS-Doppler trips stay enabled-but-gated (accuracy + plausibility).
   final accelCounts = countAccelEvents([
     for (final s in sorted)
       AccelSamplePoint(
@@ -186,7 +192,7 @@ DrivingScore computeDrivingScore(
         speedKmh: s.speedKmh,
         hAccuracyM: s.hAccuracyM,
       ),
-  ]);
+  ], suppress: suppressSpeedHarsh);
 
   // #2695 C9 — source-aware re-weight. A GPS-only / degraded trip carries
   // no engine signal (every sample's rpm is null, #2692 C4-G), so the

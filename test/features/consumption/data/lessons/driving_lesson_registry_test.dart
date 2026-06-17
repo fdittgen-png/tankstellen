@@ -39,6 +39,9 @@ void main() {
         idleSeconds: 0,
         harshBrakes: 0,
         harshAccelerations: 0,
+        // #3368 — a GPS trip (not the `virtual` default), so its GPS-derived
+        // harsh events are NOT suppressed and the hard-accel lesson still fires.
+        distanceSource: 'gps',
         secondsBelowOptimalGear: secondsBelowOptimalGear,
       );
 
@@ -317,6 +320,7 @@ void main() {
         harshBrakes: 0,
         harshAccelerations: 2, // IMU-preferred count (#2895)
         kind: TripKind.gpsOnly,
+        distanceSource: 'gps', // #3368 — GPS trip, harsh events not suppressed
         imuHardAccelCount: 2,
         imuActive: true,
       );
@@ -339,6 +343,7 @@ void main() {
         harshBrakes: 0,
         harshAccelerations: 2, // ignored — IMU did not run
         kind: TripKind.gpsOnly,
+        distanceSource: 'gps', // #3368 — GPS trip, harsh events not suppressed
         imuActive: false,
       );
       final reg = DrivingLessonRegistry.standard();

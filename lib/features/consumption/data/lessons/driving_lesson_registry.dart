@@ -105,8 +105,13 @@ class DrivingLessonRegistry {
       LessonContext(
         summary: summary,
         samples: samples,
-        score: score ?? computeDrivingScore(samples),
-        insights: insights ?? analyzeTrip(samples),
+        // #3368 — a virtual dead-reckoning trip's quantised speed manufactures
+        // phantom harsh events; suppress them in the fallback score + insights.
+        score: score ??
+            computeDrivingScore(samples,
+                suppressSpeedHarsh: summary.isVirtualSource),
+        insights: insights ??
+            analyzeTrip(samples, suppressSpeedHarsh: summary.isVirtualSource),
       ),
       l,
     );
