@@ -186,8 +186,15 @@ void main() {
       expect(returned!.stationName, 'Shell 42');
       expect(returned!.fuelType, FuelType.diesel);
       expect(returned!.targetPrice, 1.500);
-      expect(returned!.id, contains('shell-42'));
-      expect(returned!.id, contains(FuelType.diesel.apiValue));
+      // #3370 — the id is now a UUID (so it round-trips the Supabase uuid
+      // column); the station + fuel live in their own fields, not the id.
+      expect(
+        returned!.id,
+        matches(RegExp(
+          r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+          r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+        )),
+      );
     });
 
     testWidgets('Cancel returns null', (tester) async {

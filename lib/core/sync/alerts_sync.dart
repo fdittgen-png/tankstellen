@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../features/alerts/data/models/price_alert.dart';
+import '../telemetry/collectors/breadcrumb_collector.dart';
 import '../utils/json_extensions.dart';
 import 'entity_sync.dart';
 import 'sync_transport.dart';
@@ -66,11 +67,40 @@ class AlertsSync {
   /// deleted alert can't resurrect through the launch pull or another
   /// device's still-local copy (#3121, same seam as favorites #3078).
   /// [transport] is injectable for tests.
+  /// #3370 — the `alerts.id` column is a Postgres `uuid`, but two creation
+  /// paths historically minted non-UUID ids (a `stationId_fuel_ts` composite
+  /// in the create-alert dialog; the bare station id in the station-info
+  /// section), so syncing them hit `22P02 invalid input syntax for type uuid`
+  /// on every merge (recurring field reports). Such alerts can never round-trip
+  /// to Supabase, so partition them out of the SERVER sync and keep them
+  /// local-only — the user still sees them; they simply don't sync until they
+  /// carry a valid UUID. No data loss (they were erroring, not syncing).
+  static final RegExp _uuidPattern = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+    r'[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+  );
+
   static Future<List<PriceAlert>> merge(
     List<PriceAlert> localAlerts, {
     SyncTransport? transport,
-  }) =>
-      _sync.merge(localAlerts, transport: transport);
+  }) async {
+    final syncable = <PriceAlert>[];
+    final localOnly = <PriceAlert>[];
+    for (final a in localAlerts) {
+      (_uuidPattern.hasMatch(a.id) ? syncable : localOnly).add(a);
+    }
+    if (localOnly.isNotEmpty) {
+      BreadcrumbCollector.add(
+        'alerts sync: ${localOnly.length} alert(s) kept local — non-UUID id',
+        detail: 'legacy station/composite ids cannot round-trip the uuid '
+            'column (#3370); they stay on this device.',
+      );
+    }
+    final merged = await _sync.merge(syncable, transport: transport);
+    // Union: server-merged UUID alerts + the local-only non-UUID ones, so the
+    // user keeps seeing every alert regardless of whether it can sync.
+    return [...merged, ...localOnly];
+  }
 
   /// Delete a single alert row from the server and tombstone the id
   /// (#3121). Called only when the user explicitly removes an alert on

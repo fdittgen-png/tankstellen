@@ -11,12 +11,12 @@ import '../domain/station.dart';
 import '../background/provider_request_budget.dart';
 import '../cache/cache_manager.dart';
 import '../error/exceptions.dart';
-import '../logging/error_logger.dart';
 import 'diagnostics/data_access_event.dart';
 import 'diagnostics/data_access_recorder.dart';
 import 'fuel_service_policy.dart';
 import 'mixins/station_service_helpers.dart';
 import 'service_result.dart';
+import 'station_api_failure_log.dart';
 import 'station_failure_classifier.dart';
 import 'station_service.dart';
 import 'station_service_chain_codec.dart';
@@ -207,13 +207,9 @@ class StationServiceChain implements StationService {
       return result;
     } on Exception catch (e, st) {
       recordDataAccessFailure(countryCode); // #3146 — always-on tally
-      // #2296 — log the API-failure path (stack was previously discarded)
-      // so a sustained upstream outage leaves a breadcrumb. Non-fatal.
-      unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
-        'where': 'StationServiceChain.apiCall',
-        'country': countryCode,
-        'key': cacheKey,
-      }));
+      // #3370/#2296 — breadcrumb an EXPECTED `unsupported` gap (e.g. Luxembourg
+      // has no per-station detail); ERROR-log any real failure (with stack).
+      logStationApiFailure(e, st, countryCode: countryCode, cacheKey: cacheKey);
       errors.add(ServiceError(
         source: _errorSource,
         message: e.toString(),

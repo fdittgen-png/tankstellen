@@ -135,8 +135,16 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   dynamic getSetting(String key) => _settings.get(key);
 
   @override
-  Future<void> putSetting(String key, dynamic value) =>
-      _settings.put(key, value);
+  Future<void> putSetting(String key, dynamic value) async {
+    // #3370 — best-effort: a settings write racing app teardown (the box is
+    // already closed — e.g. a fire-and-forget `markKnownGood` during an OBD2
+    // disconnect at shutdown) must NOT throw an uncaught
+    // `FileSystemException: File closed` to PlatformDispatcher.onError. The
+    // value is simply dropped — the app is going away. This is the root of the
+    // recurring "File closed, settings.hive" field reports.
+    if (!Hive.isBoxOpen(HiveBoxes.settings)) return;
+    await _settings.put(key, value);
+  }
 
   // Setup completion — tracks whether the onboarding wizard has been completed
   // or explicitly skipped. Must NOT depend on hasApiKey() because the bundled
