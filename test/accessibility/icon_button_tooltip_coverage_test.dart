@@ -21,7 +21,13 @@ void main() {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
       final src = entity.readAsStringSync();
 
-      for (final match in RegExp(r'IconButton\s*\(').allMatches(src)) {
+      // #3375 — a LEFT word-boundary so a custom widget whose name merely ENDS
+      // in "IconButton" (e.g. `HeaderIconButton(`) is not false-matched as the
+      // Material `IconButton(`. Real `IconButton(` is always preceded by a
+      // non-identifier char ((, space, comma, =, return…); a preceding letter/
+      // digit/_ means it's a different widget.
+      for (final match
+          in RegExp(r'(?<![A-Za-z0-9_])IconButton\s*\(').allMatches(src)) {
         final start = match.start;
         final int openParen = src.indexOf('(', start);
         int depth = 0;
