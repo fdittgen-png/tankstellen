@@ -236,6 +236,39 @@ void main() {
       ]);
     });
 
+    test(
+        '#3252 — imputed fuel litres are CONSISTENT with the displayed '
+        'distance: litres ≈ avg × km / 100', () async {
+      final harness = _Harness(
+        vehicle: const VehicleProfile(id: 'v1', name: 'Peugeot 107'),
+      );
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+
+      // A noisy-ish moving GPS-only run → non-zero distance + a fuel estimate.
+      final t0 = DateTime(2026, 5, 29, 8);
+      for (var i = 0; i < 8; i++) {
+        harness.geo.emit(_pos(43.40 + i * 0.006, 3.50 + i * 0.004,
+            speedMps: 20.0, at: t0.add(Duration(seconds: i))));
+        await _pump();
+      }
+      await harness.pipeline.stop(automatic: true);
+
+      final s = harness.host.saved.single.summary;
+      expect(s.avgLPer100Km, isNotNull,
+          reason: 'the #2080 GPS-fuel imputation must fire with an active '
+              'vehicle');
+      expect(s.fuelLitersConsumed, isNotNull);
+      // The invariant the trip UI relies on (#3252): the displayed litres are
+      // the displayed average applied to the displayed distance.
+      expect(
+        s.fuelLitersConsumed!,
+        closeTo(s.avgLPer100Km! * s.distanceKm / 100, 1e-9),
+        reason: 'displayed litres must equal avg × shown-km / 100 — not a '
+            'separate un-gated haversine that disagrees with the shown km',
+      );
+    });
+
     test('appendObd2Sample mid-trip flips the finalised kind to '
         'gpsPlusObd2', () async {
       final harness = _Harness();
@@ -316,8 +349,12 @@ Future<void> _pump() => Future<void>.delayed(Duration.zero);
 
 /// Wires a [GpsOnlyRecordingPipeline] to a fake host + fake Geolocator.
 class _Harness {
-  _Harness({String? activeVehicleId, bool vehicleProviderThrows = false})
-      : host = _FakeHost(activeVehicleId: activeVehicleId) {
+  _Harness({
+    String? activeVehicleId,
+    bool vehicleProviderThrows = false,
+    VehicleProfile? vehicle,
+  }) : host = _FakeHost(activeVehicleId: activeVehicleId) {
+    _vehicle = vehicle;
     container = ProviderContainer(overrides: [
       geolocatorWrapperProvider.overrideWithValue(geo),
       // #2760 — the pipeline now attaches IMU fusion in start(); stub it with
@@ -335,13 +372,18 @@ class _Harness {
       // [vehicleProviderThrows] is set, the read throws instead — the
       // #2228 regression: the stop path must degrade gracefully.
       activeVehicleProfileProvider.overrideWith(
-        () => vehicleProviderThrows ? _ThrowingActiveVehicle() : _NoActiveVehicle(),
+        () => vehicleProviderThrows
+            ? _ThrowingActiveVehicle()
+            : (_vehicle != null
+                ? _RealActiveVehicle(_vehicle!)
+                : _NoActiveVehicle()),
       ),
     ]);
     // A tiny capturing provider hands us a real Ref to feed the pipeline.
     pipeline = container.read(_pipelineProvider(host));
   }
 
+  VehicleProfile? _vehicle;
   final _FakeHost host;
   final _RecordingGeolocator geo = _RecordingGeolocator();
   late final ProviderContainer container;
@@ -367,6 +409,13 @@ final _pipelineProvider =
 class _FixedActiveLanguage extends ActiveLanguage {
   @override
   AppLanguage build() => const AppLanguage('en', 'English', 'English');
+}
+
+class _RealActiveVehicle extends ActiveVehicleProfile {
+  _RealActiveVehicle(this._v);
+  final VehicleProfile _v;
+  @override
+  VehicleProfile? build() => _v;
 }
 
 class _NoActiveVehicle extends ActiveVehicleProfile {
