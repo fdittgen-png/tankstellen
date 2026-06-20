@@ -31,6 +31,7 @@ import '../../../../../core/domain/search_result_item.dart';
 import '../../../../../core/domain/station.dart';
 import '../../../../search/providers/search_provider.dart';
 import '../../widgets/error_log_export_row.dart';
+import 'startup_trace_panel.dart';
 import 'developer_diagnostics.dart';
 
 /// Developer / Debug-mode tools screen (#2248). Reachable from the
@@ -170,6 +171,14 @@ class DeveloperToolsScreen extends ConsumerWidget {
             label: Text(l.dataAccessTracerExport),
           ),
           const SizedBox(height: 16),
+
+          // --- Startup trace (#3383) — gated by Feature.startupTrace; gating
+          // stays HERE so the panel takes no feature_management dependency
+          // (#3132 boundary).
+          if (ref
+              .watch(enabledFeaturesProvider)
+              .contains(Feature.startupTrace))
+            const StartupTracePanel(),
 
           // --- Approach overlay -----------------------------------------
           // #2382 — the approach-overlay simulator. Moved here from the

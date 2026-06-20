@@ -32,5 +32,12 @@
   "developerToolsDiagnosticsCopied": "Diagnose in die Zwischenablage kopiert.",
   "developerToolsBuildInfoGroupTitle": "Build-Informationen",
   "developerToolsBuildVersion": "App-Version",
-  "developerToolsBuildChannel": "Build-Kanal"
+  "developerToolsBuildChannel": "Build-Kanal",
+  "startupTraceSectionTitle": "Startup-Initialisierungs-Trace",
+  "startupTraceExportButton": "Startup-Trace exportieren",
+  "startupTraceEmpty": "Noch kein Startup-Trace aufgezeichnet.",
+  "startupTraceTotalMs": "Gesamt: {ms} ms",
+  "startupTraceMs": "{ms} ms",
+  "startupTraceExportSuccess": "Startup-Trace im Download-Ordner gespeichert.",
+  "startupTraceExportFailure": "Startup-Trace konnte nicht exportiert werden."
 }

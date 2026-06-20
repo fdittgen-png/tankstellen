@@ -4458,6 +4458,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get developerToolsBuildChannel => 'Build channel';
 
   @override
+  String get startupTraceSectionTitle => 'Startup initialization trace';
+
+  @override
+  String get startupTraceExportButton => 'Export startup trace';
+
+  @override
+  String get startupTraceEmpty => 'No startup trace recorded yet.';
+
+  @override
+  String startupTraceTotalMs(int ms) {
+    return 'Total: $ms ms';
+  }
+
+  @override
+  String startupTraceMs(int ms) {
+    return '$ms ms';
+  }
+
+  @override
+  String get startupTraceExportSuccess => 'Startup trace saved to Downloads.';
+
+  @override
+  String get startupTraceExportFailure => 'Couldn\'t export the startup trace.';
+
+  @override
   String get insightCardTitle => 'Top wasteful behaviours';
 
   @override
@@ -12395,6 +12420,35 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get developerToolsBuildChannel => '⟦Ɓúîłđ çĥáññéł ·····⟧';
+
+  @override
+  String get startupTraceSectionTitle =>
+      '⟦Šŧářŧúƥ îñîŧîáłîžáŧîóñ ŧřáçé ············⟧';
+
+  @override
+  String get startupTraceExportButton => '⟦Éẋƥóřŧ šŧářŧúƥ ŧřáçé ········⟧';
+
+  @override
+  String get startupTraceEmpty =>
+      '⟦Ñó šŧářŧúƥ ŧřáçé řéçóřđéđ ýéŧ. ···········⟧';
+
+  @override
+  String startupTraceTotalMs(int ms) {
+    return '⟦Ŧóŧáł: $ms ɱš ···⟧';
+  }
+
+  @override
+  String startupTraceMs(int ms) {
+    return '⟦$ms ɱš ·⟧';
+  }
+
+  @override
+  String get startupTraceExportSuccess =>
+      '⟦Šŧářŧúƥ ŧřáçé šáṽéđ ŧó Đóŵñłóáđš. ·············⟧';
+
+  @override
+  String get startupTraceExportFailure =>
+      '⟦Çóúłđñ\'ŧ éẋƥóřŧ ŧĥé šŧářŧúƥ ŧřáçé. ·············⟧';
 
   @override
   String get insightCardTitle => '⟦Ŧóƥ ŵášŧéƒúł ƀéĥáṽîóúřš ·········⟧';

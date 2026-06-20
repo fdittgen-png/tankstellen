@@ -8044,6 +8044,48 @@ abstract class AppLocalizations {
   /// **'Build channel'**
   String get developerToolsBuildChannel;
 
+  /// Section header for the startup-initialization trace panel in Developer tools (#3383).
+  ///
+  /// In en, this message translates to:
+  /// **'Startup initialization trace'**
+  String get startupTraceSectionTitle;
+
+  /// Button that exports the startup-initialization trace as a JSON file to Downloads (#3383).
+  ///
+  /// In en, this message translates to:
+  /// **'Export startup trace'**
+  String get startupTraceExportButton;
+
+  /// Shown in the startup-trace panel when no startup milestones were captured this session (#3383).
+  ///
+  /// In en, this message translates to:
+  /// **'No startup trace recorded yet.'**
+  String get startupTraceEmpty;
+
+  /// Total cold-start duration line above the startup-trace waterfall (#3383).
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {ms} ms'**
+  String startupTraceTotalMs(int ms);
+
+  /// A single phase's duration in milliseconds in the startup-trace waterfall (#3383).
+  ///
+  /// In en, this message translates to:
+  /// **'{ms} ms'**
+  String startupTraceMs(int ms);
+
+  /// Confirmation snackbar after the startup trace is exported to Downloads (#3383).
+  ///
+  /// In en, this message translates to:
+  /// **'Startup trace saved to Downloads.'**
+  String get startupTraceExportSuccess;
+
+  /// Error snackbar when the startup-trace export to Downloads fails (#3383).
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t export the startup trace.'**
+  String get startupTraceExportFailure;
+
   /// Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2).
   ///
   /// In en, this message translates to:

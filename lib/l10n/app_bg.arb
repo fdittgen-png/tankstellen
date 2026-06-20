@@ -4832,5 +4832,50 @@
   "@configureCountryBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "startupTraceSectionTitle": "Startup initialization trace",
+  "@startupTraceSectionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "startupTraceExportButton": "Export startup trace",
+  "@startupTraceExportButton": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "startupTraceEmpty": "No startup trace recorded yet.",
+  "@startupTraceEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "startupTraceTotalMs": "Total: {ms} ms",
+  "@startupTraceTotalMs": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "startupTraceMs": "{ms} ms",
+  "@startupTraceMs": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "startupTraceExportSuccess": "Startup trace saved to Downloads.",
+  "@startupTraceExportSuccess": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "startupTraceExportFailure": "Couldn't export the startup trace.",
+  "@startupTraceExportFailure": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

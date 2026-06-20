@@ -137,7 +137,7 @@ void main() {
         }
         expect(
           Feature.values.length,
-          32,
+          33,
           reason:
               '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord (14); phase 3c bundled showFuel + showElectric + '
@@ -151,7 +151,8 @@ void main() {
               '#2116-6 added developerPatToken (28); #2248 added '
               'debugMode (29); #2382 added approachOverlay (30); '
               '#2569 added voiceAnnouncements (31); #2735 added '
-              'addFillUpShareIntentReceipt (32). '
+              'addFillUpShareIntentReceipt (32); #3383 added '
+              'startupTrace (33). '
               'Update the test if a new feature was added or removed.',
         );
       },

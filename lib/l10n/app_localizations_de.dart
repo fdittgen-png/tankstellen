@@ -4506,6 +4506,33 @@ class AppLocalizationsDe extends AppLocalizations {
   String get developerToolsBuildChannel => 'Build-Kanal';
 
   @override
+  String get startupTraceSectionTitle => 'Startup-Initialisierungs-Trace';
+
+  @override
+  String get startupTraceExportButton => 'Startup-Trace exportieren';
+
+  @override
+  String get startupTraceEmpty => 'Noch kein Startup-Trace aufgezeichnet.';
+
+  @override
+  String startupTraceTotalMs(int ms) {
+    return 'Gesamt: $ms ms';
+  }
+
+  @override
+  String startupTraceMs(int ms) {
+    return '$ms ms';
+  }
+
+  @override
+  String get startupTraceExportSuccess =>
+      'Startup-Trace im Download-Ordner gespeichert.';
+
+  @override
+  String get startupTraceExportFailure =>
+      'Startup-Trace konnte nicht exportiert werden.';
+
+  @override
   String get insightCardTitle => 'Größte Spritfresser';
 
   @override
