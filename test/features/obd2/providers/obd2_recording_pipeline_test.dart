@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/obd2_recording_link_ownership.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
@@ -54,6 +55,21 @@ void main() {
       expect(h.host.seedCount, 1,
           reason: 'start must seed the active-trip WAL snapshot exactly '
               'once (#1303), as the inline path did');
+    });
+
+    test('#3386 — start() CLAIMS the adapter (so #3019 stands down) and stop() '
+        'RELEASES it', () async {
+      Obd2RecordingLinkOwnership.instance.resetForTest();
+      addTearDown(Obd2RecordingLinkOwnership.instance.resetForTest);
+
+      final h = await _Harness.started();
+      expect(Obd2RecordingLinkOwnership.instance.active, isTrue,
+          reason: 'a live OBD2 recording owns the adapter — the app-wide #3019 '
+              'reconnect controller must stand down to avoid the reconnect war');
+
+      await h.dispose(); // calls pipeline.stop()
+      expect(Obd2RecordingLinkOwnership.instance.active, isFalse,
+          reason: 'stop() hands the idle reconnect role back to #3019');
     });
 
     test('a live sample flows through to the host state + drives the '

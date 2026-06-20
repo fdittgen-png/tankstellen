@@ -10,6 +10,7 @@ import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../data/obd2_connection_errors.dart';
+import '../data/obd2_recording_link_ownership.dart';
 import '../data/obd2_service.dart';
 import '../data/obd2_trip_start_budgets.dart';
 import '../data/obd2_session_context_block.dart';
@@ -188,9 +189,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     );
     _controller = ctl;
 
-    // #769 load baselines + #3382 watchdog-bound the blocking init (see
-    // obd2_trip_start_budgets): on a stall ABORT cleanly (drop controller,
-    // disconnect, surface a recoverable error) instead of hanging forever.
+    // #769 baselines + #3382 watchdog-bound init (obd2_trip_start_budgets): on
+    // a stall ABORT cleanly (disconnect + recoverable error), never hang.
     try {
       await _baselines.load().timeout(_baselinesBudget);
       await ctl.start().timeout(_startWatchdog);
@@ -270,8 +270,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // #1303 — phase transitions force an immediate snapshot.
       unawaited(_host.flushActiveSnapshot(force: true));
     });
-    // #2274 concern 2 — going live clears any connecting stage so the
-    // recording screen swaps the progress card for live metrics that frame.
+    Obd2RecordingLinkOwnership.instance.claim(); // #3386 — #3019 stands down
+    // #2274 — going live clears the connecting stage for the live-metrics frame.
     _host.state = _host.state.copyWith(
       phase: TripRecordingPhase.recording,
       clearConnectStage: true,
@@ -296,6 +296,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
 
   @override
   Future<StoppedTripResult> stop({bool automatic = false}) async {
+    Obd2RecordingLinkOwnership.instance.release(); // #3386 — #3019 resumes idle
     final ctl = _controller;
     final svc = _service;
     if (ctl == null || svc == null) {
