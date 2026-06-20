@@ -158,6 +158,36 @@ void main() {
   });
 
   test(
+      '#3242 — a real disconnect RE-PENDS the persisted adapter (FBP clears '
+      'its auto-connect set on disconnect, killing the hands-free re-pend)',
+      () async {
+    await listener.start(mac: uuid);
+    expect(restoration.registeredUuids, [uuid],
+        reason: 'start() issues the initial pending connect');
+
+    // A real connect → disconnect cycle (trip runs, then teardown calls
+    // device.disconnect(), which removes the id from FBP\'s auto-connect set).
+    stateControllers[uuid]!.add(true);
+    stateControllers[uuid]!.add(false);
+    await pumpEventQueue();
+
+    expect(restoration.registeredUuids, [uuid, uuid],
+        reason: 'the disconnect must re-arm the pend so the NEXT adapter '
+            'power-on still relaunches the app (#3242) — otherwise hands-free '
+            'connect dies after the first trip of the process');
+  });
+
+  test(
+      'the initial replayed "disconnected" does NOT re-pend (it is not a '
+      'transition)', () async {
+    await listener.start(mac: uuid);
+    stateControllers[uuid]!.add(false); // FBP replays current state
+    await pumpEventQueue();
+    expect(restoration.registeredUuids, [uuid],
+        reason: 'only a real disconnect transition re-pends');
+  });
+
+  test(
       'initial replayed "disconnected" is swallowed — a normal launch '
       'must not arm the disconnect-save debounce', () async {
     await listener.start(mac: uuid);
