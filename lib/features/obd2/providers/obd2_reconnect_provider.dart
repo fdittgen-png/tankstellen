@@ -15,6 +15,7 @@ import '../data/obd2_connect_trace.dart';
 import '../data/obd2_connect_trace_log.dart';
 import '../data/obd2_connection_service.dart';
 import '../data/obd2_link_drop_signal.dart';
+import '../data/obd2_recording_link_ownership.dart';
 import '../data/obd2_reconnect_controller.dart';
 import '../data/obd2_service.dart';
 import 'obd2_connection_state_provider.dart';
@@ -56,6 +57,12 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     // the instant a link dies (BLE disconnect edge / Classic socket close), so
     // a drop while idle / between trips still starts the bounded backoff loop.
     _dropSub = Obd2LinkDropSignal.instance.drops.listen((e) {
+      // #3386 — STAND DOWN while a trip recording owns the adapter: the trip's
+      // own DroppedSessionManager (#2188) is the sole in-trip reconnect
+      // authority. Two reconnectors on one adapter ping-pong the single RFCOMM
+      // socket forever (the field "permanently reconnecting" war). #3019 only
+      // handles drops while idle / between trips — exactly its #3013 charter.
+      if (Obd2RecordingLinkOwnership.instance.active) return;
       // #3346 — carry WHY the link dropped (and on which transport) into the
       // controller so the reconnect-episode breadcrumb records it.
       _controller?.notifyDropped(
@@ -64,7 +71,16 @@ class Obd2Reconnect extends _$Obd2Reconnect {
         mac: e.mac,
       );
     });
+    // #3386 — if a recording CLAIMS the link while #3019 is mid-loop (an idle
+    // drop that was recovering when the user hit Start), hand over immediately:
+    // stop the loop so it can't tear down the recording's freshly-owned socket.
+    final ownership = Obd2RecordingLinkOwnership.instance.recordingOwnsLink;
+    void onOwnershipChanged() {
+      if (ownership.value) _controller?.stop();
+    }
+    ownership.addListener(onOwnershipChanged);
     ref.onDispose(() {
+      ownership.removeListener(onOwnershipChanged);
       unawaited(_dropSub?.cancel());
       _dropSub = null;
       controller.dispose();
