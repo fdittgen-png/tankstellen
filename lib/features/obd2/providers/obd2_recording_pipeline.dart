@@ -9,7 +9,9 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';
+import '../data/obd2_connection_errors.dart';
 import '../data/obd2_service.dart';
+import '../data/obd2_trip_start_budgets.dart';
 import '../data/obd2_session_context_block.dart';
 import '../data/trip_recording_controller.dart';
 import '../../consumption/domain/entities/gps_sample_diagnostic.dart';
@@ -55,6 +57,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     required VehicleProfile? Function() readActiveVehicle,
     required bool Function() readOemPidsFlag,
     required bool Function() readDiagnosticCaptureFlag,
+    Duration startWatchdog = kObd2TripStartWatchdog, // #3382, overridable in tests
+    Duration baselinesBudget = kObd2TripStartBaselinesBudget,
   })  : _ref = ref,
         _host = host,
         _haptics = haptics,
@@ -63,7 +67,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         _oemFuel = oemFuel,
         _readActiveVehicle = readActiveVehicle,
         _readOemPidsFlag = readOemPidsFlag,
-        _readDiagnosticCaptureFlag = readDiagnosticCaptureFlag;
+        _readDiagnosticCaptureFlag = readDiagnosticCaptureFlag,
+        _startWatchdog = startWatchdog,
+        _baselinesBudget = baselinesBudget;
 
   final Ref _ref;
   final Obd2RecordingPipelineHost _host;
@@ -75,6 +81,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   final bool Function() _readOemPidsFlag;
   // #2459 — per-trip diagnostic-capture flag (Feature.debugMode).
   final bool Function() _readDiagnosticCaptureFlag;
+  final Duration _startWatchdog; // #3382 trip-start abort budgets
+  final Duration _baselinesBudget;
 
   Obd2Service? _service;
   TripRecordingController? _controller;
@@ -180,11 +188,17 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     );
     _controller = ctl;
 
-    // #769 — resolve the active vehicle + fuel family and load its
-    // learned baselines from Hive (delegated to TripBaselineRecorder).
-    await _baselines.load();
-
-    await ctl.start();
+    // #769 load baselines + #3382 watchdog-bound the blocking init (see
+    // obd2_trip_start_budgets): on a stall ABORT cleanly (drop controller,
+    // disconnect, surface a recoverable error) instead of hanging forever.
+    try {
+      await _baselines.load().timeout(_baselinesBudget);
+      await ctl.start().timeout(_startWatchdog);
+    } on TimeoutException {
+      _controller = null;
+      unawaited(service.disconnect());
+      throw const Obd2AdapterUnresponsive();
+    }
     // #1374 / #1981 — GPS trip-path sampling, default-on; fire-and-forget so
     // the permission round-trip never blocks trip-start.
     unawaited(_gps.start(ctl));

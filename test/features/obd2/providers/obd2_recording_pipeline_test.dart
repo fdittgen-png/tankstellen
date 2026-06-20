@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
@@ -153,8 +156,76 @@ void main() {
       expect(h.pipeline.resume(), isTrue);
       expect(h.pipeline.controller!.isPaused, isFalse);
     });
+
+    test(
+        'a stalled blocking init aborts trip-start cleanly — throws + '
+        'disconnects the link, no infinite "initializing" (#3382)', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final host = _FakeWalHost();
+      final service = Obd2Service(FakeObd2Transport(_elmOk()))
+        ..adapterMac = _Harness.fakeMac;
+      await service.connect();
+      service.adapterMac = _Harness.fakeMac;
+      expect(service.isConnected, isTrue);
+
+      // The baseline load never lands; the tiny injected watchdog must fire.
+      final gate = Completer<void>();
+      final pipeline = container.read(
+        _hangingBaselinesPipelineProvider((host: host, gate: gate.future)),
+      );
+
+      await expectLater(
+        pipeline.start(service),
+        throwsA(isA<Obd2AdapterUnresponsive>()),
+        reason: 'a stalled init must ABORT with a recoverable error, not hang',
+      );
+      // The half-open link is torn down (fire-and-forget) so a retry is clean.
+      await _pump();
+      await _pump();
+      expect(service.isConnected, isFalse,
+          reason: 'the watchdog must disconnect the link so a retry starts '
+              'fresh — and the user never has to restart the app');
+      expect(pipeline.controller, isNull,
+          reason: 'the half-started controller is dropped on abort');
+
+      gate.complete(); // release the dangling load so no work is left pending
+    });
   });
 }
+
+/// #3382 — a [TripBaselineRecorder] whose Hive-backed [load] never lands
+/// (a storage stall / lock), so the pipeline's start-watchdog must fire.
+class _HangingBaselines extends TripBaselineRecorder {
+  _HangingBaselines(super.ref, this._gate);
+
+  final Future<void> _gate;
+
+  @override
+  Future<void> load() => _gate;
+}
+
+/// Builds a pipeline whose baseline load hangs, with tiny abort budgets so the
+/// #3382 watchdog fires fast in-test.
+final _hangingBaselinesPipelineProvider = Provider.family<Obd2RecordingPipeline,
+    ({Obd2RecordingPipelineHost host, Future<void> gate})>(
+  (ref, args) => Obd2RecordingPipeline(
+    ref: ref,
+    host: args.host,
+    haptics: TripHapticController(),
+    gps: TripGpsStreamController(
+      ref: ref,
+      lifecycleState: () => AppLifecycleState.resumed,
+    ),
+    baselines: _HangingBaselines(ref, args.gate),
+    oemFuel: TripOemFuelLevelController(),
+    readActiveVehicle: () => null,
+    readOemPidsFlag: () => false,
+    readDiagnosticCaptureFlag: () => false,
+    baselinesBudget: const Duration(milliseconds: 50),
+    startWatchdog: const Duration(milliseconds: 50),
+  ),
+);
 
 Future<void> _pump() => Future<void>.delayed(Duration.zero);
 

@@ -23,6 +23,7 @@ import 'gps_only_sample_builder.dart';
 import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_connection_errors.dart';
+import 'obd2_trip_start_budgets.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_service.dart';
 import 'paused_trip_repository.dart';
@@ -765,15 +766,12 @@ class TripRecordingController {
     _stopped = false;
     _startedAt = _now();
     _sessionId = _startedAt!.toIso8601String();
-    _odometerStartKm = await _service.readOdometerKm();
+    // #3382 — odometer + VIN (#814) reads time-bounded (obd2_trip_start_budgets)
+    // so a slow/silent adapter degrades them to null and the trip still starts.
+    _odometerStartKm = await boundedStartRead(
+        _service.readOdometerKm(), kObd2TripStartOdometerBudget);
     _odometerLatestKm = _odometerStartKm;
-
-    // One-shot VIN read (#814). VIN is Mode 09 PID 02 — it never
-    // changes mid-trip, so subscribing it to the 0.1 Hz tier would
-    // just waste one Bluetooth round-trip per 10 s on a value we
-    // already have. Best-effort: a car that can't answer 0902 simply
-    // leaves [_vin] null.
-    _vin = await _readVinOnce();
+    _vin = await boundedStartRead(_readVinOnce(), kObd2TripStartVinBudget);
 
     _scheduler = _schedulerOverride ?? _buildScheduler();
     _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
