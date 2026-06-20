@@ -344,6 +344,17 @@ class FeatureManifest {
           'diagnostics: error-log export, test notifications, a test-alert '
           'pipeline run, a feature-flag dump, clear caches, and diagnostics.',
     ),
+    // Default-off (#3383): a startup-init trace panel (waterfall + export)
+    // inside Developer tools. No prereq edge — the panel lives in the
+    // debugMode-gated section, so this is just its per-tool switch.
+    Feature.startupTrace: FeatureManifestEntry.allChannels(
+      feature: Feature.startupTrace,
+      defaultOn: false,
+      displayName: 'Startup initialization trace',
+      description: 'Record the timed phases of app startup (binding → storage '
+          '→ services → first frame), view them as a waterfall, and export to '
+          'Downloads — to find serial bottlenecks and parallelisation wins.',
+    ),
     // Default-off in the manifest baseline (#2382); the `AppProfile.medium`
     // and `AppProfile.full` presets flip it ON so the in-trip approach
     // overlay is opt-out for the active driving tiers. No prerequisite —

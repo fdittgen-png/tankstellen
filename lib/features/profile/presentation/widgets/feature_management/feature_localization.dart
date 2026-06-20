@@ -93,6 +93,9 @@ String featureLabel(AppLocalizations l, Feature f) {
       return l.featureLabel_approachOverlay;
     case Feature.voiceAnnouncements:
       return l.featureLabel_voiceAnnouncements;
+    case Feature.startupTrace:
+      // #3383 dev tool — English-only manifest SSoT fallback (#2189).
+      return m.displayName;
   }
 }
 
@@ -175,6 +178,9 @@ String featureDescription(AppLocalizations l, Feature f) {
       return l.featureDescription_approachOverlay;
     case Feature.voiceAnnouncements:
       return l.featureDescription_voiceAnnouncements;
+    case Feature.startupTrace:
+      // #3383 dev tool — English-only manifest SSoT fallback (#2189).
+      return m.description;
   }
 }
 
@@ -228,6 +234,7 @@ String blockedEnableMessage(AppLocalizations l, Feature f) {
     case Feature.developerPatToken:
     case Feature.debugMode:
     case Feature.approachOverlay:
+    case Feature.startupTrace:
       return 'Prerequisites not met';
   }
 }

@@ -205,4 +205,14 @@ enum Feature {
   /// geofence stream the overlay drives, so without the overlay the
   /// detector never runs and there is nothing to speak.
   voiceAnnouncements,
+
+  /// Startup-initialization trace (#3383). A developer diagnostic that
+  /// records the timed phases of cold-start (binding → storage → services →
+  /// first frame) and renders them as a waterfall in Developer tools, plus a
+  /// file export (the same Downloads/JSON path every other trace uses). The
+  /// signal is for spotting serial bottlenecks and parallelisation /
+  /// multithreading opportunities in `AppInitializer`. Default-off, opt-in
+  /// across every channel; the panel only surfaces inside the (debugMode-
+  /// gated) Developer tools section, so this flag is the per-tool switch.
+  startupTrace,
 }

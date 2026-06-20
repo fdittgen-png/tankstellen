@@ -4496,6 +4496,31 @@ class AppLocalizationsPl extends AppLocalizations {
   String get developerToolsBuildChannel => 'Kanał kompilacji';
 
   @override
+  String get startupTraceSectionTitle => 'Startup initialization trace';
+
+  @override
+  String get startupTraceExportButton => 'Export startup trace';
+
+  @override
+  String get startupTraceEmpty => 'No startup trace recorded yet.';
+
+  @override
+  String startupTraceTotalMs(int ms) {
+    return 'Total: $ms ms';
+  }
+
+  @override
+  String startupTraceMs(int ms) {
+    return '$ms ms';
+  }
+
+  @override
+  String get startupTraceExportSuccess => 'Startup trace saved to Downloads.';
+
+  @override
+  String get startupTraceExportFailure => 'Couldn\'t export the startup trace.';
+
+  @override
   String get insightCardTitle => 'Najczęstsze marnotrawstwa';
 
   @override

@@ -152,5 +152,43 @@
   "developerToolsBuildChannel": "Build channel",
   "@developerToolsBuildChannel": {
     "description": "Row label for the active build channel in the Developer tools build-info group (#2248)."
+  },
+  "startupTraceSectionTitle": "Startup initialization trace",
+  "@startupTraceSectionTitle": {
+    "description": "Section header for the startup-initialization trace panel in Developer tools (#3383)."
+  },
+  "startupTraceExportButton": "Export startup trace",
+  "@startupTraceExportButton": {
+    "description": "Button that exports the startup-initialization trace as a JSON file to Downloads (#3383)."
+  },
+  "startupTraceEmpty": "No startup trace recorded yet.",
+  "@startupTraceEmpty": {
+    "description": "Shown in the startup-trace panel when no startup milestones were captured this session (#3383)."
+  },
+  "startupTraceTotalMs": "Total: {ms} ms",
+  "@startupTraceTotalMs": {
+    "description": "Total cold-start duration line above the startup-trace waterfall (#3383).",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "startupTraceMs": "{ms} ms",
+  "@startupTraceMs": {
+    "description": "A single phase's duration in milliseconds in the startup-trace waterfall (#3383).",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "startupTraceExportSuccess": "Startup trace saved to Downloads.",
+  "@startupTraceExportSuccess": {
+    "description": "Confirmation snackbar after the startup trace is exported to Downloads (#3383)."
+  },
+  "startupTraceExportFailure": "Couldn't export the startup trace.",
+  "@startupTraceExportFailure": {
+    "description": "Error snackbar when the startup-trace export to Downloads fails (#3383)."
   }
 }

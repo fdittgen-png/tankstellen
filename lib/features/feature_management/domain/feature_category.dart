@@ -109,6 +109,7 @@ const Map<Feature, FeatureCategory> featureCategory = <Feature, FeatureCategory>
   // 7. Developer & experimental (last).
   Feature.developerPatToken: FeatureCategory.developer,
   Feature.debugMode: FeatureCategory.developer,
+  Feature.startupTrace: FeatureCategory.developer,
 };
 
 /// Returns the [FeatureCategory] for [feature]. Asserts the [feature] is
