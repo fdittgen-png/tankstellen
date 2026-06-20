@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import '../../domain/station.dart';
+import '../../telemetry/health_counters.dart';
 import 'corridor_geo.dart';
 import 'geo_tile.dart';
 
@@ -266,6 +267,9 @@ class CorridorLocationCache {
     final inFlight = _inFlight;
     if (inFlight != null && _inFlightTile == targetTile) return inFlight;
 
+    // #3257 — count corridor (re)fetches so a field export shows whether the
+    // radar's location set is being fed (a stalled corridor = silent radar).
+    healthCounters.increment('radar.corridorRefetches');
     final future = _doFetch(lat, lng, replace: true);
     _inFlight = future;
     _inFlightTile = targetTile;
