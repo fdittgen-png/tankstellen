@@ -94,7 +94,25 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
           },
         );
 
-    await _methods.invokeMethod<bool>('start', <String, Object?>{'mac': mac});
+    // #3246 — the native arm can legitimately fail: shipped builds gate the
+    // foreground <service> out of the manifest (FGS_FORM_APPROVED off, #3173)
+    // so it is `unavailable`, or it `cannot start fgs from background`. The
+    // native side now reports those honestly instead of a phantom success;
+    // degrade silently here (recording falls back to the GPS-only / foreground
+    // path) rather than crashing the auto-record coordinator.
+    try {
+      final armed =
+          await _methods.invokeMethod<bool>('start', <String, Object?>{'mac': mac});
+      if (armed != true) {
+        debugPrint('AndroidBackgroundAdapterListener: FGS not armed (native '
+            'returned $armed)');
+      }
+      // Benign degrade — the channel code/message is the only useful signal.
+      // ignore: catch_no_st
+    } on PlatformException catch (e) {
+      debugPrint('AndroidBackgroundAdapterListener: FGS arm failed '
+          '(${e.code}): ${e.message} — degrading to no-FGS recording');
+    }
   }
 
   @override
