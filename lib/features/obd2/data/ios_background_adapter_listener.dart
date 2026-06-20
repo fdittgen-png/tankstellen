@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'background_adapter_listener.dart';
 import 'ios_state_restoration_service.dart';
 
@@ -170,6 +171,31 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
     _emit(connected
         ? AdapterConnected(mac: id, at: _now())
         : AdapterDisconnected(mac: id, at: _now()));
+    // #3242 — FBP's `disconnect()` (our session teardown ALWAYS calls it:
+    // channel close, pre-connect stale-GATT teardown, coordinator session
+    // close) removes the remoteId from FBP's auto-connect set, and the
+    // background re-pend is gated on set membership — so the #3167 hands-free
+    // pending connect would survive only until the FIRST trip of each process
+    // ends, with no trace/UI signal. Re-issue the pend on every real
+    // disconnect so the NEXT adapter power-on still relaunches the app.
+    if (!connected) unawaited(_repend(id));
+  }
+
+  /// #3242 — re-arm the OS-level pending connect after a disconnect cleared it.
+  /// `registerPersistedAdapter` only ISSUES a pending connect (it never tears a
+  /// channel down or stops a scan), so re-issuing it is idempotent + safe. Best
+  /// effort: a restoration-service fault is logged, never thrown.
+  Future<void> _repend(String mac) async {
+    try {
+      await _restoration.registerPersistedAdapter(mac);
+      BreadcrumbCollector.add('obd2-restoration: restoration-repend',
+          detail: 'mac=$mac');
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
+        'where': 'IosBackgroundAdapterListener._repend',
+        'deviceId': mac,
+      }));
+    }
   }
 
   void _emit(BackgroundAdapterEvent event) {
