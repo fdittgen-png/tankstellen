@@ -331,7 +331,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
         if (est != null) {
           summary = summary.copyWith(
             avgLPer100Km: est.lPer100Km,
-            fuelLitersConsumed: est.litersConsumed,
+            fuelLitersConsumed: est.lPer100Km * summary.distanceKm / 100, // #3252
           );
         }
       }
