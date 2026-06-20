@@ -105,10 +105,31 @@ object BackgroundAdapterChannel {
                     putExtra(AutoRecordForegroundService.EXTRA_MAC, mac)
                 }
                 try {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        ctx.startForegroundService(intent)
-                    } else {
-                        ctx.startService(intent)
+                    val component =
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            ctx.startForegroundService(intent)
+                        } else {
+                            ctx.startService(intent)
+                        }
+                    // #3246 — shipped builds gate the <service> OUT of the manifest
+                    // (FGS_FORM_APPROVED off, #3173). Starting an undeclared service
+                    // does NOT throw — it logs "Unable to start service … not found"
+                    // and resolves to a null ComponentName. Report the honest failure
+                    // instead of a phantom "armed", so Dart degrades to GPS-only rather
+                    // than believing a foreground service is running that isn't.
+                    if (component == null) {
+                        Log.w(
+                            TAG,
+                            "start: AutoRecordForegroundService is not registered " +
+                                "(FGS gated out of the manifest) — not armed",
+                        )
+                        running = false
+                        result.error(
+                            "unavailable",
+                            "foreground service not registered",
+                            null,
+                        )
+                        return
                     }
                     running = true
                     result.success(true)

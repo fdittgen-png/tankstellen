@@ -61,6 +61,27 @@ void main() {
       expect(calls.single.arguments, {'mac': 'AA:BB:CC:DD:EE:01'});
     });
 
+    test(
+        '#3246 — a native arm FAILURE (FGS not registered in a shipped build) '
+        'degrades silently: start() does NOT throw', () async {
+      messenger.setMockMethodCallHandler(methodChannel, (call) async {
+        // The native side now reports the honest failure instead of a phantom
+        // success when the <service> is gated out of the manifest (#3173).
+        throw PlatformException(
+            code: 'unavailable', message: 'foreground service not registered');
+      });
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockStreamHandler(
+        eventChannel,
+        MockStreamHandler.inline(onListen: (_, _) {}),
+      );
+
+      // Must not crash the auto-record coordinator — recording falls back to
+      // the GPS-only / foreground path.
+      await expectLater(
+          listener.start(mac: 'AA:BB:CC:DD:EE:01'), completes);
+    });
+
     test('events from the EventChannel are translated to typed events',
         () async {
       messenger.setMockMethodCallHandler(
