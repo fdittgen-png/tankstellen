@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import '../domain/fuel_type.dart';
 import '../domain/station.dart';
 import '../logging/error_logger.dart';
+import '../telemetry/health_counters.dart';
 import '../utils/geo_utils.dart' as geo;
 import '../utils/num_extensions.dart';
 import '../utils/station_extensions.dart';
@@ -240,6 +241,9 @@ class ApproachDetector {
       _schedulePoll();
       return;
     }
+    // #3257 — always-on radar health counters (#3146): make the silent
+    // "radar never fired" causes answerable in a field export.
+    healthCounters.increment('radar.polls');
     try {
       final stations = await _fetchStations(
         gps.latitude,
@@ -269,7 +273,14 @@ class ApproachDetector {
         final price = p.$1.priceFor(fuel);
         return price != null && price > 0;
       }).toList();
+      if (inRadius.isNotEmpty) healthCounters.increment('radar.inRadiusEnters');
       if (priced.isEmpty) {
+        // #3257 — distinguish "no station in radius" from "all in-radius
+        // stations were dropped by the #2601 priced-only filter" — the latter
+        // is a silent reason the radar never fires despite a forecourt ahead.
+        if (inRadius.isNotEmpty) {
+          healthCounters.increment('radar.unpricedFiltered');
+        }
         _onNoStationInRadius(gps);
       } else {
         _onStationsInRadius(priced);

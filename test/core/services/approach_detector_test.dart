@@ -8,7 +8,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:tankstellen/core/services/approach_detector.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/core/telemetry/health_counters.dart';
 import '../../helpers/silence_error_logger.dart';
+
+/// Sum a #3146 HealthCounters value across all day-rows of the snapshot
+/// (the in-memory pending deltas are folded under today's key).
+int _counterTotal(String name) {
+  final days = (healthCounters.exportSnapshot()['days'] as Map?) ?? const {};
+  var total = 0;
+  for (final row in days.values) {
+    total += ((row as Map)[name] as int?) ?? 0;
+  }
+  return total;
+}
 
 Position _pos(double lat, double lng, {double speedMps = 0}) => Position(
       latitude: lat,
@@ -410,6 +422,46 @@ void main() {
         unawaited(sub.cancel());
         unawaited(det.dispose());
         unawaited(gps.close());
+      });
+    });
+
+    test(
+        '#3257 — a poll over an in-radius UNPRICED forecourt bumps radar.polls '
+        '+ radar.inRadiusEnters + radar.unpricedFiltered (the silent #2601 '
+        'cause is now answerable in a field export)', () {
+      fakeAsync((async) {
+        healthCounters.resetForTest();
+        // In radius (~500 m N) but NO e10 price → dropped by the #2601 filter.
+        final unpriced = _station(id: 'U', lat: 48.0045, lng: 2.0);
+        final gps = StreamController<Position>.broadcast();
+        final det = ApproachDetector(
+          gpsStream: gps.stream,
+          fetchStations: (_, _, _, _, {headingDegrees}) async => [unpriced],
+          config: const ApproachDetectorConfig(
+            radiusMeters: 1000,
+            priceMode: ApproachPriceMode.nearest,
+            minPollSeconds: 5,
+            fuelTypeApiValue: 'e10',
+          ),
+        );
+        final sub = det.state.listen((_) {});
+
+        gps.add(_pos(48.0, 2.0, speedMps: 10));
+        async.flushMicrotasks();
+        async.elapse(const Duration(seconds: 30));
+        async.flushMicrotasks();
+
+        expect(_counterTotal('radar.polls'), greaterThanOrEqualTo(1));
+        expect(_counterTotal('radar.inRadiusEnters'), greaterThanOrEqualTo(1));
+        expect(_counterTotal('radar.unpricedFiltered'), greaterThanOrEqualTo(1),
+            reason: 'all in-radius stations were unpriced — the radar cannot '
+                'fire, and that reason must be countable');
+
+        unawaited(sub.cancel());
+        unawaited(det.dispose());
+        unawaited(gps.close());
+        async.flushMicrotasks();
+        healthCounters.resetForTest();
       });
     });
   });
