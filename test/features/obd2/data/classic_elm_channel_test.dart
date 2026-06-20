@@ -519,6 +519,36 @@ void main() {
       await sub.cancel();
     });
   });
+
+  group('isBenignClassicLinkDrop (#3379)', () {
+    test('the field RFCOMM-drop signature is benign (breadcrumb, not ERROR)',
+        () {
+      // The exact field-log shape: PlatformException(io, bt socket closed,
+      // read return: -1, null, null) — the normal end-of-session drop.
+      expect(
+        isBenignClassicLinkDrop(
+          'PlatformException(io, bt socket closed, read return: -1, null, null)',
+        ),
+        isTrue,
+      );
+    });
+
+    test('the older "read ret: -1" + "not connected" shapes are benign', () {
+      expect(isBenignClassicLinkDrop('read failed, socket might closed or '
+          'timeout, read ret: -1'), isTrue);
+      expect(
+        isBenignClassicLinkDrop(
+            'PlatformException(state, not connected, null, null)'),
+        isTrue,
+      );
+    });
+
+    test('an UNEXPECTED socket error is NOT benign (keeps the ERROR trace)',
+        () {
+      expect(isBenignClassicLinkDrop('GATT_ERROR 133'), isFalse);
+      expect(isBenignClassicLinkDrop('some unrelated failure'), isFalse);
+    });
+  });
 }
 
 // --- debugPrint override helpers ---------------------------------------

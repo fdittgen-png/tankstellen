@@ -371,30 +371,30 @@ void main() {
     });
 
     test(
-        'the SAME classic adapter with NO hint defaults to BLE and FAILS to '
-        'connect — proving the transport-blind bug (RED-on-master signature)',
-        () async {
+        'the SAME classic adapter with NO hint routes through the '
+        'transport-aware resolver and still CONNECTS over RFCOMM (#3380 — no '
+        'blind BLE 4 s-timeout)', () async {
       final conn = _FakeConnection(
         transportFor: () => FakeObd2Transport(Map.of(_happyPathResponses)),
         adapterIsClassic: true,
       );
 
-      // No transportHint → defaults to the BLE direct path, which a Classic
-      // adapter can never answer → the connect step fails / aborts.
+      // #3380 — a null transportHint NO LONGER defaults to the doomed BLE
+      // direct path; it takes the production `connectByMacTransportAware`
+      // resolver, which scan-classifies the Classic adapter → RFCOMM.
       final report = await runObd2SelfTest(conn, pinnedMac: 'AA:BB:CC:DD:EE:FF');
 
-      expect(report.passed, isFalse);
-      // No connect ever landed on either path (the BLE path returned null).
-      expect(conn.pathsTaken, isEmpty);
+      expect(report.passed, isTrue);
+      // Every connect resolved to the Classic RFCOMM path, not blind BLE.
+      expect(conn.pathsTaken, everyElement('classic'));
     });
 
     test(
-        'a null transportHint records origin:selfTest + no-hint-defaulted-ble '
-        'on the trace the REAL service opens', () async {
-      // Drive the REAL Obd2ConnectionService (the fake here overrides
-      // connectByMacDirect and so never opens a trace — the trace lives in the
-      // real `_traced` wrapper). The BLE direct open throws, so the run fails,
-      // but the trace is the artefact under test.
+        'a null transportHint records origin:selfTest + no-hint-transport-aware '
+        'on the trace the REAL service opens (#3380)', () async {
+      // Drive the REAL Obd2ConnectionService. With no hint the run takes the
+      // transport-aware resolver; the facade's direct open throws + the scan is
+      // empty, so the connect fails — but the trace is the artefact under test.
       final service = Obd2ConnectionService(
         registry: Obd2AdapterRegistry.defaults(),
         permissions: _GrantedPermissions(),
@@ -407,11 +407,11 @@ void main() {
       final traces = Obd2ConnectTraceLog.snapshot();
       expect(traces, isNotEmpty,
           reason: 'a FAILED self-test connect must leave a trace');
-      // The self-test stamped its origin + the explicit BLE-default decision.
+      // The self-test stamped its origin + the no-blind-BLE decision (#3380).
       expect(traces.first.origin, Obd2ConnectOrigin.selfTest);
       expect(
         traces.first.transportDecisionReason,
-        'no-hint-defaulted-ble',
+        'no-hint-transport-aware',
       );
     });
   });
@@ -526,6 +526,21 @@ class _FakeConnection extends Obd2ConnectionService {
     // being absent / wrong for a BLE adapter).
     if (!adapterIsClassic) return null;
     return _open('classic');
+  }
+
+  /// #3380 — models the production transport-aware resolver the self-test now
+  /// takes when it has NO hint: it scan-classifies the MAC and routes to the
+  /// correct transport (Classic → RFCOMM), so a hint-less Classic adapter still
+  /// connects instead of burning a doomed BLE 4 s-timeout.
+  @override
+  Future<Obd2Service?> connectByMacTransportAware(
+    String mac, {
+    String? adapterName,
+    bool fallbackToScan = true,
+  }) async {
+    reconnectCalls++;
+    if (reconnectCalls > 1 && reconnectReturnsNull) return null;
+    return adapterIsClassic ? _open('classic') : _open('ble-direct');
   }
 }
 

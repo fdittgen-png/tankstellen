@@ -54,8 +54,9 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
   /// (`connectByMacClassicDirect`) instead of the BLE GATT direct path. The
   /// panel infers it from the selected adapter's stored name via the registry
   /// name matchers — for a Classic-SPP adapter (vLinker FS) the BLE path can
-  /// ONLY 4 s-timeout, so this is the reliability fix. A null hint defaults to
-  /// BLE but records `no-hint-defaulted-ble` on the trace.
+  /// ONLY 4 s-timeout, so this is the reliability fix. A null hint no longer
+  /// blindly defaults to BLE (#3380): it routes through the production
+  /// `connectByMacTransportAware` resolver and records `no-hint-transport-aware`.
   Future<void> run({
     String? targetMac,
     Obd2ConnectTransport? transportHint,

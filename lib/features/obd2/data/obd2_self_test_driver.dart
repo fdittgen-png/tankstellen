@@ -221,8 +221,10 @@ Obd2SelfTestStepStatus statusForResponseClass(ResponseClass cls) {
 /// pinned connect + reconnect over the inferred transport — Classic takes the
 /// RFCOMM path (`connectByMacClassicDirect`) instead of the BLE GATT direct
 /// path, which can ONLY 4 s-timeout for a Classic-SPP adapter (the real vLinker
-/// FS trap). A null hint defaults to BLE but records `no-hint-defaulted-ble` on
-/// the trace — visible, not silent.
+/// FS trap). A null hint no longer defaults to BLE (#3380): it routes through
+/// the production `connectByMacTransportAware` resolver (scan-classify +
+/// cross-transport fallback) and records `no-hint-transport-aware` on the
+/// trace — visible, not silent.
 Future<Obd2SelfTestReport> runObd2SelfTest(
   Obd2ConnectionService connection, {
   void Function(Obd2SelfTestStepResult step)? onStep,
@@ -243,11 +245,13 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
   Obd2ConnectTransport? transportHint,
   String? adapterName,
 }) async {
-  final isClassic = transportHint == Obd2ConnectTransport.classic;
+  // #3380 — a null/unknown hint no longer hard-defaults to BLE; it routes
+  // through the production transport-aware resolver (see [_selfTestConnect]),
+  // so the decision reason reflects that, not a doomed BLE default.
   final decisionReason = switch (transportHint) {
     Obd2ConnectTransport.classic => 'name-matched-classic',
     Obd2ConnectTransport.ble => 'name-matched-ble',
-    Obd2ConnectTransport.unknown || null => 'no-hint-defaulted-ble',
+    Obd2ConnectTransport.unknown || null => 'no-hint-transport-aware',
   };
   final diag = Obd2CommDiagnostics.instance;
   final priorEnabled = diag.enabled;
@@ -282,7 +286,7 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
       // connect step gets its OWN longer budget ([connectDeadline]).
       service = pinnedMac != null
           ? await _selfTestConnect(connection, pinnedMac,
-                  isClassic: isClassic,
+                  transport: transportHint,
                   decisionReason: decisionReason,
                   adapterName: adapterName)
               .timeout(connectDeadline)
@@ -352,7 +356,7 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
       final mac = pinnedMac ?? service.adapterMac;
       final reconnected = await _reconnectStep(
           connection, service, diag, mac, stepDeadline,
-          isClassic: isClassic,
+          transport: transportHint,
           decisionReason: decisionReason,
           adapterName: adapterName,
           connectDeadline: connectDeadline);
