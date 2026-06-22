@@ -1,0 +1,41 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Play track status (read-only)
+
+# Manual-only. Reports what is currently live on each Play Store track so a
+# promotion can be confirmed as actually PUBLISHED (an API edit commit succeeds
+# even when Managed Publishing holds the change, or a first production release
+# is still in Google review). Read-only: the script creates an edit only to
+# READ the track resources and deletes it without committing.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: play-store-deploy
+  cancel-in-progress: false
+
+env:
+  PACKAGE_NAME: de.tankstellen.fuelprices
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install google-api-python-client
+        run: pip install google-api-python-client google-auth
+
+      - name: Report track status
+        env:
+          PLAY_STORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
+        run: bash scripts/play_track_status.sh | tee -a "$GITHUB_STEP_SUMMARY"
