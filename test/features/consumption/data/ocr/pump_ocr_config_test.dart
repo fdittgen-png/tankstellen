@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/ocr/label_anchored_roi.dart';
 import 'package:tankstellen/features/consumption/data/ocr/pump_ocr_config.dart';
 
 /// Coverage for the per-country/brand OCR config registry (#2275): JSON
@@ -98,6 +99,11 @@ void main() {
       expect(tokheim, isNotNull);
       expect(tokheim!.pumpDisplay, isNotNull,
           reason: 'FR/Tokheim must carry pump-display field ROIs');
+      // #3397 — FR/Tokheim opts into label-anchored value ROIs (digits above
+      // their labels), the capability that makes a hand-held read work.
+      expect(tokheim.valueAnchor, isNotNull,
+          reason: 'FR/Tokheim must enable label anchoring (#3397)');
+      expect(tokheim.valueAnchor!.direction, ValueAnchorDirection.above);
     });
   });
 }

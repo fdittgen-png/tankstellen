@@ -42,6 +42,12 @@
         "volumeLabel":  "VOLUME",
         "pricePerLitre":      { "left": 0.44, "top": 0.31, "width": 0.10, "height": 0.10 },
         "pricePerLitreLabel": "PRIX DU LITRE"
+      },
+      "valueAnchor": {
+        "direction":    "above",
+        "gap":          0.15,
+        "widthFactor":  1.4,
+        "heightFactor": 2.4
       }
     }
   ]
