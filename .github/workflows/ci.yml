@@ -71,7 +71,7 @@ jobs:
     outputs:
       cached: ${{ steps.probe.outputs.cache-hit }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - id: probe
         if: github.event_name == 'pull_request'
         uses: actions/cache/restore@v5
@@ -95,7 +95,7 @@ jobs:
       deps: ${{ steps.filter.outputs.deps }}
       code: ${{ steps.filter.outputs.code }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: filter
@@ -124,7 +124,7 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -169,7 +169,7 @@ jobs:
     if: ${{ needs.green-gate.outputs.cached != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -227,7 +227,7 @@ jobs:
     if: ${{ needs.green-gate.outputs.cached != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -303,7 +303,7 @@ jobs:
       matrix:
         shard: [0, 1, 2, 3]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # #1594 — selector needs `git diff master...HEAD` to work.
           # Shallow clone (default) has no master tip locally.
@@ -416,7 +416,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -461,7 +461,7 @@ jobs:
     needs: [analyze, green-gate]  # #2417 — green-gate skips when the tree already passed
     if: ${{ needs.green-gate.outputs.cached != 'true' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -499,7 +499,7 @@ jobs:
     if: ${{ needs.green-gate.outputs.cached != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -533,7 +533,7 @@ jobs:
     if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -556,7 +556,7 @@ jobs:
     if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -583,7 +583,7 @@ jobs:
     if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -620,7 +620,7 @@ jobs:
     needs: [analyze, changes, green-gate]
     if: ${{ needs.green-gate.outputs.cached != 'true' && (needs.changes.outputs.code == 'true' || github.event_name != 'pull_request') }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -753,7 +753,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
       - name: Extract version from tag
         id: version
@@ -810,7 +810,7 @@ jobs:
     needs: [green-gate, analyze, codegen-drift, l10n-gate, test, integration, startup-budget, build-android]
     if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' && needs.analyze.result == 'success' && needs.codegen-drift.result == 'success' && needs.l10n-gate.result == 'success' && needs.test.result == 'success' && needs.integration.result == 'success' && needs.startup-budget.result == 'success' && needs.build-android.result != 'failure' && needs.build-android.result != 'cancelled' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: mkdir -p .green-marker && echo "$GITHUB_SHA" > .green-marker/sha
       - uses: actions/cache/save@v5
         with:

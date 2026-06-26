@@ -45,7 +45,7 @@ jobs:
       # every shipped CFBundleVersion maps back to a commit.
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Compute monotonic build number
         id: bn
