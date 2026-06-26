@@ -20,6 +20,7 @@ import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/services/imu_event_detector.dart';
 import '../domain/trip_recorder.dart';
+import 'gps_only_trip_wal.dart';
 import 'motion_gated_gps_source.dart';
 import 'recording_pipeline.dart';
 import 'trip_recording_phase.dart';
@@ -57,18 +58,20 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   GpsOnlyRecordingPipeline({
     required Ref ref,
     required RecordingPipelineHost host,
+    GpsOnlyTripWal? wal, // #3248 — injectable for tests
   })  : _ref = ref,
-        _host = host;
+        _host = host,
+        _wal = wal ?? GpsOnlyTripWal();
 
   final Ref _ref;
   final RecordingPipelineHost _host;
+  final GpsOnlyTripWal _wal; // #3248 — write-ahead log
 
   @override
   bool get isGpsOnly => true;
 
   /// GPS-only recording has no live engine loop to pause — the position
-  /// stream keeps running. Returns false so the notifier leaves the
-  /// phase untouched (#2227).
+  /// stream keeps running (#2227). Returns false so the phase is untouched.
   @override
   bool pause() => false;
 
@@ -103,25 +106,22 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   /// from the active vehicle + its calibration matrix; null between trips.
   GpsLiveEstimateFolder? _estimateFolder;
 
-  /// Open the Geolocator stream, prime the recorder, and seed the
-  /// recording state. Returns true once the stream is opened.
-  ///
-  /// Moved verbatim from `TripRecording.startGpsOnly`'s body — the
-  /// re-entrancy guard + `alreadyActive` short-circuit stay on the
-  /// notifier (they read `state.isActive` / `_startInProgress`, which
-  /// are notifier concerns), so this entry point assumes it is clear to
-  /// start.
+  /// Open the Geolocator stream, prime the recorder, and seed recording state.
+  /// Moved verbatim from `TripRecording.startGpsOnly`'s body — the re-entrancy
+  /// guard + `alreadyActive` short-circuit stay on the notifier, so this entry
+  /// point assumes it is clear to start.
   void start() {
     _recorder = TripRecorder(
       maxIntegrationGapSeconds: 30,
-      // #2663 — feed harsh events from GPS-only trips onto the same live
-      // bus the OBD2 path uses, so spoken coaching works dongle-less too.
+      // #2663 — harsh events onto the shared live bus (dongle-less coaching).
       onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
     );
     _samples.clear();
     _startedAt = DateTime.now();
     _host.lastTripStartedAt = DateTime.now();
     _host.lastTripVehicleId = _host.readActiveVehicleId();
+    // #3248 — seed the WAL so an OS kill recovers (not loses) the trip.
+    _wal.seed(startedAt: _startedAt!, automatic: false, vehicleId: _host.readActiveVehicleId());
     // #2389 / #2506 — build the shared live physics estimate + coaching
     // folder from the active vehicle + its calibration matrix (physicsScale
     // #2388). A null vehicle / matrix falls back to the population-default
@@ -211,25 +211,18 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // #3319 — motion-gate the receiver (FGS-approved builds only).
     _gpsSource?.onSpeed(
         sample.speedKmh, DateTime.now().difference(startedAt));
-    // #2653 — a GPS-only trip's speed is the device's Doppler ground
-    // speed (genuine ~1 Hz, not 1 km/h-quantised dead reckoning), so it
-    // is differentiable; the detector's accuracy + min-speed +
-    // sustained-window gates de-noise it without the wholesale
-    // suppression the `virtual` source needs. Tag it `gps` so harsh
-    // scoring stays enabled-but-gated rather than suppressed.
+    // #2653 — GPS-only speed is Doppler ground speed (differentiable, not
+    // 1 km/h dead reckoning); tag it `gps` so harsh scoring stays gated-not-
+    // suppressed (the `virtual` source's wholesale suppression isn't needed).
     recorder.onSample(sample, distanceSource: kDistanceSourceGps);
     final summary = recorder.buildSummary();
-    // #2389 / #2506 — fold this fix into the SHARED estimate + coaching
-    // folder (also used by the OBD2 live path). The folder does its own
-    // 3-sample accel low-pass + warm-up and a bounded coaching window, so
-    // we just hand it the GPS-stamped sample. The estimate figures return
-    // null at a standstill / before warm-up, which is exactly what the
-    // live reading should carry then; the #2391 Avg + Fuel-used cards read
-    // the smoother running figures it carries.
+    _wal.onSample(_samples, summary); // #3248 — debounced WAL flush
+    // #2389 / #2506 — fold the fix into the SHARED estimate + coaching folder
+    // (also the OBD2 live path). It does its own accel low-pass + warm-up; the
+    // figures are null at standstill / before warm-up, which is correct then.
     final estimate = _estimateFolder?.fold(sample) ?? GpsLiveEstimate.none;
-    // #3329 — stamp the per-fix GPS fuel estimate (as L/h, the form
-    // Obd2GpsEstimateFallback uses) onto the persisted sample so the trip-path
-    // heatmap colours a GPS-only route by consumption instead of all-green.
+    // #3329 — stamp the per-fix GPS fuel estimate (L/h) onto the sample so the
+    // trip-path heatmap colours by consumption, not all-green.
     final instant = estimate.instantLPer100Km;
     if (instant != null && sample.speedKmh > 0 && _samples.isNotEmpty) {
       _samples[_samples.length - 1] =
@@ -262,6 +255,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     _imuSub = null;
     final imuDetector = _imuDetector;
     _imuDetector = null;
+    _wal.clear(); // #3248 — trip is ending; drop the WAL (saved below).
     if (recorder == null) {
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
