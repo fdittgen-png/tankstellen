@@ -115,6 +115,26 @@ class ActiveTripRecoveryService {
       return ActiveTripRecoveryOutcome.none;
     }
 
+    // #3250 — a snapshot whose phase is already terminal was finalised to
+    // history (the grace-window auto-finalise, or the stop-transition flush)
+    // but the WAL was left behind. Recovering it resurrects an already-saved
+    // trip as a `pausedDueToDrop` banner, and End/Resume re-puts the SAME Hive
+    // id — overwriting the good saved entry with a gutted recovery summary.
+    // Drop it: it is NOT a live trip to resume.
+    if (snapshot.phase == 'stopped' || snapshot.phase == 'saved') {
+      try {
+        await _activeRepo.clearSnapshot();
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+          'where': 'ActiveTripRecoveryService clear finalised failed'
+        }));
+        return ActiveTripRecoveryOutcome.failed;
+      }
+      debugPrint('ActiveTripRecoveryService: discarded already-finalised '
+          'snapshot id=${snapshot.id} phase=${snapshot.phase}');
+      return ActiveTripRecoveryOutcome.discarded;
+    }
+
     final now = _now();
     final stale = ActiveTripRepository.isStale(
       snapshot,
