@@ -108,17 +108,57 @@ void main() {
       );
     });
 
-    test('a GENUINE API error (5xx) STILL ERROR-logs (the guard)', () async {
+    test(
+        'a transient UPSTREAM 502 (field: gov gateway 50x in 7 min) is a '
+        'breadcrumb, NOT an ERROR (#3395)', () async {
       final svc = _serviceThrowing((o) => DioException(
             requestOptions: o,
             type: DioExceptionType.badResponse,
-            response: Response(requestOptions: o, statusCode: 503),
+            response: Response(requestOptions: o, statusCode: 502),
+          ));
+
+      final result = await svc.searchStations(_geoParams);
+
+      expect(result.data, isEmpty, reason: 'transient blip degrades to empty');
+      expect(recorder.calls, isEmpty,
+          reason: 'a transient gateway 502/503/504 must NOT spool an ERROR '
+              'trace (#3395) — it buries real faults');
+      expect(
+        BreadcrumbCollector.snapshot().map((b) => b.action),
+        contains('Prix-Carburants geo fetch — transient upstream error'),
+      );
+    });
+
+    test('503 and 504 are also transient-upstream breadcrumbs (#3395)',
+        () async {
+      for (final code in [503, 504]) {
+        errorLogger.resetForTest();
+        recorder = _CapturingRecorder();
+        errorLogger.testRecorderOverride = recorder;
+        final svc = _serviceThrowing((o) => DioException(
+              requestOptions: o,
+              type: DioExceptionType.badResponse,
+              response: Response(requestOptions: o, statusCode: code),
+            ));
+        await svc.searchStations(_geoParams);
+        expect(recorder.calls, isEmpty, reason: '$code must breadcrumb');
+      }
+    });
+
+    test(
+        'a GENUINE server error (500) or 4xx STILL ERROR-logs — only transient '
+        'gateway statuses are de-noised (#3395 guard)', () async {
+      // 500 can mean OUR request broke the server — keep it loud.
+      final svc = _serviceThrowing((o) => DioException(
+            requestOptions: o,
+            type: DioExceptionType.badResponse,
+            response: Response(requestOptions: o, statusCode: 500),
           ));
 
       await svc.searchStations(_geoParams);
 
       expect(recorder.calls, hasLength(1),
-          reason: 'a real 5xx is a genuine failure and must persist');
+          reason: 'a 500 is a genuine failure and must persist as a trace');
       expect(recorder.calls.single.toString(),
           contains('Prix-Carburants geo fetch failed'));
     });

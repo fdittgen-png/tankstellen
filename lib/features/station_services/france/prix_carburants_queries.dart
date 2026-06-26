@@ -90,6 +90,20 @@ Future<List<Map<String, dynamic>>> queryPrixCarburantsByGeo(
       debugPrint('Prix-Carburants geo fetch skipped — offline ($e)');
       return [];
     }
+    // #3395 — a transient UPSTREAM blip (the gov gateway returned 502 50× in
+    // 7 min during a real outage) is not an app fault. Breadcrumb it instead of
+    // spooling 50 ERROR traces that bury real faults; the service already
+    // degrades to empty results and the next poll retries. A genuine fault
+    // (500 / 4xx / unexpected shape) still ERROR-logs below.
+    if (isTransientUpstreamError(e)) {
+      BreadcrumbCollector.add(
+        'Prix-Carburants geo fetch — transient upstream error',
+        detail: 'status=${e.response?.statusCode ?? e.type} '
+            'lat=$lat lng=$lng',
+      );
+      debugPrint('Prix-Carburants geo fetch — transient upstream ($e)');
+      return [];
+    }
     unawaited(errorLogger.log(ErrorLayer.other, e, st,
         context: const {'where': 'Prix-Carburants geo fetch failed'}));
     return [];
