@@ -5,7 +5,9 @@
 -->
 
 <resources>
-    <color name="ic_launcher_background">#2E7D32</color>
+    <!-- #3270 — migrated from the interim green (#2E7D32) to the theme
+         primary so the launcher icon + splash match the app brand. -->
+    <color name="ic_launcher_background">#4059AD</color>
     <!-- Widget text colors with explicit light/dark variants so dark-mode
          launchers always get readable contrast — `?android:attr/textColorPrimary`
          resolved against the launcher's theme and sometimes stayed dark on

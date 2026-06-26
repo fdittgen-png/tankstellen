@@ -22,9 +22,8 @@
   the identity is consistent.
 
   Style constraints (see docs/design/ASSET_SPEC.md § 1):
-    * 2-tone only: white glyph on ic_launcher_background (#2E7D32 today,
-      slated to shift to the theme primary #4059AD once the generator
-      produces the final asset — see ASSET_SPEC).
+    * 2-tone only: white glyph on ic_launcher_background (#4059AD, the
+      theme primary — #3270 migrated it off the interim green #2E7D32).
     * No gradients, no drop shadow, no text.
     * Keep all geometry inside the 18dp–90dp safe-zone band on each axis.
 -->
@@ -68,6 +67,6 @@
                           C53,62 51.5,62.5 50.5,62
                           C49.8,61.5 49.8,60.8 50,60
                           Z"
-        android:fillColor="#2E7D32"
+        android:fillColor="#4059AD"
         android:fillAlpha="0.25" />
 </vector>
