@@ -5,6 +5,7 @@ import 'package:image/image.dart' as img;
 
 import '../pump_display_parser.dart';
 import 'label_anchored_extractor.dart';
+import 'label_anchored_roi.dart';
 import 'ocr_trace_recorder.dart';
 import 'pump_ocr_config.dart';
 import 'pump_ocr_recognizer.dart';
@@ -44,6 +45,7 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
   OcrTraceRecorder? trace,
   img.Image? frame,
   OcrPumpFieldSpec? recognizerFields,
+  OcrValueAnchor? valueAnchor,
   PumpOcrRecognizer recognizer = const PumpOcrRecognizer(),
 }) {
   // The #2830 3rd source is reachable only when a ROI template matched
@@ -59,6 +61,10 @@ PumpDisplayParseResult orchestratePumpDisplayParse({
       recognizer: recognizer,
       gate: gate,
       trace: trace,
+      // #3397 — pass ML Kit's label blocks + the brand's value-anchor so the
+      // recognizer aims its ROIs at the labels it actually found.
+      blocks: blocks,
+      anchor: valueAnchor,
     ).result;
   }
 

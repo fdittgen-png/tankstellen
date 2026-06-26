@@ -239,7 +239,8 @@ class ReceiptScanService {
             gate: _pumpGate,
             trace: trace,
             frame: src.frame,
-            recognizerFields: src.fields);
+            recognizerFields: src.fields,
+            valueAnchor: src.anchor);
     var parse = parseFor(recognised);
 
     // #2798 — the #2275 binarization can dissolve faint 7-seg digits; when

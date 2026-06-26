@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import 'label_anchored_roi.dart';
 import 'ocr_geometry.dart';
 
 /// The physical orientation of a pump display readout (#2276).
@@ -198,12 +199,19 @@ class OcrBrandTemplate {
   /// without the key continue to work unchanged.
   final OcrDisplayOrientation displayOrientation;
 
+  /// #3397 — when present, the 7-segment recognizer derives each value ROI
+  /// from the label ML Kit located (label-anchored) instead of the fixed
+  /// [pumpDisplay] rectangles, so a hand-held shot still reads. Null ⇒ the
+  /// legacy fixed-ROI sweep, so every template without the key is unchanged.
+  final OcrValueAnchor? valueAnchor;
+
   const OcrBrandTemplate({
     required this.brand,
     required this.country,
     required this.label,
     this.pumpDisplay,
     this.displayOrientation = OcrDisplayOrientation.horizontal,
+    this.valueAnchor,
   });
 
   static OcrBrandTemplate? fromJson(Object? raw) {
@@ -220,6 +228,7 @@ class OcrBrandTemplate {
       pumpDisplay: OcrPumpFieldSpec.fromJson(raw['pumpDisplay']),
       displayOrientation:
           OcrDisplayOrientation.fromJson(raw['displayOrientation']),
+      valueAnchor: OcrValueAnchor.fromJson(raw['valueAnchor']),
     );
   }
 }

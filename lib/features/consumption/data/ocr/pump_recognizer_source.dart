@@ -8,11 +8,13 @@ import 'package:image/image.dart' as img;
 
 import '../../../../core/logging/error_logger.dart';
 import '../pump_display_parse_result.dart';
+import 'label_anchored_roi.dart';
 import 'ocr_image_preprocessor.dart';
 import 'ocr_trace_recorder.dart';
 import 'pump_ocr_config.dart';
 import 'pump_ocr_recognizer.dart';
 import 'pump_validation_gate.dart';
+import 'recognized_text_block.dart';
 
 /// Resolves the #2830 recognizer-source inputs for the pump-display scan.
 ///
@@ -27,7 +29,8 @@ import 'pump_validation_gate.dart';
 ///
 /// Best-effort: any decode error logs and degrades to `(null, null)` so
 /// a quirky image still completes via the existing two sources.
-Future<({img.Image? frame, OcrPumpFieldSpec? fields})> resolveRecognizerSource(
+Future<({img.Image? frame, OcrPumpFieldSpec? fields, OcrValueAnchor? anchor})>
+    resolveRecognizerSource(
   String path,
   String? country,
   String? brand,
@@ -35,22 +38,22 @@ Future<({img.Image? frame, OcrPumpFieldSpec? fields})> resolveRecognizerSource(
   required PumpOcrConfig config,
   OcrImagePreprocessor preprocessor = const OcrImagePreprocessor(),
 }) async {
-  if (country == null) return (frame: null, fields: null);
+  if (country == null) return (frame: null, fields: null, anchor: null);
   await config.load();
   final template = config.templateFor(country: country, brand: brand);
   final fields = template?.pumpDisplay;
-  if (fields == null) return (frame: null, fields: null);
+  if (fields == null) return (frame: null, fields: null, anchor: null);
   try {
     final bytes = await File(path).readAsBytes();
     final decoded = img.decodeJpg(bytes);
-    if (decoded == null) return (frame: null, fields: null);
+    if (decoded == null) return (frame: null, fields: null, anchor: null);
     final upright = img.bakeOrientation(decoded);
     final frame = roi != null ? preprocessor.cropToRoi(upright, roi) : upright;
-    return (frame: frame, fields: fields);
+    return (frame: frame, fields: fields, anchor: template?.valueAnchor);
   } catch (e, st) {
     unawaited(errorLogger.log(ErrorLayer.storage, e, st,
         context: const {'where': 'pump recognizer-source decode failed'}));
-    return (frame: null, fields: null);
+    return (frame: null, fields: null, anchor: null);
   }
 }
 
@@ -85,8 +88,30 @@ Future<({img.Image? frame, OcrPumpFieldSpec? fields})> resolveRecognizerSource(
   PumpOcrRecognizer recognizer = const PumpOcrRecognizer(),
   PumpValidationGate gate = const PumpValidationGate(),
   OcrTraceRecorder? trace,
+  // #3397 — when [anchor] is set and ML Kit found ≥2 labels, the value ROIs are
+  // derived from those label boxes (label-anchored) and read in the labels'
+  // own upright orientation (no blind sweep needed — the labels define it);
+  // otherwise the legacy fixed-ROI 4-way sweep runs, so production is unchanged.
+  List<RecognizedTextBlock> blocks = const [],
+  OcrValueAnchor? anchor,
 }) {
-  final read = recognizer.recognizeWithSweep(frame, fields);
+  final PumpOcrResult read;
+  if (anchor != null) {
+    final anchored = resolveLabelAnchoredFields(
+      template: fields,
+      blocks: blocks,
+      frameWidth: frame.width,
+      frameHeight: frame.height,
+      anchor: anchor,
+    );
+    trace?.brand(null,
+        'recognizer: label-anchored ${anchored.anchoredCount}/3 fields');
+    read = anchored.anchoredCount >= 2
+        ? recognizer.recognize(frame, anchored.fields)
+        : recognizer.recognizeWithSweep(frame, fields);
+  } else {
+    read = recognizer.recognizeWithSweep(frame, fields);
+  }
   if (read.glareRejected || read.fieldCount < 2) {
     return (result: existing, recognizerWon: false);
   }
