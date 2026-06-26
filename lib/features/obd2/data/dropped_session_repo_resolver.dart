@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../consumption/data/trip_history_repository.dart';
+import 'active_trip_repository.dart';
 import 'dropped_session_host.dart';
 import 'paused_trip_repository.dart';
 
@@ -23,11 +24,14 @@ class DroppedSessionRepoResolver {
   DroppedSessionRepoResolver({
     PausedTripRepository? pausedOverride,
     TripHistoryRepository? historyOverride,
+    ActiveTripRepository? activeOverride,
   })  : _pausedOverride = pausedOverride,
-        _historyOverride = historyOverride;
+        _historyOverride = historyOverride,
+        _activeOverride = activeOverride;
 
   final PausedTripRepository? _pausedOverride;
   final TripHistoryRepository? _historyOverride;
+  final ActiveTripRepository? _activeOverride;
 
   PausedTripRepository? resolvePaused() {
     final override = _pausedOverride;
@@ -54,6 +58,24 @@ class DroppedSessionRepoResolver {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: const {'where': 'DroppedSessionManager history repo'}));
+      return null;
+    }
+  }
+
+  /// #3250 — the active-trip WAL box, so the grace-window finalise can CLEAR
+  /// the WAL after writing to history (else next launch resurrects an
+  /// already-saved trip).
+  ActiveTripRepository? resolveActive() {
+    final override = _activeOverride;
+    if (override != null) return override;
+    if (!Hive.isBoxOpen(ActiveTripRepository.boxName)) return null;
+    try {
+      return ActiveTripRepository(
+        box: Hive.box<String>(ActiveTripRepository.boxName),
+      );
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: const {'where': 'DroppedSessionManager active repo'}));
       return null;
     }
   }
@@ -110,5 +132,8 @@ class DroppedSessionRepoResolver {
       }
     }
     deletePausedRow(id);
+    // #3250 — clear the active-trip WAL: this trip is now in history, so the
+    // launch-time recovery must not resurrect it as a paused session.
+    unawaited(resolveActive()?.clearSnapshot());
   }
 }

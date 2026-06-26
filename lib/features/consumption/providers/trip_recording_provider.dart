@@ -176,6 +176,9 @@ class TripRecording extends _$TripRecording {
   /// after a [reset] / fresh [build].
   String? _lastTripVehicleId;
   DateTime? _lastTripStartedAt;
+  // #3251 — the live trip's auto-record provenance, so the WAL seed stamps it
+  // (the recovery badge + saved entry then know it was hands-free).
+  bool _lastTripAutomatic = false;
 
   // ---------------------------------------------------------------------------
   // #1303 — write-through persistence of the in-progress trip
@@ -387,6 +390,7 @@ class TripRecording extends _$TripRecording {
     bool automatic = false,
   }) async {
     _lastTripStartedAt ??= DateTime.now();
+    _lastTripAutomatic = automatic; // #3251 — stamp the WAL seed honestly.
     // #769 — record the vehicle id the trip is scoped to up-front so the
     // fill-up auto-link window resolves it even if the baseline load
     // races. Cheap Riverpod cache hit.
@@ -602,7 +606,7 @@ class TripRecording extends _$TripRecording {
       id: id,
       vehicleId: _lastTripVehicleId ?? _baselines.vehicleId,
       vin: ctl.vin,
-      automatic: false, // refined on every flush via _buildSnapshotFor
+      automatic: _lastTripAutomatic, // #3251 — real auto-record provenance
       phase: 'recording',
       summary: const TripSummary(
         distanceKm: 0,
@@ -690,32 +694,25 @@ class TripRecording extends _$TripRecording {
         harshAccelerations: 0,
       );
     }
-    var distanceKm = 0.0;
     var maxRpm = 0.0;
-    for (var i = 0; i < samples.length; i++) {
-      final s = samples[i];
+    for (final s in samples) {
       if ((s.rpm ?? 0) > maxRpm) maxRpm = s.rpm ?? 0; // #2692 C4-G null→0
-      if (i == 0) continue;
-      final prev = samples[i - 1];
-      final dtSec = s.timestamp
-              .difference(prev.timestamp)
-              .inMicroseconds /
-          Duration.microsecondsPerSecond;
-      if (dtSec <= 0) continue;
-      final avgSpeed = (prev.speedKmh + s.speedKmh) / 2.0;
-      distanceKm += avgSpeed * dtSec / 3600.0;
     }
-    final startedAt = samples.first.timestamp;
-    final endedAt = samples.last.timestamp;
+    // #3251 — use the controller's OWN gap-capped distance + provenance, not a
+    // re-integration of the raw buffer. Re-integrating bridged dropout gaps and
+    // fabricated ~10 km across a 20-min hole (the #1927 bug on the recovery
+    // path); `currentDistanceKm` already applies `maxIntegrationGapSeconds`, and
+    // `distanceSource` keeps the real provenance instead of defaulting 'virtual'.
     return TripSummary(
-      distanceKm: distanceKm,
+      distanceKm: ctl.currentDistanceKm,
       maxRpm: maxRpm,
       highRpmSeconds: 0,
       idleSeconds: 0,
       harshBrakes: 0,
       harshAccelerations: 0,
-      startedAt: startedAt,
-      endedAt: endedAt,
+      startedAt: samples.first.timestamp,
+      endedAt: samples.last.timestamp,
+      distanceSource: ctl.distanceSource,
     );
   }
 

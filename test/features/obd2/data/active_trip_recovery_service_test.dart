@@ -135,6 +135,42 @@ void main() {
       expect(activeRepo.loadSnapshot(), isNotNull);
     });
 
+    test(
+        '#3250 — a fresh snapshot whose phase is already terminal '
+        '(stopped/saved) is DISCARDED + cleared, not resurrected', () async {
+      for (final phase in ['stopped', 'saved']) {
+        await activeRepo.clearSnapshot();
+        // Fresh by timestamp, but the trip was already finalised to history —
+        // recovering it would re-surface a saved trip + overwrite it on End.
+        await activeRepo.saveSnapshot(
+          ActiveTripSnapshot(
+            id: 'session-$phase',
+            vehicleId: 'veh-1',
+            vin: 'VIN',
+            automatic: false,
+            phase: phase,
+            summary: summary(),
+            samples: const [],
+            odometerStartKm: 100.0,
+            odometerLatestKm: 105.0,
+            startedAt: fakeNow.subtract(const Duration(minutes: 30)),
+            lastFlushedAt: fakeNow.subtract(const Duration(minutes: 2)),
+          ),
+        );
+        final svc = ActiveTripRecoveryService(
+          activeRepo: activeRepo,
+          historyRepo: historyRepo,
+          now: () => fakeNow,
+        );
+        final outcome = await svc.recover();
+        expect(outcome, ActiveTripRecoveryOutcome.discarded,
+            reason: 'phase=$phase is already finalised — never recovered');
+        expect(svc.recoveredSnapshot, isNull);
+        expect(activeRepo.loadSnapshot(), isNull,
+            reason: 'the zombie WAL must be cleared (phase=$phase)');
+      }
+    });
+
     test('stale snapshot is discarded and cleared from disk', () async {
       final snap = staleSnapshot();
       await activeRepo.saveSnapshot(snap);
