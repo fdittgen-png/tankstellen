@@ -100,6 +100,41 @@ bool isOfflineError(Object error) {
   return false;
 }
 
+/// Whether [error] is a TRANSIENT UPSTREAM failure — the server (or a gateway
+/// in front of it) couldn't fulfil an otherwise-valid request *right now*, as
+/// opposed to a malformed request (4xx) or a genuine app/connection fault.
+///
+/// #3395 — a country feed having a bad few minutes (the FR data.economie.gouv.fr
+/// gateway returned **502** 50× in 7 min during a real outage) is upstream's
+/// problem, not an app bug, and must NOT spool 50 full ERROR traces that bury
+/// real faults. A site that already degrades to "empty results" on this can
+/// breadcrumb it instead. Deliberately scoped to the unambiguous "retry later"
+/// statuses so a real **500** (which can mean our request broke the server) and
+/// every 4xx still persist as a trace:
+///   - **502 / 503 / 504** — bad gateway / service unavailable / gateway timeout
+///     (infra/proxy transient, never a request-shape problem);
+///   - **429** — rate limited (back off, not a bug);
+///   - connect / send / receive **timeouts** — the upstream was too slow.
+/// Offline / no-network shapes are NOT included here — those are
+/// [isOfflineError]'s job; a caller typically checks offline first.
+bool isTransientUpstreamError(Object error) {
+  if (error is! DioException) return false;
+  switch (error.type) {
+    case DioExceptionType.connectionTimeout:
+    case DioExceptionType.sendTimeout:
+    case DioExceptionType.receiveTimeout:
+      return true;
+    case DioExceptionType.badResponse:
+      final code = error.response?.statusCode;
+      return code == 502 || code == 503 || code == 504 || code == 429;
+    case DioExceptionType.connectionError:
+    case DioExceptionType.badCertificate:
+    case DioExceptionType.cancel:
+    case DioExceptionType.unknown:
+      return false;
+  }
+}
+
 /// True when [message] carries one of the offline / no-network / failed
 /// host-lookup substrings. Matched case-insensitively. Kept in sync with
 /// `friendlyAuthError`'s network-family substrings (#2745).

@@ -128,4 +128,55 @@ void main() {
       expect(isOfflineError(Exception('parse failed')), isFalse);
     });
   });
+
+  group('isTransientUpstreamError — retry-later statuses only (#3395)', () {
+    DioException badResponse(int code) => DioException(
+          requestOptions: RequestOptions(path: '/'),
+          type: DioExceptionType.badResponse,
+          response: Response(
+              requestOptions: RequestOptions(path: '/'), statusCode: code),
+        );
+
+    test('502 / 503 / 504 (gateway/unavailable) are transient', () {
+      for (final code in [502, 503, 504]) {
+        expect(isTransientUpstreamError(badResponse(code)), isTrue,
+            reason: '$code is an infra/proxy transient');
+      }
+    });
+
+    test('429 (rate limited) is transient', () {
+      expect(isTransientUpstreamError(badResponse(429)), isTrue);
+    });
+
+    test('connect/send/receive timeouts are transient (upstream too slow)', () {
+      for (final t in [
+        DioExceptionType.connectionTimeout,
+        DioExceptionType.sendTimeout,
+        DioExceptionType.receiveTimeout,
+      ]) {
+        expect(
+          isTransientUpstreamError(
+              DioException(requestOptions: RequestOptions(path: '/'), type: t)),
+          isTrue,
+        );
+      }
+    });
+
+    test('500 is NOT transient — it can mean our request broke the server', () {
+      expect(isTransientUpstreamError(badResponse(500)), isFalse);
+    });
+
+    test('4xx are NOT transient — a malformed/forbidden request is a real bug',
+        () {
+      for (final code in [400, 401, 403, 404, 422]) {
+        expect(isTransientUpstreamError(badResponse(code)), isFalse,
+            reason: '$code is a request-shape problem, not retry-later');
+      }
+    });
+
+    test('a non-Dio error is never transient-upstream', () {
+      expect(isTransientUpstreamError(Exception('boom')), isFalse);
+      expect(isTransientUpstreamError(const SocketException('x')), isFalse);
+    });
+  });
 }
