@@ -121,6 +121,39 @@ void main() {
       expect(restored.samples.first.coolantTempC, 80.0);
     });
 
+    test('#3251 — GPS accuracy + bearing round-trip (were dropped before)',
+        () async {
+      await repo.saveSnapshot(
+        ActiveTripSnapshot(
+          id: 'gps-1',
+          vehicleId: 'veh-1',
+          vin: null,
+          automatic: false,
+          phase: 'recording',
+          summary: summary(),
+          samples: [
+            TripSample(
+              timestamp: start,
+              speedKmh: 42.0,
+              latitude: 43.4,
+              longitude: 3.5,
+              hAccuracyM: 4.2,
+              bearingDeg: 117.5,
+            ),
+          ],
+          odometerStartKm: null,
+          odometerLatestKm: null,
+          startedAt: start,
+          lastFlushedAt: start.add(const Duration(minutes: 1)),
+        ),
+      );
+      final s = repo.loadSnapshot()!.samples.single;
+      expect(s.hAccuracyM, closeTo(4.2, 1e-9),
+          reason: 'jitter-gating data must survive recovery');
+      expect(s.bearingDeg, closeTo(117.5, 1e-9),
+          reason: 'map-arrow bearing must survive recovery');
+    });
+
     test('loadSnapshot returns null on an empty box', () {
       expect(repo.loadSnapshot(), isNull);
     });

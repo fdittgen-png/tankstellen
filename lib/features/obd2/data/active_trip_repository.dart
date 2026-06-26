@@ -214,6 +214,11 @@ Map<String, dynamic> _sampleToJson(TripSample s) => {
       if (s.latitude != null) 'la': s.latitude,
       if (s.longitude != null) 'lo': s.longitude,
       if (s.altitudeM != null) 'al': s.altitudeM,
+      // #3251 — GPS accuracy + bearing were dropped on the WAL codec, so a
+      // recovered GPS trip lost its jitter-gating + map-arrow data. Same keys
+      // as trip_sample_codec.dart so a recovered trip round-trips identically.
+      if (s.hAccuracyM != null) 'ha': s.hAccuracyM,
+      if (s.bearingDeg != null) 'be': s.bearingDeg,
     };
 
 TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -232,6 +237,9 @@ TripSample _sampleFromJson(Map<String, dynamic> j) => TripSample(
       longitude: (j['lo'] as num?)?.toDouble(),
       // #1935 child A — GPS altitude mirror key.
       altitudeM: (j['al'] as num?)?.toDouble(),
+      // #3251 — GPS accuracy + bearing (legacy snapshots have neither → null).
+      hAccuracyM: (j['ha'] as num?)?.toDouble(),
+      bearingDeg: (j['be'] as num?)?.toDouble(),
     );
 
 /// Hive-backed singleton store for the live, in-progress trip
