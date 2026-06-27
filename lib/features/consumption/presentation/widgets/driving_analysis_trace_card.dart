@@ -12,6 +12,8 @@ import '../../data/analysis/driving_analysis_trace_export.dart';
 import '../../domain/driving_score.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/obd2_trip_features.dart';
+import '../../domain/trip_sample.dart';
 import '../../domain/trip_summary.dart';
 
 /// Dev-only and self-hiding: renders nothing unless [Feature.debugMode] is on
@@ -28,6 +30,7 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
     required this.summary,
     required this.score,
     required this.lessons,
+    required this.samples,
     this.gpsFeatures,
   });
 
@@ -35,6 +38,10 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
   final DrivingScore score;
   final List<DrivingLesson> lessons;
   final GpsDrivingFeatures? gpsFeatures;
+
+  /// The trip's raw samples — the source of the OBD2 telemetry aggregate
+  /// folded into the export (#3402).
+  final List<TripSample> samples;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,6 +86,7 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       score: score,
       lessons: lessons,
       gpsFeatures: gpsFeatures,
+      obd2Features: Obd2TripFeatures.fromSamples(samples),
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

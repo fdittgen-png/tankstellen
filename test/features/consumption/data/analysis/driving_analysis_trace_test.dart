@@ -8,6 +8,8 @@ import 'package:tankstellen/features/consumption/data/analysis/driving_analysis_
 import 'package:tankstellen/features/consumption/domain/driving_score.dart';
 import 'package:tankstellen/features/consumption/domain/gps_driving_features.dart';
 import 'package:tankstellen/features/consumption/domain/lessons/driving_lesson.dart';
+import 'package:tankstellen/features/consumption/domain/obd2_trip_features.dart';
+import 'package:tankstellen/features/consumption/domain/trip_sample.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
 
 TripSummary _summary() => TripSummary(
@@ -206,6 +208,50 @@ void main() {
         lessons: const [],
       );
       expect(trace.toJson()['gpsFeatures'], isNull);
+    });
+
+    test('obd2Features is null when no engine signal landed — the broken-link '
+        '/ GPS-only marker (#3402)', () {
+      final trace = DrivingAnalysisTrace(
+        capturedAt: DateTime.utc(2026, 6, 3, 11),
+        summary: _summary(),
+        score: _score,
+        lessons: const [],
+      );
+      expect(trace.toJson()['obd2Features'], isNull);
+    });
+
+    test('obd2Features surfaces real engine telemetry + fuel provenance '
+        '(#3402)', () {
+      final obd2 = Obd2TripFeatures.fromSamples([
+        TripSample(
+          timestamp: DateTime.utc(2026, 6, 3, 10),
+          speedKmh: 50,
+          rpm: 1800,
+          fuelRateLPerHour: 2.4,
+          engineLoadPercent: 42,
+        ),
+        TripSample(
+          timestamp: DateTime.utc(2026, 6, 3, 10, 0, 1),
+          speedKmh: 55,
+          rpm: 2200,
+          fuelRateLPerHour: 2.8,
+          engineLoadPercent: 48,
+        ),
+      ]);
+      final json = DrivingAnalysisTrace(
+        capturedAt: DateTime.utc(2026, 6, 3, 11),
+        summary: _summary(),
+        score: _score,
+        lessons: const [],
+        obd2Features: obd2,
+      ).toJson();
+
+      final block = json['obd2Features'] as Map<String, dynamic>;
+      expect(block['fuelSource'], 'measured');
+      expect(block['obd2Coverage'], 1.0);
+      expect((block['rpm'] as Map)['mean'], 2000.0);
+      expect((block['signalCoverage'] as Map)['engineLoadPercent'], 1.0);
     });
 
     test('formatDrivingAnalysisTraceJson is valid, round-trippable JSON', () {

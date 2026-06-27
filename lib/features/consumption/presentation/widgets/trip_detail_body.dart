@@ -120,6 +120,12 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         isEv: widget.isEv,
       );
 
+  /// The trip's samples in the domain shape, memoised so the O(n) conversion
+  /// runs once (not per rebuild). Feeds the driving-analysis trace's OBD2
+  /// telemetry aggregate (#3402).
+  late final List<TripSample> _tripSamples =
+      widget.samples.map(tripDetailToTripSample).toList(growable: false);
+
   List<DrivingInsight> _computeInsights() {
     if (widget.samples.isEmpty) return const [];
     // Insights are only meaningful for combustion trips — EV trips
@@ -332,6 +338,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             score: _score,
             lessons: lessons,
             gpsFeatures: _gpsFeatures,
+            samples: _tripSamples,
           ),
         // #1895 — the per-trip telemetry charts, folded into one
         // collapsed-by-default section. Extracted to its own widget (#2804)
