@@ -6,6 +6,7 @@ import 'dart:convert';
 import '../../domain/driving_score.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/obd2_trip_features.dart';
 import '../../domain/trip_summary.dart';
 
 /// A self-contained, JSON-serialisable snapshot of a single trip's
@@ -31,6 +32,15 @@ class DrivingAnalysisTrace {
 
   final TripSummary summary;
   final GpsDrivingFeatures? gpsFeatures;
+
+  /// Per-trip OBD2 telemetry aggregate (#3402). Null when the trip carried no
+  /// engine signal — a GPS-only trip, or an OBD2 trip whose link kept dropping
+  /// so every read fell back to GPS. A null section is the export's explicit
+  /// "0 % OBD2 coverage" marker; a present section surfaces the real RPM /
+  /// engine-load / throttle distribution and whether the fuel figure was
+  /// measured or estimated.
+  final Obd2TripFeatures? obd2Features;
+
   final DrivingScore score;
   final List<DrivingLesson> lessons;
 
@@ -40,6 +50,7 @@ class DrivingAnalysisTrace {
     required this.score,
     required this.lessons,
     this.gpsFeatures,
+    this.obd2Features,
     this.comment = kDrivingAnalysisCommentPrompt,
   });
 
@@ -88,6 +99,11 @@ class DrivingAnalysisTrace {
                   'high': _round(gpsFeatures!.highSpeedSeconds, 0),
                 },
               },
+        // #3402 — the real OBD2 telemetry the trip captured (RPM / engine-load
+        // / throttle / pedal distribution, measured-vs-estimated fuel, and a
+        // per-signal coverage map). Null when no engine signal landed, which
+        // makes a broken-link GPS-fallback trip read as `obd2Features: null`.
+        'obd2Features': obd2Features?.toJson(),
         'score': {
           'overall': score.score,
           'styleClass': score.styleClass.name,

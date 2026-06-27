@@ -40,6 +40,7 @@ Widget _host(Set<Feature> features) => ProviderScope(
             summary: _summary(),
             score: _score,
             lessons: const [],
+            samples: const [],
           ),
         ),
       ),
