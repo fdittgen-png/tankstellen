@@ -98,6 +98,34 @@ version_codes = latest.get('versionCodes', [])
 release_name = latest.get('name', 'Unknown')
 print(f"Found release '{release_name}' with version codes: {version_codes}")
 
+# Guard (#3407): never promote a build OLDER than what production already
+# has. Promoting a lower versionCode can only fail — and Play returns an
+# opaque error (e.g. a stale build's missing permission-declaration 403)
+# that hides the real "wrong/stale source track" cause. Compare the
+# candidate's max versionCode against production's current max (across
+# completed AND in-progress releases). Equal (re-promote to bump rollout %)
+# and higher (new release) stay allowed; a first-ever production release
+# (no existing prod release) is unaffected.
+def _max_code(codes):
+    nums = [int(c) for c in codes if str(c).isdigit()]
+    return max(nums) if nums else None
+
+candidate_max = _max_code(version_codes)
+prod = service.edits().tracks().get(
+    packageName=package_name, editId=edit_id, track='production'
+).execute()
+prod_codes = [c for r in prod.get('releases', []) for c in r.get('versionCodes', [])]
+prod_max = _max_code(prod_codes)
+if candidate_max is not None and prod_max is not None and candidate_max < prod_max:
+    print(
+        f"ERROR: refusing to promote versionCode {candidate_max} from "
+        f"'{track_from}' — production already has {prod_max}. The source "
+        f"track is stale; promote from the track holding the current build "
+        f"(usually 'beta').",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
 # Build production track update
 if rollout_pct >= 100:
     status = 'completed'

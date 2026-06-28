@@ -33,11 +33,14 @@ on:
         description: 'Source track (for promote-rollout)'
         required: false
         type: choice
+        # beta (open testing) is the real release track and is kept current by
+        # the daily build; internal is rarely updated and defaulting to it
+        # silently promotes a stale, lower-versionCode build (#3407).
         options:
-          - internal
-          - alpha
           - beta
-        default: internal
+          - alpha
+          - internal
+        default: beta
       aab_run_id:
         description: 'CI run ID to download AAB from (for deploy-internal, leave empty for latest)'
         required: false
