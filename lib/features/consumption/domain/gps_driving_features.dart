@@ -30,6 +30,12 @@ const double kSharpCornerYawRateRadPerSec = 0.30;
 /// (HDOP > 2.5–3.0 / accuracy > 10 m, per the GNSS telematics guidance).
 const double kCornerAccuracyGateM = 10.0;
 
+/// Doppler-speed floor (km/h) below which the car is stationary, so
+/// position-derived integration (distance + altitude) is skipped: at a
+/// standstill the fix wanders 5–30 m/sample and an ungated integrator
+/// manufactures phantom distance/climb (#3412). Mirrors the idle band cutoff.
+const double kStationarySpeedKmh = 5.0;
+
 /// Driving-style aggregate derived from a stream of [TripSample]s
 /// **without** any OBD2 telemetry — the lean feature set the GPS
 /// calibration matrix (ADR 0010 / #2057 / Epic #2055) is fit against.
@@ -194,7 +200,7 @@ class GpsDrivingFeatures {
   /// elapsed time to the next sample (rectangle rule — fine for
   /// 1 Hz GPS streams).
   ///
-  /// Distance prefers great-circle math (`_haversineMeters`) when
+  /// Distance prefers great-circle math ([geo.distanceMeters]) when
   /// both samples carry lat/lng, falling back to `speedKmh × dt`
   /// for segments where either side is GPS-unfixed.
   ///
@@ -245,7 +251,7 @@ class GpsDrivingFeatures {
 
       // Speed-band integration on the leading sample (rectangle rule).
       final v = prev.speedKmh;
-      if (v < 5) {
+      if (v < kStationarySpeedKmh) {
         idle += dt;
       } else if (v < 50) {
         low += dt;
@@ -255,14 +261,27 @@ class GpsDrivingFeatures {
         high += dt;
       }
 
-      // Distance — prefer haversine when both samples have a fix.
+      // #3412 — integrate position-derived metrics (distance + altitude) only
+      // over GENUINE motion with a usable fix; a standstill/jittery fix
+      // otherwise piles GPS wander into phantom distance/climb. Accuracy
+      // ceiling mirrors the corner/accel gates.
+      final pAcc = prev.hAccuracyM, cAcc = cur.hAccuracyM;
+      final accurateFix = (pAcc == null || pAcc <= kCornerAccuracyGateM) &&
+          (cAcc == null || cAcc <= kCornerAccuracyGateM);
+      final moving = v >= kStationarySpeedKmh && accurateFix;
+
+      // Distance: haversine when fixed else speed-integrated, capped by what
+      // the (more reliable) Doppler speed allows so a position jump can't leak.
       final pLat = prev.latitude, pLng = prev.longitude;
       final cLat = cur.latitude, cLng = cur.longitude;
-      if (pLat != null && pLng != null && cLat != null && cLng != null) {
-        distM += _haversineMeters(pLat, pLng, cLat, cLng);
-      } else {
-        // m = (km/h × 1000/3600) × s
-        distM += v / 3.6 * dt;
+      if (moving) {
+        final segM =
+            (pLat != null && pLng != null && cLat != null && cLng != null)
+                ? geo.distanceMeters(pLat, pLng, cLat, cLng)
+                : v / 3.6 * dt;
+        final speedCapM =
+            (math.max(prev.speedKmh, cur.speedKmh) / 3.6) * dt * 1.5;
+        distM += math.min(segM, speedCapM);
       }
 
       // Peak |acceleration| in g, sample-to-sample (a quick sanity ceiling
@@ -301,9 +320,10 @@ class GpsDrivingFeatures {
         coastSeconds += dt;
       }
 
-      // Altitude delta.
+      // Altitude delta — only while moving (#3412): standstill altitude noise
+      // would otherwise become phantom climb (a bogus "29% gradient" lesson).
       final pAlt = prev.altitudeM, cAlt = cur.altitudeM;
-      if (pAlt != null && cAlt != null) {
+      if (moving && pAlt != null && cAlt != null) {
         final dAlt = cAlt - pAlt;
         if (dAlt > 0) {
           climb += dAlt;
@@ -320,10 +340,8 @@ class GpsDrivingFeatures {
       // out (a noisy bearing manufactures phantom corners — a bad fix is
       // worse than no fix).
       final pBear = prev.bearingDeg, cBear = cur.bearingDeg;
-      final pAcc = prev.hAccuracyM, cAcc = cur.hAccuracyM;
-      final accurate = (pAcc == null || pAcc <= kCornerAccuracyGateM) &&
-          (cAcc == null || cAcc <= kCornerAccuracyGateM);
-      if (pBear != null && cBear != null && accurate) {
+      // Reuses accurateFix (pAcc/cAcc) computed above for the distance gate.
+      if (pBear != null && cBear != null && accurateFix) {
         // Signed minimal angular delta — handles the 0/360 wrap so a
         // 350°→10° step is +20°, not −340° ((d+540) mod 360) − 180.
         final dBearingDeg = ((cBear - pBear + 540.0) % 360.0) - 180.0;
@@ -378,14 +396,4 @@ class GpsDrivingFeatures {
       climbEnergyPerKm: climbPerKm,
     );
   }
-
-  /// Great-circle distance between two WGS-84 coordinates in metres.
-  /// Delegates to the shared [geo.distanceMeters] (#2169).
-  static double _haversineMeters(
-    double lat1,
-    double lng1,
-    double lat2,
-    double lng2,
-  ) =>
-      geo.distanceMeters(lat1, lng1, lat2, lng2);
 }

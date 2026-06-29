@@ -538,5 +538,68 @@ void main() {
         expect(f.steadyShare, 0);
       });
     });
+
+    group('stationary GPS jitter must not inflate distance/meanSpeed/climb '
+        '(#3412)', () {
+      // A parked phone: Doppler speed ≈ 0 (idle) but the fix wanders ~22 m
+      // (0.0002°) back and forth every second and the altitude bounces ±15 m.
+      // Pre-fix the ungated haversine + altitude integrators piled this jitter
+      // into ~km of phantom distance (meanSpeed 276 km/h on a 0.3 km trip) and
+      // ~100 m of phantom climb.
+      Iterable<TripSample> stationaryJitter({required int seconds}) sync* {
+        for (var i = 0; i <= seconds; i++) {
+          final wob = i.isEven ? 0.0002 : -0.0002; // ~22 m east/west wobble
+          final altWob = i.isEven ? 15.0 : -15.0; // ±15 m altitude noise
+          yield _s(
+            t0.add(Duration(seconds: i)),
+            i.isEven ? 0.0 : 1.5, // Doppler speed stays sub-5 km/h (idle)
+            lat: 48.85 + wob,
+            lng: 2.35,
+            altM: 100.0 + altWob,
+            hAccuracyM: 8, // an "accurate" fix — the wander is real GPS noise
+          );
+        }
+      }
+
+      test('a standstill with jittering lat/lon yields ~0 distance and a sane '
+          'meanSpeedKmh', () {
+        final f = GpsDrivingFeatures.from(stationaryJitter(seconds: 120))!;
+        // All time is idle (speed < 5).
+        expect(f.idleSeconds, closeTo(120.0, 0.5));
+        // The wander must NOT have accumulated into distance.
+        expect(f.distanceKm, lessThan(0.05),
+            reason: 'standstill jitter must not become real distance');
+        // And meanSpeed must stay physically sane (was 276 km/h).
+        expect(f.meanSpeedKmh, lessThan(5.0),
+            reason: 'a parked car cannot average tens of km/h');
+      });
+
+      test('a standstill with altitude noise yields ~0 phantom climb', () {
+        final f = GpsDrivingFeatures.from(stationaryJitter(seconds: 120))!;
+        expect(f.gradeClimbMeters, lessThan(2.0),
+            reason: 'altitude jitter at a standstill must not become climb');
+      });
+
+      test('a genuinely moving trip with accurate fixes still measures '
+          'distance (no over-gating)', () {
+        // ~30 km/h east: each 1 s step advances ~8.3 m. Over 60 s ≈ 500 m.
+        Iterable<TripSample> moving() sync* {
+          for (var i = 0; i <= 60; i++) {
+            yield _s(
+              t0.add(Duration(seconds: i)),
+              30,
+              lat: 48.85,
+              lng: 2.35 + i * 0.0001, // ~7.3 m/step east at this latitude
+              hAccuracyM: 6,
+            );
+          }
+        }
+
+        final f = GpsDrivingFeatures.from(moving())!;
+        expect(f.distanceKm, greaterThan(0.3),
+            reason: 'real motion must still accumulate distance');
+        expect(f.meanSpeedKmh, greaterThan(15.0));
+      });
+    });
   });
 }
