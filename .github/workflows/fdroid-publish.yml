@@ -98,7 +98,11 @@ jobs:
           echo "FDROID_REPO_KEY_PASSWORD=$FDROID_REPO_KEY_PASSWORD" >> "$GITHUB_ENV"
 
       - name: Build signed fdroid release APK
-        run: flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
+        # #3435 — the Play "Foreground services" declaration does not apply to
+        # F-Droid, so the fdroid flavor ships the GPS foreground service
+        # unconditionally (src/fdroid/AndroidManifestFgsApproved.xml overlay:
+        # FGS + FGS_LOCATION + battery-exemption only — no play-only services).
+        run: flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
 
       - name: Audit — no GMS / MLKit
         run: bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
