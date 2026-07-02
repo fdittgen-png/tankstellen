@@ -86,9 +86,14 @@ jobs:
         # single ABI the modern Samsung device cares about — smaller
         # download, faster CI (~5-6 min instead of ~13 for split-per-
         # abi).
+        # #3435 — sideload artifacts never pass Play review, so they always
+        # ship the GPS foreground service (#3173): this is the build used to
+        # validate background recording on-device before the Play declaration
+        # (#3436) clears.
         run: |
           flutter build apk --release --flavor play \
-            --target-platform android-arm64
+            --target-platform android-arm64 \
+            --dart-define=FGS_FORM_APPROVED=true
 
       - name: Clean up decoded keystore
         if: always() && env.ANDROID_KEYSTORE_PATH != ''
