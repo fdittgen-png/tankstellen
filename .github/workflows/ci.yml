@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@v7
       - id: probe
         if: github.event_name == 'pull_request'
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: .green-marker
           key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
@@ -135,7 +135,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -193,7 +193,7 @@ jobs:
       # regeneration every run. `--delete-conflicting-outputs` only
       # resolves output collisions, not stale internal hashes, so it is
       # not a substitute. Cost is ~+30s — well under the ~2.5 min budget.
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -235,7 +235,7 @@ jobs:
           # ci.yml pin; bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -319,7 +319,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           path: |
@@ -329,7 +329,7 @@ jobs:
           restore-keys: ${{ runner.os }}-pub-
       # #1585 — Cache compiled artefacts. Same-branch reruns and rebase
       # rounds reuse the compiled Dart output keyed on the source state.
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         if: ${{ needs.green-gate.outputs.cached != 'true' }}
         with:
           path: build/
@@ -427,7 +427,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -472,7 +472,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -510,7 +510,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -567,7 +567,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -594,7 +594,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -635,7 +635,7 @@ jobs:
           # local dev SDK). Bump deliberately, not by drift.
           flutter-version: "3.41.9"
           cache: true
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -643,7 +643,7 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
       # #1585 — Cache compiled Flutter artefacts for same-branch reruns.
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: build/
           key: ${{ runner.os }}-build-android-${{ hashFiles('pubspec.lock', 'lib/**/*.dart', 'android/**') }}
@@ -652,7 +652,7 @@ jobs:
       # the wrapper distribution, and the Gradle build cache). Warm runs
       # skip re-downloading the Android toolchain — the single biggest
       # lever on build-android wall-clock.
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -812,7 +812,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: mkdir -p .green-marker && echo "$GITHUB_SHA" > .green-marker/sha
-      - uses: actions/cache/save@v5
+      - uses: actions/cache/save@v6
         with:
           path: .green-marker
           key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
