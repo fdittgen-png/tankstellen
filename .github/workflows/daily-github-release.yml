@@ -151,10 +151,13 @@ jobs:
         # #1777 — `--obfuscate` strips Dart symbol names from the
         # release binary; `--split-debug-info` writes the symbol files
         # needed to de-obfuscate later crash reports (uploaded below).
+        # #3434 — FGS define gated on the FGS_FORM_APPROVED repo variable;
+        # see daily-beta.yml for the full rationale.
         run: |
           flutter build appbundle --release --flavor play \
             --build-number=${{ needs.pre-check.outputs.build_number }} \
-            --obfuscate --split-debug-info=build/symbols
+            --obfuscate --split-debug-info=build/symbols \
+            ${{ vars.FGS_FORM_APPROVED == 'true' && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
 
       # Per-ABI APKs were dropped from the public nightly release on
       # purpose — Play App Signing re-signs every Play install with

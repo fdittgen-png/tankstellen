@@ -99,13 +99,15 @@ jobs:
         run: flutter pub get
 
       - name: Build AAB (play flavor, run-counter build number)
-        # #3375 — ship DARK: NO --dart-define=FGS_FORM_APPROVED here. The GPS
-        # foreground service (#3173) stays code-merged but gated off, because
-        # the Play "Foreground Service Use" form (#1498) is not yet approved —
-        # uploading the FGS bundle before then 403s ("you must let us know
-        # whether your app uses any Foreground Service permissions"). Re-add the
-        # define once the form clears.
-        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
+        # #3434 — the FGS define is gated on the repo variable
+        # FGS_FORM_APPROVED (Settings → Secrets and variables → Actions →
+        # Variables). While unset/false the GPS foreground service (#3173)
+        # ships DARK (#3375): uploading an FGS bundle before the Play
+        # "Foreground services" declaration (#3436) is approved 403s
+        # ("you must let us know whether your app uses any Foreground
+        # Service permissions"). Once the declaration clears, set the
+        # variable to `true` — no workflow edit needed.
+        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} ${{ vars.FGS_FORM_APPROVED == 'true' && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
 
       - name: Clean up decoded keystore
         if: always()
