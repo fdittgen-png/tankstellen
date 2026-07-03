@@ -173,6 +173,36 @@ class Obd2ConnectSupervisor {
     }
   }
 
+  /// #3247 — run [body] (a pure, radio-free wait: the scan governor's
+  /// up-to-30 s throttle pause) with the caller's admission slot RELEASED,
+  /// then RE-ACQUIRE the SAME admission (ordinary FIFO) before returning.
+  /// Holding the single-flight slot through the governor's delay starved
+  /// every queued requester (and blocked the passive cycle) behind a wait
+  /// that touches no shared radio state.
+  ///
+  /// When the caller is NOT the current active holder — no admission in the
+  /// zone, a stale/force-released token, or a passive holder (its slot is
+  /// try-acquire-only and preemptible anyway) — [body] just runs inline.
+  /// The token's identity is preserved across the re-acquire, so nested
+  /// re-entrant admits inside the continuation still run inline.
+  Future<void> yieldSlotDuring(Future<void> Function() body) async {
+    final token = Zone.current[this];
+    if (token is! _Obd2Admission ||
+        token.released ||
+        token.passive ||
+        !identical(_current, token)) {
+      await body();
+      return;
+    }
+    _release(token);
+    try {
+      await body();
+    } finally {
+      token.rearm();
+      await _acquire(token);
+    }
+  }
+
   /// True when the caller is already INSIDE an admitted attempt whose slot
   /// is still held — the zone carries the admission token. A stale token
   /// (its admission already released, e.g. work spawned by a past attempt)
@@ -253,7 +283,16 @@ class _Obd2Admission {
   final String owner;
   final bool passive;
   final Future<void> Function()? onPreempt;
-  final Completer<void> granted = Completer<void>();
+  Completer<void> granted = Completer<void>();
+
+  /// #3247 — reset this ticket for a re-acquire after a slot yield
+  /// ([Obd2ConnectSupervisor.yieldSlotDuring]): same identity (the zone
+  /// token stays valid), fresh grant completer, released flag cleared.
+  void rearm() {
+    released = false;
+    preempting = false;
+    granted = Completer<void>();
+  }
 
   /// Owner of the holder this ticket queued behind (null = ran immediately).
   String? queuedBehind;

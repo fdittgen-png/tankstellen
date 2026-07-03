@@ -68,6 +68,7 @@ class Obd2ConnectTraceHandle {
   Obd2ConnectOutcome? _outcome;
   String? _failureDetail;
   bool _ended = false;
+  bool _superseded = false;
 
   final List<Obd2ConnectStep> _steps = <Obd2ConnectStep>[];
   final List<Obd2ScannedDevice> _scanned = <Obd2ScannedDevice>[];
@@ -208,6 +209,27 @@ class Obd2ConnectTraceHandle {
   /// — lets `beginTrace` finalise a SUPERSEDED picker-scan trace as success
   /// only when the scan actually surfaced something the user could pick).
   bool get hasScannedDevices => _root._scanned.isNotEmpty;
+
+  /// #3244 — whether this attempt was preempt-superseded (a passive holder
+  /// torn down for an arriving active requester). `beginTrace` finalises a
+  /// superseded live trace instead of child-joining into it, so the active
+  /// requester's own trace lands as a ROOT.
+  bool get isSuperseded => _root._superseded;
+
+  /// #3244 — mark this attempt preempt-superseded: stamps a `preempted`
+  /// step + (first-wins) an `unknown` outcome carrying [detail], so the
+  /// finalised zombie trace explains itself in a field export.
+  void markSuperseded(String detail) {
+    _root._superseded = true;
+    addStep(
+      label: 'preempted',
+      status: Obd2ConnectStepStatus.fail,
+      detail: detail,
+    );
+    if (!hasOutcome) {
+      setOutcome(Obd2ConnectOutcome.unknown, failureDetail: detail);
+    }
+  }
 
   /// The stamped terminal outcome, or null while undecided (#3181 — lets
   /// `_openAndInit` surface a pairing-classified failure as the TYPED

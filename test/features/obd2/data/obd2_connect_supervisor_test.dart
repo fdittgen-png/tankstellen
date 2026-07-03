@@ -294,4 +294,89 @@ void main() {
       expect(Obd2ConnectTraceLog.pendingAdmissionNote, isNull);
     });
   });
+
+  group('slot yield during a pure wait (#3247)', () {
+    test('yieldSlotDuring RELEASES the slot for a queued requester and '
+        're-acquires the SAME admission before returning', () async {
+      final sup = Obd2ConnectSupervisor();
+      final wait = Completer<void>();
+      final order = <String>[];
+
+      final holder = sup.admit<String>(
+        owner: 'scanner',
+        attempt: () async {
+          // Models scan() hitting an exhausted scan-governor bucket: the
+          // up-to-30 s pause must not starve a queued user connect.
+          await sup.yieldSlotDuring(() => wait.future);
+          order.add('scanner-resumed');
+          return 'scanner';
+        },
+      );
+      await pump();
+      expect(sup.state, Obd2SupervisorState.idle,
+          reason: 'the yielded slot is free while the governor waits');
+
+      final interloper = sup.admit<String>(
+        owner: 'user-connect',
+        attempt: () async {
+          order.add('user-connect');
+          return 'ok';
+        },
+      );
+      expect(await interloper.timeout(const Duration(seconds: 5)), 'ok',
+          reason: 'a requester must run DURING the yielded wait — the '
+              'pre-#3247 behaviour queued it behind the whole pause');
+
+      wait.complete();
+      expect(await holder.timeout(const Duration(seconds: 5)), 'scanner');
+      expect(order, ['user-connect', 'scanner-resumed'],
+          reason: 'the yielder re-acquires FIFO after the interloper');
+      expect(sup.state, Obd2SupervisorState.idle);
+    });
+
+    test('re-acquire preserves the zone token: a nested re-entrant admit '
+        'after the yield still runs inline', () async {
+      final sup = Obd2ConnectSupervisor();
+      final result = await sup.admit<String>(
+        owner: 'outer',
+        attempt: () async {
+          await sup.yieldSlotDuring(() async {});
+          final inner = await sup.admit<String>(
+              owner: 'inner', attempt: () async => 'inner-ran');
+          return 'outer:$inner';
+        },
+      ).timeout(const Duration(seconds: 5));
+      expect(result, 'outer:inner-ran');
+      expect(sup.state, Obd2SupervisorState.idle);
+    });
+
+    test('outside any admission (the unsupervised picker scan) the body just '
+        'runs inline', () async {
+      final sup = Obd2ConnectSupervisor();
+      var ran = false;
+      await sup.yieldSlotDuring(() async => ran = true);
+      expect(ran, isTrue);
+      expect(sup.state, Obd2SupervisorState.idle);
+    });
+
+    test('FAULT INJECTION — a throwing wait still re-acquires, and the '
+        'attempt releases normally afterwards', () async {
+      final sup = Obd2ConnectSupervisor();
+      await expectLater(
+        sup.admit<void>(
+          owner: 'scanner',
+          attempt: () =>
+              sup.yieldSlotDuring(() async => throw StateError('clock fault')),
+        ),
+        throwsA(isA<StateError>()),
+      );
+      expect(sup.state, Obd2SupervisorState.idle,
+          reason: 'the re-acquired slot must be released by the admit '
+              'finally, never wedged by the fault');
+      await expectLater(
+        sup.admit<String>(owner: 'next', attempt: () async => 'ok'),
+        completion('ok'),
+      );
+    });
+  });
 }

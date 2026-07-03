@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import 'last_good_adapter_store.dart';
 import 'obd2_reconnect_episode_tracer.dart';
+import 'obd2_flap_latch.dart';
 
 /// Coarse lifecycle state of the trip-INDEPENDENT auto-reconnect
 /// controller (#3019 / Epic #3013 phase 3).
@@ -132,6 +133,7 @@ class Obd2ReconnectController {
     this.onState,
     Obd2ReconnectTraceSink? onTrace,
     DateTime Function()? now,
+    Obd2FlapLatch? flapLatch,
     int maxAttempts = 6,
     Duration initialBackoff = const Duration(seconds: 2),
     Duration maxBackoff = const Duration(seconds: 60),
@@ -141,6 +143,8 @@ class Obd2ReconnectController {
         _pinnedConnect = pinnedConnect,
         _rescanConnect = rescanConnect,
         _tracer = Obd2ReconnectEpisodeTracer(onTrace: onTrace, now: now),
+        _now = now ?? DateTime.now,
+        _flap = flapLatch ?? Obd2FlapLatch(),
         _maxAttempts = maxAttempts,
         _initialBackoff = initialBackoff,
         _maxBackoff = maxBackoff,
@@ -149,6 +153,12 @@ class Obd2ReconnectController {
 
   /// #3346 — wire / detach the episode breadcrumb sink after construction.
   set onTrace(Obd2ReconnectTraceSink? sink) => _tracer.onTrace = sink;
+
+  final DateTime Function() _now;
+  // #3459 — success→instant-drop cycles must latch a stand-down; the wedge
+  // detector only sees FAILED ladders. See obd2_flap_latch.dart.
+  final Obd2FlapLatch _flap;
+  bool get isFlapLatched => _flap.flapping;
 
   Obd2ReconnectState _state = Obd2ReconnectState.idle;
   Duration _currentBackoff;
@@ -184,6 +194,7 @@ class Obd2ReconnectController {
   /// reconnect). Cancels any in-flight loop and clears the counters so the
   /// next drop starts a clean episode.
   void notifyConnected() {
+    _flap.noteConnected(_now());
     _tracer.connected(_attempts + 1);
     _timer?.cancel();
     _timer = null;
@@ -209,6 +220,15 @@ class Obd2ReconnectController {
       _tracer.dropIgnored(reason: reason, transport: transportKind);
       return;
     }
+    // #3459 — a young-death session is a flap strike; 3 latch a stand-down.
+    final justLatched = _flap.noteDropped(_now());
+    if (_flap.flapping) {
+      if (justLatched) {
+        _tracer.terminal('flap-latched', _attempts);
+      }
+      _transition(Obd2ReconnectState.terminalFailed);
+      return;
+    }
     _attempts = 0;
     _currentBackoff = _initialBackoff;
     _tracer.dropReceived(
@@ -232,6 +252,7 @@ class Obd2ReconnectController {
         _state != Obd2ReconnectState.terminalEngineOff) {
       return;
     }
+    _flap.clear(); // #3459 — an explicit user action re-arms the dialler.
     _attempts = 0;
     _currentBackoff = _initialBackoff;
     _tracer.retry(_state.name);

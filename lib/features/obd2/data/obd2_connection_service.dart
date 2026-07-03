@@ -19,6 +19,7 @@ import 'negotiated_protocol_cache.dart';
 import 'obd2_adapter_identity.dart';
 import 'obd2_adapter_wake_cache.dart';
 import 'obd2_cache_openers.dart';
+import 'obd2_channel_abandon.dart';
 import 'obd2_comm_diagnostics.dart' show redactObd2Mac;
 import 'obd2_connect_classifier.dart';
 import 'obd2_connect_supervisor.dart';
@@ -40,6 +41,7 @@ import '../../vehicle/providers/vehicle_providers.dart';
 
 part 'obd2_connect_by_mac.dart';
 part 'obd2_connection_service.g.dart';
+part 'obd2_passive_preempt.dart';
 
 /// Vehicle identity the supported-PID cache (#811/#2253) refines its
 /// per-adapter key with. Supplied lazily by the [Obd2ConnectionService]
@@ -134,28 +136,22 @@ class Obd2ConnectionService {
   final Obd2AdapterIdentityRotated? onAdapterIdentityRotated;
 
   /// #2906 — settle pause after [_stopScanBeforeConnect] stops the radio and
-  /// before a `channel.open()` fires. Android BLE is fragile if a `connect()`
-  /// races an active scan still winding down on the radio — a stale scan can
-  /// hold the controller long enough that the connect returns GATT_ERROR 133.
-  /// A short settle lets `stopScan()` actually quiesce the radio. Injectable
-  /// so tests run it as [Duration.zero] (no real wait); production keeps the
-  /// observed-safe ~120 ms.
+  /// before a `channel.open()` fires. A `connect()` racing an active scan
+  /// still winding down on the radio is the GATT_ERROR 133 trap; a short
+  /// settle lets `stopScan()` actually quiesce it. Injectable so tests run
+  /// [Duration.zero]; production keeps the observed-safe ~120 ms.
   final Duration scanSettleDelay;
 
   /// #3185 — single-flight connect ADMISSION. Every public connect entry
-  /// threads through it, so the six historical connect owners (picker
-  /// pinned fast-path, recording pre-warm, auto-record orchestrator,
-  /// trip-independent reconnect, in-trip ReconnectConnector, VIN reader)
-  /// are demoted to REQUESTERS — a second entrant queues instead of
-  /// tearing the first's half-open GATT down mid-handshake. Per-instance,
-  /// which IS per-process in production (this service is a keepAlive
-  /// singleton); tests get isolated instances.
+  /// threads through it, so the six historical connect owners are demoted
+  /// to REQUESTERS — a second entrant queues instead of tearing the first's
+  /// half-open GATT down mid-handshake. Per-instance, which IS per-process
+  /// in production (this service is a keepAlive singleton).
   final Obd2ConnectSupervisor supervisor;
 
-  /// #3185 — process-wide scan-start token bucket (the production provider
-  /// wires [Obd2ScanGovernor.process], shared with the facade's scan-seed),
-  /// so a dense connect episode can't trip Android's silent 5-scans/30s
-  /// throttle. Tests default to a fresh isolated bucket.
+  /// #3185 — process-wide scan-start token bucket (production wires
+  /// [Obd2ScanGovernor.process], shared with the facade's scan-seed), so a
+  /// dense connect episode can't trip Android's silent 5-scans/30s throttle.
   final Obd2ScanGovernor scanGovernor;
 
   Obd2ConnectionService({
@@ -210,10 +206,12 @@ class Obd2ConnectionService {
       }
 
       // #3185 — pace the radio scan start through the governor so a dense
-      // connect episode (scan-seed + fallback scans + user retry) can't trip
-      // Android's silent 5-scans/30s throttle. Fails open; a throttle pause
-      // is stamped on the trace as a `scan-throttle` step.
-      await scanGovernor.admitScanStart(reason: 'service-scan');
+      // connect episode can't trip Android's silent 5-scans/30s throttle
+      // (fails open; a pause stamps a `scan-throttle` step). #3247 — the
+      // up-to-30s throttle wait YIELDS the connect-admission slot, so queued
+      // requesters aren't starved behind a paced scan.
+      await supervisor.yieldSlotDuring(
+          () => scanGovernor.admitScanStart(reason: 'service-scan'));
 
       final accumulated = <String, Obd2AdapterCandidate>{};
 
@@ -436,6 +434,10 @@ class Obd2ConnectionService {
     String linkKind = 'ble',
     bool logFailureAsError = true,
   }) async {
+    // #3244 — capture THIS attempt's trace now: by failure time a preempted
+    // zombie's `Obd2ConnectTraceLog.active` may already be the NEW holder's
+    // root, and stamping a classification there corrupts the rival's trace.
+    final ownTrace = Obd2ConnectTraceLog.active;
     // #2253/#2261 — build the session with the supported-PID + warm
     // negotiated-protocol caches wired in (see [buildObd2Session]).
     final vehicle = activeVehicleKeyFields?.call();
@@ -480,22 +482,21 @@ class Obd2ConnectionService {
       // #2268 concern 3 — persist the observed wake outcome (no-op unless the bounded window ran).
       await adapterWakeCache?.recordObservation(mac, service.wakeObservation);
       if (!ok) {
-        // #2969 — `Obd2Service.connect` swallowed the real failure into a `false`,
-        // so classify the connect-trace outcome from the AT transcript teed so
-        // far (channel-open outcomes were already stamped FIRST at the channel
-        // layer, and first-wins keeps those): ATZ garbage → counterfeit clone,
-        // an AT timeout → init timeout, else a silent ECU / ignition off. A no-op
-        // when no trace is active (a non-connect-path caller).
-        final trace = Obd2ConnectTraceLog.active;
+        // #2969 — `Obd2Service.connect` swallowed the real failure into a
+        // `false`, so classify the connect-trace outcome from the AT
+        // transcript teed so far (first-wins keeps channel-layer stamps):
+        // ATZ garbage → counterfeit clone, an AT timeout → init timeout,
+        // else silent ECU / ignition off. Stamped on the attempt's OWN
+        // trace (#3244); a no-op for a non-connect-path caller.
+        final trace = ownTrace;
         if (trace != null && !trace.hasOutcome) {
           trace.setOutcome(trace.classifyInitFailureOutcome());
         }
         await service.disconnect();
-        // #3181 — a pairing-classified failure (the channel-open catch /
-        // Obd2Service.connect stamped it, first-wins) surfaces TYPED so the
+        // #3181 — a pairing-classified failure (stamped first-wins at the
+        // channel-open catch / Obd2Service.connect) surfaces TYPED so the
         // by-MAC paths skip the masking scan fallback and the UI shows the
-        // "power-cycle and retry within 5 minutes" guidance — not the
-        // generic adapter-unresponsive message.
+        // "power-cycle and retry within 5 minutes" guidance.
         if (trace?.outcome == Obd2ConnectOutcome.pairingRequired) {
           throw const Obd2PairingRequired();
         }
@@ -518,7 +519,7 @@ class Obd2ConnectionService {
     // connect still returns the service either way (first-wins on the trace);
     // we only correct the CLASSIFICATION, never the working connect path.
     if (service.busProbe == Obd2BusProbeResult.probedSilent) {
-      Obd2ConnectTraceLog.active?.setOutcome(Obd2ConnectOutcome.ignitionOff);
+      ownTrace?.setOutcome(Obd2ConnectOutcome.ignitionOff); // #3244 own trace
     }
     // #3019 / Epic #3013 phase 3 — auto-pin the last-good adapter so the
     // trip-INDEPENDENT reconnect controller can try the fast pinned path on
@@ -677,13 +678,15 @@ class Obd2ConnectionService {
           // #3168 — exact id absent from a NON-empty scan: on iOS the
           // pinned CBPeripheral UUID may have ROTATED. Try the name-based
           // rematch (+ re-persist of the fresh id on success); a no-match
-          // still returns null so the picker fallback is unchanged.
+          // still returns null so the picker fallback is unchanged. #3247 —
+          // the fresh id inherits known-good status (skips pairing mode).
           return connectUuidRematched(
             pinnedId: mac,
             pinnedName: adapterName,
             ranked: ranked,
             connect: connect,
             onIdentityRotated: onAdapterIdentityRotated,
+            markFreshIdKnownGood: knownAdaptersStore?.markKnownGood,
           );
         },
       ));
@@ -735,13 +738,11 @@ class Obd2ConnectionService {
   /// through so a Classic adapter is NEVER reached on the doomed BLE GATT path.
   ///
   /// The bug this fixes: the pre-warm / pinned connect called the BLE
-  /// [connectByMacDirect] UNCONDITIONALLY, so a Classic-SPP adapter (vLinker
-  /// BM-Android) could only ever 4 s-timeout (`FlutterBluePlusException |
-  /// connect | fbp-code:1 | Timed out after 4s`) — and that doomed BLE GATT to
-  /// the same MAC then POISONED the subsequent RFCOMM socket (`read ret: -1` /
-  /// "socket might closed"), so the Classic fallback ALSO failed. The in-trip
-  /// reconnect (#2565), the trip-independent reconnect (#3016) and the self-test
-  /// (#2969) were already transport-aware; this brings firstConnect in line.
+  /// [connectByMacDirect] UNCONDITIONALLY, so a Classic-SPP adapter could
+  /// only ever 4 s-timeout — and that doomed BLE GATT to the same MAC then
+  /// POISONED the subsequent RFCOMM socket (`read ret: -1`), so the Classic
+  /// fallback ALSO failed. The in-trip reconnect (#2565), the trip-independent
+  /// reconnect (#3016) and the self-test (#2969) were already transport-aware.
   ///
   /// Transport is inferred from the paired [adapterName] via the registry name
   /// matchers (the same recovery the self-test uses): a name like
@@ -771,15 +772,14 @@ class Obd2ConnectionService {
   /// [_connectByMacPassive]. Thin overridable instance method.
   ///
   /// #3185 — admitted as a PASSIVE attempt: the unbounded autoConnect wait
-  /// SKIPS its cycle (returns null, the scanner keeps its cadence) when any
-  /// other attempt is in flight, and while it holds the slot an arriving
-  /// active requester preempts it via [_teardownLastDirectChannel] (closing
-  /// the passive channel unwinds the wait) — so a parked-car wait can never
-  /// starve a user-initiated connect.
+  /// SKIPS its cycle when any other attempt is in flight; while it holds the
+  /// slot an arriving active requester preempts it via
+  /// [_preemptPassiveHolder] (#3244 — abandon + trace hand-off + close), so
+  /// a parked-car wait can never starve a user-initiated connect.
   Future<Obd2Service?> connectByMacPassive(String mac, {String? adapterName}) =>
       supervisor.admitPassive(
         owner: 'connectByMacPassive',
-        onPreempt: _teardownLastDirectChannel,
+        onPreempt: () => _preemptPassiveHolder(this),
         attempt: () => _traced(
           origin: Obd2ConnectOrigin.liveReconnect,
           mac: mac,

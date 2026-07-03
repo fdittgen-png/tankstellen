@@ -123,7 +123,11 @@ object Obd2ClassicPlugin {
                         // were exhausted) + the last IOException, instead of a
                         // bare Boolean that threw away every diagnostic (only
                         // Logcat had it). The Dart binding accepts BOTH shapes.
-                        result.success(connect(context, address, uuid, budgetMs))
+                        // #3247 — the ladder runs here on the background
+                        // thread; the Result itself is posted to the main
+                        // looper (platform-channel thread requirement).
+                        val outcome = connect(context, address, uuid, budgetMs)
+                        postResult { result.success(outcome) }
                     }
                 }
                 "write" -> {
@@ -437,16 +441,25 @@ object Obd2ClassicPlugin {
         }
     }
 
+    /** #3247 — complete a MethodChannel Result on the MAIN thread. The
+     *  connect/write bodies run on background threads, but a
+     *  `MethodChannel.Result` must only be submitted from the platform
+     *  thread (mirrors [postToSink] for the EventChannel sink). */
+    private fun postResult(block: () -> Unit) {
+        android.os.Handler(android.os.Looper.getMainLooper()).post { block() }
+    }
+
     private fun writeBytes(bytes: ByteArray, result: MethodChannel.Result) {
         val s = socket ?: return result.error("state", "not connected", null)
         thread(name = "obd2-classic-write") {
             try {
                 s.outputStream.write(bytes)
                 s.outputStream.flush()
-                result.success(true)
+                // #3247 — result posted to the main looper (see postResult).
+                postResult { result.success(true) }
             } catch (e: IOException) {
                 Log.e(TAG, "write failed", e)
-                result.error("io", e.message ?: "write failed", null)
+                postResult { result.error("io", e.message ?: "write failed", null) }
             }
         }
     }

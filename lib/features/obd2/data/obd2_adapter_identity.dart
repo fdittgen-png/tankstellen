@@ -197,6 +197,7 @@ Future<Obd2Service?> connectUuidRematched({
   required Future<Obd2Service> Function(ResolvedObd2Candidate candidate)
       connect,
   required Obd2AdapterIdentityRotated? onIdentityRotated,
+  Future<void> Function(String deviceId)? markFreshIdKnownGood,
 }) async {
   final decision = Obd2UuidRematchDecision.decide(
     pinnedId: pinnedId,
@@ -227,6 +228,22 @@ Future<Obd2Service?> connectUuidRematched({
         '"$pinnedName" advertises under ${redactObd2Mac(fresh.deviceId)} — '
         'iOS CBPeripheral UUID rotated; connecting to the fresh id (#3168)',
   );
+  // #3247 — transfer the known-good status to the fresh id BEFORE the
+  // connect: a rotated UUID is the SAME physical, already-bonded adapter
+  // (the rematch is keyed on its persisted name), so this connect must NOT
+  // re-enter #3181 first-connect pairing mode — a slow setNotify would
+  // otherwise misclassify as pairingRequired and surface the misleading
+  // "power-cycle and retry" guidance. Best-effort: a store failure only
+  // costs the wider pairing budget, never the connect.
+  if (markFreshIdKnownGood != null) {
+    try {
+      await markFreshIdKnownGood(fresh.deviceId);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'connectUuidRematched: known-good transfer failed (#3247)',
+      }));
+    }
+  }
   final service = await connect(candidate);
   // The connect SUCCEEDED on the fresh id — re-persist it so the next
   // session's pinned fast path dials the right peripheral. Best-effort.

@@ -3,8 +3,8 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_arbiter.dart';
 import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
-import 'package:tankstellen/features/obd2/data/obd2_recording_link_ownership.dart';
 import 'package:tankstellen/features/obd2/data/obd2_reconnect_controller.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 import '../../../helpers/silence_error_logger.dart';
@@ -12,8 +12,10 @@ import '../../../helpers/silence_error_logger.dart';
 void main() {
   silenceErrorLoggerSpool();
 
-  setUp(Obd2RecordingLinkOwnership.instance.resetForTest);
-  tearDown(Obd2RecordingLinkOwnership.instance.resetForTest);
+  // #3424 — the latch shim was deleted; a recording lease is taken/released
+  // directly on the arbiter (exactly what the shim delegated to).
+  setUp(Obd2LinkArbiter.instance.resetForTest);
+  tearDown(Obd2LinkArbiter.instance.resetForTest);
 
   group('Obd2Reconnect provider (#3019 / Epic #3013 phase 3)', () {
     test(
@@ -35,14 +37,18 @@ void main() {
       expect(container.read(obd2ReconnectProvider), Obd2ReconnectState.idle);
     });
 
-    test('reportDropped on the degraded provider stays bounded + safe', () {
+    test('a drop routed to the degraded provider stays bounded + safe', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
-      // The notifier exists; driving a drop is safe (the no-op connector just
-      // can't connect, so the bounded loop will eventually go terminal — but
-      // it never throws).
+      // Build the notifier so its arbiter idle policy is registered, then
+      // drive a drop the PRODUCTION way — through the link-drop signal the
+      // arbiter routes (#3424 deleted the reportDropped bypass). The no-op
+      // connector just can't connect, so the bounded loop will eventually go
+      // terminal — but it never throws.
+      expect(container.read(obd2ReconnectProvider), Obd2ReconnectState.idle);
       expect(
-        () => container.read(obd2ReconnectProvider.notifier).reportDropped(),
+        () => Obd2LinkDropSignal.instance.notifyDrop(
+            transportKind: 'classic', reason: 'classic-socket-error'),
         returnsNormally,
       );
     });
@@ -56,7 +62,9 @@ void main() {
       expect(container.read(obd2ReconnectProvider), Obd2ReconnectState.idle);
 
       // A recording owns the link → #3019 must ignore the drop signal.
-      Obd2RecordingLinkOwnership.instance.claim();
+      final lease = Obd2LinkArbiter.instance
+          .tryAcquire('recording', Obd2LinkPriority.recording);
+      expect(lease, isNotNull);
       Obd2LinkDropSignal.instance
           .notifyDrop(transportKind: 'classic', reason: 'classic-socket-error');
       await pumpEventQueue();
@@ -66,7 +74,7 @@ void main() {
               'must defer to the in-trip DroppedSessionManager');
 
       // Release: the very next idle drop is handled again as before.
-      Obd2RecordingLinkOwnership.instance.release();
+      lease!.release();
       Obd2LinkDropSignal.instance
           .notifyDrop(transportKind: 'classic', reason: 'classic-socket-error');
       await pumpEventQueue();
@@ -93,7 +101,10 @@ void main() {
           Obd2ReconnectState.reconnecting);
 
       // The user hits Start: the recording claims the link → #3019 stops.
-      Obd2RecordingLinkOwnership.instance.claim();
+      expect(
+          Obd2LinkArbiter.instance
+              .tryAcquire('recording', Obd2LinkPriority.recording),
+          isNotNull);
       await pumpEventQueue();
       expect(container.read(obd2ReconnectProvider), Obd2ReconnectState.idle,
           reason: 'a recording claiming the link must stop the app-wide loop');

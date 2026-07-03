@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_recording_link_ownership.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_arbiter.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
@@ -59,16 +59,18 @@ void main() {
 
     test('#3386 — start() CLAIMS the adapter (so #3019 stands down) and stop() '
         'RELEASES it', () async {
-      Obd2RecordingLinkOwnership.instance.resetForTest();
-      addTearDown(Obd2RecordingLinkOwnership.instance.resetForTest);
+      // #3424 — asserted on the arbiter directly (the deleted latch shim
+      // only mirrored Obd2LinkArbiter.recordingLeaseHeld).
+      Obd2LinkArbiter.instance.resetForTest();
+      addTearDown(Obd2LinkArbiter.instance.resetForTest);
 
       final h = await _Harness.started();
-      expect(Obd2RecordingLinkOwnership.instance.active, isTrue,
+      expect(Obd2LinkArbiter.instance.recordingLeaseHeld, isTrue,
           reason: 'a live OBD2 recording owns the adapter — the app-wide #3019 '
               'reconnect controller must stand down to avoid the reconnect war');
 
       await h.dispose(); // calls pipeline.stop()
-      expect(Obd2RecordingLinkOwnership.instance.active, isFalse,
+      expect(Obd2LinkArbiter.instance.recordingLeaseHeld, isFalse,
           reason: 'stop() hands the idle reconnect role back to #3019');
     });
 
