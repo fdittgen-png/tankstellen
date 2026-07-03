@@ -142,6 +142,17 @@ void main() {
             File('lib/core/services/country_raw_service_builder.dart');
         final builderContent =
             builderFile.existsSync() ? builderFile.readAsStringSync() : '';
+        // #3190 — countries whose composition moved feature-side behind a
+        // builder (the #3132 boundary pattern: the core raw builder imports
+        // ONE feature builder instead of N service files). A service imported
+        // by any features/station_services/**/*_service_builder.dart whose
+        // builder is itself wired in the core raw builder counts as wired.
+        final featureBuilderContent = featuresDir
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('_service_builder.dart'))
+            .map((f) => f.readAsStringSync())
+            .join('\n');
 
         final serviceFiles = featuresDir
             .listSync(recursive: true)
@@ -158,11 +169,13 @@ void main() {
           expect(
             serviceProviders.contains(fileName) ||
                 registryContent.contains(fileName) ||
-                builderContent.contains(fileName),
+                builderContent.contains(fileName) ||
+                featureBuilderContent.contains(fileName),
             isTrue,
             reason:
-                'service_providers.dart, country_service_registry.dart, or '
-                'country_raw_service_builder.dart must import $fileName',
+                'service_providers.dart, country_service_registry.dart, '
+                'country_raw_service_builder.dart, or a feature-side '
+                '*_service_builder.dart must import $fileName',
           );
         }
       });

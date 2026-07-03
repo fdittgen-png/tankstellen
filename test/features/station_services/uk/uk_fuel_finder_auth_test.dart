@@ -10,9 +10,11 @@ import 'package:tankstellen/features/station_services/uk/uk_fuel_finder_auth.dar
 
 /// #3190 — the statutory Fuel Finder API is fronted by OAuth 2.0 client
 /// credentials. These pin the token flow against a mock transport (no live
-/// endpoint): the POST shape (RFC 6749 §4.4), caching until expiry, expiry
-/// re-fetch, [UkFuelFinderAuth.invalidate] re-fetch, and the malformed-response
-/// guards.
+/// endpoint): the POST shape (the live contract — a JSON body with
+/// `client_id` + `client_secret`, NOT the RFC 6749 form exchange), the
+/// `{data:{access_token,…}}` response envelope, caching until expiry, expiry
+/// re-fetch, [UkFuelFinderAuth.invalidate] re-fetch, the packed-credentials
+/// parser, and the malformed-response guards.
 
 /// Captures every request and serves a programmable queue of JSON bodies.
 class _CapturingAdapter implements HttpClientAdapter {
@@ -61,10 +63,11 @@ Dio _dio(_CapturingAdapter adapter) {
 }
 
 void main() {
-  const tokenUrl = 'https://developer.fuel-finder.service.gov.uk/oauth/token';
+  const tokenUrl = 'https://test.fuel-finder.example/oauth/token';
 
   group('UkFuelFinderAuth — client-credentials token flow (#3190)', () {
-    test('POSTs grant_type=client_credentials with the client id + secret', () async {
+    test('POSTs the JSON credential body of the live token contract',
+        () async {
       final adapter = _CapturingAdapter([
         (200, {'access_token': 'tok-1', 'token_type': 'Bearer', 'expires_in': 3600}),
       ]);
@@ -73,7 +76,6 @@ void main() {
         tokenUrl: tokenUrl,
         clientId: 'client-abc',
         clientSecret: 'secret-xyz',
-        scope: 'fuel-prices:read',
       );
 
       final token = await auth.accessToken();
@@ -81,11 +83,68 @@ void main() {
       expect(token, 'tok-1');
       expect(adapter.requests.single.path, tokenUrl);
       expect(adapter.requests.single.method, 'POST');
-      final body = adapter.requestBodies.single;
-      expect(body, contains('grant_type=client_credentials'));
-      expect(body, contains('client_id=client-abc'));
-      expect(body, contains('client_secret=secret-xyz'));
-      expect(body, contains('scope=fuel-prices'));
+      expect(adapter.requests.single.headers[Headers.contentTypeHeader],
+          contains('application/json'));
+      final body = jsonDecode(adapter.requestBodies.single);
+      expect(body, {
+        'client_id': 'client-abc',
+        'client_secret': 'secret-xyz',
+      });
+    });
+
+    test('defaults to the statutory generate_access_token endpoint', () {
+      expect(
+        UkFuelFinderAuth.defaultTokenUrl,
+        'https://www.fuel-finder.service.gov.uk'
+        '/api/v1/oauth/generate_access_token',
+      );
+      final auth = UkFuelFinderAuth(
+        dio: Dio(),
+        clientId: 'c',
+        clientSecret: 's',
+      );
+      expect(auth.tokenUrl, UkFuelFinderAuth.defaultTokenUrl);
+    });
+
+    test('unwraps the live {data:{access_token,expires_in}} envelope',
+        () async {
+      final adapter = _CapturingAdapter([
+        (200, {
+          'data': {'access_token': 'tok-enveloped', 'expires_in': 3600},
+        }),
+      ]);
+      final auth = UkFuelFinderAuth(
+        dio: _dio(adapter),
+        tokenUrl: tokenUrl,
+        clientId: 'c',
+        clientSecret: 's',
+      );
+
+      expect(await auth.accessToken(), 'tok-enveloped');
+    });
+
+    test('fromPackedCredentials parses the Settings key slot', () {
+      final auth = UkFuelFinderAuth.fromPackedCredentials(
+        'client-abc:secret-with:colon',
+        dio: Dio(),
+      );
+      expect(auth, isNotNull);
+      expect(auth!.clientId, 'client-abc');
+      // Everything past the FIRST separator is the secret.
+      expect(auth.clientSecret, 'secret-with:colon');
+      expect(auth.tokenUrl, UkFuelFinderAuth.defaultTokenUrl);
+
+      // Non-credential key shapes (e.g. a Tankerkönig key in the shared
+      // slot) must not produce a GB auth.
+      expect(UkFuelFinderAuth.fromPackedCredentials(null, dio: Dio()), isNull);
+      expect(UkFuelFinderAuth.fromPackedCredentials('', dio: Dio()), isNull);
+      expect(
+          UkFuelFinderAuth.fromPackedCredentials('no-separator', dio: Dio()),
+          isNull);
+      expect(UkFuelFinderAuth.fromPackedCredentials(':secret', dio: Dio()),
+          isNull);
+      expect(UkFuelFinderAuth.fromPackedCredentials('id:', dio: Dio()),
+          isNull);
     });
 
     test('caches the token — a second call within expiry does NOT re-POST',

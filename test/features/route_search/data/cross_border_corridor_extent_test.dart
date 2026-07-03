@@ -26,6 +26,11 @@ class _NoKeyStorage implements StorageRepository {
   @override
   bool hasApiKey() => false;
 
+  // #3190 — the GB registry case now reads the packed Fuel Finder
+  // credentials from the same slot; keyless here = legacy GB behaviour.
+  @override
+  String? getApiKey() => null;
+
   @override
   dynamic noSuchMethod(Invocation invocation) =>
       super.noSuchMethod(invocation);

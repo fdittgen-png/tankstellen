@@ -1,0 +1,76 @@
+{
+  "data": {
+    "total_batches": 1,
+    "fuel_prices": [
+      {
+        "node_id": "PFS-100001",
+        "fuel_prices": [
+          {
+            "fuel_type": "E10",
+            "price": 141.9,
+            "price_last_updated": "2026-07-01 08:30:00",
+            "price_change_effective_timestamp": "2026-07-01T08:00:00Z"
+          },
+          {
+            "fuel_type": "E5",
+            "price": 154.9,
+            "price_last_updated": "2026-07-01 08:30:00",
+            "price_change_effective_timestamp": "2026-07-01T08:00:00Z"
+          },
+          {
+            "fuel_type": "B7_STANDARD",
+            "price": 148.9,
+            "price_last_updated": "2026-07-01 08:30:00",
+            "price_change_effective_timestamp": "2026-07-01T08:00:00Z"
+          },
+          {
+            "fuel_type": "B7_PREMIUM",
+            "price": 162.9,
+            "price_last_updated": "2026-07-01 08:30:00",
+            "price_change_effective_timestamp": "2026-07-01T08:00:00Z"
+          }
+        ]
+      },
+      {
+        "node_id": "PFS-100002",
+        "fuel_prices": [
+          {
+            "fuel_type": "E10",
+            "price": 139.9,
+            "price_last_updated": "2026-07-01 06:05:00",
+            "price_change_effective_timestamp": "2026-07-01T06:00:00Z"
+          },
+          {
+            "fuel_type": "B7_STANDARD",
+            "price": 146.9,
+            "price_last_updated": "2026-07-01 06:05:00",
+            "price_change_effective_timestamp": "2026-07-01T06:00:00Z"
+          }
+        ]
+      },
+      {
+        "node_id": "PFS-200001",
+        "fuel_prices": [
+          {
+            "fuel_type": "E10",
+            "price": 143.9,
+            "price_last_updated": "2026-06-30 18:40:00",
+            "price_change_effective_timestamp": "2026-06-30T18:30:00Z"
+          },
+          {
+            "fuel_type": "E5",
+            "price": 156.9,
+            "price_last_updated": "2026-06-30 18:40:00",
+            "price_change_effective_timestamp": "2026-06-30T18:30:00Z"
+          },
+          {
+            "fuel_type": "B7_STANDARD",
+            "price": 150.9,
+            "price_last_updated": "2026-06-30 18:40:00",
+            "price_change_effective_timestamp": "2026-06-30T18:30:00Z"
+          }
+        ]
+      }
+    ]
+  }
+}

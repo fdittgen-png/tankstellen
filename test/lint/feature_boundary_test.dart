@@ -394,6 +394,9 @@ const _featurePairBaseline = <String, int>{
 // (the journal/trigger/telemetry seams remain), price_history and widget
 // hit ZERO. #3137 — the obd2 extraction added no core→obd2 edge (the
 // event-channel guard lives in core/utils since #3134).
+// #3190 — station_services 19→18: the GB composition moved feature-side
+// (uk_service_builder.dart), collapsing the builder's two UK imports into
+// one seam.
 const _coreImportBaseline = <String, int>{
   'alerts': 3,
   'consumption': 6,
@@ -402,7 +405,7 @@ const _coreImportBaseline = <String, int>{
   'map': 1,
   'profile': 4,
   'search': 2,
-  'station_services': 19,
+  'station_services': 18,
 };
 
 /// Post-#3133 measurement (2026-06-11): `lib/features/` files importing
