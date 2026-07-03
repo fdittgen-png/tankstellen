@@ -16,6 +16,7 @@ import '../../../core/services/persistent_dataset.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
 import 'uk_fuel_finder_auth.dart';
+import 'uk_fuel_finder_feed.dart';
 import 'uk_station_service.dart';
 
 /// UK CMA / Fuel Finder **bulk-file** fuel-price service (#2277).
@@ -33,27 +34,46 @@ import 'uk_station_service.dart';
 /// through the identical [UkStationService.parseCmaStations] used by the legacy
 /// path, so a given area returns the same stations.
 ///
-/// The consolidated download is JSON-shaped exactly like the retailer feeds
-/// (`{"stations": [ {site_id, brand, address, postcode, location:{latitude,
-/// longitude}, prices:{E5,E10,B7,...}} ]}`); the persisted dataset is the raw
-/// record list, re-filtered per search. The download URL is injectable so the
-/// subscription-issued consolidated endpoint is a one-line config change.
+/// The download has two modes (#3190):
 ///
-/// This service is only wired into the registry when
-/// `BulkMigrationFlags.ukCmaBulk` is `true` (staged rollout, defaults to the
-/// legacy fan-out).
+///  - **Statutory feed mode** — a [UkFuelFinderFeed] is wired (the registry
+///    does this once OAuth2 credentials are configured): the two paged
+///    `/api/v1/pfs*` resources of the live Fuel Finder API are downloaded and
+///    merged into CMA-shaped records. This is the production path.
+///  - **Single-URL mode** — no feed: one GET of [_consolidatedUrl] expecting
+///    the standardized CMA envelope (`{"stations": [ {site_id, brand,
+///    address, postcode, location:{latitude,longitude},
+///    prices:{E5,E10,B7,...}} ]}`), optionally Bearer-authenticated via
+///    [UkFuelFinderAuth]. Kept injectable for tests and any future
+///    consolidated-file publication.
+///
+/// Either way the persisted dataset is the raw CMA-shaped record list,
+/// re-filtered per search.
+///
+/// Registry wiring: with credentials the service runs feed-mode as the GB
+/// PRIMARY (legacy fan-out demoted to fallback); without credentials it is
+/// only selected when `BulkMigrationFlags.ukCmaBulk` is `true` (staged
+/// rollout, defaults to the legacy fan-out).
 class UkCmaBulkStationService
     with StationServiceHelpers, CachedDatasetMixin
     implements StationService {
   final Dio _dio;
   final String _consolidatedUrl;
 
+  /// #3190 — the statutory Fuel Finder feed client (token + the two batched
+  /// `/api/v1/pfs*` resources merged into CMA-shaped records). When set it
+  /// REPLACES the single consolidated download below: [_downloadConsolidated]
+  /// delegates to [UkFuelFinderFeed.downloadCmaShapedRecords] and everything
+  /// downstream (persist / local-filter / shared parse) is unchanged. This is
+  /// the path the registry wires once OAuth2 credentials are configured.
+  final UkFuelFinderFeed? _feed;
+
   /// #3190 — OAuth 2.0 client-credentials token source for the statutory Fuel
-  /// Finder API. Null on the pre-credentials path (no GOV.UK One Login client
+  /// Finder API. Null on the pre-credentials path (no registered client
   /// configured yet) → the consolidated request goes out unauthenticated, as
   /// before. When set, each download carries a `Bearer` token (fetched +
   /// cached by [UkFuelFinderAuth]); a 401 invalidates the token and retries
-  /// once.
+  /// once. Only read by the single-URL mode — [_feed] handles its own auth.
   final UkFuelFinderAuth? _auth;
 
   /// Disk persistence (read-through). When a [CacheStrategy] is supplied (the
@@ -62,22 +82,23 @@ class UkCmaBulkStationService
   /// offline. Null in the pure-in-memory parser tests.
   final PersistentDataset<List<Map<String, dynamic>>>? _persistent;
 
-  /// Default consolidated Fuel Finder download (#3190). The statutory Fuel
-  /// Finder Scheme (Motor Fuel Price (Open Data) Regulations 2025) replaced the
-  /// withdrawn voluntary CMA scheme on 2026-05-01; its public API lives on the
-  /// gov.uk developer portal. One consolidated file covers every forecourt.
-  /// Overridable so the exact `/public-api` price-list path — which must be
-  /// confirmed against the registered API docs — drops in without touching the
-  /// parse/persist/filter logic.
+  /// Default single-download URL for the legacy consolidated-file mode
+  /// (#3190). The confirmed statutory API publishes no one-file dump — it
+  /// pages two REST resources instead (see [UkFuelFinderFeed], the mode the
+  /// registry actually wires) — so this constant now points at the real
+  /// statutory prices resource (first batch) purely as the injectable
+  /// single-URL mode's least-wrong default; it replaces the earlier
+  /// `/public-api/v1/prices/latest` guess, which was never a live path.
   // i18n-ignore: gov.uk data endpoint URL, not user-facing text
   static const String defaultConsolidatedUrl =
-      'https://developer.fuel-finder.service.gov.uk/public-api/v1/prices/latest';
+      '${UkFuelFinderFeed.defaultBaseUrl}${UkFuelFinderFeed.pricesPath}';
 
   UkCmaBulkStationService({
     Dio? dio,
     String? consolidatedUrl,
     CacheStrategy? cache,
     UkFuelFinderAuth? auth,
+    UkFuelFinderFeed? feed,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 15),
@@ -85,6 +106,7 @@ class UkCmaBulkStationService
               responseType: ResponseType.json,
             ),
         _auth = auth,
+        _feed = feed,
         _consolidatedUrl = consolidatedUrl ?? defaultConsolidatedUrl,
         _persistent = cache == null
             ? null
@@ -171,6 +193,13 @@ class UkCmaBulkStationService
   Future<List<Map<String, dynamic>>> _downloadConsolidated({
     CancelToken? cancelToken,
   }) async {
+    // #3190 — statutory feed mode: the two paged /api/v1/pfs* resources,
+    // merged into CMA-shaped records (auth + 401-retry live inside the feed).
+    final feed = _feed;
+    if (feed != null) {
+      return feed.downloadCmaShapedRecords(cancelToken: cancelToken);
+    }
+
     final auth = _auth;
     if (auth == null) {
       final response = await _dio.get<dynamic>(

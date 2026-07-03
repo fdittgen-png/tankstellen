@@ -1,0 +1,61 @@
+{
+  "data": {
+    "total_batches": 1,
+    "pfs": [
+      {
+        "node_id": "PFS-100001",
+        "trading_name": "APPLEGREEN LONDON VICTORIA",
+        "brand_name": "Applegreen",
+        "location": {
+          "address_line_1": "123 Victoria Street",
+          "address_line_2": "",
+          "city": "London",
+          "county": "Greater London",
+          "country": "England",
+          "postcode": "SW1E 6DE",
+          "latitude": 51.4966,
+          "longitude": -0.1348
+        },
+        "fuel_types": ["E10", "E5", "B7_STANDARD", "B7_PREMIUM"],
+        "amenities": ["CAR_WASH", "SHOP"],
+        "opening_times": {}
+      },
+      {
+        "node_id": "PFS-100002",
+        "trading_name": "TESCO KENSINGTON EXPRESS",
+        "brand_name": "Tesco",
+        "location": {
+          "address_line_1": "22a Warwick Road",
+          "address_line_2": "Kensington",
+          "city": "London",
+          "county": "Greater London",
+          "country": "England",
+          "postcode": "W14 8LP",
+          "latitude": 51.4901,
+          "longitude": -0.1963
+        },
+        "fuel_types": ["E10", "B7_STANDARD"],
+        "amenities": ["SHOP"],
+        "opening_times": {}
+      },
+      {
+        "node_id": "PFS-200001",
+        "trading_name": "BP EDINBURGH WESTFIELD",
+        "brand_name": "BP",
+        "location": {
+          "address_line_1": "1 Westfield Road",
+          "address_line_2": "",
+          "city": "Edinburgh",
+          "county": "City of Edinburgh",
+          "country": "Scotland",
+          "postcode": "EH11 2QW",
+          "latitude": 55.9366,
+          "longitude": -3.2415
+        },
+        "fuel_types": ["E10", "E5", "B7_STANDARD"],
+        "amenities": [],
+        "opening_times": {}
+      }
+    ]
+  }
+}

@@ -20,8 +20,7 @@ import '../../features/station_services/romania/romania_station_service.dart';
 import '../../features/station_services/slovenia/slovenia_station_service.dart';
 import '../../features/station_services/south_korea/south_korea_station_service.dart';
 import '../../features/station_services/spain/miteco_station_service.dart';
-import '../../features/station_services/uk/uk_cma_bulk_station_service.dart';
-import '../../features/station_services/uk/uk_station_service.dart';
+import '../../features/station_services/uk/uk_service_builder.dart';
 import '../cache/cache_manager.dart';
 import '../data/storage_repository.dart';
 import 'bulk_migration_flags.dart';
@@ -118,11 +117,17 @@ StationService buildRawCountryService(
     case 'PT':
       return PortugalStationService();
     case 'GB':
-      // #2277 staged rollout — consolidated CMA bulk file when flagged, else
-      // the legacy per-search retailer fan-out.
-      return BulkMigrationFlags.ukCmaBulk
-          ? UkCmaBulkStationService(cache: deps.cache)
-          : UkStationService();
+      // #3190 — statutory Fuel Finder API as PRIMARY once OAuth2 credentials
+      // are configured (Settings → API key, packed "client_id:client_secret"
+      // — the same single per-country key slot DE/KR/CL read), legacy
+      // retailer fan-out demoted to the in-service fallback; keyless
+      // installs keep the legacy / #2277 flag-gated behaviour unchanged.
+      // Composition lives feature-side in buildGbStationService (#3132
+      // boundary ratchet: one core→feature import instead of five).
+      return buildGbStationService(
+        apiKey: deps.storage.getApiKey(),
+        cache: deps.cache,
+      );
     case 'AU':
       return const AustraliaStationService();
     case 'MX':

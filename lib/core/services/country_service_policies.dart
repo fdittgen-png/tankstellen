@@ -86,19 +86,24 @@ const _ukPolicyLegacy = FuelServicePolicy(
   sourceUrl: 'https://www.gov.uk/guidance/access-fuel-price-data',
 );
 
-/// UK CMA Fuel Finder — BULK consolidated twice-daily file (#2277): one
-/// whole-country download per ~12 h publication cadence, persisted and
-/// local-filtered. Soft TTL ≈ the publish cadence, hard TTL an offline-grace
-/// multiple. Selected only when `BulkMigrationFlags.ukCmaBulk` is `true`.
+/// UK Fuel Finder — BULK whole-country download (#2277, rebased on the
+/// statutory Fuel Finder API in #3190): the paged `/api/v1/pfs*` resources,
+/// persisted and local-filtered. Soft TTL ≈ the twice-daily consumer cadence,
+/// hard TTL an offline-grace multiple. Selected only when
+/// `BulkMigrationFlags.ukCmaBulk` is `true`. (The #3190 credentialed path
+/// keeps the legacy polled policy at chain level — the bulk primary governs
+/// its own dataset TTLs internally either way, so the per-search cache on
+/// top is merely conservative.)
 const _ukPolicyBulk = FuelServicePolicy(
   model: SourceModel.bulkFile,
   minInterval: Duration(hours: 1),
   datasetTtlSoft: Duration(hours: 12),
   datasetTtlHard: Duration(hours: 48),
   searchResultTtl: Duration.zero,
-  attribution: 'CMA Fuel Finder (consolidated)',
+  attribution: 'Fuel Finder (DESNZ / VE3 Global)',
   license: 'Open Government Licence v3.0',
-  sourceUrl: 'https://www.gov.uk/guidance/access-fuel-price-data',
+  sourceUrl:
+      'https://www.gov.uk/guidance/access-the-latest-fuel-prices-and-forecourt-data-via-api-or-email',
 );
 
 /// Staged-rollout selection (#2277): legacy by default, bulk when flagged.

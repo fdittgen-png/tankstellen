@@ -54,6 +54,7 @@ class CanaryTarget {
     this.url,
     this.method = 'GET',
     this.bodyMarker,
+    this.headers = const {},
     this.skip,
     this.note = '',
   });
@@ -73,6 +74,10 @@ class CanaryTarget {
   /// Substring expected in the first 64 KiB of a GET body — the minimal
   /// shape check that catches a "200 but the API moved" soft-404.
   final String? bodyMarker;
+
+  /// Extra request headers, for endpoints that content-negotiate (#3457 —
+  /// the RO WCF backend serves XML unless `Accept: application/json`).
+  final Map<String, String> headers;
 
   /// Non-null → target is skipped (reported, never failed).
   final SkipReason? skip;
@@ -159,10 +164,12 @@ const List<CanaryTarget> targets = [
     url: 'https://applegreenstores.com/fuel-prices/data.json',
     bodyMarker: '"stations"',
     note: 'uk/uk_station_service.dart — probes one keyless retailer feed of '
-        'the shipped fan-out. NOTE: reachability only; the CMA scheme was '
-        'withdrawn and feeds may serve stale data. The Fuel Finder bulk '
-        'replacement (uk_cma_bulk_station_service.dart) answers 403 '
-        'without registered access, so it cannot be probed keylessly.',
+        'the legacy fan-out (now the GB fallback path, #3190). NOTE: '
+        'reachability only; the voluntary CMA scheme was withdrawn and feeds '
+        'may serve stale data. The statutory Fuel Finder primary '
+        '(www.fuel-finder.service.gov.uk/api/v1/pfs, '
+        'uk_fuel_finder_feed.dart) requires OAuth2 client credentials, so it '
+        'cannot be probed keylessly.',
   ),
   CanaryTarget(
     country: 'AU',
@@ -223,11 +230,18 @@ const List<CanaryTarget> targets = [
   ),
   CanaryTarget(
     country: 'RO',
-    name: 'Monitorul Prețurilor (pretcarburant.ro)',
-    url: 'https://pretcarburant.ro/api/stations',
-    bodyMarker: '"stations"',
-    note: 'romania/romania_station_service.dart — 404 as of 2026-06-10; '
-        'kept ACTIVE on purpose so the canary keeps tracking the outage.',
+    name: 'Monitorul Prețurilor (monitorulpreturilor.info)',
+    url: 'https://monitorulpreturilor.info/pmonsvc/Gas/GetGasItemsByLatLon'
+        '?lon=26.10&lat=44.43&buffer=5000&CSVGasCatalogProductIds=11'
+        '&OrderBy=dist',
+    headers: {'Accept': 'application/json'},
+    bodyMarker: '"Stations"',
+    note: 'romania/romania_station_service.dart — #3457: the service was '
+        'rebased onto the official Competition Council observatory in #3193, '
+        'but this probe still pointed at the dead third-party '
+        'pretcarburant.ro. Mirrors defaultBaseUrl + searchPath (Bucharest '
+        'centre, Benzină standard). The Accept header forces JSON — the WCF '
+        'backend otherwise serves XML.',
   ),
 ];
 
@@ -252,6 +266,7 @@ Future<ProbeResult> probe(CanaryTarget t, Duration timeout) async {
     final uri = Uri.parse(t.url!);
     final request = await client.openUrl(t.method, uri).timeout(timeout);
     request.followRedirects = true;
+    t.headers.forEach(request.headers.set);
     final response = await request.close().timeout(timeout);
     final status = response.statusCode;
 
