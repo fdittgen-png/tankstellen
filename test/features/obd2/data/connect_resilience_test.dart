@@ -216,6 +216,9 @@ class _OrderedClassicFacade implements ClassicBluetoothFacade {
   Future<void> stopScan() async => log.add('classic:stopScan');
 
   @override
+  Future<bool?> isBonded(String mac) async => null; // #3423 — unknown
+
+  @override
   ElmByteChannel channelFor(String deviceId) {
     channelForCalls.add(deviceId);
     return channel ?? _OrderedChannel(log, 'classic');

@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/lessons/driving_lesson_registry.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/climbing_cost_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/coasting_recognition_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/combustion_health_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/full_throttle_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/hard_accel_rule.dart';
@@ -16,6 +17,7 @@ import 'package:tankstellen/features/consumption/data/lessons/rules/low_gear_rul
 import 'package:tankstellen/features/consumption/data/lessons/rules/restart_cost_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/sharp_cornering_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/smooth_driving_rule.dart';
+import 'package:tankstellen/features/consumption/data/lessons/rules/upshift_cruise_rule.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:tankstellen/l10n/app_localizations_en.dart';
@@ -87,7 +89,8 @@ void main() {
 
   group('registered rule set', () {
     test('standard registry registers the migrated rules + the #2287 '
-        'analytics lessons, in declaration order', () {
+        'analytics lessons + the #3432 attribution lessons, in declaration '
+        'order', () {
       final reg = DrivingLessonRegistry.standard();
       expect(
         reg.rules.map((r) => r.id).toList(),
@@ -99,11 +102,13 @@ void main() {
           highSpeedBandLessonId,
           fullThrottleLessonId,
           lambdaEnrichmentLessonId,
+          upshiftCruiseLessonId,
           climbingCostLessonId,
           restartCostLessonId,
           hardBrakeLessonId,
           sharpCorneringLessonId,
           combustionHealthLessonId,
+          coastingFuelCutLessonId,
           smoothDrivingLessonId,
         ],
       );

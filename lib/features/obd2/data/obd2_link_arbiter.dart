@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'obd2_link_drop_signal.dart';
+import 'obd2_wedge_detector.dart';
 
 /// Priority of an [Obd2LinkLease], ordered low → high. A [tryAcquire] with a
 /// STRICTLY higher priority preempts the current holder; an equal-or-lower
@@ -91,6 +92,10 @@ class Obd2LinkArbiter {
     // Held for the process lifetime (never cancelled) — the arbiter IS the
     // app-wide drop router, alive exactly as long as the process.
     Obd2LinkDropSignal.instance.drops.listen(_routeDrop);
+    // #3422 — the LinkWedged stand-down: the instant the wedge latches, any
+    // in-flight idle loop is told to stop (mirroring a lease grant), so the
+    // bounded storm ends the moment the detector calls it.
+    Obd2WedgeDetector.instance.linkWedged.addListener(_onWedgeFlip);
   }
 
   /// Process-wide instance.
@@ -127,6 +132,16 @@ class Obd2LinkArbiter {
     void Function(Obd2LinkDropEvent event)? onDrop,
     VoidCallback? onPreempted,
   }) {
+    // #3422 — while the link is WEDGED (N consecutive exhausted Classic
+    // ladders, `Obd2WedgeDetector`), the auto-record LOOP stands down like
+    // every other reconnect policy: its movement-watch would keep dialling
+    // the dead adapter all day (the #3415 storm). User-driven claims
+    // (interactive, recording) still pass — a user gesture is one of the
+    // sanctioned wedge exits.
+    if (priority == Obd2LinkPriority.autoRecord &&
+        Obd2WedgeDetector.instance.isWedged) {
+      return null;
+    }
     final current = _holder;
     if (current != null && current.isActive) {
       // Interactive-vs-interactive: the LATEST user gesture wins — a hung
@@ -201,8 +216,22 @@ class Obd2LinkArbiter {
       } catch (_) {}
       return;
     }
+    // #3422 — LinkWedged: the idle policy stands down (a drop must not kick
+    // its bounded loop back into the storm). The recovery ladder / the user
+    // own the link until the wedge clears.
+    if (Obd2WedgeDetector.instance.isWedged) return;
     for (final reg in List<Obd2LinkIdleRegistration>.of(_idlePolicies)) {
       reg._notifyDrop(event);
+    }
+  }
+
+  /// #3422 — wedge latched → stop any in-flight idle loop (same broadcast a
+  /// lease grant uses). The wedge CLEARING needs no push: the next drop /
+  /// retry flows normally once [Obd2WedgeDetector.isWedged] is false.
+  void _onWedgeFlip() {
+    if (!Obd2WedgeDetector.instance.isWedged) return;
+    for (final reg in List<Obd2LinkIdleRegistration>.of(_idlePolicies)) {
+      reg._notifyStandDown();
     }
   }
 

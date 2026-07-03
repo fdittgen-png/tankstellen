@@ -148,10 +148,26 @@ DrivingCoachingHint? coachingHint(
 /// standstill we fall back to L/h so the readout stays useful while
 /// stopped in traffic.
 ///
+/// #3431 — prefers the EMA-smoothed true-instant fields
+/// ([TripLiveReading.instantLPer100Km] / [TripLiveReading.instantLPerHour],
+/// τ ≈ 2.5 s) when the controller stamped them, so the banner / PiP /
+/// Live-Activity figure stops flickering with raw PID noise. The raw
+/// `fuelRate / speed` derivation stays as the fallback for readings
+/// built by paths that don't run the EMA (tests, legacy fakes).
+///
 /// Returns `null` when the OBD2 stream hasn't surfaced a fuel-rate
 /// reading yet (the banner suppresses the value in that case rather
 /// than rendering a placeholder).
 String? formatInstantConsumption(TripLiveReading r) {
+  // Smoothed instant signal (#3431) — the preferred source.
+  final smoothedRate = r.instantLPerHour;
+  if (smoothedRate != null) {
+    final lPer100 = r.instantLPer100Km;
+    if (r.instantIsIdle == true || lPer100 == null) {
+      return '${smoothedRate.toStringAsFixed(1)} L/h';
+    }
+    return '${lPer100.toStringAsFixed(1)} L/100';
+  }
   final fuelRate = r.fuelRateLPerHour;
   if (fuelRate == null) return null;
   final speed = r.speedKmh ?? 0;

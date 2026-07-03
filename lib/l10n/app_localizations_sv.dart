@@ -4757,6 +4757,67 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kunde inte exportera analysspårningen.';
 
   @override
+  String get minimalDriveTripAverage => 'Trip average';
+
+  @override
+  String insightUpshiftCruise(String pctTime, String liters) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier could save $liters L';
+  }
+
+  @override
+  String get lessonAdviceUpshiftCruise =>
+      'Shift up earlier when cruising — the same speed at lower RPM burns noticeably less fuel.';
+
+  @override
+  String insightCoastingFuelCut(String pctTime, String liters) {
+    return 'Fuel-cut coasting ($pctTime% of trip): saved about $liters L';
+  }
+
+  @override
+  String get lessonAdviceCoastingFuelCut =>
+      'Nicely anticipated — lifting off early lets the engine cut fuel completely while coasting.';
+
+  @override
+  String insightTrailingLitersSaved(String liters) {
+    return '−$liters L';
+  }
+
+  @override
+  String get fuelBreakdownTitle => 'Where your fuel went';
+
+  @override
+  String get fuelBreakdownIdle => 'Idling';
+
+  @override
+  String get fuelBreakdownHarshAccel => 'Hard accelerations';
+
+  @override
+  String get fuelBreakdownHighRpmCruise => 'High-RPM cruising';
+
+  @override
+  String get fuelBreakdownCoastingSaved => 'Saved by coasting';
+
+  @override
+  String get fuelBreakdownEfficient => 'Normal driving';
+
+  @override
+  String fuelBreakdownLiters(String liters) {
+    return '$liters L';
+  }
+
+  @override
+  String get ecoNudgeIdle =>
+      'Idling for a while — switching the engine off saves fuel';
+
+  @override
+  String get ecoNudgeHarshAccel =>
+      'Strong acceleration — a gentler pedal saves fuel';
+
+  @override
+  String get ecoNudgeHighRpm =>
+      'High revs at cruise — shifting up earlier saves fuel';
+
+  @override
   String get ecoRouteOption => 'Eco';
 
   @override
@@ -6576,6 +6637,13 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get obd2ReconnectRetry => 'Tap to retry';
+
+  @override
+  String get obd2WedgeHintBody =>
+      'Your OBD2 adapter stopped responding. Switch the ignition off and on or replug the adapter — or toggle Bluetooth off and on.';
+
+  @override
+  String get obd2WedgeHintOpenBtSettings => 'Bluetooth settings';
 
   @override
   String get ocrTesterTitle => 'OCR-testare';

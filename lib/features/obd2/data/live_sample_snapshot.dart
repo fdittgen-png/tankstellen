@@ -4,9 +4,11 @@
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import 'elm327_protocol.dart';
+import 'fuel_mixture_model.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_service.dart';
 import 'pid_scheduler.dart';
+import 'precision_pid_latches.dart';
 
 /// The "clock"-side snapshot extracted from [TripRecordingController]
 /// (#1679): the per-PID latest-value scratch space, the scheduler
@@ -38,7 +40,8 @@ class LiveSampleSnapshot {
         _breadcrumbCollector = breadcrumbCollector,
         _onHighPriorityParse = onHighPriorityParse,
         _onSpeedSample = onSpeedSample,
-        _clock = clock ?? DateTime.now;
+        _clock = clock ?? DateTime.now,
+        _precision = PrecisionPidLatches(clock: clock);
 
   final Obd2Service _service;
   final VehicleProfile? _vehicle;
@@ -47,6 +50,19 @@ class LiveSampleSnapshot {
   final void Function(Object? parsedValue) _onHighPriorityParse;
   final void Function(double speedKmh) _onSpeedSample;
   final DateTime Function() _clock; // #2505 — IAT-staleness clock (test seam).
+
+  // Epic #3416 — latches + subscriptions for the precision PID families
+  // (measured wideband φ #3427, MAF 0x66 / fuel-rate 0x9D / 0xA2 #3428,
+  // ethanol 0x52 #3429). A collaborator so this grandfathered file grows
+  // by a field + one subscribe call, not by twenty latches.
+  final PrecisionPidLatches _precision;
+
+  /// The ECU's own fuel-type answer (PID 0x51) read ONCE at comm-session
+  /// start (#3429) — runtime truth that beats the free-text profile fuel
+  /// key for this session's AFR/density resolution (manual overrides
+  /// still win). Null when the ECU doesn't answer 0x51; the resolution
+  /// then falls back to the profile exactly as before.
+  String? sessionFuelTypeKey;
 
   // Latest parsed values, keyed by PID command. Written by scheduler
   // callbacks, read by the controller's `_emit` when assembling a
@@ -69,13 +85,14 @@ class LiveSampleSnapshot {
   double? _latestLtft;
   double? _latestDirectFuelRate;
 
-  // #2456 — commanded equivalence ratio λ (PID 0x44) and absolute
-  // barometric pressure (PID 0x33). Both refine the MAF / speed-density
-  // fuel derivation when the car exposes them and stay null (today's
-  // behaviour, bit-for-bit) on cars that don't. λ is sampled fast (it
-  // tracks the mixture under load); baro is sampled slowly (it only
-  // changes with altitude / weather).
-  double? _latestLambda;
+  // #2456 — commanded fuel–air equivalence ratio φ (PID 0x44 — SAE
+  // convention verified #3426: φ > 1 rich, φ < 1 lean, λ = 1/φ) and
+  // absolute barometric pressure (PID 0x33). Both refine the MAF /
+  // speed-density fuel derivation when the car exposes them and stay
+  // null (today's behaviour, bit-for-bit) on cars that don't. φ is
+  // sampled fast (it tracks the mixture under load); baro is sampled
+  // slowly (it only changes with altitude / weather).
+  double? _latestCommandedPhi;
   double? _latestBaroKpa;
 
   // #2458 — bank-2 fuel trims (PIDs 0x08 / 0x09). Fold into the MAF /
@@ -153,9 +170,19 @@ class LiveSampleSnapshot {
   // controller's `_emit` persists onto each TripSample (#2459). The
   // raw mixture inputs (MAF / MAP / STFT / LTFT) are read here too so the
   // diagnostic-capture path can stamp them for post-hoc re-derivation.
-  double? get latestLambda => _latestLambda;
+  // (Named λ pre-#3426; the PID 0x44 wire value is the SAE fuel–air
+  // equivalence ratio φ — see `effectiveAfrForPhi`.)
+  double? get latestCommandedPhi => _latestCommandedPhi;
   double? get latestBaroKpa => _latestBaroKpa;
   double? get latestAbsLoadPercent => _latestAbsLoadPercent;
+
+  /// Freshest MEASURED wideband φ (PIDs 0x24–0x2B / 0x34–0x3B, #3427),
+  /// bank-1-sensor-1 priority. Null on cars without a wideband sensor or
+  /// when the last reading went stale.
+  double? get latestMeasuredPhi => _precision.measuredPhi();
+
+  /// Measured ethanol fuel % (PID 0x52, #3429). Null when unsupported.
+  double? get latestEthanolPercent => _precision.ethanolPercent;
 
   /// Accelerator-pedal position (%) — the max of whichever of the three
   /// channels (D / E / F, PIDs 0x49 / 0x4A / 0x4B) have landed (#2458).
@@ -209,7 +236,7 @@ class LiveSampleSnapshot {
   /// **Cadence tiers** (weighted round-robin; the governor demotes deepest
   /// tiers first, never [PidTier.dynamics], so RPM / speed never starve):
   /// dynamics ~5 Hz (RPM 010C, speed 010D, throttle 0111 + the 015E → MAF
-  /// 0110 → MAP 010B fuel-rate driver), mixture ~2 Hz (λ 0144, load 0104),
+  /// 0110 → MAP 010B fuel-rate driver), mixture ~2 Hz (φ 0144, load 0104),
   /// slowCorrection ~0.5 Hz (STFT 0106, LTFT 0107, IAT 010F, baro 0133),
   /// thermalContext ~0.1 Hz (coolant 0105, tank 012F). #2458 adds pedal,
   /// abs-load/bank-2, and oil/ambient to those tiers (slots inline below).
@@ -311,12 +338,12 @@ class LiveSampleSnapshot {
     // ---- MIXTURE tier (~2 Hz, medium priority) ---------------------
     // The mixture swings on the timescale of throttle inputs, so 2 Hz
     // keeps the effective-AFR refinement current without stealing the
-    // dynamics budget. #2456 — commanded λ (0x44), optionalPid-gated:
+    // dynamics budget. #2456 — commanded φ (0x44), optionalPid-gated:
     // absent → the derivation falls back to the assumed stoich AFR.
     _sub(scheduler, Elm327Protocol.commandedEquivalenceRatioCommand,
         hz: 2.0, tier: PidTier.mixture, optionalPid: 0x44, (r) {
       final v = Elm327Protocol.parseCommandedEquivalenceRatio(r);
-      if (v != null) _latestLambda = v;
+      if (v != null) _latestCommandedPhi = v;
     });
     _sub(scheduler, Elm327Protocol.engineLoadCommand,
         hz: 2.0, tier: PidTier.mixture, (r) {
@@ -403,6 +430,15 @@ class LiveSampleSnapshot {
       final v = Elm327Protocol.parseAmbientAirTempCelsius(r);
       if (v != null) _latestAmbientTempC = v;
     }, optionalPid: 0x46);
+
+    // ---- Epic #3416 precision PIDs -------------------------------------
+    // Wideband measured φ → mixture tier (#3427); MAF 0x66 / fuel-rate
+    // 0x9D / 0xA2 → dynamics (#3428); ethanol 0x52 → slow (#3429). STRICT
+    // support gate (resolved ∧ contains): rare modern PIDs are never
+    // blind-subscribed, or an unresolved clone floods the round-robin
+    // with NO DATA initial reads and starves the dynamics tier.
+    _precision.subscribe(scheduler,
+        isPidSupported: _service.isPidKnownSupported);
   }
 
   /// Register one tier subscription on [scheduler] (#2457): each PID is a
@@ -436,6 +472,17 @@ class LiveSampleSnapshot {
   Obd2BranchTag? _lastFuelRateBranch;
   Obd2BranchTag? get lastFuelRateBranch => _lastFuelRateBranch;
 
+  /// #3428 / #3433 — the fine-grained fuel-source provenance of the most
+  /// recent [deriveFuelRateLPerHour] call. Distinguishes the new 0x9D /
+  /// 0xA2 mass branches and 0x66-vs-0x10 MAF, which [lastFuelRateBranch]
+  /// (whose `Obd2BranchTag` vocabulary is frozen — the breadcrumb overlay
+  /// switches on it exhaustively in presentation code owned by the
+  /// #3431/#3432 agent) cannot express. The controller stamps it onto
+  /// each TripSample so the driving-analysis export can report which
+  /// branch DOMINATED the trip. Null before the first call.
+  FuelRateSourceTag? _lastFuelRateSource;
+  FuelRateSourceTag? get lastFuelRateSource => _lastFuelRateSource;
+
   /// #1858 — the volumetric efficiency applied on the most recent
   /// [deriveFuelRateLPerHour] call. Only meaningful when
   /// [lastFuelRateBranch] is [Obd2BranchTag.speedDensity]; null
@@ -444,28 +491,44 @@ class LiveSampleSnapshot {
   double? get lastFuelRateVe => _lastFuelRateVe;
 
   /// Derive the current fuel rate (L/h) from whatever snapshot
-  /// values have landed so far. Mirrors the tier-1/2/3 fallback in
+  /// values have landed so far. Mirrors the fallback chain in
   /// [Obd2Service.readFuelRateLPerHour], but over snapshot values
   /// instead of live I/O — the scheduler has already done the
   /// reads. Returns null when not enough inputs have arrived yet
   /// (e.g. first 200 ms of a trip before MAP/IAT both land).
   ///
-  /// AFR + density come from the active vehicle's preferred fuel type via
-  /// [resolveAfrDensity] (#800, #2432): diesel 14.5 / 832, E85 9.8 / 785,
-  /// LPG 15.6 / 535, CNG 17.2 / petrol-equiv; null / unknown stays on the
-  /// pre-#800 petrol defaults. Manual AFR / density overrides win.
+  /// Branch order (#3428): mass-based 0x9D / 0xA2 (density-only) →
+  /// direct 0x5E → MAF (0x66 preferred over 0x10, mixture-corrected) →
+  /// speed-density (MAP + IAT + RPM).
+  ///
+  /// AFR + density come from [resolveMixtureConstants] (#800, #2432,
+  /// #3429): manual overrides win, then a measured-ethanol (0x52) blend,
+  /// then the session 0x51 / profile fuel key → constants; diesel
+  /// 14.5 / 832, E85 9.8 / 785, LPG 15.6 / 535, CNG 17.2 / petrol-equiv;
+  /// null / unknown stays on the pre-#800 petrol defaults. Diesel skips
+  /// the trim + commanded-φ corrections entirely (#3430).
   double? deriveFuelRateLPerHour() {
     // #1858 — provenance defaults; each branch below overrides them.
     _lastFuelRateBranch = Obd2BranchTag.none;
+    _lastFuelRateSource = FuelRateSourceTag.none;
     _lastFuelRateVe = null;
-    // #1397 / #2432 — single fuel-type lookup (manual override → fuel-key
+    // #1397 / #2432 / #3429 / #3430 — single fuel-type lookup (manual
+    // override → measured-ethanol blend → session 0x51 key → fuel-key
     // AFR/density → petrol default), mirroring
     // [Obd2Service.readFuelRateLPerHour] so the live integrator and the
-    // pull-mode estimator agree on every scalar. `resolveAfrDensity` is
-    // re-exported from `obd2_service.dart`.
-    final afrDensity = resolveAfrDensity(_vehicle);
-    final afr = afrDensity.afr;
-    final density = afrDensity.densityGPerL;
+    // pull-mode estimator agree on every scalar. With no 0x51 / 0x52
+    // signal this is byte-for-byte the old `resolveAfrDensity` result.
+    final mixture = resolveMixtureConstants(
+      _vehicle,
+      sessionFuelTypeKey: sessionFuelTypeKey,
+      measuredEthanolPercent: _precision.ethanolPercent,
+    );
+    final afr = mixture.afr;
+    final density = mixture.densityGPerL;
+    // #3430 — diesel gate: skip the petrol stoich-feedback corrections
+    // (STFT/LTFT trims + commanded φ); only a measured wideband φ is
+    // trusted. See the accuracy-limit doc in `fuel_mixture_model.dart`.
+    final isDiesel = mixture.kind == ResolvedFuelKind.diesel;
     final displacement = _vehicle?.manualEngineDisplacementCcOverride
             ?.round() ??
         _vehicle?.engineDisplacementCc ??
@@ -480,6 +543,76 @@ class LiveSampleSnapshot {
             ? defaultVolumetricEfficiency(_referenceVehicle)
             : 0.85);
     final collector = _breadcrumbCollector;
+
+    // Step 0 (#3428): the mass-based PIDs — the ECU reports FUEL MASS
+    // directly, so only the density touches the conversion (no AFR / VE /
+    // φ / trim guess). Above 0x5E because 0x9D carries more resolution
+    // (0.02 g/s ≈ 0.1 L/h petrol vs 0x5E's 0.05 L/h) and is the SAE-
+    // designated fuel-economy PID on modern ECUs. Breadcrumb rows use the
+    // frozen pid5E tag (the overlay's Obd2BranchTag switch lives in
+    // presentation code owned by the #3431/#3432 agent); the true source
+    // is stamped via [lastFuelRateSource].
+    final rate9dGPerS = _precision.engineFuelRate9dGPerS;
+    if (rate9dGPerS != null) {
+      final lph = fuelRateLPerHourFromGramsPerSecond(rate9dGPerS, density);
+      if (lph != null) {
+        collector?.record(
+          branch: Obd2BranchTag.pid5E,
+          fuelRateLPerHour: lph,
+          pid5ELPerHour: _latestDirectFuelRate,
+          rpm: _latestRpm,
+          afr: afr,
+          fuelDensityGPerL: density,
+          engineDisplacementCc: displacement.toDouble(),
+          volumetricEfficiency: ve,
+        );
+        // #3428 — 9D-vs-5E cross-check: both are ECU-reported fuel, so a
+        // > 50 % divergence flags a mis-scaled 0x9D or a stuck 0x5E.
+        final direct5e = _latestDirectFuelRate;
+        if (direct5e != null &&
+            direct5e > 0 &&
+            (lph - direct5e).abs() / direct5e > 0.5) {
+          collector?.recordFlag(
+            Obd2BreadcrumbCollector.flag9dVs5eDivergent,
+            'rate9d=${lph.toStringAsFixed(2)};'
+                'pid5e=${direct5e.toStringAsFixed(2)}',
+          );
+        }
+        _lastFuelRateBranch = Obd2BranchTag.pid5E;
+        _lastFuelRateSource = FuelRateSourceTag.pid9D;
+        return lph;
+      }
+    }
+    // 0xA2 (mg per cylinder per stroke) needs RPM + the cylinder count to
+    // become a mass flow; gated on a known [VehicleProfile.engineCylinders]
+    // so the conversion is never guessed (#3428).
+    final cylRate = _precision.cylinderFuelRateMgPerStroke;
+    final cylinders = _vehicle?.engineCylinders;
+    final rpmForCyl = _latestRpm;
+    if (cylRate != null && cylinders != null && rpmForCyl != null) {
+      final gPerS = cylinderFuelRateToGramsPerSecond(
+        mgPerStroke: cylRate,
+        rpm: rpmForCyl,
+        cylinders: cylinders,
+      );
+      final lph = gPerS == null
+          ? null
+          : fuelRateLPerHourFromGramsPerSecond(gPerS, density);
+      if (lph != null) {
+        collector?.record(
+          branch: Obd2BranchTag.pid5E,
+          fuelRateLPerHour: lph,
+          rpm: rpmForCyl,
+          afr: afr,
+          fuelDensityGPerL: density,
+          engineDisplacementCc: displacement.toDouble(),
+          volumetricEfficiency: ve,
+        );
+        _lastFuelRateBranch = Obd2BranchTag.pid5E;
+        _lastFuelRateSource = FuelRateSourceTag.pidA2;
+        return lph;
+      }
+    }
 
     // Step 1: direct PID 5E. Already post-trim, no correction.
     final direct = _latestDirectFuelRate;
@@ -526,18 +659,30 @@ class LiveSampleSnapshot {
         }
       }
       _lastFuelRateBranch = Obd2BranchTag.pid5E;
+      _lastFuelRateSource = FuelRateSourceTag.pid5E;
       return direct;
     }
 
     // Step 2: MAF-based. L/h = MAF × 3600 / (effectiveAFR × density).
-    // #2456 — when commanded λ (PID 0x44) has landed, the assumed stoich
-    // AFR is replaced with the ECU's effective AFR (richer mixture →
-    // more fuel). Null λ → `effectiveAfr == afr`, i.e. unchanged.
-    final maf = _latestMaf;
+    // #3428 — the dual-sensor PID 0x66 total is preferred over the legacy
+    // PID 0x10 when both landed (0x66 carries per-bank resolution).
+    // #2456 / #3427 / #3430 — the assumed stoich AFR is replaced with the
+    // mixture-resolved effective AFR: freshest MEASURED wideband φ beats
+    // commanded φ (0x44); diesel trusts only the measured value. All
+    // null → `effectiveAfr == afr`, i.e. unchanged.
+    final maf66 = _precision.mafSensorGPerS;
+    final maf = maf66 ?? _latestMaf;
     if (maf != null) {
-      final effectiveAfr = effectiveAfrForLambda(afr, _latestLambda);
+      final effectiveAfr = effectiveAfrForMixture(
+        afr,
+        measuredPhi: latestMeasuredPhi,
+        commandedPhi: _latestCommandedPhi,
+        isDiesel: isDiesel,
+      );
       final raw = maf * 3600.0 / (effectiveAfr * density);
-      final corrected = _applyTrim(raw);
+      // #3430 — STFT/LTFT are petrol stoich-feedback trims; skipped on
+      // diesel (they don't model a lean-burn mixture).
+      final corrected = isDiesel ? raw : _applyTrim(raw);
       collector?.record(
         branch: Obd2BranchTag.maf,
         fuelRateLPerHour: corrected,
@@ -549,6 +694,8 @@ class LiveSampleSnapshot {
         volumetricEfficiency: ve,
       );
       _lastFuelRateBranch = Obd2BranchTag.maf;
+      _lastFuelRateSource =
+          maf66 != null ? FuelRateSourceTag.maf66 : FuelRateSourceTag.maf;
       return corrected;
     }
 
@@ -573,31 +720,40 @@ class LiveSampleSnapshot {
       recordNone();
       return null;
     }
-    // #2456 — feed the measured baro (PID 0x33) + commanded λ (PID 0x44)
-    // into the speed-density math when available: baro scales the air
-    // charge for altitude / weather, λ replaces the assumed stoich AFR.
-    // Both null → byte-for-byte the pre-#2456 result. The effective AFR
-    // is recorded in the breadcrumb so diagnostics reflect the real
-    // denominator.
-    final lambda = _latestLambda;
+    // #2456 / #3427 / #3430 — feed the measured baro (PID 0x33) + the
+    // mixture-resolved effective AFR into the speed-density math when
+    // available: baro scales the air charge for altitude / weather; the
+    // effective AFR prefers measured wideband φ over commanded 0x44
+    // (diesel: measured only — see fuel_mixture_model.dart for why an
+    // unthrottled engine's speed-density fuel is otherwise an upper
+    // bound). All null → byte-for-byte the pre-#2456 result. The
+    // effective AFR is recorded in the breadcrumb so diagnostics reflect
+    // the real denominator; φ is passed pre-resolved (`phi: null`) so the
+    // estimator can't double-apply it.
     final baroKpa = _latestBaroKpa;
-    final effectiveAfr = effectiveAfrForLambda(afr, lambda);
+    final effectiveAfr = effectiveAfrForMixture(
+      afr,
+      measuredPhi: latestMeasuredPhi,
+      commandedPhi: _latestCommandedPhi,
+      isDiesel: isDiesel,
+    );
     final raw = Obd2Service.estimateFuelRateLPerHourFromMap(
       mapKpa: mapKpa,
       iatCelsius: iat,
       rpm: rpm,
       engineDisplacementCc: displacement,
       volumetricEfficiency: ve,
-      afr: afr,
+      afr: effectiveAfr,
       fuelDensityGPerL: density,
       baroKpa: baroKpa,
-      lambda: lambda,
+      phi: null,
     );
     if (raw == null) {
       recordNone();
       return null;
     }
-    final corrected = _applyTrim(raw);
+    // #3430 — trim correction skipped on diesel (petrol stoich feedback).
+    final corrected = isDiesel ? raw : _applyTrim(raw);
     collector?.record(
       branch: Obd2BranchTag.speedDensity,
       fuelRateLPerHour: corrected,
@@ -612,6 +768,7 @@ class LiveSampleSnapshot {
     // #1858 — the only η_v-derived branch: record the η_v applied so
     // the controller can stamp the trip's recompute provenance.
     _lastFuelRateBranch = Obd2BranchTag.speedDensity;
+    _lastFuelRateSource = FuelRateSourceTag.speedDensity;
     _lastFuelRateVe = ve;
     return corrected;
   }

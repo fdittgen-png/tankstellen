@@ -66,9 +66,9 @@ class DroppedSessionManager {
   /// disables the silent window (every drop is visible at once).
   final Duration _silentReconnectWindow;
 
-  /// Pinned adapter MAC the reconnect scanner searches for. Null when
-  /// the vehicle profile carries no adapter pairing — the scanner is
-  /// then never started and the grace window is the sole recovery path.
+  /// Pinned adapter MAC the reconnect scanner searches for — resolved
+  /// upstream by `resolveAdapterPin` (#3423: vehicle-profile MAC, else the
+  /// last-good auto-pin). Null when NEITHER exists: scanner never starts.
   final String? _pinnedAdapterMac;
 
   /// Factory that builds the reconnect scanner from the pinned MAC + the

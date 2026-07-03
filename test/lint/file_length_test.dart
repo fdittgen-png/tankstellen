@@ -414,11 +414,22 @@ void main() {
     // the altitude isFinite chokepoint guard (NaN altitude was poisoning the
     // RoadGradeCalculator on ~22 % of the 77-trip backup). The guard itself
     // is a net-neutral token swap; only the explanatory comment adds a line.
-    // 5 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // Epic #3416 (#3426–#3430/#3433) — re-grandfathered 674 → 828: the
+    // consumption-precision fuel chain. The NEW logic lives in new
+    // under-cap files (elm327_precision_pids / fuel_mixture_model /
+    // precision_pid_latches); what lands here is the derive-path branch
+    // rewiring that cannot leave this class: the 0x9D/0xA2 mass branch
+    // (with its 9D-vs-5E breadcrumb cross-check), the 0x66-preferred MAF
+    // + measured-φ effective AFR, the diesel trim/φ gates, the
+    // sessionFuelTypeKey latch, the FuelRateSourceTag provenance and the
+    // λ→φ (#3426) doc/rename. Decomposition still tracked by #3140.
+    // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2187/#2188 the comments above reference).
+    // (+3, same #3427 strict-gate change: the precision collaborator now
+    // subscribes through isPidKnownSupported — comment + call reshape.)
     'lib/features/obd2/data/live_sample_snapshot.dart': (
-      lines: 674,
-      bumps: 5,
+      lines: 831,
+      bumps: 6,
       decompositionIssue: 3140,
     ),
     // #2379 — re-grandfathered 1457 → 1468: threaded the
@@ -475,11 +486,27 @@ void main() {
     // `healthCounters` connect-rate taps (attempts / successes / failures)
     // + import + rationale comment, so a slowly-failing BLE adapter is
     // visible in the error-log export.
-    // 10 bumps — decomposition forced (#3141), tracked by the OPEN #3140
+    // Epic #3416 (#3426–#3430) — re-grandfathered 1689 → 1842: the pull
+    // mirror of the live precision fuel chain (the two paths must stay
+    // in lockstep). Parsers/policy live in NEW under-cap files
+    // (elm327_precision_pids / fuel_mixture_model); what lands here is
+    // the readFuelRateLPerHour Step-0 mass branch (0x9D / 0xA2), the
+    // 0x66-preferred MAF step + measured-φ resolution, the diesel gates,
+    // five thin `_readDouble` helpers for the new PIDs and the λ→φ
+    // (#3426) rename/doc. Decomposition still tracked by #3140.
+    // 11 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (Obd2Service is named in that issue's breakdown).
+    // #3422 — re-grandfathered 1689 → 1693: the best-effort ATPC send before
+    // a DELIBERATE disconnect (wedge prevention). The logic lives in the NEW
+    // under-cap obd2_atpc_teardown.dart; these lines are the one call + its
+    // rationale comment + the import.
+    // #3427/#3428 bundle-merge — 1846 → 1862: the STRICT
+    // isPidKnownSupported gate + debugSetSupportedPids test seam, added
+    // when the blind-optimistic gate proved to flood the scheduler
+    // round-robin on unresolved adapters (RPM cadence collapse).
     'lib/features/obd2/data/obd2_service.dart': (
-      lines: 1689,
-      bumps: 10,
+      lines: 1862,
+      bumps: 12,
       decompositionIssue: 3140,
     ),
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
@@ -602,12 +629,19 @@ void main() {
     // is already correct after the recorder suppresses GPS-derived harsh
     // scoring — i.e. why no #2895 IMU-veto wiring is needed here. Doc-only;
     // decomposition stays tracked by #2187/#2188.
-    // 17 bumps (the worst offender in this map) — decomposition forced
+    // Epic #3416 (#3429/#3433) — re-grandfathered 1717 → 1728: the
+    // session-start PID-0x51 fuel-type read (one bounded best-effort call
+    // mirroring the adjacent VIN read, feeding the snapshot's
+    // sessionFuelTypeKey) + the three new TripSample stamps in `_emit`
+    // (measuredPhi / ethanolPercent / fuelSource provenance). Pure wiring
+    // at the controller seam; the logic lives in the new under-cap
+    // precision files.
+    // 18 bumps (the worst offender in this map) — decomposition forced
     // (#3141), tracked by the OPEN #3140 (TripRecordingController is
     // named in that issue's breakdown).
     'lib/features/obd2/data/trip_recording_controller.dart': (
-      lines: 1717,
-      bumps: 17,
+      lines: 1728,
+      bumps: 18,
       decompositionIssue: 3140,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR

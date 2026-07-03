@@ -17,6 +17,9 @@ TripSample _s({
   double? pedalPercent,
   double? coolantTempC,
   double? lambda,
+  double? measuredPhi,
+  double? ethanolPercent,
+  String? fuelSource,
 }) =>
     TripSample(
       timestamp: DateTime(2026, 1, 1, 0, 0, sec),
@@ -30,6 +33,9 @@ TripSample _s({
       pedalPercent: pedalPercent,
       coolantTempC: coolantTempC,
       lambda: lambda,
+      measuredPhi: measuredPhi,
+      ethanolPercent: ethanolPercent,
+      fuelSource: fuelSource,
     );
 
 void main() {
@@ -131,6 +137,70 @@ void main() {
       expect(json['obd2Coverage'], 1.0);
       expect((json['rpm'] as Map)['mean'], 1650.0);
       expect((json['signalCoverage'] as Map)['rpm'], 1.0);
+    });
+
+    // ---- Epic #3416 / #3433 — precision-signal export ------------------
+
+    test('measured φ + ethanol distributions and coverage export (#3433)',
+        () {
+      final f = Obd2TripFeatures.fromSamples([
+        _s(sec: 0, rpm: 1500, measuredPhi: 0.98, ethanolPercent: 50),
+        _s(sec: 1, rpm: 1600, measuredPhi: 1.02, ethanolPercent: 50),
+        _s(sec: 2, rpm: 1700), // sensor blip — no φ / ethanol this tick
+      ])!;
+      expect(f.measuredPhi.mean, closeTo(1.0, 1e-9));
+      expect(f.ethanolPercent.mean, closeTo(50.0, 1e-9));
+      expect(f.signalCoverage['measuredPhi'], closeTo(2 / 3, 1e-9));
+      expect(f.signalCoverage['ethanolPercent'], closeTo(2 / 3, 1e-9));
+
+      final json = f.toJson();
+      expect((json['measuredPhi'] as Map)['mean'], 1.0);
+      expect((json['ethanolPercent'] as Map)['mean'], 50.0);
+      expect((json['signalCoverage'] as Map)['measuredPhi'],
+          closeTo(0.667, 1e-9));
+    });
+
+    test('no wideband / no flexfuel → zero coverage, null distribution',
+        () {
+      final f = Obd2TripFeatures.fromSamples([
+        _s(sec: 0, rpm: 1500),
+        _s(sec: 1, rpm: 1600),
+      ])!;
+      expect(f.measuredPhi.mean, isNull);
+      expect(f.signalCoverage['measuredPhi'], 0.0);
+      expect(f.signalCoverage['ethanolPercent'], 0.0);
+    });
+
+    test('fuelSourceShares + dominantFuelSource report the branch that '
+        'dominated the trip (#3428/#3433)', () {
+      final f = Obd2TripFeatures.fromSamples([
+        _s(sec: 0, rpm: 1500, fuelRateLPerHour: 5, fuelSource: 'pid9D'),
+        _s(sec: 1, rpm: 1500, fuelRateLPerHour: 5, fuelSource: 'pid9D'),
+        _s(sec: 2, rpm: 1500, fuelRateLPerHour: 5, fuelSource: 'pid9D'),
+        _s(sec: 3, rpm: 1500, fuelRateLPerHour: 5, fuelSource: 'maf66'),
+        // rate-less tick: no provenance stamped, excluded from shares.
+        _s(sec: 4, rpm: 1500),
+      ])!;
+      expect(f.dominantFuelSource, 'pid9D');
+      expect(f.fuelSourceShares['pid9D'], closeTo(0.75, 1e-9));
+      expect(f.fuelSourceShares['maf66'], closeTo(0.25, 1e-9));
+
+      final json = f.toJson();
+      expect(json['dominantFuelSource'], 'pid9D');
+      expect((json['fuelSourceShares'] as Map)['pid9D'], 0.75);
+    });
+
+    test('legacy trips (no per-sample provenance) export empty shares and '
+        'a null dominant branch — old exports still parse', () {
+      final f = Obd2TripFeatures.fromSamples([
+        _s(sec: 0, rpm: 1500, fuelRateLPerHour: 5),
+        _s(sec: 1, rpm: 1500, fuelRateLPerHour: 5),
+      ])!;
+      expect(f.fuelSourceShares, isEmpty);
+      expect(f.dominantFuelSource, isNull);
+      final json = f.toJson();
+      expect(json['fuelSourceShares'], isEmpty);
+      expect(json['dominantFuelSource'], isNull);
     });
   });
 }

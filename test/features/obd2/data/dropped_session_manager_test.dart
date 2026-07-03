@@ -6,8 +6,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/features/obd2/data/adapter_pin_resolution.dart';
 import 'package:tankstellen/features/obd2/data/adapter_reconnect_scanner.dart';
 import 'package:tankstellen/features/obd2/data/dropped_session_host.dart';
+import 'package:tankstellen/features/obd2/data/last_good_adapter_store.dart';
 import 'package:tankstellen/features/obd2/data/dropped_session_manager.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
@@ -544,6 +546,92 @@ void main() {
       expect(mgr.silentlyReconnecting, isFalse,
           reason: 'stop()/cancelAllTimers must clear the silent flag so a '
               'pending window can never escalate after teardown');
+    });
+
+    group('unified pin resolution (#3423)', () {
+      test('a picker-started trip with ONLY the last-good auto-pin still '
+          'gets the in-trip reconnect scanner', () {
+        final host = _FakeHost();
+        final scanner = _FakeScanner();
+        String? factoryMac;
+        final mgr = build(
+          host,
+          // The production pipeline resolves the pin through the SHARED
+          // rule before constructing the manager: no vehicle pairing, so
+          // the #3019 last-good auto-pin carries the reconnect target.
+          pinnedMac: resolveAdapterPin(
+            vehicleProfileMac: null,
+            recallLastGood: () => const LastGoodAdapter(
+              mac: 'CC:DD:EE:FF:00:11',
+              transportKind: 'classic',
+            ),
+          )?.mac,
+          scannerFactory: (mac, onReconnect) {
+            factoryMac = mac;
+            return scanner..onReconnect = onReconnect;
+          },
+        );
+
+        mgr.handleDrop();
+
+        expect(host.pausedDueToDrop, isTrue);
+        expect(scanner.startCalls, 1,
+            reason: 'pre-#3423 a trip with no vehicle-profile MAC got '
+                'grace-window-only recovery — the last-good pin must now '
+                'start the in-trip reconnect scanner');
+        expect(factoryMac, 'CC:DD:EE:FF:00:11',
+            reason: 'the scanner must search for the last-good adapter');
+      });
+
+      test('the vehicle-profile pin outranks the last-good auto-pin', () {
+        final host = _FakeHost();
+        String? factoryMac;
+        final mgr = build(
+          host,
+          pinnedMac: resolveAdapterPin(
+            vehicleProfileMac: 'AA:BB:CC:DD:EE:FF',
+            recallLastGood: () => const LastGoodAdapter(
+                mac: 'CC:DD:EE:FF:00:11', transportKind: 'classic'),
+          )?.mac,
+          scannerFactory: (mac, onReconnect) {
+            factoryMac = mac;
+            return _FakeScanner()..onReconnect = onReconnect;
+          },
+        );
+
+        mgr.handleDrop();
+
+        expect(factoryMac, 'AA:BB:CC:DD:EE:FF',
+            reason: 'an explicit per-vehicle pairing always wins');
+      });
+
+      test('NEITHER pin → no scanner; the grace window stays the sole '
+          'recovery path (behaviour unchanged)', () async {
+        final host = _FakeHost();
+        var factoryCalls = 0;
+        final mgr = build(
+          host,
+          pinnedMac: resolveAdapterPin(
+            vehicleProfileMac: null,
+            recallLastGood: () => null,
+          )?.mac,
+          scannerFactory: (mac, onReconnect) {
+            factoryCalls++;
+            return _FakeScanner()..onReconnect = onReconnect;
+          },
+        );
+
+        mgr.handleDrop();
+
+        expect(mgr.reconnectScanner, isNull);
+        expect(factoryCalls, 0,
+            reason: 'no pin from either store → the factory is never built');
+
+        await mgr.expireGraceWindowNow();
+        expect(historyRepo.loadAll(), hasLength(1),
+            reason: 'the grace auto-finalise must still work exactly as '
+                'before when no pin exists');
+      });
     });
   });
 }

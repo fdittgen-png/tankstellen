@@ -129,6 +129,15 @@ class Elm327Commands {
   /// init sequence pins the recommended `ATAT1` explicitly.
   static const adaptiveTimingCommand = 'ATAT1\r';
 
+  /// Protocol Close (#3422 — wedge PREVENTION). `ATPC` deactivates the
+  /// current OBD protocol session, parking the adapter's state machine
+  /// cleanly (and letting it drop to low power) instead of abandoning it
+  /// mid-protocol. Sent best-effort before every DELIBERATE disconnect —
+  /// never on a drop-triggered teardown (the link is already dead) — so the
+  /// adapter's single SPP channel is released in a re-openable state and the
+  /// #3415 "wedged after our own teardown" mode never arms.
+  static const protocolCloseCommand = 'ATPC\r';
+
   /// Standard initialization sequence for a new connection. `ATAT1` is
   /// sent last, after the protocol is selected, so the adaptive-timing
   /// algorithm is in effect for the very first OBD request.
@@ -227,10 +236,11 @@ class Elm327Commands {
   /// Request fuel tank level input (%). Mode 01, PID 2F. (#717)
   static const fuelTankLevelCommand = '012F\r';
 
-  /// Request commanded equivalence ratio / λ. Mode 01, PID 44 (#2456).
-  /// Formula: λ = (256·A + B) / 32768 (dimensionless). λ ≈ 1.0 at
-  /// stoichiometry; <1 is a lean cruise mixture, >1 is power-enrichment.
-  /// Replacing the assumed-stoich AFR with `stoichAFR × λ` is the biggest
+  /// Request the commanded fuel–air equivalence ratio φ. Mode 01, PID 44
+  /// (#2456, convention verified #3426). Formula: φ = (256·A + B) × 2 /
+  /// 65536 (dimensionless). Per SAE J1979 φ ≈ 1.0 at stoichiometry;
+  /// **φ < 1 is lean, φ > 1 is power-enrichment** (λ = 1/φ). Replacing
+  /// the assumed-stoich AFR with `stoichAFR / φ` is the biggest
   /// fuel-estimate accuracy win on the no-MAF speed-density path (the
   /// Peugeot). Response: "41 44 XX YY".
   static const commandedEquivalenceRatioCommand = '0144\r';

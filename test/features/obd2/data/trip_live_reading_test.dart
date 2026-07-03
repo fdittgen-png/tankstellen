@@ -139,4 +139,48 @@ void main() {
       expect(reading.liveAvgLPer100Km, closeTo(50.0, 1e-9));
     });
   });
+
+  group('true-instant fields (#3431)', () {
+    test('default null so existing call sites compile and show no signal',
+        () {
+      const reading = TripLiveReading(
+        distanceKmSoFar: 1.0,
+        elapsed: Duration(minutes: 1),
+      );
+      expect(reading.instantLPer100Km, isNull);
+      expect(reading.instantLPerHour, isNull);
+      expect(reading.instantIsIdle, isNull);
+    });
+
+    test('store the EMA-stamped values independently of the running average',
+        () {
+      const reading = TripLiveReading(
+        distanceKmSoFar: 10.0,
+        elapsed: Duration(minutes: 5),
+        fuelLitersSoFar: 0.83, // running avg → 8.3
+        instantLPer100Km: 12.5, // instant is a DIFFERENT signal
+        instantLPerHour: 7.5,
+        instantIsIdle: false,
+      );
+      expect(reading.liveAvgLPer100Km, closeTo(8.3, 1e-9));
+      expect(reading.instantLPer100Km, 12.5);
+      expect(reading.instantLPerHour, 7.5);
+      expect(reading.instantIsIdle, isFalse);
+    });
+
+    test('copyWith keeps the instant fields on a null overlay', () {
+      const reading = TripLiveReading(
+        distanceKmSoFar: 10.0,
+        elapsed: Duration(minutes: 5),
+        instantLPer100Km: 12.5,
+        instantLPerHour: 7.5,
+        instantIsIdle: true,
+      );
+      final overlaid = reading.copyWith(speedKmh: 42.0);
+      expect(overlaid.speedKmh, 42.0);
+      expect(overlaid.instantLPer100Km, 12.5);
+      expect(overlaid.instantLPerHour, 7.5);
+      expect(overlaid.instantIsIdle, isTrue);
+    });
+  });
 }

@@ -10,8 +10,9 @@ import '../domain/trip_recorder.dart';
 /// fuel-rate key (`'fe'`) joined the per-sample schema.
 ///
 /// Compact key names ('t','s','r','f','fe','th','el','ct','la','lo',
-/// 'al','ha','be','ag', + #2459 'lm','bp','aL','pp','ot','am' and the
-/// diagnostic-capture raw inputs 'mf','mp','sf','lf') keep per-trip JSON
+/// 'al','ha','be','ag', + #2459 'lm','bp','aL','pp','ot','am', the
+/// diagnostic-capture raw inputs 'mf','mp','sf','lf', + Epic #3416
+/// 'mq' measured φ / 'ep' ethanol % / 'fs' fuel-source) keep per-trip JSON
 /// small — a 39-min trip × 1 Hz lands around 19 KB compressed at this
 /// density. The timestamp uses millisecondsSinceEpoch so the JSON parses
 /// fast and round-trips precisely. Every optional key is emitted only
@@ -44,6 +45,11 @@ Map<String, dynamic> sampleToJson(TripSample s) => {
       // #2459 — consumed-but-previously-unstored signals. Each guarded so
       // a car without the PID adds zero bytes.
       if (s.lambda != null) 'lm': s.lambda,
+      // #3427 / #3429 / #3433 — measured wideband φ, ethanol % and the
+      // per-tick fuel-source provenance. Same zero-bytes-when-absent rule.
+      if (s.measuredPhi != null) 'mq': s.measuredPhi,
+      if (s.ethanolPercent != null) 'ep': s.ethanolPercent,
+      if (s.fuelSource != null) 'fs': s.fuelSource,
       if (s.baroKpa != null) 'bp': s.baroKpa,
       if (s.absLoadPercent != null) 'aL': s.absLoadPercent,
       if (s.pedalPercent != null) 'pp': s.pedalPercent,
@@ -82,6 +88,10 @@ TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
       // #2459 — missing key → null so legacy trips and cars without the
       // PID deserialise cleanly.
       lambda: (j['lm'] as num?)?.toDouble(),
+      // #3427 / #3429 / #3433 — missing key → null (legacy trips).
+      measuredPhi: (j['mq'] as num?)?.toDouble(),
+      ethanolPercent: (j['ep'] as num?)?.toDouble(),
+      fuelSource: j['fs'] as String?,
       baroKpa: (j['bp'] as num?)?.toDouble(),
       absLoadPercent: (j['aL'] as num?)?.toDouble(),
       pedalPercent: (j['pp'] as num?)?.toDouble(),

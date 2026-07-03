@@ -112,6 +112,46 @@ void main() {
     });
   });
 
+  group('Epic #3416 — measured φ / ethanol / fuel-source keys', () {
+    test('round-trip when present', () {
+      final s = TripSample(
+        timestamp: ts,
+        speedKmh: 80,
+        rpm: 2100,
+        fuelRateLPerHour: 5.5,
+        measuredPhi: 0.98,
+        ethanolPercent: 85.1,
+        fuelSource: 'pid9D',
+      );
+      final json = sampleToJson(s);
+      expect(json['mq'], 0.98);
+      expect(json['ep'], 85.1);
+      expect(json['fs'], 'pid9D');
+      final back = sampleFromJson(json);
+      expect(back.measuredPhi, 0.98);
+      expect(back.ethanolPercent, 85.1);
+      expect(back.fuelSource, 'pid9D');
+    });
+
+    test('absent → zero keys; legacy payloads deserialise null', () {
+      final s = TripSample(timestamp: ts, speedKmh: 50, rpm: 1500);
+      final json = sampleToJson(s);
+      for (final key in ['mq', 'ep', 'fs']) {
+        expect(json.containsKey(key), isFalse,
+            reason: '$key must be omitted when the field is null');
+      }
+      final legacy = <String, dynamic>{
+        't': ts.millisecondsSinceEpoch,
+        's': 60.0,
+        'r': 1700.0,
+      };
+      final back = sampleFromJson(legacy);
+      expect(back.measuredPhi, isNull);
+      expect(back.ethanolPercent, isNull);
+      expect(back.fuelSource, isNull);
+    });
+  });
+
   group('#2692 C4-G — nullable rpm round-trip', () {
     test('a GPS-only sample (rpm null) omits the "r" key entirely', () {
       final s = TripSample(timestamp: ts, speedKmh: 50, rpm: null);

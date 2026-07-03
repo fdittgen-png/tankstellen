@@ -14,6 +14,14 @@ import 'broken_map_widgets.dart';
 /// L/100 km figure plus three permanently-visible coaching symbols
 /// that light up when the matching [DrivingCoachingHint] fires.
 ///
+/// #3431 — the headline is now the TRUE instantaneous signal (the
+/// EMA-smoothed `instantLPer100Km` / `instantLPerHour` stamped by the
+/// recording controller, formatted by [formatInstantConsumption]);
+/// before, it rendered the trip running average `liveAvgLPer100Km`
+/// under the "Instant consumption" label — a mislabel. The running
+/// average keeps its place on a clearly-labelled "Trip average"
+/// secondary row, so both figures are visible and honestly named.
+///
 /// Designed to be the *primary* surface during recording — the
 /// existing `_MetricCard` column stays underneath it for users who
 /// still want the detail breakdown, but a glance at the top of the
@@ -38,7 +46,10 @@ class MinimalDriveSummary extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final state = ref.watch(tripRecordingProvider);
     final reading = state.live;
+    // #3431 — the trip RUNNING AVERAGE, rendered on its own honestly-
+    // labelled secondary row (measured wins; GPS estimate carries `~`).
     final liveAvg = reading?.liveAvgLPer100Km;
+    final gpsAvg = reading?.gpsEstimatedAvgLPer100Km;
 
     // #1423 — hide the minimal card when broken-MAP belief is in the
     // hard-disable band. The existing _MetricCard column below
@@ -58,9 +69,24 @@ class MinimalDriveSummary extends ConsumerWidget {
 
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final headline = liveAvg == null
-        ? '—'
-        : UnitFormatter.formatConsumption(liveAvg, isEv: false);
+    // #3431 — headline: the TRUE instant signal (EMA-smoothed L/100 km,
+    // L/h at idle) via the shared formatter; GPS-only trajets fall back
+    // to the live physics estimate with the `~` estimate marker
+    // (matching the banner / PiP convention, ADR 0012).
+    final instantText =
+        reading == null ? null : formatInstantConsumption(reading);
+    final gpsInstant = reading?.gpsEstimatedLPer100Km;
+    final headline = instantText ??
+        (gpsInstant != null
+            // i18n-ignore: language-neutral consumption unit format mask
+            ? '~${gpsInstant.toStringAsFixed(1)} L/100'
+            : '—');
+    final avgText = liveAvg != null
+        ? UnitFormatter.formatConsumption(liveAvg, isEv: false)
+        : (gpsAvg != null
+            // i18n-ignore: `~` estimate marker on a language-neutral mask
+            ? '~${UnitFormatter.formatConsumption(gpsAvg, isEv: false)}'
+            : null);
 
     // #2058 — when the trajet has no fuel-rate data (GPS-only mode),
     // swap the OBD2-derived tile triplet (shift-up / shift-down /
@@ -135,6 +161,29 @@ class MinimalDriveSummary extends ConsumerWidget {
                 color: scheme.primary,
               ),
             ),
+            // #3431 — the trip running average on its own honest row,
+            // so "instant" and "average" are never conflated again.
+            if (avgText != null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l.minimalDriveTripAverage,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    avgText,
+                    key: const Key('minimal_drive_trip_avg_value'),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             const SizedBox(height: 6),
             // #2903 — each symbol gets an equal Expanded share so the
             // triplet fits a narrow pane (the landscape split's left

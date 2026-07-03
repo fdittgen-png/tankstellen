@@ -148,4 +148,36 @@ void main() {
               'value — no placeholder, no 0.0 reading');
     });
   });
+
+  group('formatInstantConsumption prefers the smoothed instant (#3431)', () {
+    test('the EMA-stamped L/100 km wins over the raw rate/speed figure', () {
+      const reading = TripLiveReading(
+        elapsed: Duration(minutes: 1),
+        distanceKmSoFar: 1,
+        speedKmh: 60,
+        fuelRateLPerHour: 6, // raw would render 10.0
+        instantLPer100Km: 8.4,
+        instantLPerHour: 5.0,
+        instantIsIdle: false,
+      );
+      expect(formatInstantConsumption(reading), '8.4 L/100');
+    });
+
+    test('the idle mode flag renders the smoothed L/h', () {
+      const reading = TripLiveReading(
+        elapsed: Duration(minutes: 1),
+        distanceKmSoFar: 1,
+        speedKmh: 0,
+        fuelRateLPerHour: 1.1,
+        instantLPerHour: 0.9,
+        instantIsIdle: true,
+      );
+      expect(formatInstantConsumption(reading), '0.9 L/h');
+    });
+
+    test('readings without the stamped fields keep the raw fallback', () {
+      final out = formatInstantConsumption(_r(speed: 60, fuelRate: 6));
+      expect(out, '10.0 L/100');
+    });
+  });
 }

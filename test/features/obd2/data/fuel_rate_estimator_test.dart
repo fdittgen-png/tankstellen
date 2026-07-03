@@ -191,63 +191,65 @@ void main() {
     });
   });
 
-  group('effectiveAfrForLambda — #2456', () {
-    test('null λ returns the stoich AFR unchanged (no-PID fallback)', () {
-      expect(effectiveAfrForLambda(kPetrolAfr, null), kPetrolAfr);
-      expect(effectiveAfrForLambda(kDieselAfr, null), kDieselAfr);
+  group('effectiveAfrForPhi — #2456 / #3426', () {
+    test('null φ returns the stoich AFR unchanged (no-PID fallback)', () {
+      expect(effectiveAfrForPhi(kPetrolAfr, null), kPetrolAfr);
+      expect(effectiveAfrForPhi(kDieselAfr, null), kDieselAfr);
     });
 
-    test('λ = 1.0 returns the stoich AFR unchanged', () {
-      expect(effectiveAfrForLambda(kPetrolAfr, 1.0), closeTo(kPetrolAfr, 1e-9));
+    test('φ = 1.0 returns the stoich AFR unchanged', () {
+      expect(effectiveAfrForPhi(kPetrolAfr, 1.0), closeTo(kPetrolAfr, 1e-9));
     });
 
-    test('λ > 1 (power-enrich) lowers the effective AFR → more fuel', () {
-      // afrEff = stoich / λ; richer mixture means a smaller denominator.
+    test('φ > 1 (RICH per SAE J1979) lowers the effective AFR → more fuel',
+        () {
+      // afrEff = stoich / φ; richer mixture means a smaller denominator.
       expect(
-        effectiveAfrForLambda(kPetrolAfr, 1.2),
+        effectiveAfrForPhi(kPetrolAfr, 1.2),
         closeTo(kPetrolAfr / 1.2, 1e-9),
       );
-      expect(effectiveAfrForLambda(kPetrolAfr, 1.2), lessThan(kPetrolAfr));
+      expect(effectiveAfrForPhi(kPetrolAfr, 1.2), lessThan(kPetrolAfr));
     });
 
-    test('λ < 1 (lean cruise) raises the effective AFR → less fuel', () {
+    test('φ < 1 (LEAN per SAE J1979) raises the effective AFR → less fuel',
+        () {
       expect(
-        effectiveAfrForLambda(kPetrolAfr, 0.9),
+        effectiveAfrForPhi(kPetrolAfr, 0.9),
         closeTo(kPetrolAfr / 0.9, 1e-9),
       );
-      expect(effectiveAfrForLambda(kPetrolAfr, 0.9), greaterThan(kPetrolAfr));
+      expect(effectiveAfrForPhi(kPetrolAfr, 0.9), greaterThan(kPetrolAfr));
     });
 
-    test('garbage λ is clamped to [kMinLambda, kMaxLambda]', () {
+    test('garbage φ is clamped to [kMinCommandedPhi, kMaxCommandedPhi]', () {
       expect(
-        effectiveAfrForLambda(kPetrolAfr, 5.0),
-        closeTo(kPetrolAfr / kMaxLambda, 1e-9),
+        effectiveAfrForPhi(kPetrolAfr, 5.0),
+        closeTo(kPetrolAfr / kMaxCommandedPhi, 1e-9),
       );
       expect(
-        effectiveAfrForLambda(kPetrolAfr, 0.01),
-        closeTo(kPetrolAfr / kMinLambda, 1e-9),
+        effectiveAfrForPhi(kPetrolAfr, 0.01),
+        closeTo(kPetrolAfr / kMinCommandedPhi, 1e-9),
       );
     });
   });
 
-  group('estimateFuelRateLPerHourFromMap λ + baro — #2456', () {
+  group('estimateFuelRateLPerHourFromMap φ + baro — #2456', () {
     const mapKpa = 65.0;
     const iatCelsius = 30.0;
     const rpm = 2500.0;
 
-    double rateWith({double? lambda, double? baroKpa}) {
+    double rateWith({double? phi, double? baroKpa}) {
       return estimateFuelRateLPerHourFromMap(
         mapKpa: mapKpa,
         iatCelsius: iatCelsius,
         rpm: rpm,
         engineDisplacementCc: kDefaultEngineDisplacementCc,
         volumetricEfficiency: kDefaultVolumetricEfficiency,
-        lambda: lambda,
+        phi: phi,
         baroKpa: baroKpa,
       )!;
     }
 
-    test('absent λ + absent baro equals the pre-#2456 stoich result', () {
+    test('absent φ + absent baro equals the pre-#2456 stoich result', () {
       final today = estimateFuelRateLPerHourFromMap(
         mapKpa: mapKpa,
         iatCelsius: iatCelsius,
@@ -256,22 +258,22 @@ void main() {
         volumetricEfficiency: kDefaultVolumetricEfficiency,
       )!;
       // Same call but explicitly passing nulls must be byte-for-byte equal.
-      expect(rateWith(lambda: null, baroKpa: null), today);
+      expect(rateWith(phi: null, baroKpa: null), today);
     });
 
-    test('λ = 1.0 is identical to absent λ', () {
-      expect(rateWith(lambda: 1.0), closeTo(rateWith(lambda: null), 1e-9));
+    test('φ = 1.0 is identical to absent φ', () {
+      expect(rateWith(phi: 1.0), closeTo(rateWith(phi: null), 1e-9));
     });
 
-    test('λ = 1.2 derives ~20 % more fuel than λ = 1.0 (richer)', () {
-      final stoich = rateWith(lambda: 1.0);
-      final rich = rateWith(lambda: 1.2);
+    test('φ = 1.2 derives ~20 % more fuel than φ = 1.0 (richer)', () {
+      final stoich = rateWith(phi: 1.0);
+      final rich = rateWith(phi: 1.2);
       expect(rich / stoich, closeTo(1.2, 0.001));
     });
 
-    test('λ = 0.9 derives less fuel than λ = 1.0 (lean cruise)', () {
-      final stoich = rateWith(lambda: 1.0);
-      final lean = rateWith(lambda: 0.9);
+    test('φ = 0.9 derives less fuel than φ = 1.0 (lean commanded)', () {
+      final stoich = rateWith(phi: 1.0);
+      final lean = rateWith(phi: 0.9);
       expect(lean, lessThan(stoich));
       expect(lean / stoich, closeTo(0.9, 0.001));
     });
@@ -297,9 +299,9 @@ void main() {
       expect(clamped / unscaled, closeTo(0.6, 0.001));
     });
 
-    test('λ and baro compose multiplicatively', () {
-      final base = rateWith(lambda: 1.0, baroKpa: kSeaLevelBaroKpa);
-      final both = rateWith(lambda: 1.2, baroKpa: 84.0);
+    test('φ and baro compose multiplicatively', () {
+      final base = rateWith(phi: 1.0, baroKpa: kSeaLevelBaroKpa);
+      final both = rateWith(phi: 1.2, baroKpa: 84.0);
       expect(
         both / base,
         closeTo(1.2 * (84.0 / kSeaLevelBaroKpa), 0.001),

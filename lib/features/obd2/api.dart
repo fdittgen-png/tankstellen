@@ -26,6 +26,10 @@ export 'data/background_adapter_listener.dart';
 export 'data/broken_map_belief.dart';
 export 'data/broken_map_detector.dart';
 export 'data/can_frame_decoders/psa_fuel_level_can_decoder.dart';
+// #3437 — the consumption trip-start path fires the CDM association
+// trigger through this barrel (the one sanctioned growth: a NEW
+// cross-feature seam, not a legacy reach-in).
+export 'data/companion_auto_record_coordinator.dart';
 export 'data/elm327_protocol.dart';
 export 'data/ios_background_adapter_listener.dart';
 export 'data/ios_state_restoration_provider.dart';
@@ -45,6 +49,8 @@ export 'data/obd2_reconnect_controller.dart';
 export 'data/obd2_self_test_driver.dart';
 export 'data/obd2_service.dart';
 export 'data/obd2_session_diagnostic.dart';
+export 'data/obd2_wedge_detector.dart';
+export 'data/obd2_wedge_recovery.dart';
 export 'data/obd_adapter_blocklist.dart';
 export 'data/oem_pid_registry.dart';
 export 'data/oem_pid_table.dart';
@@ -66,6 +72,7 @@ export 'presentation/widgets/obd2_pause_banner.dart';
 export 'presentation/widgets/obd2_reconnect_retry_banner.dart';
 export 'presentation/widgets/obd2_status_chip.dart';
 export 'presentation/widgets/obd2_status_dot.dart';
+export 'presentation/widgets/obd2_wedge_recovery_banner.dart';
 export 'providers/current_obd2_fuel_level_provider.dart';
 export 'providers/obd2_capability_provider.dart';
 export 'providers/obd2_comm_diagnostics_gate_provider.dart';

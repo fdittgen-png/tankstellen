@@ -105,6 +105,38 @@ class Obd2ClassicMethodChannel {
     return v;
   }
 
+  /// #3422 — wedge-recovery rung 1: ask the OS to re-run SDP discovery for
+  /// [address], refreshing the locally-cached UUID / RFCOMM-channel records.
+  /// Async kick-off on the native side; `true` means the query was accepted.
+  /// Throws [MissingPluginException] / [PlatformException] on an old native
+  /// side — the caller ([ChannelObd2WedgeRecoveryNatives]) owns the guard.
+  Future<bool> fetchUuidsWithSdp(String address) async =>
+      await _methodChannel
+          .invokeMethod<bool>('fetchUuidsWithSdp', {'address': address}) ??
+      false;
+
+  /// #3422 — wedge-recovery rung 2 first half: drop the bond for [address]
+  /// (hidden `removeBond()` via reflection on the native side). `false` when
+  /// the reflection is unavailable or the call fails.
+  Future<bool> removeBond(String address) async =>
+      await _methodChannel
+          .invokeMethod<bool>('removeBond', {'address': address}) ??
+      false;
+
+  /// #3422 — wedge-recovery rung 2 second half: re-pair [address] with the
+  /// public `createBond()`. May surface the system pairing dialog. `true`
+  /// means the bonding process started (completion is async on the OS side).
+  Future<bool> createBond(String address) async =>
+      await _methodChannel
+          .invokeMethod<bool>('createBond', {'address': address}) ??
+      false;
+
+  /// #3422 — whether the Bluetooth adapter is currently enabled. Rung 3
+  /// polls this to await the adapter-off edge between the two consent
+  /// dialogs.
+  Future<bool> adapterEnabled() async =>
+      await _methodChannel.invokeMethod<bool>('adapterEnabled') ?? false;
+
   /// Incoming bytes from the socket's input stream, pushed by the
   /// reader thread on the native side. Subscribing starts the
   /// EventChannel; cancelling stops listening but the socket stays

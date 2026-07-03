@@ -8474,6 +8474,102 @@ abstract class AppLocalizations {
   /// **'Couldn\'t export the analysis trace.'**
   String get drivingTraceExportFailed;
 
+  /// Label of the trip-running-average row on the live minimal drive summary card (#3431). Sits under the true instantaneous headline so 'instant' and 'average' are never conflated.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip average'**
+  String get minimalDriveTripAverage;
+
+  /// Post-trip lesson headline (#3432) for steady-speed cruising at high RPM where an earlier upshift was available. Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L'**
+  String insightUpshiftCruise(String pctTime, String liters);
+
+  /// How-to-improve advice for the high-RPM-cruise upshift lesson (#3432). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Shift up earlier when cruising — the same speed at lower RPM burns noticeably less fuel.'**
+  String get lessonAdviceUpshiftCruise;
+
+  /// Positive post-trip lesson headline (#3432) recognising deceleration-fuel-cut coasting (measured fuel rate near zero while moving). Placeholders are pre-formatted strings.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel-cut coasting ({pctTime}% of trip): saved about {liters} L'**
+  String insightCoastingFuelCut(String pctTime, String liters);
+
+  /// Praise/advice line for the fuel-cut coasting lesson (#3432). Embedded in the GPX recording export.
+  ///
+  /// In en, this message translates to:
+  /// **'Nicely anticipated — lifting off early lets the engine cut fuel completely while coasting.'**
+  String get lessonAdviceCoastingFuelCut;
+
+  /// Trailing badge for a POSITIVE lesson / breakdown row showing litres saved (#3432) — the minus-sign counterpart of insightTrailingLitersWasted. Liters is a pre-formatted one-decimal string.
+  ///
+  /// In en, this message translates to:
+  /// **'−{liters} L'**
+  String insightTrailingLitersSaved(String liters);
+
+  /// Title of the per-event fuel-cost breakdown card on the Trip detail screen (#3432).
+  ///
+  /// In en, this message translates to:
+  /// **'Where your fuel went'**
+  String get fuelBreakdownTitle;
+
+  /// Breakdown row label (#3432): litres burned while stationary with the engine running (idle events > 30 s).
+  ///
+  /// In en, this message translates to:
+  /// **'Idling'**
+  String get fuelBreakdownIdle;
+
+  /// Breakdown row label (#3432): excess litres attributed to pedal-spike acceleration events.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard accelerations'**
+  String get fuelBreakdownHarshAccel;
+
+  /// Breakdown row label (#3432): estimated litres an earlier upshift would have saved during steady high-RPM cruising.
+  ///
+  /// In en, this message translates to:
+  /// **'High-RPM cruising'**
+  String get fuelBreakdownHighRpmCruise;
+
+  /// Positive breakdown row label (#3432): litres saved by deceleration fuel cut while coasting.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved by coasting'**
+  String get fuelBreakdownCoastingSaved;
+
+  /// Neutral breakdown row label (#3432): the remainder of the trip's fuel not attributed to any waste event class.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal driving'**
+  String get fuelBreakdownEfficient;
+
+  /// Plain litres badge for the neutral breakdown remainder row (#3432). Liters is a pre-formatted one-decimal string.
+  ///
+  /// In en, this message translates to:
+  /// **'{liters} L'**
+  String fuelBreakdownLiters(String liters);
+
+  /// Live in-trip nudge SnackBar (#3432) after 30+ seconds stationary with the engine running. Rate-limited to at most one nudge per minute, three per trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Idling for a while — switching the engine off saves fuel'**
+  String get ecoNudgeIdle;
+
+  /// Live in-trip nudge SnackBar (#3432) after a sustained full-pedal spike. Rate-limited to at most one nudge per minute, three per trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong acceleration — a gentler pedal saves fuel'**
+  String get ecoNudgeHarshAccel;
+
+  /// Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip.
+  ///
+  /// In en, this message translates to:
+  /// **'High revs at cruise — shifting up earlier saves fuel'**
+  String get ecoNudgeHighRpm;
+
   /// Label for the eco-routing strategy chip on the route search controls (#1123). Picks routes that minimise fuel rather than time.
   ///
   /// In en, this message translates to:
@@ -11423,6 +11519,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap to retry'**
   String get obd2ReconnectRetry;
+
+  /// One-time actionable recovery hint shown when the Classic OBD2 adapter is wedged (#3422, epic #3415): repeated reconnects ended in exhausted RFCOMM ladders and the in-app recovery rungs did not clear it. Tells the user the two physical recoveries (ignition cycle / replug) and the Bluetooth toggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your OBD2 adapter stopped responding. Switch the ignition off and on or replug the adapter — or toggle Bluetooth off and on.'**
+  String get obd2WedgeHintBody;
+
+  /// Label of the button on the wedged-adapter recovery hint (#3422) that deep-links to the system Bluetooth settings screen so the user can toggle Bluetooth off and on.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth settings'**
+  String get obd2WedgeHintOpenBtSettings;
 
   /// Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode.
   ///

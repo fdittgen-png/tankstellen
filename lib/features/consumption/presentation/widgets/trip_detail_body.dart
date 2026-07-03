@@ -14,6 +14,7 @@ import '../../data/lessons/driving_lesson_registry.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/driving_insight.dart';
 import '../../domain/driving_score.dart';
+import '../../domain/fuel_event_attribution.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/lessons/driving_lesson_rule.dart';
@@ -22,6 +23,7 @@ import '../../domain/trip_recorder.dart';
 import 'driving_analysis_trace_card.dart';
 import 'driving_insights_card.dart';
 import 'driving_score_card.dart';
+import 'fuel_breakdown_card.dart';
 import 'gps_diagnostics_card.dart';
 import 'gps_efficiency_kpi_card.dart';
 import 'gps_road_usage_card.dart';
@@ -125,6 +127,14 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   /// telemetry aggregate (#3402).
   late final List<TripSample> _tripSamples =
       widget.samples.map(tripDetailToTripSample).toList(growable: false);
+
+  /// Per-event fuel-cost attribution (#3432) — the "where your fuel
+  /// went" breakdown. Pure + O(n); memoised like the other analyses so
+  /// theme / locale rebuilds don't re-run it. Empty for EV trips (the
+  /// litre framing would be wrong — same gate as [_computeInsights]).
+  late final FuelAttribution _fuelAttribution = widget.isEv
+      ? FuelAttribution.empty
+      : FuelAttribution.fromSamples(_tripSamples);
 
   List<DrivingInsight> _computeInsights() {
     if (widget.samples.isEmpty) return const [];
@@ -285,6 +295,15 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // rows the inline analyzer + gear metric produced before.
         if (!widget.isEv && widget.samples.isNotEmpty)
           DrivingInsightsCard(lessons: lessons),
+        // "Where your fuel went" per-event fuel-cost breakdown (#3432)
+        // — right below the lessons so the ranked coaching is followed
+        // by the whole-trip litre attribution. The card self-hides when
+        // the attribution found nothing above the noise floor.
+        if (!widget.isEv && widget.samples.isNotEmpty)
+          FuelBreakdownCard(
+            attribution: _fuelAttribution,
+            totalTripLiters: widget.entry.summary.fuelLitersConsumed,
+          ),
         // Throttle / RPM histogram (#1041 phase 3a — Card C). Slotted
         // right below the insights card so the user reads "what was
         // wasteful" then immediately sees "here's the engine

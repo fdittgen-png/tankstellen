@@ -24,6 +24,16 @@ abstract class ClassicBluetoothFacade {
 
   Future<void> stopScan();
 
+  /// #3423 — whether [mac] is currently in the OS bonded-devices list.
+  ///
+  /// Tri-state on purpose: `null` means the list could not be read (plugin
+  /// error, radio off, non-Android host). Callers must treat `null` as
+  /// "possibly bonded" and proceed with the ordinary connect — ONLY a
+  /// definite `false` may be classified as a lost bond (an RFCOMM open to
+  /// an unbonded MAC is doomed by construction, so the connect chokepoint
+  /// stamps the distinct `bond-lost` failure instead of dialling).
+  Future<bool?> isBonded(String mac);
+
   /// Build an un-opened [ElmByteChannel] for [deviceId] using SPP.
   /// The transport layer calls `open()` to actually connect.
   ElmByteChannel channelFor(String deviceId);
@@ -76,6 +86,24 @@ class PluginClassicBluetoothFacade implements ClassicBluetoothFacade {
   @override
   Future<void> stopScan() async {
     // Bonded-only enumeration is instant; nothing to cancel.
+  }
+
+  @override
+  Future<bool?> isBonded(String mac) async {
+    try {
+      final bonded = await _plugin.bondedDevices();
+      final needle = mac.trim().toUpperCase();
+      return bonded.any((d) => d.address.trim().toUpperCase() == needle);
+    } catch (e, st) {
+      // #3423 — degrade to UNKNOWN (null), mirroring the scan() degradation
+      // above: a failed bonded-list read must never block the connect, and
+      // must never be misread as a lost bond.
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'PluginClassicBluetoothFacade: isBonded failed — '
+            'degraded to unknown (connect proceeds)',
+      }));
+      return null;
+    }
   }
 
   @override

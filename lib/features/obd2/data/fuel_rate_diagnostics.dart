@@ -135,6 +135,47 @@ class FuelRateDiagnostics {
     }
   }
 
+  /// Records the mass-based-branch breadcrumb (PID 0x9D / 0xA2, #3428)
+  /// and, when the 0x5E tear-offs are supplied, runs the 9D-vs-5E
+  /// divergence cross-check: both are ECU-reported fuel figures, so a
+  /// > 50 % gap flags a mis-scaled 0x9D implementation or a stuck 0x5E
+  /// (`9d-vs-5e-divergent`). The caller still surfaces [rateLPerHour].
+  ///
+  /// The breadcrumb row is tagged [Obd2BranchTag.pid5E] — the overlay's
+  /// tag enum is frozen (its exhaustive switch lives in presentation code
+  /// owned by the #3431/#3432 pass); the trip-level provenance is carried
+  /// by `FuelRateSourceTag` instead.
+  Future<void> recordMassRate(
+    double rateLPerHour, {
+    bool Function()? isPid5ESupported,
+    Future<double?> Function()? readPid5E,
+  }) async {
+    final recorder = collector;
+    if (recorder == null) return;
+    recorder.record(
+      branch: Obd2BranchTag.pid5E,
+      fuelRateLPerHour: rateLPerHour,
+      afr: afr,
+      fuelDensityGPerL: fuelDensityGPerL,
+      engineDisplacementCc: engineDisplacementCc,
+      volumetricEfficiency: volumetricEfficiency,
+    );
+    if (isPid5ESupported != null &&
+        readPid5E != null &&
+        isPid5ESupported()) {
+      final direct5e = await readPid5E();
+      if (direct5e != null &&
+          direct5e > 0 &&
+          (rateLPerHour - direct5e).abs() / direct5e > 0.5) {
+        recorder.recordFlag(
+          Obd2BreadcrumbCollector.flag9dVs5eDivergent,
+          'rate9d=${rateLPerHour.toStringAsFixed(2)};'
+              'pid5e=${direct5e.toStringAsFixed(2)}',
+        );
+      }
+    }
+  }
+
   /// Records the MAF-branch breadcrumb. [corrected] is the trim-applied
   /// rate the caller surfaces; [maf] is the raw g/s read.
   void recordMaf({required double corrected, required double maf}) {
