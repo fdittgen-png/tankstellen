@@ -26,6 +26,17 @@ class SyncRunTrace {
   static final _random = Random();
   static String? _runId;
 
+  /// Optional tap invoked by [table] with the raw per-table counts
+  /// (#3445). The launch-sync span recorder installs it while armed so
+  /// entity-merge spans carry pushed/pulled row counts without a second
+  /// reporting channel; `null` (the default) costs one null check.
+  static void Function(
+    String table,
+    int uploaded,
+    int downloaded,
+    int tombstoned,
+  )? tableSink;
+
   /// The id of the sync run currently in flight (or the most recent one)
   /// in this session, `null` before the first [begin].
   static String? get currentRunId => _runId;
@@ -57,6 +68,7 @@ class SyncRunTrace {
     final detail = 'run=${_runId ?? 'untracked'} up=$uploaded '
         'down=$downloaded tomb=$tombstoned';
     BreadcrumbCollector.add('sync:$tableName', detail: detail);
+    tableSink?.call(tableName, uploaded, downloaded, tombstoned);
     debugPrint('SyncRunTrace: $tableName $detail');
   }
 

@@ -9,6 +9,7 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/alerts_sync.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../data/models/price_alert.dart';
 import '../data/repositories/alert_repository.dart';
@@ -154,6 +155,10 @@ class AlertNotifier extends _$AlertNotifier {
     if (added > 0) {
       state = repo.getAlerts();
     }
+    // #3446 — pulled alerts are persisted; announce it on the sync bus
+    // (dropped when zero). This notifier already refreshed its own state
+    // above; the emit is for any other reader of the alerts table.
+    SyncEvents.instance.emit(SyncTableChanged(SyncTables.alerts, added));
     return added;
   }
 

@@ -24,7 +24,10 @@ import 'startup_timer.dart';
 class StartupTraceExport {
   StartupTraceExport._();
 
-  static const int schemaVersion = 1;
+  /// v2 (#3445): adds the `spans` section — the post-first-frame
+  /// launch-sync spans (`tanksync_init`, `trips_merge`, per-table entity
+  /// merges, `sync_phase_done`) recorded after `StartupTimer.finish()`.
+  static const int schemaVersion = 2;
 
   /// The export-section key registered into the error-log export.
   static const String exportSectionKey = 'startupTrace';
@@ -46,6 +49,19 @@ class StartupTraceExport {
     return out;
   }
 
+  /// Serialize [spans] (#3445 — the post-first-frame launch-sync spans)
+  /// into export rows. Attributes (per-table row counts) travel verbatim.
+  static List<Map<String, Object?>> spanMaps(List<StartupSpan> spans) => [
+        for (final s in spans)
+          {
+            'name': s.name,
+            'startMs': s.startMs,
+            'endMs': s.endMs,
+            'durationMs': s.durationMs,
+            if (s.attributes.isNotEmpty) 'attributes': s.attributes,
+          },
+      ];
+
   /// Pure builder for the canonical export document — no I/O, no globals, so
   /// it is unit-testable directly.
   static Map<String, Object?> buildDocument({
@@ -53,6 +69,7 @@ class StartupTraceExport {
     required int? totalMs,
     required DateTime exportedAt,
     required String appVersion,
+    List<StartupSpan> spans = const [],
   }) {
     return {
       'schema': schemaVersion,
@@ -61,6 +78,7 @@ class StartupTraceExport {
       'appVersion': appVersion,
       'totalMs': totalMs,
       'phases': phases(milestones),
+      'spans': spanMaps(spans),
     };
   }
 
@@ -72,6 +90,7 @@ class StartupTraceExport {
       totalMs: timer.totalMs,
       exportedAt: exportedAt ?? DateTime.now(),
       appVersion: AppConstants.appVersion,
+      spans: timer.spans,
     );
     return const JsonEncoder.withIndent('  ').convert(doc);
   }
@@ -103,6 +122,7 @@ class StartupTraceExport {
     TraceStorage.extraExportSections[exportSectionKey] = () => {
           'totalMs': StartupTimer.instance.totalMs,
           'phases': phases(StartupTimer.instance.milestones),
+          'spans': spanMaps(StartupTimer.instance.spans),
         };
   }
 }

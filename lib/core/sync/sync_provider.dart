@@ -14,6 +14,7 @@ import 'sync_config.dart';
 import 'favorites_sync.dart';
 import 'ignored_stations_sync.dart';
 import 'ratings_sync.dart';
+import 'sync_events.dart';
 import 'sync_run_trace.dart';
 import 'user_data_sync.dart';
 import '../../core/logging/error_logger.dart';
@@ -339,8 +340,15 @@ class SyncState extends _$SyncState {
     IdMergeFn mergeFavorites = FavoritesSync.merge,
     IdMergeFn mergeIgnored = IgnoredStationsSync.merge,
   }) async {
-    await storage.setFavoriteIds(await mergeFavorites(storage.getFavoriteIds()));
-    await storage.setIgnoredIds(await mergeIgnored(storage.getIgnoredIds()));
+    // #3446 — emit AFTER each persist (subscribers re-read storage).
+    final favBefore = storage.getFavoriteIds();
+    await storage.setFavoriteIds(await mergeFavorites(favBefore));
+    SyncEvents.instance.emitIdSetDelta(
+        SyncTables.favorites, favBefore, storage.getFavoriteIds());
+    final ignBefore = storage.getIgnoredIds();
+    await storage.setIgnoredIds(await mergeIgnored(ignBefore));
+    SyncEvents.instance.emitIdSetDelta(
+        SyncTables.ignoredStations, ignBefore, storage.getIgnoredIds());
   }
 
   /// Pull the user's server ratings and **persist the server-only ones
@@ -355,9 +363,7 @@ class SyncState extends _$SyncState {
   ///
   /// Union-merge semantics: **local wins on id collision** — a station the
   /// device already rates is left untouched (its in-flight edit may not yet
-  /// have reached the server). Only server-only stations are added. The
-  /// `station_rating_provider` re-reads storage on rebuild, so the in-session
-  /// UI reflects the pulled ratings.
+  /// have reached the server). Only server-only stations are added.
   ///
   /// Called on the connect / "sync now" / app-launch triggers (see
   /// `data_transparency_provider` + `AppInitializer`). [fetchRatings]
@@ -365,17 +371,24 @@ class SyncState extends _$SyncState {
   /// pull-persist wiring is unit-testable without a live Supabase session
   /// (the real fetch returns an empty map when unauthenticated, masking the
   /// wiring under test).
-  Future<void> syncAndPersistRatings(
+  /// Returns the count written; emits it on the #3446 [SyncEvents] bus
+  /// AFTER the writes so the ratings UI refreshes in-session.
+  Future<int> syncAndPersistRatings(
     StorageRepository storage, {
     RatingsFetchFn fetchRatings = RatingsSync.fetchAll,
   }) async {
     final serverRatings = await fetchRatings();
-    if (serverRatings.isEmpty) return;
+    if (serverRatings.isEmpty) return 0;
     final localRatings = storage.getRatings();
+    var written = 0;
     for (final entry in serverRatings.entries) {
       if (localRatings.containsKey(entry.key)) continue;
       await storage.setRating(entry.key, entry.value);
+      written++;
     }
+    SyncEvents.instance
+        .emit(SyncTableChanged(SyncTables.stationRatings, written));
+    return written;
   }
 
   static SyncMode _parseMode(String? value) => switch (value) {

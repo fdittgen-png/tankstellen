@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/supabase_client.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/favorites_sync.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
@@ -131,12 +132,15 @@ class DataTransparencyController extends _$DataTransparencyController {
 
       // #3076 — persist the union (server ∪ local) back to local storage
       // instead of discarding the merge result, so favorites added on
-      // another device are pulled down here. Then invalidate the favorites
-      // provider so the in-session UI reflects the newly-pulled ids; the
-      // `Favorites` notifier re-reads storage on rebuild.
+      // another device are pulled down here. The #3446 sync-events emit
+      // (AFTER the persist) replaces the old one-off
+      // `ref.invalidate(favoritesProvider)` — the `Favorites` notifier
+      // subscribes to its table and re-reads storage on the event.
       final storage = ref.read(storageRepositoryProvider);
+      final favBefore = storage.getFavoriteIds();
       await storage.setFavoriteIds(await FavoritesSync.merge(favoriteIds));
-      ref.invalidate(favoritesProvider);
+      SyncEvents.instance.emitIdSetDelta(
+          SyncTables.favorites, favBefore, storage.getFavoriteIds());
 
       // #3077 — pull server-only ratings into local storage (local wins on
       // collision). The station_rating provider re-reads storage on rebuild.
@@ -155,7 +159,12 @@ class DataTransparencyController extends _$DataTransparencyController {
       // Off → upload-only stays the contract, nothing is pulled.
       if (ref.read(tripsSyncEnabledProvider)) {
         await ref.read(vehicleProfileListProvider.notifier).pullFromServer();
-        await ref.read(fillUpListProvider.notifier).pullFromServer();
+        // #3446 — fill-ups' persist site lives in the length-frozen
+        // consumption_providers.dart (#3138), so this call site emits.
+        final fillUpsPulled =
+            await ref.read(fillUpListProvider.notifier).pullFromServer();
+        SyncEvents.instance
+            .emit(SyncTableChanged(SyncTables.fillUps, fillUpsPulled));
       }
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'DataTransparency: force sync failed'}));

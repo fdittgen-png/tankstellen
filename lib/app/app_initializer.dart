@@ -23,6 +23,7 @@ import '../core/logging/app_log.dart';
 import '../core/logging/error_log_denoise.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
+import '../core/perf/launch_sync_trace.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
 import '../core/storage/hive_boxes.dart';
@@ -166,27 +167,24 @@ class AppInitializer {
     });
 
     // #795 phase 1 — defer Supabase/TankSync warm-up and community-config
-    // asset read until after the first frame. Neither is required for the
-    // landing UI and both touch relatively slow I/O (asset bundle decode +
-    // Supabase client init + anonymous auth).
-    //
-    // We keep the call sites here (non-awaited) so structural ordering
-    // tests that pin `services < tankSync < launch` in the source body
-    // continue to pass. The actual work runs via `_deferPostFirstFrame`.
+    // asset read until after the first frame (slow I/O, not needed for the
+    // landing UI). Call sites stay here (non-awaited) so structural
+    // ordering tests pinning `services < tankSync < launch` keep passing.
     _deferPostFirstFrame(() async {
       await CommunityConfig.load();
-      await _maybeInitTankSync(storage);
+      // #3445 — span the otherwise-invisible launch-sync phase when the
+      // Feature.startupTrace devtool is on (null = zero overhead).
+      final trace = LaunchSyncPhase.armTrace(container);
+      await LaunchSyncTrace.spanned(
+          trace, 'tanksync_init', () => _maybeInitTankSync(storage));
       // #3126 — one run id threads the launch merges into the trace.
       if (TankSyncClient.client != null) SyncRunTrace.begin('launch');
-      // #1541 — run the trip-summaries merge + details retention pass
-      // once TankSync is up. No-ops cleanly when the user is signed
-      // out or when the trip-history Hive box isn't open.
-      await LaunchSyncPhase.runTripsSyncMerge(container);
-      // #3077 — pull the remaining server→local entities (ratings,
-      // alerts, fill-ups, vehicles) once TankSync is up, mirroring the
-      // trips merge above. No-ops cleanly when sync is off / unauthenticated
-      // and respects each entity's consent gate.
-      await LaunchSyncPhase.runEntitySyncMerge(container, storage);
+      // #1541 trips merge + #3077 entity pulls — each no-ops cleanly
+      // when sync is off / unauthenticated (see LaunchSyncPhase).
+      await LaunchSyncPhase.runTripsSyncMerge(container, trace: trace);
+      await LaunchSyncPhase.runEntitySyncMerge(container, storage,
+          trace: trace);
+      trace?.finish();
     });
 
     // Cache runtime version so AppConstants.appVersion is accurate (#570).

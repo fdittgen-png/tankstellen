@@ -4,6 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/vehicles_sync.dart';
 import '../data/repositories/vehicle_profile_repository.dart';
 import '../../../core/domain/vehicle_profile.dart';
@@ -79,6 +80,11 @@ class VehicleProfileList extends _$VehicleProfileList {
     }
     state = repo.getAll();
     ref.invalidate(activeVehicleProfileProvider);
+    // #3446 — this is the vehicles persist chokepoint (launch/sync-now
+    // pulls AND the #713 device-link import): announce every incoming
+    // write on the sync bus for any other reader of the table.
+    SyncEvents.instance
+        .emit(SyncTableChanged(SyncTables.vehicles, incoming.length));
     return added;
   }
 

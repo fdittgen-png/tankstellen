@@ -4,6 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/ratings_sync.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../profile/providers/profile_provider.dart';
 
@@ -22,6 +23,13 @@ class StationRatings extends _$StationRatings {
   @override
   Map<String, int> build() {
     final storage = ref.watch(storageRepositoryProvider);
+    // #3446 — re-read storage whenever a sync pull persists rating rows
+    // (launch / connect / "sync now"); this keep-alive one-shot reader
+    // otherwise showed pulled ratings one restart late.
+    final sub = SyncEvents.instance
+        .forTable(SyncTables.stationRatings)
+        .listen((_) => state = storage.getRatings());
+    ref.onDispose(sub.cancel);
     return storage.getRatings();
   }
 

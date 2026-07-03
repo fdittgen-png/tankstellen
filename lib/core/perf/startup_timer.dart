@@ -25,6 +25,8 @@ class StartupTimer {
 
   final Stopwatch _stopwatch = Stopwatch();
   final List<StartupMilestone> _milestones = [];
+  final List<StartupSpan> _spans = [];
+  DateTime? _wallClockEpoch;
   int? _totalMs;
 
   /// Whether the timer has been started.
@@ -33,13 +35,18 @@ class StartupTimer {
   /// All recorded milestones (in order).
   List<StartupMilestone> get milestones => List.unmodifiable(_milestones);
 
+  /// All recorded spans (in insertion order) — see [addSpan].
+  List<StartupSpan> get spans => List.unmodifiable(_spans);
+
   /// Total startup time in milliseconds, available after [finish] is called.
   int? get totalMs => _totalMs;
 
   /// Start the timer. Call this as early as possible in main().
   void start() {
     _milestones.clear();
+    _spans.clear();
     _totalMs = null;
+    _wallClockEpoch = DateTime.now();
     _stopwatch.reset();
     _stopwatch.start();
   }
@@ -64,6 +71,40 @@ class StartupTimer {
     }
   }
 
+  /// Milliseconds elapsed since [start] on the trace clock, usable both
+  /// BEFORE and AFTER [finish] (#3445).
+  ///
+  /// While the stopwatch runs this is its reading; once [finish] stopped
+  /// it, the wall-clock epoch captured by [start] takes over — the
+  /// post-first-frame launch-sync phase runs after `finish()` and its
+  /// spans must still land on the same timeline. `0` before [start].
+  int elapsedMsNow() {
+    if (_stopwatch.isRunning) return _stopwatch.elapsedMilliseconds;
+    final epoch = _wallClockEpoch;
+    if (epoch == null) return 0;
+    final ms = DateTime.now().difference(epoch).inMilliseconds;
+    return ms < 0 ? 0 : ms;
+  }
+
+  /// Record a named span on the startup timeline (#3445). Unlike [mark],
+  /// this works after [finish] — the deferred launch-sync phase records
+  /// its spans here. No-op before [start] (nothing to anchor to).
+  /// [attributes] travel into the trace export verbatim (row counts …).
+  void addSpan(
+    String name, {
+    required int startMs,
+    required int endMs,
+    Map<String, Object?> attributes = const {},
+  }) {
+    if (_wallClockEpoch == null) return;
+    _spans.add(StartupSpan(
+      name: name,
+      startMs: startMs,
+      endMs: endMs,
+      attributes: Map.unmodifiable(attributes),
+    ));
+  }
+
   /// Reset the timer for reuse (primarily for testing).
   @visibleForTesting
   void reset() {
@@ -71,6 +112,8 @@ class StartupTimer {
       ..stop()
       ..reset();
     _milestones.clear();
+    _spans.clear();
+    _wallClockEpoch = null;
     _totalMs = null;
   }
 
@@ -105,4 +148,35 @@ class StartupMilestone {
 
   @override
   String toString() => 'StartupMilestone($name, ${elapsedMs}ms)';
+}
+
+/// A named interval on the startup timeline (#3445) — unlike a
+/// [StartupMilestone] checkpoint it has an explicit start AND end, plus
+/// free-form [attributes] (per-table sync row counts). Recorded via
+/// [StartupTimer.addSpan], including after `finish()` ran.
+class StartupSpan {
+  const StartupSpan({
+    required this.name,
+    required this.startMs,
+    required this.endMs,
+    this.attributes = const {},
+  });
+
+  /// Span label (e.g. `tanksync_init`, `trips_merge`, a table name).
+  final String name;
+
+  /// Milliseconds since [StartupTimer.start] when the span began.
+  final int startMs;
+
+  /// Milliseconds since [StartupTimer.start] when the span ended.
+  final int endMs;
+
+  /// Extra key/values exported verbatim (row counts pulled/pushed …).
+  final Map<String, Object?> attributes;
+
+  /// The span's length on the timeline.
+  int get durationMs => endMs - startMs;
+
+  @override
+  String toString() => 'StartupSpan($name, $startMs..${endMs}ms)';
 }

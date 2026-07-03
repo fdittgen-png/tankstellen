@@ -10,6 +10,7 @@ import '../../../core/data/storage_repository.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/favorites_sync.dart';
 import '../../../core/domain/ev/charging_station.dart' as search_ev;
@@ -45,6 +46,13 @@ class Favorites extends _$Favorites {
   @override
   List<String> build() {
     final storage = ref.watch(storageRepositoryProvider);
+    // #3446 — re-read storage whenever a sync pull persists favorites
+    // rows (launch / connect / "sync now"); without this the pulled ids
+    // appeared one restart late. Mirrors the LiveHarshEventBus idiom.
+    final sub = SyncEvents.instance
+        .forTable(SyncTables.favorites)
+        .listen((_) => _reload());
+    ref.onDispose(sub.cancel);
     // Merge fuel + EV favorite IDs into a single unified list.
     return [...storage.getFavoriteIds(), ...storage.getEvFavoriteIds()];
   }

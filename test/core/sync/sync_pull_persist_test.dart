@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
+import 'package:tankstellen/core/sync/sync_events.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 
 import '../../fakes/fake_hive_storage.dart';
@@ -189,6 +190,97 @@ void main() {
       );
 
       expect(fakeStorage.getRatings(), {'keep': 3});
+    });
+  });
+
+  // #3446 — every pull that persists rows must announce it on the
+  // SyncEvents bus AFTER the write, so the subscribed providers re-read
+  // storage in-session instead of one restart late.
+  group('SyncEvents emits from the pull-persist seams (#3446)', () {
+    Future<void> flush() => Future<void>.delayed(Duration.zero);
+
+    test('syncAndPersistIds emits favorites + ignored deltas', () async {
+      await fakeStorage.setFavoriteIds(['local-1']);
+
+      final events = <SyncTableChanged>[];
+      final sub = SyncEvents.instance.stream.listen(events.add);
+      addTearDown(sub.cancel);
+
+      final container = createContainer();
+      await container.read(syncStateProvider.notifier).syncAndPersistIds(
+            fakeStorage,
+            mergeFavorites: fakeMergeWithServer(['server-fav']),
+            mergeIgnored: fakeMergeWithServer(['server-ign']),
+          );
+      await flush();
+
+      expect(
+        events.map((e) => '${e.table}:${e.changedCount}'),
+        containsAll(<String>[
+          '${SyncTables.favorites}:1',
+          '${SyncTables.ignoredStations}:1',
+        ]),
+      );
+    });
+
+    test('no-op id merge emits nothing', () async {
+      await fakeStorage.setFavoriteIds(['keep']);
+
+      final events = <SyncTableChanged>[];
+      final sub = SyncEvents.instance.stream.listen(events.add);
+      addTearDown(sub.cancel);
+
+      final container = createContainer();
+      await container.read(syncStateProvider.notifier).syncAndPersistIds(
+            fakeStorage,
+            mergeFavorites: (ids) async => ids,
+            mergeIgnored: (ids) async => ids,
+          );
+      await flush();
+
+      expect(events, isEmpty);
+    });
+
+    test('syncAndPersistRatings returns + emits the written count',
+        () async {
+      await fakeStorage.setRating('st-local', 4);
+
+      final events = <SyncTableChanged>[];
+      final sub = SyncEvents.instance
+          .forTable(SyncTables.stationRatings)
+          .listen(events.add);
+      addTearDown(sub.cancel);
+
+      final container = createContainer();
+      final written = await container
+          .read(syncStateProvider.notifier)
+          .syncAndPersistRatings(
+            fakeStorage,
+            // local id collides (skipped), two server-only rows land.
+            fetchRatings: () async => {'st-local': 1, 'a': 5, 'b': 2},
+          );
+      await flush();
+
+      expect(written, 2);
+      expect(events.single.changedCount, 2);
+    });
+
+    test('empty ratings fetch emits nothing and returns 0', () async {
+      final events = <SyncTableChanged>[];
+      final sub = SyncEvents.instance.stream.listen(events.add);
+      addTearDown(sub.cancel);
+
+      final container = createContainer();
+      final written = await container
+          .read(syncStateProvider.notifier)
+          .syncAndPersistRatings(
+            fakeStorage,
+            fetchRatings: () async => const <String, int>{},
+          );
+      await flush();
+
+      expect(written, 0);
+      expect(events, isEmpty);
     });
   });
 }
