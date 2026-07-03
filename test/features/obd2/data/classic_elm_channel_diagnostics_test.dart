@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
+import 'package:tankstellen/features/obd2/data/classic_connect_cooldown.dart';
 import 'package:tankstellen/features/obd2/data/classic_elm_channel.dart';
 import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
@@ -47,6 +48,7 @@ class _FakeClassicPlugin extends Obd2ClassicMethodChannel {
   Future<ClassicConnectResult> connectDetailed({
     required String address,
     required String uuid,
+    int? budgetMs, // #3421
   }) async {
     if (connectThrows != null) throw connectThrows!;
     return (
@@ -85,6 +87,8 @@ void main() {
 
   setUp(() {
     fake = _FakeClassicPlugin();
+    // #3421 — don't inherit a prior test's close stamp (≈1.5 s real wait).
+    ClassicConnectCooldown.instance.debugClear();
     Obd2CommDiagnostics.instance.reset();
     errorLogger.resetForTest();
     recorder = _CaptureRecorder();

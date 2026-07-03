@@ -283,6 +283,7 @@ class _FalseConnectPlugin extends Obd2ClassicMethodChannel {
   Future<ClassicConnectResult> connectDetailed({
     required String address,
     required String uuid,
+    int? budgetMs, // #3421
   }) async =>
       (ok: false, strategy: 'exhausted', error: 'read failed, socket closed');
   @override
@@ -297,6 +298,7 @@ class _ThrowingConnectPlugin extends Obd2ClassicMethodChannel {
   Future<ClassicConnectResult> connectDetailed({
     required String address,
     required String uuid,
+    int? budgetMs, // #3421
   }) async =>
       throw Exception('RFCOMM socket open failed');
   @override

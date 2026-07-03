@@ -5,8 +5,10 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import 'classic_connect_cooldown.dart';
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
+import 'obd2_platform_budgets.dart';
 import '../../../../core/utils/event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'obd2_link_drop_signal.dart';
@@ -33,6 +35,24 @@ class ClassicElmChannel implements ElmByteChannel {
   final String address;
   final String sppUuid;
   final Obd2ClassicMethodChannel _plugin;
+
+  /// #3421 — whole-ladder budget (ms) threaded to the native `connect` so
+  /// the RFCOMM ladder as a WHOLE is bounded (the #3348 watchdog only bounds
+  /// each rung). Reduced by any post-close cooldown waited in [open], so the
+  /// cooldown is counted inside the budget.
+  final int connectBudgetMs;
+
+  /// #3421 — extra Dart-side slack on top of [connectBudgetMs] for the
+  /// defense-in-depth `.timeout` around `connectDetailed` (a wedged platform
+  /// thread never runs the native budget bookkeeping). Injectable so tests
+  /// don't wait the production 3 s.
+  final Duration deadlineGrace;
+
+  /// #3421 — per-mac post-close cooldown (the #3404 micro-lever). Injectable
+  /// for tests; production shares [ClassicConnectCooldown.instance] so the
+  /// gap survives across the short-lived channel objects a reconnect
+  /// episode creates.
+  final ClassicConnectCooldown _cooldown;
 
   StreamSubscription<List<int>>? _subscription;
 
@@ -61,7 +81,11 @@ class ClassicElmChannel implements ElmByteChannel {
     required this.address,
     Obd2ClassicMethodChannel? plugin,
     this.sppUuid = sppServiceUuid,
-  }) : _plugin = plugin ?? const Obd2ClassicMethodChannel();
+    this.connectBudgetMs = Obd2PlatformBudgets.classicConnectLadderBudgetMs,
+    this.deadlineGrace = Obd2PlatformBudgets.classicConnectDartGrace,
+    ClassicConnectCooldown? cooldown,
+  })  : _plugin = plugin ?? const Obd2ClassicMethodChannel(),
+        _cooldown = cooldown ?? ClassicConnectCooldown.instance;
 
   @override
   bool get isOpen => _open;
@@ -84,6 +108,18 @@ class ClassicElmChannel implements ElmByteChannel {
     if (_incoming.isClosed) {
       _incoming = StreamController<List<int>>.broadcast();
     }
+    // #3421 — post-close cooldown (the #3404 micro-lever): a connect dialled
+    // back-to-back after a close/drop lands on the adapter's still-held SPP
+    // channel and burns a doomed ladder rung (or hangs, #3346). Wait out the
+    // remainder of the 1.5 s gap since the last close/drop of THIS mac, and
+    // count the wait INSIDE the whole-ladder budget by reducing what the
+    // native side gets. Floor at 1 ms so a pathological budget/gap combo
+    // still dispatches one bounded native attempt.
+    final cooldownWaitedMs =
+        (await _cooldown.awaitReadyToConnect(address)).inMilliseconds;
+    final nativeBudgetMs = connectBudgetMs - cooldownWaitedMs < 1
+        ? 1
+        : connectBudgetMs - cooldownWaitedMs;
     // #2466 — gated comm-diagnostics connect-lifecycle tee. A no-op
     // unless Feature.debugMode armed the collector; each call
     // early-returns on `!enabled`, so production pays one cached-bool
@@ -97,10 +133,28 @@ class ClassicElmChannel implements ElmByteChannel {
       // #2969 — connectDetailed surfaces WHICH RFCOMM strategy won / the
       // terminal failure mode + the last native IOException, so the connect
       // trace carries the native cause (not just "rfcomm open returned false").
-      connectResult = await _plugin.connectDetailed(
-        address: address,
-        uuid: sppUuid,
-      );
+      // #3421 — the whole-ladder budget is threaded down natively AND
+      // enforced here as defense-in-depth: even a WEDGED platform thread
+      // (whose native budget bookkeeping never runs because the blocking
+      // `BluetoothSocket.connect()` refuses to return — field traces t5/t8,
+      // 4.7/16.8 min) can no longer hold this Dart caller past
+      // budget + [deadlineGrace]. The TimeoutException takes the existing
+      // thrown-failure classification below.
+      final deadline = Duration(milliseconds: nativeBudgetMs) + deadlineGrace;
+      connectResult = await _plugin
+          .connectDetailed(
+            address: address,
+            uuid: sppUuid,
+            budgetMs: nativeBudgetMs,
+          )
+          .timeout(
+            deadline,
+            onTimeout: () => throw TimeoutException(
+              'classic connect exceeded the whole-ladder budget '
+              '(${nativeBudgetMs}ms) + grace — platform thread wedged (#3421)',
+              deadline,
+            ),
+          );
       // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
     } catch (e) {
       // A thrown platform error during the RFCOMM open (bonding,
@@ -264,6 +318,10 @@ class ClassicElmChannel implements ElmByteChannel {
   /// `rfcomm-open-fail`; this covers the thrown-platform-error path
   /// (bonding / permission).
   static String _classifyClassicConnectFailure(Object e) {
+    // #3421 — the Dart-side whole-ladder deadline fired (wedged platform
+    // thread). Its own bin, so the field export tells a budget overrun
+    // apart from a clean rfcomm-open failure.
+    if (e is TimeoutException) return 'connect-budget-timeout';
     final msg = e.toString().toUpperCase();
     if (msg.contains('BOND') || msg.contains('PAIR')) return 'not-bonded';
     if (msg.contains('RFCOMM') || msg.contains('SOCKET')) {
@@ -280,12 +338,21 @@ class ClassicElmChannel implements ElmByteChannel {
   void _signalDrop({required String reason}) {
     if (_closing || _dropSignalled) return;
     _dropSignalled = true;
+    // #3421 — an unexpected drop counts as a socket close for the post-close
+    // cooldown: the adapter's SPP channel is exactly as busy after a drop as
+    // after a deliberate close, so the next connect must respect the gap.
+    _cooldown.noteClosed(address);
     Obd2LinkDropSignal.instance
         .notifyDrop(transportKind: 'classic', mac: address, reason: reason);
   }
 
   @override
   Future<void> close() async {
+    // #3421 — stamp the cooldown only when a LINK was actually torn down
+    // (live, or dropped and signalled): a close() after a FAILED open has
+    // nothing to cool down, and stamping it would needlessly delay the
+    // transport's #2906 open-retry rungs.
+    if (_open || _dropSignalled) _cooldown.noteClosed(address);
     _closing = true;
     _open = false;
     await _subscription?.safeCancel();

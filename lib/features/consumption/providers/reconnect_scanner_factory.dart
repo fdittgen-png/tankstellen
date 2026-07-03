@@ -56,20 +56,31 @@ AdapterReconnectScanner? Function(
     // #2524 — swap the pipeline's pointer (so stop() tears down the LIVE
     // svc) AND the controller's via `replaceService` (so the loop polls the
     // reconnected transport, not the closed one).
+    // #2565 — the transport kind ('ble'/'classic') of the link that just
+    // dropped, read ONCE off the dead service at handle-drop time. Null when
+    // unknown ⇒ the legacy BLE-direct-first path (behaviour unchanged for
+    // BLE adapters). Drives BOTH the connector's direct-path dispatch and
+    // the #3421 in-range probe below.
+    final transportHint = readLinkKind();
     final connector = ReconnectConnector(
       connection: connection,
       onConnected: onConnected,
-      // #2565 — the transport kind ('ble'/'classic') of the link that just
-      // dropped, read off the dead service. Null when unknown ⇒ the legacy
-      // BLE-direct-first path (behaviour unchanged for BLE adapters).
-      transportHint: readLinkKind(),
+      transportHint: transportHint,
       // #3014 — the live adapter NAME, so the in-trip reconnect trace headline
       // names the adapter instead of showing only the redacted MAC.
       adapterName: readAdapterName?.call(),
     );
     final scanner = AdapterReconnectScanner(
       pinnedMac: pinnedMac,
-      probe: (mac) async => true,
+      // #3421 — REAL in-range probe (was a stub `async => true`, which made
+      // every backoff cycle dial a full connect even with the adapter
+      // absent). BLE: a short bounded advert scan for the pinned MAC;
+      // Classic/unknown: `true` (no advert to sight — see the builder doc).
+      probe: buildObd2InRangeProbe(
+        bluetooth: connection.bluetooth,
+        scanGovernor: connection.scanGovernor,
+        transportHint: transportHint,
+      ),
       // #3420 — stamp every in-trip reconnect attempt as a liveReconnect:
       // the connector dials `connectByMacClassicDirect`/direct paths that
       // default to firstConnect, which made the field trace ring read as
