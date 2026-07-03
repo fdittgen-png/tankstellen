@@ -27,7 +27,10 @@ import 'schema_sql_policies.dart';
 /// signal. See `SchemaVerifier.checkSchemaVersion`.
 /// v4 (#3125): `deletions.device_id` + `deletions.app_version` forensic
 /// columns (which install deleted a record, on which build).
-const int kSupabaseSchemaVersion = 4;
+/// v5 (#3452): `favorites.kind` (fuel | ev — EV favorites join the sync)
+/// + `favorites.data` (JSONB station payload, so a favorite pulled on a
+/// second device renders name/coords immediately).
+const int kSupabaseSchemaVersion = 5;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -58,6 +61,8 @@ CREATE TABLE IF NOT EXISTS public.users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ''',
+  // #3452 (v5): `kind` discriminates fuel vs EV favorites in the ONE
+  // table; `data` carries the full station JSON payload.
   'favorites': '''
 CREATE TABLE IF NOT EXISTS public.favorites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -65,6 +70,8 @@ CREATE TABLE IF NOT EXISTS public.favorites (
   station_id TEXT NOT NULL,
   station_name TEXT,
   country_code TEXT NOT NULL DEFAULT 'DE',
+  kind TEXT NOT NULL DEFAULT 'fuel',
+  data JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE(user_id, station_id)
 );
@@ -274,11 +281,16 @@ CREATE INDEX IF NOT EXISTS deletions_user_table_idx
 /// **unconditionally** (like the RLS/RPC blocks) to close that gap.
 ///
 /// v4 (#3125): forensic origin stamps on tombstones.
+/// v5 (#3452): EV favorites + station payloads on the favorites table.
 const String upgradeSql = '''
 ALTER TABLE public.deletions
   ADD COLUMN IF NOT EXISTS device_id TEXT;
 ALTER TABLE public.deletions
   ADD COLUMN IF NOT EXISTS app_version TEXT;
+ALTER TABLE public.favorites
+  ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'fuel';
+ALTER TABLE public.favorites
+  ADD COLUMN IF NOT EXISTS data JSONB;
 ''';
 
 /// Builds the wizard SQL. [schema] maps table name → already-exists; a table

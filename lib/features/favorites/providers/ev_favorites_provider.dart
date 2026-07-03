@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/domain/ev/charging_station.dart';
+import '../../../core/sync/favorites_sync.dart';
+import '../../../core/sync/sync_helper.dart';
 import 'favorites_provider.dart';
 import '../../../core/logging/error_logger.dart';
 
@@ -33,6 +35,12 @@ class EvFavorites extends _$EvFavorites {
     }
 
     state = storage.getEvFavoriteIds();
+    // #3452 — EV favorites sync: upload the new id + payload.
+    await SyncHelper.syncIfEnabled(
+      ref,
+      'EvFavorites.add',
+      () => FavoritesSync.merge(FavoritesSync.localRecords(storage)),
+    );
   }
 
   Future<void> remove(String stationId) async {
@@ -40,6 +48,13 @@ class EvFavorites extends _$EvFavorites {
     await storage.removeEvFavorite(stationId);
     await storage.removeEvFavoriteStationData(stationId);
     state = storage.getEvFavoriteIds();
+    // #3452 — tombstone + server delete so the removal reaches other
+    // devices instead of resurrecting from them (#3078).
+    await SyncHelper.fireAndForget(
+      ref,
+      'EvFavorites.remove',
+      () => FavoritesSync.delete(stationId),
+    );
   }
 
   Future<void> toggle(String stationId, {ChargingStation? stationData}) async {

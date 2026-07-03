@@ -51,6 +51,36 @@ void main() {
       expect(doc['totalMs'], 300);
       expect((doc['phases'] as List), hasLength(2));
     });
+
+    test('carries the launch-sync spans with counts (#3445)', () {
+      final doc = StartupTraceExport.buildDocument(
+        milestones: const [],
+        totalMs: 300,
+        exportedAt: DateTime.utc(2026, 7, 3),
+        appVersion: '6.0.0',
+        spans: const [
+          StartupSpan(name: 'tanksync_init', startMs: 310, endMs: 900),
+          StartupSpan(
+            name: 'trips_merge',
+            startMs: 900,
+            endMs: 1400,
+            attributes: {'table': 'trip_summaries', 'pulled': 4},
+          ),
+        ],
+      );
+
+      final spans = doc['spans'] as List;
+      expect(spans, hasLength(2));
+      expect(spans.first, {
+        'name': 'tanksync_init',
+        'startMs': 310,
+        'endMs': 900,
+        'durationMs': 590,
+      });
+      final trips = spans.last as Map<String, Object?>;
+      expect(trips['durationMs'], 500);
+      expect(trips['attributes'], {'table': 'trip_summaries', 'pulled': 4});
+    });
   });
 
   group('StartupTraceExport.currentJson (#3383)', () {
@@ -92,6 +122,23 @@ void main() {
       final section = supplier!() as Map<String, Object?>;
       expect(section['phases'], isA<List<Object?>>());
       expect((section['phases'] as List), isNotEmpty);
+    });
+
+    test('section carries post-finish launch-sync spans (#3445)', () {
+      StartupTimer.instance
+        ..start()
+        ..finish()
+        ..addSpan('tanksync_init', startMs: 300, endMs: 700, attributes: {
+          'table': 'vehicles',
+          'pulled': 2,
+        });
+      StartupTraceExport.ensureExtraExportSectionRegistered();
+
+      final section = TraceStorage
+          .extraExportSections[StartupTraceExport.exportSectionKey]!() as Map;
+      final spans = section['spans'] as List;
+      expect((spans.single as Map)['name'], 'tanksync_init');
+      expect(((spans.single as Map)['attributes'] as Map)['pulled'], 2);
     });
   });
 }

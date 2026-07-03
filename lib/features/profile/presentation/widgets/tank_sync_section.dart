@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
+import 'tank_sync_delete_data_tile.dart';
+import 'tank_sync_relink_tile.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sync/sync_config.dart';
@@ -50,6 +52,9 @@ class TankSyncSection extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final consent = ref.watch(gdprConsentProvider);
     return [
+      // #3449 — zero-height unless the launch identity guard flagged a
+      // stored identity with no session (re-link guidance + start-fresh).
+      const TankSyncRelinkTile(),
       ListTile(
         leading: Icon(Icons.cloud_done, color: DarkModeColors.success(context)),
         title: Text(syncConfig.modeName),
@@ -74,10 +79,12 @@ class TankSyncSection extends ConsumerWidget {
           onTap: () => _confirmSwitchToAnonymous(context, ref),
         ),
       const Divider(indent: 16, endIndent: 16),
-      // #1665 — trajet sync. Recorded trips upload to TankSync only
-      // when a non-anonymous (email) account is configured AND this
-      // toggle is on AND Cloud Sync consent is granted. Disabled with
-      // a hint when the account is anonymous or Cloud Sync is off.
+      // #1665/#3448 — trajet sync. Recorded trips upload/pull whenever
+      // Cloud Sync consent AND this toggle are on: an anonymous UUID is a
+      // full identity (its rows are RLS-scoped exactly like an email
+      // account's), so the former email requirement was dropped. The
+      // anonymous hint explains that email is what makes the data
+      // reachable from OTHER devices.
       SwitchListTile(
         key: const Key('tripsSyncToggle'),
         secondary: const Icon(Icons.route_outlined),
@@ -86,11 +93,11 @@ class TankSyncSection extends ConsumerWidget {
           !consent.cloudSync
               ? (l.consentSyncTripsDisabledHint)
               : !syncConfig.hasEmail
-              ? (l.consentSyncTripsNeedsEmailHint)
+              ? (l.consentSyncTripsAnonymousHint)
               : (l.consentSyncTripsSubtitle),
         ),
         value: consent.syncTrips,
-        onChanged: (consent.cloudSync && syncConfig.hasEmail)
+        onChanged: consent.cloudSync
             ? (v) => ref
                   .read(gdprConsentProvider.notifier)
                   .save(
@@ -113,6 +120,10 @@ class TankSyncSection extends ConsumerWidget {
         title: Text(l.linkDevice),
         onTap: () => context.push(RoutePaths.linkDevice),
       ),
+      // #3453 — per-category server-side deletion; anonymous-capable
+      // (RLS scopes to own rows) and available in every mode, community
+      // included.
+      const TankSyncDeleteDataTile(),
       if (syncConfig.mode != SyncMode.community)
         ListTile(
           leading: const Icon(Icons.qr_code),

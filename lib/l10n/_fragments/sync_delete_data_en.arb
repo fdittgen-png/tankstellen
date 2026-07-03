@@ -1,0 +1,56 @@
+{
+  "syncDeleteDataTitle": "Delete synced data",
+  "@syncDeleteDataTitle": {
+    "description": "Tile title in the TankSync settings section that opens the per-category server-side data deletion flow (#3453)."
+  },
+  "syncDeleteDataSubtitle": "Remove your trips, vehicles or fill-ups from the sync database",
+  "@syncDeleteDataSubtitle": {
+    "description": "Subtitle under the delete-synced-data tile (#3453)."
+  },
+  "syncDeleteDataPickTitle": "Delete which synced data?",
+  "@syncDeleteDataPickTitle": {
+    "description": "Title of the category-picker dialog for the synced-data deletion (#3453)."
+  },
+  "syncDeleteDataCategoryTrips": "Trips",
+  "@syncDeleteDataCategoryTrips": {
+    "description": "Category option: delete synced trips (#3453)."
+  },
+  "syncDeleteDataCategoryVehicles": "Vehicles",
+  "@syncDeleteDataCategoryVehicles": {
+    "description": "Category option: delete synced vehicles (#3453)."
+  },
+  "syncDeleteDataCategoryFillUps": "Fill-ups",
+  "@syncDeleteDataCategoryFillUps": {
+    "description": "Category option: delete synced fill-ups (#3453)."
+  },
+  "syncDeleteDataCategoryEverything": "Everything",
+  "@syncDeleteDataCategoryEverything": {
+    "description": "Category option: delete ALL synced data (the identity itself stays usable) (#3453)."
+  },
+  "syncDeleteDataConfirmTitle": "Delete {category} from the sync database?",
+  "@syncDeleteDataConfirmTitle": {
+    "description": "Confirmation dialog title before the server-side deletion; {category} is the localized category label the user picked (#3453).",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Trips"
+      }
+    }
+  },
+  "syncDeleteDataConfirmBody": "This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.",
+  "@syncDeleteDataConfirmBody": {
+    "description": "Confirmation dialog body. Documents the server-side-only decision: local data on this device stays; other devices drop their copies via tombstones (#3453)."
+  },
+  "syncDeleteDataConfirmAction": "Delete from server",
+  "@syncDeleteDataConfirmAction": {
+    "description": "Destructive confirm button of the synced-data deletion dialog (#3453)."
+  },
+  "syncDeleteDataDone": "Synced data deleted",
+  "@syncDeleteDataDone": {
+    "description": "Snackbar shown when the server-side deletion completed (#3453)."
+  },
+  "syncDeleteDataFailed": "Deleting synced data failed — please try again",
+  "@syncDeleteDataFailed": {
+    "description": "Snackbar shown when the server-side deletion failed or the user is not connected (#3453)."
+  }
+}

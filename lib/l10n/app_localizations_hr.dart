@@ -6078,8 +6078,8 @@ class AppLocalizationsHr extends AppLocalizations {
       'Omogućite Sinkronizaciju u oblaku gore za sigurnosno kopiranje vožnji.';
 
   @override
-  String get consentSyncTripsNeedsEmailHint =>
-      'Prijavite se s računom e-pošte za sinkronizaciju vožnji među uređajima.';
+  String get consentSyncTripsAnonymousHint =>
+      'Trips back up under this device\'s anonymous account. Sign in with an email to reach them from other devices.';
 
   @override
   String get consentHideDetails => 'Sakrij pojedinosti';
@@ -7205,6 +7205,70 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
+  String get syncDeleteDataTitle => 'Delete synced data';
+
+  @override
+  String get syncDeleteDataSubtitle =>
+      'Remove your trips, vehicles or fill-ups from the sync database';
+
+  @override
+  String get syncDeleteDataPickTitle => 'Delete which synced data?';
+
+  @override
+  String get syncDeleteDataCategoryTrips => 'Trips';
+
+  @override
+  String get syncDeleteDataCategoryVehicles => 'Vehicles';
+
+  @override
+  String get syncDeleteDataCategoryFillUps => 'Fill-ups';
+
+  @override
+  String get syncDeleteDataCategoryEverything => 'Everything';
+
+  @override
+  String syncDeleteDataConfirmTitle(String category) {
+    return 'Delete $category from the sync database?';
+  }
+
+  @override
+  String get syncDeleteDataConfirmBody =>
+      'This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.';
+
+  @override
+  String get syncDeleteDataConfirmAction => 'Delete from server';
+
+  @override
+  String get syncDeleteDataDone => 'Synced data deleted';
+
+  @override
+  String get syncDeleteDataFailed =>
+      'Deleting synced data failed — please try again';
+
+  @override
+  String get syncRelinkTitle => 'Cloud sync needs re-linking';
+
+  @override
+  String get syncRelinkBody =>
+      'This device\'s saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.';
+
+  @override
+  String get syncRelinkSignInAction => 'Sign in to re-link';
+
+  @override
+  String get syncRelinkStartFreshAction => 'Start fresh';
+
+  @override
+  String get syncRelinkStartFreshTitle => 'Start fresh?';
+
+  @override
+  String get syncRelinkStartFreshBody =>
+      'A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.';
+
+  @override
+  String get syncRelinkStartFreshConfirm => 'Start fresh';
 
   @override
   String get tankLevelTitle => 'Razina goriva';

@@ -53,7 +53,7 @@ final class ItineraryNotifierProvider
   }
 }
 
-String _$itineraryNotifierHash() => r'4a5c6997824931860f26be26987c3c927538939c';
+String _$itineraryNotifierHash() => r'324a13bbcca3618aa814f0352b1f4e0e8027559e';
 
 /// Manages saved itineraries with local-first strategy:
 /// - Save locally first, then sync to DB

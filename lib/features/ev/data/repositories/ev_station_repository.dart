@@ -82,3 +82,33 @@ class EvStationRepository {
     await _storage.putSetting(_listKey, json);
   }
 }
+
+/// Hydrates the [ChargingStation] for an `ocm-*` id from local caches.
+///
+/// #1804 — checks the EV favorites store first, then falls back to the
+/// recently-fetched EV station cache ([EvStationRepository]), so a
+/// station the user has seen on the map — or that a home-screen widget
+/// surfaced — resolves even when it is **not** a saved favorite. Returns
+/// `null` only when the id is genuinely unknown to the device.
+///
+/// Shared by the `/ev-station/:id` deep-link route AND (#3455) the
+/// `stationDetail` provider's ocm-id routing, so an EV id never reaches a
+/// fuel-price chain — the caller serves this cached station instead.
+ChargingStation? hydrateEvStationById(
+  String id,
+  EvFavoriteStorage favorites,
+  EvStationRepository cache,
+) {
+  final raw = favorites.getEvFavoriteStationData(id);
+  if (raw != null) {
+    try {
+      return ChargingStation.fromJson(raw);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'hydrateEvStationById: corrupt EV favorite payload'
+      }));
+      // A corrupt favorites payload shouldn't block a valid cache hit.
+    }
+  }
+  return cache.getById(id);
+}

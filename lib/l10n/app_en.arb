@@ -5121,7 +5121,7 @@
   "consentSyncTripsTitle": "Sync trip recordings",
   "consentSyncTripsSubtitle": "Back up OBD2 + GPS trips to TankSync. Cross-device, opt-in.",
   "consentSyncTripsDisabledHint": "Enable Cloud Sync above to back up trips.",
-  "consentSyncTripsNeedsEmailHint": "Sign in with an email account to sync trips across devices.",
+  "consentSyncTripsAnonymousHint": "Trips back up under this device's anonymous account. Sign in with an email to reach them from other devices.",
   "consentHideDetails": "Hide details",
   "consentShowDetails": "Show details",
   "dialogOk": "OK",
@@ -6669,6 +6669,88 @@
   "syncAdoptUseDifferentAccount": "Use a different account instead",
   "@syncAdoptUseDifferentAccount": {
     "description": "Link that leaves the QR-join adoption step and returns to the normal account-setup flow (#3080)."
+  },
+  "syncDeleteDataTitle": "Delete synced data",
+  "@syncDeleteDataTitle": {
+    "description": "Tile title in the TankSync settings section that opens the per-category server-side data deletion flow (#3453)."
+  },
+  "syncDeleteDataSubtitle": "Remove your trips, vehicles or fill-ups from the sync database",
+  "@syncDeleteDataSubtitle": {
+    "description": "Subtitle under the delete-synced-data tile (#3453)."
+  },
+  "syncDeleteDataPickTitle": "Delete which synced data?",
+  "@syncDeleteDataPickTitle": {
+    "description": "Title of the category-picker dialog for the synced-data deletion (#3453)."
+  },
+  "syncDeleteDataCategoryTrips": "Trips",
+  "@syncDeleteDataCategoryTrips": {
+    "description": "Category option: delete synced trips (#3453)."
+  },
+  "syncDeleteDataCategoryVehicles": "Vehicles",
+  "@syncDeleteDataCategoryVehicles": {
+    "description": "Category option: delete synced vehicles (#3453)."
+  },
+  "syncDeleteDataCategoryFillUps": "Fill-ups",
+  "@syncDeleteDataCategoryFillUps": {
+    "description": "Category option: delete synced fill-ups (#3453)."
+  },
+  "syncDeleteDataCategoryEverything": "Everything",
+  "@syncDeleteDataCategoryEverything": {
+    "description": "Category option: delete ALL synced data (the identity itself stays usable) (#3453)."
+  },
+  "syncDeleteDataConfirmTitle": "Delete {category} from the sync database?",
+  "@syncDeleteDataConfirmTitle": {
+    "description": "Confirmation dialog title before the server-side deletion; {category} is the localized category label the user picked (#3453).",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Trips"
+      }
+    }
+  },
+  "syncDeleteDataConfirmBody": "This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.",
+  "@syncDeleteDataConfirmBody": {
+    "description": "Confirmation dialog body. Documents the server-side-only decision: local data on this device stays; other devices drop their copies via tombstones (#3453)."
+  },
+  "syncDeleteDataConfirmAction": "Delete from server",
+  "@syncDeleteDataConfirmAction": {
+    "description": "Destructive confirm button of the synced-data deletion dialog (#3453)."
+  },
+  "syncDeleteDataDone": "Synced data deleted",
+  "@syncDeleteDataDone": {
+    "description": "Snackbar shown when the server-side deletion completed (#3453)."
+  },
+  "syncDeleteDataFailed": "Deleting synced data failed — please try again",
+  "@syncDeleteDataFailed": {
+    "description": "Snackbar shown when the server-side deletion failed or the user is not connected (#3453)."
+  },
+  "syncRelinkTitle": "Cloud sync needs re-linking",
+  "@syncRelinkTitle": {
+    "description": "Warning tile title in the TankSync settings section when a stored sync identity has no active session anymore (#3449)."
+  },
+  "syncRelinkBody": "This device's saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.",
+  "@syncRelinkBody": {
+    "description": "Explanatory body under the relink warning tile (#3449)."
+  },
+  "syncRelinkSignInAction": "Sign in to re-link",
+  "@syncRelinkSignInAction": {
+    "description": "Primary button that opens the email auth screen to restore the stored sync identity (#3449)."
+  },
+  "syncRelinkStartFreshAction": "Start fresh",
+  "@syncRelinkStartFreshAction": {
+    "description": "Secondary button that knowingly abandons the old sync identity and creates a new anonymous one (#3449)."
+  },
+  "syncRelinkStartFreshTitle": "Start fresh?",
+  "@syncRelinkStartFreshTitle": {
+    "description": "Confirmation dialog title before abandoning the old sync identity (#3449)."
+  },
+  "syncRelinkStartFreshBody": "A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.",
+  "@syncRelinkStartFreshBody": {
+    "description": "Confirmation dialog body explaining the consequence of abandoning the old sync identity (#3449)."
+  },
+  "syncRelinkStartFreshConfirm": "Start fresh",
+  "@syncRelinkStartFreshConfirm": {
+    "description": "Destructive confirm button of the start-fresh dialog (#3449)."
   },
   "tankLevelTitle": "Tank level",
   "@tankLevelTitle": {

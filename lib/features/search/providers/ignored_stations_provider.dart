@@ -4,6 +4,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/ignored_stations_sync.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
 
 part 'ignored_stations_provider.g.dart';
@@ -21,6 +22,12 @@ class IgnoredStations extends _$IgnoredStations {
   @override
   List<String> build() {
     final storage = ref.watch(storageRepositoryProvider);
+    // #3446 — re-read storage whenever a sync pull persists ignored-id
+    // rows; without this the pulled ids appeared one restart late.
+    final sub = SyncEvents.instance
+        .forTable(SyncTables.ignoredStations)
+        .listen((_) => state = storage.getIgnoredIds());
+    ref.onDispose(sub.cancel);
     return storage.getIgnoredIds();
   }
 

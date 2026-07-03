@@ -10,6 +10,7 @@ import '../../../core/data/storage_repository.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/favorites_sync.dart';
 import '../../../core/domain/ev/charging_station.dart' as search_ev;
@@ -45,6 +46,13 @@ class Favorites extends _$Favorites {
   @override
   List<String> build() {
     final storage = ref.watch(storageRepositoryProvider);
+    // #3446 — re-read storage whenever a sync pull persists favorites
+    // rows (launch / connect / "sync now"); without this the pulled ids
+    // appeared one restart late. Mirrors the LiveHarshEventBus idiom.
+    final sub = SyncEvents.instance
+        .forTable(SyncTables.favorites)
+        .listen((_) => _reload());
+    ref.onDispose(sub.cancel);
     // Merge fuel + EV favorite IDs into a single unified list.
     return [...storage.getFavoriteIds(), ...storage.getEvFavoriteIds()];
   }
@@ -159,6 +167,16 @@ class Favorites extends _$Favorites {
       await storage.addEvFavorite(stationId);
       debugPrint(
           '[Favorites.add] EV storage now has ids=${storage.getEvFavoriteIds()}');
+      // #3452 — EV favorites sync too: upload the new id + payload.
+      // Emit local state first (mirrors the #2114 fuel-path ordering).
+      _reload();
+      await SyncHelper.syncIfEnabled(
+        ref,
+        'Favorites.addEv',
+        () => FavoritesSync.merge(FavoritesSync.localRecords(storage)),
+      );
+      debugPrint('[Favorites.add] state after reload=$state');
+      return;
     } else {
       await storage.addFavorite(stationId);
       final json = rawJson ?? stationData?.toJson();
@@ -171,20 +189,19 @@ class Favorites extends _$Favorites {
       // Supabase (often > 1 s on flaky networks), and users perceive
       // the tap as a no-op until the next search redraws the row.
       _reload();
+      // #3452 — the merge now carries full records (fuel + EV ids WITH
+      // their station payloads), so the just-added favorite reaches other
+      // devices renderable, not as a bare id.
       await SyncHelper.syncIfEnabled(
         ref,
         'Favorites.add',
-        () => FavoritesSync.merge(storage.getFavoriteIds()),
+        () => FavoritesSync.merge(FavoritesSync.localRecords(storage)),
       );
       // No second _reload() here — fuel-station sync never mutates local
       // storage, so a second call would only trigger extra widget IO with
       // no state change (#2314).
       debugPrint('[Favorites.add] state after reload=$state');
-      return;
     }
-
-    _reload();
-    debugPrint('[Favorites.add] state after reload=$state');
   }
 
   /// Add an EV charging station to favorites (explicit ev/ entity).
@@ -198,6 +215,12 @@ class Favorites extends _$Favorites {
     }
 
     _reload();
+    // #3452 — EV favorites sync: upload the new id + payload.
+    await SyncHelper.syncIfEnabled(
+      ref,
+      'Favorites.addEv',
+      () => FavoritesSync.merge(FavoritesSync.localRecords(storage)),
+    );
   }
 
   /// Remove a station from favorites (checks both fuel and EV storage).
@@ -231,6 +254,14 @@ class Favorites extends _$Favorites {
     if (storage.isEvFavorite(stationId)) {
       await storage.removeEvFavorite(stationId);
       await storage.removeEvFavoriteStationData(stationId);
+
+      // #3452 — EV favorites sync too: tombstone + server delete so the
+      // removal reaches other devices instead of resurrecting from them.
+      await SyncHelper.fireAndForget(
+        ref,
+        'Favorites.removeEv',
+        () => FavoritesSync.delete(stationId),
+      );
     }
 
     _reload();

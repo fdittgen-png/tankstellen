@@ -42,7 +42,7 @@ final class LinkDeviceControllerProvider
 }
 
 String _$linkDeviceControllerHash() =>
-    r'b97e4144a61dbab0713cbc9baa16f3924648979b';
+    r'2e26f97b8fd5da4c45fa192d4fb991d7759bfce1';
 
 abstract class _$LinkDeviceController extends $Notifier<LinkDeviceState> {
   LinkDeviceState build();

@@ -4,7 +4,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/storage_providers.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/vehicles_sync.dart';
+import '../../../core/utils/event_loop_yield.dart';
 import '../data/repositories/vehicle_profile_repository.dart';
 import '../../../core/domain/vehicle_profile.dart';
 
@@ -73,12 +75,21 @@ class VehicleProfileList extends _$VehicleProfileList {
     final repo = ref.read(vehicleProfileRepositoryProvider);
     final localIds = repo.getAll().map((v) => v.id).toSet();
     var added = 0;
+    var written = 0;
     for (final v in incoming) {
       if (!localIds.contains(v.id)) added++;
       await repo.save(v);
+      // #3451 — chunk the bulk persist so a big pull can't starve frames.
+      await yieldToEventLoopEvery(written);
+      written++;
     }
     state = repo.getAll();
     ref.invalidate(activeVehicleProfileProvider);
+    // #3446 — this is the vehicles persist chokepoint (launch/sync-now
+    // pulls AND the #713 device-link import): announce every incoming
+    // write on the sync bus for any other reader of the table.
+    SyncEvents.instance
+        .emit(SyncTableChanged(SyncTables.vehicles, incoming.length));
     return added;
   }
 

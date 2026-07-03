@@ -181,7 +181,7 @@ final class AlertNotifierProvider
   }
 }
 
-String _$alertNotifierHash() => r'ffc95de425cd0dd670590cf1ebe85d4e55aa7763';
+String _$alertNotifierHash() => r'f2060492020b95fe213f0a6ecbacce8330bb0f03';
 
 abstract class _$AlertNotifier extends $Notifier<List<PriceAlert>> {
   List<PriceAlert> build();

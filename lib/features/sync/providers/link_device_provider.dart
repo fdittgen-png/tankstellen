@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/supabase_client.dart';
 import '../../../core/sync/alerts_sync.dart';
 import '../../../core/sync/favorites_sync.dart';
@@ -172,7 +173,9 @@ class LinkDeviceController extends _$LinkDeviceController {
 
       // 7. Sync merged data back to our server account. Profile is NOT
       // synced — each device keeps its own local profile + defaulting.
-      await FavoritesSync.merge(ref.read(favoritesProvider));
+      // #3452 — favorites upload as full records (fuel + EV, payloads).
+      await FavoritesSync.merge(
+          FavoritesSync.localRecords(ref.read(storageRepositoryProvider)));
       await AlertsSync.merge(ref.read(alertProvider));
       await VehiclesSync.merge(ref.read(vehicleProfileListProvider));
       await FillUpsSync.merge(ref.read(fillUpListProvider));

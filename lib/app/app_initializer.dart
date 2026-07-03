@@ -23,6 +23,7 @@ import '../core/logging/app_log.dart';
 import '../core/logging/error_log_denoise.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
+import '../core/perf/launch_sync_trace.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
 import '../core/storage/hive_boxes.dart';
@@ -30,6 +31,7 @@ import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
 import '../core/sync/sync_run_trace.dart';
+import '../core/sync/tanksync_init.dart';
 import '../core/telemetry/pii_scrubber.dart';
 import '../core/utils/edge_to_edge.dart';
 import '../features/obd2/data/obd2_connect_trace_persistence.dart';
@@ -166,27 +168,29 @@ class AppInitializer {
     });
 
     // #795 phase 1 — defer Supabase/TankSync warm-up and community-config
-    // asset read until after the first frame. Neither is required for the
-    // landing UI and both touch relatively slow I/O (asset bundle decode +
-    // Supabase client init + anonymous auth).
-    //
-    // We keep the call sites here (non-awaited) so structural ordering
-    // tests that pin `services < tankSync < launch` in the source body
-    // continue to pass. The actual work runs via `_deferPostFirstFrame`.
+    // asset read until after the first frame (slow I/O, not needed for the
+    // landing UI). Call sites stay here (non-awaited) so structural
+    // ordering tests pinning `services < tankSync < launch` keep passing.
     _deferPostFirstFrame(() async {
       await CommunityConfig.load();
-      await _maybeInitTankSync(storage);
+      // #3445 — span the otherwise-invisible launch-sync phase when the
+      // Feature.startupTrace devtool is on (null = zero overhead).
+      final trace = LaunchSyncPhase.armTrace(container);
+      // #3447 — install the pull matrix + app-resume trigger BEFORE the
+      // init so a "sync now" tap can never observe an empty registry.
+      LaunchSyncPhase.registerPulls(container, storage);
+      LaunchSyncPhase.wireResumeSync(container);
+      await LaunchSyncTrace.spanned(
+          trace, 'tanksync_init', () => _maybeInitTankSync(storage));
+      // #3449 relink surface + #3450 background init-retry ladder.
+      LaunchSyncPhase.handleInitOutcome(container, storage);
       // #3126 — one run id threads the launch merges into the trace.
       if (TankSyncClient.client != null) SyncRunTrace.begin('launch');
-      // #1541 — run the trip-summaries merge + details retention pass
-      // once TankSync is up. No-ops cleanly when the user is signed
-      // out or when the trip-history Hive box isn't open.
-      await LaunchSyncPhase.runTripsSyncMerge(container);
-      // #3077 — pull the remaining server→local entities (ratings,
-      // alerts, fill-ups, vehicles) once TankSync is up, mirroring the
-      // trips merge above. No-ops cleanly when sync is off / unauthenticated
-      // and respects each entity's consent gate.
-      await LaunchSyncPhase.runEntitySyncMerge(container, storage);
+      // #3447/#3450 — every synced table pulls in parallel; each entry is
+      // consent-gated + time-boxed and no-ops when sync is off (see
+      // LaunchSyncPhase / LaunchSyncPulls).
+      await LaunchSyncPhase.runLaunchPulls(container, trace: trace);
+      trace?.finish();
     });
 
     // Cache runtime version so AppConstants.appVersion is accurate (#570).
@@ -498,39 +502,15 @@ class AppInitializer {
 
   /// Initialises Supabase if the user has opted in. Wrapped in a hard 8-second
   /// timeout: a stuck Supabase init must not block the first frame.
+  ///
+  /// The init body — including the #3449 stored-identity guard (a stored
+  /// `sync_user_id` with no session must NOT be papered over with a fresh
+  /// anonymous UUID) — lives in [TankSyncInit]; the deferred launch block
+  /// reads `TankSyncInit.lastOutcome` afterwards to surface the relink
+  /// state and arm the #3450 background retry ladder.
   static Future<void> _maybeInitTankSync(HiveStorage storage) async {
-    final syncEnabled = storage.getSetting('sync_enabled') as bool? ?? false;
-    if (!syncEnabled) return;
-    final url = storage.getSetting('supabase_url') as String?;
-    final key = storage.getSupabaseAnonKey();
-    if (url == null || key == null) return;
-
     try {
-      await Future(() async {
-        await TankSyncClient.init(url: url, anonKey: key);
-        if (TankSyncClient.client?.auth.currentUser == null) {
-          log.info('TankSync: session expired, re-authenticating...');
-          await TankSyncClient.signInAnonymously();
-        }
-        final sessionId = TankSyncClient.client?.auth.currentUser?.id;
-        final storedId = storage.getSetting('sync_user_id') as String?;
-        if (sessionId != null && sessionId != storedId) {
-          log.info('TankSync: userId changed');
-          await storage.putSetting('sync_user_id', sessionId);
-        }
-        if (sessionId != null) {
-          try {
-            await TankSyncClient.client!.from('users').upsert(
-              {'id': sessionId},
-              onConflict: 'id',
-            );
-          } catch (e, st) {
-            unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-                context: {'where': 'maybeInitTankSync users upsert'}));
-          }
-        }
-        log.info('TankSync: ready');
-      }).timeout(const Duration(seconds: 8));
+      await TankSyncInit.run(storage).timeout(const Duration(seconds: 8));
     } on TimeoutException catch (e, st) {
       // #3143 — proceeding without sync, but record it: a silent init
       // timeout previously looked identical to "sync works" in the field.

@@ -9,7 +9,9 @@ import '../../../core/notifications/notification_providers.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/sync/alerts_sync.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
+import '../../../core/utils/event_loop_yield.dart';
 import '../data/models/price_alert.dart';
 import '../data/repositories/alert_repository.dart';
 import '../../../core/logging/error_logger.dart';
@@ -149,11 +151,18 @@ class AlertNotifier extends _$AlertNotifier {
     for (final alert in merged) {
       if (localIds.contains(alert.id)) continue;
       await repo.saveAlert(alert);
+      // #3451 — chunk the bulk persist so a big first pull can't starve
+      // frame production.
+      await yieldToEventLoopEvery(added);
       added++;
     }
     if (added > 0) {
       state = repo.getAlerts();
     }
+    // #3446 — pulled alerts are persisted; announce it on the sync bus
+    // (dropped when zero). This notifier already refreshed its own state
+    // above; the emit is for any other reader of the alerts table.
+    SyncEvents.instance.emit(SyncTableChanged(SyncTables.alerts, added));
     return added;
   }
 

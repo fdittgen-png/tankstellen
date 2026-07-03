@@ -6,9 +6,13 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/country/country_config.dart';
 import '../../../core/country/country_provider.dart';
+import '../../../core/error/exceptions.dart';
+import '../../../core/services/non_fuel_station_guard.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/storage/storage_providers.dart';
+import '../../ev/api.dart';
 import '../../route_search/providers/route_search_provider.dart';
 import '../../../core/domain/search_result_item.dart';
 import '../../../core/domain/station.dart';
@@ -41,6 +45,14 @@ Future<ServiceResult<StationDetail>> stationDetail(
   Ref ref,
   String stationId,
 ) async {
+  // #3455 — an OpenChargeMap `ocm-*` id must NEVER reach a fuel chain.
+  // `Countries.countryCodeForStationId` returns null for it (no fuel
+  // country prefix), so the fallback below used to send the EV id to the
+  // ACTIVE country's fuel detail endpoint — the field-verified 400 burst
+  // on FR/UK/LU. Serve the cached EV station instead (same hydration path
+  // as the `/ev-station/:id` deep link) and stop here either way.
+  if (isNonFuelStationId(stationId)) return _evCachedDetail(ref, stationId);
+
   // First: serve from an already-loaded result the app holds (search OR
   // route-along-the-way), which carries OSM brand enrichment + structured
   // hours. This avoids a re-fetch, preserves the brand name, and — for a
@@ -125,6 +137,44 @@ Future<ServiceResult<StationDetail>> stationDetail(
     }
     rethrow;
   }
+}
+
+/// #3455 — serves an `ocm-*` (EV) id from the device's EV caches: the EV
+/// favorites payload store first, then the recently-fetched EV station
+/// cache — the exact [hydrateEvStationById] lookup the `/ev-station/:id`
+/// deep link uses. Maps the [ChargingStation] onto the fuel
+/// [StationDetail] shape (no fuel prices — the price rows stay hidden)
+/// so a stray `/station/ocm-*` open renders name/coords/address instead
+/// of hammering a fuel detail endpoint with 400s.
+///
+/// An id unknown to the device throws the typed, non-retrying
+/// [NonFuelStationIdException] — the screen's existing error branch
+/// surfaces it, and the fuel chain is never touched.
+ServiceResult<StationDetail> _evCachedDetail(Ref ref, String stationId) {
+  final station = hydrateEvStationById(
+    stationId,
+    ref.read(storageRepositoryProvider),
+    ref.read(evStationRepositoryProvider),
+  );
+  if (station == null) throw NonFuelStationIdException(stationId);
+  return ServiceResult(
+    data: StationDetail(
+      station: Station(
+        id: station.id,
+        name: station.name,
+        brand: station.operator ?? '',
+        street: station.address ?? '',
+        postCode: station.postCode ?? '',
+        place: station.place ?? '',
+        lat: station.latitude,
+        lng: station.longitude,
+        isOpen: station.isOperational,
+        updatedAt: station.updatedAt,
+      ),
+    ),
+    source: ServiceSource.cache,
+    fetchedAt: DateTime.now(),
+  );
 }
 
 /// Returns a synchronous cache [ServiceResult] for [stationId] when the app

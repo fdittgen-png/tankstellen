@@ -50,7 +50,7 @@ final class EvFavoritesProvider
   }
 }
 
-String _$evFavoritesHash() => r'1e16aec6b6db0f3dee062687b33f5e29c66935df';
+String _$evFavoritesHash() => r'01a103c81346de791989e398bc74877ae81348be';
 
 /// Manages the user's list of favorite EV charging station IDs.
 ///

@@ -6092,8 +6092,8 @@ class AppLocalizationsDe extends AppLocalizations {
       'Cloud-Sync oben aktivieren, um Fahrten zu sichern.';
 
   @override
-  String get consentSyncTripsNeedsEmailHint =>
-      'Mit einem E-Mail-Konto anmelden, um Fahrten geräteübergreifend zu synchronisieren.';
+  String get consentSyncTripsAnonymousHint =>
+      'Fahrten werden unter dem anonymen Konto dieses Geräts gesichert. Mit E-Mail anmelden, um sie von anderen Geräten zu erreichen.';
 
   @override
   String get consentHideDetails => 'Details ausblenden';
@@ -7222,6 +7222,71 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get syncAdoptUseDifferentAccount =>
       'Stattdessen ein anderes Konto verwenden';
+
+  @override
+  String get syncDeleteDataTitle => 'Synchronisierte Daten löschen';
+
+  @override
+  String get syncDeleteDataSubtitle =>
+      'Fahrten, Fahrzeuge oder Tankvorgänge aus der Sync-Datenbank entfernen';
+
+  @override
+  String get syncDeleteDataPickTitle =>
+      'Welche synchronisierten Daten löschen?';
+
+  @override
+  String get syncDeleteDataCategoryTrips => 'Fahrten';
+
+  @override
+  String get syncDeleteDataCategoryVehicles => 'Fahrzeuge';
+
+  @override
+  String get syncDeleteDataCategoryFillUps => 'Tankvorgänge';
+
+  @override
+  String get syncDeleteDataCategoryEverything => 'Alles';
+
+  @override
+  String syncDeleteDataConfirmTitle(String category) {
+    return '$category aus der Sync-Datenbank löschen?';
+  }
+
+  @override
+  String get syncDeleteDataConfirmBody =>
+      'Die ausgewählten Daten werden aus der Sync-Datenbank entfernt und werden nicht wieder von anderen Geräten hochgeladen. Lokal auf diesem Gerät gespeicherte Daten bleiben erhalten.';
+
+  @override
+  String get syncDeleteDataConfirmAction => 'Vom Server löschen';
+
+  @override
+  String get syncDeleteDataDone => 'Synchronisierte Daten gelöscht';
+
+  @override
+  String get syncDeleteDataFailed =>
+      'Löschen der synchronisierten Daten fehlgeschlagen — bitte erneut versuchen';
+
+  @override
+  String get syncRelinkTitle => 'Cloud-Sync muss neu verknüpft werden';
+
+  @override
+  String get syncRelinkBody =>
+      'Die gespeicherte Sync-Identität dieses Geräts ist abgemeldet. Mit E-Mail anmelden, um die synchronisierten Daten neu zu verknüpfen — oder mit einer neuen Identität neu starten.';
+
+  @override
+  String get syncRelinkSignInAction => 'Anmelden & verknüpfen';
+
+  @override
+  String get syncRelinkStartFreshAction => 'Neu starten';
+
+  @override
+  String get syncRelinkStartFreshTitle => 'Neu starten?';
+
+  @override
+  String get syncRelinkStartFreshBody =>
+      'Für dieses Gerät wird eine neue anonyme Identität erstellt. Unter der alten Identität synchronisierte Daten bleiben auf dem Server, sind von hier aus aber nur noch nach Anmeldung mit dem zugehörigen E-Mail-Konto erreichbar.';
+
+  @override
+  String get syncRelinkStartFreshConfirm => 'Neu starten';
 
   @override
   String get tankLevelTitle => 'Tankfüllstand';

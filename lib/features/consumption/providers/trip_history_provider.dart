@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/sync/sync_events.dart';
 import '../data/trip_history_repository.dart';
 
 part 'trip_history_provider.g.dart';
@@ -30,6 +31,20 @@ class TripHistoryList extends _$TripHistoryList {
   @override
   List<TripHistoryEntry> build() {
     final repo = ref.watch(tripHistoryRepositoryProvider);
+    // #3446 — re-read the Hive box whenever the launch trips merge
+    // persists server-only summaries; without this the pulled trips
+    // appeared one restart late. When this provider first built BEFORE
+    // the deferred box opened, the keep-alive repository provider cached
+    // `null` — invalidate it so the rebuild picks up the now-open box.
+    final sub =
+        SyncEvents.instance.forTable(SyncTables.tripSummaries).listen((_) {
+      if (ref.read(tripHistoryRepositoryProvider) == null) {
+        ref.invalidate(tripHistoryRepositoryProvider);
+      } else {
+        refresh();
+      }
+    });
+    ref.onDispose(sub.cancel);
     if (repo == null) return const [];
     return repo.loadAll();
   }

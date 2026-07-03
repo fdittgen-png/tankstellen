@@ -34,8 +34,16 @@ class SupabaseSyncRepository implements SyncRepository {
   // ── Favorites ──
 
   @override
-  Future<List<String>> syncFavorites(List<String> localIds) =>
-      FavoritesSync.merge(localIds);
+  Future<List<String>> syncFavorites(List<String> localIds) async {
+    // #3452 — the merge is record-based now (kind + payload). This legacy
+    // id-list seam wraps bare ids (no payload); `FavoriteKind.of` routes
+    // `ocm-*` ids to the EV kind.
+    final merged = await FavoritesSync.merge([
+      for (final id in localIds)
+        FavoriteRecord(id: id, kind: FavoriteKind.of(id: id)),
+    ]);
+    return [for (final record in merged) record.id];
+  }
 
   @override
   Future<void> deleteFavorite(String stationId) =>

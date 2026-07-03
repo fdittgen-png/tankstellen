@@ -1380,7 +1380,6 @@
   "consentSyncTripsTitle": "Synkroniser turopptak",
   "consentSyncTripsSubtitle": "Sikkerhetskopier OBD2 + GPS-turer til TankSync. På tvers av enheter, valgfritt.",
   "consentSyncTripsDisabledHint": "Aktiver Skysynkronisering ovenfor for å sikkerhetskopiere turer.",
-  "consentSyncTripsNeedsEmailHint": "Logg på med en e-postkonto for å synkronisere turer mellom enheter.",
   "consentHideDetails": "Skjul detaljer",
   "consentShowDetails": "Vis detaljer",
   "dialogOk": "OK",
@@ -4875,6 +4874,112 @@
   },
   "startupTraceExportFailure": "Couldn't export the startup trace.",
   "@startupTraceExportFailure": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "consentSyncTripsAnonymousHint": "Trips back up under this device's anonymous account. Sign in with an email to reach them from other devices.",
+  "@consentSyncTripsAnonymousHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncRelinkTitle": "Cloud sync needs re-linking",
+  "@syncRelinkTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncRelinkBody": "This device's saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.",
+  "@syncRelinkBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncRelinkSignInAction": "Sign in to re-link",
+  "@syncRelinkSignInAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncRelinkStartFreshAction": "Start fresh",
+  "@syncRelinkStartFreshAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncRelinkStartFreshTitle": "Start fresh?",
+  "@syncRelinkStartFreshTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncRelinkStartFreshBody": "A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.",
+  "@syncRelinkStartFreshBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncRelinkStartFreshConfirm": "Start fresh",
+  "@syncRelinkStartFreshConfirm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataTitle": "Delete synced data",
+  "@syncDeleteDataTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataSubtitle": "Remove your trips, vehicles or fill-ups from the sync database",
+  "@syncDeleteDataSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataPickTitle": "Delete which synced data?",
+  "@syncDeleteDataPickTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryTrips": "Trips",
+  "@syncDeleteDataCategoryTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryVehicles": "Vehicles",
+  "@syncDeleteDataCategoryVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryFillUps": "Fill-ups",
+  "@syncDeleteDataCategoryFillUps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryEverything": "Everything",
+  "@syncDeleteDataCategoryEverything": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataConfirmTitle": "Delete {category} from the sync database?",
+  "@syncDeleteDataConfirmTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Trips"
+      }
+    }
+  },
+  "syncDeleteDataConfirmBody": "This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.",
+  "@syncDeleteDataConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataConfirmAction": "Delete from server",
+  "@syncDeleteDataConfirmAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataDone": "Synced data deleted",
+  "@syncDeleteDataDone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataFailed": "Deleting synced data failed — please try again",
+  "@syncDeleteDataFailed": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },

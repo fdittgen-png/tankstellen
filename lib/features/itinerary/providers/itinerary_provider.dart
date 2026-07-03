@@ -10,7 +10,9 @@ import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/itineraries_sync.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_provider.dart';
+import '../../../core/utils/event_loop_yield.dart';
 import '../domain/entities/saved_itinerary.dart';
 import '../../route_search/domain/entities/route_info.dart';
 
@@ -29,9 +31,24 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     // Start with local data immediately
     final storage = ref.read(storageRepositoryProvider);
     final local = _fromStorage(storage);
+    // #3446 — refresh from LOCAL storage whenever a sync pull persists
+    // itinerary rows (mirrors the LiveHarshEventBus subscribe idiom).
+    // Re-reading storage (never the network) means no emit loops.
+    final sub = SyncEvents.instance
+        .forTable(SyncTables.itineraries)
+        .listen((_) => _refreshFromStorage());
+    ref.onDispose(sub.cancel);
     // Kick off async merge in background
     unawaited(Future.microtask(() => _loadAndMerge()));
     return local;
+  }
+
+  /// Re-read the persisted itineraries (newest edit first — the same
+  /// ordering `_loadAndMerge` applies).
+  void _refreshFromStorage() {
+    final storage = ref.read(storageRepositoryProvider);
+    state = _fromStorage(storage)
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
   List<SavedItinerary> _fromStorage(ItineraryStorage storage) {
@@ -58,20 +75,22 @@ class ItineraryNotifier extends _$ItineraryNotifier {
   }
 
   /// Load from DB first, then merge with local (local wins on conflict).
+  /// Returns the count of server-only itineraries persisted locally.
   ///
   /// Concurrent invocations are coalesced: if a merge is already
-  /// in-flight the second caller returns immediately. This prevents the
-  /// double-fetch that would otherwise happen when build() and
-  /// initState() both call this at navigation time.
-  Future<void> _loadAndMerge() async {
-    if (_mergeInFlight) return;
+  /// in-flight the second caller returns immediately (with 0). This
+  /// prevents the double-fetch that would otherwise happen when build()
+  /// and initState() both call this at navigation time.
+  Future<int> _loadAndMerge() async {
+    if (_mergeInFlight) return 0;
     _mergeInFlight = true;
+    var added = 0;
     try {
       final syncState = ref.read(syncStateProvider);
-      if (!syncState.enabled) return;
+      if (!syncState.enabled) return 0;
 
       final serverItineraries = await ItinerariesSync.fetchAll();
-      if (serverItineraries.isEmpty) return;
+      if (serverItineraries.isEmpty) return 0;
 
       final storage = ref.read(storageRepositoryProvider);
       final localIds = state.map((i) => i.id).toSet();
@@ -83,8 +102,15 @@ class ItineraryNotifier extends _$ItineraryNotifier {
           merged.add(serverItem);
           // Also save to local storage
           await storage.addItinerary(_toMap(serverItem));
+          // #3451 — chunk the bulk persist.
+          await yieldToEventLoopEvery(added);
+          added++;
         }
       }
+      // #3446 — pulled rows are persisted; announce them on the sync bus
+      // (dropped when zero) AFTER the writes above.
+      SyncEvents.instance
+          .emit(SyncTableChanged(SyncTables.itineraries, added));
 
       // Sort by updatedAt descending
       merged.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
@@ -101,10 +127,12 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     } finally {
       _mergeInFlight = false;
     }
+    return added;
   }
 
-  /// Reload from server (pull-to-refresh).
-  Future<void> loadFromServer() async => _loadAndMerge();
+  /// Reload from server (pull-to-refresh, launch/resume/sync-now pulls).
+  /// Returns the count of server-only itineraries persisted (#3447).
+  Future<int> loadFromServer() => _loadAndMerge();
 
   /// Save a new itinerary — local first, then sync.
   Future<bool> saveRoute({

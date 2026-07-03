@@ -10,53 +10,22 @@ import '../data/storage_repository.dart';
 import '../storage/storage_providers.dart';
 import 'community_config.dart';
 import 'supabase_client.dart';
+import 'sync_auth_types.dart';
 import 'sync_config.dart';
 import 'favorites_sync.dart';
 import 'ignored_stations_sync.dart';
 import 'ratings_sync.dart';
+import 'sync_events.dart';
 import 'sync_run_trace.dart';
 import 'user_data_sync.dart';
 import '../../core/logging/error_logger.dart';
 
+// #3449 — the seam typedefs + EmailAuthResult moved to sync_auth_types.dart
+// (this file sits at the 400-line cap); re-exported so existing imports
+// keep resolving.
+export 'sync_auth_types.dart';
+
 part 'sync_provider.g.dart';
-
-/// Signature for a sync-merge that takes the device's local ids and
-/// returns the union (server ∪ local) — exactly the shape of
-/// [FavoritesSync.merge] / [IgnoredStationsSync.merge]. Injected as a
-/// seam so the pull-persist wiring (#3076) is unit-testable without a
-/// live Supabase session.
-typedef IdMergeFn = Future<List<String>> Function(List<String> localIds);
-
-/// Signature for a ratings fetch returning the server's
-/// `stationId → rating` map — the shape of [RatingsSync.fetchAll].
-/// Injected as a seam so the ratings pull-persist wiring (#3077) is
-/// unit-testable without a live Supabase session (the real fetch
-/// returns an empty map when unauthenticated, masking the wiring).
-typedef RatingsFetchFn = Future<Map<String, int>> Function();
-
-/// Signature for an email auth call (sign-up / sign-in / anonymous-upgrade)
-/// returning the resulting user id (or `null`). Mirrors the static
-/// `TankSyncClient.*` methods so the auth-branch selection in
-/// [SyncState.signInWithEmail] is unit-testable without a live Supabase
-/// session — the same seam shape #3076 introduced with [IdMergeFn].
-typedef EmailAuthFn = Future<String?> Function(String email, String password);
-
-/// Outcome of an email auth attempt, so the UI can distinguish a completed
-/// sign-in from an anonymous upgrade whose email change is still
-/// **pending server-side confirmation** (#3079). The UUID is already the
-/// user's in every case, so data is never orphaned.
-enum EmailAuthResult {
-  /// Auth completed and the session now carries the email.
-  completed,
-
-  /// The anonymous account was upgraded in place but the server requires
-  /// the user to click a confirmation link before the email is active.
-  /// Their data is already safe under the unchanged UUID.
-  confirmationPending,
-
-  /// No user id came back (e.g. client not initialised) — nothing changed.
-  failed,
-}
 
 /// Manages the cloud sync connection state.
 ///
@@ -216,6 +185,23 @@ class SyncState extends _$SyncState {
         : EmailAuthResult.completed;
   }
 
+  /// #3449 — the launch identity guard found a stored `sync_user_id` with
+  /// no live session: surface the relink-required state so sync settings
+  /// can guide the user (email sign-in re-links; "start fresh" knowingly
+  /// abandons the old UUID via [switchToAnonymous]). Both of those paths
+  /// construct a fresh [SyncConfig], which clears the flag again.
+  void markRelinkRequired() {
+    state = SyncConfig(
+      enabled: state.enabled,
+      supabaseUrl: state.supabaseUrl,
+      supabaseAnonKey: state.supabaseAnonKey,
+      userId: state.userId,
+      mode: state.mode,
+      userEmail: state.userEmail,
+      relinkRequired: true,
+    );
+  }
+
   /// Switch from email account back to anonymous.
   ///
   /// Signs out the current email session, re-authenticates anonymously,
@@ -323,8 +309,12 @@ class SyncState extends _$SyncState {
   /// Previously the [FavoritesSync.merge] / [IgnoredStationsSync.merge]
   /// return values (server ∪ local) were discarded, so a device only
   /// ever uploaded — server-side rows added on another device never
-  /// reached this one. We now write the merged superset back via
-  /// [StorageRepository.setFavoriteIds] / [StorageRepository.setIgnoredIds].
+  /// reached this one. We now write the merged superset back.
+  ///
+  /// #3452 — favorites merge as full [FavoriteRecord]s: fuel AND EV ids
+  /// with their station JSON payloads. [FavoritesSync.persist] splits the
+  /// union per store (`ocm-*` never lands in the fuel store — the #3455
+  /// guard) and writes pulled payloads where the device has none.
   ///
   /// The merges run unconditionally (no `isNotEmpty` guard): a fresh
   /// device with no local favorites must still *pull* the server's set.
@@ -333,14 +323,23 @@ class SyncState extends _$SyncState {
   /// injectable so the pull-persist wiring is unit-testable without a
   /// live Supabase session (the real merges return the input unchanged
   /// when unauthenticated, masking the wiring under test).
-  @visibleForTesting
+  ///
+  /// #3447 — production API: the SyncPullCoordinator favorites entry calls
+  /// this at launch/resume/sync-now (formerly connect-time + tests only).
   Future<void> syncAndPersistIds(
     StorageRepository storage, {
-    IdMergeFn mergeFavorites = FavoritesSync.merge,
+    FavoritesMergeFn mergeFavorites = FavoritesSync.merge,
     IdMergeFn mergeIgnored = IgnoredStationsSync.merge,
   }) async {
-    await storage.setFavoriteIds(await mergeFavorites(storage.getFavoriteIds()));
-    await storage.setIgnoredIds(await mergeIgnored(storage.getIgnoredIds()));
+    // #3446 — emit AFTER each persist (subscribers re-read storage).
+    // Favorites (fuel + EV, payloads included) persist + emit inside
+    // FavoritesSync.syncAndPersist — its delta spans both id stores AND
+    // the pulled payload writes.
+    await FavoritesSync.syncAndPersist(storage, merge: mergeFavorites);
+    final ignBefore = storage.getIgnoredIds();
+    await storage.setIgnoredIds(await mergeIgnored(ignBefore));
+    SyncEvents.instance.emitIdSetDelta(
+        SyncTables.ignoredStations, ignBefore, storage.getIgnoredIds());
   }
 
   /// Pull the user's server ratings and **persist the server-only ones
@@ -355,9 +354,7 @@ class SyncState extends _$SyncState {
   ///
   /// Union-merge semantics: **local wins on id collision** — a station the
   /// device already rates is left untouched (its in-flight edit may not yet
-  /// have reached the server). Only server-only stations are added. The
-  /// `station_rating_provider` re-reads storage on rebuild, so the in-session
-  /// UI reflects the pulled ratings.
+  /// have reached the server). Only server-only stations are added.
   ///
   /// Called on the connect / "sync now" / app-launch triggers (see
   /// `data_transparency_provider` + `AppInitializer`). [fetchRatings]
@@ -365,17 +362,24 @@ class SyncState extends _$SyncState {
   /// pull-persist wiring is unit-testable without a live Supabase session
   /// (the real fetch returns an empty map when unauthenticated, masking the
   /// wiring under test).
-  Future<void> syncAndPersistRatings(
+  /// Returns the count written; emits it on the #3446 [SyncEvents] bus
+  /// AFTER the writes so the ratings UI refreshes in-session.
+  Future<int> syncAndPersistRatings(
     StorageRepository storage, {
     RatingsFetchFn fetchRatings = RatingsSync.fetchAll,
   }) async {
     final serverRatings = await fetchRatings();
-    if (serverRatings.isEmpty) return;
+    if (serverRatings.isEmpty) return 0;
     final localRatings = storage.getRatings();
+    var written = 0;
     for (final entry in serverRatings.entries) {
       if (localRatings.containsKey(entry.key)) continue;
       await storage.setRating(entry.key, entry.value);
+      written++;
     }
+    SyncEvents.instance
+        .emit(SyncTableChanged(SyncTables.stationRatings, written));
+    return written;
   }
 
   static SyncMode _parseMode(String? value) => switch (value) {

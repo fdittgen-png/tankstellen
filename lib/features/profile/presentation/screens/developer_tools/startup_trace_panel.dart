@@ -34,6 +34,10 @@ class StartupTracePanel extends StatelessWidget {
     final phases = StartupTraceExport.phases(timer.milestones);
     final totalMs = timer.totalMs ??
         (timer.milestones.isEmpty ? 0 : timer.milestones.last.elapsedMs);
+    // #3445 — the launch-sync spans recorded AFTER StartupTimer.finish().
+    // They extend the shared waterfall timeline past the first frame.
+    final spans = timer.spans;
+    final timelineMs = spans.fold(totalMs, (m, s) => math.max(m, s.endMs));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -63,7 +67,14 @@ class StartupTracePanel extends StatelessWidget {
               name: p['name'] as String,
               atMs: p['atMs'] as int,
               durationMs: p['durationMs'] as int,
-              totalMs: math.max(1, totalMs),
+              totalMs: math.max(1, timelineMs),
+            ),
+          for (final s in spans)
+            _PhaseRow(
+              name: s.name,
+              atMs: s.endMs,
+              durationMs: s.durationMs,
+              totalMs: math.max(1, timelineMs),
             ),
         ],
         const SizedBox(height: 8),

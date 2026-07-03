@@ -145,8 +145,12 @@ void main() {
     // (isTileFetchNoise / isHandledImageNetworkNoise / isBenignStreamCancel)
     // moved out to core/logging/error_log_denoise.dart (top-level, pure,
     // independently tested); _installErrorHandlers now just calls them.
+    // #3449/#3450 — shrunk 698 → 678: the _maybeInitTankSync body (incl.
+    // the new identity guard) moved to core/sync/tanksync_init.dart; the
+    // method keeps only the 8 s timeout + telemetry the structural tests
+    // pin. Snapshot lowered to lock the shrink in (a shrink never bumps).
     'lib/app/app_initializer.dart': (
-      lines: 698,
+      lines: 678,
       bumps: 14,
       decompositionIssue: 3139,
     ),

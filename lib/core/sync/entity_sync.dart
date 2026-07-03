@@ -79,6 +79,24 @@ class EntitySync<T> {
   /// unchanged) — wrap with [jsonbDataDecoder] for per-row resilience.
   final T? Function(JsonRow row) decode;
 
+  /// #3451 — optional batch decoder used INSTEAD of per-row [decode] for
+  /// the merge's whole download set (server-only + server-newer rows, one
+  /// call per table). The heavy JSONB-blob entities wire this to a
+  /// `BatchDecode.run(rows, <top-level entrypoint>)` so the freezed
+  /// `fromJson` work runs off the UI isolate; `null` keeps the inline
+  /// per-row path. Must be behaviour-identical to mapping [decode]
+  /// (corrupt row → `null`).
+  final Future<List<T?>> Function(List<JsonRow> rows)? decodeBatch;
+
+  /// #3452 — optional both-sides re-upload predicate. The id-union merge
+  /// uploads only local-only ids, so a column added to an existing table
+  /// (the favorites `data` payload) would never reach the server for rows
+  /// that already exist there. When set, every both-sides id whose server
+  /// row satisfies this predicate is re-upserted through [encode] — e.g.
+  /// `local.data != null && row['data'] == null` backfills payloads onto
+  /// pre-v5 id-only favorites rows. `null` keeps the pure union.
+  final bool Function(T local, JsonRow serverRow)? reuploadWhen;
+
   /// The record's local edit stamp — non-null enables the #3122 LWW path
   /// for ids present on both sides. `null` keeps the pure id-union merge
   /// (e.g. `alerts`, whose table has no `updated_at` column to compare —
@@ -99,6 +117,8 @@ class EntitySync<T> {
     required this.idOf,
     required this.encode,
     required this.decode,
+    this.decodeBatch,
+    this.reuploadWhen,
     this.localStamp,
     this.tombstoneFirstDelete = true,
   });
@@ -171,10 +191,17 @@ class EntitySync<T> {
               tombstoned: tombstoned,
             );
 
-      // Upload local-only + local-newer records.
+      // Upload local-only + local-newer records — plus (#3452) any
+      // both-sides record whose server row the [reuploadWhen] predicate
+      // flags as incomplete (e.g. an id-only favorites row that predates
+      // the payload column).
       final localOnly =
           liveLocal.where((r) => !serverIds.contains(idOf(r))).toList();
-      final toUpload = [...localOnly, ...lww.localNewer];
+      final toUpload = [
+        ...localOnly,
+        ...lww.localNewer,
+        ..._backfillUploads(liveLocal, serverRows, lww.localNewer),
+      ];
       if (toUpload.isNotEmpty) {
         final rows = toUpload.map((r) => encode(r, t.userId)).toList();
         await t.upsert(table, rows, onConflict: onConflict);
@@ -182,15 +209,18 @@ class EntitySync<T> {
             '(${lww.localNewer.length} local-newer edits)');
       }
 
-      // Download server-only records…
-      final downloaded = serverRows
+      // Download server-only records and the server-newer LWW overwrites —
+      // decoded in ONE pass so the #3451 [decodeBatch] seam can offload
+      // the whole set in a single compute() call per table.
+      final serverOnlyRows = serverRows
           .where((r) => !localIds.contains(r.getString(idColumn)))
-          .map(decode)
-          .whereType<T>()
           .toList();
-      // …and overwrite local copies the server has a fresher edit of.
+      final decoded = await _decodeAll([...serverOnlyRows, ...lww.serverNewer]);
+      final downloaded =
+          decoded.take(serverOnlyRows.length).whereType<T>().toList();
       final serverNewerById = <String, T>{
-        for (final r in lww.serverNewer.map(decode).whereType<T>()) idOf(r): r,
+        for (final r in decoded.skip(serverOnlyRows.length).whereType<T>())
+          idOf(r): r,
       };
 
       // #3126 — per-table counts into the exportable trace.
@@ -210,6 +240,39 @@ class EntitySync<T> {
           context: {'where': '$logName.merge FAILED'}));
       return local;
     }
+  }
+
+  /// #3452 — the both-sides records [reuploadWhen] flags for re-upsert,
+  /// excluding any already re-uploading via the LWW local-newer split so
+  /// no record is encoded twice in one merge pass.
+  List<T> _backfillUploads(
+    List<T> liveLocal,
+    List<JsonRow> serverRows,
+    List<T> alreadyUploading,
+  ) {
+    final predicate = reuploadWhen;
+    if (predicate == null) return const [];
+    final rowById = <String, JsonRow>{
+      for (final row in serverRows)
+        if (row.getString(idColumn) != null) row.getString(idColumn)!: row,
+    };
+    final uploadingIds = alreadyUploading.map(idOf).toSet();
+    return [
+      for (final record in liveLocal)
+        if (!uploadingIds.contains(idOf(record)) &&
+            rowById[idOf(record)] != null &&
+            predicate(record, rowById[idOf(record)]!))
+          record,
+    ];
+  }
+
+  /// #3451 — one decode pass over [rows]: the [decodeBatch] seam (off the
+  /// UI isolate for the JSONB-blob tables) when configured, else the
+  /// inline per-row [decode].
+  Future<List<T?>> _decodeAll(List<JsonRow> rows) {
+    final batch = decodeBatch;
+    if (batch != null) return batch(rows);
+    return Future.value(rows.map(decode).toList());
   }
 
   /// Delete one record from the server and record its durable tombstone
