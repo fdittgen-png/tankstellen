@@ -634,7 +634,8 @@ class TripRecordingController {
   /// file stays free of `package:geolocator` imports — the GPS plugin
   /// only lives at the provider seam, which keeps unit-testing the
   /// controller cheap (no Geolocator mocks required) and lets the
-  /// flag-off path skip the plugin entirely.
+  /// flag-off path skip the plugin entirely. [fixAt] is the fix's own
+  /// timestamp (#3253); null falls back to the arrival clock.
   void updateGpsFix({
     double? latitude,
     double? longitude,
@@ -642,6 +643,7 @@ class TripRecordingController {
     double? hAccuracyM,
     double? bearingDeg,
     double? speedKmh,
+    DateTime? fixAt,
   }) {
     _liveSampleSnapshot.updateGpsFix(
       latitude: latitude,
@@ -674,19 +676,20 @@ class TripRecordingController {
       // latest fix. A healthy OBD2 trip ignores this value (the recorder
       // owns `startedAt`); it is consulted only as a fallback in
       // [_finaliseSummary].
-      final fixAt = _now();
       // #2963 — forward the fix's accuracy + timestamp so the haversine
       // distance source can reject a parked car's GPS jitter (accuracy gate)
       // and a cold-start position jump (teleport gate). Dropped here before,
       // so a 22 s idle scatter at σ≈25 m accumulated ~0.93 phantom km.
+      // #3253 — fix time, not arrival: a batched burst blinds the Δt gates.
+      final at = fixAt ?? _now();
       _distance.addGpsFix(
         latitude,
         longitude,
         hAccuracyM: hAccuracyM,
-        at: fixAt,
+        at: at,
       );
-      _gpsStartedAt ??= fixAt;
-      _gpsEndedAt = fixAt;
+      _gpsStartedAt ??= at;
+      _gpsEndedAt = at;
     }
   }
 
@@ -830,6 +833,7 @@ class TripRecordingController {
     if (!_liveController.isClosed) {
       await _liveController.close();
     }
+    _distance.publishGateRejectionTally(); // #3253 — once-per-trip tally
     return _finaliseSummary();
   }
 

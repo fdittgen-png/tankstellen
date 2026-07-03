@@ -211,7 +211,23 @@ class RadarCard extends StatelessWidget {
     final String? distanceLabel = distanceMeters == null
         ? null
         : PriceFormatter.formatDistance(distanceMeters! / 1000.0);
-    final subtitleParts = <String>[fuel.displayName, ?distanceLabel];
+    // #3257 pt2 — price-freshness disclosure. A radar lead served off the
+    // corridor cache can carry a price up to 1 h old in polled countries
+    // (corridor TTL 1 h; JIT refresh only inside the approach radius; DE
+    // moves on a 5-min cadence), and this card gave NO freshness signal
+    // while the search cards do. Reuses the search cards' upstream
+    // `updatedAt` disclosure + the existing `stationUpdatedLabel` ARB key
+    // (same semantics, no new 23-locale fan-out). Null (countries whose
+    // API sends no timestamp) simply omits the part, as on search cards.
+    final updated = station.updatedAt;
+    final String? updatedLabel = (updated == null || updated.isEmpty)
+        ? null
+        : l.stationUpdatedLabel(updated);
+    final subtitleParts = <String>[
+      fuel.displayName,
+      ?distanceLabel,
+      ?updatedLabel,
+    ];
 
     // Tap → hand the station's coords to the SSoT navigation util, which
     // launches the OS's default driving/itinéraire app (geo: URI, Google-

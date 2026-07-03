@@ -32,9 +32,9 @@ class GeolocatorWrapper {
   /// [AndroidSettings.forceLocationManager] explicitly so the behaviour is
   /// deterministic and does not depend on a runtime class-presence probe.
   ///
-  /// Centralising the wrapping HERE keeps all four call sites
-  /// (location_service.dart, movement_detection_provider.dart,
-  /// approach_state_provider.dart, trip_gps_stream_controller.dart) free of any
+  /// Centralising the wrapping HERE keeps the call sites
+  /// (location_service.dart, approach_state_provider.dart,
+  /// trip_gps_stream_controller.dart) free of any
   /// flavor branching — they keep passing a plain [LocationSettings].
   static const bool forceLocationManager =
       bool.fromEnvironment('FORCE_LOCATION_MANAGER');
@@ -118,8 +118,8 @@ class GeolocatorWrapper {
   /// ## Why this exists
   ///
   /// `Geolocator.getPositionStream()` is backed by a single platform
-  /// EventChannel (`flutter.baseflow.com/geolocator_updates_android`, see
-  /// movement_detection_provider.dart). Two independent listeners contend on
+  /// EventChannel (`flutter.baseflow.com/geolocator_updates_android`).
+  /// Two independent listeners contend on
   /// that one channel's onListen / onCancel lifecycle, and in GPS-only
   /// recording the recorder + the detector each opened a fresh
   /// [getPositionStream] in the SAME frame — the recorder won the channel and

@@ -20,6 +20,7 @@ import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/services/imu_event_detector.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_trip_wal.dart';
+import 'gps_sample_diagnostics_recorder.dart';
 import 'motion_gated_gps_source.dart';
 import 'recording_pipeline.dart';
 import 'trip_recording_phase.dart';
@@ -58,13 +59,21 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     required Ref ref,
     required RecordingPipelineHost host,
     GpsOnlyTripWal? wal, // #3248 — injectable for tests
+    GpsSampleDiagnosticsRecorder? gpsDiagnostics, // #3253 — injectable
   })  : _ref = ref,
         _host = host,
-        _wal = wal ?? GpsOnlyTripWal();
+        _wal = wal ?? GpsOnlyTripWal(),
+        _gpsDiagnostics = gpsDiagnostics ?? GpsSampleDiagnosticsRecorder();
 
   final Ref _ref;
   final RecordingPipelineHost _host;
   final GpsOnlyTripWal _wal; // #3248 — write-ahead log
+
+  /// #3253 — per-fix GPS cadence diagnostics (#1458), previously
+  /// recorded only on the OBD2 path. The throttling-exposed dongle-less
+  /// pipeline now persists them too, lighting up the trip-detail
+  /// GpsDiagnosticsCard for GPS-only trips.
+  final GpsSampleDiagnosticsRecorder _gpsDiagnostics;
 
   @override
   bool get isGpsOnly => true;
@@ -132,6 +141,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
     );
     _samples.clear();
+    _gpsDiagnostics.clear(); // #3253 — fresh cadence buffer per trip
     _startedAt = DateTime.now();
     _host.lastTripStartedAt = DateTime.now();
     _host.lastTripVehicleId = _host.readActiveVehicleId();
@@ -220,6 +230,9 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
     _samples.add(sample);
+    // #3253 — one cadence diagnostic per fix (#1458), timestamped with the
+    // fix's own clock so OS batching is visible as the gap it really is.
+    _gpsDiagnostics.record(now: p.timestamp);
     // #2760 — feed the latest GPS ground speed to the IMU detector so its
     // min-speed gate and accel-vs-brake direction classification track the
     // real vehicle speed (the inertial stream alone has no speed).
@@ -357,10 +370,14 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       summary,
       samples: samples,
       automatic: automatic,
+      // #3253 — persist the #1458 cadence diagnostics (OBD2 parity): the
+      // trip-detail GpsDiagnosticsCard now renders for GPS-only trips.
+      gpsSampleDiagnostics: _gpsDiagnostics.snapshot,
       gpsFixCount: samples.length,
     );
     _recorder = null;
     _samples.clear();
+    _gpsDiagnostics.clear();
     _startedAt = null;
     _estimateFolder = null;
     _host.state = const TripRecordingState();

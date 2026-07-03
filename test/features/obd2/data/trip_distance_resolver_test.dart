@@ -4,6 +4,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/telemetry/health_counters.dart';
 import 'package:tankstellen/features/obd2/data/trip_distance_resolver.dart';
 import 'package:tankstellen/features/obd2/data/trip_distance_source.dart';
 import 'package:tankstellen/features/obd2/data/virtual_odometer.dart';
@@ -536,6 +537,114 @@ void main() {
         r.distanceSource(odometerStartKm: null, odometerLatestKm: null),
         kDistanceSourceGps,
       );
+    });
+  });
+
+  group('TripDistanceResolver — per-gate rejection tally (#3253)', () {
+    final base = DateTime.utc(2026, 6, 1, 8);
+
+    /// A ~5 Hz jittered slow stretch: enough sub-950 ms fixes that the
+    /// #3004 decimation must thin some away.
+    void feedHighCadence(TripDistanceResolver r) {
+      for (var i = 0; i < 60; i++) {
+        r.debugAddGpsFix(
+          latitude: 45.0 + i * 0.0001, // ~11 m per raw step
+          longitude: 5.0,
+          hAccuracyM: 8.0,
+          at: base.add(Duration(milliseconds: i * 200)), // 5 Hz
+        );
+      }
+    }
+
+    test('gateRejectionTally reports the decimation drop figures', () {
+      final r = build();
+      feedHighCadence(r);
+      final tally = r.gateRejectionTally();
+      // 60 raw fixes at 5 Hz over ~12 s decimate to ~one per 950 ms
+      // (+ the retained endpoint) — most raw fixes are dropped.
+      expect(tally.decimationDroppedFixes, greaterThan(30));
+      // A straight synthetic line collapses no distance (in-between
+      // vertices lie ON the path), so the km delta stays ~0 — the
+      // FIX-count signal is the diagnostic here.
+      expect(tally.decimationCollapsedKm, greaterThanOrEqualTo(0));
+    });
+
+    test('gateRejectionTally books an accuracy-gated segment', () {
+      final r = build();
+      // 12 clean ~111 m legs at 40 km/h + one poor-accuracy outlier.
+      for (var i = 0; i < 12; i++) {
+        r.debugAddGpsFix(
+          latitude: 45.0 + i * 0.001,
+          longitude: 5.0,
+          hAccuracyM: i == 6 ? 40.0 : 6.0,
+          at: base.add(Duration(seconds: i * 10)),
+        );
+      }
+      final tally = r.gateRejectionTally();
+      expect(tally.accuracyRejectedSegments, 2,
+          reason: 'the bad endpoint touches two segments');
+      expect(tally.accuracyRejectedKm, closeTo(0.222, 0.02));
+    });
+
+    test('is a pure read — calling it twice returns the same figures', () {
+      final r = build();
+      feedHighCadence(r);
+      final first = r.gateRejectionTally();
+      final second = r.gateRejectionTally();
+      expect(second.decimationDroppedFixes, first.decimationDroppedFixes);
+      expect(second.accuracyRejectedSegments, first.accuracyRejectedSegments);
+    });
+
+    test('publishGateRejectionTally increments trips.gps.* exactly once', () {
+      healthCounters.resetForTest();
+      addTearDown(healthCounters.resetForTest);
+      final r = build();
+      for (var i = 0; i < 12; i++) {
+        r.debugAddGpsFix(
+          latitude: 45.0 + i * 0.001,
+          longitude: 5.0,
+          hAccuracyM: i == 6 ? 40.0 : 6.0,
+          at: base.add(Duration(seconds: i * 10)),
+        );
+      }
+
+      Map<String, int> today() {
+        final days =
+            healthCounters.exportSnapshot()['days']! as Map<String, dynamic>;
+        if (days.isEmpty) return const {};
+        return Map<String, int>.from(days.values.single as Map);
+      }
+
+      // Fault seam (#2349 never-throws contract): Hive is NOT initialized
+      // in this test, so the underlying counter box is unavailable — the
+      // publish must still return normally (increments stay pending).
+      expect(r.publishGateRejectionTally, returnsNormally);
+      final afterFirst = today();
+      expect(afterFirst['trips.gps.accuracyRejectedSegments'], 2);
+      expect(afterFirst['trips.gps.accuracyRejectedMeters'],
+          inInclusiveRange(200, 245));
+
+      // A re-entrant stop must not double the counters (the once latch).
+      r.publishGateRejectionTally();
+      expect(today(), afterFirst);
+    });
+
+    test('a clean trip publishes nothing (sparse counter rows)', () {
+      healthCounters.resetForTest();
+      addTearDown(healthCounters.resetForTest);
+      final r = build();
+      for (var i = 0; i < 12; i++) {
+        r.debugAddGpsFix(
+          latitude: 45.0 + i * 0.001,
+          longitude: 5.0,
+          hAccuracyM: 6.0,
+          at: base.add(Duration(seconds: i * 10)),
+        );
+      }
+      r.publishGateRejectionTally();
+      final days =
+          healthCounters.exportSnapshot()['days']! as Map<String, dynamic>;
+      expect(days, isEmpty);
     });
   });
 }

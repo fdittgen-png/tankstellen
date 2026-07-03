@@ -1,0 +1,26 @@
+{
+  "distanceSourceOdometer": "Kilometerzähler",
+  "@distanceSourceOdometer": {
+    "description": "Distance-provenance badge label (#3253) on the trip detail's Distance row — the km figure came from the car's own odometer PID delta (ground truth, #800)."
+  },
+  "distanceSourceOdometerTooltip": "Distanz vom Kilometerzähler des Fahrzeugs — ein gemessener Referenzwert.",
+  "@distanceSourceOdometerTooltip": {
+    "description": "Tooltip for the 'Odometer' distance-provenance badge (#3253): explains the km is a real odometer delta, not an estimate."
+  },
+  "distanceSourceGps": "GPS-Spur",
+  "@distanceSourceGps": {
+    "description": "Distance-provenance badge label (#3253) — the km figure is the haversine-summed GPS track (#1979): true road distance, gated against jitter/teleports."
+  },
+  "distanceSourceGpsTooltip": "Distanz aus der aufgezeichneten GPS-Spur summiert — echte Straßendistanz.",
+  "@distanceSourceGpsTooltip": {
+    "description": "Tooltip for the 'GPS track' distance-provenance badge (#3253)."
+  },
+  "distanceSourceEstimated": "Geschätzt",
+  "@distanceSourceEstimated": {
+    "description": "Distance-provenance badge label (#3253) — the km figure was integrated from the OBD2 speed sensor (the 'virtual odometer', #800). The speed sensor over-reads, so this is an estimate, like the ~ fuel figures."
+  },
+  "distanceSourceEstimatedTooltip": "Distanz aus dem Geschwindigkeitssensor integriert — eine Schätzung; der Sensor zeigt typischerweise etwas zu viel an.",
+  "@distanceSourceEstimatedTooltip": {
+    "description": "Tooltip for the 'Estimated' distance-provenance badge (#3253): explains the virtual-odometer estimate and its over-read bias."
+  }
+}

@@ -23,8 +23,8 @@ import 'package:tankstellen/core/domain/station.dart';
 
 /// Unit tests for the live `approachStateProvider` (#2163 / #2283) — the
 /// real-data wire that subscribes to the GPS stream and feeds an
-/// [ApproachDetector] only while a trip is recording. Adapted from
-/// `test/core/location/movement_detection_provider_test.dart`.
+/// [ApproachDetector] only while a trip is recording. Adapted from the
+/// (since-removed, #3253) movement-detection provider tests.
 ///
 /// Covers the lifecycle the merge layer and the simulator tests do NOT:
 ///   - trip inactive / no profile → `ApproachIdle`, GPS NOT subscribed

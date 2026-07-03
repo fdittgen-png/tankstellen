@@ -203,6 +203,59 @@ void main() {
       expect(find.text(PriceFormatter.formatPrice(1.659)), findsNothing);
     });
 
+    testWidgets(
+        '#3257 pt2 — the lead discloses its price freshness (updatedAt) '
+        'like the search cards do', (tester) async {
+      // A corridor-cached lead can carry a price up to 1 h stale in polled
+      // countries; the card must disclose the upstream timestamp.
+      const staleLead = Station(
+        id: 'radar-stn-stale',
+        name: 'Tankstelle Alt',
+        brand: 'Aral',
+        street: 'Hauptstr',
+        postCode: '10115',
+        place: 'Berlin',
+        lat: 52.5,
+        lng: 13.4,
+        e10: 1.789,
+        isOpen: true,
+        updatedAt: '10:30',
+      );
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: [
+          effectiveApproachStateProvider.overrideWithValue(
+            const ApproachInRadius(station: staleLead, distanceMeters: 250),
+          ),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
+        ],
+      );
+
+      // The `stationUpdatedLabel` disclosure joins the fuel/distance
+      // subtitle row ("E10 · 250 m · Updated 10:30").
+      expect(find.textContaining('Updated 10:30'), findsOneWidget);
+    });
+
+    testWidgets(
+        '#3257 pt2 — no freshness row when the country API sends no '
+        'updatedAt (search-card parity)', (tester) async {
+      await pumpApp(
+        tester,
+        const TripRadarCard(),
+        overrides: [
+          effectiveApproachStateProvider.overrideWithValue(
+            const ApproachInRadius(station: _pricedStation, distanceMeters: 250),
+          ),
+          effectiveFuelTypeProvider.overrideWithValue(FuelType.e10),
+          radarCandidateListProvider.overrideWith((ref) async => const []),
+        ],
+      );
+
+      expect(find.textContaining('Updated'), findsNothing);
+    });
+
     testWidgets('the tap affordance reuses the existing `navigate` ARB key',
         (tester) async {
       await pumpApp(

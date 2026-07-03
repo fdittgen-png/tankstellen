@@ -11,6 +11,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import '../../providers/trip_fuel_cost_provider.dart';
+import 'distance_source_badge.dart';
 import 'trip_detail_charts.dart';
 
 /// Headline summary card on the trip detail screen (#890).
@@ -104,7 +105,15 @@ class TripSummaryCard extends ConsumerWidget {
                   entry.adapterFirmware,
                 ),
               ),
-            _SummaryRow(label: l.trajetDetailFieldDistance, value: distance),
+            // #3253 — distance provenance chip beside the km figure: the
+            // persisted `distanceSource` (odometer / GPS track / virtual
+            // estimate) was rendered nowhere, while the fuel figures carry
+            // the ~ / maturity badge. Now the km declares its trust level.
+            _SummaryRow(
+              label: l.trajetDetailFieldDistance,
+              value: distance,
+              badge: DistanceSourceBadge(source: s.distanceSource),
+            ),
             _SummaryRow(label: l.trajetDetailFieldDuration, value: duration),
             _SummaryRow(
               label: l.trajetDetailFieldAvgConsumption,
@@ -191,7 +200,11 @@ class _SummaryRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _SummaryRow({required this.label, required this.value});
+  /// Optional trailing chip after the value (#3253 — the distance
+  /// provenance badge). Null keeps the classic label/value pair.
+  final Widget? badge;
+
+  const _SummaryRow({required this.label, required this.value, this.badge});
 
   @override
   Widget build(BuildContext context) {
@@ -210,6 +223,7 @@ class _SummaryRow extends StatelessWidget {
             ),
           ),
           Text(value, style: theme.textTheme.bodyMedium),
+          if (badge != null) ...[const SizedBox(width: 6), badge!],
         ],
       ),
     );
