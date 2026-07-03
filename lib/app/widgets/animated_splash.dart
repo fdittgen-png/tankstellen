@@ -269,7 +269,9 @@ class _BrandGlyphPainter extends CustomPainter {
 /// because the splash needs zero Material scaffolding — a Directionality,
 /// MediaQuery, and localization delegates are the whole contract. Keeping
 /// the host tiny matters because it's rendered *before* Hive / Riverpod
-/// are wired, so it must not transitively touch any service layer.
+/// are wired, so it must not transitively touch any service layer (the
+/// bare ProviderScope around it in `main.dart` only satisfies the
+/// `missing_provider_scope` lint — it wires no services, #3272).
 class SplashHost extends StatelessWidget {
   const SplashHost({super.key});
 

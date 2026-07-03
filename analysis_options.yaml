@@ -20,17 +20,18 @@ include: package:flutter_lints/flutter.yaml
 plugins:
   riverpod_lint:
     version: 3.1.3
-    # Warning-level rules disabled for now (#3159): `flutter analyze` is
-    # warning-fatal in CI and the initial run surfaced ~20 findings across
-    # these four rules (several in files owned by in-flight branches, the
-    # rest pre-existing patterns like `ref.keepAlive()` inside autoDispose
-    # rebuild-throttles and the bootstrap-owned ProviderScope). Re-enable
-    # rule by rule as the burn-down lands.
+    # #3272 — the four warning-level rules disabled at adoption (#3159)
+    # are re-enabled; the burn-down landed: the `ref.keepAlive()`
+    # rebuild-throttle pattern is gone from the codebase, the pre-init
+    # runApp hosts (SplashHost / StorageRecoveryHost) now mount a bare
+    # ProviderScope, family call sites all pass stable (identifier /
+    # field) arguments, and lib/ has no nested ProviderScope. The two
+    # deliberate exceptions (the bootstrap-owned UncontrolledProviderScope
+    # root; the keepAlive LiveActivitySync watching the autoDispose radar
+    # fallback) carry a site `// ignore: <rule>` with rationale — if one
+    # of those still fires (see the ignore-comment caveat below), the fix
+    # is a riverpod_lint bump, not re-disabling the rule globally.
     diagnostics:
-      missing_provider_scope: false
-      only_use_keep_alive_inside_keep_alive: false
-      scoped_providers_should_specify_dependencies: false
-      provider_parameters: false
       # #3161 — CI analyze is now fatal on infos, which would make this
       # info-level rule a build breaker. All 38 findings were audited:
       # the 7 lib sites are deliberate, documented seams (test-override
@@ -41,8 +42,26 @@ plugins:
       # 3.1.3's native plugin does NOT honor `// ignore:` /
       # `// ignore_for_file:` comments (verified empirically), so per-site
       # opt-outs are impossible — disabling the rule is the only lever.
-      # Re-enable once the plugin honors ignore comments.
+      # Re-enable once the plugin honors ignore comments (#3272 reviewed:
+      # blocker unchanged at 3.1.3; the 38 sites are deliberate seams /
+      # test-fake probe fields, not restructurable as lint hygiene).
       avoid_public_notifier_properties: false
+      # #3272 review outcome for the two remaining warning rules: their
+      # per-site `// ignore:` comments are ALSO inert at 3.1.3 (verified —
+      # an ignored only_use_keep_alive site still reported), so zero-finding
+      # enablement is impossible where findings are deliberate:
+      #  * only_use_keep_alive_inside_keep_alive — 7 audited lib edges where
+      #    a keepAlive notifier deliberately reads/watches an autoDispose
+      #    provider (user_position_provider:63, country_detection_provider:31,
+      #    nearest_widget_refresh_provider:101/111/145,
+      #    trip_recording_provider:1046, live_activity_provider:90 (#3170)).
+      #  * scoped_providers_should_specify_dependencies — 12 findings, all
+      #    test-harness ProviderScope(overrides:) sites; harmless there.
+      # Unblock lever for both: a riverpod_lint bump whose plugin honors
+      # ignore comments (pins riverpod — see pubspec), then re-enable and
+      # convert this inventory into per-site opt-outs.
+      only_use_keep_alive_inside_keep_alive: false
+      scoped_providers_should_specify_dependencies: false
 
 analyzer:
   # Strict language modes (#3160) — the project paid for implicit-dynamic

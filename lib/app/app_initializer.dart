@@ -122,7 +122,8 @@ class AppInitializer {
       // #3149 — Hive is down (spool can't write); plain-file the cause.
       await StartupFailureStore.persist(e, st);
       unawaited(errorLogger.log(ErrorLayer.storage, e, st));
-      runApp(const StorageRecoveryHost());
+      // #3272 — bare scope (missing_provider_scope); reads no providers.
+      runApp(const ProviderScope(child: StorageRecoveryHost()));
       return;
     } catch (e, st) {
       // #3149 — any OTHER storage-phase fault (secure-storage cipher,
@@ -131,7 +132,7 @@ class AppInitializer {
       await StartupFailureStore.persist(e, st);
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
           context: {'where': 'initStorage'}));
-      runApp(const StorageRecoveryHost());
+      runApp(const ProviderScope(child: StorageRecoveryHost()));
       return;
     }
     StartupTimer.instance.mark('storage_ready');
@@ -661,16 +662,15 @@ class AppInitializer {
 
     StartupTimer.instance.mark('first_frame');
     StartupTimer.instance.finish();
-    // #2320 — surface the cold-start total as a trace breadcrumb so a
-    // startup-latency regression is visible in production error traces
-    // (StartupTimer.finish() otherwise only prints under kDebugMode).
-    // BreadcrumbCollector is already drained into every error trace by
-    // the nav + dio observers, so a single add here puts the figure in
-    // the same ring buffer.
+    // #2320 — surface the cold-start total as a trace breadcrumb (visible
+    // in production error traces — StartupTimer.finish() only prints under
+    // kDebugMode; BreadcrumbCollector is drained into every error trace).
     final totalMs = StartupTimer.instance.totalMs;
     if (totalMs != null) {
       BreadcrumbCollector.add('startup', detail: '${totalMs}ms');
     }
+    // #3272 — UncontrolledProviderScope IS the root scope (bootstrap-owned).
+    // ignore: missing_provider_scope
     runApp(
       UncontrolledProviderScope(
         container: container,

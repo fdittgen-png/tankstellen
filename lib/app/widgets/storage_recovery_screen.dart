@@ -19,7 +19,8 @@ import 'animated_splash.dart';
 /// Like [SplashHost], it mounts a bare [WidgetsApp] (no Material
 /// scaffolding, no Navigator) because it is rendered *before* Hive /
 /// Riverpod are wired — it must not transitively touch any service
-/// layer. Localization delegates are wired so the recovery copy is
+/// layer (the bare ProviderScope around its runApp only satisfies the
+/// `missing_provider_scope` lint — it wires no services, #3272). Localization delegates are wired so the recovery copy is
 /// shown in the device language; if the delegate has not resolved yet a
 /// hard-coded English fallback keeps the screen useful rather than
 /// blank.
