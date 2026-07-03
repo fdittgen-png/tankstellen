@@ -4,6 +4,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
+import 'package:tankstellen/features/obd2/data/obd2_platform_budgets.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -72,7 +73,47 @@ void main() {
       expect(captured!.arguments, {
         'address': 'AA:BB',
         'uuid': '00001101-0000-1000-8000-00805f9b34fb',
+        // #3421 — the whole-ladder budget rides along by default.
+        'budgetMs': Obd2PlatformBudgets.classicConnectLadderBudgetMs,
       });
+    });
+
+    // #3421 — the whole-ladder budget must reach the native side as
+    // `budgetMs` so the Kotlin ladder can skip remaining rungs when spent.
+    test('#3421 — connectDetailed forwards an explicit budgetMs', () async {
+      MethodCall? captured;
+      messenger.setMockMethodCallHandler(methodChannel, (call) async {
+        captured = call;
+        return {'ok': true, 'strategy': 'secure', 'error': null};
+      });
+
+      const plugin = Obd2ClassicMethodChannel();
+      final r = await plugin.connectDetailed(
+        address: 'AA:BB',
+        uuid: 'UUID',
+        budgetMs: 12345,
+      );
+
+      expect(r.ok, isTrue);
+      expect((captured!.arguments as Map)['budgetMs'], 12345);
+    });
+
+    test(
+        '#3421 — connectDetailed defaults budgetMs to the audited '
+        'whole-ladder constant', () async {
+      MethodCall? captured;
+      messenger.setMockMethodCallHandler(methodChannel, (call) async {
+        captured = call;
+        return true;
+      });
+
+      const plugin = Obd2ClassicMethodChannel();
+      await plugin.connectDetailed(address: 'AA:BB', uuid: 'UUID');
+
+      expect(
+        (captured!.arguments as Map)['budgetMs'],
+        Obd2PlatformBudgets.classicConnectLadderBudgetMs,
+      );
     });
 
     test('connect defaults to false when native returns null', () async {

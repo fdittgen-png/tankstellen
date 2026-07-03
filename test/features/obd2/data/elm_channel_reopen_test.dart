@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/bluetooth_obd2_transport.dart';
+import 'package:tankstellen/features/obd2/data/classic_connect_cooldown.dart';
 import 'package:tankstellen/features/obd2/data/classic_elm_channel.dart';
 import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
 import 'package:tankstellen/features/obd2/data/flutter_blue_plus_elm_channel.dart';
@@ -44,6 +45,7 @@ class _ReopenFakePlugin extends Obd2ClassicMethodChannel {
   Future<ClassicConnectResult> connectDetailed({
     required String address,
     required String uuid,
+    int? budgetMs, // #3421
   }) async {
     connectCalls++;
     if (connectCalls <= failuresBeforeSuccess) {
@@ -88,6 +90,12 @@ class _ReopenableFbpChannel extends FlutterBluePlusElmChannel {
   Future<void> tuneForRecording() async {}
 }
 
+/// #3421 — zero-wait cooldown: these tests deliberately drive rapid
+/// close() → open() cycles, which the post-close cooldown would otherwise
+/// pace with a real 1.5 s sleep per reopen.
+ClassicConnectCooldown noWaitCooldown() =>
+    ClassicConnectCooldown(wait: (_) async {});
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   silenceErrorLoggerSpool();
@@ -99,7 +107,8 @@ void main() {
         () async {
       final plugin = _ReopenFakePlugin(failuresBeforeSuccess: 1);
       addTearDown(plugin.dispose);
-      final channel = ClassicElmChannel(address: 'AA:BB', plugin: plugin);
+      final channel = ClassicElmChannel(
+          address: 'AA:BB', plugin: plugin, cooldown: noWaitCooldown());
       final transport = BluetoothObd2Transport(
         channel,
         readTimeout: const Duration(milliseconds: 400),
@@ -132,7 +141,8 @@ void main() {
     test('close() → open() → incoming bytes flow again', () async {
       final plugin = _ReopenFakePlugin();
       addTearDown(plugin.dispose);
-      final channel = ClassicElmChannel(address: 'AA:BB', plugin: plugin);
+      final channel = ClassicElmChannel(
+          address: 'AA:BB', plugin: plugin, cooldown: noWaitCooldown());
 
       await channel.open();
       await channel.close();
@@ -157,7 +167,8 @@ void main() {
         () async {
       final plugin = _ReopenFakePlugin();
       addTearDown(plugin.dispose);
-      final channel = ClassicElmChannel(address: 'AA:BB', plugin: plugin);
+      final channel = ClassicElmChannel(
+          address: 'AA:BB', plugin: plugin, cooldown: noWaitCooldown());
 
       await channel.open();
       await channel.close(); // deliberate close latches `_closing` on master

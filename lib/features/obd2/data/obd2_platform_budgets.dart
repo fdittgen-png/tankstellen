@@ -74,4 +74,27 @@ class Obd2PlatformBudgets {
   /// non-iOS platform gets the Android budgets, exactly as before.
   static Obd2PlatformBudgets get resolved =>
       defaultTargetPlatform == TargetPlatform.iOS ? ios : android;
+
+  /// #3421 — WHOLE-LADDER budget (ms) for the native Classic RFCOMM connect
+  /// ladder (secure×3 → insecure → reflection channel-1 in
+  /// `Obd2ClassicPlugin.kt`). The #3348 watchdog bounds each RUNG at 7 s but
+  /// never the CALL: field trace t8 (#3415) shows ONE native connect blocking
+  /// 16.8 minutes (t5: 4.7 min) on a half-open wedged channel. Dart threads
+  /// this to the native `connect` as `budgetMs`; the Kotlin side skips the
+  /// remaining rungs once it is spent and reports strategy `budget-exhausted`.
+  /// Generous by design — a full healthy ladder (5 rungs × 7 s worst-case
+  /// watchdog would exceed it, but a HEALTHY connect lands on rung 1–2 in
+  /// ~1 s) — so it only bites when the ladder is genuinely wedged.
+  /// Platform-independent (Classic SPP is Android-only). A plain `int` so it
+  /// can serve as a const default parameter value on the channel binding.
+  static const int classicConnectLadderBudgetMs = 20000;
+
+  /// #3421 — Dart-side defense-in-depth grace on top of
+  /// [classicConnectLadderBudgetMs]: `ClassicElmChannel.open` wraps the
+  /// `connectDetailed` await in `.timeout(budget + grace)`, so even a WEDGED
+  /// platform thread — whose Kotlin-side budget bookkeeping never runs
+  /// because `BluetoothSocket.connect()` refuses to return — cannot hold a
+  /// Dart caller for minutes. 3 s comfortably clears normal MethodChannel
+  /// scheduling latency on top of the native budget.
+  static const Duration classicConnectDartGrace = Duration(seconds: 3);
 }

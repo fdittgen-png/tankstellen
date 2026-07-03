@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
@@ -73,6 +74,15 @@ object Obd2ClassicPlugin {
      *  is ~3 s). */
     private const val RFCOMM_CONNECT_TIMEOUT_MS = 7000L
 
+    /** #3421 — default WHOLE-LADDER budget. The #3348 watchdog bounds each
+     *  RUNG at 7 s but never the CALL: field traces (#3415 t5/t8) show one
+     *  native connect blocking 4.7–16.8 minutes across a wedged ladder.
+     *  Before each rung starts, the elapsed time is checked against the
+     *  budget and the remaining rungs are SKIPPED (strategy
+     *  `budget-exhausted`) once it is spent. The Dart side normally passes
+     *  its own `budgetMs`; this default keeps an old Dart caller bounded. */
+    private const val DEFAULT_CONNECT_BUDGET_MS = 20_000L
+
     private var socket: BluetoothSocket? = null
     private var readerThread: Thread? = null
     private val readerRunning = AtomicBoolean(false)
@@ -103,13 +113,17 @@ object Obd2ClassicPlugin {
                         ?: return result.error("arg", "address missing", null)
                     val uuid = call.argument<String>("uuid")
                         ?: return result.error("arg", "uuid missing", null)
+                    // #3421 — optional whole-ladder budget from Dart (absent
+                    // on an old Dart side → the bounded default applies).
+                    val budgetMs = call.argument<Number>("budgetMs")?.toLong()
+                        ?: DEFAULT_CONNECT_BUDGET_MS
                     thread(name = "obd2-classic-connect") {
                         // #2969 — return a Map{ok, strategy, error} so the Dart
                         // side surfaces WHICH RFCOMM strategy won (or that all
                         // were exhausted) + the last IOException, instead of a
                         // bare Boolean that threw away every diagnostic (only
                         // Logcat had it). The Dart binding accepts BOTH shapes.
-                        result.success(connect(context, address, uuid))
+                        result.success(connect(context, address, uuid, budgetMs))
                     }
                 }
                 "write" -> {
@@ -162,7 +176,17 @@ object Obd2ClassicPlugin {
         "error" to error,
     )
 
-    private fun connect(context: Context, address: String, uuid: String): Map<String, Any?> {
+    private fun connect(
+        context: Context,
+        address: String,
+        uuid: String,
+        budgetMs: Long,
+    ): Map<String, Any?> {
+        // #3421 — whole-ladder budget. Monotonic clock; started BEFORE the
+        // teardown of any prior socket so everything this call does counts.
+        val startedAt = SystemClock.elapsedRealtime()
+        fun budgetSpent(): Boolean =
+            SystemClock.elapsedRealtime() - startedAt >= budgetMs
         disconnect() // ensure any prior socket is closed
         val adapter = adapterOrNull(context)
             ?: return connectResult(false, "no-adapter", "Bluetooth adapter unavailable")
@@ -186,6 +210,12 @@ object Obd2ClassicPlugin {
         //    background "obd2-classic-connect" thread, so the Thread.sleep
         //    backoff between attempts never blocks the Flutter main thread.
         for (attempt in 1..MAX_RFCOMM_ATTEMPTS) {
+            // #3421 — skip the remaining rungs once the whole-ladder budget
+            // is spent. The per-rung #3348 watchdog is unchanged; this bounds
+            // the CALL, which the watchdog alone never did (#3415 t5/t8).
+            if (budgetSpent()) {
+                return budgetExhaustedResult(address, budgetMs, lastError)
+            }
             @Suppress("MissingPermission")
             val s = try {
                 device.createRfcommSocketToServiceRecord(serviceUuid)
@@ -211,6 +241,9 @@ object Obd2ClassicPlugin {
         // 2) Documented clone fallback: the INSECURE SPP socket. Many ELM327
         //    clones never complete the secure (authenticated/encrypted) RFCOMM
         //    handshake but connect fine over the insecure variant.
+        if (budgetSpent()) { // #3421
+            return budgetExhaustedResult(address, budgetMs, lastError)
+        }
         @Suppress("MissingPermission")
         val insecure = try {
             device.createInsecureRfcommSocketToServiceRecord(serviceUuid)
@@ -227,6 +260,9 @@ object Obd2ClassicPlugin {
         // 3) Last-resort reflection on the hidden channel-1 RFCOMM socket —
         //    the long-standing workaround for clones whose SDP record is
         //    missing/garbage so the UUID lookup resolves to no channel.
+        if (budgetSpent()) { // #3421
+            return budgetExhaustedResult(address, budgetMs, lastError)
+        }
         val reflected = reflectChannelOneSocket(device)
         if (reflected != null) {
             val r = tryConnectSocket(reflected, MAX_RFCOMM_ATTEMPTS + 2)
@@ -235,6 +271,23 @@ object Obd2ClassicPlugin {
         }
         Log.e(TAG, "connect: all RFCOMM strategies exhausted for $address")
         return connectResult(false, "exhausted", lastError)
+    }
+
+    /** #3421 — the whole-ladder budget ran out before this rung could start:
+     *  log + report the dedicated `budget-exhausted` strategy (with the last
+     *  rung's IOException, when any rung ran at all) so the Dart connect
+     *  trace tells a budget overrun apart from a fully-exhausted ladder. */
+    private fun budgetExhaustedResult(
+        address: String,
+        budgetMs: Long,
+        lastError: String?,
+    ): Map<String, Any?> {
+        Log.w(
+            TAG,
+            "connect: whole-ladder budget (${budgetMs}ms) exhausted for " +
+                "$address — skipping remaining rungs (#3421)",
+        )
+        return connectResult(false, "budget-exhausted", lastError)
     }
 
     /** Attempt to connect [s], adopt it as the live socket + start the reader

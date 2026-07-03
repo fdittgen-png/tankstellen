@@ -5,6 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+import 'obd2_platform_budgets.dart';
+
 /// Thin Dart binding for the in-repo Kotlin plugin `Obd2ClassicPlugin`
 /// (#763). Separated from [PluginClassicBluetoothFacade] so tests can
 /// swap this out via a constructor-injected fake without touching the
@@ -46,19 +48,31 @@ class Obd2ClassicMethodChannel {
   /// the legacy bare `bool` (bidirectional back-compat: an old native side ↔ a
   /// new Dart side, and vice-versa, both work). Use [connectDetailed] when the
   /// strategy / native error are wanted for the connect trace.
-  Future<bool> connect({required String address, required String uuid}) async =>
-      (await connectDetailed(address: address, uuid: uuid)).ok;
+  ///
+  /// #3421 — [budgetMs] bounds the WHOLE native RFCOMM connect ladder
+  /// (secure×3 → insecure → reflection): the Kotlin side skips remaining
+  /// rungs once it is spent (strategy `budget-exhausted`). The per-rung 7 s
+  /// #3348 watchdog is unchanged.
+  Future<bool> connect({
+    required String address,
+    required String uuid,
+    int budgetMs = Obd2PlatformBudgets.classicConnectLadderBudgetMs,
+  }) async =>
+      (await connectDetailed(address: address, uuid: uuid, budgetMs: budgetMs))
+          .ok;
 
   /// As [connect] but returning the parsed native result so the connect-trace
   /// can surface WHICH RFCOMM strategy won / the terminal failure mode + the
-  /// last native IOException (#2969 correction 5).
+  /// last native IOException (#2969 correction 5). [budgetMs]: see [connect]
+  /// (#3421); an old native side simply ignores the extra argument.
   Future<ClassicConnectResult> connectDetailed({
     required String address,
     required String uuid,
+    int budgetMs = Obd2PlatformBudgets.classicConnectLadderBudgetMs,
   }) async {
     final raw = await _methodChannel.invokeMethod<dynamic>(
       'connect',
-      {'address': address, 'uuid': uuid},
+      {'address': address, 'uuid': uuid, 'budgetMs': budgetMs},
     );
     return parseClassicConnectResult(raw);
   }

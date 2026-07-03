@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/obd2/data/classic_connect_cooldown.dart';
 import 'package:tankstellen/features/obd2/data/classic_elm_channel.dart';
 import 'package:tankstellen/features/obd2/data/classic_method_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
@@ -30,10 +31,12 @@ class _FakeObd2ClassicMethodChannel extends Obd2ClassicMethodChannel {
 
   // #2969 — ClassicElmChannel.open now calls connectDetailed; override it so
   // the fake's connectResult still drives the SUT + records the call.
+  // #3421 — accepts the budgetMs the channel now threads through.
   @override
   Future<ClassicConnectResult> connectDetailed({
     required String address,
     required String uuid,
+    int? budgetMs,
   }) async {
     connectCalls.add(_ConnectCall(address, uuid));
     return (
@@ -98,6 +101,7 @@ class _LateByteFakePlugin extends Obd2ClassicMethodChannel {
   Future<ClassicConnectResult> connectDetailed({
     required String address,
     required String uuid,
+    int? budgetMs, // #3421
   }) async =>
       (ok: true, strategy: 'secure', error: null);
 
@@ -157,6 +161,10 @@ void main() {
 
   setUp(() {
     fake = _FakeObd2ClassicMethodChannel();
+    // #3421 — the shared post-close cooldown would otherwise carry a prior
+    // test's close stamp for 'AA:BB' into this one and sleep ~1.5 s of real
+    // clock on the first open().
+    ClassicConnectCooldown.instance.debugClear();
   });
 
   tearDown(() async {
