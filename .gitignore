@@ -119,6 +119,7 @@ docs/guides/*
 !docs/guides/go-live-runbook.md
 !docs/guides/ios-testflight-testers.md
 !docs/guides/opening-hours.md
+!docs/guides/play-fgs-declaration.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
