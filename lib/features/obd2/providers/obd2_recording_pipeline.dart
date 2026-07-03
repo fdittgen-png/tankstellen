@@ -10,7 +10,8 @@ import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../data/obd2_connection_errors.dart';
-import '../data/obd2_recording_link_ownership.dart';
+import '../data/obd2_disconnect_quietly.dart';
+import '../data/obd2_link_arbiter.dart';
 import '../data/obd2_service.dart';
 import '../data/obd2_trip_start_budgets.dart';
 import '../data/obd2_session_context_block.dart';
@@ -86,6 +87,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   final Duration _baselinesBudget;
 
   Obd2Service? _service;
+  Obd2LinkLease? _lease; // #3420 — the recording's session lease (arbiter)
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
   StreamSubscription<TripRecordingControllerState>? _stateSub;
@@ -121,6 +123,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   /// verbatim from `TripRecording._startInternal`; the re-entrancy guard
   /// + `state.isActive` short-circuit stay on the notifier.
   Future<void> start(Obd2Service service, {bool automatic = false}) async {
+    // #3420 — claim the link BEFORE the first await: a drop anywhere in the start window belongs to THIS recording, never the #3019 idle loop.
+    _lease = Obd2LinkArbiter.instance.tryAcquire('recording', Obd2LinkPriority.recording);
     _service = service;
     // #2261 concern 6 — re-arm the deferred capability probe (first sample).
     _capabilityReconcileKicked = false;
@@ -195,8 +199,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       await _baselines.load().timeout(_baselinesBudget);
       await ctl.start().timeout(_startWatchdog);
     } on TimeoutException {
-      _controller = null;
-      unawaited(service.disconnect());
+      _controller = null; _lease?.release(); _lease = null;
+      unawaited(service.disconnectQuietly());
       throw const Obd2AdapterUnresponsive();
     }
     // #1374 / #1981 — GPS trip-path sampling, default-on; fire-and-forget so
@@ -270,7 +274,6 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // #1303 — phase transitions force an immediate snapshot.
       unawaited(_host.flushActiveSnapshot(force: true));
     });
-    Obd2RecordingLinkOwnership.instance.claim(); // #3386 — #3019 stands down
     // #2274 — going live clears the connecting stage for the live-metrics frame.
     _host.state = _host.state.copyWith(
       phase: TripRecordingPhase.recording,
@@ -296,7 +299,6 @@ class Obd2RecordingPipeline implements RecordingPipeline {
 
   @override
   Future<StoppedTripResult> stop({bool automatic = false}) async {
-    Obd2RecordingLinkOwnership.instance.release(); // #3386 — #3019 resumes idle
     final ctl = _controller;
     final svc = _service;
     if (ctl == null || svc == null) {
@@ -384,7 +386,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st,
           context: obd2DisconnectTraceContext()));
     }
-    _service = null;
+    // #3420 — the lease is held until the disconnect COMPLETED (race 2).
+    _service = null; _lease?.release(); _lease = null;
     // #1303 — trip finalised; clear the WAL so recovery doesn't resurrect it.
     await _host.clearActiveSnapshot();
     _host.state = _host.state.copyWith(phase: TripRecordingPhase.finished);

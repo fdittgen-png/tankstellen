@@ -170,7 +170,10 @@ void main() {
       addTearDown(coordinator.stop);
       await coordinator.start();
       listener.emitConnected(_mac);
-      await pumpEventQueue();
+      // The opener runs a real (fake-transport) ELM init with wall-clock
+      // settles — poll bounded instead of pumpEventQueue (mirrors the
+      // auto_trip_coordinator_test pumpSpeedTicks approach).
+      await _waitFor(() => coordinator.hasOpenSession);
 
       expect(coordinator.hasOpenSession, isTrue,
           reason: 'the auto-record authority owns the link now');
@@ -265,6 +268,16 @@ AutoRecordConfig _config() => const AutoRecordConfig(
       movementStartThresholdKmh: 5,
       disconnectSaveDelay: Duration(seconds: 60),
     );
+
+/// Bounded real-time wait — the coordinator's opener resolves on wall-clock
+/// timers (ELM init settles), which `pumpEventQueue` cannot advance.
+Future<void> _waitFor(bool Function() done,
+    {Duration timeout = const Duration(seconds: 8)}) async {
+  final sw = Stopwatch()..start();
+  while (!done() && sw.elapsed < timeout) {
+    await Future<void>.delayed(const Duration(milliseconds: 25));
+  }
+}
 
 /// A connectable fake session for the coordinator's opener seam.
 Future<Obd2Service?> _openFakeService() async {

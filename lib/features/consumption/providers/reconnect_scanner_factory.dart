@@ -70,10 +70,23 @@ AdapterReconnectScanner? Function(
     final scanner = AdapterReconnectScanner(
       pinnedMac: pinnedMac,
       probe: (mac) async => true,
-      connect: connector.attempt,
+      // #3420 — stamp every in-trip reconnect attempt as a liveReconnect:
+      // the connector dials `connectByMacClassicDirect`/direct paths that
+      // default to firstConnect, which made the field trace ring read as
+      // ten user-driven connects during the #3415 war. The origin now
+      // tells the in-trip recovery apart from a real first connect.
+      connect: (mac) => Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.liveReconnect,
+        () => connector.attempt(mac),
+        transportDecisionReason: 'in-trip-reconnect',
+      ),
       // #2261 concern 2 — after the active-scan miss ceiling switch to a
       // passive autoConnect GATT wait for the rest of the 15-min grace.
-      passiveConnect: connector.attemptPassive,
+      passiveConnect: (mac) => Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.liveReconnect,
+        () => connector.attemptPassive(mac),
+        transportDecisionReason: 'in-trip-reconnect-passive',
+      ),
       onReconnect: onReconnect,
     );
     // #2905 — let the connector's per-attempt telemetry rows carry the

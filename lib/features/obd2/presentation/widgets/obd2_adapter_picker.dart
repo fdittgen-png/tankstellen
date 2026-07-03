@@ -14,6 +14,7 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/adapter_registry.dart';
 import '../../data/obd2_adapter_identity.dart';
 import '../../data/obd2_connection_errors.dart';
+import '../../data/obd2_link_arbiter.dart';
 import '../../data/obd2_connection_service.dart';
 import '../../data/obd2_pairing_mode.dart';
 import '../../data/obd2_service.dart';
@@ -60,10 +61,11 @@ Future<Obd2Service?> showObd2AdapterPicker(
       // and NEVER opens the BLE GATT that 4 s-times-out + poisons the socket. It
       // still falls back to the merged BLE+Classic scan via `connectByMac`
       // internally for a direct miss, so the existing behaviour is preserved.
-      service = await container.read(obd2ConnectionProvider).connectByMacTransportAware(
-            pinnedMac,
-            adapterName: pinnedAdapterName,
-          );
+      // #3420 — interactive lease; refused (null → sheet) while a recording
+      // or the auto-record watch owns the link.
+      service = await Obd2LinkArbiter.instance.runInteractive<Obd2Service?>(
+          'picker-pinned',
+          () => container.read(obd2ConnectionProvider).connectByMacTransportAware(pinnedMac, adapterName: pinnedAdapterName));
     } on Obd2ConnectionError catch (e, st) {
       // Drop through to the sheet so the user can pick another adapter; the
       // fall-through snackbar surfaces it. #2745 — an expected, user-surfaced
@@ -284,7 +286,13 @@ class _Obd2AdapterPickerSheetState
     unawaited(_sub?.cancel());
     _sub = null;
     try {
-      final service = await connection.connect(candidate);
+      // #3420 — interactive lease (same contract as the pinned path above).
+      final service = await Obd2LinkArbiter.instance
+          .runInteractive('picker-scan', () => connection.connect(candidate));
+      if (service == null) {
+        // Refused: a recording / auto-record watch owns the link (#3420).
+        throw const Obd2AdapterUnresponsive();
+      }
       // #1188 — persist MAC + display name back onto the active vehicle
       // profile so the next session takes the pinned-MAC fast path and skips
       // the picker. Best-effort; uses the pre-await captures (errorlog_30) so

@@ -46,7 +46,13 @@ class Obd2VinReaderService implements VinReaderService {
     // owns its own short scan window and short-circuits on the first
     // candidate matching [pairedAdapterMac] — exactly what we want.
     try {
-      final service = await connection.connectByMac(pairedAdapterMac);
+      // #3420 — an INTERACTIVE link lease: refused (null → io failure)
+      // while a recording / auto-record watch owns the adapter, so a VIN
+      // read can never open a rival session against a live trip.
+      final service = await Obd2LinkArbiter.instance.runInteractive(
+        'vin-read',
+        () => connection.connectByMac(pairedAdapterMac),
+      );
       if (service == null) {
         return const ObdVinResult.failure(ObdVinFailureReason.io);
       }

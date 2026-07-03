@@ -36,6 +36,8 @@ export 'data/obd2_connect_trace_log.dart';
 export 'data/obd2_connect_trace_persistence.dart';
 export 'data/obd2_connection_errors.dart';
 export 'data/obd2_connection_service.dart';
+export 'data/obd2_disconnect_quietly.dart';
+export 'data/obd2_link_arbiter.dart';
 export 'data/obd2_permissions.dart';
 export 'data/obd2_read_telemetry.dart';
 export 'data/obd2_reconnect_controller.dart';

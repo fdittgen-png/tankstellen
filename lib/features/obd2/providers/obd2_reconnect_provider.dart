@@ -14,8 +14,7 @@ import '../data/obd2_comm_diagnostics.dart';
 import '../data/obd2_connect_trace.dart';
 import '../data/obd2_connect_trace_log.dart';
 import '../data/obd2_connection_service.dart';
-import '../data/obd2_link_drop_signal.dart';
-import '../data/obd2_recording_link_ownership.dart';
+import '../data/obd2_link_arbiter.dart';
 import '../data/obd2_reconnect_controller.dart';
 import '../data/obd2_service.dart';
 import 'obd2_connection_state_provider.dart';
@@ -47,42 +46,31 @@ LastGoodAdapterStore lastGoodAdapterStore(Ref ref) =>
 @Riverpod(keepAlive: true)
 class Obd2Reconnect extends _$Obd2Reconnect {
   Obd2ReconnectController? _controller;
-  StreamSubscription<Obd2LinkDropEvent>? _dropSub;
+  Obd2LinkIdleRegistration? _idleReg;
 
   @override
   Obd2ReconnectState build() {
     final controller = _buildController();
     _controller = controller;
-    // #3019 — subscribe to the PROACTIVE link-drop signal both channels emit
-    // the instant a link dies (BLE disconnect edge / Classic socket close), so
-    // a drop while idle / between trips still starts the bounded backoff loop.
-    _dropSub = Obd2LinkDropSignal.instance.drops.listen((e) {
-      // #3386 — STAND DOWN while a trip recording owns the adapter: the trip's
-      // own DroppedSessionManager (#2188) is the sole in-trip reconnect
-      // authority. Two reconnectors on one adapter ping-pong the single RFCOMM
-      // socket forever (the field "permanently reconnecting" war). #3019 only
-      // handles drops while idle / between trips — exactly its #3013 charter.
-      if (Obd2RecordingLinkOwnership.instance.active) return;
-      // #3346 — carry WHY the link dropped (and on which transport) into the
-      // controller so the reconnect-episode breadcrumb records it.
-      _controller?.notifyDropped(
+    // #3420 — register as the arbiter's IDLE policy. The arbiter is the sole
+    // consumer of the proactive link-drop signal: a drop reaches this loop
+    // ONLY while no lease (recording / auto-record / interactive) holds the
+    // link — the #3013 "idle / between trips" charter by construction, where
+    // the #3386 latch left the auto-record ↔ #3019 pair ungated (#3415).
+    // onStandDown fires the instant ANY lease is granted, so an in-flight
+    // idle loop stops before it can tear down the new owner's socket.
+    // #3346 — the drop reason/transport still reach the episode breadcrumb.
+    _idleReg = Obd2LinkArbiter.instance.registerIdlePolicy(
+      onDrop: (e) => _controller?.notifyDropped(
         reason: e.reason,
         transportKind: e.transportKind,
         mac: e.mac,
-      );
-    });
-    // #3386 — if a recording CLAIMS the link while #3019 is mid-loop (an idle
-    // drop that was recovering when the user hit Start), hand over immediately:
-    // stop the loop so it can't tear down the recording's freshly-owned socket.
-    final ownership = Obd2RecordingLinkOwnership.instance.recordingOwnsLink;
-    void onOwnershipChanged() {
-      if (ownership.value) _controller?.stop();
-    }
-    ownership.addListener(onOwnershipChanged);
+      ),
+      onStandDown: () => _controller?.stop(),
+    );
     ref.onDispose(() {
-      ownership.removeListener(onOwnershipChanged);
-      unawaited(_dropSub?.cancel());
-      _dropSub = null;
+      _idleReg?.dispose();
+      _idleReg = null;
       controller.dispose();
       _controller = null;
     });

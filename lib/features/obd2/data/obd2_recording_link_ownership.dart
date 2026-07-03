@@ -3,31 +3,22 @@
 
 import 'package:flutter/foundation.dart';
 
-/// #3386 — single-authority gate for OBD2 reconnect.
+import 'obd2_link_arbiter.dart';
+
+/// #3386 → #3420 — THIN SHIM over [Obd2LinkArbiter].
 ///
-/// Two reconnect authorities existed for the one adapter:
-///  * the in-trip [DroppedSessionManager] (#2188) — the reconnect owner WHILE a
-///    recording is active;
-///  * the app-wide, trip-INDEPENDENT [Obd2Reconnect] (#3019) — documented as
-///    the owner for a drop "while idle / between trips".
+/// The original latch let the recording pipeline claim the adapter so the
+/// app-wide #3019 reconnector stood down. #3415's field evidence proved a
+/// boolean latch cannot carry that responsibility (claim/release race
+/// windows at the trip edges; no gate at all between auto-record and
+/// #3019), so ownership moved into the [Obd2LinkArbiter] session lease.
 ///
-/// But #3019 subscribed to the link-drop signal UNCONDITIONALLY, so during a
-/// recording BOTH reconnected the single adapter. Establishing a second RFCOMM
-/// socket tears down the first (one SPP channel), the first sees a socket-close
-/// drop and reconnects, tearing down the second — a perpetual reconnect WAR
-/// that never let the link settle, leaving the trip stuck on GPS-estimated
-/// consumption (field: "Enregistrement via GPS — reconnexion OBD2" all drive).
-///
-/// This latch lets the OBD2 recording pipeline CLAIM the adapter so #3019
-/// stands down (and stops any in-flight loop) for the trip's lifetime; the
-/// trip's own [DroppedSessionManager] is then the sole in-trip authority, as
-/// the design always intended. Releasing it hands the idle/between-trips role
-/// back to #3019.
-///
-/// A process-wide singleton (not a Riverpod provider) so the data-layer
-/// reconnect controller and the recording pipeline coordinate WITHOUT a
-/// cross-feature provider dependency; the [recordingOwnsLink] notifier lets
-/// #3019 react the instant a recording claims the link.
+/// This shim preserves the latch API for its existing tests and any legacy
+/// caller: [claim]/[release] acquire/release a RECORDING lease on the
+/// arbiter, and [active]/[recordingOwnsLink] mirror "a recording lease is
+/// held" (including one acquired directly on the arbiter, e.g. by
+/// `Obd2RecordingPipeline.start`). Scheduled for deletion in #3424 once
+/// the regression suite proves nothing references it.
 class Obd2RecordingLinkOwnership {
   Obd2RecordingLinkOwnership._();
 
@@ -35,20 +26,39 @@ class Obd2RecordingLinkOwnership {
   static final Obd2RecordingLinkOwnership instance =
       Obd2RecordingLinkOwnership._();
 
-  /// True while a trip recording owns the adapter. Notifies on every change.
-  final ValueNotifier<bool> recordingOwnsLink = ValueNotifier<bool>(false);
+  Obd2LinkLease? _legacyLease;
 
-  /// Whether a recording currently owns the adapter (the in-trip
-  /// [DroppedSessionManager] is the reconnect authority).
-  bool get active => recordingOwnsLink.value;
+  /// True while a trip recording owns the adapter. Notifies on every
+  /// change. Owned by the arbiter — reflects ANY recording lease, however
+  /// acquired.
+  ValueNotifier<bool> get recordingOwnsLink =>
+      Obd2LinkArbiter.instance.recordingOwnsLink;
 
-  /// A recording now owns the adapter — #3019 stands down.
-  void claim() => recordingOwnsLink.value = true;
+  /// Whether a recording currently owns the adapter.
+  bool get active => Obd2LinkArbiter.instance.recordingLeaseHeld;
 
-  /// The recording released the adapter — #3019 resumes the idle role.
-  void release() => recordingOwnsLink.value = false;
+  /// A recording now owns the adapter (legacy path — the pipeline itself
+  /// acquires its lease on the arbiter directly).
+  void claim() =>
+      _legacyLease ??= Obd2LinkArbiter.instance.tryAcquire(
+        'legacy-latch',
+        Obd2LinkPriority.recording,
+        onPreempted: () => _legacyLease = null,
+      );
 
-  /// Reset to the unowned state (tests).
+  /// The recording released the adapter.
+  void release() {
+    _legacyLease?.release();
+    _legacyLease = null;
+  }
+
+  /// Reset to the unowned state (tests) — clears any held lease on the
+  /// arbiter, whoever acquired it.
   @visibleForTesting
-  void resetForTest() => recordingOwnsLink.value = false;
+  void resetForTest() {
+    _legacyLease = null;
+    // Shim-to-arbiter delegation: both ends are @visibleForTesting.
+    // ignore: invalid_use_of_visible_for_testing_member
+    Obd2LinkArbiter.instance.resetForTest();
+  }
 }
