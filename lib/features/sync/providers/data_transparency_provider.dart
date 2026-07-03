@@ -6,17 +6,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/supabase_client.dart';
-import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_provider.dart';
-import '../../../core/sync/favorites_sync.dart';
-import '../../../core/sync/trips_sync_enabled_provider.dart';
+import '../../../core/sync/sync_pull_coordinator.dart';
 import '../../../core/sync/user_data_sync.dart';
-import '../../alerts/providers/alert_provider.dart';
-import '../../consumption/providers/consumption_providers.dart';
-import '../../favorites/providers/favorites_provider.dart';
-import '../../vehicle/providers/vehicle_providers.dart';
 import '../../../core/logging/error_logger.dart';
 
 part 'data_transparency_provider.g.dart';
@@ -100,23 +93,20 @@ class DataTransparencyController extends _$DataTransparencyController {
   Future<void> forceSyncAndReload() async {
     state = state.copyWith(loading: true, clearError: true);
     try {
-      final favoriteIds = ref.read(favoritesProvider);
-      debugPrint(
-        'DataTransparency: forcing sync of ${favoriteIds.length} local favorites',
-      );
       debugPrint(
         'DataTransparency: auth user = ${TankSyncClient.client?.auth.currentUser?.id}',
       );
-      debugPrint(
-        'DataTransparency: client initialized = ${TankSyncClient.isConnected}',
-      );
 
       if (!TankSyncClient.isConnected) {
-        debugPrint('DataTransparency: not connected, attempting re-auth...');
-        await TankSyncClient.signInAnonymously();
-        debugPrint(
-          'DataTransparency: re-auth result = ${TankSyncClient.client?.auth.currentUser?.id}',
-        );
+        // #3449 — identity guard: only re-auth anonymously when NO
+        // identity is stored. A stored id with no session is the
+        // relink-required state; minting a fresh UUID here would orphan
+        // the stored identity's server rows (the pulls below no-op
+        // unauthenticated instead).
+        if (ref.read(syncStateProvider).userId == null) {
+          debugPrint('DataTransparency: not connected, attempting re-auth...');
+          await TankSyncClient.signInAnonymously();
+        }
       } else {
         final uid = TankSyncClient.client?.auth.currentUser?.id;
         if (uid != null) {
@@ -130,42 +120,12 @@ class DataTransparencyController extends _$DataTransparencyController {
         }
       }
 
-      // #3076 — persist the union (server ∪ local) back to local storage
-      // instead of discarding the merge result, so favorites added on
-      // another device are pulled down here. The #3446 sync-events emit
-      // (AFTER the persist) replaces the old one-off
-      // `ref.invalidate(favoritesProvider)` — the `Favorites` notifier
-      // subscribes to its table and re-reads storage on the event.
-      final storage = ref.read(storageRepositoryProvider);
-      final favBefore = storage.getFavoriteIds();
-      await storage.setFavoriteIds(await FavoritesSync.merge(favoriteIds));
-      SyncEvents.instance.emitIdSetDelta(
-          SyncTables.favorites, favBefore, storage.getFavoriteIds());
-
-      // #3077 — pull server-only ratings into local storage (local wins on
-      // collision). The station_rating provider re-reads storage on rebuild.
-      await ref.read(syncStateProvider.notifier).syncAndPersistRatings(storage);
-
-      // #3077 — alerts: an explicit upload + download pass. The
-      // add/toggle hooks already pull on every edit, but the "sync now"
-      // gesture must also pull alerts created on another device for a
-      // device that never edits one locally.
-      final alerts = ref.read(alertProvider);
-      debugPrint('DataTransparency: syncing ${alerts.length} local alerts');
-      await ref.read(alertProvider.notifier).pullFromServer();
-
-      // #3077 — fill-ups + vehicles are trip-data adjacent, so they ride
-      // the same trip-sync consent gate (cloudSync ∧ syncTrips ∧ email).
-      // Off → upload-only stays the contract, nothing is pulled.
-      if (ref.read(tripsSyncEnabledProvider)) {
-        await ref.read(vehicleProfileListProvider.notifier).pullFromServer();
-        // #3446 — fill-ups' persist site lives in the length-frozen
-        // consumption_providers.dart (#3138), so this call site emits.
-        final fillUpsPulled =
-            await ref.read(fillUpListProvider.notifier).pullFromServer();
-        SyncEvents.instance
-            .emit(SyncTableChanged(SyncTables.fillUps, fillUpsPulled));
-      }
+      // #3447 — "sync now" replays the SAME registered pull matrix as
+      // launch and app-resume (every synced table, parallel, per-table
+      // consent gates + timeouts + #3446 emits inside — see
+      // `LaunchSyncPulls`). Replaces the hand-maintained per-entity list
+      // that had drifted out of full coverage.
+      await SyncPullCoordinator.instance.pullAll();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'DataTransparency: force sync failed'}));
     }

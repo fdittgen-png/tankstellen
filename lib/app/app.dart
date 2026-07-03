@@ -11,6 +11,7 @@ import '../core/country/country_switch_listener.dart';
 import '../core/logging/error_logger.dart';
 import '../core/language/language_provider.dart';
 import '../core/notifications/notification_launch_listener.dart';
+import '../core/sync/app_resume_sync.dart';
 import '../core/theme/theme_mode_provider.dart';
 import '../features/consumption/presentation/widgets/share_receipt_listener.dart';
 import '../features/consumption/presentation/widgets/trip_recording_banner.dart';
@@ -85,6 +86,10 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
     // coordinator's cross-trigger cooldown absorbs rapid resumes.
     if (state == AppLifecycleState.resumed) {
       unawaited(BackgroundService.onOpportunisticWake());
+      // #3447 — the same free window drives the debounced TankSync pull
+      // (≥15 min since the last completed pass, never while a trip is
+      // recording) and the #3450 init-retry fast path. Never throws.
+      unawaited(AppResumeSync.instance.onAppResumed());
     }
     if (state != AppLifecycleState.paused &&
         state != AppLifecycleState.inactive) {

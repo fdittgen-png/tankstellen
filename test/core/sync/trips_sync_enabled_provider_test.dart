@@ -13,9 +13,10 @@ import 'package:tankstellen/core/sync/trips_sync_enabled_provider.dart';
 
 import '../../fakes/fake_hive_storage.dart';
 
-/// Pins `tripsSyncEnabledProvider` (#1665) — the trajet-sync gate
-/// `A ∧ B ∧ C`: non-anonymous account ∧ cloudSync consent ∧ syncTrips
-/// toggle.
+/// Pins `tripsSyncEnabledProvider` (#1665, re-cut by #3448) — the
+/// trajet-sync gate is `B ∧ C`: cloudSync consent ∧ syncTrips toggle.
+/// The former email requirement (**A**) was dropped: an anonymous UUID is
+/// a full RLS-scoped identity, so consent alone decides.
 class _FakeSyncState extends SyncState {
   _FakeSyncState(this._config);
   final SyncConfig _config;
@@ -45,9 +46,9 @@ void main() {
     return c;
   }
 
-  group('tripsSyncEnabledProvider — gate A ∧ B ∧ C (#1665)', () {
-    test('enabled only when non-anonymous account AND cloudSync AND '
-        'syncTrips are all true', () {
+  group('tripsSyncEnabledProvider — consent-only gate B ∧ C (#3448)', () {
+    test('enabled when cloudSync AND syncTrips are true (email account)',
+        () {
       expect(
         makeContainer(hasEmail: true, cloudSync: true, syncTrips: true)
             .read(tripsSyncEnabledProvider),
@@ -55,13 +56,14 @@ void main() {
       );
     });
 
-    test('an anonymous account (no email) gates off — even with both '
-        'consents granted', () {
+    test('an ANONYMOUS account with both consents granted is enabled — '
+        'the #3448 acceptance criterion', () {
       expect(
         makeContainer(hasEmail: false, cloudSync: true, syncTrips: true)
             .read(tripsSyncEnabledProvider),
-        isFalse,
-        reason: 'trajet sync requires an email-backed account',
+        isTrue,
+        reason: 'an anonymous UUID is a full identity; email only makes it '
+            'portable across devices (#3448 dropped the email gate)',
       );
     });
 
@@ -81,7 +83,7 @@ void main() {
       );
     });
 
-    test('all three off gates off', () {
+    test('everything off gates off', () {
       expect(
         makeContainer(hasEmail: false, cloudSync: false, syncTrips: false)
             .read(tripsSyncEnabledProvider),

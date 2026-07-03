@@ -3,7 +3,27 @@
 
 import '../../features/consumption/domain/entities/fill_up.dart';
 import 'entity_sync.dart';
+import 'sync_isolate_decode.dart';
 import 'sync_transport.dart';
+
+/// #3451 — top-level PURE `compute()` entrypoint (no Hive / plugins /
+/// logging, so it can run on a worker isolate). Behaviour mirrors
+/// [EntitySync.jsonbDataDecoder]: a missing or corrupt `data` blob maps to
+/// `null` and is skipped by the merge (the corrupt count stays observable
+/// through the merge's downloaded-row delta).
+List<FillUp?> decodeFillUpDataRows(List<Map<String, dynamic>> rows) => [
+      for (final row in rows) _decodeFillUpRow(row),
+    ];
+
+FillUp? _decodeFillUpRow(Map<String, dynamic> row) {
+  final data = row['data'];
+  if (data is! Map<String, dynamic>) return null;
+  try {
+    return FillUp.fromJson(data);
+  } catch (_) {
+    return null;
+  }
+}
 
 /// Per-fill-up consumption-log sync with Supabase (#713), pulled out
 /// of [SyncService] (#727). Since #3127 a thin codec config over the
@@ -46,6 +66,8 @@ class FillUpsSync {
       FillUp.fromJson,
       where: 'FillUpsSync.merge decode failed',
     ),
+    // #3451 — big pulls decode off the UI isolate, one compute() per table.
+    decodeBatch: (rows) => BatchDecode.run(rows, decodeFillUpDataRows),
   );
 
   /// Merge [localFillUps] with the user's `fill_ups` rows on

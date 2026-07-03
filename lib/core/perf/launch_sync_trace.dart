@@ -23,8 +23,11 @@ import 'startup_timer.dart';
 ///
 /// While armed, the recorder also taps [SyncRunTrace.tableSink]: the
 /// #3126 per-table counts reported by `EntitySync.merge` during an open
-/// span land in that span's attributes as `pushed` / `pulled` rows. The
-/// launch merges run serially, so window attribution is unambiguous.
+/// span land in that span's attributes as `pushed` / `pulled` rows.
+/// #3450 made the launch pulls PARALLEL, so tapped counts can
+/// misattribute across overlapping spans — every launch span therefore
+/// passes explicit `attributes` (table + pulled), which override the
+/// tapped values on key collision; the tap remains as best-effort colour.
 /// [finish] restores the previous sink and closes the phase with a
 /// `sync_phase_done` span covering the whole launch-sync window.
 class LaunchSyncTrace {

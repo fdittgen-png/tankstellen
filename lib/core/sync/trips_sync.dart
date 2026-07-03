@@ -213,10 +213,10 @@ class TripsSync {
           liveLocal.where((e) => !serverIds.contains(e.id)).toList();
       await _uploadBatch(client, userId, localOnly);
 
-      // Decode server-only rows and return the union — the superset the
-      // app-launch caller persists back to Hive (see
-      // `AppInitializer._runTripsSyncMerge`; #2239 pins this seam).
-      final merged = mergeRows(liveLocal, serverRows, tombstoned: tombstoned);
+      // Decode server-only rows (off the UI isolate, #3451) and return the
+      // union the launch caller persists back to Hive (#2239 pins mergeRows).
+      final merged = await mergeTripRowsOffThread(liveLocal, serverRows,
+          tombstoned: tombstoned);
       debugPrint('TripsSync.merge: local=${liveLocal.length} '
           'server=${serverIds.length} '
           'downloaded=${merged.length - liveLocal.length}');

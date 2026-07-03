@@ -34,11 +34,12 @@ void main() {
       // syncAndPersistIds (favorites + ignored) and syncAndPersistRatings.
       'lib/core/sync/sync_provider.dart':
           'connect-time favorites/ignored/ratings persists',
-      // runTripsSyncMerge repo.save loop + the fill_ups call-site emit
-      // (its persist site lives in the length-frozen
-      // consumption_providers.dart, #3138).
-      'lib/app/startup/launch_sync_phase.dart':
-          'launch trips merge + entity pulls',
+      // #3447 — the pull-matrix thunks: pullTrips repo.save loop, the
+      // baselines box.put loop, and the fill_ups call-site emit (its
+      // persist site lives in the length-frozen consumption_providers.dart,
+      // #3138). Launch, app-resume and "sync now" all replay this list.
+      'lib/app/startup/launch_sync_pulls.dart':
+          'launch/resume/sync-now trips + baselines + fill_ups pulls',
       // _applyMergedAlerts.
       'lib/features/alerts/providers/alert_provider.dart':
           'alerts download persist',
@@ -48,9 +49,9 @@ void main() {
       // _loadAndMerge server-only addItinerary loop.
       'lib/features/itinerary/providers/itinerary_provider.dart':
           'itineraries pull persist',
-      // "sync now": favorites persist + fill_ups call-site emit.
-      'lib/features/sync/providers/data_transparency_provider.dart':
-          'sync-now pulls',
+      // "sync now" (#3447) persists nothing directly anymore — it replays
+      // the registered pull matrix (launch_sync_pulls.dart above), whose
+      // thunks own the emits.
     };
 
     final missing = <String>[];

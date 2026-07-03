@@ -11,12 +11,13 @@ part 'trip_shares_sync_enabled_provider.g.dart';
 ///
 /// Cross-account sharing is a strict superset of the per-account trip
 /// sync gate: you can only share a trip that's syncing in the first
-/// place, and the same `A ∧ B ∧ C` conditions apply (email-backed
-/// account ∧ `cloudSync` consent ∧ `syncTrips` toggle). Rather than
-/// duplicate that logic, this derives from [tripsSyncEnabled] — so a
-/// future change to the trip-sync gate automatically flows through to
-/// the share affordances, and the share Action / "shared with me"
-/// section stay hidden for anonymous or consent-off sessions.
+/// place, and the same conditions apply (`cloudSync` consent ∧
+/// `syncTrips` toggle — #3448 dropped the former email requirement).
+/// Rather than duplicate that logic, this derives from
+/// [tripsSyncEnabled] — so a future change to the trip-sync gate
+/// automatically flows through to the share affordances, and the share
+/// Action / "shared with me" section stay hidden for consent-off
+/// sessions.
 @riverpod
 bool tripSharesSyncEnabled(Ref ref) {
   // Degrade to "sharing unavailable" if the trip-sync gate can't be

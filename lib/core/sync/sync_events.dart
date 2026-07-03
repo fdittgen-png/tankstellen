@@ -17,6 +17,23 @@ abstract final class SyncTables {
   static const String alerts = 'alerts';
   static const String vehicles = 'vehicles';
   static const String fillUps = 'fill_ups';
+  static const String obd2Baselines = 'obd2_baselines';
+
+  /// Every synced table a pull path can write locally — the #3447 pull
+  /// matrix. `test/core/sync/sync_pull_matrix_test.dart` asserts launch,
+  /// app-resume and "sync now" all cover exactly this set; extend it when
+  /// a new synced table lands (HARD RULE #5 applies to the table itself).
+  static const List<String> all = [
+    favorites,
+    ignoredStations,
+    stationRatings,
+    tripSummaries,
+    itineraries,
+    alerts,
+    vehicles,
+    fillUps,
+    obd2Baselines,
+  ];
 }
 
 /// One "a sync pull wrote rows into local storage" notification (#3446).

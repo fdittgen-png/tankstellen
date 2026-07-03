@@ -33,7 +33,7 @@
   "consentSyncTripsTitle": "Fahrtaufzeichnungen synchronisieren",
   "consentSyncTripsSubtitle": "OBD2- und GPS-Fahrten in TankSync sichern. Geräteübergreifend, opt-in.",
   "consentSyncTripsDisabledHint": "Cloud-Sync oben aktivieren, um Fahrten zu sichern.",
-  "consentSyncTripsNeedsEmailHint": "Mit einem E-Mail-Konto anmelden, um Fahrten geräteübergreifend zu synchronisieren.",
+  "consentSyncTripsAnonymousHint": "Fahrten werden unter dem anonymen Konto dieses Geräts gesichert. Mit E-Mail anmelden, um sie von anderen Geräten zu erreichen.",
   "consentHideDetails": "Details ausblenden",
   "consentShowDetails": "Details anzeigen",
   "dialogOk": "OK",

@@ -10,6 +10,7 @@ import '../data/storage_repository.dart';
 import '../storage/storage_providers.dart';
 import 'community_config.dart';
 import 'supabase_client.dart';
+import 'sync_auth_types.dart';
 import 'sync_config.dart';
 import 'favorites_sync.dart';
 import 'ignored_stations_sync.dart';
@@ -19,45 +20,12 @@ import 'sync_run_trace.dart';
 import 'user_data_sync.dart';
 import '../../core/logging/error_logger.dart';
 
+// #3449 — the seam typedefs + EmailAuthResult moved to sync_auth_types.dart
+// (this file sits at the 400-line cap); re-exported so existing imports
+// keep resolving.
+export 'sync_auth_types.dart';
+
 part 'sync_provider.g.dart';
-
-/// Signature for a sync-merge that takes the device's local ids and
-/// returns the union (server ∪ local) — exactly the shape of
-/// [FavoritesSync.merge] / [IgnoredStationsSync.merge]. Injected as a
-/// seam so the pull-persist wiring (#3076) is unit-testable without a
-/// live Supabase session.
-typedef IdMergeFn = Future<List<String>> Function(List<String> localIds);
-
-/// Signature for a ratings fetch returning the server's
-/// `stationId → rating` map — the shape of [RatingsSync.fetchAll].
-/// Injected as a seam so the ratings pull-persist wiring (#3077) is
-/// unit-testable without a live Supabase session (the real fetch
-/// returns an empty map when unauthenticated, masking the wiring).
-typedef RatingsFetchFn = Future<Map<String, int>> Function();
-
-/// Signature for an email auth call (sign-up / sign-in / anonymous-upgrade)
-/// returning the resulting user id (or `null`). Mirrors the static
-/// `TankSyncClient.*` methods so the auth-branch selection in
-/// [SyncState.signInWithEmail] is unit-testable without a live Supabase
-/// session — the same seam shape #3076 introduced with [IdMergeFn].
-typedef EmailAuthFn = Future<String?> Function(String email, String password);
-
-/// Outcome of an email auth attempt, so the UI can distinguish a completed
-/// sign-in from an anonymous upgrade whose email change is still
-/// **pending server-side confirmation** (#3079). The UUID is already the
-/// user's in every case, so data is never orphaned.
-enum EmailAuthResult {
-  /// Auth completed and the session now carries the email.
-  completed,
-
-  /// The anonymous account was upgraded in place but the server requires
-  /// the user to click a confirmation link before the email is active.
-  /// Their data is already safe under the unchanged UUID.
-  confirmationPending,
-
-  /// No user id came back (e.g. client not initialised) — nothing changed.
-  failed,
-}
 
 /// Manages the cloud sync connection state.
 ///
@@ -215,6 +183,23 @@ class SyncState extends _$SyncState {
     return pending
         ? EmailAuthResult.confirmationPending
         : EmailAuthResult.completed;
+  }
+
+  /// #3449 — the launch identity guard found a stored `sync_user_id` with
+  /// no live session: surface the relink-required state so sync settings
+  /// can guide the user (email sign-in re-links; "start fresh" knowingly
+  /// abandons the old UUID via [switchToAnonymous]). Both of those paths
+  /// construct a fresh [SyncConfig], which clears the flag again.
+  void markRelinkRequired() {
+    state = SyncConfig(
+      enabled: state.enabled,
+      supabaseUrl: state.supabaseUrl,
+      supabaseAnonKey: state.supabaseAnonKey,
+      userId: state.userId,
+      mode: state.mode,
+      userEmail: state.userEmail,
+      relinkRequired: true,
+    );
   }
 
   /// Switch from email account back to anonymous.

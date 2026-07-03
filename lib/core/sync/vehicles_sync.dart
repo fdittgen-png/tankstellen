@@ -3,7 +3,25 @@
 
 import '../domain/vehicle_profile.dart';
 import 'entity_sync.dart';
+import 'sync_isolate_decode.dart';
 import 'sync_transport.dart';
+
+/// #3451 — top-level PURE `compute()` entrypoint (no Hive / plugins /
+/// logging, so it can run on a worker isolate). Behaviour mirrors
+/// [EntitySync.jsonbDataDecoder]: a missing or corrupt `data` blob maps to
+/// `null` and is skipped by the merge.
+List<VehicleProfile?> decodeVehicleDataRows(List<Map<String, dynamic>> rows) =>
+    [for (final row in rows) _decodeVehicleRow(row)];
+
+VehicleProfile? _decodeVehicleRow(Map<String, dynamic> row) {
+  final data = row['data'];
+  if (data is! Map<String, dynamic>) return null;
+  try {
+    return VehicleProfile.fromJson(data);
+  } catch (_) {
+    return null;
+  }
+}
 
 /// Per-vehicle profile sync with Supabase (#713), pulled out of
 /// [SyncService] (#727). Since #3127 a thin codec config over the
@@ -44,6 +62,8 @@ class VehiclesSync {
       VehicleProfile.fromJson,
       where: 'VehiclesSync.merge decode failed',
     ),
+    // #3451 — big pulls decode off the UI isolate, one compute() per table.
+    decodeBatch: (rows) => BatchDecode.run(rows, decodeVehicleDataRows),
   );
 
   /// Merge [localVehicles] with the user's `vehicles` rows on

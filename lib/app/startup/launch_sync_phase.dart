@@ -5,37 +5,48 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 
 import '../../core/data/storage_repository.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/perf/launch_sync_trace.dart';
-import '../../core/storage/hive_boxes.dart';
+import '../../core/storage/hive_storage.dart';
+import '../../core/sync/app_resume_sync.dart';
 import '../../core/sync/supabase_client.dart';
-import '../../core/sync/sync_events.dart';
 import '../../core/sync/sync_provider.dart';
-import '../../core/sync/trips_sync.dart';
-import '../../core/sync/trips_sync_enabled_provider.dart';
-import '../../features/alerts/providers/alert_provider.dart';
-import '../../features/consumption/data/trip_history_repository.dart';
-import '../../features/consumption/providers/consumption_providers.dart';
+import '../../core/sync/sync_pull_coordinator.dart';
+import '../../core/sync/sync_run_trace.dart';
+import '../../core/sync/tanksync_init.dart';
+import '../../core/sync/tanksync_init_retry.dart';
+import '../../features/consumption/providers/trip_recording_provider.dart';
 import '../../features/feature_management/application/feature_flags_provider.dart';
 import '../../features/feature_management/domain/feature.dart';
-import '../../features/vehicle/providers/vehicle_providers.dart';
+import 'launch_sync_pulls.dart';
 
-/// Launch-time server→local sync merges — extracted from `AppInitializer`
-/// by the #3139 phase decomposition.
+/// Launch-time server→local sync — extracted from `AppInitializer` by the
+/// #3139 phase decomposition, re-architected around the #3447
+/// [SyncPullCoordinator]:
+///
+///  1. [registerPulls] installs the full pull matrix (every synced table,
+///     see [LaunchSyncPulls.buildEntries]) plus the master gate
+///     (client-ready ∧ `sync_enabled`) into the app-wide coordinator;
+///  2. [runLaunchPulls] replays it — all tables in PARALLEL (#3450: one
+///     failing or hung table never blocks the rest; wall-clock ≈ the
+///     slowest pull), each spanned on the #3445 launch trace;
+///  3. [handleInitOutcome] reacts to the TankSync init result: the #3449
+///     relink-required state surfaces to the sync settings, a failed /
+///     timed-out init arms the #3450 background retry ladder whose late
+///     success replays the same pulls;
+///  4. [wireResumeSync] hands the #3447 app-resume trigger its app-layer
+///     callbacks (the recording-active guard reads
+///     `tripRecordingProvider`, which core must not import).
 ///
 /// ## Ordering contract (#3139)
 ///
-/// `AppInitializer.run()` awaits both merges inside the SAME
-/// post-first-frame closure as `CommunityConfig.load()` and the TankSync
-/// init, strictly AFTER both: the merges read `TankSyncClient.client`,
-/// and they must also follow the #3126 `SyncRunTrace.begin('launch')`
-/// mint so the per-table sync counts thread under one run id.
-/// [runTripsSyncMerge] runs BEFORE [runEntitySyncMerge], preserving the
-/// pre-decomposition order (the trips merge predates the entity pulls
-/// and the entity pass piggybacks on its no-op guards being warm).
+/// `AppInitializer.run()` drives 1→4 inside the SAME post-first-frame
+/// closure as `CommunityConfig.load()` and the TankSync init, strictly
+/// after both — the pulls read `TankSyncClient.client`, and they must
+/// follow the #3126 `SyncRunTrace.begin('launch')` mint so the per-table
+/// sync counts thread under one run id.
 ///
 /// Every failure is caught and routed through [errorLogger]
 /// (`ErrorLayer.sync`); nothing in this phase may block or crash the
@@ -63,139 +74,101 @@ class LaunchSyncPhase {
             .contains(Feature.startupTrace),
       );
 
-  /// #1541 — on app launch, merge local trip summaries with the
-  /// server's `trip_summaries` rows so cross-device entries land in
-  /// the user's history without needing a manual sync gesture. Heavy
-  /// `trip_details` rows older than 90 days are pruned in the same
-  /// pass.
-  ///
-  /// No-ops cleanly when:
-  /// - TankSync isn't initialised (the user opted out or init
-  ///   timed out above), or
-  /// - the `obd2_trip_history` Hive box isn't open, or
-  /// - the user isn't authenticated (the `TripsSync` methods
-  ///   themselves short-circuit on null user id).
-  ///
-  /// Failures are caught + logged. The merge result tolerates a
-  /// missing server row — `TripsSync.merge` returns the input
-  /// unchanged on error so a transient network blip never costs the
-  /// user their local history view.
-  static Future<void> runTripsSyncMerge(
-    ProviderContainer container, {
-    LaunchSyncTrace? trace,
-  }) async {
-    // #1794 — `obd2TripHistory` is a deferred box; wait for the
-    // post-first-frame opens before reading it.
-    await HiveBoxes.initDeferred();
-    if (!_clientReady) return;
-    if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
-    // #1665 — gate the launch-time merge on the trajet-sync gate so an
-    // anonymous session no longer downloads / heals trip rows.
-    if (!container.read(tripsSyncEnabledProvider)) return;
-    var saved = 0;
-    await LaunchSyncTrace.spanned(trace, 'trips_merge', () async {
-      try {
-        final repo = TripHistoryRepository(
-          box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-        );
-        final local = repo.loadAll();
-        final localIds = local.map((e) => e.id).toSet();
-        final merged = await TripsSync.merge(local);
-        // Persist server-only entries — those whose ids weren't in the
-        // local set before the merge. The summaries-only blob lands now;
-        // the heavy samples + gpsd payload arrives via the trip-detail
-        // screen's lazy fetch on first open.
-        for (final entry in merged) {
-          if (localIds.contains(entry.id)) continue;
-          await repo.save(entry);
-          saved++;
-        }
-        // Retention pass — drop server-side detail blobs that have
-        // aged past the default 90-day window so the per-user storage
-        // budget stays bounded.
-        await TripsSync.pruneOldDetails();
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-            context: {'where': 'runTripsSyncMerge'}));
-      }
-      // #3446 — the pulled summaries are in Hive now; refresh the trip
-      // history UI. Emitted even when the catch above fired (whatever
-      // was saved before the failure IS persisted).
-      SyncEvents.instance
-          .emit(SyncTableChanged(SyncTables.tripSummaries, saved));
-    }, attributes: () => {'table': SyncTables.tripSummaries, 'pulled': saved});
+  /// Install the #3447 pull matrix into [SyncPullCoordinator.instance].
+  /// Idempotent (re-registration replaces the list); cheap (no I/O), so it
+  /// runs BEFORE the TankSync init — a "sync now" tap can never observe an
+  /// empty registry.
+  static void registerPulls(
+    ProviderContainer container,
+    StorageRepository storage,
+  ) {
+    SyncPullCoordinator.instance.register(
+      enabled: () =>
+          _clientReady && container.read(syncStateProvider).enabled,
+      entries: LaunchSyncPulls.buildEntries(container, storage),
+    );
   }
 
-  /// #3077 — on app launch, pull the remaining server→local entities into
-  /// local storage so cross-device rows land without a manual sync
-  /// gesture. TankSync was upload-only for these: the download branch
-  /// existed in each `*_sync.dart` but had no connect/launch caller
-  /// (fill-ups + vehicles), its return was discarded (ratings), or it only
-  /// fired on a local edit (alerts). The per-entity pull-persist seams are
-  /// the unit-tested units; this method is the launch-time glue.
-  ///
-  /// Consent gates (conservative — never pull data the user hasn't
-  /// consented to):
-  /// - **ratings / alerts** ride the master TankSync consent — they pull
-  ///   whenever `sync_enabled` is set (the same gate the existing
-  ///   favorites/ignored pull and the alert-mutation pull already use).
-  /// - **fill-ups / vehicles** are trip-data adjacent (fill-ups carry
-  ///   linked trajet ids + OBD2-derived consumption; a vehicle profile is
-  ///   the anchor trips attach to), so they ride the stricter trip-sync
-  ///   gate (`tripsSyncEnabledProvider` = email ∧ cloudSync ∧ syncTrips).
-  ///
-  /// No-ops cleanly when TankSync isn't initialised or the user is signed
-  /// out. Each entity is independently error-protected AND time-budgeted
-  /// (#3128) so one failing or hung pull never blocks the others.
-  static Future<void> runEntitySyncMerge(
-    ProviderContainer container,
-    StorageRepository storage, {
+  /// Replay the registered pull matrix (#3450: parallel, per-table
+  /// timeouts, per-table error isolation). No-ops cleanly when TankSync
+  /// isn't initialised or sync is disabled — the coordinator's master gate
+  /// returns before any span begins.
+  static Future<void> runLaunchPulls(
+    ProviderContainer container, {
     LaunchSyncTrace? trace,
-  }) async {
-    if (!_clientReady) return;
-    if (!container.read(syncStateProvider).enabled) return;
+  }) =>
+      SyncPullCoordinator.instance.pullAll(trace: trace);
 
-    // ratings + alerts ride the master consent; fill-ups + vehicles are
-    // trip-data adjacent and ride the stricter trip-sync gate. Keys are
-    // the Supabase table names — they double as the #3445 span names.
-    final tripData = container.read(tripsSyncEnabledProvider);
-    final pulls = <String, Future<int> Function()>{
-      SyncTables.stationRatings: () => container
-          .read(syncStateProvider.notifier)
-          .syncAndPersistRatings(storage),
-      SyncTables.alerts: () =>
-          container.read(alertProvider.notifier).pullFromServer(),
-      if (tripData)
-        SyncTables.vehicles: () => container
-            .read(vehicleProfileListProvider.notifier)
-            .pullFromServer(),
-      if (tripData)
-        SyncTables.fillUps: () =>
-            container.read(fillUpListProvider.notifier).pullFromServer(),
-    };
-    for (final entry in pulls.entries) {
-      var pulled = 0;
-      await LaunchSyncTrace.spanned(trace, entry.key, () async {
+  /// React to [TankSyncInit.lastOutcome] after the (timeout-bounded) init:
+  ///
+  ///  * `relinkRequired` → mark the #3449 state on [syncStateProvider] so
+  ///    sync settings surface the re-link guidance;
+  ///  * `failed` / still-pending (the 8 s timeout abandoned the future) →
+  ///    arm the #3450 retry ladder (30 s → 5 min backoff, max 5, plus the
+  ///    app-resume fast path). A late success mints a fresh sync-run id
+  ///    and replays the launch pulls;
+  ///  * `ready` / `notConfigured` → nothing to do.
+  static void handleInitOutcome(
+    ProviderContainer container,
+    HiveStorage storage,
+  ) {
+    final outcome = TankSyncInit.lastOutcome;
+    if (outcome == TankSyncInitOutcome.ready ||
+        outcome == TankSyncInitOutcome.notConfigured) {
+      return;
+    }
+    if (outcome == TankSyncInitOutcome.relinkRequired) {
+      _markRelinkRequired(container);
+      return;
+    }
+    TankSyncInitRetry.instance.arm(
+      attempt: () async {
+        // The orphaned first init may have finished in the background —
+        // a live session means there is nothing left to retry.
+        if (TankSyncClient.isConnected) return TankSyncInitOutcome.ready;
         try {
-          pulled = await entry.value().timeout(const Duration(seconds: 15));
-        } on TimeoutException catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: {
-            'where': 'entity pull timed out',
-            'entity': entry.key,
-          }));
-        } catch (e, st) {
-          unawaited(errorLogger.log(ErrorLayer.sync, e, st,
-              context: {'where': 'entity pull FAILED', 'entity': entry.key}));
+          return await TankSyncInit.run(storage)
+              .timeout(const Duration(seconds: 8));
+        } on TimeoutException {
+          return TankSyncInitOutcome.failed;
         }
-      }, attributes: () => {'table': entry.key, 'pulled': pulled});
-      // #3446 — fill-ups' persist site (`FillUpList.mergeFrom`) lives in
-      // the length-frozen consumption_providers.dart (#3138), so its
-      // pull emits at this call site; every OTHER entity emits at its
-      // persist site (ratings in SyncState, alerts/vehicles in their
-      // notifiers).
-      if (entry.key == SyncTables.fillUps) {
-        SyncEvents.instance.emit(SyncTableChanged(entry.key, pulled));
-      }
+      },
+      onReady: () async {
+        // #3126 — the late launch pulls thread under their own run id.
+        SyncRunTrace.begin('launch-retry');
+        await runLaunchPulls(container);
+      },
+      onRelinkRequired: () => _markRelinkRequired(container),
+    );
+  }
+
+  /// Configure the #3447 app-resume sync trigger. The recording-active
+  /// guard is `tripRecordingProvider.isActive` — the same signal the
+  /// persistent recording banner uses, covering OBD2, paused,
+  /// dropped-link and GPS-degraded trips alike.
+  static void wireResumeSync(ProviderContainer container) {
+    AppResumeSync.instance.configure(
+      recordingActive: () {
+        try {
+          return container.read(tripRecordingProvider).isActive;
+        } catch (e, st) {
+          // Provider-wiring fault — assume no recording (a pull is safe;
+          // silently never syncing again is not) and make it visible.
+          unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {
+            'where': 'AppResumeSync recording guard read failed'
+          }));
+          return false;
+        }
+      },
+    );
+  }
+
+  static void _markRelinkRequired(ProviderContainer container) {
+    try {
+      container.read(syncStateProvider.notifier).markRelinkRequired();
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'markRelinkRequired'}));
     }
   }
 }

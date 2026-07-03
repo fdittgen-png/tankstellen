@@ -38,6 +38,14 @@ class SyncConfig {
   final SyncMode mode;
   final String? userEmail;
 
+  /// #3449 — the launch identity guard found a stored [userId] but no live
+  /// session. While `true`, sync runs signed-out (pulls no-op) and the sync
+  /// settings surface re-link guidance: an email sign-in re-links the same
+  /// identity, or an explicit "start fresh" knowingly abandons the old UUID
+  /// (both construct a new [SyncConfig], clearing the flag). Never persisted
+  /// — it is re-derived at every launch.
+  final bool relinkRequired;
+
   const SyncConfig({
     this.enabled = false,
     this.supabaseUrl,
@@ -45,6 +53,7 @@ class SyncConfig {
     this.userId,
     this.mode = SyncMode.none,
     this.userEmail,
+    this.relinkRequired = false,
   });
 
   /// Whether all required fields are present to attempt a connection.

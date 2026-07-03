@@ -1,0 +1,30 @@
+{
+  "syncRelinkTitle": "Cloud sync needs re-linking",
+  "@syncRelinkTitle": {
+    "description": "Warning tile title in the TankSync settings section when a stored sync identity has no active session anymore (#3449)."
+  },
+  "syncRelinkBody": "This device's saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.",
+  "@syncRelinkBody": {
+    "description": "Explanatory body under the relink warning tile (#3449)."
+  },
+  "syncRelinkSignInAction": "Sign in to re-link",
+  "@syncRelinkSignInAction": {
+    "description": "Primary button that opens the email auth screen to restore the stored sync identity (#3449)."
+  },
+  "syncRelinkStartFreshAction": "Start fresh",
+  "@syncRelinkStartFreshAction": {
+    "description": "Secondary button that knowingly abandons the old sync identity and creates a new anonymous one (#3449)."
+  },
+  "syncRelinkStartFreshTitle": "Start fresh?",
+  "@syncRelinkStartFreshTitle": {
+    "description": "Confirmation dialog title before abandoning the old sync identity (#3449)."
+  },
+  "syncRelinkStartFreshBody": "A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.",
+  "@syncRelinkStartFreshBody": {
+    "description": "Confirmation dialog body explaining the consequence of abandoning the old sync identity (#3449)."
+  },
+  "syncRelinkStartFreshConfirm": "Start fresh",
+  "@syncRelinkStartFreshConfirm": {
+    "description": "Destructive confirm button of the start-fresh dialog (#3449)."
+  }
+}

@@ -373,11 +373,14 @@ const _featurePairBaseline = <String, int>{
   'station_detail -> search': 8,
   'station_detail -> sync': 1,
   'station_services -> station_detail': 1,
-  'sync -> alerts': 3,
-  'sync -> consumption': 3,
-  'sync -> favorites': 2,
+  // #3447 — data_transparency's "sync now" replays the app-layer pull
+  // registry instead of importing the feature notifiers directly; the
+  // remaining counts are link_device_provider's.
+  'sync -> alerts': 2,
+  'sync -> consumption': 2,
+  'sync -> favorites': 1,
   'sync -> feature_management': 2,
-  'sync -> vehicle': 2,
+  'sync -> vehicle': 1,
   'vehicle -> consumption': 12,
   'vehicle -> profile': 1,
   'widget -> price_history': 2,

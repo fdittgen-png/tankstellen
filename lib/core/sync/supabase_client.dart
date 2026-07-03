@@ -193,10 +193,17 @@ class TankSyncClient {
   }
 
   /// Sign out and reset the initialisation flag so [init] can be called again.
+  ///
+  /// #3449 — safe to call while ALREADY signed out (the relink-required
+  /// "start fresh" path runs `switchToAnonymous` on a sessionless client):
+  /// the SDK's `signOut` throws on a missing session, so it is skipped and
+  /// only the init flag is reset.
   static Future<void> signOut() async {
     final c = client;
     if (c == null) return;
-    await c.auth.signOut();
+    if (c.auth.currentSession != null) {
+      await c.auth.signOut();
+    }
     _initialized = false;
   }
 }
