@@ -158,6 +158,47 @@ class OcrTraceAnchor {
       };
 }
 
+/// One spatial label→value pairing decision of the receipt parser
+/// (#3458): which label box claimed which value box, and which rule
+/// fired (`row-overlap`, `unit-suffix`, `vat-row-excluded`,
+/// `net-row-excluded`, `rejected-out-of-range`).
+@immutable
+class OcrTracePairing {
+  final String field;
+  final String labelText;
+
+  /// Label box as `[left, top, right, bottom]` in the normalized frame.
+  final List<double> labelBox;
+  final String valueText;
+
+  /// Value box as `[left, top, right, bottom]` in the normalized frame.
+  final List<double> valueBox;
+
+  /// Which pairing rule fired.
+  final String rule;
+  final double? value;
+
+  const OcrTracePairing({
+    required this.field,
+    required this.labelText,
+    required this.labelBox,
+    required this.valueText,
+    required this.valueBox,
+    required this.rule,
+    this.value,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'field': field,
+        'labelText': labelText,
+        'labelBox': labelBox,
+        'valueText': valueText,
+        'valueBox': valueBox,
+        'rule': rule,
+        if (value != null) 'value': value,
+      };
+}
+
 /// One magnitude-fallback bucket decision for a leftover numeric.
 @immutable
 class OcrTraceFallback {

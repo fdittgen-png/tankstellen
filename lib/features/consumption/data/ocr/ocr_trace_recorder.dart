@@ -71,6 +71,7 @@ class OcrTraceRecorder {
   final List<OcrTraceClassification> _classification = [];
   final List<OcrTraceAssembledLabel> _assembled = [];
   final List<OcrTraceAnchor> _anchors = [];
+  final List<OcrTracePairing> _pairings = [];
   final List<OcrTraceFallback> _fallbacks = [];
   OcrTraceCrossCheck? _crossCheck;
   OcrTraceConfidence? _confidence;
@@ -177,6 +178,16 @@ class OcrTraceRecorder {
       _stages.add(OcrTraceStage.anchor);
     }
     _anchors.addAll(candidates);
+  }
+
+  /// Record one spatial label→value pairing decision (#3458): the label
+  /// box, the value box it claimed, and the rule that fired. Logged
+  /// under the anchor stage — pairing IS the receipt parser's anchoring.
+  void pairing(OcrTracePairing decision) {
+    if (_stages.isEmpty || _stages.last != OcrTraceStage.anchor) {
+      _stages.add(OcrTraceStage.anchor);
+    }
+    _pairings.add(decision);
   }
 
   /// Record one magnitude-fallback bucket decision.
@@ -339,6 +350,7 @@ class OcrTraceRecorder {
         classification: List.unmodifiable(_classification),
         assembledLabels: List.unmodifiable(_assembled),
         anchors: List.unmodifiable(_anchors),
+        pairings: List.unmodifiable(_pairings),
         magnitudeFallback: List.unmodifiable(_fallbacks),
         crossCheck: _crossCheck,
         confidence: _confidence,
