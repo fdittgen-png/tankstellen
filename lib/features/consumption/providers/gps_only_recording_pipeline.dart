@@ -20,6 +20,7 @@ import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/services/imu_event_detector.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_trip_wal.dart';
+import 'gps_sample_diagnostics_recorder.dart';
 import 'motion_gated_gps_source.dart';
 import 'recording_pipeline.dart';
 import 'trip_recording_phase.dart';
@@ -34,19 +35,12 @@ import 'trip_recording_state.dart';
 /// summary carries `kind: TripKind.gpsOnly` so downstream surfaces
 /// (confidence-tier badge, recording-screen redesign) can adapt.
 ///
-/// ## What this owns (moved off the notifier verbatim)
+/// Owns (moved off the notifier verbatim): the [TripRecorder], the
+/// Geolocator [StreamSubscription], the raw [TripSample] buffer +
+/// trip-start timestamp, the per-fix ingest ([_onPosition]), and the
+/// stop path (summary build, #2080 GPS-fuel imputation, persist).
 ///
-///   * the [TripRecorder] accumulator,
-///   * the Geolocator position [StreamSubscription],
-///   * the raw [TripSample] buffer + the trip-start timestamp,
-///   * the per-fix ingest ([_onPosition]) that synthesises a sample,
-///     feeds the recorder, and publishes the live reading + GPS coaching
-///     hint, and
-///   * the stop path that builds the final summary, runs the #2080
-///     GPS-fuel imputation, and persists.
-///
-/// ## What it deliberately does NOT own
-///
+/// Deliberately NOT owned:
 /// Publishing the notifier's Riverpod `state`, the last-trip identity
 /// fields, and the shared `_saveToHistory` write stay on the notifier and
 /// are reached through the injected [RecordingPipelineHost] — exactly the
@@ -58,13 +52,19 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     required Ref ref,
     required RecordingPipelineHost host,
     GpsOnlyTripWal? wal, // #3248 — injectable for tests
+    GpsSampleDiagnosticsRecorder? gpsDiagnostics, // #3253 — injectable
   })  : _ref = ref,
         _host = host,
-        _wal = wal ?? GpsOnlyTripWal();
+        _wal = wal ?? GpsOnlyTripWal(),
+        _gpsDiagnostics = gpsDiagnostics ?? GpsSampleDiagnosticsRecorder();
 
   final Ref _ref;
   final RecordingPipelineHost _host;
   final GpsOnlyTripWal _wal; // #3248 — write-ahead log
+
+  // #3253 — per-fix cadence diagnostics (#1458), OBD2 parity: lights up
+  // the trip-detail GpsDiagnosticsCard for GPS-only trips too.
+  final GpsSampleDiagnosticsRecorder _gpsDiagnostics;
 
   @override
   bool get isGpsOnly => true;
@@ -132,6 +132,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
     );
     _samples.clear();
+    _gpsDiagnostics.clear(); // #3253
     _startedAt = DateTime.now();
     _host.lastTripStartedAt = DateTime.now();
     _host.lastTripVehicleId = _host.readActiveVehicleId();
@@ -220,6 +221,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
     _samples.add(sample);
+    // #3253 — fix-clock cadence diagnostic (OS batching stays visible).
+    _gpsDiagnostics.record(now: p.timestamp);
     // #2760 — feed the latest GPS ground speed to the IMU detector so its
     // min-speed gate and accel-vs-brake direction classification track the
     // real vehicle speed (the inertial stream alone has no speed).
@@ -357,10 +360,13 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       summary,
       samples: samples,
       automatic: automatic,
+      // #3253 — #1458 cadence diagnostics, OBD2 parity.
+      gpsSampleDiagnostics: _gpsDiagnostics.snapshot,
       gpsFixCount: samples.length,
     );
     _recorder = null;
     _samples.clear();
+    _gpsDiagnostics.clear();
     _startedAt = null;
     _estimateFolder = null;
     _host.state = const TripRecordingState();

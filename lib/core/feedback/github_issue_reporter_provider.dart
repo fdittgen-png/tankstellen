@@ -16,9 +16,11 @@ part 'github_issue_reporter_provider.g.dart';
 /// by the bad-scan reporter. The token is never logged and never sent
 /// anywhere except `api.github.com` via [GithubIssueReporter].
 ///
-/// TODO(#952 phase 3): add a settings UI that lets the user paste a
-/// token + a consent dialog before we make any API call. Until then
-/// the token is always null and the reporter falls back to SharePlus.
+/// #952 phase 3 (settings UI + consent) SHIPPED in PR #997 — this key
+/// is written/cleared by `FeedbackTokenSection` (profile screen, behind
+/// `Feature.developerPatToken`), and `FeedbackConsentDialog` gates every
+/// API call in `BadScanReportSheet`. No token stored → the reporter
+/// resolves to null and the UI falls back to SharePlus (#3271).
 const String kGithubFeedbackTokenKey = 'gh_feedback_token';
 
 /// Hard-coded target repository for bad-scan reports. The OCR-failure

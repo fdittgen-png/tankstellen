@@ -117,6 +117,23 @@ class TripRecordingPipPriceLayout extends StatelessWidget {
             ),
           ),
         ],
+        // #3257 pt2 — price-freshness disclosure on the PiP radar surface:
+        // a corridor-cached lead price can be up to 1 h old in polled
+        // countries with no signal that it is. Same upstream `updatedAt`
+        // string + `stationUpdatedLabel` key the search cards use. Omitted
+        // when the country's API sends no timestamp.
+        if (station.updatedAt != null && station.updatedAt!.isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(
+            l.stationUpdatedLabel(station.updatedAt!),
+            style: TextStyle(
+              color: foregroundColor.withValues(alpha: 0.7),
+              fontSize: 11,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ],
     );
 

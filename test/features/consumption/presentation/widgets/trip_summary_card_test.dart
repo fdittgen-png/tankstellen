@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
+import 'package:tankstellen/features/consumption/presentation/widgets/distance_source_badge.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trip_summary_card.dart';
 import 'package:tankstellen/features/consumption/providers/trip_fuel_cost_provider.dart';
@@ -524,6 +525,54 @@ void main() {
       );
 
       expect(find.text('Fuel cost'), findsNothing);
+    });
+  });
+
+  group('TripSummaryCard — distance provenance badge (#3253)', () {
+    testWidgets('a virtual-source trip marks its distance as Estimated',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(), // distanceSource defaults to 'virtual'
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      expect(find.byType(DistanceSourceBadge), findsOneWidget);
+      expect(find.text('Estimated'), findsOneWidget);
+    });
+
+    testWidgets('a gps-source trip marks its distance as GPS track',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(distanceSource: 'gps'),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      expect(find.text('GPS track'), findsOneWidget);
+    });
+
+    testWidgets('a real-odometer trip marks its distance as Odometer',
+        (tester) async {
+      await pumpApp(
+        tester,
+        TripSummaryCard(
+          entry: _entry(distanceSource: 'real'),
+          vehicle: _vehicle,
+          samples: const [],
+          isEv: false,
+        ),
+      );
+
+      expect(find.text('Odometer'), findsOneWidget);
     });
   });
 }

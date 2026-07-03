@@ -4504,6 +4504,27 @@ class AppLocalizationsSv extends AppLocalizations {
   String get startupTraceExportFailure => 'Couldn\'t export the startup trace.';
 
   @override
+  String get distanceSourceOdometer => 'Odometer';
+
+  @override
+  String get distanceSourceOdometerTooltip =>
+      'Distance read from the car\'s odometer — a measured ground truth.';
+
+  @override
+  String get distanceSourceGps => 'GPS track';
+
+  @override
+  String get distanceSourceGpsTooltip =>
+      'Distance summed from the recorded GPS track — true road distance.';
+
+  @override
+  String get distanceSourceEstimated => 'Estimated';
+
+  @override
+  String get distanceSourceEstimatedTooltip =>
+      'Distance integrated from the speed sensor — an estimate; the sensor typically over-reads slightly.';
+
+  @override
   String get insightCardTitle => 'Mest slösaktiga beteenden';
 
   @override

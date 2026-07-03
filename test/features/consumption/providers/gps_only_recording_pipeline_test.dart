@@ -376,6 +376,31 @@ void main() {
       expect(harness.pipeline.onAppBackgrounded, returnsNormally);
     });
 
+    test(
+        '#3253 — stop() persists one #1458 cadence diagnostic per fix '
+        '(the GPS-only pipeline used to pass none)', () async {
+      final harness = _Harness();
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+
+      final t0 = DateTime(2026, 5, 29, 8);
+      for (var i = 0; i < 3; i++) {
+        harness.geo.emit(_pos(43.4 + i * 0.001, 3.5,
+            speedMps: 20.0, at: t0.add(Duration(seconds: i))));
+        await _pump();
+      }
+      await harness.pipeline.stop();
+
+      final diags = harness.host.saved.single.gpsSampleDiagnostics;
+      expect(diags, hasLength(3),
+          reason: 'one cadence diagnostic per GPS fix must reach '
+              'saveToHistory — RED before #3253 (always const [])');
+      // Stamped with the fix's own clock, monotonic per-trip indices.
+      expect(diags.map((d) => d.timestamp),
+          [for (var i = 0; i < 3; i++) t0.add(Duration(seconds: i))]);
+      expect(diags.map((d) => d.index), [0, 1, 2]);
+    });
+
     test('stopping a moving GPS-only trip is safe when the active-vehicle '
         'read throws (#2228)', () async {
       final harness = _Harness(vehicleProviderThrows: true);

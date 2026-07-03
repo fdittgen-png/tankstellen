@@ -122,6 +122,13 @@ class TripGpsStreamController {
             // momentarily absent. The controller latches it as a fallback;
             // the OBD2 speed always wins when present.
             speedKmh: pos.speed * 3.6,
+            // #3253 — forward the fix's OWN timestamp. The controller used
+            // to stamp fixes with its arrival clock, so an Android batched
+            // burst (many fixes, one delivery instant) collapsed every Δt
+            // to ~0 — the #3004 decimation kept all of them and the #2963
+            // teleport gate never fired. The GPS-only pipeline already
+            // trusts `p.timestamp`; this aligns the OBD2 path.
+            fixAt: pos.timestamp,
           );
           // #1458 phase 2 — record one cadence-diagnostic per fix so the
           // user can see, post-trip, whether the OS kept delivering

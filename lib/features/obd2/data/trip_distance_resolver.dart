@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../core/telemetry/health_counters.dart';
 import '../../consumption/domain/gps_track_distance.dart';
 import 'trip_distance_source.dart';
 import 'virtual_odometer.dart';
@@ -292,6 +293,46 @@ class TripDistanceResolver {
   /// straight through.
   List<VirtualOdometerSample> get debugSpeedSamples =>
       List.unmodifiable(_speedSamples);
+
+  /// Per-gate rejection tally over the buffered track (#3253): how many
+  /// segments (and km) the #2963 accuracy / teleport gates and the #1979
+  /// jitter floor dropped, plus what the #3004 ~1 Hz decimation thinned
+  /// away. Pure read — safe to call repeatedly; each call re-derives the
+  /// figures from the current buffer.
+  ///
+  /// Decimation attribution: the gates run on BOTH passes, so the delta
+  /// between the raw-track sum and the decimated-track sum is exactly the
+  /// jitter km the thinning collapsed (never negative — clamped against
+  /// floating-point drift).
+  GpsGateRejectionTally gateRejectionTally() {
+    final tally = GpsGateRejectionTally();
+    final decimated = _decimatedTrack();
+    final keptKm = GpsTrackDistance.haversineKm(decimated, tally: tally);
+    final rawKm = GpsTrackDistance.haversineKm(_gpsTrack);
+    tally.decimationDroppedFixes = _gpsTrack.length - decimated.length;
+    final collapsed = rawKm - keptKm;
+    tally.decimationCollapsedKm = collapsed > 0 ? collapsed : 0;
+    return tally;
+  }
+
+  /// One-shot publish latch: [publishGateRejectionTally] fires at most
+  /// once per resolver (= per trip), so a re-entrant stop can't double
+  /// the counters.
+  bool _gateTallyPublished = false;
+
+  /// Publish [gateRejectionTally] into the always-on #3146
+  /// [HealthCounters] (`trips.gps.*`), once per trip (#3253). Called
+  /// from the controller's stop path — NOT from the live distance
+  /// getters, which run per emit tick and would over-count. No-op when
+  /// nothing was rejected (sparse counter rows) and on every call after
+  /// the first. `HealthCounters.increment` never throws by contract.
+  void publishGateRejectionTally() {
+    if (_gateTallyPublished) return;
+    _gateTallyPublished = true;
+    for (final entry in gateRejectionTally().toCounterIncrements().entries) {
+      healthCounters.increment(entry.key, by: entry.value);
+    }
+  }
 
   /// Count of GPS fixes buffered so far (#2509). Used by the controller +
   /// persist guard to tell a genuinely-stationary trip (no movement, no

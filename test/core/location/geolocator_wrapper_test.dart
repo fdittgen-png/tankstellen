@@ -19,9 +19,10 @@ void main() {
     });
 
     test('source centralises the LocationManager forcing in the wrapper', () {
-      // Regression guard: the four GPS call sites (location_service.dart,
-      // movement_detection_provider.dart, approach_state_provider.dart,
-      // trip_gps_stream_controller.dart) must stay free of flavor branching;
+      // Regression guard: the GPS call sites (location_service.dart,
+      // approach_state_provider.dart, trip_gps_stream_controller.dart —
+      // movement_detection_provider was removed as dead code, #3253)
+      // must stay free of flavor branching;
       // the AndroidSettings(forceLocationManager:) wrapping lives ONLY here so
       // they keep passing a plain LocationSettings.
       final source = File(
@@ -47,7 +48,6 @@ void main() {
       // or reads the FORCE_LOCATION_MANAGER define directly.
       for (final path in const [
         'lib/core/location/location_service.dart',
-        'lib/core/location/movement_detection_provider.dart',
         'lib/features/approach/providers/approach_state_provider.dart',
         'lib/features/consumption/providers/trip_gps_stream_controller.dart',
       ]) {

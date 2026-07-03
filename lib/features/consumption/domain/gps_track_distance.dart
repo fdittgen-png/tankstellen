@@ -55,6 +55,58 @@ const double kGpsDistanceAccuracyGateM = 25.0;
 /// is skipped (timestamps are optional).
 const double kGpsMaxPlausibleSpeedKmh = 200.0;
 
+/// Mutable per-trip tally of the km each GPS distance gate rejected
+/// (#3253). The #2963 accuracy/teleport gates, the #1979 jitter floor
+/// and the #3004 ~1 Hz decimation all dropped segments SILENTLY, so a
+/// field report of "the trip lost 2 km" was not decomposable — there
+/// was no record of which gate ate the distance. Callers pass one of
+/// these into [GpsTrackDistance.haversineKm] (and
+/// `TripDistanceResolver.gateRejectionTally` fills the decimation
+/// figures) and publish the result into the always-on #3146
+/// `HealthCounters` at trip stop.
+///
+/// Counts + metres only — no coordinates, no timestamps, PII-free by
+/// construction (the HealthCounters naming contract).
+class GpsGateRejectionTally {
+  /// Segments dropped because an endpoint's reported horizontal
+  /// accuracy was worse than the gate (#2963), and their summed km.
+  int accuracyRejectedSegments = 0;
+  double accuracyRejectedKm = 0;
+
+  /// Sub-jitter-floor hops dropped (#1979), and their summed km.
+  int jitterRejectedSegments = 0;
+  double jitterRejectedKm = 0;
+
+  /// Implausible-speed "teleport" segments dropped (#2963), and their
+  /// summed km.
+  int teleportRejectedSegments = 0;
+  double teleportRejectedKm = 0;
+
+  /// Raw fixes thinned away by the ~1 Hz decimation (#3004), and the
+  /// km the thinning collapsed (raw-track sum minus decimated sum).
+  int decimationDroppedFixes = 0;
+  double decimationCollapsedKm = 0;
+
+  /// The tally as #3146 HealthCounters name → increment. Km ride as
+  /// whole metres so the counters stay ints; zero entries are omitted
+  /// to keep the per-day rows sparse.
+  Map<String, int> toCounterIncrements() {
+    final all = <String, int>{
+      'trips.gps.accuracyRejectedSegments': accuracyRejectedSegments,
+      'trips.gps.accuracyRejectedMeters': (accuracyRejectedKm * 1000).round(),
+      'trips.gps.jitterRejectedSegments': jitterRejectedSegments,
+      'trips.gps.jitterRejectedMeters': (jitterRejectedKm * 1000).round(),
+      'trips.gps.teleportRejectedSegments': teleportRejectedSegments,
+      'trips.gps.teleportRejectedMeters': (teleportRejectedKm * 1000).round(),
+      'trips.gps.decimationDroppedFixes': decimationDroppedFixes,
+      'trips.gps.decimationCollapsedMeters':
+          (decimationCollapsedKm * 1000).round(),
+    };
+    all.removeWhere((_, v) => v <= 0);
+    return all;
+  }
+}
+
 /// Haversine-summed road distance over a sequence of GPS fixes (#1979).
 ///
 /// Used as a distance source for the consumption calculation: the GPS
@@ -102,11 +154,16 @@ class GpsTrackDistance {
   /// legitimate city / highway segment and gut the GPS-distance feature.
   ///
   /// A track with fewer than two points has zero length.
+  ///
+  /// [tally], when provided, accumulates the per-gate rejected segment
+  /// counts + km (#3253) so a "lost 2 km" field report is decomposable.
+  /// Passing null keeps the pre-#3253 zero-overhead behaviour.
   static double haversineKm(
     List<GpsTrackPoint> track, {
     double jitterFloorKm = 0.003,
     double accuracyGateM = kGpsDistanceAccuracyGateM,
     double maxPlausibleSpeedKmh = kGpsMaxPlausibleSpeedKmh,
+    GpsGateRejectionTally? tally,
   }) {
     var total = 0.0;
     for (var i = 1; i < track.length; i++) {
@@ -115,14 +172,30 @@ class GpsTrackDistance {
       // Accuracy gate — drop a segment touching a too-noisy endpoint.
       if (_tooInaccurate(a.hAccuracyM, accuracyGateM) ||
           _tooInaccurate(b.hAccuracyM, accuracyGateM)) {
+        if (tally != null) {
+          tally.accuracyRejectedSegments++;
+          tally.accuracyRejectedKm += _segmentKm(a, b);
+        }
         continue;
       }
       final segment = _segmentKm(a, b);
-      if (segment < jitterFloorKm) continue;
+      if (segment < jitterFloorKm) {
+        if (tally != null) {
+          tally.jitterRejectedSegments++;
+          tally.jitterRejectedKm += segment;
+        }
+        continue;
+      }
       // Teleport gate — drop a segment whose implied speed is impossible
       // (a cold-start jump). Only when both timestamps are present with a
       // positive Δt; otherwise the gate is skipped (timestamps optional).
-      if (_isTeleport(a.at, b.at, segment, maxPlausibleSpeedKmh)) continue;
+      if (_isTeleport(a.at, b.at, segment, maxPlausibleSpeedKmh)) {
+        if (tally != null) {
+          tally.teleportRejectedSegments++;
+          tally.teleportRejectedKm += segment;
+        }
+        continue;
+      }
       total += segment;
     }
     return total;

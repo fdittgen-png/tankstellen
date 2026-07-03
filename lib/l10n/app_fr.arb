@@ -5201,5 +5201,35 @@
   "@obd2WedgeHintOpenBtSettings": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "distanceSourceOdometer": "Odometer",
+  "@distanceSourceOdometer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "distanceSourceOdometerTooltip": "Distance read from the car's odometer — a measured ground truth.",
+  "@distanceSourceOdometerTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "distanceSourceGps": "GPS track",
+  "@distanceSourceGps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "distanceSourceGpsTooltip": "Distance summed from the recorded GPS track — true road distance.",
+  "@distanceSourceGpsTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "distanceSourceEstimated": "Estimated",
+  "@distanceSourceEstimated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "distanceSourceEstimatedTooltip": "Distance integrated from the speed sensor — an estimate; the sensor typically over-reads slightly.",
+  "@distanceSourceEstimatedTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
