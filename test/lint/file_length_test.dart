@@ -368,9 +368,14 @@ void main() {
       bumps: 0,
       decompositionIssue: null,
     ),
+    // #3420 — re-grandfathered 726 → 777: the coordinator now claims an
+    // auto-record lease on the Obd2LinkArbiter before opening a session
+    // (tryAcquire gate + preemption handler + lease releases at hand-off /
+    // teardown), closing the ungated auto-record ↔ #3019 front of the
+    // #3415 reconnect war.
     'lib/features/obd2/data/auto_trip_coordinator.dart': (
-      lines: 726,
-      bumps: 0,
+      lines: 777,
+      bumps: 1,
       decompositionIssue: null,
     ),
     // #3279 — elm327_parsers.dart decomposed below the cap (419 → 345): the

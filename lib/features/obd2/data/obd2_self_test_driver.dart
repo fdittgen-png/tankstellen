@@ -8,6 +8,7 @@ import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_connection_service.dart';
+import 'obd2_link_arbiter.dart';
 import 'obd2_response_class.dart';
 import 'obd2_service.dart';
 
@@ -284,13 +285,18 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
       // #2969 — transport-aware pinned connect: a Classic adapter takes the
       // RFCOMM direct path (the BLE direct path would only 4 s-timeout); the
       // connect step gets its OWN longer budget ([connectDeadline]).
-      service = pinnedMac != null
-          ? await _selfTestConnect(connection, pinnedMac,
-                  transport: transportHint,
-                  decisionReason: decisionReason,
-                  adapterName: adapterName)
-              .timeout(connectDeadline)
-          : await connection.connectBest().timeout(connectDeadline);
+      // #3420 — interactive lease: refused (null → noResponse) while a
+      // recording / auto-record watch owns the adapter; the controller's
+      // no-live-recording guard remains the first line of defence.
+      service = await Obd2LinkArbiter.instance.runInteractive<Obd2Service?>(
+          'self-test',
+          () async => pinnedMac != null
+              ? await _selfTestConnect(connection, pinnedMac,
+                      transport: transportHint,
+                      decisionReason: decisionReason,
+                      adapterName: adapterName)
+                  .timeout(connectDeadline)
+              : await connection.connectBest().timeout(connectDeadline));
     } on TimeoutException {
       connectSw.stop();
       emit(_step(Obd2SelfTestStepId.scan, Obd2SelfTestStepStatus.timeout,
