@@ -71,8 +71,10 @@ String _$lastGoodAdapterStoreHash() =>
 /// (#2188) only runs while a recording is active, so a drop while idle / between
 /// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
 /// whose loop is driven purely by the connection lifecycle:
-///   * [reportDropped] (called by ANY drop signal — incl. the proactive Classic
-///     socket-closed signal, #2671) starts the bounded backoff loop;
+///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
+///     idle policy (#3420) — the arbiter is the sole consumer of the
+///     proactive link-drop signal, so this loop runs only while no lease
+///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
 ///   * each attempt tries the auto-pinned adapter first (transport-correct
 ///     direct connect, #3016), then a re-scan fallback;
 ///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
@@ -91,8 +93,10 @@ final obd2ReconnectProvider = Obd2ReconnectProvider._();
 /// (#2188) only runs while a recording is active, so a drop while idle / between
 /// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
 /// whose loop is driven purely by the connection lifecycle:
-///   * [reportDropped] (called by ANY drop signal — incl. the proactive Classic
-///     socket-closed signal, #2671) starts the bounded backoff loop;
+///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
+///     idle policy (#3420) — the arbiter is the sole consumer of the
+///     proactive link-drop signal, so this loop runs only while no lease
+///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
 ///   * each attempt tries the auto-pinned adapter first (transport-correct
 ///     direct connect, #3016), then a re-scan fallback;
 ///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
@@ -109,8 +113,10 @@ final class Obd2ReconnectProvider
   /// (#2188) only runs while a recording is active, so a drop while idle / between
   /// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
   /// whose loop is driven purely by the connection lifecycle:
-  ///   * [reportDropped] (called by ANY drop signal — incl. the proactive Classic
-  ///     socket-closed signal, #2671) starts the bounded backoff loop;
+  ///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
+  ///     idle policy (#3420) — the arbiter is the sole consumer of the
+  ///     proactive link-drop signal, so this loop runs only while no lease
+  ///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
   ///   * each attempt tries the auto-pinned adapter first (transport-correct
   ///     direct connect, #3016), then a re-scan fallback;
   ///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
@@ -145,7 +151,7 @@ final class Obd2ReconnectProvider
   }
 }
 
-String _$obd2ReconnectHash() => r'da7fcf275075da5268985cd13f6d68478bed6561';
+String _$obd2ReconnectHash() => r'a3e58c53e05fcf19c14715346960c928891709c0';
 
 /// App-wide owner of the trip-INDEPENDENT auto-reconnect controller (#3019 /
 /// Epic #3013 phase 3).
@@ -154,8 +160,10 @@ String _$obd2ReconnectHash() => r'da7fcf275075da5268985cd13f6d68478bed6561';
 /// (#2188) only runs while a recording is active, so a drop while idle / between
 /// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
 /// whose loop is driven purely by the connection lifecycle:
-///   * [reportDropped] (called by ANY drop signal — incl. the proactive Classic
-///     socket-closed signal, #2671) starts the bounded backoff loop;
+///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
+///     idle policy (#3420) — the arbiter is the sole consumer of the
+///     proactive link-drop signal, so this loop runs only while no lease
+///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
 ///   * each attempt tries the auto-pinned adapter first (transport-correct
 ///     direct connect, #3016), then a re-scan fallback;
 ///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the

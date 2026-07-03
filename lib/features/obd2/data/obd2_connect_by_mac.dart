@@ -113,7 +113,10 @@ Future<Obd2Service?> _connectByMacDirect(
           'falling back to scan: $e\n$st');
       return true;
     }());
-    await svc._teardownLastDirectChannel();
+    // #3244 — close-by-identity: tear down THIS attempt's channel only. The
+    // no-arg teardown closed whatever `_lastDirectChannel` pointed at, which
+    // a rival admitted meanwhile may have re-assigned to ITS live channel.
+    await _teardownDirectChannel(svc, channel);
     // #3181 — a TYPED pairing failure must NOT be masked by the scan
     // fallback: the scan would re-dial the same un-bonded adapter (burning
     // its 5-minute bond-acceptance window) and its scanEmpty/timeout would
@@ -211,7 +214,8 @@ Future<Obd2Service?> _connectByMacClassicDirect(
       debugPrint('_connectByMacClassicDirect: recoverable failure: $e\n$st');
       return true;
     }());
-    await svc._teardownLastDirectChannel();
+    // #3244 — close-by-identity (see _connectByMacDirect's catch).
+    await _teardownDirectChannel(svc, channel);
     return null;
   }
 }
@@ -321,7 +325,10 @@ Future<Obd2Service?> _connectByMacPassive(
     recordObd2ConnectTransient(e, st,
         where: 'Obd2ConnectionService.connectByMacPassive failed',
         layer: ErrorLayer.other);
-    await svc._teardownLastDirectChannel();
+    // #3244 — close-by-identity: after a preempt force-release the ACTIVE
+    // requester owns `_lastDirectChannel`; this zombie failure path must
+    // close only ITS OWN channel, never the active connect mid-handshake.
+    await _teardownDirectChannel(svc, channel);
     return null;
   }
 }

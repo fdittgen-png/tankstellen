@@ -36,8 +36,10 @@ LastGoodAdapterStore lastGoodAdapterStore(Ref ref) =>
 /// (#2188) only runs while a recording is active, so a drop while idle / between
 /// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
 /// whose loop is driven purely by the connection lifecycle:
-///   * [reportDropped] (called by ANY drop signal — incl. the proactive Classic
-///     socket-closed signal, #2671) starts the bounded backoff loop;
+///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
+///     idle policy (#3420) — the arbiter is the sole consumer of the
+///     proactive link-drop signal, so this loop runs only while no lease
+///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
 ///   * each attempt tries the auto-pinned adapter first (transport-correct
 ///     direct connect, #3016), then a re-scan fallback;
 ///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
@@ -188,19 +190,14 @@ class Obd2Reconnect extends _$Obd2Reconnect {
   static String _fmt(Map<String, Object?> data) =>
       data.entries.map((e) => '${e.key}=${e.value}').join(' ');
 
-  /// Report a detected connection drop — the trip-INDEPENDENT entry point.
-  /// Safe to call from anywhere a drop is observed (the proactive Classic
-  /// socket-closed signal, the in-trip drop detector, a manual probe).
-  void reportDropped() => _controller?.notifyDropped();
-
-  /// Mark the link healthy (a first connect / external successful reconnect).
-  void reportConnected() => _controller?.notifyConnected();
+  // #3424 — the `reportDropped` / `reportConnected` / `stop` entry points
+  // were deleted: no production caller remained once the arbiter became the
+  // sole drop router (#3420) — drops arrive via the idle-policy registration
+  // in [build], connect/stand-down via `onStandDown`. Regression lock:
+  // test/features/obd2/obd2_link_authority_races_test.dart (races 1–3).
 
   /// User tapped the terminal "tap to retry" affordance — restart the loop.
   void retry() => _controller?.retry();
-
-  /// Stop the loop (OBD2 disabled / owner disposing).
-  void stop() => _controller?.stop();
 
   /// Pinned fast path: a transport-correct DIRECT connect, no scan (#3016).
   /// A Classic adapter goes over RFCOMM; BLE / unknown keep the direct-GATT

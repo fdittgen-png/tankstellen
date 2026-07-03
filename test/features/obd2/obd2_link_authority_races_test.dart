@@ -17,8 +17,8 @@ import 'package:tankstellen/features/consumption/providers/trip_oem_fuel_level_c
 import 'package:tankstellen/features/consumption/providers/trip_recording_state.dart';
 import 'package:tankstellen/features/obd2/data/auto_trip_coordinator.dart';
 import 'package:tankstellen/features/obd2/data/fake_background_adapter_listener.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_arbiter.dart';
 import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
-import 'package:tankstellen/features/obd2/data/obd2_recording_link_ownership.dart';
 import 'package:tankstellen/features/obd2/data/obd2_reconnect_controller.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_speed_stream.dart';
@@ -43,8 +43,10 @@ import '../../helpers/silence_error_logger.dart';
 void main() {
   silenceErrorLoggerSpool();
 
-  setUp(Obd2RecordingLinkOwnership.instance.resetForTest);
-  tearDown(Obd2RecordingLinkOwnership.instance.resetForTest);
+  // #3424 — the latch shim this suite used to reset through was deleted;
+  // reset the arbiter (the one authority) directly.
+  setUp(Obd2LinkArbiter.instance.resetForTest);
+  tearDown(Obd2LinkArbiter.instance.resetForTest);
 
   group('OBD2 link-authority races (#3415 / #3419)', () {
     test(

@@ -12,6 +12,7 @@ import 'ble_link_tuner.dart';
 import 'connection_drop_debouncer.dart';
 import 'elm_byte_channel.dart';
 import 'elm_gatt_profiles.dart';
+import 'obd2_channel_abandon.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'obd2_connect_classifier.dart';
 import 'obd2_connect_trace.dart';
@@ -56,7 +57,7 @@ class Elm327BleUuids {
 /// It is untested on iOS — flutter_blue_plus is cross-platform but
 /// iOS BLE ELM adapters are rare; add iOS-specific handling when the
 /// app starts supporting them.
-class FlutterBluePlusElmChannel
+class FlutterBluePlusElmChannel with Obd2ChannelAbandonLatch
     implements ElmByteChannel, Obd2LinkTuner, Obd2GattRecoverable {
   /// #2969 — bound the scan-path `connect()` (the `connectTimeout == null`
   /// branch) so FBP can't block ~35 s on a vanished candidate.
@@ -202,10 +203,8 @@ class FlutterBluePlusElmChannel
     if (diag.enabled) diag.noteConnectionEvent(drop: true);
     // #3019 / Epic #3013 phase 3 — PROACTIVE drop signal. A debounce-confirmed
     // BLE drop is a real link loss; emit the transport-agnostic link-drop
-    // signal so the trip-INDEPENDENT reconnect controller starts its bounded
-    // backoff loop immediately (even when idle / no command in flight).
-    // Suppressed during a deliberate [close] (`_closing`) so a normal
-    // disconnect is never misread as a drop.
+    // signal so reconnect starts immediately (even idle / no command in
+    // flight). Suppressed during a deliberate [close] (`_closing`).
     if (!_closing && !_dropSignalled) {
       _dropSignalled = true;
       Obd2LinkDropSignal.instance.notifyDrop(
@@ -227,14 +226,15 @@ class FlutterBluePlusElmChannel
   @override
   Future<void> open() async {
     if (_open) return;
+    // #3244 — a preempt-abandoned channel is TERMINAL: never re-dial it
+    // (thrown before any trace stamping — see Obd2ChannelAbandonLatch).
+    throwIfAbandoned();
     // #3179 — make the channel safely RE-openable. The transport's open-retry
     // loop (#2906/#3014) and the reconnect path call close() + open() on the
     // SAME instance; close() closed `_incoming` and latched `_closing`, and
-    // neither was ever undone — so the "recovered" link was a zombie (notify
-    // bytes silently dropped, the drop debouncer + drop-signal permanently
-    // dead). Reset the deliberate-close + drop-signal latches and, when a
-    // prior close() closed the controller, recreate it and rebuild the
-    // disposed debouncer before the GATT dance runs.
+    // neither was ever undone — the "recovered" link was a zombie. Reset the
+    // deliberate-close + drop-signal latches and, when a prior close() closed
+    // the controller, recreate it + rebuild the disposed debouncer.
     _closing = false;
     _dropSignalled = false;
     if (_incoming.isClosed) {
@@ -263,8 +263,12 @@ class FlutterBluePlusElmChannel
       // connect trace where the REAL FBP/StateError is in hand
       // (Obd2Service.connect swallows it into a generic false). FIRST-wins, so
       // the wrong-transport gattTimeout outlives the scan fallback's scanEmpty.
-      Obd2ConnectTraceLog.stampOpenFailure(
-          classifyBleOpenOutcome(e), e.toString());
+      // #3244 — but NEVER from an abandoned zombie: by the time its hung open
+      // finally throws, `active` may already be the NEW holder's root trace.
+      if (!isAbandoned) {
+        Obd2ConnectTraceLog.stampOpenFailure(
+            classifyBleOpenOutcome(e), e.toString());
+      }
       rethrow;
     }
     if (connectSw != null) {
@@ -764,11 +768,9 @@ class FlutterBluePlusElmChannel
       _dropDebouncer.noteCommandFailure();
       // #2900 — a drop landing DURING the BLE write makes FBP throw a raw
       // disconnect exception ([isBleAdapterDisconnect]) that, left unwrapped,
-      // [TripDropDetector] didn't recognise — so the ~1 Hz speed poller re-wrote
-      // every cycle and each failure spooled an ERROR trace (error-log #23, 25×).
-      // Reclassify into the recoverable [Obd2DisconnectedException] (the #2671
-      // [ClassicElmChannel] + #2524 [BluetoothObd2Transport] precedents) and
-      // clear the session so the next write short-circuits on the open-guard.
+      // [TripDropDetector] didn't recognise (error-log #23, 25×). Reclassify
+      // into the recoverable [Obd2DisconnectedException] (the #2671 / #2524
+      // precedents) and clear the session so the next write short-circuits.
       if (isBleAdapterDisconnect(e)) {
         // #2907 — full session teardown on a write-time drop (was clearing
         // only `_open`/`_writeChar`), so a reconnect's open() starts clean.

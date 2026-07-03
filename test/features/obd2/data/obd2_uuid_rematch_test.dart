@@ -4,10 +4,12 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
 import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
 import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_adapter_identity.dart';
+import 'package:tankstellen/features/obd2/data/obd2_known_adapters_store.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
@@ -150,6 +152,32 @@ void main() {
     expect(stepsNamed('uuid-rematch'), isEmpty);
   });
 
+  test('#3247 — the FRESH id inherits known-good status BEFORE the rematch '
+      'connect, so it does NOT re-enter first-connect pairing mode', () async {
+    final storage = _FakeSettingsStorage();
+    final known = KnownObd2AdaptersStore(storage);
+    // The pinned (stale) id already completed a successful connect once.
+    await known.markKnownGood(pinnedUuid);
+    final svc = _build(
+      bt: _FakeFacade(batches: [
+        [cx(rotatedUuid)],
+      ]),
+      onRotated: ({required staleId, required fresh}) async {},
+      knownAdaptersStore: known,
+    );
+
+    final ready = await svc.connectByMac(pinnedUuid, adapterName: adapterName);
+
+    expect(ready, isNotNull);
+    expect(known.isKnownGood(rotatedUuid), isTrue,
+        reason: 'the rotation transfers trust to the fresh id');
+    await ready!.disconnect();
+    expect(stepsNamed('first-connect'), isEmpty,
+        reason: 'a rotated UUID is the SAME bonded adapter — the rematch '
+            'connect must not arm #3181 first-connect pairing mode (a slow '
+            'setNotify would misclassify as pairingRequired)');
+  });
+
   test('FAULT INJECTION — a THROWING rotation seam is swallowed: the connect '
       'that just succeeded still returns its service (never throws)',
       () async {
@@ -175,14 +203,37 @@ void main() {
 Obd2ConnectionService _build({
   required BluetoothFacade bt,
   Obd2AdapterIdentityRotated? onRotated,
+  KnownObd2AdaptersStore? knownAdaptersStore,
 }) =>
     Obd2ConnectionService(
       registry: Obd2AdapterRegistry.defaults(),
       permissions: _FakePermissions(),
       bluetooth: bt,
       onAdapterIdentityRotated: onRotated,
+      knownAdaptersStore: knownAdaptersStore,
       scanSettleDelay: Duration.zero,
     );
+
+/// In-memory settings box for the #3247 known-good transfer test (mirrors
+/// the obd2_known_adapters_store_test fake).
+class _FakeSettingsStorage implements SettingsStorage {
+  final Map<String, dynamic> data = {};
+  @override
+  dynamic getSetting(String key) => data[key];
+  @override
+  Future<void> putSetting(String key, dynamic value) async {
+    data[key] = value;
+  }
+
+  @override
+  bool get isSetupComplete => false;
+  @override
+  bool get isSetupSkipped => false;
+  @override
+  Future<void> skipSetup() async {}
+  @override
+  Future<void> resetSetupSkip() async {}
+}
 
 class _FakePermissions implements Obd2Permissions {
   @override

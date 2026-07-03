@@ -153,14 +153,20 @@ void main() {
               'an already-finalised scan trace');
     });
 
-    test('a superseded EMPTY scan stays outcome-less (not a fake success)',
-        () {
+    test('a superseded EMPTY scan finalises as scanEmpty — never a fake '
+        'success, and no longer outcome-less (#3247)', () {
       Obd2ConnectTraceLog.beginTrace(origin: Obd2ConnectOrigin.pickerScan);
       final connectRoot = Obd2ConnectTraceLog.beginTrace(
           origin: Obd2ConnectOrigin.firstConnect);
 
       expect(connectRoot.isRoot, isTrue);
-      expect(Obd2ConnectTraceLog.snapshot().single.outcome, isNull);
+      // #3247 — an outcome-less trace in the persisted ring was unreadable
+      // in a field export; an empty superseded scan IS a scan-empty result.
+      expect(Obd2ConnectTraceLog.snapshot().single.outcome,
+          Obd2ConnectOutcome.scanEmpty);
+      expect(Obd2ConnectTraceLog.snapshot().single.outcome,
+          isNot(Obd2ConnectOutcome.success),
+          reason: 'an EMPTY scan must never fake a success');
       Obd2ConnectTraceLog.endTrace(connectRoot);
     });
   });

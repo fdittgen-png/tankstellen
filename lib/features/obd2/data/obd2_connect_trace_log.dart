@@ -165,10 +165,19 @@ class Obd2ConnectTraceLog {
         // picker's stream cancel is fire-and-forget and the scan
         // generator's own `finally` may only run after this new attempt
         // has already begun. Success only when the scan actually surfaced
-        // candidates — a superseded EMPTY scan stays outcome-less.
-        if (!existing.hasOutcome && existing.hasScannedDevices) {
-          existing.setOutcome(Obd2ConnectOutcome.success);
+        // candidates; #3247 — a superseded EMPTY scan finalises as
+        // `scanEmpty` (it used to land outcome-less in the persisted ring).
+        if (!existing.hasOutcome) {
+          existing.setOutcome(existing.hasScannedDevices
+              ? Obd2ConnectOutcome.success
+              : Obd2ConnectOutcome.scanEmpty);
         }
+        endTrace(existing);
+      } else if (existing.isSuperseded) {
+        // #3244 — the live trace belongs to a PREEMPTED passive attempt
+        // (markSuperseded already stamped its step + outcome): finalise it
+        // so THIS attempt opens its own ROOT. Child-joining the zombie left
+        // the active requester with no persisted root at all.
         endTrace(existing);
       } else {
         // A nested connect (e.g. connectByMacDirect → scan fallback →

@@ -106,9 +106,9 @@ class Obd2LinkArbiter {
   final Set<Obd2LinkIdleRegistration> _idlePolicies =
       <Obd2LinkIdleRegistration>{};
 
-  /// Mirrors "a recording lease is held" for the #3387 latch shim
-  /// ([Obd2RecordingLinkOwnership]) and its pinned tests. Notifies on every
-  /// recording-ownership transition, exactly like the latch it replaces.
+  /// Mirrors "a recording lease is held" for read-only listeners (the #3387
+  /// latch this absorbed exposed the same notifier; the shim itself was
+  /// deleted in #3424). Notifies on every recording-ownership transition.
   final ValueNotifier<bool> recordingOwnsLink = ValueNotifier<bool>(false);
 
   /// The current lease holder, if any. Exposed for traces + tests.
