@@ -149,6 +149,9 @@ void main() {
     // the new identity guard) moved to core/sync/tanksync_init.dart; the
     // method keeps only the 8 s timeout + telemetry the structural tests
     // pin. Snapshot lowered to lock the shrink in (a shrink never bumps).
+    // #3272 — no bump: the `missing_provider_scope` wraps/ignore (+3
+    // lines at the marker-pinned runApp sites) are offset by compressing
+    // the #2320 rationale comment (-3), keeping the snapshot at 678.
     'lib/app/app_initializer.dart': (
       lines: 678,
       bumps: 14,

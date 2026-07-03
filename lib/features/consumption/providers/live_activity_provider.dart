@@ -82,6 +82,11 @@ class LiveActivitySync extends _$LiveActivitySync {
       // keep e10
     }
     try {
+      // #3272 — the radar fallback is autoDispose by design (its polling
+      // must stop when the last UI listener unmounts); this keepAlive sync
+      // only reaches the watch on iOS, where holding the radar for the
+      // Live Activity's lifetime is the intent (#3170).
+      // ignore: only_use_keep_alive_inside_keep_alive
       radarStation = ref.watch(nearestStationRadarProvider).value;
     } on Object {
       // no radar station

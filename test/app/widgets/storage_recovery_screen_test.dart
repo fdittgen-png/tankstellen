@@ -79,7 +79,9 @@ void main() {
       expect(after, contains('errorLogger.log(ErrorLayer.storage'),
           reason: 'the corruption exception must reach the errorLogger / '
               'TraceRecorder pipeline (#2294 acceptance)');
-      expect(after, contains('runApp(const StorageRecoveryHost())'),
+      // #3272 — wrapped in a bare ProviderScope (missing_provider_scope).
+      expect(after,
+          contains('runApp(const ProviderScope(child: StorageRecoveryHost()))'),
           reason: 'a recovery screen must be shown instead of a frozen splash');
     });
 

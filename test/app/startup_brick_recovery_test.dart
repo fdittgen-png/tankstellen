@@ -93,7 +93,9 @@ void main() {
       final afterCatchAll = rest.substring(catchAll);
       final block = afterCatchAll.substring(
           0, afterCatchAll.indexOf("StartupTimer.instance.mark('storage_ready')"));
-      expect(block, contains('runApp(const StorageRecoveryHost())'));
+      // #3272 — wrapped in a bare ProviderScope (missing_provider_scope).
+      expect(block,
+          contains('runApp(const ProviderScope(child: StorageRecoveryHost()))'));
       expect(block, contains('errorLogger.log(ErrorLayer.storage'));
     });
 

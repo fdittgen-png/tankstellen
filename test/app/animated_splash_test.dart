@@ -149,7 +149,11 @@ void main() {
     });
 
     test('main.dart mounts SplashHost before AppInitializer.run', () {
-      final runAppIdx = mainSource.indexOf('runApp(const SplashHost());');
+      // #3272 — the bare ProviderScope wrap satisfies the re-enabled
+      // `missing_provider_scope` riverpod_lint rule; nothing under the
+      // splash reads a provider.
+      final runAppIdx = mainSource
+          .indexOf('runApp(const ProviderScope(child: SplashHost()));');
       final initRunIdx = mainSource.indexOf('AppInitializer.run');
       expect(runAppIdx, isNonNegative,
           reason: 'main.dart must call runApp(SplashHost) to paint the '

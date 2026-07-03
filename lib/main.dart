@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/app.dart';
 import 'app/app_initializer.dart';
@@ -17,7 +18,9 @@ import 'app/widgets/animated_splash.dart';
 /// the real `TankstellenApp` tree once init is done.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const SplashHost());
+  // #3272 — bare scope (`missing_provider_scope`); no provider is read
+  // pre-init, the real container arrives with the second runApp.
+  runApp(const ProviderScope(child: SplashHost()));
   await AppInitializer.run(
     appBuilder: (_) => const TankstellenApp(),
   );

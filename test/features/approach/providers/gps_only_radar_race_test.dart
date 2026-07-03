@@ -283,7 +283,10 @@ void main() {
 
     // The recorder opens its (shared) GPS subscription synchronously — this is
     // the consumer that "wins" the channel in the contention model.
-    final pipeline = container.read(_pipelineProvider(_Host()));
+    // Hoisted: a family arg must be a stable identifier, not an
+    // instance creation (provider_parameters, #3272).
+    final host = _Host();
+    final pipeline = container.read(_pipelineProvider(host));
     pipeline.start();
     addTearDown(() => pipeline.stop());
 
