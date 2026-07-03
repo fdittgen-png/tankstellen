@@ -31,9 +31,13 @@ void main() {
       () {
     // file → the persist it covers.
     const persistSites = <String, String>{
-      // syncAndPersistIds (favorites + ignored) and syncAndPersistRatings.
+      // syncAndPersistIds (ignored) and syncAndPersistRatings.
       'lib/core/sync/sync_provider.dart':
-          'connect-time favorites/ignored/ratings persists',
+          'connect-time ignored/ratings persists',
+      // #3452 — FavoritesSync.syncAndPersist owns the favorites persist
+      // (fuel + EV ids AND payload blobs) + its emit.
+      'lib/core/sync/favorites_sync.dart':
+          'favorites (fuel + EV, payloads) pull persist',
       // #3447 — the pull-matrix thunks: pullTrips repo.save loop, the
       // baselines box.put loop, and the fill_ups call-site emit (its
       // persist site lives in the length-frozen consumption_providers.dart,

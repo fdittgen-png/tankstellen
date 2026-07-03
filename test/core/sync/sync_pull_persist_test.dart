@@ -4,6 +4,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
+import 'package:tankstellen/core/sync/favorites_sync.dart';
 import 'package:tankstellen/core/sync/sync_config.dart';
 import 'package:tankstellen/core/sync/sync_events.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
@@ -51,6 +52,18 @@ void main() {
     return (localIds) async => {...localIds, ...serverIds}.toList();
   }
 
+  /// The #3452 record-based favorites analogue: server-only records are
+  /// appended to whatever the device sends up.
+  FavoritesMergeFn fakeFavMergeWithServer(List<FavoriteRecord> serverRecords) {
+    return (local) async {
+      final localIds = local.map((r) => r.id).toSet();
+      return [
+        ...local,
+        ...serverRecords.where((r) => !localIds.contains(r.id)),
+      ];
+    };
+  }
+
   group('SyncState.syncAndPersistIds (#3076 pull-persist)', () {
     test('persists a server-only favorite into LOCAL storage', () async {
       await fakeStorage.setFavoriteIds(['local-1']);
@@ -60,7 +73,9 @@ void main() {
 
       await notifier.syncAndPersistIds(
         fakeStorage,
-        mergeFavorites: fakeMergeWithServer(['server-only-id']),
+        mergeFavorites: fakeFavMergeWithServer(const [
+          FavoriteRecord(id: 'server-only-id', kind: FavoriteKind.fuel),
+        ]),
         mergeIgnored: fakeMergeWithServer(const []),
       );
 
@@ -81,7 +96,7 @@ void main() {
 
       await notifier.syncAndPersistIds(
         fakeStorage,
-        mergeFavorites: fakeMergeWithServer(const []),
+        mergeFavorites: fakeFavMergeWithServer(const []),
         mergeIgnored: fakeMergeWithServer(['ignored-server']),
       );
 
@@ -103,7 +118,10 @@ void main() {
 
       await notifier.syncAndPersistIds(
         fakeStorage,
-        mergeFavorites: fakeMergeWithServer(['srv-fav-a', 'srv-fav-b']),
+        mergeFavorites: fakeFavMergeWithServer(const [
+          FavoriteRecord(id: 'srv-fav-a', kind: FavoriteKind.fuel),
+          FavoriteRecord(id: 'srv-fav-b', kind: FavoriteKind.fuel),
+        ]),
         mergeIgnored: fakeMergeWithServer(['srv-ign-a']),
       );
 
@@ -129,7 +147,7 @@ void main() {
       // identity merge — simulates an unauthenticated/empty server.
       await notifier.syncAndPersistIds(
         fakeStorage,
-        mergeFavorites: (ids) async => ids,
+        mergeFavorites: (records) async => records,
         mergeIgnored: (ids) async => ids,
       );
 
@@ -209,7 +227,9 @@ void main() {
       final container = createContainer();
       await container.read(syncStateProvider.notifier).syncAndPersistIds(
             fakeStorage,
-            mergeFavorites: fakeMergeWithServer(['server-fav']),
+            mergeFavorites: fakeFavMergeWithServer(const [
+              FavoriteRecord(id: 'server-fav', kind: FavoriteKind.fuel),
+            ]),
             mergeIgnored: fakeMergeWithServer(['server-ign']),
           );
       await flush();
@@ -223,6 +243,38 @@ void main() {
       );
     });
 
+    test('#3452 — a payload arriving for an ALREADY-KNOWN id still emits '
+        '(the favorites UI must refresh)', () async {
+      await fakeStorage.setFavoriteIds(['known-id']); // id known, no payload
+
+      final events = <SyncTableChanged>[];
+      final sub = SyncEvents.instance
+          .forTable(SyncTables.favorites)
+          .listen(events.add);
+      addTearDown(sub.cancel);
+
+      final container = createContainer();
+      await container.read(syncStateProvider.notifier).syncAndPersistIds(
+            fakeStorage,
+            // Same id set — but the server row now carries the payload.
+            mergeFavorites: (local) async => [
+              for (final r in local)
+                FavoriteRecord(
+                  id: r.id,
+                  kind: r.kind,
+                  data: r.data ?? const {'name': 'Server Payload'},
+                ),
+            ],
+            mergeIgnored: (ids) async => ids,
+          );
+      await flush();
+
+      expect(events.single.changedCount, 1,
+          reason: 'zero id-delta but one payload write must still emit');
+      expect(fakeStorage.getFavoriteStationData('known-id')?['name'],
+          'Server Payload');
+    });
+
     test('no-op id merge emits nothing', () async {
       await fakeStorage.setFavoriteIds(['keep']);
 
@@ -233,7 +285,7 @@ void main() {
       final container = createContainer();
       await container.read(syncStateProvider.notifier).syncAndPersistIds(
             fakeStorage,
-            mergeFavorites: (ids) async => ids,
+            mergeFavorites: (records) async => records,
             mergeIgnored: (ids) async => ids,
           );
       await flush();

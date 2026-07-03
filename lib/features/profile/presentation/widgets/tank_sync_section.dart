@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
+import 'tank_sync_delete_data_tile.dart';
 import 'tank_sync_relink_tile.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
@@ -119,6 +120,10 @@ class TankSyncSection extends ConsumerWidget {
         title: Text(l.linkDevice),
         onTap: () => context.push(RoutePaths.linkDevice),
       ),
+      // #3453 — per-category server-side deletion; anonymous-capable
+      // (RLS scopes to own rows) and available in every mode, community
+      // included.
+      const TankSyncDeleteDataTile(),
       if (syncConfig.mode != SyncMode.community)
         ListTile(
           leading: const Icon(Icons.qr_code),

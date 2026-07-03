@@ -88,6 +88,15 @@ class EntitySync<T> {
   /// (corrupt row → `null`).
   final Future<List<T?>> Function(List<JsonRow> rows)? decodeBatch;
 
+  /// #3452 — optional both-sides re-upload predicate. The id-union merge
+  /// uploads only local-only ids, so a column added to an existing table
+  /// (the favorites `data` payload) would never reach the server for rows
+  /// that already exist there. When set, every both-sides id whose server
+  /// row satisfies this predicate is re-upserted through [encode] — e.g.
+  /// `local.data != null && row['data'] == null` backfills payloads onto
+  /// pre-v5 id-only favorites rows. `null` keeps the pure union.
+  final bool Function(T local, JsonRow serverRow)? reuploadWhen;
+
   /// The record's local edit stamp — non-null enables the #3122 LWW path
   /// for ids present on both sides. `null` keeps the pure id-union merge
   /// (e.g. `alerts`, whose table has no `updated_at` column to compare —
@@ -109,6 +118,7 @@ class EntitySync<T> {
     required this.encode,
     required this.decode,
     this.decodeBatch,
+    this.reuploadWhen,
     this.localStamp,
     this.tombstoneFirstDelete = true,
   });
@@ -181,10 +191,17 @@ class EntitySync<T> {
               tombstoned: tombstoned,
             );
 
-      // Upload local-only + local-newer records.
+      // Upload local-only + local-newer records — plus (#3452) any
+      // both-sides record whose server row the [reuploadWhen] predicate
+      // flags as incomplete (e.g. an id-only favorites row that predates
+      // the payload column).
       final localOnly =
           liveLocal.where((r) => !serverIds.contains(idOf(r))).toList();
-      final toUpload = [...localOnly, ...lww.localNewer];
+      final toUpload = [
+        ...localOnly,
+        ...lww.localNewer,
+        ..._backfillUploads(liveLocal, serverRows, lww.localNewer),
+      ];
       if (toUpload.isNotEmpty) {
         final rows = toUpload.map((r) => encode(r, t.userId)).toList();
         await t.upsert(table, rows, onConflict: onConflict);
@@ -223,6 +240,30 @@ class EntitySync<T> {
           context: {'where': '$logName.merge FAILED'}));
       return local;
     }
+  }
+
+  /// #3452 — the both-sides records [reuploadWhen] flags for re-upsert,
+  /// excluding any already re-uploading via the LWW local-newer split so
+  /// no record is encoded twice in one merge pass.
+  List<T> _backfillUploads(
+    List<T> liveLocal,
+    List<JsonRow> serverRows,
+    List<T> alreadyUploading,
+  ) {
+    final predicate = reuploadWhen;
+    if (predicate == null) return const [];
+    final rowById = <String, JsonRow>{
+      for (final row in serverRows)
+        if (row.getString(idColumn) != null) row.getString(idColumn)!: row,
+    };
+    final uploadingIds = alreadyUploading.map(idOf).toSet();
+    return [
+      for (final record in liveLocal)
+        if (!uploadingIds.contains(idOf(record)) &&
+            rowById[idOf(record)] != null &&
+            predicate(record, rowById[idOf(record)]!))
+          record,
+    ];
   }
 
   /// #3451 — one decode pass over [rows]: the [decodeBatch] seam (off the

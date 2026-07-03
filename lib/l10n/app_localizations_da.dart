@@ -7184,6 +7184,47 @@ class AppLocalizationsDa extends AppLocalizations {
   String get syncAdoptUseDifferentAccount => 'Use a different account instead';
 
   @override
+  String get syncDeleteDataTitle => 'Delete synced data';
+
+  @override
+  String get syncDeleteDataSubtitle =>
+      'Remove your trips, vehicles or fill-ups from the sync database';
+
+  @override
+  String get syncDeleteDataPickTitle => 'Delete which synced data?';
+
+  @override
+  String get syncDeleteDataCategoryTrips => 'Trips';
+
+  @override
+  String get syncDeleteDataCategoryVehicles => 'Vehicles';
+
+  @override
+  String get syncDeleteDataCategoryFillUps => 'Fill-ups';
+
+  @override
+  String get syncDeleteDataCategoryEverything => 'Everything';
+
+  @override
+  String syncDeleteDataConfirmTitle(String category) {
+    return 'Delete $category from the sync database?';
+  }
+
+  @override
+  String get syncDeleteDataConfirmBody =>
+      'This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.';
+
+  @override
+  String get syncDeleteDataConfirmAction => 'Delete from server';
+
+  @override
+  String get syncDeleteDataDone => 'Synced data deleted';
+
+  @override
+  String get syncDeleteDataFailed =>
+      'Deleting synced data failed — please try again';
+
+  @override
   String get syncRelinkTitle => 'Cloud sync needs re-linking';
 
   @override

@@ -122,6 +122,32 @@ void main() {
       expect(sql, contains("'schema_version', '$kSupabaseSchemaVersion'"));
     });
 
+    test('#3452 — the v5 favorites columns reach an EXISTING favorites '
+        'table (idempotent ALTER upgrade path)', () {
+      // A self-hoster whose `favorites` table pre-exists gets NO CREATE
+      // block for it — the kind/data columns must therefore arrive via
+      // the unconditional `upgradeSql` ALTERs, and be idempotent.
+      final sql = SchemaVerifier.getMigrationSql(
+          {for (final t in SchemaVerifier.allTables) t: true});
+      expect(sql,
+          isNot(contains('CREATE TABLE IF NOT EXISTS public.favorites')));
+      expect(
+          sql,
+          contains('ALTER TABLE public.favorites\n'
+              "  ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'fuel'"));
+      expect(
+          sql,
+          contains('ALTER TABLE public.favorites\n'
+              '  ADD COLUMN IF NOT EXISTS data JSONB'));
+      // Fresh installs get the columns in the CREATE block too.
+      final freshSql = SchemaVerifier.getMigrationSql(const {});
+      expect(freshSql, contains("kind TEXT NOT NULL DEFAULT 'fuel'"));
+      expect(freshSql, contains('data JSONB'));
+      // v5 is what the wizard records — an un-upgraded self-host is
+      // flagged as outdated, not silently broken.
+      expect(kSupabaseSchemaVersion, greaterThanOrEqualTo(5));
+    });
+
     test('always includes RLS policies in output', () {
       // All tables present
       final sqlAllPresent = SchemaVerifier.getMigrationSql(

@@ -130,6 +130,32 @@ class UpstreamCertificateException extends AppException {
   String toString() => 'UpstreamCertificateException: $message';
 }
 
+/// Thrown when a non-fuel station id (an OpenChargeMap `ocm-*` EV id)
+/// reaches a fuel-price data path (#3455).
+///
+/// Field-verified failure mode: `stationDetail` fell back to the ACTIVE
+/// country's fuel chain for ids without a fuel-country prefix, so an EV id
+/// was sent to prix-carburants / CMA / Luxembourg detail endpoints —
+/// producing 400 bursts at ~1/s on every refresh. This exception is the
+/// typed, NON-RETRYING rejection: it is thrown before the chain's
+/// cache/retry machinery runs, is recorded as a breadcrumb (not an ERROR
+/// trace — see `non_fuel_station_guard.dart`), and callers must route the
+/// id to the EV detail source instead.
+class NonFuelStationIdException extends AppException {
+  /// The offending station id (e.g. `ocm-196522`).
+  final String stationId;
+
+  const NonFuelStationIdException(this.stationId);
+
+  @override
+  String get message =>
+      'Non-fuel station id "$stationId" must not reach a fuel-price chain '
+      '(route ocm-* ids to the EV detail source, #3455).';
+
+  @override
+  String toString() => 'NonFuelStationIdException: $message';
+}
+
 /// Thrown when every service in a fallback chain has failed,
 /// including the cache. Carries accumulated errors from each step
 /// so the UI can report exactly what went wrong.

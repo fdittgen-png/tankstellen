@@ -5019,5 +5019,71 @@
   "@syncRelinkStartFreshConfirm": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "syncDeleteDataTitle": "Delete synced data",
+  "@syncDeleteDataTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataSubtitle": "Remove your trips, vehicles or fill-ups from the sync database",
+  "@syncDeleteDataSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataPickTitle": "Delete which synced data?",
+  "@syncDeleteDataPickTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryTrips": "Trips",
+  "@syncDeleteDataCategoryTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryVehicles": "Vehicles",
+  "@syncDeleteDataCategoryVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryFillUps": "Fill-ups",
+  "@syncDeleteDataCategoryFillUps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataCategoryEverything": "Everything",
+  "@syncDeleteDataCategoryEverything": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataConfirmTitle": "Delete {category} from the sync database?",
+  "@syncDeleteDataConfirmTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Trips"
+      }
+    }
+  },
+  "syncDeleteDataConfirmBody": "This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.",
+  "@syncDeleteDataConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataConfirmAction": "Delete from server",
+  "@syncDeleteDataConfirmAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataDone": "Synced data deleted",
+  "@syncDeleteDataDone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "syncDeleteDataFailed": "Deleting synced data failed — please try again",
+  "@syncDeleteDataFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

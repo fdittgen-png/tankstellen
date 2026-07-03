@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
@@ -112,21 +113,12 @@ class LaunchSyncPulls {
     await HiveBoxes.initDeferred();
     if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return 0;
     if (!container.read(tripsSyncEnabledProvider)) return 0;
-    var saved = 0;
+    var changed = 0;
     try {
       final repo = TripHistoryRepository(
         box: Hive.box<String>(HiveBoxes.obd2TripHistory),
       );
-      final local = repo.loadAll();
-      final localIds = local.map((e) => e.id).toSet();
-      final merged = await TripsSync.merge(local);
-      for (final entry in merged) {
-        if (localIds.contains(entry.id)) continue;
-        await repo.save(entry);
-        // #3451 — don't starve frame production during a big first pull.
-        await yieldToEventLoopEvery(saved);
-        saved++;
-      }
+      changed = await mergeAndPruneTrips(repo, TripsSync.merge);
       await TripsSync.pruneOldDetails();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
@@ -135,8 +127,49 @@ class LaunchSyncPulls {
     // #3446 — emitted even when the catch above fired: whatever was saved
     // before the failure IS persisted.
     SyncEvents.instance
-        .emit(SyncTableChanged(SyncTables.tripSummaries, saved));
-    return saved;
+        .emit(SyncTableChanged(SyncTables.tripSummaries, changed));
+    return changed;
+  }
+
+  /// The trips persist step, seamed on [merge] so the #3453 removal
+  /// contract is unit-testable without a live Supabase session.
+  ///
+  /// Two directions:
+  ///  * **save** — entries in the merge result the box doesn't hold yet
+  ///    (downloaded from another device);
+  ///  * **remove (#3453)** — local entries ABSENT from the merge result:
+  ///    `TripsSync.merge` drops tombstoned ids from its local input, so a
+  ///    trip deleted server-side (single delete or the "delete my synced
+  ///    data" wipe) disappears from this device on its next pull instead
+  ///    of lingering forever. A failed/unauthenticated merge returns the
+  ///    input unchanged, so nothing is ever removed on error.
+  ///
+  /// Returns the changed-entry count (saved + removed) for the #3446
+  /// emit and #3445 trace attributes.
+  @visibleForTesting
+  static Future<int> mergeAndPruneTrips(
+    TripHistoryRepository repo,
+    Future<List<TripHistoryEntry>> Function(List<TripHistoryEntry>) merge,
+  ) async {
+    final local = repo.loadAll();
+    final localIds = local.map((e) => e.id).toSet();
+    final merged = await merge(local);
+    final mergedIds = merged.map((e) => e.id).toSet();
+    var changed = 0;
+    for (final entry in merged) {
+      if (localIds.contains(entry.id)) continue;
+      await repo.save(entry);
+      // #3451 — don't starve frame production during a big first pull.
+      await yieldToEventLoopEvery(changed);
+      changed++;
+    }
+    for (final entry in local) {
+      if (mergedIds.contains(entry.id)) continue;
+      await repo.delete(entry.id);
+      await yieldToEventLoopEvery(changed);
+      changed++;
+    }
+    return changed;
   }
 
   /// #3447 — favorites + ignored stations now pull at launch/resume too
@@ -147,7 +180,12 @@ class LaunchSyncPulls {
     ProviderContainer container,
     StorageRepository storage,
   ) async {
-    final favBefore = storage.getFavoriteIds().toSet();
+    // #3452 — the favorites merge spans BOTH stores (fuel + EV ids with
+    // payloads), so the trace delta counts the EV set too.
+    final favBefore = {
+      ...storage.getFavoriteIds(),
+      ...storage.getEvFavoriteIds(),
+    };
     final ignBefore = storage.getIgnoredIds().toSet();
     await container.read(syncStateProvider.notifier).syncAndPersistIds(storage);
     int delta(Set<String> before, List<String> after) {
@@ -155,7 +193,8 @@ class LaunchSyncPulls {
       return a.difference(before).length + before.difference(a).length;
     }
 
-    return delta(favBefore, storage.getFavoriteIds()) +
+    return delta(favBefore,
+            [...storage.getFavoriteIds(), ...storage.getEvFavoriteIds()]) +
         delta(ignBefore, storage.getIgnoredIds());
   }
 

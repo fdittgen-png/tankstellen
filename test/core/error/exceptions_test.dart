@@ -171,6 +171,7 @@ void main() {
         const NoEvApiKeyException(),
         const ServiceChainExhaustedException(errors: []),
         const UpstreamCertificateException(host: 'example.com'),
+        const NonFuelStationIdException('ocm-1'),
       ];
       for (final e in exceptions) {
         // This switch must compile - proves exhaustiveness of sealed class
@@ -182,6 +183,7 @@ void main() {
           NoEvApiKeyException() => 'noevkey',
           ServiceChainExhaustedException() => 'chain',
           UpstreamCertificateException() => 'cert',
+          NonFuelStationIdException() => 'nonfuel',
         };
         expect(result, isNotEmpty);
       }

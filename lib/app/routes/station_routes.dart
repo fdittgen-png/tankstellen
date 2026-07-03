@@ -1,15 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/data/storage_repository.dart';
 import '../../core/domain/ev/charging_station.dart';
-import '../../core/logging/error_logger.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/storage/storage_providers.dart';
 import '../../features/ev/data/repositories/ev_station_repository.dart';
@@ -89,30 +84,6 @@ List<RouteBase> stationRoutes(Ref ref) => [
       ),
     ];
 
-/// Hydrates the [ChargingStation] for an `/ev-station/:id` deep link.
-///
-/// #1804 — checks the EV favorites store first, then falls back to the
-/// recently-fetched EV station cache ([EvStationRepository]), so a
-/// station the user has seen on the map — or that a home-screen widget
-/// surfaced — opens from a deep link even when it is **not** a saved
-/// favorite. Returns `null` only when the id is genuinely unknown to
-/// the device (the caller then shows the invalid-id screen).
-@visibleForTesting
-ChargingStation? hydrateEvStationById(
-  String id,
-  EvFavoriteStorage favorites,
-  EvStationRepository cache,
-) {
-  final raw = favorites.getEvFavoriteStationData(id);
-  if (raw != null) {
-    try {
-      return ChargingStation.fromJson(raw);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'hydrateEvStationById: corrupt EV favorite payload'
-      }));
-      // A corrupt favorites payload shouldn't block a valid cache hit.
-    }
-  }
-  return cache.getById(id);
-}
+// `hydrateEvStationById` moved to `ev_station_repository.dart` (#3455) so
+// the stationDetail provider's ocm-id routing reuses the same cache-lookup
+// path as this deep-link route. Imported above; behaviour unchanged.

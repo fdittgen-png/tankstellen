@@ -3413,6 +3413,60 @@
   "@syncAdoptUseDifferentAccount": {
     "description": "Link that leaves the QR-join adoption step and returns to the normal account-setup flow (#3080)."
   },
+  "syncDeleteDataTitle": "Synchronisierte Daten löschen",
+  "@syncDeleteDataTitle": {
+    "description": "Tile title in the TankSync settings section that opens the per-category server-side data deletion flow (#3453)."
+  },
+  "syncDeleteDataSubtitle": "Fahrten, Fahrzeuge oder Tankvorgänge aus der Sync-Datenbank entfernen",
+  "@syncDeleteDataSubtitle": {
+    "description": "Subtitle under the delete-synced-data tile (#3453)."
+  },
+  "syncDeleteDataPickTitle": "Welche synchronisierten Daten löschen?",
+  "@syncDeleteDataPickTitle": {
+    "description": "Title of the category-picker dialog for the synced-data deletion (#3453)."
+  },
+  "syncDeleteDataCategoryTrips": "Fahrten",
+  "@syncDeleteDataCategoryTrips": {
+    "description": "Category option: delete synced trips (#3453)."
+  },
+  "syncDeleteDataCategoryVehicles": "Fahrzeuge",
+  "@syncDeleteDataCategoryVehicles": {
+    "description": "Category option: delete synced vehicles (#3453)."
+  },
+  "syncDeleteDataCategoryFillUps": "Tankvorgänge",
+  "@syncDeleteDataCategoryFillUps": {
+    "description": "Category option: delete synced fill-ups (#3453)."
+  },
+  "syncDeleteDataCategoryEverything": "Alles",
+  "@syncDeleteDataCategoryEverything": {
+    "description": "Category option: delete ALL synced data (the identity itself stays usable) (#3453)."
+  },
+  "syncDeleteDataConfirmTitle": "{category} aus der Sync-Datenbank löschen?",
+  "@syncDeleteDataConfirmTitle": {
+    "description": "Confirmation dialog title before the server-side deletion; {category} is the localized category label the user picked (#3453).",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Trips"
+      }
+    }
+  },
+  "syncDeleteDataConfirmBody": "Die ausgewählten Daten werden aus der Sync-Datenbank entfernt und werden nicht wieder von anderen Geräten hochgeladen. Lokal auf diesem Gerät gespeicherte Daten bleiben erhalten.",
+  "@syncDeleteDataConfirmBody": {
+    "description": "Confirmation dialog body. Documents the server-side-only decision: local data on this device stays; other devices drop their copies via tombstones (#3453)."
+  },
+  "syncDeleteDataConfirmAction": "Vom Server löschen",
+  "@syncDeleteDataConfirmAction": {
+    "description": "Destructive confirm button of the synced-data deletion dialog (#3453)."
+  },
+  "syncDeleteDataDone": "Synchronisierte Daten gelöscht",
+  "@syncDeleteDataDone": {
+    "description": "Snackbar shown when the server-side deletion completed (#3453)."
+  },
+  "syncDeleteDataFailed": "Löschen der synchronisierten Daten fehlgeschlagen — bitte erneut versuchen",
+  "@syncDeleteDataFailed": {
+    "description": "Snackbar shown when the server-side deletion failed or the user is not connected (#3453)."
+  },
   "syncRelinkTitle": "Cloud-Sync muss neu verknüpft werden",
   "@syncRelinkTitle": {
     "description": "Warning tile title in the TankSync settings section when a stored sync identity has no active session anymore (#3449)."

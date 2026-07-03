@@ -15,6 +15,7 @@ import 'diagnostics/data_access_event.dart';
 import 'diagnostics/data_access_recorder.dart';
 import 'fuel_service_policy.dart';
 import 'mixins/station_service_helpers.dart';
+import 'non_fuel_station_guard.dart';
 import 'service_result.dart';
 import 'station_api_failure_log.dart';
 import 'station_failure_classifier.dart';
@@ -356,8 +357,9 @@ class StationServiceChain implements StationService {
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
-  ) =>
-      _throughChain<StationDetail>(
+  ) async {
+    rejectNonFuelStationId(stationId, countryCode: countryCode); // #3455
+    return _throughChain<StationDetail>(
         cacheKey: CacheKey.stationDetail(stationId),
         endpoint: DataAccessEndpoint.stationDetail,
         apiCall: () => _primary.getStationDetail(stationId),
@@ -365,6 +367,7 @@ class StationServiceChain implements StationService {
         deserialize: deserializeStationDetail,
         ttl: CacheTtl.stationDetail,
       );
+  }
 
   @override
   Future<ServiceResult<Map<String, StationPrices>>> getPrices(

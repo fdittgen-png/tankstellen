@@ -7224,6 +7224,48 @@ class AppLocalizationsDe extends AppLocalizations {
       'Stattdessen ein anderes Konto verwenden';
 
   @override
+  String get syncDeleteDataTitle => 'Synchronisierte Daten löschen';
+
+  @override
+  String get syncDeleteDataSubtitle =>
+      'Fahrten, Fahrzeuge oder Tankvorgänge aus der Sync-Datenbank entfernen';
+
+  @override
+  String get syncDeleteDataPickTitle =>
+      'Welche synchronisierten Daten löschen?';
+
+  @override
+  String get syncDeleteDataCategoryTrips => 'Fahrten';
+
+  @override
+  String get syncDeleteDataCategoryVehicles => 'Fahrzeuge';
+
+  @override
+  String get syncDeleteDataCategoryFillUps => 'Tankvorgänge';
+
+  @override
+  String get syncDeleteDataCategoryEverything => 'Alles';
+
+  @override
+  String syncDeleteDataConfirmTitle(String category) {
+    return '$category aus der Sync-Datenbank löschen?';
+  }
+
+  @override
+  String get syncDeleteDataConfirmBody =>
+      'Die ausgewählten Daten werden aus der Sync-Datenbank entfernt und werden nicht wieder von anderen Geräten hochgeladen. Lokal auf diesem Gerät gespeicherte Daten bleiben erhalten.';
+
+  @override
+  String get syncDeleteDataConfirmAction => 'Vom Server löschen';
+
+  @override
+  String get syncDeleteDataDone => 'Synchronisierte Daten gelöscht';
+
+  @override
+  String get syncDeleteDataFailed =>
+      'Löschen der synchronisierten Daten fehlgeschlagen — bitte erneut versuchen';
+
+  @override
   String get syncRelinkTitle => 'Cloud-Sync muss neu verknüpft werden';
 
   @override

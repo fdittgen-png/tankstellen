@@ -309,8 +309,12 @@ class SyncState extends _$SyncState {
   /// Previously the [FavoritesSync.merge] / [IgnoredStationsSync.merge]
   /// return values (server ∪ local) were discarded, so a device only
   /// ever uploaded — server-side rows added on another device never
-  /// reached this one. We now write the merged superset back via
-  /// [StorageRepository.setFavoriteIds] / [StorageRepository.setIgnoredIds].
+  /// reached this one. We now write the merged superset back.
+  ///
+  /// #3452 — favorites merge as full [FavoriteRecord]s: fuel AND EV ids
+  /// with their station JSON payloads. [FavoritesSync.persist] splits the
+  /// union per store (`ocm-*` never lands in the fuel store — the #3455
+  /// guard) and writes pulled payloads where the device has none.
   ///
   /// The merges run unconditionally (no `isNotEmpty` guard): a fresh
   /// device with no local favorites must still *pull* the server's set.
@@ -324,14 +328,14 @@ class SyncState extends _$SyncState {
   /// this at launch/resume/sync-now (formerly connect-time + tests only).
   Future<void> syncAndPersistIds(
     StorageRepository storage, {
-    IdMergeFn mergeFavorites = FavoritesSync.merge,
+    FavoritesMergeFn mergeFavorites = FavoritesSync.merge,
     IdMergeFn mergeIgnored = IgnoredStationsSync.merge,
   }) async {
     // #3446 — emit AFTER each persist (subscribers re-read storage).
-    final favBefore = storage.getFavoriteIds();
-    await storage.setFavoriteIds(await mergeFavorites(favBefore));
-    SyncEvents.instance.emitIdSetDelta(
-        SyncTables.favorites, favBefore, storage.getFavoriteIds());
+    // Favorites (fuel + EV, payloads included) persist + emit inside
+    // FavoritesSync.syncAndPersist — its delta spans both id stores AND
+    // the pulled payload writes.
+    await FavoritesSync.syncAndPersist(storage, merge: mergeFavorites);
     final ignBefore = storage.getIgnoredIds();
     await storage.setIgnoredIds(await mergeIgnored(ignBefore));
     SyncEvents.instance.emitIdSetDelta(

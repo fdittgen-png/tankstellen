@@ -12478,6 +12478,78 @@ abstract class AppLocalizations {
   /// **'Use a different account instead'**
   String get syncAdoptUseDifferentAccount;
 
+  /// Tile title in the TankSync settings section that opens the per-category server-side data deletion flow (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete synced data'**
+  String get syncDeleteDataTitle;
+
+  /// Subtitle under the delete-synced-data tile (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove your trips, vehicles or fill-ups from the sync database'**
+  String get syncDeleteDataSubtitle;
+
+  /// Title of the category-picker dialog for the synced-data deletion (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete which synced data?'**
+  String get syncDeleteDataPickTitle;
+
+  /// Category option: delete synced trips (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get syncDeleteDataCategoryTrips;
+
+  /// Category option: delete synced vehicles (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicles'**
+  String get syncDeleteDataCategoryVehicles;
+
+  /// Category option: delete synced fill-ups (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-ups'**
+  String get syncDeleteDataCategoryFillUps;
+
+  /// Category option: delete ALL synced data (the identity itself stays usable) (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Everything'**
+  String get syncDeleteDataCategoryEverything;
+
+  /// Confirmation dialog title before the server-side deletion; {category} is the localized category label the user picked (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {category} from the sync database?'**
+  String syncDeleteDataConfirmTitle(String category);
+
+  /// Confirmation dialog body. Documents the server-side-only decision: local data on this device stays; other devices drop their copies via tombstones (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.'**
+  String get syncDeleteDataConfirmBody;
+
+  /// Destructive confirm button of the synced-data deletion dialog (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete from server'**
+  String get syncDeleteDataConfirmAction;
+
+  /// Snackbar shown when the server-side deletion completed (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Synced data deleted'**
+  String get syncDeleteDataDone;
+
+  /// Snackbar shown when the server-side deletion failed or the user is not connected (#3453).
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting synced data failed — please try again'**
+  String get syncDeleteDataFailed;
+
   /// Warning tile title in the TankSync settings section when a stored sync identity has no active session anymore (#3449).
   ///
   /// In en, this message translates to:

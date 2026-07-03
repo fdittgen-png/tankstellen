@@ -7148,6 +7148,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncAdoptUseDifferentAccount => 'Use a different account instead';
 
   @override
+  String get syncDeleteDataTitle => 'Delete synced data';
+
+  @override
+  String get syncDeleteDataSubtitle =>
+      'Remove your trips, vehicles or fill-ups from the sync database';
+
+  @override
+  String get syncDeleteDataPickTitle => 'Delete which synced data?';
+
+  @override
+  String get syncDeleteDataCategoryTrips => 'Trips';
+
+  @override
+  String get syncDeleteDataCategoryVehicles => 'Vehicles';
+
+  @override
+  String get syncDeleteDataCategoryFillUps => 'Fill-ups';
+
+  @override
+  String get syncDeleteDataCategoryEverything => 'Everything';
+
+  @override
+  String syncDeleteDataConfirmTitle(String category) {
+    return 'Delete $category from the sync database?';
+  }
+
+  @override
+  String get syncDeleteDataConfirmBody =>
+      'This removes the selected data from your sync database and it will not re-sync from your other devices. Data stored locally on this device is kept.';
+
+  @override
+  String get syncDeleteDataConfirmAction => 'Delete from server';
+
+  @override
+  String get syncDeleteDataDone => 'Synced data deleted';
+
+  @override
+  String get syncDeleteDataFailed =>
+      'Deleting synced data failed — please try again';
+
+  @override
   String get syncRelinkTitle => 'Cloud sync needs re-linking';
 
   @override
@@ -15273,6 +15314,47 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get syncAdoptUseDifferentAccount =>
       '⟦Úšé á đîƒƒéřéñŧ áççóúñŧ îñšŧéáđ ············⟧';
+
+  @override
+  String get syncDeleteDataTitle => '⟦Đéłéŧé šýñçéđ đáŧá ·······⟧';
+
+  @override
+  String get syncDeleteDataSubtitle =>
+      '⟦Řéɱóṽé ýóúř ŧřîƥš, ṽéĥîçłéš óř ƒîłł-úƥš ƒřóɱ ŧĥé šýñç đáŧáƀášé ·······················⟧';
+
+  @override
+  String get syncDeleteDataPickTitle => '⟦Đéłéŧé ŵĥîçĥ šýñçéđ đáŧá? ·········⟧';
+
+  @override
+  String get syncDeleteDataCategoryTrips => '⟦Ŧřîƥš ··⟧';
+
+  @override
+  String get syncDeleteDataCategoryVehicles => '⟦Ṽéĥîçłéš ····⟧';
+
+  @override
+  String get syncDeleteDataCategoryFillUps => '⟦Ƒîłł-úƥš ···⟧';
+
+  @override
+  String get syncDeleteDataCategoryEverything => '⟦Éṽéřýŧĥîñǧ ·····⟧';
+
+  @override
+  String syncDeleteDataConfirmTitle(String category) {
+    return '⟦Đéłéŧé $category ƒřóɱ ŧĥé šýñç đáŧáƀášé? ···········⟧';
+  }
+
+  @override
+  String get syncDeleteDataConfirmBody =>
+      '⟦Ŧĥîš řéɱóṽéš ŧĥé šéłéçŧéđ đáŧá ƒřóɱ ýóúř šýñç đáŧáƀášé áñđ îŧ ŵîłł ñóŧ řé-šýñç ƒřóɱ ýóúř óŧĥéř đéṽîçéš. Đáŧá šŧóřéđ łóçáłłý óñ ŧĥîš đéṽîçé îš ķéƥŧ. ······················································⟧';
+
+  @override
+  String get syncDeleteDataConfirmAction => '⟦Đéłéŧé ƒřóɱ šéřṽéř ·······⟧';
+
+  @override
+  String get syncDeleteDataDone => '⟦Šýñçéđ đáŧá đéłéŧéđ ········⟧';
+
+  @override
+  String get syncDeleteDataFailed =>
+      '⟦Đéłéŧîñǧ šýñçéđ đáŧá ƒáîłéđ — ƥłéášé ŧřý áǧáîñ ·················⟧';
 
   @override
   String get syncRelinkTitle => '⟦Çłóúđ šýñç ñééđš řé-łîñķîñǧ ··········⟧';
