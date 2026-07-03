@@ -8086,6 +8086,42 @@ abstract class AppLocalizations {
   /// **'Couldn\'t export the startup trace.'**
   String get startupTraceExportFailure;
 
+  /// Distance-provenance badge label (#3253) on the trip detail's Distance row — the km figure came from the car's own odometer PID delta (ground truth, #800).
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer'**
+  String get distanceSourceOdometer;
+
+  /// Tooltip for the 'Odometer' distance-provenance badge (#3253): explains the km is a real odometer delta, not an estimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance read from the car\'s odometer — a measured ground truth.'**
+  String get distanceSourceOdometerTooltip;
+
+  /// Distance-provenance badge label (#3253) — the km figure is the haversine-summed GPS track (#1979): true road distance, gated against jitter/teleports.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS track'**
+  String get distanceSourceGps;
+
+  /// Tooltip for the 'GPS track' distance-provenance badge (#3253).
+  ///
+  /// In en, this message translates to:
+  /// **'Distance summed from the recorded GPS track — true road distance.'**
+  String get distanceSourceGpsTooltip;
+
+  /// Distance-provenance badge label (#3253) — the km figure was integrated from the OBD2 speed sensor (the 'virtual odometer', #800). The speed sensor over-reads, so this is an estimate, like the ~ fuel figures.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated'**
+  String get distanceSourceEstimated;
+
+  /// Tooltip for the 'Estimated' distance-provenance badge (#3253): explains the virtual-odometer estimate and its over-read bias.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance integrated from the speed sensor — an estimate; the sensor typically over-reads slightly.'**
+  String get distanceSourceEstimatedTooltip;
+
   /// Title of the driving-insights card on the Trip detail screen — surfaces the top-3 fuel-wasting behaviours from the analyzer (#1041 phase 2).
   ///
   /// In en, this message translates to:

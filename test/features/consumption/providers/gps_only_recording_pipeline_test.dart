@@ -374,6 +374,8 @@ void main() {
       await _pump();
 
       expect(harness.pipeline.onAppBackgrounded, returnsNormally);
+    });
+
     test(
         '#3253 — stop() persists one #1458 cadence diagnostic per fix '
         '(the GPS-only pipeline used to pass none)', () async {

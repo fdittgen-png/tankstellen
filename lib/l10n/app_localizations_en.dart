@@ -4483,6 +4483,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startupTraceExportFailure => 'Couldn\'t export the startup trace.';
 
   @override
+  String get distanceSourceOdometer => 'Odometer';
+
+  @override
+  String get distanceSourceOdometerTooltip =>
+      'Distance read from the car\'s odometer — a measured ground truth.';
+
+  @override
+  String get distanceSourceGps => 'GPS track';
+
+  @override
+  String get distanceSourceGpsTooltip =>
+      'Distance summed from the recorded GPS track — true road distance.';
+
+  @override
+  String get distanceSourceEstimated => 'Estimated';
+
+  @override
+  String get distanceSourceEstimatedTooltip =>
+      'Distance integrated from the speed sensor — an estimate; the sensor typically over-reads slightly.';
+
+  @override
   String get insightCardTitle => 'Top wasteful behaviours';
 
   @override
@@ -12581,6 +12602,27 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get startupTraceExportFailure =>
       '⟦Çóúłđñ\'ŧ éẋƥóřŧ ŧĥé šŧářŧúƥ ŧřáçé. ·············⟧';
+
+  @override
+  String get distanceSourceOdometer => '⟦Óđóɱéŧéř ····⟧';
+
+  @override
+  String get distanceSourceOdometerTooltip =>
+      '⟦Đîšŧáñçé řéáđ ƒřóɱ ŧĥé çář\'š óđóɱéŧéř — á ɱéášúřéđ ǧřóúñđ ŧřúŧĥ. ·······················⟧';
+
+  @override
+  String get distanceSourceGps => '⟦ǦƤŠ ŧřáçķ ····⟧';
+
+  @override
+  String get distanceSourceGpsTooltip =>
+      '⟦Đîšŧáñçé šúɱɱéđ ƒřóɱ ŧĥé řéçóřđéđ ǦƤŠ ŧřáçķ — ŧřúé řóáđ đîšŧáñçé. ························⟧';
+
+  @override
+  String get distanceSourceEstimated => '⟦Éšŧîɱáŧéđ ····⟧';
+
+  @override
+  String get distanceSourceEstimatedTooltip =>
+      '⟦Đîšŧáñçé îñŧéǧřáŧéđ ƒřóɱ ŧĥé šƥééđ šéñšóř — áñ éšŧîɱáŧé; ŧĥé šéñšóř ŧýƥîçáłłý óṽéř-řéáđš šłîǧĥŧłý. ····································⟧';
 
   @override
   String get insightCardTitle => '⟦Ŧóƥ ŵášŧéƒúł ƀéĥáṽîóúřš ·········⟧';

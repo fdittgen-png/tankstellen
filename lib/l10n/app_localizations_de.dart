@@ -4533,6 +4533,27 @@ class AppLocalizationsDe extends AppLocalizations {
       'Startup-Trace konnte nicht exportiert werden.';
 
   @override
+  String get distanceSourceOdometer => 'Kilometerzähler';
+
+  @override
+  String get distanceSourceOdometerTooltip =>
+      'Distanz vom Kilometerzähler des Fahrzeugs — ein gemessener Referenzwert.';
+
+  @override
+  String get distanceSourceGps => 'GPS-Spur';
+
+  @override
+  String get distanceSourceGpsTooltip =>
+      'Distanz aus der aufgezeichneten GPS-Spur summiert — echte Straßendistanz.';
+
+  @override
+  String get distanceSourceEstimated => 'Geschätzt';
+
+  @override
+  String get distanceSourceEstimatedTooltip =>
+      'Distanz aus dem Geschwindigkeitssensor integriert — eine Schätzung; der Sensor zeigt typischerweise etwas zu viel an.';
+
+  @override
   String get insightCardTitle => 'Größte Spritfresser';
 
   @override

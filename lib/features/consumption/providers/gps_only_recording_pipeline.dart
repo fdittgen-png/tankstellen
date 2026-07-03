@@ -35,19 +35,12 @@ import 'trip_recording_state.dart';
 /// summary carries `kind: TripKind.gpsOnly` so downstream surfaces
 /// (confidence-tier badge, recording-screen redesign) can adapt.
 ///
-/// ## What this owns (moved off the notifier verbatim)
+/// Owns (moved off the notifier verbatim): the [TripRecorder], the
+/// Geolocator [StreamSubscription], the raw [TripSample] buffer +
+/// trip-start timestamp, the per-fix ingest ([_onPosition]), and the
+/// stop path (summary build, #2080 GPS-fuel imputation, persist).
 ///
-///   * the [TripRecorder] accumulator,
-///   * the Geolocator position [StreamSubscription],
-///   * the raw [TripSample] buffer + the trip-start timestamp,
-///   * the per-fix ingest ([_onPosition]) that synthesises a sample,
-///     feeds the recorder, and publishes the live reading + GPS coaching
-///     hint, and
-///   * the stop path that builds the final summary, runs the #2080
-///     GPS-fuel imputation, and persists.
-///
-/// ## What it deliberately does NOT own
-///
+/// Deliberately NOT owned:
 /// Publishing the notifier's Riverpod `state`, the last-trip identity
 /// fields, and the shared `_saveToHistory` write stay on the notifier and
 /// are reached through the injected [RecordingPipelineHost] — exactly the
@@ -69,10 +62,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   final RecordingPipelineHost _host;
   final GpsOnlyTripWal _wal; // #3248 — write-ahead log
 
-  /// #3253 — per-fix GPS cadence diagnostics (#1458), previously
-  /// recorded only on the OBD2 path. The throttling-exposed dongle-less
-  /// pipeline now persists them too, lighting up the trip-detail
-  /// GpsDiagnosticsCard for GPS-only trips.
+  // #3253 — per-fix cadence diagnostics (#1458), OBD2 parity: lights up
+  // the trip-detail GpsDiagnosticsCard for GPS-only trips too.
   final GpsSampleDiagnosticsRecorder _gpsDiagnostics;
 
   @override
@@ -141,7 +132,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       onHarshEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
     );
     _samples.clear();
-    _gpsDiagnostics.clear(); // #3253 — fresh cadence buffer per trip
+    _gpsDiagnostics.clear(); // #3253
     _startedAt = DateTime.now();
     _host.lastTripStartedAt = DateTime.now();
     _host.lastTripVehicleId = _host.readActiveVehicleId();
@@ -230,8 +221,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       bearingDeg: p.heading.isFinite ? p.heading : null,
     );
     _samples.add(sample);
-    // #3253 — one cadence diagnostic per fix (#1458), timestamped with the
-    // fix's own clock so OS batching is visible as the gap it really is.
+    // #3253 — fix-clock cadence diagnostic (OS batching stays visible).
     _gpsDiagnostics.record(now: p.timestamp);
     // #2760 — feed the latest GPS ground speed to the IMU detector so its
     // min-speed gate and accel-vs-brake direction classification track the
@@ -370,8 +360,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       summary,
       samples: samples,
       automatic: automatic,
-      // #3253 — persist the #1458 cadence diagnostics (OBD2 parity): the
-      // trip-detail GpsDiagnosticsCard now renders for GPS-only trips.
+      // #3253 — #1458 cadence diagnostics, OBD2 parity.
       gpsSampleDiagnostics: _gpsDiagnostics.snapshot,
       gpsFixCount: samples.length,
     );
