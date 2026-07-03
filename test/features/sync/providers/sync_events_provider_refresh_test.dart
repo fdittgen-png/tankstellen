@@ -166,7 +166,7 @@ class _FakeTripHistoryRepository implements TripHistoryRepository {
   final List<TripHistoryEntry> entries = [];
 
   @override
-  List<TripHistoryEntry> loadAll() => List.of(entries);
+  List<TripHistoryEntry> loadAll({bool dedupe = true}) => List.of(entries);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError(

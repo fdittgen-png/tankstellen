@@ -10561,11 +10561,11 @@ abstract class AppLocalizations {
   /// **'Enable Cloud Sync above to back up trips.'**
   String get consentSyncTripsDisabledHint;
 
-  /// No description provided for @consentSyncTripsNeedsEmailHint.
+  /// No description provided for @consentSyncTripsAnonymousHint.
   ///
   /// In en, this message translates to:
-  /// **'Sign in with an email account to sync trips across devices.'**
-  String get consentSyncTripsNeedsEmailHint;
+  /// **'Trips back up under this device\'s anonymous account. Sign in with an email to reach them from other devices.'**
+  String get consentSyncTripsAnonymousHint;
 
   /// No description provided for @consentHideDetails.
   ///
@@ -12477,6 +12477,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use a different account instead'**
   String get syncAdoptUseDifferentAccount;
+
+  /// Warning tile title in the TankSync settings section when a stored sync identity has no active session anymore (#3449).
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync needs re-linking'**
+  String get syncRelinkTitle;
+
+  /// Explanatory body under the relink warning tile (#3449).
+  ///
+  /// In en, this message translates to:
+  /// **'This device\'s saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.'**
+  String get syncRelinkBody;
+
+  /// Primary button that opens the email auth screen to restore the stored sync identity (#3449).
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to re-link'**
+  String get syncRelinkSignInAction;
+
+  /// Secondary button that knowingly abandons the old sync identity and creates a new anonymous one (#3449).
+  ///
+  /// In en, this message translates to:
+  /// **'Start fresh'**
+  String get syncRelinkStartFreshAction;
+
+  /// Confirmation dialog title before abandoning the old sync identity (#3449).
+  ///
+  /// In en, this message translates to:
+  /// **'Start fresh?'**
+  String get syncRelinkStartFreshTitle;
+
+  /// Confirmation dialog body explaining the consequence of abandoning the old sync identity (#3449).
+  ///
+  /// In en, this message translates to:
+  /// **'A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.'**
+  String get syncRelinkStartFreshBody;
+
+  /// Destructive confirm button of the start-fresh dialog (#3449).
+  ///
+  /// In en, this message translates to:
+  /// **'Start fresh'**
+  String get syncRelinkStartFreshConfirm;
 
   /// Title of the tank-level card on the Fuel tab — shows the current estimated litres in the tank above the consumption stats card (#1195).
   ///

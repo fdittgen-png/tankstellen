@@ -61,7 +61,7 @@ void main() {
 
     test('decodeVehicleDataRows — valid rows decode, corrupt rows map to '
         'null', () {
-      final vehicle = VehicleProfile(id: 'veh-1', name: 'Test Car');
+      const vehicle = VehicleProfile(id: 'veh-1', name: 'Test Car');
       final rows = <Map<String, dynamic>>[
         {'id': 'veh-1', 'data': vehicle.toJson()},
         {'id': 'no-data'},

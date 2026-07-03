@@ -1,8 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+import 'dart:io';
+
+import 'package:hive/hive.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+// flutter_riverpod 3.3's main lib hides the Override type; misc.dart has it.
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:tankstellen/app/startup/launch_sync_phase.dart';
 import 'package:tankstellen/core/perf/launch_sync_trace.dart';
 import 'package:tankstellen/core/perf/startup_timer.dart';
@@ -32,6 +38,13 @@ import '../../helpers/silence_error_logger.dart';
 /// which is exactly enough to drive the span wiring.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  // The trips pull opens real deferred Hive boxes (HiveBoxes.initDeferred);
+  // give Hive a temp backing dir like trips_sync_test does.
+  setUpAll(() {
+    Hive.init(
+        Directory.systemTemp.createTempSync('launch_sync_trace_').path);
+  });
   silenceErrorLoggerSpool();
 
   late FakeHiveStorage fakeStorage;
@@ -54,9 +67,8 @@ void main() {
     List<Override> extraOverrides = const [],
   }) {
     if (tripConsents) {
-      fakeStorage
-        ..putSetting(StorageKeys.consentCloudSync, true)
-        ..putSetting(StorageKeys.consentSyncTrips, true);
+      unawaited(fakeStorage.putSetting(StorageKeys.consentCloudSync, true));
+      unawaited(fakeStorage.putSetting(StorageKeys.consentSyncTrips, true));
     }
     final c = ProviderContainer(overrides: [
       hiveStorageProvider.overrideWithValue(fakeStorage),

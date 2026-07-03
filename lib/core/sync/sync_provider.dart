@@ -319,7 +319,9 @@ class SyncState extends _$SyncState {
   /// injectable so the pull-persist wiring is unit-testable without a
   /// live Supabase session (the real merges return the input unchanged
   /// when unauthenticated, masking the wiring under test).
-  @visibleForTesting
+  ///
+  /// #3447 — production API: the SyncPullCoordinator favorites entry calls
+  /// this at launch/resume/sync-now (formerly connect-time + tests only).
   Future<void> syncAndPersistIds(
     StorageRepository storage, {
     IdMergeFn mergeFavorites = FavoritesSync.merge,

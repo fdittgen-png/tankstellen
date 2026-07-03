@@ -139,7 +139,7 @@ void main() {
         'unchanged from the previous inline flow', () async {
       await configureSync(storedUserId: 'uuid-1');
 
-      var session = 'uuid-1';
+      const session = 'uuid-1';
       final outcome = await TankSyncInit.run(
         storage,
         init: ({required String url, required String anonKey}) async {},

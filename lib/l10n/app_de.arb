@@ -2787,7 +2787,7 @@
   "consentSyncTripsTitle": "Fahrtaufzeichnungen synchronisieren",
   "consentSyncTripsSubtitle": "OBD2- und GPS-Fahrten in TankSync sichern. Geräteübergreifend, opt-in.",
   "consentSyncTripsDisabledHint": "Cloud-Sync oben aktivieren, um Fahrten zu sichern.",
-  "consentSyncTripsNeedsEmailHint": "Mit einem E-Mail-Konto anmelden, um Fahrten geräteübergreifend zu synchronisieren.",
+  "consentSyncTripsAnonymousHint": "Fahrten werden unter dem anonymen Konto dieses Geräts gesichert. Mit E-Mail anmelden, um sie von anderen Geräten zu erreichen.",
   "consentHideDetails": "Details ausblenden",
   "consentShowDetails": "Details anzeigen",
   "dialogOk": "OK",
@@ -3412,6 +3412,34 @@
   "syncAdoptUseDifferentAccount": "Stattdessen ein anderes Konto verwenden",
   "@syncAdoptUseDifferentAccount": {
     "description": "Link that leaves the QR-join adoption step and returns to the normal account-setup flow (#3080)."
+  },
+  "syncRelinkTitle": "Cloud-Sync muss neu verknüpft werden",
+  "@syncRelinkTitle": {
+    "description": "Warning tile title in the TankSync settings section when a stored sync identity has no active session anymore (#3449)."
+  },
+  "syncRelinkBody": "Die gespeicherte Sync-Identität dieses Geräts ist abgemeldet. Mit E-Mail anmelden, um die synchronisierten Daten neu zu verknüpfen — oder mit einer neuen Identität neu starten.",
+  "@syncRelinkBody": {
+    "description": "Explanatory body under the relink warning tile (#3449)."
+  },
+  "syncRelinkSignInAction": "Anmelden & verknüpfen",
+  "@syncRelinkSignInAction": {
+    "description": "Primary button that opens the email auth screen to restore the stored sync identity (#3449)."
+  },
+  "syncRelinkStartFreshAction": "Neu starten",
+  "@syncRelinkStartFreshAction": {
+    "description": "Secondary button that knowingly abandons the old sync identity and creates a new anonymous one (#3449)."
+  },
+  "syncRelinkStartFreshTitle": "Neu starten?",
+  "@syncRelinkStartFreshTitle": {
+    "description": "Confirmation dialog title before abandoning the old sync identity (#3449)."
+  },
+  "syncRelinkStartFreshBody": "Für dieses Gerät wird eine neue anonyme Identität erstellt. Unter der alten Identität synchronisierte Daten bleiben auf dem Server, sind von hier aus aber nur noch nach Anmeldung mit dem zugehörigen E-Mail-Konto erreichbar.",
+  "@syncRelinkStartFreshBody": {
+    "description": "Confirmation dialog body explaining the consequence of abandoning the old sync identity (#3449)."
+  },
+  "syncRelinkStartFreshConfirm": "Neu starten",
+  "@syncRelinkStartFreshConfirm": {
+    "description": "Destructive confirm button of the start-fresh dialog (#3449)."
   },
   "tankLevelTitle": "Tankfüllstand",
   "tankLevelLitersFormat": "{litres} L",

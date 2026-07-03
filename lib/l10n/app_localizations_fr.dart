@@ -6116,8 +6116,8 @@ class AppLocalizationsFr extends AppLocalizations {
       'Activez Cloud Sync ci-dessus pour sauvegarder les trajets.';
 
   @override
-  String get consentSyncTripsNeedsEmailHint =>
-      'Connecte-toi avec un compte e-mail pour synchroniser les trajets entre appareils.';
+  String get consentSyncTripsAnonymousHint =>
+      'Trips back up under this device\'s anonymous account. Sign in with an email to reach them from other devices.';
 
   @override
   String get consentHideDetails => 'Masquer les détails';
@@ -7249,6 +7249,29 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get syncAdoptUseDifferentAccount => 'Use a different account instead';
+
+  @override
+  String get syncRelinkTitle => 'Cloud sync needs re-linking';
+
+  @override
+  String get syncRelinkBody =>
+      'This device\'s saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.';
+
+  @override
+  String get syncRelinkSignInAction => 'Sign in to re-link';
+
+  @override
+  String get syncRelinkStartFreshAction => 'Start fresh';
+
+  @override
+  String get syncRelinkStartFreshTitle => 'Start fresh?';
+
+  @override
+  String get syncRelinkStartFreshBody =>
+      'A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.';
+
+  @override
+  String get syncRelinkStartFreshConfirm => 'Start fresh';
 
   @override
   String get tankLevelTitle => 'Niveau du réservoir';

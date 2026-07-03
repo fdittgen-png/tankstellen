@@ -6092,8 +6092,8 @@ class AppLocalizationsDe extends AppLocalizations {
       'Cloud-Sync oben aktivieren, um Fahrten zu sichern.';
 
   @override
-  String get consentSyncTripsNeedsEmailHint =>
-      'Mit einem E-Mail-Konto anmelden, um Fahrten geräteübergreifend zu synchronisieren.';
+  String get consentSyncTripsAnonymousHint =>
+      'Fahrten werden unter dem anonymen Konto dieses Geräts gesichert. Mit E-Mail anmelden, um sie von anderen Geräten zu erreichen.';
 
   @override
   String get consentHideDetails => 'Details ausblenden';
@@ -7222,6 +7222,29 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get syncAdoptUseDifferentAccount =>
       'Stattdessen ein anderes Konto verwenden';
+
+  @override
+  String get syncRelinkTitle => 'Cloud-Sync muss neu verknüpft werden';
+
+  @override
+  String get syncRelinkBody =>
+      'Die gespeicherte Sync-Identität dieses Geräts ist abgemeldet. Mit E-Mail anmelden, um die synchronisierten Daten neu zu verknüpfen — oder mit einer neuen Identität neu starten.';
+
+  @override
+  String get syncRelinkSignInAction => 'Anmelden & verknüpfen';
+
+  @override
+  String get syncRelinkStartFreshAction => 'Neu starten';
+
+  @override
+  String get syncRelinkStartFreshTitle => 'Neu starten?';
+
+  @override
+  String get syncRelinkStartFreshBody =>
+      'Für dieses Gerät wird eine neue anonyme Identität erstellt. Unter der alten Identität synchronisierte Daten bleiben auf dem Server, sind von hier aus aber nur noch nach Anmeldung mit dem zugehörigen E-Mail-Konto erreichbar.';
+
+  @override
+  String get syncRelinkStartFreshConfirm => 'Neu starten';
 
   @override
   String get tankLevelTitle => 'Tankfüllstand';

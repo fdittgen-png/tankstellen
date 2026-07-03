@@ -65,7 +65,7 @@ final class StationRatingsProvider
   }
 }
 
-String _$stationRatingsHash() => r'40d01d4275737d48ff2f47a2ff760de775c09a03';
+String _$stationRatingsHash() => r'bbaa18703ffc168a2b6dc2add6a4d264d20a5faf';
 
 /// Manages station ratings (1-5 stars) with three privacy levels:
 ///

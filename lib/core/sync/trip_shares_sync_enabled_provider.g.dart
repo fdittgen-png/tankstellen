@@ -12,12 +12,13 @@ part of 'trip_shares_sync_enabled_provider.dart';
 ///
 /// Cross-account sharing is a strict superset of the per-account trip
 /// sync gate: you can only share a trip that's syncing in the first
-/// place, and the same `A ∧ B ∧ C` conditions apply (email-backed
-/// account ∧ `cloudSync` consent ∧ `syncTrips` toggle). Rather than
-/// duplicate that logic, this derives from [tripsSyncEnabled] — so a
-/// future change to the trip-sync gate automatically flows through to
-/// the share affordances, and the share Action / "shared with me"
-/// section stay hidden for anonymous or consent-off sessions.
+/// place, and the same conditions apply (`cloudSync` consent ∧
+/// `syncTrips` toggle — #3448 dropped the former email requirement).
+/// Rather than duplicate that logic, this derives from
+/// [tripsSyncEnabled] — so a future change to the trip-sync gate
+/// automatically flows through to the share affordances, and the share
+/// Action / "shared with me" section stay hidden for consent-off
+/// sessions.
 
 @ProviderFor(tripSharesSyncEnabled)
 final tripSharesSyncEnabledProvider = TripSharesSyncEnabledProvider._();
@@ -26,12 +27,13 @@ final tripSharesSyncEnabledProvider = TripSharesSyncEnabledProvider._();
 ///
 /// Cross-account sharing is a strict superset of the per-account trip
 /// sync gate: you can only share a trip that's syncing in the first
-/// place, and the same `A ∧ B ∧ C` conditions apply (email-backed
-/// account ∧ `cloudSync` consent ∧ `syncTrips` toggle). Rather than
-/// duplicate that logic, this derives from [tripsSyncEnabled] — so a
-/// future change to the trip-sync gate automatically flows through to
-/// the share affordances, and the share Action / "shared with me"
-/// section stay hidden for anonymous or consent-off sessions.
+/// place, and the same conditions apply (`cloudSync` consent ∧
+/// `syncTrips` toggle — #3448 dropped the former email requirement).
+/// Rather than duplicate that logic, this derives from
+/// [tripsSyncEnabled] — so a future change to the trip-sync gate
+/// automatically flows through to the share affordances, and the share
+/// Action / "shared with me" section stay hidden for consent-off
+/// sessions.
 
 final class TripSharesSyncEnabledProvider
     extends $FunctionalProvider<bool, bool, bool>
@@ -40,12 +42,13 @@ final class TripSharesSyncEnabledProvider
   ///
   /// Cross-account sharing is a strict superset of the per-account trip
   /// sync gate: you can only share a trip that's syncing in the first
-  /// place, and the same `A ∧ B ∧ C` conditions apply (email-backed
-  /// account ∧ `cloudSync` consent ∧ `syncTrips` toggle). Rather than
-  /// duplicate that logic, this derives from [tripsSyncEnabled] — so a
-  /// future change to the trip-sync gate automatically flows through to
-  /// the share affordances, and the share Action / "shared with me"
-  /// section stay hidden for anonymous or consent-off sessions.
+  /// place, and the same conditions apply (`cloudSync` consent ∧
+  /// `syncTrips` toggle — #3448 dropped the former email requirement).
+  /// Rather than duplicate that logic, this derives from
+  /// [tripsSyncEnabled] — so a future change to the trip-sync gate
+  /// automatically flows through to the share affordances, and the share
+  /// Action / "shared with me" section stay hidden for consent-off
+  /// sessions.
   TripSharesSyncEnabledProvider._()
     : super(
         from: null,

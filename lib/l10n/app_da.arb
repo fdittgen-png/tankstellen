@@ -1380,7 +1380,6 @@
   "consentSyncTripsTitle": "Synkroniser turoptagelser",
   "consentSyncTripsSubtitle": "Sikkerhedskopier OBD2 + GPS-ture til TankSync. Tværenhed, opt-in.",
   "consentSyncTripsDisabledHint": "Aktivér Cloud-synkronisering ovenfor for at sikkerhedskopiere ture.",
-  "consentSyncTripsNeedsEmailHint": "Log ind med en e-mailkonto for at synkronisere ture mellem enheder.",
   "consentHideDetails": "Skjul detaljer",
   "consentShowDetails": "Vis detaljer",
   "dialogOk": "OK",
@@ -4878,119 +4877,43 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "minimalDriveTripAverage": "Trip average",
-  "@minimalDriveTripAverage": {
+  "consentSyncTripsAnonymousHint": "Trips back up under this device's anonymous account. Sign in with an email to reach them from other devices.",
+  "@consentSyncTripsAnonymousHint": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
-  "@insightUpshiftCruise": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      },
-      "liters": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonAdviceUpshiftCruise": "Shift up earlier when cruising — the same speed at lower RPM burns noticeably less fuel.",
-  "@lessonAdviceUpshiftCruise": {
+  "syncRelinkTitle": "Cloud sync needs re-linking",
+  "@syncRelinkTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightCoastingFuelCut": "Fuel-cut coasting ({pctTime}% of trip): saved about {liters} L",
-  "@insightCoastingFuelCut": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      },
-      "liters": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonAdviceCoastingFuelCut": "Nicely anticipated — lifting off early lets the engine cut fuel completely while coasting.",
-  "@lessonAdviceCoastingFuelCut": {
+  "syncRelinkBody": "This device's saved sync identity is signed out. Sign in with your email to re-link your synced data, or start fresh with a new identity.",
+  "@syncRelinkBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightTrailingLitersSaved": "−{liters} L",
-  "@insightTrailingLitersSaved": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "liters": {
-        "type": "String"
-      }
-    }
-  },
-  "fuelBreakdownTitle": "Where your fuel went",
-  "@fuelBreakdownTitle": {
+  "syncRelinkSignInAction": "Sign in to re-link",
+  "@syncRelinkSignInAction": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelBreakdownIdle": "Idling",
-  "@fuelBreakdownIdle": {
+  "syncRelinkStartFreshAction": "Start fresh",
+  "@syncRelinkStartFreshAction": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelBreakdownHarshAccel": "Hard accelerations",
-  "@fuelBreakdownHarshAccel": {
+  "syncRelinkStartFreshTitle": "Start fresh?",
+  "@syncRelinkStartFreshTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelBreakdownHighRpmCruise": "High-RPM cruising",
-  "@fuelBreakdownHighRpmCruise": {
+  "syncRelinkStartFreshBody": "A new anonymous identity will be created for this device. Data synced under the old identity stays on the server but will no longer be reachable from here unless you sign in with its email account.",
+  "@syncRelinkStartFreshBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelBreakdownCoastingSaved": "Saved by coasting",
-  "@fuelBreakdownCoastingSaved": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fuelBreakdownEfficient": "Normal driving",
-  "@fuelBreakdownEfficient": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "fuelBreakdownLiters": "{liters} L",
-  "@fuelBreakdownLiters": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "liters": {
-        "type": "String"
-      }
-    }
-  },
-  "ecoNudgeIdle": "Idling for a while — switching the engine off saves fuel",
-  "@ecoNudgeIdle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "ecoNudgeHarshAccel": "Strong acceleration — a gentler pedal saves fuel",
-  "@ecoNudgeHarshAccel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "ecoNudgeHighRpm": "High revs at cruise — shifting up earlier saves fuel",
-  "@ecoNudgeHighRpm": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "obd2WedgeHintBody": "Your OBD2 adapter stopped responding. Switch the ignition off and on or replug the adapter — or toggle Bluetooth off and on.",
-  "@obd2WedgeHintBody": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "obd2WedgeHintOpenBtSettings": "Bluetooth settings",
-  "@obd2WedgeHintOpenBtSettings": {
+  "syncRelinkStartFreshConfirm": "Start fresh",
+  "@syncRelinkStartFreshConfirm": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
