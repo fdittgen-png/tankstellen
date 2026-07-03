@@ -7,19 +7,37 @@ import '../ocr/pump_validation_gate.dart';
 import '../ocr/recognized_text_block.dart';
 import 'brand_detection.dart';
 import 'receipt_field_extractors.dart';
-import 'receipt_label_anchored_extractor.dart';
-import 'receipt_label_table.dart';
 import 'receipt_parse_result.dart';
+import 'receipt_spatial_lexicon.dart';
+import 'receipt_spatial_parser.dart';
+import 'receipt_value_token.dart';
 
-/// Orchestrates the #2848 geometry-aware fuel-receipt read.
+/// Orchestrates the spatial fuel-receipt read (#3458, rewriting #2848).
 ///
-/// The receipt cousin of `orchestratePumpDisplayParse`: it runs the
-/// label-anchored extractor over ML Kit's [blocks] (binding Volume→litres,
-/// Prix→€/L, TOT TTC→total by row alignment), scores a confidence, runs
-/// the SAME per-country [PumpValidationGate] (in-range + `litres × €/L ≈
-/// total`), and folds the geometry numbers together with the
-/// date/station/fuel still read from the flat [text]. Returns a
-/// `ReceiptParseResult` with `validated` / `confidence` set.
+/// Runs the pure [parseReceiptSpatially] over ML Kit's [blocks], then
+/// applies the HONEST gate rules the Pézenas E85 field failure demanded:
+///
+///  * **Confidence counts only independently-READ fields** — 0.3 per
+///    read field, +0.1 only when all THREE were read and satisfy the
+///    identity. A derived field can never raise confidence.
+///  * **The gate sees only read fields.** 3 read → identity check;
+///    2 read → range/partial acceptance. The old flow derived the third
+///    value first and then let the gate "verify" `litres × €/L ≈ total`
+///    on the number it had just computed from those same two — the
+///    tautology that stamped confidence 1.0 on a scrambled read.
+///  * **Derivation happens AFTER acceptance, at reduced confidence**
+///    (the 2-read score stands; the derived field is flagged in
+///    [ReceiptParseResult.derived]).
+///  * **Rejection is honest**: the read fields are still returned as
+///    prefill candidates (`validated: false` + reason), so the caller's
+///    existing form-prefill path becomes assisted manual entry — the
+///    user verifies; nothing is silently accepted.
+///
+/// The per-currency plausibility band comes from the threaded
+/// [OcrLocaleProfile] when the active country is known, else from the
+/// currency symbol printed on the paper (€, Kč, Ft, zł, CHF, £, kr),
+/// else the EUR default — so range validation ALWAYS runs (#3458
+/// defect 3: 41.39 €/L must be absurd even with no profile threaded).
 ReceiptParseResult orchestrateReceiptParse({
   required List<RecognizedTextBlock> blocks,
   required String text,
@@ -28,43 +46,98 @@ ReceiptParseResult orchestrateReceiptParse({
   PumpValidationGate gate = const PumpValidationGate(),
   OcrTraceRecorder? trace,
 }) {
-  final anchored = extractReceiptByLabelAnchor(blocks);
+  final rangeOverride = profile == null
+      ? null
+      : ReceiptCurrencyRange(
+          code: profile.currency,
+          priceMin: profile.priceMin,
+          priceMax: profile.priceMax,
+          totalMax: profile.totalMax,
+        );
+  final read = parseReceiptSpatially(
+    blocks,
+    rangeOverride: rangeOverride,
+    volumeMax: profile?.volumeMax,
+    trace: trace,
+  );
 
   // Prose fields the geometry path never produces — read from flat text.
   final date = extractDate(text);
   final stationName = extractStationName(lines);
   final fuelType = extractFuelType(text);
 
-  final confidence = _confidenceFor(anchored);
+  // HONEST confidence — read fields only; derived never raises it.
+  final readCount = read.readFields.length;
+  final isConsistent = read.isConsistentRead;
+  var confidence = 0.3 * readCount;
+  if (isConsistent) confidence += 0.1;
+  confidence = confidence.clamp(0.0, 1.0);
+  trace?.confidence(
+    hasTotal: read.totalCost != null,
+    hasVolume: read.liters != null,
+    hasPrice: read.pricePerLiter != null,
+    isConsistent: isConsistent,
+    total: confidence,
+  );
+
+  // The gate evaluates READ fields only. Range checks always run: the
+  // threaded profile wins, else a profile synthesized from the currency
+  // printed on the paper (or the EUR default).
+  final gateProfile = profile ?? _profileFromRange(read.range);
   final result = gate.evaluate(
-    total: anchored.totalCost,
-    volume: anchored.liters,
-    pricePerLitre: anchored.pricePerLiter,
+    total: read.totalCost,
+    volume: read.liters,
+    pricePerLitre: read.pricePerLiter,
     confidence: confidence,
-    profile: profile,
+    profile: gateProfile,
     trace: trace,
   );
-  final derivedNames = anchored.derived.map(pumpFieldName).toSet();
+
+  // Derive the missing third ONLY after acceptance, flagged, at the
+  // unchanged 2-read confidence.
+  var total = read.totalCost;
+  var liters = read.liters;
+  var price = read.pricePerLiter;
+  final derivedNames = <String>{};
+  if (result.accepted && readCount == 2) {
+    if (total == null && liters != null && price != null) {
+      total = double.parse((liters * price).toStringAsFixed(2));
+      derivedNames.add('totalCost');
+      trace?.crossCheck(
+          volume: liters, price: price, derivedPath: 'total', computed: total);
+    } else if (liters == null && total != null && price != null && price > 0) {
+      liters = double.parse((total / price).toStringAsFixed(2));
+      derivedNames.add('liters');
+      trace?.crossCheck(
+          total: total, price: price, derivedPath: 'volume', computed: liters);
+    } else if (price == null && total != null && liters != null && liters > 0) {
+      price = double.parse((total / liters).toStringAsFixed(3));
+      derivedNames.add('pricePerLiter');
+      trace?.crossCheck(
+          total: total, volume: liters, derivedPath: 'price', computed: price);
+    }
+  }
+
   trace?.result(
-    totalCost: anchored.totalCost,
-    liters: anchored.liters,
-    pricePerLiter: anchored.pricePerLiter,
+    totalCost: total,
+    liters: liters,
+    pricePerLiter: price,
     derived: derivedNames,
     confidence: confidence,
-    validated: profile != null && result.accepted,
+    validated: result.accepted,
     validationReason: result.reason,
   );
 
   return ReceiptParseResult(
-    liters: anchored.liters,
-    totalCost: anchored.totalCost,
-    pricePerLiter: anchored.pricePerLiter,
+    liters: liters,
+    totalCost: total,
+    pricePerLiter: price,
     date: date,
     stationName: stationName,
     fuelType: fuelType,
     brandLayout: 'fuel_station',
     confidence: confidence,
-    validated: profile != null && result.accepted,
+    validated: result.accepted,
     validationReason: result.reason,
     derived: derivedNames,
   );
@@ -72,18 +145,29 @@ ReceiptParseResult orchestrateReceiptParse({
 
 /// `true` when [text] / [blocks] look like a fuel-station receipt that
 /// should route to [orchestrateReceiptParse] instead of the generic
-/// flat-string parser. Conservative: needs the fuel-pump markers AND a
-/// per-litre price signal (see [looksLikeFuelStationReceipt]).
-bool shouldUseReceiptLabelAnchor(String text, List<RecognizedTextBlock> blocks) {
+/// flat-string parser: either the legacy flat-text markers (#2848) or —
+/// language-agnostic — the classified blocks themselves carry two
+/// distinct transaction labels plus value tokens (#3458).
+bool shouldUseReceiptLabelAnchor(
+  String text,
+  List<RecognizedTextBlock> blocks,
+) {
   if (blocks.length < 2) return false;
-  return looksLikeFuelStationReceipt(text);
+  if (looksLikeFuelStationReceipt(text)) return true;
+  return hasSpatialRoutingSignal(blocks);
 }
 
-double _confidenceFor(ReceiptAnchoredResult r) {
-  var score = 0.0;
-  if (r.totalCost != null) score += 0.3;
-  if (r.liters != null) score += 0.3;
-  if (r.pricePerLiter != null) score += 0.3;
-  if (r.isConsistent) score += 0.1;
-  return score.clamp(0.0, 1.0);
-}
+/// Synthesizes the gate profile from the plausibility band the spatial
+/// read used (paper-detected currency or the EUR default), so range
+/// checks run even when no country/locale profile is threaded.
+OcrLocaleProfile _profileFromRange(ReceiptCurrencyRange range) =>
+    OcrLocaleProfile(
+      // i18n-ignore: trace-only diagnostics marker, not UI.
+      country: 'auto',
+      currency: range.code,
+      decimalSeparator: ',',
+      priceMin: range.priceMin,
+      priceMax: range.priceMax,
+      volumeMax: kReceiptVolumeMax,
+      totalMax: range.totalMax,
+    );

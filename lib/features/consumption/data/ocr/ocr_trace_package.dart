@@ -56,6 +56,10 @@ class OcrTracePackage {
   /// Every label→numeric anchor candidate, with the chosen one flagged.
   final List<OcrTraceAnchor> anchors;
 
+  /// Spatial label→value pairing decisions of the receipt parser
+  /// (#3458): label box → value box + the rule that fired.
+  final List<OcrTracePairing> pairings;
+
   /// Magnitude-fallback bucket decisions for still-unbound fields.
   final List<OcrTraceFallback> magnitudeFallback;
 
@@ -92,6 +96,7 @@ class OcrTracePackage {
     this.classification = const [],
     this.assembledLabels = const [],
     this.anchors = const [],
+    this.pairings = const [],
     this.magnitudeFallback = const [],
     this.crossCheck,
     this.confidence,
@@ -120,6 +125,8 @@ class OcrTracePackage {
           'assembledLabels': [for (final a in assembledLabels) a.toJson()],
         if (anchors.isNotEmpty)
           'anchors': [for (final a in anchors) a.toJson()],
+        if (pairings.isNotEmpty)
+          'pairings': [for (final p in pairings) p.toJson()],
         if (magnitudeFallback.isNotEmpty)
           'magnitudeFallback': [for (final f in magnitudeFallback) f.toJson()],
         if (crossCheck != null) 'crossCheck': crossCheck!.toJson(),

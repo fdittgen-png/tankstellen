@@ -28,7 +28,12 @@ FuelType? extractFuelType(String text) {
   final lower = text.toLowerCase();
   // E85 first — "e85" contains "e5" as a substring-via-boundary edge
   // case on some OCR outputs where the 8 reads as 3 or falls out.
-  if (RegExp(r'\be85\b|sp95\s*-?\s*e?\s*85|bio\s*[eé]thanol')
+  // #3458 — French pumps also print the product as "ETHANOL 85" (the
+  // Pézenas field receipt), which none of the compound codes matched;
+  // a bare (é)thanol is always Superéthanol-E85 on a fuel receipt.
+  // The lookbehind keeps "méthanol"-style words from matching.
+  if (RegExp(r'\be85\b|sp95\s*-?\s*e?\s*85|bio\s*[eé]thanol|'
+          r'(?<![a-zé])[eé]thanol')
       .hasMatch(lower)) {
     return FuelType.e85;
   }

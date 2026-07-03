@@ -94,17 +94,17 @@ class ReceiptParser {
     return reconciled;
   }
 
-  /// Geometry-aware parse for the receipt OCR path (#2848).
+  /// Geometry-aware parse for the receipt OCR path (#2848, rewritten by
+  /// #3458).
   ///
   /// When ML Kit's [blocks] (with their boxes) look like a fuel-station
-  /// receipt — pump/volume/price markers plus a per-litre signal — the
-  /// values sit in a right column row-aligned with their left-column
-  /// labels, exactly the geometry the pump-display path already solves.
-  /// We route those to the label-anchored extractor (binding Volume→
-  /// litres, Prix→€/L, TOT TTC→total by row) + the SAME validation gate,
-  /// so a fully-legible FR receipt comes back with all three fields and
-  /// `validated:true`. Everything else falls back to the flat-string
-  /// [parse], byte-for-byte unchanged — strictly additive.
+  /// receipt they route to the SPATIAL parser: rotation-normalized
+  /// row-alignment pairing (Volume→litres, Prix→€/L, TOT TTC→total),
+  /// the multi-language OCR-tolerant label lexicon, unit-suffix price
+  /// detection (`/ℓ` and its mangles), currency-aware plausibility, and
+  /// the honest gate (consistency counted over independently-READ
+  /// fields only — a derived value can never raise confidence).
+  /// Everything else falls back to the flat-string [parse], unchanged.
   ReceiptParseResult parseBlocks(
     List<RecognizedTextBlock> blocks,
     String text, {
