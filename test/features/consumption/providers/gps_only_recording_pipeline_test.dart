@@ -14,6 +14,7 @@ import 'package:tankstellen/features/consumption/domain/entities/trip_save_stage
 import 'package:tankstellen/features/consumption/domain/services/gps_fuel_estimator.dart';
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/providers/gps_only_recording_pipeline.dart';
+import 'package:tankstellen/features/consumption/providers/gps_only_trip_wal.dart';
 import 'package:tankstellen/features/consumption/providers/recording_pipeline.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_phase.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_state.dart';
@@ -317,6 +318,64 @@ void main() {
       expect(harness.geo.activeListeners, 0);
     });
 
+    test('#3438 — onAppBackgrounded() mid-trip force-flushes the current '
+        'samples + summary through the WAL', () async {
+      final wal = _CountingWal();
+      final harness = _Harness(wal: wal);
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+
+      harness.geo.emit(_pos(43.4, 3.5, speedMps: 20.0));
+      await _pump();
+      final before = wal.flushNowCalls;
+
+      harness.pipeline.onAppBackgrounded();
+
+      expect(wal.flushNowCalls, before + 1,
+          reason: 'backgrounding must force the WAL past its debounce so an '
+              'OS kill right after loses nothing');
+      expect(wal.lastFlushedSamples, hasLength(1));
+      expect(wal.lastFlushedSummary, isNotNull);
+    });
+
+    test('#3438 — onAppBackgrounded() with no active recording is a no-op',
+        () {
+      final wal = _CountingWal();
+      final harness = _Harness(wal: wal);
+      addTearDown(harness.dispose);
+
+      // Never started → no recorder → nothing to flush.
+      harness.pipeline.onAppBackgrounded();
+
+      expect(wal.flushNowCalls, 0);
+    });
+
+    test('#3438 — onAppBackgrounded() after stop() is a no-op', () async {
+      final wal = _CountingWal();
+      final harness = _Harness(wal: wal);
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+      await harness.pipeline.stop();
+      final before = wal.flushNowCalls;
+
+      harness.pipeline.onAppBackgrounded();
+
+      expect(wal.flushNowCalls, before,
+          reason: 'a stopped trip has been finalised — its WAL is cleared '
+              'and must not be resurrected by a late lifecycle event');
+    });
+
+    test('#3438 — a throwing WAL is swallowed: the lifecycle hook never '
+        'throws (fault injection, #2349)', () async {
+      final harness = _Harness(wal: _ThrowingWal());
+      addTearDown(harness.dispose);
+      harness.pipeline.start();
+      harness.geo.emit(_pos(43.4, 3.5, speedMps: 20.0));
+      await _pump();
+
+      expect(harness.pipeline.onAppBackgrounded, returnsNormally);
+    });
+
     test('stopping a moving GPS-only trip is safe when the active-vehicle '
         'read throws (#2228)', () async {
       final harness = _Harness(vehicleProviderThrows: true);
@@ -353,8 +412,10 @@ class _Harness {
     String? activeVehicleId,
     bool vehicleProviderThrows = false,
     VehicleProfile? vehicle,
+    GpsOnlyTripWal? wal, // #3438 — injectable so the flush tests can count
   }) : host = _FakeHost(activeVehicleId: activeVehicleId) {
     _vehicle = vehicle;
+    _wal = wal;
     container = ProviderContainer(overrides: [
       geolocatorWrapperProvider.overrideWithValue(geo),
       // #2760 — the pipeline now attaches IMU fusion in start(); stub it with
@@ -380,10 +441,11 @@ class _Harness {
       ),
     ]);
     // A tiny capturing provider hands us a real Ref to feed the pipeline.
-    pipeline = container.read(_pipelineProvider(host));
+    pipeline = container.read(_pipelineProvider((host: host, wal: _wal)));
   }
 
   VehicleProfile? _vehicle;
+  GpsOnlyTripWal? _wal;
   final _FakeHost host;
   final _RecordingGeolocator geo = _RecordingGeolocator();
   late final ProviderContainer container;
@@ -398,10 +460,32 @@ class _Harness {
 /// Family provider that constructs the pipeline with the provider's own
 /// [Ref] so the unit test exercises the real Riverpod read path the
 /// production notifier uses (geolocator wrapper + active-vehicle).
-final _pipelineProvider =
-    Provider.family<GpsOnlyRecordingPipeline, RecordingPipelineHost>(
-  (ref, host) => GpsOnlyRecordingPipeline(ref: ref, host: host),
+final _pipelineProvider = Provider.family<GpsOnlyRecordingPipeline,
+    ({RecordingPipelineHost host, GpsOnlyTripWal? wal})>(
+  (ref, args) =>
+      GpsOnlyRecordingPipeline(ref: ref, host: args.host, wal: args.wal),
 );
+
+/// #3438 — counts + captures WAL flushes without touching Hive.
+class _CountingWal extends GpsOnlyTripWal {
+  int flushNowCalls = 0;
+  List<TripSample>? lastFlushedSamples;
+  TripSummary? lastFlushedSummary;
+  @override
+  void flushNow(List<TripSample> samples, TripSummary summary) {
+    flushNowCalls++;
+    lastFlushedSamples = List.of(samples);
+    lastFlushedSummary = summary;
+  }
+}
+
+/// #3438 fault injection — the WAL contract is never-throws, but the
+/// lifecycle hook must hold its own guard against a misbehaving override.
+class _ThrowingWal extends GpsOnlyTripWal {
+  @override
+  void flushNow(List<TripSample> samples, TripSummary summary) =>
+      throw StateError('wal write blew up');
+}
 
 /// #2766 — pins the active language to English so `start()`'s ARB lookup for
 /// the recording-notification copy resolves without the storage / profile

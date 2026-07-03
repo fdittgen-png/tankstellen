@@ -254,6 +254,46 @@ void main() {
       expect((block['signalCoverage'] as Map)['engineLoadPercent'], 1.0);
     });
 
+    test('#3433 — schema is bumped to 2 and the precision block exports '
+        'measured φ / ethanol / dominant fuel branch', () {
+      final obd2 = Obd2TripFeatures.fromSamples([
+        TripSample(
+          timestamp: DateTime.utc(2026, 6, 3, 10),
+          speedKmh: 50,
+          rpm: 1800,
+          fuelRateLPerHour: 48.6,
+          measuredPhi: 0.99,
+          ethanolPercent: 10,
+          fuelSource: 'pid9D',
+        ),
+        TripSample(
+          timestamp: DateTime.utc(2026, 6, 3, 10, 0, 1),
+          speedKmh: 55,
+          rpm: 2200,
+          fuelRateLPerHour: 50.1,
+          measuredPhi: 1.01,
+          ethanolPercent: 10,
+          fuelSource: 'pid9D',
+        ),
+      ]);
+      final json = DrivingAnalysisTrace(
+        capturedAt: DateTime.utc(2026, 6, 3, 11),
+        summary: _summary(),
+        score: _score,
+        lessons: const [],
+        obd2Features: obd2,
+      ).toJson();
+
+      expect(json['schema'], 2);
+      final block = json['obd2Features'] as Map<String, dynamic>;
+      expect((block['measuredPhi'] as Map)['mean'], 1.0);
+      expect((block['ethanolPercent'] as Map)['mean'], 10.0);
+      expect(block['dominantFuelSource'], 'pid9D');
+      expect((block['fuelSourceShares'] as Map)['pid9D'], 1.0);
+      expect((block['signalCoverage'] as Map)['measuredPhi'], 1.0);
+      expect((block['signalCoverage'] as Map)['ethanolPercent'], 1.0);
+    });
+
     test('formatDrivingAnalysisTraceJson is valid, round-trippable JSON', () {
       final trace = DrivingAnalysisTrace(
         capturedAt: DateTime.utc(2026, 6, 3, 11),

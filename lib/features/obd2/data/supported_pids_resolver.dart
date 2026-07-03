@@ -277,6 +277,14 @@ class SupportedPidsResolver {
   /// unconditional core still rotates (#811 don't-reject-blind, #2457).
   bool get isResolved => _supportedPids != null;
 
+  /// Test seam (#3416): force-resolve the supported set so strict
+  /// `isResolved`-gated PIDs (wideband phi, 0x66, 0x9D/0xA2, 0x52) can be
+  /// exercised without scripting the 8 x `01 XX` bitmap scan.
+  @visibleForTesting
+  void debugSetSupportedPids(Set<int> pids) {
+    _supportedPids = Set.of(pids);
+  }
+
   /// The live subscription set for [target] (#2457): the **discover-all ∩
   /// target-set**. Given the polling layer's target PID table, return the
   /// subset the car actually implements.

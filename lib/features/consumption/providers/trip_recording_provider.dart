@@ -23,8 +23,10 @@ import '../domain/entities/trip_save_stage.dart';
 import '../domain/entities/trip_start_stage.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
+import 'active_vehicle_read.dart';
 import 'gps_only_recording_pipeline.dart';
 import 'recording_battery_exemption.dart';
+import 'recording_companion_association.dart';
 import 'recording_pipeline.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
@@ -377,6 +379,9 @@ class TripRecording extends _$TripRecording {
       // #3313 — manual (foreground) start: prompt once, FGS-gated. Auto
       // starts skip it (may be backgrounded; the dialog can't show).
       unawaited(ref.read(recordingBatteryExemptionProvider).maybePrompt());
+      // #3437 — same foreground moment: fire-and-forget CDM association for
+      // the pinned dongle (no-op without one / FGS-off / iOS / pre-34).
+      triggerCompanionAssociationForPinnedAdapter(ref);
     }
     try {
       await _startInternal(service, automatic: automatic);
@@ -416,21 +421,12 @@ class TripRecording extends _$TripRecording {
     await pipeline.start(service, automatic: automatic);
   }
 
-  /// Read the active vehicle profile, swallowing any provider-wiring
-  /// errors that show up in widget tests (where the Riverpod graph
-  /// for the vehicle-active-profile chain isn't always overridden).
-  /// Returns null — both a cold-start no-vehicle and an
-  /// unavailable-provider state — which the [Obd2RecordingPipeline]
-  /// handles by letting `readFuelRateLPerHour` fall back to its
-  /// generic defaults.
-  VehicleProfile? _tryReadActiveVehicle() {
-    try {
-      return ref.read(activeVehicleProfileProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording: active vehicle unavailable'}));
-      return null;
-    }
-  }
+  /// Read the active vehicle profile, swallowing provider-wiring errors
+  /// (widget tests without the vehicle graph) — delegates to the shared
+  /// [tryReadActiveVehicleProfile] guard (#3437). Null means "no vehicle";
+  /// the [Obd2RecordingPipeline] falls back to its generic fuel defaults.
+  VehicleProfile? _tryReadActiveVehicle() => tryReadActiveVehicleProfile(ref,
+      where: 'TripRecording: active vehicle unavailable');
 
   /// #1615 — read the `experimentalOemPids` feature flag, swallowing
   /// any provider-wiring error the same way [_tryReadActiveVehicle]
@@ -885,8 +881,13 @@ class TripRecording extends _$TripRecording {
   /// hook is safe to fire on every backgrounding regardless of
   /// recording state.
   Future<void> onAppBackgrounded() async {
-    if (_obd2?.controller == null) return;
     if (!state.isActive) return;
+    // #3438 — a GPS-only recording force-flushes its WAL too (previously
+    // only the OBD2 snapshot below flushed; a kill lost the debounce
+    // window). Concrete-type dispatch mirrors [debugAppendObd2SampleToGpsOnly].
+    final pipeline = _pipeline;
+    if (pipeline is GpsOnlyRecordingPipeline) pipeline.onAppBackgrounded();
+    if (_obd2?.controller == null) return;
     await _flushActiveSnapshot(force: true);
   }
 

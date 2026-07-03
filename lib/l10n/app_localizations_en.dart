@@ -4734,6 +4734,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drivingTraceExportFailed => 'Couldn\'t export the analysis trace.';
 
   @override
+  String get minimalDriveTripAverage => 'Trip average';
+
+  @override
+  String insightUpshiftCruise(String pctTime, String liters) {
+    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier could save $liters L';
+  }
+
+  @override
+  String get lessonAdviceUpshiftCruise =>
+      'Shift up earlier when cruising — the same speed at lower RPM burns noticeably less fuel.';
+
+  @override
+  String insightCoastingFuelCut(String pctTime, String liters) {
+    return 'Fuel-cut coasting ($pctTime% of trip): saved about $liters L';
+  }
+
+  @override
+  String get lessonAdviceCoastingFuelCut =>
+      'Nicely anticipated — lifting off early lets the engine cut fuel completely while coasting.';
+
+  @override
+  String insightTrailingLitersSaved(String liters) {
+    return '−$liters L';
+  }
+
+  @override
+  String get fuelBreakdownTitle => 'Where your fuel went';
+
+  @override
+  String get fuelBreakdownIdle => 'Idling';
+
+  @override
+  String get fuelBreakdownHarshAccel => 'Hard accelerations';
+
+  @override
+  String get fuelBreakdownHighRpmCruise => 'High-RPM cruising';
+
+  @override
+  String get fuelBreakdownCoastingSaved => 'Saved by coasting';
+
+  @override
+  String get fuelBreakdownEfficient => 'Normal driving';
+
+  @override
+  String fuelBreakdownLiters(String liters) {
+    return '$liters L';
+  }
+
+  @override
+  String get ecoNudgeIdle =>
+      'Idling for a while — switching the engine off saves fuel';
+
+  @override
+  String get ecoNudgeHarshAccel =>
+      'Strong acceleration — a gentler pedal saves fuel';
+
+  @override
+  String get ecoNudgeHighRpm =>
+      'High revs at cruise — shifting up earlier saves fuel';
+
+  @override
   String get ecoRouteOption => 'Eco';
 
   @override
@@ -6547,6 +6608,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get obd2ReconnectRetry => 'Tap to retry';
+
+  @override
+  String get obd2WedgeHintBody =>
+      'Your OBD2 adapter stopped responding. Switch the ignition off and on or replug the adapter — or toggle Bluetooth off and on.';
+
+  @override
+  String get obd2WedgeHintOpenBtSettings => 'Bluetooth settings';
 
   @override
   String get ocrTesterTitle => 'OCR tester';
@@ -12706,6 +12774,67 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Çóúłđñ\'ŧ éẋƥóřŧ ŧĥé áñáłýšîš ŧřáçé. ·············⟧';
 
   @override
+  String get minimalDriveTripAverage => '⟦Ŧřîƥ áṽéřáǧé ·····⟧';
+
+  @override
+  String insightUpshiftCruise(String pctTime, String liters) {
+    return '⟦Ĥîǧĥ-ŘƤṀ çřúîšîñǧ ($pctTime% óƒ ŧřîƥ): šĥîƒŧîñǧ úƥ éářłîéř çóúłđ šáṽé $liters Ł ······················⟧';
+  }
+
+  @override
+  String get lessonAdviceUpshiftCruise =>
+      '⟦Šĥîƒŧ úƥ éářłîéř ŵĥéñ çřúîšîñǧ — ŧĥé šáɱé šƥééđ áŧ łóŵéř ŘƤṀ ƀúřñš ñóŧîçéáƀłý łéšš ƒúéł. ································⟧';
+
+  @override
+  String insightCoastingFuelCut(String pctTime, String liters) {
+    return '⟦Ƒúéł-çúŧ çóášŧîñǧ ($pctTime% óƒ ŧřîƥ): šáṽéđ áƀóúŧ $liters Ł ··············⟧';
+  }
+
+  @override
+  String get lessonAdviceCoastingFuelCut =>
+      '⟦Ñîçéłý áñŧîçîƥáŧéđ — łîƒŧîñǧ óƒƒ éářłý łéŧš ŧĥé éñǧîñé çúŧ ƒúéł çóɱƥłéŧéłý ŵĥîłé çóášŧîñǧ. ··································⟧';
+
+  @override
+  String insightTrailingLitersSaved(String liters) {
+    return '⟦−$liters Ł⟧';
+  }
+
+  @override
+  String get fuelBreakdownTitle => '⟦Ŵĥéřé ýóúř ƒúéł ŵéñŧ ········⟧';
+
+  @override
+  String get fuelBreakdownIdle => '⟦Îđłîñǧ ···⟧';
+
+  @override
+  String get fuelBreakdownHarshAccel => '⟦Ĥářđ áççéłéřáŧîóñš ········⟧';
+
+  @override
+  String get fuelBreakdownHighRpmCruise => '⟦Ĥîǧĥ-ŘƤṀ çřúîšîñǧ ·······⟧';
+
+  @override
+  String get fuelBreakdownCoastingSaved => '⟦Šáṽéđ ƀý çóášŧîñǧ ·······⟧';
+
+  @override
+  String get fuelBreakdownEfficient => '⟦Ñóřɱáł đřîṽîñǧ ······⟧';
+
+  @override
+  String fuelBreakdownLiters(String liters) {
+    return '⟦$liters Ł⟧';
+  }
+
+  @override
+  String get ecoNudgeIdle =>
+      '⟦Îđłîñǧ ƒóř á ŵĥîłé — šŵîŧçĥîñǧ ŧĥé éñǧîñé óƒƒ šáṽéš ƒúéł ····················⟧';
+
+  @override
+  String get ecoNudgeHarshAccel =>
+      '⟦Šŧřóñǧ áççéłéřáŧîóñ — á ǧéñŧłéř ƥéđáł šáṽéš ƒúéł ··················⟧';
+
+  @override
+  String get ecoNudgeHighRpm =>
+      '⟦Ĥîǧĥ řéṽš áŧ çřúîšé — šĥîƒŧîñǧ úƥ éářłîéř šáṽéš ƒúéł ···················⟧';
+
+  @override
   String get ecoRouteOption => '⟦Éçó ·⟧';
 
   @override
@@ -14573,6 +14702,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2ReconnectRetry => '⟦Ŧáƥ ŧó řéŧřý ·····⟧';
+
+  @override
+  String get obd2WedgeHintBody =>
+      '⟦Ýóúř ÓƁĐ2 áđáƥŧéř šŧóƥƥéđ řéšƥóñđîñǧ. Šŵîŧçĥ ŧĥé îǧñîŧîóñ óƒƒ áñđ óñ óř řéƥłúǧ ŧĥé áđáƥŧéř — óř ŧóǧǧłé Ɓłúéŧóóŧĥ óƒƒ áñđ óñ. ·············································⟧';
+
+  @override
+  String get obd2WedgeHintOpenBtSettings => '⟦Ɓłúéŧóóŧĥ šéŧŧîñǧš ········⟧';
 
   @override
   String get ocrTesterTitle => '⟦ÓÇŘ ŧéšŧéř ····⟧';

@@ -9,6 +9,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/sync/trips_sync_enabled_provider.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';
+import '../data/adapter_pin_resolution.dart';
 import '../data/obd2_connection_errors.dart';
 import '../data/obd2_disconnect_quietly.dart';
 import '../data/obd2_link_arbiter.dart';
@@ -23,6 +24,7 @@ import '../domain/services/obd2_gps_estimate_fallback.dart';
 import '../../consumption/domain/trip_recorder.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'obd2_controller_phase_mapper.dart';
+import 'obd2_reconnect_provider.dart';
 import '../../consumption/providers/recording_pipeline.dart';
 import '../../consumption/providers/reconnect_scanner_factory.dart';
 import '../../consumption/providers/reference_vehicle_match.dart';
@@ -134,14 +136,14 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     _adapterMac = service.adapterMac;
     _adapterName = service.adapterName;
     _adapterFirmware = service.adapterFirmware;
-    // #812 phase 3 — snapshot the active vehicle for `readFuelRateLPerHour`
-    // (null vehicle / fields fall back to service defaults). Vehicle id
-    // resolved up-front to tag any pause-on-drop snapshot (#797 phase 1).
+    // #812 phase 3 — snapshot the active vehicle for `readFuelRateLPerHour`;
+    // vehicle id up-front to tag any pause-on-drop snapshot (#797 phase 1).
     final activeVehicle = _readActiveVehicle();
-    final eagerVehicleId = _readActiveVehicle()?.id;
-    // #797 phase 3 — pinned MAC + auto-reconnect scanner factory. Null MAC
-    // (unpaired) skips the scanner; the grace window is the sole recovery.
-    final pinnedMac = activeVehicle?.obd2AdapterMac;
+    // #797 phase 3 / #3423 — reconnect pin: vehicle-profile MAC first, else
+    // the #3019 last-good auto-pin (picker-started trips reconnect too);
+    // null (neither) skips the scanner — grace window is the sole recovery.
+    final pinnedMac = resolveAdapterPinMac(activeVehicle?.obd2AdapterMac,
+        () => _ref.read(lastGoodAdapterStoreProvider).recall());
     // #1395 — wire the diagnostic breadcrumb sink for this trip; controller
     // and [Obd2Service] push through the SAME keepAlive notifier so the
     // trace survives the recording screen popping.
@@ -165,7 +167,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       service: service,
       vehicle: activeVehicle,
       referenceVehicle: matchedReference,
-      vehicleId: eagerVehicleId,
+      vehicleId: activeVehicle?.id,
       pinnedAdapterMac: pinnedMac,
       automatic: automatic,
       // #2459 — diagnostic capture (Feature.debugMode); default off.
@@ -180,9 +182,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         // reconnect dispatches over the SAME transport that dropped. The
         // dead-but-typed service is still wired here.
         readLinkKind: () => _service?.linkKind,
-        // #3014 — read the live adapter NAME the same way so an in-trip
-        // reconnect trace carries the human name (e.g. `vLinker FS 1234`),
-        // not just the redacted MAC, in the health-screen trace headline.
+        // #3014 — the live adapter NAME the same way, so the in-trip
+        // reconnect trace headline names the adapter, not just the MAC.
         readAdapterName: () => _service?.adapterName,
       ),
       breadcrumbCollector: breadcrumbs,
@@ -399,5 +400,4 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       discardedNoMovement: outcome.isStationaryDiscard,
     );
   }
-
 }

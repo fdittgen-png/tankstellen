@@ -32,6 +32,7 @@ import '../../providers/recording_profile_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import '../../providers/wakelock_facade.dart';
 import '../widgets/broken_map_widgets.dart';
+import '../widgets/eco_nudge_listener.dart';
 import '../widgets/minimal_drive_summary.dart';
 import '../widgets/recording_app_bar_actions.dart';
 import '../widgets/trip_avg_consumption_card.dart';
@@ -928,6 +929,9 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           // #2380 — instant L/100 km + coaching symbols; moved from the
           // top to the bottom so the radar card leads the screen.
           const MinimalDriveSummary(),
+          // #3432 — live eco-nudge SnackBars (rate-limited in the pure
+          // engine; screen-mounted, so structurally foreground-only).
+          const EcoNudgeListener(),
         ],
       ),
     );

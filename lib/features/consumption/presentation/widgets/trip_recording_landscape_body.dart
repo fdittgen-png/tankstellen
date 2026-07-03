@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../obd2/api.dart';
 import 'broken_map_widgets.dart';
+import 'eco_nudge_listener.dart';
 import 'minimal_drive_summary.dart';
 import 'trip_avg_consumption_card.dart';
 import 'trip_radar_card.dart';
@@ -74,6 +75,9 @@ class TripRecordingLandscapeBody extends StatelessWidget {
               // a large-headline card; it leads the most time-critical
               // glance zone.
               const MinimalDriveSummary(),
+              // #3432 — live eco-nudge SnackBars in landscape too (the
+              // portrait column mounts its own; zero-size widget).
+              const EcoNudgeListener(),
               const SizedBox(height: 12),
               // Large speed read-out — the second live-feedback figure.
               Expanded(

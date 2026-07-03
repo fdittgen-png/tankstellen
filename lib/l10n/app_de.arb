@@ -2098,6 +2098,96 @@
   "@drivingTraceExportFailed": {
     "description": "Snackbar shown when exporting the driving-analysis trace JSON failed (#2804)."
   },
+  "minimalDriveTripAverage": "Fahrtdurchschnitt",
+  "@minimalDriveTripAverage": {
+    "description": "Label of the trip-running-average row on the live minimal drive summary card (#3431). Sits under the true instantaneous headline so 'instant' and 'average' are never conflated."
+  },
+  "insightUpshiftCruise": "Hochtouriges Fahren ({pctTime}% der Fahrt): früheres Hochschalten könnte {liters} L sparen",
+  "@insightUpshiftCruise": {
+    "description": "Post-trip lesson headline (#3432) for steady-speed cruising at high RPM where an earlier upshift was available. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceUpshiftCruise": "Beim Dahingleiten früher hochschalten — dieselbe Geschwindigkeit bei niedrigerer Drehzahl verbraucht spürbar weniger Kraftstoff.",
+  "@lessonAdviceUpshiftCruise": {
+    "description": "How-to-improve advice for the high-RPM-cruise upshift lesson (#3432). Embedded in the GPX recording export."
+  },
+  "insightCoastingFuelCut": "Rollen mit Schubabschaltung ({pctTime}% der Fahrt): rund {liters} L gespart",
+  "@insightCoastingFuelCut": {
+    "description": "Positive post-trip lesson headline (#3432) recognising deceleration-fuel-cut coasting (measured fuel rate near zero while moving). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceCoastingFuelCut": "Gut vorausgeschaut — frühes Gaswegnehmen lässt den Motor beim Rollen die Einspritzung komplett abschalten.",
+  "@lessonAdviceCoastingFuelCut": {
+    "description": "Praise/advice line for the fuel-cut coasting lesson (#3432). Embedded in the GPX recording export."
+  },
+  "insightTrailingLitersSaved": "−{liters} L",
+  "@insightTrailingLitersSaved": {
+    "description": "Trailing badge for a POSITIVE lesson / breakdown row showing litres saved (#3432) — the minus-sign counterpart of insightTrailingLitersWasted. Liters is a pre-formatted one-decimal string.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelBreakdownTitle": "Wohin dein Kraftstoff ging",
+  "@fuelBreakdownTitle": {
+    "description": "Title of the per-event fuel-cost breakdown card on the Trip detail screen (#3432)."
+  },
+  "fuelBreakdownIdle": "Leerlauf",
+  "@fuelBreakdownIdle": {
+    "description": "Breakdown row label (#3432): litres burned while stationary with the engine running (idle events > 30 s)."
+  },
+  "fuelBreakdownHarshAccel": "Starke Beschleunigungen",
+  "@fuelBreakdownHarshAccel": {
+    "description": "Breakdown row label (#3432): excess litres attributed to pedal-spike acceleration events."
+  },
+  "fuelBreakdownHighRpmCruise": "Hochtouriges Fahren",
+  "@fuelBreakdownHighRpmCruise": {
+    "description": "Breakdown row label (#3432): estimated litres an earlier upshift would have saved during steady high-RPM cruising."
+  },
+  "fuelBreakdownCoastingSaved": "Durch Rollen gespart",
+  "@fuelBreakdownCoastingSaved": {
+    "description": "Positive breakdown row label (#3432): litres saved by deceleration fuel cut while coasting."
+  },
+  "fuelBreakdownEfficient": "Normale Fahrt",
+  "@fuelBreakdownEfficient": {
+    "description": "Neutral breakdown row label (#3432): the remainder of the trip's fuel not attributed to any waste event class."
+  },
+  "fuelBreakdownLiters": "{liters} L",
+  "@fuelBreakdownLiters": {
+    "description": "Plain litres badge for the neutral breakdown remainder row (#3432). Liters is a pre-formatted one-decimal string.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "ecoNudgeIdle": "Längerer Leerlauf — Motor abstellen spart Kraftstoff",
+  "@ecoNudgeIdle": {
+    "description": "Live in-trip nudge SnackBar (#3432) after 30+ seconds stationary with the engine running. Rate-limited to at most one nudge per minute, three per trip."
+  },
+  "ecoNudgeHarshAccel": "Starke Beschleunigung — sanfteres Gasgeben spart Kraftstoff",
+  "@ecoNudgeHarshAccel": {
+    "description": "Live in-trip nudge SnackBar (#3432) after a sustained full-pedal spike. Rate-limited to at most one nudge per minute, three per trip."
+  },
+  "ecoNudgeHighRpm": "Hohe Drehzahl beim Dahingleiten — früheres Hochschalten spart Kraftstoff",
+  "@ecoNudgeHighRpm": {
+    "description": "Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip."
+  },
   "ecoRouteOption": "Sparsam",
   "@ecoRouteOption": {
     "description": "Label für den Eco-Routing-Chip in den Routensuche-Bedienelementen (#1123). Wählt Routen aus, die Kraftstoff statt Zeit minimieren."
@@ -3106,6 +3196,14 @@
   "obd2ReconnectRetry": "Erneut versuchen",
   "@obd2ReconnectRetry": {
     "description": "Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires."
+  },
+  "obd2WedgeHintBody": "Dein OBD2-Adapter reagiert nicht mehr. Schalte die Zündung aus und wieder ein oder stecke den Adapter neu ein – oder schalte Bluetooth aus und wieder ein.",
+  "@obd2WedgeHintBody": {
+    "description": "One-time actionable recovery hint shown when the Classic OBD2 adapter is wedged (#3422, epic #3415): repeated reconnects ended in exhausted RFCOMM ladders and the in-app recovery rungs did not clear it. Tells the user the two physical recoveries (ignition cycle / replug) and the Bluetooth toggle."
+  },
+  "obd2WedgeHintOpenBtSettings": "Bluetooth-Einstellungen",
+  "@obd2WedgeHintOpenBtSettings": {
+    "description": "Label of the button on the wedged-adapter recovery hint (#3422) that deep-links to the system Bluetooth settings screen so the user can toggle Bluetooth off and on."
   },
   "ocrTesterTitle": "OCR-Tester",
   "ocrTesterNavLabel": "OCR-Tester",

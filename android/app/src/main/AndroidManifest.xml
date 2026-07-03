@@ -234,5 +234,14 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="geo"/>
         </intent>
+        <!-- #3422 — OBD2 wedge-recovery rung 3: package visibility for
+             resolveActivity() on the Bluetooth consent dialogs (API 30+
+             filters queryIntentActivities without these entries). -->
+        <intent>
+            <action android:name="android.bluetooth.adapter.action.REQUEST_ENABLE"/>
+        </intent>
+        <intent>
+            <action android:name="android.bluetooth.adapter.action.REQUEST_DISABLE"/>
+        </intent>
     </queries>
 </manifest>

@@ -147,6 +147,33 @@ Future<Obd2Service?> _connectByMacClassicDirect(
 ) async {
   final classic = svc.classicBluetooth;
   if (classic == null) return null;
+  // #3423 — lost-bond detection. Android only opens RFCOMM to a BONDED
+  // device, so a pinned Classic MAC missing from `bondedDevices` can never
+  // connect — dialling it would just burn the whole-ladder budget (#3421)
+  // and stamp a misleading generic rfcomm-open-fail. Stamp the DISTINCT
+  // bond-lost failure + raise the guided-re-pair state instead (consumed by
+  // the #3422 recovery banner; see [Obd2LostBondState]). `null` (bonded
+  // list unreadable) degrades to the ordinary dial — an unknown must never
+  // be misclassified as a lost bond.
+  final bonded = await classic.isBonded(mac);
+  if (bonded == false) {
+    Obd2ConnectTraceLog.active
+      ?..addStep(
+        label: 'classic-bond-check',
+        status: Obd2ConnectStepStatus.fail,
+        detail: 'bond-lost: pinned Classic MAC missing from bondedDevices',
+      )
+      ..setOutcome(
+        Obd2ConnectOutcome.pairingRequired,
+        failureDetail: 'bond-lost: the adapter is no longer paired with '
+            'this phone — re-pair it in the system Bluetooth settings',
+      );
+    Obd2LostBondState.instance.noteLostBond(mac);
+    return null;
+  }
+  // A definite `true` proves the bond is back (the user re-paired): clear
+  // any lost-bond state for this MAC so the guidance dismisses itself.
+  if (bonded == true) Obd2LostBondState.instance.clearFor(mac);
   // #2906 — stop scan + settle before the RFCOMM open (mirrors the BLE path).
   await svc.stopScanBeforeConnect();
   await svc._teardownLastDirectChannel();

@@ -7,6 +7,7 @@ import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
+import android.provider.Settings
 import android.util.Rational
 import de.tankstellen.tankstellen.autorecord.BackgroundAdapterChannel
 import de.tankstellen.tankstellen.autorecord.CompanionDeviceAssociator
@@ -93,6 +94,57 @@ class MainActivity : FlutterActivity() {
             }
         }
         pipChannel = pip
+
+        // #3422 — OBD2 wedge-recovery intent bridge. Rung 3 of the recovery
+        // ladder fires the Bluetooth consent DIALOGS (REQUEST_DISABLE /
+        // REQUEST_ENABLE — no silent toggle exists on API 31+, #3404) and the
+        // Settings deep-link fallback. Firing an Activity intent needs an
+        // Activity context, so — like the PiP bridge above and unlike the
+        // context-only Obd2ClassicPlugin — this handler lives on the Activity.
+        val recovery = MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            OBD2_RECOVERY_CHANNEL,
+        )
+        recovery.setMethodCallHandler { call, result ->
+            when (call.method) {
+                // Whether an Activity resolves for [action] (OEM-dependent for
+                // the BT consent dialogs — verify before firing, #3404).
+                "resolveBtIntent" -> {
+                    val action = call.argument<String>("action")
+                    result.success(
+                        action != null &&
+                            Intent(action).resolveActivity(packageManager) != null,
+                    )
+                }
+                // Fire the consent dialog for [action]. Best-effort: false
+                // when unresolvable / the start throws (e.g. backgrounded on
+                // Android 10+); the Dart rung then falls back.
+                "fireBtIntent" -> {
+                    val action = call.argument<String>("action")
+                    result.success(
+                        action != null && startActivitySafely(Intent(action)),
+                    )
+                }
+                // The #3404 floor: deep-link straight to the system Bluetooth
+                // settings so the user can toggle BT manually.
+                "openBluetoothSettings" -> result.success(
+                    startActivitySafely(Intent(Settings.ACTION_BLUETOOTH_SETTINGS)),
+                )
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    /** #3422 — start an activity, reporting failure instead of crashing (a
+     *  background-start restriction or an unresolvable intent just returns
+     *  false so the recovery ladder falls through to the next rung). */
+    private fun startActivitySafely(intent: Intent): Boolean {
+        return try {
+            startActivity(intent)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     /**
@@ -201,5 +253,8 @@ class MainActivity : FlutterActivity() {
 
     companion object {
         private const val PIP_CHANNEL = "tankstellen/pip"
+
+        /** #3422 — OBD2 wedge-recovery intent bridge (rung 3 + deep-link). */
+        private const val OBD2_RECOVERY_CHANNEL = "tankstellen.obd2/recovery"
     }
 }

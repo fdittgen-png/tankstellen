@@ -35,13 +35,25 @@ class CompanionAutoRecordCoordinator {
   final CompanionDeviceAssociation _association;
   final bool _fgsEnabled;
 
+  /// #3437 — MACs whose association dialog was already attempted this app
+  /// session. A declined (or failed) system dialog must not re-fire on
+  /// every subsequent manual trip start; the production provider is
+  /// keepAlive, so the guard lives for the app's lifetime and naturally
+  /// resets on the next launch (an established association still
+  /// short-circuits via [CompanionDeviceAssociation.isAssociated]).
+  final Set<String> _attemptedMacs = <String>{};
+
   /// Ensure a CDM association exists for [mac]. Returns true if associated
-  /// (already or newly). Best-effort; never throws.
+  /// (already or newly). Best-effort; never throws. The system association
+  /// dialog is attempted at most once per [mac] per app session (#3437).
   Future<bool> ensureAssociated(String mac) async {
     if (!_fgsEnabled) return false;
     try {
       if (!await _association.isSupported()) return false;
       if (await _association.isAssociated()) return true;
+      // Mark BEFORE the dialog (the battery-exemption "mark first" idiom,
+      // #3313): a declined or crashed dialog never re-nags this session.
+      if (!_attemptedMacs.add(mac)) return false;
       return await _association.associate(mac);
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {

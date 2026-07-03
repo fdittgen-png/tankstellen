@@ -180,6 +180,13 @@ class Obd2BreadcrumbCollector implements Obd2BreadcrumbRecorder {
   /// dirty MAF (reading high) or a stuck PID 5E (reading low / 0).
   static const String flag5eVsMafDivergent = '5e-vs-maf-divergent';
 
+  /// Canonical flag tag — the PID 0x9D mass-based fuel rate and PID 0x5E
+  /// disagree by more than 50 % (#3428). Both are ECU-reported fuel
+  /// figures, so a divergence signals a mis-scaled 0x9D implementation
+  /// (some ECUs ship non-standard units) or a stuck 0x5E. The 0x9D value
+  /// is still surfaced; the flag rolls into the trip suspicion ratio.
+  static const String flag9dVs5eDivergent = '9d-vs-5e-divergent';
+
   final List<Obd2Breadcrumb> _entries = [];
 
   /// How many samples have ever been recorded this trip — i.e. how

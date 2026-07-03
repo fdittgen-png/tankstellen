@@ -11,9 +11,8 @@ import '../../../core/sensors/imu_sample.dart';
 import '../../../core/sensors/imu_sensor_source.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
 import '../../../core/domain/gps_calibration_matrix.dart';
-import '../../../core/domain/vehicle_profile.dart';
-import '../../vehicle/providers/vehicle_providers.dart';
 import '../../obd2/api.dart';
+import 'active_vehicle_read.dart';
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/services/gps_fuel_estimator.dart';
@@ -78,6 +77,22 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
   @override
   bool resume() => false;
 
+  /// #3438 — the app was backgrounded: force-flush the WAL immediately so
+  /// an imminent OS kill loses at most the fixes since this write, not the
+  /// whole debounce window. No-op between trips (the recorder is null).
+  /// Never throws — a WAL write must not take the recording path down.
+  void onAppBackgrounded() {
+    final recorder = _recorder;
+    if (recorder == null) return;
+    try {
+      _wal.flushNow(_samples, recorder.buildSummary());
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'GpsOnlyRecordingPipeline.onAppBackgrounded'
+      }));
+    }
+  }
+
   /// Pure accumulator — same recorder the OBD2 path uses, so the
   /// distance / harsh-event / idle integration is byte-identical.
   TripRecorder? _recorder;
@@ -127,7 +142,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // #2388). A null vehicle / matrix falls back to the population-default
     // class + cold-start scale, so the estimate still flows on a fresh
     // install — it just isn't yet OBD2-anchored.
-    final vehicle = _tryReadActiveVehicle();
+    final vehicle = tryReadActiveVehicleProfile(_ref,
+        where: 'GpsOnlyRecordingPipeline: active vehicle unavailable');
     final matrix = vehicle?.gpsCalibration;
     _estimateFolder = GpsLiveEstimateFolder.forVehicle(vehicle, matrix);
     // Subscribe to the position stream at high accuracy — the
@@ -315,7 +331,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     if (summary.kind == TripKind.gpsOnly && summary.avgLPer100Km == null) {
       final features = GpsDrivingFeatures.from(samples);
       if (features != null) {
-        final vehicle = _tryReadActiveVehicle();
+        final vehicle = tryReadActiveVehicleProfile(_ref,
+        where: 'GpsOnlyRecordingPipeline: active vehicle unavailable');
         final matrix =
             vehicle?.gpsCalibration ?? GpsCalibrationMatrix.coldStart();
         final est = GpsFuelEstimator.estimate(
@@ -373,23 +390,5 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     if (recorder == null) return;
     _samples.add(sample);
     recorder.onSample(sample);
-  }
-
-  /// #2228 — read the active vehicle profile for the #2080 GPS-fuel
-  /// imputation, swallowing provider-wiring errors the same way the OBD2
-  /// path's `_tryReadActiveVehicle` does. Before this, the stop path read
-  /// `activeVehicleProfileProvider` unguarded, so stopping a moving
-  /// GPS-only trip in a test/widget harness that lacks the vehicle
-  /// provider graph would throw (latent in production, where the graph is
-  /// wired). Returns null on error → the matrix falls back to cold-start.
-  VehicleProfile? _tryReadActiveVehicle() {
-    try {
-      return _ref.read(activeVehicleProfileProvider);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
-        'where': 'GpsOnlyRecordingPipeline: active vehicle unavailable'
-      }));
-      return null;
-    }
   }
 }

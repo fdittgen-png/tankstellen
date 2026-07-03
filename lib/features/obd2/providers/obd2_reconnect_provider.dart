@@ -17,6 +17,8 @@ import '../data/obd2_connection_service.dart';
 import '../data/obd2_link_arbiter.dart';
 import '../data/obd2_reconnect_controller.dart';
 import '../data/obd2_service.dart';
+import '../data/obd2_wedge_detector.dart';
+import '../data/obd2_wedge_recovery.dart';
 import 'obd2_connection_state_provider.dart';
 
 part 'obd2_reconnect_provider.g.dart';
@@ -68,13 +70,55 @@ class Obd2Reconnect extends _$Obd2Reconnect {
       ),
       onStandDown: () => _controller?.stop(),
     );
+    // #3422 — wedge-recovery wiring. The detector latches LinkWedged after
+    // N consecutive exhausted Classic ladders (noted at the ClassicElmChannel
+    // funnel) and kicks the escalation ladder; the ladder's rungs verify with
+    // ONE bounded pinned connect via [_wedgeProbe]. Both trace into the same
+    // exported breadcrumb channel as the reconnect episodes (#3346).
+    final recovery = Obd2WedgeRecovery.instance;
+    recovery.onTrace = _trace;
+    recovery.probeConnect = _wedgeProbe;
+    Obd2WedgeDetector.instance.onWedged = (mac) {
+      _trace('wedge-detected', {'mac': mac});
+      unawaited(recovery.start(mac));
+    };
     ref.onDispose(() {
+      Obd2WedgeDetector.instance.onWedged = null;
+      recovery.probeConnect = null;
+      recovery.onTrace = null;
       _idleReg?.dispose();
       _idleReg = null;
       controller.dispose();
       _controller = null;
     });
     return controller.state;
+  }
+
+  /// #3422 — the recovery ladder's single bounded verification connect: a
+  /// pinned-style DIRECT Classic connect to the wedged [mac] (every other
+  /// reconnect policy is standing down, so this is the only connect
+  /// traffic). `true` when the adapter answered — including a #3035
+  /// engine-off probe (the adapter is back; the ECU is just silent), which
+  /// is exactly the wedge-cleared condition. On a full success the recovered
+  /// link is republished into the app-wide status dot via [_onResult].
+  Future<bool> _wedgeProbe(String mac) async {
+    try {
+      final svc = await Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.liveReconnect,
+        () => ref.read(obd2ConnectionProvider).connectByMacClassicDirect(mac),
+        transportDecisionReason: 'wedge-recovery-probe',
+      );
+      if (svc == null) return false;
+      final result = _onResult(svc);
+      if (result == Obd2ReconnectAttemptResult.connected) {
+        _controller?.notifyConnected();
+      }
+      return result == Obd2ReconnectAttemptResult.connected ||
+          result == Obd2ReconnectAttemptResult.engineOff;
+    } catch (e, st) {
+      _logSeam('wedge probe', e, st);
+      return false;
+    }
   }
 
   Obd2ReconnectController _buildController() {

@@ -48,6 +48,14 @@ AdapterReconnectScanner? Function(
     return null;
   }
   return (pinnedMac, onReconnect) {
+    // #3422 — LinkWedged stand-down: after N consecutive exhausted Classic
+    // ladders every reconnect policy stops dialling, the IN-TRIP scanner
+    // included (its cycles were half of the #3415 storm). No scanner ⇒ the
+    // DroppedSessionManager falls back to grace-window-only recovery; the
+    // wedge-recovery ladder / the user own the link until the wedge clears.
+    if (Obd2WedgeDetector.instance.isWedged) {
+      return null;
+    }
     // One connector per drop holds the gate bookkeeping across the
     // scanner's repeated connect cycles. The connect callback prefers a
     // DIRECT connect over the LIVE transport kind (#2565) — Classic goes
@@ -86,18 +94,28 @@ AdapterReconnectScanner? Function(
       // default to firstConnect, which made the field trace ring read as
       // ten user-driven connects during the #3415 war. The origin now
       // tells the in-trip recovery apart from a real first connect.
-      connect: (mac) => Obd2ConnectTraceLog.runWithOrigin(
-        Obd2ConnectOrigin.liveReconnect,
-        () => connector.attempt(mac),
-        transportDecisionReason: 'in-trip-reconnect',
-      ),
+      // #3422 — a wedge can LATCH while this scanner is already in flight
+      // (its own exhausted ladders count toward the streak): each cycle
+      // re-checks and reports a miss WITHOUT dialling, so an in-flight
+      // scanner stops generating connect traffic the moment the wedge lands.
+      connect: (mac) async {
+        if (Obd2WedgeDetector.instance.isWedged) return false;
+        return Obd2ConnectTraceLog.runWithOrigin(
+          Obd2ConnectOrigin.liveReconnect,
+          () => connector.attempt(mac),
+          transportDecisionReason: 'in-trip-reconnect',
+        );
+      },
       // #2261 concern 2 — after the active-scan miss ceiling switch to a
       // passive autoConnect GATT wait for the rest of the 15-min grace.
-      passiveConnect: (mac) => Obd2ConnectTraceLog.runWithOrigin(
-        Obd2ConnectOrigin.liveReconnect,
-        () => connector.attemptPassive(mac),
-        transportDecisionReason: 'in-trip-reconnect-passive',
-      ),
+      passiveConnect: (mac) async {
+        if (Obd2WedgeDetector.instance.isWedged) return false; // #3422
+        return Obd2ConnectTraceLog.runWithOrigin(
+          Obd2ConnectOrigin.liveReconnect,
+          () => connector.attemptPassive(mac),
+          transportDecisionReason: 'in-trip-reconnect-passive',
+        );
+      },
       onReconnect: onReconnect,
     );
     // #2905 — let the connector's per-attempt telemetry rows carry the

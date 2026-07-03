@@ -67,6 +67,26 @@ class Obd2TripFeatures {
   /// burns proportionally more fuel for warm-up.
   final bool reachedOperatingTemp;
 
+  /// Measured wideband equivalence ratio φ (PIDs 0x24–0x2B / 0x34–0x3B,
+  /// #3427 / #3433). All-null on cars without a wideband sensor.
+  final Obd2SignalDistribution measuredPhi;
+
+  /// Measured ethanol fuel % (PID 0x52, #3429 / #3433). All-null when
+  /// unsupported.
+  final Obd2SignalDistribution ethanolPercent;
+
+  /// Share of the FUEL-carrying samples per fuel-source branch
+  /// (`FuelRateSourceTag` names: `pid9D` / `pidA2` / `pid5E` / `maf66` /
+  /// `maf` / `speedDensity`), #3428 / #3433. Empty on legacy trips (no
+  /// per-sample provenance was stamped) and on trips without any fuel
+  /// signal.
+  final Map<String, double> fuelSourceShares;
+
+  /// The branch that produced the MOST fuel-carrying samples — "which
+  /// branch dominated the trip" (#3433). Null when [fuelSourceShares] is
+  /// empty.
+  final String? dominantFuelSource;
+
   /// Per-signal capture fraction: for each OBD2 field, the share of samples
   /// that carried it. This is the at-a-glance "what did this adapter / ECU
   /// actually expose" map — a `0.0` means the PID is unsupported (or the link
@@ -87,6 +107,10 @@ class Obd2TripFeatures {
     required this.idleShare,
     required this.coolantMaxC,
     required this.reachedOperatingTemp,
+    required this.measuredPhi,
+    required this.ethanolPercent,
+    required this.fuelSourceShares,
+    required this.dominantFuelSource,
     required this.signalCoverage,
   });
 
@@ -134,6 +158,29 @@ class Obd2TripFeatures {
         ? null
         : coolants.reduce((a, b) => a > b ? a : b);
 
+    // #3428 / #3433 — per-branch shares of the fuel-carrying samples +
+    // the dominant branch. Legacy trips carry no `fuelSource`, so both
+    // stay empty/null and old exports are unchanged.
+    final branchCounts = <String, int>{};
+    var fuelSamples = 0;
+    for (final s in samples) {
+      final source = s.fuelSource;
+      if (s.fuelRateLPerHour == null || source == null) continue;
+      fuelSamples++;
+      branchCounts[source] = (branchCounts[source] ?? 0) + 1;
+    }
+    final fuelSourceShares = <String, double>{
+      for (final e in branchCounts.entries) e.key: e.value / fuelSamples,
+    };
+    String? dominant;
+    var dominantCount = -1;
+    for (final e in branchCounts.entries) {
+      if (e.value > dominantCount) {
+        dominantCount = e.value;
+        dominant = e.key;
+      }
+    }
+
     return Obd2TripFeatures(
       sampleCount: n,
       obd2SampleCount: obd2Count,
@@ -148,6 +195,10 @@ class Obd2TripFeatures {
       idleShare: idle / n,
       coolantMaxC: coolantMax,
       reachedOperatingTemp: coolantMax != null && coolantMax >= 80,
+      measuredPhi: _distOf(samples, (s) => s.measuredPhi),
+      ethanolPercent: _distOf(samples, (s) => s.ethanolPercent),
+      fuelSourceShares: fuelSourceShares,
+      dominantFuelSource: dominant,
       signalCoverage: {
         'rpm': _coverage(samples, (s) => s.rpm),
         'fuelRate': _coverage(samples, (s) => s.fuelRateLPerHour),
@@ -156,6 +207,9 @@ class Obd2TripFeatures {
         'throttlePercent': _coverage(samples, (s) => s.throttlePercent),
         'pedalPercent': _coverage(samples, (s) => s.pedalPercent),
         'lambda': _coverage(samples, (s) => s.lambda),
+        // #3427 / #3429 — measured wideband φ + ethanol % coverage.
+        'measuredPhi': _coverage(samples, (s) => s.measuredPhi),
+        'ethanolPercent': _coverage(samples, (s) => s.ethanolPercent),
         'baroKpa': _coverage(samples, (s) => s.baroKpa),
         'maf': _coverage(samples, (s) => s.mafGramsPerSecond),
         'map': _coverage(samples, (s) => s.mapKpa),
@@ -182,6 +236,15 @@ class Obd2TripFeatures {
         'absLoadPercent': absLoadPercent.toJson(),
         'coolantMaxC': coolantMaxC == null ? null : _r(coolantMaxC!, 1),
         'reachedOperatingTemp': reachedOperatingTemp,
+        // #3433 — Epic #3416 precision signals: measured wideband φ,
+        // ethanol %, and which fuel branch dominated the trip. Additive
+        // keys (schema bumped in DrivingAnalysisTrace).
+        'measuredPhi': measuredPhi.toJson(),
+        'ethanolPercent': ethanolPercent.toJson(),
+        'fuelSourceShares': {
+          for (final e in fuelSourceShares.entries) e.key: _r(e.value, 3),
+        },
+        'dominantFuelSource': dominantFuelSource,
         'signalCoverage': {
           for (final e in signalCoverage.entries) e.key: _r(e.value, 3),
         },

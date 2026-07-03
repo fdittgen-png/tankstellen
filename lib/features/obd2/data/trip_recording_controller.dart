@@ -18,14 +18,15 @@ import 'adapter_reconnect_scanner.dart';
 import 'degraded_gps_emitter.dart';
 import 'dropped_session_host.dart';
 import 'dropped_session_manager.dart';
-import 'elm327_protocol.dart';
 import 'gps_only_sample_builder.dart';
+import 'instant_consumption_ema.dart';
 import 'live_sample_snapshot.dart';
 import 'obd2_breadcrumb_collector.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_trip_start_budgets.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_service.dart';
+import 'obd2_vin_reader.dart';
 import 'paused_trip_repository.dart';
 import 'pid_scheduler.dart';
 import 'trip_distance_resolver.dart';
@@ -275,6 +276,11 @@ class TripRecordingController {
   double? _odometerLatestKm;
   double _fuelLitersSoFar = 0;
   bool _fuelRateSeen = false;
+
+  // #3431 — true instantaneous consumption: EMA-smoothed (τ ≈ 2.5 s)
+  // fuel rate ÷ speed, stamped onto every live reading. Fresh per trip
+  // (a controller is built per trip), so no explicit reset is needed.
+  final InstantConsumptionEma _instantEma = InstantConsumptionEma();
 
   // #1858 — η_v recompute provenance, accumulated per emit tick.
   // [_veWeightedFuelSum] is Σ(η_v_i × fuelRate_i) and
@@ -771,7 +777,16 @@ class TripRecordingController {
     _odometerStartKm = await boundedStartRead(
         _service.readOdometerKm(), kObd2TripStartOdometerBudget);
     _odometerLatestKm = _odometerStartKm;
-    _vin = await boundedStartRead(_readVinOnce(), kObd2TripStartVinBudget);
+    _vin = await boundedStartRead(
+        readTripVinOnce(_service), kObd2TripStartVinBudget);
+    // #3429 — one-shot ECU fuel-type read (PID 0x51), promoted from the
+    // VIN auto-population flow: runtime truth beating the free-text profile
+    // fuel key for this session's AFR/density (manual overrides still win).
+    // Fire-and-forget: trip start never waits on this nicety — a silent
+    // adapter degrades it to null after its bounded budget.
+    unawaited(boundedStartRead(_service.readFuelType(),
+            kObd2TripStartFuelTypeBudget)
+        .then((k) => _liveSampleSnapshot.sessionFuelTypeKey = k));
 
     _scheduler = _schedulerOverride ?? _buildScheduler();
     _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
@@ -1165,27 +1180,6 @@ class TripRecordingController {
     _stateController.add(currentState);
   }
 
-  /// Read the VIN exactly once at [start]. Wrapped so the one-shot
-  /// decision is visible to readers of [start] — if we ever need to
-  /// re-read mid-trip (e.g. user hot-swaps cars) this is the place
-  /// to add the timer. Returns null on NO DATA / malformed response.
-  Future<String?> _readVinOnce() async {
-    try {
-      final raw = await _service.sendCommand(Elm327Protocol.vinCommand);
-      return Elm327Protocol.parseVin(raw);
-    } catch (_) {
-      // #2428 (follow-up to #2379/#2424) — the one-shot VIN (0902) read is
-      // best-effort: a flaky/slow ELM327 times it out, the legacy
-      // concurrent-sendCommand StateError can fire, or the device drops
-      // mid-probe — and old ECUs / clone adapters never answer 0902. All
-      // EXPECTED and recoverable: we return null and the trip records fine
-      // without a VIN, so a transient here must NOT pollute the user error
-      // log (it was mis-tagged `[storage]`). The null return IS the signal.
-      debugPrint('OBD2 VIN read failed — recording trip without a VIN');
-      return null;
-    }
-  }
-
   /// Called by the debounced emit timer. Snapshots current state into
   /// a [TripLiveReading], integrates any new fuel/distance since the
   /// last emit, and pushes to [live].
@@ -1286,12 +1280,20 @@ class TripRecordingController {
         // from the snapshot latest-value getters exactly like throttle.
         // Each stays null on cars that don't expose the PID, so the
         // compact-key serialization writes zero bytes for them.
-        lambda: snap.latestLambda,
+        lambda: snap.latestCommandedPhi,
         baroKpa: snap.latestBaroKpa,
         absLoadPercent: snap.latestAbsLoadPercent,
         pedalPercent: snap.latestPedalPercent,
         oilTempC: snap.latestOilTempC,
         ambientTempC: snap.latestAmbientTempC,
+        // #3427 / #3429 / #3433 — the precision signals + the fuel-source
+        // provenance of THIS tick's derived rate (which branch produced
+        // it), so the driving-analysis export can report measured-φ /
+        // ethanol coverage and the branch that dominated the trip. The
+        // provenance is only stamped alongside an actual rate.
+        measuredPhi: snap.latestMeasuredPhi,
+        ethanolPercent: snap.latestEthanolPercent,
+        fuelSource: fuelRate == null ? null : snap.lastFuelRateSource?.name,
         // #2459 — diagnostic-capture raw mixture inputs, only on the
         // slow-cadence ticks while the flag is on (else null = not
         // written). Each is independently null-safe per PID support.
@@ -1330,6 +1332,10 @@ class TripRecordingController {
     // — matching what `_finaliseSummary` already does at stop, so live and
     // persisted agree.
     final effectiveSpeedKmh = speedKmh ?? _latestGpsSpeedKmh;
+    // #3431 — fold this tick into the true-instant EMA (null when no
+    // fuel-rate PID is measurable; the surfaces then fall back).
+    final instant = _instantEma.update(
+        now: nowTs, fuelRateLPerHour: fuelRate, speedKmh: effectiveSpeedKmh);
     final resolverDistanceKm = currentDistanceKm;
     final effectiveDistanceKm = resolverDistanceKm > summary.distanceKm
         ? resolverDistanceKm
@@ -1361,7 +1367,7 @@ class TripRecordingController {
       // the PID, so the calibration path degrades gracefully.
       oilTempC: snap.latestOilTempC,
       ambientTempC: snap.latestAmbientTempC,
-      lambda: snap.latestLambda,
+      lambda: snap.latestCommandedPhi,
       baroKpa: snap.latestBaroKpa,
       mapKpa: snap.latestMapKpa,
       stft: snap.latestStft,
@@ -1372,6 +1378,9 @@ class TripRecordingController {
       elapsed: nowTs.difference(_startedAt ?? nowTs),
       odometerStartKm: _odometerStartKm,
       odometerNowKm: _odometerLatestKm,
+      instantLPer100Km: instant?.lPer100Km,
+      instantLPerHour: instant?.lPerHour,
+      instantIsIdle: instant?.isIdle,
     );
     // #2506 — when NO fuel-rate PID is measurable (every tick null), fold
     // the GPS-physics estimate + coaching into the live reading so the

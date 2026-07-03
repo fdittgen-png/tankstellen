@@ -69,6 +69,32 @@ void main() {
     expect(fake.associatedMac, 'AA:BB:CC:DD:EE:FF');
   });
 
+  test('#3437 — a declined dialog is not re-prompted for the same MAC this '
+      'session (once per association need)', () async {
+    final declining = _DecliningAssociation();
+    final coordinator = CompanionAutoRecordCoordinator(
+        association: declining, fgsEnabled: true);
+
+    expect(await coordinator.ensureAssociated('AA:BB:CC:DD:EE:FF'), isFalse);
+    expect(await coordinator.ensureAssociated('AA:BB:CC:DD:EE:FF'), isFalse);
+    expect(declining.associateCalls, 1,
+        reason: 'the system dialog fires at most once per MAC per session — '
+            'a declined user must not be re-nagged on every trip start');
+
+    // A different dongle is a NEW association need → one fresh attempt.
+    expect(await coordinator.ensureAssociated('11:22:33:44:55:66'), isFalse);
+    expect(declining.associateCalls, 2);
+  });
+
+  test('#3437 — an existing association keeps short-circuiting true and '
+      'never consumes the per-session attempt', () async {
+    fake.associated = true;
+    final coordinator = build(fgsEnabled: true);
+    expect(await coordinator.ensureAssociated('AA:BB:CC:DD:EE:FF'), isTrue);
+    expect(await coordinator.ensureAssociated('AA:BB:CC:DD:EE:FF'), isTrue);
+    expect(fake.associateCalls, 0);
+  });
+
   test('a throwing platform call is swallowed — never throws into the start '
       'path, resolves false (#2349)', () async {
     final coordinator = CompanionAutoRecordCoordinator(
@@ -81,6 +107,24 @@ void main() {
     // ...and resolve false rather than propagating.
     expect(await coordinator.ensureAssociated('AA:BB:CC:DD:EE:FF'), isFalse);
   });
+}
+
+/// #3437 — supported + never associated + the user declines every dialog:
+/// the worst case for re-nagging.
+class _DecliningAssociation implements CompanionDeviceAssociation {
+  int associateCalls = 0;
+  @override
+  Future<bool> isSupported() async => true;
+  @override
+  Future<bool> isAssociated() async => false;
+  @override
+  Future<bool> associate(String mac) async {
+    associateCalls++;
+    return false; // user tapped "don't allow"
+  }
+
+  @override
+  Future<bool> disassociate() async => false;
 }
 
 class _ThrowingAssociation implements CompanionDeviceAssociation {

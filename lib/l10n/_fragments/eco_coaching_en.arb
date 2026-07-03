@@ -1,0 +1,92 @@
+{
+  "minimalDriveTripAverage": "Trip average",
+  "@minimalDriveTripAverage": {
+    "description": "Label of the trip-running-average row on the live minimal drive summary card (#3431). Sits under the true instantaneous headline so 'instant' and 'average' are never conflated."
+  },
+  "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
+  "@insightUpshiftCruise": {
+    "description": "Post-trip lesson headline (#3432) for steady-speed cruising at high RPM where an earlier upshift was available. Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceUpshiftCruise": "Shift up earlier when cruising — the same speed at lower RPM burns noticeably less fuel.",
+  "@lessonAdviceUpshiftCruise": {
+    "description": "How-to-improve advice for the high-RPM-cruise upshift lesson (#3432). Embedded in the GPX recording export."
+  },
+  "insightCoastingFuelCut": "Fuel-cut coasting ({pctTime}% of trip): saved about {liters} L",
+  "@insightCoastingFuelCut": {
+    "description": "Positive post-trip lesson headline (#3432) recognising deceleration-fuel-cut coasting (measured fuel rate near zero while moving). Placeholders are pre-formatted strings.",
+    "placeholders": {
+      "pctTime": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "lessonAdviceCoastingFuelCut": "Nicely anticipated — lifting off early lets the engine cut fuel completely while coasting.",
+  "@lessonAdviceCoastingFuelCut": {
+    "description": "Praise/advice line for the fuel-cut coasting lesson (#3432). Embedded in the GPX recording export."
+  },
+  "insightTrailingLitersSaved": "−{liters} L",
+  "@insightTrailingLitersSaved": {
+    "description": "Trailing badge for a POSITIVE lesson / breakdown row showing litres saved (#3432) — the minus-sign counterpart of insightTrailingLitersWasted. Liters is a pre-formatted one-decimal string.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelBreakdownTitle": "Where your fuel went",
+  "@fuelBreakdownTitle": {
+    "description": "Title of the per-event fuel-cost breakdown card on the Trip detail screen (#3432)."
+  },
+  "fuelBreakdownIdle": "Idling",
+  "@fuelBreakdownIdle": {
+    "description": "Breakdown row label (#3432): litres burned while stationary with the engine running (idle events > 30 s)."
+  },
+  "fuelBreakdownHarshAccel": "Hard accelerations",
+  "@fuelBreakdownHarshAccel": {
+    "description": "Breakdown row label (#3432): excess litres attributed to pedal-spike acceleration events."
+  },
+  "fuelBreakdownHighRpmCruise": "High-RPM cruising",
+  "@fuelBreakdownHighRpmCruise": {
+    "description": "Breakdown row label (#3432): estimated litres an earlier upshift would have saved during steady high-RPM cruising."
+  },
+  "fuelBreakdownCoastingSaved": "Saved by coasting",
+  "@fuelBreakdownCoastingSaved": {
+    "description": "Positive breakdown row label (#3432): litres saved by deceleration fuel cut while coasting."
+  },
+  "fuelBreakdownEfficient": "Normal driving",
+  "@fuelBreakdownEfficient": {
+    "description": "Neutral breakdown row label (#3432): the remainder of the trip's fuel not attributed to any waste event class."
+  },
+  "fuelBreakdownLiters": "{liters} L",
+  "@fuelBreakdownLiters": {
+    "description": "Plain litres badge for the neutral breakdown remainder row (#3432). Liters is a pre-formatted one-decimal string.",
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "ecoNudgeIdle": "Idling for a while — switching the engine off saves fuel",
+  "@ecoNudgeIdle": {
+    "description": "Live in-trip nudge SnackBar (#3432) after 30+ seconds stationary with the engine running. Rate-limited to at most one nudge per minute, three per trip."
+  },
+  "ecoNudgeHarshAccel": "Strong acceleration — a gentler pedal saves fuel",
+  "@ecoNudgeHarshAccel": {
+    "description": "Live in-trip nudge SnackBar (#3432) after a sustained full-pedal spike. Rate-limited to at most one nudge per minute, three per trip."
+  },
+  "ecoNudgeHighRpm": "High revs at cruise — shifting up earlier saves fuel",
+  "@ecoNudgeHighRpm": {
+    "description": "Live in-trip nudge SnackBar (#3432) after sustained high-RPM steady-speed cruising. Rate-limited to at most one nudge per minute, three per trip."
+  }
+}

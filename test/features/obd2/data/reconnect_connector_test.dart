@@ -404,6 +404,9 @@ class _FakeClassicFacade implements ClassicBluetoothFacade {
   Future<void> stopScan() async {}
 
   @override
+  Future<bool?> isBonded(String mac) async => null; // #3423 — unknown
+
+  @override
   ElmByteChannel channelFor(String deviceId) {
     channelForCalls.add(deviceId);
     if (channels != null) return channels![_i++];

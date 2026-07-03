@@ -4787,6 +4787,67 @@ class AppLocalizationsDe extends AppLocalizations {
       'Analyse-Trace konnte nicht exportiert werden.';
 
   @override
+  String get minimalDriveTripAverage => 'Fahrtdurchschnitt';
+
+  @override
+  String insightUpshiftCruise(String pctTime, String liters) {
+    return 'Hochtouriges Fahren ($pctTime% der Fahrt): früheres Hochschalten könnte $liters L sparen';
+  }
+
+  @override
+  String get lessonAdviceUpshiftCruise =>
+      'Beim Dahingleiten früher hochschalten — dieselbe Geschwindigkeit bei niedrigerer Drehzahl verbraucht spürbar weniger Kraftstoff.';
+
+  @override
+  String insightCoastingFuelCut(String pctTime, String liters) {
+    return 'Rollen mit Schubabschaltung ($pctTime% der Fahrt): rund $liters L gespart';
+  }
+
+  @override
+  String get lessonAdviceCoastingFuelCut =>
+      'Gut vorausgeschaut — frühes Gaswegnehmen lässt den Motor beim Rollen die Einspritzung komplett abschalten.';
+
+  @override
+  String insightTrailingLitersSaved(String liters) {
+    return '−$liters L';
+  }
+
+  @override
+  String get fuelBreakdownTitle => 'Wohin dein Kraftstoff ging';
+
+  @override
+  String get fuelBreakdownIdle => 'Leerlauf';
+
+  @override
+  String get fuelBreakdownHarshAccel => 'Starke Beschleunigungen';
+
+  @override
+  String get fuelBreakdownHighRpmCruise => 'Hochtouriges Fahren';
+
+  @override
+  String get fuelBreakdownCoastingSaved => 'Durch Rollen gespart';
+
+  @override
+  String get fuelBreakdownEfficient => 'Normale Fahrt';
+
+  @override
+  String fuelBreakdownLiters(String liters) {
+    return '$liters L';
+  }
+
+  @override
+  String get ecoNudgeIdle =>
+      'Längerer Leerlauf — Motor abstellen spart Kraftstoff';
+
+  @override
+  String get ecoNudgeHarshAccel =>
+      'Starke Beschleunigung — sanfteres Gasgeben spart Kraftstoff';
+
+  @override
+  String get ecoNudgeHighRpm =>
+      'Hohe Drehzahl beim Dahingleiten — früheres Hochschalten spart Kraftstoff';
+
+  @override
   String get ecoRouteOption => 'Sparsam';
 
   @override
@@ -6618,6 +6679,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2ReconnectRetry => 'Erneut versuchen';
+
+  @override
+  String get obd2WedgeHintBody =>
+      'Dein OBD2-Adapter reagiert nicht mehr. Schalte die Zündung aus und wieder ein oder stecke den Adapter neu ein – oder schalte Bluetooth aus und wieder ein.';
+
+  @override
+  String get obd2WedgeHintOpenBtSettings => 'Bluetooth-Einstellungen';
 
   @override
   String get ocrTesterTitle => 'OCR-Tester';

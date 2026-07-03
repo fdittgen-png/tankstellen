@@ -23,5 +23,13 @@
   "obd2ReconnectRetry": "Erneut versuchen",
   "@obd2ReconnectRetry": {
     "description": "Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires."
+  },
+  "obd2WedgeHintBody": "Dein OBD2-Adapter reagiert nicht mehr. Schalte die Zündung aus und wieder ein oder stecke den Adapter neu ein – oder schalte Bluetooth aus und wieder ein.",
+  "@obd2WedgeHintBody": {
+    "description": "One-time actionable recovery hint shown when the Classic OBD2 adapter is wedged (#3422, epic #3415): repeated reconnects ended in exhausted RFCOMM ladders and the in-app recovery rungs did not clear it. Tells the user the two physical recoveries (ignition cycle / replug) and the Bluetooth toggle."
+  },
+  "obd2WedgeHintOpenBtSettings": "Bluetooth-Einstellungen",
+  "@obd2WedgeHintOpenBtSettings": {
+    "description": "Label of the button on the wedged-adapter recovery hint (#3422) that deep-links to the system Bluetooth settings screen so the user can toggle Bluetooth off and on."
   }
 }

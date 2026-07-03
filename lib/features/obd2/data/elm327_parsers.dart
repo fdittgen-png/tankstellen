@@ -168,13 +168,16 @@ class Elm327Parsers {
     return bytes[2].toDouble();
   }
 
-  /// Parse commanded equivalence ratio / λ from Mode 01 PID 44 response
-  /// (#2456). Formula: λ = (256·A + B) / 32768 (dimensionless). Response:
-  /// "41 44 XX YY". λ ≈ 1.0 at stoichiometry; <1 is a lean cruise
-  /// mixture (less fuel per unit air), >1 is power-enrichment (more
-  /// fuel). The effective AFR the engine is actually targeting is
-  /// `stoichAFR × λ`, which the fuel-rate estimator uses in place of the
-  /// assumed-stoich AFR when this PID is available.
+  /// Parse the commanded fuel–air equivalence ratio φ from a Mode 01
+  /// PID 44 response (#2456, convention verified #3426). Formula:
+  /// φ = (256·A + B) × 2 / 65536 (= /32768, dimensionless). Response:
+  /// "41 44 XX YY". SAE J1979 defines PID 0x44 as the *fuel–air*
+  /// equivalence ratio φ = (F/A)/(F/A)stoich: φ ≈ 1.0 at stoichiometry;
+  /// **φ < 1 is LEAN** (less fuel per unit air), **φ > 1 is RICH**
+  /// (power-enrichment); λ = 1/φ. The effective AFR the engine is
+  /// actually targeting is `stoichAFR / φ` (≡ `stoichAFR × λ`) — see
+  /// `effectiveAfrForPhi` — which the fuel-rate estimator uses in place
+  /// of the assumed-stoich AFR when this PID is available.
   static double? parseCommandedEquivalenceRatio(String raw) {
     final bytes = parseModeOneBody(raw, 0x44, minBytes: 4);
     if (bytes == null) return null;

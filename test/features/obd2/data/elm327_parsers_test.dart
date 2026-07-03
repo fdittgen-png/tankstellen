@@ -959,6 +959,10 @@ void main() {
       expect(Elm327Parsers.parseFuelType('41 51 01'), 'petrol');
     });
 
+    test('0x03 (ethanol / flexfuel) maps to e85 (#3429)', () {
+      expect(Elm327Parsers.parseFuelType('41 51 03'), 'e85');
+    });
+
     test('0x04 (diesel) maps to diesel', () {
       expect(Elm327Parsers.parseFuelType('41 51 04'), 'diesel');
     });

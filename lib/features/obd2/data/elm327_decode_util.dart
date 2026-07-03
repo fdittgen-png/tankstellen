@@ -80,6 +80,7 @@ List<int>? parseModeOneBody(
 ///
 /// Recognised codes:
 ///   0x01 → 'petrol'  (Gasoline)
+///   0x03 → 'e85'     (Ethanol — flexfuel ECUs report this, #3429)
 ///   0x04 → 'diesel'  (Diesel)
 ///   0x05 → 'lpg'     (Liquefied Petroleum Gas)
 ///   0x06 → 'cng'     (Compressed Natural Gas)
@@ -99,6 +100,8 @@ String? fuelTypeCodeToProfileKey(int code) {
     case 0x0A: // hybrid ethanol
     case 0x0D: // hybrid mixed
       return 'petrol';
+    case 0x03: // ethanol / flexfuel — feeds the #3429 E85 blend constants
+      return 'e85';
     case 0x04:
     case 0x0B: // hybrid diesel
       return 'diesel';

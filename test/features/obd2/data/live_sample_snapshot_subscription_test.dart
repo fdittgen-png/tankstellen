@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/obd2/data/elm327_precision_pids.dart';
 import 'package:tankstellen/features/obd2/data/elm327_protocol.dart';
 import 'package:tankstellen/features/obd2/data/live_sample_snapshot.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
@@ -26,17 +27,15 @@ class _StubTransport implements Obd2Transport {
   Future<String> sendCommand(String command) async => 'NO DATA';
 }
 
-/// [Obd2Service] whose supported-PID answer is driven by [_supported].
-/// `null` means "discovery never ran" → don't-reject-blind (`true` for
-/// every PID), matching the production resolver contract.
+/// [Obd2Service] whose support answers are driven by the REAL resolver:
+/// a non-null [supported] set is seeded via the #3416 seam (a RESOLVED
+/// set — strict membership for `isPidKnownSupported`, membership for
+/// `isPidSupported`); `null` leaves discovery un-run → the legacy gates
+/// stay don't-reject-blind while the strict precision gates answer false.
 class _SupportStubService extends Obd2Service {
-  _SupportStubService(this._supported) : super(_StubTransport());
-
-  final Set<int>? _supported;
-
-  @override
-  bool isPidSupported(int pid) =>
-      _supported == null || _supported.contains(pid);
+  _SupportStubService(Set<int>? supported) : super(_StubTransport()) {
+    if (supported != null) debugSetSupportedPids(supported);
+  }
 }
 
 /// Drives subscribeAllTiers on a scheduler whose transport records each
@@ -94,6 +93,19 @@ void main() {
     Elm327Protocol.engineOilTempCommand, // 015C
     Elm327Protocol.ambientAirTempCommand, // 0146
   };
+  // Epic #3416 — precision PIDs (#3427/#3428/#3429): unlike the legacy
+  // optional set they are gated STRICTLY (`isPidKnownSupported` =
+  // resolved ∧ contains) and are never blind-subscribed — an unresolved
+  // clone would flood the round-robin with NO DATA initial reads and
+  // starve the dynamics tier.
+  final precision = <String>{
+    Elm327PrecisionPids.widebandCommand(0x24), // wideband φ sensor 1 (V)
+    Elm327PrecisionPids.widebandCommand(0x34), // wideband φ sensor 1 (I)
+    Elm327PrecisionPids.mafSensorCommand, // 0166
+    Elm327PrecisionPids.engineFuelRateGramsCommand, // 019D
+    Elm327PrecisionPids.cylinderFuelRateCommand, // 01A2
+    Elm327PrecisionPids.ethanolPercentCommand, // 0152
+  };
 
   test(
       'a basic car {010C,010D,0104,0111} subscribes exactly those of the '
@@ -108,10 +120,11 @@ void main() {
       Elm327Protocol.engineLoadCommand,
       Elm327Protocol.throttlePositionCommand,
     }));
-    // None of the optional (gated) PIDs were subscribed.
-    for (final cmd in optional) {
+    // None of the optional (gated) PIDs were subscribed — legacy
+    // optionalPid gates AND the strict #3416 precision gates alike.
+    for (final cmd in {...optional, ...precision}) {
       expect(subscribed, isNot(contains(cmd)),
-          reason: '$cmd is optionalPid-gated and the car lacks it');
+          reason: '$cmd is support-gated and the car lacks it');
     }
   });
 
@@ -122,19 +135,31 @@ void main() {
       0x0C, 0x0D, 0x11, 0x04, 0x0F, 0x05, 0x06, 0x07, 0x2F, // core
       0x10, 0x0B, 0x5E, 0x44, 0x33, // optional (#2456 and earlier)
       0x49, 0x4A, 0x4B, 0x43, 0x08, 0x09, 0x5C, 0x46, // #2458/#2459
+      0x24, 0x34, 0x66, 0x9D, 0xA2, 0x52, // Epic #3416 precision PIDs
     };
     final subscribed = await _subscribedCommands(all);
     expect(subscribed, containsAll(core));
     expect(subscribed, containsAll(optional));
+    expect(subscribed, containsAll(precision),
+        reason: 'a RESOLVED set naming the precision PIDs passes the '
+            'strict isPidKnownSupported gate');
   });
 
   test(
-      'a probe-less clone (discovery never ran) still rotates the full core '
-      '+ optional set (don\'t-reject-blind)', () async {
+      'a probe-less clone (discovery never ran) still rotates the core + '
+      'legacy optional set (don\'t-reject-blind) but NEVER the strict '
+      'precision families', () async {
     final subscribed = await _subscribedCommands(null);
     expect(subscribed, containsAll(core),
         reason: 'the unconditional core must always rotate');
     expect(subscribed, containsAll(optional),
-        reason: 'blind session does not reject optional PIDs');
+        reason: 'blind session does not reject legacy optional PIDs');
+    // #3416 contract change: unresolved ⇒ precision families OFF. Blind-
+    // subscribing ~20 rare PIDs starved the 5 Hz dynamics tier (RPM
+    // cadence collapse in the #726 scheduler tests).
+    for (final cmd in precision) {
+      expect(subscribed, isNot(contains(cmd)),
+          reason: '$cmd must not be blind-subscribed on an unresolved set');
+    }
   });
 }

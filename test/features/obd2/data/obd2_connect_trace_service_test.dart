@@ -272,6 +272,9 @@ class _RealClassicFacade implements ClassicBluetoothFacade {
   Future<void> stopScan() async {}
 
   @override
+  Future<bool?> isBonded(String mac) async => null; // #3423 — unknown
+
+  @override
   ElmByteChannel channelFor(String deviceId) =>
       ClassicElmChannel(address: deviceId, plugin: plugin);
 }

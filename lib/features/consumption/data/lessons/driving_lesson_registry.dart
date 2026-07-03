@@ -10,6 +10,7 @@ import '../../domain/trip_recorder.dart';
 import '../driving_insights_analyzer.dart';
 import '../driving_score_calculator.dart';
 import 'rules/climbing_cost_rule.dart';
+import 'rules/coasting_recognition_rule.dart';
 import 'rules/combustion_health_rule.dart';
 import 'rules/full_throttle_rule.dart';
 import 'rules/hard_accel_rule.dart';
@@ -22,6 +23,7 @@ import 'rules/low_gear_rule.dart';
 import 'rules/restart_cost_rule.dart';
 import 'rules/sharp_cornering_rule.dart';
 import 'rules/smooth_driving_rule.dart';
+import 'rules/upshift_cruise_rule.dart';
 
 /// Holds the post-trip [DrivingLessonRule]s and turns a trip into its
 /// ranked list of firing [DrivingLesson]s (#2251).
@@ -58,8 +60,12 @@ class DrivingLessonRegistry {
   ///   * [HighSpeedBandRule] — drag-dominated high-speed penalty (#2287);
   ///   * [FullThrottleRule]   — time at full throttle / pedal (#2461);
   ///   * [LambdaEnrichmentRule] — rich-mixture (λ < 1) fuel waste (#2461);
+  ///   * [UpshiftCruiseRule]  — steady high-RPM cruising upshift saving
+  ///     from the per-event fuel attribution (#3432);
   ///   * [CombustionHealthRule] — heuristic mixture-health note from
   ///     sustained fuel trims + commanded enrichment (#2931);
+  ///   * [CoastingRecognitionRule] — fuel-cut coasting praise with the
+  ///     estimated litres saved (#3432);
   ///   * [SmoothDrivingRule] — positive reinforcement (#2287).
   ///
   /// Declaration order is the tie-break for equal-impact lessons (see
@@ -67,7 +73,9 @@ class DrivingLessonRegistry {
   /// rendered-above-cost-lines position, and the smooth-driving praise is
   /// last so it never outranks an actual waste lesson. The combustion-
   /// health heuristic sits just before the praise — a neutral health note
-  /// that ranks below every quantified-waste lesson but above pure praise.
+  /// that ranks below every quantified-waste lesson but above pure praise;
+  /// the coasting praise (quantified saving) sits just above the generic
+  /// smooth-driving praise.
   factory DrivingLessonRegistry.standard() => DrivingLessonRegistry(const [
         LowGearRule(),
         HighRpmRule(),
@@ -76,11 +84,13 @@ class DrivingLessonRegistry {
         HighSpeedBandRule(),
         FullThrottleRule(),
         LambdaEnrichmentRule(),
+        UpshiftCruiseRule(),
         ClimbingCostRule(),
         RestartCostRule(),
         HardBrakeRule(),
         SharpCorneringRule(),
         CombustionHealthRule(),
+        CoastingRecognitionRule(),
         SmoothDrivingRule(),
       ]);
 

@@ -27,6 +27,11 @@ const Duration kObd2TripStartOdometerBudget = Duration(seconds: 6);
 /// VIN (0902) read budget — a silent adapter mid-handshake can stall it.
 const Duration kObd2TripStartVinBudget = Duration(seconds: 4);
 
+/// Fuel-type (PID 0x51) session read budget (#3429). Best-effort like the
+/// VIN: null on timeout / NO DATA and the session keeps the profile's
+/// fuel key.
+const Duration kObd2TripStartFuelTypeBudget = Duration(seconds: 3);
+
 /// Hive baseline-load budget — guards against storage stall / lock contention.
 const Duration kObd2TripStartBaselinesBudget = Duration(seconds: 8);
 

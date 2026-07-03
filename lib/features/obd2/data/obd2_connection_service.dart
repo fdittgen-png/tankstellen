@@ -26,6 +26,7 @@ import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_known_adapters_store.dart';
+import 'obd2_lost_bond_state.dart';
 import 'obd2_pairing_mode.dart';
 import 'obd2_permissions.dart';
 import 'obd2_platform_budgets.dart';
@@ -541,12 +542,11 @@ class Obd2ConnectionService {
     return service;
   }
 
-  /// #3181 — whether [mac] has NEVER completed a successful connect on
-  /// this phone. False when no [knownAdaptersStore] is wired (tests /
-  /// legacy configs — pairing mode is then never armed), when the store
-  /// knows the id, or when it matches the auto-pinned last-good adapter
-  /// (a pre-#3181 user who already connected must not re-enter pairing
-  /// mode before the store backfills on their next success).
+  /// #3181 — whether [mac] has NEVER completed a successful connect on this
+  /// phone. False when no [knownAdaptersStore] is wired (tests / legacy
+  /// configs — pairing mode is then never armed), when the store knows the
+  /// id, or when it matches the auto-pinned last-good adapter (a pre-#3181
+  /// user must not re-enter pairing mode before the store backfills).
   bool _isFirstConnectDevice(String mac) {
     final store = knownAdaptersStore;
     if (store == null) return false;

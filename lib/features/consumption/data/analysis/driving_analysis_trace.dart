@@ -22,7 +22,13 @@ import '../../domain/trip_summary.dart';
 /// of guessing cutoffs that could contradict the smooth-driving lesson.
 class DrivingAnalysisTrace {
   /// Serialisation schema version. Bump when a field's meaning changes.
-  static const int schema = 1;
+  ///
+  /// v2 (#3433, Epic #3416) — `obd2Features` gained the consumption-
+  /// precision block: `measuredPhi` / `ethanolPercent` distributions,
+  /// per-branch `fuelSourceShares` + `dominantFuelSource`, and the
+  /// `measuredPhi` / `ethanolPercent` signal-coverage keys. Purely
+  /// additive — v1 readers that ignore unknown keys still parse.
+  static const int schema = 2;
 
   final DateTime capturedAt;
 

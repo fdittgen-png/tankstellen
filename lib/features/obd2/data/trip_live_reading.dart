@@ -135,6 +135,27 @@ class TripLiveReading {
   /// sample.
   final double? gpsEstimatedFuelLitersSoFar;
 
+  // --- #3431 (epic #3416) — true instantaneous consumption ----------
+  // EMA-smoothed (τ ≈ 2.5 s) `fuelRateLPerHour / speedKmh × 100`,
+  // produced by `InstantConsumptionEma` in the controller's emit loop.
+  // DISTINCT from [liveAvgLPer100Km] (the trip running average, which
+  // several surfaces used to mislabel "instant"). All three stay null
+  // when no fuel-rate PID is measurable this tick.
+
+  /// Smoothed instantaneous consumption in L/100 km. Null at / near
+  /// standstill (see [instantIsIdle] — the figure diverges below
+  /// ~5 km/h) and when no fuel-rate PID is measurable.
+  final double? instantLPer100Km;
+
+  /// Smoothed instantaneous fuel rate in L/h — always present when the
+  /// instant signal exists; the surface to show while [instantIsIdle].
+  final double? instantLPerHour;
+
+  /// True when the instant signal is in idle mode (speed below the
+  /// ~5 km/h guard): show [instantLPerHour], not L/100 km. Null when
+  /// no instant signal exists this tick.
+  final bool? instantIsIdle;
+
   const TripLiveReading({
     this.speedKmh,
     this.rpm,
@@ -162,6 +183,9 @@ class TripLiveReading {
     this.gpsEstimatedLPer100Km,
     this.gpsEstimatedAvgLPer100Km,
     this.gpsEstimatedFuelLitersSoFar,
+    this.instantLPer100Km,
+    this.instantLPerHour,
+    this.instantIsIdle,
   });
 
   /// Overlay one or more fields onto a copy of this reading (#2506).
@@ -201,6 +225,9 @@ class TripLiveReading {
     double? gpsEstimatedLPer100Km,
     double? gpsEstimatedAvgLPer100Km,
     double? gpsEstimatedFuelLitersSoFar,
+    double? instantLPer100Km,
+    double? instantLPerHour,
+    bool? instantIsIdle,
   }) {
     return TripLiveReading(
       speedKmh: speedKmh ?? this.speedKmh,
@@ -232,12 +259,19 @@ class TripLiveReading {
           gpsEstimatedAvgLPer100Km ?? this.gpsEstimatedAvgLPer100Km,
       gpsEstimatedFuelLitersSoFar:
           gpsEstimatedFuelLitersSoFar ?? this.gpsEstimatedFuelLitersSoFar,
+      instantLPer100Km: instantLPer100Km ?? this.instantLPer100Km,
+      instantLPerHour: instantLPerHour ?? this.instantLPerHour,
+      instantIsIdle: instantIsIdle ?? this.instantIsIdle,
     );
   }
 
-  /// Live L/100 km estimate — uses trip-so-far totals, so early
-  /// samples are noisy and converge as the trip progresses. Returns
-  /// null when the car doesn't surface a fuel-rate PID.
+  /// Live L/100 km **trip running average** — uses trip-so-far totals,
+  /// so early samples are noisy and converge as the trip progresses.
+  /// Returns null when the car doesn't surface a fuel-rate PID.
+  ///
+  /// NOT an instantaneous figure (#3431) — surfaces must label it
+  /// "trip average"; the true instant signal is [instantLPer100Km] /
+  /// [instantLPerHour].
   double? get liveAvgLPer100Km {
     if (fuelLitersSoFar == null || distanceKmSoFar < 0.01) return null;
     return fuelLitersSoFar! / distanceKmSoFar * 100.0;

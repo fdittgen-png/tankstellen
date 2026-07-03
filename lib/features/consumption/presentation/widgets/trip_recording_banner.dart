@@ -182,6 +182,14 @@ class TripRecordingBanner extends ConsumerWidget {
             alignment: Alignment.topCenter,
             child: Obd2ReconnectRetryBanner(),
           ),
+          // #3422 — one-time wedged-adapter recovery hint (rung 4 of the
+          // escalation ladder). Zero-height unless the ladder raised it.
+          const AnimatedSize(
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            alignment: Alignment.topCenter,
+            child: Obd2WedgeRecoveryBanner(),
+          ),
           Expanded(child: child),
         ],
       );
@@ -251,6 +259,15 @@ class TripRecordingBanner extends ConsumerWidget {
           curve: Curves.easeOut,
           alignment: Alignment.topCenter,
           child: GpsDegradedBanner(),
+        ),
+        // #3422 — a wedge latched MID-TRIP (the in-trip scanner stood down
+        // and the recovery ladder ran dry) surfaces the same one-time hint
+        // here. Zero-height unless the ladder raised it.
+        const AnimatedSize(
+          duration: Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          alignment: Alignment.topCenter,
+          child: Obd2WedgeRecoveryBanner(),
         ),
         Expanded(child: child),
       ],

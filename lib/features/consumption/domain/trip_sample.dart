@@ -101,10 +101,30 @@ class TripSample {
   // trips. Each persists with an `if(!=null)` compact-key guard so a car
   // without the PID adds zero bytes (see `trip_sample_codec.dart`).
 
-  /// Commanded equivalence ratio / λ (PID 0x44, #2456 / persisted #2459).
-  /// The ECU's real commanded mixture; feeds the effective-AFR fuel
-  /// refinement. Null when the car doesn't expose PID 0x44.
+  /// Commanded fuel–air equivalence ratio φ (PID 0x44, #2456 / persisted
+  /// #2459). The ECU's real commanded mixture; feeds the effective-AFR
+  /// fuel refinement. Null when the car doesn't expose PID 0x44.
+  /// (Field name kept from the pre-#3426 λ naming for persistence
+  /// compatibility — the stored value is φ, SAE convention: > 1 rich.)
   final double? lambda;
+
+  /// MEASURED wideband fuel–air equivalence ratio φ (PIDs 0x24–0x2B /
+  /// 0x34–0x3B, #3427). The real sensed mixture, preferred over the
+  /// commanded [lambda] in the fuel math. Null when the car has no
+  /// wideband sensor (or the reading went stale that tick).
+  final double? measuredPhi;
+
+  /// Measured ethanol fuel fraction in percent (PID 0x52, #3429).
+  /// Drives the dynamic petrol↔E85 AFR/density blend. Null when
+  /// unsupported.
+  final double? ethanolPercent;
+
+  /// Fuel-source provenance of this tick's [fuelRateLPerHour] — a
+  /// `FuelRateSourceTag` name (`pid9D` / `pidA2` / `pid5E` / `maf66` /
+  /// `maf` / `speedDensity`), #3428 / #3433. Stamped only when a rate was
+  /// derived; the driving-analysis export aggregates it into the trip's
+  /// dominant-branch figure. Null on legacy trips and rate-less ticks.
+  final String? fuelSource;
 
   /// Absolute barometric pressure in kPa (PID 0x33, #2456 / persisted
   /// #2459). Measured ambient air pressure (altitude / weather). Null
@@ -166,6 +186,9 @@ class TripSample {
     this.bearingDeg,
     this.accelG,
     this.lambda,
+    this.measuredPhi,
+    this.ethanolPercent,
+    this.fuelSource,
     this.baroKpa,
     this.absLoadPercent,
     this.pedalPercent,
@@ -200,6 +223,9 @@ class TripSample {
         bearingDeg: bearingDeg,
         accelG: accelG,
         lambda: lambda,
+        measuredPhi: measuredPhi,
+        ethanolPercent: ethanolPercent,
+        fuelSource: fuelSource,
         baroKpa: baroKpa,
         absLoadPercent: absLoadPercent,
         pedalPercent: pedalPercent,
