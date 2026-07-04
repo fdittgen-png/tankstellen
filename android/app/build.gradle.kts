@@ -189,10 +189,25 @@ android {
             } else {
                 val taskNames = gradle.startParameter.taskNames
                     .map { it.lowercase() }
-                val isReleaseRequested = taskNames.any { name ->
+                val releaseTasks = taskNames.filter { name ->
                     name.contains("release") && !name.contains("debug")
                 }
-                if (isReleaseRequested) {
+                val isReleaseRequested = releaseTasks.isNotEmpty()
+                // #3471 — the F-Droid buildserver builds the GMS-free `fdroid`
+                // flavor from source with NO keystore and re-signs the
+                // resulting APK with its OWN key. So for an fdroid-ONLY release
+                // an UNSIGNED release APK (signingConfig = null) is the correct,
+                // expected output — F-Droid supplies the signature downstream.
+                // This is deliberately NOT the debug-key fallback that #48
+                // outlawed: the debug config is never referenced, and the throw
+                // below still fires for every non-fdroid release (Play/upload
+                // builds, whose in-place upgrades REQUIRE the real upload
+                // key). Guard on `all` so a mixed `assembleFdroidRelease
+                // assemblePlayRelease` invocation without a keystore still
+                // throws rather than shipping an unsigned Play artefact.
+                val isFdroidOnlyRelease =
+                    isReleaseRequested && releaseTasks.all { it.contains("fdroid") }
+                if (isReleaseRequested && !isFdroidOnlyRelease) {
                     throw GradleException(
                         "No release signing configuration available. " +
                             "Set ANDROID_KEYSTORE_PATH / ANDROID_KEYSTORE_PASSWORD / " +
@@ -201,13 +216,12 @@ android {
                             "Release builds never fall back to the debug key — see #48."
                     )
                 }
-                // Debug-only builds (e.g. `assemblePlayDebug`) don't need
-                // a release signing config. Leaving this null lets the
-                // configuration phase complete; any subsequent attempt to
-                // actually assemble a release variant would fail at the
-                // signing task, which is still strictly safer than
-                // silently signing with the debug key (the original #48
-                // failure mode).
+                // Two paths land here with a null signing config:
+                //   1. Debug-only builds (e.g. `assemblePlayDebug`) — Dependabot
+                //      CI runs these and legitimately can't read the keystore
+                //      secrets; leaving null lets configuration complete.
+                //   2. The fdroid-only release above — an intentionally unsigned
+                //      release APK for F-Droid to sign.
                 null
             }
         }
