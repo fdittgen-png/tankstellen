@@ -93,7 +93,8 @@ Builds:
       - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
     build: |
       $$flutter$$/bin/flutter build apk --release --flavor fdroid \
-        --dart-define=FORCE_LOCATION_MANAGER=true
+        --dart-define=FORCE_LOCATION_MANAGER=true \
+        --dart-define=FGS_FORM_APPROVED=true
     output: build/app/outputs/flutter-apk/app-fdroid-release.apk
 
 AutoUpdateMode: Version v%v
