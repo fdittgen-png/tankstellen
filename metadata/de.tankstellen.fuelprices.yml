@@ -74,15 +74,10 @@ RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
 Builds:
-  - versionName: 6.0.0
-    versionCode: 5133
-    commit: v6.0.0
+  - versionName: 6.0.1
+    versionCode: 5134
+    commit: v6.0.1
     subdir: android/app
-    # ndk: r28b  # = 28.2.13676358, which this build requests: android/app/
-    #            # build.gradle.kts sets `ndkVersion = flutter.ndkVersion` and
-    #            # Flutter 3.41.9 pins 28.2.13676358 (r28b). Uncomment + confirm
-    #            # against F-Droid's buildserver NDK list on the first MR
-    #            # `fdroid build` (it logs the version it actually provisions).
     gradle:
       - fdroid
     srclibs:
@@ -91,13 +86,16 @@ Builds:
       - $$flutter$$/bin/flutter config --no-analytics
       - $$flutter$$/bin/flutter pub get
       - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
+    scanignore:
+      - third_party/google_mlkit_commons
+      - third_party/google_mlkit_text_recognition
     build: |
       $$flutter$$/bin/flutter build apk --release --flavor fdroid \
         --dart-define=FORCE_LOCATION_MANAGER=true \
         --dart-define=FGS_FORM_APPROVED=true
     output: build/app/outputs/flutter-apk/app-fdroid-release.apk
 
-AutoUpdateMode: Version v%v
+AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 6.0.0
-CurrentVersionCode: 5133
+CurrentVersion: 6.0.1
+CurrentVersionCode: 5134

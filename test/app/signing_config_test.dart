@@ -90,6 +90,56 @@ void main() {
     );
   });
 
+  group('F-Droid flavor builds unsigned without a keystore (#3471)', () {
+    test(
+      'an fdroid-only release is detected and NOT thrown on — F-Droid '
+      'supplies the signature, so the build must proceed unsigned',
+      () {
+        // The guard scopes the #48 throw to non-fdroid releases. The tell is
+        // the fdroid-only detection feeding an `all { it.contains("fdroid") }`
+        // check that suppresses the throw for that one path.
+        expect(
+          gradleSource,
+          contains('isFdroidOnlyRelease'),
+          reason:
+              'the fdroid flavor must be allowed to build an unsigned release '
+              'APK for F-Droid to sign — see #3471',
+        );
+        expect(
+          gradleSource,
+          contains('releaseTasks.all { it.contains("fdroid") }'),
+          reason:
+              'the unsigned path must require EVERY requested release task to '
+              'be an fdroid task, so a mixed fdroid+play invocation without a '
+              'keystore still throws rather than shipping an unsigned Play APK',
+        );
+        // Belt-and-braces: the throw must still be conditional on a
+        // non-fdroid release, never unconditional.
+        expect(
+          gradleSource,
+          contains('if (isReleaseRequested && !isFdroidOnlyRelease)'),
+          reason: 'the #48 throw must still fire for every non-fdroid release',
+        );
+      },
+    );
+
+    test(
+      'the unsigned fdroid path is NOT a debug-key fallback — the debug '
+      'signing config must never be referenced for a release build',
+      () {
+        // Re-assert the #48 invariant explicitly in the #3471 context: the fix
+        // routes fdroid releases through `null` (unsigned), never the debug key.
+        expect(
+          gradleSource,
+          isNot(contains('signingConfigs.getByName("debug")')),
+          reason:
+              'the fdroid-unsigned path must use a null signing config, not '
+              'the debug key — that was the original #48 bug',
+        );
+      },
+    );
+  });
+
   group('CI workflow writes the decoded keystore + env vars (#48)', () {
     test(
       'ci.yml has a "Decode signing keystore" step that reads three '
