@@ -2634,6 +2634,78 @@
   "@coachingGpsSmoothAccel": {
     "description": "GPS-only coaching tile (#2058): an acceleration event was detected in the rolling window; a gentler ramp uses less fuel."
   },
+  "gpsCoverageSummary": "Track deckt {pct}% ab — längste Lücke {gap} ({cause})",
+  "@gpsCoverageSummary": {
+    "description": "One-line GPS coverage verdict on the trip-detail GPS diagnostics card (#3465).",
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      },
+      "gap": {
+        "type": "String"
+      },
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "gpsCoverageSummaryNoGaps": "Track deckt {pct}% ab — keine Lücken erkannt",
+  "@gpsCoverageSummaryNoGaps": {
+    "description": "Variant of the GPS coverage verdict line (#3465) for a hole-free track.",
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsCoverageAttrBackgroundThrottle": "App im Hintergrund",
+  "@gpsCoverageAttrBackgroundThrottle": {
+    "description": "Gap-cause label (#3465): OS throttled the backgrounded GPS stream on a no-foreground-service build."
+  },
+  "gpsCoverageAttrOsBatching": "System-Bündelung",
+  "@gpsCoverageAttrOsBatching": {
+    "description": "Gap-cause label (#3465): the OS queued fixes and delivered them late in one burst."
+  },
+  "gpsCoverageAttrGateRejected": "Fixe gefiltert",
+  "@gpsCoverageAttrGateRejected": {
+    "description": "Gap-cause label (#3465): the app's accuracy/teleport/decimation gates rejected the fixes in this stretch."
+  },
+  "gpsCoverageAttrSignalLoss": "Signalverlust",
+  "@gpsCoverageAttrSignalLoss": {
+    "description": "Gap-cause label (#3465): GPS reception itself dropped while the app was foregrounded."
+  },
+  "gpsCoverageAttrUnknown": "Ursache unbekannt",
+  "@gpsCoverageAttrUnknown": {
+    "description": "Gap-cause label (#3465): no verdict was possible (typically a legacy trip without lifecycle marks)."
+  },
+  "gpsCoverageHintBackgroundThrottle": "Die App lief im Hintergrund ohne Vordergrunddienst, daher hat das System GPS gedrosselt. Bildschirm während der Aufzeichnung anlassen oder Hintergrundaufzeichnung aktivieren, sobald verfügbar.",
+  "@gpsCoverageHintBackgroundThrottle": {
+    "description": "Short actionable hint under the coverage line (#3465) for the backgroundThrottle cause."
+  },
+  "gpsCoverageHintOsBatching": "Das System hat Positionsdaten verspätet in Bündeln geliefert; der Track wurde nachträglich aufgefüllt, es ging kaum etwas verloren.",
+  "@gpsCoverageHintOsBatching": {
+    "description": "Short hint under the coverage line (#3465) for the osBatching cause."
+  },
+  "gpsCoverageHintGateRejected": "Verrauschte Positionsdaten in diesem Abschnitt wurden herausgefiltert, damit die Distanzangabe ehrlich bleibt.",
+  "@gpsCoverageHintGateRejected": {
+    "description": "Short hint under the coverage line (#3465) for the gateRejected cause."
+  },
+  "gpsCoverageHintSignalLoss": "Der GPS-Empfang ist abgerissen — meist ein Tunnel, ein Parkhaus oder eine enge Häuserschlucht.",
+  "@gpsCoverageHintSignalLoss": {
+    "description": "Short hint under the coverage line (#3465) for the signalLoss cause."
+  },
+  "gpsCoverageHintUnknown": "Für diese Fahrt liegen keine App-Lebenszyklusdaten zur Lücke vor, daher lässt sich die Ursache nicht bestimmen.",
+  "@gpsCoverageHintUnknown": {
+    "description": "Short hint under the coverage line (#3465) for the unknown cause."
+  },
+  "gpsCoverageAttrLinkRecovery": "OBD2-Wiederverbindung",
+  "@gpsCoverageAttrLinkRecovery": {
+    "description": "Gap attribution label: GPS gap coinciding with an OBD2 reconnect episode (#3465)"
+  },
+  "gpsCoverageHintLinkRecovery": "Die Luecke faellt mit einer OBD2-Wiederverbindung zusammen — waehrend der Adapter neu verband, stockte die GPS-Aufzeichnung. Eine stabile Adapterverbindung behebt auch die Streckenluecken.",
+  "@gpsCoverageHintLinkRecovery": {
+    "description": "Hint for the linkRecovery gap attribution (#3465)"
+  },
   "gpsDiagnosticsTitle": "GPS-Abtastungsdiagnose",
   "@gpsDiagnosticsTitle": {
     "description": "Title of the read-only GPS sample diagnostics card on the Trip detail screen (#1458 phase 2.5)."

@@ -27,6 +27,7 @@ import 'active_vehicle_read.dart';
 import 'gps_only_recording_pipeline.dart';
 import 'recording_battery_exemption.dart';
 import 'recording_companion_association.dart';
+import 'recording_lifecycle_marks_recorder.dart';
 import 'recording_pipeline.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
@@ -117,6 +118,12 @@ class TripRecording extends _$TripRecording {
   // tagged optimistically — the user just tapped Start, the app is
   // certainly foreground.
   AppLifecycleState _lifecycleState = AppLifecycleState.resumed;
+
+  // #3465 — rolling foreground/background transition buffer, windowed to
+  // the trip at save time so the GPS coverage report can attribute track
+  // gaps. Fed from [onAppLifecycleStateChanged]; covers BOTH pipelines.
+  final RecordingLifecycleMarksRecorder _lifecycleMarks =
+      RecordingLifecycleMarksRecorder();
 
   /// #767 band-transition haptics, extracted into a focused
   /// collaborator (#1679). Constructed once and reused across
@@ -902,6 +909,7 @@ class TripRecording extends _$TripRecording {
   /// pure local read.
   void onAppLifecycleStateChanged(AppLifecycleState state) {
     _lifecycleState = state;
+    _lifecycleMarks.onLifecycleState(state); // #3465 — pure, never throws.
   }
 
   /// Exposed for tests — reads back the most recent lifecycle state
@@ -1017,6 +1025,12 @@ class TripRecording extends _$TripRecording {
         // recording. Empty when the GPS feature flag was off for this
         // trip; the entry's JSON serialiser elides the key in that case.
         gpsSampleDiagnostics: gpsSampleDiagnostics,
+        // #3465 — background/resume marks windowed to this trip, so the
+        // GPS coverage report can attribute track gaps post-hoc.
+        lifecycleMarks: summary.startedAt == null
+            ? const []
+            : _lifecycleMarks.marksForWindow(
+                summary.startedAt!, summary.endedAt ?? DateTime.now()),
         obd2Diagnostic: obd2Diagnostic, // #2912 — per-trip comm-health
       ));
       ref.read(tripHistoryListProvider.notifier).refresh();

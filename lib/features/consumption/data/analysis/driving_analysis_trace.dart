@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import '../../domain/driving_score.dart';
+import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/obd2_trip_features.dart';
@@ -28,7 +29,12 @@ class DrivingAnalysisTrace {
   /// per-branch `fuelSourceShares` + `dominantFuelSource`, and the
   /// `measuredPhi` / `ethanolPercent` signal-coverage keys. Purely
   /// additive — v1 readers that ignore unknown keys still parse.
-  static const int schema = 2;
+  ///
+  /// v3 (#3465) — new top-level `gpsCoverage` block: track coverage
+  /// ratio, expected-vs-actual fix counts, and the attributed gap list
+  /// (capped at 20 entries). Purely additive — null on legacy trips with
+  /// under two GPS fixes; v2 readers that ignore unknown keys still parse.
+  static const int schema = 3;
 
   final DateTime capturedAt;
 
@@ -47,6 +53,12 @@ class DrivingAnalysisTrace {
   /// measured or estimated.
   final Obd2TripFeatures? obd2Features;
 
+  /// Per-trip GPS coverage + gap-attribution report (#3465). Null when
+  /// the trip carries fewer than two GPS fixes (legacy trips, opted-out
+  /// trips) — the export's explicit "no track to judge" marker, mirroring
+  /// the [obd2Features] null convention.
+  final GpsCoverageReport? gpsCoverage;
+
   final DrivingScore score;
   final List<DrivingLesson> lessons;
 
@@ -57,6 +69,7 @@ class DrivingAnalysisTrace {
     required this.lessons,
     this.gpsFeatures,
     this.obd2Features,
+    this.gpsCoverage,
     this.comment = kDrivingAnalysisCommentPrompt,
   });
 
@@ -110,6 +123,10 @@ class DrivingAnalysisTrace {
         // per-signal coverage map). Null when no engine signal landed, which
         // makes a broken-link GPS-fallback trip read as `obd2Features: null`.
         'obd2Features': obd2Features?.toJson(),
+        // #3465 — GPS coverage + attributed track gaps (schema v3). Null
+        // when there is no track to judge; the gap list inside is capped
+        // at [GpsCoverageReport.kExportGapCap] entries.
+        'gpsCoverage': gpsCoverage?.toJson(),
         'score': {
           'overall': score.score,
           'styleClass': score.styleClass.name,

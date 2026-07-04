@@ -5725,6 +5725,58 @@ class AppLocalizationsDe extends AppLocalizations {
   String get coachingGpsSmoothAccel => 'Sanft beschleunigen';
 
   @override
+  String gpsCoverageSummary(int pct, String gap, String cause) {
+    return 'Track deckt $pct% ab — längste Lücke $gap ($cause)';
+  }
+
+  @override
+  String gpsCoverageSummaryNoGaps(int pct) {
+    return 'Track deckt $pct% ab — keine Lücken erkannt';
+  }
+
+  @override
+  String get gpsCoverageAttrBackgroundThrottle => 'App im Hintergrund';
+
+  @override
+  String get gpsCoverageAttrOsBatching => 'System-Bündelung';
+
+  @override
+  String get gpsCoverageAttrGateRejected => 'Fixe gefiltert';
+
+  @override
+  String get gpsCoverageAttrSignalLoss => 'Signalverlust';
+
+  @override
+  String get gpsCoverageAttrUnknown => 'Ursache unbekannt';
+
+  @override
+  String get gpsCoverageHintBackgroundThrottle =>
+      'Die App lief im Hintergrund ohne Vordergrunddienst, daher hat das System GPS gedrosselt. Bildschirm während der Aufzeichnung anlassen oder Hintergrundaufzeichnung aktivieren, sobald verfügbar.';
+
+  @override
+  String get gpsCoverageHintOsBatching =>
+      'Das System hat Positionsdaten verspätet in Bündeln geliefert; der Track wurde nachträglich aufgefüllt, es ging kaum etwas verloren.';
+
+  @override
+  String get gpsCoverageHintGateRejected =>
+      'Verrauschte Positionsdaten in diesem Abschnitt wurden herausgefiltert, damit die Distanzangabe ehrlich bleibt.';
+
+  @override
+  String get gpsCoverageHintSignalLoss =>
+      'Der GPS-Empfang ist abgerissen — meist ein Tunnel, ein Parkhaus oder eine enge Häuserschlucht.';
+
+  @override
+  String get gpsCoverageHintUnknown =>
+      'Für diese Fahrt liegen keine App-Lebenszyklusdaten zur Lücke vor, daher lässt sich die Ursache nicht bestimmen.';
+
+  @override
+  String get gpsCoverageAttrLinkRecovery => 'OBD2-Wiederverbindung';
+
+  @override
+  String get gpsCoverageHintLinkRecovery =>
+      'Die Luecke faellt mit einer OBD2-Wiederverbindung zusammen — waehrend der Adapter neu verband, stockte die GPS-Aufzeichnung. Eine stabile Adapterverbindung behebt auch die Streckenluecken.';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-Abtastungsdiagnose';
 
   @override

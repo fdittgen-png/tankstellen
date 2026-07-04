@@ -5688,6 +5688,58 @@ class AppLocalizationsFi extends AppLocalizations {
   String get coachingGpsSmoothAccel => 'Pehmeä kiihdytys';
 
   @override
+  String gpsCoverageSummary(int pct, String gap, String cause) {
+    return 'Track covers $pct% — longest gap $gap ($cause)';
+  }
+
+  @override
+  String gpsCoverageSummaryNoGaps(int pct) {
+    return 'Track covers $pct% — no gaps detected';
+  }
+
+  @override
+  String get gpsCoverageAttrBackgroundThrottle => 'app in background';
+
+  @override
+  String get gpsCoverageAttrOsBatching => 'OS fix batching';
+
+  @override
+  String get gpsCoverageAttrGateRejected => 'fixes filtered';
+
+  @override
+  String get gpsCoverageAttrSignalLoss => 'signal loss';
+
+  @override
+  String get gpsCoverageAttrUnknown => 'unknown cause';
+
+  @override
+  String get gpsCoverageHintBackgroundThrottle =>
+      'The app was in the background without a foreground service, so the system throttled GPS. Keep the screen on while recording, or enable background recording when available.';
+
+  @override
+  String get gpsCoverageHintOsBatching =>
+      'The system delivered position fixes late in batches; the track filled in afterwards, so little data was actually lost.';
+
+  @override
+  String get gpsCoverageHintGateRejected =>
+      'Noisy position fixes in this stretch were filtered out to keep the distance figure honest.';
+
+  @override
+  String get gpsCoverageHintSignalLoss =>
+      'GPS reception dropped — this usually means a tunnel, parking garage or dense urban canyon.';
+
+  @override
+  String get gpsCoverageHintUnknown =>
+      'This trip carries no app-lifecycle information for the gap, so the cause can\'t be determined.';
+
+  @override
+  String get gpsCoverageAttrLinkRecovery => 'OBD2 reconnection interference';
+
+  @override
+  String get gpsCoverageHintLinkRecovery =>
+      'The gap coincides with an OBD2 reconnection episode — the adapter link was recovering while GPS ingest stalled. Fixing the adapter connection also fixes the track.';
+
+  @override
   String get gpsDiagnosticsTitle => 'GPS-näytteenoton diagnostiikka';
 
   @override

@@ -1,0 +1,74 @@
+{
+  "gpsCoverageSummary": "Track covers {pct}% — longest gap {gap} ({cause})",
+  "@gpsCoverageSummary": {
+    "description": "One-line GPS coverage verdict on the trip-detail GPS diagnostics card (#3465): the share of the trip's time span the recorded GPS track actually covers, the single longest hole in the track, and its attributed cause. gap is a pre-formatted duration ('3m 42s'); cause is one of the localized gpsCoverageAttr* labels.",
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      },
+      "gap": {
+        "type": "String"
+      },
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "gpsCoverageSummaryNoGaps": "Track covers {pct}% — no gaps detected",
+  "@gpsCoverageSummaryNoGaps": {
+    "description": "Variant of the GPS coverage verdict line (#3465) for a hole-free track: no gap exceeded twice the expected fix interval, so there is no longest-gap/cause pair to show.",
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsCoverageAttrBackgroundThrottle": "app in background",
+  "@gpsCoverageAttrBackgroundThrottle": {
+    "description": "Gap-cause label (#3465): the gap fell inside a stretch where the app was backgrounded on a build without the recording foreground service, so the OS throttled or paused the GPS stream — the dominant field cause of incomplete traces."
+  },
+  "gpsCoverageAttrOsBatching": "OS fix batching",
+  "@gpsCoverageAttrOsBatching": {
+    "description": "Gap-cause label (#3465): the OS queued GPS fixes and delivered them late in one burst right after the gap, so the receiver was alive but delivery was deferred."
+  },
+  "gpsCoverageAttrGateRejected": "fixes filtered",
+  "@gpsCoverageAttrGateRejected": {
+    "description": "Gap-cause label (#3465): the app's own accuracy/teleport/decimation gates rejected the fixes in this stretch (too noisy to trust for road distance), so the hole is deliberate filtering, not lost signal."
+  },
+  "gpsCoverageAttrSignalLoss": "signal loss",
+  "@gpsCoverageAttrSignalLoss": {
+    "description": "Gap-cause label (#3465): the app was foregrounded and nothing else explains the gap — GPS reception itself dropped (tunnel, parking garage, urban canyon)."
+  },
+  "gpsCoverageAttrUnknown": "unknown cause",
+  "@gpsCoverageAttrUnknown": {
+    "description": "Gap-cause label (#3465): no verdict was possible — typically an older trip recorded before lifecycle marks were persisted."
+  },
+  "gpsCoverageHintBackgroundThrottle": "The app was in the background without a foreground service, so the system throttled GPS. Keep the screen on while recording, or enable background recording when available.",
+  "@gpsCoverageHintBackgroundThrottle": {
+    "description": "Short actionable hint under the coverage line (#3465) when the longest gap was caused by OS background throttling on a no-foreground-service build."
+  },
+  "gpsCoverageHintOsBatching": "The system delivered position fixes late in batches; the track filled in afterwards, so little data was actually lost.",
+  "@gpsCoverageHintOsBatching": {
+    "description": "Short hint under the coverage line (#3465) when the longest gap was caused by the OS batching fix delivery."
+  },
+  "gpsCoverageHintGateRejected": "Noisy position fixes in this stretch were filtered out to keep the distance figure honest.",
+  "@gpsCoverageHintGateRejected": {
+    "description": "Short hint under the coverage line (#3465) when the longest gap was caused by the app's own GPS quality gates rejecting fixes."
+  },
+  "gpsCoverageHintSignalLoss": "GPS reception dropped — this usually means a tunnel, parking garage or dense urban canyon.",
+  "@gpsCoverageHintSignalLoss": {
+    "description": "Short hint under the coverage line (#3465) when the longest gap was caused by genuine GPS signal loss while the app was foregrounded."
+  },
+  "gpsCoverageHintUnknown": "This trip carries no app-lifecycle information for the gap, so the cause can't be determined.",
+  "@gpsCoverageHintUnknown": {
+    "description": "Short hint under the coverage line (#3465) when the longest gap could not be attributed (typically a trip recorded before lifecycle marks existed)."
+  },
+  "gpsCoverageAttrLinkRecovery": "OBD2 reconnection interference",
+  "@gpsCoverageAttrLinkRecovery": {
+    "description": "Gap attribution label: GPS gap coinciding with an OBD2 reconnect episode (#3465)"
+  },
+  "gpsCoverageHintLinkRecovery": "The gap coincides with an OBD2 reconnection episode — the adapter link was recovering while GPS ingest stalled. Fixing the adapter connection also fixes the track.",
+  "@gpsCoverageHintLinkRecovery": {
+    "description": "Hint for the linkRecovery gap attribution (#3465)"
+  }
+}

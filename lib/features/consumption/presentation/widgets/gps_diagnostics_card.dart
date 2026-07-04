@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/gps_sample_diagnostic.dart';
+import '../../domain/gps_coverage_report.dart';
+import 'gps_coverage_line.dart';
 
 /// Read-only inspector card for the GPS sample diagnostics captured
 /// during a trip recording (#1458 phase 2.5).
@@ -31,7 +33,19 @@ import '../../domain/entities/gps_sample_diagnostic.dart';
 class GpsDiagnosticsCard extends StatelessWidget {
   final List<GpsSampleDiagnostic> diagnostics;
 
-  const GpsDiagnosticsCard({super.key, required this.diagnostics});
+  /// The trip's GPS coverage + gap-attribution report (#3465). When
+  /// present the card gains one summary line ("Track covers X% — longest
+  /// gap Ys (cause)") plus a short per-attribution hint — and the card
+  /// renders even when [diagnostics] is empty (a legacy / OBD2 trip whose
+  /// track still proves its own gaps). Null hides the coverage line and
+  /// restores the pre-#3465 rendering exactly.
+  final GpsCoverageReport? coverage;
+
+  const GpsDiagnosticsCard({
+    super.key,
+    required this.diagnostics,
+    this.coverage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +61,8 @@ class GpsDiagnosticsCard extends StatelessWidget {
     );
     final cadenceLine = l.gpsDiagnosticsCadence(summary.medianIntervalMs);
     final explainLine = l.gpsDiagnosticsExplain;
+    final coverageLine = gpsCoverageSummaryLine(coverage, l);
+    final coverageHint = gpsCoverageHint(coverage, l);
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -59,33 +75,59 @@ class GpsDiagnosticsCard extends StatelessWidget {
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         title: Text(title, style: theme.textTheme.titleMedium),
         subtitle: Text(
-          headerLine,
+          // #3465 — a coverage-only trip (no cadence diagnostics) leads
+          // with the coverage verdict instead of a zeroed sample triple.
+          diagnostics.isNotEmpty ? headerLine : (coverageLine ?? headerLine),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         children: [
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Text(cadenceLine, style: theme.textTheme.bodyMedium),
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Text(
-              _formatLifecycleBreakdown(summary.lifecyclePercent, l),
-              style: theme.textTheme.bodyMedium,
+          // #3465 — the coverage verdict + its "what do I do about it"
+          // hint, first: it is the actionable answer to "why does my
+          // track have holes"; the cadence stats below are the raw data.
+          if (coverageLine != null) ...[
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(coverageLine, style: theme.textTheme.bodyMedium),
             ),
-          ),
-          const SizedBox(height: 8),
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: Text(
-              l.gpsDiagnosticsLargestGap(summary.largestGap.inSeconds),
-              style: theme.textTheme.bodyMedium,
+            const SizedBox(height: 8),
+          ],
+          if (coverageHint != null) ...[
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                coverageHint,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 8),
+          ],
+          if (diagnostics.isNotEmpty) ...[
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(cadenceLine, style: theme.textTheme.bodyMedium),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                _formatLifecycleBreakdown(summary.lifecyclePercent, l),
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                l.gpsDiagnosticsLargestGap(summary.largestGap.inSeconds),
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           Text(
             explainLine,
             style: theme.textTheme.bodySmall?.copyWith(

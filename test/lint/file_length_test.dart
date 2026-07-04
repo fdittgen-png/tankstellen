@@ -885,9 +885,14 @@ void main() {
     // 7 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (the trip-recording pipeline; successor to the closed
     // #2187/#2188/#2190 the comments above reference).
+    // #3465 — re-grandfathered 1250 → 1262: the notifier is the single
+    // shared save/lifecycle point for both pipelines, so it gains the
+    // 12-line wiring for the recording lifecycle marks (field + record
+    // call + save-time windowing); ALL logic lives in the new under-cap
+    // recording_lifecycle_marks_recorder.dart / gps_coverage_report.dart.
     'lib/features/consumption/providers/trip_recording_provider.dart': (
-      lines: 1250,
-      bumps: 7,
+      lines: 1262,
+      bumps: 8,
       decompositionIssue: 3140,
     ),
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': (

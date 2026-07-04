@@ -254,7 +254,7 @@ void main() {
       expect((block['signalCoverage'] as Map)['engineLoadPercent'], 1.0);
     });
 
-    test('#3433 — schema is bumped to 2 and the precision block exports '
+    test('#3433 — the precision block exports '
         'measured φ / ethanol / dominant fuel branch', () {
       final obd2 = Obd2TripFeatures.fromSamples([
         TripSample(
@@ -284,7 +284,9 @@ void main() {
         obd2Features: obd2,
       ).toJson();
 
-      expect(json['schema'], 2);
+      // #3465 bumped the trace schema to 3 (additive gpsCoverage block);
+      // the #3433 precision keys are unchanged.
+      expect(json['schema'], 3);
       final block = json['obd2Features'] as Map<String, dynamic>;
       expect((block['measuredPhi'] as Map)['mean'], 1.0);
       expect((block['ethanolPercent'] as Map)['mean'], 10.0);

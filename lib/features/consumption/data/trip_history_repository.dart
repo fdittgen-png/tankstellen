@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/entities/recording_lifecycle_mark.dart';
 import '../domain/trip_recorder.dart';
 import '../../obd2/api.dart';
 import 'trip_dedup.dart';
@@ -77,6 +78,15 @@ class TripHistoryEntry {
   /// `Feature.gpsTripPath` flag was off at recording start.
   final List<GpsSampleDiagnostic> gpsSampleDiagnostics;
 
+  /// Foreground↔background transitions observed during the recording,
+  /// windowed to the trip (#3465). A tiny list (one entry per transition,
+  /// led by a clamped trip-start anchor — see
+  /// `RecordingLifecycleMarksRecorder.marksForWindow`) that lets the
+  /// post-hoc GPS coverage report attribute a track gap to OS background
+  /// throttling on a no-FGS build. Empty for legacy trips recorded before
+  /// this field landed.
+  final List<RecordingLifecycleMark> lifecycleMarks;
+
   /// OBD2 communication-health diagnostic snapshotted at trip finish
   /// (#2912, Epic #2904). The dev-only trip-detail comm-health card was
   /// **always empty** because it read the process-wide in-memory
@@ -106,6 +116,7 @@ class TripHistoryEntry {
     this.adapterName,
     this.adapterFirmware,
     this.gpsSampleDiagnostics = const [],
+    this.lifecycleMarks = const [],
     this.obd2Diagnostic,
   });
 
@@ -123,6 +134,7 @@ class TripHistoryEntry {
         adapterName: adapterName,
         adapterFirmware: adapterFirmware,
         gpsSampleDiagnostics: gpsSampleDiagnostics,
+        lifecycleMarks: lifecycleMarks,
         obd2Diagnostic: obd2Diagnostic,
       );
 
@@ -149,6 +161,12 @@ class TripHistoryEntry {
           'gpsd': gpsSampleDiagnostics
               .map((d) => d.toJson())
               .toList(growable: false),
+        // #3465 — recording lifecycle marks. Compact key 'lcm', emitted
+        // only when at least one mark was captured, so legacy trips
+        // round-trip unchanged (the mq/ep additive-optional precedent).
+        if (lifecycleMarks.isNotEmpty)
+          'lcm':
+              lifecycleMarks.map((m) => m.toJson()).toList(growable: false),
         // #2912 — per-trip OBD2 comm-health diagnostic. Compact key 'obd2d'.
         // Emitted only when a diagnostic was captured (debug-mode trips that
         // touched OBD2), so production / GPS-only / legacy trips round-trip
@@ -183,6 +201,15 @@ class TripHistoryEntry {
         // trips that never recorded a diagnostic) deserialise cleanly.
         gpsSampleDiagnostics: (json['gpsd'] as List?)
                 ?.map((e) => GpsSampleDiagnostic.fromJson(
+                      (e as Map).cast<String, dynamic>(),
+                    ))
+                .toList(growable: false) ??
+            const [],
+        // #3465 — recording lifecycle marks. Missing key → empty list so
+        // legacy trips deserialise cleanly (and the coverage report reads
+        // "no marks" as its honest unknown-attribution input).
+        lifecycleMarks: (json['lcm'] as List?)
+                ?.map((e) => RecordingLifecycleMark.fromJson(
                       (e as Map).cast<String, dynamic>(),
                     ))
                 .toList(growable: false) ??

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
+import 'package:tankstellen/features/consumption/domain/gps_coverage_report.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/gps_diagnostics_card.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -262,6 +263,113 @@ void main() {
       // The raw enum key and the English literal are both gone.
       expect(find.textContaining('resumed'), findsNothing);
       expect(find.textContaining('Largest gap'), findsNothing);
+    });
+
+    testWidgets('#3465 — the coverage summary line + hint render for the '
+        'longest gap\'s attribution', (tester) async {
+      final diagnostics = buildDiagnostics(
+        count: 6,
+        interval: const Duration(milliseconds: 1000),
+        injectedGapAt2: const Duration(milliseconds: 5000),
+      );
+      final gap = GpsCoverageGap(
+        start: DateTime.utc(2026, 1, 1, 12, 0, 2),
+        duration: const Duration(seconds: 75),
+        attribution: GpsGapAttribution.backgroundThrottle,
+      );
+      final coverage = GpsCoverageReport(
+        coverageRatio: 0.75,
+        expectedFixCount: 100,
+        actualFixCount: 75,
+        expectedFixInterval: const Duration(seconds: 1),
+        gaps: [gap],
+        longestGap: gap,
+        backgroundShare: 0.4,
+        fgsEnabled: false,
+      );
+
+      await pumpApp(
+        tester,
+        GpsDiagnosticsCard(diagnostics: diagnostics, coverage: coverage),
+      );
+      await tester.tap(find.byKey(const Key('gps_diagnostics_tile')));
+      await tester.pumpAndSettle();
+
+      // The verdict line: localized attribution label, never the raw
+      // enum name.
+      expect(
+        find.text(
+            'Track covers 75% — longest gap 1m 15s (app in background)'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('backgroundThrottle'), findsNothing);
+      // The actionable per-attribution hint.
+      expect(find.textContaining('foreground service'), findsOneWidget);
+      // The pre-#3465 cadence content is still there.
+      expect(find.textContaining('Median interval: 1000 ms'), findsOneWidget);
+    });
+
+    testWidgets('#3465 — the card renders for a trip WITH coverage but '
+        'WITHOUT cadence diagnostics (legacy/OBD2 track)', (tester) async {
+      final gap = GpsCoverageGap(
+        start: DateTime.utc(2026, 1, 1, 12),
+        duration: const Duration(seconds: 42),
+        attribution: GpsGapAttribution.signalLoss,
+      );
+      final coverage = GpsCoverageReport(
+        coverageRatio: 0.912,
+        expectedFixCount: 500,
+        actualFixCount: 456,
+        expectedFixInterval: const Duration(seconds: 1),
+        gaps: [gap],
+        longestGap: gap,
+        backgroundShare: 0.0,
+        fgsEnabled: false,
+      );
+
+      await pumpApp(
+        tester,
+        GpsDiagnosticsCard(diagnostics: const [], coverage: coverage),
+      );
+
+      // The collapsed subtitle leads with the coverage verdict instead of
+      // a zeroed sample triple.
+      expect(
+        find.text('Track covers 91% — longest gap 42s (signal loss)'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('gps_diagnostics_tile')));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('GPS reception dropped'), findsOneWidget);
+      // No cadence stats without diagnostics — the zeroed median must not
+      // render.
+      expect(find.textContaining('Median interval'), findsNothing);
+    });
+
+    testWidgets('#3465 — a hole-free track reads "no gaps detected"',
+        (tester) async {
+      const coverage = GpsCoverageReport(
+        coverageRatio: 1.0,
+        expectedFixCount: 100,
+        actualFixCount: 100,
+        expectedFixInterval: Duration(seconds: 1),
+        gaps: [],
+        longestGap: null,
+        backgroundShare: 0.0,
+        fgsEnabled: false,
+      );
+
+      await pumpApp(
+        tester,
+        const GpsDiagnosticsCard(diagnostics: [], coverage: coverage),
+      );
+
+      expect(
+        find.text('Track covers 100% — no gaps detected'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('mixed lifecycle states all render localized (French) (#2765)',
