@@ -119,6 +119,14 @@ platform :ios do
     match(type: "appstore", api_key: key, readonly: false)
   end
 
+  desc "Repair: generate MISSING appstore provisioning profiles into the match repo."
+  desc "CI-safe (unlike match_bootstrap): appstore type only, existing certs reused,"
+  desc "no certificate generation forced. Run via the workflow's sync_certs input"
+  desc "when a new signed target (e.g. the widget extension) lacks its profile."
+  lane :match_sync_appstore do
+    match(type: "appstore", api_key: asc_api_key, readonly: false)
+  end
+
   desc "Build a signed appstore-distribution IPA. Expects match_appstore to have populated the keychain first."
   lane :build_appstore do |options|
     build_number = options[:build_number] || ENV["IOS_BUILD_NUMBER"] || Time.now.strftime("%Y%m%d")

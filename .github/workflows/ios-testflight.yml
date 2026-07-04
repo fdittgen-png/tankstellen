@@ -26,6 +26,11 @@ on:
         required: false
         type: boolean
         default: false
+      sync_certs:
+        description: 'Repair mode: run write-mode match (appstore) to generate MISSING provisioning profiles into the certs repo instead of building. Use when match fails with "No matching provisioning profiles found" (e.g. a new signed target like the widget extension was added).'
+        required: false
+        type: boolean
+        default: false
   schedule:
     # 04:30 Europe/Paris is intentionally distinct from the other daily crons:
     # daily-beta.yml runs at 16:00 and daily-github-release.yml at 21:00, so the
@@ -38,7 +43,10 @@ concurrency:
 
 jobs:
   build-and-upload:
-    runs-on: macos-latest
+    # Pinned (was macos-latest): the macos-latest label migrates to macOS 26
+    # beginning 2026-06-15 (actions/runner-images#14167); pin so the Xcode /
+    # SDK selection below stays deterministic until macOS 26 is validated.
+    runs-on: macos-15
     timeout-minutes: 60
     permissions:
       # contents: write — required by the post-upload tag push (#3177) so
@@ -152,7 +160,15 @@ jobs:
           BETA_FEEDBACK_EMAIL: ${{ secrets.BETA_FEEDBACK_EMAIL || '' }}
           FASTLANE_DISABLE_COLORS: '1'
           FASTLANE_HIDE_CHANGELOG: '1'
-        run: bundle exec fastlane release_testflight build_number:"${IOS_BUILD_NUMBER}" changelog:"${TESTFLIGHT_CHANGELOG}" distribute_external:"${DISTRIBUTE}"
+        # sync_certs repair mode (#3467): generate missing appstore profiles
+        # into the match repo (needs MATCH_DEPLOY_KEY with WRITE access),
+        # then exit without building.
+        run: |
+          if [ "${{ inputs.sync_certs }}" = "true" ]; then
+            bundle exec fastlane match_sync_appstore
+          else
+            bundle exec fastlane release_testflight build_number:"${IOS_BUILD_NUMBER}" changelog:"${TESTFLIGHT_CHANGELOG}" distribute_external:"${DISTRIBUTE}"
+          fi
 
       - name: Clean up decoded API key
         if: always()
