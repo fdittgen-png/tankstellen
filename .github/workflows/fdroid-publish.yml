@@ -97,12 +97,25 @@ jobs:
           echo "FDROID_REPO_KEYSTORE_PASSWORD=$FDROID_REPO_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
           echo "FDROID_REPO_KEY_PASSWORD=$FDROID_REPO_KEY_PASSWORD" >> "$GITHUB_ENV"
 
+      - name: Compute monotonic versionCode
+        id: bn
+        # F-Droid updates purely on versionCode, so a rebuild of the static
+        # pubspec `+NNNN` produces the SAME code and F-Droid offers no update.
+        # Inject the same monotonic run-counter scheme daily-beta.yml uses
+        # (2026060000 + run_number*10 + run_attempt): strictly increasing per
+        # run, unique per re-run, well under Android's 2_100_000_000 cap and
+        # above the last static pubspec code (5133) the repo shipped.
+        run: |
+          BN=$(( 2026060000 + ${{ github.run_number }} * 10 + ${{ github.run_attempt }} ))
+          echo "build_number=$BN" >> "$GITHUB_OUTPUT"
+          echo "F-Droid versionCode: $BN"
+
       - name: Build signed fdroid release APK
         # #3435 — the Play "Foreground services" declaration does not apply to
         # F-Droid, so the fdroid flavor ships the GPS foreground service
         # unconditionally (src/fdroid/AndroidManifestFgsApproved.xml overlay:
         # FGS + FGS_LOCATION + battery-exemption only — no play-only services).
-        run: flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
+        run: flutter build apk --release --flavor fdroid --build-number=${{ steps.bn.outputs.build_number }} --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
 
       - name: Audit — no GMS / MLKit
         run: bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
