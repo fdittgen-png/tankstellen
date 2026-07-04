@@ -124,7 +124,12 @@ platform :ios do
   desc "no certificate generation forced. Run via the workflow's sync_certs input"
   desc "when a new signed target (e.g. the widget extension) lacks its profile."
   lane :match_sync_appstore do
-    match(type: "appstore", api_key: asc_api_key, readonly: false)
+    # force: true — regenerate the profile even if one already exists, so an
+    # entitlement change (e.g. a newly-associated App Group, #3467) is picked
+    # up. match otherwise only regenerates on a missing/expired profile or a
+    # rotated cert, never on entitlement drift. Safe here: this is a manual
+    # repair lane (sync_certs input), not the readonly build path.
+    match(type: "appstore", api_key: asc_api_key, readonly: false, force: true)
   end
 
   desc "Build a signed appstore-distribution IPA. Expects match_appstore to have populated the keychain first."
