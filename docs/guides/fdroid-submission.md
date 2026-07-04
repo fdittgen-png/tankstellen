@@ -91,7 +91,7 @@ account.
    ```
    fdroid build -v -l de.tankstellen.fuelprices
    ```
-   This checks out the `v5.0.0` tag, runs the `prebuild` (flutter pub get +
+   This checks out the `v6.0.0` tag, runs the `prebuild` (flutter pub get +
    `build_runner build`) and the `build` (`flutter build apk --release --flavor
    fdroid --dart-define=FORCE_LOCATION_MANAGER=true`), and produces
    `app-fdroid-release.apk`.
