@@ -74,9 +74,9 @@ RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
 Builds:
-  - versionName: 5.0.0
-    versionCode: 5132
-    commit: v5.0.0
+  - versionName: 6.0.0
+    versionCode: 5133
+    commit: v6.0.0
     subdir: android/app
     # ndk: r28b  # = 28.2.13676358, which this build requests: android/app/
     #            # build.gradle.kts sets `ndkVersion = flutter.ndkVersion` and
@@ -93,10 +93,11 @@ Builds:
       - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
     build: |
       $$flutter$$/bin/flutter build apk --release --flavor fdroid \
-        --dart-define=FORCE_LOCATION_MANAGER=true
+        --dart-define=FORCE_LOCATION_MANAGER=true \
+        --dart-define=FGS_FORM_APPROVED=true
     output: build/app/outputs/flutter-apk/app-fdroid-release.apk
 
 AutoUpdateMode: Version v%v
-UpdateCheckMode: Tags ^v\d
-CurrentVersion: 5.0.0
-CurrentVersionCode: 5132
+UpdateCheckMode: Tags ^v[0-9.]+$
+CurrentVersion: 6.0.0
+CurrentVersionCode: 5133
