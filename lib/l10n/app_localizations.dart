@@ -10034,6 +10034,90 @@ abstract class AppLocalizations {
   /// **'Smooth accel'**
   String get coachingGpsSmoothAccel;
 
+  /// One-line GPS coverage verdict on the trip-detail GPS diagnostics card (#3465): the share of the trip's time span the recorded GPS track actually covers, the single longest hole in the track, and its attributed cause. gap is a pre-formatted duration ('3m 42s'); cause is one of the localized gpsCoverageAttr* labels.
+  ///
+  /// In en, this message translates to:
+  /// **'Track covers {pct}% — longest gap {gap} ({cause})'**
+  String gpsCoverageSummary(int pct, String gap, String cause);
+
+  /// Variant of the GPS coverage verdict line (#3465) for a hole-free track: no gap exceeded twice the expected fix interval, so there is no longest-gap/cause pair to show.
+  ///
+  /// In en, this message translates to:
+  /// **'Track covers {pct}% — no gaps detected'**
+  String gpsCoverageSummaryNoGaps(int pct);
+
+  /// Gap-cause label (#3465): the gap fell inside a stretch where the app was backgrounded on a build without the recording foreground service, so the OS throttled or paused the GPS stream — the dominant field cause of incomplete traces.
+  ///
+  /// In en, this message translates to:
+  /// **'app in background'**
+  String get gpsCoverageAttrBackgroundThrottle;
+
+  /// Gap-cause label (#3465): the OS queued GPS fixes and delivered them late in one burst right after the gap, so the receiver was alive but delivery was deferred.
+  ///
+  /// In en, this message translates to:
+  /// **'OS fix batching'**
+  String get gpsCoverageAttrOsBatching;
+
+  /// Gap-cause label (#3465): the app's own accuracy/teleport/decimation gates rejected the fixes in this stretch (too noisy to trust for road distance), so the hole is deliberate filtering, not lost signal.
+  ///
+  /// In en, this message translates to:
+  /// **'fixes filtered'**
+  String get gpsCoverageAttrGateRejected;
+
+  /// Gap-cause label (#3465): the app was foregrounded and nothing else explains the gap — GPS reception itself dropped (tunnel, parking garage, urban canyon).
+  ///
+  /// In en, this message translates to:
+  /// **'signal loss'**
+  String get gpsCoverageAttrSignalLoss;
+
+  /// Gap-cause label (#3465): no verdict was possible — typically an older trip recorded before lifecycle marks were persisted.
+  ///
+  /// In en, this message translates to:
+  /// **'unknown cause'**
+  String get gpsCoverageAttrUnknown;
+
+  /// Short actionable hint under the coverage line (#3465) when the longest gap was caused by OS background throttling on a no-foreground-service build.
+  ///
+  /// In en, this message translates to:
+  /// **'The app was in the background without a foreground service, so the system throttled GPS. Keep the screen on while recording, or enable background recording when available.'**
+  String get gpsCoverageHintBackgroundThrottle;
+
+  /// Short hint under the coverage line (#3465) when the longest gap was caused by the OS batching fix delivery.
+  ///
+  /// In en, this message translates to:
+  /// **'The system delivered position fixes late in batches; the track filled in afterwards, so little data was actually lost.'**
+  String get gpsCoverageHintOsBatching;
+
+  /// Short hint under the coverage line (#3465) when the longest gap was caused by the app's own GPS quality gates rejecting fixes.
+  ///
+  /// In en, this message translates to:
+  /// **'Noisy position fixes in this stretch were filtered out to keep the distance figure honest.'**
+  String get gpsCoverageHintGateRejected;
+
+  /// Short hint under the coverage line (#3465) when the longest gap was caused by genuine GPS signal loss while the app was foregrounded.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS reception dropped — this usually means a tunnel, parking garage or dense urban canyon.'**
+  String get gpsCoverageHintSignalLoss;
+
+  /// Short hint under the coverage line (#3465) when the longest gap could not be attributed (typically a trip recorded before lifecycle marks existed).
+  ///
+  /// In en, this message translates to:
+  /// **'This trip carries no app-lifecycle information for the gap, so the cause can\'t be determined.'**
+  String get gpsCoverageHintUnknown;
+
+  /// Gap attribution label: GPS gap coinciding with an OBD2 reconnect episode (#3465)
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 reconnection interference'**
+  String get gpsCoverageAttrLinkRecovery;
+
+  /// Hint for the linkRecovery gap attribution (#3465)
+  ///
+  /// In en, this message translates to:
+  /// **'The gap coincides with an OBD2 reconnection episode — the adapter link was recovering while GPS ingest stalled. Fixing the adapter connection also fixes the track.'**
+  String get gpsCoverageHintLinkRecovery;
+
   /// Title of the read-only GPS sample diagnostics card on the Trip detail screen — surfaces the cadence + lifecycle-state info captured by #1458 phase 2 so the user can verify that the OS did not throttle the GPS stream during phone-sleep, ahead of deciding whether phase 3 (foreground service) is needed.
   ///
   /// In en, this message translates to:

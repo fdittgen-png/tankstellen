@@ -10,6 +10,7 @@ import '../../../feature_management/domain/feature.dart';
 import '../../data/analysis/driving_analysis_trace.dart';
 import '../../data/analysis/driving_analysis_trace_export.dart';
 import '../../domain/driving_score.dart';
+import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/obd2_trip_features.dart';
@@ -32,12 +33,18 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
     required this.lessons,
     required this.samples,
     this.gpsFeatures,
+    this.gpsCoverage,
   });
 
   final TripSummary summary;
   final DrivingScore score;
   final List<DrivingLesson> lessons;
   final GpsDrivingFeatures? gpsFeatures;
+
+  /// The trip's GPS coverage + gap-attribution report (#3465), computed
+  /// once by the detail body and folded into the export's `gpsCoverage`
+  /// block. Null when the trip carries no usable track.
+  final GpsCoverageReport? gpsCoverage;
 
   /// The trip's raw samples — the source of the OBD2 telemetry aggregate
   /// folded into the export (#3402).
@@ -87,6 +94,7 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       lessons: lessons,
       gpsFeatures: gpsFeatures,
       obd2Features: Obd2TripFeatures.fromSamples(samples),
+      gpsCoverage: gpsCoverage,
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

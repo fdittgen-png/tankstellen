@@ -15,6 +15,7 @@ import '../../data/trip_history_repository.dart';
 import '../../domain/driving_insight.dart';
 import '../../domain/driving_score.dart';
 import '../../domain/fuel_event_attribution.dart';
+import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/lessons/driving_lesson_rule.dart';
@@ -127,6 +128,13 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   /// telemetry aggregate (#3402).
   late final List<TripSample> _tripSamples =
       widget.samples.map(tripDetailToTripSample).toList(growable: false);
+
+  /// GPS coverage + gap-attribution report (#3465); null under two GPS
+  /// fixes. Memoised like [_insights]; feeds the card + the trace export.
+  late final GpsCoverageReport? _gpsCoverage = GpsCoverageReport.forTrip(
+    _tripSamples,
+    marks: widget.entry.lifecycleMarks,
+  );
 
   /// Per-event fuel-cost attribution (#3432) — the "where your fuel
   /// went" breakdown. Pure + O(n); memoised like the other analyses so
@@ -332,14 +340,17 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // nowhere). Shown only when at least one harsh event was recorded.
         if (ImuAccelBrakeCard.summaryFor(widget.entry.summary) != null)
           ImuAccelBrakeCard(summary: widget.entry.summary),
-        // GPS sample diagnostics inspector (#1458 phase 2.5).
-        // Read-only — rendered only when at least one diagnostic was
-        // captured (legacy trips and flag-off trips skip this card so
-        // their layout is unchanged). Phase 3 (Android foreground GPS
-        // service) is conditional on what this card surfaces during
-        // field testing.
-        if (widget.entry.gpsSampleDiagnostics.isNotEmpty)
-          GpsDiagnosticsCard(diagnostics: widget.entry.gpsSampleDiagnostics),
+        // GPS sample diagnostics inspector (#1458 phase 2.5) + the #3465
+        // coverage/gap-attribution summary line. Read-only — rendered when
+        // a cadence diagnostic was captured OR the track supports a
+        // coverage report; trips with neither (legacy no-GPS trips) skip
+        // the card so their layout is unchanged.
+        if (widget.entry.gpsSampleDiagnostics.isNotEmpty ||
+            _gpsCoverage != null)
+          GpsDiagnosticsCard(
+            diagnostics: widget.entry.gpsSampleDiagnostics,
+            coverage: _gpsCoverage,
+          ),
         // OBD2 communication-health diagnostics (#2470). Dev-only — the
         // card self-hides unless Feature.debugMode is on AND a session was
         // captured, the OBD2 analogue of the GPS card above. #2912 — feeds
@@ -357,6 +368,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             score: _score,
             lessons: lessons,
             gpsFeatures: _gpsFeatures,
+            gpsCoverage: _gpsCoverage,
             samples: _tripSamples,
           ),
         // #1895 — the per-trip telemetry charts, folded into one

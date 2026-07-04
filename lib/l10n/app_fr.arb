@@ -5231,5 +5231,91 @@
   "@distanceSourceEstimatedTooltip": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "gpsCoverageSummary": "Track covers {pct}% — longest gap {gap} ({cause})",
+  "@gpsCoverageSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      },
+      "gap": {
+        "type": "String"
+      },
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "gpsCoverageSummaryNoGaps": "Track covers {pct}% — no gaps detected",
+  "@gpsCoverageSummaryNoGaps": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsCoverageAttrBackgroundThrottle": "app in background",
+  "@gpsCoverageAttrBackgroundThrottle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageAttrOsBatching": "OS fix batching",
+  "@gpsCoverageAttrOsBatching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageAttrGateRejected": "fixes filtered",
+  "@gpsCoverageAttrGateRejected": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageAttrSignalLoss": "signal loss",
+  "@gpsCoverageAttrSignalLoss": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageAttrUnknown": "unknown cause",
+  "@gpsCoverageAttrUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageHintBackgroundThrottle": "The app was in the background without a foreground service, so the system throttled GPS. Keep the screen on while recording, or enable background recording when available.",
+  "@gpsCoverageHintBackgroundThrottle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageHintOsBatching": "The system delivered position fixes late in batches; the track filled in afterwards, so little data was actually lost.",
+  "@gpsCoverageHintOsBatching": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageHintGateRejected": "Noisy position fixes in this stretch were filtered out to keep the distance figure honest.",
+  "@gpsCoverageHintGateRejected": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageHintSignalLoss": "GPS reception dropped — this usually means a tunnel, parking garage or dense urban canyon.",
+  "@gpsCoverageHintSignalLoss": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageHintUnknown": "This trip carries no app-lifecycle information for the gap, so the cause can't be determined.",
+  "@gpsCoverageHintUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageAttrLinkRecovery": "OBD2 reconnection interference",
+  "@gpsCoverageAttrLinkRecovery": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gpsCoverageHintLinkRecovery": "The gap coincides with an OBD2 reconnection episode — the adapter link was recovering while GPS ingest stalled. Fixing the adapter connection also fixes the track.",
+  "@gpsCoverageHintLinkRecovery": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
