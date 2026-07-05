@@ -68,20 +68,28 @@ class GpsKpiVerdicts {
 
   const GpsKpiVerdicts._();
 
-  /// Band an RPA value (lower = better).
-  static GpsKpiVerdict rpa(double v) => _lowerIsBetter(v, rpaGoodMax, rpaModerateMax);
+  /// Band an RPA value (lower = better). [bands] defaults to the
+  /// conservative literature-anchored cutoffs; the #3503 calibration
+  /// derives a personal set from the driver's own verdicts.
+  static GpsKpiVerdict rpa(double v,
+          {GpsKpiBands bands = GpsKpiBands.defaults}) =>
+      _lowerIsBetter(v, bands.rpaGoodMax, bands.rpaModerateMax);
 
   /// Band a PKE value (lower = better).
-  static GpsKpiVerdict pke(double v) => _lowerIsBetter(v, pkeGoodMax, pkeModerateMax);
+  static GpsKpiVerdict pke(double v,
+          {GpsKpiBands bands = GpsKpiBands.defaults}) =>
+      _lowerIsBetter(v, bands.pkeGoodMax, bands.pkeModerateMax);
 
   /// Band a VAPOS value (lower = better).
-  static GpsKpiVerdict vapos(double v) =>
-      _lowerIsBetter(v, vaposGoodMax, vaposModerateMax);
+  static GpsKpiVerdict vapos(double v,
+          {GpsKpiBands bands = GpsKpiBands.defaults}) =>
+      _lowerIsBetter(v, bands.vaposGoodMax, bands.vaposModerateMax);
 
   /// Band a coasting share (higher = better — inverted polarity).
-  static GpsKpiVerdict coast(double v) {
-    if (v >= coastGoodMin) return GpsKpiVerdict.good;
-    if (v >= coastModerateMin) return GpsKpiVerdict.moderate;
+  static GpsKpiVerdict coast(double v,
+      {GpsKpiBands bands = GpsKpiBands.defaults}) {
+    if (v >= bands.coastGoodMin) return GpsKpiVerdict.good;
+    if (v >= bands.coastModerateMin) return GpsKpiVerdict.moderate;
     return GpsKpiVerdict.aggressive;
   }
 
@@ -90,4 +98,44 @@ class GpsKpiVerdicts {
     if (v <= moderateMax) return GpsKpiVerdict.moderate;
     return GpsKpiVerdict.aggressive;
   }
+}
+
+/// One resolvable set of KPI band cutoffs (#3503, epic #3498).
+///
+/// [defaults] is byte-identical to the [GpsKpiVerdicts] consts; the
+/// verdict-calibration store derives a personal instance from the driver's
+/// own smooth/aggressive labels once enough have accumulated — a heavier
+/// vehicle or a hilly commute legitimately shifts where "smooth" sits.
+class GpsKpiBands {
+  final double rpaGoodMax;
+  final double rpaModerateMax;
+  final double pkeGoodMax;
+  final double pkeModerateMax;
+  final double vaposGoodMax;
+  final double vaposModerateMax;
+  final double coastGoodMin;
+  final double coastModerateMin;
+
+  const GpsKpiBands({
+    required this.rpaGoodMax,
+    required this.rpaModerateMax,
+    required this.pkeGoodMax,
+    required this.pkeModerateMax,
+    required this.vaposGoodMax,
+    required this.vaposModerateMax,
+    required this.coastGoodMin,
+    required this.coastModerateMin,
+  });
+
+  /// The uncalibrated defaults — the [GpsKpiVerdicts] consts, unchanged.
+  static const GpsKpiBands defaults = GpsKpiBands(
+    rpaGoodMax: GpsKpiVerdicts.rpaGoodMax,
+    rpaModerateMax: GpsKpiVerdicts.rpaModerateMax,
+    pkeGoodMax: GpsKpiVerdicts.pkeGoodMax,
+    pkeModerateMax: GpsKpiVerdicts.pkeModerateMax,
+    vaposGoodMax: GpsKpiVerdicts.vaposGoodMax,
+    vaposModerateMax: GpsKpiVerdicts.vaposModerateMax,
+    coastGoodMin: GpsKpiVerdicts.coastGoodMin,
+    coastModerateMin: GpsKpiVerdicts.coastModerateMin,
+  );
 }
