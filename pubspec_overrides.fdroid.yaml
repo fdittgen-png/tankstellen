@@ -27,6 +27,11 @@ dependency_overrides:
   # stub only keeps the Play/iOS mobile_scanner code compiling on libre.
   mobile_scanner:
     path: tool/fdroid_stubs/mobile_scanner
+  # #3492 — no-op sentry_flutter (opt-in crash reporter; F-Droid flags the SDK
+  # as a Tracking anti-feature). Libre ships no Sentry: init is gated off and
+  # the stub keeps app_initializer/pii_scrubber compiling with zero io.sentry.
+  sentry_flutter:
+    path: tool/fdroid_stubs/sentry_flutter
   # #3490 — no-op ML Kit text-OCR (upstream pulls com.google.mlkit.vision.text
   # + gms). Libre OCR is unavailable (NoopOcrTextEngine); Play/iOS keep it.
   google_mlkit_text_recognition:

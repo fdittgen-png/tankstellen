@@ -1,0 +1,30 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Libre / F-Droid drop-in replacement for `sentry_flutter` (#3492, epic #3473).
+# Sentry is an opt-in crash/diagnostic reporter; F-Droid flags the SDK's
+# presence as a Tracking anti-feature. To keep the libre listing free of any
+# anti-feature flag, this no-op stub provides the SAME Dart surface the app
+# compiles against (`SentryFlutter.init`, `SentryFlutterOptions`, `SentryEvent`
+# + the event value types the PII scrubber mutates) with NO native `io.sentry`
+# code and NO `flutter: plugin:` block, so GeneratedPluginRegistrant never
+# registers it and zero `io.sentry` references reach the fdroid dex.
+#
+# The libre build additionally never CALLS `SentryFlutter.init` (gated on
+# `AppFlavor.isLibre`, and there is no baked DSN), so this only needs to COMPILE.
+#
+# Swapped in ONLY for the fdroid build via `pubspec_overrides.yaml` (generated
+# from `pubspec_overrides.fdroid.yaml` by `dart run tool/apply_fdroid_overrides.dart`).
+# Play + iOS builds keep the real `sentry_flutter` (opt-in reporting unchanged).
+name: sentry_flutter
+description: Libre/F-Droid no-op stub for sentry_flutter (no io.sentry). Epic #3473.
+version: 9.22.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter

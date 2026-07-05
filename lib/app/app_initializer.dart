@@ -15,6 +15,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import '../features/alerts/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
+import '../core/platform/app_flavor.dart';
 import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/health_counters.dart';
 import '../core/telemetry/storage/startup_failure_store.dart';
@@ -266,22 +267,20 @@ class AppInitializer {
 
     StartupTimer.instance.mark('pre_run_app');
 
-    // #1769 — Sentry no longer wraps `runApp`; the old wrapper forced
-    // both `SentryFlutter.init` and the package-info round-trip it
-    // needs for the release string onto the cold-start critical path.
-    // The app now paints first and Sentry initialises in the first
-    // post-first-frame microtask. Native crash handlers come up a few
-    // hundred ms later — acceptable, since Sentry only needs to be live
-    // before an error is *reported*, not before first paint.
-    // `_installErrorHandlers` is re-run afterwards so the app's
-    // `errorLogger` pipeline stays the authoritative target, matching
-    // today's behaviour where `_launch` overwrote Sentry's own
-    // integration handlers.
+    // #1769 — Sentry no longer wraps `runApp`; the old wrapper forced both
+    // `SentryFlutter.init` and the package-info round-trip onto the cold-start
+    // critical path. The app now paints first and Sentry initialises in the
+    // first post-first-frame microtask — native crash handlers come up a few
+    // hundred ms later, acceptable since Sentry only needs to be live before an
+    // error is *reported*, not before first paint. `_installErrorHandlers` is
+    // re-run afterwards so the `errorLogger` pipeline stays authoritative.
+    // #3492 — libre / F-Droid ships NO Sentry SDK (stub → no `io.sentry`), so
+    // never init there; `AppFlavor.isLibre` is const so R8 folds the block out.
     final dsn = resolveSentryDsn(storage);
     final consentGiven = storage
             .getSetting('consent_error_reporting') as bool? ??
         false;
-    if (dsn.isNotEmpty && consentGiven) {
+    if (!AppFlavor.isLibre && dsn.isNotEmpty && consentGiven) {
       _deferPostFirstFrame(() async {
         final packageInfo = await _resolvePackageInfo();
         await SentryFlutter.init((options) {
@@ -290,18 +289,16 @@ class AppInitializer {
           options.environment = 'production';
           options.release =
               'tankstellen@${packageInfo.version}+${packageInfo.buildNumber}';
-          // #1109 — strip PII (emails, lat/lng, tokens, user/request
-          // blocks, long breadcrumb payloads) from every event before
-          // it leaves the device. The scrubber is a pure function so it
-          // stays unit-tested and shared with `TraceUploader`.
+          // #1109 — strip PII (emails, lat/lng, tokens, user/request blocks,
+          // long breadcrumbs) from every event before it leaves the device.
+          // The scrubber is a pure function shared with `TraceUploader`.
           options.beforeSend = (event, hint) {
             try {
               return PiiScrubber.scrubSentryEvent(event);
             } catch (e, st) {
-              // #3144 — breadcrumb-level (NOT errorLogger): a warn-level
-              // trace from inside beforeSend could recurse through the
-              // Sentry upload path. The breadcrumb still rides inside the
-              // next persisted trace, so the scrub fault is field-visible.
+              // #3144 — breadcrumb-level (NOT errorLogger): a warn trace from
+              // inside beforeSend could recurse through the Sentry upload path.
+              // The breadcrumb still rides the next persisted trace.
               log.info('Sentry beforeSend scrub failed: $e\n$st',
                   tag: 'sentry');
               return event;
