@@ -18,3 +18,8 @@ dependency_overrides:
   # supabase_flutter). Unused on libre; keeps supabase compiling GMS-free.
   passkeys_android:
     path: tool/fdroid_stubs/passkeys_android
+  # #3476 — vendored GMS-free geolocator_android: FusedLocationClient +
+  # GoogleApiAvailability removed, always uses Android's LocationManager (the
+  # app already forces this). Drops all com.google.android.gms.location refs.
+  geolocator_android:
+    path: third_party/geolocator_android
