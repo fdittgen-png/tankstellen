@@ -64,6 +64,12 @@ plugins:
       scoped_providers_should_specify_dependencies: false
 
 analyzer:
+  # Vendored upstream plugins (patched for the GMS-free F-Droid build, #3473 —
+  # e.g. third_party/geolocator_android) keep their own upstream conventions;
+  # don't hold third-party code to the app's strict lints. They compile as
+  # normal packages; only the app's own sources are linted.
+  exclude:
+    - third_party/**
   # Strict language modes (#3160) — the project paid for implicit-dynamic
   # casts twice (#2296, #2311 in the Hive/JSON codec layer); these make
   # implicit downcasts, raw generic types and uninferable invocations
