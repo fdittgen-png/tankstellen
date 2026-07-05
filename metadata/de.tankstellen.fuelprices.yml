@@ -10,10 +10,16 @@
 # This is the REPRODUCIBLE-BUILD recipe: F-Droid's buildserver checks out the
 # tagged source and builds the GMS-free `fdroid` flavor itself (unlike the
 # self-hosted repo under fdroid/, which ships a prebuilt APK).
+#
+# #3481 — this file mirrors the fdroiddata MR !42093 branch `add-sparkilo`
+# byte-for-byte below this comment block (the MR iterations dropped
+# `subdir:`/`gradle:` — the whole-app `flutter build apk --flavor fdroid`
+# needs neither — and Summary/Description, which F-Droid reads from the
+# upstream fastlane/metadata structure instead).
 
 Categories:
-  - Navigation
   - Internet
+  - Navigation
 License: MIT
 AuthorName: Florian DITTGEN
 AuthorEmail: fdittgen@gmail.com
@@ -22,66 +28,16 @@ SourceCode: https://github.com/fdittgen-png/tankstellen
 IssueTracker: https://github.com/fdittgen-png/tankstellen/issues
 
 Name: Sparkilo
-Summary: Find the cheapest fuel and EV charging nearby and cut driving costs
-Description: |-
-  Sparkilo compares real-time fuel and EV-charging prices and helps you spend
-  less to run your car: pay less per litre, burn less per kilometre, and keep a
-  clear record of what you actually spend. It is free, ad-free, has no account
-  and is privacy-first — your GPS position and any API keys never leave the
-  device. The interface is available in 23 languages.
-
-  Prices come from each country's official open-data source, not from
-  crowdsourcing, covering Austria, Argentina, Australia, Chile, Denmark, France,
-  Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South
-  Korea, Spain and the United Kingdom, plus EV charging worldwide via Open Charge
-  Map.
-
-  '''Find cheaper fuel'''
-
-  * Search nearby or along a route, filtered by fuel type, radius, open-now and amenities.
-  * Petrol, diesel, LPG, CNG, E85 and electric in one unified search and map.
-  * Price pins coloured cheapest-to-priciest; along a route the best-value stops are flagged.
-  * Per-station and radius price alerts, evaluated on the device and only when you are nearby.
-  * Favourites with full price rows, and EV chargers showing power, connectors and availability.
-
-  '''Burn less per kilometre'''
-
-  * Connect any ELM327-compatible OBD-II adapter for live eco-coaching.
-  * Per-trip driving score, throttle and RPM histograms, and hard-acceleration insights.
-  * Hands-free trip logbook over OBD-II or GPS only, with each route coloured by efficiency.
-
-  '''See what you spend'''
-
-  * Consumption tracker: average L/100 km, cost per kilometre, total spent and fill-up history.
-  * Built-in fuel-cost calculator and a CO2 dashboard broken down by trip length and speed band.
-  * Approach overlay, a home-screen widget, and spoken price announcements while you drive.
-
-  '''Privacy'''
-
-  A Privacy Dashboard lets you view, export or delete all of your data at any
-  time. Optional TankSync synchronises favourites, vehicles, fill-ups and alerts
-  to a server you control.
-
-  '''About this F-Droid build'''
-
-  This is the fully free build: no Google Play Services, no other proprietary
-  Google libraries, and no crash-reporting or analytics of any kind. Maps use
-  OpenStreetMap and positioning uses Android's location manager. QR scanning
-  (device pairing, payment codes) works via the free ZXing library. Only the
-  pump-display and receipt text scanners, which rely on Google ML Kit, are
-  unavailable in this build — add those fill-ups by hand instead. Every other
-  feature works as described.
+AutoName: Sparkilo
 
 RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
 Builds:
-  - versionName: 6.0.1
-    versionCode: 5134
-    commit: v6.0.1
-    subdir: android/app
-    gradle:
-      - fdroid
+  - versionName: 6.0.2
+    versionCode: 5135
+    commit: v6.0.2
+    output: build/app/outputs/flutter-apk/app-fdroid-release.apk
     srclibs:
       - flutter@stable
     prebuild:
@@ -100,13 +56,11 @@ Builds:
       # with the stubs above, but the scanner still walks the source tree.
       - third_party/google_mlkit_commons
       - third_party/google_mlkit_text_recognition
-    build: |
-      $$flutter$$/bin/flutter build apk --release --flavor fdroid \
-        --dart-define=FORCE_LOCATION_MANAGER=true \
-        --dart-define=FGS_FORM_APPROVED=true
-    output: build/app/outputs/flutter-apk/app-fdroid-release.apk
+    build: $$flutter$$/bin/flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
+      --dart-define=FGS_FORM_APPROVED=true
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
-CurrentVersion: 6.0.1
-CurrentVersionCode: 5134
+UpdateCheckData: pubspec.yaml|version:\s.+\+(\d+)|.|version:\s(.+)\+
+CurrentVersion: 6.0.2
+CurrentVersionCode: 5135

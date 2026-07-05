@@ -1,0 +1,5 @@
+• OBD2 : couche de connexion réécrite — une seule autorité de connexion, reconnexions bornées, récupération automatique d'un adaptateur bloqué
+• Trajets : rapport de couverture GPS expliquant chaque trou d'enregistrement
+• Carte : correction d'un blocage après recherche dans de rares cas
+• Consommation : l'estimation du réservoir utilise la vraie moyenne du véhicule
+• Version F-Droid : 100 % sans Google (QR via ZXing, sans Sentry)

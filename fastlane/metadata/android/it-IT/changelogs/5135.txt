@@ -1,0 +1,5 @@
+• OBD2: livello di connessione riscritto — un'unica autorità di connessione, riconnessioni limitate, recupero automatico dell'adattatore bloccato
+• Viaggi: report di copertura GPS che spiega ogni lacuna del percorso
+• Mappa: risolto un blocco dopo la ricerca in rari casi
+• Consumi: la stima del serbatoio usa la media reale del veicolo
+• Build F-Droid: 100% senza Google (scansione QR con ZXing, senza Sentry)
