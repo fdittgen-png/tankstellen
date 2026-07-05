@@ -56,6 +56,12 @@ jobs:
           sudo apt-get install -y libmagic1
           pip install --upgrade pip
           pip install --upgrade fdroidserver
+      # #3480 (epic #3473) — swap the GMS/ML-Kit/Play-Core/Sentry-pulling
+      # plugins for the Dart-only stubs BEFORE resolving deps, exactly as the
+      # fdroiddata recipe prebuild does. Without this the self-hosted repo
+      # shipped an APK that still carried io.sentry / com.google.mlkit —
+      # the strict release audit below now fails on any such reference.
+      - run: dart run tool/apply_fdroid_overrides.dart
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
 
