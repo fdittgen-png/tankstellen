@@ -43,7 +43,8 @@ class NavigationUtils {
     await launchUrl(webUri, mode: LaunchMode.externalApplication);
   }
 
-  /// Open a route in Google Maps with multiple waypoints.
+  /// Open a route through multiple stations in the user's preferred
+  /// maps/navigation app.
   ///
   /// [origin] — start point as "lat,lng" string.
   /// [destination] — end point as "lat,lng" string.
@@ -51,11 +52,31 @@ class NavigationUtils {
   ///
   /// Stations should be sorted by their position along the route
   /// BEFORE calling this method to avoid zigzag routing.
+  ///
+  /// Like [openInMaps], this prefers the OS's DEFAULT maps app via a `geo:`
+  /// intent to the destination (Organic Maps, OsmAnd, Waze, Google Maps…),
+  /// instead of forcing Google Maps. Multi-stop routing has no cross-app URI
+  /// scheme, so the intermediate [waypoints] are only carried by the Google
+  /// Maps web fallback below — used when no installed app handles `geo:`
+  /// (e.g. a GMS-free / F-Droid device with no maps app). See #3474.
   static Future<void> openRouteInMaps({
     required String origin,
     required String destination,
     List<String> waypoints = const [],
   }) async {
+    final geoUri = _geoUriForLatLng(destination);
+    if (geoUri != null) {
+      try {
+        final launched =
+            await launchUrl(geoUri, mode: LaunchMode.externalApplication);
+        if (launched) return;
+      } on Exception catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.other, e, st,
+            context: const {'where': 'Route navigation geo: URI failed'}));
+      }
+    }
+
+    // Fallback: Google Maps web with the full multi-stop route.
     var url = 'https://www.google.com/maps/dir/?api=1'
         '&origin=$origin'
         '&destination=$destination'
@@ -66,5 +87,16 @@ class NavigationUtils {
     }
 
     await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  }
+
+  /// Build a `geo:lat,lng?q=lat,lng` URI from a `"lat,lng"` string, or `null`
+  /// if it is not a valid coordinate pair (so the caller can fall back).
+  static Uri? _geoUriForLatLng(String latLng) {
+    final parts = latLng.split(',');
+    if (parts.length != 2) return null;
+    final lat = double.tryParse(parts[0].trim());
+    final lng = double.tryParse(parts[1].trim());
+    if (lat == null || lng == null) return null;
+    return Uri.parse('geo:$lat,$lng?q=$lat,$lng');
   }
 }

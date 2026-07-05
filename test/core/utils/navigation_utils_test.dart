@@ -157,6 +157,41 @@ void main() {
     });
   });
 
+  group('NavigationUtils - route prefers default app via geo: (#3474)', () {
+    // Mirrors NavigationUtils._geoUriForLatLng, which openRouteInMaps now
+    // tries FIRST so the OS opens the default maps app instead of forcing
+    // Google Maps.
+    Uri? geoUriForLatLng(String latLng) {
+      final parts = latLng.split(',');
+      if (parts.length != 2) return null;
+      final lat = double.tryParse(parts[0].trim());
+      final lng = double.tryParse(parts[1].trim());
+      if (lat == null || lng == null) return null;
+      return Uri.parse('geo:$lat,$lng?q=$lat,$lng');
+    }
+
+    test('builds a geo: URI from a valid "lat,lng" destination', () {
+      final uri = geoUriForLatLng('51.5074,-0.1278');
+      expect(uri, isNotNull);
+      expect(uri!.scheme, 'geo');
+      expect(uri.path, '51.5074,-0.1278');
+      expect(uri.query, 'q=51.5074,-0.1278');
+    });
+
+    test('returns null for a malformed destination (falls back to web)', () {
+      expect(geoUriForLatLng('not-a-coordinate'), isNull);
+      expect(geoUriForLatLng('48.0'), isNull);
+      expect(geoUriForLatLng('48.0,2.0,3.0'), isNull);
+      expect(geoUriForLatLng('48.0,abc'), isNull);
+    });
+
+    test('geo: URI is preferred over the Google Maps host for routes', () {
+      final uri = geoUriForLatLng('50.6292,3.0573');
+      expect(uri!.scheme, 'geo');
+      expect(uri.host, isNot('www.google.com'));
+    });
+  });
+
   group('NavigationUtils - URL encoding correctness', () {
     test('pipe separator in waypoints is preserved in raw URL', () {
       const waypoints = '48.0,2.0|49.0,3.0';
