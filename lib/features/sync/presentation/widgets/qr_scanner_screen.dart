@@ -9,21 +9,23 @@ import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/permissions/camera_permissions.dart';
+import '../../../../core/platform/app_flavor.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'qr_scanner_helpers.dart';
+import 'zxing_scanner_view.dart';
 
 /// Full-screen QR code scanner for scanning TankSync credentials and
 /// payment QR codes from the station-detail screen.
 ///
-/// TODO(#3477): barcode/QR capability seam for the GMS-free F-Droid
-/// architecture (epic #3473). `mobile_scanner` pulls ML Kit
-/// (`com.google.mlkit.vision.barcode`, rejected by `fdroid scanner`). Plan
-/// (see `.local-docs/fdroid-gms-free-refactor-notes.md`): a `BarcodeScanner`
-/// capability behind an `AppFlavor`-selected provider — `mobile_scanner` on
-/// Play/iOS, a FOSS ZXing scanner on libre — so TankSync QR device-linking
-/// keeps working on F-Droid. First extract the QR parse/validate logic
-/// (`qr_scanner_helpers.dart`) so both impls share it plugin-free.
+/// #3477 — the camera-decode surface is [AppFlavor]-selected (epic #3473):
+/// Play + iOS use `mobile_scanner` (ML Kit); the GMS-free libre / F-Droid
+/// build uses [ZxingScannerView] (FOSS `flutter_zxing`), so TankSync QR
+/// device-linking keeps working on F-Droid without the ML Kit
+/// (`com.google.mlkit.vision.barcode`) references `fdroid scanner` rejects.
+/// Everything plugin-agnostic — the permission gate, the decode timeout, the
+/// frame overlay, the guidance caption and the haptic-on-decode + pop — is
+/// shared here; only the preview widget (and the torch affordance) differs.
 ///
 /// #721 hardens the scanner against the failure modes the bare
 /// `MobileScanner` has no opinion on:
@@ -72,7 +74,10 @@ class QrScannerScreen extends StatefulWidget {
 enum _ScannerPhase { probing, scanning, denied, permanentlyDenied, timeout }
 
 class _QrScannerScreenState extends State<QrScannerScreen> {
-  late final MobileScannerController _controller;
+  /// The ML Kit controller — created only on Play / iOS. On the libre build
+  /// [ZxingScannerView] owns its own camera, so this is never initialised or
+  /// read (guarded by [AppFlavor.isLibre] at every use site).
+  MobileScannerController? _controller;
   bool _scanned = false;
   bool _ownsController = false;
   _ScannerPhase _phase = _ScannerPhase.probing;
@@ -81,11 +86,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.controllerOverride != null) {
-      _controller = widget.controllerOverride!;
-    } else {
-      _controller = MobileScannerController();
-      _ownsController = true;
+    if (!AppFlavor.isLibre) {
+      if (widget.controllerOverride != null) {
+        _controller = widget.controllerOverride!;
+      } else {
+        _controller = MobileScannerController();
+        _ownsController = true;
+      }
     }
     unawaited(_probePermission());
   }
@@ -132,8 +139,9 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   @override
   void dispose() {
     _timeoutTimer?.cancel();
-    if (_ownsController) {
-      unawaited(_controller.dispose());
+    final controller = _controller;
+    if (_ownsController && controller != null) {
+      unawaited(controller.dispose());
     }
     super.dispose();
   }
@@ -141,14 +149,18 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // The AppBar torch button is mobile_scanner's (it reads the controller's
+    // torch state). The libre build has no controller — [ZxingScannerView]
+    // renders its own in-preview flashlight — so it shows no AppBar torch.
+    final controller = _controller;
     return PageScaffold(
       title: l10n.syncWizardScanQrCode,
       bodyPadding: EdgeInsets.zero,
-      actions: _phase == _ScannerPhase.scanning
+      actions: _phase == _ScannerPhase.scanning && controller != null
           ? [
               QrScannerTorchButton(
-                state: _controller,
-                onToggle: _controller.toggleTorch,
+                state: controller,
+                onToggle: controller.toggleTorch,
               ),
             ]
           : null,
@@ -181,10 +193,16 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           onPressed: _retry,
         );
       case _ScannerPhase.scanning:
+        final controller = _controller;
         return Stack(
           fit: StackFit.expand,
           children: [
-            MobileScanner(controller: _controller, onDetect: _onDetect),
+            // #3477 — libre uses the FOSS zxing preview; Play/iOS the ML Kit
+            // MobileScanner. Both funnel a decode into [_onValue].
+            if (controller != null)
+              MobileScanner(controller: controller, onDetect: _onDetect)
+            else
+              ZxingScannerView(onValue: _onValue),
             const QrScanFrameOverlay(),
             Align(
               alignment: Alignment.bottomCenter,
@@ -198,10 +216,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   }
 
   void _onDetect(BarcodeCapture capture) {
+    final value = capture.barcodes.firstOrNull?.rawValue;
+    if (value != null) _onValue(value);
+  }
+
+  /// Shared decode handler for both scanner backends: de-dupes, nudges, and
+  /// returns the raw value to the caller.
+  void _onValue(String value) {
     if (_scanned) return;
-    final barcode = capture.barcodes.firstOrNull;
-    final value = barcode?.rawValue;
-    if (value == null) return;
     _scanned = true;
     _timeoutTimer?.cancel();
     // Medium impact — noticeable but not startling. Gives the user

@@ -1,0 +1,31 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Libre / F-Droid drop-in replacement for the `mobile_scanner` plugin (#3477,
+# epic #3473). The upstream plugin's Android side pulls ML Kit barcode
+# (`com.google.mlkit.vision.barcode.*` + `com.google.android.gms.*`), whose
+# class references `fdroid scanner` / `check-apk` rejects. This package provides
+# the SAME Dart surface the QR screen compiles against (`MobileScannerController`,
+# `MobileScanner`, `BarcodeCapture`, `Barcode`, `MobileScannerState`,
+# `TorchState`) as a no-op, and — crucially — declares NO `flutter: plugin:`
+# platform block, so it contributes ZERO native code.
+#
+# It is never reached at runtime on libre: [QrScannerScreen] selects
+# [ZxingScannerView] (FOSS flutter_zxing) when `AppFlavor.isLibre` and never
+# constructs the controller or the widget; this only needs to COMPILE.
+#
+# Swapped in ONLY for the fdroid build via `pubspec_overrides.yaml` (generated
+# from `pubspec_overrides.fdroid.yaml` by `dart run tool/apply_fdroid_overrides.dart`).
+# Play + iOS builds keep the real `mobile_scanner`.
+name: mobile_scanner
+description: Libre/F-Droid no-op stub for mobile_scanner (no ML Kit barcode). Epic #3473.
+version: 7.2.0
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter

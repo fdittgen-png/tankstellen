@@ -8,8 +8,7 @@
 #
 # Each entry swaps a GMS/ML-Kit/Play-Core-pulling plugin for a FOSS or no-op
 # drop-in, so the fdroid dex carries ZERO `com.google.android.*` references
-# (which `fdroid scanner` / `check apk` rejects). Add the other capability swaps
-# here as their children land (#3476 location, #3477 barcode, #3478 passkeys).
+# (which `fdroid scanner` / `check apk` rejects).
 dependency_overrides:
   # #3479 — no-op store review (upstream pulls Play Core `…play:review`).
   in_app_review:
@@ -23,3 +22,8 @@ dependency_overrides:
   # app already forces this). Drops all com.google.android.gms.location refs.
   geolocator_android:
     path: third_party/geolocator_android
+  # #3477 — no-op mobile_scanner (upstream pulls com.google.mlkit.vision.barcode
+  # + gms). Libre QR scanning uses FOSS flutter_zxing (ZxingScannerView); the
+  # stub only keeps the Play/iOS mobile_scanner code compiling on libre.
+  mobile_scanner:
+    path: tool/fdroid_stubs/mobile_scanner

@@ -786,6 +786,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_zxing:
+    dependency: "direct main"
+    description:
+      name: flutter_zxing
+      sha256: "6bf0cb0fde122455e73ae78214457c106fbde3c633af4624ce29567ac590ef21"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
   freezed:
     dependency: "direct dev"
     description:
@@ -2369,4 +2377,4 @@ packages:
     version: "2.1.1"
 sdks:
   dart: ">=3.11.3 <4.0.0"
-  flutter: ">=3.38.4"
+  flutter: ">=3.41.0"
