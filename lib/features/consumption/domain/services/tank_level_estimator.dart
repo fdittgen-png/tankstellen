@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import '../entities/fill_up.dart';
+import 'trip_length_aggregator.dart';
 
 /// How a [TankLevelEstimate] was derived (#1195).
 ///
@@ -140,9 +141,15 @@ TankLevelEstimate estimateTankLevel({
   final capacityL = vehicle.tankCapacityL;
   final upperBound = capacityL ?? double.infinity;
 
-  // TODO(#1191): replace with vehicle.tripLengthAggregates
-  //   ?.overallAvgLPer100Km once the carbon-dashboard aggregates land.
-  const avgLPer100Km = _defaultAvgLPer100Km;
+  // #1191 — ground the estimate in the vehicle's REAL average consumption
+  // from its trip history (measured litres, else the GPS estimate — see
+  // [aggregateByTripLength]), falling back to the fleet default only when
+  // there is no usable trip data for this vehicle yet. This makes the
+  // tank-level and range estimates track how THIS car actually drinks,
+  // instead of a fixed 7.0 L/100 km fleet average.
+  final avgLPer100Km =
+      aggregateByTripLength(trips, vehicleId: vehicle.id).overallAvgLPer100Km ??
+          _defaultAvgLPer100Km;
 
   // Compute the starting level right after [lastFillUp] (#1360 partial-
   // fill branch). For full fills this is just capacity; for partials

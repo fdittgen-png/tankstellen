@@ -230,6 +230,29 @@ void main() {
       expect(breakdown.long.avgLPer100Km!, closeTo(5.0, 0.001));
     });
   });
+
+  group('overallAvgLPer100Km (#1191 — tank-level estimator input)', () {
+    test('null when no bucket has a qualifying trip', () {
+      expect(TripLengthBreakdown.empty.overallAvgLPer100Km, isNull);
+      // All-null-litres trips are dropped ⇒ still no qualifying distance.
+      final breakdown = aggregateByTripLength([
+        _entry(id: 't1', distanceKm: 3.0, fuelLitersConsumed: null),
+        _entry(id: 't2', distanceKm: 40.0, fuelLitersConsumed: null),
+      ]);
+      expect(breakdown.overallAvgLPer100Km, isNull);
+    });
+
+    test('pools litres and distance across ALL buckets, not per-bucket', () {
+      // short 3km/0.4L + medium 12km/0.9L + long 40km/2.4L:
+      //   Σlitres = 3.7, Σkm = 55 ⇒ 3.7 / 55 × 100 = 6.7273 L/100 km.
+      final breakdown = aggregateByTripLength([
+        _entry(id: 'short', distanceKm: 3.0, fuelLitersConsumed: 0.4),
+        _entry(id: 'medium', distanceKm: 12.0, fuelLitersConsumed: 0.9),
+        _entry(id: 'long', distanceKm: 40.0, fuelLitersConsumed: 2.4),
+      ]);
+      expect(breakdown.overallAvgLPer100Km!, closeTo(6.7273, 0.001));
+    });
+  });
 }
 
 /// Convenience constructor for a [TripHistoryEntry] in this file's

@@ -195,8 +195,11 @@ void main() {
         trips: trips,
       );
 
-      // 50 - 2.5 - (40 × 7.0 / 100) = 50 - 2.5 - 2.8 = 44.7
-      expect(result.levelL, closeTo(44.7, 0.001));
+      // #1191 — the distance-only t2 is now estimated with THIS vehicle's
+      // real average from its history, not the 7.0 fleet default: t1 measures
+      // 2.5 L over 30 km ⇒ 2.5/30×100 = 8.333 L/100 km. So:
+      //   50 - 2.5 - (40 × 8.333 / 100) = 50 - 2.5 - 3.333 = 44.167
+      expect(result.levelL, closeTo(44.1667, 0.001));
       expect(result.method, TankLevelEstimationMethod.mixed);
     });
   });
@@ -311,7 +314,7 @@ void main() {
       expect(result.rangeKm, closeTo(714.2857, 0.01));
     });
 
-    test('rangeKm responds to consumption — half tank = ~half range', () {
+    test('rangeKm reflects the vehicle real consumption (#1191)', () {
       final trips = [
         trip(
           id: 't1',
@@ -327,8 +330,10 @@ void main() {
         trips: trips,
       );
 
-      // levelL = 25 → 25 / 7.0 × 100 ≈ 357.1 km
-      expect(result.rangeKm, closeTo(357.142, 0.01));
+      // #1191 — t1 burns 25 L over 100 km ⇒ real avg 25 L/100 km, and the
+      // range now tracks THIS car's thirst instead of the 7.0 fleet default:
+      // levelL 50 - 25 = 25 → 25 / 25 × 100 = 100 km.
+      expect(result.rangeKm, closeTo(100.0, 0.01));
     });
   });
 
