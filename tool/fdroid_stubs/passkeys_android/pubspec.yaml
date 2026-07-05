@@ -1,0 +1,36 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Libre / F-Droid drop-in for `passkeys_android` (#3478, epic #3473).
+#
+# The upstream `passkeys_android` is the federated Android implementation of the
+# `passkeys` plugin (pulled transitively by `supabase_flutter`). Its native
+# `FlutterPasskeysPlugin` references `com.google.android.gms.fido.*` /
+# `gms.auth.api.identity.*`, which `fdroid scanner` rejects. The app never uses
+# passkey auth (TankSync uses email/anon), so this replaces the Android impl
+# with a Dart-ONLY no-op: it still endorses `passkeys` for Android (so the
+# federated plugin resolves + Supabase compiles), but declares NO native
+# `package`/`pluginClass`, so ZERO GMS FIDO/auth code reaches the fdroid dex.
+#
+# Swapped in ONLY for the fdroid build via `pubspec_overrides.yaml`.
+name: passkeys_android
+description: Libre/F-Droid no-op Android impl of passkeys (no GMS FIDO). Epic #3473.
+version: 2.12.0
+publish_to: none
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+flutter:
+  plugin:
+    implements: passkeys
+    platforms:
+      android:
+        # Dart-only endorsement: no `package`/`pluginClass` ⇒ no native code.
+        dartPluginClass: PasskeysAndroid
+
+dependencies:
+  flutter:
+    sdk: flutter
+  passkeys_platform_interface: ^2.4.0
