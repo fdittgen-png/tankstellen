@@ -128,6 +128,20 @@ class TripLengthBreakdown {
   /// waste vertical space.
   bool get isEmpty =>
       short.tripCount == 0 && medium.tripCount == 0 && long.tripCount == 0;
+
+  /// The vehicle's overall average consumption across every bucket:
+  /// `(Σ totalLitres / Σ totalDistanceKm) × 100`. Null when no bucket has a
+  /// qualifying trip (total distance zero), so the caller can fall back to a
+  /// default. Grounded in the same measured-litres-else-GPS-estimate figures
+  /// the buckets use — so it reflects the vehicle's real history rather than a
+  /// fixed constant. Consumed by the tank-level estimator (#1191).
+  double? get overallAvgLPer100Km {
+    final totalKm =
+        short.totalDistanceKm + medium.totalDistanceKm + long.totalDistanceKm;
+    if (totalKm <= 0) return null;
+    final totalL = short.totalLitres + medium.totalLitres + long.totalLitres;
+    return totalL / totalKm * 100.0;
+  }
 }
 
 /// Fold the [trips] iterable into a three-bucket [TripLengthBreakdown].
