@@ -15,6 +15,18 @@ part 'geolocator_wrapper.g.dart';
 /// All permission and location calls go through this provider instead of
 /// calling Geolocator.checkPermission() etc. directly, so tests can
 /// override the provider with a fake implementation.
+///
+/// TODO(#3476): location capability seam for the GMS-free F-Droid architecture
+/// (epic #3473). `forceLocationManager` already routes the LIBRE build through
+/// Android's LocationManager at runtime, but `geolocator_android`'s
+/// `FusedLocationClient` still leaves compile-time `com.google.android.gms.*`
+/// REFERENCES in the fdroid dex that `fdroid scanner` rejects. Plan (see
+/// `.local-docs/fdroid-gms-free-refactor-notes.md`): vendor + patch
+/// `geolocator_android` for the libre build (drop `FusedLocationClient` + the
+/// `GoogleApiAvailability` probe), swapped in via a libre-only
+/// `pubspec_overrides.yaml` — keeping this Dart API + all 11 call sites
+/// unchanged. Refactor TODO: extract `_SharedPositionSource` to its own file
+/// and split out a thin permissions seam.
 @Riverpod(keepAlive: true)
 GeolocatorWrapper geolocatorWrapper(Ref ref) {
   return GeolocatorWrapper();
