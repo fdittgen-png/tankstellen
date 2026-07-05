@@ -6,7 +6,6 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sensors/imu_sample.dart';
 import 'package:tankstellen/core/sensors/imu_sensor_source.dart';
-import 'package:tankstellen/features/consumption/domain/harsh_event.dart';
 import 'package:tankstellen/features/consumption/domain/trip_summary.dart';
 import 'package:tankstellen/features/consumption/providers/trip_imu_fusion.dart';
 

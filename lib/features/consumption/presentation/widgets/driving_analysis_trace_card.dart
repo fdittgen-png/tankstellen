@@ -13,6 +13,7 @@ import '../../domain/driving_score.dart';
 import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/obd2_engine_coverage.dart';
 import '../../domain/obd2_trip_features.dart';
 import '../../domain/trip_sample.dart';
 import '../../domain/trip_summary.dart';
@@ -95,6 +96,9 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       gpsFeatures: gpsFeatures,
       obd2Features: Obd2TripFeatures.fromSamples(samples),
       gpsCoverage: gpsCoverage,
+      // #3499 (schema v4) — engine-sample coverage + reason, so a null
+      // obd2Features on a gpsPlusObd2 trip is no longer unexplained.
+      obd2Coverage: Obd2EngineCoverage.fromTripSamples(samples),
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

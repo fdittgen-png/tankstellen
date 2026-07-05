@@ -94,15 +94,14 @@ class TripImuFusion {
   /// A throwing platform-channel teardown is logged and swallowed — the
   /// trip save this runs inside must never be lost to a sensor teardown.
   Future<void> stop() async {
-    final sub = _sub;
-    _sub = null;
     try {
-      await sub?.cancel();
+      await _sub?.cancel();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: {
         'where': '$_where: IMU stream cancel failed',
       }));
     }
+    _sub = null;
   }
 
   /// Stamp the aggregate IMU counts + the #2895 veto onto [summary]: when

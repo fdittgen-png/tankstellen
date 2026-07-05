@@ -4895,6 +4895,20 @@ class AppLocalizationsFr extends AppLocalizations {
       'Conduite plus intelligente — privilégie l\'autoroute régulière aux raccourcis en zigzag.';
 
   @override
+  String get obd2CoverageNoneNote =>
+      'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
+
+  @override
+  String obd2CoverageDroppedNote(int percent) {
+    return 'Engine data stopped $percent% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.';
+  }
+
+  @override
+  String obd2CoveragePartialNote(int percent) {
+    return 'Engine data covered only $percent% of this trip — gaps use GPS-based estimates.';
+  }
+
+  @override
   String get favoritesShareAction => 'Partager';
 
   @override

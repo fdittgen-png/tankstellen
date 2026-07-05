@@ -4828,6 +4828,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Smarter drive — favours steady highway over zigzag shortcuts.';
 
   @override
+  String get obd2CoverageNoneNote =>
+      'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
+
+  @override
+  String obd2CoverageDroppedNote(int percent) {
+    return 'Engine data stopped $percent% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.';
+  }
+
+  @override
+  String obd2CoveragePartialNote(int percent) {
+    return 'Engine data covered only $percent% of this trip — gaps use GPS-based estimates.';
+  }
+
+  @override
   String get favoritesShareAction => 'Share';
 
   @override
@@ -13003,6 +13017,20 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get ecoRouteHint =>
       '⟦Šɱářŧéř đřîṽé — ƒáṽóúřš šŧéáđý ĥîǧĥŵáý óṽéř žîǧžáǧ šĥóřŧçúŧš. ·······················⟧';
+
+  @override
+  String get obd2CoverageNoneNote =>
+      '⟦Ñó éñǧîñé đáŧá ářřîṽéđ ƒřóɱ ŧĥé ÓƁĐ2 áđáƥŧéř óñ ŧĥîš ŧřîƥ — ƒúéł ƒîǧúřéš ářé ǦƤŠ-ƀášéđ éšŧîɱáŧéš. ···································⟧';
+
+  @override
+  String obd2CoverageDroppedNote(int percent) {
+    return '⟦Éñǧîñé đáŧá šŧóƥƥéđ $percent% îñŧó ŧĥé ŧřîƥ (çóññéçŧîóñ đřóƥƥéđ) — ƒúéł ƒîǧúřéš áƒŧéř ŧĥáŧ ƥóîñŧ ářé ǦƤŠ-ƀášéđ éšŧîɱáŧéš. ·········································⟧';
+  }
+
+  @override
+  String obd2CoveragePartialNote(int percent) {
+    return '⟦Éñǧîñé đáŧá çóṽéřéđ óñłý $percent% óƒ ŧĥîš ŧřîƥ — ǧáƥš úšé ǦƤŠ-ƀášéđ éšŧîɱáŧéš. ·························⟧';
+  }
 
   @override
   String get favoritesShareAction => '⟦Šĥářé ··⟧';

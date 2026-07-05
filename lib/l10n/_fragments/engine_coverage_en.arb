@@ -1,0 +1,24 @@
+{
+  "obd2CoverageNoneNote": "No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.",
+  "@obd2CoverageNoneNote": {
+    "description": "Trip-detail note (#3499, epic #3498) shown on a gpsPlusObd2 trip whose samples carried ZERO engine PIDs: the adapter session never delivered engine data (drop at start, silent ECU, no supported PIDs), so the fuel chart/figures silently fell back to the GPS-physics estimate. This makes that fallback honest instead of unexplained."
+  },
+  "obd2CoverageDroppedNote": "Engine data stopped {percent}% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.",
+  "@obd2CoverageDroppedNote": {
+    "description": "Trip-detail note (#3499) for the adapter-dropped-mid-trip signature: engine PIDs flowed, then ended well before the trip did. percent is the position (0-100) of the last engine-bearing sample.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2CoveragePartialNote": "Engine data covered only {percent}% of this trip — gaps use GPS-based estimates.",
+  "@obd2CoveragePartialNote": {
+    "description": "Trip-detail note (#3499) for patchy engine coverage with no clean cut-off (flaky link / slow PID round-trips). percent is the share (0-100) of samples that carried an engine PID.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  }
+}

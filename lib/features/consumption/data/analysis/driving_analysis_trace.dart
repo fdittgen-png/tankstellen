@@ -7,6 +7,7 @@ import '../../domain/driving_score.dart';
 import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/obd2_engine_coverage.dart';
 import '../../domain/obd2_trip_features.dart';
 import '../../domain/trip_summary.dart';
 
@@ -34,7 +35,13 @@ class DrivingAnalysisTrace {
   /// ratio, expected-vs-actual fix counts, and the attributed gap list
   /// (capped at 20 entries). Purely additive — null on legacy trips with
   /// under two GPS fixes; v2 readers that ignore unknown keys still parse.
-  static const int schema = 3;
+  ///
+  /// v4 (#3499, epic #3498) — new top-level `obd2Coverage` block: the share
+  /// of samples that carried an engine PID + the coarse reason
+  /// (full / partial / droppedMidTrip / noEngineData), so a `gpsPlusObd2`
+  /// trip whose `obd2Features` are null is no longer unexplained. Purely
+  /// additive — null on empty trips; v3 readers still parse.
+  static const int schema = 4;
 
   final DateTime capturedAt;
 
@@ -59,6 +66,11 @@ class DrivingAnalysisTrace {
   /// the [obd2Features] null convention.
   final GpsCoverageReport? gpsCoverage;
 
+  /// Per-trip engine-sample coverage + reason (#3499, schema v4). Null only
+  /// on an empty trip — a present block with `reason: noEngineData` is the
+  /// honest explanation for a null [obd2Features] on a `gpsPlusObd2` trip.
+  final Obd2EngineCoverage? obd2Coverage;
+
   final DrivingScore score;
   final List<DrivingLesson> lessons;
 
@@ -70,6 +82,7 @@ class DrivingAnalysisTrace {
     this.gpsFeatures,
     this.obd2Features,
     this.gpsCoverage,
+    this.obd2Coverage,
     this.comment = kDrivingAnalysisCommentPrompt,
   });
 
@@ -123,6 +136,9 @@ class DrivingAnalysisTrace {
         // per-signal coverage map). Null when no engine signal landed, which
         // makes a broken-link GPS-fallback trip read as `obd2Features: null`.
         'obd2Features': obd2Features?.toJson(),
+        // #3499 (schema v4) — engine-sample coverage + reason, the honest
+        // companion to a null obd2Features on a gpsPlusObd2 trip.
+        'obd2Coverage': obd2Coverage?.toJson(),
         // #3465 — GPS coverage + attributed track gaps (schema v3). Null
         // when there is no track to judge; the gap list inside is capped
         // at [GpsCoverageReport.kExportGapCap] entries.

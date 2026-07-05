@@ -4881,6 +4881,20 @@ class AppLocalizationsDe extends AppLocalizations {
       'Smarter fahren — bevorzugt ruhige Autobahn statt Zickzack-Abkürzungen.';
 
   @override
+  String get obd2CoverageNoneNote =>
+      'Auf dieser Fahrt kamen keine Motordaten vom OBD2-Adapter an — die Kraftstoffwerte sind GPS-basierte Schätzungen.';
+
+  @override
+  String obd2CoverageDroppedNote(int percent) {
+    return 'Die Motordaten endeten bei $percent % der Fahrt (Verbindung abgerissen) — spätere Kraftstoffwerte sind GPS-basierte Schätzungen.';
+  }
+
+  @override
+  String obd2CoveragePartialNote(int percent) {
+    return 'Motordaten deckten nur $percent % dieser Fahrt ab — Lücken nutzen GPS-basierte Schätzungen.';
+  }
+
+  @override
   String get favoritesShareAction => 'Teilen';
 
   @override

@@ -8624,6 +8624,24 @@ abstract class AppLocalizations {
   /// **'Smarter drive — favours steady highway over zigzag shortcuts.'**
   String get ecoRouteHint;
 
+  /// Trip-detail note (#3499, epic #3498) shown on a gpsPlusObd2 trip whose samples carried ZERO engine PIDs: the adapter session never delivered engine data (drop at start, silent ECU, no supported PIDs), so the fuel chart/figures silently fell back to the GPS-physics estimate. This makes that fallback honest instead of unexplained.
+  ///
+  /// In en, this message translates to:
+  /// **'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.'**
+  String get obd2CoverageNoneNote;
+
+  /// Trip-detail note (#3499) for the adapter-dropped-mid-trip signature: engine PIDs flowed, then ended well before the trip did. percent is the position (0-100) of the last engine-bearing sample.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine data stopped {percent}% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.'**
+  String obd2CoverageDroppedNote(int percent);
+
+  /// Trip-detail note (#3499) for patchy engine coverage with no clean cut-off (flaky link / slow PID round-trips). percent is the share (0-100) of samples that carried an engine PID.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine data covered only {percent}% of this trip — gaps use GPS-based estimates.'**
+  String obd2CoveragePartialNote(int percent);
+
   /// AppBar action tooltip for the share-favorites button on the Favorites screen (#1344).
   ///
   /// In en, this message translates to:
