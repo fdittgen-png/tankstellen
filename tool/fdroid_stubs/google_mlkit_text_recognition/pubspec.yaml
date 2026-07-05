@@ -1,0 +1,35 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Libre / F-Droid drop-in replacement for `google_mlkit_text_recognition`
+# (#3490, epic #3473). The upstream plugin's Android side pulls ML Kit
+# (`com.google.mlkit.vision.text.*` + `com.google.android.gms.*`), whose class
+# references `fdroid scanner` / `check-apk` rejects. This package provides the
+# SAME Dart API the app compiles against (`TextRecognizer`, `RecognizedText`,
+# `TextBlock`, `TextLine`, `TextRecognitionScript`) as a no-op, and — crucially
+# — declares NO `flutter: plugin:` platform block, so it contributes ZERO
+# native code: GeneratedPluginRegistrant never registers it and no ML Kit
+# reference reaches the fdroid dex.
+#
+# It re-exports the sibling `google_mlkit_commons` stub for `InputImage`,
+# mirroring the real package's dependency graph so no orphaned override remains.
+# Never reached at runtime on libre — the OCR factory selects `NoopOcrTextEngine`
+# when `AppFlavor.isLibre`; this only needs to COMPILE.
+#
+# Swapped in ONLY for the fdroid build via `pubspec_overrides.yaml` (generated
+# from `pubspec_overrides.fdroid.yaml` by `dart run tool/apply_fdroid_overrides.dart`).
+# Play + iOS builds keep the real vendored `third_party/google_mlkit_text_recognition`.
+name: google_mlkit_text_recognition
+description: Libre/F-Droid no-op stub for google_mlkit_text_recognition (no ML Kit). Epic #3473.
+version: 0.15.1
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_mlkit_commons:
+    path: ../google_mlkit_commons

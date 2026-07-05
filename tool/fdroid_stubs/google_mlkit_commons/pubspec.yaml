@@ -1,0 +1,27 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Libre / F-Droid drop-in replacement for `google_mlkit_commons` (#3490, epic
+# #3473). The upstream package's Android side pulls ML Kit / GMS
+# (`com.google.mlkit.*`, `com.google.android.gms.*`), whose class references
+# `fdroid scanner` rejects. This package provides the SAME Dart surface the app
+# compiles against (just `InputImage.fromFilePath`) as a no-op value type and —
+# crucially — declares NO `flutter: plugin:` platform block, so it contributes
+# ZERO native code: GeneratedPluginRegistrant never registers it and no ML Kit
+# reference reaches the fdroid dex.
+#
+# Swapped in ONLY for the fdroid build via `pubspec_overrides.yaml` (generated
+# from `pubspec_overrides.fdroid.yaml` by `dart run tool/apply_fdroid_overrides.dart`).
+# Play + iOS builds keep the real vendored `third_party/google_mlkit_commons`.
+name: google_mlkit_commons
+description: Libre/F-Droid no-op stub for google_mlkit_commons (no ML Kit/GMS). Epic #3473.
+version: 0.11.1
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter

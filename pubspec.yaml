@@ -50,6 +50,12 @@ dependencies:
   intl: ^0.20.2
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.2.0
+  # FOSS QR/barcode scanner (FFI to libzxing) — the GMS-free replacement for
+  # mobile_scanner's ML Kit backend on the libre/F-Droid build (#3477, epic
+  # #3473). Present in every flavor; the QR screen selects it only when
+  # AppFlavor.isLibre (Play/iOS keep mobile_scanner). On libre, mobile_scanner
+  # is swapped for a no-op stub so its com.google.mlkit refs leave the dex.
+  flutter_zxing: ^2.3.0
   image_picker: ^1.2.2
   # Live camera preview for the pump-display capture reticle (#1868).
   # image_picker delegates to the OS camera app, which cannot host an

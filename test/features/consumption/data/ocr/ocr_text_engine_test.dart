@@ -3,6 +3,7 @@
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/ocr/noop_ocr_text_engine.dart';
 import 'package:tankstellen/features/consumption/data/ocr/ocr_text_engine.dart';
 
 /// #3052 — the iOS [VisionOcrTextEngine] is a thin bridge over the
@@ -105,5 +106,24 @@ void main() {
     final engine = VisionOcrTextEngine();
     final result = await engine.recognize('/tmp/x.jpg');
     expect(result!.blocks.single.box.right, 3.0);
+  });
+
+  // #3490 — the libre / F-Droid build has no on-device OCR backend (ML Kit is
+  // stubbed to keep the dex GMS-free). Its engine is an explicit no-op that
+  // returns null — the same "no data" outcome a failed recognize produces —
+  // so receipt / pump OCR degrade to manual entry instead of pretending.
+  group('NoopOcrTextEngine (libre)', () {
+    test('recognize always returns null', () async {
+      const engine = NoopOcrTextEngine();
+      expect(await engine.recognize('/tmp/receipt.jpg'), isNull);
+      expect(
+        await engine.recognize('/tmp/pump.jpg', languageCorrection: false),
+        isNull,
+      );
+    });
+
+    test('dispose is a safe no-op', () {
+      const NoopOcrTextEngine().dispose();
+    });
   });
 }
