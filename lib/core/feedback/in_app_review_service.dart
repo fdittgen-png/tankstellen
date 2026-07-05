@@ -3,12 +3,12 @@
 
 import 'dart:async';
 
-import 'package:in_app_review/in_app_review.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../logging/error_logger.dart';
 import '../storage/storage_keys.dart';
 import '../storage/storage_providers.dart';
+import 'review_prompter.dart';
 
 part 'in_app_review_service.g.dart';
 
@@ -33,32 +33,27 @@ const Duration kInAppReviewMinInterval = Duration(days: 30);
 /// on Android, `SKStoreReviewController` on iOS) — there are NO app-owned
 /// strings, hence zero ARB impact.
 ///
-/// LIBRE-BUILD SAFETY (never throws): the Android side of `in_app_review`
-/// depends on Play Core (`com.google.android.play:review`), which is a
-/// proprietary group STRIPPED from the F-Droid (`fdroid`) flavor (see
-/// `android/app/build.gradle.kts` `gmsExcludeGroups` and
-/// `scripts/audit_no_gms.sh`). On that build the review classes are absent,
-/// so touching the plugin would throw `NoClassDefFoundError` /
-/// `MissingPluginException`. Every interaction with the reviewer — including
-/// the `isAvailable()` probe — is therefore wrapped in a catch-all that
-/// swallows the error and no-ops, keeping the libre build crash-free. This
-/// guarantee is validated by the fault-injection test in
+/// LIBRE-BUILD SAFETY (never throws): the store-review interaction goes
+/// through the flavor-selected [reviewPrompterProvider] ([ReviewPrompter]) —
+/// the libre / F-Droid build gets [NoopReviewPrompter], which reports
+/// unavailable and never touches the Play-Core-backed `in_app_review` plugin
+/// (`com.google.android.play:review`, absent from the `fdroid` flavor).
+/// Belt-and-braces, every interaction is ALSO wrapped in a catch-all that
+/// swallows any `NoClassDefFoundError` / `MissingPluginException` and no-ops,
+/// keeping every build crash-free. Both guarantees are validated by
 /// `test/core/feedback/in_app_review_service_test.dart`.
 ///
 /// `keepAlive: true` because the counter must survive across route churn —
 /// each successful search anywhere in the app feeds the same tally.
 @Riverpod(keepAlive: true)
 class InAppReviewService extends _$InAppReviewService {
-  /// Probes whether the OS review flow is available. Defaults to the real
-  /// plugin; overridable in tests so we never hit the platform channel.
-  Future<bool> Function() isAvailable = InAppReview.instance.isAvailable;
-
-  /// Triggers the OS review dialog. Defaults to the real plugin;
-  /// overridable in tests.
-  Future<void> Function() requestReview = InAppReview.instance.requestReview;
-
   /// Clock seam — overridable so the 30-day cooldown is testable without
   /// real wall-clock waits. Defaults to [DateTime.now].
+  ///
+  /// The store-review interaction itself is the flavor-selected
+  /// [reviewPrompterProvider] ([ReviewPrompter]) — [StoreReviewPrompter] on
+  /// Play/iOS, [NoopReviewPrompter] on the libre build — so tests override
+  /// that provider rather than a plugin seam here.
   DateTime Function() now = DateTime.now;
 
   @override
@@ -98,8 +93,9 @@ class InAppReviewService extends _$InAppReviewService {
         now().toIso8601String(),
       );
 
-      if (await isAvailable()) {
-        await requestReview();
+      final prompter = ref.read(reviewPrompterProvider);
+      if (await prompter.isAvailable()) {
+        await prompter.requestReview();
       }
     } catch (e, st) {
       // Swallow everything — including NoClassDefFoundError /
