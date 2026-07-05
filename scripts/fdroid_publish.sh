@@ -56,16 +56,26 @@ echo "==> Checking F-Droid repo signing env"
 [[ -n "${FDROID_REPO_KEY_PASSWORD:-}" ]] || fail \
   "FDROID_REPO_KEY_PASSWORD is unset (config.yml reads it via {env: …})"
 
-# --- 3. Clean codegen (HARD RULE #3) -----------------------------------------
+# --- 3. Libre stubs + clean codegen (HARD RULE #3) ---------------------------
+# #3480 (epic #3473) — swap the GMS/ML-Kit/Play-Core/Sentry-pulling plugins
+# for the Dart-only stubs BEFORE resolving, exactly as the fdroiddata recipe
+# prebuild does; the strict release audit below fails on any residual
+# reference. NB this leaves pubspec_overrides.yaml modified in the working
+# tree — restore it after publishing (git checkout -- pubspec_overrides.yaml).
+echo "==> Applying fdroid pubspec overrides (libre stubs)"
+dart run tool/apply_fdroid_overrides.dart
 echo "==> Clean codegen"
 flutter pub get
 dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 
 # --- 4. Build the signed, GMS-free release APK -------------------------------
+# #3435 — FGS define parity with fdroid-publish.yml: F-Droid ships the GPS
+# foreground service unconditionally (no Play declaration applies).
 echo "==> Building signed fdroid release APK"
 flutter build apk --release --flavor fdroid \
-  --dart-define=FORCE_LOCATION_MANAGER=true
+  --dart-define=FORCE_LOCATION_MANAGER=true \
+  --dart-define=FGS_FORM_APPROVED=true
 [[ -f "${APK_OUT}" ]] || fail "expected APK not found at ${APK_OUT}"
 
 # --- 5. Audit the release APK — abort on any GMS/MLKit hit -------------------

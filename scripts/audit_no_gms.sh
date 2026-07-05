@@ -3,28 +3,39 @@
 # SPDX-License-Identifier: MIT
 
 # audit_no_gms.sh — prove the F-Droid (`fdroid`) flavor is free of proprietary
-# Google libraries: Google Mobile Services, ML Kit (#2574) AND Play Core (the
-# In-App Review API pulled by in_app_review, #3069).
+# Google libraries: Google Mobile Services, ML Kit (#2574), Play Core (the
+# In-App Review API pulled by in_app_review, #3069) AND Sentry (the Tracking
+# anti-feature, #3492).
 #
-# Two independent layers, EITHER of which fails the audit:
+# Layers, ANY of which fails the audit:
 #
 #   (A) Dependency-graph layer (always runs): resolve the fdroid release runtime
 #       classpath via Gradle and assert it contains NO `com.google.android.gms`,
-#       NO `com.google.mlkit` and NO `com.google.android.play` coordinates. This
-#       is the authoritative proof — it is what the official fdroiddata
-#       reproducible build inspects.
+#       NO `com.google.mlkit`, NO `com.google.android.play` and NO `io.sentry`
+#       coordinates. This is the authoritative proof — it is what the official
+#       fdroiddata reproducible build inspects.
 #
 #   (B) Bytecode layer (runs when an APK path is given): unzip the APK, dexdump
 #       every classesN.dex, and assert no `Lcom/google/android/gms/...;`,
-#       `Lcom/google/mlkit/...;` or `Lcom/google/android/play/...;` type
-#       reference survives into the shipped dex. Falls back to `strings` on the
-#       dex when dexdump is unavailable.
+#       `Lcom/google/mlkit/...;`, `Lcom/google/android/play/...;` or
+#       `Lio/sentry/...;` class is DEFINED in the shipped dex. Falls back to
+#       `strings` on the dex when dexdump is unavailable.
+#
+#   (C) Strict REFERENCE gate (#3480, epic #3473): on a RELEASE APK (basename
+#       contains `release`, or `--strict-refs` is passed) even a dangling type
+#       REFERENCE fails — the same bar as F-Droid's `check apk` scanner, which
+#       rejected MR !42093 on exactly such references. Feasible since the
+#       epic-#3473 pubspec-override mechanism removed every referrer: a release
+#       fdroid dex audits `gms:0 mlkit:0 play:0 sentry:0`. A DEBUG APK keeps
+#       the definition-only bar (R8 is off, so Flutter's own embedding retains
+#       inert Play-Core deferred-components references there).
 #
 # Usage:
-#   scripts/audit_no_gms.sh                 # layer A only (dependency graph)
-#   scripts/audit_no_gms.sh path/to.apk     # layer A + layer B on the APK
+#   scripts/audit_no_gms.sh                        # layer A only
+#   scripts/audit_no_gms.sh path/to.apk            # + B (+ C when 'release' in name)
+#   scripts/audit_no_gms.sh path/to.apk --strict-refs   # force layer C
 #
-# Exit codes: 0 = clean, 1 = a GMS/MLKit/Play-Core hit was found,
+# Exit codes: 0 = clean, 1 = a GMS/MLKit/Play-Core/Sentry hit was found,
 #             2 = setup/usage error.
 
 set -euo pipefail
@@ -33,26 +44,38 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Pattern that matches a GMS, ML Kit or Play Core coordinate in
-# `:app:dependencies` output (group:artifact form).
-GMS_GRAPH_PATTERN='com\.google\.android\.gms|com\.google\.mlkit|com\.google\.android\.play'
-# A GMS/ML Kit/Play-Core *type descriptor* anywhere in the dex (definition OR
-# reference). NB: the project's own plugin packages are `com.google_mlkit_*`
-# (underscore) — this `com/google/(android/gms|mlkit|android/play)/` pattern
-# (slash after google) never matches those, only the proprietary
-# `com.google.android.gms` / `com.google.mlkit` / `com.google.android.play`.
-GMS_DEX_PATTERN='Lcom/google/android/gms/|Lcom/google/mlkit/|Lcom/google/android/play/'
-# A GMS/ML Kit/Play-Core *class definition* (proprietary bytecode actually
-# shipped). dexdump prints `  Class descriptor  : 'Lcom/google/...;'` for every
-# class DEFINED in the dex. This is the authoritative "no proprietary Google code
-# in the APK" test — see the long note at the head of layer B below for why a
-# dangling *reference* (to an absent class) is NOT a failure.
-GMS_DEX_DEF_PATTERN="Class descriptor *: *'Lcom/google/android/gms/|Class descriptor *: *'Lcom/google/mlkit/|Class descriptor *: *'Lcom/google/android/play/"
+# Pattern that matches a GMS, ML Kit, Play Core or Sentry coordinate in
+# `:app:dependencies` output (group:artifact form). #3480 — io.sentry added:
+# the fdroid flavor compiles Sentry out entirely (#3492).
+GMS_GRAPH_PATTERN='com\.google\.android\.gms|com\.google\.mlkit|com\.google\.android\.play|io\.sentry'
+# A GMS/ML Kit/Play-Core/Sentry *type descriptor* anywhere in the dex
+# (definition OR reference). NB: the project's own plugin packages are
+# `com.google_mlkit_*` (underscore) — this `com/google/(android/gms|mlkit|
+# android/play)/` pattern (slash after google) never matches those, only the
+# proprietary `com.google.android.gms` / `com.google.mlkit` /
+# `com.google.android.play` / `io.sentry`.
+GMS_DEX_PATTERN='Lcom/google/android/gms/|Lcom/google/mlkit/|Lcom/google/android/play/|Lio/sentry/'
+# A GMS/ML Kit/Play-Core/Sentry *class definition* (proprietary/tracking
+# bytecode actually shipped). dexdump prints `  Class descriptor  :
+# 'Lcom/google/...;'` for every class DEFINED in the dex. This is the
+# authoritative "no proprietary Google code in the APK" test — see the long
+# note at the head of layer B below for why a dangling *reference* (to an
+# absent class) fails only in strict mode (layer C).
+GMS_DEX_DEF_PATTERN="Class descriptor *: *'Lcom/google/android/gms/|Class descriptor *: *'Lcom/google/mlkit/|Class descriptor *: *'Lcom/google/android/play/|Class descriptor *: *'Lio/sentry/"
 
 APK_PATH="${1:-}"
+# #3480 — layer C (fail on dangling REFERENCES, the F-Droid `check apk` bar).
+# Forced with --strict-refs; auto-enabled for a release-named APK, where the
+# epic-#3473 override mechanism + R8 guarantee a 0-reference dex.
+STRICT_REFS=0
+if [[ "${2:-}" == "--strict-refs" ]]; then
+  STRICT_REFS=1
+elif [[ -n "${APK_PATH}" && "$(basename "${APK_PATH}")" == *release* ]]; then
+  STRICT_REFS=1
+fi
 FAILED=0
 
-echo "==> [A] fdroid runtime classpath — must contain no GMS/MLKit/Play-Core"
+echo "==> [A] fdroid runtime classpath — must contain no GMS/MLKit/Play-Core/Sentry"
 
 # This is a Flutter project: the Gradle wrapper lives at android/gradlew (it is
 # generated by `flutter pub get`/`flutter build`, and is .gitignored), NOT at
@@ -97,11 +120,13 @@ if ! GRAPH_OUT="$(run_app_dependencies "${GRAPH_CONFIG}")"; then
 fi
 
 if echo "${GRAPH_OUT}" | grep -Eq "${GMS_GRAPH_PATTERN}"; then
-  echo "FAIL: GMS/MLKit/Play-Core coordinates present on ${GRAPH_CONFIG}:" >&2
+  echo "FAIL: GMS/MLKit/Play-Core/Sentry coordinates present on ${GRAPH_CONFIG}:" >&2
   echo "${GRAPH_OUT}" | grep -E "${GMS_GRAPH_PATTERN}" >&2
+  echo "HINT: run 'dart run tool/apply_fdroid_overrides.dart' first — the" >&2
+  echo "      libre stubs (epic #3473) must be applied before resolving." >&2
   FAILED=1
 else
-  echo "OK: no com.google.android.gms / com.google.mlkit / com.google.android.play on ${GRAPH_CONFIG}."
+  echo "OK: no com.google.android.gms / com.google.mlkit / com.google.android.play / io.sentry on ${GRAPH_CONFIG}."
 fi
 
 if [[ -n "${APK_PATH}" ]]; then
@@ -112,23 +137,17 @@ if [[ -n "${APK_PATH}" ]]; then
   #   class is DEFINED in the dex. We detect that with dexdump's
   #   `Class descriptor : 'L…;'` lines.
   #
-  # WHY A DANGLING *REFERENCE* IS NOT A FAILURE:
-  #   The GMS/ML Kit/Play-Core-bearing plugins (geolocator_android,
-  #   google_mlkit_*, mobile_scanner, in_app_review) compile against compile-only
-  #   stubs (android/build.gradle.kts, #2584). The real classes are absent from
-  #   the fdroid runtime/dex, but the plugins' OWN compiled methods still name
-  #   those absent types in their signatures, leaving dangling type *references*
-  #   in the dex constant pool. Those references are inert: the classes do not
-  #   exist, and the code that would touch them never runs
-  #   (forceLocationManager=true routes location via Android's LocationManager;
-  #   ML Kit OCR/barcode hit the caught MissingPluginException path; the in-app
-  #   review channel is absent and InAppReviewService swallows the
-  #   NoClassDefFoundError/MissingPluginException). It is IMPOSSIBLE to remove the
-  #   references
-  #   without editing the un-editable upstream plugin sources, and they ship NO
-  #   Google bytecode — so the authoritative criterion is "no class DEFINITION".
-  #   (The release build's R8 shrinks most of them out; the CI debug build keeps
-  #   them. We still print the reference count for visibility.)
+  # WHY A DANGLING *REFERENCE* FAILS ONLY IN STRICT MODE (#3480):
+  #   Since epic #3473 the libre build swaps every GMS/ML Kit/Play-Core/Sentry-
+  #   pulling plugin for a Dart-only stub at the pub graph level, so a RELEASE
+  #   fdroid dex carries ZERO references — F-Droid's `check apk` scanner
+  #   enforces exactly that, and layer C mirrors it (strict mode, auto-enabled
+  #   for release-named APKs). A DEBUG APK still legitimately retains inert
+  #   references: R8 is off, so Flutter's own engine embedding keeps its dead
+  #   PlayStoreDeferredComponentManager constant-pool entries (#3479 strips
+  #   them only in release via the proguard keep-rule tuning). On debug the
+  #   authoritative criterion therefore stays "no class DEFINITION", with the
+  #   reference count printed for visibility.
   if [[ ! -f "${APK_PATH}" ]]; then
     echo "ERROR: APK not found: ${APK_PATH}" >&2
     exit 2
@@ -192,10 +211,16 @@ if [[ -n "${APK_PATH}" ]]; then
         printf '%s\n' "${DEFS}" | sed -n '1,40p' >&2
         DEX_DEF_HIT=1
       fi
-      # (b) dangling references — count for visibility, never a failure.
+      # (b) dangling references — informational on a debug APK; FATAL in the
+      # #3480 strict mode (layer C — the F-Droid `check apk` bar).
       REFS="$(printf '%s\n' "${DUMP}" | { grep -Eo "${GMS_DEX_PATTERN}[A-Za-z0-9/_$]+;" || true; } | sort -u)"
       if [[ -n "${REFS}" ]]; then
         DEX_REF_TOTAL=$((DEX_REF_TOTAL + $(printf '%s\n' "${REFS}" | grep -c .)))
+        if [[ "${STRICT_REFS}" -eq 1 ]]; then
+          echo "FAIL [strict]: dangling GMS/ML Kit/Play-Core/Sentry type REFERENCES in $(basename "${dex}") — F-Droid's check-apk scanner rejects these (#3480):" >&2
+          printf '%s\n' "${REFS}" | sed -n '1,40p' >&2
+          DEX_DEF_HIT=1
+        fi
       fi
     else
       # No dexdump: ASCII type descriptors live in the dex as plain strings, but
@@ -224,24 +249,33 @@ if [[ -n "${APK_PATH}" ]]; then
   if [[ -z "${DEXDUMP_BIN}" ]]; then
     echo "NOTE: dexdump not found — used the conservative 'strings' reference scan"
     echo "      (set ANDROID_HOME for the precise class-definition audit)."
+  elif [[ "${STRICT_REFS}" -eq 1 ]]; then
+    echo "INFO [strict]: ${DEX_REF_TOTAL} dangling GMS/ML Kit/Play-Core/Sentry type reference(s) — must be 0 (#3480)."
   else
-    echo "INFO: ${DEX_REF_TOTAL} dangling GMS/ML Kit/Play-Core type reference(s) to absent classes (inert; not a failure)."
+    echo "INFO: ${DEX_REF_TOTAL} dangling GMS/ML Kit/Play-Core/Sentry type reference(s) to absent classes (inert on a debug APK; the release audit fails on any)."
   fi
   if [[ "${DEX_DEF_HIT}" -eq 0 ]]; then
-    echo "OK: no GMS/ML Kit/Play-Core class DEFINITIONS in any dex — no proprietary Google code shipped."
+    if [[ "${STRICT_REFS}" -eq 1 ]]; then
+      echo "OK [strict]: zero GMS/ML Kit/Play-Core/Sentry definitions AND references in any dex."
+    else
+      echo "OK: no GMS/ML Kit/Play-Core/Sentry class DEFINITIONS in any dex — no proprietary Google code shipped."
+    fi
   else
     FAILED=1
   fi
 fi
 
 if [[ "${FAILED}" -ne 0 ]]; then
-  echo "==> AUDIT FAILED: the fdroid flavor ships GMS/ML Kit/Play-Core code" >&2
-  echo "    (coordinate on the runtime classpath, or a proprietary class" >&2
-  echo "    defined in the dex)." >&2
+  echo "==> AUDIT FAILED: the fdroid flavor ships GMS/ML Kit/Play-Core/Sentry" >&2
+  echo "    code (coordinate on the runtime classpath, a proprietary class" >&2
+  echo "    defined in the dex, or — in strict release mode — any dangling" >&2
+  echo "    type reference, the F-Droid check-apk bar, #3480)." >&2
   exit 1
 fi
 
-echo "==> AUDIT PASSED: fdroid flavor ships no GMS/ML Kit/Play-Core coordinates"
-echo "    and no proprietary com.google.android.gms / com.google.mlkit /"
-echo "    com.google.android.play class definitions."
+echo "==> AUDIT PASSED: fdroid flavor ships no GMS/ML Kit/Play-Core/Sentry"
+echo "    coordinates and no proprietary class definitions"
+if [[ -n "${APK_PATH}" && "${STRICT_REFS}" -eq 1 ]]; then
+  echo "    — and zero dangling type references (strict release bar, #3480)."
+fi
 exit 0

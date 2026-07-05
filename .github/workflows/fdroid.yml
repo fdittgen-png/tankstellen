@@ -1,20 +1,24 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: MIT
 
-# F-Droid no-GMS audit (#2575)
+# F-Droid no-GMS audit (#2575, hardened by #3480)
 #
 # ADVISORY workflow — proves the `fdroid` flavor ships ZERO proprietary Google
-# Mobile Services. It is intentionally NOT a required check / branch-protection
-# context: it has no ci-docs-stub.yml coverage, and a transient Android/Gradle
-# failure must never block `gh pr merge --auto`. The authoritative gate is the
-# dependency-graph layer (layer A of scripts/audit_no_gms.sh), which is fast and
-# deterministic; the debug-APK dex layer (layer B) is the belt-and-braces proof
-# that nothing GMS survives into the shipped bytecode.
+# Mobile Services (and no Sentry). It is intentionally NOT a required check /
+# branch-protection context: it has no ci-docs-stub.yml coverage, and a
+# transient Android/Gradle failure must never block `gh pr merge --auto`. The
+# authoritative gate is the dependency-graph layer (layer A of
+# scripts/audit_no_gms.sh), which is fast and deterministic; the RELEASE-APK
+# dex layer (B + strict C) is the belt-and-braces proof that not even a
+# dangling type REFERENCE survives into the shipped bytecode — the exact bar
+# F-Droid's `check apk` scanner applies (it rejected MR !42093 on references
+# a debug-dex audit could not see, #3480).
 #
-# A DEBUG apk is built deliberately: it needs no keystore (the dependency graph,
-# not the signature, proves the exclude), and --flavor fdroid
-# --dart-define=FORCE_LOCATION_MANAGER=true exercises the exact runtime config
-# the release/F-Droid builds use.
+# A RELEASE apk is built deliberately (#3480): only R8 strips Flutter's dead
+# PlayStoreDeferredComponentManager references (#3479), so the debug dex this
+# workflow used to audit could never prove the 0-reference bar. The build is
+# keyless-UNSIGNED — an fdroid-only release without a keystore is the
+# sanctioned F-Droid shape (#3471; F-Droid signs downstream).
 
 name: F-Droid no-GMS audit
 
@@ -65,14 +69,20 @@ jobs:
       - run: dart run tool/apply_fdroid_overrides.dart
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
-      # Build the unsigned DEBUG fdroid APK with the GMS-free runtime config.
-      # #3435 — FGS define matches fdroid-publish.yml so the GMS audit runs
-      # against the same artifact shape F-Droid actually ships.
-      - name: Build fdroid debug APK
-        run: flutter build apk --debug --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
-      # Layer A (dependency graph) ALWAYS runs; layer B (dex) runs on the
-      # debug APK just produced. dexdump comes from the runner's Android SDK
+      # Build the keyless-unsigned RELEASE fdroid APK with the GMS-free
+      # runtime config (#3480 — release, not debug: only R8 strips the dead
+      # Play-Core deferred-components refs, #3479, so only the release dex can
+      # prove the 0-reference bar F-Droid's check-apk applies). #3435 — FGS
+      # define matches fdroid-publish.yml so the audit runs against the same
+      # artifact shape F-Droid actually ships. #3471 sanctions the
+      # keystore-less fdroid-only release (unsigned; F-Droid signs downstream).
+      - name: Build fdroid release APK (unsigned)
+        run: flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
+      # Layer A (dependency graph) ALWAYS runs; layers B + strict C (dex,
+      # #3480: class definitions AND dangling references must both be 0) run
+      # on the release APK just produced — strict mode auto-enables on the
+      # release-named APK. dexdump comes from the runner's Android SDK
       # build-tools (ANDROID_HOME is set on ubuntu-latest); the script falls
       # back to `strings` if it cannot find it.
-      - name: Audit — no GMS / MLKit
-        run: bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-debug.apk
+      - name: Audit — no GMS / MLKit / Play Core / Sentry (strict)
+        run: bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
