@@ -1,0 +1,26 @@
+{
+  "tripVerdictPromptTitle": "How did this trip feel?",
+  "@tripVerdictPromptTitle": {
+    "description": "Title of the 3-tap post-trip verdict prompt on the trip detail (#3501, epic #3498). The driver's subjective answer calibrates the driving-analysis thresholds (RPA/PKE/VAPOS bands, harsh-event gates) against how trips actually felt."
+  },
+  "tripVerdictSmooth": "Smooth",
+  "@tripVerdictSmooth": {
+    "description": "Verdict chip (#3501): the trip felt calm/relaxed — no notable hard accelerations, braking or cornering."
+  },
+  "tripVerdictModerate": "Moderate",
+  "@tripVerdictModerate": {
+    "description": "Verdict chip (#3501): an ordinary trip — some brisk moments, nothing aggressive."
+  },
+  "tripVerdictAggressive": "Aggressive",
+  "@tripVerdictAggressive": {
+    "description": "Verdict chip (#3501): the trip had hard accelerations / late braking / sharp cornering."
+  },
+  "tripVerdictDismiss": "Not now",
+  "@tripVerdictDismiss": {
+    "description": "Dismiss affordance (tooltip of the X button) on the verdict prompt (#3501). Dismissing is persisted per trip so the prompt never nags twice for the same trip."
+  },
+  "tripVerdictThanks": "Thanks — this helps calibrate your driving analysis.",
+  "@tripVerdictThanks": {
+    "description": "Confirmation line shown in place of the verdict prompt right after the driver answers (#3501)."
+  }
+}

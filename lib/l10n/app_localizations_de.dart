@@ -2655,6 +2655,42 @@ class AppLocalizationsDe extends AppLocalizations {
   String get coachingVoiceSmoothAccel => 'Beschleunige gleichmäßiger';
 
   @override
+  String get coachingVoiceSharpCorner => 'Nimm Kurven etwas sanfter';
+
+  @override
+  String get coachingVoiceHarshBrakingStrong =>
+      'Das war eine sehr harte Bremsung — halte mehr Abstand';
+
+  @override
+  String get coachingVoiceHardAccelerationStrong =>
+      'Sehr starke Beschleunigung — das kostet richtig Sprit';
+
+  @override
+  String get coachingVoiceSharpCornerStrong =>
+      'Sehr scharfe Kurve — langsam rein, sanft raus';
+
+  @override
+  String coachingVoiceTripSummary(
+    String distanceKm,
+    String consumption,
+    int harshCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      harshCount,
+      locale: localeName,
+      other: '$harshCount harte Manöver.',
+      one: 'Ein hartes Manöver.',
+      zero: 'Schön gleichmäßig — keine harten Manöver.',
+    );
+    return 'Fahrt gespeichert: $distanceKm Kilometer, $consumption. $_temp0';
+  }
+
+  @override
+  String coachingVoiceConsumptionPhrase(String value) {
+    return '$value Liter pro 100 Kilometer';
+  }
+
+  @override
   String get voiceCoachingSettingTitle => 'Gesprochenes Fahrcoaching';
 
   @override
@@ -6765,6 +6801,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die OBD2-Verbindung wurde unterbrochen und konnte nicht automatisch wiederhergestellt werden. Prüfe, ob der Adapter eingeschaltet und in Reichweite ist, und tippe dann auf „Erneut versuchen“.';
 
   @override
+  String get obd2ReconnectDismiss => 'Ausblenden';
+
+  @override
+  String get autoRecordNotificationTitle => 'Automatische Fahrtaufzeichnung';
+
+  @override
+  String get autoRecordNotificationText => 'Wartet auf deinen OBD2-Adapter';
+
+  @override
   String get obd2ReconnectRetry => 'Erneut versuchen';
 
   @override
@@ -7899,6 +7944,25 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trajetsSharedBadge => 'Geteilt';
+
+  @override
+  String get tripVerdictPromptTitle => 'Wie hat sich diese Fahrt angefühlt?';
+
+  @override
+  String get tripVerdictSmooth => 'Ruhig';
+
+  @override
+  String get tripVerdictModerate => 'Normal';
+
+  @override
+  String get tripVerdictAggressive => 'Aggressiv';
+
+  @override
+  String get tripVerdictDismiss => 'Jetzt nicht';
+
+  @override
+  String get tripVerdictThanks =>
+      'Danke — das hilft, deine Fahranalyse zu kalibrieren.';
 
   @override
   String get unifiedFilterFuel => 'Kraftstoff';

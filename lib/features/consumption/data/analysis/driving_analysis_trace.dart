@@ -66,6 +66,13 @@ class DrivingAnalysisTrace {
   /// the [obd2Features] null convention.
   final GpsCoverageReport? gpsCoverage;
 
+  /// #3501 (schema v4) — the driver's own post-trip verdict
+  /// (`TripVerdict.name`: smooth / moderate / aggressive; `skipped` and
+  /// null mean unanswered). The structured replacement for hand-editing
+  /// [comment]; when present, the comment prompt is dropped from the
+  /// export automatically.
+  final String? verdict;
+
   /// Per-trip engine-sample coverage + reason (#3499, schema v4). Null only
   /// on an empty trip — a present block with `reason: noEngineData` is the
   /// honest explanation for a null [obd2Features] on a `gpsPlusObd2` trip.
@@ -83,6 +90,7 @@ class DrivingAnalysisTrace {
     this.obd2Features,
     this.gpsCoverage,
     this.obd2Coverage,
+    this.verdict,
     this.comment = kDrivingAnalysisCommentPrompt,
   });
 
@@ -91,7 +99,12 @@ class DrivingAnalysisTrace {
         'kind': 'drivingAnalysis',
         'capturedAt': capturedAt.toIso8601String(),
         // The annotation slot — first so it is obvious in the shared file.
-        'comment': comment,
+        // #3501 — once an in-app verdict exists the begging prompt is
+        // replaced by a pointer to the structured field below.
+        'comment': verdict != null && comment == kDrivingAnalysisCommentPrompt
+            ? 'verdict captured in-app — see the "verdict" field'
+            : comment,
+        'verdict': verdict,
         'summary': {
           'tripKind': summary.kind.name,
           'distanceKm': _round(summary.distanceKm, 3),
@@ -123,6 +136,18 @@ class DrivingAnalysisTrace {
                 'brakeEvents': gpsFeatures!.brakeEvents,
                 'sharpCornerEvents': gpsFeatures!.sharpCornerEvents,
                 'maxAccelG': _round(gpsFeatures!.maxAccelG, 3),
+                // #3503 — self-describing gates: the field export that
+                // motivated epic #3498 read "maxAccelG 0.341 g yet
+                // accelEvents 0" as a contradiction. The peak is a
+                // sample-to-sample instantaneous derivative (physically
+                // clamped); events must SUSTAIN ≥1 s above the threshold
+                // through the accuracy/min-speed gates.
+                'gates': const {
+                  'maxAccelG': 'instantaneous sample-to-sample peak, clamped',
+                  'events':
+                      'sustained >=1.0s at >=3.0 (accel) / >=3.5 (brake) '
+                          'm/s2, accuracy- and min-speed-gated',
+                },
                 'meanSpeedKmh': _round(gpsFeatures!.meanSpeedKmh, 1),
                 'speedBandSeconds': {
                   'idle': _round(gpsFeatures!.idleSeconds, 0),

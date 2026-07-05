@@ -1,0 +1,8 @@
+{
+  "tripVerdictPromptTitle": "Wie hat sich diese Fahrt angefühlt?",
+  "tripVerdictSmooth": "Ruhig",
+  "tripVerdictModerate": "Normal",
+  "tripVerdictAggressive": "Aggressiv",
+  "tripVerdictDismiss": "Jetzt nicht",
+  "tripVerdictThanks": "Danke — das hilft, deine Fahranalyse zu kalibrieren."
+}

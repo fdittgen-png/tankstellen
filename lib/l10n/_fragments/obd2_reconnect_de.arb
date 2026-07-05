@@ -20,6 +20,9 @@
   "@obd2ReconnectFailedBody": {
     "description": "Body text of the terminal auto-reconnect-failure surface (Epic #3013 phase 3). Explains the auto-reconnect gave up after bounded attempts and how to recover."
   },
+  "obd2ReconnectDismiss": "Ausblenden",
+  "autoRecordNotificationTitle": "Automatische Fahrtaufzeichnung",
+  "autoRecordNotificationText": "Wartet auf deinen OBD2-Adapter",
   "obd2ReconnectRetry": "Erneut versuchen",
   "@obd2ReconnectRetry": {
     "description": "Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires."

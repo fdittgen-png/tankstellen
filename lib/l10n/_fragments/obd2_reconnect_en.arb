@@ -20,6 +20,18 @@
   "@obd2ReconnectFailedBody": {
     "description": "Body text of the terminal auto-reconnect-failure surface (Epic #3013 phase 3). Explains the auto-reconnect gave up after bounded attempts and how to recover."
   },
+  "obd2ReconnectDismiss": "Dismiss",
+  "@obd2ReconnectDismiss": {
+    "description": "Tooltip of the X button on the terminal reconnect-failed strip (#3505). Dismisses the strip for the current drop episode only — a fresh drop re-arms it."
+  },
+  "autoRecordNotificationTitle": "Trip auto-record",
+  "@autoRecordNotificationTitle": {
+    "description": "Title of the Android foreground-service notification shown while the hands-free auto-record watch is armed (#3505 — replaces the hard-coded English string in AutoRecordForegroundService.kt). Handed to the native side at arm time."
+  },
+  "autoRecordNotificationText": "Watching for your OBD2 adapter",
+  "@autoRecordNotificationText": {
+    "description": "Body of the Android auto-record foreground-service notification (#3505). Handed to the native side at arm time."
+  },
   "obd2ReconnectRetry": "Tap to retry",
   "@obd2ReconnectRetry": {
     "description": "Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires."

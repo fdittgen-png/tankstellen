@@ -2629,6 +2629,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get coachingVoiceSmoothAccel => 'Accelerate more smoothly';
 
   @override
+  String get coachingVoiceSharpCorner => 'Take corners a little gentler';
+
+  @override
+  String get coachingVoiceHarshBrakingStrong =>
+      'That was a very hard stop — leave more distance';
+
+  @override
+  String get coachingVoiceHardAccelerationStrong =>
+      'Very hard acceleration — that burns real fuel';
+
+  @override
+  String get coachingVoiceSharpCornerStrong =>
+      'Very sharp corner — slow in, gentle out';
+
+  @override
+  String coachingVoiceTripSummary(
+    String distanceKm,
+    String consumption,
+    int harshCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      harshCount,
+      locale: localeName,
+      other: '$harshCount harsh events.',
+      one: 'One harsh event.',
+      zero: 'Nice and smooth — no harsh events.',
+    );
+    return 'Trip saved: $distanceKm kilometres, $consumption. $_temp0';
+  }
+
+  @override
+  String coachingVoiceConsumptionPhrase(String value) {
+    return '$value litres per 100 kilometres';
+  }
+
+  @override
   String get voiceCoachingSettingTitle => 'Spoken driving coaching';
 
   @override
@@ -6694,6 +6730,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.';
 
   @override
+  String get obd2ReconnectDismiss => 'Dismiss';
+
+  @override
+  String get autoRecordNotificationTitle => 'Trip auto-record';
+
+  @override
+  String get autoRecordNotificationText => 'Watching for your OBD2 adapter';
+
+  @override
   String get obd2ReconnectRetry => 'Tap to retry';
 
   @override
@@ -7813,6 +7858,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trajetsSharedBadge => 'Shared';
+
+  @override
+  String get tripVerdictPromptTitle => 'How did this trip feel?';
+
+  @override
+  String get tripVerdictSmooth => 'Smooth';
+
+  @override
+  String get tripVerdictModerate => 'Moderate';
+
+  @override
+  String get tripVerdictAggressive => 'Aggressive';
+
+  @override
+  String get tripVerdictDismiss => 'Not now';
+
+  @override
+  String get tripVerdictThanks =>
+      'Thanks — this helps calibrate your driving analysis.';
 
   @override
   String get unifiedFilterFuel => 'Fuel';
@@ -10755,6 +10819,43 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get coachingVoiceSmoothAccel =>
       '⟦Áççéłéřáŧé ɱóřé šɱóóŧĥłý ··········⟧';
+
+  @override
+  String get coachingVoiceSharpCorner =>
+      '⟦Ŧáķé çóřñéřš á łîŧŧłé ǧéñŧłéř ···········⟧';
+
+  @override
+  String get coachingVoiceHarshBrakingStrong =>
+      '⟦Ŧĥáŧ ŵáš á ṽéřý ĥářđ šŧóƥ — łéáṽé ɱóřé đîšŧáñçé ·················⟧';
+
+  @override
+  String get coachingVoiceHardAccelerationStrong =>
+      '⟦Ṽéřý ĥářđ áççéłéřáŧîóñ — ŧĥáŧ ƀúřñš řéáł ƒúéł ·················⟧';
+
+  @override
+  String get coachingVoiceSharpCornerStrong =>
+      '⟦Ṽéřý šĥářƥ çóřñéř — šłóŵ îñ, ǧéñŧłé óúŧ ··············⟧';
+
+  @override
+  String coachingVoiceTripSummary(
+    String distanceKm,
+    String consumption,
+    int harshCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      harshCount,
+      locale: localeName,
+      other: '$harshCount harsh events.',
+      one: 'One harsh event.',
+      zero: 'Nice and smooth — no harsh events.',
+    );
+    return '⟦Ŧřîƥ šáṽéđ: $distanceKm ķîłóɱéŧřéš, $consumption. $_temp0 ·········⟧';
+  }
+
+  @override
+  String coachingVoiceConsumptionPhrase(String value) {
+    return '⟦$value łîŧřéš ƥéř 100 ķîłóɱéŧřéš ·········⟧';
+  }
 
   @override
   String get voiceCoachingSettingTitle => '⟦Šƥóķéñ đřîṽîñǧ çóáçĥîñǧ ·········⟧';
@@ -14943,6 +15044,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Ŧĥé ÓƁĐ2 çóññéçŧîóñ ŵáš łóšŧ áñđ áúŧóɱáŧîç řéçóññéçŧîóñ đîđñ’ŧ šúççééđ. Çĥéçķ ŧĥé áđáƥŧéř îš ƥóŵéřéđ áñđ îñ řáñǧé, ŧĥéñ ŧáƥ řéŧřý. ···············································⟧';
 
   @override
+  String get obd2ReconnectDismiss => '⟦Đîšɱîšš ···⟧';
+
+  @override
+  String get autoRecordNotificationTitle => '⟦Ŧřîƥ áúŧó-řéçóřđ ······⟧';
+
+  @override
+  String get autoRecordNotificationText =>
+      '⟦Ŵáŧçĥîñǧ ƒóř ýóúř ÓƁĐ2 áđáƥŧéř ···········⟧';
+
+  @override
   String get obd2ReconnectRetry => '⟦Ŧáƥ ŧó řéŧřý ·····⟧';
 
   @override
@@ -16092,6 +16203,25 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetsSharedBadge => '⟦Šĥářéđ ···⟧';
+
+  @override
+  String get tripVerdictPromptTitle => '⟦Ĥóŵ đîđ ŧĥîš ŧřîƥ ƒééł? ········⟧';
+
+  @override
+  String get tripVerdictSmooth => '⟦Šɱóóŧĥ ···⟧';
+
+  @override
+  String get tripVerdictModerate => '⟦Ṁóđéřáŧé ····⟧';
+
+  @override
+  String get tripVerdictAggressive => '⟦Áǧǧřéššîṽé ·····⟧';
+
+  @override
+  String get tripVerdictDismiss => '⟦Ñóŧ ñóŵ ···⟧';
+
+  @override
+  String get tripVerdictThanks =>
+      '⟦Ŧĥáñķš — ŧĥîš ĥéłƥš çáłîƀřáŧé ýóúř đřîṽîñǧ áñáłýšîš. ···················⟧';
 
   @override
   String get unifiedFilterFuel => '⟦Ƒúéł ··⟧';

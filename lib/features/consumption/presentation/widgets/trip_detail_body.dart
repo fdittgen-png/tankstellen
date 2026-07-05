@@ -36,6 +36,7 @@ import 'trip_detail_charts_section.dart';
 import 'trip_detail_to_trip_sample.dart';
 import 'trip_path_map_card.dart';
 import 'trip_summary_card.dart';
+import 'trip_verdict_prompt_card.dart';
 
 /// Scrollable body of the trip detail screen (#890): summary card
 /// followed by the driving-insights cost-line card (#1041 phase 2)
@@ -281,12 +282,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
           isEv: widget.isEv,
         ),
         const SizedBox(height: 8),
-        // GPS path overlay (#1374 phase 2). Self-suppresses when the
-        // trip carries no GPS samples — legacy trips, opted-out trips,
-        // trips that never got a fix — so no parent-side gating is
-        // needed and the layout stays unchanged for those trips.
-        // Phase 3 will replace the single-colour polyline with a
-        // per-segment heatmap.
+        // GPS path overlay (#1374): self-suppresses without GPS samples.
         TripPathMapCard(samples: widget.samples),
         // Composite driving score (#1041 phase 5a — Card A). Sits at
         // the top of the Insights group: a single big 0..100 number
@@ -303,6 +299,12 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // rows the inline analyzer + gear metric produced before.
         if (!widget.isEv && widget.samples.isNotEmpty)
           DrivingInsightsCard(lessons: lessons),
+        // #3501 — 3-tap post-trip verdict (self-hides once answered).
+        if (widget.samples.isNotEmpty)
+          TripVerdictPromptCard(
+            entryId: widget.entry.id,
+            verdict: widget.entry.verdict,
+          ),
         // "Where your fuel went" per-event fuel-cost breakdown (#3432)
         // — right below the lessons so the ranked coaching is followed
         // by the whole-trip litre attribution. The card self-hides when
@@ -351,12 +353,8 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             diagnostics: widget.entry.gpsSampleDiagnostics,
             coverage: _gpsCoverage,
           ),
-        // OBD2 communication-health diagnostics (#2470). Dev-only — the
-        // card self-hides unless Feature.debugMode is on AND a session was
-        // captured, the OBD2 analogue of the GPS card above. #2912 — feeds
-        // the trip's PERSISTED diagnostic so the card shows THIS trip's
-        // health (restart-durable) instead of the in-memory singleton that
-        // surfaced as "always empty"; null falls back to the live collector.
+        // OBD2 comm-health diagnostics (#2470, #2912): dev-only, self-hides;
+        // fed the trip's PERSISTED diagnostic (restart-durable).
         Obd2DiagnosticsTripCard(tripDiagnostic: widget.entry.obd2Diagnostic),
         // Driving-analysis trace export (#2804). Dev-only — self-hides unless
         // Feature.debugMode is on. Exports this trip's KPIs / score / lessons
@@ -370,6 +368,7 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
             gpsFeatures: _gpsFeatures,
             gpsCoverage: _gpsCoverage,
             samples: _tripSamples,
+            verdict: widget.entry.verdict, // #3501
           ),
         // #1895 — the per-trip telemetry charts, folded into one
         // collapsed-by-default section. Extracted to its own widget (#2804)

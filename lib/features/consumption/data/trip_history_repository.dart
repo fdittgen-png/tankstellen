@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 import '../domain/entities/gps_sample_diagnostic.dart';
+import '../domain/trip_verdict.dart';
 import '../domain/entities/recording_lifecycle_mark.dart';
 import '../domain/trip_recorder.dart';
 import '../../obd2/api.dart';
@@ -106,6 +107,11 @@ class TripHistoryEntry {
   /// lesson — it is a real serialised field, not `@JsonKey`-excluded).
   final Obd2SessionDiagnostic? obd2Diagnostic;
 
+  /// The driver's own post-trip verdict (#3501) — `TripVerdict.name`, or
+  /// null while the prompt hasn't been answered. `skipped` records a
+  /// dismissal so the prompt never nags twice for the same trip.
+  final String? verdict;
+
   const TripHistoryEntry({
     required this.id,
     required this.vehicleId,
@@ -118,13 +124,15 @@ class TripHistoryEntry {
     this.gpsSampleDiagnostics = const [],
     this.lifecycleMarks = const [],
     this.obd2Diagnostic,
+    this.verdict,
   });
 
   /// Returns a copy with the given fields replaced (#1858). The
   /// retroactive η_v recompute uses it to swap in a rescaled [summary]
   /// while leaving the id / vehicle / samples / adapter identity
   /// untouched.
-  TripHistoryEntry copyWith({TripSummary? summary}) => TripHistoryEntry(
+  TripHistoryEntry copyWith({TripSummary? summary, String? verdict}) =>
+      TripHistoryEntry(
         id: id,
         vehicleId: vehicleId,
         summary: summary ?? this.summary,
@@ -136,6 +144,7 @@ class TripHistoryEntry {
         gpsSampleDiagnostics: gpsSampleDiagnostics,
         lifecycleMarks: lifecycleMarks,
         obd2Diagnostic: obd2Diagnostic,
+        verdict: verdict ?? this.verdict,
       );
 
   Map<String, dynamic> toJson() => {
@@ -174,6 +183,10 @@ class TripHistoryEntry {
         // via its own short-keyed toJson, so the persisted snapshot reloads
         // intact (NOT @JsonKey-dropped — #2776 lesson).
         if (obd2Diagnostic != null) 'obd2d': obd2Diagnostic!.toJson(),
+        // #3501 — the driver's post-trip verdict. Omitted when unanswered so
+        // legacy entries round-trip unchanged. A synced-entity FIELD add is
+        // TankSync-transparent (JSONB data column, #2929).
+        if (verdict != null) 'verdict': verdict,
       };
 
   static TripHistoryEntry fromJson(Map<String, dynamic> json) =>
@@ -222,6 +235,8 @@ class TripHistoryEntry {
             : Obd2SessionDiagnostic.fromJson(
                 (json['obd2d'] as Map).cast<String, dynamic>(),
               ),
+        // #3501 — missing key → null (unanswered) on legacy entries.
+        verdict: json['verdict'] as String?,
       );
 }
 
@@ -340,6 +355,29 @@ class TripHistoryRepository {
 
   Future<void> delete(String id) async {
     await _box.delete(id);
+  }
+
+  /// #3501 — persist the driver's post-trip verdict onto an existing entry.
+  /// Best-effort: a missing/corrupt row or a failed write is logged and
+  /// swallowed (the prompt simply re-appears next visit). Returns true when
+  /// the verdict was written.
+  Future<bool> saveVerdict(String id, TripVerdict verdict) async {
+    try {
+      final raw = _box.get(id);
+      if (raw == null) return false;
+      final entry = TripHistoryEntry.fromJson(
+        (jsonDecode(raw) as Map).cast<String, dynamic>(),
+      );
+      await _box.put(
+        id,
+        jsonEncode(entry.copyWith(verdict: verdict.wireName).toJson()),
+      );
+      return true;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: const {'where': 'TripHistoryRepository.saveVerdict'}));
+      return false;
+    }
   }
 
   /// Wipe every persisted trip (#2571). Used by the full-backup RESTORE
