@@ -7528,6 +7528,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Coolant (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Altitude (m)';
 
   @override
@@ -15790,6 +15793,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get trajetDetailChartCoolant => '⟦Çóółáñŧ (°Ç) ····⟧';
+
+  @override
+  String get trajetDetailChartAltitudeRelative =>
+      '⟦Áłŧîŧúđé (ɱ, ƒřóɱ šŧářŧ) ········⟧';
 
   @override
   String get trajetDetailChartAltitude => '⟦Áłŧîŧúđé (ɱ) ····⟧';

@@ -7610,6 +7610,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Hűtőfolyadék (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Magasság (m)';
 
   @override

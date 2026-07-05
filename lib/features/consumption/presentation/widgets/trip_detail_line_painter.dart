@@ -20,6 +20,15 @@ class _LineChartPainter extends CustomPainter {
   final Color labelColor;
   final String unit;
 
+  /// #3502 — the un-smoothed series, drawn as a faint background polyline
+  /// behind [points] when smoothing is on. Null keeps the classic
+  /// single-line plot.
+  final List<_ChartPoint>? rawPoints;
+
+  /// #3502 — percentile axis cap forwarded into the geometry (see
+  /// [_TripChartGeometry.forSize]); above-cap values draw clamped.
+  final double? yCap;
+
   /// #2977 — index of the scrubbed sample whose crosshair + marker is drawn,
   /// or null when the user has not scrubbed. Projected with the same
   /// [_TripChartGeometry] the nearest-point hit-test uses, so the marker
@@ -31,6 +40,8 @@ class _LineChartPainter extends CustomPainter {
     required this.color,
     required this.labelColor,
     required this.unit,
+    this.rawPoints,
+    this.yCap,
     this.selectedIndex,
   });
 
@@ -38,7 +49,30 @@ class _LineChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
 
-    final geo = _TripChartGeometry.forSize(size, points);
+    final geo = _TripChartGeometry.forSize(size, points, yCap: yCap);
+
+    // #3502 — the raw series first (behind), faint + thin, values clamped
+    // into the capped axis by yFor. Nothing is hidden by the smoothing —
+    // the eye reads the median line, the spikes stay visible as texture.
+    final raw = rawPoints;
+    if (raw != null && raw.isNotEmpty) {
+      final rawPaint = Paint()
+        ..color = color.withAlpha(70)
+        ..strokeWidth = 1
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+      final rawPath = Path();
+      for (int i = 0; i < raw.length; i++) {
+        final pt = Offset(geo.xFor(raw[i].timestamp), geo.yFor(raw[i].value));
+        if (i == 0) {
+          rawPath.moveTo(pt.dx, pt.dy);
+        } else {
+          rawPath.lineTo(pt.dx, pt.dy);
+        }
+      }
+      canvas.drawPath(rawPath, rawPaint);
+    }
 
     // Max / min labels at the corners — gives the user a quick read
     // on the range without cluttering the plot with grid lines.
@@ -131,6 +165,8 @@ class _LineChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(_LineChartPainter oldDelegate) =>
       oldDelegate.points != points ||
+      oldDelegate.rawPoints != rawPoints ||
+      oldDelegate.yCap != yCap ||
       oldDelegate.color != color ||
       oldDelegate.unit != unit ||
       oldDelegate.selectedIndex != selectedIndex;

@@ -7576,6 +7576,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Chladivo (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Nadmořská výška (m)';
 
   @override

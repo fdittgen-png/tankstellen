@@ -7561,6 +7561,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Kylvätska (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Höjd (m)';
 
   @override

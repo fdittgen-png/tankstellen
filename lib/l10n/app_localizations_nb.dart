@@ -7561,6 +7561,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Kjølevæske (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Høyde (m)';
 
   @override

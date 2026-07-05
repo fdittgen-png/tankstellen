@@ -223,6 +223,12 @@ class TripDetailFuelRateChart extends StatelessWidget {
       unit: 'L/h',
       emptyWhenAllNull: true,
       estimated: hasEstimate,
+      // #3502 — a 1 Hz fuel-rate series (especially the GPS-physics
+      // estimate) is unreadable spikes: plot the rolling median with the
+      // raw series faint behind, and cap the axis at p99 so one outlier
+      // can't squash the whole readable band.
+      smoothWindow: 9,
+      capPercentile: 0.99,
     );
   }
 }

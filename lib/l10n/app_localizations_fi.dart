@@ -7565,6 +7565,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Jäähdytysneste (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Korkeus (m)';
 
   @override

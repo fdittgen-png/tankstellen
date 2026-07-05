@@ -13144,6 +13144,12 @@ abstract class AppLocalizations {
   /// **'Coolant (°C)'**
   String get trajetDetailChartCoolant;
 
+  /// Trip-detail chart section title (#3502): the altitude profile is plotted RELATIVE to the trip start, because raw GPS altitude is the WGS84 ellipsoid height on Android (no geoid correction) and routinely reads below sea level near a coast. 'from start' tells the user the 0 line is where they departed.
+  ///
+  /// In en, this message translates to:
+  /// **'Altitude (m, from start)'**
+  String get trajetDetailChartAltitudeRelative;
+
   /// Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix).
   ///
   /// In en, this message translates to:

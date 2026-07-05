@@ -7559,6 +7559,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Jahutusvedelik (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Kõrgus (m)';
 
   @override

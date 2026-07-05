@@ -7607,6 +7607,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Dzesēšanas šķidrums (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Augstums (m)';
 
   @override

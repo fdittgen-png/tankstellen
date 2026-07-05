@@ -7626,6 +7626,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Охладителна течност (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Височина (m)';
 
   @override

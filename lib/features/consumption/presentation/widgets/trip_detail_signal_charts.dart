@@ -70,9 +70,16 @@ class TripDetailCoolantChart extends StatelessWidget {
   }
 }
 
-/// Altitude-over-time line chart (#2461). Plots `sample.altitudeM` (GPS)
-/// in metres. Parent gates on any non-null sample; self-falls-back to
-/// the empty caption otherwise.
+/// Altitude-over-time line chart (#2461, reworked #3502). Plots the GPS
+/// altitude RELATIVE to the trip start, lightly median-smoothed.
+///
+/// Raw GPS altitude is the WGS84 *ellipsoid* height on Android (no geoid
+/// correction), so absolute values routinely read below sea level near a
+/// coast — the field screenshot that motivated #3502 showed "−3.7 m".
+/// The relative profile keeps exactly the information a driver reads from
+/// this chart (climbs and descents, which also feed climbEnergyPerKm)
+/// while sidestepping the meaningless absolute datum and the
+/// Android-vs-iOS (ellipsoid-vs-MSL) inconsistency.
 class TripDetailAltitudeChart extends StatelessWidget {
   final List<TripDetailSample> samples;
   final Color? color;
@@ -85,12 +92,33 @@ class TripDetailAltitudeChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Baseline = median of the first few non-null fixes, so one noisy
+    // first fix can't offset the whole profile.
+    final first = <double>[];
+    for (final s in samples) {
+      final a = s.altitudeM;
+      if (a == null) continue;
+      first.add(a);
+      if (first.length == 5) break;
+    }
+    double? base;
+    if (first.isNotEmpty) {
+      final sorted = [...first]..sort();
+      base = sorted[sorted.length ~/ 2];
+    }
+    final baseline = base;
     return _TripDetailLineChart(
       samples: samples,
       color: color,
-      valueOf: (s) => s.altitudeM,
+      valueOf: baseline == null
+          ? (s) => null
+          : (s) {
+              final a = s.altitudeM;
+              return a == null ? null : a - baseline;
+            },
       unit: 'm',
       emptyWhenAllNull: true,
+      smoothWindow: 5, // #3502 — kill per-fix altitude jitter
     );
   }
 }

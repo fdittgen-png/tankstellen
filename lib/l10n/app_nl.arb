@@ -5239,5 +5239,10 @@
         "type": "int"
       }
     }
+  },
+  "trajetDetailChartAltitudeRelative": "Altitude (m, from start)",
+  "@trajetDetailChartAltitudeRelative": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

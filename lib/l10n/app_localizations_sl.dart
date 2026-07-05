@@ -7572,6 +7572,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Hladilna tekočina (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Nadmorska višina (m)';
 
   @override

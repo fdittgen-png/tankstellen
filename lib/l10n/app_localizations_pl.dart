@@ -7594,6 +7594,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Czynnik chłodzący (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Wysokość (m)';
 
   @override

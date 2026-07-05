@@ -7625,6 +7625,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Ψυκτικό (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Υψόμετρο (m)';
 
   @override

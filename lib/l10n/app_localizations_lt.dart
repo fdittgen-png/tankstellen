@@ -7604,6 +7604,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Aušinimo skystis (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Aukštis (m)';
 
   @override

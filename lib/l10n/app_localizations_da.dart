@@ -7565,6 +7565,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Kølevand (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Højde (m)';
 
   @override

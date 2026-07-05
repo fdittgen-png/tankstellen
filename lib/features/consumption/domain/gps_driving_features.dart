@@ -7,6 +7,13 @@ import '../../../core/utils/geo_utils.dart' as geo;
 import 'accel_event_gate.dart';
 import 'trip_recorder.dart';
 
+/// #3502 — altitude deadband (m) for the climb/descent hysteresis: GPS
+/// altitude jitter is ±2-8 m per fix at 1 Hz, so sample-to-sample deltas
+/// summed directly manufacture phantom climb on a flat road. Real grades
+/// commit their FULL delta each time the anchor advances, so nothing real
+/// is lost — only the oscillation inside the band nets out.
+const double kAltitudeDeadbandM = 3.0;
+
 /// Lateral-acceleration threshold (m/s²) above which a turn counts as a
 /// "sharp corner" event. 3.5 m/s² ≈ 0.36 g — the telematics convention
 /// for a harsh-cornering event (Digital Matter 3.5 m/s²; Verizon 0.4 g
@@ -232,6 +239,8 @@ class GpsDrivingFeatures {
     double distM = 0;
     double maxAccelG = 0;
     double climb = 0, descent = 0;
+    // #3502 — altitude anchor for the climb/descent deadband hysteresis.
+    double? altAnchor;
     double cornerLoad = 0;
     int sharpCorners = 0;
     // #2695 C9 speed-only energy KPIs.
@@ -322,13 +331,28 @@ class GpsDrivingFeatures {
 
       // Altitude delta — only while moving (#3412): standstill altitude noise
       // would otherwise become phantom climb (a bogus "29% gradient" lesson).
-      final pAlt = prev.altitudeM, cAlt = cur.altitudeM;
-      if (moving && pAlt != null && cAlt != null) {
-        final dAlt = cAlt - pAlt;
-        if (dAlt > 0) {
-          climb += dAlt;
-        } else {
-          descent += -dAlt;
+      // #3502 — anchor-deadband hysteresis on top: per-fix GPS altitude
+      // jitter (±2-8 m at 1 Hz) summed sample-to-sample manufactured
+      // hundreds of phantom climb metres on a flat road, inflating
+      // climbEnergyPerKm and its "L wasted climbing" lesson. Climb/descent
+      // now commits only when the altitude has moved ≥ [kAltitudeDeadbandM]
+      // from the last committed anchor — real grades pass unchanged (the
+      // full delta is credited when the anchor advances), oscillation
+      // inside the band nets to zero.
+      final cAlt = cur.altitudeM;
+      if (moving && cAlt != null) {
+        // Seed the anchor from the segment's PREV altitude so the very
+        // first delta is credited (matching the pre-#3502 pair semantics).
+        final anchor = altAnchor ?? prev.altitudeM ?? cAlt;
+        altAnchor ??= anchor;
+        final dAlt = cAlt - anchor;
+        if (dAlt.abs() >= kAltitudeDeadbandM) {
+          if (dAlt > 0) {
+            climb += dAlt;
+          } else {
+            descent += -dAlt;
+          }
+          altAnchor = cAlt;
         }
       }
 

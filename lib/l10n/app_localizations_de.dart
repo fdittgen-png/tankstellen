@@ -7610,6 +7610,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Kühlmittel (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Höhe (m, ab Start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Höhe (m)';
 
   @override
