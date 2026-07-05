@@ -1,0 +1,16 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Libre / F-Droid dependency overrides (epic #3473). Applied ONLY for the fdroid
+# build by `dart run tool/apply_fdroid_overrides.dart`, which copies this file to
+# `pubspec_overrides.yaml` (gitignored) before `flutter pub get`. Play + iOS
+# builds never generate that file, so they keep the real, full-featured plugins.
+#
+# Each entry swaps a GMS/ML-Kit/Play-Core-pulling plugin for a FOSS or no-op
+# drop-in, so the fdroid dex carries ZERO `com.google.android.*` references
+# (which `fdroid scanner` / `check apk` rejects). Add the other capability swaps
+# here as their children land (#3476 location, #3477 barcode, #3478 passkeys).
+dependency_overrides:
+  # #3479 — no-op store review (upstream pulls Play Core `…play:review`).
+  in_app_review:
+    path: tool/fdroid_stubs/in_app_review
