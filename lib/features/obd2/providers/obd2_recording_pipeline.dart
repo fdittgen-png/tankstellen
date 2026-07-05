@@ -90,6 +90,11 @@ class Obd2RecordingPipeline implements RecordingPipeline {
 
   Obd2Service? _service;
   Obd2LinkLease? _lease; // #3420 — the recording's session lease (arbiter)
+  // #3500 — per-trip IMU sensor fusion, the SAME shared collaborator the
+  // GPS-only pipeline runs. Before this the OBD2 path ran NO inertial
+  // detector (the #2895/#3029 parity note), so every OBD2 trip reported
+  // imuActive=false, harsh counts 0, and the live voice coach never fired.
+  TripImuFusion? _imuFusion;
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
   StreamSubscription<TripRecordingControllerState>? _stateSub;
@@ -194,6 +199,17 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     );
     _controller = ctl;
 
+    // #3500 — attach the shared per-trip IMU fusion (same collaborator the
+    // GPS-only pipeline runs): confirmed inertial accel/brake episodes feed
+    // the SAME live harsh-event bus, so spoken coaching now fires on OBD2
+    // trips too. Sensor failure is non-fatal (logged inside the fusion).
+    final imuFusion = buildTripImuFusion(
+      _ref,
+      onEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
+      where: 'Obd2RecordingPipeline.start',
+    )..start();
+    _imuFusion = imuFusion;
+
     // #769 baselines + #3382 watchdog-bound init (obd2_trip_start_budgets): on
     // a stall ABORT cleanly (disconnect + recoverable error), never hang.
     try {
@@ -201,6 +217,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       await ctl.start().timeout(_startWatchdog);
     } on TimeoutException {
       _controller = null; _lease?.release(); _lease = null;
+      _imuFusion = null;
+      unawaited(imuFusion.stop());
       unawaited(service.disconnectQuietly());
       throw const Obd2AdapterUnresponsive();
     }
@@ -219,6 +237,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // its session id + odometer reads (stays on the notifier).
     _host.seedActiveSnapshot();
     _liveSub = ctl.live.listen((reading) {
+      // #3500 — keep the IMU fusion's min-speed gate + accel/brake direction
+      // tracking the real vehicle speed (OBD2 speed PID or GPS-derived).
+      _imuFusion?.feedSpeedKmh(reading.speedKmh);
       // #2261 concern 6 — run the deferred `0902` capability probe lazily
       // now that the first samples are landing. Fire-and-forget +
       // one-shot.
@@ -332,7 +353,16 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       samples: capturedSamples,
       vehicle: _readActiveVehicle(),
     );
-    final summary = filled.summary;
+    // #3500 — harvest the per-trip IMU fusion: stamp the aggregate inertial
+    // counts + the #2895 `imuActive ? imu : recorder` veto, exactly as the
+    // GPS-only pipeline does. Torn down BEFORE the summary is persisted so
+    // no inertial subscription survives between trips.
+    final imuFusion = _imuFusion;
+    _imuFusion = null;
+    await imuFusion?.stop();
+    final summary = imuFusion == null
+        ? filled.summary
+        : imuFusion.applyTo(filled.summary);
     final odometerStartKm = ctl.odometerStartKm;
     final odometerLatestKm = ctl.odometerLatestKm;
     // #2509 — GPS-fix count BEFORE teardown: lets the guard keep a real

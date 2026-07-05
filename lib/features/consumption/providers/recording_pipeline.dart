@@ -6,6 +6,12 @@ import '../domain/entities/trip_save_stage.dart';
 import '../domain/trip_recorder.dart';
 import 'trip_recording_state.dart';
 
+// #3500 — re-exported so the OBD2 pipeline reaches the shared per-trip IMU
+// fusion through this already-imported seam file instead of raising the
+// obd2 -> consumption boundary count (the #3132 only-decreasing baseline;
+// same re-export pattern as the #3291-#3295 decompositions).
+export 'trip_imu_fusion.dart';
+
 /// Strategy seam for a complete trip-recording pipeline (#2190).
 ///
 /// The [TripRecording] notifier historically owned two mutually-

@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
@@ -87,39 +88,61 @@ class ImuSensorSource {
         // quiet stream that simply never emits — the GPS+IMU trip then
         // records off GPS alone rather than crashing. (Tests that exercise
         // the detector override this provider with a synthetic source.)
-        try {
-          gyroSub = gyroscopeEventStream(
-            samplingPeriod: SensorInterval.gameInterval,
-          ).listen((e) => lastGyroZ = e.z, onError: (Object _) {});
-          accelSub = userAccelerometerEventStream(
-            samplingPeriod: SensorInterval.gameInterval,
-          ).listen(
-            (e) {
-              if (out.isClosed) return;
-              out.add(ImuSample(
-                t: DateTime.now(),
-                axMps2: e.x,
-                ayMps2: e.y,
-                azMps2: e.z,
-                gyroZRadPerSec: lastGyroZ,
-              ));
-            },
-            onError: (Object err, StackTrace st) {
-              if (!out.isClosed) out.addError(err, st);
-            },
-          );
-        } catch (_) {
-          // ignore: silent_catch — Sensors unavailable — leave the stream quiet.
-        }
+        //
+        // #3500 — runZonedGuarded, not just try/catch: sensors_plus fires an
+        // UNAWAITED `setSamplingPeriod` MethodChannel call inside
+        // `gyroscopeEventStream`/`userAccelerometerEventStream`, so on a
+        // host without the plugin bound (or a device missing the sensor)
+        // the failure surfaces as an unhandled ASYNC error a try/catch can
+        // never see — crashing a bare test zone and spamming the global
+        // handler in production. The guarded zone absorbs those too.
+        runZonedGuarded(() {
+          try {
+            gyroSub = gyroscopeEventStream(
+              samplingPeriod: SensorInterval.gameInterval,
+            ).listen((e) => lastGyroZ = e.z, onError: (Object _) {});
+            accelSub = userAccelerometerEventStream(
+              samplingPeriod: SensorInterval.gameInterval,
+            ).listen(
+              (e) {
+                if (out.isClosed) return;
+                out.add(ImuSample(
+                  t: DateTime.now(),
+                  axMps2: e.x,
+                  ayMps2: e.y,
+                  azMps2: e.z,
+                  gyroZRadPerSec: lastGyroZ,
+                ));
+              },
+              onError: (Object err, StackTrace st) {
+                if (!out.isClosed) out.addError(err, st);
+              },
+            );
+          } catch (_) {
+            // ignore: silent_catch — Sensors unavailable — leave the stream quiet.
+          }
+        }, (e, st) {
+          // Sensors unavailable (async form) — leave the stream quiet; the
+          // fusion's isActive stays false so the recorder counts stand.
+          debugPrint('ImuSensorSource: sensor attach failed (quiet) — $e');
+        });
       },
       onCancel: () async {
-        try {
-          await accelSub?.cancel();
-          await gyroSub?.cancel();
-        } catch (_) {
-          // ignore: silent_catch — A subscription that failed to set up cleanly may also throw on
-          // cancel; nothing to recover.
-        }
+        // #3500 — the EventChannel teardown ALSO fires an unawaited channel
+        // message, so a missing plugin/sensor surfaces as an unhandled async
+        // error here too; absorb it in a guarded zone like the attach side.
+        final done = runZonedGuarded(() async {
+          try {
+            await accelSub?.cancel();
+            await gyroSub?.cancel();
+          } catch (_) {
+            // ignore: silent_catch — A subscription that failed to set up cleanly may also throw on
+            // cancel; nothing to recover.
+          }
+        }, (e, st) {
+          debugPrint('ImuSensorSource: sensor detach failed (quiet) — $e');
+        });
+        if (done != null) await done;
         if (!out.isClosed) await out.close();
       },
     );
