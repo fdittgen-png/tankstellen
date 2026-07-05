@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/feedback/in_app_review_service.dart';
+import 'package:tankstellen/core/feedback/review_prompter.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/storage/storage_providers.dart';
 
@@ -29,8 +30,9 @@ class _FakeSettings implements SettingsStorage {
 }
 
 /// Records how the reviewer seam was driven so each test can assert exactly
-/// how many times the OS dialog was requested.
-class _Reviewer {
+/// how many times the OS dialog was requested. Stands in for the
+/// flavor-selected [ReviewPrompter] via a provider override.
+class _Reviewer implements ReviewPrompter {
   int isAvailableCalls = 0;
   int requestReviewCalls = 0;
   bool available = true;
@@ -38,6 +40,7 @@ class _Reviewer {
   /// When set, both seam fns throw it — drives the never-throws fault test.
   Object? throwError;
 
+  @override
   Future<bool> isAvailable() async {
     isAvailableCalls++;
     final err = throwError;
@@ -45,6 +48,7 @@ class _Reviewer {
     return available;
   }
 
+  @override
   Future<void> requestReview() async {
     requestReviewCalls++;
     final err = throwError;
@@ -59,11 +63,10 @@ class _Reviewer {
 }) {
   final c = ProviderContainer(overrides: [
     settingsStorageProvider.overrideWithValue(settings),
+    reviewPrompterProvider.overrideWithValue(reviewer),
   ]);
   addTearDown(c.dispose);
-  final service = c.read(inAppReviewServiceProvider.notifier)
-    ..isAvailable = reviewer.isAvailable
-    ..requestReview = reviewer.requestReview;
+  final service = c.read(inAppReviewServiceProvider.notifier);
   if (now != null) service.now = now;
   return (container: c, service: service);
 }

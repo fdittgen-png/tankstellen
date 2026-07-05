@@ -15,16 +15,14 @@ part of 'in_app_review_service.dart';
 /// on Android, `SKStoreReviewController` on iOS) — there are NO app-owned
 /// strings, hence zero ARB impact.
 ///
-/// LIBRE-BUILD SAFETY (never throws): the Android side of `in_app_review`
-/// depends on Play Core (`com.google.android.play:review`), which is a
-/// proprietary group STRIPPED from the F-Droid (`fdroid`) flavor (see
-/// `android/app/build.gradle.kts` `gmsExcludeGroups` and
-/// `scripts/audit_no_gms.sh`). On that build the review classes are absent,
-/// so touching the plugin would throw `NoClassDefFoundError` /
-/// `MissingPluginException`. Every interaction with the reviewer — including
-/// the `isAvailable()` probe — is therefore wrapped in a catch-all that
-/// swallows the error and no-ops, keeping the libre build crash-free. This
-/// guarantee is validated by the fault-injection test in
+/// LIBRE-BUILD SAFETY (never throws): the store-review interaction goes
+/// through the flavor-selected [reviewPrompterProvider] ([ReviewPrompter]) —
+/// the libre / F-Droid build gets [NoopReviewPrompter], which reports
+/// unavailable and never touches the Play-Core-backed `in_app_review` plugin
+/// (`com.google.android.play:review`, absent from the `fdroid` flavor).
+/// Belt-and-braces, every interaction is ALSO wrapped in a catch-all that
+/// swallows any `NoClassDefFoundError` / `MissingPluginException` and no-ops,
+/// keeping every build crash-free. Both guarantees are validated by
 /// `test/core/feedback/in_app_review_service_test.dart`.
 ///
 /// `keepAlive: true` because the counter must survive across route churn —
@@ -40,16 +38,14 @@ final inAppReviewServiceProvider = InAppReviewServiceProvider._();
 /// on Android, `SKStoreReviewController` on iOS) — there are NO app-owned
 /// strings, hence zero ARB impact.
 ///
-/// LIBRE-BUILD SAFETY (never throws): the Android side of `in_app_review`
-/// depends on Play Core (`com.google.android.play:review`), which is a
-/// proprietary group STRIPPED from the F-Droid (`fdroid`) flavor (see
-/// `android/app/build.gradle.kts` `gmsExcludeGroups` and
-/// `scripts/audit_no_gms.sh`). On that build the review classes are absent,
-/// so touching the plugin would throw `NoClassDefFoundError` /
-/// `MissingPluginException`. Every interaction with the reviewer — including
-/// the `isAvailable()` probe — is therefore wrapped in a catch-all that
-/// swallows the error and no-ops, keeping the libre build crash-free. This
-/// guarantee is validated by the fault-injection test in
+/// LIBRE-BUILD SAFETY (never throws): the store-review interaction goes
+/// through the flavor-selected [reviewPrompterProvider] ([ReviewPrompter]) —
+/// the libre / F-Droid build gets [NoopReviewPrompter], which reports
+/// unavailable and never touches the Play-Core-backed `in_app_review` plugin
+/// (`com.google.android.play:review`, absent from the `fdroid` flavor).
+/// Belt-and-braces, every interaction is ALSO wrapped in a catch-all that
+/// swallows any `NoClassDefFoundError` / `MissingPluginException` and no-ops,
+/// keeping every build crash-free. Both guarantees are validated by
 /// `test/core/feedback/in_app_review_service_test.dart`.
 ///
 /// `keepAlive: true` because the counter must survive across route churn —
@@ -63,16 +59,14 @@ final class InAppReviewServiceProvider
   /// on Android, `SKStoreReviewController` on iOS) — there are NO app-owned
   /// strings, hence zero ARB impact.
   ///
-  /// LIBRE-BUILD SAFETY (never throws): the Android side of `in_app_review`
-  /// depends on Play Core (`com.google.android.play:review`), which is a
-  /// proprietary group STRIPPED from the F-Droid (`fdroid`) flavor (see
-  /// `android/app/build.gradle.kts` `gmsExcludeGroups` and
-  /// `scripts/audit_no_gms.sh`). On that build the review classes are absent,
-  /// so touching the plugin would throw `NoClassDefFoundError` /
-  /// `MissingPluginException`. Every interaction with the reviewer — including
-  /// the `isAvailable()` probe — is therefore wrapped in a catch-all that
-  /// swallows the error and no-ops, keeping the libre build crash-free. This
-  /// guarantee is validated by the fault-injection test in
+  /// LIBRE-BUILD SAFETY (never throws): the store-review interaction goes
+  /// through the flavor-selected [reviewPrompterProvider] ([ReviewPrompter]) —
+  /// the libre / F-Droid build gets [NoopReviewPrompter], which reports
+  /// unavailable and never touches the Play-Core-backed `in_app_review` plugin
+  /// (`com.google.android.play:review`, absent from the `fdroid` flavor).
+  /// Belt-and-braces, every interaction is ALSO wrapped in a catch-all that
+  /// swallows any `NoClassDefFoundError` / `MissingPluginException` and no-ops,
+  /// keeping every build crash-free. Both guarantees are validated by
   /// `test/core/feedback/in_app_review_service_test.dart`.
   ///
   /// `keepAlive: true` because the counter must survive across route churn —
@@ -105,7 +99,7 @@ final class InAppReviewServiceProvider
 }
 
 String _$inAppReviewServiceHash() =>
-    r'550e05de2dcaa51191b8b64f80590d469a91c3e3';
+    r'dfe557c1b311ee4f0ad41fd1ba1ee742f6a1048e';
 
 /// Asks the OS to show its native store-review dialog at genuine positive
 /// moments, throttled by a count threshold and a 30-day cooldown (#3069).
@@ -114,16 +108,14 @@ String _$inAppReviewServiceHash() =>
 /// on Android, `SKStoreReviewController` on iOS) — there are NO app-owned
 /// strings, hence zero ARB impact.
 ///
-/// LIBRE-BUILD SAFETY (never throws): the Android side of `in_app_review`
-/// depends on Play Core (`com.google.android.play:review`), which is a
-/// proprietary group STRIPPED from the F-Droid (`fdroid`) flavor (see
-/// `android/app/build.gradle.kts` `gmsExcludeGroups` and
-/// `scripts/audit_no_gms.sh`). On that build the review classes are absent,
-/// so touching the plugin would throw `NoClassDefFoundError` /
-/// `MissingPluginException`. Every interaction with the reviewer — including
-/// the `isAvailable()` probe — is therefore wrapped in a catch-all that
-/// swallows the error and no-ops, keeping the libre build crash-free. This
-/// guarantee is validated by the fault-injection test in
+/// LIBRE-BUILD SAFETY (never throws): the store-review interaction goes
+/// through the flavor-selected [reviewPrompterProvider] ([ReviewPrompter]) —
+/// the libre / F-Droid build gets [NoopReviewPrompter], which reports
+/// unavailable and never touches the Play-Core-backed `in_app_review` plugin
+/// (`com.google.android.play:review`, absent from the `fdroid` flavor).
+/// Belt-and-braces, every interaction is ALSO wrapped in a catch-all that
+/// swallows any `NoClassDefFoundError` / `MissingPluginException` and no-ops,
+/// keeping every build crash-free. Both guarantees are validated by
 /// `test/core/feedback/in_app_review_service_test.dart`.
 ///
 /// `keepAlive: true` because the counter must survive across route churn —
