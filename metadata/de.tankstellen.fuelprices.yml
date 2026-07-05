@@ -64,11 +64,13 @@ Description: |-
 
   '''About this F-Droid build'''
 
-  This is the fully free build, with no Google Play Services and no other
-  proprietary Google libraries. Maps use OpenStreetMap and positioning uses
-  Android's location manager. Because the pump-display, receipt and barcode
-  scanners rely on Google ML Kit, scanning is not available in this build — add
-  fill-ups by hand instead. Every other feature works as described.
+  This is the fully free build: no Google Play Services, no other proprietary
+  Google libraries, and no crash-reporting or analytics of any kind. Maps use
+  OpenStreetMap and positioning uses Android's location manager. QR scanning
+  (device pairing, payment codes) works via the free ZXing library. Only the
+  pump-display and receipt text scanners, which rely on Google ML Kit, are
+  unavailable in this build — add those fill-ups by hand instead. Every other
+  feature works as described.
 
 RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
@@ -83,10 +85,19 @@ Builds:
     srclibs:
       - flutter@stable
     prebuild:
+      # epic #3473 — swap the GMS/ML-Kit/Play-Core/Sentry-pulling plugins for
+      # the Dart-only stubs BEFORE `pub get`, so the resolved graph (and the
+      # dex) is structurally free of com.google.android.gms / com.google.mlkit
+      # / com.google.android.play / io.sentry. Play + iOS never run this.
+      # (`cp` — not `dart run` — so it needs no prior package resolution.)
+      - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
       - $$flutter$$/bin/flutter config --no-analytics
       - $$flutter$$/bin/flutter pub get
       - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
     scanignore:
+      # Vendored real ML-Kit plugin sources (kept for the Play/iOS build) still
+      # name com.google.mlkit in their Java; the fdroid build overrides them
+      # with the stubs above, but the scanner still walks the source tree.
       - third_party/google_mlkit_commons
       - third_party/google_mlkit_text_recognition
     build: |
