@@ -184,6 +184,8 @@ class ImuEventDetector {
       horizMag: horizMag,
       highYaw: highYaw,
       constantSpeed: constantSpeed,
+      t: s.t,
+      speedKmh: speedKmh,
     );
     _scoreAccelBrake(
       dt: dt,
@@ -201,6 +203,8 @@ class ImuEventDetector {
     required double horizMag,
     required bool highYaw,
     required bool constantSpeed,
+    required DateTime t,
+    required double speedKmh,
   }) {
     // A corner is a sustained lateral load: the (centripetal) horizontal
     // accel ≥ 3.5 m/s², the yaw rate above the gate, and a ~constant speed
@@ -213,6 +217,9 @@ class ImuEventDetector {
       if (!_inCorner && _cornerDur >= _cornerMinSustainedSec) {
         _sharpCornerCount++;
         _inCorner = true;
+        // #3504 — the confirmed corner reaches the live bus too, so the
+        // voice coach can cue cornering (brakes/accels already did).
+        _emit(HarshEventType.corner, horizMag, t, speedKmh);
       }
     } else {
       _cornerDur = 0;

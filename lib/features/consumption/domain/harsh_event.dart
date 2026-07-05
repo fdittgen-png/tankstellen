@@ -54,15 +54,21 @@ class HarshEvent {
 
 enum HarshEventType {
   brake,
-  acceleration;
+  acceleration,
+
+  /// #3504 — a sustained sharp corner (IMU lateral load + yaw), so the
+  /// live voice coach can cue cornering like it cues brakes/accels.
+  corner;
 
   String get wireName => switch (this) {
         HarshEventType.brake => 'brake',
         HarshEventType.acceleration => 'accel',
+        HarshEventType.corner => 'corner',
       };
 
   static HarshEventType fromWireName(String? s) => switch (s) {
         'accel' => HarshEventType.acceleration,
+        'corner' => HarshEventType.corner,
         _ => HarshEventType.brake,
       };
 }

@@ -4,6 +4,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,6 +17,7 @@ import '../../consumption/domain/driving_coaching.dart'
     show DrivingCoachingHint, coachingHint;
 import '../../consumption/domain/harsh_event.dart'
     show HarshEvent, HarshEventType;
+import '../../consumption/providers/trip_history_provider.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 import 'live_harsh_event_bus_provider.dart';
 import 'voice_coaching_enabled_provider.dart';
@@ -28,6 +30,14 @@ part 'driving_coach_voice_listener_provider.g.dart';
 /// event per second of hard braking should be spoken at most once per
 /// window.
 const Duration _cueCooldown = Duration(seconds: 20);
+
+/// #3504 — settle before reading the just-saved trip (the history-list
+/// refresh races the finished phase flip) and the freshness window past
+/// which the newest entry is NOT the trip that just ended. Both are
+/// @visibleForTesting-adjacent module constants; tests use the clock
+/// override + a real (tiny) settle.
+const Duration _tripSummarySettle = Duration(seconds: 1);
+const Duration _tripSummaryFresh = Duration(minutes: 3);
 
 /// The dead-link fix (#2663): wires the driving coach into TTS.
 ///
@@ -106,8 +116,50 @@ class DrivingCoachVoiceListener extends _$DrivingCoachVoiceListener {
           unawaited(_speakHint(hint, ttsService));
         }
         lastHint = hint;
+        // #3504 — optional spoken end-of-trip summary: exactly one line on
+        // the recording→finished transition, behind the same voice toggle.
+        if (next.phase == TripRecordingPhase.finished &&
+            prev?.phase != TripRecordingPhase.finished) {
+          unawaited(_speakTripSummary(ttsService));
+        }
       },
     );
+  }
+
+  /// #3504 — speak "trip saved: distance, consumption, harsh count" once
+  /// per save. Reads the newest history entry after a short settle (the
+  /// list refresh races the phase flip); skips silently when no fresh
+  /// entry or no consumption figure exists. Cooldown-gated as a backstop
+  /// against double phase flips.
+  Future<void> _speakTripSummary(VoiceAnnouncementService ttsService) async {
+    try {
+      await Future<void>.delayed(_tripSummarySettle);
+      const key = 'summary.trip';
+      final now = _clock;
+      if (_onCooldown(key, now)) return;
+      final entry = ref.read(tripHistoryListProvider).firstOrNull;
+      final summary = entry?.summary;
+      final avg = summary?.avgLPer100Km;
+      if (summary == null || avg == null) return;
+      // Freshness gate: only a trip that ENDED in the last couple of
+      // minutes is "the trip that just finished".
+      final ended = summary.endedAt;
+      if (ended == null || now.difference(ended).abs() > _tripSummaryFresh) {
+        return;
+      }
+      final l = _l10n();
+      final line = l.coachingVoiceTripSummary(
+        summary.distanceKm.toStringAsFixed(1),
+        l.coachingVoiceConsumptionPhrase(avg.toStringAsFixed(1)),
+        summary.harshAccelerations + summary.harshBrakes,
+      );
+      _lastSpokenAt[key] = now;
+      await _speak(line, ttsService);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+        'where': 'DrivingCoachVoiceListener._speakTripSummary',
+      }));
+    }
   }
 
   /// Resolve the single active coaching hint from a recording state: the
@@ -144,12 +196,34 @@ class DrivingCoachVoiceListener extends _$DrivingCoachVoiceListener {
     // trip — a test feeding timestamps 30 s apart sees the throttle clear.
     if (_onCooldown(key, event.timestamp)) return;
     final l = _l10n();
+    // #3504 — severity tiers: a magnitude well past the harsh threshold
+    // (>= 1.5x) gets the stronger phrasing, so "hard" and "very hard" stop
+    // sounding identical.
+    final strong = _isStrong(event);
     final cue = switch (event.type) {
-      HarshEventType.brake => l.coachingVoiceHarshBraking,
-      HarshEventType.acceleration => l.coachingVoiceHardAcceleration,
+      HarshEventType.brake =>
+        strong ? l.coachingVoiceHarshBrakingStrong : l.coachingVoiceHarshBraking,
+      HarshEventType.acceleration => strong
+          ? l.coachingVoiceHardAccelerationStrong
+          : l.coachingVoiceHardAcceleration,
+      // #3504 — cornering cue (IMU-confirmed, now emitted on OBD2 trips
+      // too via the #3500 shared fusion).
+      HarshEventType.corner =>
+        strong ? l.coachingVoiceSharpCornerStrong : l.coachingVoiceSharpCorner,
     };
     _lastSpokenAt[key] = event.timestamp;
     await _speak(cue, ttsService);
+  }
+
+  /// #3504 — whether [event] is well past its type's harsh threshold
+  /// (>= 1.5x, in g): brake 3.5 m/s², accel 3.0 m/s², corner 3.5 m/s²
+  /// lateral (the shared gate constants, expressed here in g).
+  static bool _isStrong(HarshEvent event) {
+    final baseG = switch (event.type) {
+      HarshEventType.brake || HarshEventType.corner => 3.5 / 9.80665,
+      HarshEventType.acceleration => 3.0 / 9.80665,
+    };
+    return event.magnitudeG >= baseG * 1.5;
   }
 
   Future<void> _speakHint(
