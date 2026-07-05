@@ -1,0 +1,26 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+#
+# Libre / F-Droid drop-in replacement for the `in_app_review` plugin (#3479,
+# epic #3473). The upstream plugin's Android side pulls Play Core
+# (`com.google.android.play:review`), whose class references `fdroid scanner`
+# rejects. This package provides the SAME Dart API as a no-op and — crucially —
+# declares NO `flutter: plugin:` platform block, so it contributes ZERO native
+# code: GeneratedPluginRegistrant never registers it and no Play Core reference
+# reaches the fdroid dex.
+#
+# Swapped in ONLY for the fdroid build via `pubspec_overrides.yaml` (generated
+# from `pubspec_overrides.fdroid.yaml` by `dart run tool/apply_fdroid_overrides.dart`).
+# Play + iOS builds never see this file and keep the real plugin.
+name: in_app_review
+description: Libre/F-Droid no-op stub for in_app_review (no Play Core). Epic #3473.
+version: 2.0.12
+publish_to: none
+
+environment:
+  sdk: ^3.9.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter

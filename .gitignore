@@ -143,3 +143,6 @@ fdroid/tmp/
 fdroid/archive/
 # fdroid/config.yml, fdroid/metadata/, and fdroid/repo/ are intentionally
 # TRACKED — do not ignore them.
+
+# Generated per-build fdroid dependency overrides (#3473); source = pubspec_overrides.fdroid.yaml
+pubspec_overrides.yaml

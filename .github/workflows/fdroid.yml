@@ -58,6 +58,11 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
+      # #3479 — swap GMS-tied plugins for FOSS/no-op stubs BEFORE resolving deps,
+      # exactly as the fdroiddata recipe prebuild does, so this audit runs
+      # against the real libre dependency graph (in_app_review stubbed → no Play
+      # Core `review` classes, etc.). Play/iOS jobs never run this step.
+      - run: dart run tool/apply_fdroid_overrides.dart
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
       # Build the unsigned DEBUG fdroid APK with the GMS-free runtime config.
