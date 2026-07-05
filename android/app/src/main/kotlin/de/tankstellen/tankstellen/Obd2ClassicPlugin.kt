@@ -256,7 +256,7 @@ object Obd2ClassicPlugin {
                 null
             }
             if (s != null) {
-                val r = tryConnectSocket(s, attempt)
+                val r = tryConnectSocket(s, attempt, ::budgetSpent)
                 if (r == null) return connectResult(true, "secure")
                 lastError = r
             }
@@ -284,7 +284,7 @@ object Obd2ClassicPlugin {
             null
         }
         if (insecure != null) {
-            val r = tryConnectSocket(insecure, MAX_RFCOMM_ATTEMPTS + 1)
+            val r = tryConnectSocket(insecure, MAX_RFCOMM_ATTEMPTS + 1, ::budgetSpent)
             if (r == null) return connectResult(true, "insecure")
             lastError = r
         }
@@ -296,7 +296,7 @@ object Obd2ClassicPlugin {
         }
         val reflected = reflectChannelOneSocket(device)
         if (reflected != null) {
-            val r = tryConnectSocket(reflected, MAX_RFCOMM_ATTEMPTS + 2)
+            val r = tryConnectSocket(reflected, MAX_RFCOMM_ATTEMPTS + 2, ::budgetSpent)
             if (r == null) return connectResult(true, "reflection")
             lastError = r
         }
@@ -323,8 +323,21 @@ object Obd2ClassicPlugin {
 
     /** Attempt to connect [s], adopt it as the live socket + start the reader
      *  on success, or close it on failure. Returns null on success, or the
-     *  IOException message on failure (#2969 — was a bare Boolean). */
-    private fun tryConnectSocket(s: BluetoothSocket, attempt: Int): String? {
+     *  IOException message on failure (#2969 — was a bare Boolean).
+     *
+     *  #3495 F2 — [budgetSpent] is re-checked AFTER the blocking `connect()`
+     *  returns: a rung that started just under the whole-ladder budget can
+     *  complete up to the 7 s watchdog later, PAST the Dart caller's
+     *  budget+grace deadline — the Dart `.timeout` has already thrown, so
+     *  adopting here would create a live socket + reader with no Dart owner
+     *  (a ghost holding the adapter's single SPP channel until the next
+     *  connect's teardown). When the budget is spent at completion, the
+     *  socket is closed instead of adopted. */
+    private fun tryConnectSocket(
+        s: BluetoothSocket,
+        attempt: Int,
+        budgetSpent: () -> Boolean = { false },
+    ): String? {
         // #3348 — bound the blocking connect() with a watchdog. `connect()` has
         // no timeout; closing the socket from another thread is the documented
         // way to abort it (it throws immediately). The watchdog only fires when
@@ -354,6 +367,15 @@ object Obd2ClassicPlugin {
                     " (attempt $attempt)"
             }
             watchdog.interrupt()
+            if (budgetSpent()) {
+                // #3495 F2 — completed past the whole-ladder budget: the Dart
+                // caller has already timed out and moved on. Close, don't adopt.
+                Log.w(TAG, "connect: RFCOMM open completed after the whole-ladder" +
+                    " budget (attempt $attempt) — not adopting (#3495)")
+                try { s.close() } catch (_: IOException) {}
+                return "RFCOMM open completed after the whole-ladder budget" +
+                    " (attempt $attempt)"
+            }
             socket = s
             startReader()
             null

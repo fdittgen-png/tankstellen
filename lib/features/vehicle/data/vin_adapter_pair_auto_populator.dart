@@ -128,7 +128,26 @@ class VinAdapterPairAutoPopulator {
   /// Run the post-pair flow against [pairedAdapterMac], merging into
   /// [profile]. The returned outcome carries either a non-null updated
   /// profile (caller persists it) or an `aborted` sentinel.
+  ///
+  /// #3495 F3 — runs under a short-lived interactive link lease: this was
+  /// the one remaining production connect path with no arbiter claim, so it
+  /// could open a second session against a link a recording / auto-record
+  /// watch owns. Refused (an equal-or-higher holder keeps the link) ⇒ the
+  /// auto-population is skipped, exactly like a failed connect.
   Future<VinAdapterPairAutoPopulationOutcome> run({
+    required String pairedAdapterMac,
+    required VehicleProfile profile,
+  }) async {
+    final outcome = await Obd2LinkArbiter.instance.runInteractive(
+      'post-pair-populate',
+      () => _runLeased(pairedAdapterMac: pairedAdapterMac, profile: profile),
+    );
+    return outcome ?? VinAdapterPairAutoPopulationOutcome.aborted();
+  }
+
+  /// The pre-#3495 [run] body, unchanged — connect → VIN → PIDs → optional
+  /// broken-MAP probe → disconnect — now always executing under the lease.
+  Future<VinAdapterPairAutoPopulationOutcome> _runLeased({
     required String pairedAdapterMac,
     required VehicleProfile profile,
   }) async {

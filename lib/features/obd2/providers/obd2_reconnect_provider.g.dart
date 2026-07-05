@@ -151,7 +151,7 @@ final class Obd2ReconnectProvider
   }
 }
 
-String _$obd2ReconnectHash() => r'a3e58c53e05fcf19c14715346960c928891709c0';
+String _$obd2ReconnectHash() => r'638d0d5c851179aefffd6c51962af20f9e450d65';
 
 /// App-wide owner of the trip-INDEPENDENT auto-reconnect controller (#3019 /
 /// Epic #3013 phase 3).
