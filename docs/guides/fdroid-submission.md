@@ -18,34 +18,46 @@ guide covers both, but they are not the same thing:
    default F-Droid catalogue but is gated on **external review that takes days
    to weeks**.
 
-The GMS-free `fdroid` flavor (#2574, #2584) is what both paths build: it ships
-**no proprietary `com.google.android.gms` / `com.google.mlkit` code** in the dex,
-maps are OpenStreetMap, and positioning is forced through Android's
-`LocationManager` via `--dart-define=FORCE_LOCATION_MANAGER=true`.
+The GMS-free `fdroid` flavor (#2574, epic #3473) is what both paths build: it
+ships **zero references** to `com.google.android.gms`, `com.google.mlkit`,
+`com.google.android.play` or `io.sentry` in the dex, maps are OpenStreetMap,
+and positioning is forced through Android's `LocationManager` via
+`--dart-define=FORCE_LOCATION_MANAGER=true`.
 
-### How GMS/ML Kit stay out of the fdroid dex (#2584)
+### How GMS/ML Kit/Play Core/Sentry stay out of the fdroid dex (epic #3473)
 
-The `:app` module's `exclude(group = …)` (android/app/build.gradle.kts) cleans the
-**app's** dependency graph, but GMS/ML Kit are pulled in by the Flutter **plugin**
-sub-projects (`geolocator_android`, `google_mlkit_commons`,
-`google_mlkit_text_recognition`, `mobile_scanner`), which are un-flavored Android
-library modules whose single AAR AGP merges into both flavors. Those plugins
-`import com.google.android.gms.*` unconditionally, so a blanket exclude breaks
-compilation. The fix (android/build.gradle.kts, gated on the fdroid task graph):
+> Historical note: the earlier #2584 approach (runtime exclude + compile-only
+> stub in android/build.gradle.kts) removed the class *definitions* but left
+> inert dangling *references* in the constant pool, which F-Droid's
+> `check apk` scanner rejects. Epic #3473 replaced it; the sections below
+> describe the current mechanism.
 
-1. **Runtime exclude** — drop the real GMS/ML Kit coordinates from each plugin's
-   fdroid runtime classpath, so the proprietary classes never reach the dex.
-2. **Compile-only stub** — put the GMS/ML Kit *compile* API back on each plugin's
-   compile classpath as `compileOnly`, so the plugin Java still compiles against
-   the real signatures. `compileOnly` is never packaged, so it adds nothing to the
-   dex.
+The proprietary code is pulled in by Flutter **plugin** packages, so the libre
+build swaps the plugins themselves, at the *Dart package graph* level:
 
-Net: **zero `com.google.android.gms` / `com.google.mlkit` class definitions** in the
-fdroid dex. The plugins' own compiled methods still *name* those (now absent) types
-in their signatures, leaving inert dangling type *references* in the constant pool —
-they reference classes that do not exist and the code that would touch them never
-runs (see the OCR caveat below + `forceLocationManager`). The `play` flavor is
-untouched: real GMS, full functionality (fused location + ML Kit OCR/barcode).
+1. **Per-flavor Dart-only stub packages** live under `tool/fdroid_stubs/`
+   (`google_mlkit_text_recognition`, `google_mlkit_commons`, `mobile_scanner`,
+   `sentry_flutter`, …). Each mirrors the real package's Dart API but contains
+   **no Android module at all**, so nothing reaches the Gradle build.
+2. **`pubspec_overrides.fdroid.yaml`** maps those package names onto the stubs.
+   The F-Droid recipe's `prebuild` copies it to `pubspec_overrides.yaml`
+   **before `flutter pub get`** (`tool/apply_fdroid_overrides.dart` does the
+   same for local builds), so the resolved graph — and therefore the dex — is
+   structurally free of the proprietary code. Play + iOS never apply the
+   overrides and keep the real plugins byte-identically.
+3. **Behaviour switches** gate the affected features at runtime:
+   `QrScannerScreen` uses the FOSS `flutter_zxing` camera path on libre
+   (QR scanning still works), `createDefaultOcrTextEngine()` returns a no-op
+   engine (receipt/pump OCR unavailable by the maintainer's explicit choice),
+   and `SentryFlutter.init` is gated on `!AppFlavor.isLibre`.
+4. **R8 keep-rule tuning** (`allowshrinking,allowobfuscation` on the broad
+   Flutter keep in `android/app/proguard-rules.pro`) lets the dead
+   `PlayStoreDeferredComponentManager` tree-shake out of the release dex.
+
+Net: a release fdroid dex audit shows `gms:0 mlkit:0 play:0 sentry:0`
+references (not just definitions). Only the FOSS, Apache-2.0
+`com.google.crypto.tink` remains, which F-Droid allows. The `play` flavor is
+untouched: real GMS, full functionality (fused location + ML Kit OCR).
 
 ## Submitting the official fdroiddata recipe
 
@@ -91,10 +103,14 @@ account.
    ```
    fdroid build -v -l de.tankstellen.fuelprices
    ```
-   This checks out the `v6.0.0` tag, runs the `prebuild` (flutter pub get +
-   `build_runner build`) and the `build` (`flutter build apk --release --flavor
-   fdroid --dart-define=FORCE_LOCATION_MANAGER=true`), and produces
-   `app-fdroid-release.apk`.
+   This checks out the tag pinned in the recipe's `commit:` (currently
+   `v6.0.2`), runs the `prebuild` (**copy the fdroid pubspec overrides**, then
+   flutter pub get + `build_runner build`) and the `build` (`flutter build apk
+   --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
+   --dart-define=FGS_FORM_APPROVED=true`), and produces
+   `app-fdroid-release.apk`. The pinned tag must contain the epic #3473
+   catalog-clean work — earlier tags fail F-Droid's `check apk` scanner on
+   dangling GMS references.
 5. **Set the NDK**: the recipe leaves `ndk:` commented. After the first clean
    `fdroid build` succeeds, read the exact NDK the buildserver used from the log
    and pin it in the `Builds:` block, then re-run the build.
@@ -104,22 +120,18 @@ account.
 
 ## Caveats to disclose in the MR
 
-- **OCR (and barcode scanning) is unavailable in the fdroid flavor by design.**
+- **Text OCR is unavailable in the fdroid flavor by design; QR scanning works.**
   The pump-display / receipt OCR depends on Google ML Kit
-  (`google_mlkit_text_recognition`), and the barcode path on `mobile_scanner` —
-  both pull `com.google.mlkit` → `com.google.android.gms`. The fdroid flavor keeps
-  ML Kit on the compile classpath only (compile-only stub, #2584) with the real
-  classes absent at runtime, so any OCR call throws and the in-app scan path
-  degrades gracefully (`ReceiptScanService._recogniseRaw` catches it and returns
-  null — no crash, the feature is just inert). Manual fill-up entry is unaffected.
-  Note this in the MR description so reviewers understand the capability gap is
-  intentional.
-- **Sentry.** The app integrates Sentry for *opt-in* crash/diagnostic reporting
-  (off by default). F-Droid reviewers may require either the
-  `AntiFeatures: [Tracking]` flag on the recipe, **or** compiling Sentry out of
-  the fdroid flavor entirely (a build-flavor guard / no-op stub). Decide with
-  the reviewer; the cleanest libre outcome is to exclude Sentry from the fdroid
-  flavor so no `AntiFeatures` flag is needed.
+  (`google_mlkit_text_recognition`), which the libre build replaces with a
+  no-op engine (#3490) — the in-app scan path degrades gracefully and manual
+  fill-up entry is unaffected. Barcode/QR scanning was migrated to the FOSS
+  `flutter_zxing` on libre (#3477), so device pairing and payment QR codes
+  still scan. Note the OCR gap in the MR description so reviewers understand
+  it is intentional.
+- **Sentry is compiled out of the fdroid flavor entirely** (#3492): the libre
+  build resolves a Dart-only `sentry_flutter` stub and never calls
+  `SentryFlutter.init`, so the dex carries zero `io.sentry` references and no
+  `AntiFeatures: [Tracking]` flag is needed.
 - **Maps & location.** Already libre: OpenStreetMap tiles + `flutter_map`, and
   `LocationManager` positioning (no `google_maps_flutter`, no Play-Services
   Location). No disclosure needed.
@@ -134,11 +146,15 @@ Before either submission, prove the flavor is clean:
   --configuration fdroidReleaseRuntimeClasspath ) \
   | grep -E 'com\.google\.android\.gms|com\.google\.mlkit'
 
-# both layers, against a built APK. Layer B asserts no GMS/ML Kit class
-# DEFINITIONS in the dex (no proprietary Google code shipped); inert dangling
-# references to absent classes are reported but are not a failure (#2584).
-flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
+# both layers, against a built APK. With the epic #3473 pubspec-override
+# mechanism, the RELEASE fdroid dex must carry ZERO references (not just
+# definitions) — the same bar as F-Droid's `check apk` scanner:
+tool/apply_fdroid_overrides.dart  # or: cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
+flutter build apk --release --flavor fdroid \
+  --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
 bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
+unzip -p build/app/outputs/flutter-apk/app-fdroid-release.apk 'classes*.dex' \
+  | strings | grep -cE 'com/google/android/gms|com/google/mlkit|com/google/android/play|Lio/sentry/'  # must be 0
 
 # contrast — the play flavor SHOULD still carry GMS (the exclude is flavor-scoped):
 ( cd android && ./gradlew app:dependencies \

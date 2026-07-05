@@ -1,0 +1,5 @@
+• OBD2: capa de conexión reescrita — una sola autoridad de conexión, reconexiones acotadas, recuperación automática del adaptador bloqueado
+• Viajes: informe de cobertura GPS que explica cada hueco del trayecto
+• Mapa: corregido un bloqueo tras buscar en casos poco comunes
+• Consumo: la estimación del depósito usa la media real de tu vehículo
+• Compilación F-Droid: 100 % libre de Google (QR con ZXing, sin Sentry)

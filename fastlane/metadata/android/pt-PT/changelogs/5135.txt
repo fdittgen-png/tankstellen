@@ -1,0 +1,5 @@
+• OBD2: camada de ligação reescrita — uma única autoridade de ligação, reconexões limitadas, recuperação automática de adaptador bloqueado
+• Viagens: relatório de cobertura GPS que explica cada falha do percurso
+• Mapa: corrigido um bloqueio após pesquisar em casos raros
+• Consumo: a estimativa do depósito usa a média real do teu veículo
+• Build F-Droid: 100% sem Google (leitura de QR via ZXing, sem Sentry)

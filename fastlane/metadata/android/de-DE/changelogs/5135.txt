@@ -1,0 +1,5 @@
+• OBD2: Verbindungsschicht neu geschrieben — eine Verbindungsinstanz, begrenzte Reconnects, automatische Wiederherstellung blockierter Adapter
+• Fahrten: GPS-Abdeckungsbericht erklärt jede Lücke in der Aufzeichnung
+• Karte: Einfrieren nach der Suche in seltenen Fällen behoben
+• Verbrauch: Tankfüllstands-Schätzung nutzt jetzt den echten Durchschnitt
+• F-Droid-Build: 100 % Google-frei (QR-Scan via ZXing, kein Sentry)

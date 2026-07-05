@@ -1,0 +1,5 @@
+• OBD2: rewritten connection layer — one connection authority, bounded reconnects, automatic recovery of a wedged adapter
+• Trips: GPS coverage report explains every gap in a recorded track
+• Map: fixed a freeze after searching in rare edge cases
+• Consumption: tank-level estimate now uses your vehicle's real average
+• F-Droid build: 100% Google-free (QR scanning via ZXing, no Sentry)
