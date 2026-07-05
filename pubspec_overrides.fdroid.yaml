@@ -27,3 +27,9 @@ dependency_overrides:
   # stub only keeps the Play/iOS mobile_scanner code compiling on libre.
   mobile_scanner:
     path: tool/fdroid_stubs/mobile_scanner
+  # #3490 — no-op ML Kit text-OCR (upstream pulls com.google.mlkit.vision.text
+  # + gms). Libre OCR is unavailable (NoopOcrTextEngine); Play/iOS keep it.
+  google_mlkit_text_recognition:
+    path: tool/fdroid_stubs/google_mlkit_text_recognition
+  google_mlkit_commons:
+    path: tool/fdroid_stubs/google_mlkit_commons
