@@ -46,4 +46,54 @@ void main() {
     expect(Obd2LinkArbiter.instance.recordingLeaseHeld, isFalse);
     lease!.release();
   });
+
+  group('#3495 F1 — recording-over-recording newest-wins', () {
+    test(
+        'a new recording acquire PREEMPTS a stale recording lease instead of '
+        'being refused (the stop()-in-teardown race)', () {
+      var oldPreempted = false;
+      final stale = Obd2LinkArbiter.instance.tryAcquire(
+        'recording',
+        Obd2LinkPriority.recording,
+        onPreempted: () => oldPreempted = true,
+      );
+      expect(stale, isNotNull);
+
+      // The previous trip's stop() still holds its lease through the final
+      // disconnect when the next trip starts. Refusing here left the NEW
+      // recording lease-less — its drops routed to the idle loop (the war,
+      // resurrected). Newest-wins: the fresh claim is granted.
+      final fresh = Obd2LinkArbiter.instance
+          .tryAcquire('recording', Obd2LinkPriority.recording);
+      expect(fresh, isNotNull,
+          reason: 'a recording acquire must NEVER silently fail — the '
+              'pipeline claims it before its first await and does not '
+              'null-check (#3495 F1)');
+      expect(oldPreempted, isTrue);
+      expect(stale!.isActive, isFalse);
+      expect(Obd2LinkArbiter.instance.holder, same(fresh));
+      expect(Obd2LinkArbiter.instance.recordingLeaseHeld, isTrue);
+
+      // The stale holder's own release (stop() finishing later) is the
+      // idempotent no-op release of a revoked lease — the fresh holder keeps
+      // the link.
+      stale.release();
+      expect(Obd2LinkArbiter.instance.holder, same(fresh));
+      expect(Obd2LinkArbiter.instance.recordingLeaseHeld, isTrue);
+      fresh!.release();
+    });
+
+    test('auto-record-over-auto-record is still refused (loops must not '
+        'tear each other down)', () {
+      final first = Obd2LinkArbiter.instance
+          .tryAcquire('auto-record', Obd2LinkPriority.autoRecord);
+      expect(first, isNotNull);
+      final second = Obd2LinkArbiter.instance
+          .tryAcquire('auto-record', Obd2LinkPriority.autoRecord);
+      expect(second, isNull,
+          reason: 'newest-wins is deliberate for user-driven kinds only '
+              '(interactive, recording); loops retry on their own schedule');
+      first!.release();
+    });
+  });
 }

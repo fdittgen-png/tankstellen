@@ -14,6 +14,7 @@ import '../data/obd2_comm_diagnostics.dart';
 import '../data/obd2_connect_trace.dart';
 import '../data/obd2_connect_trace_log.dart';
 import '../data/obd2_connection_service.dart';
+import '../data/obd2_disconnect_quietly.dart';
 import '../data/obd2_link_arbiter.dart';
 import '../data/obd2_reconnect_controller.dart';
 import '../data/obd2_service.dart';
@@ -220,11 +221,26 @@ class Obd2Reconnect extends _$Obd2Reconnect {
         transportDecisionReason:
             pinned.isClassic ? 'reconnect-pinned-classic' : 'reconnect-pinned-ble',
       );
+      if (_abandonIfStopped(svc)) return Obd2ReconnectAttemptResult.failed;
       return _onResult(svc);
     } catch (e, st) {
       _logSeam('pinned', e, st);
       return Obd2ReconnectAttemptResult.failed;
     }
+  }
+
+  /// #3495 F4 — the loop was stopped (a lease grant's stand-down / dispose)
+  /// while this seam's connect was in flight. `_runCycle` aborts on its state
+  /// guard AFTER the seam resolves, so without this the just-established
+  /// session leaked open (holding the adapter's single SPP channel) and the
+  /// status dot had already been marked connected. Disconnect the fresh
+  /// service quietly and report `failed` instead. False (keep the session)
+  /// while the controller is still reconnecting.
+  bool _abandonIfStopped(Obd2Service? svc) {
+    if (svc == null) return false;
+    if (_controller?.state == Obd2ReconnectState.reconnecting) return false;
+    unawaited(svc.disconnectQuietly());
+    return true;
   }
 
   /// Re-scan fallback: scan + match the pinned MAC (#1188), so a changed /
@@ -243,6 +259,7 @@ class Obd2Reconnect extends _$Obd2Reconnect {
             : connection.connectBest(),
         transportDecisionReason: 'reconnect-rescan',
       );
+      if (_abandonIfStopped(svc)) return Obd2ReconnectAttemptResult.failed;
       return _onResult(svc);
     } catch (e, st) {
       _logSeam('rescan', e, st);

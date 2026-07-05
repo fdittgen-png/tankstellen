@@ -18,6 +18,7 @@ import 'package:tankstellen/features/obd2/data/broken_map_belief.dart';
 import 'package:tankstellen/features/obd2/data/broken_map_detector.dart';
 import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_arbiter.dart';
 import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
@@ -199,6 +200,60 @@ void main() {
 
       expect(outcome.profile, isNull);
       expect(outcome.readVin, isFalse);
+    });
+  });
+
+  group('#3495 F3 — arbiter link lease', () {
+    setUp(Obd2LinkArbiter.instance.resetForTest);
+    tearDown(Obd2LinkArbiter.instance.resetForTest);
+
+    test(
+        'a held recording lease REFUSES the post-pair populate: no connect is '
+        'attempted and the outcome is aborted', () async {
+      final service = buildConnectedService({'0902': 'NO DATA>'});
+      final connection = _FakeConnection(connectByMacResult: service);
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+      );
+
+      final lease = Obd2LinkArbiter.instance
+          .tryAcquire('recording', Obd2LinkPriority.recording);
+      addTearDown(() => lease?.release());
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(outcome.profile, isNull);
+      expect(outcome.readVin, isFalse);
+      expect(connection.connectByMacCalls, 0,
+          reason: 'the populator was the one remaining connect path with no '
+              'arbiter claim — it must never dial into a link a recording '
+              'owns (#3495 F3)');
+      expect(Obd2LinkArbiter.instance.holder?.owner, 'recording',
+          reason: 'the recording keeps the link');
+    });
+
+    test('with the link free, the populate runs under a short-lived '
+        'interactive lease and releases it', () async {
+      final service = buildConnectedService({'0902': 'NO DATA>'});
+      final connection = _FakeConnection(connectByMacResult: service);
+      final populator = VinAdapterPairAutoPopulator(
+        connection: connection,
+        decoder: buildDecoder(online: false),
+      );
+
+      final outcome = await populator.run(
+        pairedAdapterMac: 'AA:BB',
+        profile: baseProfile(),
+      );
+
+      expect(connection.connectByMacCalls, 1);
+      expect(outcome.readVin, isFalse); // NO DATA VIN — same as before
+      expect(Obd2LinkArbiter.instance.holder, isNull,
+          reason: 'the interactive lease is released when the run settles');
     });
   });
 
@@ -666,12 +721,17 @@ class _FakeConnection extends Obd2ConnectionService {
   /// propagates the typed [Obd2AdapterUnresponsive] on an engine-off pair).
   final Object? connectByMacError;
 
+  /// #3495 F3 — how many times the populator actually dialled. A refused
+  /// arbiter lease must leave this at 0.
+  int connectByMacCalls = 0;
+
   @override
   Future<Obd2Service?> connectByMac(
     String mac, {
     Duration timeout = const Duration(seconds: 5),
     String? adapterName,
   }) async {
+    connectByMacCalls++;
     if (connectByMacError != null) throw connectByMacError!;
     final s = connectByMacResult;
     if (s == null) return null;

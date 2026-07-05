@@ -10,7 +10,10 @@ import 'obd2_wedge_detector.dart';
 
 /// Priority of an [Obd2LinkLease], ordered low → high. A [tryAcquire] with a
 /// STRICTLY higher priority preempts the current holder; an equal-or-lower
-/// request is refused (the caller keeps its existing fallback behaviour).
+/// request is refused (the caller keeps its existing fallback behaviour) —
+/// EXCEPT interactive-over-interactive and recording-over-recording, where
+/// the newest claim wins (#3495 F1: a stale holder must not wedge the newer
+/// one of its own kind).
 ///
 /// `idle` is deliberately NOT a lease: the #3019 idle reconnector registers
 /// as the FALLBACK drop policy via [Obd2LinkArbiter.registerIdlePolicy] and
@@ -146,15 +149,21 @@ class Obd2LinkArbiter {
     if (current != null && current.isActive) {
       // Interactive-vs-interactive: the LATEST user gesture wins — a hung
       // earlier attempt (e.g. a native connect blocked for minutes, #3415
-      // trace t8) must not wedge every later tap. All other equal-or-lower
+      // trace t8) must not wedge every later tap. Recording-vs-recording
+      // (#3495 F1): same newest-wins rule — the only reachable equal case is
+      // a prior trip's stop() still holding its lease through the final
+      // disconnect (race 2) when the next trip starts; refusing there left
+      // the NEW recording lease-less, routing its drops to the idle loop
+      // (the war, resurrected for one session). All other equal-or-lower
       // acquires are refused: loops (idle/auto-record) retry on their own
       // schedule and must never tear down a live holder.
-      final gestureOverGesture = priority == Obd2LinkPriority.interactive &&
-          current.priority == Obd2LinkPriority.interactive;
-      if (priority.rank <= current.priority.rank && !gestureOverGesture) {
+      final newestWins = current.priority == priority &&
+          (priority == Obd2LinkPriority.interactive ||
+              priority == Obd2LinkPriority.recording);
+      if (priority.rank <= current.priority.rank && !newestWins) {
         return null;
       }
-      // Strictly higher (or gesture-over-gesture) — revoke, then notify the
+      // Strictly higher (or same-kind newest-wins) — revoke, then notify the
       // ousted holder.
       current._active = false;
       _holder = null;
