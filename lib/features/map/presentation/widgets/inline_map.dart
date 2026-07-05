@@ -237,37 +237,25 @@ class _InlineMapState extends ConsumerState<InlineMap> {
             .map((r) => r.station)
             .toList();
 
-  /// The [LatLngBounds] of the result [stations], with a tiny epsilon box for
-  /// a single result so `CameraFit.bounds` cannot divide-by-zero (mirrors
-  /// `RouteMapView._computeRouteBounds`).
+  /// The [LatLngBounds] of the result [stations]. #3488 — delegates to the
+  /// canonical [StationMapGeometry.boundsOfPoints], which drops non-finite
+  /// points and epsilon-pads any near-zero span (a single result OR several
+  /// co-located stations) so `CameraFit.bounds` cannot compute an infinite
+  /// fit-zoom.
   static LatLngBounds _boundsOf(List<Station> stations) =>
-      _boundsOfPoints([for (final s in stations) LatLng(s.lat, s.lng)]);
+      StationMapGeometry.boundsOfPoints(
+        [for (final s in stations) LatLng(s.lat, s.lng)],
+      );
 
   /// #3033 — the camera bounds for the route map: the along-route STATION
   /// extent, falling back to the route [geometry] (so an empty route still
-  /// frames its line), then a default box. Mirrors
-  /// `RouteMapView._computeRouteBounds`.
+  /// frames its line), then the canonical fallback box.
   static LatLngBounds _routeBoundsOf(
     List<Station> stations,
     List<LatLng> geometry,
   ) {
     final points = <LatLng>[for (final s in stations) LatLng(s.lat, s.lng)];
     if (points.isEmpty) points.addAll(geometry);
-    if (points.isEmpty) points.add(const LatLng(48.8566, 2.3522)); // Paris.
-    return _boundsOfPoints(points);
-  }
-
-  /// Bounds over [points], with a tiny epsilon box for a single point so
-  /// `CameraFit.bounds` cannot divide-by-zero. Assumes [points] is non-empty.
-  static LatLngBounds _boundsOfPoints(List<LatLng> points) {
-    if (points.length == 1) {
-      final p = points.first;
-      const eps = 0.0005; // ~50 m; fine for any latitude.
-      return LatLngBounds(
-        LatLng(p.latitude - eps, p.longitude - eps),
-        LatLng(p.latitude + eps, p.longitude + eps),
-      );
-    }
-    return LatLngBounds.fromPoints(points);
+    return StationMapGeometry.boundsOfPoints(points);
   }
 }

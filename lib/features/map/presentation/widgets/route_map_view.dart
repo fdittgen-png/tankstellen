@@ -23,6 +23,7 @@ import '../../../../core/domain/search_result_item.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
+import 'station_map_geometry.dart';
 import 'route_best_stops_list.dart';
 import 'route_info_bar.dart';
 import 'route_view_mode_bar.dart';
@@ -88,21 +89,14 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     if (points.isEmpty) {
       // No results to frame — fall back to the route geometry so the
       // itinerary is still visible (the build method renders an EmptyState
-      // in this case anyway), then to a Paris-centred box.
+      // in this case anyway), then to the canonical fallback box.
       points.addAll(widget.routeResult.route.geometry);
     }
-    if (points.isEmpty) {
-      points.add(const LatLng(48.8566, 2.3522));
-    }
-    if (points.length == 1) {
-      final p = points.first;
-      const eps = 0.0005; // ~50 m at the equator; fine for any latitude.
-      return LatLngBounds(
-        LatLng(p.latitude - eps, p.longitude - eps),
-        LatLng(p.latitude + eps, p.longitude + eps),
-      );
-    }
-    return LatLngBounds.fromPoints(points);
+    // #3488 — delegates to the canonical NaN-safe / zero-span-safe helper:
+    // it drops non-finite points, falls back to a finite box when empty,
+    // and epsilon-pads any near-zero span (single point OR several
+    // co-located stations) so `CameraFit.bounds` never divides-by-zero.
+    return StationMapGeometry.boundsOfPoints(points);
   }
 
   @override
