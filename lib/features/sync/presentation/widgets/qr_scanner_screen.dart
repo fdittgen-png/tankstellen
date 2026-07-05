@@ -16,6 +16,15 @@ import 'qr_scanner_helpers.dart';
 /// Full-screen QR code scanner for scanning TankSync credentials and
 /// payment QR codes from the station-detail screen.
 ///
+/// TODO(#3477): barcode/QR capability seam for the GMS-free F-Droid
+/// architecture (epic #3473). `mobile_scanner` pulls ML Kit
+/// (`com.google.mlkit.vision.barcode`, rejected by `fdroid scanner`). Plan
+/// (see `.local-docs/fdroid-gms-free-refactor-notes.md`): a `BarcodeScanner`
+/// capability behind an `AppFlavor`-selected provider — `mobile_scanner` on
+/// Play/iOS, a FOSS ZXing scanner on libre — so TankSync QR device-linking
+/// keeps working on F-Droid. First extract the QR parse/validate logic
+/// (`qr_scanner_helpers.dart`) so both impls share it plugin-free.
+///
 /// #721 hardens the scanner against the failure modes the bare
 /// `MobileScanner` has no opinion on:
 /// * Camera permission denied → a settings CTA instead of a silent
