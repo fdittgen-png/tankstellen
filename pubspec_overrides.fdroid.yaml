@@ -14,3 +14,7 @@ dependency_overrides:
   # #3479 — no-op store review (upstream pulls Play Core `…play:review`).
   in_app_review:
     path: tool/fdroid_stubs/in_app_review
+  # #3478 — Dart-only passkeys Android impl (upstream pulls GMS FIDO/auth via
+  # supabase_flutter). Unused on libre; keeps supabase compiling GMS-free.
+  passkeys_android:
+    path: tool/fdroid_stubs/passkeys_android
