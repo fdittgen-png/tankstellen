@@ -53,14 +53,32 @@ class DrivingMapView extends StatelessWidget {
         InteractiveFlag.doubleTapZoom,
   );
 
-  /// Geographic centroid of the given stations.
+  /// A finite fallback camera centre (Paris) when there is nothing sane to
+  /// frame — mirrors the map feature's own fallback (#3488). Kept local so
+  /// this feature stays self-contained (no cross-feature import).
+  static const LatLng _fallbackCenter = LatLng(48.8566, 2.3522);
+
+  /// Half-width (~50 m) of the epsilon box padded around a degenerate,
+  /// zero-span bounds so `CameraFit.bounds` never computes an infinite
+  /// fit-zoom (which projects to `LatLng(NaN, NaN)` and throws on every
+  /// tile update — #3488).
+  static const double _boundsEpsilon = 0.0005;
+
+  /// Geographic centroid of the given stations. #3488 — NaN-safe: stations
+  /// with non-finite coords are skipped and an empty / all-non-finite input
+  /// returns [_fallbackCenter] rather than `0/0 = NaN`, so a
+  /// `LatLng(NaN, NaN)` never reaches the camera and freezes the map.
   static LatLng computeCenter(List<Station> stations) {
     double sumLat = 0, sumLng = 0;
+    var count = 0;
     for (final s in stations) {
+      if (!s.lat.isFinite || !s.lng.isFinite) continue;
       sumLat += s.lat;
       sumLng += s.lng;
+      count++;
     }
-    return LatLng(sumLat / stations.length, sumLng / stations.length);
+    if (count == 0) return _fallbackCenter;
+    return LatLng(sumLat / count, sumLng / count);
   }
 
   /// (min, max) price for [fuel] across the given stations. Returns (0, 0)
@@ -72,20 +90,34 @@ class DrivingMapView extends StatelessWidget {
   ) =>
       priceRange(stations, fuel);
 
-  /// The [LatLngBounds] framing all [stations]. A single station gets a tiny
-  /// epsilon box so `CameraFit.bounds` cannot divide-by-zero (mirrors
-  /// `InlineMap._boundsOf` / `RouteMapView._computeRouteBounds`).
+  /// The [LatLngBounds] framing all [stations]. #3488 — drops non-finite
+  /// coords and epsilon-pads any near-zero span (a single station OR several
+  /// co-located / duplicate ones — the field trigger) so `CameraFit.bounds`
+  /// cannot compute an infinite fit-zoom → `LatLng(NaN, NaN)` camera.
   static LatLngBounds _boundsOf(List<Station> stations) {
-    final points = [for (final s in stations) LatLng(s.lat, s.lng)];
-    if (points.length == 1) {
-      final p = points.first;
-      const eps = 0.0005; // ~50 m; fine for any latitude.
-      return LatLngBounds(
-        LatLng(p.latitude - eps, p.longitude - eps),
-        LatLng(p.latitude + eps, p.longitude + eps),
-      );
+    double? minLat, maxLat, minLng, maxLng;
+    for (final s in stations) {
+      if (!s.lat.isFinite || !s.lng.isFinite) continue;
+      minLat = (minLat == null) ? s.lat : (s.lat < minLat ? s.lat : minLat);
+      maxLat = (maxLat == null) ? s.lat : (s.lat > maxLat ? s.lat : maxLat);
+      minLng = (minLng == null) ? s.lng : (s.lng < minLng ? s.lng : minLng);
+      maxLng = (maxLng == null) ? s.lng : (s.lng > maxLng ? s.lng : maxLng);
     }
-    return LatLngBounds.fromPoints(points);
+    if (minLat == null || maxLat == null || minLng == null || maxLng == null) {
+      minLat = _fallbackCenter.latitude;
+      maxLat = _fallbackCenter.latitude;
+      minLng = _fallbackCenter.longitude;
+      maxLng = _fallbackCenter.longitude;
+    }
+    if (maxLat - minLat < _boundsEpsilon) {
+      minLat -= _boundsEpsilon;
+      maxLat += _boundsEpsilon;
+    }
+    if (maxLng - minLng < _boundsEpsilon) {
+      minLng -= _boundsEpsilon;
+      maxLng += _boundsEpsilon;
+    }
+    return LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
   }
 
   @override

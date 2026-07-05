@@ -58,6 +58,33 @@ void main() {
       expect(center.latitude, closeTo(48.137, 1e-9));
       expect(center.longitude, closeTo(11.575, 1e-9));
     });
+
+    // #3488 — NaN-safety: a non-finite centroid propagates
+    // `LatLng(NaN, NaN)` into the driving camera, which then throws on
+    // every tile update and freezes the map.
+    test('empty list returns a finite fallback, never NaN', () {
+      final center = DrivingMapView.computeCenter(const []);
+      expect(center.latitude.isFinite, isTrue);
+      expect(center.longitude.isFinite, isTrue);
+    });
+
+    test('skips a station with non-finite coordinates', () {
+      final center = DrivingMapView.computeCenter([
+        _station(id: 'bad', lat: double.nan, lng: double.nan),
+        _station(id: 'ok', lat: 48.0, lng: 2.0),
+      ]);
+      expect(center.latitude, closeTo(48.0, 1e-9));
+      expect(center.longitude, closeTo(2.0, 1e-9));
+    });
+
+    test('all-non-finite input falls back finite, never NaN', () {
+      final center = DrivingMapView.computeCenter([
+        _station(id: 'a', lat: double.nan, lng: 2.0),
+        _station(id: 'b', lat: 48.0, lng: double.infinity),
+      ]);
+      expect(center.latitude.isFinite, isTrue);
+      expect(center.longitude.isFinite, isTrue);
+    });
   });
 
   group('DrivingMapView.computePriceRange', () {
