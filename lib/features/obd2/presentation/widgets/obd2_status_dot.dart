@@ -8,7 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/obd2_reconnect_controller.dart';
 import '../../providers/obd2_connection_state_provider.dart';
+import '../../providers/obd2_reconnect_provider.dart';
 
 /// Tiny always-visible OBD2 connection indicator (#784).
 ///
@@ -19,6 +21,8 @@ import '../../providers/obd2_connection_state_provider.dart';
 ///
 /// Colours:
 /// - green  = connected
+/// - amber (pulsing) = idle auto-reconnect in flight (#3505 — the AMBIENT
+///   replacement for the app-wide "Reconnecting…" strip)
 /// - red    = permission denied
 /// - hidden = idle (no saved adapter)
 class Obd2StatusDot extends ConsumerWidget {
@@ -27,9 +31,24 @@ class Obd2StatusDot extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(obd2ConnectionStatusProvider);
-    if (!snapshot.hasVisibleIndicator) return const SizedBox.shrink();
+    // #3505 — the idle reconnect loop surfaces HERE (pulsing amber +
+    // the spoken/semantics label), not as an app-wide strip.
+    final reconnecting =
+        ref.watch(obd2ReconnectProvider) == Obd2ReconnectState.reconnecting;
+    if (!snapshot.hasVisibleIndicator && !reconnecting) {
+      return const SizedBox.shrink();
+    }
     final l = AppLocalizations.of(context);
-    final (color, semanticsLabel) = _styleFor(context, snapshot, l);
+    var (color, semanticsLabel) = _styleFor(context, snapshot, l);
+    if (reconnecting) {
+      color = Colors.amber;
+      semanticsLabel = l.obd2ReconnectInProgress;
+    }
+    final dot = Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
     return Semantics(
       label: semanticsLabel,
       button: true,
@@ -39,11 +58,7 @@ class Obd2StatusDot extends ConsumerWidget {
         onTap: () => _openSheet(context, ref, snapshot, l),
         child: Padding(
           padding: const EdgeInsets.all(8),
-          child: Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
+          child: reconnecting ? _PulsingDot(child: dot) : dot,
         ),
       ),
     );
@@ -130,4 +145,38 @@ class Obd2StatusDot extends ConsumerWidget {
         return '';
     }
   }
+}
+
+/// #3505 — gentle opacity pulse for the reconnecting dot: ambient enough
+/// to ignore, alive enough to say "the app is on it". Pure animation
+/// wrapper so the dot widget itself stays a ConsumerWidget.
+class _PulsingDot extends StatefulWidget {
+  final Widget child;
+
+  const _PulsingDot({required this.child});
+
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+        opacity: Tween<double>(begin: 0.35, end: 1).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+        ),
+        child: widget.child,
+      );
 }

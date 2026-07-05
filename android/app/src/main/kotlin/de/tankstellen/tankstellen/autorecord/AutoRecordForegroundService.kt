@@ -53,6 +53,12 @@ import de.tankstellen.tankstellen.R
  */
 class AutoRecordForegroundService : Service() {
     companion object {
+        /** #3505 — SharedPreferences file + keys carrying the LOCALIZED
+         *  notification copy Dart persists at arm time. */
+        const val NOTIF_PREFS = "autorecord_notification"
+        const val NOTIF_KEY_TITLE = "title"
+        const val NOTIF_KEY_TEXT = "text"
+
         private const val TAG = "AutoRecordFgService"
         const val EXTRA_MAC = "mac"
 
@@ -116,18 +122,25 @@ class AutoRecordForegroundService : Service() {
     }
 
     private fun startForegroundSafe() {
+        // #3505 — localized copy persisted by BackgroundAdapterChannel at arm
+        // time (HARD RULE #1: no hard-coded user-facing text); the English
+        // literals below are only the never-armed / fresh-install fallback.
+        val prefs = getSharedPreferences(NOTIF_PREFS, MODE_PRIVATE)
+        val title = prefs.getString(NOTIF_KEY_TITLE, null) ?: "Trip auto-record"
+        val text = prefs.getString(NOTIF_KEY_TEXT, null)
+            ?: "Watching for your OBD2 adapter"
         val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle("Trip auto-record")
-                .setContentText("Watching for your OBD2 adapter")
+                .setContentTitle(title)
+                .setContentText(text)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
                 .build()
         } else {
             @Suppress("DEPRECATION")
             Notification.Builder(this)
-                .setContentTitle("Trip auto-record")
-                .setContentText("Watching for your OBD2 adapter")
+                .setContentTitle(title)
+                .setContentText(text)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_LOW)

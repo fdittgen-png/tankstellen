@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_reconnect_controller.dart';
 import 'package:tankstellen/features/obd2/presentation/widgets/obd2_reconnect_retry_banner.dart';
-import 'package:tankstellen/features/obd2/providers/obd2_connection_state_provider.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -35,7 +34,7 @@ class _Host extends StatelessWidget {
 }
 
 void main() {
-  group('Obd2ReconnectRetryBanner (#3019 / Epic #3013 phase 3)', () {
+  group('Obd2ReconnectRetryBanner (#3019, reworked #3505)', () {
     testWidgets('zero-height when connected', (tester) async {
       await pumpApp(
         tester,
@@ -45,25 +44,39 @@ void main() {
               () => _FakeObd2Reconnect(Obd2ReconnectState.connected)),
         ],
       );
-      expect(find.byKey(const Key('obd2ReconnectingBanner')), findsNothing);
       expect(find.byKey(const Key('obd2ReconnectFailedBanner')), findsNothing);
     });
 
-    testWidgets('shows the reconnecting banner while reconnecting',
-        (tester) async {
-      // settle:false — the reconnecting banner carries an indefinite
-      // CircularProgressIndicator that pumpAndSettle would wait on forever.
+    testWidgets(
+        '#3505 — RECONNECTING paints NO app-wide strip (the pulsing status '
+        'dot is the ambient surface now)', (tester) async {
       await pumpApp(
         tester,
         const _Host(),
-        settle: false,
         overrides: [
           obd2ReconnectProvider.overrideWith(
               () => _FakeObd2Reconnect(Obd2ReconnectState.reconnecting)),
         ],
       );
-      expect(find.byKey(const Key('obd2ReconnectingBanner')), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing,
+          reason: 'background housekeeping must not colonise every screen '
+              'with an urgent spinner strip (#3505)');
+      expect(find.byKey(const Key('obd2ReconnectFailedBanner')), findsNothing);
+    });
+
+    testWidgets(
+        '#3505 — terminal ENGINE-OFF (parked car, the expected idle state) '
+        'paints no app-wide banner either', (tester) async {
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [
+          obd2ReconnectProvider.overrideWith(
+              () => _FakeObd2Reconnect(Obd2ReconnectState.terminalEngineOff)),
+        ],
+      );
+      expect(find.byKey(const Key('obd2ReconnectFailedBanner')), findsNothing);
+      expect(find.byType(Container), findsNothing);
     });
 
     testWidgets('shows the terminal tap-to-retry banner when failed',
@@ -81,39 +94,6 @@ void main() {
           find.byKey(const Key('obd2ReconnectRetryButton')), findsOneWidget);
     });
 
-    testWidgets(
-        '#3035 — shows the engine-off banner (turn the ignition on) when '
-        'terminalEngineOff, with its own retry button', (tester) async {
-      await pumpApp(
-        tester,
-        const _Host(),
-        overrides: [
-          obd2ReconnectProvider.overrideWith(
-              () => _FakeObd2Reconnect(Obd2ReconnectState.terminalEngineOff)),
-        ],
-      );
-      expect(find.byKey(const Key('obd2ReconnectEngineOffBanner')),
-          findsOneWidget);
-      expect(find.byKey(const Key('obd2ReconnectEngineOffRetryButton')),
-          findsOneWidget);
-      // NOT the generic hardware-failure banner.
-      expect(find.byKey(const Key('obd2ReconnectFailedBanner')), findsNothing);
-    });
-
-    testWidgets('#3035 — tapping the engine-off retry calls notifier.retry()',
-        (tester) async {
-      final fake = _FakeObd2Reconnect(Obd2ReconnectState.terminalEngineOff);
-      await pumpApp(
-        tester,
-        const _Host(),
-        overrides: [obd2ReconnectProvider.overrideWith(() => fake)],
-      );
-      await tester
-          .tap(find.byKey(const Key('obd2ReconnectEngineOffRetryButton')));
-      await tester.pumpAndSettle();
-      expect(fake.retryCalls, 1);
-    });
-
     testWidgets('tapping retry calls notifier.retry()', (tester) async {
       final fake = _FakeObd2Reconnect(Obd2ReconnectState.terminalFailed);
       await pumpApp(
@@ -129,30 +109,22 @@ void main() {
       expect(fake.retryCalls, 1);
     });
 
-    testWidgets('names the adapter while reconnecting when known',
+    testWidgets(
+        '#3505 — the X dismisses the failed strip for the current episode',
         (tester) async {
       await pumpApp(
         tester,
         const _Host(),
-        settle: false, // indefinite spinner in the reconnecting banner
         overrides: [
           obd2ReconnectProvider.overrideWith(
-              () => _FakeObd2Reconnect(Obd2ReconnectState.reconnecting)),
-          obd2ConnectionStatusProvider.overrideWith(_StubStatus.new),
+              () => _FakeObd2Reconnect(Obd2ReconnectState.terminalFailed)),
         ],
       );
-      // The named variant interpolates the adapter name.
-      expect(find.textContaining('vLinker FS'), findsOneWidget);
+      expect(find.byKey(const Key('obd2ReconnectFailedBanner')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('obd2ReconnectDismissButton')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('obd2ReconnectFailedBanner')), findsNothing,
+          reason: 'dismissed for this episode — a fresh drop re-arms it');
     });
   });
-}
-
-/// Stub app-wide status carrying a friendly adapter name for the named
-/// reconnecting-banner copy.
-class _StubStatus extends Obd2ConnectionStatus {
-  @override
-  Obd2ConnectionSnapshot build() => const Obd2ConnectionSnapshot(
-        state: Obd2ConnectionState.connected,
-        adapterName: 'vLinker FS',
-      );
 }

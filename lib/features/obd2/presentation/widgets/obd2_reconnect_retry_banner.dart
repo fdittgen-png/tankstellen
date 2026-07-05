@@ -6,28 +6,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2_reconnect_controller.dart';
-import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/obd2_reconnect_provider.dart';
 
 /// Terminal auto-reconnect "tap to retry" surface (Epic #3013 phase 3,
-/// #3019).
+/// #3019 — reworked by #3505).
 ///
 /// The trip-INDEPENDENT [Obd2ReconnectController] drives a bounded
 /// backoff reconnect loop on any link drop (decoupled from a live trip).
-/// Two of its states reach the user here:
+/// #3505 demoted the idle-loop states that used to paint an app-wide
+/// strip over EVERY screen (the field screenshot showed the spinner
+/// colonising the trip-history screen for minutes — background
+/// housekeeping presented as urgent):
 ///
-///   * [Obd2ReconnectState.reconnecting] — a calm "reconnecting…" banner
-///     so the user knows the app is already trying (no action needed).
-///   * [Obd2ReconnectState.terminalFailed] — after the bounded attempts
-///     were exhausted the auto-loop STOPS, and this banner offers the
-///     user-actionable "tap to retry" button the Epic requires, instead
-///     of spinning forever or silently giving up. Tapping restarts the
-///     loop via [Obd2Reconnect.retry].
-///   * [Obd2ReconnectState.terminalEngineOff] (#3035) — the adapter
-///     re-connected fine but the `0100` probe confirmed the ECU is silent
-///     (a parked car / ignition off). The loop STOPS (no backoff burst) and
-///     this banner shows the accurate "turn the ignition on and retry"
-///     prompt, again wired to [Obd2Reconnect.retry].
+///   * [Obd2ReconnectState.reconnecting] — AMBIENT now: no strip; the
+///     [Obd2StatusDot] pulses amber with the reconnect semantics label.
+///   * [Obd2ReconnectState.terminalEngineOff] (#3035) — a parked car with
+///     the ignition off is the EXPECTED idle state, not an app-wide
+///     banner; the dot carries it, the retry affordance lives on the
+///     OBD2 surfaces (picker / trip start re-checks on its own).
+///   * [Obd2ReconnectState.terminalFailed] — STAYS user-actionable (the
+///     bounded attempts were exhausted): the strip offers "tap to retry",
+///     and #3505 adds a dismiss (X) that silences it for THIS episode —
+///     a fresh drop re-arms it.
 ///
 /// Renders zero-height in every other state (idle / connected), so it is
 /// safe to drop into any always-on chrome.
@@ -38,24 +38,39 @@ import '../../providers/obd2_reconnect_provider.dart';
 /// instead of a bulky [MaterialBanner] (which read as a detached system
 /// surface, unlike the rest of the app). The host wraps it in an `AnimatedSize`
 /// so the strip slides in/out smoothly instead of jumping the screen below it.
-class Obd2ReconnectRetryBanner extends ConsumerWidget {
+class Obd2ReconnectRetryBanner extends ConsumerStatefulWidget {
   const Obd2ReconnectRetryBanner({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<Obd2ReconnectRetryBanner> createState() =>
+      _Obd2ReconnectRetryBannerState();
+}
+
+class _Obd2ReconnectRetryBannerState
+    extends ConsumerState<Obd2ReconnectRetryBanner> {
+  /// #3505 — the user closed the terminal-failed strip for this episode.
+  /// Any state change away from terminalFailed re-arms it (a fresh drop
+  /// starts a fresh episode).
+  bool _dismissed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen<Obd2ReconnectState>(obd2ReconnectProvider, (prev, next) {
+      if (next != Obd2ReconnectState.terminalFailed && _dismissed) {
+        setState(() => _dismissed = false);
+      }
+    });
     final state = ref.watch(obd2ReconnectProvider);
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final adapterName = ref.watch(
-      obd2ConnectionStatusProvider.select((s) => s.adapterName),
-    );
     switch (state) {
-      case Obd2ReconnectState.reconnecting:
-        return _reconnectingBanner(theme, l, adapterName);
       case Obd2ReconnectState.terminalFailed:
-        return _failedBanner(context, ref, theme, l);
+        return _dismissed
+            ? const SizedBox.shrink()
+            : _failedBanner(context, ref, theme, l);
+      // #3505 — ambient states: the status dot carries them (see class doc).
+      case Obd2ReconnectState.reconnecting:
       case Obd2ReconnectState.terminalEngineOff:
-        return _engineOffBanner(context, ref, theme, l);
       case Obd2ReconnectState.idle:
       case Obd2ReconnectState.connected:
         return const SizedBox.shrink();
@@ -102,31 +117,6 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
     );
   }
 
-  Widget _reconnectingBanner(
-    ThemeData theme,
-    AppLocalizations l,
-    String? adapterName,
-  ) {
-    final hasName = adapterName != null && adapterName.isNotEmpty;
-    final text = hasName
-        ? (l.obd2ReconnectInProgressNamed(adapterName))
-        : (l.obd2ReconnectInProgress);
-    final fg = theme.colorScheme.onSecondaryContainer;
-    return _strip(
-      key: const Key('obd2ReconnectingBanner'),
-      theme: theme,
-      background: theme.colorScheme.secondaryContainer,
-      foreground: fg,
-      leading: SizedBox(
-        width: 16,
-        height: 16,
-        child: CircularProgressIndicator(strokeWidth: 2, color: fg),
-      ),
-      message: text,
-      // No action: the loop is in flight; the user just waits.
-    );
-  }
-
   Widget _failedBanner(
     BuildContext context,
     WidgetRef ref,
@@ -141,41 +131,23 @@ class Obd2ReconnectRetryBanner extends ConsumerWidget {
       foreground: fg,
       leading: Icon(Icons.bluetooth_disabled, size: 20, color: fg),
       message: l.obd2ReconnectFailedBody,
-      action: TextButton(
-        key: const Key('obd2ReconnectRetryButton'),
-        style: TextButton.styleFrom(foregroundColor: fg),
-        onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
-        child: Text(l.obd2ReconnectRetry),
-      ),
-    );
-  }
-
-  /// #3035 — terminal "the adapter re-connected but the engine is off"
-  /// surface. The auto-loop STOPPED on a confirmed engine-off (the `0100`
-  /// probe stayed silent through every retry), so re-trying on a backoff
-  /// would just spin. We reuse the existing localized engine-off string
-  /// (`obdAdapterUnresponsive` — "turn the ignition on and retry") and the
-  /// same manual [Obd2Reconnect.retry] action so the user re-checks once the
-  /// ignition is on, instead of being told "adapter not found".
-  Widget _engineOffBanner(
-    BuildContext context,
-    WidgetRef ref,
-    ThemeData theme,
-    AppLocalizations l,
-  ) {
-    final fg = theme.colorScheme.onTertiaryContainer;
-    return _strip(
-      key: const Key('obd2ReconnectEngineOffBanner'),
-      theme: theme,
-      background: theme.colorScheme.tertiaryContainer,
-      foreground: fg,
-      leading: Icon(Icons.power_settings_new, size: 20, color: fg),
-      message: l.obdAdapterUnresponsive,
-      action: TextButton(
-        key: const Key('obd2ReconnectEngineOffRetryButton'),
-        style: TextButton.styleFrom(foregroundColor: fg),
-        onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
-        child: Text(l.obd2ReconnectRetry),
+      action: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton(
+            key: const Key('obd2ReconnectRetryButton'),
+            style: TextButton.styleFrom(foregroundColor: fg),
+            onPressed: () => ref.read(obd2ReconnectProvider.notifier).retry(),
+            child: Text(l.obd2ReconnectRetry),
+          ),
+          // #3505 — dismiss for THIS episode; a fresh drop re-arms.
+          IconButton(
+            key: const Key('obd2ReconnectDismissButton'),
+            tooltip: l.obd2ReconnectDismiss,
+            icon: Icon(Icons.close, size: 18, color: fg),
+            onPressed: () => setState(() => _dismissed = true),
+          ),
+        ],
       ),
     );
   }

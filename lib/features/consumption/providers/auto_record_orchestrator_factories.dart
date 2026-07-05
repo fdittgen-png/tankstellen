@@ -1,8 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:ui' show Locale;
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../core/language/language_provider.dart';
+import '../../../l10n/app_localizations.dart';
 
 import '../../vehicle/providers/vehicle_providers.dart';
 import '../../obd2/api.dart';
@@ -31,7 +36,23 @@ typedef BackgroundAdapterListenerFactory = BackgroundAdapterListener
 BackgroundAdapterListenerFactory autoRecordListenerFactory(Ref ref) {
   return () {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return AndroidBackgroundAdapterListener();
+      // #3505 — hand the native FGS its localized notification copy,
+      // resolved off the active in-app language without a BuildContext
+      // (the recordingLocationSettingsForRef precedent, #2766). Guarded:
+      // a harness without the language graph degrades to the native
+      // English fallback rather than failing the arm.
+      final listener = AndroidBackgroundAdapterListener();
+      try {
+        final code = ref.read(activeLanguageProvider).code;
+        final l10n = lookupAppLocalizations(Locale(code));
+        listener
+          ..notificationTitle = l10n.autoRecordNotificationTitle
+          ..notificationText = l10n.autoRecordNotificationText;
+      } catch (e) {
+        debugPrint('autoRecordListenerFactory: l10n unavailable ($e) — '
+            'native notification falls back to English');
+      }
+      return listener;
     }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       // #3167 — hands-free auto-record Phase 3. The keepAlive singleton

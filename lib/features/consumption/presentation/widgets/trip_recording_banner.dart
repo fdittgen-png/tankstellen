@@ -143,19 +143,21 @@ class TripRecordingBanner extends ConsumerWidget {
     // "reconnecting…" / terminal "tap to retry" banner ABOVE every screen,
     // decoupled from any live trip — a drop while idle still recovers.
     final reconnectState = ref.watch(obd2ReconnectProvider);
+    // #3505 — reconnecting shows only the AMBIENT pulsing status dot (the
+    // app-wide spinner strip is gone); terminalFailed keeps its actionable
+    // (now dismissible) strip; terminalEngineOff is the expected parked-car
+    // state and adds no chrome at all.
     final reconnectVisible =
         reconnectState == Obd2ReconnectState.reconnecting ||
-        reconnectState == Obd2ReconnectState.terminalFailed ||
-        // #3035 — the terminal engine-off banner is user-actionable too.
-        reconnectState == Obd2ReconnectState.terminalEngineOff;
+        reconnectState == Obd2ReconnectState.terminalFailed;
 
     // When no trip is active: show a thin strip carrying only the
     // OBD2 status dot — and only when there's an adapter remembered
     // (otherwise the dot itself collapses to zero size). First-run
     // users with nothing configured see no chrome at all.
     if (!state.isActive) {
-      // #3019 — a drop while idle still surfaces the auto-reconnect banner,
-      // even when no status dot would show (no paired-adapter indicator).
+      // #3019/#3505 — a drop while idle still surfaces its (ambient dot /
+      // terminal strip) chrome even when no paired-adapter indicator shows.
       if (!obd2.hasVisibleIndicator && !reconnectVisible) return child;
       return Column(
         children: [
