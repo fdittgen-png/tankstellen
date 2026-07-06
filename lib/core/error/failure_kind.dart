@@ -58,6 +58,8 @@ FailureKind failureKindFromDio(DioException e) {
     case DioExceptionType.connectionTimeout:
     case DioExceptionType.sendTimeout:
     case DioExceptionType.receiveTimeout:
+    // dio 5.10 — the transform phase timing out is a timeout like the rest.
+    case DioExceptionType.transformTimeout:
       return FailureKind.timeout;
     case DioExceptionType.connectionError:
       return FailureKind.network;

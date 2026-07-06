@@ -64,6 +64,8 @@ class ErrorLocalizer {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
+      // dio 5.10 — the transform phase timing out is a timeout like the rest.
+      case DioExceptionType.transformTimeout:
         return l10n.errorTimeout;
       case DioExceptionType.connectionError:
         return l10n.errorNoConnection;
