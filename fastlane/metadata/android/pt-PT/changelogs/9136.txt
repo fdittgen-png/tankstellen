@@ -1,0 +1,5 @@
+• O veredicto pós-viagem calibra a análise de condução à tua sensação
+• Os sensores de movimento detetam travagens/curvas bruscas também em viagens OBD2; avisos de voz + resumo falado
+• Gráficos legíveis; altitude relativa ao início; sem energia de subida fantasma
+• Reconexão mais discreta: ponto de estado em vez de um banner de ecrã inteiro
+• Removidas 4 permissões sem uso (microfone, estado do telefone, armazenamento antigo)
