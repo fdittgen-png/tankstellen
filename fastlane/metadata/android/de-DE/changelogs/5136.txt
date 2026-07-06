@@ -1,0 +1,5 @@
+• Fahrt-Bewertung kalibriert die Fahranalyse auf dein Fahrgefühl
+• Bewegungssensoren erkennen hartes Bremsen/Kurven auch bei OBD2-Fahrten; Sprachhinweise + gesprochene Zusammenfassung
+• Lesbare Fahrt-Diagramme; Höhe relativ zum Start; kein Phantom-Steigungsverbrauch
+• Ruhigere Wiederverbindung: dezenter Statuspunkt statt Vollbild-Banner
+• 4 ungenutzte Berechtigungen entfernt (Mikrofon, Telefonstatus, Alt-Speicher)

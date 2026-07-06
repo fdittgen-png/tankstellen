@@ -62,7 +62,8 @@ jobs:
       # shipped an APK that still carried io.sentry / com.google.mlkit —
       # the strict release audit below now fails on any such reference.
       - run: dart run tool/apply_fdroid_overrides.dart
-      - run: flutter pub get
+      # #3507 — enforce the committed libre lockfile (see fdroid.yml).
+      - run: flutter pub get --enforce-lockfile
       - run: dart run build_runner build --delete-conflicting-outputs
 
       # --- Decode the APP signing keystore (reuse the existing secrets) ------

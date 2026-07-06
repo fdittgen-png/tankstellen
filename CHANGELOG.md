@@ -12,17 +12,51 @@ About-screen build number always maps back to a commit.
 
 ## [Unreleased]
 
+## [6.0.3] - 2026-07-06 (Build 5136)
+
+### Added
+
+- Post-trip verdict prompt (smooth/moderate/aggressive) that calibrates the
+  driving-analysis thresholds to how your trips actually feel.
+- Phone motion sensors (IMU) now detect hard accel/brake/corner events on
+  OBD2 trips too (previously GPS-only trips only), with cornering voice cues,
+  severity-tiered coaching phrases and an optional spoken end-of-trip summary.
+- Trip detail explains when and why engine data was missing (adapter dropped
+  mid-trip / never delivered), instead of silently showing estimated fuel.
+
+### Fixed
+
+- Trip charts made readable: smoothed fuel-rate with an outlier-capped axis,
+  altitude plotted relative to the trip start, and phantom "climb energy"
+  from GPS altitude jitter eliminated.
+- Removed four unused permissions libraries had merged into the app
+  (microphone, phone state, legacy storage) — nothing in the app ever used them.
+- Reconnection UX: the idle "Reconnecting…" banner no longer covers every
+  screen — a pulsing status dot carries it; the failure strip is dismissible;
+  the auto-record notification is now localized.
+
+## [6.0.2] - 2026-07-05 (Build 5135)
+
 ### Added
 
 - Weekly endpoint-canary CI that live-probes every country service's
   endpoint and tracks outages in a single issue, so a silent endpoint
   death is caught in days instead of months.
+- F-Droid: the libre build is 100% catalog-clean — no Google Play Services,
+  ML Kit, Play Core or Sentry code at all; QR scanning via the free ZXing
+  library. Submitted to the official F-Droid catalog.
 
 ### Fixed
 
 - South Korea: searches that the live OPINET API can never satisfy now
   surface a clear, classified error instead of a silently empty map
   (the full coordinate fix is tracked separately).
+- OBD2 link-authority hardening from the deep post-arbiter review: a
+  back-to-back stop/start can no longer strand a trip without reconnect
+  ownership, and a timed-out native connect can no longer leave a ghost
+  socket holding the adapter's only channel.
+- Map freeze after searching in rare edge cases; tank-level estimate now
+  uses the vehicle's real average consumption.
 
 ## [6.0.0] - 2026-06-07 (Build 5133)
 
