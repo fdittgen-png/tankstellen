@@ -65,7 +65,7 @@ echo "==> Checking F-Droid repo signing env"
 echo "==> Applying fdroid pubspec overrides (libre stubs)"
 dart run tool/apply_fdroid_overrides.dart
 echo "==> Clean codegen"
-flutter pub get
+flutter pub get --enforce-lockfile
 dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 

@@ -62,7 +62,8 @@ jobs:
       # shipped an APK that still carried io.sentry / com.google.mlkit —
       # the strict release audit below now fails on any such reference.
       - run: dart run tool/apply_fdroid_overrides.dart
-      - run: flutter pub get
+      # #3507 — enforce the committed libre lockfile (see fdroid.yml).
+      - run: flutter pub get --enforce-lockfile
       - run: dart run build_runner build --delete-conflicting-outputs
 
       # --- Decode the APP signing keystore (reuse the existing secrets) ------
@@ -107,12 +108,10 @@ jobs:
         id: bn
         # F-Droid updates purely on versionCode, so a rebuild of the static
         # pubspec `+NNNN` produces the SAME code and F-Droid offers no update.
-        # Inject the same monotonic run-counter scheme daily-beta.yml uses
-        # (2026060000 + run_number*10 + run_attempt): strictly increasing per
-        # run, unique per re-run, well under Android's 2_100_000_000 cap and
-        # above the last static pubspec code (5133) the repo shipped.
+        # #3513 — the ONE shared wall-clock versionCode scheme (see
+        # daily-beta.yml): strictly monotonic across all workflows.
         run: |
-          BN=$(( 2026060000 + ${{ github.run_number }} * 10 + ${{ github.run_attempt }} ))
+          BN=$(( 2026100000 + ( $(date -u +%s) - 1751760000 ) / 60 )) # #3513 shared scheme
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
           echo "F-Droid versionCode: $BN"
 

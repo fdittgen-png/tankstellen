@@ -23,8 +23,20 @@ void main() {
     exit(1);
   }
   File('pubspec_overrides.yaml').writeAsStringSync(src.readAsStringSync());
+  // #3507 — the libre overrides change pub resolution (stubs replace the
+  // GMS/Sentry plugins), so `--enforce-lockfile` needs the matching LIBRE
+  // lockfile swapped in alongside. Regenerate it whenever dependencies
+  // change: apply overrides -> flutter pub get -> cp pubspec.lock
+  // pubspec.fdroid.lock (CI fails on drift via --enforce-lockfile).
+  final lock = File('pubspec.fdroid.lock');
+  if (lock.existsSync()) {
+    File('pubspec.lock').writeAsStringSync(lock.readAsStringSync());
+  } else {
+    stderr.writeln('WARNING: pubspec.fdroid.lock missing — '
+        '--enforce-lockfile builds will fail.');
+  }
   stdout.writeln(
     'Applied fdroid dependency overrides -> pubspec_overrides.yaml '
-    '(run `flutter pub get` next).',
+    '+ pubspec.fdroid.lock -> pubspec.lock (run `flutter pub get` next).',
   );
 }
