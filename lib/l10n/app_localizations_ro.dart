@@ -2652,6 +2652,42 @@ class AppLocalizationsRo extends AppLocalizations {
   String get coachingVoiceSmoothAccel => 'Accelerați mai lin';
 
   @override
+  String get coachingVoiceSharpCorner => 'Take corners a little gentler';
+
+  @override
+  String get coachingVoiceHarshBrakingStrong =>
+      'That was a very hard stop — leave more distance';
+
+  @override
+  String get coachingVoiceHardAccelerationStrong =>
+      'Very hard acceleration — that burns real fuel';
+
+  @override
+  String get coachingVoiceSharpCornerStrong =>
+      'Very sharp corner — slow in, gentle out';
+
+  @override
+  String coachingVoiceTripSummary(
+    String distanceKm,
+    String consumption,
+    int harshCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      harshCount,
+      locale: localeName,
+      other: '$harshCount harsh events.',
+      one: 'One harsh event.',
+      zero: 'Nice and smooth — no harsh events.',
+    );
+    return 'Trip saved: $distanceKm kilometres, $consumption. $_temp0';
+  }
+
+  @override
+  String coachingVoiceConsumptionPhrase(String value) {
+    return '$value litres per 100 kilometres';
+  }
+
+  @override
   String get voiceCoachingSettingTitle => 'Coaching vocal în timpul conducerii';
 
   @override
@@ -4883,6 +4919,20 @@ class AppLocalizationsRo extends AppLocalizations {
       'Condus mai inteligent — favorizează autostrada constantă față de scurtăturile în zigzag.';
 
   @override
+  String get obd2CoverageNoneNote =>
+      'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.';
+
+  @override
+  String obd2CoverageDroppedNote(int percent) {
+    return 'Engine data stopped $percent% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.';
+  }
+
+  @override
+  String obd2CoveragePartialNote(int percent) {
+    return 'Engine data covered only $percent% of this trip — gaps use GPS-based estimates.';
+  }
+
+  @override
   String get favoritesShareAction => 'Partajați';
 
   @override
@@ -6760,6 +6810,15 @@ class AppLocalizationsRo extends AppLocalizations {
       'The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.';
 
   @override
+  String get obd2ReconnectDismiss => 'Dismiss';
+
+  @override
+  String get autoRecordNotificationTitle => 'Trip auto-record';
+
+  @override
+  String get autoRecordNotificationText => 'Watching for your OBD2 adapter';
+
+  @override
   String get obd2ReconnectRetry => 'Tap to retry';
 
   @override
@@ -7601,6 +7660,9 @@ class AppLocalizationsRo extends AppLocalizations {
   String get trajetDetailChartCoolant => 'Răcire (°C)';
 
   @override
+  String get trajetDetailChartAltitudeRelative => 'Altitude (m, from start)';
+
+  @override
   String get trajetDetailChartAltitude => 'Altitudine (m)';
 
   @override
@@ -7889,6 +7951,25 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get trajetsSharedBadge => 'Partajat';
+
+  @override
+  String get tripVerdictPromptTitle => 'How did this trip feel?';
+
+  @override
+  String get tripVerdictSmooth => 'Smooth';
+
+  @override
+  String get tripVerdictModerate => 'Moderate';
+
+  @override
+  String get tripVerdictAggressive => 'Aggressive';
+
+  @override
+  String get tripVerdictDismiss => 'Not now';
+
+  @override
+  String get tripVerdictThanks =>
+      'Thanks — this helps calibrate your driving analysis.';
 
   @override
   String get unifiedFilterFuel => 'Combustibil';

@@ -13,6 +13,7 @@ import '../../domain/driving_score.dart';
 import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/obd2_engine_coverage.dart';
 import '../../domain/obd2_trip_features.dart';
 import '../../domain/trip_sample.dart';
 import '../../domain/trip_summary.dart';
@@ -34,6 +35,7 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
     required this.samples,
     this.gpsFeatures,
     this.gpsCoverage,
+    this.verdict,
   });
 
   final TripSummary summary;
@@ -49,6 +51,11 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
   /// The trip's raw samples — the source of the OBD2 telemetry aggregate
   /// folded into the export (#3402).
   final List<TripSample> samples;
+
+  /// #3501 — the driver's persisted post-trip verdict (`TripVerdict.name`),
+  /// folded into the export so the calibration loop no longer relies on
+  /// hand-edited comments. Null while unanswered.
+  final String? verdict;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -95,6 +102,10 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       gpsFeatures: gpsFeatures,
       obd2Features: Obd2TripFeatures.fromSamples(samples),
       gpsCoverage: gpsCoverage,
+      // #3499 (schema v4) — engine-sample coverage + reason, so a null
+      // obd2Features on a gpsPlusObd2 trip is no longer unexplained.
+      obd2Coverage: Obd2EngineCoverage.fromTripSamples(samples),
+      verdict: verdict, // #3501 — structured verdict beats the comment slot
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

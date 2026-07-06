@@ -7,6 +7,7 @@ import '../../domain/driving_score.dart';
 import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
+import '../../domain/obd2_engine_coverage.dart';
 import '../../domain/obd2_trip_features.dart';
 import '../../domain/trip_summary.dart';
 
@@ -34,7 +35,13 @@ class DrivingAnalysisTrace {
   /// ratio, expected-vs-actual fix counts, and the attributed gap list
   /// (capped at 20 entries). Purely additive — null on legacy trips with
   /// under two GPS fixes; v2 readers that ignore unknown keys still parse.
-  static const int schema = 3;
+  ///
+  /// v4 (#3499, epic #3498) — new top-level `obd2Coverage` block: the share
+  /// of samples that carried an engine PID + the coarse reason
+  /// (full / partial / droppedMidTrip / noEngineData), so a `gpsPlusObd2`
+  /// trip whose `obd2Features` are null is no longer unexplained. Purely
+  /// additive — null on empty trips; v3 readers still parse.
+  static const int schema = 4;
 
   final DateTime capturedAt;
 
@@ -59,6 +66,18 @@ class DrivingAnalysisTrace {
   /// the [obd2Features] null convention.
   final GpsCoverageReport? gpsCoverage;
 
+  /// #3501 (schema v4) — the driver's own post-trip verdict
+  /// (`TripVerdict.name`: smooth / moderate / aggressive; `skipped` and
+  /// null mean unanswered). The structured replacement for hand-editing
+  /// [comment]; when present, the comment prompt is dropped from the
+  /// export automatically.
+  final String? verdict;
+
+  /// Per-trip engine-sample coverage + reason (#3499, schema v4). Null only
+  /// on an empty trip — a present block with `reason: noEngineData` is the
+  /// honest explanation for a null [obd2Features] on a `gpsPlusObd2` trip.
+  final Obd2EngineCoverage? obd2Coverage;
+
   final DrivingScore score;
   final List<DrivingLesson> lessons;
 
@@ -70,6 +89,8 @@ class DrivingAnalysisTrace {
     this.gpsFeatures,
     this.obd2Features,
     this.gpsCoverage,
+    this.obd2Coverage,
+    this.verdict,
     this.comment = kDrivingAnalysisCommentPrompt,
   });
 
@@ -78,7 +99,12 @@ class DrivingAnalysisTrace {
         'kind': 'drivingAnalysis',
         'capturedAt': capturedAt.toIso8601String(),
         // The annotation slot — first so it is obvious in the shared file.
-        'comment': comment,
+        // #3501 — once an in-app verdict exists the begging prompt is
+        // replaced by a pointer to the structured field below.
+        'comment': verdict != null && comment == kDrivingAnalysisCommentPrompt
+            ? 'verdict captured in-app — see the "verdict" field'
+            : comment,
+        'verdict': verdict,
         'summary': {
           'tripKind': summary.kind.name,
           'distanceKm': _round(summary.distanceKm, 3),
@@ -110,6 +136,18 @@ class DrivingAnalysisTrace {
                 'brakeEvents': gpsFeatures!.brakeEvents,
                 'sharpCornerEvents': gpsFeatures!.sharpCornerEvents,
                 'maxAccelG': _round(gpsFeatures!.maxAccelG, 3),
+                // #3503 — self-describing gates: the field export that
+                // motivated epic #3498 read "maxAccelG 0.341 g yet
+                // accelEvents 0" as a contradiction. The peak is a
+                // sample-to-sample instantaneous derivative (physically
+                // clamped); events must SUSTAIN ≥1 s above the threshold
+                // through the accuracy/min-speed gates.
+                'gates': const {
+                  'maxAccelG': 'instantaneous sample-to-sample peak, clamped',
+                  'events':
+                      'sustained >=1.0s at >=3.0 (accel) / >=3.5 (brake) '
+                          'm/s2, accuracy- and min-speed-gated',
+                },
                 'meanSpeedKmh': _round(gpsFeatures!.meanSpeedKmh, 1),
                 'speedBandSeconds': {
                   'idle': _round(gpsFeatures!.idleSeconds, 0),
@@ -123,6 +161,9 @@ class DrivingAnalysisTrace {
         // per-signal coverage map). Null when no engine signal landed, which
         // makes a broken-link GPS-fallback trip read as `obd2Features: null`.
         'obd2Features': obd2Features?.toJson(),
+        // #3499 (schema v4) — engine-sample coverage + reason, the honest
+        // companion to a null obd2Features on a gpsPlusObd2 trip.
+        'obd2Coverage': obd2Coverage?.toJson(),
         // #3465 — GPS coverage + attributed track gaps (schema v3). Null
         // when there is no track to judge; the gap list inside is capped
         // at [GpsCoverageReport.kExportGapCap] entries.

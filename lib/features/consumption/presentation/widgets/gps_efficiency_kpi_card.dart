@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/gps_kpi_verdict.dart';
 import '../../domain/trip_recorder.dart';
+import '../../providers/verdict_calibration_provider.dart';
 
 /// GPS-only efficiency KPI card on the Trip detail screen (#2695 C9 /
 /// #2697 P3). Surfaces the speed-only energy KPIs — RPA, PKE, VAPOS,
@@ -20,7 +22,7 @@ import '../../domain/trip_recorder.dart';
 ///
 /// Optionally shows the consumption-vs-efficient-baseline delta (#2696
 /// C10) as a trailing line when the caller resolved one.
-class GpsEfficiencyKpiCard extends StatelessWidget {
+class GpsEfficiencyKpiCard extends ConsumerWidget {
   /// Pre-computed GPS features for the trip.
   final GpsDrivingFeatures features;
 
@@ -50,7 +52,7 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
@@ -58,12 +60,19 @@ class GpsEfficiencyKpiCard extends StatelessWidget {
     // aggressive so the raw figure carries a verdict + colour, mirroring
     // DrivingScoreCard's class band. Climb energy is terrain, not driving
     // style, so it stays an un-banded plain row.
+    // #3503 — the bands are the defaults until enough #3501 verdicts
+    // accumulate, then the driver's own calibrated set.
+    final bands = ref.watch(gpsKpiBandsProvider);
     final rpaVerdict = GpsKpiVerdicts.rpa(
       features.relativePositiveAcceleration,
+      bands: bands,
     );
-    final pkeVerdict = GpsKpiVerdicts.pke(features.positiveKineticEnergy);
-    final vaposVerdict = GpsKpiVerdicts.vapos(features.meanPositiveVa);
-    final coastVerdict = GpsKpiVerdicts.coast(features.coastShare);
+    final pkeVerdict =
+        GpsKpiVerdicts.pke(features.positiveKineticEnergy, bands: bands);
+    final vaposVerdict =
+        GpsKpiVerdicts.vapos(features.meanPositiveVa, bands: bands);
+    final coastVerdict =
+        GpsKpiVerdicts.coast(features.coastShare, bands: bands);
 
     final rows = <Widget>[
       _kpiRow(

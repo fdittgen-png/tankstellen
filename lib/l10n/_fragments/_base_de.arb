@@ -1191,6 +1191,12 @@
     "description": "Spoken driving-coach cue (#2663) after a braking event — full spoken phrasing of the coachingGpsAnticipateBrake tile."
   },
   "coachingVoiceSmoothAccel": "Beschleunige gleichmäßiger",
+  "coachingVoiceSharpCorner": "Nimm Kurven etwas sanfter",
+  "coachingVoiceHarshBrakingStrong": "Das war eine sehr harte Bremsung — halte mehr Abstand",
+  "coachingVoiceHardAccelerationStrong": "Sehr starke Beschleunigung — das kostet richtig Sprit",
+  "coachingVoiceSharpCornerStrong": "Sehr scharfe Kurve — langsam rein, sanft raus",
+  "coachingVoiceTripSummary": "Fahrt gespeichert: {distanceKm} Kilometer, {consumption}. {harshCount, plural, =0{Schön gleichmäßig — keine harten Manöver.} =1{Ein hartes Manöver.} other{{harshCount} harte Manöver.}}",
+  "coachingVoiceConsumptionPhrase": "{value} Liter pro 100 Kilometer",
   "@coachingVoiceSmoothAccel": {
     "description": "Spoken driving-coach cue (#2663) after a sharp acceleration on a GPS-only trip — full spoken phrasing of the coachingGpsSmoothAccel tile."
   },

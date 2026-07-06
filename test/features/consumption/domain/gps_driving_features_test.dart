@@ -291,6 +291,36 @@ void main() {
         expect(f.gradeClimbMeters, 0);
         expect(f.gradeDescentMeters, 0);
       });
+
+      test('#3502 — sub-deadband GPS altitude jitter on a flat road nets to '
+          'ZERO climb (no phantom climbEnergy)', () {
+        // ±2 m alternating jitter, all inside the 3 m deadband: the old
+        // sample-to-sample sum booked ~2 m of climb per oscillation.
+        final samples = [
+          for (var i = 0; i < 40; i++)
+            _s(t0.add(Duration(seconds: 10 * i)), 50,
+                lat: 45, lng: 5 + 0.001 * i, altM: 100 + (i.isEven ? 0 : 2)),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.gradeClimbMeters, 0,
+            reason: 'oscillation inside the deadband must net out');
+        expect(f.gradeDescentMeters, 0);
+      });
+
+      test('#3502 — a real sustained grade passes the deadband at full value',
+          () {
+        // 1 m per 10 s sample, 40 samples → 39 m real climb; the anchor
+        // advances every 3 m so the committed total tracks the grade.
+        final samples = [
+          for (var i = 0; i < 40; i++)
+            _s(t0.add(Duration(seconds: 10 * i)), 50,
+                lat: 45, lng: 5 + 0.001 * i, altM: 100.0 + i),
+        ];
+        final f = GpsDrivingFeatures.from(samples)!;
+        expect(f.gradeClimbMeters, closeTo(39.0, 3.0),
+            reason: 'a real grade must not be eaten by the deadband '
+                '(at most one sub-3 m tail is uncommitted)');
+      });
     });
 
     group('cornering load (#2655 — revived from persisted bearing)', () {

@@ -115,7 +115,7 @@ final class TripHistoryListProvider
   }
 }
 
-String _$tripHistoryListHash() => r'73bae358a6d84c44fd7fa159cdf394403f1998b4';
+String _$tripHistoryListHash() => r'd41ec95c24d2e0bfbb72614451371474bde00904';
 
 /// List of finalised trips, newest-first. Empty when the box is
 /// closed or carries no entries. Refreshed by callers after they

@@ -85,7 +85,10 @@ class TripDetailChartsSection extends StatelessWidget {
             ),
           if (hasAltitudeSamples)
             TripChartSection(
-              title: l.trajetDetailChartAltitude,
+              // #3502 — the profile is plotted relative to the trip start
+              // (raw GPS altitude is ellipsoid height on Android; absolute
+              // values read below sea level near a coast).
+              title: l.trajetDetailChartAltitudeRelative,
               chart: TripDetailAltitudeChart(samples: samples),
             ),
           if (hasLambdaSamples)

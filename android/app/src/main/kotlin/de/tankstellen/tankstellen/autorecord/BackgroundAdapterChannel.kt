@@ -101,6 +101,21 @@ object BackgroundAdapterChannel {
                     result.error("arg", "mac missing", null)
                     return
                 }
+                // #3505 — persist the LOCALIZED notification copy Dart hands
+                // over, so even a CDM cold start (app process dead — no Dart
+                // side to ask) shows the user's language. Absent args keep
+                // whatever was stored (language unchanged since last arm).
+                val title = call.argument<String>("notifTitle")
+                val text = call.argument<String>("notifText")
+                if (title != null || text != null) {
+                    ctx.getSharedPreferences(
+                        AutoRecordForegroundService.NOTIF_PREFS,
+                        android.content.Context.MODE_PRIVATE,
+                    ).edit().apply {
+                        if (title != null) putString(AutoRecordForegroundService.NOTIF_KEY_TITLE, title)
+                        if (text != null) putString(AutoRecordForegroundService.NOTIF_KEY_TEXT, text)
+                    }.apply()
+                }
                 val intent = Intent(ctx, AutoRecordForegroundService::class.java).apply {
                     putExtra(AutoRecordForegroundService.EXTRA_MAC, mac)
                 }

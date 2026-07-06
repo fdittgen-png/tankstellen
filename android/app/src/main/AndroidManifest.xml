@@ -9,6 +9,28 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- #1868 — in-app camera for the pump-display capture reticle. -->
     <uses-permission android:name="android.permission.CAMERA"/>
+
+    <!-- #3506 — strip permissions merged in by libraries the app never
+         uses (surfaced by F-Droid's scanner on MR !42093; Play's policy
+         review flags RECORD_AUDIO too):
+          * RECORD_AUDIO + WRITE_EXTERNAL_STORAGE come from
+            camera_android_camerax's video-recording support — the app
+            only takes still photos. Pre-Q save-to-Downloads is already
+            best-effort without WRITE (PublicFileExporterChannel).
+          * READ_EXTERNAL_STORAGE is merger-IMPLIED by camerax's WRITE;
+            image_picker uses intent-based pickers needing no storage
+            permission.
+          * READ_PHONE_STATE is merger-IMPLIED because litert-gpu-api
+            (via tflite_flutter) ships a library manifest with
+            targetSdkVersion < 4 (the ancient-library compat rule). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"
+        tools:node="remove"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"
+        tools:node="remove"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- ACCESS_BACKGROUND_LOCATION removed for Open Testing release.

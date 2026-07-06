@@ -73,6 +73,13 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   @override
   Stream<BackgroundAdapterEvent> get events => _controller.stream;
 
+  /// #3505 — localized notification title/body handed to the native FGS at
+  /// arm time (null keeps the built-in English fallback). Settable fields
+  /// (not `start` params) so the [BackgroundAdapterListener] interface and
+  /// its iOS/fake implementations stay untouched.
+  String? notificationTitle;
+  String? notificationText;
+
   @override
   Future<void> start({required String mac}) async {
     // Ensure we're listening to the EventChannel BEFORE the service
@@ -101,8 +108,14 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
     // degrade silently here (recording falls back to the GPS-only / foreground
     // path) rather than crashing the auto-record coordinator.
     try {
-      final armed =
-          await _methods.invokeMethod<bool>('start', <String, Object?>{'mac': mac});
+      final armed = await _methods.invokeMethod<bool>('start', <String, Object?>{
+        'mac': mac,
+        // #3505 — localized FGS notification copy; the native side persists
+        // it so a CDM cold start (app process dead) still shows the user's
+        // language instead of the hard-coded English fallback.
+        if (notificationTitle != null) 'notifTitle': notificationTitle,
+        if (notificationText != null) 'notifText': notificationText,
+      });
       if (armed != true) {
         debugPrint('AndroidBackgroundAdapterListener: FGS not armed (native '
             'returned $armed)');

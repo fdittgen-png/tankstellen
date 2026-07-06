@@ -3,10 +3,13 @@
 
 import 'dart:ui' show Locale;
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../logging/error_logger.dart';
 import '../voice_announcement_service.dart';
 
 /// Platform TTS implementation using [FlutterTts].
@@ -28,6 +31,20 @@ class FlutterTtsAnnouncementService implements VoiceAnnouncementService {
   Future<void> initialize() async {
     if (_initialized) return;
     await _tts.setSharedInstance(true);
+    // #3504 — navigation-guidance audio attributes: cues DUCK music instead
+    // of stopping it, and never talk over the telephony stream during an
+    // active call (the field screenshots were taken mid-call). On iOS this
+    // maps to the playback category with duckOthers; Android to
+    // USAGE_ASSISTANCE_NAVIGATION_GUIDANCE with transient-may-duck focus.
+    // Best-effort: an engine without the API just keeps the default mix.
+    try {
+      await _tts.setAudioAttributesForNavigation();
+    } catch (e, st) {
+      // Best-effort — an engine without the API keeps the default mix.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+        'where': 'FlutterTtsAnnouncementService: navigation audio attrs',
+      }));
+    }
     await _tts.setSpeechRate(0.5);
     await _tts.setVolume(1.0);
     await _tts.setPitch(1.0);

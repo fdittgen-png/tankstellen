@@ -31,6 +31,7 @@
   "trajetDetailChartEngineLoad": "Motorlast (%)",
   "trajetDetailChartThrottle": "Drosselklappe / Pedal (%)",
   "trajetDetailChartCoolant": "Kühlmittel (°C)",
+  "trajetDetailChartAltitudeRelative": "Höhe (m, ab Start)",
   "trajetDetailChartAltitude": "Höhe (m)",
   "trajetDetailChartLambda": "Soll-λ",
   "trajetDetailChartsSection": "Diagramme",

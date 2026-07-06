@@ -29,6 +29,18 @@ class _TripDetailLineChart extends StatefulWidget {
   /// never misled into reading it as measured data.
   final bool estimated;
 
+  /// #3502 — centered rolling-median window applied to the plotted series
+  /// (≤1 = off). When on, the RAW series is kept as a faint background
+  /// polyline so nothing is hidden — the smoothed line is what the eye
+  /// reads, the raw one is what the scrub still exposes point-by-point.
+  final int smoothWindow;
+
+  /// #3502 — cap the y-axis at this percentile (0..1) of the RAW values
+  /// (null = classic full-range axis). A 1 Hz estimate series whose single
+  /// spike is 3× the p99 otherwise squashes the whole readable band into
+  /// the bottom of the plot; capped values draw clamped at the top edge.
+  final double? capPercentile;
+
   const _TripDetailLineChart({
     required this.samples,
     required this.color,
@@ -36,6 +48,8 @@ class _TripDetailLineChart extends StatefulWidget {
     required this.unit,
     required this.emptyWhenAllNull,
     this.estimated = false,
+    this.smoothWindow = 1,
+    this.capPercentile,
   });
 
   @override
@@ -69,6 +83,26 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
     }
   }
 
+  /// #3502 — centered rolling median over [window] values (odd windows
+  /// centre exactly; even ones lean left by half a slot). Timestamps are
+  /// preserved so the x-axis stays truthful; the median (not a mean) keeps
+  /// step edges crisp while killing single-sample spikes.
+  static List<_ChartPoint> _rollingMedian(List<_ChartPoint> pts, int window) {
+    final half = window ~/ 2;
+    final out = <_ChartPoint>[];
+    for (var i = 0; i < pts.length; i++) {
+      final from = math.max(0, i - half);
+      final to = math.min(pts.length, i + half + 1);
+      final vals = [for (var j = from; j < to; j++) pts[j].value]..sort();
+      final mid = vals.length ~/ 2;
+      final median = vals.length.isOdd
+          ? vals[mid]
+          : (vals[mid - 1] + vals[mid]) / 2;
+      out.add(_ChartPoint(pts[i].timestamp, median));
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -100,7 +134,23 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
     }
     points.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    final selected = (_selected != null && _selected! < points.length)
+    // #3502 — readable series: rolling-median smoothing (raw kept faint
+    // behind) + a percentile-capped y-axis. Both off by default.
+    var plotted = points;
+    List<_ChartPoint>? rawBehind;
+    if (widget.smoothWindow > 1 && points.length > widget.smoothWindow) {
+      rawBehind = points;
+      plotted = _rollingMedian(points, widget.smoothWindow);
+    }
+    double? yCap;
+    final capAt = widget.capPercentile;
+    if (capAt != null && points.length > 10) {
+      final sortedVals = points.map((p) => p.value).toList(growable: false)
+        ..sort();
+      yCap = sortedVals[((sortedVals.length - 1) * capAt).round()];
+    }
+
+    final selected = (_selected != null && _selected! < plotted.length)
         ? _selected
         : null;
     final locale = Localizations.localeOf(context);
@@ -112,17 +162,20 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
           final size = Size(constraints.maxWidth, constraints.maxHeight);
           return GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTapDown: (d) => _scrub(d.localPosition, size, points),
-            onHorizontalDragStart: (d) => _scrub(d.localPosition, size, points),
+            onTapDown: (d) => _scrub(d.localPosition, size, plotted),
+            onHorizontalDragStart: (d) =>
+                _scrub(d.localPosition, size, plotted),
             onHorizontalDragUpdate: (d) =>
-                _scrub(d.localPosition, size, points),
+                _scrub(d.localPosition, size, plotted),
             child: Stack(
               fit: StackFit.expand,
               children: [
                 Positioned.fill(
                   child: CustomPaint(
                     painter: _LineChartPainter(
-                      points: points,
+                      points: plotted,
+                      rawPoints: rawBehind,
+                      yCap: yCap,
                       color: effective,
                       labelColor: theme.colorScheme.onSurface,
                       unit: widget.unit,
@@ -133,7 +186,7 @@ class _TripDetailLineChartState extends State<_TripDetailLineChart> {
                 ),
                 if (selected != null)
                   _TripChartReadout(
-                    point: points[selected],
+                    point: plotted[selected],
                     unit: widget.unit,
                     locale: locale,
                   ),
@@ -207,13 +260,21 @@ class _TripChartGeometry {
        _chartWidth = chartWidth,
        _chartHeight = chartHeight;
 
-  factory _TripChartGeometry.forSize(Size size, List<_ChartPoint> points) {
+  factory _TripChartGeometry.forSize(
+    Size size,
+    List<_ChartPoint> points, {
+    double? yCap,
+  }) {
     final chartWidth = size.width - leftInset - rightInset;
     final chartHeight = size.height - topInset - bottomInset;
 
     final values = points.map((p) => p.value).toList(growable: false);
     final minV = values.reduce(math.min);
-    final maxV = values.reduce(math.max);
+    // #3502 — a percentile cap bounds the axis so one spike can't squash
+    // the readable band; values above it project clamped at the top edge
+    // (yFor clamps).
+    var maxV = values.reduce(math.max);
+    if (yCap != null && yCap > minV && yCap < maxV) maxV = yCap;
     final range = (maxV - minV).abs();
     final padding = range > 0 ? range * 0.1 : 1.0;
     final yMin = minV - padding;
@@ -241,8 +302,12 @@ class _TripChartGeometry {
     return leftInset + rel * _chartWidth;
   }
 
-  double yFor(double v) =>
-      topInset + _chartHeight - ((v - _yMin) / _ySpan) * _chartHeight;
+  double yFor(double v) {
+    // #3502 — clamp into the (possibly capped) axis range so above-cap
+    // spikes draw flat at the top edge instead of escaping the plot.
+    final vv = v.clamp(_yMin, _yMin + _ySpan).toDouble();
+    return topInset + _chartHeight - ((vv - _yMin) / _ySpan) * _chartHeight;
+  }
 
   /// Index into [points] of the point whose plotted x is nearest [localPos].
   /// Mirrors `PriceChartAxes.nearestPointIndex` (#2384).

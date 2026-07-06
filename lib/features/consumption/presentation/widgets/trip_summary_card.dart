@@ -10,6 +10,8 @@ import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
+import '../../domain/obd2_engine_coverage.dart';
+import '../../domain/trip_summary.dart';
 import '../../providers/trip_fuel_cost_provider.dart';
 import 'distance_source_badge.dart';
 import 'trip_detail_charts.dart';
@@ -105,6 +107,12 @@ class TripSummaryCard extends ConsumerWidget {
                   entry.adapterFirmware,
                 ),
               ),
+            // #3499 (epic #3498) — engine-data honesty: a gpsPlusObd2 trip
+            // whose OBD2 link contributed no (or partial) engine PIDs says
+            // so HERE, next to the adapter identity, instead of silently
+            // rendering "~ estimated" fuel figures with no explanation.
+            if (_engineCoverageNote(l) case final note?)
+              _EngineCoverageNote(text: note),
             // #3253 — distance provenance chip beside the km figure: the
             // persisted `distanceSource` (odometer / GPS track / virtual
             // estimate) was rendered nowhere, while the fuel figures carry
@@ -139,6 +147,31 @@ class TripSummaryCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// #3499 — the localized engine-coverage explainer for a `gpsPlusObd2`
+  /// trip with missing/partial engine data, or null when nothing needs
+  /// saying (full coverage, GPS-only trips, EV, empty trips).
+  String? _engineCoverageNote(AppLocalizations l) {
+    if (isEv || entry.summary.kind != TripKind.gpsPlusObd2) return null;
+    final coverage = Obd2EngineCoverage.fromFlags([
+      for (final d in samples)
+        d.rpm != null ||
+            d.engineLoadPercent != null ||
+            d.throttlePercent != null ||
+            // MEASURED fuel rate only — the GPS-physics estimated series
+            // (d.estimatedFuelRateLPerHour) is exactly what this note
+            // explains, so it must not count as engine data.
+            d.fuelRateLPerHour != null,
+    ]);
+    return switch (coverage?.reason) {
+      null || Obd2EngineCoverageReason.full => null,
+      Obd2EngineCoverageReason.noEngineData => l.obd2CoverageNoneNote,
+      Obd2EngineCoverageReason.droppedMidTrip => l.obd2CoverageDroppedNote(
+          (coverage!.lastEngineAtShare * 100).round()),
+      Obd2EngineCoverageReason.partial =>
+        l.obd2CoveragePartialNote((coverage!.share * 100).round()),
+    };
   }
 
   static String _avgSpeedLabel(List<TripDetailSample> samples, String unknown) {
@@ -224,6 +257,38 @@ class _SummaryRow extends StatelessWidget {
           ),
           Text(value, style: theme.textTheme.bodyMedium),
           if (badge != null) ...[const SizedBox(width: 6), badge!],
+        ],
+      ),
+    );
+  }
+}
+
+/// #3499 — compact info strip explaining missing/partial engine data on a
+/// `gpsPlusObd2` trip (the honest companion to the "~ estimated" fuel
+/// figures). Info-toned, not error-toned: the trip itself is fine.
+class _EngineCoverageNote extends StatelessWidget {
+  final String text;
+
+  const _EngineCoverageNote({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fg = theme.colorScheme.onSurfaceVariant;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline, size: 16, color: fg),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              key: const Key('engineCoverageNote'),
+              style: theme.textTheme.bodySmall?.copyWith(color: fg),
+            ),
+          ),
         ],
       ),
     );

@@ -1,0 +1,5 @@
+{
+  "obd2CoverageNoneNote": "Auf dieser Fahrt kamen keine Motordaten vom OBD2-Adapter an — die Kraftstoffwerte sind GPS-basierte Schätzungen.",
+  "obd2CoverageDroppedNote": "Die Motordaten endeten bei {percent} % der Fahrt (Verbindung abgerissen) — spätere Kraftstoffwerte sind GPS-basierte Schätzungen.",
+  "obd2CoveragePartialNote": "Motordaten deckten nur {percent} % dieser Fahrt ab — Lücken nutzen GPS-basierte Schätzungen."
+}

@@ -1,12 +1,19 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/sync/sync_events.dart';
 import '../data/trip_history_repository.dart';
+import '../domain/trip_verdict.dart';
+import '../domain/gps_driving_features.dart';
+import 'verdict_calibration_provider.dart';
+import '../../../core/logging/error_logger.dart';
+import 'package:collection/collection.dart';
 
 part 'trip_history_provider.g.dart';
 
@@ -56,6 +63,31 @@ class TripHistoryList extends _$TripHistoryList {
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return;
     state = repo.loadAll();
+  }
+
+  /// #3501 — persist the driver's post-trip verdict and refresh so the
+  /// prompt card (which keys off `entry.verdict == null`) hides itself.
+  Future<void> setVerdict(String id, TripVerdict verdict) async {
+    final repo = ref.read(tripHistoryRepositoryProvider);
+    if (repo == null) return;
+    await repo.saveVerdict(id, verdict);
+    state = repo.loadAll();
+    // #3503 — feed the calibration store: join the label with the trip's
+    // energy KPIs and re-derive the personal bands. Best-effort — the
+    // store swallows its own failures, and a missing entry just skips.
+    try {
+      final entry = state.where((e) => e.id == id).firstOrNull;
+      final features =
+          entry == null ? null : GpsDrivingFeatures.from(entry.samples);
+      await ref
+          .read(verdictCalibrationStoreProvider)
+          .record(verdict, features);
+      ref.invalidate(gpsKpiBandsProvider);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
+        'where': 'TripHistoryList.setVerdict calibration record'
+      }));
+    }
   }
 
   /// Delete one trip and refresh the list. Exposed so the history

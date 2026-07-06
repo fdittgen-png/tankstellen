@@ -5317,5 +5317,126 @@
   "@gpsCoverageHintLinkRecovery": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2CoverageNoneNote": "No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.",
+  "@obd2CoverageNoneNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2CoverageDroppedNote": "Engine data stopped {percent}% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.",
+  "@obd2CoverageDroppedNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "obd2CoveragePartialNote": "Engine data covered only {percent}% of this trip — gaps use GPS-based estimates.",
+  "@obd2CoveragePartialNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "trajetDetailChartAltitudeRelative": "Altitude (m, from start)",
+  "@trajetDetailChartAltitudeRelative": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripVerdictPromptTitle": "How did this trip feel?",
+  "@tripVerdictPromptTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripVerdictSmooth": "Smooth",
+  "@tripVerdictSmooth": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripVerdictModerate": "Moderate",
+  "@tripVerdictModerate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripVerdictAggressive": "Aggressive",
+  "@tripVerdictAggressive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripVerdictDismiss": "Not now",
+  "@tripVerdictDismiss": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripVerdictThanks": "Thanks — this helps calibrate your driving analysis.",
+  "@tripVerdictThanks": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceSharpCorner": "Take corners a little gentler",
+  "@coachingVoiceSharpCorner": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceHarshBrakingStrong": "That was a very hard stop — leave more distance",
+  "@coachingVoiceHarshBrakingStrong": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceHardAccelerationStrong": "Very hard acceleration — that burns real fuel",
+  "@coachingVoiceHardAccelerationStrong": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceSharpCornerStrong": "Very sharp corner — slow in, gentle out",
+  "@coachingVoiceSharpCornerStrong": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "coachingVoiceTripSummary": "Trip saved: {distanceKm} kilometres, {consumption}. {harshCount, plural, =0{Nice and smooth — no harsh events.} =1{One harsh event.} other{{harshCount} harsh events.}}",
+  "@coachingVoiceTripSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "distanceKm": {
+        "type": "String"
+      },
+      "consumption": {
+        "type": "String"
+      },
+      "harshCount": {
+        "type": "int"
+      }
+    }
+  },
+  "coachingVoiceConsumptionPhrase": "{value} litres per 100 kilometres",
+  "@coachingVoiceConsumptionPhrase": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReconnectDismiss": "Dismiss",
+  "@obd2ReconnectDismiss": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "autoRecordNotificationTitle": "Trip auto-record",
+  "@autoRecordNotificationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "autoRecordNotificationText": "Watching for your OBD2 adapter",
+  "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -1327,6 +1327,46 @@
   "@coachingVoiceSmoothAccel": {
     "description": "Spoken driving-coach cue (#2663) after a sharp acceleration on a GPS-only trip — full spoken phrasing of the coachingGpsSmoothAccel tile."
   },
+  "coachingVoiceSharpCorner": "Take corners a little gentler",
+  "@coachingVoiceSharpCorner": {
+    "description": "Spoken driving-coach cue (#3504) when the IMU confirms a sustained sharp corner (lateral load + yaw) during recording."
+  },
+  "coachingVoiceHarshBrakingStrong": "That was a very hard stop — leave more distance",
+  "@coachingVoiceHarshBrakingStrong": {
+    "description": "Strong-severity variant of coachingVoiceHarshBraking (#3504): spoken instead of the normal cue when the braking magnitude is well past the harsh threshold (>=1.5x)."
+  },
+  "coachingVoiceHardAccelerationStrong": "Very hard acceleration — that burns real fuel",
+  "@coachingVoiceHardAccelerationStrong": {
+    "description": "Strong-severity variant of coachingVoiceHardAcceleration (#3504), spoken when the acceleration magnitude is well past the harsh threshold (>=1.5x)."
+  },
+  "coachingVoiceSharpCornerStrong": "Very sharp corner — slow in, gentle out",
+  "@coachingVoiceSharpCornerStrong": {
+    "description": "Strong-severity variant of coachingVoiceSharpCorner (#3504), spoken when the lateral load is well past the corner threshold (>=1.5x)."
+  },
+  "coachingVoiceTripSummary": "Trip saved: {distanceKm} kilometres, {consumption}. {harshCount, plural, =0{Nice and smooth — no harsh events.} =1{One harsh event.} other{{harshCount} harsh events.}}",
+  "@coachingVoiceTripSummary": {
+    "description": "Optional spoken end-of-trip summary (#3504), spoken once when a recording finishes saving, behind the existing voice-coaching toggle. distanceKm is pre-formatted (e.g. '20.1'); consumption is a pre-formatted localized phrase (e.g. '7.1 litres per 100 kilometres'); harshCount is the summed harsh accel+brake count.",
+    "placeholders": {
+      "distanceKm": {
+        "type": "String"
+      },
+      "consumption": {
+        "type": "String"
+      },
+      "harshCount": {
+        "type": "int"
+      }
+    }
+  },
+  "coachingVoiceConsumptionPhrase": "{value} litres per 100 kilometres",
+  "@coachingVoiceConsumptionPhrase": {
+    "description": "TTS-friendly consumption phrase used inside coachingVoiceTripSummary (#3504) — spelled out so the speech engine does not have to read 'L/100km'. value is the pre-formatted number.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "voiceCoachingSettingTitle": "Spoken driving coaching",
   "@voiceCoachingSettingTitle": {
     "description": "Title of the toggle (#2663) in the coaching settings section that turns spoken driving cues (hard acceleration, harsh braking, shift hints) on or off. On by default."

@@ -1199,6 +1199,12 @@
     "description": "Spoken driving-coach cue (#2663) after a braking event — full spoken phrasing of the coachingGpsAnticipateBrake tile."
   },
   "coachingVoiceSmoothAccel": "Beschleunige gleichmäßiger",
+  "coachingVoiceSharpCorner": "Nimm Kurven etwas sanfter",
+  "coachingVoiceHarshBrakingStrong": "Das war eine sehr harte Bremsung — halte mehr Abstand",
+  "coachingVoiceHardAccelerationStrong": "Sehr starke Beschleunigung — das kostet richtig Sprit",
+  "coachingVoiceSharpCornerStrong": "Sehr scharfe Kurve — langsam rein, sanft raus",
+  "coachingVoiceTripSummary": "Fahrt gespeichert: {distanceKm} Kilometer, {consumption}. {harshCount, plural, =0{Schön gleichmäßig — keine harten Manöver.} =1{Ein hartes Manöver.} other{{harshCount} harte Manöver.}}",
+  "coachingVoiceConsumptionPhrase": "{value} Liter pro 100 Kilometer",
   "@coachingVoiceSmoothAccel": {
     "description": "Spoken driving-coach cue (#2663) after a sharp acceleration on a GPS-only trip — full spoken phrasing of the coachingGpsSmoothAccel tile."
   },
@@ -2229,6 +2235,9 @@
   "@ecoRouteHint": {
     "description": "Hilfetext unterhalb des Eco-Chips, der erklärt, wann der Nutzer ihn wählen sollte (#1123). Kurz halten; das Leitmotiv 'Smarter pump. Smarter drive.' soll erkennbar bleiben."
   },
+  "obd2CoverageNoneNote": "Auf dieser Fahrt kamen keine Motordaten vom OBD2-Adapter an — die Kraftstoffwerte sind GPS-basierte Schätzungen.",
+  "obd2CoverageDroppedNote": "Die Motordaten endeten bei {percent} % der Fahrt (Verbindung abgerissen) — spätere Kraftstoffwerte sind GPS-basierte Schätzungen.",
+  "obd2CoveragePartialNote": "Motordaten deckten nur {percent} % dieser Fahrt ab — Lücken nutzen GPS-basierte Schätzungen.",
   "favoritesShareAction": "Teilen",
   "favoritesShareSubject": "Sparkilo — Favoriten am {date}",
   "favoritesShareError": "Bild konnte nicht erstellt werden",
@@ -3289,6 +3298,9 @@
   "@obd2ReconnectFailedBody": {
     "description": "Body text of the terminal auto-reconnect-failure surface (Epic #3013 phase 3). Explains the auto-reconnect gave up after bounded attempts and how to recover."
   },
+  "obd2ReconnectDismiss": "Ausblenden",
+  "autoRecordNotificationTitle": "Automatische Fahrtaufzeichnung",
+  "autoRecordNotificationText": "Wartet auf deinen OBD2-Adapter",
   "obd2ReconnectRetry": "Erneut versuchen",
   "@obd2ReconnectRetry": {
     "description": "Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires."
@@ -3660,6 +3672,7 @@
   "trajetDetailChartEngineLoad": "Motorlast (%)",
   "trajetDetailChartThrottle": "Drosselklappe / Pedal (%)",
   "trajetDetailChartCoolant": "Kühlmittel (°C)",
+  "trajetDetailChartAltitudeRelative": "Höhe (m, ab Start)",
   "trajetDetailChartAltitude": "Höhe (m)",
   "trajetDetailChartLambda": "Soll-λ",
   "trajetDetailChartsSection": "Diagramme",
@@ -3845,6 +3858,12 @@
   "@trajetsSharedBadge": {
     "description": "Small badge on a trip row indicating the trip was shared with the user by another account and is read-only (#2240)."
   },
+  "tripVerdictPromptTitle": "Wie hat sich diese Fahrt angefühlt?",
+  "tripVerdictSmooth": "Ruhig",
+  "tripVerdictModerate": "Normal",
+  "tripVerdictAggressive": "Aggressiv",
+  "tripVerdictDismiss": "Jetzt nicht",
+  "tripVerdictThanks": "Danke — das hilft, deine Fahranalyse zu kalibrieren.",
   "unifiedFilterFuel": "Kraftstoff",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Beide",

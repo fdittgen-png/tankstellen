@@ -4916,6 +4916,46 @@ abstract class AppLocalizations {
   /// **'Accelerate more smoothly'**
   String get coachingVoiceSmoothAccel;
 
+  /// Spoken driving-coach cue (#3504) when the IMU confirms a sustained sharp corner (lateral load + yaw) during recording.
+  ///
+  /// In en, this message translates to:
+  /// **'Take corners a little gentler'**
+  String get coachingVoiceSharpCorner;
+
+  /// Strong-severity variant of coachingVoiceHarshBraking (#3504): spoken instead of the normal cue when the braking magnitude is well past the harsh threshold (>=1.5x).
+  ///
+  /// In en, this message translates to:
+  /// **'That was a very hard stop — leave more distance'**
+  String get coachingVoiceHarshBrakingStrong;
+
+  /// Strong-severity variant of coachingVoiceHardAcceleration (#3504), spoken when the acceleration magnitude is well past the harsh threshold (>=1.5x).
+  ///
+  /// In en, this message translates to:
+  /// **'Very hard acceleration — that burns real fuel'**
+  String get coachingVoiceHardAccelerationStrong;
+
+  /// Strong-severity variant of coachingVoiceSharpCorner (#3504), spoken when the lateral load is well past the corner threshold (>=1.5x).
+  ///
+  /// In en, this message translates to:
+  /// **'Very sharp corner — slow in, gentle out'**
+  String get coachingVoiceSharpCornerStrong;
+
+  /// Optional spoken end-of-trip summary (#3504), spoken once when a recording finishes saving, behind the existing voice-coaching toggle. distanceKm is pre-formatted (e.g. '20.1'); consumption is a pre-formatted localized phrase (e.g. '7.1 litres per 100 kilometres'); harshCount is the summed harsh accel+brake count.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip saved: {distanceKm} kilometres, {consumption}. {harshCount, plural, =0{Nice and smooth — no harsh events.} =1{One harsh event.} other{{harshCount} harsh events.}}'**
+  String coachingVoiceTripSummary(
+    String distanceKm,
+    String consumption,
+    int harshCount,
+  );
+
+  /// TTS-friendly consumption phrase used inside coachingVoiceTripSummary (#3504) — spelled out so the speech engine does not have to read 'L/100km'. value is the pre-formatted number.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} litres per 100 kilometres'**
+  String coachingVoiceConsumptionPhrase(String value);
+
   /// Title of the toggle (#2663) in the coaching settings section that turns spoken driving cues (hard acceleration, harsh braking, shift hints) on or off. On by default.
   ///
   /// In en, this message translates to:
@@ -8624,6 +8664,24 @@ abstract class AppLocalizations {
   /// **'Smarter drive — favours steady highway over zigzag shortcuts.'**
   String get ecoRouteHint;
 
+  /// Trip-detail note (#3499, epic #3498) shown on a gpsPlusObd2 trip whose samples carried ZERO engine PIDs: the adapter session never delivered engine data (drop at start, silent ECU, no supported PIDs), so the fuel chart/figures silently fell back to the GPS-physics estimate. This makes that fallback honest instead of unexplained.
+  ///
+  /// In en, this message translates to:
+  /// **'No engine data arrived from the OBD2 adapter on this trip — fuel figures are GPS-based estimates.'**
+  String get obd2CoverageNoneNote;
+
+  /// Trip-detail note (#3499) for the adapter-dropped-mid-trip signature: engine PIDs flowed, then ended well before the trip did. percent is the position (0-100) of the last engine-bearing sample.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine data stopped {percent}% into the trip (connection dropped) — fuel figures after that point are GPS-based estimates.'**
+  String obd2CoverageDroppedNote(int percent);
+
+  /// Trip-detail note (#3499) for patchy engine coverage with no clean cut-off (flaky link / slow PID round-trips). percent is the share (0-100) of samples that carried an engine PID.
+  ///
+  /// In en, this message translates to:
+  /// **'Engine data covered only {percent}% of this trip — gaps use GPS-based estimates.'**
+  String obd2CoveragePartialNote(int percent);
+
   /// AppBar action tooltip for the share-favorites button on the Favorites screen (#1344).
   ///
   /// In en, this message translates to:
@@ -11634,6 +11692,24 @@ abstract class AppLocalizations {
   /// **'The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.'**
   String get obd2ReconnectFailedBody;
 
+  /// Tooltip of the X button on the terminal reconnect-failed strip (#3505). Dismisses the strip for the current drop episode only — a fresh drop re-arms it.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get obd2ReconnectDismiss;
+
+  /// Title of the Android foreground-service notification shown while the hands-free auto-record watch is armed (#3505 — replaces the hard-coded English string in AutoRecordForegroundService.kt). Handed to the native side at arm time.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip auto-record'**
+  String get autoRecordNotificationTitle;
+
+  /// Body of the Android auto-record foreground-service notification (#3505). Handed to the native side at arm time.
+  ///
+  /// In en, this message translates to:
+  /// **'Watching for your OBD2 adapter'**
+  String get autoRecordNotificationText;
+
   /// Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires.
   ///
   /// In en, this message translates to:
@@ -13126,6 +13202,12 @@ abstract class AppLocalizations {
   /// **'Coolant (°C)'**
   String get trajetDetailChartCoolant;
 
+  /// Trip-detail chart section title (#3502): the altitude profile is plotted RELATIVE to the trip start, because raw GPS altitude is the WGS84 ellipsoid height on Android (no geoid correction) and routinely reads below sea level near a coast. 'from start' tells the user the 0 line is where they departed.
+  ///
+  /// In en, this message translates to:
+  /// **'Altitude (m, from start)'**
+  String get trajetDetailChartAltitudeRelative;
+
   /// Section title above the GPS-altitude-over-time chart on the Trip detail screen (#2461). Hidden when no sample carries an altitude value (GPS path off / no fix).
   ///
   /// In en, this message translates to:
@@ -13641,6 +13723,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shared'**
   String get trajetsSharedBadge;
+
+  /// Title of the 3-tap post-trip verdict prompt on the trip detail (#3501, epic #3498). The driver's subjective answer calibrates the driving-analysis thresholds (RPA/PKE/VAPOS bands, harsh-event gates) against how trips actually felt.
+  ///
+  /// In en, this message translates to:
+  /// **'How did this trip feel?'**
+  String get tripVerdictPromptTitle;
+
+  /// Verdict chip (#3501): the trip felt calm/relaxed — no notable hard accelerations, braking or cornering.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth'**
+  String get tripVerdictSmooth;
+
+  /// Verdict chip (#3501): an ordinary trip — some brisk moments, nothing aggressive.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get tripVerdictModerate;
+
+  /// Verdict chip (#3501): the trip had hard accelerations / late braking / sharp cornering.
+  ///
+  /// In en, this message translates to:
+  /// **'Aggressive'**
+  String get tripVerdictAggressive;
+
+  /// Dismiss affordance (tooltip of the X button) on the verdict prompt (#3501). Dismissing is persisted per trip so the prompt never nags twice for the same trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get tripVerdictDismiss;
+
+  /// Confirmation line shown in place of the verdict prompt right after the driver answers (#3501).
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks — this helps calibrate your driving analysis.'**
+  String get tripVerdictThanks;
 
   /// Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c).
   ///
