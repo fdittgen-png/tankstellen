@@ -30,6 +30,8 @@ bool isOfflineDioException(Object error) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
+      // dio 5.10 — the transform phase timing out is a timeout like the rest.
+      case DioExceptionType.transformTimeout:
         return true;
       case DioExceptionType.unknown:
         // i18n-ignore: matching a platform exception class name, not UI text.
@@ -123,6 +125,8 @@ bool isTransientUpstreamError(Object error) {
     case DioExceptionType.connectionTimeout:
     case DioExceptionType.sendTimeout:
     case DioExceptionType.receiveTimeout:
+    // dio 5.10 — the transform phase timing out is a timeout like the rest.
+    case DioExceptionType.transformTimeout:
       return true;
     case DioExceptionType.badResponse:
       final code = error.response?.statusCode;
