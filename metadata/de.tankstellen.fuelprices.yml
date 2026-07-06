@@ -40,8 +40,7 @@ Builds:
     srclibs:
       - flutter@stable
     prebuild:
-      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' 
-        .github/workflows/fdroid.yml)
+      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
       - '[[ $flutterVersion ]]'
       - git -C $$flutter$$ checkout -f $flutterVersion
       - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
@@ -57,9 +56,8 @@ Builds:
       - .pub-cache
     build:
       - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter build apk --release --flavor fdroid 
-        --split-per-abi --target-platform android-arm --build-number=$(( 
-        $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true 
+      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
+        --target-platform android-arm --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
         --dart-define=FGS_FORM_APPROVED=true
 
   - versionName: 6.0.4
@@ -69,8 +67,7 @@ Builds:
     srclibs:
       - flutter@stable
     prebuild:
-      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' 
-        .github/workflows/fdroid.yml)
+      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
       - '[[ $flutterVersion ]]'
       - git -C $$flutter$$ checkout -f $flutterVersion
       - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
@@ -86,9 +83,8 @@ Builds:
       - .pub-cache
     build:
       - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter build apk --release --flavor fdroid 
-        --split-per-abi --target-platform android-arm64 --build-number=$(( 
-        $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true 
+      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
+        --target-platform android-arm64 --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
         --dart-define=FGS_FORM_APPROVED=true
 
   - versionName: 6.0.4
@@ -98,8 +94,7 @@ Builds:
     srclibs:
       - flutter@stable
     prebuild:
-      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' 
-        .github/workflows/fdroid.yml)
+      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
       - '[[ $flutterVersion ]]'
       - git -C $$flutter$$ checkout -f $flutterVersion
       - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
@@ -115,9 +110,8 @@ Builds:
       - .pub-cache
     build:
       - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter build apk --release --flavor fdroid 
-        --split-per-abi --target-platform android-x64 --build-number=$(( 
-        $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true 
+      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
+        --target-platform android-x64 --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
         --dart-define=FGS_FORM_APPROVED=true
 
 AutoUpdateMode: Version
