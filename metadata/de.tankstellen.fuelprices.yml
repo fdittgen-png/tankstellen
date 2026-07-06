@@ -35,43 +35,108 @@ Repo: https://github.com/fdittgen-png/tankstellen.git
 
 Builds:
   - versionName: 6.0.3
-    versionCode: 5136
+    versionCode: 6136
     commit: v6.0.3
-    output: build/app/outputs/flutter-apk/app-fdroid-release.apk
+    output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
     srclibs:
       - flutter@stable
     prebuild:
-      # templates/build-flutter.yml — pin the srclib to the exact Flutter
-      # version the app is built with, extracted from the CI workflow.
       - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
       - '[[ $flutterVersion ]]'
       - git -C $$flutter$$ checkout -f $flutterVersion
-      # epic #3473 — swap the GMS/ML-Kit/Play-Core/Sentry-pulling plugins for
-      # Dart-only stubs BEFORE `pub get`; #3507 — swap the matching LIBRE
-      # lockfile in alongside so --enforce-lockfile pins the whole graph.
       - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
       - cp pubspec.fdroid.lock pubspec.lock
-      # templates/build-flutter.yml — local pub cache so the scanner walks
-      # the dart packages too.
       - export PUB_CACHE=$(pwd)/.pub-cache
       - $$flutter$$/bin/flutter config --no-analytics
       - $$flutter$$/bin/flutter pub get --enforce-lockfile
       - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
     scanignore:
-      # Vendored real ML-Kit plugin sources (kept for the Play/iOS build) still
-      # name com.google.mlkit in their Java; the fdroid build overrides them
-      # with the stubs above, but the scanner still walks the source tree.
       - third_party/google_mlkit_commons
       - third_party/google_mlkit_text_recognition
     scandelete:
       - .pub-cache
     build:
       - export PUB_CACHE=$(pwd)/.pub-cache
-      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true
-        --dart-define=FGS_FORM_APPROVED=true
+      # One block shape for all ABIs: the target platform + the flutter
+      # base build number derive from this block's versionCode (flutter's
+      # --split-per-abi offsets are +1000 armeabi-v7a / +2000 arm64-v8a /
+      # +4000 x86_64), so checkupdates-cloned blocks stay correct.
+      - case $$VERCODE$$ in 6*) abi=android-arm; off=1000;; 7*) abi=android-arm64;
+        off=2000;; *) abi=android-x64; off=4000;; esac
+      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
+        --target-platform $abi --build-number=$(( $$VERCODE$$ - off ))
+        --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
+  - versionName: 6.0.3
+    versionCode: 7136
+    commit: v6.0.3
+    output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
+    srclibs:
+      - flutter@stable
+    prebuild:
+      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
+      - '[[ $flutterVersion ]]'
+      - git -C $$flutter$$ checkout -f $flutterVersion
+      - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
+      - cp pubspec.fdroid.lock pubspec.lock
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get --enforce-lockfile
+      - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
+    scanignore:
+      - third_party/google_mlkit_commons
+      - third_party/google_mlkit_text_recognition
+    scandelete:
+      - .pub-cache
+    build:
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      # One block shape for all ABIs: the target platform + the flutter
+      # base build number derive from this block's versionCode (flutter's
+      # --split-per-abi offsets are +1000 armeabi-v7a / +2000 arm64-v8a /
+      # +4000 x86_64), so checkupdates-cloned blocks stay correct.
+      - case $$VERCODE$$ in 6*) abi=android-arm; off=1000;; 7*) abi=android-arm64;
+        off=2000;; *) abi=android-x64; off=4000;; esac
+      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
+        --target-platform $abi --build-number=$(( $$VERCODE$$ - off ))
+        --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
+  - versionName: 6.0.3
+    versionCode: 9136
+    commit: v6.0.3
+    output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
+    srclibs:
+      - flutter@stable
+    prebuild:
+      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
+      - '[[ $flutterVersion ]]'
+      - git -C $$flutter$$ checkout -f $flutterVersion
+      - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
+      - cp pubspec.fdroid.lock pubspec.lock
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get --enforce-lockfile
+      - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
+    scanignore:
+      - third_party/google_mlkit_commons
+      - third_party/google_mlkit_text_recognition
+    scandelete:
+      - .pub-cache
+    build:
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      # One block shape for all ABIs: the target platform + the flutter
+      # base build number derive from this block's versionCode (flutter's
+      # --split-per-abi offsets are +1000 armeabi-v7a / +2000 arm64-v8a /
+      # +4000 x86_64), so checkupdates-cloned blocks stay correct.
+      - case $$VERCODE$$ in 6*) abi=android-arm; off=1000;; 7*) abi=android-arm64;
+        off=2000;; *) abi=android-x64; off=4000;; esac
+      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
+        --target-platform $abi --build-number=$(( $$VERCODE$$ - off ))
+        --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
 UpdateCheckData: pubspec.yaml|version:\s.+\+(\d+)|.|version:\s(.+)\+
+VercodeOperation:
+  - '%c + 1000'
+  - '%c + 2000'
+  - '%c + 4000'
 CurrentVersion: 6.0.3
-CurrentVersionCode: 5136
+CurrentVersionCode: 9136
