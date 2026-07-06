@@ -121,10 +121,11 @@ account.
 ## Release-notes discipline for split-per-ABI builds
 
 F-Droid keys fastlane changelogs by **versionCode**, and the split builds
-carry `base+1000/2000/4000` (armeabi-v7a / arm64-v8a / x86_64). Every
-release must therefore ship FOUR changelog files per locale: `<base>.txt`
-(Play/self-hosted) plus the three derived copies — otherwise the catalog
-listing loses its What's New (#3516).
+carry `base*10 + {1,2,3}` (armeabi-v7a / arm64-v8a / x86_64 — the
+fdroid-flavor gradle override, #3518). Every release must therefore ship
+FOUR changelog files per locale: `<base>.txt` (Play/self-hosted) plus the
+three derived copies — otherwise the catalog listing loses its What's New
+(#3516).
 
 ## Caveats to disclose in the MR
 

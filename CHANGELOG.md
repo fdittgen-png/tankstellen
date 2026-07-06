@@ -12,6 +12,13 @@ About-screen build number always maps back to a commit.
 
 ## [Unreleased]
 
+## [6.0.4] - 2026-07-06 (Build 5137)
+
+### Changed
+
+- F-Droid: standard per-ABI versionCode scheme (base×10+ABI) per catalog
+  review — three ~40 MB APKs instead of one 124 MB universal APK.
+
 ## [6.0.3] - 2026-07-06 (Build 5136)
 
 ### Added

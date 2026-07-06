@@ -1,0 +1,5 @@
+• Post-trip verdict prompt calibrates the driving analysis to how trips feel
+• Motion sensors detect hard braking/cornering on OBD2 trips; spoken corner cues + trip summary
+• Readable trip charts; altitude relative to start; no phantom climb energy
+• Quieter reconnection: ambient status dot instead of a full-screen banner
+• Removed 4 unused permissions (microphone, phone state, legacy storage)
