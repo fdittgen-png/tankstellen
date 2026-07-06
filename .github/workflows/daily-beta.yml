@@ -57,14 +57,13 @@ jobs:
         id: bn
         run: |
           # #1882 — the old YYYYMMDDHH scheme gave only hour resolution,
-          # so two runs in the same hour produced the same code and Play
-          # rejected the duplicate. Derive it from the monotonic run
-          # counter instead: unique per run, unique per re-run attempt,
-          # strictly increasing. Base 2_026_060_000 is just above the
-          # last YYYYMMDDHH code ever uploaded (2026051719); the *10
-          # leaves room for re-run attempts. Max stays well under
-          # Android's 2_100_000_000 cap.
-          BN=$(( 2026060000 + ${{ github.run_number }} * 10 + ${{ github.run_attempt }} ))
+          # #3513 — ONE shared wall-clock scheme across every release-build
+          # workflow (minutes since 2025-07-06 UTC on a 2026100000 base):
+          # per-workflow run counters could leapfrog each other and trip
+          # Play's no-downgrade rule (the v6.0.3 tag deploy did exactly
+          # that). Strictly monotonic everywhere, above every shipped code,
+          # ~230 years under the 2_147_483_647 cap.
+          BN=$(( 2026100000 + ( $(date -u +%s) - 1751760000 ) / 60 )) # #3513 shared scheme
           echo "build_number=$BN" >> "$GITHUB_OUTPUT"
           echo "Build number: $BN" \
             "(run ${{ github.run_number }}, attempt ${{ github.run_attempt }})"

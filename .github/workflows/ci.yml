@@ -700,12 +700,26 @@ jobs:
       - name: Build APK (debug — PR validation)
         if: github.event_name == 'pull_request'
         run: flutter build apk --debug --flavor play
+      - name: Compute monotonic versionCode
+        if: github.event_name != 'pull_request'
+        id: bn
+        # #3513 — ONE shared, wall-clock-derived versionCode across every
+        # release-build workflow: minutes since 2025-07-06 UTC on a 2026100000
+        # base. Strictly monotonic across ALL workflows (the per-workflow
+        # run_number counters could leapfrog each other and trip Play's
+        # no-downgrade rule, as the v6.0.3 tag deploy did), above every shipped
+        # code, ~230 years under Android's 2_147_483_647 cap. The official
+        # F-Droid catalog keeps pubspec's static codes (separate install base).
+        run: |
+          BN=$(( 2026100000 + ( $(date -u +%s) - 1751760000 ) / 60 ))
+          echo "build_number=$BN" >> "$GITHUB_OUTPUT"
+          echo "versionCode: $BN"
       - name: Build APK (release, split per ABI)
         if: github.event_name != 'pull_request'
-        run: flutter build apk --release --split-per-abi --flavor play
+        run: flutter build apk --release --split-per-abi --flavor play --build-number=${{ steps.bn.outputs.build_number }}
       - name: Build App Bundle (release)
         if: github.event_name != 'pull_request'
-        run: flutter build appbundle --release --flavor play
+        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
       # #2947 — assert the MERGED play manifest declares ZERO
       # FOREGROUND_SERVICE* permissions, so a future accidental FGS re-merge
       # (the Android Auto v2 live bridge is a BOUND service, no FGS) trips CI
