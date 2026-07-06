@@ -21,6 +21,11 @@ import '../../../core/logging/error_logger.dart';
 class NativeGeocodingProvider implements GeocodingProvider {
   final String _countryName;
 
+  // geocoding 5.x wraps the former top-level functions in a class. `late`
+  // defers platform-factory lookup to the first geocode call: constructing
+  // eagerly throws off-device (test hosts have no platform implementation).
+  late final geo.Geocoding _geocoding = geo.Geocoding();
+
   NativeGeocodingProvider({String countryName = 'Deutschland'})
       : _countryName = countryName;
 
@@ -39,7 +44,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
     CancelToken? cancelToken,
   }) async {
     try {
-      final locations = await geo.locationFromAddress(
+      final locations = await _geocoding.locationFromAddress(
         '$zipCode, $_countryName',
       );
       if (locations.isEmpty) {
@@ -67,7 +72,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
   }) async {
     if (!isAvailable) return null;
     try {
-      final placemarks = await geo.placemarkFromCoordinates(lat, lng);
+      final placemarks = await _geocoding.placemarkFromCoordinates(lat, lng);
       if (placemarks.isEmpty) return null;
       return placemarks.first.isoCountryCode;
     } on Exception catch (e, st) {
@@ -96,7 +101,7 @@ class NativeGeocodingProvider implements GeocodingProvider {
     CancelToken? cancelToken,
   }) async {
     try {
-      final placemarks = await geo.placemarkFromCoordinates(lat, lng);
+      final placemarks = await _geocoding.placemarkFromCoordinates(lat, lng);
       if (placemarks.isEmpty) return '$lat, $lng';
       final place = placemarks.first;
       return [place.postalCode, place.locality]

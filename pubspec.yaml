@@ -34,7 +34,7 @@ dependencies:
   # migration pass, not as routine drift (#1684).
   latlong2: ^0.9.1
   geolocator: ^14.0.3
-  geocoding: ^4.0.0
+  geocoding: ^5.0.0
   # IMU sensor fusion for dongle-optional driving analytics (#2760).
   # Pure-platform accelerometer + gyroscope (Android SensorManager /
   # iOS CoreMotion) — no GMS / Play Services dependency, so it ships on
