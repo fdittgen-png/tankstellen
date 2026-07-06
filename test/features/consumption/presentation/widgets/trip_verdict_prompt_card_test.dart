@@ -76,18 +76,23 @@ void main() {
     expect(await repo.saveVerdict('ghost', TripVerdict.smooth), isFalse);
   });
 
-  Widget host(Widget child) => ProviderScope(
-        overrides: [
-          // Point the notifier's repo at the test box.
-          tripHistoryRepositoryProvider
-              .overrideWith((ref) => TripHistoryRepository(box: box)),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(body: child),
-        ),
-      );
+  // Widget tests avoid real Hive IO inside the test zone entirely (it never
+  // completes there): the notifier is faked and call-recorded, persistence
+  // itself is proven by the plain test()s above.
+  late _FakeTripHistoryList fakeList;
+  Widget host(Widget child) {
+    fakeList = _FakeTripHistoryList();
+    return ProviderScope(
+      overrides: [
+        tripHistoryListProvider.overrideWith(() => fakeList),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: child),
+      ),
+    );
+  }
 
   testWidgets('renders nothing once a verdict (incl. skipped) is persisted',
       (tester) async {
@@ -97,10 +102,8 @@ void main() {
     expect(find.byType(Card), findsNothing);
   });
 
-  testWidgets('tapping a chip persists the verdict and thanks the driver',
+  testWidgets('tapping a chip records the verdict and thanks the driver',
       (tester) async {
-    final repo = TripHistoryRepository(box: box);
-    await repo.save(entry());
     await tester.pumpWidget(host(
       const TripVerdictPromptCard(entryId: 't1', verdict: null),
     ));
@@ -110,22 +113,34 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('tripVerdictThanks')), findsOneWidget);
-    expect(repo.loadAll().single.verdict, 'smooth',
-        reason: 'the tap must persist through the notifier to Hive');
+    expect(fakeList.calls, [('t1', TripVerdict.smooth)],
+        reason: 'the tap must reach the notifier exactly once');
   });
 
-  testWidgets('dismissing persists skipped so the prompt never nags twice',
+  testWidgets('dismissing records skipped so the prompt never nags twice',
       (tester) async {
-    final repo = TripHistoryRepository(box: box);
-    await repo.save(entry());
     await tester.pumpWidget(host(
       const TripVerdictPromptCard(entryId: 't1', verdict: null),
     ));
     await tester.tap(find.byKey(const Key('tripVerdictDismiss')));
     await tester.pumpAndSettle();
 
-    expect(repo.loadAll().single.verdict, 'skipped');
+    expect(fakeList.calls, [('t1', TripVerdict.skipped)]);
     expect(find.byKey(const Key('tripVerdictThanks')), findsNothing,
         reason: 'a dismissal is not thanked, just hidden');
   });
+}
+
+/// Call-recording fake — the widget contract is "one notifier call per tap";
+/// Hive persistence is proven by the plain test()s above.
+class _FakeTripHistoryList extends TripHistoryList {
+  final List<(String, TripVerdict)> calls = [];
+
+  @override
+  List<TripHistoryEntry> build() => const [];
+
+  @override
+  Future<void> setVerdict(String id, TripVerdict verdict) async {
+    calls.add((id, verdict));
+  }
 }

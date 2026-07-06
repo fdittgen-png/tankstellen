@@ -15,7 +15,6 @@ import 'package:tankstellen/features/consumption/data/trip_history_repository.da
 import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trajets_record_fab.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/trajets_tab.dart';
-import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/features/consumption/providers/trip_recording_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';

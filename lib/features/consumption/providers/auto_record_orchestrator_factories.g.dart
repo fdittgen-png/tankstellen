@@ -73,7 +73,7 @@ final class AutoRecordListenerFactoryProvider
 }
 
 String _$autoRecordListenerFactoryHash() =>
-    r'5679d42e1a8c6f9453334fab9c982863798be3a3';
+    r'c765df8cd84dd3bf14c78e048f7ded53fb72fcc3';
 
 /// Default opener: opens a fresh [Obd2Service] for the configured MAC
 /// via [Obd2ConnectionService.connectByMac] (#1004 phase 2b-3).

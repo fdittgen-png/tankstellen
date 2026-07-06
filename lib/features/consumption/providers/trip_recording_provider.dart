@@ -39,22 +39,16 @@ import 'trip_recording_phase.dart';
 import 'trip_recording_state.dart';
 import '../../../core/logging/error_logger.dart';
 
-// Re-export the phase, state, and haptic-policy types so existing
-// callers (widgets, screens, tests) that import this file keep
-// resolving without touching every import site after the #563
-// provider-split refactor. New callers should import the individual
-// files directly.
+// Re-exports so existing callers keep resolving after the #563 split;
+// new callers should import the individual files directly.
 export 'haptic_feedback_policy.dart'
     show HapticIntensity, hapticForBandTransition;
 export 'trip_recording_phase.dart' show TripRecordingPhase;
 export 'trip_recording_state.dart' show TripRecordingState;
-// #1330 phase 3 — re-export TripDropReason so widgets watching
-// `tripRecordingProvider.select((s) => s.dropReason)` resolve the
-// type without a second import.
+// #1330 — TripDropReason for `select((s) => s.dropReason)` watchers.
 export '../../obd2/api.dart' show TripDropReason;
-// #2190 — StoppedTripResult moved next to the RecordingPipeline strategy
-// seam to avoid a circular import. Re-export it so the ~10 callers that
-// import this provider keep resolving the type without a new import.
+// #2190 — StoppedTripResult lives beside the RecordingPipeline seam
+// (circular-import avoidance); re-exported for its ~10 callers.
 export 'recording_pipeline.dart' show StoppedTripResult;
 // #2274 concern 2 — the connecting phase carries a TripStartStage on the
 // state; re-export it so callers that drive the start flow through this
@@ -63,6 +57,9 @@ export '../domain/entities/trip_start_stage.dart' show TripStartStage;
 // #2548 — the saving phase carries a TripSaveStage; re-export it so
 // callers resolve the type without a second import.
 export '../domain/entities/trip_save_stage.dart' show TripSaveStage;
+
+// #3504 — re-export: keeps the #3132 driving->consumption count flat.
+export 'trip_history_provider.dart';
 
 part 'trip_recording_provider.g.dart';
 

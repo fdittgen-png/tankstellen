@@ -7,11 +7,9 @@ import '../../../core/utils/geo_utils.dart' as geo;
 import 'accel_event_gate.dart';
 import 'trip_recorder.dart';
 
-/// #3502 — altitude deadband (m) for the climb/descent hysteresis: GPS
-/// altitude jitter is ±2-8 m per fix at 1 Hz, so sample-to-sample deltas
-/// summed directly manufacture phantom climb on a flat road. Real grades
-/// commit their FULL delta each time the anchor advances, so nothing real
-/// is lost — only the oscillation inside the band nets out.
+/// #3502 — altitude deadband (m) for the climb/descent hysteresis: ±2-8 m
+/// per-fix GPS jitter summed directly manufactures phantom climb on a flat
+/// road; real grades commit their full delta each anchor advance.
 const double kAltitudeDeadbandM = 3.0;
 
 /// Lateral-acceleration threshold (m/s²) above which a turn counts as a
@@ -46,26 +44,11 @@ const double kStationarySpeedKmh = 5.0;
 /// Driving-style aggregate derived from a stream of [TripSample]s
 /// **without** any OBD2 telemetry — the lean feature set the GPS
 /// calibration matrix (ADR 0010 / #2057 / Epic #2055) is fit against.
-///
-/// Pure transform. No vehicle, no matrix, no I/O. The caller passes
-/// in the trajet's `Iterable<TripSample>`; the static
-/// [GpsDrivingFeatures.from] returns the aggregate (or `null` when
-/// the sample stream is empty / too short to produce a meaningful
-/// figure).
-///
-/// Field names map 1:1 to the matrix design in
-/// `docs/decisions/0010-gps-calibration-matrix.md`. The 4-coefficient
-/// lean model consumes:
-///
-/// - `idleSeconds / totalSeconds` → `idleCost`
-/// - `highSpeedSeconds / totalSeconds` → `highSpeedPenalty`
-/// - `accelEvents / distanceKm` → `accelEventCost`
-/// - the constant term (baseline)
-///
-/// The remaining fields ([brakeEvents], [gradeClimbMeters],
-/// [gradeDescentMeters], [cornerLoadIntegral]) are captured so the
-/// 7-coefficient expansion path doesn't have to revisit the recorder
-/// when it lands.
+/// Pure transform (no vehicle/matrix/IO); [GpsDrivingFeatures.from]
+/// returns null on an empty/too-short stream. Field names map 1:1 to
+/// docs/decisions/0010-gps-calibration-matrix.md; the extra fields
+/// ([brakeEvents], grade/corner integrals) pre-capture the 7-coef
+/// expansion so it never revisits the recorder.
 class GpsDrivingFeatures {
   /// Seconds where `speedKmh < 5` — engine running, car stationary.
   final double idleSeconds;
@@ -329,16 +312,9 @@ class GpsDrivingFeatures {
         coastSeconds += dt;
       }
 
-      // Altitude delta — only while moving (#3412): standstill altitude noise
-      // would otherwise become phantom climb (a bogus "29% gradient" lesson).
-      // #3502 — anchor-deadband hysteresis on top: per-fix GPS altitude
-      // jitter (±2-8 m at 1 Hz) summed sample-to-sample manufactured
-      // hundreds of phantom climb metres on a flat road, inflating
-      // climbEnergyPerKm and its "L wasted climbing" lesson. Climb/descent
-      // now commits only when the altitude has moved ≥ [kAltitudeDeadbandM]
-      // from the last committed anchor — real grades pass unchanged (the
-      // full delta is credited when the anchor advances), oscillation
-      // inside the band nets to zero.
+      // Altitude delta — only while moving (#3412: standstill noise becomes
+      // phantom climb) and through the #3502 anchor-deadband hysteresis
+      // (in-band jitter nets to zero; real grades commit full deltas).
       final cAlt = cur.altitudeM;
       if (moving && cAlt != null) {
         // Seed the anchor from the segment's PREV altitude so the very

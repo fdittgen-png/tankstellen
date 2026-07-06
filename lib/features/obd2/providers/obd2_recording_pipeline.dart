@@ -35,21 +35,14 @@ import '../../consumption/providers/trip_oem_fuel_level_controller.dart';
 import '../../consumption/providers/trip_recording_phase.dart';
 import '../../consumption/providers/trip_recording_state.dart';
 
-/// Concrete OBD2 recording strategy (#2227), completing the
-/// [RecordingPipeline] seam #2190 opened with [GpsOnlyRecordingPipeline].
-/// Owns the sensor-rich OBD2 recording loop that used to be inline on the
-/// [TripRecording] notifier (the `_pipeline == null` default path): the
-/// owned [Obd2Service], the [TripRecordingController] + its live /
-/// stateChanges subscriptions, the adapter-identity snapshot (#1312), the
-/// one-shot capability-probe latch (#2261), and the auto-reconnect scanner
-/// factory (#797 / #2245). Focused collaborators are *injected* from the
-/// notifier so they outlive a single recording.
-///
-/// Deliberately NOT owned: the Riverpod `state`, the last-trip identity
-/// fields, `_saveToHistory`, and the #1303 active-trip WAL (+ #1347
-/// cold-start recovery) stay on the notifier via [Obd2RecordingPipelineHost]
-/// — the WAL survives the recording loop being torn down (recovery runs with
-/// no pipeline at all). The seed / flush cadence uses the same host hooks.
+/// Concrete OBD2 recording strategy (#2227) behind the [RecordingPipeline]
+/// seam (#2190): owns the [Obd2Service], the [TripRecordingController] +
+/// its live/stateChanges subscriptions, the adapter-identity snapshot
+/// (#1312), the capability-probe latch (#2261) and the reconnect-scanner
+/// factory (#797/#2245); collaborators are injected from the notifier.
+/// NOT owned (host seam): the Riverpod state, last-trip identity,
+/// `_saveToHistory`, and the #1303 WAL (+#1347 recovery — it runs with no
+/// pipeline at all).
 class Obd2RecordingPipeline implements RecordingPipeline {
   Obd2RecordingPipeline({
     required Ref ref,
@@ -90,10 +83,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
 
   Obd2Service? _service;
   Obd2LinkLease? _lease; // #3420 — the recording's session lease (arbiter)
-  // #3500 — per-trip IMU sensor fusion, the SAME shared collaborator the
-  // GPS-only pipeline runs. Before this the OBD2 path ran NO inertial
-  // detector (the #2895/#3029 parity note), so every OBD2 trip reported
-  // imuActive=false, harsh counts 0, and the live voice coach never fired.
+  // #3500 — per-trip IMU fusion (shared with the GPS-only pipeline); the
+  // OBD2 path previously ran NO inertial detector (#2895/#3029 note).
   TripImuFusion? _imuFusion;
   TripRecordingController? _controller;
   StreamSubscription<TripLiveReading>? _liveSub;
@@ -108,62 +99,47 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   @override
   bool get isGpsOnly => false;
 
-  /// The live controller, exposed so the notifier's WAL snapshot
-  /// helpers, `pause` / `resume`, and `debugController` read it through
-  /// the pipeline instead of owning a field. Null between trips and in
-  /// the cold-start-recovered state (where no pipeline exists).
+  /// The live controller (WAL snapshots, pause/resume, debug hooks read it
+  /// here). Null between trips / in the cold-start-recovered state.
   TripRecordingController? get controller => _controller;
 
   /// The vehicle id the current recording's baselines are scoped to —
   /// stamped onto the WAL snapshot + the saved entry by the notifier.
   String? get baselineVehicleId => _baselines.vehicleId;
 
-  /// Adapter identity snapshotted at [start] (#1312), read by the
-  /// notifier's WAL save so it survives the service being disconnected
-  /// before the entry is written.
+  /// Adapter identity snapshotted at [start] (#1312) — survives the
+  /// pre-save disconnect.
   String? get adapterMac => _adapterMac;
   String? get adapterName => _adapterName;
   String? get adapterFirmware => _adapterFirmware;
 
-  /// Begin a recording session backed by [service]. The pipeline takes
-  /// ownership of the service — [stop] handles the full teardown. Moved
-  /// verbatim from `TripRecording._startInternal`; the re-entrancy guard
-  /// + `state.isActive` short-circuit stay on the notifier.
+  /// Begin a recording backed by [service] (pipeline takes ownership;
+  /// [stop] tears down). The re-entrancy guard stays on the notifier.
   Future<void> start(Obd2Service service, {bool automatic = false}) async {
     // #3420 — claim the link BEFORE the first await: a drop anywhere in the start window belongs to THIS recording, never the #3019 idle loop.
     _lease = Obd2LinkArbiter.instance.tryAcquire('recording', Obd2LinkPriority.recording);
     _service = service;
     // #2261 concern 6 — re-arm the deferred capability probe (first sample).
     _capabilityReconcileKicked = false;
-    // #1312 — snapshot adapter identity NOW: the service is disconnected in
-    // `stop` before the entry is saved, so it can't be read off the live
-    // service then. Null → the detail card hides the row.
+    // #1312 — snapshot adapter identity NOW (stop disconnects pre-save).
     _adapterMac = service.adapterMac;
     _adapterName = service.adapterName;
     _adapterFirmware = service.adapterFirmware;
     // #812 phase 3 — snapshot the active vehicle for `readFuelRateLPerHour`;
     // vehicle id up-front to tag any pause-on-drop snapshot (#797 phase 1).
     final activeVehicle = _readActiveVehicle();
-    // #797 phase 3 / #3423 — reconnect pin: vehicle-profile MAC first, else
-    // the #3019 last-good auto-pin (picker-started trips reconnect too);
-    // null (neither) skips the scanner — grace window is the sole recovery.
+    // #797/#3423 — reconnect pin: vehicle MAC, else the #3019 auto-pin;
+    // null skips the scanner (grace window is the sole recovery).
     final pinnedMac = resolveAdapterPinMac(activeVehicle?.obd2AdapterMac,
         () => _ref.read(lastGoodAdapterStoreProvider).recall());
-    // #1395 — wire the diagnostic breadcrumb sink for this trip; controller
-    // and [Obd2Service] push through the SAME keepAlive notifier so the
-    // trace survives the recording screen popping.
+    // #1395 — per-trip breadcrumb sink (keepAlive: survives screen pops).
     final breadcrumbs = _ref.read(obd2BreadcrumbsProvider.notifier);
     breadcrumbs.clear(); // fresh suspicion-rate denominator for THIS trip
     service.breadcrumbCollector = breadcrumbs;
-    // #1422 phase 1 — match the active vehicle to the bundled catalog so the
-    // controller uses the engine-tech-derived η_v default instead of the
-    // legacy 0.85 literal until VeLearner converges. Null on no-match.
+    // #1422 — catalog match → engine-tech η_v default (null on no-match).
     final matchedReference = tryMatchReferenceVehicle(_ref, activeVehicle);
-    // #2506 — SHARED GPS-physics live-estimate + coaching folder (mirrors
-    // the GPS-only pipeline). Folded per no-fuel-PID tick in the controller
-    // so the OBD2 live screen carries `~ estimated` consumption + GPS
-    // coaching, mirroring the post-trip `Obd2GpsEstimateFallback`. Null
-    // vehicle / matrix → population-default class + cold-start scale.
+    // #2506 — shared GPS-physics live-estimate + coaching folder (null
+    // vehicle/matrix → population defaults), mirrors the GPS-only pipeline.
     final gpsEstimateFolder = GpsLiveEstimateFolder.forVehicle(
       activeVehicle,
       activeVehicle?.gpsCalibration,
@@ -199,10 +175,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     );
     _controller = ctl;
 
-    // #3500 — attach the shared per-trip IMU fusion (same collaborator the
-    // GPS-only pipeline runs): confirmed inertial accel/brake episodes feed
-    // the SAME live harsh-event bus, so spoken coaching now fires on OBD2
-    // trips too. Sensor failure is non-fatal (logged inside the fusion).
+    // #3500 — shared per-trip IMU fusion: confirmed inertial episodes feed
+    // the live harsh-event bus (spoken coaching on OBD2 trips too); sensor
+    // failure is non-fatal (logged inside the fusion).
     final imuFusion = buildTripImuFusion(
       _ref,
       onEvent: _ref.read(liveHarshEventBusProvider.notifier).add,
@@ -222,8 +197,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       unawaited(service.disconnectQuietly());
       throw const Obd2AdapterUnresponsive();
     }
-    // #1374 / #1981 — GPS trip-path sampling, default-on; fire-and-forget so
-    // the permission round-trip never blocks trip-start.
+    // #1374/#1981 — GPS trip-path sampling; never blocks trip-start.
     unawaited(_gps.start(ctl));
     // #1615 — opt-in OEM-PID exact-fuel-level poll; no-op when off.
     _oemFuel.start(
@@ -237,12 +211,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // its session id + odometer reads (stays on the notifier).
     _host.seedActiveSnapshot();
     _liveSub = ctl.live.listen((reading) {
-      // #3500 — keep the IMU fusion's min-speed gate + accel/brake direction
-      // tracking the real vehicle speed (OBD2 speed PID or GPS-derived).
+      // #3500 — feed real vehicle speed to the fusion's min-speed gate.
       _imuFusion?.feedSpeedKmh(reading.speedKmh);
-      // #2261 concern 6 — run the deferred `0902` capability probe lazily
-      // now that the first samples are landing. Fire-and-forget +
-      // one-shot.
+      // #2261 — deferred `0902` capability probe, one-shot fire-and-forget.
       if (!_capabilityReconcileKicked) {
         _capabilityReconcileKicked = true;
         unawaited(_service?.ensureCapabilityReconciled() ?? Future.value());
@@ -327,9 +298,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
-    // #2548 — staged save-progress: flip into the transient (non-active)
-    // `saving` phase so the screen shows the inline TripSaveProgress card
-    // instead of a frozen swap. Finalising (odometer + summary) is beat 1.
+    // #2548 — staged save-progress, beat 1 (odometer + summary).
     _host.setSaveStage(TripSaveStage.finalizingSummary);
     try {
       await ctl.refreshOdometer();
@@ -353,10 +322,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       samples: capturedSamples,
       vehicle: _readActiveVehicle(),
     );
-    // #3500 — harvest the per-trip IMU fusion: stamp the aggregate inertial
-    // counts + the #2895 `imuActive ? imu : recorder` veto, exactly as the
-    // GPS-only pipeline does. Torn down BEFORE the summary is persisted so
-    // no inertial subscription survives between trips.
+    // #3500 — harvest the IMU fusion (counts + the #2895 veto, as the
+    // GPS-only pipeline does); torn down before the summary persists.
     final imuFusion = _imuFusion;
     _imuFusion = null;
     await imuFusion?.stop();

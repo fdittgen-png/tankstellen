@@ -3,10 +3,13 @@
 
 import 'dart:ui' show Locale;
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../logging/error_logger.dart';
 import '../voice_announcement_service.dart';
 
 /// Platform TTS implementation using [FlutterTts].
@@ -36,8 +39,11 @@ class FlutterTtsAnnouncementService implements VoiceAnnouncementService {
     // Best-effort: an engine without the API just keeps the default mix.
     try {
       await _tts.setAudioAttributesForNavigation();
-    } catch (e) {
-      debugPrint('VoiceAnnouncement: navigation audio attrs unavailable: $e');
+    } catch (e, st) {
+      // Best-effort — an engine without the API keeps the default mix.
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+        'where': 'FlutterTtsAnnouncementService: navigation audio attrs',
+      }));
     }
     await _tts.setSpeechRate(0.5);
     await _tts.setVolume(1.0);

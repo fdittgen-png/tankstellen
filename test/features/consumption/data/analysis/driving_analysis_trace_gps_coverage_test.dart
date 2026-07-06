@@ -79,7 +79,7 @@ void main() {
 
     final json = trace(coverage: coverage).toJson();
 
-    expect(json['schema'], 3);
+    expect(json['schema'], 4); // v4: additive obd2Coverage + verdict (#3499/#3501)
     final block = json['gpsCoverage'] as Map<String, dynamic>;
     expect(block['actualFixCount'], 12);
     expect(block['expectedFixCount'], 41);

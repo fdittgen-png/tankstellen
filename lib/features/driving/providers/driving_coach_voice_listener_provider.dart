@@ -17,7 +17,6 @@ import '../../consumption/domain/driving_coaching.dart'
     show DrivingCoachingHint, coachingHint;
 import '../../consumption/domain/harsh_event.dart'
     show HarshEvent, HarshEventType;
-import '../../consumption/providers/trip_history_provider.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 import 'live_harsh_event_bus_provider.dart';
 import 'voice_coaching_enabled_provider.dart';
@@ -120,11 +119,23 @@ class DrivingCoachVoiceListener extends _$DrivingCoachVoiceListener {
         // the recording→finished transition, behind the same voice toggle.
         if (next.phase == TripRecordingPhase.finished &&
             prev?.phase != TripRecordingPhase.finished) {
-          unawaited(_speakTripSummary(ttsService));
+          // A cancellable Timer (NOT Future.delayed): the settle must die
+          // with the provider, or a disposed test tree trips the
+          // pending-timer invariant.
+          _summaryTimer?.cancel();
+          _summaryTimer = Timer(_tripSummarySettle,
+              () => unawaited(_speakTripSummary(ttsService)));
         }
       },
     );
+    ref.onDispose(() {
+      _summaryTimer?.cancel();
+      _summaryTimer = null;
+    });
   }
+
+  /// #3504 — pending end-of-trip-summary settle; cancelled on dispose.
+  Timer? _summaryTimer;
 
   /// #3504 — speak "trip saved: distance, consumption, harsh count" once
   /// per save. Reads the newest history entry after a short settle (the
@@ -133,7 +144,6 @@ class DrivingCoachVoiceListener extends _$DrivingCoachVoiceListener {
   /// against double phase flips.
   Future<void> _speakTripSummary(VoiceAnnouncementService ttsService) async {
     try {
-      await Future<void>.delayed(_tripSummarySettle);
       const key = 'summary.trip';
       final now = _clock;
       if (_onCooldown(key, now)) return;
