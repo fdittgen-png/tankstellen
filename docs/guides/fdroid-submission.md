@@ -149,7 +149,7 @@ Before either submission, prove the flavor is clean:
 # both layers, against a built APK. With the epic #3473 pubspec-override
 # mechanism, the RELEASE fdroid dex must carry ZERO references (not just
 # definitions) — the same bar as F-Droid's `check apk` scanner:
-tool/apply_fdroid_overrides.dart  # or: cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
+dart run tool/apply_fdroid_overrides.dart  # copies the overrides AND pubspec.fdroid.lock (#3507)
 flutter build apk --release --flavor fdroid \
   --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
 bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk

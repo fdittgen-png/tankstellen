@@ -67,7 +67,10 @@ jobs:
       # against the real libre dependency graph (in_app_review stubbed → no Play
       # Core `review` classes, etc.). Play/iOS jobs never run this step.
       - run: dart run tool/apply_fdroid_overrides.dart
-      - run: flutter pub get
+      # #3507 — enforce the committed LIBRE lockfile (pubspec.fdroid.lock,
+      # swapped in by the apply tool): a dependency bump that forgets to
+      # regenerate it fails HERE, not on F-Droid's buildserver.
+      - run: flutter pub get --enforce-lockfile
       - run: dart run build_runner build --delete-conflicting-outputs
       # Build the keyless-unsigned RELEASE fdroid APK with the GMS-free
       # runtime config (#3480 — release, not debug: only R8 strips the dead
