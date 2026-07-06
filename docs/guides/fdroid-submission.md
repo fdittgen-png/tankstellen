@@ -118,6 +118,15 @@ account.
    **days to weeks** before it lands and the first reproducible build is
    published.
 
+## Release-notes discipline for split-per-ABI builds
+
+F-Droid keys fastlane changelogs by **versionCode**, and the split builds
+carry `base*10 + {1,2,3}` (armeabi-v7a / arm64-v8a / x86_64 — the
+fdroid-flavor gradle override, #3518). Every release must therefore ship
+FOUR changelog files per locale: `<base>.txt` (Play/self-hosted) plus the
+three derived copies — otherwise the catalog listing loses its What's New
+(#3516).
+
 ## Caveats to disclose in the MR
 
 - **Text OCR is unavailable in the fdroid flavor by design; QR scanning works.**

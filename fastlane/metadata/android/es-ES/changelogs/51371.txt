@@ -1,0 +1,5 @@
+• El veredicto tras el viaje calibra el análisis de conducción a tus sensaciones
+• Los sensores de movimiento detectan frenadas/curvas bruscas también en viajes OBD2; avisos de voz y resumen hablado
+• Gráficos legibles; altitud relativa al inicio; sin energía de subida fantasma
+• Reconexión más discreta: punto de estado en vez de un banner a pantalla completa
+• Eliminados 4 permisos sin uso (micrófono, estado del teléfono, almacenamiento antiguo)

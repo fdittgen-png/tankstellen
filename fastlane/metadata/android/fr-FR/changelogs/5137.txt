@@ -1,0 +1,5 @@
+• Le verdict post-trajet calibre l'analyse de conduite sur votre ressenti
+• Les capteurs de mouvement détectent freinages/virages brusques aussi en OBD2 ; annonces vocales + résumé parlé
+• Graphiques lisibles ; altitude relative au départ ; plus d'énergie de montée fantôme
+• Reconnexion plus discrète : point d'état au lieu d'un bandeau plein écran
+• 4 permissions inutilisées supprimées (micro, état du téléphone, ancien stockage)

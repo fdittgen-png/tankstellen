@@ -34,9 +34,9 @@ RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
 Builds:
-  - versionName: 6.0.3
-    versionCode: 6136
-    commit: v6.0.3
+  - versionName: 6.0.4
+    versionCode: 51371
+    commit: v6.0.4
     output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
     srclibs:
       - flutter@stable
@@ -61,14 +61,14 @@ Builds:
       # base build number derive from this block's versionCode (flutter's
       # --split-per-abi offsets are +1000 armeabi-v7a / +2000 arm64-v8a /
       # +4000 x86_64), so checkupdates-cloned blocks stay correct.
-      - case $$VERCODE$$ in 6*) abi=android-arm; off=1000;; 7*) abi=android-arm64;
-        off=2000;; *) abi=android-x64; off=4000;; esac
+      - case $(( $$VERCODE$$ % 10 )) in 1) abi=android-arm;; 2) abi=android-arm64;;
+        *) abi=android-x64;; esac
       - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
-        --target-platform $abi --build-number=$(( $$VERCODE$$ - off ))
+        --target-platform $abi --build-number=$(( $$VERCODE$$ / 10 ))
         --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
-  - versionName: 6.0.3
-    versionCode: 7136
-    commit: v6.0.3
+  - versionName: 6.0.4
+    versionCode: 51372
+    commit: v6.0.4
     output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
     srclibs:
       - flutter@stable
@@ -93,14 +93,14 @@ Builds:
       # base build number derive from this block's versionCode (flutter's
       # --split-per-abi offsets are +1000 armeabi-v7a / +2000 arm64-v8a /
       # +4000 x86_64), so checkupdates-cloned blocks stay correct.
-      - case $$VERCODE$$ in 6*) abi=android-arm; off=1000;; 7*) abi=android-arm64;
-        off=2000;; *) abi=android-x64; off=4000;; esac
+      - case $(( $$VERCODE$$ % 10 )) in 1) abi=android-arm;; 2) abi=android-arm64;;
+        *) abi=android-x64;; esac
       - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
-        --target-platform $abi --build-number=$(( $$VERCODE$$ - off ))
+        --target-platform $abi --build-number=$(( $$VERCODE$$ / 10 ))
         --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
-  - versionName: 6.0.3
-    versionCode: 9136
-    commit: v6.0.3
+  - versionName: 6.0.4
+    versionCode: 51373
+    commit: v6.0.4
     output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
     srclibs:
       - flutter@stable
@@ -125,18 +125,18 @@ Builds:
       # base build number derive from this block's versionCode (flutter's
       # --split-per-abi offsets are +1000 armeabi-v7a / +2000 arm64-v8a /
       # +4000 x86_64), so checkupdates-cloned blocks stay correct.
-      - case $$VERCODE$$ in 6*) abi=android-arm; off=1000;; 7*) abi=android-arm64;
-        off=2000;; *) abi=android-x64; off=4000;; esac
+      - case $(( $$VERCODE$$ % 10 )) in 1) abi=android-arm;; 2) abi=android-arm64;;
+        *) abi=android-x64;; esac
       - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
-        --target-platform $abi --build-number=$(( $$VERCODE$$ - off ))
+        --target-platform $abi --build-number=$(( $$VERCODE$$ / 10 ))
         --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$
 UpdateCheckData: pubspec.yaml|version:\s.+\+(\d+)|.|version:\s(.+)\+
 VercodeOperation:
-  - '%c + 1000'
-  - '%c + 2000'
-  - '%c + 4000'
-CurrentVersion: 6.0.3
-CurrentVersionCode: 9136
+  - '%c * 10 + 1'
+  - '%c * 10 + 2'
+  - '%c * 10 + 3'
+CurrentVersion: 6.0.4
+CurrentVersionCode: 51373

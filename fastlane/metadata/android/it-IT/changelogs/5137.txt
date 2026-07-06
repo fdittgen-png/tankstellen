@@ -1,0 +1,5 @@
+• Il verdetto post-viaggio calibra l'analisi di guida sulle tue sensazioni
+• I sensori di movimento rilevano frenate/curve brusche anche nei viaggi OBD2; avvisi vocali + riepilogo parlato
+• Grafici leggibili; altitudine relativa alla partenza; niente energia di salita fantasma
+• Riconnessione più discreta: punto di stato invece di un banner a tutto schermo
+• Rimossi 4 permessi inutilizzati (microfono, stato del telefono, archiviazione legacy)
