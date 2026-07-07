@@ -50,6 +50,10 @@ on:
         description: 'Also upload ios/fastlane/screenshots/<locale>/ (#3521)'
         type: boolean
         default: false
+      overwrite_screenshots:
+        description: 'Delete existing ASC screenshots first (#3525 — set false when the version state blocks deletion: "Can''t Delete Screenshot After Submit for review")'
+        type: boolean
+        default: true
 
 concurrency:
   group: app-store-listing
@@ -108,6 +112,7 @@ jobs:
           # `submit` only matters on a real run; on a dry run it is ignored.
           SUBMIT: ${{ inputs.submit }}
           UPLOAD_SCREENSHOTS: ${{ inputs.upload_screenshots }}
+          OVERWRITE_SCREENSHOTS: ${{ inputs.overwrite_screenshots }}
           FASTLANE_DISABLE_COLORS: '1'
         run: |
           set -euo pipefail
@@ -129,11 +134,14 @@ jobs:
           )
 
           # #3521 — screenshots ship only on explicit opt-in, and only if the
-          # harness output is actually committed. overwrite_screenshots keeps
-          # ASC exactly in sync with the repo (stale slots are replaced).
+          # harness output is actually committed. overwrite keeps ASC exactly
+          # in sync with the repo (stale slots are replaced) — but #3525: when
+          # the version state blocks deletion ("Can't Delete Screenshot After
+          # Submit for review"), dispatch with overwrite_screenshots=false to
+          # upload additively into empty slots without the delete pass.
           if [ "$UPLOAD_SCREENSHOTS" = "true" ] && [ -d fastlane/screenshots ]; then
-            echo "::notice::Uploading screenshots from ios/fastlane/screenshots/."
-            ARGS+=( --skip_screenshots false --overwrite_screenshots true )
+            echo "::notice::Uploading screenshots from ios/fastlane/screenshots/ (overwrite: $OVERWRITE_SCREENSHOTS)."
+            ARGS+=( --skip_screenshots false --overwrite_screenshots "$OVERWRITE_SCREENSHOTS" )
           else
             ARGS+=( --skip_screenshots true )
           fi
