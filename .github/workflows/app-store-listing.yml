@@ -139,10 +139,18 @@ jobs:
           fi
 
           if [ "$DRY_RUN" = "true" ]; then
-            # --verify_only validates the metadata against App Store Connect
-            # WITHOUT uploading. submit_for_review is irrelevant here.
-            echo "::notice::Dry run — deliver --verify_only (validate metadata, no upload)."
-            ARGS+=( --verify_only true --submit_for_review false )
+            # #3523 — deliver's --verify_only is a BINARY verification mode:
+            # it builds an IPA upload package, and with --skip_binary_upload
+            # and no IPA it crashes digesting a nil path. The read-only
+            # metadata validation is `fastlane precheck`, which scans the
+            # App Store Connect metadata for rule violations WITHOUT
+            # uploading or changing anything.
+            echo "::notice::Dry run — fastlane precheck (read-only metadata scan, no upload)."
+            bundle exec fastlane precheck \
+              --api_key_path "$ASC_API_KEY_JSON" \
+              --app_identifier de.tankstellen.tankstellen \
+              --include_in_app_purchases false
+            exit 0
           else
             # Real upload. submit_for_review is true ONLY when the maintainer
             # explicitly set the submit input; otherwise metadata is staged

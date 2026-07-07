@@ -90,9 +90,11 @@ Apple listing changes are tied to a specific app version + the review process,
 so an auto-publish on every metadata commit (the way Play does) is too risky.
 
 1. **Validate first (dry run).** Dispatch with `dry_run` = **true** (the
-   default). This runs `deliver --verify_only`, which validates the metadata
-   against App Store Connect — checks lengths, locale coverage, forbidden
-   content — **without uploading anything**.
+   default). This runs `fastlane precheck`, a read-only scan of the App
+   Store Connect metadata for rule violations — **without uploading
+   anything**. (It used to pass `deliver --verify_only`, but that flag is
+   a *binary* verification mode: with `skip_binary_upload` and no IPA it
+   crashes digesting a nil path, #3523.)
 2. **Real run.** Dispatch with `dry_run` = **false** to upload the text
    metadata. Leave `submit` = false (the default) so the copy is *staged*
    for the editable version and a human reviews + submits in the console.
