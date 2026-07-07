@@ -29,9 +29,11 @@ name: App Store listing
 # - APP_STORE_CONNECT_API_KEY_ID      the key's Key ID
 # - APP_STORE_CONNECT_API_ISSUER_ID   the issuer ID
 #
-# Screenshots are intentionally NOT uploaded here: Apple requires exact
-# device-pixel sizes per device class, which we don't yet have (tracked
-# separately). See ios/fastlane/Deliverfile + the guide doc.
+# Screenshots (#3521): 6.9" iPhone captures from the integration harness
+# (integration_test/appstore_screenshots_test.dart) live under
+# ios/fastlane/screenshots/<locale>/. They are uploaded ONLY when the
+# maintainer sets the `upload_screenshots` input — the default run stays
+# text-only, matching the Deliverfile's skip_screenshots(true).
 
 on:
   workflow_dispatch:
@@ -42,6 +44,10 @@ on:
         default: true
       submit:
         description: 'Submit for review after upload (DANGER — only when intentional; ignored on a dry run)'
+        type: boolean
+        default: false
+      upload_screenshots:
+        description: 'Also upload ios/fastlane/screenshots/<locale>/ (#3521)'
         type: boolean
         default: false
 
@@ -101,6 +107,7 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           # `submit` only matters on a real run; on a dry run it is ignored.
           SUBMIT: ${{ inputs.submit }}
+          UPLOAD_SCREENSHOTS: ${{ inputs.upload_screenshots }}
           FASTLANE_DISABLE_COLORS: '1'
         run: |
           set -euo pipefail
@@ -117,10 +124,19 @@ jobs:
           ARGS=(
             --api_key_path "$ASC_API_KEY_JSON"
             --skip_binary_upload true
-            --skip_screenshots true
             --force true
             --precheck_include_in_app_purchases false
           )
+
+          # #3521 — screenshots ship only on explicit opt-in, and only if the
+          # harness output is actually committed. overwrite_screenshots keeps
+          # ASC exactly in sync with the repo (stale slots are replaced).
+          if [ "$UPLOAD_SCREENSHOTS" = "true" ] && [ -d fastlane/screenshots ]; then
+            echo "::notice::Uploading screenshots from ios/fastlane/screenshots/."
+            ARGS+=( --skip_screenshots false --overwrite_screenshots true )
+          else
+            ARGS+=( --skip_screenshots true )
+          fi
 
           if [ "$DRY_RUN" = "true" ]; then
             # --verify_only validates the metadata against App Store Connect
@@ -159,7 +175,8 @@ jobs:
             echo "- **Bundle ID:** de.tankstellen.tankstellen"
             echo "- **Dry run:** ${{ inputs.dry_run }}"
             echo "- **Submit for review:** ${{ inputs.submit }} (ignored on a dry run)"
-            echo "- **Uploaded:** text metadata only (no binary, no screenshots)"
+            echo "- **Screenshots:** ${{ inputs.upload_screenshots }}"
+            echo "- **Uploaded:** text metadata${{ inputs.upload_screenshots == true && ' + screenshots' || ' only' }} (never the binary)"
             echo ""
             echo "Prerequisite: needs a version in **Prepare for Submission** state in App Store Connect."
           } >> "$GITHUB_STEP_SUMMARY"
