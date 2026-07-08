@@ -137,19 +137,15 @@ class TripRecordingBanner extends ConsumerWidget {
       );
     }
 
-    // #3019 / Epic #3013 phase 3 — the trip-INDEPENDENT auto-reconnect
-    // controller. Watching it here keeps the keepAlive provider alive (so it
-    // subscribes to the proactive link-drop signal) and surfaces its
-    // "reconnecting…" / terminal "tap to retry" banner ABOVE every screen,
-    // decoupled from any live trip — a drop while idle still recovers.
+    // #3529 (Epic #3527) — the app-wide link supervisor. Watching it here
+    // keeps the keepAlive provider alive (so the supervisor subscribes to
+    // the proactive link-drop signal) and surfaces the ambient
+    // "reconnecting…" dot ABOVE every screen, decoupled from any live
+    // trip — a drop while idle still recovers. There is no terminal
+    // "tap to retry" state anymore: the supervisor's capped-backoff loop
+    // retries until user stop or engine-off.
     final reconnectState = ref.watch(obd2ReconnectProvider);
-    // #3505 — reconnecting shows only the AMBIENT pulsing status dot (the
-    // app-wide spinner strip is gone); terminalFailed keeps its actionable
-    // (now dismissible) strip; terminalEngineOff is the expected parked-car
-    // state and adds no chrome at all.
-    final reconnectVisible =
-        reconnectState == Obd2ReconnectState.reconnecting ||
-        reconnectState == Obd2ReconnectState.terminalFailed;
+    final reconnectVisible = reconnectState == Obd2LinkState.reconnecting;
 
     // When no trip is active: show a thin strip carrying only the
     // OBD2 status dot — and only when there's an adapter remembered
@@ -174,24 +170,10 @@ class TripRecordingBanner extends ConsumerWidget {
               ),
             ),
           ),
-          // #3019 — trip-independent reconnect surface (reconnecting / retry).
-          // #3306 — AnimatedSize so the strip slides in/out smoothly instead of
-          // jolting the screen below it every time the reconnect loop flips
-          // state (reconnecting ⇄ failed ⇄ idle) — the "flickering form" report.
-          const AnimatedSize(
-            duration: Duration(milliseconds: 200),
-            curve: Curves.easeOut,
-            alignment: Alignment.topCenter,
-            child: Obd2ReconnectRetryBanner(),
-          ),
-          // #3422 — one-time wedged-adapter recovery hint (rung 4 of the
-          // escalation ladder). Zero-height unless the ladder raised it.
-          const AnimatedSize(
-            duration: Duration(milliseconds: 200),
-            curve: Curves.easeOut,
-            alignment: Alignment.topCenter,
-            child: Obd2WedgeRecoveryBanner(),
-          ),
+          // #3529 — the reconnect loop is ambient-only now (the pulsing
+          // status dot above); the terminal "tap to retry" strip and the
+          // wedge-recovery hint died with their subsystems (#3527: the
+          // supervisor has no dead-end states to advertise).
           Expanded(child: child),
         ],
       );

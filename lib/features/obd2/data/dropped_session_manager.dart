@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../../consumption/data/trip_history_repository.dart';
-import 'adapter_reconnect_scanner.dart';
+import 'obd2_reattach_source.dart';
 import 'auto_record_trace_log.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'obd2_session_diagnostic.dart';
@@ -74,7 +74,7 @@ class DroppedSessionManager {
   /// Factory that builds the reconnect scanner from the pinned MAC + the
   /// on-reconnect callback. Null in production unit contexts that don't
   /// wire the BT scan layer.
-  final AdapterReconnectScanner? Function(
+  final Obd2ReattachSource? Function(
     String pinnedMac,
     VoidCallback onReconnect,
   )? _reconnectScannerFactory;
@@ -87,7 +87,7 @@ class DroppedSessionManager {
 
   Timer? _graceTimer;
   Timer? _silentReconnectTimer;
-  AdapterReconnectScanner? _reconnectScanner;
+  Obd2ReattachSource? _reconnectScanner;
 
   /// #1904 — true between a transport drop and either a silent
   /// reconnect or the escalation to the visible drop.
@@ -103,7 +103,7 @@ class DroppedSessionManager {
     required Duration pauseGraceWindow,
     required Duration silentReconnectWindow,
     String? pinnedAdapterMac,
-    AdapterReconnectScanner? Function(
+    Obd2ReattachSource? Function(
       String pinnedMac,
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
@@ -131,7 +131,7 @@ class DroppedSessionManager {
   /// The auto-reconnect scanner currently in flight, or null when none
   /// is wired / running. Exposed for the controller's
   /// `debugReconnectScanner` test hook.
-  AdapterReconnectScanner? get reconnectScanner => _reconnectScanner;
+  Obd2ReattachSource? get reconnectScanner => _reconnectScanner;
 
   /// #2767 — true while the in-flight reconnect scanner has given up active
   /// scanning and is passive-waiting for the adapter to power back up. Drives
