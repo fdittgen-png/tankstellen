@@ -129,6 +129,20 @@ class Elm327Commands {
   /// init sequence pins the recommended `ATAT1` explicitly.
   static const adaptiveTimingCommand = 'ATAT1\r';
 
+  /// Warm start (#3528 — the ELM-level recovery for garbage/BUFFER FULL
+  /// trouble, per the AndrOBD ladder). `ATWS` resets the ELM327's UART
+  /// and buffers WITHOUT the full ATZ re-enumeration and without losing
+  /// the negotiated protocol — the cheapest way to clean a noisy wire.
+  static const warmStartCommand = 'ATWS\r';
+
+  /// Read the adapter's measured battery voltage (#3528 keepalive).
+  /// Answers instantly from the adapter itself — zero CAN traffic — so
+  /// it is the canonical "are you still there" probe that also stops
+  /// auto-sleeping clones (Vgate iCar Pro) from dozing off between
+  /// polls. python-OBD additionally uses it as an "actually plugged
+  /// into a car" check (< 6 V ⇒ bench, not vehicle).
+  static const readVoltageCommand = 'ATRV\r';
+
   /// Protocol Close (#3422 — wedge PREVENTION). `ATPC` deactivates the
   /// current OBD protocol session, parking the adapter's state machine
   /// cleanly (and letting it drop to low power) instead of abandoning it
