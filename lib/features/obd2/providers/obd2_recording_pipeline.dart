@@ -12,7 +12,6 @@ import '../../../core/domain/vehicle_profile.dart';
 import '../data/adapter_pin_resolution.dart';
 import '../data/obd2_connection_errors.dart';
 import '../data/obd2_disconnect_quietly.dart';
-import '../data/obd2_link_arbiter.dart';
 import '../data/obd2_service.dart';
 import '../data/obd2_trip_start_budgets.dart';
 import '../data/obd2_session_context_block.dart';
@@ -82,7 +81,6 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   final Duration _baselinesBudget;
 
   Obd2Service? _service;
-  Obd2LinkLease? _lease; // #3420 — the recording's session lease (arbiter)
   // #3500 — per-trip IMU fusion (shared with the GPS-only pipeline); the
   // OBD2 path previously ran NO inertial detector (#2895/#3029 note).
   TripImuFusion? _imuFusion;
@@ -116,8 +114,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   /// Begin a recording backed by [service] (pipeline takes ownership;
   /// [stop] tears down). The re-entrancy guard stays on the notifier.
   Future<void> start(Obd2Service service, {bool automatic = false}) async {
-    // #3420 — claim the link BEFORE the first await: a drop anywhere in the start window belongs to THIS recording, never the #3019 idle loop.
-    _lease = Obd2LinkArbiter.instance.tryAcquire('recording', Obd2LinkPriority.recording);
+    // #3527 — no lease, no arbitration: the one Obd2LinkSupervisor owns
+    // the link's health app-wide; this pipeline owns only the trip.
     _service = service;
     // #2261 concern 6 — re-arm the deferred capability probe (first sample).
     _capabilityReconcileKicked = false;
@@ -191,7 +189,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       await _baselines.load().timeout(_baselinesBudget);
       await ctl.start().timeout(_startWatchdog);
     } on TimeoutException {
-      _controller = null; _lease?.release(); _lease = null;
+      _controller = null;
       _imuFusion = null;
       unawaited(imuFusion.stop());
       unawaited(service.disconnectQuietly());
@@ -384,8 +382,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       unawaited(errorLogger.log(ErrorLayer.providers, e, st,
           context: obd2DisconnectTraceContext()));
     }
-    // #3420 — the lease is held until the disconnect COMPLETED (race 2).
-    _service = null; _lease?.release(); _lease = null;
+    _service = null;
     // #1303 — trip finalised; clear the WAL so recovery doesn't resurrect it.
     await _host.clearActiveSnapshot();
     _host.state = _host.state.copyWith(phase: TripRecordingPhase.finished);

@@ -64,66 +64,60 @@ final class LastGoodAdapterStoreProvider
 String _$lastGoodAdapterStoreHash() =>
     r'e3f12c50ac74faa882a1a248c7f6b1b80d74a623';
 
-/// App-wide owner of the trip-INDEPENDENT auto-reconnect controller (#3019 /
-/// Epic #3013 phase 3).
+/// App-wide owner of THE [Obd2LinkSupervisor] (#3529, Epic #3527).
 ///
-/// This is the decoupling the Epic asks for: the in-trip [DroppedSessionManager]
-/// (#2188) only runs while a recording is active, so a drop while idle / between
-/// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
-/// whose loop is driven purely by the connection lifecycle:
-///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
-///     idle policy (#3420) — the arbiter is the sole consumer of the
-///     proactive link-drop signal, so this loop runs only while no lease
-///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
-///   * each attempt tries the auto-pinned adapter first (transport-correct
-///     direct connect, #3016), then a re-scan fallback;
-///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
-///     UI shows a "tap to retry" affordance wired to [retry].
+/// The supervisor is the single reconnect authority of the rewritten
+/// link layer — this provider wires it into the app graph:
+///   * the DEFAULT dial policy (auto-pinned adapter direct-connect
+///     first, transport-correct, #3016; then a re-scan fallback);
+///   * engine-off classification (#3035): a dial that reaches the
+///     adapter but finds a silent bus parks the supervisor in
+///     [Obd2LinkState.engineOff] instead of feeding the backoff loop;
+///   * republishing a recovered link into the app-wide status dot;
+///   * the #3346 episode breadcrumbs + gated comm-diagnostics counters.
 ///
-/// On a successful (re)connect it republishes the live state into the app-wide
-/// [Obd2ConnectionStatus] dot so every screen reflects the recovered link.
+/// Replaces the #3019 [Obd2ReconnectController] + arbiter idle-policy +
+/// wedge-recovery constellation (deletion tracked by #3533): there is
+/// no terminal-failed dead end anymore — the loop retries (capped
+/// backoff) until the user disconnects or the engine is off.
 
 @ProviderFor(Obd2Reconnect)
 final obd2ReconnectProvider = Obd2ReconnectProvider._();
 
-/// App-wide owner of the trip-INDEPENDENT auto-reconnect controller (#3019 /
-/// Epic #3013 phase 3).
+/// App-wide owner of THE [Obd2LinkSupervisor] (#3529, Epic #3527).
 ///
-/// This is the decoupling the Epic asks for: the in-trip [DroppedSessionManager]
-/// (#2188) only runs while a recording is active, so a drop while idle / between
-/// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
-/// whose loop is driven purely by the connection lifecycle:
-///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
-///     idle policy (#3420) — the arbiter is the sole consumer of the
-///     proactive link-drop signal, so this loop runs only while no lease
-///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
-///   * each attempt tries the auto-pinned adapter first (transport-correct
-///     direct connect, #3016), then a re-scan fallback;
-///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
-///     UI shows a "tap to retry" affordance wired to [retry].
+/// The supervisor is the single reconnect authority of the rewritten
+/// link layer — this provider wires it into the app graph:
+///   * the DEFAULT dial policy (auto-pinned adapter direct-connect
+///     first, transport-correct, #3016; then a re-scan fallback);
+///   * engine-off classification (#3035): a dial that reaches the
+///     adapter but finds a silent bus parks the supervisor in
+///     [Obd2LinkState.engineOff] instead of feeding the backoff loop;
+///   * republishing a recovered link into the app-wide status dot;
+///   * the #3346 episode breadcrumbs + gated comm-diagnostics counters.
 ///
-/// On a successful (re)connect it republishes the live state into the app-wide
-/// [Obd2ConnectionStatus] dot so every screen reflects the recovered link.
+/// Replaces the #3019 [Obd2ReconnectController] + arbiter idle-policy +
+/// wedge-recovery constellation (deletion tracked by #3533): there is
+/// no terminal-failed dead end anymore — the loop retries (capped
+/// backoff) until the user disconnects or the engine is off.
 final class Obd2ReconnectProvider
-    extends $NotifierProvider<Obd2Reconnect, Obd2ReconnectState> {
-  /// App-wide owner of the trip-INDEPENDENT auto-reconnect controller (#3019 /
-  /// Epic #3013 phase 3).
+    extends $NotifierProvider<Obd2Reconnect, Obd2LinkState> {
+  /// App-wide owner of THE [Obd2LinkSupervisor] (#3529, Epic #3527).
   ///
-  /// This is the decoupling the Epic asks for: the in-trip [DroppedSessionManager]
-  /// (#2188) only runs while a recording is active, so a drop while idle / between
-  /// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
-  /// whose loop is driven purely by the connection lifecycle:
-  ///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
-  ///     idle policy (#3420) — the arbiter is the sole consumer of the
-  ///     proactive link-drop signal, so this loop runs only while no lease
-  ///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
-  ///   * each attempt tries the auto-pinned adapter first (transport-correct
-  ///     direct connect, #3016), then a re-scan fallback;
-  ///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
-  ///     UI shows a "tap to retry" affordance wired to [retry].
+  /// The supervisor is the single reconnect authority of the rewritten
+  /// link layer — this provider wires it into the app graph:
+  ///   * the DEFAULT dial policy (auto-pinned adapter direct-connect
+  ///     first, transport-correct, #3016; then a re-scan fallback);
+  ///   * engine-off classification (#3035): a dial that reaches the
+  ///     adapter but finds a silent bus parks the supervisor in
+  ///     [Obd2LinkState.engineOff] instead of feeding the backoff loop;
+  ///   * republishing a recovered link into the app-wide status dot;
+  ///   * the #3346 episode breadcrumbs + gated comm-diagnostics counters.
   ///
-  /// On a successful (re)connect it republishes the live state into the app-wide
-  /// [Obd2ConnectionStatus] dot so every screen reflects the recovered link.
+  /// Replaces the #3019 [Obd2ReconnectController] + arbiter idle-policy +
+  /// wedge-recovery constellation (deletion tracked by #3533): there is
+  /// no terminal-failed dead end anymore — the loop retries (capped
+  /// backoff) until the user disconnects or the engine is off.
   Obd2ReconnectProvider._()
     : super(
         from: null,
@@ -143,46 +137,44 @@ final class Obd2ReconnectProvider
   Obd2Reconnect create() => Obd2Reconnect();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(Obd2ReconnectState value) {
+  Override overrideWithValue(Obd2LinkState value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<Obd2ReconnectState>(value),
+      providerOverride: $SyncValueProvider<Obd2LinkState>(value),
     );
   }
 }
 
-String _$obd2ReconnectHash() => r'638d0d5c851179aefffd6c51962af20f9e450d65';
+String _$obd2ReconnectHash() => r'6c43612287210834d61078629472b46dfcd85e82';
 
-/// App-wide owner of the trip-INDEPENDENT auto-reconnect controller (#3019 /
-/// Epic #3013 phase 3).
+/// App-wide owner of THE [Obd2LinkSupervisor] (#3529, Epic #3527).
 ///
-/// This is the decoupling the Epic asks for: the in-trip [DroppedSessionManager]
-/// (#2188) only runs while a recording is active, so a drop while idle / between
-/// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
-/// whose loop is driven purely by the connection lifecycle:
-///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
-///     idle policy (#3420) — the arbiter is the sole consumer of the
-///     proactive link-drop signal, so this loop runs only while no lease
-///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
-///   * each attempt tries the auto-pinned adapter first (transport-correct
-///     direct connect, #3016), then a re-scan fallback;
-///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
-///     UI shows a "tap to retry" affordance wired to [retry].
+/// The supervisor is the single reconnect authority of the rewritten
+/// link layer — this provider wires it into the app graph:
+///   * the DEFAULT dial policy (auto-pinned adapter direct-connect
+///     first, transport-correct, #3016; then a re-scan fallback);
+///   * engine-off classification (#3035): a dial that reaches the
+///     adapter but finds a silent bus parks the supervisor in
+///     [Obd2LinkState.engineOff] instead of feeding the backoff loop;
+///   * republishing a recovered link into the app-wide status dot;
+///   * the #3346 episode breadcrumbs + gated comm-diagnostics counters.
 ///
-/// On a successful (re)connect it republishes the live state into the app-wide
-/// [Obd2ConnectionStatus] dot so every screen reflects the recovered link.
+/// Replaces the #3019 [Obd2ReconnectController] + arbiter idle-policy +
+/// wedge-recovery constellation (deletion tracked by #3533): there is
+/// no terminal-failed dead end anymore — the loop retries (capped
+/// backoff) until the user disconnects or the engine is off.
 
-abstract class _$Obd2Reconnect extends $Notifier<Obd2ReconnectState> {
-  Obd2ReconnectState build();
+abstract class _$Obd2Reconnect extends $Notifier<Obd2LinkState> {
+  Obd2LinkState build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final ref = this.ref as $Ref<Obd2ReconnectState, Obd2ReconnectState>;
+    final ref = this.ref as $Ref<Obd2LinkState, Obd2LinkState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<Obd2ReconnectState, Obd2ReconnectState>,
-              Obd2ReconnectState,
+              AnyNotifier<Obd2LinkState, Obd2LinkState>,
+              Obd2LinkState,
               Object?,
               Object?
             >;

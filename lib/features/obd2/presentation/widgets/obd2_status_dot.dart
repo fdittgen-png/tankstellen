@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/obd2_reconnect_controller.dart';
+import '../../data/obd2_link_supervisor.dart';
 import '../../providers/obd2_connection_state_provider.dart';
 import '../../providers/obd2_reconnect_provider.dart';
 
@@ -34,7 +34,7 @@ class Obd2StatusDot extends ConsumerWidget {
     // #3505 — the idle reconnect loop surfaces HERE (pulsing amber +
     // the spoken/semantics label), not as an app-wide strip.
     final reconnecting =
-        ref.watch(obd2ReconnectProvider) == Obd2ReconnectState.reconnecting;
+        ref.watch(obd2ReconnectProvider) == Obd2LinkState.reconnecting;
     if (!snapshot.hasVisibleIndicator && !reconnecting) {
       return const SizedBox.shrink();
     }

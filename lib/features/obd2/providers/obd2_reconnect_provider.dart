@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../core/data/storage_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
@@ -15,11 +14,8 @@ import '../data/obd2_connect_trace.dart';
 import '../data/obd2_connect_trace_log.dart';
 import '../data/obd2_connection_service.dart';
 import '../data/obd2_disconnect_quietly.dart';
-import '../data/obd2_link_arbiter.dart';
-import '../data/obd2_reconnect_controller.dart';
+import '../data/obd2_link_supervisor.dart';
 import '../data/obd2_service.dart';
-import '../data/obd2_wedge_detector.dart';
-import '../data/obd2_wedge_recovery.dart';
 import 'obd2_connection_state_provider.dart';
 
 part 'obd2_reconnect_provider.g.dart';
@@ -30,258 +26,95 @@ part 'obd2_reconnect_provider.g.dart';
 LastGoodAdapterStore lastGoodAdapterStore(Ref ref) =>
     LastGoodAdapterStore(ref.watch(settingsStorageProvider));
 
-/// App-wide owner of the trip-INDEPENDENT auto-reconnect controller (#3019 /
-/// Epic #3013 phase 3).
+/// App-wide owner of THE [Obd2LinkSupervisor] (#3529, Epic #3527).
 ///
-/// This is the decoupling the Epic asks for: the in-trip [DroppedSessionManager]
-/// (#2188) only runs while a recording is active, so a drop while idle / between
-/// trips never re-establishes. This notifier owns an [Obd2ReconnectController]
-/// whose loop is driven purely by the connection lifecycle:
-///   * drops reach it EXCLUSIVELY through its registered [Obd2LinkArbiter]
-///     idle policy (#3420) — the arbiter is the sole consumer of the
-///     proactive link-drop signal, so this loop runs only while no lease
-///     holds the link (#3424 deleted the bypassing `reportDropped` seam);
-///   * each attempt tries the auto-pinned adapter first (transport-correct
-///     direct connect, #3016), then a re-scan fallback;
-///   * after the bound it stops in [Obd2ReconnectState.terminalFailed] and the
-///     UI shows a "tap to retry" affordance wired to [retry].
+/// The supervisor is the single reconnect authority of the rewritten
+/// link layer — this provider wires it into the app graph:
+///   * the DEFAULT dial policy (auto-pinned adapter direct-connect
+///     first, transport-correct, #3016; then a re-scan fallback);
+///   * engine-off classification (#3035): a dial that reaches the
+///     adapter but finds a silent bus parks the supervisor in
+///     [Obd2LinkState.engineOff] instead of feeding the backoff loop;
+///   * republishing a recovered link into the app-wide status dot;
+///   * the #3346 episode breadcrumbs + gated comm-diagnostics counters.
 ///
-/// On a successful (re)connect it republishes the live state into the app-wide
-/// [Obd2ConnectionStatus] dot so every screen reflects the recovered link.
+/// Replaces the #3019 [Obd2ReconnectController] + arbiter idle-policy +
+/// wedge-recovery constellation (deletion tracked by #3533): there is
+/// no terminal-failed dead end anymore — the loop retries (capped
+/// backoff) until the user disconnects or the engine is off.
 @Riverpod(keepAlive: true)
 class Obd2Reconnect extends _$Obd2Reconnect {
-  Obd2ReconnectController? _controller;
-  Obd2LinkIdleRegistration? _idleReg;
+  Obd2LinkSupervisor? _supervisor;
+  StreamSubscription<Obd2LinkState>? _statesSub;
+
+  /// THE supervisor. Interactive surfaces (picker, VIN reader,
+  /// self-test) route their one-shot dials through
+  /// [Obd2LinkSupervisor.connectWith] so the app has exactly one dial
+  /// path; the recording pipeline reads the live service from here.
+  Obd2LinkSupervisor get supervisor {
+    // build() ran before any access (Riverpod contract), so this is
+    // only null after dispose — a programming error worth surfacing.
+    final sup = _supervisor;
+    if (sup == null) {
+      throw StateError('Obd2Reconnect accessed after dispose');
+    }
+    return sup;
+  }
 
   @override
-  Obd2ReconnectState build() {
-    final controller = _buildController();
-    _controller = controller;
-    // #3420 — register as the arbiter's IDLE policy. The arbiter is the sole
-    // consumer of the proactive link-drop signal: a drop reaches this loop
-    // ONLY while no lease (recording / auto-record / interactive) holds the
-    // link — the #3013 "idle / between trips" charter by construction, where
-    // the #3386 latch left the auto-record ↔ #3019 pair ungated (#3415).
-    // onStandDown fires the instant ANY lease is granted, so an in-flight
-    // idle loop stops before it can tear down the new owner's socket.
-    // #3346 — the drop reason/transport still reach the episode breadcrumb.
-    _idleReg = Obd2LinkArbiter.instance.registerIdlePolicy(
-      onDrop: (e) => _controller?.notifyDropped(
-        reason: e.reason,
-        transportKind: e.transportKind,
-        mac: e.mac,
-      ),
-      onStandDown: () => _controller?.stop(),
-    );
-    // #3422 — wedge-recovery wiring. The detector latches LinkWedged after
-    // N consecutive exhausted Classic ladders (noted at the ClassicElmChannel
-    // funnel) and kicks the escalation ladder; the ladder's rungs verify with
-    // ONE bounded pinned connect via [_wedgeProbe]. Both trace into the same
-    // exported breadcrumb channel as the reconnect episodes (#3346).
-    final recovery = Obd2WedgeRecovery.instance;
-    recovery.onTrace = _trace;
-    recovery.probeConnect = _wedgeProbe;
-    Obd2WedgeDetector.instance.onWedged = (mac) {
-      _trace('wedge-detected', {'mac': mac});
-      unawaited(recovery.start(mac));
-    };
+  Obd2LinkState build() {
+    final sup = Obd2LinkSupervisor(dial: _dialDefault);
+    _supervisor = sup;
+    _statesSub = sup.states.listen(_onLinkState);
     ref.onDispose(() {
-      Obd2WedgeDetector.instance.onWedged = null;
-      recovery.probeConnect = null;
-      recovery.onTrace = null;
-      _idleReg?.dispose();
-      _idleReg = null;
-      controller.dispose();
-      _controller = null;
+      unawaited(_statesSub?.cancel());
+      _statesSub = null;
+      unawaited(sup.dispose());
+      _supervisor = null;
     });
-    return controller.state;
+    return sup.state.value;
   }
 
-  /// #3422 — the recovery ladder's single bounded verification connect: a
-  /// pinned-style DIRECT Classic connect to the wedged [mac] (every other
-  /// reconnect policy is standing down, so this is the only connect
-  /// traffic). `true` when the adapter answered — including a #3035
-  /// engine-off probe (the adapter is back; the ECU is just silent), which
-  /// is exactly the wedge-cleared condition. On a full success the recovered
-  /// link is republished into the app-wide status dot via [_onResult].
-  Future<bool> _wedgeProbe(String mac) async {
-    try {
-      final svc = await Obd2ConnectTraceLog.runWithOrigin(
-        Obd2ConnectOrigin.liveReconnect,
-        () => ref.read(obd2ConnectionProvider).connectByMacClassicDirect(mac),
-        transportDecisionReason: 'wedge-recovery-probe',
-      );
-      if (svc == null) return false;
-      final result = _onResult(svc);
-      if (result == Obd2ReconnectAttemptResult.connected) {
-        _controller?.notifyConnected();
-      }
-      return result == Obd2ReconnectAttemptResult.connected ||
-          result == Obd2ReconnectAttemptResult.engineOff;
-    } catch (e, st) {
-      _logSeam('wedge probe', e, st);
-      return false;
-    }
-  }
+  DateTime? _reconnectingSince;
 
-  Obd2ReconnectController _buildController() {
-    // The app shell watches this provider, so a failed dependency read (a
-    // not-yet-bootstrapped Bluetooth graph / settings box, or a widget-test
-    // scope that doesn't override them) must NEVER crash the shell. Guard the
-    // reads and degrade to a no-op connector — the state machine still works
-    // (it just can't connect), and the surface stays inert. Best-effort: the
-    // failure is logged once at build.
-    Obd2ConnectionService? connection;
-    LastGoodAdapterStore? pinStore;
-    try {
-      connection = ref.read(obd2ConnectionProvider);
-      pinStore = ref.read(lastGoodAdapterStoreProvider);
-    } catch (e, st) {
-      _logSeam('build dependency read', e, st);
-    }
-    final resolvedStore =
-        pinStore ?? const LastGoodAdapterStore(_NullSettingsStorage());
-    final controller = Obd2ReconnectController(
-      pinStore: resolvedStore,
-      pinnedConnect: connection == null
-          ? (_) async => Obd2ReconnectAttemptResult.notFound
-          : (pinned) => _connectPinned(connection!, pinned),
-      rescanConnect: connection == null
-          ? (_) async => Obd2ReconnectAttemptResult.notFound
-          : (pinned) => _connectRescan(connection!, pinned),
-    );
-    // Republish every transition into the Riverpod state so the UI rebuilds.
-    controller.onState = (s) => state = s;
-    // #3346 — route the reconnect-EPISODE breadcrumbs (drop reason, each
-    // attempt's path/outcome/latency, backoff, terminal) into the exported
-    // channels: the always-on BreadcrumbCollector (rides every error trace)
-    // + the developer-mode comm-diagnostics reconnect reservoir.
-    controller.onTrace = _trace;
-    return controller;
-  }
-
-  /// #3346 — fan one reconnect-episode event out to the exported telemetry
-  /// channels. Best-effort: the controller already guards this against throws.
-  void _trace(String event, Map<String, Object?> data) {
-    BreadcrumbCollector.add('obd2-reconnect: $event', detail: _fmt(data));
-    // Feed the gated comm-diagnostics reconnect counters so the developer-mode
-    // health screen's reservoir reflects real reconnect activity, not just
-    // first-connects.
+  void _onLinkState(Obd2LinkState next) {
+    state = next;
+    // #3346 — episode breadcrumbs + gated comm-diagnostics counters.
+    BreadcrumbCollector.add('obd2-link: $next');
     final diag = Obd2CommDiagnostics.instance;
-    if (!diag.enabled) return;
-    switch (event) {
-      case 'attempt-start':
-        diag.noteConnectionEvent(attempt: true);
-      case 'connected':
-        final ms = data['episodeMs'];
-        diag.noteConnectionEvent(
-          success: true,
-          visibleReconnect: true,
-          timeToReconnectMs: ms is int ? ms : null,
-        );
-      case 'terminal-failed':
-        diag.noteConnectionEvent(failureReason: 'reconnect-exhausted');
-      case 'terminal-engine-off':
-        diag.noteConnectionEvent(failureReason: 'reconnect-engine-off');
+    switch (next) {
+      case Obd2LinkState.reconnecting:
+        _reconnectingSince ??= DateTime.now();
+        if (diag.enabled) diag.noteConnectionEvent(attempt: true);
+      case Obd2LinkState.ready:
+        final since = _reconnectingSince;
+        _reconnectingSince = null;
+        if (diag.enabled && since != null) {
+          diag.noteConnectionEvent(
+            success: true,
+            visibleReconnect: true,
+            timeToReconnectMs:
+                DateTime.now().difference(since).inMilliseconds,
+          );
+        }
+        _republishStatusDot();
+      case Obd2LinkState.engineOff:
+        _reconnectingSince = null;
+        if (diag.enabled) {
+          diag.noteConnectionEvent(failureReason: 'reconnect-engine-off');
+        }
+      case Obd2LinkState.idle:
+      case Obd2LinkState.connecting:
+      case Obd2LinkState.userDisconnected:
+        _reconnectingSince = null;
     }
   }
 
-  /// Render a flat breadcrumb map as a compact `k=v` string (stable key
-  /// order is not required — a field reader scans for the tokens).
-  static String _fmt(Map<String, Object?> data) =>
-      data.entries.map((e) => '${e.key}=${e.value}').join(' ');
-
-  // #3424 — the `reportDropped` / `reportConnected` / `stop` entry points
-  // were deleted: no production caller remained once the arbiter became the
-  // sole drop router (#3420) — drops arrive via the idle-policy registration
-  // in [build], connect/stand-down via `onStandDown`. Regression lock:
-  // test/features/obd2/obd2_link_authority_races_test.dart (races 1–3).
-
-  /// User tapped the terminal "tap to retry" affordance — restart the loop.
-  void retry() => _controller?.retry();
-
-  /// Pinned fast path: a transport-correct DIRECT connect, no scan (#3016).
-  /// A Classic adapter goes over RFCOMM; BLE / unknown keep the direct-GATT
-  /// path. A connect failure is caught + classified to `failed` here (the
-  /// controller's own guard is a second backstop), so the bounded loop keeps
-  /// its backoff schedule rather than surfacing a raw error.
-  Future<Obd2ReconnectAttemptResult> _connectPinned(
-    Obd2ConnectionService connection,
-    LastGoodAdapter pinned,
-  ) async {
-    try {
-      // #3346 — stamp the per-attempt connect trace as a liveReconnect (not a
-      // firstConnect), so the persisted, exported connect-trace ring tells a
-      // silent mid-drive reconnect apart from a user-driven first connect.
-      final svc = await Obd2ConnectTraceLog.runWithOrigin(
-        Obd2ConnectOrigin.liveReconnect,
-        () => pinned.isClassic
-            ? connection.connectByMacClassicDirect(pinned.mac)
-            : connection.connectByMacDirect(pinned.mac, fallbackToScan: false),
-        transportDecisionReason:
-            pinned.isClassic ? 'reconnect-pinned-classic' : 'reconnect-pinned-ble',
-      );
-      if (_abandonIfStopped(svc)) return Obd2ReconnectAttemptResult.failed;
-      return _onResult(svc);
-    } catch (e, st) {
-      _logSeam('pinned', e, st);
-      return Obd2ReconnectAttemptResult.failed;
-    }
-  }
-
-  /// #3495 F4 — the loop was stopped (a lease grant's stand-down / dispose)
-  /// while this seam's connect was in flight. `_runCycle` aborts on its state
-  /// guard AFTER the seam resolves, so without this the just-established
-  /// session leaked open (holding the adapter's single SPP channel) and the
-  /// status dot had already been marked connected. Disconnect the fresh
-  /// service quietly and report `failed` instead. False (keep the session)
-  /// while the controller is still reconnecting.
-  bool _abandonIfStopped(Obd2Service? svc) {
-    if (svc == null) return false;
-    if (_controller?.state == Obd2ReconnectState.reconnecting) return false;
-    unawaited(svc.disconnectQuietly());
-    return true;
-  }
-
-  /// Re-scan fallback: scan + match the pinned MAC (#1188), so a changed /
-  /// duplicate adapter still recovers. With no pin we fall back to the
-  /// highest-RSSI known adapter ([Obd2ConnectionService.connectByMac] requires
-  /// a MAC, so the no-pin case uses a fresh scan via [connectBest]).
-  Future<Obd2ReconnectAttemptResult> _connectRescan(
-    Obd2ConnectionService connection,
-    LastGoodAdapter? pinned,
-  ) async {
-    try {
-      final svc = await Obd2ConnectTraceLog.runWithOrigin(
-        Obd2ConnectOrigin.liveReconnect,
-        () => pinned != null
-            ? connection.connectByMac(pinned.mac)
-            : connection.connectBest(),
-        transportDecisionReason: 'reconnect-rescan',
-      );
-      if (_abandonIfStopped(svc)) return Obd2ReconnectAttemptResult.failed;
-      return _onResult(svc);
-    } catch (e, st) {
-      _logSeam('rescan', e, st);
-      return Obd2ReconnectAttemptResult.failed;
-    }
-  }
-
-  /// Translate a connect result into the controller's outcome and, on
-  /// success, republish the recovered link into the app-wide status dot.
-  ///
-  /// #3035 — a non-null service whose `0100` probe came back
-  /// [Obd2BusProbeResult.probedSilent] is a CONFIRMED engine-off: the adapter
-  /// re-connected fine, the ECU is just silent (parked car). Surface
-  /// [Obd2ReconnectAttemptResult.engineOff] so the controller STOPS into its
-  /// terminal "turn the ignition on" state instead of looping
-  /// reconnect→engine-off→teardown. A [Obd2BusProbeResult.transient] (slow
-  /// live car / flaky link) is NOT engine-off — it counts as `connected`.
-  Obd2ReconnectAttemptResult _onResult(Obd2Service? svc) {
-    if (svc == null) return Obd2ReconnectAttemptResult.notFound;
-    if (svc.busProbe == Obd2BusProbeResult.probedSilent) {
-      return Obd2ReconnectAttemptResult.engineOff;
-    }
+  /// On a recovered link, repaint the app-wide status dot. Must never
+  /// fail the reconnect itself.
+  void _republishStatusDot() {
+    final svc = _supervisor?.service;
+    if (svc == null) return;
     try {
       ref.read(obd2ConnectionStatusProvider.notifier).markConnected(
             adapterName: svc.adapterName,
@@ -289,10 +122,76 @@ class Obd2Reconnect extends _$Obd2Reconnect {
             capability: svc.capability,
           );
     } catch (e, st) {
-      // Republishing the status dot must never fail the reconnect itself.
       _logSeam('markConnected', e, st);
     }
-    return Obd2ReconnectAttemptResult.connected;
+  }
+
+  /// The supervisor's DEFAULT dial policy: auto-pinned adapter first
+  /// via a transport-correct DIRECT connect (no scan, #3016), then a
+  /// re-scan fallback (#1188 — a changed/duplicate adapter still
+  /// recovers; no pin ⇒ highest-RSSI known adapter).
+  ///
+  /// Engine-off classification (#3035): a non-null service whose `0100`
+  /// probe came back [Obd2BusProbeResult.probedSilent] means the
+  /// adapter is fine and the CAR is off — park the supervisor instead
+  /// of feeding the backoff loop (reconnect→engine-off→teardown cycles
+  /// burn the battery of a parked car).
+  ///
+  /// Shell safety: the app shell watches this provider, so failed
+  /// dependency reads (not-yet-bootstrapped graph / widget-test scope)
+  /// must degrade to a no-op dial, never crash the shell.
+  Future<Obd2Service?> _dialDefault() async {
+    final Obd2ConnectionService connection;
+    final LastGoodAdapterStore pinStore;
+    try {
+      connection = ref.read(obd2ConnectionProvider);
+      pinStore = ref.read(lastGoodAdapterStoreProvider);
+    } catch (e, st) {
+      _logSeam('dial dependency read', e, st);
+      return null;
+    }
+    final pinned = pinStore.recall();
+
+    // Pinned fast path — transport-correct direct connect.
+    if (pinned != null) {
+      final direct = await Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.liveReconnect,
+        () => pinned.isClassic
+            ? connection.connectByMacClassicDirect(pinned.mac)
+            : connection.connectByMacDirect(pinned.mac, fallbackToScan: false),
+        transportDecisionReason: pinned.isClassic
+            ? 'reconnect-pinned-classic'
+            : 'reconnect-pinned-ble',
+      );
+      final classified = _classify(direct);
+      if (classified != null || _supervisor?.userRequestedDisconnect == true) {
+        return classified;
+      }
+    }
+
+    // Re-scan fallback.
+    final rescanned = await Obd2ConnectTraceLog.runWithOrigin(
+      Obd2ConnectOrigin.liveReconnect,
+      () => pinned != null
+          ? connection.connectByMac(pinned.mac)
+          : connection.connectBest(),
+      transportDecisionReason: 'reconnect-rescan',
+    );
+    return _classify(rescanned);
+  }
+
+  /// Engine-off gate for a dial result. Returns the service to keep, or
+  /// null after parking/releasing.
+  Obd2Service? _classify(Obd2Service? svc) {
+    if (svc == null) return null;
+    if (svc.busProbe == Obd2BusProbeResult.probedSilent) {
+      // Adapter back, ECU silent — a parked car. Release the link (the
+      // adapter sleeps on its own) and park the loop.
+      unawaited(svc.disconnectQuietly());
+      _supervisor?.noteEngineOff();
+      return null;
+    }
+    return svc;
   }
 
   void _logSeam(String where, Object e, StackTrace st) {
@@ -300,24 +199,4 @@ class Obd2Reconnect extends _$Obd2Reconnect {
       'where': 'Obd2Reconnect $where seam failed',
     }));
   }
-}
-
-/// No-op [SettingsStorage] backing the reconnect controller's pin store ONLY
-/// when the real settings box could not be resolved at build (#3019). It
-/// recalls nothing, so the pinned fast path is simply skipped — the shell
-/// stays alive instead of crashing on a not-yet-bootstrapped graph.
-class _NullSettingsStorage implements SettingsStorage {
-  const _NullSettingsStorage();
-  @override
-  dynamic getSetting(String key) => null;
-  @override
-  Future<void> putSetting(String key, dynamic value) async {}
-  @override
-  bool get isSetupComplete => false;
-  @override
-  bool get isSetupSkipped => false;
-  @override
-  Future<void> skipSetup() async {}
-  @override
-  Future<void> resetSetupSkip() async {}
 }

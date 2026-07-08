@@ -122,6 +122,19 @@ class Obd2LinkSupervisor {
   /// drop. Read-only outside; mutated only by [connect] / [disconnect].
   bool get userRequestedDisconnect => _userRequestedDisconnect;
 
+  int _attemptCount = 0;
+
+  /// 1-based ordinal of the current reconnect attempt (telemetry /
+  /// banner copy). Resets on success and on every parked state.
+  int get attemptNumber => _attemptCount + 1;
+
+  /// Current backoff in milliseconds (telemetry).
+  int get currentBackoffMs => _backoff.inMilliseconds;
+
+  /// True once the backoff has grown to its cap — the loop is in its
+  /// calm long-wait cadence (#2767's "passive waiting" banner copy).
+  bool get backoffAtCap => _backoff >= maxBackoff;
+
   /// User/policy-initiated connect. Clears the disconnect intent, exits
   /// any parked state, and dials now. Joins the in-flight attempt if
   /// one exists (single flight). Returns the live service, or null when
@@ -134,11 +147,26 @@ class Obd2LinkSupervisor {
     return _attempt(userInitiated: true);
   }
 
+  /// Interactive connect with a ONE-SHOT dial policy override — the
+  /// adapter picker / VIN reader / self-test dial a *specific* device
+  /// rather than the supervisor's default pinned+rescan policy, but the
+  /// attempt still runs through the same single-flight machinery
+  /// (research rule 2: there is no second dial path). On success the
+  /// dialed service becomes the supervised link; the backoff loop keeps
+  /// using the DEFAULT dialer afterwards.
+  Future<Obd2Service?> connectWith(Obd2LinkDialer dialer) {
+    if (_disposed) return Future<Obd2Service?>.value();
+    _userRequestedDisconnect = false;
+    _cancelBackoffTimer();
+    return _attempt(userInitiated: true, dialer: dialer);
+  }
+
   /// User-initiated disconnect: park the loop, tear the link down. No
   /// automatic dial happens until the next [connect].
   Future<void> disconnect() async {
     _userRequestedDisconnect = true;
     _cancelBackoffTimer();
+    _attemptCount = 0;
     final dead = _service;
     _service = null;
     _setState(Obd2LinkState.userDisconnected);
@@ -180,6 +208,7 @@ class Obd2LinkSupervisor {
     if (_disposed || _state.value == Obd2LinkState.userDisconnected) return;
     _cancelBackoffTimer();
     _service = null;
+    _attemptCount = 0;
     _setState(Obd2LinkState.engineOff);
   }
 
@@ -201,17 +230,19 @@ class Obd2LinkSupervisor {
   /// The single dial path. Every connect — user tap, drop reaction,
   /// backoff tick — funnels here; `_attemptInFlight` makes it single
   /// flight (a second caller joins the same future).
-  Future<Obd2Service?> _attempt({required bool userInitiated}) {
+  Future<Obd2Service?> _attempt(
+      {required bool userInitiated, Obd2LinkDialer? dialer}) {
     final inFlight = _attemptInFlight;
     if (inFlight != null) return inFlight;
-    final future = _attemptOnce(userInitiated: userInitiated);
+    final future = _attemptOnce(userInitiated: userInitiated, dialer: dialer);
     _attemptInFlight = future;
     return future.whenComplete(() {
       if (identical(_attemptInFlight, future)) _attemptInFlight = null;
     });
   }
 
-  Future<Obd2Service?> _attemptOnce({required bool userInitiated}) async {
+  Future<Obd2Service?> _attemptOnce(
+      {required bool userInitiated, Obd2LinkDialer? dialer}) async {
     _cancelBackoffTimer();
     // Tear down whatever half-dead service is still around so the
     // adapter's single RFCOMM channel is free before the fresh dial
@@ -231,7 +262,7 @@ class Obd2LinkSupervisor {
     Obd2Service? fresh;
     Object? failure;
     try {
-      fresh = await _dial();
+      fresh = await (dialer ?? _dial)();
     } catch (e) {
       failure = e;
       // A dial fault is part of normal reconnect weather (adapter out
@@ -267,9 +298,11 @@ class Obd2LinkSupervisor {
     if (fresh != null) {
       _service = fresh;
       _backoff = Duration.zero;
+      _attemptCount = 0;
       _setState(Obd2LinkState.ready);
       return fresh;
     }
+    _attemptCount++;
     // Miss (null or fault): grow the backoff and re-arm — but only when
     // auto-dialing is still allowed. There is deliberately NO attempt
     // cap and NO terminal-failed state.

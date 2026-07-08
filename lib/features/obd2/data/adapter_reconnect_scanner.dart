@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'obd2_reattach_source.dart';
 import 'obd2_read_telemetry.dart';
 import 'reconnect_scanner_diagnostics.dart';
 
@@ -54,7 +55,10 @@ typedef AdapterConnectAttempt = Future<bool> Function(String mac);
 ///     once.
 ///   - The scanner does not own the controller; the caller decides
 ///     what `onReconnect` means (typically "cancel grace, resume").
-class AdapterReconnectScanner {
+// #3531 — implements the trip layer's reattach seam so existing tests and
+// the transitional wiring type-check; the class itself is slated for
+// deletion (#3533) once the supervisor-backed source is field-validated.
+class AdapterReconnectScanner implements Obd2ReattachSource {
   final String _pinnedMac;
   final AdapterInRangeProbe _probe;
   final AdapterConnectAttempt _connect;
@@ -188,6 +192,7 @@ class AdapterReconnectScanner {
   /// to drive the calmer "passive-waiting" banner copy, so this is a public
   /// signal, not a test-only one. Note it can flip back to `false` when the
   /// scanner periodically re-arms an active scan from passive mode.
+  @override
   bool get isPassiveWaiting => _passiveMode;
 
   /// Consecutive active-scan misses recorded this drop (#2261). Exposed
@@ -198,15 +203,18 @@ class AdapterReconnectScanner {
   /// #2905 — 1-based ordinal + current backoff (ms) of the attempt the
   /// scanner is ABOUT to make, read by the [ReconnectConnector] so each
   /// per-attempt telemetry row carries its episode ordinal + backoff.
+  @override
   int get currentAttemptNumber => _consecutiveMisses + 1;
 
   /// See [currentAttemptNumber].
+  @override
   int get currentBackoffMs => _currentBackoff.inMilliseconds;
 
   /// Schedule the first probe cycle. Safe to call repeatedly — a
   /// second call while already scanning is a no-op so the caller
   /// (typically [TripRecordingController._handleDrop]) doesn't have
   /// to defensively null-check.
+  @override
   Future<void> start() async {
     if (_scanning) return;
     _scanning = true;
@@ -233,6 +241,7 @@ class AdapterReconnectScanner {
 
   /// Cancel any pending timer and mark the scanner stopped. Safe to
   /// call more than once and safe to call before [start].
+  @override
   Future<void> stop() async {
     _timer?.cancel();
     _timer = null;

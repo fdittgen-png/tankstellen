@@ -14,7 +14,7 @@ import '../../consumption/domain/services/gps_live_estimate_folder.dart';
 import '../../consumption/domain/services/trip_consumption_reliability.dart';
 import '../../consumption/domain/trip_recorder.dart';
 import '../../consumption/data/trip_history_repository.dart';
-import 'adapter_reconnect_scanner.dart';
+import 'obd2_reattach_source.dart';
 import 'degraded_gps_emitter.dart';
 import 'dropped_session_host.dart';
 import 'dropped_session_manager.dart';
@@ -67,7 +67,7 @@ export 'dropped_session_manager.dart' show TripDropReason;
 /// scanner. Phase 1's job is to make the state observable so the
 /// follow-up PR can react to it.
 ///
-/// phase 3 (#797) wires an [AdapterReconnectScanner] into the
+/// phase 3 (#797) wires an [Obd2ReattachSource] into the
 /// drop-recovery state machine: while the controller is in
 /// [TripRecordingControllerState.pausedDueToDrop] the scanner
 /// periodically probes for the pinned adapter's MAC. On a
@@ -416,7 +416,7 @@ class TripRecordingController {
     String? pinnedAdapterMac,
     bool automatic = false,
     bool diagnosticCapture = false,
-    AdapterReconnectScanner? Function(
+    Obd2ReattachSource? Function(
       String pinnedMac,
       VoidCallback onReconnect,
     )? reconnectScannerFactory,
@@ -1540,7 +1540,7 @@ class TripRecordingController {
   /// the manager releases the reference as soon as it's no longer
   /// needed.
   @visibleForTesting
-  AdapterReconnectScanner? get debugReconnectScanner =>
+  Obd2ReattachSource? get debugReconnectScanner =>
       _droppedSession.reconnectScanner;
 
   /// Exposed for tests: inject a hand-crafted [TripSample] directly

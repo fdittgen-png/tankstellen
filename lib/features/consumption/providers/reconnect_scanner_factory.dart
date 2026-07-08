@@ -9,121 +9,51 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../obd2/api.dart';
 
-/// Build the reconnect-scanner factory handed to `TripRecordingController`
-/// (#797 phase 3), extracted out of `Obd2RecordingPipeline` as a free
-/// function so threading the live transport kind through the connector keeps
-/// the pipeline under the #1680 file-length cap (sanctioned #2190
-/// decomposition — move-only, behaviour preserved + the #2565 hint thread).
+/// Build the in-trip reattach-source factory handed to
+/// `TripRecordingController` (#797 phase 3, rewritten by #3531 /
+/// Epic #3527).
 ///
-/// Returns null in tests / environments where [obd2ConnectionProvider] can't
-/// be resolved — the controller then falls back to grace-window-only
-/// recovery.
+/// Historically this built an [AdapterReconnectScanner] — an in-trip
+/// DIALING loop that raced the app-wide reconnect authority over the
+/// adapter's single RFCOMM channel (the #3386 war; half the #3415
+/// storm's connect traffic). The trip layer no longer dials at all:
+/// the one [Obd2LinkSupervisor] owns reconnection, and the factory
+/// returns a [SupervisorReattachSource] that merely subscribes for the
+/// re-attach moment. The DroppedSessionManager's orchestration (silent
+/// window, GPS-degrade, grace) is unchanged.
+///
+/// Returns null in tests / environments where the supervisor provider
+/// can't be resolved — the controller then falls back to
+/// grace-window-only recovery.
 ///
 /// [onConnected] is invoked with the freshly-reconnected service so the
 /// pipeline can swap its `_service` pointer AND the controller's via
-/// `replaceService` (#2524). [readLinkKind] reads the (dead-but-typed) live
-/// service's `linkKind` at handle-drop time so the connector dispatches the
-/// reconnect over the SAME transport that just dropped (#2565) — a Classic
-/// adapter reconnects over RFCOMM, not a doomed 4 s BLE GATT timeout.
-AdapterReconnectScanner? Function(
+/// `replaceService` (#2524). The `pinnedMac` factory parameter is kept
+/// for seam compatibility (the supervisor's own dial policy already
+/// targets the pinned adapter, #3016).
+Obd2ReattachSource? Function(
   String pinnedMac,
   VoidCallback onReconnect,
 )? buildReconnectScannerFactory({
   required Ref ref,
   required void Function(Obd2Service service) onConnected,
-  required String? Function() readLinkKind,
-  // #3014 — symmetric to [readLinkKind]: the live adapter NAME read off the
-  // dead-but-typed service at handle-drop time, so the reconnect trace headline
-  // names the adapter. Optional (defaults to a null reader) so existing test
-  // call sites and the back-compat path are unchanged.
+  // Kept for seam compatibility with existing call sites; the supervisor
+  // reads the live transport kind itself at dial time.
+  String? Function()? readLinkKind,
   String? Function()? readAdapterName,
 }) {
-  final Obd2ConnectionService connection;
+  final Obd2LinkSupervisor supervisor;
   try {
-    connection = ref.read(obd2ConnectionProvider);
+    supervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
   } catch (e, st) {
     unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
-      'where': 'Obd2RecordingPipeline: connection provider unavailable'
+      'where': 'Obd2RecordingPipeline: link supervisor unavailable'
     }));
     return null;
   }
-  return (pinnedMac, onReconnect) {
-    // #3422 — LinkWedged stand-down: after N consecutive exhausted Classic
-    // ladders every reconnect policy stops dialling, the IN-TRIP scanner
-    // included (its cycles were half of the #3415 storm). No scanner ⇒ the
-    // DroppedSessionManager falls back to grace-window-only recovery; the
-    // wedge-recovery ladder / the user own the link until the wedge clears.
-    if (Obd2WedgeDetector.instance.isWedged) {
-      return null;
-    }
-    // One connector per drop holds the gate bookkeeping across the
-    // scanner's repeated connect cycles. The connect callback prefers a
-    // DIRECT connect over the LIVE transport kind (#2565) — Classic goes
-    // straight to RFCOMM, BLE keeps its direct-GATT-first path (#2245) —
-    // and only falls back to a transport-aware RSSI-gated scan.
-    // #2524 — swap the pipeline's pointer (so stop() tears down the LIVE
-    // svc) AND the controller's via `replaceService` (so the loop polls the
-    // reconnected transport, not the closed one).
-    // #2565 — the transport kind ('ble'/'classic') of the link that just
-    // dropped, read ONCE off the dead service at handle-drop time. Null when
-    // unknown ⇒ the legacy BLE-direct-first path (behaviour unchanged for
-    // BLE adapters). Drives BOTH the connector's direct-path dispatch and
-    // the #3421 in-range probe below.
-    final transportHint = readLinkKind();
-    final connector = ReconnectConnector(
-      connection: connection,
-      onConnected: onConnected,
-      transportHint: transportHint,
-      // #3014 — the live adapter NAME, so the in-trip reconnect trace headline
-      // names the adapter instead of showing only the redacted MAC.
-      adapterName: readAdapterName?.call(),
-    );
-    final scanner = AdapterReconnectScanner(
-      pinnedMac: pinnedMac,
-      // #3421 — REAL in-range probe (was a stub `async => true`, which made
-      // every backoff cycle dial a full connect even with the adapter
-      // absent). BLE: a short bounded advert scan for the pinned MAC;
-      // Classic/unknown: `true` (no advert to sight — see the builder doc).
-      probe: buildObd2InRangeProbe(
-        bluetooth: connection.bluetooth,
-        scanGovernor: connection.scanGovernor,
-        transportHint: transportHint,
-      ),
-      // #3420 — stamp every in-trip reconnect attempt as a liveReconnect:
-      // the connector dials `connectByMacClassicDirect`/direct paths that
-      // default to firstConnect, which made the field trace ring read as
-      // ten user-driven connects during the #3415 war. The origin now
-      // tells the in-trip recovery apart from a real first connect.
-      // #3422 — a wedge can LATCH while this scanner is already in flight
-      // (its own exhausted ladders count toward the streak): each cycle
-      // re-checks and reports a miss WITHOUT dialling, so an in-flight
-      // scanner stops generating connect traffic the moment the wedge lands.
-      connect: (mac) async {
-        if (Obd2WedgeDetector.instance.isWedged) return false;
-        return Obd2ConnectTraceLog.runWithOrigin(
-          Obd2ConnectOrigin.liveReconnect,
-          () => connector.attempt(mac),
-          transportDecisionReason: 'in-trip-reconnect',
-        );
-      },
-      // #2261 concern 2 — after the active-scan miss ceiling switch to a
-      // passive autoConnect GATT wait for the rest of the 15-min grace.
-      passiveConnect: (mac) async {
-        if (Obd2WedgeDetector.instance.isWedged) return false; // #3422
-        return Obd2ConnectTraceLog.runWithOrigin(
-          Obd2ConnectOrigin.liveReconnect,
-          () => connector.attemptPassive(mac),
-          transportDecisionReason: 'in-trip-reconnect-passive',
-        );
-      },
-      onReconnect: onReconnect,
-    );
-    // #2905 — let the connector's per-attempt telemetry rows carry the
-    // scanner's live episode ordinal + backoff. Wired here (not via the ctor)
-    // so the connector→scanner dependency stays one-directional.
-    connector
-      ..attemptNumber = (() => scanner.currentAttemptNumber)
-      ..backoffMs = (() => scanner.currentBackoffMs);
-    return scanner;
-  };
+  return (pinnedMac, onReconnect) => SupervisorReattachSource(
+        supervisor,
+        onConnected: onConnected,
+        onReconnect: onReconnect,
+      );
 }
