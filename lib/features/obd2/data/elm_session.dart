@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'elm327_commands.dart';
 import 'obd2_response_class.dart';
 import 'obd2_transport.dart';
@@ -126,6 +127,20 @@ class ElmSession {
   /// reply — including `NO DATA`, which means the ECU answered).
   DateTime? get lastAliveAt => _lastAliveAt;
 
+  /// Adopt a link the caller ALREADY initialized (#3528 integration —
+  /// `Obd2Service.connect` runs a richer init than [initialize]: wake
+  /// policy, warm-protocol replay, handshake tracing, per-command
+  /// transient retry). Skips the init burst and goes straight to
+  /// [ElmSessionState.ready] with the ladder + liveness watchdog armed.
+  void adoptReady() {
+    if (_disposed || _state == ElmSessionState.dead) return;
+    _consecutiveTimeouts = 0;
+    _consecutiveGarbage = 0;
+    _noteAlive();
+    _setState(ElmSessionState.ready);
+    _armWatchdog();
+  }
+
   /// Run the init burst. Throws on a hard-command failure (echo-off /
   /// protocol-set) or a transport error; `?` replies to optional
   /// commands are tolerated per research rule 12.
@@ -225,12 +240,16 @@ class ElmSession {
       return;
     }
     _recoveryInFlight = true;
+    // #3534 — the classify→recover rung of the drop timeline: names which
+    // ladder command fired (ATWS = garbage, ATPC = bus error) so a field
+    // trace shows WHY the session recovered (or went on to die).
+    BreadcrumbCollector.add('ELM recovery', detail: recoveryCommand);
     _setState(ElmSessionState.recovering);
     try {
       await _transport.sendCommand(recoveryCommand);
       _noteAlive();
-    } on Object catch (e) {
-      debugPrint('ElmSession: recovery "$recoveryCommand" failed: $e');
+    } on Object catch (e, st) {
+      debugPrint('ElmSession: recovery "$recoveryCommand" failed: $e\n$st');
     } finally {
       _recoveryInFlight = false;
       if (_state == ElmSessionState.recovering) {
