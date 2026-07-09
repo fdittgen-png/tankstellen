@@ -22,3 +22,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final onboardingIncludesIosStandbyStepProvider = Provider<bool>(
   (ref) => defaultTargetPlatform == TargetPlatform.iOS,
 );
+
+/// Whether the OBD2 onboarding step offers the in-wizard connect flow
+/// (App Review 5.1.1(iv), #3535).
+///
+/// Apple rejects onboarding screens that prime a permission and offer a
+/// "Connect" + "Maybe later" choice: a pre-permission message must use
+/// neutral wording and always proceed to the OS prompt. On iOS the step
+/// therefore renders informational-only — no connect / skip buttons —
+/// and the Bluetooth permission fires later, on the direct user action
+/// of pairing an adapter from the vehicle screen. Android keeps the
+/// in-wizard connect + VIN auto-fill flow.
+final onboardingObd2ConnectFlowEnabledProvider = Provider<bool>(
+  (ref) => defaultTargetPlatform != TargetPlatform.iOS,
+);

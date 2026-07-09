@@ -5372,14 +5372,6 @@
   "@locationConsentLegalBasis": {
     "description": "Legal-basis footnote of the GDPR location-consent dialog. 'GDPR' is the established English/EU abbreviation; the article reference is the legal citation (#2306)."
   },
-  "locationConsentDecline": "Decline",
-  "@locationConsentDecline": {
-    "description": "Decline button on the GDPR location-consent dialog (#2306)."
-  },
-  "locationConsentAccept": "Accept",
-  "@locationConsentAccept": {
-    "description": "Accept button on the GDPR location-consent dialog (#2306)."
-  },
   "loyaltySettingsTitle": "Fuel club cards",
   "@loyaltySettingsTitle": {
     "description": "Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120)."
@@ -6336,6 +6328,10 @@
   "onboardingPickUseMode": "Pick a use mode to continue.",
   "@onboardingPickUseMode": {
     "description": "Error shown when the user taps the onboarding wizard's Next button on the first step without choosing a use mode (#1691)."
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
+    "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
   },
   "openNow": "Open",
   "@openNow": {

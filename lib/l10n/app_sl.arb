@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Podatki o lokaciji se ne uporabljajo za oglaševanje, analitiko ali sledenje.",
   "locationConsentRevoke": "Dostop do lokacije lahko kadar koli prekličete v sistemskih nastavitvah. Lahko pa iščete tudi po poštni številki.",
   "locationConsentLegalBasis": "Pravna podlaga: člen 6(1)(a) GDPR (privolitev)",
-  "locationConsentDecline": "Zavrni",
-  "locationConsentAccept": "Sprejmi",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (cilj: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} se je znižal na bližnjih črpalkah",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

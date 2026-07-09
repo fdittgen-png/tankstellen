@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Τα δεδομένα τοποθεσίας δεν χρησιμοποιούνται για διαφήμιση, ανάλυση ή παρακολούθηση.",
   "locationConsentRevoke": "Μπορείτε να ανακαλέσετε την πρόσβαση στην τοποθεσία ανά πάσα στιγμή στις ρυθμίσεις συστήματος. Εναλλακτικά, αναζητήστε με ταχυδρομικό κώδικα.",
   "locationConsentLegalBasis": "Νομική βάση: άρθρο 6 παρ. 1 στοιχ. α) ΓΚΠΔ (συγκατάθεση)",
-  "locationConsentDecline": "Απόρριψη",
-  "locationConsentAccept": "Αποδοχή",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (στόχος: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} έπεσε σε κοντινά πρατήρια",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Plasseringsdata brukes ikke til annonsering, analyse eller sporing.",
   "locationConsentRevoke": "Du kan når som helst trekke tilbake plasseringstilgangen i systeminnstillingene. Alternativt kan du søke etter postnummer.",
   "locationConsentLegalBasis": "Rettslig grunnlag: GDPR art. 6 nr. 1 bokstav a (samtykke)",
-  "locationConsentDecline": "Avslå",
-  "locationConsentAccept": "Godta",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (mål: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} har falt på stasjoner i nærheten",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

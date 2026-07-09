@@ -237,8 +237,12 @@ class _OnboardingWizardScreenState
     // OBD2 + Vehicles are always skippable when shown; API key is
     // skippable when it shows. The OBD2 step owns its own skip button,
     // but surfacing the wizard's "Skip" too keeps the UX consistent
-    // with the rest of the optional steps.
-    if (_obd2StepIndex != -1 && currentStep == _obd2StepIndex) return true;
+    // with the rest of the optional steps. On iOS the OBD2 step is
+    // informational-only (App Review 5.1.1(iv), #3535), so there is
+    // nothing to skip — Next advances just the same.
+    if (_obd2StepIndex != -1 && currentStep == _obd2StepIndex) {
+      return ref.read(onboardingObd2ConnectFlowEnabledProvider);
+    }
     if (_vehiclesStepIndex != -1 && currentStep == _vehiclesStepIndex) {
       return true;
     }

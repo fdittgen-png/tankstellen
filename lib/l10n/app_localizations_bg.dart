@@ -6321,12 +6321,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Правно основание: чл. 6, пар. 1, б. „а“ от ОРЗД (съгласие)';
 
   @override
-  String get locationConsentDecline => 'Откажи';
-
-  @override
-  String get locationConsentAccept => 'Приеми';
-
-  @override
   String get loyaltySettingsTitle => 'Карти за горивни клубове';
 
   @override
@@ -7000,6 +6994,10 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Изберете режим на използване за да продължите.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Отворено';

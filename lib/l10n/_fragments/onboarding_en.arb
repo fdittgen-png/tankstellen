@@ -27,5 +27,9 @@
   "onboardingPickUseMode": "Pick a use mode to continue.",
   "@onboardingPickUseMode": {
     "description": "Error shown when the user taps the onboarding wizard's Next button on the first step without choosing a use mode (#1691)."
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
+    "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
   }
 }

@@ -6305,12 +6305,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)';
 
   @override
-  String get locationConsentDecline => 'Noraidīt';
-
-  @override
-  String get locationConsentAccept => 'Piekrist';
-
-  @override
   String get loyaltySettingsTitle => 'Degvielas kluba kartes';
 
   @override
@@ -6983,6 +6977,10 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Izvēlieties lietošanas veidu, lai turpinātu.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Atvērts';

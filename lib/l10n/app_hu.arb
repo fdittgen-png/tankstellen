@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "A helyadatokat nem használjuk reklámra, elemzésre vagy nyomon követésre.",
   "locationConsentRevoke": "A helyhozzáférést bármikor visszavonhatja a rendszerbeállításokban. Másik lehetőségként irányítószám szerint is kereshet.",
   "locationConsentLegalBasis": "Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)",
-  "locationConsentDecline": "Elutasítás",
-  "locationConsentAccept": "Elfogadás",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (cél: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} csökkent a közeli kutakon",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

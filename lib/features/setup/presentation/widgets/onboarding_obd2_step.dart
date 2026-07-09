@@ -16,6 +16,7 @@ import '../../../vehicle/presentation/widgets/vin_confirm_dialog.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../../vehicle/providers/vin_decoder_provider.dart';
 import '../../providers/onboarding_obd2_connector.dart';
+import '../../providers/onboarding_platform_steps_provider.dart';
 import '../../providers/onboarding_wizard_provider.dart';
 import '../../../../core/logging/error_logger.dart';
 
@@ -39,6 +40,10 @@ import '../../../../core/logging/error_logger.dart';
 /// decoded, the step just stashes the decoded data in the wizard
 /// state and calls [onProceed] — the following manual step picks it
 /// up from there.
+///
+/// On iOS (`onboardingObd2ConnectFlowEnabledProvider` false) the step
+/// renders informational-only — App Review 5.1.1(iv) forbids the
+/// "Connect adapter" / "Maybe later" pre-permission pattern (#3535).
 class OnboardingObd2Step extends ConsumerStatefulWidget {
   /// Called when the user taps "Maybe later" or after a failed
   /// connect / VIN read so the wizard can advance to the next step
@@ -261,6 +266,14 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    // App Review 5.1.1(iv) (#3535) — on iOS the step is informational
+    // only: no "Connect adapter" (permission primer) and no "Maybe
+    // later" (skip that dodges the prompt). The wizard's own Next
+    // advances; pairing happens later from the vehicle screen where
+    // the Bluetooth permission fires on the direct user action.
+    final connectFlowEnabled = ref.watch(
+      onboardingObd2ConnectFlowEnabledProvider,
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -286,14 +299,18 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
           ),
           const SizedBox(height: 12),
           Text(
-            l10n.onboardingObd2StepBody,
+            connectFlowEnabled
+                ? l10n.onboardingObd2StepBody
+                : l10n.onboardingObd2LaterNote,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 28),
-          if (_phase == _Phase.readingVin)
+          if (!connectFlowEnabled)
+            const SizedBox.shrink(key: Key('onboardingObd2InfoOnly'))
+          else if (_phase == _Phase.readingVin)
             Column(
               key: const Key('onboardingObd2ReadingVin'),
               children: [

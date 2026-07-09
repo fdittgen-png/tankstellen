@@ -81,13 +81,13 @@ class LocationConsentDialog {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l.locationConsentDecline),
-          ),
+          // App Review 5.1.1(iv) (#3535) — a pre-permission explainer must
+          // use neutral wording ("Continue") and always proceed to the OS
+          // permission prompt; the OS prompt itself is where the user
+          // declines. No decline/skip button may appear on this message.
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(l.locationConsentAccept),
+            child: Text(l.continueButton),
           ),
         ],
       ),

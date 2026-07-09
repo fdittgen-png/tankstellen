@@ -6303,12 +6303,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)';
 
   @override
-  String get locationConsentDecline => 'Ablehnen';
-
-  @override
-  String get locationConsentAccept => 'Zustimmen';
-
-  @override
   String get loyaltySettingsTitle => 'Tankstellen-Kundenkarten';
 
   @override
@@ -6982,6 +6976,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Wähle einen Nutzungsmodus, um fortzufahren.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'Du kannst einen Bluetooth-OBD2-Adapter jederzeit später über den Fahrzeug-Bildschirm koppeln, um Fahrten aufzuzeichnen und Motordaten auszulesen.';
 
   @override
   String get openNow => 'Geöffnet';

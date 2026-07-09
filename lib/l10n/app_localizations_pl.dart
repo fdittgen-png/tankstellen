@@ -6294,12 +6294,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda)';
 
   @override
-  String get locationConsentDecline => 'Odmów';
-
-  @override
-  String get locationConsentAccept => 'Akceptuj';
-
-  @override
   String get loyaltySettingsTitle => 'Karty paliwowe';
 
   @override
@@ -6972,6 +6966,10 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Wybierz tryb użytkowania, aby kontynuować.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Otwarte';

@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Atrašanās vietas dati netiek izmantoti reklāmai, analītikai vai izsekošanai.",
   "locationConsentRevoke": "Atrašanās vietas piekļuvi varat jebkurā laikā atsaukt sistēmas iestatījumos. Varat arī meklēt pēc pasta indeksa.",
   "locationConsentLegalBasis": "Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)",
-  "locationConsentDecline": "Noraidīt",
-  "locationConsentAccept": "Piekrist",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (mērķis: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} kritās tuvumā esošajās stacijās",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

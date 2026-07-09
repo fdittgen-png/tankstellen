@@ -6313,12 +6313,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Base jurídica: art. 6.1.a) del RGPD (consentimiento)';
 
   @override
-  String get locationConsentDecline => 'Rechazar';
-
-  @override
-  String get locationConsentAccept => 'Aceptar';
-
-  @override
   String get loyaltySettingsTitle => 'Tarjetas de club de combustible';
 
   @override
@@ -6991,6 +6985,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingPickUseMode => 'Elige un modo de uso para continuar.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Abierto';

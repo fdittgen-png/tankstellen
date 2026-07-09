@@ -6302,12 +6302,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Base giuridica: art. 6, par. 1, lett. a) del GDPR (consenso)';
 
   @override
-  String get locationConsentDecline => 'Rifiuta';
-
-  @override
-  String get locationConsentAccept => 'Accetta';
-
-  @override
   String get loyaltySettingsTitle => 'Carte fedeltà carburante';
 
   @override
@@ -6981,6 +6975,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Scegli una modalità d\'uso per continuare.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Aperto';

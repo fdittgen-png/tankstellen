@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Vietos duomenys nenaudojami reklamai, analitikai ar sekimui.",
   "locationConsentRevoke": "Vietos prieigą galite bet kada atšaukti sistemos nustatymuose. Taip pat galite ieškoti pagal pašto kodą.",
   "locationConsentLegalBasis": "Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)",
-  "locationConsentDecline": "Atmesti",
-  "locationConsentAccept": "Sutikti",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (tikslas: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} atpigo netoliese esančiose degalinėse",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
