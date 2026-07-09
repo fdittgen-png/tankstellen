@@ -83,6 +83,15 @@ object Obd2ClassicPlugin {
      *  its own `budgetMs`; this default keeps an old Dart caller bounded. */
     private const val DEFAULT_CONNECT_BUDGET_MS = 20_000L
 
+    /** #3530 — post-connect settle before the socket is handed to the reader
+     *  and the Dart side starts the ELM init. ELM327 clones routinely accept
+     *  the RFCOMM connect while their SPP service is still waking; an ATZ
+     *  fired in that gap is dropped or answered with garbage, which the
+     *  session's error ladder then has to clean up (AndrOBD ships the same
+     *  settle for the same reason). Runs on the background connect thread —
+     *  the Flutter main thread is never blocked. */
+    private const val CONNECT_SETTLE_MS = 500L
+
     private var socket: BluetoothSocket? = null
     private var readerThread: Thread? = null
     private val readerRunning = AtomicBoolean(false)
@@ -144,33 +153,11 @@ object Obd2ClassicPlugin {
                 // location-permission branch unreachable). Reuse this channel
                 // instead of pulling in device_info_plus.
                 "sdkInt" -> result.success(android.os.Build.VERSION.SDK_INT)
-                // #3422 — wedge-recovery rung 1: refresh the LOCAL SDP /
-                // RFCOMM-channel cache for the adapter. Kicks off an async
-                // OS-side SDP query; `true` means the query was accepted.
-                "fetchUuidsWithSdp" -> {
-                    val address = call.argument<String>("address")
-                        ?: return result.error("arg", "address missing", null)
-                    result.success(fetchUuidsWithSdp(context, address))
-                }
-                // #3422 — wedge-recovery rung 2 (guarded re-bond): drop the
-                // bond via the hidden reflection `removeBond()`, then re-pair
-                // with the public `createBond()`. Both async kick-offs.
-                "removeBond" -> {
-                    val address = call.argument<String>("address")
-                        ?: return result.error("arg", "address missing", null)
-                    result.success(removeBond(context, address))
-                }
-                "createBond" -> {
-                    val address = call.argument<String>("address")
-                        ?: return result.error("arg", "address missing", null)
-                    result.success(createBond(context, address))
-                }
-                // #3422 — wedge-recovery rung 3 needs to await the adapter
-                // actually turning OFF between the two consent dialogs.
-                "adapterEnabled" -> {
-                    @Suppress("MissingPermission")
-                    result.success(adapterOrNull(context)?.isEnabled == true)
-                }
+                // #3530 — the #3422 wedge-recovery natives (fetchUuidsWithSdp /
+                // removeBond / createBond / adapterEnabled) were deleted with
+                // the Dart wedge subsystem (Epic #3527): the Obd2LinkSupervisor's
+                // canonical recovery (full close → fresh socket → watchdogged
+                // connect) replaced the escalation ladder they served.
                 else -> result.notImplemented()
             }
         } catch (e: Exception) {
@@ -376,6 +363,15 @@ object Obd2ClassicPlugin {
                 return "RFCOMM open completed after the whole-ladder budget" +
                     " (attempt $attempt)"
             }
+            // #3530 — let the clone's SPP service settle before any I/O; see
+            // CONNECT_SETTLE_MS. Interruption tears the socket down cleanly.
+            try {
+                Thread.sleep(CONNECT_SETTLE_MS)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                try { s.close() } catch (_: IOException) {}
+                return "interrupted during post-connect settle"
+            }
             socket = s
             startReader()
             null
@@ -499,56 +495,6 @@ object Obd2ClassicPlugin {
         // signals when there was nothing to tear down.
         if (hadConnection) {
             postToSink { sink -> sink.endOfStream() }
-        }
-    }
-
-    /** #3422 — wedge-recovery rung 1: ask the OS to re-run SDP discovery for
-     *  [address], refreshing the locally-cached UUID / RFCOMM-channel records
-     *  a wedged re-open may be dialling into. `fetchUuidsWithSdp()` is an
-     *  async kick-off; the Dart side waits a settle delay before its bounded
-     *  verification connect. Never throws — false on any failure. */
-    private fun fetchUuidsWithSdp(context: Context, address: String): Boolean {
-        val adapter = adapterOrNull(context) ?: return false
-        return try {
-            @Suppress("MissingPermission")
-            adapter.getRemoteDevice(address).fetchUuidsWithSdp()
-        } catch (e: Exception) {
-            Log.w(TAG, "fetchUuidsWithSdp failed for $address", e)
-            false
-        }
-    }
-
-    /** #3422 — wedge-recovery rung 2 (guarded re-bond, config-gated on the
-     *  Dart side): drop the bond via the hidden `removeBond()` — reflection,
-     *  the long-standing community workaround (no public API removes a bond).
-     *  Returns false when the reflection is unavailable (future Android hides
-     *  it) or the call fails; the Dart rung then falls through. */
-    private fun removeBond(context: Context, address: String): Boolean {
-        val adapter = adapterOrNull(context) ?: return false
-        return try {
-            @Suppress("MissingPermission")
-            val device = adapter.getRemoteDevice(address)
-            val m = device.javaClass.getMethod("removeBond")
-            (m.invoke(device) as? Boolean) == true
-        } catch (e: Exception) {
-            Log.w(TAG, "removeBond reflection failed for $address", e)
-            false
-        }
-    }
-
-    /** #3422 — wedge-recovery rung 2 second half: re-pair with the PUBLIC
-     *  `createBond()`. May surface the system pairing dialog (ELM clones pair
-     *  just-works / PIN 1234) — acceptable as guided recovery; the Dart side
-     *  gates the whole rung behind a developer flag. Async kick-off; `true`
-     *  means the bonding process started. */
-    private fun createBond(context: Context, address: String): Boolean {
-        val adapter = adapterOrNull(context) ?: return false
-        return try {
-            @Suppress("MissingPermission")
-            adapter.getRemoteDevice(address).createBond()
-        } catch (e: Exception) {
-            Log.w(TAG, "createBond failed for $address", e)
-            false
         }
     }
 
