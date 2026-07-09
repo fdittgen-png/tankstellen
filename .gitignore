@@ -118,6 +118,7 @@ docs/guides/*
 !docs/guides/app-store-listing.md
 !docs/guides/go-live-runbook.md
 !docs/guides/ios-testflight-testers.md
+!docs/guides/obd2-link-rewrite-validation.md
 !docs/guides/opening-hours.md
 !docs/guides/play-fgs-declaration.md
 

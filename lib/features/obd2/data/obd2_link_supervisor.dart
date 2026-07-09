@@ -194,6 +194,10 @@ class Obd2LinkSupervisor {
           '(${_state.value}) — not dialing');
       return;
     }
+    // #3534 — the per-drop timeline starts here (detect → dial →
+    // recovered); the field-validation checklist reads this chain out
+    // of the breadcrumb export after an induced-drop drive.
+    BreadcrumbCollector.add('OBD2 link drop', detail: reason);
     _setState(Obd2LinkState.reconnecting);
     // Dial immediately on the first drop; backoff grows only on misses.
     if (_attemptInFlight == null && _backoffTimer == null) {
@@ -209,6 +213,8 @@ class Obd2LinkSupervisor {
     _cancelBackoffTimer();
     _service = null;
     _attemptCount = 0;
+    // #3534 — the checklist's "engine-off parks the loop" line item.
+    BreadcrumbCollector.add('OBD2 link parked', detail: 'engine off');
     _setState(Obd2LinkState.engineOff);
   }
 
@@ -263,13 +269,13 @@ class Obd2LinkSupervisor {
     Object? failure;
     try {
       fresh = await (dialer ?? _dial)();
-    } catch (e) {
+    } catch (e, st) {
       failure = e;
       // A dial fault is part of normal reconnect weather (adapter out
       // of range, socket refused) — breadcrumb-level, never an ERROR
       // surface. Real terminal faults reach the user via [connect]'s
       // returned null + the UI's link state.
-      debugPrint('Obd2LinkSupervisor: dial failed: $e');
+      debugPrint('Obd2LinkSupervisor: dial failed: $e\n$st');
       BreadcrumbCollector.add(
         'OBD2 dial failed',
         detail: '${e.runtimeType} backoff=${_backoff.inMilliseconds}ms',
@@ -296,6 +302,15 @@ class Obd2LinkSupervisor {
       return null;
     }
     if (fresh != null) {
+      // #3534 — close the drop timeline: a recovery names how many dials
+      // it took (attempt 1 = the immediate post-drop dial). A plain
+      // user-initiated first connect is 0 prior misses.
+      BreadcrumbCollector.add(
+        'OBD2 link ready',
+        detail: userInitiated && _attemptCount == 0
+            ? 'first connect'
+            : 'recovered after ${_attemptCount + 1} dial(s)',
+      );
       _service = fresh;
       _backoff = Duration.zero;
       _attemptCount = 0;
