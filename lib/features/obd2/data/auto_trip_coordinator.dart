@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/logging/error_logger.dart';
 import 'auto_record_trace_log.dart';
 import 'background_adapter_listener.dart';
-import 'obd2_link_arbiter.dart';
+import 'obd2_link_supervisor.dart';
 import 'obd2_read_telemetry.dart';
 import 'obd2_service.dart';
 import 'obd2_speed_stream.dart';
@@ -169,6 +169,13 @@ class AutoTripCoordinator {
   /// `Obd2SpeedStream.new` with the production poll period; tests
   /// inject a factory that returns a stream with a much shorter
   /// period so assertions run in microseconds.
+  /// #3527 — the one link supervisor. When present, the movement-watch
+  /// session REUSES its live service (a manual recording shares the same
+  /// link — no second RFCOMM session, the #3415 war's second front) and
+  /// dials through its single-flight machinery otherwise. Optional so
+  /// event-only tests keep constructing the coordinator bare.
+  final Obd2LinkSupervisor? linkSupervisor;
+
   final Obd2SpeedStreamFactory speedStreamFactory;
 
   /// Snapshot of the auto-record fields off the active vehicle
@@ -203,11 +210,6 @@ class AutoTripCoordinator {
   /// injected, or after a successful hand-off.
   Obd2Service? _session;
 
-  /// #3420 — the auto-record lease on the [Obd2LinkArbiter], held while a
-  /// movement-watch session is open. Released at hand-off (the recorder
-  /// acquires its own recording lease), on teardown, and on preemption.
-  Obd2LinkLease? _linkLease;
-
   AutoTripCoordinator({
     required this.listener,
     required this.startTrip,
@@ -215,6 +217,7 @@ class AutoTripCoordinator {
     required this.config,
     this.sessionOpener,
     this.foregroundSessionOpener,
+    this.linkSupervisor,
     Obd2SpeedStreamFactory? speedStreamFactory,
     int? consecutiveSamplesWindow,
     DateTime Function()? now,
@@ -453,28 +456,17 @@ class AutoTripCoordinator {
       // we simply have no speed source. Stay idle.
       return;
     }
-    // #3420 — claim the link as the auto-record authority BEFORE any
-    // connect. Refused while a recording (or another holder) owns the
-    // adapter: opening a second RFCOMM session against a live trip tears
-    // down the recording's socket — the #3415 field war's second front.
-    final lease = Obd2LinkArbiter.instance.tryAcquire(
-      'auto-record',
-      Obd2LinkPriority.autoRecord,
-      onPreempted: _onLinkPreempted,
-    );
-    if (lease == null) {
-      AutoRecordTraceLog.add(
-        AutoRecordEventKind.sessionOpenFailed,
-        mac: config.mac,
-        detail: 'link-held-by=${Obd2LinkArbiter.instance.holder?.owner}',
-      );
-      return;
-    }
-    _linkLease = lease;
-
+    // #3527 — no lease, no arbitration: reuse the supervisor's live
+    // service when one exists (a manual recording in flight shares the
+    // one link — never a second RFCOMM session against a live trip),
+    // else dial through the supervisor's single-flight machinery.
+    final sup = linkSupervisor;
     Obd2Service? service;
     try {
-      service = await opener(config.mac);
+      service = sup?.service ??
+          (sup != null
+              ? await sup.connectWith(() => opener(config.mac))
+              : await opener(config.mac));
     } catch (e, st) {
       service = null;
       AutoRecordTraceLog.add(
@@ -497,22 +489,22 @@ class AutoTripCoordinator {
         mac: config.mac,
         detail: 'opener returned null',
       );
-      _releaseLinkLease(); // #3420 — no session, hand the link back
       return;
     }
 
     // The connect cycle could have been cancelled between awaiting the
     // opener and now (stop() was called, a disconnect already fired and
-    // queued ahead of us, or a recording PREEMPTED the lease mid-open,
-    // #3420). Drop the freshly-opened service rather than wire a dangling
-    // subscription against a link someone else now owns.
-    if (!_started || _tripActive || _session != null || !lease.isActive) {
-      try {
-        await service.disconnect();
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: drop-orphan disconnect failed'}));
+    // queued ahead of us, or a trip went live mid-open). Don't wire a
+    // dangling subscription — but never close a supervisor-owned link
+    // (#3527): the supervisor keeps it healthy for whoever needs it next.
+    if (!_started || _tripActive || _session != null) {
+      if (!identical(linkSupervisor?.service, service)) {
+        try {
+          await service.disconnect();
+        } catch (e, st) {
+          unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {'where': 'AutoTripCoordinator: drop-orphan disconnect failed'}));
+        }
       }
-      _releaseLinkLease(); // #3420 — the cycle was cancelled under us
       return;
     }
 
@@ -669,7 +661,6 @@ class AutoTripCoordinator {
     // same moment: the recorder's `start()` acquires its own RECORDING
     // lease, so the hand-off is a clean ownership transfer, not a preempt.
     _session = null;
-    _releaseLinkLease();
     AutoRecordTraceLog.add(
       AutoRecordEventKind.sessionHandedOff,
       mac: config.mac,
@@ -745,12 +736,14 @@ class AutoTripCoordinator {
 
   /// Close [_session] if held, swallowing transport errors. Idempotent
   /// — `_session` is nulled out either way so a follow-up call is a
-  /// no-op. #3420 — also hands the auto-record link lease back.
+  /// no-op. #3527 — a session that IS the supervisor's live link is NOT
+  /// closed here: the supervisor owns link health end-to-end, and a
+  /// deliberate close would leave it believing a dead socket is ready.
   Future<void> _closeSessionIfHeld() async {
-    _releaseLinkLease();
     final held = _session;
     if (held == null) return;
     _session = null;
+    if (identical(linkSupervisor?.service, held)) return;
     try {
       await held.disconnect();
     } catch (e, st) {
@@ -758,23 +751,4 @@ class AutoTripCoordinator {
     }
   }
 
-  void _releaseLinkLease() {
-    _linkLease?.release();
-    _linkLease = null;
-  }
-
-  /// #3420 — a strictly-higher authority (a manual recording) took the
-  /// link. The lease is already revoked; stop the movement watch and drop
-  /// the held session so the new owner's connect finds a free adapter.
-  void _onLinkPreempted() {
-    _linkLease = null;
-    unawaited(_speedSub?.cancel());
-    _speedSub = null;
-    AutoRecordTraceLog.add(
-      AutoRecordEventKind.sessionOpenFailed,
-      mac: config.mac,
-      detail: 'link-preempted: watch stopped, session closing',
-    );
-    unawaited(_closeSessionIfHeld());
-  }
 }

@@ -99,10 +99,11 @@ Obd2SessionOpener autoRecordSessionOpenerFactory(Ref ref) {
 /// Later opens — and every open on a normal launch — run [inner]
 /// untagged, so the service's own default origin applies.
 ///
-/// The origin override scopes the supervisor-admitted connect the
-/// opener performs ([Obd2ConnectionService.connectByMac] →
-/// `supervisor.admit`), so the restoration path enters single-flight
-/// admission like every other requester — only its trace label differs.
+/// The origin override scopes the connect the opener performs — the
+/// coordinator hands this opener to the one [Obd2LinkSupervisor]'s
+/// `connectWith` (#3527), so the restoration path enters the same
+/// single-flight dial as every other requester — only its trace label
+/// differs.
 ///
 /// Exposed (not private) so the unit test can drive it with a fake
 /// restoration service + a fake inner opener without standing up the

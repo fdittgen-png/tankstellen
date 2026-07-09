@@ -10,6 +10,7 @@ import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/collectors/breadcrumb_collector.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
+import 'package:tankstellen/features/obd2/data/adapter_capability.dart';
 import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
 import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
 import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
@@ -384,17 +385,27 @@ void main() {
         // unmount the sheet while it is still pending.
         final svc = _GatedConnection();
 
+        // #3527 — the dial now runs through the app-scoped (keepAlive)
+        // link supervisor. An explicit container mirrors production: the
+        // SHEET unmounts mid-connect, but the app graph (and thus the
+        // supervisor's in-flight dial) survives. Replacing the whole
+        // ProviderScope instead would dispose the supervisor and make it
+        // discard the fresh service — a teardown artifact, not the
+        // errorlog_30 scenario.
+        final container = ProviderContainer(overrides: [
+          obd2ConnectionProvider.overrideWith((_) => svc),
+          vehicleProfileListProvider.overrideWith(() => list),
+          activeVehicleProfileProvider.overrideWith(
+            () => _StubActiveVehicle(
+              const VehicleProfile(id: 'v1', name: 'Golf'),
+            ),
+          ),
+        ]);
+        addTearDown(container.dispose);
+
         await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              obd2ConnectionProvider.overrideWith((_) => svc),
-              vehicleProfileListProvider.overrideWith(() => list),
-              activeVehicleProfileProvider.overrideWith(
-                () => _StubActiveVehicle(
-                  const VehicleProfile(id: 'v1', name: 'Golf'),
-                ),
-              ),
-            ],
+          UncontrolledProviderScope(
+            container: container,
             child: const MaterialApp(
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
@@ -410,9 +421,13 @@ void main() {
 
         // Dismiss the sheet WHILE connect() is still in flight — this is the
         // crash window: the sheet unmounts, then connect() resolves and the
-        // post-await persist runs.
+        // post-await persist runs. The container stays alive (production:
+        // dismissing a sheet never tears down the app graph).
         await tester.pumpWidget(
-          const MaterialApp(home: Scaffold(body: SizedBox.shrink())),
+          UncontrolledProviderScope(
+            container: container,
+            child: const MaterialApp(home: Scaffold(body: SizedBox.shrink())),
+          ),
         );
         expect(
           find.byType(Obd2AdapterPickerSheet),
@@ -610,6 +625,20 @@ class _RecordingFakeConnection extends Obd2ConnectionService {
 /// Minimal [Obd2Service] stand-in. The pinned-MAC tests only need
 /// identity comparison (`same(fakeService)`); no transport calls fire.
 class _NoopObd2Service implements Obd2Service {
+  // #3527 — the picker's dial now runs through the link supervisor, whose
+  // ready transition republishes the status dot from the fresh service's
+  // identity fields. Give the noop fake that minimal identity surface so
+  // the seam doesn't spool a NoSuchMethodError into the error log the
+  // errorlog_30 tests assert empty.
+  @override
+  String? adapterName = 'noop';
+
+  @override
+  String? adapterMac = 'noop-mac';
+
+  @override
+  Obd2AdapterCapability get capability => Obd2AdapterCapability.standardOnly;
+
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

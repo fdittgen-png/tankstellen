@@ -1,11 +1,16 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/logging/error_logger.dart';
 import '../data/obd2_connect_trace.dart';
 import '../data/obd2_connection_service.dart';
+import '../data/obd2_link_supervisor.dart';
 import '../data/obd2_self_test_driver.dart';
+import 'obd2_reconnect_provider.dart';
 import 'obd2_self_test_state.dart';
 import '../../consumption/providers/trip_recording_provider.dart';
 
@@ -83,6 +88,17 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
     final connection = ref.read(obd2ConnectionProvider);
     final pinnedMac =
         (targetMac != null && targetMac.isNotEmpty) ? targetMac : null;
+    // #3527 — thread THE link supervisor into the driver's one-shot dial;
+    // degrade to null (bare dial) when the reconnect graph can't resolve
+    // (unit-test scope without the obd2 overrides).
+    Obd2LinkSupervisor? linkSupervisor;
+    try {
+      linkSupervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'Obd2SelfTestController: supervisor resolve failed',
+      }));
+    }
     final report = await runObd2SelfTest(
       connection,
       pinnedMac: pinnedMac,
@@ -90,6 +106,7 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
       adapterName: adapterName, // #3014 — name the trace headline
       isCancelled: () => _cancelled,
       onStep: _onStep,
+      linkSupervisor: linkSupervisor,
     );
 
     state = Obd2SelfTestState(

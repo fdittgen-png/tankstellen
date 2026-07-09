@@ -18,7 +18,8 @@ import 'package:tankstellen/features/obd2/data/broken_map_belief.dart';
 import 'package:tankstellen/features/obd2/data/broken_map_detector.dart';
 import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_link_arbiter.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
 import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
@@ -203,46 +204,63 @@ void main() {
     });
   });
 
-  group('#3495 F3 — arbiter link lease', () {
-    setUp(Obd2LinkArbiter.instance.resetForTest);
-    tearDown(Obd2LinkArbiter.instance.resetForTest);
-
+  group('#3527 — link supervisor integration (replaces the #3495 F3 lease)',
+      () {
     test(
-        'a held recording lease REFUSES the post-pair populate: no connect is '
-        'attempted and the outcome is aborted', () async {
-      final service = buildConnectedService({'0902': 'NO DATA>'});
-      final connection = _FakeConnection(connectByMacResult: service);
+        'a live supervisor-owned service is REUSED: no rival dial, and the '
+        'run never disconnects the supervised link (KEEP-LINK)', () async {
+      final liveService = buildConnectedService({'0902': 'NO DATA>'});
+      final sup = Obd2LinkSupervisor(
+        dial: () async => liveService,
+        drops: const Stream<Obd2LinkDropEvent>.empty(),
+      );
+      addTearDown(() async {
+        // Detach the service first — dispose would disconnect it, which
+        // is fine, but do it deterministically for the fake transport.
+        await sup.dispose();
+      });
+      await sup.connect();
+      expect(sup.service, same(liveService));
+
+      final connection = _FakeConnection(
+        connectByMacResult: buildConnectedService({'0902': 'NO DATA>'}),
+      );
       final populator = VinAdapterPairAutoPopulator(
         connection: connection,
         decoder: buildDecoder(online: false),
+        linkSupervisor: sup,
       );
-
-      final lease = Obd2LinkArbiter.instance
-          .tryAcquire('recording', Obd2LinkPriority.recording);
-      addTearDown(() => lease?.release());
 
       final outcome = await populator.run(
         pairedAdapterMac: 'AA:BB',
         profile: baseProfile(),
       );
 
-      expect(outcome.profile, isNull);
+      expect(outcome.profile, isNull); // NO DATA VIN — aborted, as before
       expect(outcome.readVin, isFalse);
       expect(connection.connectByMacCalls, 0,
-          reason: 'the populator was the one remaining connect path with no '
-              'arbiter claim — it must never dial into a link a recording '
-              'owns (#3495 F3)');
-      expect(Obd2LinkArbiter.instance.holder?.owner, 'recording',
-          reason: 'the recording keeps the link');
+          reason: 'the populator must never dial a rival session against a '
+              'link the supervisor owns (#3527) — it reuses the live '
+              'service instead');
+      expect(sup.service, same(liveService),
+          reason: 'KEEP-LINK: the supervised link stays up after the run');
     });
 
-    test('with the link free, the populate runs under a short-lived '
-        'interactive lease and releases it', () async {
+    test(
+        'with no live link, the dial joins the supervisor single flight '
+        '(connectWith) and the dialed service becomes THE supervised link',
+        () async {
       final service = buildConnectedService({'0902': 'NO DATA>'});
       final connection = _FakeConnection(connectByMacResult: service);
+      final sup = Obd2LinkSupervisor(
+        dial: () async => null, // default dialer unused in this path
+        drops: const Stream<Obd2LinkDropEvent>.empty(),
+      );
+      addTearDown(sup.dispose);
       final populator = VinAdapterPairAutoPopulator(
         connection: connection,
         decoder: buildDecoder(online: false),
+        linkSupervisor: sup,
       );
 
       final outcome = await populator.run(
@@ -252,8 +270,10 @@ void main() {
 
       expect(connection.connectByMacCalls, 1);
       expect(outcome.readVin, isFalse); // NO DATA VIN — same as before
-      expect(Obd2LinkArbiter.instance.holder, isNull,
-          reason: 'the interactive lease is released when the run settles');
+      expect(sup.service, same(service),
+          reason: 'the one-shot dial ran through connectWith, so the dialed '
+              'service is now the supervised link and is NOT torn down '
+              'by the populator (#3527 KEEP-LINK)');
     });
   });
 

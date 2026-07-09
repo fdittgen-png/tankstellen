@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/logging/error_logger.dart';
@@ -32,7 +34,14 @@ abstract class VinReaderService {
 class Obd2VinReaderService implements VinReaderService {
   final Obd2ConnectionService connection;
 
-  Obd2VinReaderService({required this.connection});
+  /// #3527 — THE one link supervisor. When wired, [readVin] reuses its
+  /// live service (never a second dial against a link it owns) and
+  /// otherwise dials through its single-flight machinery
+  /// ([Obd2LinkSupervisor.connectWith]). Null keeps the legacy direct
+  /// dial (widget tests without the reconnect graph).
+  final Obd2LinkSupervisor? linkSupervisor;
+
+  Obd2VinReaderService({required this.connection, this.linkSupervisor});
 
   @override
   Future<ObdVinResult> readVin({required String pairedAdapterMac}) async {
@@ -46,13 +55,17 @@ class Obd2VinReaderService implements VinReaderService {
     // owns its own short scan window and short-circuits on the first
     // candidate matching [pairedAdapterMac] — exactly what we want.
     try {
-      // #3420 — an INTERACTIVE link lease: refused (null → io failure)
-      // while a recording / auto-record watch owns the adapter, so a VIN
-      // read can never open a rival session against a live trip.
-      final service = await Obd2LinkArbiter.instance.runInteractive(
-        'vin-read',
-        () => connection.connectByMac(pairedAdapterMac),
-      );
+      // #3527 — the one-shot dial routes through THE link supervisor:
+      // reuse its live service when one exists (a VIN read never opens
+      // a rival session against a link it owns), else join its
+      // single-flight machinery via [Obd2LinkSupervisor.connectWith].
+      // Direct dial when no supervisor is wired (legacy/test path).
+      final sup = linkSupervisor;
+      final service = sup?.service ??
+          (sup != null
+              ? await sup
+                  .connectWith(() => connection.connectByMac(pairedAdapterMac))
+              : await connection.connectByMac(pairedAdapterMac));
       if (service == null) {
         return const ObdVinResult.failure(ObdVinFailureReason.io);
       }
@@ -60,7 +73,11 @@ class Obd2VinReaderService implements VinReaderService {
         final reader = Obd2VinReader(service: service);
         return await reader.read();
       } finally {
-        await service.disconnect();
+        // #3527 KEEP-LINK — never disconnect a service the supervisor
+        // owns; it keeps the link healthy for whoever needs it next.
+        if (!identical(sup?.service, service)) {
+          await service.disconnect();
+        }
       }
     } catch (e, st) {
       // [Obd2VinReader.read] swallows its own errors; this catch is for
@@ -90,7 +107,21 @@ class Obd2VinReaderService implements VinReaderService {
 /// container — production usage wires through to the real Bluetooth
 /// stack.
 final vinReaderServiceProvider = Provider<VinReaderService>(
-  (ref) => Obd2VinReaderService(
-    connection: ref.watch(obd2ConnectionProvider),
-  ),
+  (ref) {
+    // #3527 — resolve THE link supervisor; degrade to null (legacy
+    // direct dial) when the reconnect graph can't resolve (widget-test
+    // scope without the obd2 overrides).
+    Obd2LinkSupervisor? linkSupervisor;
+    try {
+      linkSupervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'vinReaderServiceProvider: supervisor resolve failed',
+      }));
+    }
+    return Obd2VinReaderService(
+      connection: ref.watch(obd2ConnectionProvider),
+      linkSupervisor: linkSupervisor,
+    );
+  },
 );

@@ -10,28 +10,24 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
-import 'package:tankstellen/features/obd2/data/adapter_registry.dart';
-import 'package:tankstellen/features/obd2/data/adapter_reconnect_scanner.dart';
 import 'package:tankstellen/features/obd2/data/auto_record_trace_log.dart';
-import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
-import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
-import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
-import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
+import 'package:tankstellen/features/obd2/data/obd2_reattach_source.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
-import 'package:tankstellen/features/obd2/data/reconnect_connector.dart';
 import 'package:tankstellen/features/obd2/data/trip_recording_controller.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 
 /// Exercises the #797 phase 3 wiring between the controller's
-/// drop-detection path and the auto-reconnect scanner. Uses an
+/// drop-detection path and the reattach source. Uses an
 /// in-memory Hive box so the paused-trips / history state is
-/// observable, and a hand-crafted scanner factory so the test
+/// observable, and a hand-crafted reattach-source factory so the test
 /// controls exactly when "the MAC is in range".
 void main() {
-  group('TripRecordingController × AdapterReconnectScanner (#797 phase 3)',
+  group('TripRecordingController × Obd2ReattachSource (#797 phase 3)',
       () {
     late Directory tmpDir;
     late Box<String> pausedBox;
@@ -79,7 +75,7 @@ void main() {
       VoidCallback? capturedOnReconnect;
       var scannerStartCount = 0;
       var scannerStopCount = 0;
-      AdapterReconnectScanner? builtScanner;
+      _ObservableScanner? builtScanner;
 
       final ctl = TripRecordingController(
         service: Obd2Service(transport),
@@ -576,8 +572,8 @@ void main() {
           pausedRepo: pausedRepo,
           historyRepo: historyRepo,
           pinnedAdapterMac: 'AA:BB',
-          // A scanner whose onReconnect we fire manually; on fire it stands
-          // in for ReconnectConnector.onConnected → ctl.replaceService.
+          // A reattach source whose onReconnect we fire manually; on fire it
+          // stands in for the supervisor reattach → ctl.replaceService.
           reconnectScannerFactory: (mac, onReconnect) {
             capturedOnReconnect = onReconnect;
             return _ObservableScanner(
@@ -601,7 +597,7 @@ void main() {
             reason: 'the OLD service must be disconnected on drop');
 
         // Simulate the reconnect landing a NEW live service: this is what
-        // ReconnectConnector.onConnected → Obd2RecordingPipeline does.
+        // the supervisor reattach → Obd2RecordingPipeline does.
         ctl.replaceService(liveService);
         capturedOnReconnect!.call();
         expect(ctl.currentState, TripRecordingControllerState.recording,
@@ -745,10 +741,12 @@ void main() {
       });
     });
 
-    // ── #2907 — reconnect RECOVERY: never poll a dead transport; the swap
-    //    must reach the controller through the REAL connector chain ──────────
-    group('reconnect recovery — dead-transport gate + real-chain swap (#2907)',
-        () {
+    // ── #2907 — reconnect RECOVERY: never poll a dead transport ─────────────
+    // (The historical "real-chain swap" twin drove the deleted in-trip
+    // ReconnectConnector + AdapterReconnectScanner wiring; #3527 replaced
+    // that chain with the Obd2LinkSupervisor reattach, covered by the
+    // supervisor / reattach-source tests.)
+    group('reconnect recovery — dead-transport gate (#2907)', () {
       test(
           '_runTransport short-circuits a DEAD service instead of writing into '
           'the closed socket', () async {
@@ -787,9 +785,8 @@ void main() {
       });
 
       test(
-          'drop → reconnect via the REAL ReconnectConnector swaps the service '
-          'and polling RESUMES on the LIVE transport (not the dead one)',
-          () async {
+          'drop → asynchronous reattach swaps the service and polling '
+          'RESUMES on the LIVE transport (not the dead one)', () async {
         // The OLD link: answers init/odometer/VIN (start completes) then dies.
         final deadTransport = _DroppableTransport(initResponses());
         await deadTransport.connect();
@@ -802,12 +799,7 @@ void main() {
           '010C': '41 0C 0E A6>', // ~937 rpm
         });
         await liveTransport.connect();
-
-        // A fake connection whose direct connect hands back the live service —
-        // exactly what ReconnectConnector.onConnected forwards to the
-        // controller's replaceService in production.
-        final connection =
-            _ReconnectingFakeConnection(liveService: Obd2Service(liveTransport));
+        final liveService = Obd2Service(liveTransport);
 
         late TripRecordingController ctl;
         ctl = TripRecordingController(
@@ -819,40 +811,34 @@ void main() {
           historyRepo: historyRepo,
           // Default 6 s silent window — the reconnect lands silently inside it.
           pinnedAdapterMac: 'AA:BB',
-          // The REAL production wiring: a ReconnectConnector whose onConnected
-          // calls ctl.replaceService, driven by a real AdapterReconnectScanner.
-          reconnectScannerFactory: (mac, onReconnect) {
-            final connector = ReconnectConnector(
-              connection: connection,
-              onConnected: ctl.replaceService,
-            );
-            return AdapterReconnectScanner(
-              pinnedMac: mac,
-              probe: (_) async => true,
-              connect: connector.attempt,
-              onReconnect: onReconnect,
-              firstProbeDelay: const Duration(milliseconds: 10),
-              initialBackoff: const Duration(milliseconds: 20),
-            );
-          },
+          // Mirrors the #3527 production wiring: a SupervisorReattachSource
+          // delivers the supervisor's fresh service via
+          // onConnected(replaceService) THEN onReconnect, asynchronously
+          // after start() — this fake reproduces that exact contract.
+          reconnectScannerFactory: (mac, onReconnect) =>
+              _DelayedReattachSource(
+            delay: const Duration(milliseconds: 30),
+            onAttach: () {
+              ctl.replaceService(liveService);
+              onReconnect();
+            },
+          ),
         );
 
         await ctl.start();
         // Drop the OLD link → the controller disconnects it (handleDrop) and
-        // the scanner starts probing.
+        // the reattach source starts watching.
         deadTransport.simulateDrop();
         ctl.debugTriggerDrop();
 
-        // Let the real scanner fire: probe→connect→onConnected(replaceService)
-        // →onReconnect→resume. This is the full production chain, in order.
+        // Let the reattach fire: onConnected(replaceService) → onReconnect
+        // → resume. Same order as the production supervisor hand-off.
         final readings = <TripLiveReading>[];
         final sub = ctl.live.listen(readings.add);
         await Future<void>.delayed(const Duration(milliseconds: 400));
 
         expect(ctl.currentState, TripRecordingControllerState.recording,
             reason: 'the silent reconnect must restore the recording state');
-        expect(connection.directConnectCount, greaterThanOrEqualTo(1),
-            reason: 'the real connector must have run a direct reconnect');
         expect(liveTransport.pidPollCount, greaterThan(0),
             reason: '#2907 — after the swap the scheduler must poll the LIVE '
                 'transport, not the orphaned dead one');
@@ -862,6 +848,114 @@ void main() {
                 'reconnected link (RED before — the loop polled the dead one)');
 
         await sub.cancel();
+        await ctl.stop();
+      });
+    });
+
+    // ── #3531 — the 2026-07-08 field bug: drop → grace elapsed → trip
+    // finalised → the OLD idle loop never woke again (its recovery signal
+    // was already consumed) → permanent flatline until an app restart.
+    // The rewrite is structurally immune: the ONE Obd2LinkSupervisor keeps
+    // its own retry loop regardless of trip state, so a grace-elapsed
+    // finalise can never strand the link.
+    group(
+        '#3531 flatline regression — grace-elapsed finalise never strands '
+        'the link', () {
+      test(
+          'the supervisor keeps retrying after the trip auto-finalised and '
+          'reaches ready on its own once the adapter returns', () async {
+        final drops = StreamController<Obd2LinkDropEvent>.broadcast();
+        final dialer = _MutableDialer(); // every dial misses, for now
+        final sup = Obd2LinkSupervisor(
+          dial: dialer.dial,
+          drops: drops.stream,
+          // Tiny backoffs so several supervisor attempts land inside the
+          // (short) grace window and the post-finalise recovery is fast.
+          initialBackoff: const Duration(milliseconds: 10),
+          maxBackoff: const Duration(milliseconds: 40),
+        );
+
+        final transport = FakeObd2Transport(initResponses());
+        await transport.connect();
+        late TripRecordingController ctl;
+        ctl = TripRecordingController(
+          service: Obd2Service(transport),
+          pollInterval: const Duration(minutes: 1),
+          vehicleId: 'car-3531',
+          pausedRepo: pausedRepo,
+          historyRepo: historyRepo,
+          // SHORT grace so the trip auto-finalises mid-test.
+          pauseGraceWindow: const Duration(milliseconds: 120),
+          // Visible drop immediately — the grace timer arms on the drop.
+          silentReconnectWindow: Duration.zero,
+          pinnedAdapterMac: 'AA:BB',
+          // The REAL production wiring (#3527): the trip layer never
+          // dials — it merely subscribes to the one supervisor for the
+          // re-attach moment.
+          reconnectScannerFactory: (mac, onReconnect) =>
+              SupervisorReattachSource(
+            sup,
+            onConnected: ctl.replaceService,
+            onReconnect: onReconnect,
+          ),
+        );
+
+        await ctl.start();
+        ctl.debugInjectSample(
+          speedKmh: 60,
+          rpm: 2000,
+          at: DateTime(2026, 7, 8, 18),
+        );
+
+        // The link dies: BOTH layers get the drop signal, as in production
+        // (the channel raises Obd2LinkDropSignal → supervisor; the drop
+        // detector raises handleDrop → trip layer).
+        ctl.debugTriggerDrop();
+        sup.notifyDrop('socket-error');
+        expect(ctl.currentState, TripRecordingControllerState.pausedDueToDrop);
+
+        // The adapter stays away past the grace window: the trip
+        // auto-finalises to history — the exact moment the old
+        // architecture stranded the link.
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+        expect(historyRepo.loadAll(), hasLength(1),
+            reason: 'grace elapsed → the partial trip is finalised');
+        expect(ctl.currentState, TripRecordingControllerState.stopped,
+            reason: 'the recording session is over');
+        expect(dialer.calls, greaterThan(1),
+            reason: 'the supervisor was already retrying during the grace '
+                'window (its loop is independent of the trip)');
+
+        // #3531 core assertion: finalising the trip (which stops the
+        // reattach source) must NOT stop the supervisor's own loop.
+        expect(sup.state.value, Obd2LinkState.reconnecting,
+            reason: '#3531 — the supervisor must still be running its '
+                'backoff loop AFTER the trip finalised; the old idle loop '
+                'was dead here (recovery signal already consumed)');
+        final callsAtFinalise = dialer.calls;
+
+        // The adapter finally powers back up — with NO trip running.
+        final liveTransport = FakeObd2Transport(initResponses());
+        await liveTransport.connect();
+        dialer.outcome = () => Obd2Service(liveTransport);
+
+        final deadline = DateTime.now().add(const Duration(seconds: 5));
+        while (sup.state.value != Obd2LinkState.ready &&
+            DateTime.now().isBefore(deadline)) {
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
+
+        expect(sup.state.value, Obd2LinkState.ready,
+            reason: '#3531 — the link must recover on the supervisor\'s own '
+                'loop after the trip is gone: the next trip finds a live '
+                'adapter instead of a permanent flatline');
+        expect(sup.service, isNotNull);
+        expect(dialer.calls, greaterThan(callsAtFinalise),
+            reason: 'the post-finalise dials came from the supervisor\'s '
+                'own backoff loop — nothing else exists to dial');
+
+        await sup.dispose();
+        await drops.close();
         await ctl.stop();
       });
     });
@@ -896,66 +990,6 @@ class _DroppableTransport implements Obd2Transport {
 
   @override
   Future<void> disconnect() async => _connected = false;
-}
-
-/// A fake [Obd2ConnectionService] whose direct-by-MAC reconnect hands back a
-/// pre-built LIVE service — standing in for the real connect dance so the
-/// reconnect chain (connector → onConnected → replaceService → resume) runs
-/// end-to-end without a Bluetooth stack (#2907).
-class _ReconnectingFakeConnection extends Obd2ConnectionService {
-  _ReconnectingFakeConnection({required this.liveService})
-      : super(
-          registry: Obd2AdapterRegistry.defaults(),
-          permissions: _AlwaysGrant(),
-          bluetooth: _UnusedFacade(),
-        );
-
-  final Obd2Service liveService;
-  int directConnectCount = 0;
-
-  @override
-  Future<Obd2Service?> connectByMacDirect(
-    String mac, {
-    Duration? timeout,
-    bool fallbackToScan = true,
-    String? adapterName,
-  }) async {
-    directConnectCount++;
-    return liveService;
-  }
-}
-
-class _AlwaysGrant implements Obd2Permissions {
-  @override
-  Future<Obd2PermissionState> current() async => Obd2PermissionState.granted;
-  @override
-  Future<Obd2PermissionState> request() async => Obd2PermissionState.granted;
-  @override
-  Future<bool> requestNotifications() async => true;
-}
-
-/// The BLE facade is never touched in the #2907 chain test — the fake
-/// connection short-circuits the direct connect — so every member throws to
-/// fail loudly if the path is ever taken.
-class _UnusedFacade implements BluetoothFacade {
-  @override
-  Stream<List<Obd2AdapterCandidate>> scan({
-    required Set<String> serviceUuids,
-    Duration timeout = const Duration(seconds: 8),
-  }) =>
-      throw UnimplementedError();
-  @override
-  Future<void> stopScan() async {}
-  @override
-  ElmByteChannel channelFor(String deviceId, Obd2AdapterProfile profile) =>
-      throw UnimplementedError();
-  @override
-  ElmByteChannel channelForDirect(
-    String mac, {
-    Duration connectTimeout = const Duration(seconds: 4),
-    bool autoConnect = false,
-  }) =>
-      throw UnimplementedError();
 }
 
 /// Captures every `errorLogger.log` call routed through the foreground
@@ -1097,12 +1131,12 @@ class _FlakyTransport implements Obd2Transport {
   }
 }
 
-/// A fake scanner that records `start()` / `stop()` invocations so
+/// A fake reattach source that records `start()` / `stop()` invocations so
 /// the trip-controller tests can assert lifecycle coupling without
 /// actually driving timers. Purely an observation hook — the real
-/// scanner's backoff math is covered by
-/// `adapter_reconnect_scanner_test.dart`.
-class _ObservableScanner implements AdapterReconnectScanner {
+/// [SupervisorReattachSource]'s subscription + delivery contract is covered
+/// by the supervisor / reattach-source tests (#3527/#3531).
+class _ObservableScanner implements Obd2ReattachSource {
   _ObservableScanner({
     required this.pinnedMac,
     required this.onReconnect,
@@ -1110,17 +1144,10 @@ class _ObservableScanner implements AdapterReconnectScanner {
     required this.onStop,
   });
 
-  @override
   final String pinnedMac;
-
   final VoidCallback onReconnect;
   final VoidCallback onStart;
   final VoidCallback onStop;
-
-  bool _scanning = false;
-
-  @override
-  bool get isScanning => _scanning;
 
   /// #2767 — mutable so a test can flip the fake into passive-waiting (then
   /// invoke [onPassiveWait]) to drive the manager's re-emit + the
@@ -1132,26 +1159,62 @@ class _ObservableScanner implements AdapterReconnectScanner {
   VoidCallback? onPassiveWait;
 
   @override
-  int get consecutiveMisses => 0;
-
-  @override
-  Duration get currentBackoff => const Duration(seconds: 5);
-
-  @override
   int get currentAttemptNumber => 1;
 
   @override
   int get currentBackoffMs => 5000;
 
   @override
+  Future<void> start() async => onStart();
+
+  @override
+  Future<void> stop() async => onStop();
+}
+
+/// A reattach source that re-attaches on its own a short delay after
+/// `start()` — modelling the production [SupervisorReattachSource] whose
+/// subscribed supervisor lands a fresh dial while the trip waits: the
+/// delivery is `onAttach` (replaceService + onReconnect, in that order),
+/// and the trip layer itself never dials (#3527).
+class _DelayedReattachSource implements Obd2ReattachSource {
+  _DelayedReattachSource({required this.delay, required this.onAttach});
+
+  final Duration delay;
+  final VoidCallback onAttach;
+  bool _stopped = false;
+
+  @override
   Future<void> start() async {
-    _scanning = true;
-    onStart();
+    await Future<void>.delayed(delay);
+    if (_stopped) return;
+    onAttach();
   }
 
   @override
-  Future<void> stop() async {
-    _scanning = false;
-    onStop();
+  Future<void> stop() async => _stopped = true;
+
+  @override
+  set onPassiveWait(VoidCallback? callback) {}
+
+  @override
+  bool get isPassiveWaiting => false;
+
+  @override
+  int get currentAttemptNumber => 1;
+
+  @override
+  int get currentBackoffMs => 0;
+}
+
+/// Dialer for the #3531 flatline-regression supervisor: keeps returning
+/// whatever [outcome] currently produces (null = miss), so the test can
+/// flip the adapter from "away" to "back" mid-run.
+class _MutableDialer {
+  Obd2Service? Function() outcome = () => null;
+  int calls = 0;
+
+  Future<Obd2Service?> dial() async {
+    calls++;
+    return outcome();
   }
 }

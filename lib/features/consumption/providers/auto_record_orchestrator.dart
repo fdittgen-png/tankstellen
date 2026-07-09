@@ -255,6 +255,21 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
     final foregroundOpener =
         ref.read(autoRecordForegroundSessionOpenerFactoryProvider);
 
+    // #3527 — thread THE link supervisor into the coordinator so its
+    // movement-watch session reuses / joins the one supervised link
+    // instead of dialing a rival session. Degrades to null (the
+    // coordinator then dials its opener directly) when the reconnect
+    // graph can't resolve — mirroring the lifecycle guard above.
+    Obd2LinkSupervisor? linkSupervisor;
+    try {
+      linkSupervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
+    } catch (e, st) {
+      debugPrint(
+        'AutoRecordOrchestrator: link supervisor unavailable — '
+        'coordinator dials without it: $e\n$st',
+      );
+    }
+
     final listener = listenerFactory();
     final coordinator = AutoTripCoordinator(
       listener: listener,
@@ -282,6 +297,7 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
       },
       sessionOpener: sessionOpener,
       foregroundSessionOpener: foregroundOpener,
+      linkSupervisor: linkSupervisor,
       config: _configFor(profile, mac),
     );
     return _OrchestratorEntry(
