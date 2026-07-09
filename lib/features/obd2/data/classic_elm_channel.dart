@@ -15,7 +15,6 @@ import 'obd2_link_drop_signal.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
-import 'obd2_wedge_detector.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 
@@ -158,11 +157,6 @@ class ClassicElmChannel implements ElmByteChannel {
           );
       // ignore: catch_no_st — rethrow-only: the original stack is preserved by rethrow
     } catch (e) {
-      // #3422 — the Dart-side deadline (wedged platform thread) carries the
-      // wedge signature; other throws (bonding/permissions) break the streak.
-      noteClassicLadderOutcome(address,
-          ok: false,
-          strategy: e is TimeoutException ? 'connect-budget-timeout' : null);
       // A thrown platform error during the RFCOMM open (bonding,
       // permissions). Bin coarsely, then rethrow unchanged.
       if (diag.enabled) {
@@ -178,10 +172,6 @@ class ClassicElmChannel implements ElmByteChannel {
       rethrow;
     }
     if (!connectResult.ok) {
-      // #3422 — an `exhausted` / `budget-exhausted` ladder outcome feeds the
-      // wedge streak (N=3 consecutive → LinkWedged, the bounded storm).
-      noteClassicLadderOutcome(address,
-          ok: false, strategy: connectResult.strategy);
       // The plugin reported a clean RFCOMM-open failure (false, not a
       // throw): the adapter is unbonded or out of range.
       if (diag.enabled) {
@@ -206,9 +196,6 @@ class ClassicElmChannel implements ElmByteChannel {
         'Adapter did not answer — turn the ignition on and retry',
       );
     }
-    // #3422 — a successful connect resets the wedge streak / clears a wedge.
-    noteClassicLadderOutcome(address,
-        ok: true, strategy: connectResult.strategy);
     if (connectSw != null) {
       connectSw.stop();
       diag.noteConnectionEvent(

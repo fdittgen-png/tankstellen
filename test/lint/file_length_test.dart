@@ -363,18 +363,9 @@ void main() {
       bumps: 6,
       decompositionIssue: 3140,
     ),
-    // #2953 — grandfathered at 405 (5 over): the _probeSafely / _connectSafely
-    // catches were rerouted from a raw `errorLogger.log` ERROR spool to the
-    // shared `recordObd2ConnectTransient` de-noiser (a parked-car engine-off
-    // transient must breadcrumb, not spool an ERROR every backoff cycle —
-    // #2892/#2935/#2945 never reached this site) via a small shared `_denoise`
-    // helper + its dartdoc. The net push just past 400 is a real fix; further
-    // compression would hurt readability. Decomposition tracked by #2187/#2188.
-    'lib/features/obd2/data/adapter_reconnect_scanner.dart': (
-      lines: 405,
-      bumps: 0,
-      decompositionIssue: null,
-    ),
+    // #3533 — adapter_reconnect_scanner.dart entry removed: the file was
+    // deleted in the #3527 rewrite (the Obd2LinkSupervisor is the one
+    // reconnect owner; no in-trip scanner exists anymore).
     // #3420 — re-grandfathered 726 → 777: the coordinator now claims an
     // auto-record lease on the Obd2LinkArbiter before opening a session
     // (tryAcquire gate + preemption handler + lease releases at hand-off /
@@ -511,10 +502,16 @@ void main() {
     // isPidKnownSupported gate + debugSetSupportedPids test seam, added
     // when the blind-optimistic gate proved to flood the scheduler
     // round-robin on unresolved adapters (RPM cadence collapse).
+    // #3528/#3532 (Epic #3527) — 1862 → 1894: the ElmSession attach on
+    // connect + the _rawSend funnel (lifecycle/routing themselves live
+    // in the NEW under-cap obd2_service_session.dart) and the #3532
+    // probation feed (noteMode01Reply from the three read chokepoints).
+    // Decomposition tracked by #3540 (#3140 closed with the file still
+    // over the cap).
     'lib/features/obd2/data/obd2_service.dart': (
-      lines: 1862,
-      bumps: 12,
-      decompositionIssue: 3140,
+      lines: 1894,
+      bumps: 13,
+      decompositionIssue: 3540,
     ),
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
     // dropped its `errorLogger.log([storage], …)` (and the now-unused
