@@ -7,10 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/features/obd2/data/adapter_pin_resolution.dart';
-import 'package:tankstellen/features/obd2/data/adapter_reconnect_scanner.dart';
 import 'package:tankstellen/features/obd2/data/dropped_session_host.dart';
 import 'package:tankstellen/features/obd2/data/last_good_adapter_store.dart';
 import 'package:tankstellen/features/obd2/data/dropped_session_manager.dart';
+import 'package:tankstellen/features/obd2/data/obd2_reattach_source.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
 import 'package:tankstellen/features/consumption/domain/entities/gps_sample_diagnostic.dart';
@@ -59,7 +59,7 @@ void main() {
       Duration grace = const Duration(hours: 1),
       Duration silentWindow = Duration.zero,
       String? pinnedMac,
-      AdapterReconnectScanner? Function(String, VoidCallback)? scannerFactory,
+      Obd2ReattachSource? Function(String, VoidCallback)? scannerFactory,
     }) {
       return DroppedSessionManager(
         host: host,
@@ -737,20 +737,15 @@ class _FakeHost implements DroppedSessionHost {
       );
 }
 
-/// Observation-only scanner: records start()/stop() counts and lets a
-/// test fire its [onReconnect] manually. The real backoff math is
-/// covered by `adapter_reconnect_scanner_test.dart`.
-class _FakeScanner implements AdapterReconnectScanner {
+/// Observation-only reattach source: records start()/stop() counts and lets
+/// a test fire its [onReconnect] manually.
+class _FakeScanner implements Obd2ReattachSource {
   VoidCallback? onReconnect;
   int startCalls = 0;
   int stopCalls = 0;
   bool _scanning = false;
 
-  @override
-  String get pinnedMac => 'AA:BB';
-
-  @override
-  Duration get currentBackoff => const Duration(seconds: 5);
+  bool get isScanning => _scanning;
 
   @override
   int get currentAttemptNumber => 1;
@@ -759,16 +754,10 @@ class _FakeScanner implements AdapterReconnectScanner {
   int get currentBackoffMs => 5000;
 
   @override
-  bool get isScanning => _scanning;
-
-  @override
   bool get isPassiveWaiting => false;
 
   @override
   VoidCallback? onPassiveWait;
-
-  @override
-  int get consecutiveMisses => 0;
 
   @override
   Future<void> start() async {

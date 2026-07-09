@@ -14,7 +14,6 @@ import '../data/obd2_connection_errors.dart';
 import '../data/obd2_disconnect_quietly.dart';
 import '../data/obd2_service.dart';
 import '../data/obd2_trip_start_budgets.dart';
-import '../data/obd2_session_context_block.dart';
 import '../data/trip_recording_controller.dart';
 import '../../consumption/domain/entities/gps_sample_diagnostic.dart';
 import '../../consumption/domain/entities/trip_save_stage.dart';
@@ -24,6 +23,7 @@ import '../../consumption/domain/trip_recorder.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'obd2_controller_phase_mapper.dart';
 import 'obd2_reconnect_provider.dart';
+import 'obd2_supervised_teardown.dart';
 import '../../consumption/providers/recording_pipeline.dart';
 import '../../consumption/providers/reconnect_scanner_factory.dart';
 import '../../consumption/providers/reference_vehicle_match.dart';
@@ -375,13 +375,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     _adapterMac = null;
     _adapterName = null;
     _adapterFirmware = null;
-    try {
-      await svc.disconnect();
-    } catch (e, st) {
-      // #2472 — context adds the obd2Session block only when dev-armed.
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-          context: obd2DisconnectTraceContext()));
-    }
+    // #3527 — keep-link: a supervisor-owned service stays connected at
+    // trip end (see obd2_supervised_teardown.dart for the rationale).
+    await teardownServiceRespectingSupervisor(_ref, svc);
     _service = null;
     // #1303 — trip finalised; clear the WAL so recovery doesn't resurrect it.
     await _host.clearActiveSnapshot();

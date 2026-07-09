@@ -117,43 +117,46 @@ class VinAdapterPairAutoPopulator {
   /// pulling in the providers layer from a data-layer class.
   static const double _blocklistThreshold = 0.7;
 
+  /// #3527 — THE one link supervisor. When wired, [run] reuses its live
+  /// service (never a second dial against a link it owns) and otherwise
+  /// dials through its single-flight machinery
+  /// ([Obd2LinkSupervisor.connectWith]). Null keeps the legacy direct
+  /// dial (unit tests construct the populator bare).
+  final Obd2LinkSupervisor? linkSupervisor;
+
   VinAdapterPairAutoPopulator({
     required this.connection,
     required this.decoder,
     this.populator = const VinAutoPopulator(),
     this.brokenMapDetector,
     this.blocklist,
+    this.linkSupervisor,
   });
 
   /// Run the post-pair flow against [pairedAdapterMac], merging into
   /// [profile]. The returned outcome carries either a non-null updated
   /// profile (caller persists it) or an `aborted` sentinel.
   ///
-  /// #3495 F3 — runs under a short-lived interactive link lease: this was
-  /// the one remaining production connect path with no arbiter claim, so it
-  /// could open a second session against a link a recording / auto-record
-  /// watch owns. Refused (an equal-or-higher holder keeps the link) ⇒ the
-  /// auto-population is skipped, exactly like a failed connect.
+  /// #3495 F3 / #3527 — the connect routes through THE link supervisor
+  /// ([linkSupervisor]) when wired: it reuses the supervisor's live
+  /// service or joins its single-flight machinery, so the
+  /// auto-population can never open a rival session against a link a
+  /// recording owns (the old interactive arbiter lease is gone).
   Future<VinAdapterPairAutoPopulationOutcome> run({
     required String pairedAdapterMac,
     required VehicleProfile profile,
   }) async {
-    final outcome = await Obd2LinkArbiter.instance.runInteractive(
-      'post-pair-populate',
-      () => _runLeased(pairedAdapterMac: pairedAdapterMac, profile: profile),
-    );
-    return outcome ?? VinAdapterPairAutoPopulationOutcome.aborted();
-  }
-
-  /// The pre-#3495 [run] body, unchanged — connect → VIN → PIDs → optional
-  /// broken-MAP probe → disconnect — now always executing under the lease.
-  Future<VinAdapterPairAutoPopulationOutcome> _runLeased({
-    required String pairedAdapterMac,
-    required VehicleProfile profile,
-  }) async {
     Obd2Service? service;
+    final sup = linkSupervisor;
     try {
-      service = await connection.connectByMac(pairedAdapterMac);
+      // #3527 — reuse the supervisor's live service when one exists,
+      // else dial through its single-flight machinery; direct dial when
+      // no supervisor is wired (unit tests).
+      service = sup?.service ??
+          (sup != null
+              ? await sup
+                  .connectWith(() => connection.connectByMac(pairedAdapterMac))
+              : await connection.connectByMac(pairedAdapterMac));
       if (service == null) {
         return VinAdapterPairAutoPopulationOutcome.aborted();
       }
@@ -317,7 +320,11 @@ class VinAdapterPairAutoPopulator {
       return VinAdapterPairAutoPopulationOutcome.aborted();
     } finally {
       try {
-        await service?.disconnect();
+        // #3527 KEEP-LINK — never disconnect a service the supervisor
+        // owns; it keeps the link healthy for whoever needs it next.
+        if (service != null && !identical(sup?.service, service)) {
+          await service.disconnect();
+        }
       } catch (e, st) {
         // Disconnect failures aren't actionable here — the next pair
         // attempt re-runs the connect path, which handles a stuck

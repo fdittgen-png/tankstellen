@@ -34,9 +34,32 @@ class RecordingStartCoordinator {
   Obd2Service? _prewarmedService;
   bool _prewarmConsumed = false;
 
+  /// #3527 — THE one link supervisor, captured whenever a call site
+  /// resolves it off the graph. Held as a field so the teardown paths
+  /// ([dispose], the in-flight backout) can honour the KEEP-LINK rule:
+  /// a service the supervisor owns is never disconnected here — the
+  /// supervisor keeps the link healthy for whoever needs it next.
+  Obd2LinkSupervisor? _supervisor;
+
   /// Set false once the host's `State` is disposed so the
   /// post-connect callbacks stop touching a dead widget.
   bool _alive = true;
+
+  /// Resolve THE app-wide [Obd2LinkSupervisor] (#3527), caching it in
+  /// [_supervisor] for the teardown paths. Null when the reconnect
+  /// graph can't resolve (widget tests that don't override it) — the
+  /// callers then degrade to the direct legacy dial.
+  Obd2LinkSupervisor? _resolveSupervisor(WidgetRef ref) {
+    try {
+      _supervisor = ref.read(obd2ReconnectProvider.notifier).supervisor;
+    } catch (_) {
+      // No reconnect graph (widget tests that don't override it) — the
+      // supervisor is a best-effort integration, so degrade silently to
+      // the direct dial, mirroring the connection-graph guard below.
+      _supervisor = null;
+    }
+    return _supervisor;
+  }
 
   /// #2274 concern 3 — begin a direct-connect-by-MAC for the active
   /// vehicle's pinned adapter when the tab opens. No-op when OBD2 is not
@@ -71,24 +94,31 @@ class RecordingStartCoordinator {
     // GATT. `fallbackToScan: false` — the pre-warm is a fast best-effort warm,
     // not a guaranteed connect; a miss just means the start flow connects
     // normally. A successful warm is held for the start flow to consume.
-    // #3420 — the pre-warm is an INTERACTIVE link lease: refused outright
-    // (null, a plain pre-warm miss) while a recording or the auto-record
-    // watch owns the adapter, and it silences the #3019 idle loop while it
-    // dials — one connect authority at a time.
-    final future = Obd2LinkArbiter.instance.runInteractive(
-      'prewarm',
-      () => connection.connectByMacTransportAware(
-        mac,
-        adapterName: activeVehicle?.obd2AdapterName,
-        fallbackToScan: false,
-      ),
-    );
+    // #3527 — the pre-warm routes through THE one link supervisor:
+    // reuse its live service when one exists (never a second dial
+    // against a link it owns), else join its single-flight machinery
+    // via [Obd2LinkSupervisor.connectWith]. Falls back to the direct
+    // dial when the supervisor graph can't resolve (widget tests).
+    final sup = _resolveSupervisor(ref);
+    Future<Obd2Service?> dial() => connection.connectByMacTransportAware(
+          mac,
+          adapterName: activeVehicle?.obd2AdapterName,
+          fallbackToScan: false,
+        );
+    final live = sup?.service;
+    final future = live != null
+        ? Future<Obd2Service?>.value(live)
+        : (sup != null ? sup.connectWith(dial) : dial());
     _prewarm = future;
     unawaited(future.then((svc) {
       if (!_alive) {
         // Backed out while the warm was in flight — disconnect it so we
-        // don't leak an open GATT link.
-        unawaited(svc?.disconnectQuietly());
+        // don't leak an open GATT link. #3527 KEEP-LINK: a service the
+        // supervisor owns stays up; it keeps the link healthy for
+        // whoever needs it next.
+        if (svc != null && !identical(_supervisor?.service, svc)) {
+          unawaited(svc.disconnectQuietly());
+        }
         return;
       }
       _prewarmedService = svc;
@@ -116,6 +146,9 @@ class RecordingStartCoordinator {
     required void Function(Object error) onConnectionError,
     required bool Function() isMounted,
   }) async {
+    // #3527 — resolve (and cache) the supervisor so the teardown guards
+    // below can honour KEEP-LINK even when [maybePrewarm] never ran.
+    final sup = _resolveSupervisor(ref);
     try {
       // #2274 concern 3 — consume the pre-warmed link if one is ready.
       // Awaiting the in-flight warm here is cheap: if it has already
@@ -174,15 +207,22 @@ class RecordingStartCoordinator {
       if (service.busProbe == Obd2BusProbeResult.probedSilent) {
         notifier.cancelConnecting();
         onConnectionError(const Obd2EngineOff());
-        unawaited(service.disconnectQuietly());
+        // #3527 KEEP-LINK — never disconnect a service the supervisor
+        // owns; deliberately closing it would leave the supervisor
+        // believing a dead socket is ready.
+        if (!identical(sup?.service, service)) {
+          unawaited(service.disconnectQuietly());
+        }
         return;
       }
       // #3335 — the user may have hit Cancel on the connecting card while
       // the BLE connect was in flight. If the session is no longer
-      // connecting, tear the freshly-linked service down and do NOT start a
-      // trip they backed out of.
+      // connecting, tear the freshly-linked service down (#3527: unless
+      // the supervisor owns it) and do NOT start a trip they backed out of.
       if (!ref.read(tripRecordingProvider).isConnecting) {
-        unawaited(service.disconnectQuietly());
+        if (!identical(sup?.service, service)) {
+          unawaited(service.disconnectQuietly());
+        }
         return;
       }
       notifier.setConnectStage(TripStartStage.readingVehicleData);
@@ -206,13 +246,21 @@ class RecordingStartCoordinator {
     if (_prewarmConsumed) return;
     final svc = _prewarmedService;
     if (svc != null) {
-      unawaited(svc.disconnectQuietly());
+      // #3527 KEEP-LINK — a warm the supervisor owns stays up.
+      if (!identical(_supervisor?.service, svc)) {
+        unawaited(svc.disconnectQuietly());
+      }
     } else {
       // The warm may still be in flight — disconnect whatever it
       // resolves to, since this tab is gone. #3420 — disconnectQuietly:
       // the raw disconnect() here leaked teardown PlatformExceptions to
       // PlatformDispatcher.onError (the 2026-07-02 field log entry).
-      unawaited(_prewarm?.then((s) => s?.disconnectQuietly()));
+      // #3527 KEEP-LINK — unless the supervisor owns the resolved link.
+      unawaited(_prewarm?.then((s) {
+        if (s != null && !identical(_supervisor?.service, s)) {
+          unawaited(s.disconnectQuietly());
+        }
+      }));
     }
   }
 }

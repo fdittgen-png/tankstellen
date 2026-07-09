@@ -8,7 +8,7 @@ import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_connection_service.dart';
-import 'obd2_link_arbiter.dart';
+import 'obd2_link_supervisor.dart';
 import 'obd2_response_class.dart';
 import 'obd2_service.dart';
 
@@ -245,6 +245,10 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
   String? pinnedMac,
   Obd2ConnectTransport? transportHint,
   String? adapterName,
+  // #3527 — THE one link supervisor; when wired, the connect step reuses its
+  // live service / joins its single-flight dial, and the final teardown
+  // KEEP-LINKs a supervisor-owned service. Null = bare dial (tests).
+  Obd2LinkSupervisor? linkSupervisor,
 }) async {
   // #3380 — a null/unknown hint no longer hard-defaults to BLE; it routes
   // through the production transport-aware resolver (see [_selfTestConnect]),
@@ -285,11 +289,11 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
       // #2969 — transport-aware pinned connect: a Classic adapter takes the
       // RFCOMM direct path (the BLE direct path would only 4 s-timeout); the
       // connect step gets its OWN longer budget ([connectDeadline]).
-      // #3420 — interactive lease: refused (null → noResponse) while a
-      // recording / auto-record watch owns the adapter; the controller's
+      // #3527 — the dial routes through THE link supervisor when wired
+      // (reuse-live / single-flight, see [_superviseDial]); the controller's
       // no-live-recording guard remains the first line of defence.
-      service = await Obd2LinkArbiter.instance.runInteractive<Obd2Service?>(
-          'self-test',
+      service = await _superviseDial(
+          linkSupervisor,
           () async => pinnedMac != null
               ? await _selfTestConnect(connection, pinnedMac,
                       transport: transportHint,
@@ -377,8 +381,11 @@ Future<Obd2SelfTestReport> runObd2SelfTest(
   } finally {
     // ALWAYS tear down + finalise so a failing adapter never leaks the
     // link and the trace is always persisted to the health protocol.
+    // #3527 KEEP-LINK — never disconnect a service the supervisor owns.
     try {
-      await service?.disconnect();
+      if (!identical(linkSupervisor?.service, service)) {
+        await service?.disconnect();
+      }
     } catch (_) {
       // ignore: silent_catch — Disconnect is best-effort; the session is finalised regardless.
     }

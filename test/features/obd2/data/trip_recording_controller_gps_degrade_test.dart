@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:tankstellen/features/obd2/data/adapter_reconnect_scanner.dart';
+import 'package:tankstellen/features/obd2/data/obd2_reattach_source.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
@@ -188,7 +188,7 @@ void main() {
       expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly);
 
       // The reconnect builds a BRAND-NEW healthy transport (the
-      // production flow — `ReconnectConnector` → `replaceService`).
+      // production flow — the link supervisor's reattach → `replaceService`).
       final liveTransport = FakeObd2Transport({
         ...initResponses(),
         '010D': '41 0D 32>', // 50 km/h
@@ -295,10 +295,10 @@ void main() {
   });
 }
 
-/// A fake scanner that records `start()` / `stop()` invocations and lets a
-/// test fire its [onReconnect] manually — mirrors the one in
+/// A fake reattach source that records `start()` / `stop()` invocations and
+/// lets a test fire its [onReconnect] manually — mirrors the one in
 /// `trip_recording_controller_reconnect_test.dart`.
-class _ObservableScanner implements AdapterReconnectScanner {
+class _ObservableScanner implements Obd2ReattachSource {
   _ObservableScanner({
     required this.pinnedMac,
     required this.onReconnect,
@@ -306,7 +306,6 @@ class _ObservableScanner implements AdapterReconnectScanner {
     required this.onStop,
   });
 
-  @override
   final String pinnedMac;
 
   final VoidCallback onReconnect;
@@ -315,7 +314,6 @@ class _ObservableScanner implements AdapterReconnectScanner {
 
   bool _scanning = false;
 
-  @override
   bool get isScanning => _scanning;
 
   @override
@@ -323,12 +321,6 @@ class _ObservableScanner implements AdapterReconnectScanner {
 
   @override
   VoidCallback? onPassiveWait;
-
-  @override
-  int get consecutiveMisses => 0;
-
-  @override
-  Duration get currentBackoff => const Duration(seconds: 5);
 
   @override
   int get currentAttemptNumber => 1;

@@ -14,10 +14,10 @@ import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../data/adapter_registry.dart';
 import '../../data/obd2_adapter_identity.dart';
 import '../../data/obd2_connection_errors.dart';
-import '../../data/obd2_link_arbiter.dart';
 import '../../data/obd2_connection_service.dart';
 import '../../data/obd2_pairing_mode.dart';
 import '../../data/obd2_service.dart';
+import 'obd2_picker_supervised_dial.dart';
 import '../obd2_connection_error_l10n.dart';
 import '../obd2_connect_telemetry.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -61,10 +61,10 @@ Future<Obd2Service?> showObd2AdapterPicker(
       // and NEVER opens the BLE GATT that 4 s-times-out + poisons the socket. It
       // still falls back to the merged BLE+Classic scan via `connectByMac`
       // internally for a direct miss, so the existing behaviour is preserved.
-      // #3420 — interactive lease; refused (null → sheet) while a recording
-      // or the auto-record watch owns the link.
-      service = await Obd2LinkArbiter.instance.runInteractive<Obd2Service?>(
-          'picker-pinned',
+      // #3527 — supervised one-shot dial: no reuse-live for a user-chosen
+      // device — see [obd2PickerSupervisedDial].
+      service = await obd2PickerSupervisedDial(
+          container,
           () => container.read(obd2ConnectionProvider).connectByMacTransportAware(pinnedMac, adapterName: pinnedAdapterName));
     } on Obd2ConnectionError catch (e, st) {
       // Drop through to the sheet so the user can pick another adapter; the
@@ -286,11 +286,13 @@ class _Obd2AdapterPickerSheetState
     unawaited(_sub?.cancel());
     _sub = null;
     try {
-      // #3420 — interactive lease (same contract as the pinned path above).
-      final service = await Obd2LinkArbiter.instance
-          .runInteractive('picker-scan', () => connection.connect(candidate));
+      // #3527 — supervised one-shot dial (same contract as the pinned
+      // path above); the container is read pre-await (errorlog_30).
+      final service = await obd2PickerSupervisedDial(
+          ProviderScope.containerOf(context, listen: false),
+          () => connection.connect(candidate));
       if (service == null) {
-        // Refused: a recording / auto-record watch owns the link (#3420).
+        // Dial miss — surface the same typed error the classic path threw.
         throw const Obd2AdapterUnresponsive();
       }
       // #1188 — persist MAC + display name back onto the active vehicle

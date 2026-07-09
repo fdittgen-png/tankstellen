@@ -12,6 +12,19 @@ Obd2SelfTestStepResult _step(
         Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs) =>
     Obd2SelfTestStepResult(id: id, status: status, latencyMs: latencyMs);
 
+/// #3527 — route the self-test's one-shot connect through THE link
+/// supervisor when one is wired: reuse its live service (never a second
+/// dial against a link it owns), else join its single-flight machinery
+/// via [Obd2LinkSupervisor.connectWith]. Bare [dial] when no supervisor
+/// is available (unit tests / legacy path).
+Future<Obd2Service?> _superviseDial(
+  Obd2LinkSupervisor? sup,
+  Obd2LinkDialer dial,
+) async {
+  if (sup == null) return dial();
+  return sup.service ?? await sup.connectWith(dial);
+}
+
 /// #2969 / #3380 — transport-aware pinned connect for the self-test, stamping
 /// `origin:selfTest` + the transport decision reason on the connect trace the
 /// service opens. Routes by the inferred [transport]:
