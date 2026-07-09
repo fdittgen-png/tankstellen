@@ -283,16 +283,19 @@ void main() {
       final ok = await service.connect();
       expect(ok, isTrue);
 
-      // Scan ran → in-memory set populated with the decoded PIDs.
-      expect(service.isPidSupported(0x01), isTrue);
+      // Scan ran → in-memory BITMAP populated with the decoded PIDs.
+      expect(service.debugSupportedPids,
+          unorderedEquals([0x01, 0x0B, 0x0C, 0x0F]));
       expect(service.isPidSupported(0x0B), isTrue);
-      expect(service.isPidSupported(0x0C), isTrue);
-      expect(service.isPidSupported(0x0F), isTrue);
-      expect(service.isPidSupported(0x5E), isFalse);
+      // #3532 — the bitmap is a prior, not a gate: bitmap-absent PIDs
+      // stay queryable until 3× real NO DATA parks them at runtime.
+      expect(service.isPidSupported(0x5E), isTrue,
+          reason: '#3532 optimistic — the bitmap must not reject up-front');
 
       // And persisted under the VIN key for next session.
       expect(cache.get('VF7PPPP0000000001'),
           containsAll([0x01, 0x0B, 0x0C, 0x0F]));
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test('cache hit on second connect → no scan, no 01 XX round-trips',
@@ -305,8 +308,8 @@ void main() {
 
       // Note: '0100' is INTENTIONALLY NOT in the transport's response
       // map. If the service tries to scan, FakeObd2Transport returns
-      // 'NO DATA>' — which would blank the in-memory cache and fail
-      // the isPidSupported(0x0B) assertion below.
+      // 'NO DATA>' — which would blank the in-memory bitmap and fail
+      // the debugSupportedPids assertion below.
       final transport = FakeObd2Transport({
         ..._initResponses,
         '0902': _vinResponse('VF7PPPP0000000001'),
@@ -317,10 +320,18 @@ void main() {
       final ok = await service.connect();
       expect(ok, isTrue);
 
-      expect(service.isPidSupported(0x0B), isTrue,
-          reason: 'cached set must have populated _supportedPids without '
+      // The cache benefit (#811): the 8 × 01 XX bitmap scan is skipped
+      // entirely — no '0100' round-trip this session.
+      expect(transport.sentCommands, isNot(contains('0100')),
+          reason: 'warm HIT must skip the supported-PID bitmap scan');
+      expect(service.debugSupportedPids,
+          unorderedEquals([0x01, 0x0B, 0x0C, 0x0F]),
+          reason: 'cached set must have populated the bitmap without '
               'any 01 XX round-trip');
-      expect(service.isPidSupported(0x5E), isFalse);
+      // #3532 — bitmap-absent PIDs are no longer rejected up-front; only
+      // runtime probation (3× real NO DATA) parks them.
+      expect(service.isPidSupported(0x5E), isTrue);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test(
@@ -344,12 +355,17 @@ void main() {
       final ok = await service.connect();
       expect(ok, isTrue);
 
-      // Fresh-scan PIDs, NOT the cached VIN-A single-PID set.
-      expect(service.isPidSupported(0x0B), isTrue);
-      expect(service.isPidSupported(0x0C), isTrue);
-      expect(service.isPidSupported(0x0F), isTrue);
-      expect(service.isPidSupported(0x01), isFalse,
+      // A fresh scan ran (the VIN-B key missed the cache)…
+      expect(transport.sentCommands, contains('0100'),
+          reason: 'a different VIN must miss the cache and force a scan');
+      // …and the bitmap holds the fresh-scan PIDs, NOT the cached
+      // VIN-A single-PID set (#3532: the bitmap is where the cached set
+      // lives now; isPidSupported no longer reflects bitmap absence).
+      expect(service.debugSupportedPids,
+          unorderedEquals([0x0B, 0x0C, 0x0F]));
+      expect(service.debugSupportedPids, isNot(contains(0x01)),
           reason: 'VIN-A cache must not leak into VIN-B');
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test(
@@ -371,6 +387,7 @@ void main() {
       // And nothing primed in memory either — supportsPid stays in
       // "unknown ⇒ allow" mode.
       expect(service.isPidSupported(0x5E), isTrue);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test(
@@ -398,23 +415,31 @@ void main() {
 
       final ok = await service.connect();
       expect(ok, isTrue);
-      // Cached PIDs loaded → 0x5E still false → sanity signal.
+      // #2253 fast path: the fallback key HIT the cache, so neither the
+      // bitmap scan nor any 01 XX round-trip happened…
+      expect(transport.sentCommands, isNot(contains('0100')));
+      // …and the cached set landed in the bitmap. (#3532: bitmap-absent
+      // 0x5E stays optimistically queryable — probation, not the bitmap,
+      // parks it at runtime.)
+      expect(service.debugSupportedPids,
+          unorderedEquals([0x0B, 0x0C, 0x0F]));
       expect(service.isPidSupported(0x0B), isTrue);
-      expect(service.isPidSupported(0x5E), isFalse);
+      expect(service.isPidSupported(0x5E), isTrue);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
-    test('readFuelRateLPerHour skips PID 5E and MAF round-trips when '
-        'the cached set excludes them (Peugeot 107 flow)', () async {
+    test('readFuelRateLPerHour polls 5E/MAF optimistically despite the '
+        'cached bitmap; 3× NO DATA parks them via probation and the '
+        'speed-density path still wins (#3532, Peugeot 107 flow)', () async {
       // Seed cache with the real Peugeot 107 1KR-FE profile: no 5E,
       // no MAF, but MAP/IAT/RPM all present.
       const vin = 'VF7PPPP0000000001';
       await SupportedPidsCache(box).put(vin, {0x0B, 0x0C, 0x0F});
 
-      // Intentionally do NOT wire '015E' or '0110' — if the service
-      // bypasses the cache and tries them, FakeObd2Transport returns
-      // 'NO DATA>' and the round-trips count toward wasted Bluetooth
-      // time. We assert the fuel rate comes out of the speed-density
-      // path anyway.
+      // '015E' / '0110' intentionally NOT wired: FakeObd2Transport
+      // answers them with a real 'NO DATA>' — under #3532 they ARE
+      // queried (the cached bitmap is a prior, not a gate) and each
+      // real NO DATA feeds the probation streak.
       final transport = FakeObd2Transport({
         ..._initResponses,
         '0902': _vinResponse(vin),
@@ -428,11 +453,33 @@ void main() {
       );
       await service.connect();
 
-      expect(service.isPidSupported(0x5E), isFalse);
-      expect(service.isPidSupported(0x10), isFalse);
+      // The cached bitmap loaded, but bitmap-absent PIDs stay queryable.
+      expect(service.isPidSupported(0x5E), isTrue,
+          reason: '#3532 optimistic — the bitmap must not reject up-front');
+      expect(service.isPidSupported(0x10), isTrue);
+
+      // 3 reads: each probes 5E + MAF (real NO DATA), then falls through
+      // to the speed-density path and still produces a rate.
+      for (var i = 0; i < 3; i++) {
+        final rate = await service.readFuelRateLPerHour();
+        expect(rate, isNotNull);
+        expect(rate!, greaterThan(0));
+      }
+      expect(transport.sentCommands.where((c) => c == '015E').length, 3);
+      expect(transport.sentCommands.where((c) => c == '0110').length, 3);
+      expect(service.isPidSupported(0x5E), isFalse,
+          reason: '3× real NO DATA → probation parks 5E (#3532)');
+      expect(service.isPidSupported(0x10), isFalse,
+          reason: '3× real NO DATA → probation parks MAF (#3532)');
+
+      // A 4th read no longer spends Bluetooth time on the parked PIDs.
       final rate = await service.readFuelRateLPerHour();
       expect(rate, isNotNull);
       expect(rate, greaterThan(0));
+      expect(transport.sentCommands.where((c) => c == '015E').length, 3,
+          reason: 'a probation-parked PID must not be polled again');
+      expect(transport.sentCommands.where((c) => c == '0110').length, 3);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
   });
 
@@ -548,15 +595,21 @@ void main() {
 
       // Scan ran on the cold path.
       expect(transport.sentCommands, contains('0100'));
-      // In-memory + persisted under the production key.
+      // In-memory bitmap + persisted under the production key. (#3532:
+      // the bitmap no longer drives isPidSupported rejections — assert
+      // the bitmap itself.)
+      expect(service.debugSupportedPids,
+          unorderedEquals([0x01, 0x0B, 0x0C, 0x0F]));
       expect(service.isPidSupported(0x0B), isTrue);
-      expect(service.isPidSupported(0x5E), isFalse);
+      expect(service.isPidSupported(0x5E), isTrue,
+          reason: '#3532 optimistic — bitmap absence must not reject');
       expect(box.get(prodKey), isNotNull,
           reason: 'cold path must persist the bitmap under the prod key');
       expect(
         SupportedPidsCache(box).get(prodKey),
         containsAll([0x01, 0x0B, 0x0C, 0x0F]),
       );
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test(
@@ -586,20 +639,25 @@ void main() {
       expect(transport.sentCommands, isNot(contains('0100')),
           reason: 'HIT must skip the supported-PID support scan');
 
-      // Cached set populated the in-memory bitmap.
+      // Cached set populated the in-memory bitmap. (#3532: bitmap-absent
+      // 0x5E stays optimistically queryable — only probation parks it.)
+      expect(service.debugSupportedPids,
+          unorderedEquals([0x01, 0x0B, 0x0C, 0x0F]));
       expect(service.isPidSupported(0x0B), isTrue);
-      expect(service.isPidSupported(0x5E), isFalse);
+      expect(service.isPidSupported(0x5E), isTrue);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test(
-        'warm HIT → unsupported PIDs are NOT polled by the recording-loop '
-        'consumers (readFuelRateLPerHour speed-density path)', () async {
+        'warm HIT → bitmap-absent PIDs ARE polled optimistically by the '
+        'recording-loop consumers until 3× NO DATA parks them (#3532; the '
+        'cache benefit is the scan/0902 skip, not read-skipping)', () async {
       // Peugeot 107 1KR-FE: no 5E, no MAF; MAP/IAT/RPM present.
       await SupportedPidsCache(box).put(prodKey, {0x0B, 0x0C, 0x0F});
 
-      // 015E / 0110 intentionally NOT wired: if the service polled an
-      // unsupported PID it would hit FakeObd2Transport's NO DATA and
-      // show up in sentCommands.
+      // 015E / 0110 intentionally NOT wired: FakeObd2Transport answers
+      // them with a real 'NO DATA>' — each poll feeds the probation
+      // streak (#3532).
       final transport = FakeObd2Transport({
         ..._initResponses,
         '010B': '41 0B 28>', // MAP 40 kPa
@@ -613,16 +671,35 @@ void main() {
       );
       await service.connect();
 
-      expect(service.isPidSupported(0x5E), isFalse);
+      // The warm HIT still buys the connect-time savings…
+      expect(transport.sentCommands, isNot(contains('0100')));
+      expect(transport.sentCommands, isNot(contains('0902')));
+      // …but the bitmap no longer pre-rejects reads.
+      expect(service.isPidSupported(0x5E), isTrue,
+          reason: '#3532 optimistic — the bitmap must not reject up-front');
+      expect(service.isPidSupported(0x10), isTrue);
+
+      // Every read still yields a speed-density rate while 5E/MAF answer
+      // real NO DATA; after 3 misses probation parks them.
+      for (var i = 0; i < 3; i++) {
+        final rate = await service.readFuelRateLPerHour();
+        expect(rate, isNotNull);
+        expect(rate!, greaterThan(0));
+      }
+      expect(transport.sentCommands.where((c) => c == '015E').length, 3);
+      expect(transport.sentCommands.where((c) => c == '0110').length, 3);
+      expect(service.isPidSupported(0x5E), isFalse,
+          reason: '3× real NO DATA → probation parks 5E (#3532)');
       expect(service.isPidSupported(0x10), isFalse);
 
+      // From then on the parked PIDs cost no further round-trips.
       final rate = await service.readFuelRateLPerHour();
       expect(rate, isNotNull);
       expect(rate, greaterThan(0));
-
-      // The unsupported PID commands were never sent.
-      expect(transport.sentCommands, isNot(contains('015E')));
-      expect(transport.sentCommands, isNot(contains('0110')));
+      expect(transport.sentCommands.where((c) => c == '015E').length, 3,
+          reason: 'a probation-parked PID must not be polled again');
+      expect(transport.sentCommands.where((c) => c == '0110').length, 3);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test(
@@ -643,6 +720,7 @@ void main() {
       // "Unknown ⇒ allow": every PID still reports supported.
       expect(service.isPidSupported(0x5E), isTrue);
       expect(service.isPidSupported(0x0B), isTrue);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
     test(
@@ -665,10 +743,13 @@ void main() {
       expect(ok, isTrue);
       // VIN read happened (it's the only key source here)…
       expect(transport.sentCommands, contains('0902'));
-      // …and the cached set loaded → no support scan.
+      // …and the cached set loaded into the bitmap → no support scan.
       expect(transport.sentCommands, isNot(contains('0100')));
+      expect(service.debugSupportedPids, unorderedEquals([0x0B, 0x0C, 0x0F]));
       expect(service.isPidSupported(0x0B), isTrue);
-      expect(service.isPidSupported(0x5E), isFalse);
+      // #3532 — bitmap absence no longer rejects; probation would.
+      expect(service.isPidSupported(0x5E), isTrue);
+      await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
   });
 }

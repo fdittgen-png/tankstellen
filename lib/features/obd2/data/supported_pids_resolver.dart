@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'elm327_protocol.dart';
 import 'obd2_comm_diagnostics.dart';
+import 'pid_probation.dart';
 import 'supported_pids_cache.dart';
 import 'supported_pids_probe.dart';
 
@@ -71,13 +72,35 @@ class SupportedPidsResolver {
   /// runs (incl. when [prime] served the set straight from the cache).
   Obd2BusProbeResult get lastProbeResult => _lastProbeResult;
 
+  /// #3532 — consecutive REAL `NO DATA` replies a PID must return at
+  /// runtime before it enters probation. Kept as the resolver's public
+  /// constant (tests + docs reference it); [PidProbation] carries the
+  /// same default.
+  static const int probationThreshold = 3;
+
+  /// #3532 — per-connection runtime probation (see [PidProbation]).
+  final PidProbation _probation = PidProbation(threshold: probationThreshold);
+
   /// Clear the per-connection supported-PIDs cache. A new session may
   /// be a different car / different adapter firmware. Call at the top
   /// of the host's `connect`.
   void resetForNewConnection() {
     _supportedPids = null;
     _lastProbeResult = Obd2BusProbeResult.notProbed;
+    _probation.reset();
   }
+
+  /// #3532 — feed one runtime mode-01 reply into the probation state.
+  /// [parsed] is whether the caller's parser extracted a value; see
+  /// [PidProbation.noteReply] for the counting rules.
+  void noteMode01Reply(String command, String raw, {required bool parsed}) =>
+      _probation.noteReply(command, raw, parsed: parsed);
+
+  /// #3532 — whether [pid] is parked by runtime probation.
+  bool isPidInProbation(int pid) => _probation.contains(pid);
+
+  /// PIDs currently parked by probation (diagnostics view).
+  Set<int> get debugProbationPids => _probation.parked;
 
   /// Attempt to load the supported-PID set from the persistent cache
   /// (#811). Silent no-op when no cache was injected. Always swallows
@@ -255,16 +278,24 @@ class SupportedPidsResolver {
     return supported;
   }
 
-  /// Whether [pid] is known to be supported by the connected vehicle
-  /// (#811). Key semantics:
+  /// Whether [pid] should be queried this connection (#811, rewritten by
+  /// #3532). OPTIMISTIC: the discovered `0100` bitmap no longer rejects —
+  /// clone adapters routinely UNDER-report it, and #2475's hard intersect
+  /// (target ∩ bitmap) permanently starved PIDs the ECU actually answers
+  /// ("less adapter info", Epic #3527). Only runtime probation parks a
+  /// PID: [probationThreshold] consecutive REAL `NO DATA` replies, fed
+  /// through [noteMode01Reply]. An honest bitmap converges to the same
+  /// rejections after ≤3 cheap misses per absent PID; an under-reporting
+  /// one keeps every answering PID live.
   ///
-  ///   - When discovery has NOT run yet (cache is null), returns
-  ///     `true` — we don't know enough to reject the query, so let it
-  ///     go through and surface NO DATA naturally.
-  ///   - When the cache IS populated and [pid] is present → `true`.
-  ///   - When the cache IS populated and [pid] is absent → `false`.
-  bool isPidSupported(int pid) =>
-      _supportedPids == null || _supportedPids!.contains(pid);
+  /// Callers that need the STRICT bitmap claim (rare opt-in PIDs that
+  /// must never be probed blind, #3416) use [isPidInBitmap] via the
+  /// host's `isPidKnownSupported`.
+  bool isPidSupported(int pid) => !_probation.contains(pid);
+
+  /// STRICT bitmap membership (#3416/#3532): whether the discovered
+  /// `0100` bitmap CLAIMS [pid]. False when discovery hasn't run.
+  bool isPidInBitmap(int pid) => _supportedPids?.contains(pid) ?? false;
 
   /// Direct view of the supported-PID set for tests and diagnostics.
   /// Returns an unmodifiable empty set when discovery hasn't run.
@@ -285,28 +316,18 @@ class SupportedPidsResolver {
     _supportedPids = Set.of(pids);
   }
 
-  /// The live subscription set for [target] (#2457): the **discover-all ∩
-  /// target-set**. Given the polling layer's target PID table, return the
-  /// subset the car actually implements.
-  ///
-  ///   - Discovery has run → `target ∩ discovered`. A car supporting only
-  ///     {010C, 010D, 0104, 0111} resolves to exactly those of [target].
-  ///   - Discovery has NOT run (probe-less clone, blind session) → the
-  ///     full [target] unchanged. We don't know enough to drop any PID,
-  ///     so the unconditional core still rotates and unsupported PIDs
-  ///     self-evict via the scheduler's #2379 backoff.
-  ///
-  /// The discovered set itself is persisted once per adapter by [prime]
-  /// (keyed off adapterMac + make:model:year via the #2253 fallback key),
-  /// so this intersection costs no extra adapter I/O after the first scan.
-  /// Returned set is unmodifiable.
-  Set<int> resolvedTargetSet(Set<int> target) {
-    final discovered = _supportedPids;
-    if (discovered == null) return Set.unmodifiable(target);
-    return Set.unmodifiable(
-      target.where(discovered.contains).toSet(),
-    );
-  }
+  /// The live subscription set for [target] (#2457, rewritten by #3532):
+  /// the **optimistic union**. The full target set is subscribed whether
+  /// or not discovery ran — the `0100` bitmap is a prior, not a gate
+  /// (under-reporting clones starved real PIDs under the old
+  /// `target ∩ discovered`, Epic #3527). Only PIDs parked by runtime
+  /// probation ([noteMode01Reply], [probationThreshold]× real `NO DATA`)
+  /// are dropped; genuinely-absent PIDs also self-evict via the
+  /// scheduler's #2379 backoff in the meantime. Returned set is
+  /// unmodifiable.
+  Set<int> resolvedTargetSet(Set<int> target) => Set.unmodifiable(
+        target.where((pid) => !_probation.contains(pid)).toSet(),
+      );
 
   /// Discovered-supported tri-state for [pid] (#2469):
   ///

@@ -9,10 +9,14 @@ import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/pid_scheduler.dart';
 
-/// #2457 — subscribeAllTiers wires the live set = target table ∩
-/// discovered-supported. A car with only the four basic PIDs must
-/// subscribe exactly those plus the unconditional core; a fully-capable
-/// car subscribes the optional air-mass / mixture PIDs too.
+/// #2457 → #3532 — subscribeAllTiers wires the OPTIMISTIC UNION: the
+/// full target table subscribes regardless of the discovered bitmap
+/// (clone adapters under-report it; the old `target ∩ discovered`
+/// starved PIDs the ECU actually answers — Epic #3527). Bitmap-absent
+/// optional PIDs poll NO DATA and self-evict via runtime probation
+/// (3× real NO DATA) plus the scheduler's #2379 backoff. Only the
+/// strict #3416 precision families stay bitmap-gated
+/// (`isPidKnownSupported`) and are never blind-subscribed.
 
 /// Trivial transport — the snapshot test never reads, it only inspects
 /// which commands got subscribed via the recording scheduler.
@@ -41,8 +45,13 @@ class _SupportStubService extends Obd2Service {
 /// Drives subscribeAllTiers on a scheduler whose transport records each
 /// distinct command, then returns the set of subscribed commands. Every
 /// PID is newly subscribed (lastReadAt == null → infinity weight), so the
-/// scheduler reads each at least once within a few ticks.
-Future<Set<String>> _subscribedCommands(Set<int>? supported) async {
+/// scheduler reads each at least once within a few ticks. Pass a
+/// pre-built [service] to exercise probation state seeded before the
+/// subscription (#3532); otherwise one is built from [supported].
+Future<Set<String>> _subscribedCommands(
+  Set<int>? supported, {
+  Obd2Service? service,
+}) async {
   final seen = <String>{};
   final scheduler = PidScheduler(
     transport: (cmd) async {
@@ -52,7 +61,7 @@ Future<Set<String>> _subscribedCommands(Set<int>? supported) async {
     tickRate: const Duration(milliseconds: 2),
   );
   final snapshot = LiveSampleSnapshot(
-    service: _SupportStubService(supported),
+    service: service ?? _SupportStubService(supported),
     onHighPriorityParse: (_) {},
     onSpeedSample: (_) {},
   );
@@ -108,24 +117,53 @@ void main() {
   };
 
   test(
-      'a basic car {010C,010D,0104,0111} subscribes exactly those of the '
-      'target — the optional air-mass / mixture PIDs are NOT subscribed',
+      'a basic car {010C,010D,0104,0111} still subscribes the FULL target '
+      '— the bitmap no longer gates the legacy optional PIDs (#3532 '
+      'optimistic union); only the strict precision families stay off',
       () async {
     final subscribed =
         await _subscribedCommands(<int>{0x0C, 0x0D, 0x04, 0x11});
-    // The four supported core PIDs are present.
+    // The four bitmap-claimed core PIDs are present…
     expect(subscribed, containsAll(<String>{
       Elm327Protocol.engineRpmCommand,
       Elm327Protocol.vehicleSpeedCommand,
       Elm327Protocol.engineLoadCommand,
       Elm327Protocol.throttlePositionCommand,
     }));
-    // None of the optional (gated) PIDs were subscribed — legacy
-    // optionalPid gates AND the strict #3416 precision gates alike.
-    for (final cmd in {...optional, ...precision}) {
+    // …and so is every legacy optional PID: under #3532 the bitmap is a
+    // prior, not a gate (under-reporting clones starved real PIDs).
+    // Bitmap-absent PIDs poll NO DATA and self-evict via probation +
+    // the scheduler's #2379 backoff instead of being pre-rejected.
+    expect(subscribed, containsAll(optional),
+        reason: '#3532 — the full target set subscribes optimistically');
+    // The #3416 precision families keep the STRICT bitmap gate: the
+    // resolved set lacks them, so they are never blind-subscribed.
+    for (final cmd in precision) {
       expect(subscribed, isNot(contains(cmd)),
-          reason: '$cmd is support-gated and the car lacks it');
+          reason: '$cmd is strictly gated and the bitmap lacks it');
     }
+  });
+
+  test(
+      'a PID parked by runtime probation (3× real NO DATA) is dropped '
+      'from the subscription set (#3532 self-eviction)', () async {
+    final service = _SupportStubService(<int>{0x0C, 0x0D, 0x04, 0x11});
+    // Drive 3 real NO DATA replies through the service's read path —
+    // the _StubTransport answers every command with 'NO DATA', so three
+    // MAF reads park PID 0x10 via SupportedPidsResolver.noteMode01Reply.
+    for (var i = 0; i < 3; i++) {
+      expect(await service.readMafGramsPerSecond(), isNull);
+    }
+    expect(service.isPidSupported(0x10), isFalse,
+        reason: 'sanity: 3× real NO DATA parks MAF in probation');
+
+    final subscribed = await _subscribedCommands(null, service: service);
+    expect(subscribed, isNot(contains(Elm327Protocol.mafCommand)),
+        reason: 'a probation-parked PID must not be subscribed');
+    // The rest of the optional set stays optimistically live.
+    expect(subscribed,
+        containsAll(optional.difference({Elm327Protocol.mafCommand})));
+    expect(subscribed, containsAll(core));
   });
 
   test(
