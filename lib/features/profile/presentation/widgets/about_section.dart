@@ -2,17 +2,22 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/osm_attribution.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../providers/donation_links_provider.dart';
 
-class AboutSection extends StatelessWidget {
+class AboutSection extends ConsumerWidget {
   const AboutSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    // App Review 3.1.1 (#3536) — external donation links (PayPal /
+    // Revolut) must not render on iOS; only IAP may take payments there.
+    final showDonations = ref.watch(donationLinksVisibleProvider);
 
     return Card(
       child: Column(
@@ -66,48 +71,50 @@ class AboutSection extends StatelessWidget {
               mode: LaunchMode.externalApplication,
             ),
           ),
-          const Divider(height: 1),
-          // Donations
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Text(
-              AppLocalizations.of(context).aboutSupportProject,
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+          if (showDonations) ...[
+            const Divider(height: 1),
+            // Donations
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Text(
+                AppLocalizations.of(context).aboutSupportProject,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              AppLocalizations.of(context).aboutSupportDescription,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                AppLocalizations.of(context).aboutSupportDescription,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          ListTile(
-            leading: const Icon(Icons.payment, color: Color(0xFF003087)),
-            title: const Text('PayPal'), // i18n-ignore: brand / proper noun
-            subtitle: const Text('paypal.me/FlorianDITTGEN'),
-            onTap: () => launchUrl(
-              Uri.parse(AppConstants.paypalUrl),
-              mode: LaunchMode.externalApplication,
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.payment, color: Color(0xFF003087)),
+              title: const Text('PayPal'), // i18n-ignore: brand / proper noun
+              subtitle: const Text('paypal.me/FlorianDITTGEN'),
+              onTap: () => launchUrl(
+                Uri.parse(AppConstants.paypalUrl),
+                mode: LaunchMode.externalApplication,
+              ),
             ),
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.account_balance_wallet,
-              color: Color(0xFF0075EB),
+            ListTile(
+              leading: const Icon(
+                Icons.account_balance_wallet,
+                color: Color(0xFF0075EB),
+              ),
+              title: const Text('Revolut'), // i18n-ignore: brand / proper noun
+              subtitle: const Text('revolut.me/floriamcep'),
+              onTap: () => launchUrl(
+                Uri.parse(AppConstants.revolutUrl),
+                mode: LaunchMode.externalApplication,
+              ),
             ),
-            title: const Text('Revolut'), // i18n-ignore: brand / proper noun
-            subtitle: const Text('revolut.me/floriamcep'),
-            onTap: () => launchUrl(
-              Uri.parse(AppConstants.revolutUrl),
-              mode: LaunchMode.externalApplication,
-            ),
-          ),
+          ],
           const Divider(height: 1),
           // Attributions
           ListTile(
