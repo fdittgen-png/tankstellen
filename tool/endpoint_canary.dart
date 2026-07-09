@@ -224,9 +224,13 @@ const List<CanaryTarget> targets = [
     country: 'GR',
     name: 'fuelpricesgr community API',
     url: 'https://fuelpricesgr.com/api/prices/today',
-    bodyMarker: '"prices"',
-    note: 'greece/greece_station_service.dart — NXDOMAIN as of 2026-06-10; '
-        'kept ACTIVE on purpose so the canary keeps tracking the outage.',
+    skip: SkipReason.noEndpoint,
+    note: 'greece/greece_station_service.dart — fuelpricesgr.com has been '
+        'NXDOMAIN since 2026-06-10 with no public replacement (the upstream '
+        'repo documents self-hosting only, re-verified 2026-07-09). The app '
+        'already degrades cleanly (#3194 short-circuit; self-hosted baseUrl '
+        're-enables). A month of weekly DEADs tracked nothing new — the '
+        'restore is #3539; re-activate this probe with the new host then.',
   ),
   CanaryTarget(
     country: 'RO',
@@ -236,12 +240,15 @@ const List<CanaryTarget> targets = [
         '&OrderBy=dist',
     headers: {'Accept': 'application/json'},
     bodyMarker: '"Stations"',
-    note: 'romania/romania_station_service.dart — #3457: the service was '
-        'rebased onto the official Competition Council observatory in #3193, '
-        'but this probe still pointed at the dead third-party '
-        'pretcarburant.ro. Mirrors defaultBaseUrl + searchPath (Bucharest '
-        'centre, Benzină standard). The Accept header forces JSON — the WCF '
-        'backend otherwise serves XML.',
+    skip: SkipReason.geoBlocked,
+    note: 'romania/romania_station_service.dart — the endpoint is ALIVE for '
+        'real users (verified 2026-07-09 via Dart HttpClient from a '
+        'residential network: HTTP 200 + full Stations payload) but the WCF '
+        'front-end rejects the TLS handshake from GitHub-runner/datacenter '
+        'IPs (HandshakeException on 2026-07-06 AND 2026-07-09 runs — two '
+        'consecutive false DEADs, #3508). Same probeable-not-from-CI family '
+        'as the AR geo-block; re-probe manually from a residential network '
+        'when touching the RO service (#3457 has the probe recipe).',
   ),
 ];
 

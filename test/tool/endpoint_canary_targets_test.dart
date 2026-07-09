@@ -25,7 +25,14 @@ void main() {
     test('RO probe mirrors RomaniaStationService.defaultBaseUrl + searchPath',
         () {
       final ro = targetFor('RO');
-      expect(ro.skip, isNull, reason: 'RO has a live keyless endpoint');
+      // #3508 — the endpoint is alive for real users, but its WCF
+      // front-end rejects the TLS handshake from GitHub-runner IPs (two
+      // consecutive weekly false DEADs), so the probe is skip-with-reason.
+      // The URL + quirks below stay pinned to the service so a manual
+      // residential re-probe (and a future un-skip) can't drift.
+      expect(ro.skip, SkipReason.geoBlocked,
+          reason: 'CI cannot reach the WAF-fronted endpoint (#3508); the '
+              'drift checks below still guard the probe recipe');
       expect(
         ro.url,
         startsWith(
