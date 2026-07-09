@@ -927,8 +927,14 @@ void main() {
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
+      // The scan populated the strict bitmap (#3532: isPidKnownSupported
+      // is the bitmap view; isPidSupported is optimistic and no longer
+      // rejects bitmap-absent PIDs up-front).
+      expect(ready.isPidKnownSupported(0x0B), isTrue);
+      expect(ready.isPidKnownSupported(0x5E), isFalse);
       expect(ready.isPidSupported(0x0B), isTrue);
-      expect(ready.isPidSupported(0x5E), isFalse);
+      expect(ready.isPidSupported(0x5E), isTrue,
+          reason: '#3532 optimistic — only runtime probation parks a PID');
       // Persisted under the production key for the next session.
       expect(SupportedPidsCache(box).get(prodKey),
           containsAll([0x01, 0x0B, 0x0C, 0x0F]));
@@ -956,9 +962,14 @@ void main() {
       );
 
       final ready = await svc.connect(_resolvedVlinker(registry));
-      // Cached bitmap populated the in-memory set without a scan/VIN read.
-      expect(ready.isPidSupported(0x0B), isTrue);
-      expect(ready.isPidSupported(0x5E), isFalse);
+      // Cached bitmap populated the in-memory set without a scan/VIN read
+      // — visible through the strict bitmap accessor (#3532); the
+      // optimistic isPidSupported never rejects on bitmap absence.
+      expect(ready.isPidKnownSupported(0x0B), isTrue,
+          reason: 'the cached set must resolve the bitmap without a scan');
+      expect(ready.isPidKnownSupported(0x5E), isFalse);
+      expect(ready.isPidSupported(0x5E), isTrue,
+          reason: '#3532 optimistic — only runtime probation parks a PID');
       await ready.disconnect();
     });
 
