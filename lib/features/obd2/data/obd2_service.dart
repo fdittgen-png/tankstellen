@@ -24,6 +24,7 @@ import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_read_telemetry.dart';
+import 'obd2_service_session.dart';
 import 'obd2_debug_session.dart';
 import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
@@ -101,6 +102,13 @@ class Obd2Service implements Obd2RawCommandPort {
   /// picks the cache slot. Extracted from this class in #1679; built
   /// in the constructor body so it can capture the [_send] tear-off.
   late final SupportedPidsResolver _pids;
+
+  /// #3528 (Epic #3527) — the protocol session owning the classify-
+  /// before-you-kill ladder, the staleness watchdog and the ATRV
+  /// keepalive for this connection. Attached by [connect] once the rich
+  /// init succeeded; detached by [disconnect]. Lifecycle + send routing
+  /// live in [Obd2ServiceSession].
+  final Obd2ServiceSession _session = Obd2ServiceSession();
 
   /// Stable adapter identifier (BLE remote-id / Classic MAC) for the
   /// device backing this session (#1312). Stamped by
@@ -488,8 +496,16 @@ class Obd2Service implements Obd2RawCommandPort {
   /// directly and parses responses PID-by-PID, rather than going
   /// through the typed `readRpm` / `readSpeed` helpers. Keeping the
   /// escape hatch on the service lets the transport stay private.
-  Future<String> sendCommand(String command) =>
-      _transport.sendCommand(command);
+  ///
+  /// #3528 — routed through the live [ElmSession]'s classification
+  /// ladder when one is attached, so the scheduler's polling traffic
+  /// (the bulk of a trip's I/O) feeds the garbage/ATWS + CAN/ATPC
+  /// recovery rungs and refreshes the staleness watchdog.
+  Future<String> sendCommand(String command) => _rawSend(command);
+
+  /// #3528 — the ONE raw-send funnel (see [Obd2ServiceSession.send]).
+  Future<String> _rawSend(String command) =>
+      _session.send(command, _transport);
 
   /// [Obd2RawCommandPort] facade — verbatim pass-through to
   /// [sendCommand]. Lets OEM tables (#1401 phase 3) and the
@@ -711,6 +727,10 @@ class Obd2Service implements Obd2RawCommandPort {
 
       await _pids.prime();
 
+      // #3528 — the link is initialized: attach the protocol session
+      // (ladder + staleness watchdog + keepalive) over it.
+      _session.start(_transport, linkKind: () => linkKind, mac: () => adapterMac);
+
       // #1920 — record the successful handshake with the firmware
       // string when the adapter reported one.
       AutoRecordTraceLog.add(
@@ -753,27 +773,21 @@ class Obd2Service implements Obd2RawCommandPort {
     }
   }
 
-  /// Whether [pid] is known to be supported by the connected vehicle
-  /// (#811). Delegates to [SupportedPidsResolver]. Key semantics:
-  ///
-  ///   - When [discoverSupportedPids] has NOT been called yet
-  ///     (cache is null), returns `true` — we don't know enough to
-  ///     reject the query, so let it go through and surface NO DATA
-  ///     naturally.
-  ///   - When the cache IS populated and [pid] is present, returns
-  ///     `true`.
-  ///   - When the cache IS populated and [pid] is absent, returns
-  ///     `false` — callers skip the query.
+  /// Whether [pid] should be queried this connection (#811, rewritten by
+  /// #3532). Delegates to [SupportedPidsResolver.isPidSupported]:
+  /// OPTIMISTIC — the discovered bitmap no longer rejects (clones
+  /// under-report it); only runtime probation (3× real `NO DATA`, fed by
+  /// the read helpers) parks a PID for the rest of the connection.
   bool isPidSupported(int pid) => _pids.isPidSupported(pid);
 
   /// STRICT support check for the #3416 precision PIDs (wideband φ, 0x66,
   /// 0x9D/0xA2, 0x51/0x52): true only when the support set is RESOLVED and
-  /// contains [pid]. Unlike [isPidSupported]'s "unknown ⇒ allow", rare
+  /// the BITMAP claims [pid] (#3532 — probation never widens this; rare
   /// modern PIDs must never be blind-subscribed — an unresolved clone would
   /// flood the round-robin with ~20 NO DATA reads and starve the dynamics
-  /// tier (seen as RPM cadence collapse in the #726 scheduler tests).
+  /// tier, seen as RPM cadence collapse in the #726 scheduler tests).
   bool isPidKnownSupported(int pid) =>
-      _pids.isResolved && _pids.isPidSupported(pid);
+      _pids.isResolved && _pids.isPidInBitmap(pid);
 
   /// Direct view of the supported-PID set for tests and diagnostics.
   /// Returns an unmodifiable empty set when discovery hasn't run —
@@ -907,7 +921,10 @@ class Obd2Service implements Obd2RawCommandPort {
 
     try {
       final response = await _send(Elm327Protocol.vehicleSpeedCommand);
-      return Elm327Protocol.parseVehicleSpeed(response);
+      final value = Elm327Protocol.parseVehicleSpeed(response);
+      _pids.noteMode01Reply(Elm327Protocol.vehicleSpeedCommand, response,
+          parsed: value != null); // #3532
+      return value;
     } catch (e, st) {
       recordObd2ReadFailure(e, st, where: 'OBD2 readSpeed failed'); // #2855
       return null;
@@ -944,7 +961,10 @@ class Obd2Service implements Obd2RawCommandPort {
 
     try {
       final response = await _send(Elm327Protocol.engineRpmCommand);
-      return Elm327Protocol.parseEngineRpm(response);
+      final value = Elm327Protocol.parseEngineRpm(response);
+      _pids.noteMode01Reply(Elm327Protocol.engineRpmCommand, response,
+          parsed: value != null); // #3532
+      return value;
     } catch (e, st) {
       recordObd2ReadFailure(e, st, where: 'OBD2 readRpm failed'); // #2855
       return null;
@@ -1780,6 +1800,9 @@ class Obd2Service implements Obd2RawCommandPort {
 
   /// Close the transport connection. Safe to call multiple times.
   Future<void> disconnect() async {
+    // #3528 — stop the session FIRST: its keepalive must not race the
+    // teardown, and a deliberate close is not a session death.
+    _session.stop();
     // #3422 — wedge PREVENTION: ATPC parks the adapter's protocol session
     // before a DELIBERATE teardown (skipped when the link already dropped).
     await sendProtocolCloseBeforeTeardown(_transport);
@@ -1794,7 +1817,12 @@ class Obd2Service implements Obd2RawCommandPort {
     if (!_transport.isConnected) return null;
     try {
       final response = await _send(command);
-      return parser(response);
+      final value = parser(response);
+      // #3532 — feed the probation state: a real NO DATA streak parks the
+      // PID; any parsed value clears it. Transport faults (the catch
+      // below) are link weather and deliberately count for nothing.
+      _pids.noteMode01Reply(command, response, parsed: value != null);
+      return value;
     } catch (e, st) {
       recordObd2ReadFailure(e, st, where: 'OBD2 read $label failed'); // #2855
       return null;
@@ -1808,7 +1836,8 @@ class Obd2Service implements Obd2RawCommandPort {
   /// `_transport.sendCommand` exactly. Adapter-specific subclasses in
   /// later phases can strip stray prompts / echoes here.
   Future<String> _send(String command) async {
-    final raw = await _transport.sendCommand(command);
+    // #3528 — through the session ladder when one is attached.
+    final raw = await _rawSend(command);
     return _adapter.preParse(raw);
   }
 
