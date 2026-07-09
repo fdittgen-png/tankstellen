@@ -11,7 +11,6 @@ import 'package:tankstellen/features/obd2/data/classic_bluetooth_facade.dart';
 import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
-import 'package:tankstellen/features/obd2/data/reconnect_connector.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #2906 stop-scan-before-connect ordering. A shared [_EventLog] records the
@@ -43,9 +42,12 @@ void main() {
 
     test('the scan-fallback reconnect path stops the scan before connecting',
         () async {
-      // The worst race: the connector breaks out of an `await for` scan loop
-      // and immediately connects. `connect()` must stop the (still winding
-      // down) scan before opening — the GATT-133 trap the issue describes.
+      // The worst race: the by-MAC direct path breaks out of an `await for`
+      // scan loop and immediately connects. `connect()` must stop the (still
+      // winding down) scan before opening — the GATT-133 trap the issue
+      // describes. (Historically driven through the in-trip
+      // ReconnectConnector; #3527 deleted it — the same service path is now
+      // exercised directly.)
       final log = _EventLog();
       final ble = _OrderedFacade(
         log,
@@ -56,12 +58,8 @@ void main() {
           [_cand('aa:bb', -50)],
         ],
       );
-      final connector = ReconnectConnector(
-        connection: _build(ble),
-        onConnected: (_) {},
-      );
 
-      await connector.attempt('aa:bb');
+      await _build(ble).connectByMacDirect('aa:bb');
 
       // The scan-path connect opened the 'scan' channel; a stopScan must
       // precede it.

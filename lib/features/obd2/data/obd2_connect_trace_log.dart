@@ -67,9 +67,10 @@ class Obd2ConnectTraceLog {
   /// never throws; null until the persistence layer initialises.
   static void Function(Obd2ConnectTrace trace)? onTracePersist;
 
-  /// #3185 — one-shot supervisor-admission note, set by
-  /// [Obd2ConnectSupervisor] when a connect requester had to WAIT for the
-  /// single-flight slot (or preempted a passive holder), consumed by the
+  /// #3185 — one-shot admission note, set by whatever serializes connect
+  /// attempts (historically the #3185 connect supervisor; the single
+  /// authority is now `Obd2LinkSupervisor`, #3529) when a connect requester
+  /// had to WAIT for its turn, consumed by the
   /// next ROOT [beginTrace] into a `supervisor-admission` step. Admission
   /// necessarily happens BEFORE the attempt opens its trace (a trace opened
   /// while the holder's is live would merge into it as a child), so the
