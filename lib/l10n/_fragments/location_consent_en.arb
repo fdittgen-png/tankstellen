@@ -30,13 +30,5 @@
   "locationConsentLegalBasis": "Legal basis: Art. 6(1)(a) GDPR (Consent)",
   "@locationConsentLegalBasis": {
     "description": "Legal-basis footnote of the GDPR location-consent dialog. 'GDPR' is the established English/EU abbreviation; the article reference is the legal citation (#2306)."
-  },
-  "locationConsentDecline": "Decline",
-  "@locationConsentDecline": {
-    "description": "Decline button on the GDPR location-consent dialog (#2306)."
-  },
-  "locationConsentAccept": "Accept",
-  "@locationConsentAccept": {
-    "description": "Accept button on the GDPR location-consent dialog (#2306)."
   }
 }

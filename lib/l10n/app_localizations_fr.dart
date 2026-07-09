@@ -6328,12 +6328,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Base juridique : art. 6, §1, a) du RGPD (consentement)';
 
   @override
-  String get locationConsentDecline => 'Refuser';
-
-  @override
-  String get locationConsentAccept => 'Accepter';
-
-  @override
   String get loyaltySettingsTitle => 'Mes cartes de fidélité';
 
   @override
@@ -7009,6 +7003,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Choisissez un mode d\'utilisation pour continuer.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Ouvert';

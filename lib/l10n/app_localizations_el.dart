@@ -6319,12 +6319,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Νομική βάση: άρθρο 6 παρ. 1 στοιχ. α) ΓΚΠΔ (συγκατάθεση)';
 
   @override
-  String get locationConsentDecline => 'Απόρριψη';
-
-  @override
-  String get locationConsentAccept => 'Αποδοχή';
-
-  @override
   String get loyaltySettingsTitle => 'Κάρτες καυσίμων';
 
   @override
@@ -7000,6 +6994,10 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Επιλέξτε λειτουργία χρήσης για συνέχεια.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Ανοιχτό';

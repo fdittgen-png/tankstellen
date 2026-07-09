@@ -13,9 +13,11 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 ///   write the `location_consent_given` flag on the narrow
 ///   [SettingsStorage] interface, NOT the legacy `location_consent`
 ///   key used elsewhere.
-/// * Dialog UX — `show` returns `true` on Accept, `false` on Decline,
-///   renders the GDPR bullets, and falls back to English for locales
-///   the `_ConsentTexts` map does not cover.
+/// * Dialog UX — `show` is a pre-permission explainer with a single
+///   "Continue" action that always proceeds to the OS permission
+///   request (App Review 5.1.1(iv), #3535): no decline/skip button may
+///   appear on the message, and it renders the GDPR bullets in every
+///   shipped locale.
 void main() {
   group('LocationConsentDialog — persistence', () {
     test('hasConsent returns false on a fresh storage', () {
@@ -62,18 +64,25 @@ void main() {
   });
 
   group('LocationConsentDialog — dialog behaviour (English)', () {
-    testWidgets('returns true when user taps Accept', (tester) async {
+    testWidgets('returns true when user taps Continue', (tester) async {
       final future = await _openDialog(tester, const Locale('en'));
-      await tester.tap(find.text('Accept'));
+      await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
       expect(await future, isTrue);
     });
 
-    testWidgets('returns false when user taps Decline', (tester) async {
+    testWidgets(
+        'offers no decline/skip action — Continue is the only button '
+        '(App Review 5.1.1(iv), #3535)', (tester) async {
+      // The pre-permission explainer must always proceed to the OS
+      // permission request; declining happens on the OS prompt itself.
       final future = await _openDialog(tester, const Locale('en'));
-      await tester.tap(find.text('Decline'));
+      expect(find.byType(FilledButton), findsOneWidget);
+      expect(find.byType(TextButton), findsNothing);
+      expect(find.text('Decline'), findsNothing);
+      await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      expect(await future, isFalse);
+      await future;
     });
 
     testWidgets('renders all three privacy bullets', (tester) async {
@@ -91,7 +100,7 @@ void main() {
         findsOneWidget,
       );
       // Clean up.
-      await tester.tap(find.text('Decline'));
+      await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
       await future;
     });
@@ -99,7 +108,7 @@ void main() {
     testWidgets('shows the GDPR legal-basis line', (tester) async {
       final future = await _openDialog(tester, const Locale('en'));
       expect(find.textContaining('Art. 6(1)(a) GDPR'), findsOneWidget);
-      await tester.tap(find.text('Decline'));
+      await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
       await future;
     });
@@ -107,17 +116,17 @@ void main() {
     testWidgets('dialog is not dismissible by tapping the barrier',
         (tester) async {
       // barrierDismissible: false — tapping outside the dialog must NOT
-      // resolve the future. Protects against accidental dismissal
-      // being misread as an explicit decline.
+      // resolve the future. The explainer only resolves via Continue,
+      // which hands off to the OS permission prompt.
       final future = await _openDialog(tester, const Locale('en'));
       await tester.tapAt(const Offset(10, 10));
       await tester.pumpAndSettle();
       // Dialog is still up.
-      expect(find.text('Accept'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
       // Clean up so the pending future doesn't leak.
-      await tester.tap(find.text('Decline'));
+      await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      expect(await future, isFalse);
+      expect(await future, isTrue);
     });
   });
 
@@ -125,9 +134,8 @@ void main() {
     testWidgets('renders German labels for de locale', (tester) async {
       final future = await _openDialog(tester, const Locale('de'));
       expect(find.text('Standortfreigabe'), findsOneWidget);
-      expect(find.text('Zustimmen'), findsOneWidget);
-      expect(find.text('Ablehnen'), findsOneWidget);
-      await tester.tap(find.text('Ablehnen'));
+      expect(find.text('Weiter'), findsOneWidget);
+      await tester.tap(find.text('Weiter'));
       await tester.pumpAndSettle();
       await future;
     });
@@ -135,9 +143,8 @@ void main() {
     testWidgets('renders French labels for fr locale', (tester) async {
       final future = await _openDialog(tester, const Locale('fr'));
       expect(find.text('Accès à la localisation'), findsOneWidget);
-      expect(find.text('Accepter'), findsOneWidget);
-      expect(find.text('Refuser'), findsOneWidget);
-      await tester.tap(find.text('Refuser'));
+      expect(find.text('Continuer'), findsOneWidget);
+      await tester.tap(find.text('Continuer'));
       await tester.pumpAndSettle();
       await future;
     });
@@ -150,9 +157,8 @@ void main() {
       // including 'bg' — renders in the device language.
       final future = await _openDialog(tester, const Locale('bg'));
       expect(find.text('Достъп до местоположението'), findsOneWidget);
-      expect(find.text('Приеми'), findsOneWidget);
-      expect(find.text('Откажи'), findsOneWidget);
-      await tester.tap(find.text('Откажи'));
+      expect(find.text('Продължи'), findsOneWidget);
+      await tester.tap(find.text('Продължи'));
       await tester.pumpAndSettle();
       await future;
     });

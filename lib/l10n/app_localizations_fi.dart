@@ -6267,12 +6267,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)';
 
   @override
-  String get locationConsentDecline => 'Hylkää';
-
-  @override
-  String get locationConsentAccept => 'Hyväksy';
-
-  @override
   String get loyaltySettingsTitle => 'Polttoainekortit';
 
   @override
@@ -6941,6 +6935,10 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get onboardingPickUseMode => 'Valitse käyttötapa jatkaaksesi.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Auki';

@@ -6237,12 +6237,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Legal basis: Art. 6(1)(a) GDPR (Consent)';
 
   @override
-  String get locationConsentDecline => 'Decline';
-
-  @override
-  String get locationConsentAccept => 'Accept';
-
-  @override
   String get loyaltySettingsTitle => 'Fuel club cards';
 
   @override
@@ -6909,6 +6903,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingPickUseMode => 'Pick a use mode to continue.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Open';
@@ -14536,12 +14534,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Łéǧáł ƀášîš: Ářŧ. 6(1)(á) ǦĐƤŘ (Çóñšéñŧ) ···········⟧';
 
   @override
-  String get locationConsentDecline => '⟦Đéçłîñé ···⟧';
-
-  @override
-  String get locationConsentAccept => '⟦Áççéƥŧ ···⟧';
-
-  @override
   String get loyaltySettingsTitle => '⟦Ƒúéł çłúƀ çářđš ······⟧';
 
   @override
@@ -15228,6 +15220,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get onboardingPickUseMode =>
       '⟦Ƥîçķ á úšé ɱóđé ŧó çóñŧîñúé. ··········⟧';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      '⟦Ýóú çáñ ƥáîř á Ɓłúéŧóóŧĥ ÓƁĐ2 áđáƥŧéř áñýŧîɱé łáŧéř ƒřóɱ ŧĥé ṽéĥîçłé šçřééñ ŧó řéçóřđ ŧřîƥš áñđ řéáđ éñǧîñé đáŧá. ·········································⟧';
 
   @override
   String get openNow => '⟦Óƥéñ ··⟧';

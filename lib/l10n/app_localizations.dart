@@ -10883,18 +10883,6 @@ abstract class AppLocalizations {
   /// **'Legal basis: Art. 6(1)(a) GDPR (Consent)'**
   String get locationConsentLegalBasis;
 
-  /// Decline button on the GDPR location-consent dialog (#2306).
-  ///
-  /// In en, this message translates to:
-  /// **'Decline'**
-  String get locationConsentDecline;
-
-  /// Accept button on the GDPR location-consent dialog (#2306).
-  ///
-  /// In en, this message translates to:
-  /// **'Accept'**
-  String get locationConsentAccept;
-
   /// Title of the loyalty settings sub-screen where the user manages fuel-club cards (#1120).
   ///
   /// In en, this message translates to:
@@ -12039,6 +12027,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a use mode to continue.'**
   String get onboardingPickUseMode;
+
+  /// Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen.
+  ///
+  /// In en, this message translates to:
+  /// **'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.'**
+  String get onboardingObd2LaterNote;
 
   /// Opening-hours status line — station is currently open (#2709).
   ///

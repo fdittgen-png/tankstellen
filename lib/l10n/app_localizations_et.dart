@@ -6266,12 +6266,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Õiguslik alus: isikuandmete kaitse üldmääruse art 6 lg 1 p a (nõusolek)';
 
   @override
-  String get locationConsentDecline => 'Keeldu';
-
-  @override
-  String get locationConsentAccept => 'Nõustu';
-
-  @override
   String get loyaltySettingsTitle => 'Kütuseklubi kaardid';
 
   @override
@@ -6940,6 +6934,10 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get onboardingPickUseMode => 'Jätkamiseks vali kasutusrežiim.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Avatud';

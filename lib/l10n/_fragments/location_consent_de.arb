@@ -6,7 +6,5 @@
   "locationConsentBulletNoServer": "Ihr Standort wird nicht auf Servern gespeichert — es gibt keine eigenen Server.",
   "locationConsentBulletNoTracking": "Standortdaten werden nicht für Werbung, Analyse oder Tracking verwendet.",
   "locationConsentRevoke": "Sie können die Standortfreigabe jederzeit in den Systemeinstellungen widerrufen. Alternativ können Sie per Postleitzahl suchen.",
-  "locationConsentLegalBasis": "Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)",
-  "locationConsentDecline": "Ablehnen",
-  "locationConsentAccept": "Zustimmen"
+  "locationConsentLegalBasis": "Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)"
 }

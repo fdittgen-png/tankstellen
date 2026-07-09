@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Locatiegegevens worden niet gebruikt voor advertenties, analyse of tracking.",
   "locationConsentRevoke": "Je kunt de locatietoegang op elk moment intrekken in de systeeminstellingen. Je kunt ook zoeken op postcode.",
   "locationConsentLegalBasis": "Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)",
-  "locationConsentDecline": "Weigeren",
-  "locationConsentAccept": "Accepteren",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (doel: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} gedaald bij tankstations in de buurt",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Данните за местоположението не се използват за реклама, анализ или проследяване.",
   "locationConsentRevoke": "Можете да отмените достъпа до местоположението по всяко време в системните настройки. Като алтернатива търсете по пощенски код.",
   "locationConsentLegalBasis": "Правно основание: чл. 6, пар. 1, б. „а“ от ОРЗД (съгласие)",
-  "locationConsentDecline": "Откажи",
-  "locationConsentAccept": "Приеми",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (цел: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} поевтиня в близки бензиностанции",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

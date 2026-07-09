@@ -10,6 +10,7 @@ import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/onboarding_obd2_step.dart';
 import 'package:tankstellen/features/setup/providers/onboarding_obd2_connector.dart';
+import 'package:tankstellen/features/setup/providers/onboarding_platform_steps_provider.dart';
 import 'package:tankstellen/features/setup/providers/onboarding_wizard_provider.dart';
 import 'package:tankstellen/features/vehicle/data/vin_decoder.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/vin_data.dart';
@@ -257,6 +258,38 @@ void main() {
     });
   });
 
+  group('OnboardingObd2Step — iOS informational mode '
+      '(App Review 5.1.1(iv), #3535)', () {
+    testWidgets(
+        'connect flow disabled → no Connect / Maybe later buttons, '
+        'the later-note body renders instead', (tester) async {
+      final connector = _FakeConnector();
+
+      await _pumpStep(
+        tester,
+        connector: connector,
+        onProceed: () {},
+        onAutoFillSuccess: () {},
+        connectFlowEnabled: false,
+      );
+
+      // Apple rejects a pre-permission message with a "Connect" CTA
+      // and a "maybe later/skip" exit — neither may render on iOS.
+      expect(find.text('Connect adapter'), findsNothing);
+      expect(find.text('Maybe later'), findsNothing);
+      expect(find.byKey(const Key('onboardingObd2ConnectButton')),
+          findsNothing);
+      expect(find.byKey(const Key('onboardingObd2SkipButton')),
+          findsNothing);
+      expect(find.byKey(const Key('onboardingObd2InfoOnly')),
+          findsOneWidget);
+      // The informational body replaces the plug-in-and-connect copy.
+      expect(find.textContaining('anytime later from the vehicle screen'),
+          findsOneWidget);
+      expect(connector.connectCalls, 0);
+    });
+  });
+
   group('OnboardingObd2Step — obd2AdapterMac persistence (#1310)', () {
     testWidgets(
       'happy path: connect + VIN read + confirm → saved profile carries '
@@ -366,6 +399,7 @@ Future<void> _pumpStep(
   required VoidCallback onAutoFillSuccess,
   VinDecoder? vinDecoder,
   void Function(ProviderContainer)? onContainerReady,
+  bool? connectFlowEnabled,
 }) async {
   // The onboarding step may save a VehicleProfile via
   // [vehicleProfileListProvider], which normally writes through
@@ -379,6 +413,9 @@ Future<void> _pumpStep(
     onboardingObd2ConnectorProvider.overrideWithValue(connector),
     settingsStorageProvider.overrideWithValue(fakeStorage),
     if (vinDecoder != null) vinDecoderProvider.overrideWithValue(vinDecoder),
+    if (connectFlowEnabled != null)
+      onboardingObd2ConnectFlowEnabledProvider
+          .overrideWithValue(connectFlowEnabled),
   ]);
   addTearDown(container.dispose);
   onContainerReady?.call(container);

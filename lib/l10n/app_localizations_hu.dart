@@ -6308,12 +6308,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Jogalap: a GDPR 6. cikk (1) bekezdés a) pontja (hozzájárulás)';
 
   @override
-  String get locationConsentDecline => 'Elutasítás';
-
-  @override
-  String get locationConsentAccept => 'Elfogadás';
-
-  @override
   String get loyaltySettingsTitle => 'Üzemanyag-törzsvevő kártyák';
 
   @override
@@ -6987,6 +6981,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Válasszon használati módot a folytatáshoz.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Nyitva';

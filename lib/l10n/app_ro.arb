@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "Datele de locație nu sunt folosite pentru publicitate, analiză sau urmărire.",
   "locationConsentRevoke": "Puteți revoca accesul la locație oricând din setările sistemului. Alternativ, căutați după codul poștal.",
   "locationConsentLegalBasis": "Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)",
-  "locationConsentDecline": "Refuză",
-  "locationConsentAccept": "Acceptă",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (țintă: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} a scăzut la benzinăriile din apropiere",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

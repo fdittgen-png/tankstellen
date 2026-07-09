@@ -6289,12 +6289,6 @@ class AppLocalizationsHr extends AppLocalizations {
       'Pravna osnova: čl. 6. st. 1. t. (a) GDPR-a (privola)';
 
   @override
-  String get locationConsentDecline => 'Odbij';
-
-  @override
-  String get locationConsentAccept => 'Prihvati';
-
-  @override
   String get loyaltySettingsTitle => 'Kartice gorivnog kluba';
 
   @override
@@ -6966,6 +6960,10 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get onboardingPickUseMode => 'Odaberite način korištenja za nastavak.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Otvoreno';

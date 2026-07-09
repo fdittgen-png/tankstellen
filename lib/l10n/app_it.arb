@@ -1975,8 +1975,6 @@
   "locationConsentBulletNoTracking": "I dati di posizione non vengono usati per pubblicità, analisi o tracciamento.",
   "locationConsentRevoke": "Puoi revocare l'accesso alla posizione in qualsiasi momento nelle impostazioni di sistema. In alternativa, cerca per CAP.",
   "locationConsentLegalBasis": "Base giuridica: art. 6, par. 1, lett. a) del GDPR (consenso)",
-  "locationConsentDecline": "Rifiuta",
-  "locationConsentAccept": "Accetta",
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "priceAlertNotificationBody": "{price} {currency} (obiettivo: {target} {currency})",
   "velocityAlertNotificationTitle": "{fuelLabel} in calo nei distributori vicini",
@@ -5333,6 +5331,11 @@
   },
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "onboardingObd2LaterNote": "You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.",
+  "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

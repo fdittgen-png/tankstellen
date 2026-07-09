@@ -6290,12 +6290,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Rechtsgrondslag: art. 6, lid 1, onder a) AVG (toestemming)';
 
   @override
-  String get locationConsentDecline => 'Weigeren';
-
-  @override
-  String get locationConsentAccept => 'Accepteren';
-
-  @override
   String get loyaltySettingsTitle => 'Tankpaskaarten';
 
   @override
@@ -6965,6 +6959,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get onboardingPickUseMode => 'Kies een gebruiksmodus om door te gaan.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Open';

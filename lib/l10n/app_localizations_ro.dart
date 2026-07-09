@@ -6310,12 +6310,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)';
 
   @override
-  String get locationConsentDecline => 'Refuză';
-
-  @override
-  String get locationConsentAccept => 'Acceptă';
-
-  @override
   String get loyaltySettingsTitle => 'Carduri de fidelitate combustibil';
 
   @override
@@ -6991,6 +6985,10 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Alegeți un mod de utilizare pentru a continua.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Deschis';

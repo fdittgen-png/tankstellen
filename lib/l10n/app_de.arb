@@ -2953,8 +2953,6 @@
   "locationConsentBulletNoTracking": "Standortdaten werden nicht für Werbung, Analyse oder Tracking verwendet.",
   "locationConsentRevoke": "Sie können die Standortfreigabe jederzeit in den Systemeinstellungen widerrufen. Alternativ können Sie per Postleitzahl suchen.",
   "locationConsentLegalBasis": "Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)",
-  "locationConsentDecline": "Ablehnen",
-  "locationConsentAccept": "Zustimmen",
   "loyaltySettingsTitle": "Tankstellen-Kundenkarten",
   "loyaltySettingsSubtitle": "Treuerabatt automatisch auf den angezeigten Preis anwenden",
   "loyaltyMenuTitle": "Tankstellen-Kundenkarten",
@@ -3365,6 +3363,10 @@
   "onboardingObd2VinReadFailed": "VIN konnte nicht ausgelesen werden — bitte manuell eingeben",
   "onboardingObd2ConnectFailed": "Adapter konnte nicht verbunden werden. Du kannst es erneut versuchen oder überspringen.",
   "onboardingPickUseMode": "Wähle einen Nutzungsmodus, um fortzufahren.",
+  "onboardingObd2LaterNote": "Du kannst einen Bluetooth-OBD2-Adapter jederzeit später über den Fahrzeug-Bildschirm koppeln, um Fahrten aufzuzeichnen und Motordaten auszulesen.",
+  "@onboardingObd2LaterNote": {
+    "description": "Informational note on the iOS variant of the OBD2 onboarding step (App Review 5.1.1(iv), #3535): no in-wizard connect flow on iOS, the adapter is paired later from the vehicle screen."
+  },
   "openNow": "Geöffnet",
   "openNowClosed": "Geschlossen",
   "openHoursUnknown": "Öffnungszeiten unbekannt",

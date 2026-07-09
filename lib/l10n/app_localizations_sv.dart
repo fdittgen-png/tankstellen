@@ -6264,12 +6264,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Rättslig grund: art. 6.1 a i GDPR (samtycke)';
 
   @override
-  String get locationConsentDecline => 'Avböj';
-
-  @override
-  String get locationConsentAccept => 'Acceptera';
-
-  @override
   String get loyaltySettingsTitle => 'Bränsleklubbskort';
 
   @override
@@ -6939,6 +6933,10 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Välj ett användningsläge för att fortsätta.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Öppen';

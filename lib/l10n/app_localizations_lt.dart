@@ -6303,12 +6303,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Teisinis pagrindas: BDAR 6 str. 1 d. a punktas (sutikimas)';
 
   @override
-  String get locationConsentDecline => 'Atmesti';
-
-  @override
-  String get locationConsentAccept => 'Sutikti';
-
-  @override
   String get loyaltySettingsTitle => 'Degalų klubo kortelės';
 
   @override
@@ -6981,6 +6975,10 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Norėdami tęsti, pasirinkite naudojimo režimą.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Atidaryta';

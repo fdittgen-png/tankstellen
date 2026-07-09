@@ -409,6 +409,39 @@ void main() {
         }
       },
     );
+
+    testWidgets(
+      'on iOS the OBD2 step is informational-only: no wizard Skip, no '
+      'Connect / Maybe later, Next advances (App Review 5.1.1(iv), #3535)',
+      (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        try {
+          await pumpIosWizard(tester);
+          await tester.tap(find.text('Next')); // → Country
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Next')); // → Vehicle
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Skip')); // past Vehicle
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Next')); // standby → OBD2
+          await tester.pumpAndSettle();
+
+          expect(find.text('5 / 9'), findsOneWidget);
+          // Apple forbids the "Connect" + "maybe later/skip" pattern in
+          // front of a permission request — neither may render on iOS.
+          expect(find.text('Connect adapter'), findsNothing);
+          expect(find.text('Maybe later'), findsNothing);
+          expect(find.text('Skip'), findsNothing);
+
+          // The wizard's neutral Next advances past the step.
+          await tester.tap(find.text('Next'));
+          await tester.pumpAndSettle();
+          expect(find.text('6 / 9'), findsOneWidget);
+        } finally {
+          debugDefaultTargetPlatformOverride = null;
+        }
+      },
+    );
   });
 }
 

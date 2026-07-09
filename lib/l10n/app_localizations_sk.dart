@@ -6296,12 +6296,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Právny základ: čl. 6 ods. 1 písm. a) GDPR (súhlas)';
 
   @override
-  String get locationConsentDecline => 'Odmietnuť';
-
-  @override
-  String get locationConsentAccept => 'Prijať';
-
-  @override
   String get loyaltySettingsTitle => 'Vernostné palivové karty';
 
   @override
@@ -6971,6 +6965,10 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get onboardingPickUseMode =>
       'Pre pokračovanie vyberte režim používania.';
+
+  @override
+  String get onboardingObd2LaterNote =>
+      'You can pair a Bluetooth OBD2 adapter anytime later from the vehicle screen to record trips and read engine data.';
 
   @override
   String get openNow => 'Otvorené';
