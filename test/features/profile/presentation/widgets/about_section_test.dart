@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/constants/app_constants.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/about_section.dart';
+import 'package:tankstellen/features/profile/providers/donation_links_provider.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -61,14 +62,31 @@ void main() {
       expect(find.text('fdittgen-png/tankstellen'), findsOneWidget);
     });
 
-    testWidgets('renders donation section', (tester) async {
+    testWidgets('renders donation section when donation links are visible '
+        '(Android / F-Droid)', (tester) async {
       await pumpApp(
         tester,
         const SingleChildScrollView(child: AboutSection()),
+        overrides: [donationLinksVisibleProvider.overrideWithValue(true)],
       );
 
       expect(find.text('PayPal'), findsOneWidget);
       expect(find.text('Revolut'), findsOneWidget);
+    });
+
+    testWidgets('hides the entire donation block on iOS '
+        '(App Review 3.1.1, #3536)', (tester) async {
+      // Apple forbids donation mechanisms other than In-App Purchase —
+      // the external PayPal / Revolut links must not render at all.
+      await pumpApp(
+        tester,
+        const SingleChildScrollView(child: AboutSection()),
+        overrides: [donationLinksVisibleProvider.overrideWithValue(false)],
+      );
+
+      expect(find.text('PayPal'), findsNothing);
+      expect(find.text('Revolut'), findsNothing);
+      expect(find.text('Support this project'), findsNothing);
     });
 
     testWidgets(

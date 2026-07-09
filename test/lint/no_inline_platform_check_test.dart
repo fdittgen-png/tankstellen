@@ -64,6 +64,8 @@ void main() {
     'lib/features/alerts/presentation/widgets/alerts_best_effort_note.dart',
     // #3170 — the Live Activity capability gate (ActivityKit is iOS-only).
     'lib/features/consumption/data/live_activity_controller.dart',
+    // #3536 — App Review 3.1.1: donation links must not render on iOS.
+    'lib/features/profile/providers/donation_links_provider.dart',
   };
 
   // Files already violating the rule when the guard landed (#2350).
