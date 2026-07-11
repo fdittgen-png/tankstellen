@@ -278,31 +278,77 @@ class ShellBottomBar extends ConsumerWidget {
         ? theme.colorScheme.onPrimary
         : theme.colorScheme.onPrimary.withValues(alpha: 0.6);
 
-    final button = Material(
-      color: buttonColor,
-      shape: const CircleBorder(),
-      elevation: 4,
-      shadowColor: Colors.black.withValues(alpha: 0.4),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTapHandler,
-        child: SizedBox(
-          width: diameter,
-          height: diameter,
-          child: Center(
-            child: action != null
-                ? Icon(
-                    iconData,
-                    size: isLandscape ? 22.0 : 28.0,
-                    color: iconColor,
-                  )
-                : ShellBounceIcon(
-                    controller: controller,
-                    selected: selected,
-                    icon: iconData,
-                    iconSize: isLandscape ? 22.0 : 28.0,
-                    color: iconColor,
-                  ),
+    // #3548 — the app's heart must not read as a flat disc. Three layers
+    // of depth, all derived from the theme so light/dark/eco stay
+    // coherent:
+    //   * a hairline surface-coloured ring in the CircleBorder side —
+    //     a crisp seat separating the button from whatever scrolls
+    //     beneath the notch;
+    //   * a top-light gradient over the primary fill (painted by an Ink
+    //     so the ripple stays above it) — the dome that makes the disc
+    //     read as raised;
+    //   * a soft primary-tinted glow under the Material's own key
+    //     shadow — the professional "lifted" halo.
+    // Disabled keeps the flat dimmed fill (no dome on a dead control).
+    final ringColor = theme.colorScheme.surface;
+    final gradient = actionEnabled
+        ? LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.lerp(buttonColor, Colors.white, 0.22)!,
+              buttonColor,
+              Color.lerp(buttonColor, Colors.black, 0.14)!,
+            ],
+            stops: const [0.0, 0.55, 1.0],
+          )
+        : null;
+
+    final button = DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: actionEnabled
+            ? [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.30),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : const [],
+      ),
+      child: Material(
+        color: buttonColor,
+        shape: CircleBorder(
+          side: BorderSide(color: ringColor, width: isLandscape ? 2 : 2.5),
+        ),
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: 0.4),
+        clipBehavior: Clip.antiAlias,
+        child: Ink(
+          decoration: BoxDecoration(shape: BoxShape.circle, gradient: gradient),
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onTapHandler,
+            child: SizedBox(
+              width: diameter,
+              height: diameter,
+              child: Center(
+                child: action != null
+                    ? Icon(
+                        iconData,
+                        size: isLandscape ? 22.0 : 28.0,
+                        color: iconColor,
+                      )
+                    : ShellBounceIcon(
+                        controller: controller,
+                        selected: selected,
+                        icon: iconData,
+                        iconSize: isLandscape ? 22.0 : 28.0,
+                        color: iconColor,
+                      ),
+              ),
+            ),
           ),
         ),
       ),

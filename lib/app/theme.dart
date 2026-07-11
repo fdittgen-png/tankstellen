@@ -27,19 +27,45 @@ const FlexSchemeColor _forestGreen = FlexSchemeColor(
 class AppTheme {
   AppTheme._();
 
-  /// Floating-SnackBar geometry shared by all three themes (#2488).
+  /// Shared post-processing overlaid on all three Flex-generated themes.
   ///
-  /// FlexColorScheme's `snackBarRadius` / `snackBarElevation` flow through
-  /// `subThemesData`, but it never sets [SnackBarThemeData.behavior] — so
-  /// SnackBars default to the docked (fixed) style, which clips against the
-  /// bottom navigation bar on full-screen routes. We overlay
-  /// [SnackBarBehavior.floating] on the generated `snackBarTheme` (preserving
-  /// Flex's colour/shape) so every SnackBar floats clear of the nav bar.
-  static ThemeData _floatingSnackBars(ThemeData theme) => theme.copyWith(
-        snackBarTheme: theme.snackBarTheme.copyWith(
-          behavior: SnackBarBehavior.floating,
+  /// **Floating SnackBars** (#2488): FlexColorScheme's `snackBarRadius` /
+  /// `snackBarElevation` flow through `subThemesData`, but it never sets
+  /// [SnackBarThemeData.behavior] — so SnackBars default to the docked
+  /// (fixed) style, which clips against the bottom navigation bar on
+  /// full-screen routes. [SnackBarBehavior.floating] is overlaid on the
+  /// generated `snackBarTheme` (preserving Flex's colour/shape).
+  ///
+  /// **One chip family** (#3548): the search surfaces are chip-dense
+  /// (mode toggle, fuel types, amenities, brands, sort row) and the stock
+  /// M3 mix of outlined-and-washed-out pills read flat and inconsistent.
+  /// One deliberate treatment across every chip: unselected = quiet
+  /// surface fill behind a hairline `outlineVariant` stroke; selected =
+  /// tonal `secondaryContainer` fill with NO stroke (the fill IS the
+  /// signal) and a medium-weight label. Radius stays the canonical
+  /// AppRadius.xl pill from `chipRadius` (#2494).
+  static ThemeData _polish(ThemeData theme) {
+    final cs = theme.colorScheme;
+    return theme.copyWith(
+      snackBarTheme: theme.snackBarTheme.copyWith(
+        behavior: SnackBarBehavior.floating,
+      ),
+      chipTheme: theme.chipTheme.copyWith(
+        backgroundColor: cs.surface,
+        selectedColor: cs.secondaryContainer,
+        checkmarkColor: cs.onSecondaryContainer,
+        side: WidgetStateBorderSide.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? const BorderSide(color: Colors.transparent, width: 0)
+              : BorderSide(color: cs.outlineVariant),
         ),
-      );
+        labelStyle: (theme.chipTheme.labelStyle ?? theme.textTheme.labelLarge)
+            ?.copyWith(fontWeight: FontWeight.w600),
+        elevation: 0,
+        pressElevation: 0,
+      ),
+    );
+  }
 
   /// Default light theme (#1757, retuned #1887, de-greyed #2375) — clean
   /// forest-green accent on a near-white surface.
@@ -56,7 +82,7 @@ class AppTheme {
   /// background instead of being muddied into it. The deliberately
   /// green-forward look lives in [eco]; [light] is the clean default.
   static ThemeData light() {
-    return _floatingSnackBars(FlexThemeData.light(
+    return _polish(FlexThemeData.light(
       colors: _forestGreen,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
       blendLevel: 8,
@@ -80,7 +106,7 @@ class AppTheme {
         // 1 dp). [SectionCard]'s hairline outline reinforces it.
         cardElevation: 0.0,
         // Floating SnackBar geometry (#2488) — radius + elevation; the
-        // floating behaviour itself is overlaid by [_floatingSnackBars].
+        // floating behaviour itself is overlaid by [_polish].
         snackBarRadius: 12.0,
         snackBarElevation: 6.0,
       ),
@@ -95,7 +121,7 @@ class AppTheme {
   /// in step with [light], so the dark surfaces carry the same
   /// deliberate green identity rather than reading as neutral charcoal.
   static ThemeData dark() {
-    return _floatingSnackBars(FlexThemeData.dark(
+    return _polish(FlexThemeData.dark(
       colors: _forestGreen.toDark(28),
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
       blendLevel: 22,
@@ -159,7 +185,7 @@ class AppTheme {
   /// eco. [light] and [dark] keep their surface-coloured app bars; a
   /// green-app-bar repaint of the default themes is a separate change.
   static ThemeData eco() {
-    return _floatingSnackBars(FlexThemeData.light(
+    return _polish(FlexThemeData.light(
       colors: _forestGreen,
       surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
       blendLevel: 20,
