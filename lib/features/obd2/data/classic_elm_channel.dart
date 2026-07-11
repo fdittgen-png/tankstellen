@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'classic_connect_cooldown.dart';
 import 'classic_method_channel.dart';
 import 'elm_byte_channel.dart';
+import 'classic_connect_timeout_message.dart';
 import 'obd2_platform_budgets.dart';
 import '../../../../core/utils/event_channel_cancel.dart';
 import 'obd2_comm_diagnostics.dart';
@@ -141,6 +142,12 @@ class ClassicElmChannel implements ElmByteChannel {
       // budget + [deadlineGrace]. The TimeoutException takes the existing
       // thrown-failure classification below.
       final deadline = Duration(milliseconds: nativeBudgetMs) + deadlineGrace;
+      // #3558 — wall-clock anchor for the timeout wording: when the app is
+      // background-frozen (no FGS), this 23 s timer can fire MINUTES late,
+      // and stamping that as "platform thread wedged" sent a whole field
+      // investigation down the wrong path. DateTime (not Stopwatch): the
+      // monotonic clock pauses in deep sleep, wall time doesn't.
+      final dialedAt = DateTime.now();
       connectResult = await _plugin
           .connectDetailed(
             address: address,
@@ -150,8 +157,11 @@ class ClassicElmChannel implements ElmByteChannel {
           .timeout(
             deadline,
             onTimeout: () => throw TimeoutException(
-              'classic connect exceeded the whole-ladder budget '
-              '(${nativeBudgetMs}ms) + grace — platform thread wedged (#3421)',
+              classicConnectTimeoutMessage(
+                budgetMs: nativeBudgetMs,
+                deadline: deadline,
+                actualElapsed: DateTime.now().difference(dialedAt),
+              ),
               deadline,
             ),
           );
