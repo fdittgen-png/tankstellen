@@ -49,6 +49,12 @@ class HardAccelRule implements DrivingLessonRule {
     final eventCount = summary.imuActive
         ? summary.harshAccelerations
         : (insight.metadata['eventCount'] ?? 0).toInt();
+    // #3557 — zero events refutes the lesson's premise: when the trusted
+    // (IMU-preferred) count is 0, the analyzer's litres are GPS
+    // speed-derivative noise and the card would read the absurd
+    // "0 hard accelerations: 2.3 L wasted". Mirror of [HardBrakeRule]'s
+    // guard, which #2789 kept there but dropped here.
+    if (eventCount <= 0) return null;
     final count = eventCount.toString();
     return DrivingLesson(
       id: id,
