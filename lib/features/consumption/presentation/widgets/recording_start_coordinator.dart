@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -204,6 +205,27 @@ class RecordingStartCoordinator {
       // EVERY retry); a `transient` / `answered` / `notProbed` (warm
       // cache-hit) connect starts and lets the scheduler pick up PIDs once the
       // protocol search converges.
+      // #3551 — the verdict below may be STALE: with #3527 KEEP-LINK the
+      // service is often REUSED (prewarm dialed when the screen opened, or
+      // the supervisor kept the link up), so `busProbe` is a snapshot from
+      // that earlier connect — typically taken before the user turned the
+      // ignition on. Re-run the resilient #3035 probe ONCE before
+      // concluding engine-off; a bus that answers now proceeds normally.
+      // Only the silent path pays for this (the path that used to bail
+      // instantly with a wrong error).
+      if (service.busProbe == Obd2BusProbeResult.probedSilent) {
+        BreadcrumbCollector.add(
+          'OBD2 start: stale silent-bus verdict — re-probing',
+        );
+        try {
+          await service.discoverSupportedPids();
+        } on Object catch (e, st) {
+          // A thrown probe is link weather, not a verdict — the gate
+          // below re-reads whatever the probe left behind.
+          recordObd2ConnectFailure(e, st,
+              where: 'RecordingStart re-probe (#3551)');
+        }
+      }
       if (service.busProbe == Obd2BusProbeResult.probedSilent) {
         notifier.cancelConnecting();
         onConnectionError(const Obd2EngineOff());
