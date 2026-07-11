@@ -236,10 +236,25 @@ class Obd2LinkSupervisor {
   /// The single dial path. Every connect — user tap, drop reaction,
   /// backoff tick — funnels here; `_attemptInFlight` makes it single
   /// flight (a second caller joins the same future).
+  ///
+  /// #3553 — a caller carrying a [dialer] OVERRIDE must never have its
+  /// dial policy silently swallowed by whatever attempt is already in
+  /// flight: field evidence showed auto-record's dial for the ACTIVE
+  /// vehicle's adapter joining the backoff loop's dial to the PREVIOUS
+  /// (last-good) adapter, returning the wrong target's failure — and the
+  /// requested device never being dialed at all. The override now joins
+  /// for the result first (a live link satisfies everyone — one link
+  /// only), and chains its own attempt strictly AFTER a missed in-flight
+  /// completes. Still never two concurrent dials.
   Future<Obd2Service?> _attempt(
       {required bool userInitiated, Obd2LinkDialer? dialer}) {
     final inFlight = _attemptInFlight;
-    if (inFlight != null) return inFlight;
+    if (inFlight != null) {
+      if (dialer == null) return inFlight;
+      return inFlight.then((svc) => svc != null || _disposed
+          ? svc
+          : _attempt(userInitiated: userInitiated, dialer: dialer));
+    }
     final future = _attemptOnce(userInitiated: userInitiated, dialer: dialer);
     _attemptInFlight = future;
     return future.whenComplete(() {
