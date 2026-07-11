@@ -64,7 +64,23 @@ def beta_feedback_email
 end
 
 # Notes shown to the App Review team — explains there is no sign-in to demo.
-BETA_REVIEW_NOTES = "App uses anonymous auth on launch — no sign-in or account needed to use any feature. Free, ad-free, open-source (MIT). Fuel + EV charging price comparison.".freeze
+BETA_REVIEW_NOTES_BASE = "App uses anonymous auth on launch — no sign-in or account needed to use any feature. Free, ad-free, open-source (MIT). Fuel + EV charging price comparison.".freeze
+
+# #3537 — App Review guideline 2.1: Apple requires a demo video (recorded on
+# a PHYSICAL device, showing the background-location + Bluetooth features
+# incl. every permission prompt) with EVERY submission ("updated demo videos
+# will need to be provided for every app submission"). The unlisted link
+# lives in the DEMO_VIDEO_URL repository secret so it ships automatically
+# with each future submission; when unset (forks, link not yet recorded)
+# the base notes go out alone rather than failing the lane.
+def beta_review_notes
+  video = ENV["DEMO_VIDEO_URL"]
+  return BETA_REVIEW_NOTES_BASE if video.nil? || video.strip.empty?
+
+  "#{BETA_REVIEW_NOTES_BASE} Demo video (physical iOS device, includes the " \
+    "background-location and Bluetooth/OBD2 flows with all permission " \
+    "prompts): #{video.strip}"
+end
 
 # App-Review contact block in *snake_case* — the casing pilot's
 # `beta_app_review_info` option expects (pilot/lib/pilot/options.rb). Returns
@@ -81,7 +97,7 @@ def beta_review_contact_info_snake
     contact_phone: phone.strip,
     contact_email: beta_feedback_email,
     demo_account_required: false,
-    notes: BETA_REVIEW_NOTES,
+    notes: beta_review_notes,
   }
 end
 
@@ -593,7 +609,7 @@ platform :ios do
         contactPhone: ENV.fetch("BETA_CONTACT_PHONE").strip,
         contactEmail: beta_feedback_email,
         demoAccountRequired: false,
-        notes: BETA_REVIEW_NOTES,
+        notes: beta_review_notes,
       },
     )
     UI.success("Beta App Review contact info updated for #{app.name}.")
