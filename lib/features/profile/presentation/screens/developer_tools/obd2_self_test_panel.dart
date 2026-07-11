@@ -218,7 +218,20 @@ class _StepRow extends StatelessWidget {
           _statusIcon(context, l),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(_stepLabel(l), style: theme.textTheme.bodyMedium),
+            // #3555 — captured layer data renders under the step name.
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_stepLabel(l), style: theme.textTheme.bodyMedium),
+                if (step.detail != null)
+                  Text(
+                    step.detail!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+              ],
+            ),
           ),
           if (step.latencyMs != null)
             Text(
@@ -283,6 +296,8 @@ class _StepRow extends StatelessWidget {
 
   String _stepLabel(AppLocalizations l) {
     switch (step.id) {
+      case Obd2SelfTestStepId.bluetooth:
+        return l.obd2TestStepBluetooth;
       case Obd2SelfTestStepId.scan:
         // #2938 — when the run connected by MAC, the first step is a direct
         // connect, not a scan; relabel it so the trace matches what ran.
@@ -297,8 +312,12 @@ class _StepRow extends StatelessWidget {
         return l.obd2TestStepInfo;
       case Obd2SelfTestStepId.supportedPids:
         return l.obd2TestStepSupportedPids;
+      case Obd2SelfTestStepId.protocol:
+        return l.obd2TestStepProtocol;
       case Obd2SelfTestStepId.sampleReads:
         return l.obd2TestStepSampleReads;
+      case Obd2SelfTestStepId.soak:
+        return l.obd2TestStepSoak;
       case Obd2SelfTestStepId.reconnect:
         return l.obd2TestStepReconnect;
       case Obd2SelfTestStepId.disconnect:

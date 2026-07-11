@@ -9,8 +9,10 @@ part of 'obd2_self_test_driver.dart';
 /// cap; everything here is `_`-private to the library.
 
 Obd2SelfTestStepResult _step(
-        Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs) =>
-    Obd2SelfTestStepResult(id: id, status: status, latencyMs: latencyMs);
+        Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs,
+        {String? detail}) =>
+    Obd2SelfTestStepResult(
+        id: id, status: status, latencyMs: latencyMs, detail: detail);
 
 /// #3527 — route the self-test's one-shot connect through THE link
 /// supervisor when one is wired: reuse its live service (never a second
@@ -85,10 +87,16 @@ Future<Obd2SelfTestStepResult> _infoStep(
     diag.recordHandshakeLine('ATRV', voltage, rvSw.elapsedMilliseconds);
     sw.stop();
     final ok = _looksLikeInfoReply(desc) && _looksLikeInfoReply(voltage);
+    // #3555 — the adapter chip's own words: device description + battery
+    // voltage, cleaned of prompt/CR noise (transcript-category raw data).
+    final detail = [_cleanInfoReply(desc), _cleanInfoReply(voltage)]
+        .where((t) => t.isNotEmpty)
+        .join(' \u00b7 ');
     return _step(
       Obd2SelfTestStepId.info,
       ok ? Obd2SelfTestStepStatus.ok : Obd2SelfTestStepStatus.garbage,
       sw.elapsedMilliseconds,
+      detail: detail.isEmpty ? null : detail,
     );
   } on TimeoutException {
     sw.stop();
@@ -101,6 +109,15 @@ Future<Obd2SelfTestStepResult> _infoStep(
         sw.elapsedMilliseconds);
   }
 }
+
+/// #3555 — one-line cleanup of a free-form info reply for the step's
+/// detail: prompt/CR/LF stripped, whitespace collapsed.
+String _cleanInfoReply(String raw) => raw
+    .replaceAll('>', ' ')
+    .replaceAll('\r', ' ')
+    .replaceAll('\n', ' ')
+    .replaceAll(RegExp(r'\s+'), ' ')
+    .trim();
 
 /// A free-form info reply (AT@1 / ATRV) is "ok" when it is non-empty and
 /// carries no ELM error token (`?`, `NO DATA`, `STOPPED`, `UNABLE`).
@@ -145,7 +162,7 @@ Future<Obd2SelfTestStepResult> _supportedPidsStep(
   try {
     // The probe records the raw `0100` reply (trace + transcript) itself via
     // its recordTrace tee, so we only map the tri-state result here.
-    await service.discoverSupportedPids().timeout(deadline);
+    final pids = await service.discoverSupportedPids().timeout(deadline);
     sw.stop();
     final status = switch (service.busProbe) {
       Obd2BusProbeResult.answered => Obd2SelfTestStepStatus.ok,
@@ -156,7 +173,10 @@ Future<Obd2SelfTestStepResult> _supportedPidsStep(
     diag.recordSupportedTriState('0100',
         status == Obd2SelfTestStepStatus.ok ? 'supported' : 'unsupported');
     return _step(
-        Obd2SelfTestStepId.supportedPids, status, sw.elapsedMilliseconds);
+        Obd2SelfTestStepId.supportedPids, status, sw.elapsedMilliseconds,
+        // #3555 — how much of the standard PID space this car implements
+        // + the probe tri-state, the report's vehicle-bus headline.
+        detail: '${pids.length} PIDs \u00b7 bus ${service.busProbe.name}');
   } on TimeoutException {
     sw.stop();
     diag.recordSupportedTriState('0100', 'unknown');
@@ -180,6 +200,7 @@ Future<Obd2SelfTestStepResult> _sampleReadsStep(
 ) async {
   const pids = ['010C', '010D', '0105'];
   var worst = Obd2SelfTestStepStatus.ok;
+  final values = <String>[];
   final sw = Stopwatch()..start();
   for (final pid in pids) {
     diag.noteDispatch(pid);
@@ -190,6 +211,10 @@ Future<Obd2SelfTestStepResult> _sampleReadsStep(
       final cls = classifyObd2Response(raw);
       diag.noteResult(pid, cls, rttMs: pidSw.elapsedMilliseconds);
       worst = _worse(worst, statusForResponseClass(cls));
+      // #3555 — surface the PARSED live values, not just pass/fail: the
+      // report should read like the dashboard the ECU actually painted.
+      final parsed = _describeSampleValue(pid, raw);
+      if (parsed != null) values.add(parsed);
     } on TimeoutException {
       pidSw.stop();
       diag.noteResult(pid, ResponseClass.timeout,
@@ -201,7 +226,8 @@ Future<Obd2SelfTestStepResult> _sampleReadsStep(
     }
   }
   sw.stop();
-  return _step(Obd2SelfTestStepId.sampleReads, worst, sw.elapsedMilliseconds);
+  return _step(Obd2SelfTestStepId.sampleReads, worst, sw.elapsedMilliseconds,
+      detail: values.isEmpty ? null : values.join(' \u00b7 '));
 }
 
 /// Reconnect step: deliberate `disconnect()` (noteConnectionEvent drop)
@@ -253,7 +279,9 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
         visibleReconnect: true, timeToReconnectMs: elapsed);
     return (
       result: _step(
-          Obd2SelfTestStepId.reconnect, Obd2SelfTestStepStatus.ok, elapsed),
+          Obd2SelfTestStepId.reconnect, Obd2SelfTestStepStatus.ok, elapsed,
+          // i18n-ignore: locale-neutral duration token, not UI copy.
+          detail: '${elapsed}ms'),
       service: reconnected,
     );
   } on TimeoutException {
@@ -271,6 +299,25 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
       service: null,
     );
   }
+}
+
+/// #3555 — parse one sample-read reply into a locale-neutral value token
+/// for the step detail (`RPM 850` / `13 km/h` / `88\u00b0C`). Null when the
+/// reply didn't parse — the status classification already covers that.
+// i18n-ignore: locale-neutral units on raw protocol data, not UI copy.
+String? _describeSampleValue(String pid, String raw) {
+  switch (pid) {
+    case '010C':
+      final rpm = Elm327Protocol.parseEngineRpm(raw);
+      return rpm == null ? null : 'RPM ${rpm.round()}';
+    case '010D':
+      final kmh = Elm327Protocol.parseVehicleSpeed(raw);
+      return kmh == null ? null : '$kmh km/h';
+    case '0105':
+      final c = Elm327Protocol.parseCoolantTempCelsius(raw);
+      return c == null ? null : '${c.round()}\u00b0C';
+  }
+  return null;
 }
 
 /// Severity ordering for the worst-status fold in [_sampleReadsStep]:

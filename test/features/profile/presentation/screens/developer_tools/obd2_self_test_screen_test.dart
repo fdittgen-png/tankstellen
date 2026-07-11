@@ -32,6 +32,8 @@ const _happyPathResponses = {
   'ATI': 'ELM327 v1.5>',
   'AT@1': 'OBDII to RS232 Interpreter>',
   'ATRV': '12.4V>',
+  // #3555 — the protocol layer step reads the negotiated protocol.
+  'ATDPN': 'A6>',
   '0100': '41 00 BE 3F A8 13>',
   '010C': '41 0C 1A F8>',
   '010D': '41 0D 50>',

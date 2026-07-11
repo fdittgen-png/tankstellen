@@ -6686,6 +6686,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get obd2TestStepScan => 'Scansione adattatore';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Connetti e inizializza';
 
   @override
@@ -6695,7 +6698,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'PID supportati';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Letture di esempio';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Test di riconnessione';

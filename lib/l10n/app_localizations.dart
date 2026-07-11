@@ -11482,6 +11482,12 @@ abstract class AppLocalizations {
   /// **'Scan for adapter'**
   String get obd2TestStepScan;
 
+  /// Step name of the #3555 self-test layer that checks the PHONE's Bluetooth radio state before any dial.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Bluetooth'**
+  String get obd2TestStepBluetooth;
+
   /// Step label in the OBD2 adapter self-test progress list: open the link and run the ELM327 init handshake (#2645).
   ///
   /// In en, this message translates to:
@@ -11500,11 +11506,23 @@ abstract class AppLocalizations {
   /// **'Supported PIDs'**
   String get obd2TestStepSupportedPids;
 
+  /// Step name of the #3555 self-test layer that reports WHICH OBD protocol the adapter negotiated with the car (ATDPN).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle protocol'**
+  String get obd2TestStepProtocol;
+
   /// Step label in the OBD2 adapter self-test progress list: sample-read RPM, speed and coolant (#2645).
   ///
   /// In en, this message translates to:
   /// **'Sample reads'**
   String get obd2TestStepSampleReads;
+
+  /// Step name of the #3555 self-test layer that polls live data continuously at recording cadence and reports the success rate + latency.
+  ///
+  /// In en, this message translates to:
+  /// **'Sustained polling'**
+  String get obd2TestStepSoak;
 
   /// Step label in the OBD2 adapter self-test progress list: deliberately disconnect and reconnect, timing the recovery (#2645).
   ///

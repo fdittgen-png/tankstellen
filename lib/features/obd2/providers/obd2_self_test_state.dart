@@ -35,6 +35,10 @@ abstract class Obd2SelfTestStep with _$Obd2SelfTestStep {
     @Default(Obd2SelfTestStepStatus.skipped) Obd2SelfTestStepStatus status,
     int? latencyMs,
 
+    /// #3555 — the layer's captured data (raw, locale-neutral transcript
+    /// line: firmware id, voltage, protocol name, PID count, live values).
+    String? detail,
+
     /// True while this step is the one currently executing — drives the
     /// inline progress spinner. Exactly one step is `running` at a time.
     @Default(false) bool running,

@@ -6692,6 +6692,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obd2TestStepScan => 'Adapter keresése';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Csatlakozás és inicializálás';
 
   @override
@@ -6701,7 +6704,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Támogatott PID-ek';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Mintaolvasások';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Újracsatlakozás teszt';

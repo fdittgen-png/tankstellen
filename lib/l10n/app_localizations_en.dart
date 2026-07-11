@@ -6616,6 +6616,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2TestStepScan => 'Scan for adapter';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Connect & init';
 
   @override
@@ -6625,7 +6628,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Supported PIDs';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Sample reads';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Reconnect test';
@@ -14898,6 +14907,9 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get obd2TestStepScan => '⟦Šçáñ ƒóř áđáƥŧéř ······⟧';
 
   @override
+  String get obd2TestStepBluetooth => '⟦Ƥĥóñé Ɓłúéŧóóŧĥ ······⟧';
+
+  @override
   String get obd2TestStepConnect => '⟦Çóññéçŧ & îñîŧ ·····⟧';
 
   @override
@@ -14907,7 +14919,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get obd2TestStepSupportedPids => '⟦Šúƥƥóřŧéđ ƤÎĐš ······⟧';
 
   @override
+  String get obd2TestStepProtocol => '⟦Ṽéĥîçłé ƥřóŧóçół ·······⟧';
+
+  @override
   String get obd2TestStepSampleReads => '⟦Šáɱƥłé řéáđš ·····⟧';
+
+  @override
+  String get obd2TestStepSoak => '⟦Šúšŧáîñéđ ƥółłîñǧ ·······⟧';
 
   @override
   String get obd2TestStepReconnect => '⟦Řéçóññéçŧ ŧéšŧ ······⟧';
