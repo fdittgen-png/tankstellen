@@ -3,27 +3,6 @@
   "@obd2ReconnectInProgress": {
     "description": "Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight."
   },
-  "obd2ReconnectInProgressNamed": "Reconnecting to {adapter}…",
-  "@obd2ReconnectInProgressNamed": {
-    "description": "Shown while auto-reconnect is trying to re-establish a named OBD2 adapter link (Epic #3013 phase 3). adapter is the friendly device name, e.g. 'vLinker FS'.",
-    "placeholders": {
-      "adapter": {
-        "type": "String"
-      }
-    }
-  },
-  "obd2ReconnectFailedTitle": "Couldn’t reconnect to your adapter",
-  "@obd2ReconnectFailedTitle": {
-    "description": "Title of the terminal auto-reconnect-failure surface, shown after the bounded reconnect attempts were exhausted (Epic #3013 phase 3, #3019). The auto-loop has stopped; the user can tap to retry."
-  },
-  "obd2ReconnectFailedBody": "The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.",
-  "@obd2ReconnectFailedBody": {
-    "description": "Body text of the terminal auto-reconnect-failure surface (Epic #3013 phase 3). Explains the auto-reconnect gave up after bounded attempts and how to recover."
-  },
-  "obd2ReconnectDismiss": "Dismiss",
-  "@obd2ReconnectDismiss": {
-    "description": "Tooltip of the X button on the terminal reconnect-failed strip (#3505). Dismisses the strip for the current drop episode only — a fresh drop re-arms it."
-  },
   "autoRecordNotificationTitle": "Trip auto-record",
   "@autoRecordNotificationTitle": {
     "description": "Title of the Android foreground-service notification shown while the hands-free auto-record watch is armed (#3505 — replaces the hard-coded English string in AutoRecordForegroundService.kt). Handed to the native side at arm time."
@@ -31,17 +10,5 @@
   "autoRecordNotificationText": "Watching for your OBD2 adapter",
   "@autoRecordNotificationText": {
     "description": "Body of the Android auto-record foreground-service notification (#3505). Handed to the native side at arm time."
-  },
-  "obd2ReconnectRetry": "Tap to retry",
-  "@obd2ReconnectRetry": {
-    "description": "Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires."
-  },
-  "obd2WedgeHintBody": "Your OBD2 adapter stopped responding. Switch the ignition off and on or replug the adapter — or toggle Bluetooth off and on.",
-  "@obd2WedgeHintBody": {
-    "description": "One-time actionable recovery hint shown when the Classic OBD2 adapter is wedged (#3422, epic #3415): repeated reconnects ended in exhausted RFCOMM ladders and the in-app recovery rungs did not clear it. Tells the user the two physical recoveries (ignition cycle / replug) and the Bluetooth toggle."
-  },
-  "obd2WedgeHintOpenBtSettings": "Bluetooth settings",
-  "@obd2WedgeHintOpenBtSettings": {
-    "description": "Label of the button on the wedged-adapter recovery hint (#3422) that deep-links to the system Bluetooth settings screen so the user can toggle Bluetooth off and on."
   }
 }

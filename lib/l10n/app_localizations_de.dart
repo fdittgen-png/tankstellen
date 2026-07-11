@@ -6782,36 +6782,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verbindung zum OBD2-Adapter wird wiederhergestellt…';
 
   @override
-  String obd2ReconnectInProgressNamed(String adapter) {
-    return 'Verbindung zu $adapter wird wiederhergestellt…';
-  }
-
-  @override
-  String get obd2ReconnectFailedTitle =>
-      'Adapter konnte nicht erneut verbunden werden';
-
-  @override
-  String get obd2ReconnectFailedBody =>
-      'Die OBD2-Verbindung wurde unterbrochen und konnte nicht automatisch wiederhergestellt werden. Prüfe, ob der Adapter eingeschaltet und in Reichweite ist, und tippe dann auf „Erneut versuchen“.';
-
-  @override
-  String get obd2ReconnectDismiss => 'Ausblenden';
-
-  @override
   String get autoRecordNotificationTitle => 'Automatische Fahrtaufzeichnung';
 
   @override
   String get autoRecordNotificationText => 'Wartet auf deinen OBD2-Adapter';
-
-  @override
-  String get obd2ReconnectRetry => 'Erneut versuchen';
-
-  @override
-  String get obd2WedgeHintBody =>
-      'Dein OBD2-Adapter reagiert nicht mehr. Schalte die Zündung aus und wieder ein oder stecke den Adapter neu ein – oder schalte Bluetooth aus und wieder ein.';
-
-  @override
-  String get obd2WedgeHintOpenBtSettings => 'Bluetooth-Einstellungen';
 
   @override
   String get ocrTesterTitle => 'OCR-Tester';
