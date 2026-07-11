@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
+import '../../vehicle/api.dart' show activeVehicleProfileProvider;
 import '../data/last_good_adapter_store.dart';
 import '../data/obd2_comm_diagnostics.dart';
 import '../data/obd2_connect_trace.dart';
@@ -152,6 +153,31 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     }
     final pinned = pinStore.recall();
 
+    // #3553 — the ACTIVE vehicle's pinned adapter is authoritative user
+    // intent; the last-good pin is only an optimization (it updates
+    // exclusively on a SUCCESSFUL connect, so after a vehicle/adapter
+    // switch it points at the PREVIOUS device until the new one connects
+    // — which this loop then prevented by always dialing the stale pin).
+    // When the two disagree, dial the vehicle's adapter FIRST
+    // (transport-aware); the last-good + rescan paths below stay the
+    // fallbacks.
+    final vehicleMac = _activeVehicleAdapterMac();
+    if (vehicleMac != null && vehicleMac != pinned?.mac) {
+      final byVehicle = await Obd2ConnectTraceLog.runWithOrigin(
+        Obd2ConnectOrigin.liveReconnect,
+        () => connection.connectByMacTransportAware(
+          vehicleMac,
+          adapterName: _activeVehicleAdapterName(),
+          fallbackToScan: false,
+        ),
+        transportDecisionReason: 'reconnect-active-vehicle',
+      );
+      final classified = _classify(byVehicle);
+      if (classified != null || _supervisor?.userRequestedDisconnect == true) {
+        return classified;
+      }
+    }
+
     // Pinned fast path — transport-correct direct connect.
     if (pinned != null) {
       final direct = await Obd2ConnectTraceLog.runWithOrigin(
@@ -178,6 +204,29 @@ class Obd2Reconnect extends _$Obd2Reconnect {
       transportDecisionReason: 'reconnect-rescan',
     );
     return _classify(rescanned);
+  }
+
+  /// The active vehicle's pinned adapter MAC (#3553), or null when no
+  /// vehicle is active / none is pinned / the graph isn't up (shell
+  /// safety — same degradation contract as the dependency reads above).
+  String? _activeVehicleAdapterMac() {
+    try {
+      final mac = ref.read(activeVehicleProfileProvider)?.obd2AdapterMac;
+      return (mac == null || mac.trim().isEmpty) ? null : mac;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The active vehicle's pinned adapter NAME (#3553) — feeds the
+  /// transport registry's name-based Classic/BLE inference. Null on any
+  /// failure, mirroring [_activeVehicleAdapterMac].
+  String? _activeVehicleAdapterName() {
+    try {
+      return ref.read(activeVehicleProfileProvider)?.obd2AdapterName;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Engine-off gate for a dial result. Returns the service to keep, or

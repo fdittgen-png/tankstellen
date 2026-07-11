@@ -13,6 +13,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
 import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
+import 'package:tankstellen/features/obd2/data/last_good_adapter_store.dart';
+import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
+import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 void main() {
@@ -136,4 +141,147 @@ void main() {
       );
     });
   });
+
+  group('default dial adapter identity (#3553)', () {
+    ProviderContainer buildContainer({
+      required _FakeConnection connection,
+      required LastGoodAdapter? pinned,
+      required VehicleProfile? vehicle,
+    }) {
+      final container = ProviderContainer(overrides: [
+        obd2ConnectionProvider.overrideWith((_) => connection),
+        lastGoodAdapterStoreProvider.overrideWithValue(_FakePinStore(pinned)),
+        activeVehicleProfileProvider.overrideWith(() => _StubVehicle(vehicle)),
+      ]);
+      addTearDown(container.dispose);
+      return container;
+    }
+
+    test(
+        'the ACTIVE vehicle adapter is dialed FIRST when it differs from '
+        'the stale last-good pin — the pin/rescan stay the fallbacks', () async {
+      final connection = _FakeConnection();
+      final container = buildContainer(
+        connection: connection,
+        pinned: const LastGoodAdapter(
+            mac: 'D4:OLD', transportKind: 'classic', name: 'vLinker FS'),
+        vehicle: const VehicleProfile(
+          id: 'veh-2',
+          name: 'Second car',
+          obd2AdapterMac: 'DC:NEW',
+          obd2AdapterName: 'vLinker BM-Android',
+        ),
+      );
+      final sup = container.read(obd2ReconnectProvider.notifier).supervisor;
+
+      final got = await sup.connect();
+
+      expect(got, isNull, reason: 'every fake dial misses');
+      expect(connection.calls.first, 'transport-aware:DC:NEW',
+          reason: 'vehicle intent is authoritative — dialed before the pin');
+      expect(connection.calls, contains('classic-direct:D4:OLD'),
+          reason: 'the last-good pin remains the fallback');
+    });
+
+    test(
+        'when the vehicle adapter and the pin AGREE, no extra dial is '
+        'added — the pinned fast path runs first as before', () async {
+      final connection = _FakeConnection();
+      final container = buildContainer(
+        connection: connection,
+        pinned: const LastGoodAdapter(
+            mac: 'D4:SAME', transportKind: 'classic', name: 'vLinker FS'),
+        vehicle: const VehicleProfile(
+          id: 'veh-1',
+          name: 'Clio',
+          obd2AdapterMac: 'D4:SAME',
+        ),
+      );
+      final sup = container.read(obd2ReconnectProvider.notifier).supervisor;
+
+      await sup.connect();
+
+      expect(connection.calls.first, 'classic-direct:D4:SAME');
+      expect(
+        connection.calls.where((c) => c.startsWith('transport-aware:')),
+        isEmpty,
+        reason: 'an agreeing pin keeps the single pinned fast path',
+      );
+    });
+  });
+}
+
+/// Records every dial in order; all dials miss (return null) so the
+/// #3553 ordering is observable without a live link.
+class _FakeConnection implements Obd2ConnectionService {
+  final List<String> calls = [];
+
+  @override
+  Future<Obd2Service?> connectByMacTransportAware(
+    String mac, {
+    String? adapterName,
+    bool fallbackToScan = true,
+  }) async {
+    calls.add('transport-aware:$mac');
+    return null;
+  }
+
+  @override
+  Future<Obd2Service?> connectByMacClassicDirect(String mac,
+      {String? adapterName}) async {
+    calls.add('classic-direct:$mac');
+    return null;
+  }
+
+  @override
+  Future<Obd2Service?> connectByMacDirect(
+    String mac, {
+    Duration? timeout,
+    bool fallbackToScan = true,
+    String? adapterName,
+  }) async {
+    calls.add('ble-direct:$mac');
+    return null;
+  }
+
+  @override
+  Future<Obd2Service?> connectByMac(
+    String mac, {
+    Duration timeout = const Duration(seconds: 5),
+    String? adapterName,
+  }) async {
+    calls.add('rescan:$mac');
+    return null;
+  }
+
+  @override
+  Future<Obd2Service?> connectBest() async {
+    calls.add('connect-best');
+    return null;
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Pin store returning a fixed recall; writes are ignored.
+class _FakePinStore implements LastGoodAdapterStore {
+  _FakePinStore(this._pinned);
+  final LastGoodAdapter? _pinned;
+
+  @override
+  LastGoodAdapter? recall() => _pinned;
+
+  @override
+  Future<void> record(LastGoodAdapter adapter) async {}
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _StubVehicle extends ActiveVehicleProfile {
+  _StubVehicle(this._v);
+  final VehicleProfile? _v;
+  @override
+  VehicleProfile? build() => _v;
 }

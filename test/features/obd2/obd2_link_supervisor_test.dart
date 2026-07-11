@@ -237,6 +237,84 @@ void main() {
     });
   });
 
+  test(
+      'connectWith joining a MISSED in-flight dial still dials its own '
+      'target afterwards — the override is never swallowed (#3553)', () {
+    fakeAsync((async) {
+      final gate = Completer<Obd2Service?>();
+      var defaultDials = 0;
+      final sup = Obd2LinkSupervisor(
+        dial: () {
+          defaultDials++;
+          return gate.future;
+        },
+        drops: drops.stream,
+        jitter: Random(42),
+      );
+      // The backoff loop dials (the stale last-good adapter) and hangs.
+      drops.add(const Obd2LinkDropEvent(
+          transportKind: 'classic', reason: 'socket-error'));
+      async.flushMicrotasks();
+      expect(defaultDials, 1);
+
+      // Auto-record dials the ACTIVE vehicle's (different) adapter.
+      var overrideDials = 0;
+      final live = _liveService();
+      Obd2Service? got;
+      unawaited(sup.connectWith(() async {
+        overrideDials++;
+        return live;
+      }).then((s) => got = s));
+      async.flushMicrotasks();
+      expect(overrideDials, 0,
+          reason: 'never two concurrent dials — the override waits');
+
+      gate.complete(null); // the stale-target dial MISSES
+      async.flushMicrotasks();
+      expect(overrideDials, 1,
+          reason: 'the override dial must run right after the miss');
+      expect(identical(got, live), isTrue,
+          reason: 'the caller gets ITS OWN dial result, not the miss');
+      expect(sup.state.value, Obd2LinkState.ready);
+      unawaited(sup.dispose());
+      async.flushMicrotasks();
+    });
+  });
+
+  test(
+      'connectWith joining an in-flight dial that SUCCEEDS returns the '
+      'live link without a second dial (#3553 — one link satisfies all)',
+      () {
+    fakeAsync((async) {
+      final gate = Completer<Obd2Service?>();
+      final sup = Obd2LinkSupervisor(
+        dial: () => gate.future,
+        drops: drops.stream,
+        jitter: Random(42),
+      );
+      drops.add(const Obd2LinkDropEvent(
+          transportKind: 'classic', reason: 'socket-error'));
+      async.flushMicrotasks();
+
+      var overrideDials = 0;
+      Obd2Service? got;
+      unawaited(sup.connectWith(() async {
+        overrideDials++;
+        return _liveService();
+      }).then((s) => got = s));
+      async.flushMicrotasks();
+
+      final live = _liveService();
+      gate.complete(live);
+      async.flushMicrotasks();
+      expect(overrideDials, 0,
+          reason: 'a live link from the in-flight dial satisfies everyone');
+      expect(identical(got, live), isTrue);
+      unawaited(sup.dispose());
+      async.flushMicrotasks();
+    });
+  });
+
   test('a dial FAULT (not just a miss) also feeds the backoff loop', () {
     fakeAsync((async) {
       dialer.enqueue(StateError('rfcomm refused'));
