@@ -93,7 +93,7 @@ class SearchCriteriaForm extends ConsumerWidget {
             RouteInput(key: routeInputKey, onSearch: onRouteSearch),
           ],
           const SizedBox(height: 8),
-          Text(l10n.fuelType, style: theme.textTheme.titleSmall),
+          _SectionHeader(l10n.fuelType),
           const SizedBox(height: 4),
           const FuelTypeSelector(),
           const SizedBox(height: 8),
@@ -119,7 +119,7 @@ class SearchCriteriaForm extends ConsumerWidget {
             secondary: const Icon(Icons.schedule),
           ),
           const SizedBox(height: 4),
-          Text(l10n.amenities, style: theme.textTheme.titleSmall),
+          _SectionHeader(l10n.amenities),
           const SizedBox(height: 4),
           AmenityFilterWrap(
             selected: amenities,
@@ -135,17 +135,45 @@ class SearchCriteriaForm extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 8),
+          // #3548 — quiet secondary action: hairline outline + secondary
+          // foreground so it stops competing with the central search FAB
+          // (the form's only primary action).
           OutlinedButton.icon(
             key: const ValueKey('criteria-save-defaults-button'),
             onPressed: onSaveDefaults,
-            icon: const Icon(Icons.bookmark_add),
+            icon: const Icon(Icons.bookmark_add, size: 18),
             label: Text(l10n.saveAsDefaults),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(44),
+              foregroundColor: theme.colorScheme.secondary,
+              side: BorderSide(color: theme.colorScheme.outlineVariant),
             ),
           ),
           // #2131 — the inline Search CTA moved to the central FAB.
         ],
+      ),
+    );
+  }
+}
+
+/// #3548 — the criteria form's section eyebrow: letter-spaced,
+/// medium-weight `onSurfaceVariant` label instead of a plain
+/// `titleSmall`, so section starts scan as structure rather than
+/// body text. Style only — the string itself is the localized label.
+class _SectionHeader extends StatelessWidget {
+  final String text;
+
+  const _SectionHeader(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      text,
+      style: theme.textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.8,
+        color: theme.colorScheme.onSurfaceVariant,
       ),
     );
   }

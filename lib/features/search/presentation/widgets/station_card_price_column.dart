@@ -156,6 +156,11 @@ class _StationPriceColumn extends StatelessWidget {
                     currencyOverride: currencyOverride,
                     baseStyle: theme.textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
+                      // #3548 — tabular figures: every card's price digits
+                      // occupy identical advance widths, so the price
+                      // column reads as an aligned scannable column
+                      // instead of ragged proportional digits.
+                      fontFeatures: const [FontFeature.tabularFigures()],
                       // #3198 — grey only when known-closed (see above).
                       color: station.isOpen == false
                           ? theme.colorScheme.onSurfaceVariant
