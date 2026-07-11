@@ -224,27 +224,37 @@ class TripRecordingBanner extends ConsumerWidget {
             ),
           ),
         ),
-        // #797 phase 2 — BT-drop pause banner. Zero-height unless the
-        // provider is in pausedDueToDrop; self-watches its slice of
-        // the state so the main banner above doesn't rebuild on
-        // drop/resume transitions. #3306 — AnimatedSize for the same smooth
-        // slide-in as the idle reconnect strip (no jolt on drop/resume).
-        const AnimatedSize(
-          duration: Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          alignment: Alignment.topCenter,
-          child: Obd2PauseBanner(),
+        // #3545 — the drop/degraded status floats OVER the content instead
+        // of being inserted as a row: every appear/disappear used to reflow
+        // the whole screen below (forms visibly jumped on each reconnect
+        // cycle). Both pills render zero-size when idle and are mutually
+        // exclusive (#797 pausedDueToDrop vs #2565 degradedGpsOnly), and
+        // only the pill itself claims hits — taps beside it fall through.
+        Expanded(
+          child: Stack(
+            children: [
+              child,
+              const Positioned(
+                top: 8,
+                left: 12,
+                right: 12,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Obd2PauseBanner(),
+                ),
+              ),
+              const Positioned(
+                top: 8,
+                left: 12,
+                right: 12,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: GpsDegradedBanner(),
+                ),
+              ),
+            ],
+          ),
         ),
-        // #2565 — GPS-degraded banner (OBD2 dropped, GPS alive — still
-        // recording). Mutually exclusive with the pause banner above;
-        // zero-height unless the provider is in degradedGpsOnly.
-        const AnimatedSize(
-          duration: Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          alignment: Alignment.topCenter,
-          child: GpsDegradedBanner(),
-        ),
-        Expanded(child: child),
       ],
     );
   }

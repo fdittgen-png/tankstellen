@@ -238,8 +238,10 @@ void main() {
   });
 
   group('GpsDegradedBanner flicker fix (#3010)', () {
-    testWidgets('the banner is wrapped in AnimatedSize — it eases in/out '
-        'instead of popping', (tester) async {
+    testWidgets('the pill is wrapped in AnimatedOpacity — it fades in/out '
+        'instead of popping (#3545: it floats in an overlay, so a fade is '
+        'the whole anti-pop mechanism — there is no layout below to ease)',
+        (tester) async {
       final fake = _FakeTripRecording(
         const TripRecordingState(phase: TripRecordingPhase.degradedGpsOnly),
       );
@@ -251,21 +253,21 @@ void main() {
       await tester.pump(_pastDebounce);
       await tester.pumpAndSettle();
 
-      // The single GpsDegradedBanner must contribute an AnimatedSize wrapping
-      // its content — proves the abrupt SizedBox.shrink() toggle is gone.
-      expect(
-        find.descendant(
-          of: find.byType(GpsDegradedBanner),
-          matching: find.byType(AnimatedSize),
-        ),
-        findsOneWidget,
-      );
       expect(
         find.descendant(
           of: find.byType(GpsDegradedBanner),
           matching: find.byType(AnimatedOpacity),
         ),
         findsOneWidget,
+      );
+      // #3545 — the full-width MaterialBanner is gone: the status is a
+      // compact floating pill that never reflows the content beneath.
+      expect(
+        find.descendant(
+          of: find.byType(GpsDegradedBanner),
+          matching: find.byType(MaterialBanner),
+        ),
+        findsNothing,
       );
     });
 
