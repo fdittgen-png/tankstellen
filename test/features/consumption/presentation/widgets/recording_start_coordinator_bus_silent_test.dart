@@ -95,6 +95,46 @@ void main() {
         reason: 'the unusable link must be disconnected');
     expect(recording.cancelConnectingCallCount, greaterThanOrEqualTo(1),
         reason: 'the connecting phase must roll back to idle');
+
+    // #3551 — the verdict was re-checked with ONE fresh probe before the
+    // engine-off conclusion (it stayed silent here, so the error stands).
+    expect(service.reprobeCallCount, 1,
+        reason: 'a silent verdict must be re-probed once before bailing');
+  });
+
+  testWidgets(
+      'a STALE silent verdict that answers on the fresh re-probe starts '
+      'the trip — no engine-off error (#3551: prewarm dialed before the '
+      'ignition was on; the user started the engine since)', (tester) async {
+    final service = _FakeObd2Service(
+      busAnswered: false,
+      busProbe: Obd2BusProbeResult.probedSilent,
+      busProbeAfterReprobe: Obd2BusProbeResult.answered,
+    );
+    final coordinator = RecordingStartCoordinator();
+    final errors = <Object>[];
+    late _SpyTripRecording recording;
+
+    await withRef(tester, _SpyTripRecording.new, (ref, notifier) async {
+      recording = notifier;
+      notifier.enterConnecting();
+      await coordinator.connectAndStart(
+        ref,
+        notifier: notifier,
+        openPicker: () async => service,
+        onConnectionError: errors.add,
+        isMounted: () => true,
+      );
+    });
+
+    expect(service.reprobeCallCount, 1,
+        reason: 'the stale silent verdict must trigger one fresh probe');
+    expect(errors, isEmpty,
+        reason: 'a bus that answers the re-probe is NOT engine-off');
+    expect(recording.startCallCount, 1,
+        reason: 'the trip must start once the fresh probe answered');
+    expect(service.disconnectCallCount, 0,
+        reason: 'a live, answering link must not be torn down');
   });
 
   testWidgets(
@@ -272,18 +312,33 @@ class _FakeObd2Service implements Obd2Service {
   _FakeObd2Service({
     required bool busAnswered,
     required Obd2BusProbeResult busProbe,
+    this.busProbeAfterReprobe,
   })  : busAnsweredValue = busAnswered,
         busProbeValue = busProbe;
 
   final bool busAnsweredValue;
-  final Obd2BusProbeResult busProbeValue;
+  Obd2BusProbeResult busProbeValue;
+
+  /// #3551 — when non-null, [discoverSupportedPids] flips [busProbe] to
+  /// this value, modelling a stale silent verdict refreshed by the
+  /// start-gate's re-probe (engine turned on since the prewarm dial).
+  final Obd2BusProbeResult? busProbeAfterReprobe;
   int disconnectCallCount = 0;
+  int reprobeCallCount = 0;
 
   @override
   bool get busAnswered => busAnsweredValue;
 
   @override
   Obd2BusProbeResult get busProbe => busProbeValue;
+
+  @override
+  Future<Set<int>> discoverSupportedPids() async {
+    reprobeCallCount++;
+    final next = busProbeAfterReprobe;
+    if (next != null) busProbeValue = next;
+    return const <int>{};
+  }
 
   @override
   Future<void> disconnect() async {
