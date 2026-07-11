@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/app_radius.dart';
 import '../../../../l10n/app_localizations.dart';
 // `trip_recording_provider.dart` re-exports `TripRecordingPhase`.
 import '../../providers/trip_recording_provider.dart';
@@ -43,10 +44,9 @@ import '../../providers/trip_recording_provider.dart';
 ///   * **Grace / hysteresis** — once shown, it lingers for [_hideGrace]
 ///     after the phase recovers, so a quick re-drop inside the grace
 ///     window keeps it up rather than strobing it off-then-on.
-///   * **Animate + reserve layout** — the in/out transition runs through
-///     [AnimatedSize] (height eased from 0) + a fade, so showing/hiding
-///     it eases the content below instead of jerking it. The collapsed
-///     state is a true zero-height box, so it costs no layout when idle.
+///   * **Fade** — the in/out transition is a fade (#3545: the pill floats
+///     in an overlay, so there is no content below to reflow). The hidden
+///     state is a true zero-size box, so it costs no layout when idle.
 class GpsDegradedBanner extends ConsumerStatefulWidget {
   const GpsDegradedBanner({super.key});
 
@@ -58,7 +58,7 @@ class GpsDegradedBanner extends ConsumerStatefulWidget {
   /// re-drop keeps it up instead of strobing it off then back on.
   static const Duration _hideGrace = Duration(milliseconds: 1500);
 
-  /// Ease duration of the AnimatedSize / fade in & out.
+  /// Ease duration of the fade in & out.
   static const Duration _animDuration = Duration(milliseconds: 220);
 
   @override
@@ -153,52 +153,57 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
       tripRecordingProvider.select((s) => s.reconnectPassiveWaiting),
     );
 
-    // AnimatedSize eases the height between 0 (collapsed) and the banner's
-    // intrinsic height, so showing/hiding it never jerks the metrics row
-    // above or the content below — it grows/shrinks in place. The fade
-    // softens the colour pop. When hidden the child is a true zero-height
-    // box, so the idle cost is nil.
-    return AnimatedSize(
+    // #3545 — the widget now floats in an overlay Stack, so there is no
+    // layout below to ease: the fade alone softens the appearance. When
+    // hidden the child is a true zero-size box, so the idle cost is nil
+    // and taps in its corner of the overlay fall through.
+    return AnimatedOpacity(
       duration: GpsDegradedBanner._animDuration,
-      curve: Curves.easeInOut,
-      alignment: Alignment.topCenter,
-      child: AnimatedOpacity(
-        duration: GpsDegradedBanner._animDuration,
-        opacity: _visible ? 1.0 : 0.0,
-        child: _visible
-            ? _banner(context, passiveWaiting: passiveWaiting)
-            : const SizedBox(width: double.infinity, height: 0),
-      ),
+      opacity: _visible ? 1.0 : 0.0,
+      child: _visible
+          ? _pill(context, passiveWaiting: passiveWaiting)
+          : const SizedBox.shrink(),
     );
   }
 
-  Widget _banner(BuildContext context, {required bool passiveWaiting}) {
+  Widget _pill(BuildContext context, {required bool passiveWaiting}) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    return MaterialBanner(
+    // A compact floating pill on a neutral/informational surface (not the
+    // error surface the pause pill uses) — the trip is fine, it's just
+    // running on GPS. No Resume / End: recording continues automatically.
+    return Material(
       key: const Key('gpsDegradedBanner'),
-      // A neutral/informational surface (not the error surface the pause
-      // banner uses) — the trip is fine, it's just running on GPS.
-      backgroundColor: theme.colorScheme.secondaryContainer,
-      contentTextStyle: TextStyle(
-        color: theme.colorScheme.onSecondaryContainer,
+      color: theme.colorScheme.secondaryContainer,
+      elevation: 3,
+      borderRadius: AppRadius.xl,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              // A steady "fix held" glyph for the busy reconnect, a quieter
+              // "still listening" glyph once we've dropped to the passive
+              // wait.
+              passiveWaiting ? Icons.bluetooth_searching : Icons.gps_fixed,
+              size: 18,
+              color: theme.colorScheme.onSecondaryContainer,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                passiveWaiting
+                    ? (l.obd2GpsDegradedPassiveWaitingBanner)
+                    : (l.obd2GpsDegradedBannerTitle),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSecondaryContainer,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      leading: Icon(
-        // A steady "fix held" glyph for the busy reconnect, a quieter
-        // "still listening" glyph once we've dropped to the passive wait.
-        passiveWaiting ? Icons.bluetooth_searching : Icons.gps_fixed,
-        color: theme.colorScheme.onSecondaryContainer,
-      ),
-      content: Text(
-        passiveWaiting
-            ? (l.obd2GpsDegradedPassiveWaitingBanner)
-            : (l.obd2GpsDegradedBannerTitle),
-      ),
-      // No Resume / End: recording continues automatically. A
-      // MaterialBanner requires a non-empty actions list, so a single
-      // zero-size placeholder keeps the layout valid without offering a
-      // tap target the user must not need.
-      actions: const [SizedBox.shrink()],
     );
   }
 }

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/app_radius.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/providers/trip_recording_provider.dart';
 
@@ -49,33 +50,78 @@ class Obd2PauseBanner extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final isSilentFailure = dropReason == TripDropReason.silentFailure;
-    return MaterialBanner(
-      key: const Key('obd2PauseBanner'),
-      backgroundColor: theme.colorScheme.errorContainer,
-      contentTextStyle: TextStyle(color: theme.colorScheme.onErrorContainer),
-      leading: Icon(
-        isSilentFailure
-            ? Icons.report_gmailerrorred_outlined
-            : Icons.bluetooth_disabled,
-        color: theme.colorScheme.onErrorContainer,
-      ),
-      content: Text(
-        isSilentFailure
-            ? (l.tripRecordingObd2NotResponding)
-            : (l.obd2PauseBannerTitle),
-      ),
-      actions: [
-        TextButton(
-          key: const Key('obd2PauseBannerResume'),
-          onPressed: () => ref.read(tripRecordingProvider.notifier).resume(),
-          child: Text(l.obd2PauseBannerResume),
+    // #3545 — a compact floating pill instead of a full-width
+    // MaterialBanner: the widget now lives in an overlay Stack, so it
+    // must never claim more width than its content (hits beside it fall
+    // through to the screen underneath). liveRegion announces the pause
+    // to screen readers, which the ambient overlay placement no longer
+    // guarantees by document order.
+    return Semantics(
+      liveRegion: true,
+      child: Material(
+        key: const Key('obd2PauseBanner'),
+        color: theme.colorScheme.errorContainer,
+        elevation: 3,
+        borderRadius: AppRadius.xl,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 8, 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isSilentFailure
+                        ? Icons.report_gmailerrorred_outlined
+                        : Icons.bluetooth_disabled,
+                    size: 18,
+                    color: theme.colorScheme.onErrorContainer,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      isSilentFailure
+                          ? (l.tripRecordingObd2NotResponding)
+                          : (l.obd2PauseBannerTitle),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    key: const Key('obd2PauseBannerResume'),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      foregroundColor: theme.colorScheme.onErrorContainer,
+                    ),
+                    onPressed: () =>
+                        ref.read(tripRecordingProvider.notifier).resume(),
+                    child: Text(l.obd2PauseBannerResume),
+                  ),
+                  TextButton(
+                    key: const Key('obd2PauseBannerEnd'),
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      foregroundColor: theme.colorScheme.onErrorContainer,
+                    ),
+                    onPressed: () =>
+                        ref.read(tripRecordingProvider.notifier).stop(),
+                    child: Text(l.obd2PauseBannerEnd),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        TextButton(
-          key: const Key('obd2PauseBannerEnd'),
-          onPressed: () => ref.read(tripRecordingProvider.notifier).stop(),
-          child: Text(l.obd2PauseBannerEnd),
-        ),
-      ],
+      ),
     );
   }
 }
