@@ -269,7 +269,7 @@ const kGreece = CountryConfig(
   requiresApiKey: false,
   apiProvider: 'Paratiritirio Timon',
   attribution:
-      'Data: fuelprices.gr (Paratiritirio Timon) via fuelpricesgr community API',
+      'Data: fuelprices.gr (Paratiritirio Timon) via FuelPricesGreeceAPI community mirror',
   fuelTypes: ['Αμόλυβδη 95', 'Αμόλυβδη 100', 'Diesel', 'LPG'],
   supportedFuelTypes: {
     FuelType.e5,
@@ -280,9 +280,10 @@ const kGreece = CountryConfig(
   },
   examplePostalCode: '10431',
   exampleCity: 'Αθήνα',
-  // #3194 — default host is NXDOMAIN; the service short-circuits to
-  // "unavailable" unless self-hosted. Hidden until a real source exists.
-  verified: false,
+  // #3539 — restored on the FuelPricesGreeceAPI community mirror of the
+  // ministry bulletins (live-verified 2026-07-11) after the fuelpricesgr
+  // host died (#3194). Weekly endpoint-canary watches it.
+  verified: true,
 );
 
 /// Romania — *Monitorul Prețurilor*, the Competition Council's

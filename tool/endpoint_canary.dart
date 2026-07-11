@@ -222,15 +222,19 @@ const List<CanaryTarget> targets = [
   ),
   CanaryTarget(
     country: 'GR',
-    name: 'fuelpricesgr community API',
-    url: 'https://fuelpricesgr.com/api/prices/today',
-    skip: SkipReason.noEndpoint,
-    note: 'greece/greece_station_service.dart — fuelpricesgr.com has been '
-        'NXDOMAIN since 2026-06-10 with no public replacement (the upstream '
-        'repo documents self-hosting only, re-verified 2026-07-09). The app '
-        'already degrades cleanly (#3194 short-circuit; self-hosted baseUrl '
-        're-enables). A month of weekly DEADs tracked nothing new — the '
-        'restore is #3539; re-activate this probe with the new host then.',
+    name: 'FuelPricesGreeceAPI community mirror',
+    // Fixed historical window: probes reachability + shape (not
+    // freshness) without needing a dynamic date. The x-api-key is the
+    // PUBLIC one from the project README (see greece_station_service).
+    url: 'https://5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com/v2/data'
+        '?start_date=2026-07-01&end_date=2026-07-09&offset=0',
+    headers: {'x-api-key': 'VH5AaWqgBchJw3a8yOkq5i5nVJ0hNMl5mwzkPMm1'},
+    bodyMarker: 'AUTOMOTIVE_DIESEL',
+    note: 'greece/greece_station_service.dart — #3539 restore after '
+        'fuelpricesgr.com died NXDOMAIN (#3194). Hobbyist-run mirror of '
+        'the ministry bulletins; if this probe goes DEAD, the durable '
+        'fallback plan is a self-published GitHub-Pages JSON parsed from '
+        'the official fuelprices.gr PDFs.',
   ),
   CanaryTarget(
     country: 'RO',
