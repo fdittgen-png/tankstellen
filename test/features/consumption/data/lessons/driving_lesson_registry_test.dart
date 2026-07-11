@@ -336,6 +336,32 @@ void main() {
       expect(hardAccel.title, startsWith('2 hard accelerations'));
     });
 
+    test('hard-accel lesson is SUPPRESSED when the IMU ran and counted ZERO '
+        'events — no "0 hard accelerations: 2.3 L wasted" card (#3557)', () {
+      // Field export 2026-07-11: the IMU (trusted source) counted 0 hard
+      // accelerations, but the noisy GPS speed-derivative cost line still
+      // carried litres — and the card rendered the absurd zero-count
+      // headline. Zero trusted events refutes the premise: no lesson.
+      const zeroImuSummary = TripSummary(
+        distanceKm: 5,
+        maxRpm: 4000,
+        highRpmSeconds: 0,
+        idleSeconds: 0,
+        harshBrakes: 0,
+        harshAccelerations: 0, // IMU ran and counted NOTHING
+        kind: TripKind.gpsOnly,
+        distanceSource: 'gps',
+        imuHardAccelCount: 0,
+        imuActive: true,
+      );
+      final reg = DrivingLessonRegistry.standard();
+      // The GPS derivative still "sees" 5 events worth of litres in the
+      // sample stream — exactly the field condition.
+      final lessons = reg.evaluate(zeroImuSummary, hardAccelSamples(), l);
+      expect(lessons.map((e) => e.id), isNot(contains(hardAccelLessonId)),
+          reason: 'zero trusted events must suppress the cost line');
+    });
+
     test('hard-accel lesson keeps the GPS-derived count when the IMU did NOT '
         'run (#2789 C5 fallback)', () {
       // imuActive=false → no inertial signal → fall back to the (clamped)
