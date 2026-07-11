@@ -113,7 +113,11 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
       phase: Obd2SelfTestPhase.done,
       steps: [
         for (final s in report.steps)
-          Obd2SelfTestStep(id: s.id, status: s.status, latencyMs: s.latencyMs),
+          Obd2SelfTestStep(
+              id: s.id,
+              status: s.status,
+              latencyMs: s.latencyMs,
+              detail: s.detail),
       ],
       verdict: report.verdict,
       elapsedMs: report.elapsedMs,
@@ -137,6 +141,7 @@ class Obd2SelfTestController extends _$Obd2SelfTestController {
           s.copyWith(
             status: result.status,
             latencyMs: result.latencyMs,
+            detail: result.detail,
             running: false,
           )
         else

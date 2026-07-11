@@ -31,6 +31,8 @@ const _happyPathResponses = {
   ..._initResponses,
   'AT@1': 'OBDII to RS232 Interpreter>',
   'ATRV': '12.4V>',
+  // #3555 — the protocol layer step reads the negotiated protocol.
+  'ATDPN': 'A6>',
   '0100': '41 00 BE 3F A8 13>',
   '010C': '41 0C 1A F8>',
   '010D': '41 0D 50>',
@@ -83,8 +85,10 @@ void main() {
       final rich = finished.firstWhere((s) => s.pidStats.isNotEmpty);
       final cmds = rich.initTranscript.map((l) => l.cmd).toList();
       expect(cmds, containsAll(<String>['AT@1', 'ATRV', '0100']));
-      expect(rich.pidStats['010C']?.ok, 1);
-      expect(rich.pidStats['010D']?.ok, 1);
+      // #3555 — the soak step adds 6 more reads of each hot PID on the
+      // same pre-reconnect session (1 sample + 6 soak = 7).
+      expect(rich.pidStats['010C']?.ok, 7);
+      expect(rich.pidStats['010D']?.ok, 7);
       expect(rich.pidStats['0105']?.ok, 1);
       expect(rich.discoveredSupported['0100'], 'supported');
       // The drop landed on the pre-reconnect session.
@@ -120,7 +124,8 @@ void main() {
       // per-PID table.
       final session = Obd2CommDiagnostics.instance.finishedSessions
           .firstWhere((s) => s.pidStats.isNotEmpty);
-      expect(session.pidStats['010C']?.timeout, 1);
+      // #3555 — the soak step retries the delayed PID 6 more times.
+      expect(session.pidStats['010C']?.timeout, 7);
       // The disconnect step still ran (full trace on failure).
       expect(
         report.steps.last.id,
@@ -216,6 +221,8 @@ void main() {
           ..._initResponses,
           'AT@1': 'OBDII to RS232 Interpreter>',
           'ATRV': '12.4V>',
+          // #3555 — a silent bus never negotiated a protocol.
+          'ATDPN': 'A0>',
           '0100': 'SEARCHING...STOPPED>',
           '010C': 'NO DATA>',
           '010D': 'NO DATA>',
@@ -291,6 +298,96 @@ void main() {
 
       expect(report.verdict, Obd2SelfTestVerdict.passed);
       expect(report.passed, isTrue);
+    });
+  });
+
+  group('deep layered diagnostics (#3555)', () {
+    test(
+        'the report opens with the bluetooth layer and every step carries '
+        'its captured DATA in detail', () async {
+      final conn = _FakeConnection(
+        transportFor: () => FakeObd2Transport(Map.of(_happyPathResponses)),
+      );
+
+      final report = await runObd2SelfTest(
+        conn,
+        pinnedMac: 'AA:BB:CC:DD:EE:FF',
+        adapterName: 'vLinker FS',
+      );
+
+      expect(report.steps.first.id, Obd2SelfTestStepId.bluetooth,
+          reason: 'the phone radio layer runs before any dial');
+
+      String? detailOf(Obd2SelfTestStepId id) =>
+          report.steps.firstWhere((s) => s.id == id).detail;
+
+      expect(detailOf(Obd2SelfTestStepId.bluetooth), contains('radio'));
+      expect(detailOf(Obd2SelfTestStepId.info), contains('12.4V'),
+          reason: 'the adapter chip layer surfaces the battery voltage');
+      expect(detailOf(Obd2SelfTestStepId.supportedPids), contains('PIDs'),
+          reason: 'the bus layer surfaces how many PIDs the car implements');
+      expect(detailOf(Obd2SelfTestStepId.protocol),
+          contains('ISO 15765-4 CAN (11-bit, 500k)'),
+          reason: 'ATDPN A6 maps to its human protocol name');
+      expect(detailOf(Obd2SelfTestStepId.sampleReads), contains('RPM'),
+          reason: 'the live-data layer surfaces the PARSED values');
+      expect(detailOf(Obd2SelfTestStepId.soak), contains('ok 12/12'),
+          reason: 'the soak layer reports its success rate');
+      expect(detailOf(Obd2SelfTestStepId.reconnect), isNotNull,
+          reason: 'the recovery layer reports its time-to-reconnect');
+    });
+
+    test(
+        'a silent bus maps protocol + soak to the engine-off signature so '
+        'the #3009 verdict stays engineOff, never a red failure', () async {
+      final conn = _FakeConnection(
+        transportFor: () => FakeObd2Transport({
+          ..._initResponses,
+          'AT@1': 'OBDII to RS232 Interpreter>',
+          'ATRV': '12.4V>',
+          'ATDPN': 'A0>',
+          '0100': 'SEARCHING...STOPPED>',
+          '010C': 'NO DATA>',
+          '010D': 'NO DATA>',
+          '0105': 'NO DATA>',
+        }),
+      );
+
+      final report = await runObd2SelfTest(conn, pinnedMac: 'M');
+
+      final protocol = report.steps
+          .firstWhere((st) => st.id == Obd2SelfTestStepId.protocol);
+      final soak =
+          report.steps.firstWhere((st) => st.id == Obd2SelfTestStepId.soak);
+      expect(protocol.status, Obd2SelfTestStepStatus.noResponse,
+          reason: 'ATDPN A0 = no protocol negotiated = silent bus');
+      expect(soak.status, Obd2SelfTestStepStatus.noResponse,
+          reason: 'a NO-DATA-dominated soak is the engine-off signature');
+      expect(report.verdict, Obd2SelfTestVerdict.engineOff);
+    });
+
+    test('a degraded link (partial soak answers) surfaces as garbage, '
+        'keeping the run red rather than silently passing', () async {
+      var calls = 0;
+      final conn = _FakeConnection(
+        transportFor: () => _FlakyTransport(Map.of(_happyPathResponses),
+            // Every second 010C/010D soak read answers NO DATA — a link
+            // that "works" but cannot sustain recording cadence.
+            flakyEvery: 2, onCall: () => calls++),
+      );
+
+      final report = await runObd2SelfTest(conn, pinnedMac: 'M');
+
+      final soak =
+          report.steps.firstWhere((st) => st.id == Obd2SelfTestStepId.soak);
+      expect(soak.status, Obd2SelfTestStepStatus.garbage,
+          reason: 'a ~50% answer rate is degraded, not ok and not engine-off');
+      // The degradation is SURFACED in the step detail (the honest count);
+      // the overall verdict stays the conservative non-red engine-off class
+      // per the #3009 signature (garbage on live-data steps only).
+      expect(soak.detail, contains('ok 6/12'));
+      expect(report.verdict, isNot(Obd2SelfTestVerdict.passed));
+      expect(calls, greaterThan(0));
     });
   });
 
@@ -586,4 +683,28 @@ class _UnusedBluetoothFacade implements BluetoothFacade {
     bool autoConnect = false,
   }) =>
       throw UnimplementedError();
+}
+
+
+/// #3555 — a transport whose hot-PID replies alternate real data / NO DATA,
+/// modelling a link that answers single reads but degrades under sustained
+/// polling. AT/init commands stay scripted so connect + info pass.
+class _FlakyTransport extends FakeObd2Transport {
+  _FlakyTransport(super.responses,
+      {required this.flakyEvery, required this.onCall});
+
+  final int flakyEvery;
+  final void Function() onCall;
+  int _hotCalls = 0;
+
+  @override
+  Future<String> sendCommand(String command) async {
+    final cmd = command.trim();
+    if (cmd == '010C' || cmd == '010D') {
+      onCall();
+      _hotCalls++;
+      if (_hotCalls % flakyEvery == 0) return 'NO DATA>';
+    }
+    return super.sendCommand(command);
+  }
 }

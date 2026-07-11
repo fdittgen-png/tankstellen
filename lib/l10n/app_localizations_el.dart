@@ -6704,6 +6704,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get obd2TestStepScan => 'Σάρωση για αντάπτορα';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Σύνδεση & αρχικοποίηση';
 
   @override
@@ -6713,7 +6716,13 @@ class AppLocalizationsEl extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Υποστηριζόμενα PIDs';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Δείγματα ανάγνωσης';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Δοκιμή επανασύνδεσης';

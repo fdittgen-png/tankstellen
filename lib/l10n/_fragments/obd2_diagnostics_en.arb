@@ -401,6 +401,10 @@
   "@obd2TestStepScan": {
     "description": "Step label in the OBD2 adapter self-test progress list: discover the Bluetooth adapter (#2645)."
   },
+  "obd2TestStepBluetooth": "Phone Bluetooth",
+  "@obd2TestStepBluetooth": {
+    "description": "Step name of the #3555 self-test layer that checks the PHONE's Bluetooth radio state before any dial."
+  },
   "obd2TestStepConnect": "Connect & init",
   "@obd2TestStepConnect": {
     "description": "Step label in the OBD2 adapter self-test progress list: open the link and run the ELM327 init handshake (#2645)."
@@ -413,9 +417,17 @@
   "@obd2TestStepSupportedPids": {
     "description": "Step label in the OBD2 adapter self-test progress list: request the supported-PID bitmask (0100) (#2645)."
   },
+  "obd2TestStepProtocol": "Vehicle protocol",
+  "@obd2TestStepProtocol": {
+    "description": "Step name of the #3555 self-test layer that reports WHICH OBD protocol the adapter negotiated with the car (ATDPN)."
+  },
   "obd2TestStepSampleReads": "Sample reads",
   "@obd2TestStepSampleReads": {
     "description": "Step label in the OBD2 adapter self-test progress list: sample-read RPM, speed and coolant (#2645)."
+  },
+  "obd2TestStepSoak": "Sustained polling",
+  "@obd2TestStepSoak": {
+    "description": "Step name of the #3555 self-test layer that polls live data continuously at recording cadence and reports the success rate + latency."
   },
   "obd2TestStepReconnect": "Reconnect test",
   "@obd2TestStepReconnect": {

@@ -6713,6 +6713,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get obd2TestStepScan => 'Rechercher l\'adaptateur';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Connexion et initialisation';
 
   @override
@@ -6722,7 +6725,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'PIDs supportés';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Lectures d\'échantillon';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Test de reconnexion';

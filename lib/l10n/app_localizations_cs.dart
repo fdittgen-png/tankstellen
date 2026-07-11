@@ -6660,6 +6660,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2TestStepScan => 'Skenovat adaptér';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Připojit a inicializovat';
 
   @override
@@ -6669,7 +6672,13 @@ class AppLocalizationsCs extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Podporované PID';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Zkušební čtení';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Test opětovného připojení';

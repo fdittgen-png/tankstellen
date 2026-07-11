@@ -26,6 +26,7 @@ const _happyPathResponses = {
   'AT@1': 'OBDII to RS232 Interpreter>',
   'ATRV': '12.4V>',
   '0100': '41 00 BE 3F A8 13>',
+  'ATDPN': 'A6>',
   '010C': '41 0C 1A F8>',
   '010D': '41 0D 50>',
   '0105': '41 05 5A>',

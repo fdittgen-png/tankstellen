@@ -6659,6 +6659,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2TestStepScan => 'Iskanje adapterja';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Poveži in inicializiraj';
 
   @override
@@ -6668,7 +6671,13 @@ class AppLocalizationsSl extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Podprti PID';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Vzorčna branja';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Test ponovne povezave';

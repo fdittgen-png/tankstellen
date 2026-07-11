@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Obd2SelfTestStep {
 
- Obd2SelfTestStepId get id; Obd2SelfTestStepStatus get status; int? get latencyMs;/// True while this step is the one currently executing — drives the
+ Obd2SelfTestStepId get id; Obd2SelfTestStepStatus get status; int? get latencyMs;/// #3555 — the layer's captured data (raw, locale-neutral transcript
+/// line: firmware id, voltage, protocol name, PID count, live values).
+ String? get detail;/// True while this step is the one currently executing — drives the
 /// inline progress spinner. Exactly one step is `running` at a time.
  bool get running;
 /// Create a copy of Obd2SelfTestStep
@@ -27,16 +29,16 @@ $Obd2SelfTestStepCopyWith<Obd2SelfTestStep> get copyWith => _$Obd2SelfTestStepCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SelfTestStep&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.latencyMs, latencyMs) || other.latencyMs == latencyMs)&&(identical(other.running, running) || other.running == running));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Obd2SelfTestStep&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.latencyMs, latencyMs) || other.latencyMs == latencyMs)&&(identical(other.detail, detail) || other.detail == detail)&&(identical(other.running, running) || other.running == running));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,status,latencyMs,running);
+int get hashCode => Object.hash(runtimeType,id,status,latencyMs,detail,running);
 
 @override
 String toString() {
-  return 'Obd2SelfTestStep(id: $id, status: $status, latencyMs: $latencyMs, running: $running)';
+  return 'Obd2SelfTestStep(id: $id, status: $status, latencyMs: $latencyMs, detail: $detail, running: $running)';
 }
 
 
@@ -47,7 +49,7 @@ abstract mixin class $Obd2SelfTestStepCopyWith<$Res>  {
   factory $Obd2SelfTestStepCopyWith(Obd2SelfTestStep value, $Res Function(Obd2SelfTestStep) _then) = _$Obd2SelfTestStepCopyWithImpl;
 @useResult
 $Res call({
- Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs, bool running
+ Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs, String? detail, bool running
 });
 
 
@@ -64,12 +66,13 @@ class _$Obd2SelfTestStepCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SelfTestStep
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? status = null,Object? latencyMs = freezed,Object? running = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? status = null,Object? latencyMs = freezed,Object? detail = freezed,Object? running = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as Obd2SelfTestStepId,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as Obd2SelfTestStepStatus,latencyMs: freezed == latencyMs ? _self.latencyMs : latencyMs // ignore: cast_nullable_to_non_nullable
-as int?,running: null == running ? _self.running : running // ignore: cast_nullable_to_non_nullable
+as int?,detail: freezed == detail ? _self.detail : detail // ignore: cast_nullable_to_non_nullable
+as String?,running: null == running ? _self.running : running // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -155,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Obd2SelfTestStepId id,  Obd2SelfTestStepStatus status,  int? latencyMs,  bool running)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Obd2SelfTestStepId id,  Obd2SelfTestStepStatus status,  int? latencyMs,  String? detail,  bool running)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Obd2SelfTestStep() when $default != null:
-return $default(_that.id,_that.status,_that.latencyMs,_that.running);case _:
+return $default(_that.id,_that.status,_that.latencyMs,_that.detail,_that.running);case _:
   return orElse();
 
 }
@@ -176,10 +179,10 @@ return $default(_that.id,_that.status,_that.latencyMs,_that.running);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Obd2SelfTestStepId id,  Obd2SelfTestStepStatus status,  int? latencyMs,  bool running)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Obd2SelfTestStepId id,  Obd2SelfTestStepStatus status,  int? latencyMs,  String? detail,  bool running)  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SelfTestStep():
-return $default(_that.id,_that.status,_that.latencyMs,_that.running);case _:
+return $default(_that.id,_that.status,_that.latencyMs,_that.detail,_that.running);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +199,10 @@ return $default(_that.id,_that.status,_that.latencyMs,_that.running);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Obd2SelfTestStepId id,  Obd2SelfTestStepStatus status,  int? latencyMs,  bool running)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Obd2SelfTestStepId id,  Obd2SelfTestStepStatus status,  int? latencyMs,  String? detail,  bool running)?  $default,) {final _that = this;
 switch (_that) {
 case _Obd2SelfTestStep() when $default != null:
-return $default(_that.id,_that.status,_that.latencyMs,_that.running);case _:
+return $default(_that.id,_that.status,_that.latencyMs,_that.detail,_that.running);case _:
   return null;
 
 }
@@ -211,12 +214,15 @@ return $default(_that.id,_that.status,_that.latencyMs,_that.running);case _:
 
 
 class _Obd2SelfTestStep implements Obd2SelfTestStep {
-  const _Obd2SelfTestStep({required this.id, this.status = Obd2SelfTestStepStatus.skipped, this.latencyMs, this.running = false});
+  const _Obd2SelfTestStep({required this.id, this.status = Obd2SelfTestStepStatus.skipped, this.latencyMs, this.detail, this.running = false});
   
 
 @override final  Obd2SelfTestStepId id;
 @override@JsonKey() final  Obd2SelfTestStepStatus status;
 @override final  int? latencyMs;
+/// #3555 — the layer's captured data (raw, locale-neutral transcript
+/// line: firmware id, voltage, protocol name, PID count, live values).
+@override final  String? detail;
 /// True while this step is the one currently executing — drives the
 /// inline progress spinner. Exactly one step is `running` at a time.
 @override@JsonKey() final  bool running;
@@ -231,16 +237,16 @@ _$Obd2SelfTestStepCopyWith<_Obd2SelfTestStep> get copyWith => __$Obd2SelfTestSte
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SelfTestStep&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.latencyMs, latencyMs) || other.latencyMs == latencyMs)&&(identical(other.running, running) || other.running == running));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Obd2SelfTestStep&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.latencyMs, latencyMs) || other.latencyMs == latencyMs)&&(identical(other.detail, detail) || other.detail == detail)&&(identical(other.running, running) || other.running == running));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,status,latencyMs,running);
+int get hashCode => Object.hash(runtimeType,id,status,latencyMs,detail,running);
 
 @override
 String toString() {
-  return 'Obd2SelfTestStep(id: $id, status: $status, latencyMs: $latencyMs, running: $running)';
+  return 'Obd2SelfTestStep(id: $id, status: $status, latencyMs: $latencyMs, detail: $detail, running: $running)';
 }
 
 
@@ -251,7 +257,7 @@ abstract mixin class _$Obd2SelfTestStepCopyWith<$Res> implements $Obd2SelfTestSt
   factory _$Obd2SelfTestStepCopyWith(_Obd2SelfTestStep value, $Res Function(_Obd2SelfTestStep) _then) = __$Obd2SelfTestStepCopyWithImpl;
 @override @useResult
 $Res call({
- Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs, bool running
+ Obd2SelfTestStepId id, Obd2SelfTestStepStatus status, int? latencyMs, String? detail, bool running
 });
 
 
@@ -268,12 +274,13 @@ class __$Obd2SelfTestStepCopyWithImpl<$Res>
 
 /// Create a copy of Obd2SelfTestStep
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? status = null,Object? latencyMs = freezed,Object? running = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? status = null,Object? latencyMs = freezed,Object? detail = freezed,Object? running = null,}) {
   return _then(_Obd2SelfTestStep(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as Obd2SelfTestStepId,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as Obd2SelfTestStepStatus,latencyMs: freezed == latencyMs ? _self.latencyMs : latencyMs // ignore: cast_nullable_to_non_nullable
-as int?,running: null == running ? _self.running : running // ignore: cast_nullable_to_non_nullable
+as int?,detail: freezed == detail ? _self.detail : detail // ignore: cast_nullable_to_non_nullable
+as String?,running: null == running ? _self.running : running // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

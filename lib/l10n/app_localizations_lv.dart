@@ -6688,6 +6688,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obd2TestStepScan => 'Skenēt adapterus';
 
   @override
+  String get obd2TestStepBluetooth => 'Phone Bluetooth';
+
+  @override
   String get obd2TestStepConnect => 'Savienot un inicializēt';
 
   @override
@@ -6697,7 +6700,13 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obd2TestStepSupportedPids => 'Atbalstītie PID';
 
   @override
+  String get obd2TestStepProtocol => 'Vehicle protocol';
+
+  @override
   String get obd2TestStepSampleReads => 'Parauga nolasījumi';
+
+  @override
+  String get obd2TestStepSoak => 'Sustained polling';
 
   @override
   String get obd2TestStepReconnect => 'Atkārtota savienojuma tests';

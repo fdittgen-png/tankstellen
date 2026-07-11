@@ -5298,5 +5298,20 @@
   "@onboardingObd2LaterNote": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2TestStepBluetooth": "Phone Bluetooth",
+  "@obd2TestStepBluetooth": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepProtocol": "Vehicle protocol",
+  "@obd2TestStepProtocol": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2TestStepSoak": "Sustained polling",
+  "@obd2TestStepSoak": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
