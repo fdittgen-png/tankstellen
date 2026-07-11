@@ -13,12 +13,11 @@ import 'bluetooth_obd2_transport.dart';
 import 'elm327_adapter.dart';
 import 'elm327_precision_pids.dart';
 import 'elm327_protocol.dart';
-import 'fuel_mixture_model.dart' as mixture_model;
-import 'fuel_rate_diagnostics.dart';
 import 'fuel_rate_estimator.dart' as estimator;
 import 'negotiated_protocol_cache.dart';
 import 'obd2_atpc_teardown.dart';
 import 'obd2_breadcrumb_collector.dart';
+import 'obd2_can_frame_stream.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'obd2_connect_trace.dart';
 import 'obd2_connect_trace_log.dart';
@@ -26,6 +25,8 @@ import 'obd2_connection_errors.dart';
 import 'obd2_read_telemetry.dart';
 import 'obd2_service_session.dart';
 import 'obd2_debug_session.dart';
+import 'obd2_fuel_rate_reader.dart';
+import 'obd2_odometer_reader.dart';
 import 'obd2_transport.dart';
 import 'oem_pid_table.dart';
 import 'supported_pids_cache.dart';
@@ -94,7 +95,7 @@ enum WakeObservation {
 /// — the narrow facade OEM tables and the broken-MAP detector accept.
 /// The [sendRaw] method delegates to [sendCommand]; production callers
 /// pass the live service unchanged, tests pass a 5-line fake.
-class Obd2Service implements Obd2RawCommandPort {
+class Obd2Service implements Obd2RawCommandPort, Obd2FuelRateReads {
   final Obd2Transport _transport;
 
   /// Owns the #811 supported-PID concern — the persistent cache, the
@@ -778,6 +779,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// OPTIMISTIC — the discovered bitmap no longer rejects (clones
   /// under-report it); only runtime probation (3× real `NO DATA`, fed by
   /// the read helpers) parks a PID for the rest of the connection.
+  @override
   bool isPidSupported(int pid) => _pids.isPidSupported(pid);
 
   /// STRICT support check for the #3416 precision PIDs (wideband φ, 0x66,
@@ -786,6 +788,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// modern PIDs must never be blind-subscribed — an unresolved clone would
   /// flood the round-robin with ~20 NO DATA reads and starve the dynamics
   /// tier, seen as RPM cadence collapse in the #726 scheduler tests).
+  @override
   bool isPidKnownSupported(int pid) =>
       _pids.isResolved && _pids.isPidInBitmap(pid);
 
@@ -805,115 +808,18 @@ class Obd2Service implements Obd2RawCommandPort {
 
   /// Read the odometer value in km.
   ///
-  /// Fallback chain (#719, refactored in #950 phase 2):
-  ///   1. PID A6 (standard, only on cars from ~2018+)
-  ///   2. PID 31 (distance since DTC cleared) — proxy, resets on DTC
-  ///   3. Manufacturer Mode 22 PID — resolution depends on
-  ///      [referenceVehicle]:
-  ///        * When [referenceVehicle] is non-null (#950 path), dispatch
-  ///          on its `odometerPidStrategy` (`stdA6` / `psaUds` /
-  ///          `bmwCan` / `vwUds` / `unknown`). `stdA6` and `unknown`
-  ///          short-circuit to null after the standard PIDs fail; the
-  ///          others walk only the matching catalog entry.
-  ///        * When [referenceVehicle] is null (legacy path), identify
-  ///          brand from the VIN and iterate every catalog entry for
-  ///          that brand. Preserves pre-#950 behaviour for callers that
-  ///          haven't been migrated yet.
-  ///
+  /// #3540 — the fallback chain (standard A6 → PID 31 proxy →
+  /// manufacturer Mode 22 catalog) lives in [Obd2OdometerReader]; this
+  /// stays the public API and hands it the send/connectivity primitives.
   /// Returns null when every layer fails, so callers can surface
   /// "odometer not readable for your car" instead of a zero.
   Future<double?> readOdometerKm({
     ReferenceVehicle? referenceVehicle,
-  }) async {
-    if (!_transport.isConnected) return null;
-
-    try {
-      // 1. Direct odometer (standard PID A6)
-      final a6 = await _send(Elm327Protocol.odometerCommand);
-      final odometer = Elm327Protocol.parseOdometer(a6);
-      if (odometer != null) return odometer;
-
-      // 2. Distance since DTC cleared (standard PID 31)
-      final pid31 = await _send(Elm327Protocol.distanceSinceDtcClearedCommand);
-      final distance = Elm327Protocol.parseDistanceSinceDtcCleared(pid31);
-      if (distance != null) return distance.toDouble();
-
-      // 3. Manufacturer Mode 22 fallback.
-      if (referenceVehicle != null) {
-        return _readOdometerByStrategy(referenceVehicle.odometerPidStrategy);
-      }
-
-      // Legacy path: identify brand from VIN and iterate catalog.
-      // Silent failure on unknown-brand is intentional — we'd rather
-      // return null than spam the car with commands it rejects.
-      final vinResponse = await _send(Elm327Protocol.vinCommand);
-      final vin = Elm327Protocol.parseVin(vinResponse);
-      final brand = vehicleBrandFromVin(vin);
-      if (brand == VehicleBrand.unknown) return null;
-      return _readOdometerFromCatalogByBrand(brand);
-    } catch (_) {
-      // #2379 — best-effort one-shot: an engine-off car times this out
-      // routinely. NOT an error; the null return is the signal, no trace.
-      return null;
-    }
-  }
-
-  /// Resolve a [ReferenceVehicle.odometerPidStrategy] code to the
-  /// corresponding manufacturer-catalog brand and walk that brand's
-  /// entries. `stdA6` / `unknown` return null without sending any
-  /// further commands — the standard PIDs already exhausted that path.
-  /// `bmwCan` / `vwUds` route to the existing catalog rows; raw-CAN
-  /// support beyond Mode 22 is a separate issue.
-  Future<double?> _readOdometerByStrategy(String strategy) async {
-    switch (strategy) {
-      case 'psaUds':
-        return _readOdometerFromCatalogByBrand(VehicleBrand.psa);
-      case 'vwUds':
-        return _readOdometerFromCatalogByBrand(VehicleBrand.vwGroup);
-      case 'bmwCan':
-        // Catalog ships a Mode 22 fallback for BMW; raw-CAN broadcast
-        // (the literal "bmwCan" name) is a separate issue. Walk the
-        // catalog entry — better than returning null for cars that
-        // would otherwise answer 22 30 16.
-        return _readOdometerFromCatalogByBrand(VehicleBrand.bmw);
-      case 'stdA6':
-      case 'unknown':
-        return null;
-      default:
-        debugPrint(
-            'OBD2 readOdometer: unrecognised strategy "$strategy" — '
-            'falling back to null');
-        return null;
-    }
-  }
-
-  Future<double?> _readOdometerFromCatalogByBrand(VehicleBrand brand) async {
-    for (final entry in Elm327Protocol.mfgOdometerCatalog) {
-      if (entry.brand != brand) continue;
-      final response = await _send(entry.command);
-      final value = switch (entry.kind) {
-        MfgOdometerKind.threeBytesKm =>
-          Elm327Protocol.parseMfgOdometer3Byte(
-            response,
-            expectedPidHi: entry.pidHi,
-            expectedPidLo: entry.pidLo,
-          ),
-        MfgOdometerKind.twoBytesKm => Elm327Protocol.parseMfgOdometer2Byte(
-            response,
-            expectedPidHi: entry.pidHi,
-            expectedPidLo: entry.pidLo,
-          ),
-        MfgOdometerKind.twoBytesMilesTimes10 =>
-          Elm327Protocol.parseMfgOdometerMilesTimes10(
-            response,
-            expectedPidHi: entry.pidHi,
-            expectedPidLo: entry.pidLo,
-          ),
-      };
-      if (value != null) return value;
-    }
-    return null;
-  }
+  }) =>
+      Obd2OdometerReader(
+        send: _send,
+        isConnected: () => _transport.isConnected,
+      ).read(odometerPidStrategy: referenceVehicle?.odometerPidStrategy);
 
   /// Read current vehicle speed in km/h.
   Future<int?> readSpeedKmh() async {
@@ -956,6 +862,7 @@ class Obd2Service implements Obd2RawCommandPort {
   Future<Set<int>> discoverSupportedPids() => _pids.discoverSupportedPids();
 
   /// Read current engine RPM.
+  @override
   Future<double?> readRpm() async {
     if (!_transport.isConnected) return null;
 
@@ -985,304 +892,28 @@ class Obd2Service implements Obd2RawCommandPort {
         label: 'throttle',
       );
 
-  /// Read engine fuel rate in L/h. Fallback chain (#717, #800, #3428):
+  /// Read engine fuel rate in L/h (#717, #800, #3428).
   ///
-  ///   0. **PID 9D / A2** — ECU-reported fuel MASS (g/s or mg/stroke).
-  ///      Top precision: only the fuel density touches the conversion —
-  ///      no AFR / VE / φ / trim guess. 0xA2 additionally needs a known
-  ///      cylinder count. A 9D-vs-5E divergence cross-check stamps the
-  ///      breadcrumb trace (#3428).
-  ///   1. **PID 5E** — direct `engine fuel rate` reading. Modern ECUs
-  ///      (~2014+) answer directly. Best accuracy, preferred when
-  ///      supported.
-  ///   2. **PID 10 MAF** — derive fuel rate from mass air flow:
-  ///      `L/h = MAF_g_per_s × 3600 / (AFR × density)`. Accepted ~5–10 %
-  ///      error, still very usable. Fails on cars without a MAF sensor.
-  ///   3. **MAP + IAT + RPM speed-density** — when neither direct fuel
-  ///      rate nor MAF is available (e.g. Peugeot 107 1.0L 1KR-FE), use
-  ///      the ideal gas law to estimate air mass flow from intake
-  ///      manifold pressure, intake air temperature, engine RPM, engine
-  ///      displacement, and volumetric efficiency. Accepted ~10–15 %
-  ///      error — still infinitely better than the `—` placeholder the
-  ///      trip summary would otherwise show.
-  ///
-  /// Pass the active [VehicleProfile] via [vehicle] to feed the
-  /// step-3 speed-density fallback the car's real engine displacement
-  /// and volumetric efficiency (#812 phase 3). When [vehicle] is null
-  /// or its engine fields are null, the method falls back to
-  /// [kDefaultEngineDisplacementCc] / [kDefaultVolumetricEfficiency]
-  /// — still honest, just tuned for the 1.0 L NA petrol class (Peugeot
-  /// 107 / Aygo / C1) that originally motivated the fallback.
-  /// Partial profiles (e.g. displacement known, VE unknown) use the
-  /// known field and fall back for the missing one.
-  ///
-  /// Fuel-trim correction (#813) is applied on the MAF and
-  /// speed-density branches — both compute air-mass at stoichiometric
-  /// AFR, but the ECU is often trimming the real mixture ±10 %. The
-  /// `(1 + (STFT + LTFT) / 100)` factor closes most of the gap with
-  /// pump-measured consumption. Skipped on the direct-5E path because
-  /// the ECU already returns a post-trim number there.
-  ///
-  /// The MAF and speed-density branches honour the vehicle's
-  /// [VehicleProfile.preferredFuelType] (#800): diesel engines run
-  /// AFR ≈ 14.5 with a density of ~832 g/L, petrol AFR ≈ 14.7 with
-  /// density ~745 g/L. When the profile is absent or the fuel type is
-  /// unrecognised we default to petrol — that's the class of car
-  /// (Peugeot 107 / Aygo / C1) that motivated this fallback.
-  ///
-  /// #3427 / #3429 / #3430 — the mixture refinements mirror the live
-  /// path: a measured ethanol % (PID 0x52) blends the petrol↔E85
-  /// constants; a MEASURED wideband φ (0x24–0x2B / 0x34–0x3B) beats the
-  /// commanded 0x44; and a diesel skips the trim + commanded-φ
-  /// corrections entirely (lean-burn — see `fuel_mixture_model.dart`).
+  /// #3540 — the full fallback chain (mass PIDs 9D/A2 → direct 5E → MAF →
+  /// speed-density) plus the mixture/trim refinements live in
+  /// [Obd2FuelRateReader]; this stays the public API and hands the reader
+  /// the narrow [Obd2FuelRateReads] port this service implements. See the
+  /// reader's class doc for the precedence rules and error bars.
   Future<double?> readFuelRateLPerHour({
     VehicleProfile? vehicle,
     ReferenceVehicle? referenceVehicle,
-  }) async {
-    // Precedence (#950 phase 2 + #1397):
-    //   1. Manual override on the VehicleProfile (user typed a value
-    //      into the "Advanced calibration" card — overrides everything).
-    //   2. VehicleProfile field (set during onboarding / VIN decode).
-    //   3. ReferenceVehicle catalog entry (data-driven defaults).
-    //   4. Generic estimator constants (last-resort fallback).
-    final engineDisplacementCc =
-        vehicle?.manualEngineDisplacementCcOverride?.round() ??
-            vehicle?.engineDisplacementCc ??
-            referenceVehicle?.displacementCc ??
-            estimator.kDefaultEngineDisplacementCc;
-    // VE on VehicleProfile is a non-nullable double with its own
-    // default (0.85). The manual override takes precedence so a user
-    // can pin the value while the auto-learner is still bootstrapping.
-    //
-    // #1422 phase 1 — when the user's profile carries the legacy 0.85
-    // default AND the VeLearner hasn't accumulated any samples yet,
-    // fall through to the engine-tech-derived helper instead of the
-    // raw catalog literal. This kicks Atkinson / VNT diesel / DI turbo
-    // engines off 0.85 from day one, without disturbing existing
-    // VeLearner-converged users (samples > 0 keeps the stored value)
-    // or users who explicitly typed a non-default value through the
-    // calibration card.
-    final manualVe = vehicle?.manualVolumetricEfficiencyOverride;
-    final profileVe =
-        _resolveProfileVolumetricEfficiency(vehicle, referenceVehicle);
-    final volumetricEfficiency = manualVe ??
-        profileVe ??
-        (referenceVehicle != null
-            ? defaultVolumetricEfficiency(referenceVehicle)
-            : estimator.kDefaultVolumetricEfficiency);
-    // #1625 — the per-engine-class η_v(rpm) curve the speed-density
-    // estimator interpolates. Applied ONLY when η_v came from the
-    // catalog default: a manual override or a learned profile value
-    // is a figure the user/learner pinned, so it is used flat. An
-    // empty curve makes the estimator fall back to [volumetricEfficiency].
-    final etaVCurve =
-        (manualVe == null && profileVe == null && referenceVehicle != null)
-            ? etaVCurveFor(referenceVehicle)
-            : const <EtaVCurvePoint>[];
-    // #2432 / #3429 / #3430 — single fuel-type lookup (manual overrides
-    // win, else the measured-ethanol 0x52 blend, else the free-text fuel
-    // key → AFR/density, else petrol default). When there is no profile
-    // the reference-catalog fuel string is the fallback key, so that path
-    // also gets E85/LPG/CNG coverage, not just diesel. Mirrors the live
-    // path's `resolveMixtureConstants` so the two can't disagree.
-    final ethanolPercent =
-        isPidKnownSupported(0x52) ? await readEthanolPercent() : null;
-    final afrDensity = mixture_model.resolveMixtureConstants(vehicle,
-        fallbackFuelType: vehicle == null ? referenceVehicle?.fuelType : null,
-        measuredEthanolPercent: ethanolPercent);
-    final afr = afrDensity.afr;
-    final fuelDensityGPerL = afrDensity.densityGPerL;
-    // #3430 — diesel gate: skip STFT/LTFT + commanded-φ corrections; only
-    // a measured wideband φ adjusts the AFR (see fuel_mixture_model.dart).
-    final isDiesel =
-        afrDensity.kind == mixture_model.ResolvedFuelKind.diesel;
-    // #1395 / #2191 — the diagnostic side-channel (breadcrumb trace +
-    // the suspicious-low / 5E-vs-MAF sanity bounds) lives in this
-    // collaborator so the fallback chain below reads clean: compute
-    // the value, delegate the diagnostics. It captures the per-call
-    // resolved constants here (displacement pre-coerced to double for
-    // the recorder, which renders it as a plain number) plus the
-    // live-read tear-offs the cross-checks need.
-    final diagnostics = FuelRateDiagnostics(
-      collector: breadcrumbCollector,
-      afr: afr,
-      fuelDensityGPerL: fuelDensityGPerL,
-      engineDisplacementCc: engineDisplacementCc.toDouble(),
-      volumetricEfficiency: volumetricEfficiency,
-      readRpm: readRpm,
-      isMafSupported: () => isPidSupported(0x10),
-      readMaf: readMafGramsPerSecond,
-    );
+  }) =>
+      Obd2FuelRateReader(reads: this, collector: breadcrumbCollector)
+          .read(vehicle: vehicle, referenceVehicle: referenceVehicle);
 
-    // Step 0 (#3428): mass-based PIDs — ECU-reported FUEL MASS, so only
-    // the density touches the conversion (no AFR / VE / φ / trim guess).
-    // 0x9D outranks 0x5E (finer 0.02 g/s resolution, the SAE-designated
-    // fuel-economy PID); 0xA2 needs RPM + a known cylinder count.
-    if (isPidKnownSupported(0x9D)) {
-      final gPerS = await readEngineFuelRateGramsPerSecond();
-      final lph = gPerS == null
-          ? null
-          : mixture_model.fuelRateLPerHourFromGramsPerSecond(
-              gPerS, fuelDensityGPerL);
-      if (lph != null) {
-        await diagnostics.recordMassRate(
-          lph,
-          isPid5ESupported: () => isPidSupported(0x5E),
-          readPid5E: () => _readDouble(
-            Elm327Protocol.engineFuelRateCommand,
-            Elm327Protocol.parseFuelRateLPerHour,
-            label: 'fuelRate',
-          ),
-        );
-        return lph;
-      }
-    }
-    final cylinders = vehicle?.engineCylinders;
-    if (isPidKnownSupported(0xA2) && cylinders != null) {
-      final mgPerStroke = await readCylinderFuelRateMgPerStroke();
-      final rpmForCyl = mgPerStroke == null ? null : await readRpm();
-      final gPerS = (mgPerStroke == null || rpmForCyl == null)
-          ? null
-          : mixture_model.cylinderFuelRateToGramsPerSecond(
-              mgPerStroke: mgPerStroke,
-              rpm: rpmForCyl,
-              cylinders: cylinders,
-            );
-      final lph = gPerS == null
-          ? null
-          : mixture_model.fuelRateLPerHourFromGramsPerSecond(
-              gPerS, fuelDensityGPerL);
-      if (lph != null) {
-        await diagnostics.recordMassRate(lph);
-        return lph;
-      }
-    }
-
-    // Step 1: direct fuel-rate PID (already post-trim — no correction).
-    // Skipped when #811 discovery proved the car doesn't implement PID 5E.
-    double? directRate;
-    if (isPidSupported(0x5E)) {
-      directRate = await _readDouble(
+  /// One direct PID 0x5E read (#3540 — the [Obd2FuelRateReads] port's
+  /// step-1 primitive; already post-trim on the ECU side).
+  @override
+  Future<double?> readDirectFuelRatePid5E() => _readDouble(
         Elm327Protocol.engineFuelRateCommand,
         Elm327Protocol.parseFuelRateLPerHour,
         label: 'fuelRate',
       );
-    }
-    if (directRate != null) {
-      await diagnostics.recordPid5E(directRate);
-      return directRate;
-    }
-
-    // Step 2: MAF-based estimate. Same short-circuit — a Peugeot 107
-    // without a MAF sensor returns empty set on PID 10, saves the
-    // Bluetooth round-trip on every tick. #3428 — the dual-sensor PID
-    // 0x66 total is preferred over the legacy PID 0x10 when supported.
-    if (isPidKnownSupported(0x66) || isPidSupported(0x10)) {
-      double? maf;
-      if (isPidKnownSupported(0x66)) {
-        maf = await readMafSensorGramsPerSecond();
-      }
-      if (maf == null && isPidSupported(0x10)) {
-        maf = await readMafGramsPerSecond();
-      }
-      if (maf != null) {
-        // #2456 / #3427 / #3430 — divide by the mixture-resolved
-        // effective AFR: freshest MEASURED wideband φ beats commanded
-        // 0x44; diesel trusts only the measured value (commanded φ is
-        // meaningless as a diesel load signal, and the 0x44 read is
-        // skipped outright). Nothing available → effectiveAfr == afr.
-        final measuredPhi = await _readMeasuredPhi();
-        final commandedPhi = (!isDiesel &&
-                measuredPhi == null &&
-                isPidSupported(0x44))
-            ? await readCommandedEquivalenceRatio()
-            : null;
-        final effectiveAfr = mixture_model.effectiveAfrForMixture(
-          afr,
-          measuredPhi: measuredPhi,
-          commandedPhi: commandedPhi,
-          isDiesel: isDiesel,
-        );
-        // L/h = MAF × 3600 / (effectiveAFR × density).
-        final rate = maf * 3600.0 / (effectiveAfr * fuelDensityGPerL);
-        // #3430 — STFT/LTFT are petrol stoich-feedback trims: skipped on
-        // diesel.
-        final corrected =
-            isDiesel ? rate : await _applyFuelTrimCorrection(rate);
-        diagnostics.recordMaf(corrected: corrected, maf: maf);
-        return corrected;
-      }
-    }
-
-    // Step 3: speed-density fallback. Requires all three of MAP / IAT
-    // / RPM. If any one is known-unsupported, the step can't run and
-    // we surface null — there's no partial correction worth shipping.
-    if (!isPidSupported(0x0B) ||
-        !isPidSupported(0x0F) ||
-        !isPidSupported(0x0C)) {
-      diagnostics.recordNoBranch();
-      return null;
-    }
-    final mapKpa = await readManifoldPressureKpa();
-    final iatCelsius = await readIntakeAirTempCelsius();
-    final rpm = await readRpm();
-    if (mapKpa == null || iatCelsius == null || rpm == null) {
-      diagnostics.recordNoBranch(
-        mapKpa: mapKpa,
-        iatCelsius: iatCelsius,
-        rpm: rpm,
-      );
-      return null;
-    }
-    // #2456 / #3427 / #3430 — refine with the measured baro (PID 0x33)
-    // air-density term and the mixture-resolved effective AFR (measured
-    // wideband φ preferred over commanded 0x44; diesel measured-only —
-    // the 0x44 read is skipped there). All supportsPid-gated; absent →
-    // the pre-#2456 result exactly. φ is passed pre-resolved
-    // (`phi: null`) so the estimator can't double-apply it.
-    final baroKpa = isPidSupported(0x33) ? await readBaroPressureKpa() : null;
-    final sdMeasuredPhi = await _readMeasuredPhi();
-    final sdCommandedPhi = (!isDiesel &&
-            sdMeasuredPhi == null &&
-            isPidSupported(0x44))
-        ? await readCommandedEquivalenceRatio()
-        : null;
-    final sdEffectiveAfr = mixture_model.effectiveAfrForMixture(
-      afr,
-      measuredPhi: sdMeasuredPhi,
-      commandedPhi: sdCommandedPhi,
-      isDiesel: isDiesel,
-    );
-    final rate = estimator.estimateFuelRateLPerHourFromMap(
-      mapKpa: mapKpa,
-      iatCelsius: iatCelsius,
-      rpm: rpm,
-      engineDisplacementCc: engineDisplacementCc,
-      volumetricEfficiency: volumetricEfficiency,
-      afr: sdEffectiveAfr,
-      fuelDensityGPerL: fuelDensityGPerL,
-      etaVCurve: etaVCurve,
-      baroKpa: baroKpa,
-      phi: null,
-    );
-    if (rate == null) {
-      diagnostics.recordNoBranch(
-        mapKpa: mapKpa,
-        iatCelsius: iatCelsius,
-        rpm: rpm,
-      );
-      return null;
-    }
-    // #3430 — trim correction skipped on diesel (petrol stoich feedback).
-    final corrected = isDiesel ? rate : await _applyFuelTrimCorrection(rate);
-    diagnostics.recordSpeedDensity(
-      corrected: corrected,
-      mapKpa: mapKpa,
-      iatCelsius: iatCelsius,
-      rpm: rpm,
-    );
-    return corrected;
-  }
 
   /// Stoichiometric AFR for petrol / gasoline (#800). Approximately
   /// 14.7 kg of air per kg of fuel at perfect combustion.
@@ -1309,31 +940,6 @@ class Obd2Service implements Obd2RawCommandPort {
   ///
   /// Backwards-compat forwarder for [kDieselDensityGPerL].
   static const double dieselDensityGPerL = estimator.kDieselDensityGPerL;
-
-  /// Multiply a stoichiometric-assumption fuel rate by
-  /// `(1 + (STFT + LTFT) / 100)` when both trims are readable (#813).
-  /// If either trim is missing or un-parseable, returns [raw]
-  /// unchanged — better to ship the raw MAF/speed-density number
-  /// than one corrected by half the signal.
-  Future<double> _applyFuelTrimCorrection(double raw) async {
-    final stft = await readShortTermFuelTrimPercent();
-    final ltft = await readLongTermFuelTrimPercent();
-    if (stft == null || ltft == null) return raw;
-    // #2458 — fold in bank-2 trims (PIDs 08 / 09) when the car exposes
-    // them so dual-bank engines get the bank-averaged correction. Both
-    // supportsPid-gated; absent → null → bank-1-only, unchanged.
-    final stft2 =
-        isPidSupported(0x08) ? await readShortTermFuelTrimBank2Percent() : null;
-    final ltft2 =
-        isPidSupported(0x09) ? await readLongTermFuelTrimBank2Percent() : null;
-    return estimator.applyFuelTrimCorrection(
-      raw,
-      stft: stft,
-      ltft: ltft,
-      stftBank2: stft2,
-      ltftBank2: ltft2,
-    );
-  }
 
   /// Pure-math fuel-trim correction factor (#813).
   ///
@@ -1387,6 +993,7 @@ class Obd2Service implements Obd2RawCommandPort {
       );
 
   /// Read mass air flow in g/s. (#717)
+  @override
   Future<double?> readMafGramsPerSecond() => _readDouble(
         Elm327Protocol.mafCommand,
         Elm327Protocol.parseMafGramsPerSecond,
@@ -1394,6 +1001,7 @@ class Obd2Service implements Obd2RawCommandPort {
       );
 
   /// Read intake manifold absolute pressure (kPa). (#800)
+  @override
   Future<double?> readManifoldPressureKpa() => _readDouble(
         Elm327Protocol.intakeManifoldPressureCommand,
         Elm327Protocol.parseManifoldPressureKpa,
@@ -1401,6 +1009,7 @@ class Obd2Service implements Obd2RawCommandPort {
       );
 
   /// Read intake air temperature (°C). (#800)
+  @override
   Future<double?> readIntakeAirTempCelsius() => _readDouble(
         Elm327Protocol.intakeAirTempCommand,
         Elm327Protocol.parseIntakeAirTempCelsius,
@@ -1410,6 +1019,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// Read absolute barometric pressure (kPa) via Mode 01 PID 0x33
   /// (#2456). Feeds the speed-density air-density correction so altitude
   /// / weather scale the air charge. Returns null when unsupported.
+  @override
   Future<double?> readBaroPressureKpa() => _readDouble(
         Elm327Protocol.baroPressureCommand,
         Elm327Protocol.parseBaroPressureKpa,
@@ -1421,6 +1031,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// lean). φ ≈ 1.0 at stoich; replaces the assumed stoich AFR in the
   /// MAF / speed-density fuel math via `effectiveAfrForPhi`. Returns
   /// null when unsupported.
+  @override
   Future<double?> readCommandedEquivalenceRatio() => _readDouble(
         Elm327Protocol.commandedEquivalenceRatioCommand,
         Elm327Protocol.parseCommandedEquivalenceRatio,
@@ -1430,6 +1041,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// Read total MAF from the dual-sensor Mode 01 PID 0x66 (#3428).
   /// Preferred over the legacy PID 0x10 when supported. Null when
   /// unsupported / NO DATA.
+  @override
   Future<double?> readMafSensorGramsPerSecond() => _readDouble(
         Elm327PrecisionPids.mafSensorCommand,
         Elm327PrecisionPids.parseMafSensorGramsPerSecond,
@@ -1439,6 +1051,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// Read the direct engine fuel rate in g/s via Mode 01 PID 0x9D
   /// (#3428) — the top-precision mass-based branch (engine channel A/B
   /// only; the C/D vehicle channel is ignored, see the parser).
+  @override
   Future<double?> readEngineFuelRateGramsPerSecond() => _readDouble(
         Elm327PrecisionPids.engineFuelRateGramsCommand,
         Elm327PrecisionPids.parseEngineFuelRateGramsPerSecond,
@@ -1447,6 +1060,7 @@ class Obd2Service implements Obd2RawCommandPort {
 
   /// Read the cylinder fuel rate in mg/stroke via Mode 01 PID 0xA2
   /// (#3428). Needs RPM + cylinder count to become a mass flow.
+  @override
   Future<double?> readCylinderFuelRateMgPerStroke() => _readDouble(
         Elm327PrecisionPids.cylinderFuelRateCommand,
         Elm327PrecisionPids.parseCylinderFuelRateMgPerStroke,
@@ -1455,6 +1069,7 @@ class Obd2Service implements Obd2RawCommandPort {
 
   /// Read the measured ethanol fuel percentage via Mode 01 PID 0x52
   /// (#3429). Drives the dynamic petrol↔E85 AFR/density blend.
+  @override
   Future<double?> readEthanolPercent() => _readDouble(
         Elm327PrecisionPids.ethanolPercentCommand,
         Elm327PrecisionPids.parseEthanolPercent,
@@ -1466,7 +1081,8 @@ class Obd2Service implements Obd2RawCommandPort {
   /// their families). At most one Bluetooth round-trip — only the first
   /// supported PID is read; null when no wideband PID is supported or
   /// the read returned NO DATA.
-  Future<double?> _readMeasuredPhi() async {
+  @override
+  Future<double?> readMeasuredPhi() async {
     for (final pid in Elm327PrecisionPids.allWidebandPids) {
       if (!isPidKnownSupported(pid)) continue;
       return _readDouble(
@@ -1480,6 +1096,7 @@ class Obd2Service implements Obd2RawCommandPort {
 
   /// Read short-term fuel trim bank 1 (%) (#813). Fast-feedback loop
   /// correction; the ECU adjusts this constantly to hit stoich.
+  @override
   Future<double?> readShortTermFuelTrimPercent() => _readDouble(
         Elm327Protocol.shortTermFuelTrimCommand,
         Elm327Protocol.parseShortTermFuelTrim,
@@ -1489,6 +1106,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// Read long-term fuel trim bank 1 (%) (#813). Slow-drifting
   /// correction that captures persistent offsets — altitude, air
   /// filter state, injector wear.
+  @override
   Future<double?> readLongTermFuelTrimPercent() => _readDouble(
         Elm327Protocol.longTermFuelTrimCommand,
         Elm327Protocol.parseLongTermFuelTrim,
@@ -1498,6 +1116,7 @@ class Obd2Service implements Obd2RawCommandPort {
   /// Read short-term fuel trim bank 2 (%) via Mode 01 PID 0x08 (#2458).
   /// Only dual-bank (V / boxer) engines answer; inline engines return
   /// null and the correction stays on bank 1 alone.
+  @override
   Future<double?> readShortTermFuelTrimBank2Percent() => _readDouble(
         Elm327Protocol.shortTermFuelTrimBank2Command,
         Elm327Protocol.parseShortTermFuelTrimBank2,
@@ -1506,6 +1125,7 @@ class Obd2Service implements Obd2RawCommandPort {
 
   /// Read long-term fuel trim bank 2 (%) via Mode 01 PID 0x09 (#2458).
   /// Same dual-bank semantics as [readShortTermFuelTrimBank2Percent].
+  @override
   Future<double?> readLongTermFuelTrimBank2Percent() => _readDouble(
         Elm327Protocol.longTermFuelTrimBank2Command,
         Elm327Protocol.parseLongTermFuelTrimBank2,
@@ -1581,179 +1201,15 @@ class Obd2Service implements Obd2RawCommandPort {
     }
   }
 
-  /// PSA instrument-cluster broadcast frame ID (#1418). Mirrors
-  /// `PsaFuelLevelCanDecoder.frameId` — kept as a private constant
-  /// here so the data layer doesn't import the decoder (decoder
-  /// depends on stream shape, not the other way around).
-  static const int _psaFuelLevelFrameId = 0x0E6;
-
-  /// Set the ELM327's CAN receive-address filter to the PSA
-  /// instrument-cluster frame `0x0E6` (#1418). Only frames matching
-  /// this 11-bit ID are surfaced by the next `STMA`.
-  static const String _atCraPsaFuelLevelCommand = 'ATCRA 0E6\r';
-
-  /// STN listen-mode start (#1418). After this returns OK, the
-  /// adapter starts emitting frame lines on the raw byte channel
-  /// without the trailing `>` prompt that [sendCommand] normally
-  /// waits on.
-  static const String _stmaCommand = 'STMA\r';
-
-  /// STN listen-mode stop (#1418). Sent via
-  /// [Obd2Transport.sendListenModeStop] on stream cancel — the prompt
-  /// won't come back until the adapter exits listen-mode, so the
-  /// regular [sendCommand] path can't carry it.
-  static const String _stmpCommand = 'STMP\r';
-
   /// Open a passive CAN-frame stream filtered to the PSA
   /// instrument-cluster broadcast frame `0x0E6` (#1418).
   ///
-  /// Sends [`ATCRA 0E6`] (CAN receive-address filter for frame ID
-  /// `0x0E6`, the PSA EMP2 BSI broadcast) followed by [`STMA`] (STN
-  /// listen-mode start) on first listen, then parses each
-  /// listen-mode line of the form `0E6 D <len> <byte0> <byte1> …`
-  /// into a `(int id, List<int> payload)` record. On
-  /// stream-subscription cancel, sends [`STMP`] so the adapter
-  /// returns to normal mode.
-  ///
-  /// The output is a broadcast stream so the high-level
-  /// `psaFuelLevelProvider` can subscribe + cancel without disturbing
-  /// the underlying channel — multiple consumers (e.g. the trip
-  /// recorder + a diagnostic overlay) can share one listen-mode
-  /// session in a future epic.
-  ///
-  /// **Pre-conditions** (caller's responsibility):
-  ///   * The ELM channel must be open ([connect] succeeded).
-  ///   * The adapter must report
-  ///     [Obd2AdapterCapability.passiveCanCapable]. The high-level
-  ///     [`psaFuelLevelProvider`] enforces this gate; the data layer
-  ///     here stays dumb so a future caller that knows what it is
-  ///     doing (e.g. a debug screen on an STN clone) can opt in
-  ///     without re-implementing the gate.
-  ///
-  /// **What this method does NOT do**:
-  ///   * It does not block on the [`PsaFuelLevelCanDecoder`]; it
-  ///     emits raw `(id, payload)` tuples. The decoder's
-  ///     [`PsaFuelLevelCanDecoder.filterFuelLevelStream`] consumer
-  ///     transforms tuples into litres.
-  ///   * It does not validate the listen-mode response — malformed
-  ///     lines (wrong frame id, short payload, non-hex bytes) are
-  ///     silently dropped so a buffer-overflow burst doesn't kill
-  ///     the stream.
-  ///
-  /// Phase 5 of #1401 (PR #1417) shipped the pure-data decoder; this
-  /// method is the streaming-transport wiring the decoder docstring
-  /// promised. Errors on the underlying line stream propagate to the
-  /// returned stream — the gating provider downgrades on failure.
-  Stream<({int id, List<int> payload})> canFrameStream() {
-    final raw = _transport;
-    if (raw is! Obd2ListenModeTransport) {
-      // The transport doesn't support raw line streaming — surface a
-      // clear error rather than silently emitting nothing. The
-      // capability gate at the provider layer should already have
-      // caught this; surfacing it here makes the failure mode
-      // obvious if a future caller bypasses the gate.
-      return Stream.error(
-        UnsupportedError(
-          'Obd2Service.canFrameStream requires an '
-          'Obd2ListenModeTransport (e.g. on STN-chip adapters). '
-          'Current transport: ${raw.runtimeType}',
-        ),
-      );
-    }
-    // Capture the promoted reference so the closures below see the
-    // listen-mode interface. Dart's flow analysis won't carry the
-    // `is!` promotion through a `final` capture into function
-    // literals — a typed cast is the cleanest way to fix it.
-    final listenTransport = raw as Obd2ListenModeTransport;
-    late StreamController<({int id, List<int> payload})> controller;
-    StreamSubscription<String>? sub;
-
-    Future<void> setup() async {
-      try {
-        // Setup: filter then start listen mode. Both commands respond
-        // with OK + `>` so the regular sendCommand path is fine.
-        await _transport.sendCommand(_atCraPsaFuelLevelCommand);
-        await _transport.sendCommand(_stmaCommand);
-        // Subscribe to raw lines AFTER STMA so we don't accidentally
-        // consume the OK reply as a frame.
-        sub = listenTransport.openListenLineStream().listen(
-          (line) {
-            final frame = _parseListenModeLine(line);
-            if (frame != null && !controller.isClosed) {
-              controller.add(frame);
-            }
-          },
-          onError: (Object e, StackTrace st) {
-            if (!controller.isClosed) controller.addError(e, st);
-          },
-          onDone: () {
-            if (!controller.isClosed) unawaited(controller.close());
-          },
-        );
-      } catch (e, st) {
-        // Any setup failure surfaces on the stream so the caller
-        // sees it — never silently swallow.
-        if (!controller.isClosed) {
-          controller.addError(e, st);
-          await controller.close();
-        }
-      }
-    }
-
-    Future<void> teardown() async {
-      // Unhook the listener BEFORE sending STMP so the adapter's exit
-      // ack (if any) doesn't show up as a stray `frame line`.
-      await sub?.cancel();
-      sub = null;
-      try {
-        await listenTransport.sendListenModeStop(_stmpCommand);
-      } catch (e, st) {
-        // Best-effort: the user has already cancelled, no point
-        // crashing on a STMP write that might fail because the
-        // channel is mid-disconnect.
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'OBD2 canFrameStream STMP failed'}));
-      }
-    }
-
-    controller = StreamController<({int id, List<int> payload})>.broadcast(
-      onListen: setup,
-      onCancel: teardown,
-    );
-    return controller.stream;
-  }
-
-  /// Parse one STN listen-mode line of the form
-  /// `0E6 D 8 12 34 56 78 9A BC DE F0` (frame id, `D`ata indicator,
-  /// length, then [length] hex byte tokens) into the decoder's
-  /// `(id, payload)` record (#1418).
-  ///
-  /// Returns `null` for any malformed line — wrong frame id (only
-  /// the PSA fuel-level frame is wanted here), missing length, length
-  /// mismatch, or non-hex byte tokens. The stream silently drops
-  /// nulls so a malformed burst doesn't kill the consumer.
-  static ({int id, List<int> payload})? _parseListenModeLine(String line) {
-    final tokens = line.trim().split(RegExp(r'\s+'));
-    // Need at minimum: id, "D", length, plus one byte = 4 tokens.
-    if (tokens.length < 4) return null;
-    final parsedId = int.tryParse(tokens[0], radix: 16);
-    if (parsedId != _psaFuelLevelFrameId) return null;
-    if (tokens[1].toUpperCase() != 'D') return null;
-    final length = int.tryParse(tokens[2], radix: 16);
-    if (length == null) return null;
-    final byteTokens = tokens.sublist(3);
-    if (byteTokens.length != length) return null;
-    final payload = <int>[];
-    for (final token in byteTokens) {
-      final byte = int.tryParse(token, radix: 16);
-      if (byte == null || byte < 0 || byte > 0xFF) return null;
-      payload.add(byte);
-    }
-    // The `parsedId != _psaFuelLevelFrameId` early-return above
-    // proves non-null here, but the record-field type system can't
-    // track that proof — fall back to the local constant which is
-    // both non-null and equal.
-    return (id: _psaFuelLevelFrameId, payload: payload);
-  }
+  /// #3540 — the listen-mode wiring (ATCRA/STMA/STMP, line parsing,
+  /// broadcast-controller lifecycle) lives in `obd2_can_frame_stream.dart`;
+  /// this stays the public API. Pre-conditions and non-goals are documented
+  /// on [psaCanFrameStream].
+  Stream<({int id, List<int> payload})> canFrameStream() =>
+      psaCanFrameStream(_transport);
 
   /// Ask the underlying BLE link for high throughput while actively
   /// polling PIDs (#2261 concern 4) — high connection priority + a
@@ -1858,37 +1314,4 @@ class Obd2Service implements Obd2RawCommandPort {
         : await transport.sendCommand(command);
     return _adapter.preParse(raw);
   }
-}
-
-/// Returns the user-profile η_v that should beat the catalog helper, or
-/// null when the engine-tech default should kick in instead (#1422 phase 1).
-///
-/// Resolution rules:
-///   - Profile is null → null (caller falls back to catalog helper).
-///   - Profile carries a learned EWMA value
-///     (`volumetricEfficiencySamples > 0`) → return the stored value, no
-///     matter what it is. The user's own car beats the table.
-///   - Profile carries a non-default value (anything ≠ 0.85) → return it.
-///     This covers users who typed a non-default value somewhere upstream
-///     even though the sample counter never bumped.
-///   - Profile sits at the cold-start default 0.85 with zero learned
-///     samples → null. Caller resolves
-///     `defaultVolumetricEfficiency(reference)` instead so a Dacia dCi
-///     gets 0.95 from day one rather than being stuck at 0.85 until
-///     VeLearner converges over several plein cycles.
-double? _resolveProfileVolumetricEfficiency(
-  VehicleProfile? vehicle,
-  ReferenceVehicle? referenceVehicle,
-) {
-  if (vehicle == null) return null;
-  // Without a reference vehicle to derive a better default from, the
-  // stored value is the best we have — even if it equals 0.85.
-  if (referenceVehicle == null) return vehicle.volumetricEfficiency;
-  if (vehicle.volumetricEfficiencySamples > 0) {
-    return vehicle.volumetricEfficiency;
-  }
-  if (vehicle.volumetricEfficiency != estimator.kDefaultVolumetricEfficiency) {
-    return vehicle.volumetricEfficiency;
-  }
-  return null;
 }
