@@ -508,8 +508,13 @@ void main() {
     // probation feed (noteMode01Reply from the three read chokepoints).
     // Decomposition tracked by #3540 (#3140 closed with the file still
     // over the cap).
+    // #3540 — 1894 → 1317: the fuel-rate fallback chain (+ trim
+    // correction + profile-η_v resolution) moved to the NEW under-cap
+    // obd2_fuel_rate_reader.dart, the odometer strategy/catalog chain to
+    // obd2_odometer_reader.dart, and the #1418 PSA listen-mode stream to
+    // obd2_can_frame_stream.dart; the service keeps thin delegators.
     'lib/features/obd2/data/obd2_service.dart': (
-      lines: 1894,
+      lines: 1317,
       bumps: 13,
       decompositionIssue: 3540,
     ),
