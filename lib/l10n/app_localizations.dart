@@ -11662,30 +11662,6 @@ abstract class AppLocalizations {
   /// **'Reconnecting to your OBD2 adapter…'**
   String get obd2ReconnectInProgress;
 
-  /// Shown while auto-reconnect is trying to re-establish a named OBD2 adapter link (Epic #3013 phase 3). adapter is the friendly device name, e.g. 'vLinker FS'.
-  ///
-  /// In en, this message translates to:
-  /// **'Reconnecting to {adapter}…'**
-  String obd2ReconnectInProgressNamed(String adapter);
-
-  /// Title of the terminal auto-reconnect-failure surface, shown after the bounded reconnect attempts were exhausted (Epic #3013 phase 3, #3019). The auto-loop has stopped; the user can tap to retry.
-  ///
-  /// In en, this message translates to:
-  /// **'Couldn’t reconnect to your adapter'**
-  String get obd2ReconnectFailedTitle;
-
-  /// Body text of the terminal auto-reconnect-failure surface (Epic #3013 phase 3). Explains the auto-reconnect gave up after bounded attempts and how to recover.
-  ///
-  /// In en, this message translates to:
-  /// **'The OBD2 connection was lost and automatic reconnection didn’t succeed. Check the adapter is powered and in range, then tap retry.'**
-  String get obd2ReconnectFailedBody;
-
-  /// Tooltip of the X button on the terminal reconnect-failed strip (#3505). Dismisses the strip for the current drop episode only — a fresh drop re-arms it.
-  ///
-  /// In en, this message translates to:
-  /// **'Dismiss'**
-  String get obd2ReconnectDismiss;
-
   /// Title of the Android foreground-service notification shown while the hands-free auto-record watch is armed (#3505 — replaces the hard-coded English string in AutoRecordForegroundService.kt). Handed to the native side at arm time.
   ///
   /// In en, this message translates to:
@@ -11697,24 +11673,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Watching for your OBD2 adapter'**
   String get autoRecordNotificationText;
-
-  /// Label of the button that restarts the bounded auto-reconnect loop after it gave up (Epic #3013 phase 3, #3019). The user-actionable 'tap to retry' affordance the Epic requires.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to retry'**
-  String get obd2ReconnectRetry;
-
-  /// One-time actionable recovery hint shown when the Classic OBD2 adapter is wedged (#3422, epic #3415): repeated reconnects ended in exhausted RFCOMM ladders and the in-app recovery rungs did not clear it. Tells the user the two physical recoveries (ignition cycle / replug) and the Bluetooth toggle.
-  ///
-  /// In en, this message translates to:
-  /// **'Your OBD2 adapter stopped responding. Switch the ignition off and on or replug the adapter — or toggle Bluetooth off and on.'**
-  String get obd2WedgeHintBody;
-
-  /// Label of the button on the wedged-adapter recovery hint (#3422) that deep-links to the system Bluetooth settings screen so the user can toggle Bluetooth off and on.
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth settings'**
-  String get obd2WedgeHintOpenBtSettings;
 
   /// Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode.
   ///
