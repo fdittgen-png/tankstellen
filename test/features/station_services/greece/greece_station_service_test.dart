@@ -1,5 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
+//
+// #3539 — Greece rewritten from the dead per-prefecture fuelpricesgr
+// API (#3194 NXDOMAIN) to the emvouvakis FuelPricesGreeceAPI mirror:
+// ONE ranged `GET {base}/data` request returns a flat country-wide row
+// list (one row per prefecture per day, one COLUMN per fuel).
+
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,47 +24,46 @@ import '../../../helpers/silence_error_logger.dart';
 
 import '../../../mocks/mocks.dart';
 
-/// Build a synthetic daily-price row in the shape `fuelpricesgr`
-/// returns. Mirrors the Pydantic `PriceData` model:
-/// `{ "fuel_type": "UNLEADED_95", "price": 1.721 }`.
-Map<String, dynamic> _priceRow(String fuelType, double price) =>
-    <String, dynamic>{'fuel_type': fuelType, 'price': price};
-
-/// Build a `PriceResponse`-shaped envelope for a given date.
-Map<String, dynamic> _priceResponse({
-  String date = '2026-04-21',
-  List<Map<String, dynamic>>? rows,
-}) {
-  return <String, dynamic>{
-    'date': date,
-    'data': rows ??
-        <Map<String, dynamic>>[
-          _priceRow('UNLEADED_95', 1.721),
-          _priceRow('UNLEADED_100', 1.969),
-          _priceRow('DIESEL', 1.528),
-          _priceRow('DIESEL_HEATING', 1.165),
-          _priceRow('GAS', 0.978),
-        ],
-  };
-}
-
-/// The community API returns `list[PriceResponse]`. Wrap a single
-/// response (or several) in a list for the happy path.
-List<Map<String, dynamic>> _envelope(List<Map<String, dynamic>> responses) =>
-    responses;
+/// Build one prefecture-day row in the shape the emvouvakis mirror
+/// returns: `{ "DATE": ..., "REGION": ..., "<FUEL_COLUMN>": <num|null> }`.
+Map<String, dynamic> _row({
+  String date = '2026-07-09',
+  String region = 'N. ATHINON',
+  Map<String, dynamic> fuels = const <String, dynamic>{
+    'UNLEADED_95_Octane': 1.943,
+    'UNLEADED_100_OCTANE': 2.16,
+    'AUTOMOTIVE_DIESEL': 1.787,
+    'AUTOGAS': 0.907,
+    'HOME_HEATING_DIESEL': null,
+    'Super': null,
+  },
+}) =>
+    <String, dynamic>{'DATE': date, 'REGION': region, ...fuels};
 
 void main() {
   silenceErrorLoggerSpool();
   setUpAll(() {
     registerFallbackValue(<String, dynamic>{});
+    registerFallbackValue(Options());
   });
+
+  /// The REAL recorded /data response (51 rows, one per prefecture,
+  /// DATE 2026-07-09) — drives the searchStations happy path.
+  final recordedRows = jsonDecode(
+    File('test/fixtures/gr_emvouvakis_v2_data_day.json').readAsStringSync(),
+  ) as List<dynamic>;
 
   late MockDio mockDio;
   late GreeceStationService service;
 
   setUp(() {
     mockDio = MockDio();
-    service = GreeceStationService(dio: mockDio, baseUrl: 'https://test/api');
+    service = GreeceStationService(
+      dio: mockDio,
+      baseUrl: 'https://test/api',
+      apiKey: 'test-key',
+      now: () => DateTime(2026, 7, 11),
+    );
   });
 
   Response<dynamic> response(dynamic data) => Response<dynamic>(
@@ -65,58 +72,18 @@ void main() {
         data: data,
       );
 
+  void stubGet(dynamic data) {
+    when(() => mockDio.get<dynamic>(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+          cancelToken: any(named: 'cancelToken'),
+        )).thenAnswer((_) async => response(data));
+  }
+
   group('GreeceStationService', () {
     test('implements StationService', () {
       expect(service, isA<StationService>());
-    });
-
-    group('default-host unavailability short-circuit (#3194)', () {
-      // fuelpricesgr.com is NXDOMAIN (live-verified 2026-06-10) and the
-      // upstream project has no public deployment. A service still
-      // pointed at the dead default must not fire one doomed DNS lookup
-      // per prefecture — it reports unavailable in one step.
-      test('returns empty result with an unsupported ServiceError and '
-          'makes NO network call', () async {
-        final defaultService = GreeceStationService(dio: mockDio);
-        const params =
-            SearchParams(lat: 37.9838, lng: 23.7275, radiusKm: 25);
-
-        final result = await defaultService.searchStations(params);
-
-        expect(result.data, isEmpty);
-        expect(result.source, ServiceSource.greeceApi);
-        expect(result.errors, hasLength(1));
-        expect(result.errors.single.kind, FailureKind.unsupported);
-        expect(result.errors.single.message, contains('#3194'));
-        verifyNever(() => mockDio.get<dynamic>(
-              any(),
-              queryParameters: any(named: 'queryParameters'),
-              cancelToken: any(named: 'cancelToken'),
-            ));
-        verifyNever(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            ));
-      });
-
-      test('a self-hosted baseUrl bypasses the short-circuit and fetches',
-          () async {
-        when(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            )).thenAnswer((_) async => response(_envelope([])));
-
-        const params =
-            SearchParams(lat: 37.9838, lng: 23.7275, radiusKm: 25);
-        // `service` from setUp targets https://test/api.
-        final result = await service.searchStations(params);
-
-        expect(result.source, ServiceSource.greeceApi);
-        verify(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            )).called(greaterThan(0));
-      });
     });
 
     test('country registered as GR with EUR currency', () {
@@ -124,53 +91,55 @@ void main() {
       expect(gr, isNotNull);
       expect(gr!.currency, 'EUR');
       expect(gr.requiresApiKey, isFalse,
-          reason: 'Greek community API is free / open — no key required');
+          reason: 'The mirror ships its own PUBLIC shared key — the user '
+              'never has to supply one');
       expect(gr.apiProvider, contains('Paratiritirio'));
     });
 
-    group('fuel observatory-key mapping', () {
-      test('UNLEADED_95 → e5', () {
+    group('fuel observatory-column mapping', () {
+      test('UNLEADED_95_Octane → e5', () {
         expect(
-          GreeceStationService.fuelForObservatoryKey('UNLEADED_95'),
+          GreeceStationService.fuelForObservatoryKey('UNLEADED_95_Octane'),
           FuelType.e5,
         );
       });
 
-      test('UNLEADED_100 → e98', () {
+      test('UNLEADED_100_OCTANE → e98', () {
         expect(
-          GreeceStationService.fuelForObservatoryKey('UNLEADED_100'),
+          GreeceStationService.fuelForObservatoryKey('UNLEADED_100_OCTANE'),
           FuelType.e98,
         );
       });
 
-      test('DIESEL → diesel', () {
+      test('AUTOMOTIVE_DIESEL → diesel', () {
         expect(
-          GreeceStationService.fuelForObservatoryKey('DIESEL'),
+          GreeceStationService.fuelForObservatoryKey('AUTOMOTIVE_DIESEL'),
           FuelType.diesel,
         );
       });
 
-      test('GAS (Υγραέριο) → lpg', () {
+      test('AUTOGAS (Υγραέριο) → lpg', () {
         expect(
-          GreeceStationService.fuelForObservatoryKey('GAS'),
+          GreeceStationService.fuelForObservatoryKey('AUTOGAS'),
           FuelType.lpg,
         );
       });
 
-      test('DIESEL_HEATING is intentionally unmapped (not motoring fuel)', () {
+      test('HOME_HEATING_DIESEL is intentionally unmapped (not motoring '
+          'fuel)', () {
         expect(
-          GreeceStationService.fuelForObservatoryKey('DIESEL_HEATING'),
+          GreeceStationService.fuelForObservatoryKey('HOME_HEATING_DIESEL'),
           isNull,
         );
         expect(
           GreeceStationService.droppedObservatoryKeys,
-          contains('diesel_heating'),
+          contains('home_heating_diesel'),
         );
       });
 
-      test('SUPER is intentionally unmapped (leaded, phased out)', () {
+      test('Super is intentionally unmapped (leaded, phased out)', () {
         expect(
-          GreeceStationService.fuelForObservatoryKey('SUPER'),
+          GreeceStationService.fuelForObservatoryKey('Super'),
           isNull,
         );
         expect(
@@ -179,32 +148,43 @@ void main() {
         );
       });
 
+      test('DATE / REGION envelope columns are dropped, not fuels', () {
+        expect(GreeceStationService.fuelForObservatoryKey('DATE'), isNull);
+        expect(GreeceStationService.fuelForObservatoryKey('REGION'), isNull);
+        expect(
+          GreeceStationService.droppedObservatoryKeys,
+          containsAll(<String>['date', 'region']),
+        );
+      });
+
       test('mapping is case-insensitive', () {
         expect(
-          GreeceStationService.fuelForObservatoryKey('unleaded_95'),
+          GreeceStationService.fuelForObservatoryKey('unleaded_95_octane'),
           FuelType.e5,
         );
         expect(
-          GreeceStationService.fuelForObservatoryKey('Unleaded_95'),
+          GreeceStationService.fuelForObservatoryKey('UNLEADED_95_OCTANE'),
           FuelType.e5,
+        );
+        expect(
+          GreeceStationService.fuelForObservatoryKey('autogas'),
+          FuelType.lpg,
         );
       });
     });
 
     group('searchStations', () {
-      test('builds stations for the nearest prefectures from Athens',
-          () async {
-        when(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            )).thenAnswer((_) async => response(_envelope([_priceResponse()])));
+      test('builds stations for the nearest prefectures from Athens off '
+          'the recorded country-wide row list', () async {
+        stubGet(recordedRows);
 
-        // Athens → should hit ATTICA first; we fetch the 4 nearest.
+        // Athens → ATTICA first; the 4 nearest prefectures surface.
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         final result = await service.searchStations(params);
 
         expect(result.source, ServiceSource.greeceApi);
         expect(result.data, isNotEmpty);
+        expect(result.errors, isEmpty);
 
         // Every station id carries the `gr-` prefix.
         expect(
@@ -214,55 +194,65 @@ void main() {
               'favorites currency lookup finds it.',
         );
 
-        // Prices must map correctly onto the Station slots.
-        final attica =
-            result.data.firstWhere((s) => s.id == 'gr-attica');
-        expect(attica.e5, closeTo(1.721, 0.0001));
-        expect(attica.e98, closeTo(1.969, 0.0001));
-        expect(attica.diesel, closeTo(1.528, 0.0001));
-        expect(attica.lpg, closeTo(0.978, 0.0001));
+        // The recorded N. ATHINON row must map onto the Station slots.
+        final attica = result.data.firstWhere((s) => s.id == 'gr-attica');
+        expect(attica.e5, closeTo(1.943, 0.0001));
+        expect(attica.e98, closeTo(2.16, 0.0001));
+        expect(attica.diesel, closeTo(1.787, 0.0001));
+        expect(attica.lpg, closeTo(0.907, 0.0001));
+        expect(attica.updatedAt, '2026-07-09');
+        expect(attica.isOpen, isNull,
+            reason: 'Prefecture-level virtual stations have no open/closed '
+                'notion (#3198).');
       });
 
-      test('fetches exactly 4 closest prefectures (not all 8)', () async {
-        when(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            )).thenAnswer((_) async => response(_envelope([_priceResponse()])));
+      test('makes exactly ONE HTTP call regardless of candidate count',
+          () async {
+        stubGet(recordedRows);
 
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         await service.searchStations(params);
 
         verify(() => mockDio.get<dynamic>(
               any(),
+              queryParameters: any(named: 'queryParameters'),
+              options: any(named: 'options'),
               cancelToken: any(named: 'cancelToken'),
-            )).called(4);
+            )).called(1);
       });
 
-      test('targets the /data/daily/prefecture/{name} path', () async {
-        when(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            )).thenAnswer((_) async => response(_envelope([_priceResponse()])));
+      test('targets /data with the ranged start_date/end_date/offset '
+          'params and the x-api-key header', () async {
+        stubGet(recordedRows);
 
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         await service.searchStations(params);
 
         final captured = verify(() => mockDio.get<dynamic>(
               captureAny(),
+              queryParameters: captureAny(named: 'queryParameters'),
+              options: captureAny(named: 'options'),
               cancelToken: any(named: 'cancelToken'),
             )).captured;
-        expect(
-          captured.every((url) =>
-              (url as String).startsWith('https://test/api/data/daily/prefecture/')),
-          isTrue,
-          reason:
-              'Every GR call must hit /data/daily/prefecture/<PREFECTURE>.',
-        );
+
+        expect(captured[0], 'https://test/api/data');
+
+        final query = captured[1] as Map<String, dynamic>;
+        // now = 2026-07-11, lookback = 7 days.
+        expect(query['start_date'], '2026-07-04');
+        expect(query['end_date'], '2026-07-11');
+        expect(query['offset'], 0);
+
+        final options = captured[2] as Options;
+        expect(options.headers?['x-api-key'], 'test-key');
       });
 
-      test('HTTP 401 is re-raised as ApiException', () async {
+      test('HTTP 401 is re-raised as ApiException mentioning the key',
+          () async {
         when(() => mockDio.get<dynamic>(
               any(),
+              queryParameters: any(named: 'queryParameters'),
+              options: any(named: 'options'),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
           requestOptions: RequestOptions(),
@@ -277,13 +267,17 @@ void main() {
         await expectLater(
           () => service.searchStations(params),
           throwsA(isA<ApiException>()
-              .having((e) => e.statusCode, 'statusCode', 401)),
+              .having((e) => e.statusCode, 'statusCode', 401)
+              .having((e) => e.message, 'message', contains('key'))),
         );
       });
 
-      test('HTTP 403 is re-raised as ApiException', () async {
+      test('HTTP 403 is re-raised as ApiException mentioning the key',
+          () async {
         when(() => mockDio.get<dynamic>(
               any(),
+              queryParameters: any(named: 'queryParameters'),
+              options: any(named: 'options'),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
           requestOptions: RequestOptions(),
@@ -298,15 +292,17 @@ void main() {
         await expectLater(
           () => service.searchStations(params),
           throwsA(isA<ApiException>()
-              .having((e) => e.statusCode, 'statusCode', 403)),
+              .having((e) => e.statusCode, 'statusCode', 403)
+              .having((e) => e.message, 'message', contains('key'))),
         );
       });
 
-      test(
-          'network timeout on every prefecture surfaces ApiException to '
-          'the fallback chain', () async {
+      test('network timeout surfaces ApiException (unreachable) to the '
+          'fallback chain', () async {
         when(() => mockDio.get<dynamic>(
               any(),
+              queryParameters: any(named: 'queryParameters'),
+              options: any(named: 'options'),
               cancelToken: any(named: 'cancelToken'),
             )).thenThrow(DioException(
           type: DioExceptionType.connectionTimeout,
@@ -316,100 +312,83 @@ void main() {
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         await expectLater(
           () => service.searchStations(params),
+          throwsA(isA<ApiException>()
+              .having((e) => e.message, 'message', contains('unreachable'))),
+        );
+      });
+
+      test('non-list body raises ApiException', () async {
+        stubGet(<String, dynamic>{'oops': 'not a list'});
+
+        const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
+        await expectLater(
+          () => service.searchStations(params),
           throwsA(isA<ApiException>()),
         );
       });
 
-      test(
-          'partial failures (some prefectures up, some down) still return '
-          'data with accumulated errors', () async {
-        var callCount = 0;
-        when(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            )).thenAnswer((_) async {
-          callCount += 1;
-          if (callCount.isEven) {
-            throw DioException(
-              type: DioExceptionType.connectionTimeout,
-              requestOptions: RequestOptions(),
-            );
-          }
-          return response(_envelope([_priceResponse()]));
-        });
+      test('empty row list → empty result without errors', () async {
+        stubGet(<dynamic>[]);
 
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         final result = await service.searchStations(params);
 
-        expect(result.data, isNotEmpty);
-        expect(result.errors, isNotEmpty,
-            reason: 'Errors from the failed fetches should accumulate.');
-      });
-
-      test('empty list for a prefecture drops that entry silently', () async {
-        when(() => mockDio.get<dynamic>(
-              any(),
-              cancelToken: any(named: 'cancelToken'),
-            )).thenAnswer((_) async => response(<Map<String, dynamic>>[]));
-
-        const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
-        final result = await service.searchStations(params);
-
-        // All four prefectures returned empty → no stations, but no
-        // errors either (empty list is a valid response).
+        // No recent data is a valid response — no stations, no errors.
         expect(result.data, isEmpty);
         expect(result.errors, isEmpty);
       });
     });
 
     group('parsePrefectureResponse', () {
-      const attica = {
-        'stationId': 'gr-attica',
-        'displayName': 'Αττική / Attica',
-        'place': 'Αθήνα',
-        'lat': 37.9838,
-        'lng': 23.7275,
-      };
-
-      Station? parse(dynamic body) => service.parsePrefectureResponse(
+      Station? parse(dynamic body, {String regionKey = 'N. ATHINON'}) =>
+          service.parsePrefectureResponse(
             body,
-            stationId: attica['stationId']! as String,
-            displayName: attica['displayName']! as String,
-            place: attica['place']! as String,
-            prefectureLat: attica['lat']! as double,
-            prefectureLng: attica['lng']! as double,
+            regionKey: regionKey,
+            stationId: 'gr-attica',
+            displayName: 'Αττική / Attica',
+            place: 'Αθήνα',
+            prefectureLat: 37.9838,
+            prefectureLng: 23.7275,
             fromLat: 37.98,
             fromLng: 23.73,
           );
 
-      test('happy path parses all four supported fuels', () {
-        final s = parse(_envelope([_priceResponse()]));
+      test('happy path parses all four supported fuels from the region row',
+          () {
+        final s = parse(<dynamic>[_row()]);
         expect(s, isNotNull);
         expect(s!.id, 'gr-attica');
-        expect(s.e5, closeTo(1.721, 0.0001));
-        expect(s.e98, closeTo(1.969, 0.0001));
-        expect(s.diesel, closeTo(1.528, 0.0001));
-        expect(s.lpg, closeTo(0.978, 0.0001));
-        // Diesel heating is dropped — no dedicated slot on Station,
-        // but confirm no fuel slot accidentally absorbed it.
+        expect(s.e5, closeTo(1.943, 0.0001));
+        expect(s.e98, closeTo(2.16, 0.0001));
+        expect(s.diesel, closeTo(1.787, 0.0001));
+        expect(s.lpg, closeTo(0.907, 0.0001));
+        // Heating diesel is dropped — confirm no fuel slot absorbed it.
         expect(s.dieselPremium, isNull);
       });
 
-      test('picks the newest entry when multiple dates are returned', () {
-        final s = parse(_envelope([
-          _priceResponse(date: '2026-04-20', rows: [
-            _priceRow('UNLEADED_95', 1.700),
-          ]),
-          _priceResponse(date: '2026-04-21', rows: [
-            _priceRow('UNLEADED_95', 1.721),
-          ]),
-        ]));
+      test('picks the newest DATE when the ranged window returns several '
+          'rows for the region', () {
+        final s = parse(<dynamic>[
+          _row(date: '2026-07-08', fuels: {'UNLEADED_95_Octane': 1.900}),
+          _row(date: '2026-07-09', fuels: {'UNLEADED_95_Octane': 1.943}),
+          _row(date: '2026-07-07', fuels: {'UNLEADED_95_Octane': 1.890}),
+        ]);
         expect(s, isNotNull);
-        expect(s!.e5, closeTo(1.721, 0.0001));
+        expect(s!.e5, closeTo(1.943, 0.0001));
+        expect(s.updatedAt, '2026-07-09');
+      });
+
+      test('rows for OTHER regions are ignored — no matching row → null',
+          () {
+        final s = parse(<dynamic>[
+          _row(region: 'N. THESSALONIKIS'),
+          _row(region: 'N. CHANION'),
+        ]);
+        expect(s, isNull);
       });
 
       test('empty list → null station', () {
-        expect(parse(const <Map<String, dynamic>>[]), isNull);
+        expect(parse(const <dynamic>[]), isNull);
       });
 
       test('non-list body raises ApiException', () {
@@ -419,91 +398,88 @@ void main() {
         );
       });
 
-      test('DIESEL_HEATING is silently dropped', () {
-        final s = parse(_envelope([
-          _priceResponse(rows: [
-            _priceRow('DIESEL', 1.528),
-            _priceRow('DIESEL_HEATING', 1.165), // dropped
-          ]),
-        ]));
+      test('HOME_HEATING_DIESEL and Super columns are silently dropped',
+          () {
+        final s = parse(<dynamic>[
+          _row(fuels: {
+            'AUTOMOTIVE_DIESEL': 1.787,
+            'HOME_HEATING_DIESEL': 1.165, // dropped
+            'Super': 1.950, // dropped
+          }),
+        ]);
         expect(s, isNotNull);
-        expect(s!.diesel, closeTo(1.528, 0.0001));
-        // No dieselPremium on Station for GR.
-      });
-
-      test('SUPER (leaded) is silently dropped', () {
-        final s = parse(_envelope([
-          _priceResponse(rows: [
-            _priceRow('DIESEL', 1.528),
-            _priceRow('SUPER', 1.950),
-          ]),
-        ]));
-        expect(s, isNotNull);
-        expect(s!.diesel, closeTo(1.528, 0.0001));
+        expect(s!.diesel, closeTo(1.787, 0.0001));
         expect(s.e5, isNull);
         expect(s.e98, isNull);
+        expect(s.lpg, isNull);
+        expect(s.dieselPremium, isNull);
       });
 
-      test('stationId is threaded through unchanged (gr- prefix preserved)',
-          () {
-        final s = parse(_envelope([_priceResponse()]));
-        expect(s, isNotNull);
-        expect(s!.id, startsWith('gr-'));
-      });
-
-      test('prefecture with zero mappable rows returns null', () {
-        final s = parse(_envelope([
-          _priceResponse(rows: [
-            _priceRow('DIESEL_HEATING', 1.165),
-            _priceRow('SUPER', 1.950),
-          ]),
-        ]));
+      test('region with zero recognised positive-price fuel columns '
+          'returns null', () {
+        final s = parse(<dynamic>[
+          _row(fuels: {
+            'HOME_HEATING_DIESEL': 1.165,
+            'Super': 1.950,
+            'UNLEADED_95_Octane': null,
+          }),
+        ]);
         expect(s, isNull,
             reason: 'No recognised motoring fuels → no synthetic pin.');
       });
 
-      test('non-numeric price is dropped (price slot stays null)', () {
-        final s = parse(_envelope([
-          _priceResponse(rows: [
-            _priceRow('UNLEADED_95', 1.721),
-            <String, dynamic>{'fuel_type': 'DIESEL', 'price': 'N/A'},
-          ]),
-        ]));
+      test('non-numeric price is dropped (that slot stays null)', () {
+        final s = parse(<dynamic>[
+          _row(fuels: {
+            'UNLEADED_95_Octane': 1.943,
+            'AUTOMOTIVE_DIESEL': 'N/A',
+          }),
+        ]);
         expect(s, isNotNull);
-        expect(s!.e5, closeTo(1.721, 0.0001));
+        expect(s!.e5, closeTo(1.943, 0.0001));
         expect(s.diesel, isNull);
       });
 
-      test('zero or negative prices are rejected', () {
-        final s = parse(_envelope([
-          _priceResponse(rows: [
-            _priceRow('UNLEADED_95', 0),
-            _priceRow('DIESEL', -1.0),
-            _priceRow('GAS', 0.978),
-          ]),
-        ]));
+      test('zero or negative prices are rejected per column', () {
+        final s = parse(<dynamic>[
+          _row(fuels: {
+            'UNLEADED_95_Octane': 0,
+            'AUTOMOTIVE_DIESEL': -1.0,
+            'AUTOGAS': 0.907,
+          }),
+        ]);
         expect(s, isNotNull);
         expect(s!.e5, isNull);
         expect(s.diesel, isNull);
-        expect(s.lpg, closeTo(0.978, 0.0001));
+        expect(s.lpg, closeTo(0.907, 0.0001));
       });
 
       test('numeric price strings are accepted', () {
-        final s = parse(_envelope([
-          _priceResponse(rows: [
-            <String, dynamic>{'fuel_type': 'UNLEADED_95', 'price': '1.721'},
-          ]),
-        ]));
+        final s = parse(<dynamic>[
+          _row(fuels: {'UNLEADED_95_Octane': '1.943'}),
+        ]);
         expect(s, isNotNull);
-        expect(s!.e5, closeTo(1.721, 0.0001));
+        expect(s!.e5, closeTo(1.943, 0.0001));
       });
 
-      test('updatedAt reflects the newest response date', () {
-        final s = parse(_envelope([
-          _priceResponse(date: '2026-04-21'),
-        ]));
+      test('stationId is threaded through unchanged (gr- prefix preserved)',
+          () {
+        final s = parse(<dynamic>[_row()]);
         expect(s, isNotNull);
-        expect(s!.updatedAt, '2026-04-21');
+        expect(s!.id, startsWith('gr-'));
+      });
+
+      test('updatedAt is stamped from the winning row DATE', () {
+        final s = parse(<dynamic>[_row(date: '2026-07-09')]);
+        expect(s, isNotNull);
+        expect(s!.updatedAt, '2026-07-09');
+      });
+
+      test('isOpen is honest-unknown (null) — prefecture granularity has '
+          'no open/closed notion (#3198)', () {
+        final s = parse(<dynamic>[_row()]);
+        expect(s, isNotNull);
+        expect(s!.isOpen, isNull);
       });
     });
 

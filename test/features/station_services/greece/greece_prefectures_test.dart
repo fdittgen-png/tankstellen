@@ -6,7 +6,8 @@ import 'package:tankstellen/features/station_services/greece/greece_prefectures.
 import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
-/// Tests cover the helpers extracted in PR #1030:
+/// Tests cover the helpers extracted in PR #1030, rewritten for the
+/// #3539 emvouvakis-mirror shape:
 ///   * [GreekPrefecture] entity
 ///   * [GreeceObservatoryKeys.lookup]
 ///   * [GreeceObservatoryKeys.fuelForObservatoryKey]
@@ -15,23 +16,23 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 ///   * [kGreekPrefectures] const list
 ///   * [prefecturesForQuery] top-level helper
 ///
-/// note: `parsePrices` operates on the inner `data: [...]` array of a
-/// `PriceResponse` envelope (NOT the date-wrapped outer list). The
-/// "newer-date wins" logic does not live in this helper — date
-/// selection happens upstream in `GreeceStationService`. Tests below
-/// reflect what the source actually does.
+/// note: since #3539 `parsePrices` operates on ONE prefecture-day ROW
+/// (a map with one COLUMN per fuel), not the old `data: [...]` array
+/// of `{fuel_type, price}` objects. The "newer-date wins" logic does
+/// not live in this helper — date selection happens upstream in
+/// `GreeceStationService.parsePrefectureResponse`.
 void main() {
   group('GreekPrefecture', () {
     test('constructor populates all fields verbatim', () {
       const p = GreekPrefecture(
-        apiName: 'ATTICA',
+        apiName: 'N. ATHINON',
         id: 'gr-attica',
         displayName: 'Αττική / Attica',
         place: 'Αθήνα',
         lat: 37.9838,
         lng: 23.7275,
       );
-      expect(p.apiName, 'ATTICA');
+      expect(p.apiName, 'N. ATHINON');
       expect(p.id, 'gr-attica');
       expect(p.displayName, 'Αττική / Attica');
       expect(p.place, 'Αθήνα');
@@ -66,20 +67,27 @@ void main() {
   });
 
   group('GreeceObservatoryKeys.fuelForObservatoryKey', () {
-    test('contains the four documented mappings', () {
+    test('contains the four documented column mappings (#3539)', () {
       const map = GreeceObservatoryKeys.fuelForObservatoryKey;
-      expect(map['unleaded_95'], FuelType.e5);
-      expect(map['unleaded_100'], FuelType.e98);
-      expect(map['diesel'], FuelType.diesel);
-      expect(map['gas'], FuelType.lpg);
+      expect(map['unleaded_95_octane'], FuelType.e5);
+      expect(map['unleaded_100_octane'], FuelType.e98);
+      expect(map['automotive_diesel'], FuelType.diesel);
+      expect(map['autogas'], FuelType.lpg);
     });
 
-    test('does NOT contain dropped keys (DIESEL_HEATING / SUPER)', () {
-      // note: source stores keys lowercase. Dropped keys are the policy
-      // pinned in [droppedObservatoryKeys], not in this map.
+    test('does NOT contain dropped columns (HOME_HEATING_DIESEL / Super)',
+        () {
+      // note: source stores keys lowercase. Dropped columns are the
+      // policy pinned in [droppedObservatoryKeys], not in this map.
       const map = GreeceObservatoryKeys.fuelForObservatoryKey;
-      expect(map.containsKey('diesel_heating'), isFalse);
+      expect(map.containsKey('home_heating_diesel'), isFalse);
       expect(map.containsKey('super'), isFalse);
+    });
+
+    test('does NOT contain the DATE / REGION envelope columns', () {
+      const map = GreeceObservatoryKeys.fuelForObservatoryKey;
+      expect(map.containsKey('date'), isFalse);
+      expect(map.containsKey('region'), isFalse);
     });
 
     test('has exactly four entries (no silent additions)', () {
@@ -89,191 +97,191 @@ void main() {
   });
 
   group('GreeceObservatoryKeys.droppedObservatoryKeys', () {
-    test('contains the documented dropped keys', () {
+    test('contains the documented dropped columns', () {
       expect(
         GreeceObservatoryKeys.droppedObservatoryKeys,
-        containsAll(<String>['diesel_heating', 'super']),
+        containsAll(<String>['home_heating_diesel', 'super', 'date', 'region']),
       );
     });
 
-    test('has exactly two entries (policy lock)', () {
-      expect(GreeceObservatoryKeys.droppedObservatoryKeys, hasLength(2));
+    test('has exactly four entries (policy lock)', () {
+      expect(GreeceObservatoryKeys.droppedObservatoryKeys, hasLength(4));
     });
   });
 
   group('GreeceObservatoryKeys.lookup', () {
-    test('lowercase known key returns the mapped FuelType', () {
-      expect(GreeceObservatoryKeys.lookup('unleaded_95'), FuelType.e5);
-      expect(GreeceObservatoryKeys.lookup('unleaded_100'), FuelType.e98);
-      expect(GreeceObservatoryKeys.lookup('diesel'), FuelType.diesel);
-      expect(GreeceObservatoryKeys.lookup('gas'), FuelType.lpg);
+    test('lowercase known column returns the mapped FuelType', () {
+      expect(GreeceObservatoryKeys.lookup('unleaded_95_octane'), FuelType.e5);
+      expect(
+          GreeceObservatoryKeys.lookup('unleaded_100_octane'), FuelType.e98);
+      expect(
+          GreeceObservatoryKeys.lookup('automotive_diesel'), FuelType.diesel);
+      expect(GreeceObservatoryKeys.lookup('autogas'), FuelType.lpg);
     });
 
-    test('uppercase key is normalised via toLowerCase', () {
-      // Source: `fuelForObservatoryKey[key.toLowerCase()]`.
-      expect(GreeceObservatoryKeys.lookup('UNLEADED_95'), FuelType.e5);
-      expect(GreeceObservatoryKeys.lookup('Diesel'), FuelType.diesel);
-      expect(GreeceObservatoryKeys.lookup('GAS'), FuelType.lpg);
+    test('the API\'s own mixed-case spellings are normalised', () {
+      // The real rows spell them `UNLEADED_95_Octane` /
+      // `UNLEADED_100_OCTANE` / `AUTOMOTIVE_DIESEL` / `AUTOGAS`.
+      expect(GreeceObservatoryKeys.lookup('UNLEADED_95_Octane'), FuelType.e5);
+      expect(
+          GreeceObservatoryKeys.lookup('UNLEADED_100_OCTANE'), FuelType.e98);
+      expect(
+          GreeceObservatoryKeys.lookup('AUTOMOTIVE_DIESEL'), FuelType.diesel);
+      expect(GreeceObservatoryKeys.lookup('AUTOGAS'), FuelType.lpg);
     });
 
-    test('mixed-case key is normalised via toLowerCase', () {
-      expect(GreeceObservatoryKeys.lookup('UnLeAdEd_100'), FuelType.e98);
+    test('mixed-case column is normalised via toLowerCase', () {
+      expect(
+          GreeceObservatoryKeys.lookup('UnLeAdEd_100_OcTaNe'), FuelType.e98);
     });
 
     test('empty string returns null', () {
       expect(GreeceObservatoryKeys.lookup(''), isNull);
     });
 
-    test('unknown key returns null', () {
+    test('unknown column returns null', () {
       expect(GreeceObservatoryKeys.lookup('petrol'), isNull);
       expect(GreeceObservatoryKeys.lookup('e85'), isNull);
     });
 
-    test('dropped keys (DIESEL_HEATING, SUPER) return null', () {
+    test('dropped columns (HOME_HEATING_DIESEL, Super, DATE, REGION) '
+        'return null', () {
       // Same return value as "unknown", which is the deliberate policy.
-      expect(GreeceObservatoryKeys.lookup('DIESEL_HEATING'), isNull);
-      expect(GreeceObservatoryKeys.lookup('diesel_heating'), isNull);
-      expect(GreeceObservatoryKeys.lookup('SUPER'), isNull);
+      expect(GreeceObservatoryKeys.lookup('HOME_HEATING_DIESEL'), isNull);
+      expect(GreeceObservatoryKeys.lookup('home_heating_diesel'), isNull);
+      expect(GreeceObservatoryKeys.lookup('Super'), isNull);
       expect(GreeceObservatoryKeys.lookup('super'), isNull);
+      expect(GreeceObservatoryKeys.lookup('DATE'), isNull);
+      expect(GreeceObservatoryKeys.lookup('REGION'), isNull);
     });
 
     test('whitespace is NOT trimmed (source only lowercases)', () {
       // note: `lookup` only does `.toLowerCase()`. Surrounding whitespace
-      // is kept, so 'unleaded_95 ' / ' diesel' miss the map.
-      expect(GreeceObservatoryKeys.lookup(' unleaded_95'), isNull);
-      expect(GreeceObservatoryKeys.lookup('diesel '), isNull);
+      // is kept, so 'autogas ' / ' autogas' miss the map.
+      expect(GreeceObservatoryKeys.lookup(' unleaded_95_octane'), isNull);
+      expect(GreeceObservatoryKeys.lookup('autogas '), isNull);
     });
   });
 
   group('GreeceObservatoryKeys.parsePrices', () {
-    test('non-list input returns an empty map', () {
+    test('non-Map input returns an empty map', () {
       expect(GreeceObservatoryKeys.parsePrices(null), isEmpty);
-      expect(GreeceObservatoryKeys.parsePrices(<String, dynamic>{}), isEmpty);
+      expect(GreeceObservatoryKeys.parsePrices(<dynamic>[]), isEmpty);
       expect(GreeceObservatoryKeys.parsePrices('oops'), isEmpty);
       expect(GreeceObservatoryKeys.parsePrices(42), isEmpty);
     });
 
-    test('empty list returns an empty map', () {
-      expect(GreeceObservatoryKeys.parsePrices(<dynamic>[]), isEmpty);
+    test('empty map returns an empty map', () {
+      expect(GreeceObservatoryKeys.parsePrices(<String, dynamic>{}), isEmpty);
     });
 
-    test('parses a typical Observatory data array', () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'UNLEADED_95', 'price': 1.721},
-        <String, dynamic>{'fuel_type': 'UNLEADED_100', 'price': 2.005},
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': 1.499},
-        <String, dynamic>{'fuel_type': 'GAS', 'price': 0.999},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
+    test('parses a typical prefecture-day row', () {
+      final row = <String, dynamic>{
+        'DATE': '2026-07-09',
+        'REGION': 'N. ATHINON',
+        'UNLEADED_95_Octane': 1.943,
+        'UNLEADED_100_OCTANE': 2.16,
+        'AUTOMOTIVE_DIESEL': 1.787,
+        'AUTOGAS': 0.907,
+        'HOME_HEATING_DIESEL': null,
+        'Super': null,
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
       expect(out, hasLength(4));
-      expect(out[FuelType.e5], closeTo(1.721, 1e-9));
-      expect(out[FuelType.e98], closeTo(2.005, 1e-9));
-      expect(out[FuelType.diesel], closeTo(1.499, 1e-9));
-      expect(out[FuelType.lpg], closeTo(0.999, 1e-9));
+      expect(out[FuelType.e5], closeTo(1.943, 1e-9));
+      expect(out[FuelType.e98], closeTo(2.16, 1e-9));
+      expect(out[FuelType.diesel], closeTo(1.787, 1e-9));
+      expect(out[FuelType.lpg], closeTo(0.907, 1e-9));
     });
 
-    test('non-Map entries are silently dropped', () {
-      final raw = <dynamic>[
-        'oops',
-        42,
-        null,
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': 1.499},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
-      expect(out, hasLength(1));
-      expect(out[FuelType.diesel], closeTo(1.499, 1e-9));
-    });
-
-    test('rows with missing fuel_type are dropped', () {
-      final raw = <dynamic>[
-        <String, dynamic>{'price': 1.5},
-        <String, dynamic>{'fuel_type': '', 'price': 1.5},
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': 1.499},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
+    test('the DATE / REGION envelope columns never leak as prices', () {
+      final row = <String, dynamic>{
+        'DATE': '2026-07-09',
+        'REGION': 'N. ATHINON',
+        'AUTOMOTIVE_DIESEL': 1.787,
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
       expect(out.keys, [FuelType.diesel]);
     });
 
-    test('dropped Observatory keys (DIESEL_HEATING, SUPER) are filtered out',
+    test('dropped columns (HOME_HEATING_DIESEL, Super) are filtered out',
         () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'DIESEL_HEATING', 'price': 1.20},
-        <String, dynamic>{'fuel_type': 'SUPER', 'price': 1.85},
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': 1.499},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
+      final row = <String, dynamic>{
+        'HOME_HEATING_DIESEL': 1.20,
+        'Super': 1.85,
+        'AUTOMOTIVE_DIESEL': 1.787,
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
       expect(out.keys, [FuelType.diesel]);
     });
 
-    test('unknown fuel_type values are dropped', () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'HYDROGEN', 'price': 9.99},
-        <String, dynamic>{'fuel_type': 'UNLEADED_95', 'price': 1.721},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
+    test('unknown columns are dropped', () {
+      final row = <String, dynamic>{
+        'HYDROGEN': 9.99,
+        'UNLEADED_95_Octane': 1.943,
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
+      expect(out.keys, [FuelType.e5]);
+    });
+
+    test('null fuel values are dropped (API publishes null for '
+        'unreported fuels)', () {
+      final row = <String, dynamic>{
+        'UNLEADED_95_Octane': 1.943,
+        'UNLEADED_100_OCTANE': null,
+        'AUTOGAS': null,
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
       expect(out.keys, [FuelType.e5]);
     });
 
     test('zero / negative prices are filtered (num path)', () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'UNLEADED_95', 'price': 0},
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': -1.0},
-        <String, dynamic>{'fuel_type': 'GAS', 'price': 0.999},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
+      final row = <String, dynamic>{
+        'UNLEADED_95_Octane': 0,
+        'AUTOMOTIVE_DIESEL': -1.0,
+        'AUTOGAS': 0.907,
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
       expect(out, hasLength(1));
-      expect(out[FuelType.lpg], closeTo(0.999, 1e-9));
+      expect(out[FuelType.lpg], closeTo(0.907, 1e-9));
     });
 
     test('numeric string prices are parsed', () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': '1.499'},
-        <String, dynamic>{'fuel_type': 'UNLEADED_95', 'price': '  1.721  '},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
-      expect(out[FuelType.diesel], closeTo(1.499, 1e-9));
-      expect(out[FuelType.e5], closeTo(1.721, 1e-9));
+      final row = <String, dynamic>{
+        'AUTOMOTIVE_DIESEL': '1.787',
+        'UNLEADED_95_Octane': '  1.943  ',
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
+      expect(out[FuelType.diesel], closeTo(1.787, 1e-9));
+      expect(out[FuelType.e5], closeTo(1.943, 1e-9));
     });
 
-    test('blank / non-numeric / null string prices are dropped', () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': ''},
-        <String, dynamic>{'fuel_type': 'GAS', 'price': '   '},
-        <String, dynamic>{'fuel_type': 'UNLEADED_95', 'price': 'TBD'},
-        <String, dynamic>{'fuel_type': 'UNLEADED_100', 'price': null},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
-      expect(out, isEmpty);
+    test('blank / non-numeric string prices are dropped', () {
+      final row = <String, dynamic>{
+        'AUTOMOTIVE_DIESEL': '',
+        'AUTOGAS': '   ',
+        'UNLEADED_95_Octane': 'TBD',
+      };
+      expect(GreeceObservatoryKeys.parsePrices(row), isEmpty);
     });
 
-    test('zero-string price is filtered', () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': '0'},
-        <String, dynamic>{'fuel_type': 'GAS', 'price': '-2.5'},
-      ];
-      expect(GreeceObservatoryKeys.parsePrices(raw), isEmpty);
+    test('zero-string / negative-string prices are filtered', () {
+      final row = <String, dynamic>{
+        'AUTOMOTIVE_DIESEL': '0',
+        'AUTOGAS': '-2.5',
+      };
+      expect(GreeceObservatoryKeys.parsePrices(row), isEmpty);
     });
 
-    test('duplicate fuel_type rows: last write wins', () {
-      // note: source iterates in order and overwrites, so the LAST
-      // valid row for a given FuelType is the one that sticks.
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': 1.40},
-        <String, dynamic>{'fuel_type': 'DIESEL', 'price': 1.55},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
-      expect(out[FuelType.diesel], closeTo(1.55, 1e-9));
-    });
-
-    test('case-insensitive fuel_type keys are accepted (lookup lowercases)',
+    test('case-insensitive column names are accepted (lookup lowercases)',
         () {
-      final raw = <dynamic>[
-        <String, dynamic>{'fuel_type': 'unleaded_95', 'price': 1.721},
-        <String, dynamic>{'fuel_type': 'Diesel', 'price': 1.499},
-      ];
-      final out = GreeceObservatoryKeys.parsePrices(raw);
-      expect(out[FuelType.e5], closeTo(1.721, 1e-9));
-      expect(out[FuelType.diesel], closeTo(1.499, 1e-9));
+      final row = <String, dynamic>{
+        'unleaded_95_octane': 1.943,
+        'Automotive_Diesel': 1.787,
+      };
+      final out = GreeceObservatoryKeys.parsePrices(row);
+      expect(out[FuelType.e5], closeTo(1.943, 1e-9));
+      expect(out[FuelType.diesel], closeTo(1.787, 1e-9));
     });
   });
 
@@ -297,12 +305,32 @@ void main() {
       }
     });
 
-    test('every apiName is uppercase / non-empty', () {
+    test('every apiName is an uppercase `N. <NAME>` REGION code (#3539)',
+        () {
       for (final p in kGreekPrefectures) {
         expect(p.apiName, isNotEmpty);
+        expect(p.apiName, startsWith('N. '),
+            reason: 'apiName must be the mirror REGION code '
+                '(N. = Νομός, transliterated)');
         expect(p.apiName, p.apiName.toUpperCase(),
-            reason: 'apiName must be the Observatory enum value');
+            reason: 'apiName must match the uppercase REGION column');
       }
+    });
+
+    test('the eight REGION codes match the mirror feed', () {
+      expect(
+        kGreekPrefectures.map((p) => p.apiName),
+        containsAll(<String>[
+          'N. ATHINON',
+          'N. THESSALONIKIS',
+          'N. ACHAIAS',
+          'N. LARISAS',
+          'N. IRAKLIOU',
+          'N. IOANNINON',
+          'N. DODEKANISON',
+          'N. CHANION',
+        ]),
+      );
     });
 
     test('coordinates fall within mainland-Greece + Aegean bbox', () {
@@ -358,7 +386,7 @@ void main() {
       const params = SearchParams(lat: 37.9838, lng: 23.7275);
       const subset = <GreekPrefecture>[
         GreekPrefecture(
-          apiName: 'HERAKLION',
+          apiName: 'N. IRAKLIOU',
           id: 'gr-heraklion',
           displayName: 'Ηράκλειο / Heraklion',
           place: 'Ηράκλειο',
@@ -366,7 +394,7 @@ void main() {
           lng: 25.1442,
         ),
         GreekPrefecture(
-          apiName: 'ATTICA',
+          apiName: 'N. ATHINON',
           id: 'gr-attica',
           displayName: 'Αττική / Attica',
           place: 'Αθήνα',

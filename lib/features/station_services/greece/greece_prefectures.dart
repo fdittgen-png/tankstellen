@@ -14,8 +14,10 @@ import '../../../core/utils/geo_utils.dart';
 /// synthetic [Station] stamped with that prefecture's most recent
 /// daily mean. See `greece_station_service.dart` for the contract.
 class GreekPrefecture {
-  /// The Observatory's enum name (e.g. `ATTICA`, `THESSALONIKI`).
-  /// Plugged straight into `/data/daily/prefecture/{apiName}`.
+  /// The observatory-mirror `REGION` code (e.g. `N. ATHINON`,
+  /// `N. THESSALONIKIS` — `N.` = Νομός, transliterated) as published by
+  /// the emvouvakis FuelPricesGreeceAPI rows (#3539). Matched against
+  /// each row's `REGION` column.
   final String apiName;
 
   /// Stable Tankstellen-side station id (e.g. `gr-attica`). The
@@ -55,7 +57,7 @@ class GreekPrefecture {
 /// radius, without flooding the map with 50+ synthetic pins.
 const List<GreekPrefecture> kGreekPrefectures = [
   GreekPrefecture(
-    apiName: 'ATTICA',
+    apiName: 'N. ATHINON',
     id: 'gr-attica',
     displayName: 'Αττική / Attica',
     place: 'Αθήνα',
@@ -63,7 +65,7 @@ const List<GreekPrefecture> kGreekPrefectures = [
     lng: 23.7275,
   ),
   GreekPrefecture(
-    apiName: 'THESSALONIKI',
+    apiName: 'N. THESSALONIKIS',
     id: 'gr-thessaloniki',
     displayName: 'Θεσσαλονίκη / Thessaloniki',
     place: 'Θεσσαλονίκη',
@@ -71,7 +73,7 @@ const List<GreekPrefecture> kGreekPrefectures = [
     lng: 22.9444,
   ),
   GreekPrefecture(
-    apiName: 'ACHAEA',
+    apiName: 'N. ACHAIAS',
     id: 'gr-achaea',
     displayName: 'Αχαΐα / Achaea',
     place: 'Πάτρα',
@@ -79,7 +81,7 @@ const List<GreekPrefecture> kGreekPrefectures = [
     lng: 21.7346,
   ),
   GreekPrefecture(
-    apiName: 'LARISSA',
+    apiName: 'N. LARISAS',
     id: 'gr-larissa',
     displayName: 'Λάρισα / Larissa',
     place: 'Λάρισα',
@@ -87,7 +89,7 @@ const List<GreekPrefecture> kGreekPrefectures = [
     lng: 22.4191,
   ),
   GreekPrefecture(
-    apiName: 'HERAKLION',
+    apiName: 'N. IRAKLIOU',
     id: 'gr-heraklion',
     displayName: 'Ηράκλειο / Heraklion',
     place: 'Ηράκλειο',
@@ -95,7 +97,7 @@ const List<GreekPrefecture> kGreekPrefectures = [
     lng: 25.1442,
   ),
   GreekPrefecture(
-    apiName: 'IOANNINA',
+    apiName: 'N. IOANNINON',
     id: 'gr-ioannina',
     displayName: 'Ιωάννινα / Ioannina',
     place: 'Ιωάννινα',
@@ -103,7 +105,7 @@ const List<GreekPrefecture> kGreekPrefectures = [
     lng: 20.8537,
   ),
   GreekPrefecture(
-    apiName: 'DODECANESE',
+    apiName: 'N. DODEKANISON',
     id: 'gr-dodecanese',
     displayName: 'Δωδεκάνησα / Dodecanese',
     place: 'Ρόδος',
@@ -111,7 +113,7 @@ const List<GreekPrefecture> kGreekPrefectures = [
     lng: 28.2176,
   ),
   GreekPrefecture(
-    apiName: 'CHANIA',
+    apiName: 'N. CHANION',
     id: 'gr-chania',
     displayName: 'Χανιά / Chania',
     place: 'Χανιά',
@@ -128,45 +130,48 @@ const List<GreekPrefecture> kGreekPrefectures = [
 class GreeceObservatoryKeys {
   GreeceObservatoryKeys._();
 
-  /// Observatory `fuel_type` enum → canonical [FuelType].
+  /// Observatory-mirror row column → canonical [FuelType] (#3539 — the
+  /// emvouvakis API publishes one row per prefecture per day with one
+  /// COLUMN per fuel, unlike the old fuelpricesgr `fuel_type` array).
   ///
-  /// `DIESEL_HEATING` and `SUPER` are intentionally absent from the
-  /// map. [droppedObservatoryKeys] pins the policy for tests.
+  /// `HOME_HEATING_DIESEL` and `Super` are intentionally absent from
+  /// the map. [droppedObservatoryKeys] pins the policy for tests.
   static const Map<String, FuelType> fuelForObservatoryKey = {
-    'unleaded_95': FuelType.e5,
-    'unleaded_100': FuelType.e98,
-    'diesel': FuelType.diesel,
-    'gas': FuelType.lpg,
+    'unleaded_95_octane': FuelType.e5,
+    'unleaded_100_octane': FuelType.e98,
+    'automotive_diesel': FuelType.diesel,
+    'autogas': FuelType.lpg,
   };
 
-  /// Keys the parser deliberately drops because no [FuelType] exists
-  /// (DIESEL_HEATING is not a motoring fuel; SUPER is phased-out
-  /// leaded).
+  /// Columns the parser deliberately drops because no [FuelType] exists
+  /// (HOME_HEATING_DIESEL is not a motoring fuel; Super is phased-out
+  /// leaded) — plus the non-fuel `DATE` / `REGION` envelope columns.
   static const Set<String> droppedObservatoryKeys = {
-    'diesel_heating',
+    'home_heating_diesel',
     'super',
+    'date',
+    'region',
   };
 
-  /// Case-insensitive lookup for the Observatory `fuel_type` enum.
-  /// Returns `null` for unknown keys and for the intentionally
-  /// dropped keys ([droppedObservatoryKeys]).
+  /// Case-insensitive lookup for a row column name. Returns `null`
+  /// for unknown columns and for the intentionally dropped ones
+  /// ([droppedObservatoryKeys]).
   static FuelType? lookup(String key) =>
       fuelForObservatoryKey[key.toLowerCase()];
 
-  /// Parse the `data: [...]` array of a `PriceResponse` envelope into
-  /// a [FuelType] → EUR-per-litre map. Unknown keys, dropped keys
-  /// (`DIESEL_HEATING`, `SUPER`), zero / negative prices, and
-  /// non-numeric prices are silently filtered out.
-  static Map<FuelType, double> parsePrices(dynamic rawData) {
+  /// Parse one prefecture-day row (a map of fuel columns, #3539) into
+  /// a [FuelType] → EUR-per-litre map. Unknown columns, dropped
+  /// columns (`HOME_HEATING_DIESEL`, `Super`, the `DATE` / `REGION`
+  /// envelope), nulls (the API publishes `null` for fuels a prefecture
+  /// did not report that day), zero / negative prices, and non-numeric
+  /// prices are silently filtered out.
+  static Map<FuelType, double> parsePrices(dynamic rawRow) {
     final out = <FuelType, double>{};
-    if (rawData is! List) return out;
-    for (final row in rawData) {
-      if (row is! Map) continue;
-      final key = row['fuel_type']?.toString() ?? '';
-      if (key.isEmpty) continue;
-      final fuel = lookup(key);
+    if (rawRow is! Map) return out;
+    for (final entry in rawRow.entries) {
+      final fuel = lookup(entry.key.toString());
       if (fuel == null) continue; // unknown / intentionally dropped
-      final price = _parseEuroPerLitre(row['price']);
+      final price = _parseEuroPerLitre(entry.value);
       if (price == null) continue;
       out[fuel] = price;
     }

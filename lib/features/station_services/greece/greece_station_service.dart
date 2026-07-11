@@ -44,79 +44,94 @@ import '../../../core/logging/error_logger.dart';
 /// can differ by 10–15 cents/L) and keeps the app usable in Greece
 /// until — or unless — a station-level feed becomes available.
 ///
-/// **Endpoint contract** (community API defaults to `https://fuelpricesgr.com/api/`):
+/// **Endpoint contract** (#3539 — restored on the community
+/// [FuelPricesGreeceAPI](https://github.com/emvouvakis/FuelPricesGreeceAPI)
+/// mirror after `fuelpricesgr.com` went NXDOMAIN, #3194; that project
+/// scrapes the SAME official ministry bulletins daily):
 ///
 /// ```
-/// GET /data/daily/prefecture/{prefecture}
+/// GET {base}/data?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD&offset=0
+/// x-api-key: <public key from the project README>
 /// ```
 ///
-/// returns the prefecture's most recent daily price points:
+/// returns ONE flat list with one row per prefecture per day — a single
+/// request covers the whole country (no per-prefecture fan-out):
 ///
 /// ```json
 /// [
-///   {
-///     "date": "2026-04-21",
-///     "data": [
-///       { "fuel_type": "UNLEADED_95",  "price": 1.721 },
-///       { "fuel_type": "UNLEADED_100", "price": 1.969 },
-///       { "fuel_type": "DIESEL",       "price": 1.528 },
-///       { "fuel_type": "DIESEL_HEATING", "price": 1.165 },
-///       { "fuel_type": "GAS",          "price": 0.978 }
-///     ]
-///   }
+///   { "DATE": "2026-07-09", "REGION": "N. ATHINON",
+///     "UNLEADED_95_Octane": 1.943, "UNLEADED_100_OCTANE": 2.16,
+///     "AUTOMOTIVE_DIESEL": 1.787, "AUTOGAS": 0.907,
+///     "HOME_HEATING_DIESEL": null, "Super": null },
+///   …
 /// ]
 /// ```
 ///
-/// Fuel-type mapping lives on [GreeceObservatoryKeys] in
+/// Fuel-column mapping lives on [GreeceObservatoryKeys] in
 /// `greece_prefectures.dart`:
 ///
 /// ```
-/// UNLEADED_95      → FuelType.e5
-/// UNLEADED_100     → FuelType.e98
-/// DIESEL           → FuelType.diesel
-/// DIESEL_HEATING   → (skipped — not a motoring fuel)
-/// GAS              → FuelType.lpg    (Υγραέριο)
-/// SUPER            → (skipped — leaded; phased out)
+/// UNLEADED_95_Octane   → FuelType.e5
+/// UNLEADED_100_OCTANE  → FuelType.e98
+/// AUTOMOTIVE_DIESEL    → FuelType.diesel
+/// HOME_HEATING_DIESEL  → (skipped — not a motoring fuel)
+/// AUTOGAS              → FuelType.lpg    (Υγραέριο)
+/// Super                → (skipped — leaded; phased out)
 /// ```
 ///
-/// No auth, no keys — the community API is free and open. The service
-/// still round-trips the user's `_baseUrl` so operators can point
-/// Tankstellen at a self-hosted mirror if the hosted endpoint goes
-/// down; and the parser is fully fixture-driven so a URL-path drift at
-/// upstream is a one-line fix.
+/// The API key is the PUBLIC one the project publishes in its README —
+/// free, shared, rate-limited; not a paid credential and not a secret.
+/// The service still round-trips `_baseUrl` / `_apiKey` so operators can
+/// point Tankstellen at a self-hosted deployment (of either upstream) if
+/// the hosted endpoint dies again; the parser is fully fixture-driven so
+/// a shape drift at upstream is a one-line fix. The durable long-term
+/// plan (self-published GitHub-Pages JSON parsed from the ministry PDFs)
+/// is tracked separately.
 class GreeceStationService
     with StationServiceHelpers
     implements StationService {
-  /// Community API base URL.
-  ///
-  /// **#3194 — this host does not exist.** `fuelpricesgr.com` is
-  /// NXDOMAIN (live-verified 2026-06-10, as is the ministry's old
-  /// `deltia.fuelprices.gr`), and the upstream project
-  /// (github.com/mavroprovato/fuelpricesgr) documents no public
-  /// deployment — its README is localhost-only. Greece therefore cannot
-  /// work out of the box; the country is `verified: false` and hidden
-  /// from the pickers. Rather than fan out one doomed DNS lookup per
-  /// prefecture on every search, [searchStations] short-circuits when
-  /// it is still pointed at this default and reports the service as
-  /// unavailable (one errorLogger trace + a [ServiceError]).
-  ///
-  /// Operators who self-host the upstream wrapper can pass their own
-  /// `baseUrl` to the constructor — the full fetch/parse path then runs
-  /// unchanged (the route shapes match the upstream FastAPI exactly).
-  static const String defaultBaseUrl = 'https://fuelpricesgr.com/api';
+  /// Community mirror base URL (#3539, live-verified 2026-07-11 with
+  /// data through 2026-07-09 — matching the latest official bulletin).
+  /// The old `fuelpricesgr.com` default has been NXDOMAIN since
+  /// 2026-06-10 (#3194) with no public replacement instance.
+  static const String defaultBaseUrl =
+      'https://5fcbs3i0z4.execute-api.eu-west-3.amazonaws.com/v2';
+
+  /// The PUBLIC shared API key from the FuelPricesGreeceAPI README —
+  /// published by the project for anyone's use (free tier, rate-limited).
+  /// Deliberately NOT a repo secret: it is upstream's own public
+  /// credential, exactly like an unauthenticated endpoint with extra
+  /// steps. Overridable for self-hosted deployments.
+  static const String defaultApiKey =
+      'VH5AaWqgBchJw3a8yOkq5i5nVJ0hNMl5mwzkPMm1';
+
+  /// How far back the single ranged query looks. The ministry publishes
+  /// business-daily and can lag a day or two around holidays — a week
+  /// guarantees at least one row per prefecture without over-fetching
+  /// (51 prefectures × 7 days ≈ 360 rows, well under the API's
+  /// 10 000-row default limit).
+  static const Duration lookback = Duration(days: 7);
 
   final Dio _dio;
   final String _baseUrl;
+  final String _apiKey;
+
+  /// Test seam for the ranged query's end date — defaults to wall clock.
+  final DateTime Function() _now;
 
   GreeceStationService({
     Dio? dio,
     String? baseUrl,
+    String? apiKey,
+    DateTime Function()? now,
   })  : _dio = dio ??
             DioFactory.create(
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
             ),
-        _baseUrl = baseUrl ?? defaultBaseUrl;
+        _baseUrl = baseUrl ?? defaultBaseUrl,
+        _apiKey = apiKey ?? defaultApiKey,
+        _now = now ?? DateTime.now;
 
   /// Public delegator: case-insensitive lookup for the Observatory
   /// `fuel_type` enum. Kept on the class so existing tests keep
@@ -134,52 +149,58 @@ class GreeceStationService
     SearchParams params, {
     CancelToken? cancelToken,
   }) async {
-    // #3194 — the default host is NXDOMAIN and upstream has no public
-    // deployment. Degrade gracefully: one clear trace + an unavailable
-    // marker instead of N doomed DNS lookups and a raw throw. A
-    // self-hosted mirror (custom baseUrl) takes the normal path below.
-    if (_baseUrl == defaultBaseUrl) {
-      final unavailable = ServiceError(
-        source: ServiceSource.greeceApi,
-        message: 'GR service unavailable: default host is NXDOMAIN and '
-            'upstream fuelpricesgr has no public deployment (#3194); '
-            'set a self-hosted baseUrl to enable Greece',
-        kind: FailureKind.unsupported,
-        occurredAt: DateTime.now(),
+    // The user's nearest prefectures — the single ranged query below
+    // returns the whole country, but only the closest few surface as
+    // synthetic pins (same anti-clutter policy as before #3539).
+    final candidates = prefecturesForQuery(params, kGreekPrefectures);
+
+    final end = _now();
+    final start = end.subtract(GreeceStationService.lookback);
+    String d(DateTime t) => '${t.year.toString().padLeft(4, '0')}-'
+        '${t.month.toString().padLeft(2, '0')}-'
+        '${t.day.toString().padLeft(2, '0')}';
+
+    final List<dynamic> rows;
+    try {
+      final response = await _dio.get<dynamic>(
+        '$_baseUrl/data',
+        queryParameters: {
+          'start_date': d(start),
+          'end_date': d(end),
+          'offset': 0,
+        },
+        options: Options(headers: {'x-api-key': _apiKey}),
+        cancelToken: cancelToken,
       );
-      unawaited(errorLogger.log(
-        ErrorLayer.other,
-        ApiException(
-          message: unavailable.message,
-          kind: FailureKind.unsupported,
-        ),
-        StackTrace.current,
-        context: const {'where': 'GR search short-circuit (#3194)'},
-      ));
-      return ServiceResult(
-        data: const <Station>[],
-        source: ServiceSource.greeceApi,
-        fetchedAt: DateTime.now(),
-        errors: [unavailable],
+      final data = response.data;
+      if (data is! List) {
+        throw const ApiException(
+          message: 'Paratiritirio mirror returned unparseable body',
+        );
+      }
+      rows = data;
+    } on DioException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st,
+          context: const {'where': 'GR ranged fetch failed (#3539)'}));
+      final status = e.response?.statusCode;
+      // 401/403 = the shared public key was revoked / a self-hosted
+      // deployment is behind different auth — a hard, actionable error.
+      throw ApiException(
+        message: status == 401 || status == 403
+            ? 'Paratiritirio mirror rejected request (HTTP $status) — '
+                'API key revoked?'
+            : 'Paratiritirio mirror unreachable: ${e.type.name}',
+        statusCode: status,
       );
     }
 
-    // Pull the user's nearest prefectures first — a radius-based
-    // pre-filter so we don't slam the upstream with 8 serial requests
-    // when the user is standing in Athens and the answer is `ATTICA`.
-    final candidates = prefecturesForQuery(params, kGreekPrefectures);
-
     final stations = <Station>[];
     final errors = <ServiceError>[];
-
     for (final pref in candidates) {
       try {
-        final response = await _dio.get<dynamic>(
-          '$_baseUrl/data/daily/prefecture/${pref.apiName}',
-          cancelToken: cancelToken,
-        );
         final s = parsePrefectureResponse(
-          response.data,
+          rows,
+          regionKey: pref.apiName,
           stationId: pref.id,
           displayName: pref.displayName,
           place: pref.place,
@@ -189,42 +210,16 @@ class GreeceStationService
           fromLng: params.lng,
         );
         if (s != null) stations.add(s);
-      } on DioException catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'GR daily fetch failed for ${pref.apiName}'}));
-        final status = e.response?.statusCode;
-        if (status == 401 || status == 403) {
-          // The community API is free and anonymous — a 401/403 means
-          // the operator has proxied it behind auth. Surface as a hard
-          // error so the fallback chain can log it.
-          throw ApiException(
-            message: 'Paratiritirio rejected request (HTTP $status)',
-            statusCode: status,
-          );
-        }
-        errors.add(ServiceError(
-          source: ServiceSource.greeceApi,
-          message: 'fetch ${pref.apiName}: ${e.type.name}',
-          statusCode: status,
-          occurredAt: DateTime.now(),
-        ));
       } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {'where': 'GR daily fetch unexpected error for ${pref.apiName}'}));
+        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: {
+          'where': 'GR parse failed for ${pref.apiName} (#3539)',
+        }));
         errors.add(ServiceError(
           source: ServiceSource.greeceApi,
           message: 'parse ${pref.apiName}: $e',
           occurredAt: DateTime.now(),
         ));
       }
-    }
-
-    // If every prefecture request failed hard, surface an ApiException
-    // so the chain drops to stale cache.
-    if (stations.isEmpty && candidates.isNotEmpty && errors.isNotEmpty) {
-      throw ApiException(
-        message:
-            'Paratiritirio unreachable (${errors.length}/${candidates.length} '
-            'prefectures failed)',
-      );
     }
 
     final filtered = filterByRadius(stations, params.radiusKm);
@@ -238,22 +233,22 @@ class GreeceStationService
     );
   }
 
-  /// Parse a single prefecture's daily response into a synthetic
-  /// [Station]. Exposed for tests so the parser is driven by fixtures
-  /// independent of any Dio mock.
+  /// Parse the mirror's flat country-wide row list into ONE
+  /// prefecture's synthetic [Station] (#3539). Exposed for tests so the
+  /// parser is driven by recorded fixtures independent of any Dio mock.
   ///
-  /// The response is either:
-  /// - A list of `PriceResponse` objects (most recent first), or
-  /// - An empty list when the prefecture has no recent data.
-  ///
-  /// We pick the most recent entry (first in the list) and stamp its
-  /// fuel prices onto the virtual station.
+  /// [data] is the whole `/data` response (one row per prefecture per
+  /// day); rows whose `REGION` differs from [regionKey] are skipped,
+  /// and the newest `DATE` among the matches wins. Null when the
+  /// prefecture has no row in the ranged window or no recognised fuel
+  /// column carries a positive price.
   ///
   /// The prefecture is addressed by its stable `stationId` so tests do
   /// not need access to the [GreekPrefecture] type.
   @visibleForTesting
   Station? parsePrefectureResponse(
     dynamic data, {
+    required String regionKey,
     required String stationId,
     required String displayName,
     required String place,
@@ -264,23 +259,23 @@ class GreeceStationService
   }) {
     if (data is! List) {
       throw const ApiException(
-        message: 'Paratiritirio returned unparseable body',
+        message: 'Paratiritirio mirror returned unparseable body',
       );
     }
 
-    // Empty list is valid — just means no recent data for this
-    // prefecture. Drop the station (a synthetic entry with no prices
-    // would clutter the list).
+    // Empty list is valid — just means no recent data. Drop the station
+    // (a synthetic entry with no prices would clutter the list).
     if (data.isEmpty) return null;
 
-    // Prefer the newest entry. The community API documents "most recent
-    // first" but we defend against order drift by picking the entry with
-    // the greatest `date` string (ISO-8601 lexicographic order works).
+    // Newest row for THIS prefecture. Rows arrive one-per-day over the
+    // ranged window; pick the greatest `DATE` string (ISO-8601
+    // lexicographic order works) among matching `REGION`s.
     Map<dynamic, dynamic>? newest;
     String newestDate = '';
     for (final item in data) {
       if (item is! Map) continue;
-      final date = item['date']?.toString() ?? '';
+      if (item['REGION']?.toString() != regionKey) continue;
+      final date = item['DATE']?.toString() ?? '';
       if (date.compareTo(newestDate) > 0) {
         newestDate = date;
         newest = item;
@@ -288,7 +283,7 @@ class GreeceStationService
     }
     if (newest == null) return null;
 
-    final prices = GreeceObservatoryKeys.parsePrices(newest['data']);
+    final prices = GreeceObservatoryKeys.parsePrices(newest);
     // A prefecture with zero recognised fuel rows is dropped — no
     // synthetic pin for "nothing to show".
     if (prices.isEmpty) return null;
