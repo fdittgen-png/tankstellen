@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/logging/error_logger.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
@@ -124,8 +123,11 @@ class RecordingStartCoordinator {
       }
       _prewarmedService = svc;
     }).catchError((Object e, StackTrace st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: const {'where': 'RecordingStart pre-warm connect failed'}));
+      // #3561 — same #2745 triage as connectAndStart: an EXPECTED adapter
+      // condition (unreachable / engine off / BT off) during the silent
+      // pre-warm is a breadcrumb, never an ErrorLayer.ui trace. The two
+      // paths share the helper so they can't drift (its doc's promise).
+      recordObd2ConnectFailure(e, st, where: 'RecordingStart pre-warm');
     }));
   }
 
