@@ -2757,6 +2757,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Optionnel : synchroniser favoris, alertes et notes entre appareils';
 
   @override
+  String get tankSyncSchemaOutdatedTitle => 'Cloud database needs an update';
+
+  @override
+  String get tankSyncSchemaOutdatedSubtitle =>
+      'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.';
+
+  @override
   String get setupCloudSync => 'Configurer la synchronisation cloud';
 
   @override

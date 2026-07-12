@@ -1233,6 +1233,8 @@
   "deleteAccountSubtitle": "Alle Serverdaten dauerhaft entfernen",
   "localOnly": "Nur lokal",
   "localOnlySubtitle": "Optional: Favoriten, Alarme und Bewertungen geräteübergreifend synchronisieren",
+  "tankSyncSchemaOutdatedTitle": "Cloud-Datenbank braucht ein Update",
+  "tankSyncSchemaOutdatedSubtitle": "Dein selbst gehostetes TankSync-Schema ist veraltet — einige Daten können nicht synchronisiert werden. Öffne den Sync-Assistenten und führe das Update-SQL in deinem Supabase-Projekt aus.",
   "setupCloudSync": "Cloud-Sync einrichten",
   "disconnectTitle": "TankSync trennen?",
   "disconnectBody": "Cloud-Synchronisierung wird deaktiviert. Ihre lokalen Daten (Favoriten, Alarme, Verlauf) bleiben auf diesem Gerät erhalten. Serverdaten werden nicht gelöscht.",

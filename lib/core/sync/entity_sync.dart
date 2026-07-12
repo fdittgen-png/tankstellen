@@ -6,8 +6,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../core/logging/error_logger.dart';
+import '../telemetry/collectors/breadcrumb_collector.dart';
 import '../utils/json_extensions.dart';
 import 'deletions_sync.dart';
+import 'schema_drift_notice.dart';
 import 'sync_device_identity.dart';
 import 'sync_helper.dart';
 import 'sync_run_trace.dart';
@@ -236,6 +238,25 @@ class EntitySync<T> {
         ...downloaded,
       ];
     } catch (e, st) {
+      // #3560 — an outdated SELF-HOST schema (server rejects a column or
+      // table a newer app version added) is a KNOWN, user-fixable
+      // condition, not a fault: it degraded three days of field error
+      // logs into one repeated PostgrestException per sync run. One
+      // actionable breadcrumb per table per session (the #3331
+      // deletions-absent pattern) + the SchemaDriftNotice the TankSync
+      // settings tile watches; the merge degrades to input-unchanged
+      // exactly as before. Everything else still ERROR-logs.
+      if (isSchemaDriftError(e)) {
+        if (SchemaDriftNotice.instance.note(table)) {
+          BreadcrumbCollector.add(
+            'sync: $table schema outdated',
+            detail: 'self-host TankSync schema rejects the current '
+                '$table shape — re-run the wizard SQL '
+                '(${e.runtimeType})',
+          );
+        }
+        return local;
+      }
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
           context: {'where': '$logName.merge FAILED'}));
       return local;

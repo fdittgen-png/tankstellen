@@ -5070,6 +5070,18 @@ abstract class AppLocalizations {
   /// **'Optional: sync favorites, alerts, and ratings across devices'**
   String get localOnlySubtitle;
 
+  /// Title of the #3560 amber warning tile in the TankSync settings section, shown when the self-hosted Supabase schema is older than this app expects.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud database needs an update'**
+  String get tankSyncSchemaOutdatedTitle;
+
+  /// Subtitle of the #3560 schema-outdated warning tile. Tapping opens the sync wizard, which shows the update SQL to paste into the Supabase SQL editor.
+  ///
+  /// In en, this message translates to:
+  /// **'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.'**
+  String get tankSyncSchemaOutdatedSubtitle;
+
   /// No description provided for @setupCloudSync.
   ///
   /// In en, this message translates to:
