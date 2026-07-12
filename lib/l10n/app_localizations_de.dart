@@ -2753,6 +2753,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Optional: Favoriten, Alarme und Bewertungen geräteübergreifend synchronisieren';
 
   @override
+  String get tankSyncSchemaOutdatedTitle =>
+      'Cloud-Datenbank braucht ein Update';
+
+  @override
+  String get tankSyncSchemaOutdatedSubtitle =>
+      'Dein selbst gehostetes TankSync-Schema ist veraltet — einige Daten können nicht synchronisiert werden. Öffne den Sync-Assistenten und führe das Update-SQL in deinem Supabase-Projekt aus.';
+
+  @override
   String get setupCloudSync => 'Cloud-Sync einrichten';
 
   @override

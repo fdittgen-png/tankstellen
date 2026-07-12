@@ -2743,6 +2743,13 @@ class AppLocalizationsPl extends AppLocalizations {
       'Opcjonalne: synchronizuj ulubione, alerty i oceny między urządzeniami';
 
   @override
+  String get tankSyncSchemaOutdatedTitle => 'Cloud database needs an update';
+
+  @override
+  String get tankSyncSchemaOutdatedSubtitle =>
+      'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.';
+
+  @override
   String get setupCloudSync => 'Skonfiguruj synchronizację w chmurze';
 
   @override

@@ -560,25 +560,33 @@
   "priceHistoryStationsTracked": "{count} stations tracked",
   "@priceHistoryStationsTracked": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "alertsConfiguredCount": "{count} configured",
   "@alertsConfiguredCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ignoredStationsHidden": "{count} stations hidden",
   "@ignoredStationsHidden": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "ratingsStationsRated": "{count} stations rated",
   "@ratingsStationsRated": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "noPriceHistory": "No price history yet",
@@ -1180,7 +1188,9 @@
   "useModeSwitchedSnack": "Use mode set to {profile}.",
   "@useModeSwitchedSnack": {
     "placeholders": {
-      "profile": { "type": "String" }
+      "profile": {
+        "type": "String"
+      }
     }
   },
   "profileDefaultVehicleLabel": "Default vehicle (optional)",
@@ -1392,6 +1402,14 @@
   "deleteAccountSubtitle": "Remove all server data permanently",
   "localOnly": "Local only",
   "localOnlySubtitle": "Optional: sync favorites, alerts, and ratings across devices",
+  "tankSyncSchemaOutdatedTitle": "Cloud database needs an update",
+  "@tankSyncSchemaOutdatedTitle": {
+    "description": "Title of the #3560 amber warning tile in the TankSync settings section, shown when the self-hosted Supabase schema is older than this app expects."
+  },
+  "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
+  "@tankSyncSchemaOutdatedSubtitle": {
+    "description": "Subtitle of the #3560 schema-outdated warning tile. Tapping opens the sync wizard, which shows the update SQL to paste into the Supabase SQL editor."
+  },
   "setupCloudSync": "Set up cloud sync",
   "disconnectTitle": "Disconnect TankSync?",
   "disconnectBody": "Cloud sync will be disabled. Your local data (favorites, alerts, history) is preserved on this device. Server data is not deleted.",
@@ -1954,6 +1972,6 @@
   },
   "onboardingExploreDemoData": "Explore with demo data",
   "@onboardingExploreDemoData": {
-    "description": "Onboarding API-key step \u2014 CTA to skip key entry and use demo data (#1691)."
+    "description": "Onboarding API-key step — CTA to skip key entry and use demo data (#1691)."
   }
 }

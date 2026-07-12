@@ -10,6 +10,7 @@ import '../../../../core/navigation/app_routes.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
 import 'tank_sync_delete_data_tile.dart';
 import 'tank_sync_relink_tile.dart';
+import 'tank_sync_schema_outdated_tile.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sync/sync_config.dart';
@@ -55,6 +56,9 @@ class TankSyncSection extends ConsumerWidget {
       // #3449 — zero-height unless the launch identity guard flagged a
       // stored identity with no session (re-link guidance + start-fresh).
       const TankSyncRelinkTile(),
+      // #3560 — zero-height unless the self-host schema is outdated (drift
+      // hit this session, or the recorded schema version is behind).
+      const TankSyncSchemaOutdatedTile(),
       ListTile(
         leading: Icon(Icons.cloud_done, color: DarkModeColors.success(context)),
         title: Text(syncConfig.modeName),

@@ -2751,6 +2751,13 @@ class AppLocalizationsRo extends AppLocalizations {
       'Opțional: sincronizați favorite, alerte și evaluări pe mai multe dispozitive';
 
   @override
+  String get tankSyncSchemaOutdatedTitle => 'Cloud database needs an update';
+
+  @override
+  String get tankSyncSchemaOutdatedSubtitle =>
+      'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.';
+
+  @override
   String get setupCloudSync => 'Configurați sincronizarea cloud';
 
   @override

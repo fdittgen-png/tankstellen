@@ -2748,6 +2748,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Optioneel: favorieten, meldingen en beoordelingen synchroniseren via apparaten';
 
   @override
+  String get tankSyncSchemaOutdatedTitle => 'Cloud database needs an update';
+
+  @override
+  String get tankSyncSchemaOutdatedSubtitle =>
+      'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.';
+
+  @override
   String get setupCloudSync => 'Cloudsync instellen';
 
   @override

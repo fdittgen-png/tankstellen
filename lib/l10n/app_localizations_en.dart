@@ -2726,6 +2726,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Optional: sync favorites, alerts, and ratings across devices';
 
   @override
+  String get tankSyncSchemaOutdatedTitle => 'Cloud database needs an update';
+
+  @override
+  String get tankSyncSchemaOutdatedSubtitle =>
+      'Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.';
+
+  @override
   String get setupCloudSync => 'Set up cloud sync';
 
   @override
@@ -10901,6 +10908,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get localOnlySubtitle =>
       '⟦Óƥŧîóñáł: šýñç ƒáṽóřîŧéš, áłéřŧš, áñđ řáŧîñǧš áçřóšš đéṽîçéš ·······················⟧';
+
+  @override
+  String get tankSyncSchemaOutdatedTitle =>
+      '⟦Çłóúđ đáŧáƀášé ñééđš áñ úƥđáŧé ············⟧';
+
+  @override
+  String get tankSyncSchemaOutdatedSubtitle =>
+      '⟦Ýóúř šéłƒ-ĥóšŧéđ ŦáñķŠýñç šçĥéɱá îš óúŧđáŧéđ — šóɱé đáŧá çáññóŧ šýñç. Óƥéñ ŧĥé šýñç ŵîžářđ áñđ řúñ ŧĥé úƥđáŧé ŠɊŁ óñ ýóúř Šúƥáƀášé ƥřóĵéçŧ. ··················································⟧';
 
   @override
   String get setupCloudSync => '⟦Šéŧ úƥ çłóúđ šýñç ······⟧';
