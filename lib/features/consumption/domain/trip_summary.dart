@@ -24,6 +24,19 @@ class TripSummary {
   /// trip carried no fuel-rate samples. This is what the "save as
   /// fill-up" flow pre-fills into the liters field (#726).
   final double? fuelLitersConsumed;
+
+  /// #3576 — GPS-physics ESTIMATE of the average consumption (L/100 km),
+  /// stamped at stop time from the shared [GpsLiveEstimateFolder] when —
+  /// and only when — no measured fuel figure exists ([avgLPer100Km] is
+  /// null). The live recording view showed these `~` figures the whole
+  /// drive; discarding them at save read as "the data got lost". UI must
+  /// always render them with the `~` estimate prefix, never as measured.
+  final double? estimatedAvgLPer100Km;
+
+  /// #3576 — GPS-physics ESTIMATE of the litres burned; same contract as
+  /// [estimatedAvgLPer100Km]. Never pre-fills the fill-up flow (#726
+  /// stays measured-only).
+  final double? estimatedFuelLitersConsumed;
   final DateTime? startedAt;
   final DateTime? endedAt;
 
@@ -173,6 +186,8 @@ class TripSummary {
     required this.harshAccelerations,
     this.avgLPer100Km,
     this.fuelLitersConsumed,
+    this.estimatedAvgLPer100Km,
+    this.estimatedFuelLitersConsumed,
     this.startedAt,
     this.endedAt,
     this.distanceSource = 'virtual',
@@ -219,6 +234,8 @@ class TripSummary {
     int? harshAccelerations,
     double? avgLPer100Km,
     double? fuelLitersConsumed,
+    double? estimatedAvgLPer100Km,
+    double? estimatedFuelLitersConsumed,
     DateTime? startedAt,
     DateTime? endedAt,
     String? distanceSource,
@@ -243,6 +260,10 @@ class TripSummary {
         harshAccelerations: harshAccelerations ?? this.harshAccelerations,
         avgLPer100Km: avgLPer100Km ?? this.avgLPer100Km,
         fuelLitersConsumed: fuelLitersConsumed ?? this.fuelLitersConsumed,
+        estimatedAvgLPer100Km:
+            estimatedAvgLPer100Km ?? this.estimatedAvgLPer100Km,
+        estimatedFuelLitersConsumed:
+            estimatedFuelLitersConsumed ?? this.estimatedFuelLitersConsumed,
         startedAt: startedAt ?? this.startedAt,
         endedAt: endedAt ?? this.endedAt,
         distanceSource: distanceSource ?? this.distanceSource,
