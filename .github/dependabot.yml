@@ -49,6 +49,16 @@ updates:
       # dependency_overrides (#3172) — the hosted constraint is inert, and
       # bumping it just makes pubspec.yaml lie about the shipped version.
       - dependency-name: "google_mlkit_text_recognition"
+      # SDK-pinned test stack (#3567): `flutter_test` from the Flutter SDK
+      # pins meta exactly (1.17.0 on the CI-pinned Flutter), and the
+      # test/test_api/test_core trio moves with it. Bumps can never
+      # version-solve (PR #3564 was born red). Unblocks when the Flutter
+      # SDK ships meta >=1.18 — remove these together with the riverpod
+      # cluster holds above.
+      - dependency-name: "meta"
+      - dependency-name: "test"
+      - dependency-name: "test_api"
+      - dependency-name: "test_core"
 
   - package-ecosystem: "github-actions"
     directory: "/"
