@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../core/domain/vehicle_profile.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../../consumption/domain/driving_coaching.dart' show DrivingCoachingHint;
 import '../../consumption/domain/entities/gps_sample_diagnostic.dart';
 import '../../consumption/domain/services/gear_inference.dart';
@@ -916,6 +917,14 @@ class TripRecordingController {
     // scoring on the `gps`/`virtual` source in `onSample`, so base.harsh* is
     // 0 for a no-speed-PID GPS trip (no phantom) and reflects the direct OBD2
     // speed PID on a `real` trip (preserved). Pass-through is correct here.
+    // #3576 — persist the live GPS-physics estimate the user watched all
+    // drive (the #2506 overlay) when NO measured fuel exists: the field
+    // trip showed ~2.01 L / ~11.0 L/100 km live and dashes after save.
+    // Measured data always wins — a single real fuel-rate sample keeps
+    // the estimate fields null.
+    final estimateFolder = _gpsEstimateFolder;
+    final stampEstimates =
+        base.fuelLitersConsumed == null && !_fuelRateSeen;
     return TripSummary(
       distanceKm: distanceKm,
       maxRpm: base.maxRpm,
@@ -925,6 +934,10 @@ class TripRecordingController {
       harshAccelerations: base.harshAccelerations,
       avgLPer100Km: avg,
       fuelLitersConsumed: base.fuelLitersConsumed,
+      estimatedAvgLPer100Km:
+          stampEstimates ? estimateFolder?.finalAvgLPer100Km : null,
+      estimatedFuelLitersConsumed:
+          stampEstimates ? estimateFolder?.finalFuelLiters : null,
       startedAt: startedAt,
       endedAt: endedAt,
       distanceSource: source,
@@ -1060,7 +1073,48 @@ class TripRecordingController {
       transport: _runTransport,
       tickRate: _schedulerTickRate,
       clock: _now,
+      onNoProtocolEpisode: () => unawaited(_recoverVehicleProtocol()),
     );
+  }
+
+  /// #3575 — quiet-window protocol recovery for the UNABLE-TO-CONNECT
+  /// livelock: the scheduler signalled a sustained no-protocol reply
+  /// streak (adapter connected before ignition-on → failed auto search →
+  /// every command errs instantly, and the polling cadence keeps
+  /// interrupting a restarted search). Pause polling so the `0100`
+  /// search finally gets an uninterrupted window, re-run discovery, and
+  /// resume. Throttled to one attempt per [_protocolRecoveryInterval] —
+  /// the scheduler episode re-signals while the condition persists, so a
+  /// car whose engine starts mid-trip recovers within a minute instead
+  /// of erring for the whole drive (field log 2026-07-13, 21 min of
+  /// 100% err at 0% completeness).
+  bool _protocolRecoveryInFlight = false;
+  DateTime? _lastProtocolRecoveryAt;
+  static const Duration _protocolRecoveryInterval = Duration(seconds: 45);
+
+  Future<void> _recoverVehicleProtocol() async {
+    if (_protocolRecoveryInFlight) return;
+    final now = _now();
+    final last = _lastProtocolRecoveryAt;
+    if (last != null && now.difference(last) < _protocolRecoveryInterval) {
+      return;
+    }
+    _lastProtocolRecoveryAt = now;
+    _protocolRecoveryInFlight = true;
+    final scheduler = _scheduler;
+    scheduler?.pause();
+    try {
+      final recovered = await _service.recoverVehicleProtocol();
+      BreadcrumbCollector.add(
+        'OBD2 recording: no-protocol episode (#3575)',
+        detail: recovered
+            ? 'recovered — polling resumes with a live protocol'
+            : 'still no protocol — retrying in ${_protocolRecoveryInterval.inSeconds}s',
+      );
+    } finally {
+      _protocolRecoveryInFlight = false;
+      scheduler?.resume();
+    }
   }
 
   /// Wrap [Obd2Service.sendCommand] with drop-detection bookkeeping

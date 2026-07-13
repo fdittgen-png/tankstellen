@@ -919,4 +919,37 @@ void main() {
           reason: 'headroom returned → demotions are unwound');
     });
   });
+
+  group('no-protocol episode (#3575)', () {
+    test(
+        'fires after threshold consecutive UNABLE TO CONNECT replies, '
+        'and a healthy reply resets the streak', () async {
+      var episodes = 0;
+      var healthy = false;
+      final scheduler = PidScheduler(
+        transport: (_) async =>
+            healthy ? '41 0C 1A F8' : 'UNABLE TO CONNECT',
+        tickRate: const Duration(milliseconds: 1),
+        onNoProtocolEpisode: () => episodes++,
+        noProtocolEpisodeThreshold: 5,
+      );
+      scheduler.subscribe('010C', ScheduledPid(hz: 10.0), (_) {});
+      scheduler.start();
+
+      // The ELM's cached failed-search answers instantly — the field
+      // livelock. Enough ticks for well over 5 consecutive replies.
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      expect(episodes, greaterThanOrEqualTo(1),
+          reason: 'a sustained no-protocol streak must signal the owner');
+
+      // A healthy bus resets the streak: no further episodes fire.
+      healthy = true;
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      final settled = episodes;
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      scheduler.stop();
+      expect(episodes, settled,
+          reason: 'healthy replies must stop the episode signal');
+    });
+  });
 }

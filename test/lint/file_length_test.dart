@@ -517,9 +517,12 @@ void main() {
     // obd2_fuel_rate_reader.dart, the odometer strategy/catalog chain to
     // obd2_odometer_reader.dart, and the #1418 PSA listen-mode stream to
     // obd2_can_frame_stream.dart; the service keeps thin delegators.
+    // #3575 — re-grandfathered 1317 → 1357: recoverVehicleProtocol(),
+    // the in-session ATSP0 + 0100 + ATDPN recovery for the
+    // UNABLE-TO-CONNECT livelock (2026-07-13 field trip).
     'lib/features/obd2/data/obd2_service.dart': (
-      lines: 1317,
-      bumps: 13,
+      lines: 1357,
+      bumps: 14,
       decompositionIssue: 3540,
     ),
     // #2428 — re-grandfathered 1235 → 1241: the recoverable VIN-read catch
@@ -652,9 +655,12 @@ void main() {
     // 18 bumps (the worst offender in this map) — decomposition forced
     // (#3141), tracked by the OPEN #3140 (TripRecordingController is
     // named in that issue's breakdown).
+    // #3575/#3576 — re-grandfathered 1728 → 1780: the no-protocol
+    // episode handler (pause → recoverVehicleProtocol → resume, throttled)
+    // + stop-time stamping of the live GPS-physics estimate figures.
     'lib/features/obd2/data/trip_recording_controller.dart': (
-      lines: 1728,
-      bumps: 18,
+      lines: 1780,
+      bumps: 19,
       decompositionIssue: 3140,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
@@ -761,8 +767,10 @@ void main() {
     // line; no logic added.
     // 8 bumps — decomposition forced (#3141), tracked by the OPEN #3138
     // (trips/fillups feature split; this screen is trips).
+    // #3576 — re-grandfathered 1107 → 1110: the stop summary sheet
+    // renders the `~` estimate fallback for fuel + average.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        (lines: 1107, bumps: 8, decompositionIssue: 3138),
+        (lines: 1110, bumps: 9, decompositionIssue: 3138),
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart': (
       lines: 439,
       bumps: 0,

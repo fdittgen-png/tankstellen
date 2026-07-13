@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/logging/error_logger.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'pid_bandwidth_governor.dart';
+import 'pid_no_protocol_episode.dart';
 import 'pid_scheduler_comm_diagnostics.dart';
 import 'pid_subscription.dart';
 import 'scheduled_pid.dart';
@@ -31,25 +32,16 @@ export 'scheduled_pid.dart';
 /// ## Transient-failure handling (#2379)
 ///
 /// Per-PID transport failures (timeout, NO DATA, adapter dropped) are
-/// **expected and recoverable** — engine-off cars NO-DATA half their
-/// PIDs, and a slow clone times out intermittently. They are NOT error-
-/// logged one-per-PID-per-tick (which flooded a real user's error log
-/// with ~50 of 54 traces). Instead:
-///
-/// - Each subscription counts consecutive failures. After
-///   [_maxConsecutiveFailures] in a row the PID is **backed off**: its
-///   selection weight is recomputed at [_backoffHz] (≈ once per 30 s)
-///   instead of its configured hz, so it neither floods the adapter nor
-///   starves healthy PIDs. A single successful read resets the counter
-///   and restores full cadence. The `lastReadAt` anti-starvation stamp
-///   is kept on every attempt (success OR failure), so a backed-off PID
-///   still climbs weight and is retried — just rarely.
-/// - When the adapter looks broadly unresponsive ([_backoffThreshold]+
-///   PIDs backed off) a SINGLE rate-limited aggregated diagnostic is
-///   emitted, at most once per [_diagnosticWindow].
-///
-/// Recording is unaffected — a backed-off PID simply contributes fewer
-/// samples; the loop never stalls.
+/// **expected and recoverable** — never error-logged per-PID-per-tick.
+/// After [_maxConsecutiveFailures] in a row a PID is backed off to
+/// [_backoffHz] (one success restores full cadence; the `lastReadAt`
+/// anti-starvation stamp is kept on every attempt so it is still
+/// retried, just rarely). [_backoffThreshold]+ simultaneous backoffs
+/// emit ONE aggregated diagnostic per [_diagnosticWindow]. Recording is
+/// unaffected — a backed-off PID simply contributes fewer samples.
+/// Sustained no-protocol REPLIES (successful round-trips whose content
+/// is UNABLE TO CONNECT / STOPPED) are a separate condition — see
+/// [PidNoProtocolEpisode] (#3575).
 ///
 /// ## Bandwidth governor (#2457)
 ///
@@ -72,7 +64,15 @@ class PidScheduler {
     required this.transport,
     this.tickRate = const Duration(milliseconds: 100),
     DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+    void Function()? onNoProtocolEpisode,
+    int noProtocolEpisodeThreshold = 40,
+  })  : _clock = clock ?? DateTime.now,
+        _noProtocolEpisode = PidNoProtocolEpisode(
+            threshold: noProtocolEpisodeThreshold,
+            onEpisode: onNoProtocolEpisode);
+
+  /// #3575 — see [PidNoProtocolEpisode].
+  final PidNoProtocolEpisode _noProtocolEpisode;
 
   /// Consecutive per-PID transport failures before the PID is backed off
   /// to [_backoffHz]. Three covers a brief blip (one slow round-trip,
@@ -343,6 +343,7 @@ class PidScheduler {
       // A successful read clears any accumulated failure streak so the
       // PID resumes its configured cadence immediately (#2379).
       sub.consecutiveFailures = 0;
+      _noProtocolEpisode.note(response); // #3575 — content-classified.
       if (diag.enabled) {
         PidSchedulerCommDiagnostics.noteSuccess(command, response,
             dispatchedAt: now, completedAt: completedAt);
