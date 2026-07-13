@@ -26,6 +26,29 @@ updates:
       # red-CI'd the whole minor-and-patch group). Hold it until the riverpod
       # 3.x line is intentionally moved in lockstep.
       - dependency-name: "riverpod_lint"
+      # Ignoring riverpod_lint alone is NOT enough: bumping any other member
+      # of its lock-stepped cluster makes Dependabot co-bump riverpod_lint to
+      # resolve, reproducing the #3352 red (it did exactly that in PR #3563 —
+      # riverpod_lint 3.1.4 needs analyzer ^12 -> meta ^1.18, which
+      # flutter_test's meta 1.17.0 pin forbids on Flutter 3.41.9). Hold the
+      # whole cluster until the Flutter SDK ships meta >=1.18, then move it
+      # in one intentional lockstep bump.
+      - dependency-name: "flutter_riverpod"
+      - dependency-name: "riverpod_annotation"
+      - dependency-name: "riverpod_generator"
+      # json_serializable >=6.13.2 needs analyzer >=10 (riverpod_lint 3.1.3
+      # needs ^9), and json_annotation 4.12 forces json_serializable >=6.13.2
+      # — same cluster.
+      - dependency-name: "json_serializable"
+      - dependency-name: "json_annotation"
+      # Dependabot pulled the 3.2.6-dev.1 prerelease into PR #3563; stable
+      # releases only.
+      - dependency-name: "freezed"
+        versions: [">=3.2.6-dev <3.2.6"]
+      # Vendored as a stripped fork under third_party/ via
+      # dependency_overrides (#3172) — the hosted constraint is inert, and
+      # bumping it just makes pubspec.yaml lie about the shipped version.
+      - dependency-name: "google_mlkit_text_recognition"
 
   - package-ecosystem: "github-actions"
     directory: "/"
