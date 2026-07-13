@@ -1450,10 +1450,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Jogalap: GDPR 6. cikk (1) bekezdés a) pont (hozzájárulás). A hozzájárulást bármikor visszavonhatja a Beállításokban.';
 
   @override
-  String get gdprAcceptAll => 'Összes elfogadása';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Kiválasztottak elfogadása';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

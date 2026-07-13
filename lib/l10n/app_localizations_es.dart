@@ -1450,10 +1450,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Base jurídica: art. 6(1)(a) del RGPD (consentimiento). Puedes retirar tu consentimiento en cualquier momento en Ajustes.';
 
   @override
-  String get gdprAcceptAll => 'Aceptar todo';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Aceptar selección';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

@@ -1450,10 +1450,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Base giuridica: art. 6, par. 1, lett. a) GDPR (Consenso). Puoi revocare il consenso in qualsiasi momento nelle Impostazioni.';
 
   @override
-  String get gdprAcceptAll => 'Accetta tutto';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Accetta selezionati';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

@@ -445,8 +445,6 @@
   "gdprCloudSyncDescription": "Synkronoi suosikit ja hälytykset laitteiden välillä TankSyncin avulla. Käyttää anonyymiä todennusta. Tietosi salataan siirrossa.",
   "gdprCloudSyncShort": "Synkronoi suosikit ja hälytykset laitteiden välillä",
   "gdprLegalBasis": "Oikeusperuste: Art. 6(1)(a) GDPR (Suostumus). Voit peruuttaa suostumuksen milloin tahansa Asetuksissa.",
-  "gdprAcceptAll": "Hyväksy kaikki",
-  "gdprAcceptSelected": "Hyväksy valitut",
   "gdprSettingsHint": "Voit muuttaa tietosuojavalintojasi milloin tahansa.",
   "routeSaved": "Reitti tallennettu!",
   "routeSaveFailed": "Reitin tallennus epäonnistui",
@@ -5321,6 +5319,16 @@
   },
   "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
   "@tankSyncSchemaOutdatedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueAll": "Continue with all",
+  "@gdprContinueAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueSelected": "Continue with selected",
+  "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

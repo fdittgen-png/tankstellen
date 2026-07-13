@@ -1450,10 +1450,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Правно основание: Чл. 6(1)(а) GDPR (Съгласие). Можете да оттеглите съгласието си по всяко време в Настройки.';
 
   @override
-  String get gdprAcceptAll => 'Приеми всички';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Приеми избраните';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

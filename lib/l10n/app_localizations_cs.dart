@@ -1449,10 +1449,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Právní základ: čl. 6 odst. 1 písm. a) GDPR (souhlas). Souhlas můžete kdykoli odvolat v nastavení.';
 
   @override
-  String get gdprAcceptAll => 'Přijmout vše';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Přijmout vybrané';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

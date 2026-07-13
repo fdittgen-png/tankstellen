@@ -1443,10 +1443,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Pravna podlaga: čl. 6(1)(a) GDPR (Privolitev). Privolitev lahko kadar koli umaknete v Nastavitvah.';
 
   @override
-  String get gdprAcceptAll => 'Sprejmi vse';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Sprejmi izbrano';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

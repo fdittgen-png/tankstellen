@@ -1446,10 +1446,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Oikeusperuste: Art. 6(1)(a) GDPR (Suostumus). Voit peruuttaa suostumuksen milloin tahansa Asetuksissa.';
 
   @override
-  String get gdprAcceptAll => 'Hyväksy kaikki';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Hyväksy valitut';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

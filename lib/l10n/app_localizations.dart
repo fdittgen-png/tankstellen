@@ -2751,17 +2751,17 @@ abstract class AppLocalizations {
   /// **'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.'**
   String get gdprLegalBasis;
 
-  /// No description provided for @gdprAcceptAll.
+  /// No description provided for @gdprContinueAll.
   ///
   /// In en, this message translates to:
-  /// **'Accept All'**
-  String get gdprAcceptAll;
+  /// **'Continue with all'**
+  String get gdprContinueAll;
 
-  /// No description provided for @gdprAcceptSelected.
+  /// No description provided for @gdprContinueSelected.
   ///
   /// In en, this message translates to:
-  /// **'Accept Selected'**
-  String get gdprAcceptSelected;
+  /// **'Continue with selected'**
+  String get gdprContinueSelected;
 
   /// No description provided for @gdprSettingsHint.
   ///

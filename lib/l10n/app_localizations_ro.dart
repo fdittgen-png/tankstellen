@@ -1451,10 +1451,10 @@ class AppLocalizationsRo extends AppLocalizations {
       'Baza legală: Art. 6(1)(a) GDPR (Consimțământ). Puteți retrage consimțământul oricând din Setări.';
 
   @override
-  String get gdprAcceptAll => 'Acceptați toate';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Acceptați selecția';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

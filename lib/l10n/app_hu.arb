@@ -445,8 +445,6 @@
   "gdprCloudSyncDescription": "Kedvencek és riasztások szinkronizálása az eszközök között TankSync segítségével. Névtelen hitelesítést használ. Az adatok titkosítva kerülnek átvitelre.",
   "gdprCloudSyncShort": "Kedvencek és riasztások szinkronizálása az eszközök között",
   "gdprLegalBasis": "Jogalap: GDPR 6. cikk (1) bekezdés a) pont (hozzájárulás). A hozzájárulást bármikor visszavonhatja a Beállításokban.",
-  "gdprAcceptAll": "Összes elfogadása",
-  "gdprAcceptSelected": "Kiválasztottak elfogadása",
   "gdprSettingsHint": "Adatvédelmi beállításait bármikor módosíthatja.",
   "routeSaved": "Útvonal mentve!",
   "routeSaveFailed": "Az útvonal mentése sikertelen",
@@ -5321,6 +5319,16 @@
   },
   "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
   "@tankSyncSchemaOutdatedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueAll": "Continue with all",
+  "@gdprContinueAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueSelected": "Continue with selected",
+  "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

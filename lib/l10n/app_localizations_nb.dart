@@ -1443,10 +1443,10 @@ class AppLocalizationsNb extends AppLocalizations {
       'Rettslig grunnlag: Art. 6(1)(a) GDPR (Samtykke). Du kan trekke tilbake samtykket når som helst i Innstillinger.';
 
   @override
-  String get gdprAcceptAll => 'Godta alle';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Godta valgte';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

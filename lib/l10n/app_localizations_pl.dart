@@ -1448,10 +1448,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Podstawa prawna: art. 6 ust. 1 lit. a RODO (zgoda). Możesz wycofać zgodę w dowolnym momencie w Ustawieniach.';
 
   @override
-  String get gdprAcceptAll => 'Akceptuj wszystko';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Akceptuj wybrane';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

@@ -445,8 +445,6 @@
   "gdprCloudSyncDescription": "Συγχρονισμός αγαπημένων και ειδοποιήσεων σε συσκευές μέσω TankSync. Χρησιμοποιεί ανώνυμη ταυτοποίηση. Τα δεδομένα σας κρυπτογραφούνται κατά τη μεταφορά.",
   "gdprCloudSyncShort": "Συγχρονισμός αγαπημένων και ειδοποιήσεων σε συσκευές",
   "gdprLegalBasis": "Νομική βάση: Άρθρο 6(1)(α) GDPR (Συγκατάθεση). Μπορείτε να ανακαλέσετε τη συγκατάθεση ανά πάσα στιγμή στις Ρυθμίσεις.",
-  "gdprAcceptAll": "Αποδοχή όλων",
-  "gdprAcceptSelected": "Αποδοχή επιλεγμένων",
   "gdprSettingsHint": "Μπορείτε να αλλάξετε τις επιλογές απορρήτου σας ανά πάσα στιγμή.",
   "routeSaved": "Η διαδρομή αποθηκεύτηκε!",
   "routeSaveFailed": "Αποτυχία αποθήκευσης διαδρομής",
@@ -5321,6 +5319,16 @@
   },
   "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
   "@tankSyncSchemaOutdatedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueAll": "Continue with all",
+  "@gdprContinueAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueSelected": "Continue with selected",
+  "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

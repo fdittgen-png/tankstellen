@@ -1450,10 +1450,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Rechtsgrond: art. 6 lid 1 sub a AVG (toestemming). Je kunt toestemming te allen tijde intrekken via Instellingen.';
 
   @override
-  String get gdprAcceptAll => 'Alles accepteren';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Selectie accepteren';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

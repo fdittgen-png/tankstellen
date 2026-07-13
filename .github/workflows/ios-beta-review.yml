@@ -78,6 +78,9 @@ jobs:
           # Workflow-dispatch inputs (if given) override the secrets / defaults.
           BETA_CONTACT_FIRST: ${{ inputs.contact_first != '' && inputs.contact_first || secrets.BETA_CONTACT_FIRST || '' }}
           BETA_CONTACT_LAST: ${{ inputs.contact_last != '' && inputs.contact_last || secrets.BETA_CONTACT_LAST || '' }}
+          # #3537 — App Review 2.1 demo-video link, appended to the review
+          # notes by beta_review_notes(); notes go out without it when unset.
+          DEMO_VIDEO_URL: ${{ secrets.DEMO_VIDEO_URL || '' }}
           FASTLANE_DISABLE_COLORS: '1'
         run: bundle exec fastlane configure_beta_review
 

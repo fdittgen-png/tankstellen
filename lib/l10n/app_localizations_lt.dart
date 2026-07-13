@@ -1447,10 +1447,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Teisinis pagrindas: BDAR 6 str. 1 d. a p. (Sutikimas). Sutikimą galite atšaukti bet kada Nustatymuose.';
 
   @override
-  String get gdprAcceptAll => 'Priimti viską';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Priimti pasirinktus';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

@@ -158,6 +158,9 @@ jobs:
           BETA_CONTACT_FIRST: ${{ secrets.BETA_CONTACT_FIRST || '' }}
           BETA_CONTACT_LAST: ${{ secrets.BETA_CONTACT_LAST || '' }}
           BETA_FEEDBACK_EMAIL: ${{ secrets.BETA_FEEDBACK_EMAIL || '' }}
+          # #3537 — App Review 2.1 demo-video link, appended to the review
+          # notes by beta_review_notes(); notes go out without it when unset.
+          DEMO_VIDEO_URL: ${{ secrets.DEMO_VIDEO_URL || '' }}
           FASTLANE_DISABLE_COLORS: '1'
           FASTLANE_HIDE_CHANGELOG: '1'
         # sync_certs repair mode (#3467): generate missing appstore profiles

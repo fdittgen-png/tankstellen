@@ -1442,10 +1442,10 @@ class AppLocalizationsEt extends AppLocalizations {
       'Õiguslik alus: art. 6(1)(a) GDPR (nõusolek). Nõusoleku saad igal ajal seadetes tagasi võtta.';
 
   @override
-  String get gdprAcceptAll => 'Nõustu kõigega';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Nõustu valitutega';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint => 'Oma privaatsusvalikuid saad igal ajal muuta.';
