@@ -1453,10 +1453,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Base légale : art. 6(1)(a) du RGPD (consentement). Vous pouvez retirer votre consentement à tout moment dans les Paramètres.';
 
   @override
-  String get gdprAcceptAll => 'Tout accepter';
+  String get gdprContinueAll => 'Continuer avec tout';
 
   @override
-  String get gdprAcceptSelected => 'Accepter la sélection';
+  String get gdprContinueSelected => 'Continuer avec la sélection';
 
   @override
   String get gdprSettingsHint =>

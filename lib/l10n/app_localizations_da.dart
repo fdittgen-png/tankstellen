@@ -1445,10 +1445,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Retsgrundlag: Art. 6(1)(a) GDPR (Samtykke). Du kan trække samtykke tilbage til enhver tid i Indstillinger.';
 
   @override
-  String get gdprAcceptAll => 'Accepter alle';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Accepter valgte';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

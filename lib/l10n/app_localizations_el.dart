@@ -1453,10 +1453,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Νομική βάση: Άρθρο 6(1)(α) GDPR (Συγκατάθεση). Μπορείτε να ανακαλέσετε τη συγκατάθεση ανά πάσα στιγμή στις Ρυθμίσεις.';
 
   @override
-  String get gdprAcceptAll => 'Αποδοχή όλων';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Αποδοχή επιλεγμένων';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

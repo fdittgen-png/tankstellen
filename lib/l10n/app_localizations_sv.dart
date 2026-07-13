@@ -1443,10 +1443,10 @@ class AppLocalizationsSv extends AppLocalizations {
       'Rättslig grund: Art. 6(1)(a) GDPR (Samtycke). Du kan återkalla samtycket när som helst i Inställningar.';
 
   @override
-  String get gdprAcceptAll => 'Acceptera alla';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Acceptera valda';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

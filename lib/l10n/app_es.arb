@@ -445,8 +445,6 @@
   "gdprCloudSyncDescription": "Sincroniza favoritos y alertas entre dispositivos mediante TankSync. Usa autenticación anónima. Tus datos se cifran durante la transmisión.",
   "gdprCloudSyncShort": "Sincroniza favoritos y alertas entre dispositivos",
   "gdprLegalBasis": "Base jurídica: art. 6(1)(a) del RGPD (consentimiento). Puedes retirar tu consentimiento en cualquier momento en Ajustes.",
-  "gdprAcceptAll": "Aceptar todo",
-  "gdprAcceptSelected": "Aceptar selección",
   "gdprSettingsHint": "Puedes cambiar tus opciones de privacidad en cualquier momento.",
   "routeSaved": "¡Ruta guardada!",
   "routeSaveFailed": "Error al guardar la ruta",
@@ -5321,6 +5319,16 @@
   },
   "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
   "@tankSyncSchemaOutdatedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueAll": "Continue with all",
+  "@gdprContinueAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueSelected": "Continue with selected",
+  "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

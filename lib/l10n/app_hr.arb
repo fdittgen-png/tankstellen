@@ -445,8 +445,6 @@
   "gdprCloudSyncDescription": "Sinkronizirajte favorite i upozorenja na svim uređajima putem TankSync. Koristi anonimnu autentifikaciju. Vaši podaci su šifrirani u prijenosu.",
   "gdprCloudSyncShort": "Sinkroniziraj favorite i upozorenja na svim uređajima",
   "gdprLegalBasis": "Pravna osnova: čl. 6(1)(a) GDPR (Pristanak). Pristanak možete povući u bilo kojem trenutku u Postavkama.",
-  "gdprAcceptAll": "Prihvati sve",
-  "gdprAcceptSelected": "Prihvati odabrano",
   "gdprSettingsHint": "Možete promijeniti svoje odluke o privatnosti u bilo kojem trenutku.",
   "routeSaved": "Ruta spremljena!",
   "routeSaveFailed": "Spremanje rute nije uspjelo",
@@ -5321,6 +5319,16 @@
   },
   "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
   "@tankSyncSchemaOutdatedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueAll": "Continue with all",
+  "@gdprContinueAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueSelected": "Continue with selected",
+  "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

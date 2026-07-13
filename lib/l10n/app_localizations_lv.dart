@@ -1449,10 +1449,10 @@ class AppLocalizationsLv extends AppLocalizations {
       'Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana). Piekrišanu varat atsaukt jebkurā laikā iestatījumos.';
 
   @override
-  String get gdprAcceptAll => 'Pieņemt visu';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Pieņemt izvēlētos';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

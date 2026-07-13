@@ -445,8 +445,6 @@
   "gdprCloudSyncDescription": "Synka favoriter och aviseringar mellan enheter via TankSync. Använder anonym autentisering. Din data är krypterad under överföring.",
   "gdprCloudSyncShort": "Synka favoriter och aviseringar mellan enheter",
   "gdprLegalBasis": "Rättslig grund: Art. 6(1)(a) GDPR (Samtycke). Du kan återkalla samtycket när som helst i Inställningar.",
-  "gdprAcceptAll": "Acceptera alla",
-  "gdprAcceptSelected": "Acceptera valda",
   "gdprSettingsHint": "Du kan ändra dina integritetsinställningar när som helst.",
   "routeSaved": "Rutt sparad!",
   "routeSaveFailed": "Det gick inte att spara rutten",
@@ -5321,6 +5319,16 @@
   },
   "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
   "@tankSyncSchemaOutdatedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueAll": "Continue with all",
+  "@gdprContinueAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueSelected": "Continue with selected",
+  "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

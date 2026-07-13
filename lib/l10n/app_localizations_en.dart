@@ -1436,10 +1436,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Legal basis: Art. 6(1)(a) GDPR (Consent). You can withdraw consent anytime in Settings.';
 
   @override
-  String get gdprAcceptAll => 'Accept All';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Accept Selected';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>
@@ -9592,10 +9592,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Łéǧáł ƀášîš: Ářŧ. 6(1)(á) ǦĐƤŘ (Çóñšéñŧ). Ýóú çáñ ŵîŧĥđřáŵ çóñšéñŧ áñýŧîɱé îñ Šéŧŧîñǧš. ····························⟧';
 
   @override
-  String get gdprAcceptAll => '⟦Áççéƥŧ Áłł ····⟧';
+  String get gdprContinueAll => '⟦Çóñŧîñúé ŵîŧĥ áłł ·······⟧';
 
   @override
-  String get gdprAcceptSelected => '⟦Áççéƥŧ Šéłéçŧéđ ······⟧';
+  String get gdprContinueSelected => '⟦Çóñŧîñúé ŵîŧĥ šéłéçŧéđ ·········⟧';
 
   @override
   String get gdprSettingsHint =>

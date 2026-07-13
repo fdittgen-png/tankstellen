@@ -73,13 +73,14 @@ void main() {
       expect(find.text('Community Wait Times'), findsNothing);
     });
 
-    testWidgets('shows Accept All and Accept Selected buttons',
+    // #3565 — App Review 5.1.1: neutral Continue wording, never "Accept".
+    testWidgets('shows Continue with all and Continue with selected buttons',
         (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
-      expect(find.text('Accept All'), findsOneWidget);
-      expect(find.text('Accept Selected'), findsOneWidget);
+      expect(find.text('Continue with all'), findsOneWidget);
+      expect(find.text('Continue with selected'), findsOneWidget);
     });
 
     testWidgets('shows legal basis text', (tester) async {
@@ -114,7 +115,7 @@ void main() {
       expect(switches[3].value, isFalse);
     });
 
-    testWidgets('Accept Selected saves only selected consents',
+    testWidgets('Continue with selected saves only selected consents',
         (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
@@ -123,8 +124,7 @@ void main() {
       await tester.tap(find.byType(Switch).first);
       await tester.pumpAndSettle();
 
-      // Tap Accept Selected
-      await tester.tap(find.text('Accept Selected'));
+      await tester.tap(find.text('Continue with selected'));
       await tester.pumpAndSettle();
 
       expect(fakeStorage.getSetting(StorageKeys.gdprConsentGiven), true);
@@ -133,12 +133,12 @@ void main() {
       expect(fakeStorage.getSetting(StorageKeys.consentCloudSync), false);
     });
 
-    testWidgets('Accept All saves all consents as true', (tester) async {
+    testWidgets('Continue with all saves all consents as true',
+        (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
-      // Tap Accept All
-      await tester.tap(find.text('Accept All'));
+      await tester.tap(find.text('Continue with all'));
       await tester.pumpAndSettle();
 
       expect(fakeStorage.getSetting(StorageKeys.gdprConsentGiven), true);

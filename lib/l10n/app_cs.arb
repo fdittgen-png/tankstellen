@@ -445,8 +445,6 @@
   "gdprCloudSyncDescription": "Synchronizujte oblíbené a upozornění mezi zařízeními přes TankSync. Používá anonymní ověřování. Vaše data jsou šifrována při přenosu.",
   "gdprCloudSyncShort": "Synchronizovat oblíbené a upozornění mezi zařízeními",
   "gdprLegalBasis": "Právní základ: čl. 6 odst. 1 písm. a) GDPR (souhlas). Souhlas můžete kdykoli odvolat v nastavení.",
-  "gdprAcceptAll": "Přijmout vše",
-  "gdprAcceptSelected": "Přijmout vybrané",
   "gdprSettingsHint": "Svá nastavení ochrany soukromí můžete kdykoli změnit.",
   "routeSaved": "Trasa uložena!",
   "routeSaveFailed": "Uložení trasy selhalo",
@@ -5321,6 +5319,16 @@
   },
   "tankSyncSchemaOutdatedSubtitle": "Your self-hosted TankSync schema is outdated — some data cannot sync. Open the sync wizard and run the update SQL on your Supabase project.",
   "@tankSyncSchemaOutdatedSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueAll": "Continue with all",
+  "@gdprContinueAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "gdprContinueSelected": "Continue with selected",
+  "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

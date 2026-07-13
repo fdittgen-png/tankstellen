@@ -1444,10 +1444,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Pravna osnova: čl. 6(1)(a) GDPR (Pristanak). Pristanak možete povući u bilo kojem trenutku u Postavkama.';
 
   @override
-  String get gdprAcceptAll => 'Prihvati sve';
+  String get gdprContinueAll => 'Continue with all';
 
   @override
-  String get gdprAcceptSelected => 'Prihvati odabrano';
+  String get gdprContinueSelected => 'Continue with selected';
 
   @override
   String get gdprSettingsHint =>

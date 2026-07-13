@@ -1452,10 +1452,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Sie können Ihre Einwilligung jederzeit in den Einstellungen widerrufen.';
 
   @override
-  String get gdprAcceptAll => 'Alle akzeptieren';
+  String get gdprContinueAll => 'Mit allen fortfahren';
 
   @override
-  String get gdprAcceptSelected => 'Auswahl akzeptieren';
+  String get gdprContinueSelected => 'Mit Auswahl fortfahren';
 
   @override
   String get gdprSettingsHint =>
