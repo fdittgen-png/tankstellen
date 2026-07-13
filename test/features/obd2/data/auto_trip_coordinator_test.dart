@@ -737,6 +737,64 @@ void main() {
   });
 
   // -------------------------------------------------------------------------
+  // #3569 — a foreground link death produces no platform event (FGS gated),
+  // so the speed stream's transport watchdog is the only drop signal. The
+  // coordinator must tear the dead watch down and must never stay stranded
+  // behind its own skip-guard (field log 2026-07-13: zero dials 10:32→21:32).
+  // -------------------------------------------------------------------------
+
+  group('dead-link self-heal (#3569)', () {
+    test('speed-watch death tears the session down (no platform event)',
+        () async {
+      final direct = _SessionOpenerHarness();
+      final fake = buildFakeService([0, 0, 0, 0]);
+      direct.queue.add(fake.service);
+      coordinator = buildCoordinator(foregroundOpener: direct.opener());
+
+      await coordinator.start();
+      await coordinator.armForegroundActive();
+      await pumpSpeedTicks(2);
+      expect(coordinator.hasOpenSession, isTrue);
+
+      // The transport dies with NO AdapterDisconnected event — exactly
+      // the foreground-drop case. The stream watchdog must error+close
+      // and the coordinator must clean up.
+      await fake.transport.disconnect();
+      await pumpSpeedTicks(3);
+
+      expect(coordinator.hasOpenSession, isFalse,
+          reason: 'a dead transport must not leave a held session');
+    });
+
+    test('foreground arm self-heals a stranded dead session and re-dials',
+        () async {
+      final direct = _SessionOpenerHarness();
+      final first = buildFakeService([0, 0]);
+      final second = buildFakeService([0, 0]);
+      direct.queue.add(first.service);
+      coordinator = buildCoordinator(foregroundOpener: direct.opener());
+
+      await coordinator.start();
+      await coordinator.armForegroundActive();
+      await pumpSpeedTicks(2);
+      expect(coordinator.hasOpenSession, isTrue);
+
+      // Kill the transport. Even if the watchdog tick hasn't fired yet,
+      // the NEXT resume must detect the dead held session, tear it down,
+      // and dial again instead of skipping forever.
+      await first.transport.disconnect();
+      direct.queue.add(second.service);
+      await coordinator.armForegroundActive();
+      await pumpSpeedTicks(2);
+
+      expect(direct.callCount, 2,
+          reason: 'the resume after a dead link must re-dial, not skip');
+      expect(coordinator.hasOpenSession, isTrue,
+          reason: 'the re-dial must leave a fresh watched session');
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // #2282 concern 4 — connectionPriority balanced-downgrade when only the
   // 1 Hz auto-record movement stream is live.
   // -------------------------------------------------------------------------

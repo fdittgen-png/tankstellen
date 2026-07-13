@@ -424,6 +424,20 @@ class AutoTripCoordinator {
   /// connect is logged and swallowed — the next resume retries.
   Future<void> armForegroundActive() async {
     if (!_started) return;
+    // #3569 — self-heal a stranded watch before consulting the
+    // skip-guard: if the held session's transport is dead (the drop
+    // happened while foregrounded, so no platform event and possibly a
+    // stream that neither errored nor closed), tear it down now so this
+    // resume re-arms instead of skipping forever.
+    final held = _session;
+    if (!_tripActive && held != null && !held.isConnected) {
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.foregroundArmAttempt,
+        mac: config.mac,
+        detail: 'held session is dead — tearing down before re-arm',
+      );
+      await _onDisconnected();
+    }
     // Already watching (session held) or recording — nothing to arm.
     if (_tripActive || _session != null || _speedSub != null) {
       AutoRecordTraceLog.add(
@@ -515,7 +529,31 @@ class AutoTripCoordinator {
     // it back to high on threshold-cross when it owns the session.
     unawaited(_tuneLinkForBackground(service));
     final speedStream = speedStreamFactory(service, mac: config.mac);
-    _speedSub = speedStream.stream.listen(_onSpeedSample);
+    // #3569 — a foreground link death produces NO AdapterDisconnected
+    // platform event (the FGS is gated off), so the speed stream's own
+    // error/done is the only drop signal the coordinator gets. Without
+    // these handlers the dead `_session`/`_speedSub` stranded
+    // `armForegroundActive` behind its skip-guard for the rest of the
+    // day (field log 2026-07-13: zero dials from 10:32 to 21:32).
+    _speedSub = speedStream.stream.listen(
+      _onSpeedSample,
+      onError: (Object e, StackTrace st) {
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.sessionOpenFailed,
+          mac: config.mac,
+          detail: 'speed stream error — treating as link drop: $e',
+        );
+        unawaited(_onDisconnected());
+      },
+      onDone: () {
+        AutoRecordTraceLog.add(
+          AutoRecordEventKind.sessionOpenFailed,
+          mac: config.mac,
+          detail: 'speed stream closed — treating as link drop',
+        );
+        unawaited(_onDisconnected());
+      },
+    );
   }
 
   /// Best-effort balanced-priority downgrade (#2282 concern 4). The
@@ -641,6 +679,20 @@ class AutoTripCoordinator {
         detail: 'no session held at threshold-cross',
       );
       _tripActive = false;
+      return;
+    }
+    if (!session.isConnected) {
+      // #3569 — never hand a dead husk to the recorder: a link that died
+      // between the last speed sample and the threshold-cross would start
+      // a trip whose every PID command times out. Tear down instead; the
+      // disconnect debounce + the self-healing foreground arm take over.
+      AutoRecordTraceLog.add(
+        AutoRecordEventKind.tripStartFailed,
+        mac: config.mac,
+        detail: 'session dead at threshold-cross — torn down, not handed off',
+      );
+      _tripActive = false;
+      await _onDisconnected();
       return;
     }
     // Stop the coordinator's speed polling immediately — the recorder
