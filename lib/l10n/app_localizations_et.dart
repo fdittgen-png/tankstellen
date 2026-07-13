@@ -6758,6 +6758,16 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
 
   @override
+  String get obd2StatusEngineOff => 'OBD2 paused — engine off';
+
+  @override
+  String get obd2StatusEngineOffBody =>
+      'The adapter was reachable but the vehicle bus stayed silent, so automatic reconnection is paused. It resumes when you drive or reopen the app — or reconnect now.';
+
+  @override
+  String get obd2StatusReconnectNow => 'Reconnect now';
+
+  @override
   String get autoRecordNotificationTitle => 'Trip auto-record';
 
   @override

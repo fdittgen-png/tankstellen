@@ -3,8 +3,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
 import 'package:tankstellen/features/obd2/presentation/widgets/obd2_status_dot.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_connection_state_provider.dart';
+import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -16,6 +18,15 @@ class _FakeObd2Status extends Obd2ConnectionStatus {
 
   @override
   Obd2ConnectionSnapshot build() => _initial;
+}
+
+/// #3570 — pins the link state without the production supervisor wiring.
+class _PinnedLinkState extends Obd2Reconnect {
+  final Obd2LinkState _pinned;
+  _PinnedLinkState(this._pinned);
+
+  @override
+  Obd2LinkState build() => _pinned;
 }
 
 void main() {
@@ -53,6 +64,32 @@ void main() {
       final handle = tester.ensureSemantics();
       expect(
         find.bySemanticsLabel('OBD2 adapter: connected'),
+        findsOneWidget,
+      );
+      handle.dispose();
+    });
+
+    testWidgets(
+        '#3570 — the parked engineOff state renders a visible dot with '
+        'its own semantics label (it used to be completely invisible)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const Obd2StatusDot(),
+        overrides: [
+          // No paired-adapter snapshot: engineOff alone must surface it.
+          obd2ConnectionStatusProvider.overrideWith(
+            () => _FakeObd2Status(const Obd2ConnectionSnapshot()),
+          ),
+          obd2ReconnectProvider.overrideWith(
+            () => _PinnedLinkState(Obd2LinkState.engineOff),
+          ),
+        ],
+      );
+      expect(find.byKey(const Key('obd2StatusDot')), findsOneWidget);
+      final handle = tester.ensureSemantics();
+      expect(
+        find.bySemanticsLabel('OBD2 paused — engine off'),
         findsOneWidget,
       );
       handle.dispose();

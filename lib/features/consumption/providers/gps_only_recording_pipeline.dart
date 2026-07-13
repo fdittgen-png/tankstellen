@@ -17,6 +17,7 @@ import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_trip_wal.dart';
+import 'gps_movement_wake_nudge.dart';
 import 'gps_sample_diagnostics_recorder.dart';
 import 'motion_gated_gps_source.dart';
 import 'recording_pipeline.dart';
@@ -190,6 +191,21 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     );
   }
 
+  // #3570 — movement-wake nudge for a parked link (counter + throttle
+  // live in [GpsMovementWakeNudge]; the wake callback resolves THE
+  // supervisor lazily so tests without the reconnect graph stay green).
+  late final GpsMovementWakeNudge _wakeNudge = GpsMovementWakeNudge(
+    wake: () {
+      try {
+        _ref.read(obd2ReconnectProvider.notifier).supervisor.wake();
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+          'where': 'GpsOnlyRecordingPipeline: movement wake failed',
+        }));
+      }
+    },
+  );
+
   void _onPosition(Position p) {
     final recorder = _recorder;
     final startedAt = _startedAt;
@@ -214,6 +230,10 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // min-speed gate and accel-vs-brake direction classification track the
     // real vehicle speed (the inertial stream alone has no speed).
     _imuFusion?.feedSpeedKmh(sample.speedKmh);
+    // #3570 — sustained GPS movement is the other documented exit from the
+    // supervisor's engineOff park: recording a moving trip proves the
+    // engine runs, so a parked link must redial (wake() no-ops otherwise).
+    _wakeNudge.onSpeed(sample.speedKmh);
     // #3319 — motion-gate the receiver (FGS-approved builds only).
     _gpsSource?.onSpeed(
         sample.speedKmh, DateTime.now().difference(startedAt));

@@ -5331,5 +5331,20 @@
   "@gdprContinueSelected": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2StatusEngineOff": "OBD2 paused — engine off",
+  "@obd2StatusEngineOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2StatusEngineOffBody": "The adapter was reachable but the vehicle bus stayed silent, so automatic reconnection is paused. It resumes when you drive or reopen the app — or reconnect now.",
+  "@obd2StatusEngineOffBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2StatusReconnectNow": "Reconnect now",
+  "@obd2StatusReconnectNow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

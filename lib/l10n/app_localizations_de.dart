@@ -6799,6 +6799,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verbindung zum OBD2-Adapter wird wiederhergestellt…';
 
   @override
+  String get obd2StatusEngineOff => 'OBD2 pausiert — Motor aus';
+
+  @override
+  String get obd2StatusEngineOffBody =>
+      'Der Adapter war erreichbar, aber der Fahrzeugbus blieb stumm, daher ist die automatische Wiederverbindung pausiert. Sie wird beim Fahren oder beim Öffnen der App fortgesetzt — oder jetzt neu verbinden.';
+
+  @override
+  String get obd2StatusReconnectNow => 'Jetzt neu verbinden';
+
+  @override
   String get autoRecordNotificationTitle => 'Automatische Fahrtaufzeichnung';
 
   @override

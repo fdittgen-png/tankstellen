@@ -3,6 +3,18 @@
   "@obd2ReconnectInProgress": {
     "description": "Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight."
   },
+  "obd2StatusEngineOff": "OBD2 paused — engine off",
+  "@obd2StatusEngineOff": {
+    "description": "Status-dot semantics label while the link supervisor is parked in engineOff (#3570): the adapter answered but the vehicle bus was silent, so auto-reconnect is paused until movement / app resume / manual wake."
+  },
+  "obd2StatusEngineOffBody": "The adapter was reachable but the vehicle bus stayed silent, so automatic reconnection is paused. It resumes when you drive or reopen the app — or reconnect now.",
+  "@obd2StatusEngineOffBody": {
+    "description": "Body text of the status-dot bottom sheet in the parked engineOff state (#3570), explaining why the link is not retrying and how it recovers."
+  },
+  "obd2StatusReconnectNow": "Reconnect now",
+  "@obd2StatusReconnectNow": {
+    "description": "Action button on the status-dot sheet that wakes the parked supervisor and dials immediately (#3570)."
+  },
   "autoRecordNotificationTitle": "Trip auto-record",
   "@autoRecordNotificationTitle": {
     "description": "Title of the Android foreground-service notification shown while the hands-free auto-record watch is armed (#3505 — replaces the hard-coded English string in AutoRecordForegroundService.kt). Handed to the native side at arm time."

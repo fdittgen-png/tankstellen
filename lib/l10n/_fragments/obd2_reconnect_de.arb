@@ -3,6 +3,9 @@
   "@obd2ReconnectInProgress": {
     "description": "Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight."
   },
+  "obd2StatusEngineOff": "OBD2 pausiert — Motor aus",
+  "obd2StatusEngineOffBody": "Der Adapter war erreichbar, aber der Fahrzeugbus blieb stumm, daher ist die automatische Wiederverbindung pausiert. Sie wird beim Fahren oder beim Öffnen der App fortgesetzt — oder jetzt neu verbinden.",
+  "obd2StatusReconnectNow": "Jetzt neu verbinden",
   "autoRecordNotificationTitle": "Automatische Fahrtaufzeichnung",
   "autoRecordNotificationText": "Wartet auf deinen OBD2-Adapter"
 }
