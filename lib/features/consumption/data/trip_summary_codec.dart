@@ -20,6 +20,12 @@ Map<String, dynamic> tripSummaryToJson(TripSummary s) => {
       if (s.avgLPer100Km != null) 'avgLPer100Km': s.avgLPer100Km,
       if (s.fuelLitersConsumed != null)
         'fuelLitersConsumed': s.fuelLitersConsumed,
+      // #3576: GPS-physics estimate figures, stamped only when the
+      // measured fields are null. Compact keys 'eAvg'/'eFuel'; omitted
+      // when null so measured / legacy trips round-trip byte-identical.
+      if (s.estimatedAvgLPer100Km != null) 'eAvg': s.estimatedAvgLPer100Km,
+      if (s.estimatedFuelLitersConsumed != null)
+        'eFuel': s.estimatedFuelLitersConsumed,
       if (s.startedAt != null) 'startedAt': s.startedAt!.toIso8601String(),
       if (s.endedAt != null) 'endedAt': s.endedAt!.toIso8601String(),
       // #800: provenance of distanceKm — `'real'` for odometer-backed
@@ -74,6 +80,8 @@ TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
       harshAccelerations: (j['harshAccelerations'] as num).toInt(),
       avgLPer100Km: (j['avgLPer100Km'] as num?)?.toDouble(),
       fuelLitersConsumed: (j['fuelLitersConsumed'] as num?)?.toDouble(),
+      estimatedAvgLPer100Km: (j['eAvg'] as num?)?.toDouble(),
+      estimatedFuelLitersConsumed: (j['eFuel'] as num?)?.toDouble(),
       startedAt: j['startedAt'] == null
           ? null
           : DateTime.parse(j['startedAt'] as String),

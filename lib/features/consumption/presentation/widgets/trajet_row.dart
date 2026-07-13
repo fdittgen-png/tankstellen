@@ -126,6 +126,16 @@ class TrajetRow extends StatelessWidget {
                               s.avgLPer100Km!.toStringAsFixed(1),
                               avgUnit,
                             ),
+                          )
+                        // #3576 — persisted GPS-physics estimate,
+                        // `~`-prefixed per the estimate convention.
+                        else if (s.estimatedAvgLPer100Km != null)
+                          _Chip(
+                            icon: Icons.eco,
+                            text: l.trajetsRowAvgConsumption(
+                              '~${s.estimatedAvgLPer100Km!.toStringAsFixed(1)}',
+                              avgUnit,
+                            ),
                           ),
                         if (s.coldStartSurcharge)
                           _Chip(

@@ -8,16 +8,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../../driving/providers/live_harsh_event_bus_provider.dart';
-import '../../../core/domain/gps_calibration_matrix.dart';
 import '../../obd2/api.dart';
 import 'active_vehicle_read.dart';
 import '../domain/entities/trip_save_stage.dart';
-import '../domain/gps_driving_features.dart';
-import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
 import '../domain/trip_recorder.dart';
 import 'gps_only_trip_wal.dart';
 import 'gps_movement_wake_nudge.dart';
+import 'gps_trip_fuel_backfill.dart';
 import 'gps_sample_diagnostics_recorder.dart';
 import 'motion_gated_gps_source.dart';
 import 'recording_pipeline.dart';
@@ -191,9 +189,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     );
   }
 
-  // #3570 — movement-wake nudge for a parked link (counter + throttle
-  // live in [GpsMovementWakeNudge]; the wake callback resolves THE
-  // supervisor lazily so tests without the reconnect graph stay green).
+  // #3570 — movement-wake nudge for a parked link ([GpsMovementWakeNudge]).
   late final GpsMovementWakeNudge _wakeNudge = GpsMovementWakeNudge(
     wake: () {
       try {
@@ -321,33 +317,17 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // #3500 — the stamp + #2895 veto now live on the shared fusion, so the
     // OBD2 pipeline applies the exact same semantics.
     if (imuFusion != null) summary = imuFusion.applyTo(summary);
-    // #2080 — for GPS-only / hybrid trips (no OBD2 fuel-rate
-    // coverage), feed the sample stream through GpsDrivingFeatures +
-    // the active vehicle's GpsCalibrationMatrix to impute
-    // `avgLPer100Km` and `fuelLitersConsumed`. The fields stay null
-    // when no active vehicle exists, when the trajet has no
-    // distance, or when the OBD2 path already populated them
-    // (gpsPlusObd2 trips skip this branch — `summary.kind` is the
-    // gate).
-    if (summary.kind == TripKind.gpsOnly && summary.avgLPer100Km == null) {
-      final features = GpsDrivingFeatures.from(samples);
-      if (features != null) {
-        final vehicle = tryReadActiveVehicleProfile(_ref,
-        where: 'GpsOnlyRecordingPipeline: active vehicle unavailable');
-        final matrix =
-            vehicle?.gpsCalibration ?? GpsCalibrationMatrix.coldStart();
-        final est = GpsFuelEstimator.estimate(
-          matrix: matrix,
-          features: features,
-        );
-        if (est != null) {
-          summary = summary.copyWith(
-            avgLPer100Km: est.lPer100Km,
-            fuelLitersConsumed: est.lPer100Km * summary.distanceKm / 100, // #3252
-          );
-        }
-      }
-    }
+    // #2080/#3252/#3576 — stop-time fuel backfill (batch estimate into
+    // the measured fields, live-folder estimate into the `~` fields
+    // when the batch declines); see [backfillGpsTripFuel].
+    summary = backfillGpsTripFuel(
+      summary,
+      samples: samples,
+      vehicleCalibration: tryReadActiveVehicleProfile(_ref,
+              where: 'GpsOnlyRecordingPipeline: active vehicle unavailable')
+          ?.gpsCalibration,
+      liveFolder: _estimateFolder,
+    );
     // #2548 — second beat: writing the finished trip to Hive history.
     _host.setSaveStage(TripSaveStage.savingToHistory);
     // #2509 — each GPS fix feeds one sample through the recorder, so the

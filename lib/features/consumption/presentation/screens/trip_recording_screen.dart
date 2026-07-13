@@ -979,6 +979,11 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
   ) {
     final s = r.summary;
     final liters = s.fuelLitersConsumed;
+    // #3576 — no measured fuel: fall back to the persisted GPS-physics
+    // estimate the live view showed all drive, `~`-prefixed (estimate
+    // convention shared with the recording screen), instead of a dash.
+    final estLiters = s.estimatedFuelLitersConsumed;
+    final estAvg = s.estimatedAvgLPer100Km;
     final endKm = r.endOdometerKm;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -992,15 +997,21 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         _MetricCard(
           icon: Icons.local_gas_station,
           label: l.tripMetricFuelUsed,
-          value: liters == null ? '—' : '${liters.toStringAsFixed(2)} L',
+          value: liters != null
+              ? '${liters.toStringAsFixed(2)} L'
+              : estLiters != null
+                  ? '~${estLiters.toStringAsFixed(2)} L'
+                  : '—',
         ),
         const SizedBox(height: 8),
         _MetricCard(
           icon: Icons.eco,
           label: l.tripMetricAvgConsumption,
-          value: s.avgLPer100Km == null
-              ? '—'
-              : UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: false),
+          value: s.avgLPer100Km != null
+              ? UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: false)
+              : estAvg != null
+                  ? '~${UnitFormatter.formatConsumption(estAvg, isEv: false)}'
+                  : '—',
         ),
         const SizedBox(height: 8),
         _MetricCard(

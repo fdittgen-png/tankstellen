@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../core/domain/vehicle_profile.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'adapter_capability.dart';
 import 'auto_record_trace_log.dart';
 import 'bluetooth_obd2_transport.dart';
@@ -860,6 +861,48 @@ class Obd2Service implements Obd2RawCommandPort, Obd2FuelRateReads {
   /// doesn't implement. One walk per trip-recording session is
   /// enough.
   Future<Set<int>> discoverSupportedPids() => _pids.discoverSupportedPids();
+
+  /// #3575 — in-session vehicle-protocol recovery for the ELM
+  /// UNABLE-TO-CONNECT livelock. When the adapter connected before the
+  /// ignition was on, the first auto protocol search fails and the chip
+  /// answers every later command instantly with UNABLE TO CONNECT /
+  /// STOPPED — and the polling cadence keeps interrupting any restarted
+  /// search, so it can never converge. Recovery: reset to the auto
+  /// search (`ATSP0`), clear the per-connection PID state, and re-run
+  /// the resilient first-`0100` discovery (which owns the #3035/#3037
+  /// search window) with NO other traffic in flight — the caller must
+  /// pause its poll scheduler around this call. On an answering bus the
+  /// negotiated protocol is re-read and re-cached (#2261).
+  ///
+  /// Returns true when the bus answered (protocol re-established);
+  /// false on a still-silent bus or any transport fault. Never throws.
+  Future<bool> recoverVehicleProtocol() async {
+    if (!_transport.isConnected) return false;
+    try {
+      await _send(Elm327Protocol.autoProtocolCommand);
+      _pids.resetForNewConnection();
+      await discoverSupportedPids();
+      final answered = busProbe == Obd2BusProbeResult.answered;
+      if (answered) {
+        await _resolveAndCacheProtocol(warmConnect: false);
+      }
+      BreadcrumbCollector.add(
+        'OBD2 protocol recovery (#3575)',
+        detail: answered ? 'bus answered — protocol re-established' : 'bus still silent',
+      );
+      return answered;
+    } catch (e, st) {
+      // An expected link condition mid-recovery (adapter asleep, socket
+      // died) — breadcrumb, not an ERROR trace; the scheduler episode
+      // will re-signal if the link is actually alive.
+      BreadcrumbCollector.add(
+        'OBD2 protocol recovery failed (#3575)',
+        detail: '${e.runtimeType}',
+      );
+      debugPrint('Obd2Service.recoverVehicleProtocol: $e\n$st');
+      return false;
+    }
+  }
 
   /// Read current engine RPM.
   @override

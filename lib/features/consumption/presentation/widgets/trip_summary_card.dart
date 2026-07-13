@@ -66,12 +66,19 @@ class TripSummaryCard extends ConsumerWidget {
             s.endedAt!.isAfter(s.startedAt!)
         ? _fmtDuration(s.endedAt!.difference(s.startedAt!))
         : unknown;
-    final avgConsumption = s.avgLPer100Km == null
-        ? unknown
-        : UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: isEv);
-    final fuelUsed = s.fuelLitersConsumed == null
-        ? unknown
-        : '${s.fuelLitersConsumed!.toStringAsFixed(2)} L';
+    // #3576 — measured wins; a persisted GPS-physics estimate renders
+    // `~`-prefixed (the live view's estimate convention); dash only when
+    // neither exists.
+    final avgConsumption = s.avgLPer100Km != null
+        ? UnitFormatter.formatConsumption(s.avgLPer100Km!, isEv: isEv)
+        : s.estimatedAvgLPer100Km != null
+            ? '~${UnitFormatter.formatConsumption(s.estimatedAvgLPer100Km!, isEv: isEv)}'
+            : unknown;
+    final fuelUsed = s.fuelLitersConsumed != null
+        ? '${s.fuelLitersConsumed!.toStringAsFixed(2)} L'
+        : s.estimatedFuelLitersConsumed != null
+            ? '~${s.estimatedFuelLitersConsumed!.toStringAsFixed(2)} L'
+            : unknown;
     final avgSpeed = _avgSpeedLabel(samples, unknown);
     final maxSpeed = _maxSpeedLabel(samples, unknown);
 

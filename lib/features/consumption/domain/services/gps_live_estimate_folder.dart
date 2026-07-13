@@ -88,6 +88,18 @@ class GpsLiveEstimateFolder {
   final GpsLiveFuelEstimator _estimator;
   final Duration _coachingWindow;
 
+  /// #3576 — final trip-level estimate figures for stop-time persistence
+  /// onto [TripSummary.estimatedAvgLPer100Km] /
+  /// [TripSummary.estimatedFuelLitersConsumed]. Null until the physics
+  /// has warmed up (mirrors the live view's dash).
+  double? get finalAvgLPer100Km => _estimator.runningAvgLPer100Km;
+
+  /// See [finalAvgLPer100Km]. Zero litres reads as "no estimate".
+  double? get finalFuelLiters {
+    final liters = _estimator.litersSoFar;
+    return liters > 0 ? liters : null;
+  }
+
   /// Road-grade estimator (#2654) — driven IDENTICALLY to
   /// [BaselineRollingState]: 150 m window, 0.2 exp-smoothing,
   /// minSamplesInWindow=5 confidence gate. Fed the running horizontal
