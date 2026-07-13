@@ -11692,6 +11692,24 @@ abstract class AppLocalizations {
   /// **'Reconnecting to your OBD2 adapter…'**
   String get obd2ReconnectInProgress;
 
+  /// Status-dot semantics label while the link supervisor is parked in engineOff (#3570): the adapter answered but the vehicle bus was silent, so auto-reconnect is paused until movement / app resume / manual wake.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 paused — engine off'**
+  String get obd2StatusEngineOff;
+
+  /// Body text of the status-dot bottom sheet in the parked engineOff state (#3570), explaining why the link is not retrying and how it recovers.
+  ///
+  /// In en, this message translates to:
+  /// **'The adapter was reachable but the vehicle bus stayed silent, so automatic reconnection is paused. It resumes when you drive or reopen the app — or reconnect now.'**
+  String get obd2StatusEngineOffBody;
+
+  /// Action button on the status-dot sheet that wakes the parked supervisor and dials immediately (#3570).
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect now'**
+  String get obd2StatusReconnectNow;
+
   /// Title of the Android foreground-service notification shown while the hands-free auto-record watch is armed (#3505 — replaces the hard-coded English string in AutoRecordForegroundService.kt). Handed to the native side at arm time.
   ///
   /// In en, this message translates to:

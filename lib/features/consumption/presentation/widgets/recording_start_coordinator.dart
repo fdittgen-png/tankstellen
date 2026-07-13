@@ -228,6 +228,24 @@ class RecordingStartCoordinator {
               where: 'RecordingStart re-probe (#3551)');
         }
       }
+      // #3571 — a REUSED link whose re-probe still reads silent is
+      // ambiguous: a genuinely silent bus (engine off) and a ZOMBIE
+      // socket (every probe command times out on a dead transport) look
+      // identical from here, and the 2026-07-13 field log shows the
+      // husk case producing a false "engine off" while the car was
+      // running. Research rule 8: recovery = fresh socket. Make ONE
+      // watchdogged redial through the supervisor's single flight; a
+      // genuine engine-off fails the probe again on the fresh socket
+      // and costs one ladder, a zombie link recovers.
+      if (service.busProbe == Obd2BusProbeResult.probedSilent &&
+          sup != null &&
+          identical(sup.service, service)) {
+        BreadcrumbCollector.add(
+          'OBD2 start: still silent on a reused link — fresh dial (#3571)',
+        );
+        final fresh = await sup.connect();
+        if (fresh != null) service = fresh;
+      }
       if (service.busProbe == Obd2BusProbeResult.probedSilent) {
         notifier.cancelConnecting();
         onConnectionError(const Obd2EngineOff());

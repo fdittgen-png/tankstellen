@@ -38,6 +38,7 @@ import '../../../core/storage/storage_providers.dart';
 import '../../vehicle/providers/vehicle_providers.dart';
 
 part 'obd2_connect_by_mac.dart';
+part 'obd2_connect_profile_fallback.dart';
 part 'obd2_connection_service.g.dart';
 part 'obd2_passive_preempt.dart';
 
@@ -707,7 +708,8 @@ class Obd2ConnectionService {
         mac: mac,
         adapterName: adapterName, // #3014 — name the Classic by-MAC attempt
         requestedTransport: Obd2ConnectTransport.classic,
-        body: () => _connectByMacClassicDirect(this, mac),
+        body: () =>
+            _connectByMacClassicDirect(this, mac, adapterName: adapterName),
       );
 
   /// #3025 / Epic #3013 — TRANSPORT-AWARE direct-connect-by-MAC for the

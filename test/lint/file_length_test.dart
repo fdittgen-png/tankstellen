@@ -371,9 +371,13 @@ void main() {
     // (tryAcquire gate + preemption handler + lease releases at hand-off /
     // teardown), closing the ungated auto-record ↔ #3019 front of the
     // #3415 reconnect war.
+    // #3569 — re-grandfathered 777 → 803: the coordinator gains the
+    // dead-link self-heal (speed-stream error/done handlers, the
+    // foreground-arm liveness check, and the dead-husk hand-off guard)
+    // that un-strands auto-record after a foreground link death.
     'lib/features/obd2/data/auto_trip_coordinator.dart': (
-      lines: 777,
-      bumps: 1,
+      lines: 803,
+      bumps: 2,
       decompositionIssue: null,
     ),
     // #3279 — elm327_parsers.dart decomposed below the cap (419 → 345): the
@@ -892,9 +896,12 @@ void main() {
     // 12-line wiring for the recording lifecycle marks (field + record
     // call + save-time windowing); ALL logic lives in the new under-cap
     // recording_lifecycle_marks_recorder.dart / gps_coverage_report.dart.
+    // #3573 — re-grandfathered 1262 → 1286: the comm-diagnostic capture
+    // gate (GPS-only trips must not inherit the process-wide idle-link
+    // session) + the debugSaveToHistory test seam that proves it.
     'lib/features/consumption/providers/trip_recording_provider.dart': (
-      lines: 1262,
-      bumps: 8,
+      lines: 1286,
+      bumps: 9,
       decompositionIssue: 3140,
     ),
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': (

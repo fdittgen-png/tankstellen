@@ -6728,6 +6728,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
 
   @override
+  String get obd2StatusEngineOff => 'OBD2 paused — engine off';
+
+  @override
+  String get obd2StatusEngineOffBody =>
+      'The adapter was reachable but the vehicle bus stayed silent, so automatic reconnection is paused. It resumes when you drive or reopen the app — or reconnect now.';
+
+  @override
+  String get obd2StatusReconnectNow => 'Reconnect now';
+
+  @override
   String get autoRecordNotificationTitle => 'Trip auto-record';
 
   @override
@@ -15029,6 +15039,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2ReconnectInProgress =>
       '⟦Řéçóññéçŧîñǧ ŧó ýóúř ÓƁĐ2 áđáƥŧéř… ·············⟧';
+
+  @override
+  String get obd2StatusEngineOff => '⟦ÓƁĐ2 ƥáúšéđ — éñǧîñé óƒƒ ········⟧';
+
+  @override
+  String get obd2StatusEngineOffBody =>
+      '⟦Ŧĥé áđáƥŧéř ŵáš řéáçĥáƀłé ƀúŧ ŧĥé ṽéĥîçłé ƀúš šŧáýéđ šîłéñŧ, šó áúŧóɱáŧîç řéçóññéçŧîóñ îš ƥáúšéđ. Îŧ řéšúɱéš ŵĥéñ ýóú đřîṽé óř řéóƥéñ ŧĥé áƥƥ — óř řéçóññéçŧ ñóŵ. ···························································⟧';
+
+  @override
+  String get obd2StatusReconnectNow => '⟦Řéçóññéçŧ ñóŵ ·····⟧';
 
   @override
   String get autoRecordNotificationTitle => '⟦Ŧřîƥ áúŧó-řéçóřđ ······⟧';

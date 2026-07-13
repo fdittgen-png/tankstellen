@@ -33,13 +33,20 @@ class Obd2StatusDot extends ConsumerWidget {
     final snapshot = ref.watch(obd2ConnectionStatusProvider);
     // #3505 — the idle reconnect loop surfaces HERE (pulsing amber +
     // the spoken/semantics label), not as an app-wide strip.
-    final reconnecting =
-        ref.watch(obd2ReconnectProvider) == Obd2LinkState.reconnecting;
-    if (!snapshot.hasVisibleIndicator && !reconnecting) {
+    final linkState = ref.watch(obd2ReconnectProvider);
+    final reconnecting = linkState == Obd2LinkState.reconnecting;
+    // #3570 — the parked engineOff state was invisible: no dot case, so
+    // the user drove with no hint that auto-reconnect was paused.
+    final engineOff = linkState == Obd2LinkState.engineOff;
+    if (!snapshot.hasVisibleIndicator && !reconnecting && !engineOff) {
       return const SizedBox.shrink();
     }
     final l = AppLocalizations.of(context);
     var (color, semanticsLabel) = _styleFor(context, snapshot, l);
+    if (engineOff) {
+      color = Colors.grey;
+      semanticsLabel = l.obd2StatusEngineOff;
+    }
     if (reconnecting) {
       color = Colors.amber;
       semanticsLabel = l.obd2ReconnectInProgress;
@@ -55,7 +62,7 @@ class Obd2StatusDot extends ConsumerWidget {
       child: InkWell(
         key: const Key('obd2StatusDot'),
         customBorder: const CircleBorder(),
-        onTap: () => _openSheet(context, ref, snapshot, l),
+        onTap: () => _openSheet(context, ref, snapshot, l, engineOff: engineOff),
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: reconnecting ? _PulsingDot(child: dot) : dot,
@@ -84,8 +91,9 @@ class Obd2StatusDot extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     Obd2ConnectionSnapshot snapshot,
-    AppLocalizations l,
-  ) {
+    AppLocalizations l, {
+    bool engineOff = false,
+  }) {
     final name = snapshot.adapterName ?? (l.obd2StatusNoAdapter);
     final mac = snapshot.adapterMac;
     unawaited(
@@ -107,7 +115,9 @@ class Obd2StatusDot extends ConsumerWidget {
                   ],
                   const SizedBox(height: 12),
                   Text(
-                    _description(snapshot.state, l),
+                    engineOff
+                        ? l.obd2StatusEngineOffBody
+                        : _description(snapshot.state, l),
                     style: Theme.of(ctx).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 16),
@@ -124,6 +134,20 @@ class Obd2StatusDot extends ConsumerWidget {
                         },
                         child: Text(l.obd2StatusForget),
                       ),
+                      if (engineOff)
+                        FilledButton(
+                          key: const Key('obd2StatusDotWake'),
+                          onPressed: () {
+                            // #3570 — manual exit from the engineOff park:
+                            // wake() re-arms the supervisor and dials.
+                            ref
+                                .read(obd2ReconnectProvider.notifier)
+                                .supervisor
+                                .wake();
+                            Navigator.of(ctx).pop();
+                          },
+                          child: Text(l.obd2StatusReconnectNow),
+                        ),
                     ],
                   ),
                 ],

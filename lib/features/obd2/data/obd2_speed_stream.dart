@@ -116,6 +116,23 @@ class Obd2SpeedStream {
   }
 
   Future<void> _tick() async {
+    // #3569 — rule 10: staleness watchdog ABOVE the socket. A dead
+    // transport emits neither samples nor errors (readSpeedKmh swallows
+    // to null, indistinguishable from an alive NO DATA), so without this
+    // check the movement watch stayed silently armed on a corpse and the
+    // coordinator's foreground-arm skip-guard never dialed again (field
+    // log 2026-07-13). One error + close gives consumers a death signal.
+    if (!_service.isConnected) {
+      _timer?.cancel();
+      _timer = null;
+      if (!_controller.isClosed) {
+        _controller.addError(
+          StateError('Obd2SpeedStream: transport disconnected'),
+        );
+        await _controller.close();
+      }
+      return;
+    }
     int? kmh;
     try {
       kmh = await _service.readSpeedKmh();

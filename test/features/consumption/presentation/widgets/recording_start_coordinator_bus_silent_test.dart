@@ -5,7 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_drop_signal.dart';
+import 'package:tankstellen/features/obd2/data/obd2_link_supervisor.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
+import 'package:tankstellen/features/obd2/providers/obd2_reconnect_provider.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/'
     'recording_start_coordinator.dart';
 import 'package:tankstellen/features/consumption/providers/'
@@ -275,6 +278,89 @@ void main() {
     expect(service.disconnectCallCount, 1,
         reason: 'the orphaned link must be torn down');
   });
+
+  testWidgets(
+      '#3571 — a REUSED supervisor link that stays silent after the re-probe '
+      'gets ONE fresh dial before any engine-off verdict: a zombie socket '
+      'recovers instead of false-reporting "engine off"', (tester) async {
+    // The husk: a reused (supervisor-owned) service whose socket is dead —
+    // every probe command times out, so the re-probe still reads silent.
+    final husk = _FakeObd2Service(
+      busAnswered: false,
+      busProbe: Obd2BusProbeResult.probedSilent,
+      busProbeAfterReprobe: Obd2BusProbeResult.probedSilent,
+    );
+    // The fresh dial lands on the live car: bus answers.
+    final fresh = _FakeObd2Service(
+      busAnswered: true,
+      busProbe: Obd2BusProbeResult.answered,
+    );
+    final dials = <Obd2Service>[husk, fresh];
+    final sup = Obd2LinkSupervisor(
+      dial: () async => dials.removeAt(0),
+      drops: const Stream<Obd2LinkDropEvent>.empty(),
+    );
+    addTearDown(sup.dispose);
+    // Seed the supervisor with the husk so the coordinator's reuse path
+    // sees identical(sup.service, service).
+    await sup.connect();
+    expect(identical(sup.service, husk), isTrue);
+
+    final coordinator = RecordingStartCoordinator();
+    final errors = <Object>[];
+    late _SpyTripRecording recording;
+
+    late WidgetRef capturedRef;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          tripRecordingProvider.overrideWith(_SpyTripRecording.new),
+          obd2ReconnectProvider
+              .overrideWith(() => _SupervisorStubReconnect(sup)),
+        ],
+        child: Consumer(
+          builder: (_, ref, _) {
+            capturedRef = ref;
+            recording =
+                ref.read(tripRecordingProvider.notifier) as _SpyTripRecording;
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+
+    recording.enterConnecting();
+    await coordinator.connectAndStart(
+      capturedRef,
+      notifier: recording,
+      openPicker: () async => husk,
+      onConnectionError: errors.add,
+      isMounted: () => true,
+    );
+
+    expect(errors, isEmpty,
+        reason: 'a zombie reused link must recover, not report engine-off');
+    expect(husk.reprobeCallCount, 1,
+        reason: 'the #3551 re-probe still runs first');
+    expect(recording.startCallCount, 1,
+        reason: 'the trip starts on the freshly dialed service');
+    expect(identical(recording.lastStartedService, fresh), isTrue,
+        reason: 'the started service must be the fresh dial, not the husk');
+  });
+}
+
+/// #3571 — [Obd2Reconnect] stub whose supervisor is injected by the test.
+/// `build` skips the production wiring (default dialer + state listener);
+/// the coordinator only ever reads `.supervisor` off it.
+class _SupervisorStubReconnect extends Obd2Reconnect {
+  _SupervisorStubReconnect(this._sup);
+  final Obd2LinkSupervisor _sup;
+
+  @override
+  Obd2LinkSupervisor get supervisor => _sup;
+
+  @override
+  Obd2LinkState build() => Obd2LinkState.idle;
 }
 
 /// Spy [TripRecording] that records the calls the coordinator makes. The

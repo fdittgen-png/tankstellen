@@ -148,6 +148,19 @@ class AutoRecordOrchestrator extends _$AutoRecordOrchestrator {
   /// are isolated so one coordinator's connect error can't abort the
   /// others. Best-effort and idempotent — see [armForegroundActive].
   Future<void> _armForegroundActiveAll() async {
+    // #3570 — app resume is one of the two documented exits from the
+    // supervisor's engineOff park (obd2_link_supervisor.dart), but the
+    // wiring was never built: wake() had zero production callers, so a
+    // parked link stayed dead until a manual reconnect. wake() is a
+    // no-op in every state except engineOff, so this is free on the
+    // common path.
+    try {
+      ref.read(obd2ReconnectProvider.notifier).supervisor.wake();
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'AutoRecordOrchestrator: resume wake failed',
+      }));
+    }
     for (final entry in _entries.values.toList()) {
       try {
         await entry.coordinator.armForegroundActive();
