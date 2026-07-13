@@ -146,8 +146,9 @@ Future<Obd2Service?> _connectByMacDirect(
 /// (mirrors the BLE path's dead-transport guard).
 Future<Obd2Service?> _connectByMacClassicDirect(
   Obd2ConnectionService svc,
-  String mac,
-) async {
+  String mac, {
+  String? adapterName,
+}) async {
   final classic = svc.classicBluetooth;
   if (classic == null) return null;
   // #3423 — lost-bond detection. Android only opens RFCOMM to a BONDED
@@ -182,8 +183,9 @@ Future<Obd2Service?> _connectByMacClassicDirect(
   await svc._teardownLastDirectChannel();
 
   // No scan ⇒ no resolved profile. Pick the best-fit Classic profile so
-  // the init quirks + display name match the bonded adapter.
-  final profile = _classicProfileForReconnect(svc);
+  // the init quirks match the bonded adapter — name-matched from the
+  // caller's stored [adapterName] when one was threaded through (#3572).
+  final profile = _classicProfileForReconnect(svc, adapterName: adapterName);
   // #2969 — the RFCOMM path: stamp resolvedTransport:classic.
   Obd2ConnectTraceLog.active
       ?.setResolvedTransport(Obd2ConnectTransport.classic);
@@ -194,7 +196,13 @@ Future<Obd2Service?> _connectByMacClassicDirect(
       channel: channel,
       adapter: profile.adapter,
       mac: mac,
-      name: profile.displayName,
+      // #3572 — stamp the TRUTHFUL identity: the caller's stored device
+      // name when known, else a neutral label. Never the fallback
+      // profile's product name ("vLinker FS (Classic)") — that fabricated
+      // pair rendered a wrong adapter on the trip summary (field log
+      // 2026-07-13: FS name against the BM-Android's MAC).
+      // i18n-ignore: technical adapter label stored on the link record.
+      name: adapterName ?? 'OBD2 (Classic)',
       linkKind: 'classic',
       logFailureAsError: false, // #2379 — recoverable (scanner re-arms)
     );
@@ -371,25 +379,6 @@ Future<void> _stopScanBeforeConnect(Obd2ConnectionService svc) async {
   }
 }
 
-/// Generic FFF0 BLE profile used for direct/passive connect quirks +
-/// display name when no scan resolved a profile.
-Obd2AdapterProfile _genericBleProfile(Obd2ConnectionService svc) =>
-    svc.registry.profiles.firstWhere(
-      (p) => p.id == 'generic-fff0',
-      orElse: () => svc.registry.profiles.firstWhere(
-        (p) => p.transport == BluetoothTransport.ble,
-      ),
-    );
-
-/// Best Classic profile for an in-trip reconnect (#2565). No scan ran, so
-/// the MAC is all we have; we can't name-match an RFCOMM socket, so prefer
-/// the `vlinker-fs-classic` profile (the dominant field adapter + the one
-/// in the reconnect-storm report) and fall back to the first Classic
-/// profile. The Classic adapter quirks are a safe superset for ELM327 SPP.
-Obd2AdapterProfile _classicProfileForReconnect(Obd2ConnectionService svc) =>
-    svc.registry.profiles.firstWhere(
-      (p) => p.id == 'vlinker-fs-classic',
-      orElse: () => svc.registry.profiles.firstWhere(
-        (p) => p.transport == BluetoothTransport.classic,
-      ),
-    );
+// #3572 — `_genericBleProfile` + `_classicProfileForReconnect` moved to
+// `obd2_connect_profile_fallback.dart` (same library part) when this file
+// hit the 400-line guard.
