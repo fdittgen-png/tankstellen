@@ -176,6 +176,25 @@ class TripRecording extends _$TripRecording {
   @visibleForTesting
   bool get debugIsGpsOnlyActive => _pipeline?.isGpsOnly ?? false;
 
+  /// Exposed for tests (#3573): drive the private `_saveToHistory` write
+  /// directly so the comm-diagnostic gating (adapter-identity present vs
+  /// GPS-only) is assertable without a full recording pipeline.
+  @visibleForTesting
+  Future<TripPersistOutcome> debugSaveToHistory(
+    TripSummary summary, {
+    List<TripSample> samples = const [],
+    String? adapterMac,
+    String? adapterName,
+    int gpsFixCount = 0,
+  }) =>
+      _saveToHistory(
+        summary,
+        samples: samples,
+        adapterMac: adapterMac,
+        adapterName: adapterName,
+        gpsFixCount: gpsFixCount,
+      );
+
   /// Snapshot of the vehicle the last [startTrip] call was scoped to.
   /// Exposed so the save-as-fill-up path can figure out which
   /// trajets to auto-link (#888). Null before the first call, or
@@ -1005,7 +1024,15 @@ class TripRecording extends _$TripRecording {
       final id = summary.startedAt?.toIso8601String() ??
           DateTime.now().toIso8601String();
       // #2912 — per-trip OBD2 comm-health diagnostic (never-throws capture).
-      final obd2Diagnostic = Obd2CommDiagnostics.instance.captureForTrip();
+      // #3573 — only for trips that actually bound an OBD2 service
+      // (adapter identity is stamped by the OBD2 pipeline alone): the
+      // capture reads a PROCESS-WIDE singleton session, so a GPS-only
+      // trip used to inherit whatever idle link the supervisor happened
+      // to hold and render a misleading "0% complete · 0% utilization ·
+      // no dropouts" card for a link the trip never touched.
+      final obd2Diagnostic = adapterMac == null
+          ? null
+          : Obd2CommDiagnostics.instance.captureForTrip();
       await repo.save(TripHistoryEntry(
         id: id,
         vehicleId: vehicleId,
