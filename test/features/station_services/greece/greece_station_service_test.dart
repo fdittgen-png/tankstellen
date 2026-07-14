@@ -60,6 +60,10 @@ void main() {
     mockDio = MockDio();
     service = GreeceStationService(
       dio: mockDio,
+      // #3549 — pinned so tests can stub the primary explicitly; the
+      // generic stubGet answers it too (rows are FRESH for now=07-11),
+      // which keeps the parse tests source-agnostic by design.
+      selfPublishedUrl: 'https://selfpub.test/latest.json',
       baseUrl: 'https://test/api',
       apiKey: 'test-key',
       now: () => DateTime(2026, 7, 11),
@@ -224,6 +228,16 @@ void main() {
       test('targets /data with the ranged start_date/end_date/offset '
           'params and the x-api-key header', () async {
         stubGet(recordedRows);
+        // #3549 — knock the self-published PRIMARY out so this test pins
+        // the MIRROR leg's contract (registered after stubGet: the more
+        // recent matching stub wins in mocktail).
+        when(() => mockDio.get<dynamic>(
+              'https://selfpub.test/latest.json',
+              cancelToken: any(named: 'cancelToken'),
+            )).thenThrow(DioException(
+          requestOptions: RequestOptions(path: '/latest.json'),
+          type: DioExceptionType.connectionError,
+        ));
 
         const params = SearchParams(lat: 37.98, lng: 23.73, radiusKm: 500);
         await service.searchStations(params);
@@ -235,15 +249,17 @@ void main() {
               cancelToken: any(named: 'cancelToken'),
             )).captured;
 
-        expect(captured[0], 'https://test/api/data');
+        // The last captured trio is the mirror request (a failed
+        // self-published attempt may precede it).
+        expect(captured[captured.length - 3], 'https://test/api/data');
 
-        final query = captured[1] as Map<String, dynamic>;
+        final query = captured[captured.length - 2] as Map<String, dynamic>;
         // now = 2026-07-11, lookback = 7 days.
         expect(query['start_date'], '2026-07-04');
         expect(query['end_date'], '2026-07-11');
         expect(query['offset'], 0);
 
-        final options = captured[2] as Options;
+        final options = captured[captured.length - 1] as Options;
         expect(options.headers?['x-api-key'], 'test-key');
       });
 

@@ -84,12 +84,28 @@ import '../../../core/logging/error_logger.dart';
 /// The service still round-trips `_baseUrl` / `_apiKey` so operators can
 /// point Tankstellen at a self-hosted deployment (of either upstream) if
 /// the hosted endpoint dies again; the parser is fully fixture-driven so
-/// a shape drift at upstream is a one-line fix. The durable long-term
-/// plan (self-published GitHub-Pages JSON parsed from the ministry PDFs)
-/// is tracked separately.
+/// a shape drift at upstream is a one-line fix.
+///
+/// **Durable primary (#3549)**: since the mirror is hobbyist-run (the
+/// exact single-maintainer failure mode that killed fuelpricesgr.com),
+/// the PRIMARY source is now the project's own SELF-PUBLISHED JSON —
+/// `gr-fuel-publish.yml` parses the official ministry PDF bulletins
+/// business-daily (vendored `tool/gr_fuel/` MIT parser) into rows shaped
+/// EXACTLY like the mirror's `/v2/data` response, uploaded to the rolling
+/// `fuel-gr` release. Both sources therefore share one codec; the mirror
+/// stays as the automatic fallback whenever the self-published asset is
+/// unreachable, unparseable, or stale (no row within [lookback]).
 class GreeceStationService
     with StationServiceHelpers
     implements StationService {
+  /// Self-published rows (#3549) — a release asset fully under the
+  /// project's control, updated daily from the official ministry PDFs.
+  /// (A release asset, not GitHub Pages, so the pages.yml full-replace
+  /// deploy — the #3072 trap — can never wipe it.)
+  static const String defaultSelfPublishedUrl =
+      'https://github.com/fdittgen-png/tankstellen/releases/download/'
+      'fuel-gr/latest.json';
+
   /// Community mirror base URL (#3539, live-verified 2026-07-11 with
   /// data through 2026-07-09 — matching the latest official bulletin).
   /// The old `fuelpricesgr.com` default has been NXDOMAIN since
@@ -113,6 +129,7 @@ class GreeceStationService
   static const Duration lookback = Duration(days: 7);
 
   final Dio _dio;
+  final String _selfPublishedUrl;
   final String _baseUrl;
   final String _apiKey;
 
@@ -121,6 +138,7 @@ class GreeceStationService
 
   GreeceStationService({
     Dio? dio,
+    String? selfPublishedUrl,
     String? baseUrl,
     String? apiKey,
     DateTime Function()? now,
@@ -129,6 +147,7 @@ class GreeceStationService
               connectTimeout: const Duration(seconds: 10),
               receiveTimeout: const Duration(seconds: 20),
             ),
+        _selfPublishedUrl = selfPublishedUrl ?? defaultSelfPublishedUrl,
         _baseUrl = baseUrl ?? defaultBaseUrl,
         _apiKey = apiKey ?? defaultApiKey,
         _now = now ?? DateTime.now;
@@ -160,38 +179,47 @@ class GreeceStationService
         '${t.month.toString().padLeft(2, '0')}-'
         '${t.day.toString().padLeft(2, '0')}';
 
-    final List<dynamic> rows;
-    try {
-      final response = await _dio.get<dynamic>(
-        '$_baseUrl/data',
-        queryParameters: {
-          'start_date': d(start),
-          'end_date': d(end),
-          'offset': 0,
-        },
-        options: Options(headers: {'x-api-key': _apiKey}),
-        cancelToken: cancelToken,
-      );
-      final data = response.data;
-      if (data is! List) {
-        throw const ApiException(
-          message: 'Paratiritirio mirror returned unparseable body',
+    // #3549 — PRIMARY: the self-published rows (our own release asset,
+    // parsed from the official ministry PDFs). Falls through to the
+    // community mirror on ANY miss — unreachable, unparseable, or stale
+    // (no row within the lookback window). Both share one row shape, so
+    // the per-prefecture parse below is source-agnostic.
+    List<dynamic>? rows =
+        await _fetchSelfPublished(freshCutoff: d(start), cancelToken: cancelToken);
+
+    if (rows == null) {
+      try {
+        final response = await _dio.get<dynamic>(
+          '$_baseUrl/data',
+          queryParameters: {
+            'start_date': d(start),
+            'end_date': d(end),
+            'offset': 0,
+          },
+          options: Options(headers: {'x-api-key': _apiKey}),
+          cancelToken: cancelToken,
+        );
+        final data = response.data;
+        if (data is! List) {
+          throw const ApiException(
+            message: 'Paratiritirio mirror returned unparseable body',
+          );
+        }
+        rows = data;
+      } on DioException catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.other, e, st,
+            context: const {'where': 'GR ranged fetch failed (#3539)'}));
+        final status = e.response?.statusCode;
+        // 401/403 = the shared public key was revoked / a self-hosted
+        // deployment is behind different auth — a hard, actionable error.
+        throw ApiException(
+          message: status == 401 || status == 403
+              ? 'Paratiritirio mirror rejected request (HTTP $status) — '
+                  'API key revoked?'
+              : 'Paratiritirio mirror unreachable: ${e.type.name}',
+          statusCode: status,
         );
       }
-      rows = data;
-    } on DioException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st,
-          context: const {'where': 'GR ranged fetch failed (#3539)'}));
-      final status = e.response?.statusCode;
-      // 401/403 = the shared public key was revoked / a self-hosted
-      // deployment is behind different auth — a hard, actionable error.
-      throw ApiException(
-        message: status == 401 || status == 403
-            ? 'Paratiritirio mirror rejected request (HTTP $status) — '
-                'API key revoked?'
-            : 'Paratiritirio mirror unreachable: ${e.type.name}',
-        statusCode: status,
-      );
     }
 
     final stations = <Station>[];
@@ -231,6 +259,44 @@ class GreeceStationService
       fetchedAt: DateTime.now(),
       errors: errors,
     );
+  }
+
+  /// #3549 — fetch the self-published rows. Returns null (never throws)
+  /// on ANY miss so the caller falls back to the mirror: network error,
+  /// non-list body, or staleness — no row's `DATE` at/after
+  /// [freshCutoff] (ISO date, lexicographic compare), which covers a
+  /// silently broken publish pipeline leaving an old asset behind.
+  Future<List<dynamic>?> _fetchSelfPublished({
+    required String freshCutoff,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.get<dynamic>(
+        _selfPublishedUrl,
+        cancelToken: cancelToken,
+      );
+      final data = response.data;
+      if (data is! List || data.isEmpty) return null;
+      final fresh = data.any((row) =>
+          row is Map &&
+          (row['DATE']?.toString() ?? '').compareTo(freshCutoff) >= 0);
+      if (!fresh) {
+        unawaited(errorLogger.log(
+          ErrorLayer.other,
+          const ApiException(message: 'GR self-published rows stale (#3549)'),
+          StackTrace.current,
+          context: const {'where': 'GR self-published freshness gate'},
+        ));
+        return null;
+      }
+      return data;
+    } on DioException catch (e, st) {
+      // Expected fallback path (asset not yet published, GitHub hiccup):
+      // log at breadcrumb-weight via debugPrint, not an ERROR trace — the
+      // mirror fallback keeps the feature working.
+      debugPrint('GR self-published fetch missed (#3549): ${e.type.name}\n$st');
+      return null;
+    }
   }
 
   /// Parse the mirror's flat country-wide row list into ONE
