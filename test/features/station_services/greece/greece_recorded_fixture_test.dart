@@ -87,14 +87,19 @@ void main() {
       stations = result.data;
     });
 
-    test('exactly ONE ranged /data request with the x-api-key header', () {
-      expect(adapter.requestedUris, hasLength(1));
-      final uri = adapter.requestedUris.single;
+    test(
+        '#3549 — the self-published primary is tried first; its miss '
+        'falls back to exactly ONE ranged /data request with the '
+        'x-api-key header', () {
+      expect(adapter.requestedUris, hasLength(2));
+      expect(adapter.requestedUris.first.path, endsWith('/latest.json'),
+          reason: 'the self-published asset is the PRIMARY source');
+      final uri = adapter.requestedUris[1];
       expect(uri.path, endsWith('/data'));
       expect(uri.queryParameters['start_date'], '2026-07-04');
       expect(uri.queryParameters['end_date'], '2026-07-11');
       expect(uri.queryParameters['offset'], '0');
-      expect(adapter.requestedHeaders.single['x-api-key'], 'recorded-key');
+      expect(adapter.requestedHeaders[1]['x-api-key'], 'recorded-key');
     });
 
     test('the recorded row list parses to the Attica virtual station', () {

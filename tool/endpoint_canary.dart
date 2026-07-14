@@ -222,6 +222,21 @@ const List<CanaryTarget> targets = [
   ),
   CanaryTarget(
     country: 'GR',
+    name: 'Self-published GR fuel prices (fuel-gr release, #3549)',
+    // The app's PRIMARY Greek source: our own release asset, rebuilt
+    // business-daily by gr-fuel-publish.yml from the official ministry
+    // PDFs. Same row shape as the mirror below, so the same bodyMarker
+    // probes it. A DEAD here means the publish pipeline broke — the app
+    // degrades to the mirror automatically, but fix the workflow.
+    url: 'https://github.com/fdittgen-png/tankstellen/releases/download/'
+        'fuel-gr/latest.json',
+    bodyMarker: 'AUTOMOTIVE_DIESEL',
+    note: 'greece/greece_station_service.dart — defaultSelfPublishedUrl '
+        '(#3549). Publisher: .github/workflows/gr-fuel-publish.yml + '
+        'tool/gr_fuel/.',
+  ),
+  CanaryTarget(
+    country: 'GR',
     name: 'FuelPricesGreeceAPI community mirror',
     // Fixed historical window: probes reachability + shape (not
     // freshness) without needing a dynamic date. The x-api-key is the
@@ -232,9 +247,8 @@ const List<CanaryTarget> targets = [
     bodyMarker: 'AUTOMOTIVE_DIESEL',
     note: 'greece/greece_station_service.dart — #3539 restore after '
         'fuelpricesgr.com died NXDOMAIN (#3194). Hobbyist-run mirror of '
-        'the ministry bulletins; if this probe goes DEAD, the durable '
-        'fallback plan is a self-published GitHub-Pages JSON parsed from '
-        'the official fuelprices.gr PDFs.',
+        'the ministry bulletins; since #3549 it is the FALLBACK behind '
+        'the self-published release asset above.',
   ),
   CanaryTarget(
     country: 'RO',

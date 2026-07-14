@@ -1,0 +1,78 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: GR Fuel Prices Publish
+
+# #3549 — self-published Greek fuel prices: parse the ministry's official
+# daily-prefecture PDF bulletins (fuelprices.gr) with the vendored MIT
+# parser and publish mirror-shaped JSON as a release asset, so the app
+# consumes a URL fully under our control (immune to the third-party-domain
+# rot that killed fuelpricesgr.com, #3194, and could kill the hobbyist
+# emvouvakis mirror, #3539).
+#
+# Published to the rolling `fuel-gr` release (NOT GitHub Pages — the
+# pages.yml deploy full-replaces the site, the #3072 trap, while a release
+# asset needs no preservation dance):
+#   https://github.com/fdittgen-png/tankstellen/releases/download/fuel-gr/latest.json
+#
+# The ministry publishes business-daily, typically by late morning Athens
+# time; 11:00 UTC (13:00/14:00 Athens) reliably lands after that. The
+# script itself looks back 7 days, so weekend/holiday gaps and the odd
+# missed run never leave the asset empty — and a stale asset (all rows
+# older than the app's 7-day lookback) makes the app fall back to the
+# emvouvakis mirror automatically.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 11 * * *'
+
+permissions:
+  contents: write # release asset upload
+
+concurrency:
+  group: gr-fuel-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # the vendored parser uses `match` (>= 3.10)
+
+      - name: Install parser dependency
+        run: pip install pypdf
+
+      - name: Parse the ministry bulletins
+        working-directory: tool/gr_fuel
+        run: python3 publish_gr_fuel.py "$RUNNER_TEMP/latest.json"
+
+      - name: Publish to the rolling fuel-gr release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Idempotent: create the rolling release once, then clobber the
+          # asset on every run. Marked prerelease so it never shows up as
+          # the repo's "latest release" next to the real app releases.
+          gh release view fuel-gr --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create fuel-gr --repo "$GITHUB_REPOSITORY" \
+              --title "Greek fuel prices (rolling data release)" \
+              --notes "Machine-updated daily by gr-fuel-publish.yml (#3549): prefecture-level fuel prices parsed from the official fuelprices.gr ministry bulletins. Consumed by the app's GreeceStationService; not an app release." \
+              --prerelease
+          gh release upload fuel-gr "$RUNNER_TEMP/latest.json" \
+            --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## GR fuel prices publish"
+            echo ""
+            echo "- Asset: \`fuel-gr/latest.json\` ($(wc -c < "$RUNNER_TEMP/latest.json" 2>/dev/null || echo '?') bytes)"
+            echo "- Source: official fuelprices.gr daily-prefecture bulletins"
+          } >> "$GITHUB_STEP_SUMMARY"
