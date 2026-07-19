@@ -122,6 +122,33 @@ class ErrorLogger {
   bool get isForegroundBound =>
       _container != null || testRecorderOverride != null;
 
+  /// #3581 — episode gate for the SYNC layer only: an unreachable
+  /// self-host retries every table on every resume, and the identical
+  /// failure spooled 40× in minutes, flooding real traces out of the
+  /// ring. Consecutive sync errors with the same signature within
+  /// [syncEpisodeWindow] are counted, not spooled; the first different
+  /// signature (or window expiry) logs one summary carrying the
+  /// suppressed count. Other layers are untouched.
+  static const Duration syncEpisodeWindow = Duration(minutes: 10);
+  String? _syncEpisodeSignature;
+  DateTime? _syncEpisodeLastAt;
+  int _syncEpisodeSuppressed = 0;
+
+  /// Signature = error type + leading message chars — stable across the
+  /// per-table variations of one outage episode.
+  static String _syncSignature(Object error) {
+    final s = error.toString();
+    return '${error.runtimeType}:${s.substring(0, s.length < 80 ? s.length : 80)}';
+  }
+
+  /// Test seam — reset the #3581 episode gate.
+  @visibleForTesting
+  void resetSyncEpisodeForTest() {
+    _syncEpisodeSignature = null;
+    _syncEpisodeLastAt = null;
+    _syncEpisodeSuppressed = 0;
+  }
+
   /// Log [error] under [layer]. Routes to [TraceRecorder] in the
   /// foreground and to [IsolateErrorSpool] in background isolates.
   ///
@@ -134,6 +161,29 @@ class ErrorLogger {
     Map<String, Object?>? context,
   }) async {
     final stackTrace = stack ?? StackTrace.current;
+    if (layer == ErrorLayer.sync) {
+      final now = DateTime.now();
+      final signature = _syncSignature(error);
+      final last = _syncEpisodeLastAt;
+      final sameEpisode = signature == _syncEpisodeSignature &&
+          last != null &&
+          now.difference(last) < syncEpisodeWindow;
+      if (sameEpisode) {
+        _syncEpisodeLastAt = now;
+        _syncEpisodeSuppressed++;
+        return; // counted, not spooled — the episode's first trace stands.
+      }
+      final suppressed = _syncEpisodeSuppressed;
+      _syncEpisodeSignature = signature;
+      _syncEpisodeLastAt = now;
+      _syncEpisodeSuppressed = 0;
+      if (suppressed > 0) {
+        context = {
+          ...?context,
+          'previousSyncEpisodeSuppressed': suppressed,
+        };
+      }
+    }
     try {
       if (testRecorderOverride != null) {
         await testRecorderOverride!.record(
