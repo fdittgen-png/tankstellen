@@ -43,6 +43,24 @@ class MainActivity : FlutterActivity() {
         // app-internal and never shipped to pub.dev.
         Obd2ClassicPlugin.registerWith(flutterEngine, applicationContext)
 
+        // #3580 — crash-forensics harvest bridge: the Dart side drains the
+        // uncaught-exception journal + ApplicationExitInfo once per launch
+        // and folds abnormal process deaths into the on-device error log.
+        // Runs off the main thread (file IO + a binder call).
+        val forensics = MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            CRASH_FORENSICS_CHANNEL,
+        )
+        forensics.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "harvest" -> Thread {
+                    val payload = CrashForensics.harvest(applicationContext)
+                    runOnUiThread { result.success(payload) }
+                }.start()
+                else -> result.notImplemented()
+            }
+        }
+
         // Hands-free auto-record bridge (#1004 phase 2b-1). Same
         // rationale as Obd2ClassicPlugin: the channel is app-internal
         // and never shipped to pub.dev. The Dart side
@@ -253,6 +271,7 @@ class MainActivity : FlutterActivity() {
 
     companion object {
         private const val PIP_CHANNEL = "tankstellen/pip"
+        private const val CRASH_FORENSICS_CHANNEL = "tankstellen/crash_forensics"
 
         /** #3422 — OBD2 wedge-recovery intent bridge (rung 3 + deep-link). */
         private const val OBD2_RECOVERY_CHANNEL = "tankstellen.obd2/recovery"
