@@ -2342,6 +2342,15 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tripDiscard => 'Atmest';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Odometrs nolasīts: $km km';
   }

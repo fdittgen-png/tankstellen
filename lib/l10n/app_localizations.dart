@@ -4346,6 +4346,24 @@ abstract class AppLocalizations {
   /// **'Discard'**
   String get tripDiscard;
 
+  /// No description provided for @tripSummaryAutoSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip saved automatically'**
+  String get tripSummaryAutoSaved;
+
+  /// No description provided for @tripSummaryDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get tripSummaryDone;
+
+  /// No description provided for @tripSummaryDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this trip'**
+  String get tripSummaryDelete;
+
   /// No description provided for @obdOdometerRead.
   ///
   /// In en, this message translates to:

@@ -1162,6 +1162,9 @@
     "description": "Trip-summary CTA: persists a TripHistoryEntry only — no fill-up created. (#1185)"
   },
   "tripDiscard": "Discard",
+  "tripSummaryAutoSaved": "Trip saved automatically",
+  "tripSummaryDone": "Done",
+  "tripSummaryDelete": "Delete this trip",
   "obdOdometerRead": "Odometer read: {km} km",
   "@obdOdometerRead": {
     "placeholders": {

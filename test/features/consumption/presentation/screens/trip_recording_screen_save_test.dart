@@ -133,7 +133,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('TripRecordingScreen save (#1185)', () {
-    testWidgets('summary CTA reads "Save trip" — not "Save as fill-up"',
+    testWidgets('summary CTA reads "Done" (#3582 — trip already saved) '
+        '— not "Save as fill-up"',
         (tester) async {
       final notifier = _StoppingFakeTripRecording(
         _stoppedAt(DateTime.utc(2026, 4, 27, 8)),
@@ -141,7 +142,11 @@ void main() {
       await _pumpAndStop(tester, notifier: notifier);
 
       // New, semantic label.
-      expect(find.text('Save trip'), findsOneWidget);
+      expect(find.text('Done'), findsOneWidget);
+      // #3582 — the sheet says the trip is already saved and offers an
+      // HONEST delete instead of the old keep-anyway "Discard".
+      expect(find.text('Trip saved automatically'), findsOneWidget);
+      expect(find.text('Delete this trip'), findsOneWidget);
       // Legacy "fill-up" copy must not survive the rename.
       expect(find.text('Save as fill-up'), findsNothing);
       // The save button keeps its key so existing tests / accessibility
@@ -149,7 +154,7 @@ void main() {
       expect(find.byKey(const Key('tripSaveButton')), findsOneWidget);
     });
 
-    testWidgets('tapping Save trip pops with a TripSaveResult carrying '
+    testWidgets('tapping Done pops with a TripSaveResult carrying '
         'the persisted entry id', (tester) async {
       final startedAt = DateTime.utc(2026, 4, 27, 8);
       final notifier = _StoppingFakeTripRecording(_stoppedAt(startedAt));
@@ -203,7 +208,7 @@ void main() {
       expect(notifier.resetCalls, 1);
     });
 
-    testWidgets('tapping Save trip does NOT push AddFillUpScreen '
+    testWidgets('tapping Done does NOT push AddFillUpScreen '
         '(trip-as-consumption-record fix)', (tester) async {
       final notifier = _StoppingFakeTripRecording(
         _stoppedAt(DateTime.utc(2026, 4, 27, 8)),

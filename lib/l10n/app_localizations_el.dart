@@ -2347,6 +2347,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tripDiscard => 'Απόρριψη';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Ανάγνωση χιλιομετρητή: $km km';
   }

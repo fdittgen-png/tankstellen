@@ -11,10 +11,13 @@ import 'package:home_widget/home_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../features/alerts/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/cache/cache_manager.dart';
+import '../core/telemetry/collectors/breadcrumb_persistence.dart';
+import '../core/telemetry/crash_forensics_harvester.dart';
 import '../core/platform/app_flavor.dart';
 import '../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../core/telemetry/health_counters.dart';
@@ -237,6 +240,23 @@ class AppInitializer {
       } catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.background, e, st,
             context: {'where': 'legacyToggleMigration kick-off'}));
+      }
+    });
+
+    // #3580 — crash forensics: restore the previous run's persisted
+    // breadcrumbs, start mirroring this run's ring to disk, then drain
+    // the native crash journal + ApplicationExitInfo so every abnormal
+    // process death (native crash / ANR / OOM kill — the "recording
+    // crashed with no traces" class) lands in the on-device error log
+    // with the context of what the app was doing when it died.
+    _deferPostFirstFrame(() async {
+      try {
+        final supportDir = await getApplicationSupportDirectory();
+        await BreadcrumbPersistence.init(supportDir.path);
+        await CrashForensicsHarvester.harvestAndLog();
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.background, e, st,
+            context: const {'where': 'crash forensics startup (#3580)'}));
       }
     });
 

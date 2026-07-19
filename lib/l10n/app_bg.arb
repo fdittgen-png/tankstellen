@@ -5346,5 +5346,20 @@
   "@obd2StatusReconnectNow": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "tripSummaryAutoSaved": "Trip saved automatically",
+  "@tripSummaryAutoSaved": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripSummaryDone": "Done",
+  "@tripSummaryDone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripSummaryDelete": "Delete this trip",
+  "@tripSummaryDelete": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

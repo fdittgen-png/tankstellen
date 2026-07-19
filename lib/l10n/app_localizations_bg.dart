@@ -2347,6 +2347,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripDiscard => 'Отхвърли';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Одометърът е прочетен: $km км';
   }

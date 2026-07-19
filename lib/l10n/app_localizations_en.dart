@@ -2322,6 +2322,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripDiscard => 'Discard';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Odometer read: $km km';
   }
@@ -10503,6 +10512,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripDiscard => '⟦Đîšçářđ ···⟧';
+
+  @override
+  String get tripSummaryAutoSaved => '⟦Ŧřîƥ šáṽéđ áúŧóɱáŧîçáłłý ··········⟧';
+
+  @override
+  String get tripSummaryDone => '⟦Đóñé ··⟧';
+
+  @override
+  String get tripSummaryDelete => '⟦Đéłéŧé ŧĥîš ŧřîƥ ······⟧';
 
   @override
   String obdOdometerRead(int km) {
