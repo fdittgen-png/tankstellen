@@ -2331,6 +2331,15 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripDiscard => 'Odbaci';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Kilometar-sat pročitan: $km km';
   }

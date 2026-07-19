@@ -2342,6 +2342,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tripDiscard => 'Descartar';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Lectura del cuentakilómetros: $km km';
   }

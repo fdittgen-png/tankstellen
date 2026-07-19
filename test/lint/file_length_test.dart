@@ -152,9 +152,11 @@ void main() {
     // #3272 — no bump: the `missing_provider_scope` wraps/ignore (+3
     // lines at the marker-pinned runApp sites) are offset by compressing
     // the #2320 rationale comment (-3), keeping the snapshot at 678.
+    // #3580 — re-grandfathered 678 → 695: the crash-forensics
+    // startup wiring (breadcrumb persistence init + exit-info harvest).
     'lib/app/app_initializer.dart': (
-      lines: 678,
-      bumps: 14,
+      lines: 695,
+      bumps: 15,
       decompositionIssue: 3139,
     ),
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
@@ -769,8 +771,10 @@ void main() {
     // (trips/fillups feature split; this screen is trips).
     // #3576 — re-grandfathered 1107 → 1110: the stop summary sheet
     // renders the `~` estimate fallback for fuel + average.
+    // #3582 — re-grandfathered 1110 → 1135: the auto-saved summary
+    // notice + the honest delete-saved-trip action.
     'lib/features/consumption/presentation/screens/trip_recording_screen.dart':
-        (lines: 1110, bumps: 9, decompositionIssue: 3138),
+        (lines: 1135, bumps: 10, decompositionIssue: 3138),
     'lib/features/consumption/presentation/widgets/broken_map_widgets.dart': (
       lines: 439,
       bumps: 0,

@@ -2341,6 +2341,15 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tripDiscard => 'Zahodiť';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Tachometer prečítaný: $km km';
   }

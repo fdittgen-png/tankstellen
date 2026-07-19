@@ -468,7 +468,18 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     ).pop(TripSaveResult(entryId: entryId, summary: r.summary));
   }
 
-  void _onDiscard() {
+  /// #3582 — the trip was auto-saved at stop, so "delete" must actually
+  /// remove the persisted entry, not just reset the UI (the old
+  /// "Discard" silently kept the trip in history).
+  void _onDeleteSavedTrip() {
+    final r = _stopped;
+    if (r != null) {
+      final entryId = r.summary.startedAt?.toIso8601String();
+      final repo = ref.read(tripHistoryRepositoryProvider);
+      if (entryId != null && repo != null) {
+        unawaited(repo.delete(entryId));
+      }
+    }
     ref.read(tripRecordingProvider.notifier).reset();
     Navigator.of(context).pop(null);
   }
@@ -1020,17 +1031,31 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           value: endKm == null ? '—' : '${endKm.toStringAsFixed(0)} km',
         ),
         const Spacer(),
+        // #3582 — the trip is ALREADY saved by `stop()` (#1185); this
+        // sheet is a confirmation, not a gate. Say so, offer Done, and
+        // make the secondary action an HONEST delete of the saved entry
+        // (the old "Discard" reset the UI but silently kept the trip).
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            l.tripSummaryAutoSaved,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ),
         FilledButton.icon(
           key: const Key('tripSaveButton'),
           onPressed: _onSave,
-          icon: const Icon(Icons.save),
-          label: Text(l.tripSaveRecording),
+          icon: const Icon(Icons.check),
+          label: Text(l.tripSummaryDone),
         ),
         const SizedBox(height: 8),
         TextButton(
           key: const Key('tripDiscardButton'),
-          onPressed: _onDiscard,
-          child: Text(l.tripDiscard),
+          onPressed: _onDeleteSavedTrip,
+          child: Text(l.tripSummaryDelete),
         ),
       ],
     );

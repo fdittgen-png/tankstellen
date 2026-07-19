@@ -2336,6 +2336,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tripDiscard => 'Zahodit';
 
   @override
+  String get tripSummaryAutoSaved => 'Trip saved automatically';
+
+  @override
+  String get tripSummaryDone => 'Done';
+
+  @override
+  String get tripSummaryDelete => 'Delete this trip';
+
+  @override
   String obdOdometerRead(int km) {
     return 'Tachometr přečten: $km km';
   }

@@ -930,6 +930,9 @@
   "tripSaveAsFillUp": "Enregistrer comme plein",
   "tripSaveRecording": "Enregistrer le trajet",
   "tripDiscard": "Abandonner",
+  "tripSummaryAutoSaved": "Trajet enregistré automatiquement",
+  "tripSummaryDone": "Terminé",
+  "tripSummaryDelete": "Supprimer ce trajet",
   "obdOdometerRead": "Compteur lu : {km} km",
   "@obdOdometerRead": {
     "placeholders": {

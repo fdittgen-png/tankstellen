@@ -1055,6 +1055,9 @@
   "tripSaveAsFillUp": "Als Tankfüllung speichern",
   "tripSaveRecording": "Fahrt speichern",
   "tripDiscard": "Verwerfen",
+  "tripSummaryAutoSaved": "Fahrt automatisch gespeichert",
+  "tripSummaryDone": "Fertig",
+  "tripSummaryDelete": "Diese Fahrt löschen",
   "obdOdometerRead": "Kilometerstand gelesen: {km} km",
   "@obdOdometerRead": {
     "placeholders": {
