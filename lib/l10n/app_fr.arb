@@ -4567,7 +4567,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Mixture looks a little lean — the engine added fuel ({pctTrim}% trim) to compensate",
+  "lessonCombustionHealthLeanBorderline": "Mélange légèrement pauvre — le moteur a ajouté du carburant ({pctTrim} % de correction) pour compenser",
   "@lessonCombustionHealthLeanBorderline": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
@@ -4577,7 +4577,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanMarked": "Mixture looks lean — the engine sustained a large {pctTrim}% fuel addition, a possible inefficiency",
+  "lessonCombustionHealthLeanMarked": "Mélange pauvre — le moteur a maintenu un ajout de carburant important de {pctTrim} %, une inefficacité possible",
   "@lessonCombustionHealthLeanMarked": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
@@ -4587,7 +4587,7 @@
       }
     }
   },
-  "lessonCombustionHealthRichBorderline": "Mixture looks a little rich — the engine pulled fuel ({pctTrim}% trim) to compensate",
+  "lessonCombustionHealthRichBorderline": "Mélange légèrement riche — le moteur a réduit le carburant ({pctTrim} % de correction) pour compenser",
   "@lessonCombustionHealthRichBorderline": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
@@ -4597,7 +4597,7 @@
       }
     }
   },
-  "lessonCombustionHealthRichMarked": "Mixture looks rich — the engine sustained a large {pctTrim}% fuel cut, a possible inefficiency",
+  "lessonCombustionHealthRichMarked": "Mélange riche — le moteur a maintenu une réduction de carburant importante de {pctTrim} %, une inefficacité possible",
   "@lessonCombustionHealthRichMarked": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
@@ -4607,7 +4607,7 @@
       }
     }
   },
-  "lessonCombustionHealthEnrichment": "Engine ran rich under load ({pctShare}% of the warm drive) — possible wasted fuel",
+  "lessonCombustionHealthEnrichment": "Moteur enrichi sous charge ({pctShare} % du trajet à chaud) — carburant potentiellement gaspillé",
   "@lessonCombustionHealthEnrichment": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
@@ -4617,7 +4617,7 @@
       }
     }
   },
-  "lessonCombustionHealthSubtitle": "Heuristic health signal, not a diagnosis",
+  "lessonCombustionHealthSubtitle": "Signal de santé heuristique, pas un diagnostic",
   "@lessonCombustionHealthSubtitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
@@ -5070,7 +5070,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "insightUpshiftCruise": "High-RPM cruising ({pctTime}% of trip): shifting up earlier could save {liters} L",
+  "insightUpshiftCruise": "Croisière à haut régime ({pctTime} % du trajet) : passer les rapports plus tôt économiserait {liters} L",
   "@insightUpshiftCruise": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
@@ -5131,7 +5131,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "fuelBreakdownHighRpmCruise": "High-RPM cruising",
+  "fuelBreakdownHighRpmCruise": "Croisière à haut régime",
   "@fuelBreakdownHighRpmCruise": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
