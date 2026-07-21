@@ -30,9 +30,14 @@ EvStationRepository evStationRepository(Ref ref) {
 /// in a real API key without a restart.
 @Riverpod(keepAlive: true)
 EvStationService evStationService(Ref ref) {
-  final storage = ref.watch(settingsStorageProvider);
-  final rawKey = storage.getSetting(StorageKeys.evApiKey);
-  final apiKey = rawKey is String && rawKey.trim().isNotEmpty ? rawKey : null;
+  // #3592 — the EV key lives in SECURE storage and ships with a default;
+  // [ApiKeyStorage.getEvApiKey] is the accessor that carries both (the
+  // generic settings-box read returned null forever, so the map overlay
+  // served demo stations even for configured users — the search side
+  // was already on the correct accessor).
+  final storage = ref.watch(apiKeyStorageProvider);
+  final rawKey = storage.getEvApiKey();
+  final apiKey = rawKey != null && rawKey.trim().isNotEmpty ? rawKey : null;
   return OpenChargeMapService(apiKey: apiKey);
 }
 
