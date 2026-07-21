@@ -119,7 +119,7 @@ final class EvStationServiceProvider
   }
 }
 
-String _$evStationServiceHash() => r'1d977c9206aebfb49e6f452730f35e05f49b83b6';
+String _$evStationServiceHash() => r'0122deaf9d47120b8ef9102bd9655297017bf644';
 
 /// Whether EV charging stations should be overlaid on the map.
 ///
