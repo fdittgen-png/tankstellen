@@ -57,6 +57,15 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   // #1374 phase 2 — the GPS trip-path overlay card on the trip detail screen.
   'tripPath',
 
+  // #3587 — the driving-lessons combustion-health family + the
+  // upshift-cruise insight + the fuel-breakdown label were caught
+  // rendering ENGLISH on a French device (field captures 2026-07-21):
+  // the MT autofill had copied the source text verbatim. These lesson
+  // surfaces are core French-reachable — hand-French required.
+  'lessonCombustionHealth',
+  'insightUpshiftCruise',
+  'fuelBreakdownHighRpmCruise',
+
   // #1401 phase 6 — the adapter-capability card on the Edit vehicle screen.
   'obd2Capability',
 
