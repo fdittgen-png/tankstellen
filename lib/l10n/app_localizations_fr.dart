@@ -4736,32 +4736,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Mixture looks a little lean — the engine added fuel ($pctTrim% trim) to compensate';
+    return 'Mélange légèrement pauvre — le moteur a ajouté du carburant ($pctTrim % de correction) pour compenser';
   }
 
   @override
   String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Mixture looks lean — the engine sustained a large $pctTrim% fuel addition, a possible inefficiency';
+    return 'Mélange pauvre — le moteur a maintenu un ajout de carburant important de $pctTrim %, une inefficacité possible';
   }
 
   @override
   String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Mixture looks a little rich — the engine pulled fuel ($pctTrim% trim) to compensate';
+    return 'Mélange légèrement riche — le moteur a réduit le carburant ($pctTrim % de correction) pour compenser';
   }
 
   @override
   String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Mixture looks rich — the engine sustained a large $pctTrim% fuel cut, a possible inefficiency';
+    return 'Mélange riche — le moteur a maintenu une réduction de carburant importante de $pctTrim %, une inefficacité possible';
   }
 
   @override
   String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Engine ran rich under load ($pctShare% of the warm drive) — possible wasted fuel';
+    return 'Moteur enrichi sous charge ($pctShare % du trajet à chaud) — carburant potentiellement gaspillé';
   }
 
   @override
   String get lessonCombustionHealthSubtitle =>
-      'Heuristic health signal, not a diagnosis';
+      'Signal de santé heuristique, pas un diagnostic';
 
   @override
   String get lessonAdviceCombustionHealthLean =>
@@ -4878,7 +4878,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String insightUpshiftCruise(String pctTime, String liters) {
-    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier could save $liters L';
+    return 'Croisière à haut régime ($pctTime % du trajet) : passer les rapports plus tôt économiserait $liters L';
   }
 
   @override
@@ -4909,7 +4909,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fuelBreakdownHarshAccel => 'Hard accelerations';
 
   @override
-  String get fuelBreakdownHighRpmCruise => 'High-RPM cruising';
+  String get fuelBreakdownHighRpmCruise => 'Croisière à haut régime';
 
   @override
   String get fuelBreakdownCoastingSaved => 'Saved by coasting';
