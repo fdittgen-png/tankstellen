@@ -8,6 +8,7 @@ import '../accel_event_gate.dart';
 import '../gps_driving_features.dart'
     show kSharpCornerThresholdMps2, kSharpCornerYawRateRadPerSec;
 import '../harsh_event.dart';
+import '../imu_event_record.dart';
 
 /// Pure, plugin-free harsh-accel / harsh-brake / sharp-corner detector for
 /// the dongle-optional GPS+IMU pipeline (#2760).
@@ -89,6 +90,18 @@ class ImuEventDetector {
   int _hardAccelCount = 0;
   int _hardBrakeCount = 0;
   int _sharpCornerCount = 0;
+
+  /// #3589 — per-stretch magnitude records (confirmed events AND rejected
+  /// near-misses) for threshold calibration. Bounded by
+  /// [kImuEventRecordCap]; harvest via [eventRecords] at trip stop.
+  final ImuStretchTracker _stretches = ImuStretchTracker();
+
+  /// Finalized per-stretch records, including the stretch still open at
+  /// call time (trip stop happens mid-drive).
+  List<ImuEventRecord> get eventRecords => _stretches.finish();
+
+  /// Stretches beyond the record cap — counted, not stored (#3589).
+  int get droppedEventRecords => _stretches.dropped;
 
   /// Total samples handed to [onSample]. The first only seeds the dt anchor;
   /// `isActive` therefore requires > 1 so a single stray emit doesn't claim
@@ -179,6 +192,19 @@ class ImuEventDetector {
     final netSpeedDeltaKmh = speedKmh - _maneuverStartSpeedKmh;
     final constantSpeed = netSpeedDeltaKmh.abs() <= _constantSpeedDeltaKmh;
 
+    // #3589 — fold this sample's stretch state into the calibration
+    // records BEFORE scoring, so a confirmation in this same tick lands
+    // on the already-open stretch.
+    _stretches.onSample(
+      strong: strong,
+      dt: dt,
+      horizMag: horizMag,
+      yawRate: yawRate,
+      speedKmh: speedKmh,
+      netSpeedDeltaKmh: netSpeedDeltaKmh,
+      cornerGeometry: highYaw && constantSpeed,
+    );
+
     _scoreCorner(
       dt: dt,
       horizMag: horizMag,
@@ -217,6 +243,7 @@ class ImuEventDetector {
       if (!_inCorner && _cornerDur >= _cornerMinSustainedSec) {
         _sharpCornerCount++;
         _inCorner = true;
+        _stretches.confirm('corner');
         // #3504 — the confirmed corner reaches the live bus too, so the
         // voice coach can cue cornering (brakes/accels already did).
         _emit(HarshEventType.corner, horizMag, t, speedKmh);
@@ -264,6 +291,7 @@ class ImuEventDetector {
       if (!_inAccel) {
         _hardAccelCount++;
         _inAccel = true;
+        _stretches.confirm('accel');
         _emit(HarshEventType.acceleration, horizMag, t, speedKmh);
       }
     } else {
@@ -281,6 +309,7 @@ class ImuEventDetector {
       if (!_inBrake) {
         _hardBrakeCount++;
         _inBrake = true;
+        _stretches.confirm('brake');
         _emit(HarshEventType.brake, horizMag, t, speedKmh);
       }
     } else {
@@ -324,6 +353,7 @@ class ImuEventDetector {
   }
 
   void _breakEpisodes() {
+    _stretches.breakEpisodes();
     _maneuverDur = 0;
     _cornerDur = 0;
     _accelBelowDur = 0;

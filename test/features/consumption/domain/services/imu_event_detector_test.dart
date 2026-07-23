@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sensors/imu_sample.dart';
 import 'package:tankstellen/features/consumption/domain/harsh_event.dart';
+import 'package:tankstellen/features/consumption/domain/imu_event_record.dart';
 import 'package:tankstellen/features/consumption/domain/services/imu_event_detector.dart';
 
 /// Reuse-fidelity tests for the pure [ImuEventDetector] (#2760). No
@@ -223,5 +224,89 @@ void main() {
     expect(fired[1].type, HarshEventType.brake);
     // Magnitude is reported in g, derived from the 4.0 m/s² horizontal mag.
     expect(fired[0].magnitudeG, closeTo(4.0 / standardGravityMps2, 1e-6));
+  });
+
+  group('per-stretch calibration records (#3589)', () {
+    test('a confirmed accel stretch records outcome/peak/duration/speeds',
+        () {
+      final det = ImuEventDetector();
+      final t = feed(det,
+          start: t0,
+          count: 30, // 1.5 s at 4.0 m/s², speed rising -> confirmed accel
+          mag: 4.0,
+          startSpeedKmh: 30,
+          speedStepKmh: 0.5);
+      // Close the stretch with calm samples so it finalizes.
+      feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 45);
+
+      final rec = det.eventRecords.single;
+      expect(rec.outcome, 'accel');
+      expect(rec.peakMps2, closeTo(4.0, 0.001));
+      expect(rec.durationSec, closeTo(1.5, 0.1));
+      expect(rec.startSpeedKmh, closeTo(30, 1.0));
+      expect(rec.netSpeedDeltaKmh, greaterThan(5));
+    });
+
+    test('a strong burst UNDER the 1 s floor is a tooShort near-miss — '
+        'the calibration sees what the counter rejected', () {
+      final det = ImuEventDetector();
+      final t = feed(det,
+          start: t0,
+          count: 10, // 0.5 s at 5.0 m/s² — strong but too short
+          mag: 5.0,
+          startSpeedKmh: 40,
+          speedStepKmh: 0.5);
+      feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 45);
+
+      expect(det.hardAccelCount, 0, reason: 'the counter must still reject');
+      final rec = det.eventRecords.single;
+      expect(rec.outcome, 'tooShort');
+      expect(rec.peakMps2, closeTo(5.0, 0.001));
+      expect(rec.durationSec, lessThan(1.0));
+    });
+
+    test('a sustained strong stretch with CONSTANT speed and no yaw is '
+        'ambiguous — recorded, not counted', () {
+      final det = ImuEventDetector();
+      final t = feed(det,
+          start: t0,
+          count: 40, // 2 s at 3.6 m/s², speed flat -> no direction
+          mag: 3.6,
+          startSpeedKmh: 50);
+      feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 50);
+
+      expect(det.hardAccelCount, 0);
+      expect(det.hardBrakeCount, 0);
+      expect(det.eventRecords.single.outcome, 'ambiguous');
+    });
+
+    test('the open stretch at trip stop is included by the harvest getter',
+        () {
+      final det = ImuEventDetector();
+      feed(det,
+          start: t0,
+          count: 30,
+          mag: 4.0,
+          startSpeedKmh: 30,
+          speedStepKmh: 0.5);
+      // No calm tail — the trip stops mid-manoeuvre.
+      expect(det.eventRecords, hasLength(1));
+      expect(det.eventRecords.single.outcome, 'accel');
+    });
+
+    test('records past the cap are counted, not stored', () {
+      final det = ImuEventDetector();
+      var t = t0;
+      for (var i = 0; i < kImuEventRecordCap + 5; i++) {
+        t = feed(det,
+            start: t,
+            count: 10, // short bursts -> tooShort records
+            mag: 5.0,
+            startSpeedKmh: 40);
+        t = feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 40);
+      }
+      expect(det.eventRecords, hasLength(kImuEventRecordCap));
+      expect(det.droppedEventRecords, 5);
+    });
   });
 }

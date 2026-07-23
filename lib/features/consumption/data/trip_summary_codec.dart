@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../domain/trip_recorder.dart';
+import '../domain/imu_event_record.dart';
 
 /// JSON codec for the persisted [TripSummary] (#726).
 ///
@@ -69,6 +70,10 @@ Map<String, dynamic> tripSummaryToJson(TripSummary s) => {
       if (s.imuHardBrakeCount != 0) 'ihb': s.imuHardBrakeCount,
       if (s.sharpCornerCount != 0) 'sc': s.sharpCornerCount,
       if (s.imuActive) 'ima': true, // #2895 IMU-ran bit (prefer IMU zero)
+      // #3589 — per-stretch IMU calibration records + past-cap counter.
+      if (s.imuEventRecords.isNotEmpty)
+        'ier': [for (final r in s.imuEventRecords) r.toJson()],
+      if (s.imuEventRecordsDropped != 0) 'ierd': s.imuEventRecordsDropped,
     };
 
 TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -124,4 +129,9 @@ TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
       imuHardBrakeCount: (j['ihb'] as num?)?.toInt() ?? 0,
       sharpCornerCount: (j['sc'] as num?)?.toInt() ?? 0,
       imuActive: (j['ima'] as bool?) ?? false, // #2895 IMU-ran bit
+      imuEventRecords: [
+        for (final e in (j['ier'] as List?) ?? const [])
+          if (e is Map<String, dynamic>) ?ImuEventRecord.fromJson(e),
+      ],
+      imuEventRecordsDropped: (j['ierd'] as num?)?.toInt() ?? 0,
     );

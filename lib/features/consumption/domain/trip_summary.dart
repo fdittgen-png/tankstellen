@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'harsh_event.dart';
+import 'imu_event_record.dart';
 
 export 'harsh_event.dart';
 
@@ -177,6 +178,16 @@ class TripSummary {
   /// score falls back to the (clamped) GPS-derived counts.
   final bool imuActive;
 
+  /// #3589 — per-stretch IMU magnitude records (confirmed accel / brake /
+  /// corner AND the rejected near-misses with their reasons), capped at
+  /// [kImuEventRecordCap]. Feeds the driving-analysis export so the harsh
+  /// thresholds can be calibrated against labeled magnitude distributions.
+  /// Empty for OBD2-era legacy trips and IMU-less devices.
+  final List<ImuEventRecord> imuEventRecords;
+
+  /// Stretches past the record cap — counted, not stored (#3589).
+  final int imuEventRecordsDropped;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -202,6 +213,8 @@ class TripSummary {
     this.imuHardBrakeCount = 0,
     this.sharpCornerCount = 0,
     this.imuActive = false,
+    this.imuEventRecords = const [],
+    this.imuEventRecordsDropped = 0,
   });
 
   /// IMU hard-accel episodes per km (#2760). Derived, not stored — the raw
@@ -249,6 +262,8 @@ class TripSummary {
     int? imuHardAccelCount,
     int? imuHardBrakeCount,
     int? sharpCornerCount,
+    List<ImuEventRecord>? imuEventRecords,
+    int? imuEventRecordsDropped,
     bool? imuActive,
   }) =>
       TripSummary(
@@ -279,6 +294,9 @@ class TripSummary {
         imuHardAccelCount: imuHardAccelCount ?? this.imuHardAccelCount,
         imuHardBrakeCount: imuHardBrakeCount ?? this.imuHardBrakeCount,
         sharpCornerCount: sharpCornerCount ?? this.sharpCornerCount,
+        imuEventRecords: imuEventRecords ?? this.imuEventRecords,
+        imuEventRecordsDropped:
+            imuEventRecordsDropped ?? this.imuEventRecordsDropped,
         imuActive: imuActive ?? this.imuActive,
       );
 }
