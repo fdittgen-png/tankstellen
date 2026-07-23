@@ -9,6 +9,10 @@ import '../widgets/trip_detail_charts.dart';
 /// the trip-detail charts consume (#1040). Lives in its own file so
 /// `trip_detail_screen.dart` stays under the 400-line guard.
 TripDetailSample toDetailSample(TripSample s) => TripDetailSample(
+      // #3594 — carry the WHOLE domain sample; the reverse converter
+      // returns it verbatim, so the persisted-trip round-trip can never
+      // drop a field again (it happened five times field-by-field).
+      domain: s,
       timestamp: s.timestamp,
       speedKmh: s.speedKmh,
       rpm: s.rpm,

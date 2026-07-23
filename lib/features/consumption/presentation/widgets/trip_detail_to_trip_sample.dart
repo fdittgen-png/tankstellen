@@ -12,7 +12,12 @@ import 'trip_detail_charts.dart';
 /// #2692 C4-G — rpm threads through nullable (NOT `?? 0`): a GPS-only
 /// sample stays rpm null so the source-aware score re-weight + the
 /// GPS-efficiency card fire instead of seeing a fabricated 0.
-TripSample tripDetailToTripSample(TripDetailSample s) => TripSample(
+TripSample tripDetailToTripSample(TripDetailSample s) =>
+    // #3594 — a sample that came from persistence carries its domain
+    // original; return it VERBATIM (lossless by construction). The field
+    // copy below only serves hand-built TripDetailSamples in tests.
+    s.domain ??
+    TripSample(
       timestamp: s.timestamp,
       speedKmh: s.speedKmh,
       rpm: s.rpm,
