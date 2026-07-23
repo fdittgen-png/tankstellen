@@ -9,6 +9,7 @@
 // converter (toDetailSample) that keeps altitude. RED before the fix
 // (climbEnergyPerKm == 0), GREEN after.
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/consumption/data/trip_sample_codec.dart';
 import 'package:tankstellen/features/consumption/domain/accel_event_gate.dart';
 import 'package:tankstellen/features/consumption/domain/gps_driving_features.dart';
 import 'package:tankstellen/features/consumption/domain/trip_sample.dart';
@@ -95,5 +96,52 @@ void main() {
     expect(features!.climbEnergyPerKm, greaterThan(0),
         reason: 'altitude must survive the converter so a real climb is not '
             'reported as 0 m/km on the trip-detail GPS-efficiency card');
+  });
+  test(
+      'LOSSLESS round-trip for EVERY TripSample field (#3594) — the codec '
+      'map pins completeness so a future field can never silently drop', () {
+    // Every field non-null. If TripSample gains a field, sampleToJson gains
+    // its key, and this test fails until the converter pair carries it.
+    final full = TripSample(
+      timestamp: DateTime(2026, 7, 23, 8, 30),
+      speedKmh: 72.5,
+      rpm: 2450,
+      fuelRateLPerHour: 6.4,
+      estimatedFuelRateLPerHour: 6.1,
+      throttlePercent: 31.0,
+      engineLoadPercent: 48.0,
+      coolantTempC: 88.0,
+      latitude: 43.4612,
+      longitude: 3.4238,
+      altitudeM: 112.0,
+      hAccuracyM: 4.5,
+      bearingDeg: 181.0,
+      accelG: 0.12,
+      lambda: 0.98,
+      measuredPhi: 1.01,
+      ethanolPercent: 8.5,
+      fuelSource: 'pid9D',
+      baroKpa: 99.4,
+      absLoadPercent: 55.0,
+      pedalPercent: 28.0,
+      oilTempC: 95.0,
+      ambientTempC: 24.0,
+      mafGramsPerSecond: 7.8,
+      mapKpa: 61.0,
+      stft: 2.3,
+      ltft: 25.0,
+    );
+
+    final roundTripped = tripDetailToTripSample(toDetailSample(full));
+
+    expect(
+      sampleToJson(roundTripped),
+      sampleToJson(full),
+      reason: 'the saved-trip analysis path (fromSamples over the '
+          'round-tripped list) must see exactly what the recorder persisted '
+          '— fuelSourceShares was {} in every field export because the pair '
+          'dropped fs (and el/mq/ep/bp/aL/ot/am/mf/mp/be/ag/fe on one side '
+          'or the other)',
+    );
   });
 }

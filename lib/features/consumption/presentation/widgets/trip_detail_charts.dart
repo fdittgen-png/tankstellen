@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/trip_recorder.dart';
 
 // #2431 — the CustomPainter + its point model live in a part file so this
 // widget file stays under the 400-line guard after the estimated-series
@@ -140,6 +141,15 @@ class TripDetailSample {
   /// fix (same semantics as [latitude]).
   final double? hAccuracyM;
 
+  /// The originating domain [TripSample] when this instance was produced
+  /// by `toDetailSample` (#3594). The reverse converter returns it
+  /// VERBATIM, making the persisted-trip round-trip lossless by
+  /// construction — no more field-by-field carrying (this pair dropped
+  /// fields five separate times: #2460, #2790, #2931, #2963, #3594).
+  /// Null only for hand-built instances (tests); those fall back to the
+  /// explicit field copy in `tripDetailToTripSample`.
+  final TripSample? domain;
+
   const TripDetailSample({
     required this.timestamp,
     required this.speedKmh,
@@ -157,6 +167,7 @@ class TripDetailSample {
     this.stft,
     this.ltft,
     this.hAccuracyM,
+    this.domain,
   });
 }
 
