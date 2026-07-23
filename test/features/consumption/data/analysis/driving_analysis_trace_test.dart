@@ -112,6 +112,9 @@ void main() {
       expect(imu['sharpCornerCount'], 3);
       expect(imu['hardAccelPerKm'], 0.1);
       expect(imu['sharpCornersPerKm'], 0.15);
+      // #3589 — the per-stretch calibration records ride the imu block.
+      expect(imu['events'], isA<List<dynamic>>());
+      expect(imu['droppedEvents'], 0);
 
       final gps = json['gpsFeatures'] as Map<String, dynamic>;
       expect(gps['rpa'], 0.224);

@@ -123,6 +123,10 @@ class DrivingAnalysisTrace {
           'hardAccelPerKm': _round(summary.imuHardAccelPerKm, 3),
           'hardBrakePerKm': _round(summary.imuHardBrakePerKm, 3),
           'sharpCornersPerKm': _round(summary.sharpCornersPerKm, 3),
+          // #3589 — per-stretch magnitude records (confirmed + rejected
+          // near-misses) for threshold calibration against verdicts.
+          'events': [for (final r in summary.imuEventRecords) r.toJson()],
+          'droppedEvents': summary.imuEventRecordsDropped,
         },
         'gpsFeatures': gpsFeatures == null
             ? null

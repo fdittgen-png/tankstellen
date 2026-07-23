@@ -10,6 +10,7 @@ import '../../../core/sensors/imu_sample.dart';
 import '../../../core/sensors/imu_sensor_source.dart';
 import '../domain/services/imu_event_detector.dart';
 import '../domain/trip_summary.dart';
+import '../domain/imu_event_record.dart';
 
 /// One per-trip IMU sensor-fusion lifecycle, shared by BOTH recording
 /// pipelines (#3500, epic #3498).
@@ -59,6 +60,10 @@ class TripImuFusion {
   int get hardAccelCount => _detector.hardAccelCount;
   int get hardBrakeCount => _detector.hardBrakeCount;
   int get sharpCornerCount => _detector.sharpCornerCount;
+
+  /// #3589 — per-stretch calibration records (confirmed + near-misses).
+  List<ImuEventRecord> get eventRecords => _detector.eventRecords;
+  int get droppedEventRecords => _detector.droppedEventRecords;
 
   /// Subscribe the detector to the inertial stream. Idempotent. A throwing
   /// sensor layer (no IMU hardware, plugin not bound, no services binding in
@@ -113,6 +118,10 @@ class TripImuFusion {
         imuHardBrakeCount: hardBrakeCount,
         sharpCornerCount: sharpCornerCount,
         imuActive: isActive,
+        // #3589 — the magnitude records ride the summary only when the
+        // sensor ran; an IMU-less trip keeps its empty default.
+        imuEventRecords: isActive ? eventRecords : null,
+        imuEventRecordsDropped: isActive ? droppedEventRecords : null,
         harshAccelerations: isActive ? hardAccelCount : null,
         harshBrakes: isActive ? hardBrakeCount : null,
       );
