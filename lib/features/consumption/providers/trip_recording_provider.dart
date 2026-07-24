@@ -21,6 +21,7 @@ import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/entities/trip_start_stage.dart';
+import '../domain/services/recovered_summary_rebuild.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
 import 'active_vehicle_read.dart';
@@ -829,8 +830,17 @@ class TripRecording extends _$TripRecording {
       }
     }
 
+    // #3597 — the snapshot's summary is a skeleton (distance + maxRpm
+    // only); replay the persisted samples through the canonical recorder
+    // so the salvaged trip keeps its consumption figure, idle/high-RPM
+    // time and cold-start flag instead of surfacing avgLPer100Km null.
+    final summary = rebuildRecoveredSummary(
+      skeleton: snapshot.summary,
+      samples: snapshot.samples,
+    );
+
     final result = StoppedTripResult(
-      summary: snapshot.summary,
+      summary: summary,
       odometerStartKm: snapshot.odometerStartKm,
       odometerLatestKm: snapshot.odometerLatestKm,
     );
@@ -844,7 +854,7 @@ class TripRecording extends _$TripRecording {
         await historyRepo.save(TripHistoryEntry(
           id: snapshot.id,
           vehicleId: snapshot.vehicleId,
-          summary: snapshot.summary,
+          summary: summary,
           automatic: snapshot.automatic,
           samples: snapshot.samples,
         ));
