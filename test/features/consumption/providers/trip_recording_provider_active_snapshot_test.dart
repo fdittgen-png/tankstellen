@@ -311,6 +311,70 @@ void main() {
   );
 
   test(
+    'the salvaged summary is REBUILT from samples — fuel figure and '
+    'high-RPM time survive a crash-ended trip (#3597)',
+    () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final notifier = container.read(tripRecordingProvider.notifier);
+      notifier.debugSetActiveRepo(activeRepo);
+
+      final start = DateTime.utc(2026, 7, 24, 17, 0);
+      // 10 minutes at 1 Hz, 5.5 L/h — the WAL skeleton below carries
+      // NONE of it (that is exactly the field bug: a 92 km measured
+      // trip surfaced with avgLPer100Km null after a crash).
+      final samples = List<TripSample>.generate(
+        600,
+        (i) => TripSample(
+          timestamp: start.add(Duration(seconds: i)),
+          speedKmh: 60,
+          rpm: 3800,
+          fuelRateLPerHour: i % 6 == 0 ? 5.5 : null,
+        ),
+      );
+      final snap = ActiveTripSnapshot(
+        id: start.toIso8601String(),
+        vehicleId: 'veh-crashed',
+        vin: 'VIN-CRASHED',
+        automatic: false,
+        phase: 'pausedDueToDrop',
+        summary: const TripSummary(
+          distanceKm: 10.0,
+          maxRpm: 3800,
+          highRpmSeconds: 0,
+          idleSeconds: 0,
+          harshBrakes: 0,
+          harshAccelerations: 0,
+          distanceSource: 'gps',
+        ),
+        samples: samples,
+        odometerStartKm: 1000.0,
+        odometerLatestKm: 1010.0,
+        startedAt: start,
+        lastFlushedAt: start.add(const Duration(minutes: 10)),
+      );
+      await activeRepo.saveSnapshot(snap);
+      expect(notifier.restoreFromSnapshot(snap), isTrue);
+
+      final result = await notifier.stop();
+
+      expect(result.summary.fuelLitersConsumed, isNotNull,
+          reason: 'the replay must integrate the persisted fuel rates');
+      expect(result.summary.fuelLitersConsumed!, closeTo(0.91, 0.05));
+      expect(result.summary.avgLPer100Km, isNotNull);
+      expect(result.summary.avgLPer100Km!, closeTo(9.1, 0.6));
+      expect(result.summary.highRpmSeconds, greaterThan(500));
+      expect(result.summary.distanceKm, closeTo(10.0, 0.001),
+          reason: 'the skeleton keeps the gap-capped live distance (#3251)');
+
+      final historyRepo = TripHistoryRepository(box: historyBox);
+      expect(historyRepo.loadAll().single.summary.avgLPer100Km, isNotNull,
+          reason: 'the rebuilt summary — not the skeleton — is persisted');
+    },
+  );
+
+  test(
     'resume() after restoreFromSnapshot also salvages snapshot to '
     'history (#1347)',
     () async {

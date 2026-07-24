@@ -912,8 +912,10 @@ void main() {
     // gate (GPS-only trips must not inherit the process-wide idle-link
     // session) + the debugSaveToHistory test seam that proves it.
     'lib/features/consumption/providers/trip_recording_provider.dart': (
-      lines: 1286,
-      bumps: 9,
+      // #3597 — the salvage path now rebuilds the recovered summary from
+      // samples (comment + call, +10). Decomposition tracked by #3140.
+      lines: 1296,
+      bumps: 10,
       decompositionIssue: 3140,
     ),
     'lib/features/feature_management/data/legacy_toggle_migrator.dart': (
