@@ -40,7 +40,7 @@ import 'rules/upshift_cruise_rule.dart';
 /// migrated cost-line lessons are bit-for-bit the coaching the old card
 /// showed, and the O(n) passes are paid once rather than per rule.
 /// Lesson id for the engine-off-transport note (#3599). Stable.
-const String transportLessonId = 'transportDetected';
+const String transportLessonId = 'engineOffMoving';
 
 class DrivingLessonRegistry {
   /// The registered rules, in declaration order. Two rules may not share

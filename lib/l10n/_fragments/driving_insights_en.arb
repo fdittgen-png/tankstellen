@@ -247,11 +247,11 @@
   "@lessonAdviceCombustionHealthEnrichment": {
     "description": "How-to-improve advice for the commanded-enrichment combustion-health heuristic (#2931). Points at the driving that triggers enrichment. Embedded in the GPX recording export."
   },
-  "lessonTransportTitle": "Vehicle was transported — engine off while moving",
+  "lessonTransportTitle": "Engine data missing for most of this trip",
   "@lessonTransportTitle": {
-    "description": "#3599 info lesson title shown instead of coaching when the car was towed/on a flatbed/train: ECU answering, engine off, GPS distance real"
+    "description": "#3599 info lesson: the engine reported no activity while the car covered real distance — cause unknown (failed OBD2 stream, or the car moved without driving); shown instead of coaching"
   },
-  "lessonTransportAdvice": "This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.",
+  "lessonTransportAdvice": "The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.",
   "@lessonTransportAdvice": {
     "description": "#3599 info lesson advice body"
   }

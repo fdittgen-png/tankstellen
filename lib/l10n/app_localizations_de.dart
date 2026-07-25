@@ -4764,11 +4764,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get lessonTransportTitle =>
-      'Fahrzeug wurde transportiert — Motor aus während der Fahrt';
+      'Motordaten fehlen für den Großteil dieser Fahrt';
 
   @override
   String get lessonTransportAdvice =>
-      'Diese Fahrt sieht nach Abschleppen, Anhänger oder Zugtransport aus: Der Motor war fast die gesamte Strecke aus. Ihr Verbrauch fließt nicht in deine Statistiken ein.';
+      'Der Motor meldete fast über die gesamte Strecke keine Aktivität. Entweder ist der OBD2-Datenstrom ausgefallen oder das Fahrzeug wurde ohne eigenen Antrieb bewegt — der Verbrauchswert ist unzuverlässig und fließt nicht in deine Statistiken ein.';
 
   @override
   String get drivingScoreCardTitle => 'Fahrnote';

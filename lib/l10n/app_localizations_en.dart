@@ -4711,11 +4711,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lessonTransportTitle =>
-      'Vehicle was transported — engine off while moving';
+      'Engine data missing for most of this trip';
 
   @override
   String get lessonTransportAdvice =>
-      'This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.';
+      'The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.';
 
   @override
   String get drivingScoreCardTitle => 'Driving score';
@@ -12985,11 +12985,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get lessonTransportTitle =>
-      '⟦Ṽéĥîçłé ŵáš ŧřáñšƥóřŧéđ — éñǧîñé óƒƒ ŵĥîłé ɱóṽîñǧ ··················⟧';
+      '⟦Éñǧîñé đáŧá ɱîššîñǧ ƒóř ɱóšŧ óƒ ŧĥîš ŧřîƥ ···············⟧';
 
   @override
   String get lessonTransportAdvice =>
-      '⟦Ŧĥîš ŧřîƥ łóóķš łîķé á ŧóŵ, ƒłáŧƀéđ óř ŧřáîñ ŧřáñšƥóřŧ: ŧĥé éñǧîñé ŵáš óƒƒ ƒóř áłɱóšŧ ŧĥé ŵĥółé đîšŧáñçé. Îŧš çóñšúɱƥŧîóñ îš éẋçłúđéđ ƒřóɱ ýóúř šŧáŧîšŧîçš. ·························································⟧';
+      '⟦Ŧĥé éñǧîñé řéƥóřŧéđ ñó áçŧîṽîŧý ƒóř áłɱóšŧ ŧĥé ŵĥółé đîšŧáñçé. Éîŧĥéř ŧĥé ÓƁĐ2 šŧřéáɱ ƒáîłéđ ɱîđ-ŧřîƥ óř ŧĥé çář ŵáš ɱóṽéđ ŵîŧĥóúŧ đřîṽîñǧ — ŧĥé çóñšúɱƥŧîóñ ƒîǧúřé îš úñřéłîáƀłé áñđ éẋçłúđéđ ƒřóɱ ýóúř šŧáŧîšŧîçš. ··············································································⟧';
 
   @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';

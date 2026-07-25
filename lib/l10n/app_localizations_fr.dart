@@ -4777,11 +4777,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get lessonTransportTitle =>
-      'Véhicule transporté — moteur coupé pendant le déplacement';
+      'Données moteur absentes sur la majeure partie du trajet';
 
   @override
   String get lessonTransportAdvice =>
-      'Ce trajet ressemble à un remorquage, un plateau ou un transport en train : le moteur était coupé sur presque toute la distance. Sa consommation est exclue de vos statistiques.';
+      'Le moteur n\'a signalé aucune activité sur presque toute la distance. Soit le flux OBD2 est tombé en panne, soit le véhicule a été déplacé sans rouler par ses propres moyens — la consommation est peu fiable et exclue de vos statistiques.';
 
   @override
   String get drivingScoreCardTitle => 'Score de conduite';
