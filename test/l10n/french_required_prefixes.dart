@@ -63,6 +63,7 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   // the MT autofill had copied the source text verbatim. These lesson
   // surfaces are core French-reachable — hand-French required.
   'lessonCombustionHealth',
+  'lessonTransport',
   'insightUpshiftCruise',
   'fuelBreakdownHighRpmCruise',
 

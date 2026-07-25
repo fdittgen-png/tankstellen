@@ -2088,6 +2088,14 @@
   "lessonAdviceCombustionHealthLean": "Eine dauerhafte Magerkorrektur kann auf ein Falschluftleck, eine schwache Spritzufuhr oder einen alternden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.",
   "lessonAdviceCombustionHealthRich": "Eine dauerhafte Fettkorrektur kann auf eine undichte Einspritzdüse, zu hohen Spritdruck oder einen falsch messenden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.",
   "lessonAdviceCombustionHealthEnrichment": "Fettes Laufen unter hoher Last verbraucht zusätzlich Sprit. Früher hochschalten und bei langen Zügen Gas wegnehmen, damit der Motor näher am stöchiometrischen Gemisch bleibt.",
+  "lessonTransportTitle": "Fahrzeug wurde transportiert — Motor aus während der Fahrt",
+  "@lessonTransportTitle": {
+    "description": "#3599"
+  },
+  "lessonTransportAdvice": "Diese Fahrt sieht nach Abschleppen, Anhänger oder Zugtransport aus: Der Motor war fast die gesamte Strecke aus. Ihr Verbrauch fließt nicht in deine Statistiken ein.",
+  "@lessonTransportAdvice": {
+    "description": "#3599"
+  },
   "drivingScoreCardTitle": "Fahrnote",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Gesamtnote aus Leerlauf, starken Beschleunigungen, hartem Bremsen und Zeit über 3000 U/min. Ein Vergleich „besser als X% deiner bisherigen Fahrten“ folgt in einem späteren Release.",

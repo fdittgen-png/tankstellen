@@ -8400,6 +8400,18 @@ abstract class AppLocalizations {
   /// **'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.'**
   String get lessonAdviceCombustionHealthEnrichment;
 
+  /// #3599 info lesson title shown instead of coaching when the car was towed/on a flatbed/train: ECU answering, engine off, GPS distance real
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle was transported — engine off while moving'**
+  String get lessonTransportTitle;
+
+  /// #3599 info lesson advice body
+  ///
+  /// In en, this message translates to:
+  /// **'This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.'**
+  String get lessonTransportAdvice;
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:

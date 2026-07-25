@@ -6,6 +6,7 @@ import '../../domain/driving_insight.dart';
 import '../../domain/driving_score.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/lessons/driving_lesson_rule.dart';
+import '../../domain/services/engine_off_transport.dart';
 import '../../domain/trip_recorder.dart';
 import '../driving_insights_analyzer.dart';
 import '../driving_score_calculator.dart';
@@ -38,6 +39,9 @@ import 'rules/upshift_cruise_rule.dart';
 /// [LessonContext], and feeds every rule the same context — so the
 /// migrated cost-line lessons are bit-for-bit the coaching the old card
 /// showed, and the O(n) passes are paid once rather than per rule.
+/// Lesson id for the engine-off-transport note (#3599). Stable.
+const String transportLessonId = 'transportDetected';
+
 class DrivingLessonRegistry {
   /// The registered rules, in declaration order. Two rules may not share
   /// an [DrivingLessonRule.id] — the constructor asserts uniqueness so a
@@ -136,6 +140,23 @@ class DrivingLessonRegistry {
     LessonContext context,
     AppLocalizations l,
   ) {
+    // #3599 — a towed/transported car (engine off, GPS moving) has no
+    // driving to coach: every rule would misread the stationary
+    // drivetrain (a field tow got charged a 1.7 L "climbing cost").
+    // Replace the whole list with one neutral explanation.
+    if (isEngineOffTransport(context.summary)) {
+      return [
+        DrivingLesson(
+          id: transportLessonId,
+          impact: 0,
+          metricValue: 0,
+          title: l.lessonTransportTitle,
+          advice: l.lessonTransportAdvice,
+          polarity: LessonPolarity.info,
+        ),
+      ];
+    }
+
     // Collect firing lessons, tagging each with its rule index so the
     // sort can break ties by registration order (Dart's List.sort is
     // not guaranteed stable).

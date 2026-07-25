@@ -246,5 +246,13 @@
   "lessonAdviceCombustionHealthEnrichment": "Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.",
   "@lessonAdviceCombustionHealthEnrichment": {
     "description": "How-to-improve advice for the commanded-enrichment combustion-health heuristic (#2931). Points at the driving that triggers enrichment. Embedded in the GPX recording export."
+  },
+  "lessonTransportTitle": "Vehicle was transported — engine off while moving",
+  "@lessonTransportTitle": {
+    "description": "#3599 info lesson title shown instead of coaching when the car was towed/on a flatbed/train: ECU answering, engine off, GPS distance real"
+  },
+  "lessonTransportAdvice": "This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.",
+  "@lessonTransportAdvice": {
+    "description": "#3599 info lesson advice body"
   }
 }

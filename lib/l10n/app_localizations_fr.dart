@@ -4776,6 +4776,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
 
   @override
+  String get lessonTransportTitle =>
+      'Véhicule transporté — moteur coupé pendant le déplacement';
+
+  @override
+  String get lessonTransportAdvice =>
+      'Ce trajet ressemble à un remorquage, un plateau ou un transport en train : le moteur était coupé sur presque toute la distance. Sa consommation est exclue de vos statistiques.';
+
+  @override
   String get drivingScoreCardTitle => 'Score de conduite';
 
   @override

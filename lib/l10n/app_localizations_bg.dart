@@ -4767,6 +4767,14 @@ class AppLocalizationsBg extends AppLocalizations {
       'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
 
   @override
+  String get lessonTransportTitle =>
+      'Vehicle was transported — engine off while moving';
+
+  @override
+  String get lessonTransportAdvice =>
+      'This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.';
+
+  @override
   String get drivingScoreCardTitle => 'Резултат за шофиране';
 
   @override

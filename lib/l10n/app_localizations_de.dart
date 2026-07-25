@@ -4763,6 +4763,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fettes Laufen unter hoher Last verbraucht zusätzlich Sprit. Früher hochschalten und bei langen Zügen Gas wegnehmen, damit der Motor näher am stöchiometrischen Gemisch bleibt.';
 
   @override
+  String get lessonTransportTitle =>
+      'Fahrzeug wurde transportiert — Motor aus während der Fahrt';
+
+  @override
+  String get lessonTransportAdvice =>
+      'Diese Fahrt sieht nach Abschleppen, Anhänger oder Zugtransport aus: Der Motor war fast die gesamte Strecke aus. Ihr Verbrauch fließt nicht in deine Statistiken ein.';
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override

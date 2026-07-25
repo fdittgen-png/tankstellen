@@ -10,6 +10,7 @@ import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/obd2_engine_coverage.dart';
 import '../../domain/obd2_trip_features.dart';
 import '../../domain/trip_summary.dart';
+import '../../domain/services/engine_off_transport.dart';
 
 /// A self-contained, JSON-serialisable snapshot of a single trip's
 /// driving-analysis inputs + outputs, for offline threshold calibration
@@ -111,6 +112,9 @@ class DrivingAnalysisTrace {
           'durationSec': _durationSec(summary),
           'avgLPer100Km': _roundN(summary.avgLPer100Km, 2),
           'distanceSource': summary.distanceSource,
+          // #3599 — engine-off transport (tow/flatbed/train) telemetry.
+          'engineRunningSeconds': _roundN(summary.engineRunningSeconds, 1),
+          'engineOffTransport': isEngineOffTransport(summary),
         },
         'imu': {
           // #2895 — whether the inertial sensor ran. A genuine IMU zero with

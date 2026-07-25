@@ -5432,5 +5432,7 @@
   "@tankSyncSchemaOutdatedSubtitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
-  }
+  },
+  "lessonTransportTitle": "Véhicule transporté — moteur coupé pendant le déplacement",
+  "lessonTransportAdvice": "Ce trajet ressemble à un remorquage, un plateau ou un transport en train : le moteur était coupé sur presque toute la distance. Sa consommation est exclue de vos statistiques."
 }

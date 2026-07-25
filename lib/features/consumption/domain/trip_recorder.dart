@@ -47,6 +47,7 @@ class TripRecorder {
   double _distanceKm = 0;
   double _maxRpm = 0;
   double _highRpmSeconds = 0;
+  double _engineRunningSeconds = 0;
   double _idleSeconds = 0;
   double _fuelLiters = 0;
   bool _hadFuelRate = false;
@@ -82,6 +83,11 @@ class TripRecorder {
   /// thermostat-open threshold for typical petrol engines and is the
   /// value the issue body cites for the cold-start heuristic.
   static const double _coolantWarmThresholdC = 70.0;
+
+  /// RPM at/above which the engine counts as RUNNING for the
+  /// engine-off-transport detector (#3599) — comfortably below any
+  /// idle (~600-900) and above ignition-on-engine-off readings (0).
+  static const double kEngineRunningRpmFloor = 300.0;
 
   TripRecorder({
     this.highRpmThreshold = 3500,
@@ -205,6 +211,13 @@ class TripRecorder {
       _highRpmSeconds += dt;
     }
 
+    // Engine-running time (#3599): the transport detector's numerator.
+    // Only rpm-carrying samples count, so a GPS-only trip accumulates
+    // nothing and can never be misflagged as a tow.
+    if ((previous.rpm ?? 0) >= kEngineRunningRpmFloor) {
+      _engineRunningSeconds += dt;
+    }
+
     // Idle time: engine on, car stationary for the whole interval.
     if (previous.speedKmh <= 0.5 && prevRpm > 0) {
       _idleSeconds += dt;
@@ -310,6 +323,7 @@ class TripRecorder {
       endedAt: _endedAt,
       coldStartSurcharge: coldStartSurcharge,
       harshEvents: _harshDetector.events,
+      engineRunningSeconds: _engineRunningSeconds,
     );
   }
 
@@ -320,6 +334,7 @@ class TripRecorder {
     _distanceKm = 0;
     _maxRpm = 0;
     _highRpmSeconds = 0;
+    _engineRunningSeconds = 0;
     _idleSeconds = 0;
     _harshDetector.reset();
     _fuelLiters = 0;
