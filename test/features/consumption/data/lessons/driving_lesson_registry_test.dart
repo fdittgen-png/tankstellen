@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/lessons/driving_lesson_registry.dart';
+import 'package:tankstellen/features/consumption/domain/lessons/driving_lesson.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/climbing_cost_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/coasting_recognition_rule.dart';
 import 'package:tankstellen/features/consumption/data/lessons/rules/combustion_health_rule.dart';
@@ -382,5 +383,26 @@ void main() {
       final hardAccel = lessons.firstWhere((e) => e.id == hardAccelLessonId);
       expect(hardAccel.title, startsWith('5 hard accelerations'));
     });
+  });
+
+  test('an engine-off transport trip yields ONLY the info note — no '
+      'coaching from a stationary drivetrain (#3599)', () {
+    final registry = DrivingLessonRegistry.standard();
+    final towSummary = TripSummary(
+      distanceKm: 76.5,
+      maxRpm: 1000,
+      highRpmSeconds: 400, // would fire highRpm on a normal trip
+      idleSeconds: 200, // would fire idling
+      harshBrakes: 3,
+      harshAccelerations: 3,
+      startedAt: start,
+      endedAt: start.add(const Duration(seconds: 2956)),
+      distanceSource: 'gps',
+      engineRunningSeconds: 60, // engine ran 2% of the trip
+    );
+    final lessons = registry.evaluate(towSummary, const [], l);
+    expect(lessons, hasLength(1));
+    expect(lessons.single.id, transportLessonId);
+    expect(lessons.single.polarity, LessonPolarity.info);
   });
 }

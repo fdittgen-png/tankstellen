@@ -4710,6 +4710,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
 
   @override
+  String get lessonTransportTitle =>
+      'Engine data missing for most of this trip';
+
+  @override
+  String get lessonTransportAdvice =>
+      'The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.';
+
+  @override
   String get drivingScoreCardTitle => 'Driving score';
 
   @override
@@ -12974,6 +12982,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get lessonAdviceCombustionHealthEnrichment =>
       '⟦Řúññîñǧ řîçĥ úñđéř ĥéáṽý łóáđ ƀúřñš éẋŧřá ƒúéł. Šĥóřŧ-šĥîƒŧ áñđ éášé óƒƒ óñ łóñǧ ƥúłłš šó ŧĥé éñǧîñé çáñ šŧáý ñéář á šŧóîçĥîóɱéŧřîç ɱîẋŧúřé. ···················································⟧';
+
+  @override
+  String get lessonTransportTitle =>
+      '⟦Éñǧîñé đáŧá ɱîššîñǧ ƒóř ɱóšŧ óƒ ŧĥîš ŧřîƥ ···············⟧';
+
+  @override
+  String get lessonTransportAdvice =>
+      '⟦Ŧĥé éñǧîñé řéƥóřŧéđ ñó áçŧîṽîŧý ƒóř áłɱóšŧ ŧĥé ŵĥółé đîšŧáñçé. Éîŧĥéř ŧĥé ÓƁĐ2 šŧřéáɱ ƒáîłéđ ɱîđ-ŧřîƥ óř ŧĥé çář ŵáš ɱóṽéđ ŵîŧĥóúŧ đřîṽîñǧ — ŧĥé çóñšúɱƥŧîóñ ƒîǧúřé îš úñřéłîáƀłé áñđ éẋçłúđéđ ƒřóɱ ýóúř šŧáŧîšŧîçš. ··············································································⟧';
 
   @override
   String get drivingScoreCardTitle => '⟦Đřîṽîñǧ šçóřé ·····⟧';

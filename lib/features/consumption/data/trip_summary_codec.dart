@@ -74,6 +74,8 @@ Map<String, dynamic> tripSummaryToJson(TripSummary s) => {
       if (s.imuEventRecords.isNotEmpty)
         'ier': [for (final r in s.imuEventRecords) r.toJson()],
       if (s.imuEventRecordsDropped != 0) 'ierd': s.imuEventRecordsDropped,
+      // #3599 — engine-running seconds for the transport detector.
+      if (s.engineRunningSeconds != null) 'ergs': s.engineRunningSeconds,
     };
 
 TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -134,4 +136,5 @@ TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
           if (e is Map<String, dynamic>) ?ImuEventRecord.fromJson(e),
       ],
       imuEventRecordsDropped: (j['ierd'] as num?)?.toInt() ?? 0,
+      engineRunningSeconds: (j['ergs'] as num?)?.toDouble(),
     );

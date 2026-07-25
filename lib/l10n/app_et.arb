@@ -5361,5 +5361,15 @@
   "@tripSummaryDelete": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "lessonTransportTitle": "Vehicle was transported — engine off while moving",
+  "@lessonTransportTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "lessonTransportAdvice": "This trip looks like a tow, flatbed or train transport: the engine was off for almost the whole distance. Its consumption is excluded from your statistics.",
+  "@lessonTransportAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -64,4 +64,16 @@ void main() {
     final back = tripSummaryFromJson(json);
     expect(back.imuEventRecords, hasLength(1));
   });
+
+  test('engineRunningSeconds round-trips; legacy stays key-free (#3599)',
+      () {
+    final json = tripSummaryToJson(
+        mk().copyWith(engineRunningSeconds: 61.5));
+    expect(json['ergs'], 61.5);
+    expect(tripSummaryFromJson(json).engineRunningSeconds, 61.5);
+
+    final legacy = tripSummaryToJson(mk());
+    expect(legacy.containsKey('ergs'), isFalse);
+    expect(tripSummaryFromJson(legacy).engineRunningSeconds, isNull);
+  });
 }

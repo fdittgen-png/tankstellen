@@ -246,5 +246,13 @@
   "lessonAdviceCombustionHealthEnrichment": "Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.",
   "@lessonAdviceCombustionHealthEnrichment": {
     "description": "How-to-improve advice for the commanded-enrichment combustion-health heuristic (#2931). Points at the driving that triggers enrichment. Embedded in the GPX recording export."
+  },
+  "lessonTransportTitle": "Engine data missing for most of this trip",
+  "@lessonTransportTitle": {
+    "description": "#3599 info lesson: the engine reported no activity while the car covered real distance — cause unknown (failed OBD2 stream, or the car moved without driving); shown instead of coaching"
+  },
+  "lessonTransportAdvice": "The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.",
+  "@lessonTransportAdvice": {
+    "description": "#3599 info lesson advice body"
   }
 }

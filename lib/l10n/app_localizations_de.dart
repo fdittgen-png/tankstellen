@@ -4763,6 +4763,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fettes Laufen unter hoher Last verbraucht zusätzlich Sprit. Früher hochschalten und bei langen Zügen Gas wegnehmen, damit der Motor näher am stöchiometrischen Gemisch bleibt.';
 
   @override
+  String get lessonTransportTitle =>
+      'Motordaten fehlen für den Großteil dieser Fahrt';
+
+  @override
+  String get lessonTransportAdvice =>
+      'Der Motor meldete fast über die gesamte Strecke keine Aktivität. Entweder ist der OBD2-Datenstrom ausgefallen oder das Fahrzeug wurde ohne eigenen Antrieb bewegt — der Verbrauchswert ist unzuverlässig und fließt nicht in deine Statistiken ein.';
+
+  @override
   String get drivingScoreCardTitle => 'Fahrnote';
 
   @override

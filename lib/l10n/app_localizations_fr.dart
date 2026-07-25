@@ -4776,6 +4776,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
 
   @override
+  String get lessonTransportTitle =>
+      'Données moteur absentes sur la majeure partie du trajet';
+
+  @override
+  String get lessonTransportAdvice =>
+      'Le moteur n\'a signalé aucune activité sur presque toute la distance. Soit le flux OBD2 est tombé en panne, soit le véhicule a été déplacé sans rouler par ses propres moyens — la consommation est peu fiable et exclue de vos statistiques.';
+
+  @override
   String get drivingScoreCardTitle => 'Score de conduite';
 
   @override

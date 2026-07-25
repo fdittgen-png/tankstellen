@@ -5432,5 +5432,7 @@
   "@tankSyncSchemaOutdatedSubtitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
-  }
+  },
+  "lessonTransportTitle": "Données moteur absentes sur la majeure partie du trajet",
+  "lessonTransportAdvice": "Le moteur n'a signalé aucune activité sur presque toute la distance. Soit le flux OBD2 est tombé en panne, soit le véhicule a été déplacé sans rouler par ses propres moyens — la consommation est peu fiable et exclue de vos statistiques."
 }

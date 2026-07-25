@@ -8400,6 +8400,18 @@ abstract class AppLocalizations {
   /// **'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.'**
   String get lessonAdviceCombustionHealthEnrichment;
 
+  /// #3599 info lesson: the engine reported no activity while the car covered real distance — cause unknown (failed OBD2 stream, or the car moved without driving); shown instead of coaching
+  ///
+  /// In en, this message translates to:
+  /// **'Engine data missing for most of this trip'**
+  String get lessonTransportTitle;
+
+  /// #3599 info lesson advice body
+  ///
+  /// In en, this message translates to:
+  /// **'The engine reported no activity for almost the whole distance. Either the OBD2 stream failed mid-trip or the car was moved without driving — the consumption figure is unreliable and excluded from your statistics.'**
+  String get lessonTransportAdvice;
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:

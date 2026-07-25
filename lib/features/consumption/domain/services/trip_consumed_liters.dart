@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../trip_summary.dart';
+import 'engine_off_transport.dart';
 
 /// The SINGLE canonical answer to "how many litres did this trip burn?"
 /// (#2447 / Epic #2439).
@@ -48,6 +49,12 @@ import '../trip_summary.dart';
 /// summable number use [tripConsumedLiters]; callers that must distinguish
 /// "no data" from "zero litres" use this nullable form.
 double? tripConsumedLitersOrNull(TripSummary summary) {
+  // #3599 — a towed/transported car burned no meaningful fuel while GPS
+  // covered real distance; its near-zero figures would poison every
+  // aggregate as a best-ever consumption. One exclusion here removes it
+  // from the monthly card, the length buckets and the reconciliation
+  // basis alike.
+  if (isEngineOffTransport(summary)) return null;
   final measured = summary.fuelLitersConsumed;
   if (measured != null) return measured;
 

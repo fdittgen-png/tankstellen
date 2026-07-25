@@ -112,4 +112,34 @@ void main() {
       expect(RoadGrade.flat.confident, isFalse);
     });
   });
+
+  test('a physically implausible grade is NOT confident (#3600) — the '
+      'wheels-stationary transport that produced a 49% "climb"', () {
+    final calc = RoadGradeCalculator();
+    // Altitude rises 60 m over barely 160 m of run: ~37% grade.
+    for (var i = 0; i <= 40; i++) {
+      calc.addSample(
+        cumulativeDistanceKm: i * 0.004,
+        altitudeM: 100.0 + i * 1.5,
+      );
+    }
+    final grade = calc.current;
+    expect(grade.gradeFraction.abs(),
+        greaterThan(kMaxPlausibleGradeFraction));
+    expect(grade.confident, isFalse,
+        reason: 'no paved road sustains > 25% — treat as signal failure');
+  });
+
+  test('a plausible alpine grade stays confident', () {
+    final calc = RoadGradeCalculator();
+    // 8% climb over 400 m with dense samples.
+    for (var i = 0; i <= 100; i++) {
+      calc.addSample(
+        cumulativeDistanceKm: i * 0.004,
+        altitudeM: 100.0 + i * 0.32,
+      );
+    }
+    expect(calc.current.confident, isTrue);
+    expect(calc.current.gradeFraction, closeTo(0.08, 0.01));
+  });
 }

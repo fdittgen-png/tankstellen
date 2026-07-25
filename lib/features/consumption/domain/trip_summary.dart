@@ -188,6 +188,13 @@ class TripSummary {
   /// Stretches past the record cap — counted, not stored (#3589).
   final int imuEventRecordsDropped;
 
+  /// Seconds the engine was actually RUNNING (rpm ≥ 300), #3599. The
+  /// numerator of the engine-off-transport detector: a towed/transported
+  /// car keeps its ECU answering (rpm 0) while GPS covers real distance.
+  /// Null on legacy trips (recorded before the field) — the detector
+  /// treats null as "unknown", never as "transport".
+  final double? engineRunningSeconds;
+
   const TripSummary({
     required this.distanceKm,
     required this.maxRpm,
@@ -215,6 +222,7 @@ class TripSummary {
     this.imuActive = false,
     this.imuEventRecords = const [],
     this.imuEventRecordsDropped = 0,
+    this.engineRunningSeconds,
   });
 
   /// IMU hard-accel episodes per km (#2760). Derived, not stored — the raw
@@ -264,6 +272,7 @@ class TripSummary {
     int? sharpCornerCount,
     List<ImuEventRecord>? imuEventRecords,
     int? imuEventRecordsDropped,
+    double? engineRunningSeconds,
     bool? imuActive,
   }) =>
       TripSummary(
@@ -297,6 +306,8 @@ class TripSummary {
         imuEventRecords: imuEventRecords ?? this.imuEventRecords,
         imuEventRecordsDropped:
             imuEventRecordsDropped ?? this.imuEventRecordsDropped,
+        engineRunningSeconds:
+            engineRunningSeconds ?? this.engineRunningSeconds,
         imuActive: imuActive ?? this.imuActive,
       );
 }
