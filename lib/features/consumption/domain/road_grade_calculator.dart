@@ -38,6 +38,12 @@ class RoadGrade {
 /// The caller (#1942) feeds it the trip's running distance + the GPS
 /// altitude latched on each [TripSample] (#1940), and applies the grade
 /// to the speed-density fuel estimate only when it is confident.
+/// Steepest grade a paved road plausibly sustains (#3600). Alpine passes
+/// top out near 20%; anything beyond ±25% means the run denominator or
+/// the altitude signal is broken (wheels-stationary transport, GPS
+/// altitude garbage) and the grade must not be trusted.
+const double kMaxPlausibleGradeFraction = 0.25;
+
 class RoadGradeCalculator {
   RoadGradeCalculator({
     this.windowMeters = 150.0,
@@ -116,11 +122,17 @@ class RoadGradeCalculator {
     if (run <= 0) return RoadGrade.flat;
     final rise = latest.smoothedAltitudeM - anchor.smoothedAltitudeM;
 
+    final gradeFraction = rise / run;
     return RoadGrade(
-      gradeFraction: rise / run,
+      gradeFraction: gradeFraction,
       // A full window AND enough samples in it — a GPS-altitude
-      // dropout leaves the window sparse and is not trusted.
-      confident: samplesInWindow >= minSamplesInWindow,
+      // dropout leaves the window sparse and is not trusted. And a
+      // grade steeper than any paved road (#3600 — a wheels-stationary
+      // transport shrank the run to near zero and produced a
+      // "confident" 49% climb) is a signal-quality failure, not a
+      // hill: every confident-gated consumer must degrade instead.
+      confident: samplesInWindow >= minSamplesInWindow &&
+          gradeFraction.abs() <= kMaxPlausibleGradeFraction,
     );
   }
 
