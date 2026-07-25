@@ -259,6 +259,27 @@ class TripRecordingController {
   PidScheduler? _scheduler;
   Timer? _emitTimer;
   DateTime? _startedAt;
+
+  /// #3602 — wall time of the last successful high-priority engine parse.
+  /// The staleness fence: [_emit] refuses to stamp snapshot engine values
+  /// onto samples when no fresh parse landed within
+  /// [_engineDataStalenessLimit] — a scheduler that never started (link
+  /// never opened: the 76.5 km field trip recorded 49 min of ghost
+  /// engine data from a rehydrated snapshot at 0.0 Hz) produces no parse
+  /// events at all, so the null-parse silent-failure detector is
+  /// structurally blind to it (it counts null PARSES, not absent polls).
+  DateTime? _lastFreshEngineParseAt;
+  bool _staleEngineEscalated = false;
+
+  /// Oldest a high-priority engine parse may be before the snapshot is
+  /// treated as a ghost. Generous vs the 5 Hz dynamics tier and the
+  /// K-line's ~4-6 reads/s: even a struggling ISO 9141 link refreshes
+  /// rpm every ~1-2 s.
+  static const Duration _engineDataStalenessLimit = Duration(seconds: 15);
+
+  /// Grace after recording start before the fence may fire — the first
+  /// connect + scheduler spin-up takes a few seconds legitimately.
+  static const Duration _engineDataStartGrace = Duration(seconds: 30);
   DateTime? _lastSampleAt;
 
   // #2509 — timestamps of the FIRST and LATEST valid GPS fixes that
@@ -1206,6 +1227,8 @@ class TripRecordingController {
     if (parsedValue != null) {
       // ANY successful high-priority parse clears the window — we're
       // detecting "ECU is dead", not "this one PID is unsupported".
+      _lastFreshEngineParseAt = _now(); // #3602 — the staleness fence anchor
+      _staleEngineEscalated = false;
       _dropDetector.observeHighPriorityParse(parsedValue);
       return;
     }
@@ -1261,6 +1284,34 @@ class TripRecordingController {
 
     final snap = _liveSampleSnapshot;
     final nowTs = _now();
+
+    // #3602 — staleness fence: never stamp snapshot engine values without
+    // a recent successful parse backing them. A link that never opened
+    // (or died without a transport error) leaves the scheduler at 0 Hz;
+    // the null-parse detector is starved blind, and 49 min of a real
+    // field drive got ghost engine data (rpm 0, resting throttle) stamped
+    // onto every GPS fix — classified 'full OBD2, measured fuel'.
+    // Escalate ONCE through the same silent-failure drop path (pause with
+    // grace → reconnect → #2565 GPS-only degrade), and skip this tick so
+    // nothing stale reaches the recorder.
+    final fresh = _lastFreshEngineParseAt;
+    final started = _startedAt;
+    final pastGrace = started == null ||
+        nowTs.difference(started) > _engineDataStartGrace;
+    final engineStale = pastGrace &&
+        (fresh == null ||
+            nowTs.difference(fresh) > _engineDataStalenessLimit);
+    if (engineStale) {
+      if (!_staleEngineEscalated) {
+        _staleEngineEscalated = true;
+        debugPrint(
+          'TripRecordingController: engine data stale '
+          '(lastParse=$fresh) — escalating as silent failure (#3602)',
+        );
+        _onSilentFailure();
+      }
+      return;
+    }
     final fuelRate = snap.deriveFuelRateLPerHour();
     // #1858 — fold this tick into the trip's η_v recompute provenance.
     // Speed-density fuel is the only η_v-derived branch; PID 5E / MAF

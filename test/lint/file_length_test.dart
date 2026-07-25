@@ -661,8 +661,11 @@ void main() {
     // episode handler (pause → recoverVehicleProtocol → resume, throttled)
     // + stop-time stamping of the live GPS-physics estimate figures.
     'lib/features/obd2/data/trip_recording_controller.dart': (
-      lines: 1780,
-      bumps: 19,
+      // #3602 — the engine-data staleness fence (freshness anchor, two
+      // constants, the _emit gate + once-latched escalation, +51).
+      // Decomposition tracked by #3140.
+      lines: 1831,
+      bumps: 20,
       decompositionIssue: 3140,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR
