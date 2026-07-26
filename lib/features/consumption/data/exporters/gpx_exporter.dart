@@ -3,6 +3,7 @@
 
 import 'package:xml/xml.dart';
 
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/lessons/driving_lesson.dart';
 import '../../domain/trip_recorder.dart';
@@ -273,10 +274,10 @@ String _trackName(TripHistoryEntry entry) {
   final start = entry.summary.startedAt;
   if (start == null) return 'tankstellen trajet ${entry.id}';
   final y = start.year.toString();
-  final m = start.month.toString().padLeft(2, '0');
-  final d = start.day.toString().padLeft(2, '0');
-  final h = start.hour.toString().padLeft(2, '0');
-  final min = start.minute.toString().padLeft(2, '0');
+  final m = twoDigits(start.month);
+  final d = twoDigits(start.day);
+  final h = twoDigits(start.hour);
+  final min = twoDigits(start.minute);
   return 'tankstellen $y-$m-$d $h:$min';
 }
 
@@ -287,10 +288,10 @@ String gpxFileNameFor(TripHistoryEntry entry) {
   final start = entry.summary.startedAt;
   if (start == null) return 'tankstellen-trajet-${entry.id}.gpx';
   final y = start.year.toString();
-  final m = start.month.toString().padLeft(2, '0');
-  final d = start.day.toString().padLeft(2, '0');
-  final h = start.hour.toString().padLeft(2, '0');
-  final min = start.minute.toString().padLeft(2, '0');
+  final m = twoDigits(start.month);
+  final d = twoDigits(start.day);
+  final h = twoDigits(start.hour);
+  final min = twoDigits(start.minute);
   return 'tankstellen-trajet-$y$m${d}T$h$min.gpx';
 }
 

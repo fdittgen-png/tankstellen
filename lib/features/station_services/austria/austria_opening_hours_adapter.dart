@@ -162,8 +162,8 @@ class AustriaOpeningHoursAdapter extends OpeningHoursAdapter {
       return DayHours.closedDay(day);
     }
 
-    final start = _minutesFromClock(from);
-    final end = _minutesFromClock(to);
+    final start = parseClockMinutes(from);
+    final end = parseClockMinutes(to);
     if (start == null || end == null) {
       // No usable clock pair → no signal for this day; omit it (treated as
       // unknown by the model) rather than inventing a state.
@@ -192,16 +192,7 @@ class AustriaOpeningHoursAdapter extends OpeningHoursAdapter {
     return v == 'geschlossen' || v == 'closed';
   }
 
-  /// `HH:MM` → minutes-from-midnight (0..1440; 24:00 → 1440), or `null`.
-  /// `24:00` is accepted as the feed's whole-day end marker.
-  int? _minutesFromClock(String clock) {
-    final parts = clock.split(':');
-    if (parts.length < 2) return null;
-    final hour = int.tryParse(parts[0]);
-    final minute = int.tryParse(parts[1]);
-    if (hour == null || minute == null) return null;
-    if (hour == 24 && minute == 0) return 1440;
-    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
-    return hour * 60 + minute;
-  }
+  // `HH:MM` clock parsing delegates to the shared
+  // [OpeningHoursAdapter.parseClockMinutes] (#3614) — `24:00` is
+  // accepted as the feed's whole-day end marker.
 }

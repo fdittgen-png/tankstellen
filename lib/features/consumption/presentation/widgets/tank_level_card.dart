@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/services/tank_level_estimator.dart';
@@ -175,9 +176,7 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
 
   String _formatDate(DateTime? date) {
     if (date == null) return '';
-    final m = date.month.toString().padLeft(2, '0');
-    final d = date.day.toString().padLeft(2, '0');
-    return '${date.year}-$m-$d';
+    return '${date.year}-${twoDigits(date.month)}-${twoDigits(date.day)}';
   }
 
   String _methodLabel(AppLocalizations l, TankLevelEstimationMethod method) {

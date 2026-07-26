@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../obd2/api.dart';
 import 'broken_map_widgets.dart';
@@ -154,7 +155,7 @@ class TripRecordingLandscapeBody extends StatelessWidget {
                               key: const Key('landscapeElapsedTile'),
                               icon: Icons.timer,
                               label: l.tripMetricElapsed,
-                              value: r == null ? '—' : _fmtElapsed(r.elapsed),
+                              value: r == null ? '—' : formatMinutesSeconds(r.elapsed),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -184,12 +185,6 @@ class TripRecordingLandscapeBody extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  static String _fmtElapsed(Duration d) {
-    final m = d.inMinutes;
-    final s = d.inSeconds % 60;
-    return '${m.toString()}:${s.toString().padLeft(2, '0')}';
   }
 }
 

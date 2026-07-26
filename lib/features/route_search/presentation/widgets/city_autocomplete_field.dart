@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/services/location_search_service.dart';
+import '../../../../core/utils/debouncer.dart';
 
 /// Reusable text field with debounced city autocomplete suggestions.
 ///
@@ -40,7 +41,8 @@ class CityAutocompleteField extends StatefulWidget {
 }
 
 class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
-  Timer? _debounce;
+  final _searchDebounce =
+      Debouncer(duration: const Duration(milliseconds: 800));
   List<ResolvedLocation> _suggestions = [];
   bool _showSuggestions = false;
   bool _isLoading = false;
@@ -56,7 +58,7 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
+    _searchDebounce.dispose();
     _focusNode.removeListener(_onFocusChange);
     _focusNode.dispose();
     _removeOverlay();
@@ -71,7 +73,7 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
 
   void _onTextChanged(String value) {
     widget.onTextChanged();
-    _debounce?.cancel();
+    _searchDebounce.cancel();
 
     if (value.trim().length < 2) {
       _removeOverlay();
@@ -84,7 +86,7 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
       return;
     }
 
-    _debounce = Timer(const Duration(milliseconds: 800), () async {
+    _searchDebounce(() async {
       if (!mounted) return;
       setState(() => _isLoading = true);
       try {
@@ -116,7 +118,7 @@ class _CityAutocompleteFieldState extends State<CityAutocompleteField> {
     // A search may be debounced or in flight (Nominatim is rate-limited) when
     // the user taps a suggestion — cancel it and clear the spinner so the
     // suffix progress indicator never lingers after a selection (#2753).
-    _debounce?.cancel();
+    _searchDebounce.cancel();
     widget.controller.text = city.name;
     widget.onCitySelected(city);
     _removeOverlay();

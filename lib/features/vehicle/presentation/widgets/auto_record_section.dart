@@ -5,9 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/permissions/location_permissions.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -49,19 +48,22 @@ class AutoRecordSection extends ConsumerWidget {
   /// still being created.
   final String vehicleId;
 
-  /// Hook for prompting `Permission.locationAlways`. Null defers to
-  /// the production `permission_handler` API; widget tests inject a
-  /// fake so the prompt sequence can be asserted without binding
-  /// the real plugin. Stored as nullable rather than wrapped at
-  /// construction so the constructor stays const-eligible.
-  final Future<PermissionStatus> Function()? requestBackgroundLocation;
+  /// Hook for prompting the background/"always" location grant. Null
+  /// defers to the production [LocationPermissions] facade (#3614);
+  /// widget tests inject a fake so the prompt sequence can be
+  /// asserted without binding the real plugin. Stored as nullable
+  /// rather than wrapped at construction so the constructor stays
+  /// const-eligible.
+  final Future<LocationPermissionOutcome> Function()?
+      requestBackgroundLocation;
 
-  /// Hook for prompting `Permission.location` (foreground). Same
-  /// shape and rationale as [requestBackgroundLocation] — Android
-  /// requires foreground location to be granted before the OS will
-  /// even consider an `ACCESS_BACKGROUND_LOCATION` prompt (#1302),
-  /// so the widget runs a two-step flow and tests inject both hooks.
-  final Future<PermissionStatus> Function()? requestForegroundLocation;
+  /// Hook for prompting the foreground location grant. Same shape and
+  /// rationale as [requestBackgroundLocation] — Android requires
+  /// foreground location to be granted before the OS will even
+  /// consider an `ACCESS_BACKGROUND_LOCATION` prompt (#1302), so the
+  /// widget runs a two-step flow and tests inject both hooks.
+  final Future<LocationPermissionOutcome> Function()?
+      requestForegroundLocation;
 
   /// Hook for opening the OS app-settings page. Used as the fallback
   /// for the permanently-denied path on Android 11+, where the runtime
@@ -89,16 +91,18 @@ class AutoRecordSection extends ConsumerWidget {
     this.onScrollToObd2Card,
   });
 
-  static Future<PermissionStatus> _defaultRequestBackgroundLocation() {
-    return Permission.locationAlways.request();
+  static Future<LocationPermissionOutcome>
+      _defaultRequestBackgroundLocation() {
+    return const LocationPermissions().requestAlways();
   }
 
-  static Future<PermissionStatus> _defaultRequestForegroundLocation() {
-    return Permission.location.request();
+  static Future<LocationPermissionOutcome>
+      _defaultRequestForegroundLocation() {
+    return const LocationPermissions().requestWhileInUse();
   }
 
   static Future<void> _defaultOpenSettings() async {
-    await openAppSettings();
+    await const LocationPermissions().openAppSettings();
   }
 
   @override
@@ -283,7 +287,7 @@ class AutoRecordSection extends ConsumerWidget {
     try {
       // Step 1 — foreground location must be granted first.
       final fgStatus = await foregroundPrompt();
-      if (!fgStatus.isGranted) {
+      if (fgStatus != LocationPermissionOutcome.granted) {
         if (!context.mounted) return;
         SnackBarHelper.show(
           context,
@@ -296,12 +300,12 @@ class AutoRecordSection extends ConsumerWidget {
       // can never recover via runtime dialog, so we route through the
       // rationale dialog → Settings fallback instead of re-prompting.
       final bgStatus = await backgroundPrompt();
-      if (bgStatus.isGranted) {
+      if (bgStatus == LocationPermissionOutcome.granted) {
         await _persist(ref, profile.copyWith(backgroundLocationConsent: true));
         return;
       }
 
-      if (bgStatus.isPermanentlyDenied || bgStatus.isRestricted) {
+      if (bgStatus == LocationPermissionOutcome.permanentlyDenied) {
         if (!context.mounted) return;
         await _showRationaleDialog(
           context: context,

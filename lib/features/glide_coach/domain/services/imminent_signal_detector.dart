@@ -151,30 +151,17 @@ class ImminentSignalDetector {
   /// Initial bearing from `from` to `to` in degrees [0, 360).
   /// Forward-azimuth on the WGS-84 sphere.
   ///
-  /// Returns `0.0` when both points are identical (the standard
-  /// great-circle formula yields `atan2(0, 0)` which is well-defined
-  /// as 0, but we short-circuit to keep the contract explicit).
+  /// Returns `0.0` when both points are identical. Delegates to the
+  /// shared [geo.bearingDegrees] (#3614) — numerically identical to
+  /// the local formula it replaces (same forward azimuth, same
+  /// `[0, 360)` normalisation, same zero-distance contract).
   @visibleForTesting
-  static double bearingDegrees(LatLng from, LatLng to) {
-    if (from.latitude == to.latitude && from.longitude == to.longitude) {
-      return 0.0;
-    }
-
-    final lat1 = _degToRad(from.latitude);
-    final lat2 = _degToRad(to.latitude);
-    final deltaLng = _degToRad(to.longitude - from.longitude);
-
-    final y = math.sin(deltaLng) * math.cos(lat2);
-    final x =
-        math.cos(lat1) * math.sin(lat2) -
-        math.sin(lat1) * math.cos(lat2) * math.cos(deltaLng);
-
-    final bearingRad = math.atan2(y, x);
-    final bearingDeg = _radToDeg(bearingRad);
-    // Normalise to [0, 360). `(x % 360 + 360) % 360` handles negative
-    // bearings without conditionals.
-    return (bearingDeg % 360 + 360) % 360;
-  }
+  static double bearingDegrees(LatLng from, LatLng to) => geo.bearingDegrees(
+        from.latitude,
+        from.longitude,
+        to.latitude,
+        to.longitude,
+      );
 
   /// Great-circle distance in metres via the haversine formula.
   /// Delegates to the shared [geo.distanceMeters] (#2169).
@@ -234,5 +221,4 @@ class ImminentSignalDetector {
   }
 
   static double _degToRad(double deg) => deg * math.pi / 180.0;
-  static double _radToDeg(double rad) => rad * 180.0 / math.pi;
 }

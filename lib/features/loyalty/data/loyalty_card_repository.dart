@@ -1,15 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
-import 'dart:convert';
-
-import 'package:hive/hive.dart';
-
-import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/json_box_repository.dart';
 import '../domain/entities/loyalty_card.dart';
-import '../../../core/logging/error_logger.dart';
 
 /// Hive-backed CRUD for [LoyaltyCard] records (#1120 pilot).
 ///
@@ -28,49 +21,38 @@ import '../../../core/logging/error_logger.dart';
 ///     diagnostics and avoids any coupling on Hive's nested-map
 ///     coercion behaviour.
 ///
-/// All public methods degrade gracefully when the settings box isn't
-/// open (e.g. unit tests that skip Hive init) — the repo behaves
-/// like an empty store rather than throwing, mirroring
-/// [RadiusAlertStore].
-class LoyaltyCardRepository {
+/// Storage mechanics live in [JsonBoxRepository] (#3614). All public
+/// methods degrade gracefully when the settings box isn't open (e.g.
+/// unit tests that skip Hive init) — the repo behaves like an empty
+/// store rather than throwing, mirroring [RadiusAlertStore].
+class LoyaltyCardRepository extends JsonBoxRepository<LoyaltyCard> {
   /// Public so the price-display path / future BG isolate can iterate
   /// loyalty cards without re-importing this class.
   static const String keyPrefix = 'loyalty_card:';
 
-  final Box<dynamic> _box;
-
-  LoyaltyCardRepository({required Box<dynamic> box}) : _box = box;
+  LoyaltyCardRepository({required super.box})
+      : super(
+          fromJson: LoyaltyCard.fromJson,
+          toJson: (card) => card.toJson(),
+          keyOf: (card) => card.id,
+          entryKeyPrefix: keyPrefix,
+          debugName: 'LoyaltyCardRepository',
+        );
 
   /// Load every persisted card, newest-first by [LoyaltyCard.addedAt].
   /// Corrupt payloads are skipped so a single bad write doesn't hide
   /// the whole list.
   List<LoyaltyCard> loadAll() {
-    final out = <LoyaltyCard>[];
-    for (final key in _box.keys) {
-      if (key is! String || !key.startsWith(keyPrefix)) continue;
-      final raw = _box.get(key);
-      if (raw == null) continue;
-      try {
-        final json = _decode(raw);
-        if (json == null) continue;
-        out.add(LoyaltyCard.fromJson(json));
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'LoyaltyCardRepository.loadAll: skipping $key'}));
-      }
-    }
+    final out = getAll();
     out.sort((a, b) => b.addedAt.compareTo(a.addedAt));
     return out;
   }
 
   /// Insert or overwrite [card] by id.
-  Future<void> upsert(LoyaltyCard card) async {
-    await _box.put('$keyPrefix${card.id}', jsonEncode(card.toJson()));
-  }
+  Future<void> upsert(LoyaltyCard card) => put(card);
 
   /// Remove a card by id. No-op when the key is absent.
-  Future<void> remove(String id) async {
-    await _box.delete('$keyPrefix$id');
-  }
+  Future<void> remove(String id) => deleteByKey(id);
 
   /// Toggle the `enabled` flag in-place. Returns the updated card, or
   /// `null` when [id] doesn't exist.
@@ -83,26 +65,5 @@ class LoyaltyCardRepository {
   }
 
   /// Wipe every card. Used by the "reset" debug action.
-  Future<void> clear() async {
-    final keys = _box.keys
-        .whereType<String>()
-        .where((k) => k.startsWith(keyPrefix))
-        .toList();
-    for (final k in keys) {
-      await _box.delete(k);
-    }
-  }
-
-  Map<String, dynamic>? _decode(dynamic raw) {
-    if (raw is String) {
-      if (raw.isEmpty) return null;
-      final decoded = jsonDecode(raw);
-      if (decoded is Map) return HiveBoxes.toStringDynamicMap(decoded);
-      return null;
-    }
-    if (raw is Map) {
-      return HiveBoxes.toStringDynamicMap(raw);
-    }
-    return null;
-  }
+  Future<void> clear() => clearStored();
 }

@@ -12,6 +12,7 @@ import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -934,7 +935,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
           _MetricCard(
             icon: Icons.timer,
             label: l.tripMetricElapsed,
-            value: r == null ? '—' : _fmtElapsed(r.elapsed),
+            value: r == null ? '—' : formatMinutesSeconds(r.elapsed),
           ),
           const SizedBox(height: 8),
           // #2380 — instant L/100 km + coaching symbols; moved from the
@@ -1059,12 +1060,6 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
         ),
       ],
     );
-  }
-
-  static String _fmtElapsed(Duration d) {
-    final m = d.inMinutes;
-    final s = d.inSeconds % 60;
-    return '${m.toString()}:${s.toString().padLeft(2, '0')}';
   }
 }
 

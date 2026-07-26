@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/hive_boxes.dart';
+import '../../../../core/storage/json_box_repository.dart';
 import '../../domain/entities/service_reminder.dart';
 
 /// CRUD repository for [ServiceReminder] entries (#584).
@@ -17,49 +16,32 @@ import '../../domain/entities/service_reminder.dart';
 /// stored as a JSON-encoded string keyed by its id — the same
 /// pattern [HiveBoxes.achievements] and [HiveBoxes.obd2TripHistory]
 /// use. No custom TypeAdapter is needed; freezed/json_serializable
-/// handles (de)serialisation.
-class ServiceReminderRepository {
-  final Box<String> _box;
-
-  ServiceReminderRepository(this._box);
+/// handles (de)serialisation. Storage mechanics live in
+/// [JsonBoxRepository] (#3614).
+class ServiceReminderRepository extends JsonBoxRepository<ServiceReminder> {
+  ServiceReminderRepository(Box<String> box)
+      : super(
+          box: box,
+          fromJson: ServiceReminder.fromJson,
+          toJson: (reminder) => reminder.toJson(),
+          keyOf: (reminder) => reminder.id,
+          debugName: 'ServiceReminderRepository',
+        );
 
   /// Factory that grabs the open box from Hive. Use this in app code;
   /// tests can pass a specific [Box<String>] to the default ctor.
   factory ServiceReminderRepository.fromHive() =>
       ServiceReminderRepository(Hive.box<String>(HiveBoxes.serviceReminders));
 
-  /// Returns all stored reminders, unsorted.
-  List<ServiceReminder> getAll() {
-    final result = <ServiceReminder>[];
-    for (final key in _box.keys) {
-      final raw = _box.get(key);
-      if (raw == null) continue;
-      try {
-        final map = jsonDecode(raw) as Map<String, dynamic>;
-        result.add(ServiceReminder.fromJson(map));
-      } catch (e, st) {
-        debugPrint('ServiceReminderRepository: skipping "$key": $e\n$st');
-      }
-    }
-    return result;
-  }
+  // getAll() — inherited from [JsonBoxRepository]: all stored
+  // reminders, unsorted, corrupt entries skipped-and-logged.
 
   /// Returns all reminders attached to [vehicleId].
   List<ServiceReminder> getForVehicle(String vehicleId) =>
       getAll().where((r) => r.vehicleId == vehicleId).toList();
 
   /// Returns a single reminder by id or `null` when missing.
-  ServiceReminder? getById(String id) {
-    final raw = _box.get(id);
-    if (raw == null) return null;
-    try {
-      final map = jsonDecode(raw) as Map<String, dynamic>;
-      return ServiceReminder.fromJson(map);
-    } catch (e, st) {
-      debugPrint('ServiceReminderRepository: failed to decode "$id": $e\n$st');
-      return null;
-    }
-  }
+  ServiceReminder? getById(String id) => getByKey(id);
 
   /// Add or update a single reminder (matched by id).
   ///
@@ -68,7 +50,7 @@ class ServiceReminderRepository {
   /// error with nobody awaiting it.
   Future<void> save(ServiceReminder reminder) async {
     try {
-      await _box.put(reminder.id, jsonEncode(reminder.toJson()));
+      await put(reminder);
     } catch (e, st) {
       // TODO(#3610-follow-up): surface to user
       unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
@@ -83,8 +65,8 @@ class ServiceReminderRepository {
   /// Same fire-and-forget contract as [save]: log, never rethrow.
   Future<void> delete(String id) async {
     try {
-      if (_box.containsKey(id)) {
-        await _box.delete(id);
+      if (box.containsKey(id)) {
+        await deleteByKey(id);
       }
     } catch (e, st) {
       // TODO(#3610-follow-up): surface to user
@@ -103,13 +85,13 @@ class ServiceReminderRepository {
       if (r.vehicleId == vehicleId) victimKeys.add(r.id);
     }
     if (victimKeys.isNotEmpty) {
-      await _box.deleteAll(victimKeys);
+      await box.deleteAll(victimKeys);
     }
   }
 
   /// Wipe the entire reminder box. Used by the privacy dashboard.
   Future<void> clear() async {
-    await _box.clear();
+    await box.clear();
   }
 
   /// Mark a reminder done at [currentOdometerKm] — rebases

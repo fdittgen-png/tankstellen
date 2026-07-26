@@ -10,7 +10,7 @@ import '../../data/storage_repository.dart';
 import '../../storage/storage_providers.dart';
 import '../../utils/geo_utils.dart' as geo;
 import '../dio_factory.dart';
-import '../../../features/search/domain/entities/brand_registry.dart';
+import '../../domain/brand_registry.dart';
 import '../../domain/station.dart';
 import '../../../core/logging/error_logger.dart';
 

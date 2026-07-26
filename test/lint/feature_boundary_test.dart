@@ -397,6 +397,10 @@ const _featurePairBaseline = <String, int>{
 // #3190 — station_services 19→18: the GB composition moved feature-side
 // (uk_service_builder.dart), collapsing the builder's two UK imports into
 // one seam.
+// #3614 — search 2→1: BrandRegistry moved to lib/core/domain/, so the
+// OSM brand enricher's import is core→core now (the search feature
+// re-exports the registry to keep its public surface stable). The
+// survivor is country_provider → search_provider.
 const _coreImportBaseline = <String, int>{
   'alerts': 3,
   'consumption': 6,
@@ -404,7 +408,7 @@ const _coreImportBaseline = <String, int>{
   'itinerary': 3,
   'map': 1,
   'profile': 4,
-  'search': 2,
+  'search': 1,
   'station_services': 18,
 };
 
