@@ -132,18 +132,23 @@ class FuelTab extends ConsumerWidget {
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
-      itemCount: fillUps.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: headerChildren,
-          );
-        }
-        return buildFillUpRow(index - 1);
-      },
+    // #3615 — pull-to-refresh re-reads the fill-up store + stats.
+    return RefreshIndicator(
+      onRefresh: () async => ref.invalidate(fillUpListProvider),
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(top: 8, bottom: bottomInset),
+        itemCount: fillUps.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: headerChildren,
+            );
+          }
+          return buildFillUpRow(index - 1);
+        },
+      ),
     );
   }
 

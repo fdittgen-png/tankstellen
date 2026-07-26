@@ -17,6 +17,7 @@ import 'package:tankstellen/features/search/providers/search_provider.dart';
 import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
 
 /// Widget tests for [InlineMap] — the embeddable map widget that drives
 /// the split-screen layout from `searchStateProvider` + the active fuel
@@ -34,7 +35,7 @@ void main() {
       );
 
   group('InlineMap loading branch', () {
-    testWidgets('renders a CircularProgressIndicator while AsyncLoading',
+    testWidgets('renders the shimmer pane while AsyncLoading (#3615)',
         (tester) async {
       final test = standardTestOverrides();
       when(() => test.mockStorage.hasApiKey()).thenReturn(false);
@@ -59,7 +60,10 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 50));
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // #3615 — the map pane speaks the shared skeleton language, not
+      // a bare centred spinner.
+      expect(find.byType(ShimmerPane), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
       // Loading branch must not render the data widgets.
       expect(find.byType(StationMapLayers), findsNothing);
       expect(find.byType(EmptyState), findsNothing);

@@ -118,3 +118,30 @@ class ShimmerStationDetail extends StatelessWidget {
     );
   }
 }
+
+/// A generic shimmering pane for surfaces that are not lists — map
+/// panes, embedded previews (#3615: replaces the bare centred spinners
+/// so every loading surface speaks the one skeleton language the
+/// search list established).
+class ShimmerPane extends StatelessWidget {
+  const ShimmerPane({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      highlightColor: Theme.of(context).colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: AppRadius.lg,
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -9,8 +9,6 @@ import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/widgets/settings_app_bar_action.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/location/location_consent.dart';
-import '../../../../core/location/user_position_provider.dart';
-import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -30,14 +28,12 @@ import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
-import '../widgets/demo_mode_banner.dart';
-import '../widgets/unsupported_region_notice.dart';
 import '../widgets/radar_pin_help_sheet.dart';
 import '../widgets/radar_screen_pin_mixin.dart';
 import '../widgets/radar_search_fab.dart';
 import '../widgets/search_results_content.dart';
+import '../widgets/search_chrome_banners.dart';
 import '../widgets/search_summary_bar.dart';
-import '../widgets/user_position_bar.dart';
 
 /// Main search screen — results-first layout.
 ///
@@ -334,56 +330,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         isWideScreen(context) && ref.watch(radarSearchProvider).active;
     return Column(
       children: [
-        if (!hideChromeForLandscapeRadar) ...[
-          DemoModeBanner(country: country, corridorCountryCodes: corridorCodes),
-          // #3361 — honest "no coverage for your country" notice (replaces the
-          // silent fall-back to Germany that read as a geo-restriction).
-          const UnsupportedRegionNotice(),
-          // Compact summary bar — top-level entry point for editing criteria.
-          const SearchSummaryBar(),
-          UserPositionBar(
-            onUpdatePosition: () async {
-              final settings = ref.read(settingsStorageProvider);
-              // #3159 — capture before the consent/GPS awaits; ref.read on an
-              // unmounted element throws a StateError under Riverpod 3.
-              final positionNotifier = ref.read(userPositionProvider.notifier);
-              if (!LocationConsentDialog.hasConsent(settings)) {
-                if (!mounted) return;
-                final consented = await LocationConsentDialog.show(context);
-                if (!consented) return;
-                await LocationConsentDialog.recordConsent(settings);
-              }
-              try {
-                await positionNotifier.updateFromGps();
-                if (!mounted) return;
-                final state = ref.read(searchStateProvider);
-                if (state.hasValue && state.value!.data.isNotEmpty) {
-                  unawaited(_performGpsSearch());
-                }
-              } catch (e, st) {
-                // #1692 — never surface a raw exception toString() to the
-                // user; show a localized, actionable message instead.
-                // #2146 — route to the exportable log so the cause is
-                // recoverable from a bug report.
-                unawaited(
-                  errorLogger.log(
-                    ErrorLayer.ui,
-                    e,
-                    st,
-                    context: const {
-                      'where': 'SearchScreen: userPosition.updateFromGps',
-                    },
-                  ),
-                );
-                if (!context.mounted) return;
-                SnackBarHelper.showError(
-                  context,
-                  AppLocalizations.of(context).searchFailedSnackbar,
-                );
-              }
-            },
-          ),
-        ],
+        SearchChromeBanners(
+          hidden: hideChromeForLandscapeRadar,
+          country: country,
+          corridorCountryCodes: corridorCodes,
+          onSearchAgain: _performGpsSearch,
+        ),
         // Results dominate the remaining vertical space.
         Expanded(
           child: Semantics(

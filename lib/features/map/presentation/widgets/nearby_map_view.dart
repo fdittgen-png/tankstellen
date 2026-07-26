@@ -19,6 +19,7 @@ import '../../../../core/domain/search_result_item.dart';
 import '../../../search/providers/search_screen_ui_provider.dart';
 import 'station_map_geometry.dart';
 import 'station_map_layers.dart';
+import '../../../../core/widgets/shimmer_placeholder.dart';
 
 /// Displays a map of nearby stations from the current search results.
 ///
@@ -180,7 +181,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
           ],
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const ShimmerPane(),
       error: (error, _) => ServiceChainErrorWidget(
         error: error,
         onRetry: () => context.go(RoutePaths.search),
