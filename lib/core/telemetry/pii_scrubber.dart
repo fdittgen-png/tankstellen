@@ -66,8 +66,23 @@ class PiiScrubber {
   /// search call sites emit. Matches a lat/lng/lon(gitude) KEY followed
   /// by `=` or `:` and a signed decimal, redacting key+value together.
   /// Keyed so a plain price (`diesel: 1.789`) is never touched.
+  /// #3612 — the numeric value may also be an integer (`lat=48`) or
+  /// carry a single decimal (`lat=48.1`): device coordinates get rounded
+  /// before they reach a log line, and a rounded coordinate is still
+  /// PII. The value part is therefore `-?\d{1,3}(?:\.\d+)?`.
   static final RegExp _coordKeyValueRegex = RegExp(
-    r'\b(?:lat|latitude|lng|lon|longitude)\s*[=:]\s*-?\d{1,3}\.\d+',
+    r'\b(?:lat|latitude|lng|lon|longitude)\s*[=:]\s*-?\d{1,3}(?:\.\d+)?',
+    caseSensitive: false,
+  );
+
+  /// #3612 — structured (JSON-ish) coordinate fields: `"lat": 43.4612`,
+  /// `"longitude": 11`, … The quote before the key breaks the
+  /// `\b`-anchored key/value rule above (the closing quote sits between
+  /// the key and the `:`), so serialized request/response bodies leaked
+  /// their coordinates verbatim. Redacts key + value together; accepts
+  /// integers and any number of decimals, same rationale as above.
+  static final RegExp _coordJsonKeyRegex = RegExp(
+    r'"(?:lat|latitude|lng|lon|longitude)"\s*:\s*-?\d{1,3}(?:\.\d+)?',
     caseSensitive: false,
   );
 
@@ -76,6 +91,20 @@ class PiiScrubber {
   /// session ids, and station-id+coord composites. Anchored on word
   /// boundaries so we don't redact half a sentence.
   static final RegExp _tokenRegex = RegExp(r'\b[A-Za-z0-9_-]{20,}\b');
+
+  /// #3612 — a full JWT (`header.payload.signature`, three dot-separated
+  /// base64url segments). The generic token rule only catches segments
+  /// that are individually >= 20 chars, so a JWT with a short header or
+  /// signature segment survived partially, and even a fully-caught one
+  /// left the tell-tale `X.Y.Z` shape behind. Targeted rather than a
+  /// loosened [_tokenRegex]: every real-world JWT header is base64url of
+  /// `{"…` and therefore starts with `eyJ`, which ordinary prose never
+  /// does — so dotted sentences, version strings (`v1.2.3`) and file names
+  /// (`a.b.dart`) are never eaten. Runs BEFORE [_tokenRegex] so the
+  /// whole token collapses into a single marker.
+  static final RegExp _jwtRegex = RegExp(
+    r'\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b',
+  );
 
   // --------------------------------------------------------------------------
   // Public API
@@ -94,6 +123,10 @@ class PiiScrubber {
     var out = text.replaceAll(_emailRegex, emailMarker);
     out = out.replaceAll(_coordRegex, coordMarker);
     out = out.replaceAll(_coordKeyValueRegex, coordMarker);
+    out = out.replaceAll(_coordJsonKeyRegex, coordMarker);
+    // JWT before the generic token rule so the whole three-segment token
+    // collapses into ONE marker instead of per-segment fragments (#3612).
+    out = out.replaceAll(_jwtRegex, tokenMarker);
     out = out.replaceAll(_tokenRegex, tokenMarker);
     return out;
   }

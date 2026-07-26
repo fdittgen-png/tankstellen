@@ -73,6 +73,11 @@ class BackupXmlReader {
   BackupPayload read(String xml) {
     final XmlDocument doc;
     try {
+      // #3612 — verified against package:xml: `parse` never fetches
+      // external entities/DTDs and keeps a DOCTYPE's internal subset as
+      // an opaque node; only the predefined character entities expand
+      // (default `XmlDefaultEntityMapping.xml()`), so a "billion
+      // laughs" / XXE payload cannot amplify or exfiltrate here.
       doc = XmlDocument.parse(xml);
     } catch (e, st) {
       Error.throwWithStackTrace(

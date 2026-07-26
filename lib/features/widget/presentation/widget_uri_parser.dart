@@ -31,7 +31,17 @@ String? widgetUriToPath(Uri? uri) {
   if (uri.host != 'station') return null;
   final id = uri.queryParameters['id'];
   if (id == null || id.isEmpty) return null;
+  if (!_stationIdPattern.hasMatch(id)) return null;
   return id.startsWith('ocm-')
       ? RoutePaths.evStationById(id)
       : RoutePaths.station(id);
 }
+
+/// #3612 (2026-07-26 audit, wave 2) — the station id is interpolated
+/// straight into a router path, so an adversarial launch URI (`../`,
+/// spaces, quotes, path separators) could otherwise shape the route.
+/// Constrained to the charset every real id format uses — tankerkoenig
+/// UUIDs (hex + `-`), numeric FR/ES/IT ids, and OpenChargeMap `ocm-<n>`
+/// ids all match — with a 64-char bound. Anything else is rejected like
+/// every other invalid URI (`null` → caller no-op).
+final RegExp _stationIdPattern = RegExp(r'^[A-Za-z0-9_.:-]{1,64}$');
