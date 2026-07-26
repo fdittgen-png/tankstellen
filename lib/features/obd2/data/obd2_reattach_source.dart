@@ -71,16 +71,27 @@ class SupervisorReattachSource implements Obd2ReattachSource {
   Future<void> start() async {
     if (_sub != null || _fired) return;
     // The supervisor may have re-attached BEFORE the manager finished
-    // its drop bookkeeping and started us — deliver immediately.
+    // its drop bookkeeping and started us — deliver immediately. BUT
+    // (#3625) only a service whose transport is actually open counts:
+    // after an in-trip drop the supervisor can still HOLD the very
+    // corpse the trip just dropped (disconnectDroppedService closed its
+    // transport; the reference lingers until the next dial). Firing
+    // with it resumed the scheduler onto a dead socket → instant
+    // re-drop → new reattach source → same corpse — the ~4.7 s
+    // success-flap loop that recorded a whole field trip with zero
+    // engine data. A held-but-dead service waits for the next genuine
+    // ready below.
     final live = _supervisor.service;
-    if (live != null) {
+    if (live != null && live.isConnected) {
       _fire(live);
       return;
     }
     _sub = _supervisor.states.listen((next) {
       if (next == Obd2LinkState.ready) {
+        // #3625 — same guard: a ready racing a teardown must not hand
+        // the trip a corpse.
         final svc = _supervisor.service;
-        if (svc != null) _fire(svc);
+        if (svc != null && svc.isConnected) _fire(svc);
         return;
       }
       if (next == Obd2LinkState.reconnecting &&

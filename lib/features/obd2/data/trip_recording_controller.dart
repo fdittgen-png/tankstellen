@@ -617,10 +617,25 @@ class TripRecordingController {
   /// Best-effort: a disconnect failure on the already-dead old link must
   /// never derail the just-recovered recording, so it is swallowed to a
   /// breadcrumb.
+  /// #3625 — until this instant, transport errors and null parses do
+  /// NOT count toward a drop. A freshly adopted reconnect session on a
+  /// K-line car (ISO 9141, 10.4 kbaud) performs its slow bus init on
+  /// the FIRST poll; without the grace the drop detector declared a
+  /// silent failure before the #3575 quiet-window protocol recovery
+  /// could run, tearing the session down and producing the field flap:
+  /// dial(≈4.7 s) → adopt → first-poll fail → drop → redial, forever —
+  /// a whole trip recorded with zero engine data.
+  DateTime? _reconnectGraceUntil;
+
+  /// Generous vs the ~2.5 s ISO 9141 5-baud init plus one #3575
+  /// recovery pass.
+  static const Duration _reconnectGrace = Duration(seconds: 8);
+
   void replaceService(Obd2Service service) {
     final old = _service;
     if (identical(old, service)) return;
     _service = service;
+    _reconnectGraceUntil = _now().add(_reconnectGrace);
     // #2907 — the reconnected link is healthy: clear the drop detector's
     // error window (incl. any dead-transport short-circuits the [_runTransport]
     // gate logged against the OLD service) so the first poll on the new live
@@ -1204,9 +1219,18 @@ class TripRecordingController {
   /// pausing?" state.
   void _registerTransportError(Object error) {
     if (_pausedDueToDrop || _stopped) return;
+    // #3625 — inside the post-reconnect grace the fresh session is
+    // still bringing the bus up; failures feed the #3575 protocol
+    // episode instead of the drop verdict.
+    if (_inReconnectGrace) return;
     if (_dropDetector.registerTransportError(error)) {
       _droppedSession.handleDrop();
     }
+  }
+
+  bool get _inReconnectGrace {
+    final until = _reconnectGraceUntil;
+    return until != null && _now().isBefore(until);
   }
 
   /// Bookkeeping for the silent-failure heuristic (#1330 phase 3).
@@ -1236,6 +1260,9 @@ class TripRecordingController {
     // of nulls double-fire into a second drop. The lifecycle guard
     // stays here; the detector just counts.
     if (_pausedDueToDrop || _stopped) return;
+    // #3625 — bus-init nulls during the post-reconnect grace are the
+    // K-line waking up, not a dead ECU.
+    if (_inReconnectGrace) return;
     if (_dropDetector.observeHighPriorityParse(parsedValue)) {
       _onSilentFailure();
     }
