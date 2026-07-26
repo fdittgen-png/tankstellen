@@ -22,6 +22,7 @@ import '../../../search/providers/search_screen_ui_provider.dart';
 import '../../../search/providers/selected_station_provider.dart';
 import 'station_map_geometry.dart';
 import 'station_map_layers.dart';
+import '../../../../core/widgets/shimmer_placeholder.dart';
 
 /// A reusable map widget that displays station markers in the split-screen
 /// landscape pane.
@@ -91,7 +92,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
           }
           return _buildRouteMap(context, result, stations, selectedFuel);
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerPane(),
         error: (_, _) => _mapUnavailable(context),
       );
     }
@@ -105,7 +106,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
       return radar.stations.when(
         data: (stations) =>
             _buildMap(context, stations, selectedFuel, searchRadius, sortMode),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerPane(),
         error: (_, _) => _mapUnavailable(context),
       );
     }
@@ -125,7 +126,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
           sortMode,
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const ShimmerPane(),
       error: (_, _) => _mapUnavailable(context),
     );
   }

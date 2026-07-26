@@ -23,6 +23,7 @@ import '../../providers/search_provider.dart';
 import 'radar_scope_view.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
+import '../../../../core/widgets/empty_state.dart';
 
 /// Renders the result panel of `SearchScreen` based on the current
 /// [SearchMode] and [FuelType]:
@@ -161,8 +162,17 @@ class SearchResultsContent extends ConsumerWidget {
           // lands and the list re-ranks.
           return Column(
             children: [
-              if (radar.locating)
-                _RadarUpdatingBanner(message: l10n.radarUpdatingLocation),
+              // #3615 — the refresh banner slides in/out instead of
+              // snapping the list down a row.
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                alignment: Alignment.topCenter,
+                child: radar.locating
+                    ? _RadarUpdatingBanner(
+                        message: l10n.radarUpdatingLocation)
+                    : const SizedBox(width: double.infinity),
+              ),
               Expanded(child: body),
             ],
           );
@@ -183,27 +193,15 @@ class SearchResultsContent extends ConsumerWidget {
     return searchState.when(
       data: (result) {
         if (result.data.isEmpty) {
-          return Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // #2743 — the redundant "Stations les plus proches" CTA
-                  // card was removed; it duplicated the always-visible
-                  // central search FAB and the Fuel Station Radar button.
-                  // #2131 — the empty-state inline "Search" CTA moved to
-                  // the central FAB. The shell's FAB is always visible
-                  // on this screen, so the empty state is no longer a
-                  // dead-end even without an inline button.
-                  Text(
-                    l10n.startSearch,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
+          // #2743/#2131 — no inline CTA: the central search FAB is the
+          // always-visible affordance. #3615 — same icon+title visual
+          // language as the radar empty state (shared EmptyState), so
+          // the screen's two "nothing here" moments no longer look like
+          // two different apps.
+          return SingleChildScrollView(
+            child: EmptyState(
+              icon: Icons.search,
+              title: l10n.startSearch,
             ),
           );
         }

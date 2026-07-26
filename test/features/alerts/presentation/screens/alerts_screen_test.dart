@@ -15,6 +15,7 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import 'package:tankstellen/core/widgets/shimmer_placeholder.dart';
 
 void main() {
   group('AlertsScreen', () {
@@ -240,11 +241,57 @@ void main() {
       );
     });
   });
+  group('#3615 polish', () {
+    testWidgets('loading shows the shared skeleton, not a bare spinner',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertsAsyncProvider
+              .overrideWithValue(const AsyncValue<List<PriceAlert>>.loading()),
+        ],
+        settle: false,
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(find.byType(ShimmerStationList), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('the alerts list is pull-to-refreshable', (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey()).thenReturn(false);
+      when(() => test.mockStorage.getAlerts()).thenReturn([]);
+
+      await pumpApp(
+        tester,
+        const AlertsScreen(),
+        overrides: [
+          ...test.overrides,
+          alertProvider.overrideWith(() => _FixedAlerts(const [])),
+        ],
+      );
+
+      expect(find.byType(RefreshIndicator), findsOneWidget);
+      // The gesture completes without touching the network: local
+      // providers just re-read their stores.
+      await tester.fling(
+          find.byType(ListView).first, const Offset(0, 300), 1000);
+      await tester.pumpAndSettle();
+    });
+  });
 }
 
 class _EmptyAlerts extends AlertNotifier {
   @override
   List<PriceAlert> build() => [];
+
 }
 
 class _FixedAlerts extends AlertNotifier {

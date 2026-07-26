@@ -15,6 +15,7 @@ import '../../providers/charging_logs_provider.dart';
 import 'charging_cost_trend_chart.dart';
 import 'charging_efficiency_chart.dart';
 import 'charging_log_card.dart';
+import '../../../../core/widgets/shimmer_placeholder.dart';
 
 /// Body of the Charging tab on the Consumption screen.
 ///
@@ -33,7 +34,7 @@ class ChargingTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return async.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const ShimmerStationList(),
       error: (e, _) => Center(child: Text('Failed to load charging logs: $e')),
       data: (logs) {
         if (logs.isEmpty) {
@@ -45,37 +46,42 @@ class ChargingTab extends ConsumerWidget {
           );
         }
         final ordered = logs.reversed.toList(growable: false);
-        return ListView.builder(
-          padding: EdgeInsets.only(
-            top: 8,
-            bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
+        // #3615 — pull-to-refresh re-reads the charging-log store.
+        return RefreshIndicator(
+          onRefresh: () async => ref.invalidate(chargingLogsProvider),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.only(
+              top: 8,
+              bottom: 96 + MediaQuery.of(context).viewPadding.bottom,
+            ),
+            itemCount: ordered.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                // Charts header — read the derived rollup providers so
+                // they react to the same chargingLogsProvider we already
+                // watched upstream.
+                return const _ChargingChartsSection();
+              }
+              final log = ordered[index - 1];
+              return Dismissible(
+                key: ValueKey('charging-${log.id}'),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 24),
+                  color: DarkModeColors.error(context),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (_) {
+                  unawaited(
+                    ref.read(chargingLogsProvider.notifier).remove(log.id),
+                  );
+                },
+                child: ChargingLogCard(log: log),
+              );
+            },
           ),
-          itemCount: ordered.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              // Charts header — read the derived rollup providers so
-              // they react to the same chargingLogsProvider we already
-              // watched upstream.
-              return const _ChargingChartsSection();
-            }
-            final log = ordered[index - 1];
-            return Dismissible(
-              key: ValueKey('charging-${log.id}'),
-              direction: DismissDirection.endToStart,
-              background: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 24),
-                color: DarkModeColors.error(context),
-                child: const Icon(Icons.delete, color: Colors.white),
-              ),
-              onDismissed: (_) {
-                unawaited(
-                  ref.read(chargingLogsProvider.notifier).remove(log.id),
-                );
-              },
-              child: ChargingLogCard(log: log),
-            );
-          },
         );
       },
     );

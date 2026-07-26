@@ -24,6 +24,7 @@ import '../widgets/alert_statistics_card.dart';
 import '../widgets/alerts_best_effort_note.dart';
 import '../widgets/alerts_last_checked_footer.dart';
 import '../widgets/radius_alert_create_sheet.dart';
+import '../../../../core/widgets/shimmer_placeholder.dart';
 
 class AlertsScreen extends ConsumerWidget {
   const AlertsScreen({super.key});
@@ -43,7 +44,7 @@ class AlertsScreen extends ConsumerWidget {
       ),
       body: alertsAsync.when(
         data: (alerts) => _AlertsBody(alerts: alerts),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerStationList(),
         error: (error, stackTrace) => ServiceChainErrorWidget(
           error: error,
           stackTrace: stackTrace,
@@ -79,77 +80,82 @@ class _AlertsBody extends ConsumerWidget {
     // dense rows. Replaces the old layout where per-station alerts floated
     // unlabelled above a big divider (asymmetric with the labelled radius
     // section) and the screen wasted most of its vertical space.
-    return ListView(
-      padding: const EdgeInsets.only(top: 8, bottom: 24),
-      children: [
-        const AlertStatisticsCard(),
-        const SizedBox(height: 4),
-        // ── Station alerts ──────────────────────────────────────────
-        _SectionHeader(
-          title: l10n.alertsStationSectionTitle,
-          count: alerts.length,
-          addTooltip: l10n.alertsStationAdd,
-          // #2857 — the "+" used to be a dead-end that only re-showed the
-          // "create from a station's detail page" hint. It now opens the
-          // favorite-station picker and, on selection, the same
-          // [CreateAlertDialog] the station-detail app bar uses.
-          onAdd: () => AlertStationPickerSheet.addStationAlert(context, ref),
-        ),
-        if (alerts.isEmpty)
-          _SectionEmpty(
-            icon: Icons.notifications_off_outlined,
-            text: l10n.noPriceAlertsHint,
-          )
-        else
-          _GroupedAlertsCard(
-            children: [
-              for (final a in alerts)
-                _AlertListTile(key: ValueKey(a.id), alert: a),
-            ],
+    // #3615 — pull-to-refresh re-evaluates both alert sections.
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(alertsAsyncProvider);
+        ref.invalidate(radiusAlertsProvider);
+      },
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(top: 8, bottom: 24),
+        children: [
+          const AlertStatisticsCard(),
+          const SizedBox(height: 4),
+          // ── Station alerts ──────────────────────────────────────────
+          _SectionHeader(
+            title: l10n.alertsStationSectionTitle,
+            count: alerts.length,
+            addTooltip: l10n.alertsStationAdd,
+            // #2857 — the "+" used to be a dead-end that only re-showed the
+            // "create from a station's detail page" hint. It now opens the
+            // favorite-station picker and, on selection, the same
+            // [CreateAlertDialog] the station-detail app bar uses.
+            onAdd: () => AlertStationPickerSheet.addStationAlert(context, ref),
           ),
-        const SizedBox(height: 12),
-        // ── Zone / radius alerts (#578 phase 2) ─────────────────────
-        _SectionHeader(
-          title: l10n.alertsRadiusSectionTitle,
-          count: radiusAsync.asData?.value.length ?? 0,
-          addTooltip: l10n.alertsRadiusAdd,
-          onAdd: () => RadiusAlertCreateSheet.show(context),
-        ),
-        radiusAsync.when(
-          data: (radiusAlerts) {
-            if (radiusAlerts.isEmpty) {
-              return _RadiusEmptyState();
-            }
-            return _GroupedAlertsCard(
+          if (alerts.isEmpty)
+            _SectionEmpty(
+              icon: Icons.notifications_off_outlined,
+              text: l10n.noPriceAlertsHint,
+            )
+          else
+            _GroupedAlertsCard(
               children: [
-                for (final a in radiusAlerts)
-                  _RadiusAlertListTile(
-                    key: ValueKey('radius-${a.id}'),
-                    alert: a,
-                  ),
+                for (final a in alerts)
+                  _AlertListTile(key: ValueKey(a.id), alert: a),
               ],
-            );
-          },
-          loading: () => const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator()),
+            ),
+          const SizedBox(height: 12),
+          // ── Zone / radius alerts (#578 phase 2) ─────────────────────
+          _SectionHeader(
+            title: l10n.alertsRadiusSectionTitle,
+            count: radiusAsync.asData?.value.length ?? 0,
+            addTooltip: l10n.alertsRadiusAdd,
+            onAdd: () => RadiusAlertCreateSheet.show(context),
           ),
-          error: (error, stackTrace) => ServiceChainErrorWidget(
-            error: error,
-            stackTrace: stackTrace,
-            searchContext: l10n.alertsLoadErrorTitle,
-            onRetry: () => ref.invalidate(radiusAlertsProvider),
+          radiusAsync.when(
+            data: (radiusAlerts) {
+              if (radiusAlerts.isEmpty) {
+                return _RadiusEmptyState();
+              }
+              return _GroupedAlertsCard(
+                children: [
+                  for (final a in radiusAlerts)
+                    _RadiusAlertListTile(
+                      key: ValueKey('radius-${a.id}'),
+                      alert: a,
+                    ),
+                ],
+              );
+            },
+            loading: () => const ShimmerStationList(count: 2),
+            error: (error, stackTrace) => ServiceChainErrorWidget(
+              error: error,
+              stackTrace: stackTrace,
+              searchContext: l10n.alertsLoadErrorTitle,
+              onRetry: () => ref.invalidate(radiusAlertsProvider),
+            ),
           ),
-        ),
-        // #3147 — "last checked" footer: surfaces the dedup store's
-        // last-completed-scan stamp so a user can verify the background
-        // scan actually runs (the alert-SLA field check).
-        const AlertsLastCheckedFooter(),
-        // #3169 — iOS-only honest disclosure: background alert delivery
-        // on iPhone is best-effort (OS-budgeted), never Android-grade.
-        // Renders nothing on other platforms.
-        const AlertsBestEffortNote(),
-      ],
+          // #3147 — "last checked" footer: surfaces the dedup store's
+          // last-completed-scan stamp so a user can verify the background
+          // scan actually runs (the alert-SLA field check).
+          const AlertsLastCheckedFooter(),
+          // #3169 — iOS-only honest disclosure: background alert delivery
+          // on iPhone is best-effort (OS-budgeted), never Android-grade.
+          // Renders nothing on other platforms.
+          const AlertsBestEffortNote(),
+        ],
+      ),
     );
   }
 }

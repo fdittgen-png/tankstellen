@@ -334,56 +334,75 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         isWideScreen(context) && ref.watch(radarSearchProvider).active;
     return Column(
       children: [
-        if (!hideChromeForLandscapeRadar) ...[
-          DemoModeBanner(country: country, corridorCountryCodes: corridorCodes),
-          // #3361 — honest "no coverage for your country" notice (replaces the
-          // silent fall-back to Germany that read as a geo-restriction).
-          const UnsupportedRegionNotice(),
-          // Compact summary bar — top-level entry point for editing criteria.
-          const SearchSummaryBar(),
-          UserPositionBar(
-            onUpdatePosition: () async {
-              final settings = ref.read(settingsStorageProvider);
-              // #3159 — capture before the consent/GPS awaits; ref.read on an
-              // unmounted element throws a StateError under Riverpod 3.
-              final positionNotifier = ref.read(userPositionProvider.notifier);
-              if (!LocationConsentDialog.hasConsent(settings)) {
-                if (!mounted) return;
-                final consented = await LocationConsentDialog.show(context);
-                if (!consented) return;
-                await LocationConsentDialog.recordConsent(settings);
-              }
-              try {
-                await positionNotifier.updateFromGps();
-                if (!mounted) return;
-                final state = ref.read(searchStateProvider);
-                if (state.hasValue && state.value!.data.isNotEmpty) {
-                  unawaited(_performGpsSearch());
-                }
-              } catch (e, st) {
-                // #1692 — never surface a raw exception toString() to the
-                // user; show a localized, actionable message instead.
-                // #2146 — route to the exportable log so the cause is
-                // recoverable from a bug report.
-                unawaited(
-                  errorLogger.log(
-                    ErrorLayer.ui,
-                    e,
-                    st,
-                    context: const {
-                      'where': 'SearchScreen: userPosition.updateFromGps',
-                    },
-                  ),
-                );
-                if (!context.mounted) return;
-                SnackBarHelper.showError(
-                  context,
-                  AppLocalizations.of(context).searchFailedSnackbar,
-                );
-              }
-            },
-          ),
-        ],
+        // #3615 — the chrome banners appear/disappear with a size
+        // animation instead of a post-frame layout jump.
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: hideChromeForLandscapeRadar
+              ? const SizedBox(width: double.infinity)
+              : Column(
+                  children: [
+                    DemoModeBanner(
+                      country: country,
+                      corridorCountryCodes: corridorCodes,
+                    ),
+                    // #3361 — honest "no coverage for your country" notice (replaces the
+                    // silent fall-back to Germany that read as a geo-restriction).
+                    const UnsupportedRegionNotice(),
+                    // Compact summary bar — top-level entry point for editing criteria.
+                    const SearchSummaryBar(),
+                    UserPositionBar(
+                      onUpdatePosition: () async {
+                        final settings = ref.read(settingsStorageProvider);
+                        // #3159 — capture before the consent/GPS awaits; ref.read on an
+                        // unmounted element throws a StateError under Riverpod 3.
+                        final positionNotifier = ref.read(
+                          userPositionProvider.notifier,
+                        );
+                        if (!LocationConsentDialog.hasConsent(settings)) {
+                          if (!mounted) return;
+                          final consented = await LocationConsentDialog.show(
+                            context,
+                          );
+                          if (!consented) return;
+                          await LocationConsentDialog.recordConsent(settings);
+                        }
+                        try {
+                          await positionNotifier.updateFromGps();
+                          if (!mounted) return;
+                          final state = ref.read(searchStateProvider);
+                          if (state.hasValue && state.value!.data.isNotEmpty) {
+                            unawaited(_performGpsSearch());
+                          }
+                        } catch (e, st) {
+                          // #1692 — never surface a raw exception toString() to the
+                          // user; show a localized, actionable message instead.
+                          // #2146 — route to the exportable log so the cause is
+                          // recoverable from a bug report.
+                          unawaited(
+                            errorLogger.log(
+                              ErrorLayer.ui,
+                              e,
+                              st,
+                              context: const {
+                                'where':
+                                    'SearchScreen: userPosition.updateFromGps',
+                              },
+                            ),
+                          );
+                          if (!context.mounted) return;
+                          SnackBarHelper.showError(
+                            context,
+                            AppLocalizations.of(context).searchFailedSnackbar,
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+        ),
         // Results dominate the remaining vertical space.
         Expanded(
           child: Semantics(

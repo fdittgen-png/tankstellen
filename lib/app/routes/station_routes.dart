@@ -14,6 +14,7 @@ import '../../features/report/presentation/screens/report_screen.dart';
 import '../../features/search/presentation/screens/ev_station_detail_screen.dart';
 import '../../features/station_detail/presentation/screens/station_detail_screen.dart';
 import '../station_id_validator.dart';
+import 'detail_transition_page.dart';
 import 'invalid_id_screen.dart';
 
 /// Detail-level routes anchored on a single station id: fuel and EV
@@ -34,19 +35,26 @@ List<RouteBase> stationRoutes(Ref ref) => [
       ),
       GoRoute(
         path: RoutePaths.stationPattern,
-        builder: (context, state) {
+        // #3615 — shared detail transition (fade + settle).
+        pageBuilder: (context, state) {
           final id = state.pathParameters['id'];
-          if (!isValidStationId(id)) {
-            return invalidIdScreen(context, state.matchedLocation);
-          }
-          return StationDetailScreen(stationId: id!);
+          return detailTransitionPage(
+            key: state.pageKey,
+            child: !isValidStationId(id)
+                ? invalidIdScreen(context, state.matchedLocation)
+                : StationDetailScreen(stationId: id!),
+          );
         },
       ),
       GoRoute(
         path: RoutePaths.evStation,
-        builder: (context, state) {
+        // #3615 — same detail transition as the fuel screen.
+        pageBuilder: (context, state) {
           final station = state.extra as ChargingStation;
-          return EVStationDetailScreen(station: station);
+          return detailTransitionPage(
+            key: state.pageKey,
+            child: EVStationDetailScreen(station: station),
+          );
         },
       ),
       // Deep-link friendly EV detail: takes the station id in the
