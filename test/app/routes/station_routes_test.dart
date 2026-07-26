@@ -83,14 +83,15 @@ void main() {
       }
     });
 
-    test('every GoRoute has a non-null builder', () {
+    test('every GoRoute has a builder or a pageBuilder (#3615: the two '
+        'detail routes moved to the shared transition pageBuilder)', () {
       final routes = _routesUnderTest();
       for (var i = 0; i < routes.length; i++) {
         final route = routes[i] as GoRoute;
         expect(
-          route.builder,
+          route.builder ?? route.pageBuilder,
           isNotNull,
-          reason: 'route $i (${route.path}) should have a non-null builder',
+          reason: 'route $i (${route.path}) should build something',
         );
       }
     });
