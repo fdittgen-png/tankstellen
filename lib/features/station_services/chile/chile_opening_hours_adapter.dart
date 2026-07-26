@@ -67,10 +67,10 @@ class ChileOpeningHoursAdapter extends OpeningHoursAdapter {
     'domingo': OpeningDay.sun,
   };
 
-  /// Captures an `HH:MM-HH:MM` (or `HH.MM-HH.MM`) clock range.
-  static final RegExp _rangeRe = RegExp(
-    r'(\d{1,2})[.:](\d{2})\s*-\s*(\d{1,2})[.:](\d{2})',
-  );
+  /// Captures an `HH:MM-HH:MM` (or `HH.MM-HH.MM`) clock range — the
+  /// shared [OpeningHoursAdapter.clockRangeRe] pattern (#3614).
+  static final RegExp _rangeRe =
+      OpeningHoursAdapter.clockRangeRe(dotSeparator: true);
 
   /// Captures a `<label>` token immediately preceding a clock range, plus the
   /// optional `a <label2>` span (`Lunes a Viernes 07:00-22:00`). The schedule

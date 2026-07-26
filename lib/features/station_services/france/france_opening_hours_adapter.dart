@@ -79,10 +79,10 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
 
   /// Matches one `HH.MM-HH.MM` (or `HH:MM-HH:MM`) clock range within a day's
   /// segment. `allMatches` picks up both halves of a ` et `-joined split
-  /// shift.
-  static final RegExp _clockRangeRe = RegExp(
-    r'(\d{1,2})[.:](\d{2})\s*-\s*(\d{1,2})[.:](\d{2})',
-  );
+  /// shift. The pattern is the shared [OpeningHoursAdapter.clockRangeRe]
+  /// (#3614).
+  static final RegExp _clockRangeRe =
+      OpeningHoursAdapter.clockRangeRe(dotSeparator: true);
 
   @override
   WeeklyOpeningHours parse(dynamic rawProviderData) {
@@ -126,12 +126,7 @@ class FranceOpeningHoursAdapter extends OpeningHoursAdapter {
         var sawUsable = false;
         for (final c in _clockRangeRe.allMatches(segment)) {
           sawClock = true;
-          final range = TimeRange.fromClock(
-            startHour: int.parse(c.group(1)!),
-            startMinute: int.parse(c.group(2)!),
-            endHour: int.parse(c.group(3)!),
-            endMinute: int.parse(c.group(4)!),
-          );
+          final range = rangeFromClockMatch(c);
           // #3308 — an open==close range (`01:00-01:00`) is the feed's
           // round-the-clock convention, not a real interval — don't keep it as
           // a range, but DO mark the day open24h below (the official site shows

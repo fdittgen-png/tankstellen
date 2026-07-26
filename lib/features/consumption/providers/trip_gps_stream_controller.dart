@@ -10,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/location/geolocator_wrapper.dart';
 import '../../../core/location/recording_location_settings.dart';
+import '../../../core/permissions/location_permissions.dart';
 import '../../feature_management/application/feature_flags_provider.dart';
 import '../../feature_management/domain/feature.dart';
 import '../../glide_coach/domain/entities/glide_coach_advice.dart';
@@ -72,13 +73,14 @@ class TripGpsStreamController {
     if (!flags.isEnabled(Feature.gpsTripPath)) return;
     final geolocator = _ref.read(geolocatorWrapperProvider);
     try {
-      // #1981 — request foreground location permission up front.
-      var permission = await geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await geolocator.requestPermission();
-      }
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
+      // #1981 — request foreground location permission up front. #3614 —
+      // check/request sequence lives in [LocationPermissions], still routed
+      // through the [GeolocatorWrapper] seam tests fake.
+      final outcome = await LocationPermissions(
+        checkWhileInUseBackend: geolocator.checkPermission,
+        requestWhileInUseBackend: geolocator.requestPermission,
+      ).ensureWhileInUse();
+      if (outcome != LocationPermissionOutcome.granted) {
         return;
       }
       // #3249 — route the OBD2-trip GPS through the SHARED, recording-promoted

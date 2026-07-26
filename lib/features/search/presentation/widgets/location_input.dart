@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -37,7 +38,8 @@ class LocationInput extends ConsumerStatefulWidget {
 class LocationInputWidgetState extends ConsumerState<LocationInput> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
-  Timer? _debounce;
+  final _suggestionsDebounce =
+      Debouncer(duration: const Duration(milliseconds: 1000));
 
   @override
   void initState() {
@@ -54,7 +56,7 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
+    _suggestionsDebounce.dispose();
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -68,8 +70,7 @@ class LocationInputWidgetState extends ConsumerState<LocationInput> {
     ref.read(locationInputControllerProvider.notifier).setInputType(type);
 
     if (type == LocationInputType.city) {
-      _debounce?.cancel();
-      _debounce = Timer(const Duration(milliseconds: 1000), () {
+      _suggestionsDebounce(() {
         unawaited(_fetchSuggestions(value));
       });
     }

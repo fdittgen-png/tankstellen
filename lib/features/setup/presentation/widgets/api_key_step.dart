@@ -1,13 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/api_key_validator.dart';
 
@@ -33,7 +33,8 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
   /// Tracks whether the current API key input has valid UUID format.
   /// `null` means the field is empty (no validation state shown).
   bool? _isFormatValid;
-  Timer? _debounceTimer;
+  final _formatDebounce =
+      Debouncer(duration: const Duration(milliseconds: 500));
 
   @override
   void initState() {
@@ -45,14 +46,13 @@ class _ApiKeyStepState extends ConsumerState<ApiKeyStep> {
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    _formatDebounce.dispose();
     widget.apiKeyController.removeListener(_onApiKeyChanged);
     super.dispose();
   }
 
   void _onApiKeyChanged() {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+    _formatDebounce(() {
       if (!mounted) return;
       _evaluateFormat(widget.apiKeyController.text.trim());
     });

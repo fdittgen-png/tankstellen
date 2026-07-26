@@ -3,8 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import 'package:tankstellen/core/permissions/location_permissions.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/auto_record_section.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
@@ -38,8 +38,8 @@ Future<_FakeVehicleProfileList> _pumpSection(
   WidgetTester tester, {
   required String vehicleId,
   required _FakeVehicleProfileList list,
-  Future<PermissionStatus> Function()? requestBackgroundLocation,
-  Future<PermissionStatus> Function()? requestForegroundLocation,
+  Future<LocationPermissionOutcome> Function()? requestBackgroundLocation,
+  Future<LocationPermissionOutcome> Function()? requestForegroundLocation,
   Future<void> Function()? openSettings,
   VoidCallback? onScrollToObd2Card,
 }) async {
@@ -198,8 +198,8 @@ void main() {
           tester,
           vehicleId: 'v1',
           list: list,
-          requestForegroundLocation: () async => PermissionStatus.granted,
-          requestBackgroundLocation: () async => PermissionStatus.granted,
+          requestForegroundLocation: () async => LocationPermissionOutcome.granted,
+          requestBackgroundLocation: () async => LocationPermissionOutcome.granted,
         );
 
         await tester.tap(
@@ -223,8 +223,8 @@ void main() {
           tester,
           vehicleId: 'v1',
           list: list,
-          requestForegroundLocation: () async => PermissionStatus.granted,
-          requestBackgroundLocation: () async => PermissionStatus.denied,
+          requestForegroundLocation: () async => LocationPermissionOutcome.granted,
+          requestBackgroundLocation: () async => LocationPermissionOutcome.denied,
         );
 
         await tester.tap(
@@ -258,10 +258,10 @@ void main() {
           tester,
           vehicleId: 'v1',
           list: list,
-          requestForegroundLocation: () async => PermissionStatus.denied,
+          requestForegroundLocation: () async => LocationPermissionOutcome.denied,
           requestBackgroundLocation: () async {
             bgPromptCalls++;
-            return PermissionStatus.granted;
+            return LocationPermissionOutcome.granted;
           },
         );
 
@@ -294,8 +294,8 @@ void main() {
           tester,
           vehicleId: 'v1',
           list: list,
-          requestForegroundLocation: () async => PermissionStatus.granted,
-          requestBackgroundLocation: () async => PermissionStatus.granted,
+          requestForegroundLocation: () async => LocationPermissionOutcome.granted,
+          requestBackgroundLocation: () async => LocationPermissionOutcome.granted,
         );
 
         await tester.tap(
@@ -320,9 +320,9 @@ void main() {
           tester,
           vehicleId: 'v1',
           list: list,
-          requestForegroundLocation: () async => PermissionStatus.granted,
+          requestForegroundLocation: () async => LocationPermissionOutcome.granted,
           requestBackgroundLocation: () async =>
-              PermissionStatus.permanentlyDenied,
+              LocationPermissionOutcome.permanentlyDenied,
           openSettings: () async {
             openSettingsCalls++;
           },

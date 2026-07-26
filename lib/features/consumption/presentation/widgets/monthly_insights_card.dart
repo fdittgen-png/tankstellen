@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/monthly_insights_aggregator.dart';
 
@@ -263,7 +264,7 @@ String _fmtDuration(Duration d) {
   final hours = d.inMinutes ~/ 60;
   final mins = d.inMinutes % 60;
   if (mins == 0) return '${hours}h';
-  return '${hours}h ${mins.toString().padLeft(2, '0')}';
+  return '${hours}h ${twoDigits(mins)}';
 }
 
 String _fmtDistance(double km) {

@@ -10,6 +10,7 @@ import '../../../../core/country/country_provider.dart';
 import '../../../../core/language/language_provider.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
+import '../../../../core/utils/debouncer.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
@@ -37,7 +38,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   /// `null` means the field is empty (no validation state shown).
   bool? _isFormatValid;
 
-  Timer? _debounceTimer;
+  final _formatDebounce =
+      Debouncer(duration: const Duration(milliseconds: 500));
 
   @override
   void initState() {
@@ -47,15 +49,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    _formatDebounce.dispose();
     _apiKeyController.removeListener(_onApiKeyChanged);
     _apiKeyController.dispose();
     super.dispose();
   }
 
   void _onApiKeyChanged() {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+    _formatDebounce(() {
       if (!mounted) return;
       final text = _apiKeyController.text.trim();
       setState(() {

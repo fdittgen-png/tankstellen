@@ -15,7 +15,8 @@ import '../../../helpers/pump_app.dart';
 /// flutter_test fake-async zone (see `tearDownAll` lock errors in the
 /// commit history) — the fake repository sidesteps the whole class
 /// of issues and exercises the same notifier path.
-class _FakeLoyaltyCardRepository implements LoyaltyCardRepository {
+class _FakeLoyaltyCardRepository extends Fake
+    implements LoyaltyCardRepository {
   final Map<String, LoyaltyCard> _store = <String, LoyaltyCard>{};
 
   @override

@@ -1,12 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:hive/hive.dart';
 
-import '../../../core/logging/error_logger.dart';
+import '../../../core/storage/json_box_repository.dart';
 import '../domain/achievement.dart';
 
 /// Hive-backed persistence of earned achievements (#781). One JSON
@@ -16,10 +13,16 @@ import '../domain/achievement.dart';
 /// Stored as plain strings — the badges aren't PII; they're a
 /// summary of activity the user already logged. Box is opened
 /// alongside the other low-sensitivity Hive boxes at startup.
-class AchievementsRepository {
-  final Box<String> _box;
-
-  AchievementsRepository({required Box<String> box}) : _box = box;
+/// Storage mechanics live in [JsonBoxRepository] (#3614).
+class AchievementsRepository extends JsonBoxRepository<EarnedAchievement> {
+  AchievementsRepository({required Box<String> box})
+      : super(
+          box: box,
+          fromJson: EarnedAchievement.fromJson,
+          toJson: (earned) => earned.toJson(),
+          keyOf: (earned) => earned.id.name,
+          debugName: 'AchievementsRepository',
+        );
 
   static const String boxName = 'achievements';
 
@@ -27,18 +30,7 @@ class AchievementsRepository {
   /// Corrupt payloads are skipped so one bad write doesn't hide the
   /// whole list.
   List<EarnedAchievement> loadAll() {
-    final result = <EarnedAchievement>[];
-    for (final key in _box.keys) {
-      final raw = _box.get(key);
-      if (raw == null || raw.isEmpty) continue;
-      try {
-        final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
-        final earned = EarnedAchievement.fromJson(json);
-        if (earned != null) result.add(earned);
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {'where': 'AchievementsRepository.loadAll', 'key': key.toString()}));
-      }
-    }
+    final result = getAll();
     result.sort((a, b) => b.earnedAt.compareTo(a.earnedAt));
     return result;
   }
@@ -58,13 +50,13 @@ class AchievementsRepository {
     for (final id in newlyEarnedIds) {
       if (existing.containsKey(id)) continue;
       final earned = EarnedAchievement(id: id, earnedAt: now);
-      await _box.put(id.name, jsonEncode(earned.toJson()));
+      await put(earned);
       freshlyEarned.add(earned);
     }
     return freshlyEarned;
   }
 
   Future<void> clear() async {
-    await _box.clear();
+    await box.clear();
   }
 }

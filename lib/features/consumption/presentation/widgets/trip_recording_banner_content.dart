@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/cold_start_baselines.dart';
 import '../../domain/driving_coaching.dart';
@@ -168,7 +169,7 @@ class TripRecordingBannerContent extends StatelessWidget {
         const SizedBox(width: 8),
         if (elapsed != null)
           Text(
-            _fmtElapsed(elapsed),
+            formatMinutesSeconds(elapsed),
             style: TextStyle(
               color: fg,
               fontFeatures: const [FontFeature.tabularFigures()],
@@ -206,11 +207,5 @@ class TripRecordingBannerContent extends StatelessWidget {
     final pct = (d * 100).round();
     final sign = pct > 0 ? '+' : (pct < 0 ? '' : '±');
     return '$sign$pct%';
-  }
-
-  static String _fmtElapsed(Duration d) {
-    final m = d.inMinutes;
-    final s = d.inSeconds % 60;
-    return '${m.toString()}:${s.toString().padLeft(2, '0')}';
   }
 }

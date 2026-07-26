@@ -162,7 +162,7 @@ class SpainOpeningHoursAdapter extends OpeningHoursAdapter {
       return applied;
     }
 
-    final range = _parseRange(hoursPart);
+    final range = parseClockRange(hoursPart);
     if (range == null) return false;
     for (final d in days) {
       states.putIfAbsent(d, () => DayState.openRanges);
@@ -200,26 +200,6 @@ class SpainOpeningHoursAdapter extends OpeningHoursAdapter {
     return kRegularWeekdays.sublist(from, to + 1);
   }
 
-  /// Parses an `HH:MM-HH:MM` clock range, or `null` when malformed. `24:00`
-  /// is accepted as the end-of-day marker (→ minute 1440).
-  TimeRange? _parseRange(String hours) {
-    final dash = hours.indexOf('-');
-    if (dash < 0) return null;
-    final start = _minutesFromClock(hours.substring(0, dash).trim());
-    final end = _minutesFromClock(hours.substring(dash + 1).trim());
-    if (start == null || end == null) return null;
-    return TimeRange(startMinutes: start, endMinutes: end);
-  }
-
-  /// `HH:MM` → minutes-from-midnight (0..1440; `24:00` → 1440), or `null`.
-  int? _minutesFromClock(String clock) {
-    final parts = clock.split(':');
-    if (parts.length < 2) return null;
-    final hour = int.tryParse(parts[0]);
-    final minute = int.tryParse(parts[1]);
-    if (hour == null || minute == null) return null;
-    if (hour == 24 && minute == 0) return 1440;
-    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
-    return hour * 60 + minute;
-  }
+  // `HH:MM-HH:MM` parsing delegates to the shared
+  // [OpeningHoursAdapter.parseClockRange] (#3614).
 }

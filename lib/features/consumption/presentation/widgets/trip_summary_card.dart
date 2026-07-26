@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/num_extensions.dart';
 import '../../../../core/utils/price_formatter.dart';
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
@@ -219,11 +220,8 @@ class TripSummaryCard extends ConsumerWidget {
 
   static String _fmtDate(DateTime d) {
     final y = d.year.toString();
-    final m = d.month.toString().padLeft(2, '0');
-    final day = d.day.toString().padLeft(2, '0');
-    final h = d.hour.toString().padLeft(2, '0');
-    final min = d.minute.toString().padLeft(2, '0');
-    return '$y-$m-$day $h:$min';
+    return '$y-${twoDigits(d.month)}-${twoDigits(d.day)} '
+        '${twoDigits(d.hour)}:${twoDigits(d.minute)}';
   }
 
   static String _fmtDuration(Duration d) {

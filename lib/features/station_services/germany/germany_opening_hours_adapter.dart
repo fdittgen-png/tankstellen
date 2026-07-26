@@ -96,8 +96,8 @@ class GermanyOpeningHoursAdapter extends OpeningHoursAdapter {
         final days = _daysFromText(row.text);
         if (days.isEmpty) continue;
 
-        final start = _minutesFromClock(row.start);
-        final end = _minutesFromClock(row.end);
+        final start = parseClockMinutes(row.start);
+        final end = parseClockMinutes(row.end);
         if (start == null || end == null) continue;
 
         final is24h = _isWholeDayRange(start, end);
@@ -244,19 +244,10 @@ class GermanyOpeningHoursAdapter extends OpeningHoursAdapter {
   bool _isWholeDayRange(int start, int end) =>
       (start == 0 && end == 1440) || (start == 0 && end == 0);
 
-  /// `HH:MM:SS` (seconds optional) → minutes-from-midnight (0..1440; `24:00`
-  /// → 1440), or `null` on a malformed clock. Seconds are accepted and
-  /// dropped (the feed's per-second precision is irrelevant to weekly hours).
-  int? _minutesFromClock(String clock) {
-    final parts = clock.split(':');
-    if (parts.length < 2) return null;
-    final hour = int.tryParse(parts[0]);
-    final minute = int.tryParse(parts[1]);
-    if (hour == null || minute == null) return null;
-    if (hour == 24 && minute == 0) return 1440;
-    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
-    return hour * 60 + minute;
-  }
+  // `HH:MM[:SS]` clock parsing delegates to the shared
+  // [OpeningHoursAdapter.parseClockMinutes] (#3614) — seconds are
+  // accepted and dropped (the feed's per-second precision is irrelevant
+  // to weekly hours).
 }
 
 /// A normalised `{text,start,end}` opening-times row (internal to the adapter).

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/time_formatter.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_log.dart';
@@ -238,7 +239,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
       );
     }
 
-    final dateStr = '${_date.year}-${_pad(_date.month)}-${_pad(_date.day)}';
+    final dateStr = '${_date.year}-${twoDigits(_date.month)}-${twoDigits(_date.day)}';
     final derived = computeChargingLogReadout(
       vehicleId: _vehicleId,
       kWhText: _kwhCtrl.text,
@@ -274,5 +275,4 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     );
   }
 
-  String _pad(int n) => n.toString().padLeft(2, '0');
 }

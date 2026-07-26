@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/utils/debouncer.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/reference_vehicle_catalog_provider.dart';
 import '../../domain/entities/reference_vehicle.dart';
@@ -61,8 +62,8 @@ class _ReferenceVehiclePickerState
   /// Debounce window for the type-ahead. The catalog is ~250 entries —
   /// trivially filterable — but debouncing still avoids rebuilding the
   /// list on every keystroke when the user types fast on a long query.
-  static const _debounce = Duration(milliseconds: 250);
-  Timer? _debounceTimer;
+  final _searchDebounce =
+      Debouncer(duration: const Duration(milliseconds: 250));
 
   /// The committed (post-debounce) search query.
   String _query = '';
@@ -80,15 +81,14 @@ class _ReferenceVehiclePickerState
 
   @override
   void dispose() {
-    _debounceTimer?.cancel();
+    _searchDebounce.dispose();
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
 
   void _onSearchChanged() {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounce, () {
+    _searchDebounce(() {
       if (!mounted) return;
       setState(() => _query = _searchController.text.trim().toLowerCase());
     });

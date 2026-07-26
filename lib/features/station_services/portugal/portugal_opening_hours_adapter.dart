@@ -60,9 +60,12 @@ class PortugalOpeningHoursAdapter extends OpeningHoursAdapter {
     'feriado': [OpeningDay.publicHoliday],
   };
 
-  /// Captures one `HH:MM-HH:MM` clock range in four groups.
+  /// Captures one `HH:MM-HH:MM` clock range in four groups — the shared
+  /// [OpeningHoursAdapter.clockRangeRe] pattern, colon-only: this feed
+  /// never emits dot separators, so its accepted inputs stay unchanged
+  /// (#3614).
   static final RegExp _rangeRe =
-      RegExp(r'(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})');
+      OpeningHoursAdapter.clockRangeRe(dotSeparator: false);
 
   @override
   WeeklyOpeningHours parse(dynamic rawProviderData) {
@@ -138,12 +141,7 @@ class PortugalOpeningHoursAdapter extends OpeningHoursAdapter {
 
     final ranges = <TimeRange>[];
     for (final m in _rangeRe.allMatches(raw)) {
-      final range = TimeRange.fromClock(
-        startHour: int.parse(m.group(1)!),
-        startMinute: int.parse(m.group(2)!),
-        endHour: int.parse(m.group(3)!),
-        endMinute: int.parse(m.group(4)!),
-      );
+      final range = rangeFromClockMatch(m);
       // A degenerate `HH:MM-HH:MM` with equal bounds carries no duration —
       // drop it (never a 24-hour wrap).
       if (range.isDegenerate) continue;
