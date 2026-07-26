@@ -151,7 +151,7 @@ class LocationSearchService {
       // Cache the deduped results so cached reads dedup-stably too.
       await _cache.put(
         cacheKey,
-        _serializeLocations(results),
+        serializeLocations(results),
         ttl: CacheTtl.citySearch,
         source: ServiceSource.nominatimGeocoding,
       );
@@ -162,21 +162,6 @@ class LocationSearchService {
     }
   }
 
-  Map<String, dynamic> _serializeLocations(List<ResolvedLocation> locs) => {
-        'locations': locs
-            .map((l) => {
-                  'name': l.name,
-                  'lat': l.lat,
-                  'lng': l.lng,
-                  'postcode': l.postcode,
-                  'osmId': l.osmId,
-                  'importance': l.importance,
-                  'placeRank': l.placeRank,
-                  'addressType': l.addressType,
-                  'country': l.country,
-                })
-            .toList(),
-      };
 
   List<ResolvedLocation> _deserializeLocations(Map<String, dynamic> data) {
     final list = data['locations'] as List<dynamic>?;
@@ -290,3 +275,22 @@ class LocationSearchService {
   }
 
 }
+
+/// The `city:` cache envelope codec. Top-level (not private to the
+/// service) so the #3619 shape-pinning test can hash its structural
+/// signature against [CacheSchema.byPrefix]'s `city` version.
+Map<String, dynamic> serializeLocations(List<ResolvedLocation> locs) => {
+      'locations': locs
+          .map((l) => {
+                'name': l.name,
+                'lat': l.lat,
+                'lng': l.lng,
+                'postcode': l.postcode,
+                'osmId': l.osmId,
+                'importance': l.importance,
+                'placeRank': l.placeRank,
+                'addressType': l.addressType,
+                'country': l.country,
+              })
+          .toList(),
+    };

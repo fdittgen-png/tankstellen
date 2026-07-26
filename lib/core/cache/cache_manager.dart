@@ -12,11 +12,13 @@ import '../logging/error_logger.dart';
 import '../services/service_result.dart';
 import '../storage/storage_providers.dart';
 import 'cache_eviction_policy.dart';
+import 'cache_schema.dart';
 
 export 'cache_eviction_policy.dart' show CacheEvictionPolicy;
 // CacheTtl / CacheKey moved out under the 400-line cap (#3155); the
 // re-export keeps every existing `cache_manager.dart` import working.
 export 'cache_keys.dart';
+export 'cache_schema.dart' show CacheSchema;
 
 part 'cache_manager.g.dart';
 
@@ -34,12 +36,17 @@ class CacheEntry {
 
   /// The app build that wrote this entry (`AppConstants.appVersion` at
   /// `put()` time), or `null` for an entry persisted by a build that
-  /// predates the stamp (#3219 follow-up). Cached payloads are PARSED
-  /// output, so an entry written by a different build may embed the very
-  /// parser bug an update just fixed — [CacheManager.getFresh] therefore
-  /// refuses to serve a cross-build entry as fresh (it stays available to
-  /// the stale/offline fallback via [CacheManager.get]).
+  /// predates the stamp (#3219 follow-up). Since #3619 this is
+  /// DIAGNOSTIC only — freshness gating moved to [schemaVersion], so an
+  /// app update no longer cold-boots every cache.
   final String? appBuild;
+
+  /// The [CacheSchema] version of this entry's key prefix at `put()`
+  /// time (#3619), or `null` for a pre-stamp entry. [CacheManager.getFresh]
+  /// requires an exact match with the CURRENT registered version: a
+  /// codec shape change bumps the registry, the stale envelope reads as
+  /// a fresh-miss (one refetch), and everything else survives updates.
+  final int? schemaVersion;
 
   /// JSON-encoded size of [payload], stamped once at `put()` time
   /// (#3613), or `null` for an entry persisted by a build that predates
@@ -56,6 +63,7 @@ class CacheEntry {
     required this.originalSource,
     required this.ttl,
     this.appBuild,
+    this.schemaVersion,
     this.approxBytes,
   });
 
@@ -130,9 +138,11 @@ class CacheManager implements CacheStrategy {
         // #3150 — the enum NAME, not the reorder-fragile index.
         'source': source.name,
         'ttlMs': ttl.inMilliseconds,
-        // #3219 follow-up — stamp the writing build so [getFresh] can
-        // refuse to serve another build's PARSED payload as fresh.
+        // #3219 follow-up — the writing build, diagnostic since #3619.
         'appBuild': AppConstants.appVersion,
+        // #3619 — the key prefix's schema version; [getFresh] requires
+        // an exact match with the current registry.
+        'schema': CacheSchema.forKey(key),
         // #3613 — stamp the payload's encoded byte length once here so
         // the eviction byte sweep never has to re-encode it. `dataset:`
         // entries are exempt from the byte sweep (#3155), so encoding
@@ -174,6 +184,8 @@ class CacheManager implements CacheStrategy {
       originalSource: _sourceFrom(raw['source']),
       ttl: Duration(milliseconds: raw['ttlMs'] as int? ?? 300000),
       appBuild: raw['appBuild'] as String?,
+      // #3619 — absent on pre-stamp entries → null (fresh-miss).
+      schemaVersion: raw['schema'] as int?,
       // #3613 — absent on pre-stamp entries → null (sweep re-encodes).
       approxBytes: raw['bytes'] as int?,
     );
@@ -191,25 +203,24 @@ class CacheManager implements CacheStrategy {
     return ServiceSource.cache;
   }
 
-  /// Get data only if the cache entry is still valid (not expired) AND was
-  /// written by THIS app build.
+  /// Get data only if the cache entry is still valid (not expired) AND
+  /// carries the CURRENT [CacheSchema] version for its key prefix.
   ///
-  /// #3219 follow-up — cached payloads are PARSED output (e.g. the
-  /// `serializeStationList` Station JSON), so an entry persisted by an older
-  /// build embeds that build's parser bugs. With FR's 6-hour
-  /// `searchResultTtl`, the #3224 hours fix was invisible after updating:
-  /// the freshly installed build kept serving the PRE-fix build's hour-less
-  /// stations for the same search key until the TTL lapsed — "the fix
-  /// shipped but the phone still shows the bug". A cross-build (or
-  /// unstamped pre-stamp) entry is therefore treated as a fresh-miss —
-  /// forcing one re-fetch + re-parse with the current code — while [get]
-  /// still serves it to the chain's stale/offline fallback, so an update
-  /// never costs the offline backbone.
+  /// #3219 established WHY parsed payloads need a freshness gate (an
+  /// older build's parser bugs sit embedded in its cached output); the
+  /// original gate was the blunt appBuild stamp, which cold-booted EVERY
+  /// cache — including multi-MB `dataset:` country payloads — on EVERY
+  /// update. #3619 narrows it: only a SHAPE change (a [CacheSchema]
+  /// bump, enforced by the shape-pinning test) busts, and only for the
+  /// affected entry type. Unstamped pre-#3619 entries read as a
+  /// fresh-miss once, exactly like the old cross-build path; [get]
+  /// still serves everything to the stale/offline fallback, so an
+  /// update never costs the offline backbone.
   @override
   CacheEntry? getFresh(String key) {
     final entry = get(key);
     if (entry == null || entry.isExpired) return null;
-    if (entry.appBuild != AppConstants.appVersion) return null;
+    if (entry.schemaVersion != CacheSchema.forKey(key)) return null;
     return entry;
   }
 
