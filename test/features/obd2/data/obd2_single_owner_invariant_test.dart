@@ -30,7 +30,13 @@ import 'package:tankstellen/features/obd2/data/obd2_reattach_source.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/obd2_transport.dart';
 
-Obd2Service _liveService() => Obd2Service(FakeObd2Transport());
+// #3625 — the reattach source only delivers a service whose transport
+// is actually OPEN; the fake must be connected to count as live.
+Obd2Service _liveService() {
+  final transport = FakeObd2Transport();
+  unawaited(transport.connect());
+  return Obd2Service(transport);
+}
 
 /// Counting dialer: returns whatever [outcome] currently produces
 /// (null = miss) and counts every invocation — the probe that proves
