@@ -294,6 +294,31 @@ void main() {
       expect(det.eventRecords.single.outcome, 'accel');
     });
 
+    test('a road-vibration micro-jolt (one 50ms blip at 3.2) is counted, '
+        'not stored — the field flood fix', () {
+      final det = ImuEventDetector();
+      final t = feed(det,
+          start: t0,
+          count: 2, // 0.05s over threshold — the field blip shape
+          mag: 3.2,
+          startSpeedKmh: 40);
+      feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 40);
+
+      expect(det.eventRecords, isEmpty,
+          reason: 'sub-0.15s sub-4.5 blips carry no calibration signal');
+      expect(det.droppedEventRecords, 1);
+    });
+
+    test('a short but VIOLENT jolt (0.05s at 6.0) is still recorded', () {
+      final det = ImuEventDetector();
+      final t = feed(det,
+          start: t0, count: 2, mag: 6.0, startSpeedKmh: 40);
+      feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 40);
+
+      expect(det.eventRecords, hasLength(1),
+          reason: 'high peak clears the micro-jolt floor');
+    });
+
     test('records past the cap are counted, not stored', () {
       final det = ImuEventDetector();
       var t = t0;

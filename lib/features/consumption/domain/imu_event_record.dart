@@ -10,6 +10,16 @@ import 'gps_driving_features.dart' show kSharpCornerYawRateRadPerSec;
 /// past the cap are counted, not stored.
 const int kImuEventRecordCap = 48;
 
+/// Micro-jolt floor (#3589 field tuning): the first field trips flooded
+/// the cap with 600-700 road-vibration blips (duration ≈ 0.0-0.1 s at
+/// barely-over-threshold magnitude), drowning the informative stretches.
+/// A stretch shorter than [kImuMicroJoltMaxDuration] whose peak stayed
+/// under [kImuMicroJoltMaxPeak] is counted into `dropped`, not stored —
+/// it carries no calibration signal a histogram of one 'tooShort' blip
+/// after another wouldn't.
+const double kImuMicroJoltMaxDuration = 0.15;
+const double kImuMicroJoltMaxPeak = 4.5;
+
 /// One strong-manoeuvre stretch as the IMU detector saw it (#3589) —
 /// confirmed events AND rejected near-misses, so the accel/brake
 /// thresholds can be calibrated against labeled magnitude distributions
@@ -96,7 +106,8 @@ class ImuStretchTracker {
   /// [finish] first at harvest time).
   List<ImuEventRecord> get records => List.unmodifiable(_records);
 
-  /// Stretches past [kImuEventRecordCap] — counted, not stored.
+  /// Stretches not stored: past [kImuEventRecordCap], or sub-noise
+  /// micro-jolts under the #3589 field-tuning floor.
   int get dropped => _dropped;
 
   /// Fold one sample's stretch state. [strong] mirrors the detector's
@@ -151,6 +162,14 @@ class ImuStretchTracker {
 
   void _finalize() {
     _open = false;
+    // Micro-jolt: a road-vibration blip, counted but not stored — see
+    // [kImuMicroJoltMaxDuration]. Confirmed events are always stored.
+    if (_confirmedOutcome == null &&
+        _duration < kImuMicroJoltMaxDuration &&
+        _peakMps2 < kImuMicroJoltMaxPeak) {
+      _dropped++;
+      return;
+    }
     final outcome = _confirmedOutcome ??
         (_duration < kAccelEventMinSustainedSec
             ? 'tooShort'
