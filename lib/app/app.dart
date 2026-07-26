@@ -20,6 +20,7 @@ import '../features/widget/presentation/widget_click_listener.dart';
 import '../l10n/app_localizations.dart';
 import 'router.dart';
 import 'theme.dart';
+import 'widgets/startup_reveal.dart';
 
 /// Top-level Material app for Tankstellen. This is the *only* widget
 /// constructed directly from `main()` (via [AppInitializer]); everything
@@ -77,8 +78,14 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
           .onAppLifecycleStateChanged(state);
     } catch (e, st) {
       // #3143 — release-visible: debugPrint is no-opped in release.
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: {'where': 'onAppLifecycleStateChanged'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: {'where': 'onAppLifecycleStateChanged'},
+        ),
+      );
     }
     // #3169 — every foreground resume is a free execution window: fire an
     // opportunistic alert scan (iOS headless one-off; Android no-op — its
@@ -104,8 +111,14 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
       final notifier = ref.read(tripRecordingProvider.notifier);
       unawaited(notifier.onAppBackgrounded());
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
-          context: {'where': 'onAppBackgrounded'}));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.ui,
+          e,
+          st,
+          context: {'where': 'onAppBackgrounded'},
+        ),
+      );
     }
   }
 
@@ -142,19 +155,26 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
         // detail screen. Sits at the same layer as the home-widget
         // click listener so both deep-link sources share the same
         // post-builder navigation context.
-        return NotificationLaunchListener(
-          child: WidgetClickListener(
-            // #2735 — inbound OS share-intent receiver. Sits beside the
-            // notification + widget deep-link listeners so all three
-            // deep-link sources share the same post-builder navigation
-            // context. A receipt image shared from another app is
-            // stashed + routed to /consumption/add, where the form is
-            // prefilled from its OCR (#2734). Opt-in via
-            // Feature.addFillUpShareIntentReceipt (gated in the handler).
-            child: ShareReceiptListener(
-              child: CountrySwitchListener(
-                child: TripRecordingBanner(
-                  child: child ?? const SizedBox.shrink(),
+        // #3607 — StartupReveal holds the branded splash as an overlay
+        // until the first screen has settled (min hold + frame
+        // quiescence, hard-capped), so the user never watches the form
+        // being constructed. One reveal per process — the language-key
+        // tree rebuild does not re-play it.
+        return StartupReveal(
+          child: NotificationLaunchListener(
+            child: WidgetClickListener(
+              // #2735 — inbound OS share-intent receiver. Sits beside the
+              // notification + widget deep-link listeners so all three
+              // deep-link sources share the same post-builder navigation
+              // context. A receipt image shared from another app is
+              // stashed + routed to /consumption/add, where the form is
+              // prefilled from its OCR (#2734). Opt-in via
+              // Feature.addFillUpShareIntentReceipt (gated in the handler).
+              child: ShareReceiptListener(
+                child: CountrySwitchListener(
+                  child: TripRecordingBanner(
+                    child: child ?? const SizedBox.shrink(),
+                  ),
                 ),
               ),
             ),
