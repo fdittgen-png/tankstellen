@@ -5381,5 +5381,168 @@
   "@featureDescription_voiceFeedback": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "tankReportTitle": "Tank report",
+  "@tankReportTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tankReportHeadline": "{value} L/100 km",
+  "@tankReportHeadline": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportSincePrevious": "Since the previous full tank: {km} km · {liters} L · {cost}",
+  "@tankReportSincePrevious": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportTrendUp": "{delta} L/100 km more than the previous tank",
+  "@tankReportTrendUp": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportTrendDown": "{delta} L/100 km less than the previous tank",
+  "@tankReportTrendDown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportTrendFlat": "Level with the previous tank",
+  "@tankReportTrendFlat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tankReportNoPrevious": "Evolution appears after your next full tank.",
+  "@tankReportNoPrevious": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tankReportCoverage": "Recordings cover {pct} % of this tank",
+  "@tankReportCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportRecordedAvg": "Recorded slice: {value} L/100 km",
+  "@tankReportRecordedAvg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportExplainHeader": "What the recordings suggest",
+  "@tankReportExplainHeader": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tankReportFactorHighRpm": "High-RPM share {cur} % (was {prev} %)",
+  "@tankReportFactorHighRpm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cur": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportFactorHarsh": "Harsh events {cur}/100 km (was {prev})",
+  "@tankReportFactorHarsh": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cur": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportFactorColdStarts": "Cold starts {cur} (was {prev})",
+  "@tankReportFactorColdStarts": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cur": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportFactorIdle": "Idle share {cur} % (was {prev} %)",
+  "@tankReportFactorIdle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cur": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportCaveat": "Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.",
+  "@tankReportCaveat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tankReportCalibrationUnder": "Recorded estimates run {pct} % under pump truth",
+  "@tankReportCalibrationUnder": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "tankReportCalibrationOver": "Recorded estimates run {pct} % over pump truth",
+  "@tankReportCalibrationOver": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
   }
 }

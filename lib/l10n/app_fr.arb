@@ -5436,5 +5436,22 @@
   "lessonTransportTitle": "Données moteur absentes sur la majeure partie du trajet",
   "lessonTransportAdvice": "Le moteur n'a signalé aucune activité sur presque toute la distance. Soit le flux OBD2 est tombé en panne, soit le véhicule a été déplacé sans rouler par ses propres moyens — la consommation est peu fiable et exclue de vos statistiques.",
   "featureLabel_voiceFeedback": "Retour vocal (synthèse vocale)",
-  "featureDescription_voiceFeedback": "Interrupteur principal de toute sortie vocale — coach de conduite et annonces de stations. Désactivé : l'application n'ouvre jamais de moteur de synthèse vocale."
+  "featureDescription_voiceFeedback": "Interrupteur principal de toute sortie vocale — coach de conduite et annonces de stations. Désactivé : l'application n'ouvre jamais de moteur de synthèse vocale.",
+  "tankReportTitle": "Rapport de plein",
+  "tankReportHeadline": "{value} L/100 km",
+  "tankReportSincePrevious": "Depuis le plein précédent : {km} km · {liters} L · {cost}",
+  "tankReportTrendUp": "{delta} L/100 km de plus que le plein précédent",
+  "tankReportTrendDown": "{delta} L/100 km de moins que le plein précédent",
+  "tankReportTrendFlat": "Au même niveau que le plein précédent",
+  "tankReportNoPrevious": "L'évolution apparaîtra après votre prochain plein.",
+  "tankReportCoverage": "Les enregistrements couvrent {pct} % de ce plein",
+  "tankReportRecordedAvg": "Part enregistrée : {value} L/100 km",
+  "tankReportExplainHeader": "Ce que suggèrent les enregistrements",
+  "tankReportFactorHighRpm": "Part haut régime {cur} % (avant {prev} %)",
+  "tankReportFactorHarsh": "Manœuvres brusques {cur}/100 km (avant {prev})",
+  "tankReportFactorColdStarts": "Démarrages à froid {cur} (avant {prev})",
+  "tankReportFactorIdle": "Part de ralenti {cur} % (avant {prev} %)",
+  "tankReportCaveat": "Les enregistrements sont spontanés et ne couvrent qu'une partie de ce plein — ces indices sont indicatifs, pas toute la vérité.",
+  "tankReportCalibrationUnder": "Les estimations enregistrées sont {pct} % en dessous de la vérité de la pompe",
+  "tankReportCalibrationOver": "Les estimations enregistrées sont {pct} % au-dessus de la vérité de la pompe"
 }

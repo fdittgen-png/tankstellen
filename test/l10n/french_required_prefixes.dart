@@ -64,6 +64,7 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   // surfaces are core French-reachable — hand-French required.
   'lessonCombustionHealth',
   'lessonTransport',
+  'tankReport',
   'insightUpshiftCruise',
   'fuelBreakdownHighRpmCruise',
 

@@ -7474,6 +7474,83 @@ class AppLocalizationsPl extends AppLocalizations {
       'Bak napełniony do pełna — odznacz, jeśli to było częściowe tankowanie';
 
   @override
+  String get tankReportTitle => 'Tank report';
+
+  @override
+  String tankReportHeadline(String value) {
+    return '$value L/100 km';
+  }
+
+  @override
+  String tankReportSincePrevious(String km, String liters, String cost) {
+    return 'Since the previous full tank: $km km · $liters L · $cost';
+  }
+
+  @override
+  String tankReportTrendUp(String delta) {
+    return '$delta L/100 km more than the previous tank';
+  }
+
+  @override
+  String tankReportTrendDown(String delta) {
+    return '$delta L/100 km less than the previous tank';
+  }
+
+  @override
+  String get tankReportTrendFlat => 'Level with the previous tank';
+
+  @override
+  String get tankReportNoPrevious =>
+      'Evolution appears after your next full tank.';
+
+  @override
+  String tankReportCoverage(String pct) {
+    return 'Recordings cover $pct % of this tank';
+  }
+
+  @override
+  String tankReportRecordedAvg(String value) {
+    return 'Recorded slice: $value L/100 km';
+  }
+
+  @override
+  String get tankReportExplainHeader => 'What the recordings suggest';
+
+  @override
+  String tankReportFactorHighRpm(String cur, String prev) {
+    return 'High-RPM share $cur % (was $prev %)';
+  }
+
+  @override
+  String tankReportFactorHarsh(String cur, String prev) {
+    return 'Harsh events $cur/100 km (was $prev)';
+  }
+
+  @override
+  String tankReportFactorColdStarts(String cur, String prev) {
+    return 'Cold starts $cur (was $prev)';
+  }
+
+  @override
+  String tankReportFactorIdle(String cur, String prev) {
+    return 'Idle share $cur % (was $prev %)';
+  }
+
+  @override
+  String get tankReportCaveat =>
+      'Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.';
+
+  @override
+  String tankReportCalibrationUnder(String pct) {
+    return 'Recorded estimates run $pct % under pump truth';
+  }
+
+  @override
+  String tankReportCalibrationOver(String pct) {
+    return 'Recorded estimates run $pct % over pump truth';
+  }
+
+  @override
   String get themeCardTitle => 'Motyw';
 
   @override

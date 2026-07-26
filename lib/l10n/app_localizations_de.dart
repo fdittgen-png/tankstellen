@@ -7486,6 +7486,83 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tank bis zum Rand gefüllt — abwählen, wenn es eine Teilbetankung war';
 
   @override
+  String get tankReportTitle => 'Tank-Bericht';
+
+  @override
+  String tankReportHeadline(String value) {
+    return '$value L/100 km';
+  }
+
+  @override
+  String tankReportSincePrevious(String km, String liters, String cost) {
+    return 'Seit dem letzten Volltanken: $km km · $liters L · $cost';
+  }
+
+  @override
+  String tankReportTrendUp(String delta) {
+    return '$delta L/100 km mehr als beim vorigen Tank';
+  }
+
+  @override
+  String tankReportTrendDown(String delta) {
+    return '$delta L/100 km weniger als beim vorigen Tank';
+  }
+
+  @override
+  String get tankReportTrendFlat => 'Gleichauf mit dem vorigen Tank';
+
+  @override
+  String get tankReportNoPrevious =>
+      'Die Entwicklung erscheint nach deinem nächsten Volltanken.';
+
+  @override
+  String tankReportCoverage(String pct) {
+    return 'Aufzeichnungen decken $pct % dieses Tanks ab';
+  }
+
+  @override
+  String tankReportRecordedAvg(String value) {
+    return 'Aufgezeichneter Anteil: $value L/100 km';
+  }
+
+  @override
+  String get tankReportExplainHeader => 'Was die Aufzeichnungen nahelegen';
+
+  @override
+  String tankReportFactorHighRpm(String cur, String prev) {
+    return 'Hochdrehzahl-Anteil $cur % (vorher $prev %)';
+  }
+
+  @override
+  String tankReportFactorHarsh(String cur, String prev) {
+    return 'Harte Manöver $cur/100 km (vorher $prev)';
+  }
+
+  @override
+  String tankReportFactorColdStarts(String cur, String prev) {
+    return 'Kaltstarts $cur (vorher $prev)';
+  }
+
+  @override
+  String tankReportFactorIdle(String cur, String prev) {
+    return 'Leerlauf-Anteil $cur % (vorher $prev %)';
+  }
+
+  @override
+  String get tankReportCaveat =>
+      'Aufzeichnungen sind spontan und decken nur einen Teil dieses Tanks ab — diese Hinweise sind Anhaltspunkte, nicht die ganze Wahrheit.';
+
+  @override
+  String tankReportCalibrationUnder(String pct) {
+    return 'Aufgezeichnete Schätzungen liegen $pct % unter der Zapfsäulen-Wahrheit';
+  }
+
+  @override
+  String tankReportCalibrationOver(String pct) {
+    return 'Aufgezeichnete Schätzungen liegen $pct % über der Zapfsäulen-Wahrheit';
+  }
+
+  @override
   String get themeCardTitle => 'Design';
 
   @override

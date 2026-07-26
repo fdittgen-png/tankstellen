@@ -7512,6 +7512,83 @@ class AppLocalizationsFr extends AppLocalizations {
       'Réservoir rempli à ras bord — décochez s\'il s\'agissait d\'un plein partiel';
 
   @override
+  String get tankReportTitle => 'Rapport de plein';
+
+  @override
+  String tankReportHeadline(String value) {
+    return '$value L/100 km';
+  }
+
+  @override
+  String tankReportSincePrevious(String km, String liters, String cost) {
+    return 'Depuis le plein précédent : $km km · $liters L · $cost';
+  }
+
+  @override
+  String tankReportTrendUp(String delta) {
+    return '$delta L/100 km de plus que le plein précédent';
+  }
+
+  @override
+  String tankReportTrendDown(String delta) {
+    return '$delta L/100 km de moins que le plein précédent';
+  }
+
+  @override
+  String get tankReportTrendFlat => 'Au même niveau que le plein précédent';
+
+  @override
+  String get tankReportNoPrevious =>
+      'L\'évolution apparaîtra après votre prochain plein.';
+
+  @override
+  String tankReportCoverage(String pct) {
+    return 'Les enregistrements couvrent $pct % de ce plein';
+  }
+
+  @override
+  String tankReportRecordedAvg(String value) {
+    return 'Part enregistrée : $value L/100 km';
+  }
+
+  @override
+  String get tankReportExplainHeader => 'Ce que suggèrent les enregistrements';
+
+  @override
+  String tankReportFactorHighRpm(String cur, String prev) {
+    return 'Part haut régime $cur % (avant $prev %)';
+  }
+
+  @override
+  String tankReportFactorHarsh(String cur, String prev) {
+    return 'Manœuvres brusques $cur/100 km (avant $prev)';
+  }
+
+  @override
+  String tankReportFactorColdStarts(String cur, String prev) {
+    return 'Démarrages à froid $cur (avant $prev)';
+  }
+
+  @override
+  String tankReportFactorIdle(String cur, String prev) {
+    return 'Part de ralenti $cur % (avant $prev %)';
+  }
+
+  @override
+  String get tankReportCaveat =>
+      'Les enregistrements sont spontanés et ne couvrent qu\'une partie de ce plein — ces indices sont indicatifs, pas toute la vérité.';
+
+  @override
+  String tankReportCalibrationUnder(String pct) {
+    return 'Les estimations enregistrées sont $pct % en dessous de la vérité de la pompe';
+  }
+
+  @override
+  String tankReportCalibrationOver(String pct) {
+    return 'Les estimations enregistrées sont $pct % au-dessus de la vérité de la pompe';
+  }
+
+  @override
   String get themeCardTitle => 'Thème';
 
   @override
