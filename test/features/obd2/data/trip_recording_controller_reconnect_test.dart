@@ -873,6 +873,11 @@ void main() {
           // (short) grace window and the post-finalise recovery is fast.
           initialBackoff: const Duration(milliseconds: 10),
           maxBackoff: const Duration(milliseconds: 40),
+          // #3603 — the repeated identical misses here rightly trip the
+          // stand-down; a tiny storm interval keeps this real-time test
+          // about ITS invariant (loop survives trip finalise), not the
+          // storm cadence (covered by obd2_link_standdown_test).
+          stormBackoff: const Duration(milliseconds: 80),
         );
 
         final transport = FakeObd2Transport(initResponses());
