@@ -16,6 +16,7 @@ import '../../../feature_management/application/feature_flags_provider.dart';
 import '../../../feature_management/domain/feature.dart';
 import '../../data/ereceipt/ereceipt_text_parser.dart';
 import '../../data/ocr/receipt_pdf_rasterizer.dart';
+import '../../data/share/share_payload_guard.dart';
 import '../../data/share/shared_receipt_intent.dart';
 import '../../providers/pending_shared_receipt_provider.dart';
 import '../../providers/pending_shared_receipt_text_provider.dart';
@@ -60,12 +61,19 @@ class ShareReceiptHandler {
   final ReceiptPdfRasterizer _pdfRasterizer;
   final EReceiptTextParser _textParser;
 
+  /// Size probe for the #3612 ingestion guard — injectable so tests can
+  /// drive the cap without a real filesystem. Production uses
+  /// [sharePayloadSizeBytes] (a `File.lengthSync` wrapper).
+  final int? Function(String path) _payloadSizeBytes;
+
   ShareReceiptHandler(
     this._ref, {
     ReceiptPdfRasterizer? pdfRasterizer,
     EReceiptTextParser textParser = const EReceiptTextParser(),
+    int? Function(String path)? payloadSizeBytes,
   }) : _pdfRasterizer = pdfRasterizer ?? const ReceiptPdfRasterizer(),
-       _textParser = textParser;
+       _textParser = textParser,
+       _payloadSizeBytes = payloadSizeBytes ?? sharePayloadSizeBytes;
 
   /// Handle one inbound [intent]. No-op for a null intent, an empty item
   /// list, or — defensively — when the feature is gated off.
@@ -90,7 +98,10 @@ class ShareReceiptHandler {
           .where((i) => i.kind == SharedReceiptItemKind.image)
           .firstOrNull;
       if (image?.path != null) {
-        _stashAndRoute(image!.path!);
+        // #3612 ingestion cap — a rejected payload is dropped, not routed.
+        if (_payloadAccepted(image!.path!, 'image')) {
+          _stashAndRoute(image.path!);
+        }
         return;
       }
 
@@ -101,7 +112,12 @@ class ShareReceiptHandler {
           .where((i) => i.kind == SharedReceiptItemKind.pdf)
           .firstOrNull;
       if (pdf?.path != null) {
-        unawaited(_rasterizeAndRoute(pdf!.path!));
+        // #3612 ingestion cap — checked BEFORE the rasteriser opens the
+        // document; the page cap (`ReceiptPdfRasterizer.maxPages`) then
+        // bounds what a size-acceptable PDF may contain.
+        if (_payloadAccepted(pdf!.path!, 'pdf')) {
+          unawaited(_rasterizeAndRoute(pdf.path!));
+        }
         return;
       }
 
@@ -177,6 +193,28 @@ class ShareReceiptHandler {
     _ref.read(pendingSharedReceiptTextProvider.notifier).set(result);
     debugPrint('ShareReceiptHandler.handle stashed parsed text result');
     _push(RoutePaths.addFillUp);
+  }
+
+  /// #3612 — inbound-share ingestion guard. A shared file only enters the
+  /// OCR / rasterise pipeline when [isAcceptableSharePayload] accepts its
+  /// size and extension. Rejection is logged and the payload silently
+  /// ignored — no snackbar: an over-cap or wrong-type payload is
+  /// adversarial or malformed, not a user mistake to message about.
+  bool _payloadAccepted(String path, String kind) {
+    final size = _payloadSizeBytes(path);
+    if (isAcceptableSharePayload(sizeBytes: size, path: path)) return true;
+    unawaited(
+      errorLogger.log(
+        ErrorLayer.ui,
+        StateError('shared $kind payload rejected by the ingestion guard'),
+        StackTrace.current,
+        context: {
+          'where': 'ShareReceiptHandler._payloadAccepted',
+          'sizeBytes': size,
+        },
+      ),
+    );
+    return false;
   }
 
   bool _featureEnabled() {

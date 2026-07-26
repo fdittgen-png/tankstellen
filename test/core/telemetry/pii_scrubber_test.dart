@@ -342,6 +342,79 @@ void main() {
     });
   });
 
+  group('structured coordinates + JWT (#3612)', () {
+    // 2026-07-26 audit wave 2: JSON-serialized bodies and rounded device
+    // coordinates leaked through the #3145 key/value rule (the quote
+    // before the key breaks its \b anchor; integers have no `.\d+`).
+
+    test('redacts integer keyed coordinates (lat=48 lng=11)', () {
+      const msg = 'tile request lat=48 lng=11 zoom=12';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('lat=48')));
+      expect(out, isNot(contains('lng=11')));
+      expect(out, contains(PiiScrubber.coordMarker));
+      expect(out, contains('zoom=12'),
+          reason: 'the non-PII zoom hint must survive');
+    });
+
+    test('redacts single-decimal keyed coordinates (lat: 48.1)', () {
+      const msg = 'centered at lat: 48.1 lon: 11.5';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('48.1')));
+      expect(out, isNot(contains('11.5')));
+      expect(out, contains(PiiScrubber.coordMarker));
+    });
+
+    test('redacts JSON-quoted coordinate keys ("lat": 43.4612)', () {
+      const msg = '{"lat": 43.4612, "lng": 5.4321, "station": "total-42"}';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('43.4612')));
+      expect(out, isNot(contains('5.4321')));
+      expect(out, contains(PiiScrubber.coordMarker));
+      expect(out, contains('total-42'),
+          reason: 'non-coordinate JSON fields must survive for triage');
+    });
+
+    test('redacts JSON-quoted latitude/longitude with integer values', () {
+      const msg = '{"latitude": 48, "longitude": 11}';
+      final out = PiiScrubber.scrubText(msg)!;
+      expect(out, isNot(contains('"latitude": 48')));
+      expect(out, isNot(contains('"longitude": 11')));
+      expect(PiiScrubber.coordMarker.allMatches(out).length, 2);
+    });
+
+    test('redacts a full JWT as ONE token marker', () {
+      // Shape of a real HS256 JWT — short header/signature segments used
+      // to survive the >=20-char generic token rule.
+      const jwt = 'eyJhbGciOiJIUzI1NiJ9.'
+          'eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4ifQ.'
+          'SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      final out = PiiScrubber.scrubText('auth failed for token $jwt today')!;
+      expect(out, isNot(contains('eyJ')));
+      expect(out, isNot(contains('SflKxwRJ')));
+      expect(PiiScrubber.tokenMarker.allMatches(out).length, 1,
+          reason: 'the three segments must collapse into a single marker, '
+              'not per-segment fragments');
+      expect(out, contains('auth failed for token'));
+      expect(out, contains('today'));
+    });
+
+    test('does NOT eat ordinary dotted prose or version strings', () {
+      const msg = 'Updated to v1.2.3. See file.name.ext and pkg.module.Class. '
+          'End of sentence. Next sentence.';
+      final out = PiiScrubber.scrubText(msg);
+      expect(out, equals(msg),
+          reason: 'the JWT rule is anchored on the eyJ base64url-JSON '
+              'prefix so ordinary sentences are never redacted');
+    });
+
+    test('does NOT redact non-coordinate numeric fields', () {
+      const msg = '{"price": 1.789, "count": 42} and speed=88';
+      final out = PiiScrubber.scrubText(msg);
+      expect(out, equals(msg));
+    });
+  });
+
   group('never-throws contract (#2349 fault injection)', () {
     test('scrubText returns normally on adversarial inputs', () {
       // Pathological strings that stress every regex branch at once:

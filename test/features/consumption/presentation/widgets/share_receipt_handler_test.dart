@@ -268,6 +268,120 @@ void main() {
     });
   });
 
+  group('ShareReceiptHandler.handle — ingestion caps (#3612)', () {
+    Future<ProviderContainer> pumpGuarded(
+      WidgetTester tester, {
+      required GoRouter router,
+      required int? Function(String) sizeOf,
+      required ReceiptPdfRasterizer rasterizer,
+    }) async {
+      final container = ProviderContainer(
+        overrides: [
+          enabledFeaturesProvider.overrideWithValue(featureOn),
+          routerProvider.overrideWith((_) => router),
+          shareReceiptHandlerProvider.overrideWith(
+            (ref) => ShareReceiptHandler(
+              ref,
+              pdfRasterizer: rasterizer,
+              payloadSizeBytes: sizeOf,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      return container;
+    }
+
+    testWidgets('an over-cap image is dropped — no stash, no route',
+        (tester) async {
+      final router = _router();
+      final container = await pumpGuarded(
+        tester,
+        router: router,
+        sizeOf: (_) => 17 * 1024 * 1024,
+        rasterizer: _FakeRasterizer(null),
+      );
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_imageIntent('/tmp/huge.jpg'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(pendingSharedReceiptProvider), isNull,
+          reason: 'a 17 MB payload must never enter the OCR pipeline');
+      expect(find.text('home'), findsOneWidget,
+          reason: 'rejection is silent — no navigation, no snackbar');
+    });
+
+    testWidgets('an in-cap image with a real size still stashes and routes',
+        (tester) async {
+      final router = _router();
+      final container = await pumpGuarded(
+        tester,
+        router: router,
+        sizeOf: (_) => 2 * 1024 * 1024,
+        rasterizer: _FakeRasterizer(null),
+      );
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_imageIntent('/tmp/receipt.jpg'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(pendingSharedReceiptProvider), '/tmp/receipt.jpg');
+      expect(find.text('add-fill-up'), findsOneWidget);
+    });
+
+    testWidgets('an over-cap PDF never reaches the rasteriser',
+        (tester) async {
+      final router = _router();
+      final fake = _FakeRasterizer('/should/not/be/used.jpg');
+      final container = await pumpGuarded(
+        tester,
+        router: router,
+        sizeOf: (_) => 17 * 1024 * 1024,
+        rasterizer: fake,
+      );
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_pdfIntent('/tmp/huge.pdf'));
+      await tester.pumpAndSettle();
+
+      expect(fake.receivedPdfPath, isNull,
+          reason: 'the size cap must be enforced BEFORE the document opens');
+      expect(container.read(pendingSharedReceiptProvider), isNull);
+      expect(find.text('home'), findsOneWidget);
+    });
+
+    testWidgets(
+        'an image whose cache path has a non-receipt extension is dropped',
+        (tester) async {
+      final router = _router();
+      final container = await pumpGuarded(
+        tester,
+        router: router,
+        sizeOf: (_) => 1024,
+        rasterizer: _FakeRasterizer(null),
+      );
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_imageIntent('/tmp/payload.svg'));
+      await tester.pumpAndSettle();
+
+      expect(container.read(pendingSharedReceiptProvider), isNull,
+          reason: 'only jpg/jpeg/png/webp/pdf may enter the pipeline');
+      expect(find.text('home'), findsOneWidget);
+    });
+  });
+
   group('ShareReceiptHandler — never throws (#2349 fault injection)', () {
     testWidgets('returns normally when a downstream read throws',
         (tester) async {

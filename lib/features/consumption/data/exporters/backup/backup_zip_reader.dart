@@ -40,10 +40,24 @@ class BackupZipReadException implements Exception {
 class BackupZipReader {
   const BackupZipReader();
 
+  /// #3612 — hard cap on the number of entries a restore zip may carry.
+  /// A real backup is one `.xml` entry (plus, at worst, a handful of
+  /// hand-re-zip artifacts like `__MACOSX/` forks); thousands of entries
+  /// is a zip-bomb shape, rejected before any content is touched.
+  static const int maxEntries = 64;
+
+  /// #3612 — hard cap on the TOTAL claimed decompressed size across all
+  /// entries (64 MB). The claimed sizes come from the zip's central
+  /// directory, so a decompression bomb (tiny compressed payload
+  /// claiming/holding gigabytes) is rejected BEFORE any entry is
+  /// inflated. 64 MB is orders of magnitude above any real backup XML.
+  static const int maxTotalUncompressedBytes = 64 * 1024 * 1024;
+
   /// Decode [bytes] and return the inner backup XML as a UTF-8 string.
   ///
   /// Throws [BackupZipReadException] when the bytes are not a valid
-  /// zip, carry no `.xml` entry, or hold an empty XML payload.
+  /// zip, exceed the entry-count / decompressed-size caps (#3612),
+  /// carry no `.xml` entry, or hold an empty XML payload.
   String readXml(Uint8List bytes) {
     if (bytes.isEmpty) {
       throw const BackupZipReadException('empty file');
@@ -60,6 +74,25 @@ class BackupZipReader {
         const BackupZipReadException('not a valid zip archive'),
         st,
       );
+    }
+
+    // #3612 — bomb guards. `ZipDecoder.decodeBytes` only parses the
+    // directory headers; each entry's content is inflated lazily on
+    // first `.content` access, so both checks below run BEFORE any
+    // decompression happens. `ArchiveFile.size` is the header's claimed
+    // uncompressed size.
+    if (archive.files.length > maxEntries) {
+      throw const BackupZipReadException('too many entries in the zip');
+    }
+    var totalUncompressed = 0;
+    for (final file in archive.files) {
+      if (!file.isFile) continue;
+      totalUncompressed += file.size;
+      if (totalUncompressed > maxTotalUncompressedBytes) {
+        throw const BackupZipReadException(
+          'zip decompresses beyond the size cap',
+        );
+      }
     }
 
     ArchiveFile? xmlEntry;

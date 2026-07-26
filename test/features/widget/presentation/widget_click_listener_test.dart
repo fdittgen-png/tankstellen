@@ -82,59 +82,109 @@ void main() {
               'trips this test and forces a review.');
     });
 
-    test('id with URL-encoded slash (ocm-42%2Ffoo) round-trips to '
-        'the decoded form', () {
-      // `%2F` decodes to `/`. The router path will contain a `/`, which
-      // downstream GoRoute parsing may treat as a path separator — but
-      // THAT is the router's concern. Here we only assert the id is
-      // passed through as decoded by `queryParameters`.
+    test('id with URL-encoded slash (ocm-42%2Ffoo) is REJECTED '
+        '(#3612 charset guard)', () {
+      // `%2F` decodes to `/`. Pre-#3612 the decoded slash flowed into
+      // the router path verbatim; the charset guard now rejects it —
+      // no real id format contains a slash, only injection attempts do.
       final path = widgetUriToPath(
         Uri.parse('tankstellenwidget://station?id=ocm-42%2Ffoo'),
       );
-      expect(path, '/ev-station/ocm-42/foo',
-          reason: 'Encoded slash decodes to a literal slash in the id, '
-              'which then becomes part of the router path. If the '
-              'router rejects that, the user sees a no-op instead of a '
-              'wrong station — acceptable trade-off.');
+      expect(path, isNull,
+          reason: 'A slash in an id can shape the router path — the '
+              '#3612 guard turns it into the same no-op as any other '
+              'invalid URI.');
     });
 
-    test('id with URL-encoded space (%20) round-trips to literal space', () {
+    test('id with URL-encoded space (%20) is REJECTED (#3612)', () {
       final path = widgetUriToPath(
         Uri.parse('tankstellenwidget://station?id=it-42%20milano'),
       );
-      expect(path, '/station/it-42 milano',
-          reason: 'Space-in-id is a pathological but legal input; the '
-              'decoder should pass it through unchanged so the router '
-              'decides what to do — rather than silently mangling it '
-              'into a different id.');
+      expect(path, isNull,
+          reason: 'No real station id contains a space; the #3612 '
+              'charset guard rejects it rather than routing a mangled '
+              'path.');
     });
 
-    test('id with a literal space — Uri parse treats as separator; '
-        'behaviour must be deterministic (not random across runs)', () {
+    test('id with a literal space is REJECTED — deterministically (#3612)',
+        () {
       // An un-encoded space in a URI is illegal but `Uri.parse` is
-      // forgiving. Behaviour is deterministic across Dart VM runs;
-      // lock it in so a future `Uri` upgrade doesn't silently change
-      // what the widget tap does.
+      // forgiving and keeps the space in queryParameters. The #3612
+      // guard rejects it; lock the behaviour in so a future `Uri`
+      // upgrade doesn't silently change what the widget tap does.
       final uri = Uri.parse('tankstellenwidget://station?id=de abc');
-      final path = widgetUriToPath(uri);
-      // Dart's Uri parser keeps the space as-is in queryParameters.
-      expect(path, '/station/de abc');
+      expect(widgetUriToPath(uri), isNull);
     });
 
     test('id with `+` decodes to space per `application/x-www-form-urlencoded` '
-        '(form-encoded query — the exact behaviour of Uri.queryParameters)',
-        () {
-      // Not the bug, but #753 diagnostics need to know `+` is not a
-      // literal plus in this decoder. If a country's id ever contains
-      // `+`, the native side must `%2B`-encode it or the Flutter side
-      // will see a space.
+        'and is therefore REJECTED (#3612)', () {
+      // #753 diagnostics need to know `+` is not a literal plus in this
+      // decoder: `Uri.queryParameters` decodes it to a space, which the
+      // #3612 charset guard rejects. If a country's id ever contains
+      // `+`, the native side must `%2B`-encode it — and the guard's
+      // charset must be widened deliberately.
       final path = widgetUriToPath(
         Uri.parse('tankstellenwidget://station?id=a+b'),
       );
-      expect(path, '/station/a b',
-          reason: 'Uri.queryParameters decodes `+` as space. A real id '
-              'containing `+` must be pre-encoded as `%2B` on the '
-              'Kotlin side or the app will open a sibling station.');
+      expect(path, isNull);
+    });
+  });
+
+  group('widgetUriToPath (#3612 — id charset guard)', () {
+    test('accepts an ocm-prefixed EV id', () {
+      expect(
+        widgetUriToPath(
+          Uri.parse('tankstellenwidget://station?id=ocm-149681'),
+        ),
+        '/ev-station/ocm-149681',
+      );
+    });
+
+    test('accepts a tankerkoenig-style UUID id', () {
+      expect(
+        widgetUriToPath(
+          Uri.parse('tankstellenwidget://station'
+              '?id=51d4b671-a095-1aa0-e100-80009459e03a'),
+        ),
+        '/station/51d4b671-a095-1aa0-e100-80009459e03a',
+      );
+    });
+
+    test('rejects a path-traversal shaped id (../)', () {
+      expect(
+        widgetUriToPath(
+          Uri.parse('tankstellenwidget://station?id=..%2F..%2Fsettings'),
+        ),
+        isNull,
+      );
+    });
+
+    test('rejects an id containing quotes', () {
+      expect(
+        widgetUriToPath(
+          Uri.parse('tankstellenwidget://station?id=%22onclick%22'),
+        ),
+        isNull,
+      );
+      expect(
+        widgetUriToPath(
+          Uri.parse("tankstellenwidget://station?id=it-42'or'1"),
+        ),
+        isNull,
+      );
+    });
+
+    test('accepts a 64-char id but rejects 65 chars', () {
+      final ok = 'a' * 64;
+      final tooLong = 'a' * 65;
+      expect(
+        widgetUriToPath(Uri.parse('tankstellenwidget://station?id=$ok')),
+        '/station/$ok',
+      );
+      expect(
+        widgetUriToPath(Uri.parse('tankstellenwidget://station?id=$tooLong')),
+        isNull,
+      );
     });
   });
 
