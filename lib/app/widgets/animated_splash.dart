@@ -41,7 +41,13 @@ import '../../l10n/app_localizations.dart';
 /// splash as the root, then again with [TankstellenApp] once
 /// `AppInitializer.run()` resolves.
 class AnimatedSplash extends StatefulWidget {
-  const AnimatedSplash({super.key});
+  const AnimatedSplash({super.key, this.animateIn = true});
+
+  /// When false, the intro scale/fade is skipped and the splash renders
+  /// at its settled end state immediately (#3607) — used by the
+  /// [StartupReveal] overlay, where the intro already played under the
+  /// pre-init host and replaying it would read as a restart.
+  final bool animateIn;
 
   /// Matches `android/app/src/main/res/values/colors.xml →
   /// ic_launcher_background`. Kept in both places so the native splash
@@ -102,8 +108,9 @@ class _AnimatedSplashState extends State<AnimatedSplash>
     _started = true;
     // #2972 — reduced-motion guard. With the OS "remove animations" flag on,
     // jump the controller straight to its end (logo full-size, fully opaque)
-    // instead of running the 650 ms scale+fade reveal.
-    if (AppMotion.enabled(context)) {
+    // instead of running the 650 ms scale+fade reveal. #3607 — the
+    // continuation overlay skips the intro the same way.
+    if (widget.animateIn && AppMotion.enabled(context)) {
       unawaited(_controller.forward());
     } else {
       _controller.value = 1.0;
@@ -168,7 +175,14 @@ class _AnimatedSplashState extends State<AnimatedSplash>
                     const SizedBox(height: 28),
                     FadeTransition(
                       opacity: _fade,
-                      child: const _SplashProgressBar(),
+                      // #3607 — the StartupReveal continuation overlay
+                      // renders a STATIC brand frame: an indeterminate
+                      // bar schedules a frame forever, which would defeat
+                      // the reveal's frame-quiescence detection (and by
+                      // that point init is done — nothing is "loading").
+                      child: widget.animateIn
+                          ? const _SplashProgressBar()
+                          : const SizedBox.shrink(),
                     ),
                   ],
                 ),
