@@ -12286,6 +12286,30 @@ abstract class AppLocalizations {
   /// **'elapsed'**
   String get tripRecordingPipElapsedCaption;
 
+  /// Title of the confirmation dialog shown before a scanned payment-QR web URL is handed to the browser (#3611). Scanned QR codes are attacker-controlled input, so the app never auto-launches them.
+  ///
+  /// In en, this message translates to:
+  /// **'Open scanned link?'**
+  String get qrLaunchConfirmTitle;
+
+  /// Body of the #3611 QR-URL confirmation dialog. {host} is the full host of the scanned URL (prefixed with its scheme when it is not https, e.g. 'http://pay.example.com') so the user can judge the destination before the browser opens.
+  ///
+  /// In en, this message translates to:
+  /// **'This QR code points to {host}. Only open links you trust.'**
+  String qrLaunchConfirmBody(String host);
+
+  /// Confirm button of the #3611 QR-URL confirmation dialog — proceeds to launch the scanned URL in the external browser.
+  ///
+  /// In en, this message translates to:
+  /// **'Open link'**
+  String get qrLaunchConfirmOpen;
+
+  /// Cancel button of the #3611 QR-URL confirmation dialog — dismisses without launching anything.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get qrLaunchConfirmCancel;
+
   /// Title of the bottom sheet explaining the pin button on the fuel-station radar (search) screen (#2785). Opened by long-pressing the pin in the AppBar.
   ///
   /// In en, this message translates to:

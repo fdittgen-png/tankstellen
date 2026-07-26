@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,6 +14,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/services/sensitive_clipboard.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/export/data_exporter.dart';
@@ -137,7 +137,9 @@ class _PrivacyDashboardScreenState
     // satisfied that we never reach across one to look up `context`.
     final l = AppLocalizations.of(context);
     final json = ref.read(exportPrivacyDataProvider);
-    await Clipboard.setData(ClipboardData(text: json));
+    // #3611 — the export blob aggregates the user's stored data; use
+    // SensitiveClipboard so the clipboard is auto-cleared after 60 s.
+    await SensitiveClipboard.copy(json);
     // #1993 — also save a copy to the on-device Downloads folder so the
     // user can find the file later via any file manager. The clipboard
     // path stays so existing copy-paste workflows are unchanged.
@@ -177,7 +179,7 @@ class _PrivacyDashboardScreenState
             },
           ),
         );
-        await Clipboard.setData(ClipboardData(text: json));
+        await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
         if (!mounted) return;
         SnackBarHelper.showSuccess(
           context,
@@ -200,7 +202,7 @@ class _PrivacyDashboardScreenState
       return;
     }
 
-    await Clipboard.setData(ClipboardData(text: json));
+    await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
     // #1993 — also persist to Downloads (small-path); snackbar now reports
     // the saved path. Falls back to the legacy copy snackbar on save failure.
     await _saveExportToDownloads(
@@ -278,7 +280,8 @@ class _PrivacyDashboardScreenState
         ..writeln(csv);
     });
     final csvText = buf.toString();
-    await Clipboard.setData(ClipboardData(text: csvText));
+    // #3611 — same hygiene as the JSON export: auto-clear after 60 s.
+    await SensitiveClipboard.copy(csvText);
     // #1993 — also save a copy to the Downloads folder for offline retrieval.
     await _saveExportToDownloads(
       text: csvText,

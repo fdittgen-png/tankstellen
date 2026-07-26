@@ -7126,6 +7126,20 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'pagājis';
 
   @override
+  String get qrLaunchConfirmTitle => 'Open scanned link?';
+
+  @override
+  String qrLaunchConfirmBody(String host) {
+    return 'This QR code points to $host. Only open links you trust.';
+  }
+
+  @override
+  String get qrLaunchConfirmOpen => 'Open link';
+
+  @override
+  String get qrLaunchConfirmCancel => 'Cancel';
+
+  @override
   String get radarPinHelpTitle => 'Par piespraudēšanu';
 
   @override

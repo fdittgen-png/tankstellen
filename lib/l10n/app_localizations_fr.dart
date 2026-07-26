@@ -7153,6 +7153,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'écoulé';
 
   @override
+  String get qrLaunchConfirmTitle => 'Ouvrir le lien scanné ?';
+
+  @override
+  String qrLaunchConfirmBody(String host) {
+    return 'Ce code QR mène à $host. N\'ouvrez que les liens auxquels vous faites confiance.';
+  }
+
+  @override
+  String get qrLaunchConfirmOpen => 'Ouvrir le lien';
+
+  @override
+  String get qrLaunchConfirmCancel => 'Annuler';
+
+  @override
   String get radarPinHelpTitle => 'À propos de l\'épingle';
 
   @override

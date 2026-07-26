@@ -306,6 +306,47 @@ void main() {
       });
     });
 
+    group('trip-box encryption (#3611)', () {
+      test('the four trip boxes are in _encryptedDeferredBoxes and the '
+          'deferred open threads the cipher', () {
+        final source =
+            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+
+        final setMatch = RegExp(
+          r'_encryptedDeferredBoxes = \{(.*?)\};',
+          dotAll: true,
+        ).firstMatch(source);
+        expect(setMatch, isNotNull,
+            reason: '_encryptedDeferredBoxes set must exist (#3611)');
+        final setBody = setMatch!.group(1)!;
+        for (final boxName in [
+          'obd2Baselines',
+          'obd2TripHistory',
+          'obd2PausedTrips',
+          'obd2ActiveTrip',
+        ]) {
+          expect(setBody.contains(boxName), isTrue,
+              reason: '$boxName must be in _encryptedDeferredBoxes — trip '
+                  'data is driving telemetry and must be encrypted (#3611)');
+        }
+
+        final deferredMatch = RegExp(
+          r'static Future<void> _openDeferred\(\) async \{(.*?)\n  \}',
+          dotAll: true,
+        ).firstMatch(source);
+        expect(deferredMatch, isNotNull,
+            reason: '_openDeferred() must exist');
+        final deferredBody = deferredMatch!.group(1)!;
+        expect(deferredBody.contains('encryptionCipher'), isTrue,
+            reason: 'the deferred open must pass the cipher for the '
+                'encrypted trip boxes (#3611)');
+        expect(
+            deferredBody.contains('HiveTripBoxEncryption.migrate'), isTrue,
+            reason: 'the crash-safe plain→encrypted migration must run '
+                'before the encrypted opens (#3611)');
+      });
+    });
+
     group('toStringDynamicMap', () {
       test('returns null for null input', () {
         expect(HiveBoxes.toStringDynamicMap(null), isNull);

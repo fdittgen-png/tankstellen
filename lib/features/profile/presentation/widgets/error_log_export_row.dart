@@ -6,12 +6,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/services/sensitive_clipboard.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/telemetry/storage/trace_storage.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -130,7 +130,7 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
             },
           ),
         );
-        await Clipboard.setData(ClipboardData(text: json));
+        await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
         if (!mounted) return;
         SnackBarHelper.showSuccess(
           context,
@@ -148,7 +148,9 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
       return;
     }
 
-    await Clipboard.setData(ClipboardData(text: json));
+    // #3611 — the error-log blob may carry pre-scrub payloads; use
+    // SensitiveClipboard so the clipboard is auto-cleared after 60 s.
+    await SensitiveClipboard.copy(json);
     await _saveExportToDownloads(
       text: json,
       copySnackbar: _formatCopySnackbar(

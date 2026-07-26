@@ -1,0 +1,24 @@
+{
+  "qrLaunchConfirmTitle": "Open scanned link?",
+  "@qrLaunchConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before a scanned payment-QR web URL is handed to the browser (#3611). Scanned QR codes are attacker-controlled input, so the app never auto-launches them."
+  },
+  "qrLaunchConfirmBody": "This QR code points to {host}. Only open links you trust.",
+  "@qrLaunchConfirmBody": {
+    "description": "Body of the #3611 QR-URL confirmation dialog. {host} is the full host of the scanned URL (prefixed with its scheme when it is not https, e.g. 'http://pay.example.com') so the user can judge the destination before the browser opens.",
+    "placeholders": {
+      "host": {
+        "type": "String",
+        "example": "pay.example.com"
+      }
+    }
+  },
+  "qrLaunchConfirmOpen": "Open link",
+  "@qrLaunchConfirmOpen": {
+    "description": "Confirm button of the #3611 QR-URL confirmation dialog — proceeds to launch the scanned URL in the external browser."
+  },
+  "qrLaunchConfirmCancel": "Cancel",
+  "@qrLaunchConfirmCancel": {
+    "description": "Cancel button of the #3611 QR-URL confirmation dialog — dismisses without launching anything."
+  }
+}

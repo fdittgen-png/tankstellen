@@ -7143,6 +7143,20 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'изминало';
 
   @override
+  String get qrLaunchConfirmTitle => 'Open scanned link?';
+
+  @override
+  String qrLaunchConfirmBody(String host) {
+    return 'This QR code points to $host. Only open links you trust.';
+  }
+
+  @override
+  String get qrLaunchConfirmOpen => 'Open link';
+
+  @override
+  String get qrLaunchConfirmCancel => 'Cancel';
+
+  @override
   String get radarPinHelpTitle => 'За закрепването';
 
   @override

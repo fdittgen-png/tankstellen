@@ -4,10 +4,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../../core/services/sensitive_clipboard.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/qr_payment_decoder.dart';
 
@@ -23,6 +23,13 @@ enum ScanPaymentOutcome {
   /// An EPC SEPA Girocode was decoded and the confirmation dialog was
   /// shown. Actual banking-app hand-off happens after user confirms.
   confirmEpc,
+
+  /// A plain web URL was decoded (#3611). The caller must show the
+  /// [ScanPaymentDispatcher.buildUrlConfirmDialog] confirmation —
+  /// scanned QR codes are attacker-controlled input, so the browser
+  /// hand-off only happens after the user has seen the host and
+  /// confirmed.
+  confirmUrl,
 
   /// The code could not be classified into an actionable category —
   /// UI should show the raw value with copy / report options.
@@ -78,8 +85,10 @@ class ScanPaymentDispatcher {
     clipboardWriter = _defaultClipboardWriter;
   }
 
+  // #3611 — IBAN + beneficiary are sensitive: route through
+  // SensitiveClipboard so the payload is auto-cleared after 60 s.
   static Future<void> _defaultClipboardWriter(String text) =>
-      Clipboard.setData(ClipboardData(text: text));
+      SensitiveClipboard.copy(text);
 
   static Future<bool> _defaultLauncher(Uri uri, {LaunchMode? mode}) =>
       launchUrl(uri, mode: mode ?? LaunchMode.externalApplication);
@@ -95,8 +104,11 @@ class ScanPaymentDispatcher {
   /// returned enum.
   static Future<ScanPaymentOutcome> handle(QrPaymentTarget target) async {
     switch (target) {
-      case QrPaymentUrl(:final url):
-        return _tryLaunch(Uri.parse(url));
+      case QrPaymentUrl():
+        // #3611 — never auto-launch a scanned http(s) URL; the caller
+        // shows the host-confirmation dialog first and then calls
+        // [launchConfirmedUrl].
+        return ScanPaymentOutcome.confirmUrl;
       case QrPaymentAppLink(:final uri):
         return _tryLaunch(Uri.parse(uri));
       case QrPaymentEpc():
@@ -221,5 +233,59 @@ class ScanPaymentDispatcher {
         ),
       ],
     );
+  }
+
+  /// Launches a user-CONFIRMED scanned URL (#3611). Callers must only
+  /// invoke this after [buildUrlConfirmDialog] returned `true`.
+  static Future<ScanPaymentOutcome> launchConfirmedUrl(QrPaymentUrl target) =>
+      _tryLaunch(Uri.parse(target.url));
+
+  /// The host string shown in the #3611 confirmation dialog: the bare
+  /// host for `https` (the default expectation), scheme-prefixed for
+  /// anything else so a plain-`http` (or otherwise unusual) target is
+  /// visibly flagged.
+  static String displayHostOf(Uri uri) =>
+      uri.scheme == 'https' ? uri.host : '${uri.scheme}://${uri.host}';
+
+  /// Confirmation dialog shown before a scanned http(s) QR is handed to
+  /// the browser (#3611). Shows the full host — plus the scheme when it
+  /// is not `https` — and pops `true` (open) / `false` (cancel).
+  /// Separated from the launch machinery so widget tests can render it
+  /// standalone, mirroring [buildEpcDialog].
+  static Widget buildUrlConfirmDialog(BuildContext context, Uri uri) {
+    final l10n = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l10n.qrLaunchConfirmTitle),
+      content: Text(l10n.qrLaunchConfirmBody(displayHostOf(uri))),
+      actions: [
+        TextButton(
+          key: const Key('qr_launch_confirm_cancel'),
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.qrLaunchConfirmCancel),
+        ),
+        FilledButton(
+          key: const Key('qr_launch_confirm_open'),
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.qrLaunchConfirmOpen),
+        ),
+      ],
+    );
+  }
+
+  /// Shows the #3611 URL confirmation for [target] and, when the user
+  /// confirms, launches it. Returns `null` when the user cancelled,
+  /// otherwise the launch outcome ([ScanPaymentOutcome.launched] /
+  /// [ScanPaymentOutcome.launchFailed]).
+  static Future<ScanPaymentOutcome?> confirmAndLaunchUrl(
+    BuildContext context,
+    QrPaymentUrl target,
+  ) async {
+    final uri = Uri.parse(target.url);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => buildUrlConfirmDialog(ctx, uri),
+    );
+    if (confirmed != true) return null;
+    return _tryLaunch(uri);
   }
 }

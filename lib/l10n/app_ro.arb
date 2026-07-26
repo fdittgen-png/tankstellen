@@ -5544,5 +5544,31 @@
         "type": "String"
       }
     }
+  },
+  "qrLaunchConfirmTitle": "Open scanned link?",
+  "@qrLaunchConfirmTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "qrLaunchConfirmBody": "This QR code points to {host}. Only open links you trust.",
+  "@qrLaunchConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "host": {
+        "type": "String",
+        "example": "pay.example.com"
+      }
+    }
+  },
+  "qrLaunchConfirmOpen": "Open link",
+  "@qrLaunchConfirmOpen": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "qrLaunchConfirmCancel": "Cancel",
+  "@qrLaunchConfirmCancel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

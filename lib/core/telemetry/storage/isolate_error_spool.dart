@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../pii_scrubber.dart';
 import '../trace_recorder.dart';
 import 'isolate_error_spool_entry.dart';
 
@@ -131,11 +132,19 @@ class IsolateErrorSpool {
     DateTime? timestamp,
   }) async {
     try {
+      // #3611 — scrub PII at WRITE time: the spool box is deliberately
+      // unencrypted (background isolates run before the keychain is
+      // available), so an error message that embeds coordinates or a
+      // token must never reach disk verbatim. `scrubText` returns
+      // non-null for non-null input; the `??` keeps the raw string as
+      // a defensive fallback only.
+      final rawMessage = error.toString();
+      final rawStack = (stack ?? StackTrace.current).toString();
       final entry = IsolateErrorSpoolEntry(
         timestamp: timestamp ?? DateTime.now(),
         isolateTaskName: isolateTaskName,
-        errorMessage: error.toString(),
-        stack: (stack ?? StackTrace.current).toString(),
+        errorMessage: PiiScrubber.scrubText(rawMessage) ?? rawMessage,
+        stack: PiiScrubber.scrubText(rawStack) ?? rawStack,
         contextMap: _sanitizeContext(contextMap),
       );
       final box = await boxFactory();

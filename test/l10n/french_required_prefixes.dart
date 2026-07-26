@@ -78,4 +78,9 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   // #1439 — the auto-record consent scope-clarification badge, help dialog
   // and revoke hint on the Edit vehicle screen.
   'autoRecordConsent',
+
+  // #3611 — the QR-URL launch confirmation is a SECURITY dialog (the user
+  // decides whether an attacker-controllable scanned link opens); it must
+  // never fall back to English on a French device.
+  'qrLaunchConfirm',
 ];

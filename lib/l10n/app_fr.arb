@@ -5453,5 +5453,17 @@
   "tankReportFactorIdle": "Part de ralenti {cur} % (avant {prev} %)",
   "tankReportCaveat": "Les enregistrements sont spontanés et ne couvrent qu'une partie de ce plein — ces indices sont indicatifs, pas toute la vérité.",
   "tankReportCalibrationUnder": "Les estimations enregistrées sont {pct} % en dessous de la vérité de la pompe",
-  "tankReportCalibrationOver": "Les estimations enregistrées sont {pct} % au-dessus de la vérité de la pompe"
+  "tankReportCalibrationOver": "Les estimations enregistrées sont {pct} % au-dessus de la vérité de la pompe",
+  "qrLaunchConfirmTitle": "Ouvrir le lien scanné ?",
+  "qrLaunchConfirmBody": "Ce code QR mène à {host}. N'ouvrez que les liens auxquels vous faites confiance.",
+  "@qrLaunchConfirmBody": {
+    "placeholders": {
+      "host": {
+        "type": "String",
+        "example": "pay.example.com"
+      }
+    }
+  },
+  "qrLaunchConfirmOpen": "Ouvrir le lien",
+  "qrLaunchConfirmCancel": "Annuler"
 }
