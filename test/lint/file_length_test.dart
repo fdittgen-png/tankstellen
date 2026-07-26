@@ -683,11 +683,12 @@ void main() {
       decompositionIssue: 3141,
     ),
     'lib/features/obd2/data/trip_recording_controller.dart': (
-      // #3602 — the engine-data staleness fence (freshness anchor, two
-      // constants, the _emit gate + once-latched escalation, +51).
+      // #3625 — post-reconnect grace: replaceService opens an 8 s window
+      // during which transport errors / null parses feed the #3575
+      // protocol recovery instead of the drop verdict (+27).
       // Decomposition tracked by #3140.
-      lines: 1831,
-      bumps: 20,
+      lines: 1858,
+      bumps: 21,
       decompositionIssue: 3140,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR

@@ -132,5 +132,50 @@ void main() {
 
       await ctl.stop();
     });
+
+  group('post-reconnect grace (#3625)', () {
+      test('null parses right after replaceService do NOT drop the fresh '
+          'session — the K-line gets its bus-init window', () async {
+        var clock = DateTime(2026, 7, 26, 6, 40);
+        final ctl = await startCtl(() => clock);
+
+        // Healthy streaming past the start grace.
+        clock = clock.add(const Duration(seconds: 40));
+        ctl.debugObserveHighPriorityParse(1500.0);
+        ctl.debugEmitNow();
+        expect(ctl.currentState, TripRecordingControllerState.recording);
+
+        // The reconnect adopts a fresh service…
+        final transport = FakeObd2Transport({
+          'ATZ': 'ELM327 v1.5>',
+          'ATE0': 'OK>',
+        });
+        await transport.connect();
+        ctl.replaceService(Obd2Service(transport));
+
+        // …whose first polls all fail (bus init in progress): a storm of
+        // null parses inside the grace must not fire the silent-failure
+        // drop — this exact storm produced the 4.7 s field flap.
+        clock = clock.add(const Duration(seconds: 3));
+        for (var i = 0; i < 40; i++) {
+          ctl.debugObserveHighPriorityParse(null);
+        }
+        expect(ctl.currentState, TripRecordingControllerState.recording,
+            reason: 'inside the 8 s grace the fresh session must survive '
+                'its bus init');
+
+        // Past the grace, a bus that STILL never produced a parse is a
+        // genuinely dead session — the #3604 staleness fence (15 s since
+        // the last fresh parse) takes over and drops it.
+        clock = clock.add(const Duration(seconds: 14));
+        ctl.debugEmitNow();
+        expect(
+            ctl.currentState, TripRecordingControllerState.pausedDueToDrop,
+            reason: 'the grace is a window, not immunity — the fence '
+                'still ends a session whose bus never came up');
+
+        await ctl.stop();
+      });
+    });
   });
 }
