@@ -206,6 +206,14 @@ enum Feature {
   /// detector never runs and there is nothing to speak.
   voiceAnnouncements,
 
+  /// Master switch for ALL spoken output — every text-to-speech surface
+  /// (#3605): the driving voice coach (#2663) and, via a `requires`
+  /// edge, the station voice announcements above. Default-off on every
+  /// channel: flutter_tts opens a system TTS connection per not-ready
+  /// `speak()` without closing the old one (72 leaked binders in one
+  /// field crash harvest), so nothing may speak unless the user opts in.
+  voiceFeedback,
+
   /// Startup-initialization trace (#3383). A developer diagnostic that
   /// records the timed phases of cold-start (binding → storage → services →
   /// first frame) and renders them as a waterfall in Developer tools, plus a

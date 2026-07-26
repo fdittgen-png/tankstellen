@@ -9264,6 +9264,18 @@ abstract class AppLocalizations {
   /// **'Power-user and contributor tools.'**
   String get featureGroupDescription_developer;
 
+  /// #3605 master TTS feature switch label
+  ///
+  /// In en, this message translates to:
+  /// **'Spoken feedback (text-to-speech)'**
+  String get featureLabel_voiceFeedback;
+
+  /// #3605
+  ///
+  /// In en, this message translates to:
+  /// **'Master switch for every spoken surface — the driving voice coach and station announcements. When off, the app never opens a text-to-speech engine.'**
+  String get featureDescription_voiceFeedback;
+
   /// Title of the one-time consent dialog before we file a public GitHub issue from a bad-scan report (#952 phase 3).
   ///
   /// In en, this message translates to:

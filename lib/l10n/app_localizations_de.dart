@@ -5279,6 +5279,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Werkzeuge für Power-User und Mitwirkende.';
 
   @override
+  String get featureLabel_voiceFeedback => 'Sprachausgabe (Text-to-Speech)';
+
+  @override
+  String get featureDescription_voiceFeedback =>
+      'Hauptschalter für jede gesprochene Ausgabe — Fahr-Sprachcoach und Tankstellen-Ansagen. Aus: Die App öffnet nie eine Text-to-Speech-Engine.';
+
+  @override
   String get feedbackConsentTitle => 'Bericht an GitHub senden?';
 
   @override

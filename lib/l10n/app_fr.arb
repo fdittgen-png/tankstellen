@@ -5434,5 +5434,7 @@
     "description": "MT — needs native review"
   },
   "lessonTransportTitle": "Données moteur absentes sur la majeure partie du trajet",
-  "lessonTransportAdvice": "Le moteur n'a signalé aucune activité sur presque toute la distance. Soit le flux OBD2 est tombé en panne, soit le véhicule a été déplacé sans rouler par ses propres moyens — la consommation est peu fiable et exclue de vos statistiques."
+  "lessonTransportAdvice": "Le moteur n'a signalé aucune activité sur presque toute la distance. Soit le flux OBD2 est tombé en panne, soit le véhicule a été déplacé sans rouler par ses propres moyens — la consommation est peu fiable et exclue de vos statistiques.",
+  "featureLabel_voiceFeedback": "Retour vocal (synthèse vocale)",
+  "featureDescription_voiceFeedback": "Interrupteur principal de toute sortie vocale — coach de conduite et annonces de stations. Désactivé : l'application n'ouvre jamais de moteur de synthèse vocale."
 }

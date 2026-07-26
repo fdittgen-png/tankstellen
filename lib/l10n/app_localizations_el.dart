@@ -5287,6 +5287,13 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εργαλεία για προχωρημένους χρήστες και συνεισφέροντες.';
 
   @override
+  String get featureLabel_voiceFeedback => 'Spoken feedback (text-to-speech)';
+
+  @override
+  String get featureDescription_voiceFeedback =>
+      'Master switch for every spoken surface — the driving voice coach and station announcements. When off, the app never opens a text-to-speech engine.';
+
+  @override
   String get feedbackConsentTitle => 'Αποστολή αναφοράς στο GitHub;';
 
   @override

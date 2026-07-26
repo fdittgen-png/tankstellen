@@ -81,6 +81,9 @@ const Map<Feature, FeatureCategory> featureCategory = <Feature, FeatureCategory>
   // 3. Fuel Station Radar.
   Feature.approachOverlay: FeatureCategory.radar,
   Feature.voiceAnnouncements: FeatureCategory.radar,
+  // #3605 — the master TTS switch spans radar announcements AND the
+  // driving coach; it lives with the other radar/driving audio toggles.
+  Feature.voiceFeedback: FeatureCategory.radar,
 
   // 4. Consumption (Conso card + dependents + obd2Optional + carbon).
   Feature.obd2TripRecording: FeatureCategory.consumption,

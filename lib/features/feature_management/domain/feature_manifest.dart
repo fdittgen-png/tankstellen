@@ -378,10 +378,19 @@ class FeatureManifest {
     // same live geofence stream (`approachStateProvider`) the overlay
     // drives: without the overlay the detector never starts, so there is
     // nothing to announce.
+    Feature.voiceFeedback: FeatureManifestEntry.allChannels(
+      feature: Feature.voiceFeedback,
+      defaultOn: false,
+      displayName: 'Spoken feedback (text-to-speech)',
+      description:
+          'Master switch for every spoken surface — the driving voice '
+              'coach and station announcements. Off: the app never opens '
+              'a text-to-speech engine.',
+    ),
     Feature.voiceAnnouncements: FeatureManifestEntry.allChannels(
       feature: Feature.voiceAnnouncements,
       defaultOn: false,
-      requires: {Feature.approachOverlay},
+      requires: {Feature.approachOverlay, Feature.voiceFeedback},
       displayName: 'Voice announcements',
       description:
           'Speak nearby cheap fuel stations aloud as you drive, so you '

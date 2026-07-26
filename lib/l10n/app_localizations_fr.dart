@@ -5296,6 +5296,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Outils pour utilisateurs avancés et contributeurs.';
 
   @override
+  String get featureLabel_voiceFeedback => 'Retour vocal (synthèse vocale)';
+
+  @override
+  String get featureDescription_voiceFeedback =>
+      'Interrupteur principal de toute sortie vocale — coach de conduite et annonces de stations. Désactivé : l\'application n\'ouvre jamais de moteur de synthèse vocale.';
+
+  @override
   String get feedbackConsentTitle => 'Envoyer le rapport à GitHub ?';
 
   @override

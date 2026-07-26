@@ -5251,6 +5251,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'Orodja za napredne uporabnike in sodelavce.';
 
   @override
+  String get featureLabel_voiceFeedback => 'Spoken feedback (text-to-speech)';
+
+  @override
+  String get featureDescription_voiceFeedback =>
+      'Master switch for every spoken surface — the driving voice coach and station announcements. When off, the app never opens a text-to-speech engine.';
+
+  @override
   String get feedbackConsentTitle => 'Poslati poročilo na GitHub?';
 
   @override

@@ -2341,6 +2341,14 @@
   "featureGroupDescription_input": "Hilfen zum Erfassen von Tankvorgängen.",
   "featureGroupTitle_developer": "Entwickler & experimentell",
   "featureGroupDescription_developer": "Werkzeuge für Power-User und Mitwirkende.",
+  "featureLabel_voiceFeedback": "Sprachausgabe (Text-to-Speech)",
+  "@featureLabel_voiceFeedback": {
+    "description": "#3605"
+  },
+  "featureDescription_voiceFeedback": "Hauptschalter für jede gesprochene Ausgabe — Fahr-Sprachcoach und Tankstellen-Ansagen. Aus: Die App öffnet nie eine Text-to-Speech-Engine.",
+  "@featureDescription_voiceFeedback": {
+    "description": "#3605"
+  },
   "feedbackConsentTitle": "Bericht an GitHub senden?",
   "feedbackConsentBody": "Damit wird ein öffentliches Ticket in unserem GitHub-Repository mit deinem Foto und dem OCR-Text erstellt. Es werden keine personenbezogenen Daten (Standort, Konto-ID) gesendet. Fortfahren?",
   "feedbackConsentContinue": "Fortfahren",

@@ -105,7 +105,7 @@ final class VoiceCoachingEnabledProvider
 }
 
 String _$voiceCoachingEnabledHash() =>
-    r'15d87dcf5c85192b9e732da85214b81df3538e32';
+    r'5703aa4926d21045a0763ba3b03562f647de8779';
 
 /// Persisted user toggle for spoken driving coaching (#2663).
 ///

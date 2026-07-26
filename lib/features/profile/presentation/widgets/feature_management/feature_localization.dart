@@ -93,6 +93,8 @@ String featureLabel(AppLocalizations l, Feature f) {
       return l.featureLabel_approachOverlay;
     case Feature.voiceAnnouncements:
       return l.featureLabel_voiceAnnouncements;
+    case Feature.voiceFeedback:
+      return l.featureLabel_voiceFeedback;
     case Feature.startupTrace:
       // #3383 dev tool — English-only manifest SSoT fallback (#2189).
       return m.displayName;
@@ -178,6 +180,8 @@ String featureDescription(AppLocalizations l, Feature f) {
       return l.featureDescription_approachOverlay;
     case Feature.voiceAnnouncements:
       return l.featureDescription_voiceAnnouncements;
+    case Feature.voiceFeedback:
+      return l.featureDescription_voiceFeedback;
     case Feature.startupTrace:
       // #3383 dev tool — English-only manifest SSoT fallback (#2189).
       return m.description;
@@ -213,6 +217,7 @@ String blockedEnableMessage(AppLocalizations l, Feature f) {
     // Features without prerequisites can never reach this branch — the
     // dependency-graph helpers short-circuit. Return a generic fallback
     // so the function is total in case the manifest changes.
+    case Feature.voiceFeedback:
     case Feature.obd2TripRecording:
     case Feature.tankSync:
     case Feature.priceAlerts:

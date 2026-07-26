@@ -5218,6 +5218,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Power-user and contributor tools.';
 
   @override
+  String get featureLabel_voiceFeedback => 'Spoken feedback (text-to-speech)';
+
+  @override
+  String get featureDescription_voiceFeedback =>
+      'Master switch for every spoken surface — the driving voice coach and station announcements. When off, the app never opens a text-to-speech engine.';
+
+  @override
   String get feedbackConsentTitle => 'Send report to GitHub?';
 
   @override
@@ -13509,6 +13516,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureGroupDescription_developer =>
       '⟦Ƥóŵéř-úšéř áñđ çóñŧřîƀúŧóř ŧóółš. ·············⟧';
+
+  @override
+  String get featureLabel_voiceFeedback =>
+      '⟦Šƥóķéñ ƒééđƀáçķ (ŧéẋŧ-ŧó-šƥééçĥ) ············⟧';
+
+  @override
+  String get featureDescription_voiceFeedback =>
+      '⟦Ṁášŧéř šŵîŧçĥ ƒóř éṽéřý šƥóķéñ šúřƒáçé — ŧĥé đřîṽîñǧ ṽóîçé çóáçĥ áñđ šŧáŧîóñ áññóúñçéɱéñŧš. Ŵĥéñ óƒƒ, ŧĥé áƥƥ ñéṽéř óƥéñš á ŧéẋŧ-ŧó-šƥééçĥ éñǧîñé. ·····················································⟧';
 
   @override
   String get feedbackConsentTitle => '⟦Šéñđ řéƥóřŧ ŧó ǦîŧĤúƀ? ········⟧';

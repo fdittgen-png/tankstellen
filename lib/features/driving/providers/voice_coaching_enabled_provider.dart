@@ -7,6 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/logging/error_logger.dart';
+import '../../feature_management/api.dart';
 
 part 'voice_coaching_enabled_provider.g.dart';
 
@@ -39,9 +40,17 @@ class VoiceCoachingEnabled extends _$VoiceCoachingEnabled {
 
   @override
   bool build() {
+    // #3605 — the master TTS switch gates EVERY spoken surface: with
+    // [Feature.voiceFeedback] off (the default on every channel) the
+    // coach never speaks and the FlutterTts engine is never constructed
+    // — flutter_tts leaks one system TTS connection per not-ready
+    // speak() (72 live binders in a field crash harvest), so silence
+    // must be the default, not a preference.
+    if (!watchEffectiveFeature(ref, Feature.voiceFeedback)) return false;
     unawaited(_load());
-    // Pre-load frame: default ON. `_load` only overrides it if the user
-    // has explicitly persisted a value (i.e. opted out).
+    // Pre-load frame while the feature IS enabled: default ON so opting
+    // into the master switch immediately speaks; `_load` only overrides
+    // it if the user explicitly muted the coach.
     return true;
   }
 
