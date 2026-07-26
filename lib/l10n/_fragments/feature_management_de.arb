@@ -85,5 +85,13 @@
   "featureGroupTitle_input": "Eingabe & Scannen",
   "featureGroupDescription_input": "Hilfen zum Erfassen von Tankvorgängen.",
   "featureGroupTitle_developer": "Entwickler & experimentell",
-  "featureGroupDescription_developer": "Werkzeuge für Power-User und Mitwirkende."
+  "featureGroupDescription_developer": "Werkzeuge für Power-User und Mitwirkende.",
+  "featureLabel_voiceFeedback": "Sprachausgabe (Text-to-Speech)",
+  "@featureLabel_voiceFeedback": {
+    "description": "#3605"
+  },
+  "featureDescription_voiceFeedback": "Hauptschalter für jede gesprochene Ausgabe — Fahr-Sprachcoach und Tankstellen-Ansagen. Aus: Die App öffnet nie eine Text-to-Speech-Engine.",
+  "@featureDescription_voiceFeedback": {
+    "description": "#3605"
+  }
 }
