@@ -292,7 +292,9 @@ class ReceiptScanService {
     final recognised =
         await _recogniseRaw(path, enhanceContrast: enhanceContrast, roi: roi);
     if (recognised == null) return null;
-    debugPrint('OCR text (${recognised.text.length} chars):\n${recognised.text}');
+    // #3610 — never print the recognised text itself: a receipt can carry
+    // PII (card fragments, loyalty ids). Character count only.
+    debugPrint('OCR text: ${recognised.text.length} chars');
     // #2848 — the engine already carries the per-line block geometry so the
     // receipt path can route a fuel-station receipt to the label-anchored
     // extractor (ML Kit via mapRecognizedText, Vision via the channel).

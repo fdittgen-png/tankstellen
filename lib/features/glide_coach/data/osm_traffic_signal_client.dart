@@ -92,8 +92,13 @@ class OsmTrafficSignalClient {
     } on DioException catch (e, st) {
       debugPrint('OsmTrafficSignalClient.fetchInBoundingBox dio error: '
           '${e.message}\n$st');
-      throw OsmTrafficSignalException(
-        'Overpass request failed: ${e.message ?? e.type.name}',
+      // #3610 — rethrow with the ORIGINAL stack so the trace points at
+      // the dio failure, not at this wrapper.
+      Error.throwWithStackTrace(
+        OsmTrafficSignalException(
+          'Overpass request failed: ${e.message ?? e.type.name}',
+        ),
+        st,
       );
     }
 
@@ -128,7 +133,11 @@ class OsmTrafficSignalClient {
     } catch (e, st) {
       debugPrint('OsmTrafficSignalClient.fetchInBoundingBox parse error: '
           '$e\n$st');
-      throw OsmTrafficSignalException('Failed to parse Overpass response: $e');
+      // #3610 — keep the original stack across the wrap.
+      Error.throwWithStackTrace(
+        OsmTrafficSignalException('Failed to parse Overpass response: $e'),
+        st,
+      );
     }
   }
 

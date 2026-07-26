@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/storage/hive_boxes.dart';
 import '../../domain/entities/service_reminder.dart';
 
@@ -60,14 +62,36 @@ class ServiceReminderRepository {
   }
 
   /// Add or update a single reminder (matched by id).
+  ///
+  /// Callers fire-and-forget this write, so a failure is logged rather
+  /// than rethrown — rethrowing would surface as an unhandled zone
+  /// error with nobody awaiting it.
   Future<void> save(ServiceReminder reminder) async {
-    await _box.put(reminder.id, jsonEncode(reminder.toJson()));
+    try {
+      await _box.put(reminder.id, jsonEncode(reminder.toJson()));
+    } catch (e, st) {
+      // TODO(#3610-follow-up): surface to user
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        'where': 'ServiceReminderRepository.save',
+        'reminderId': reminder.id,
+      }));
+    }
   }
 
   /// Delete a reminder by id. No-op when it does not exist.
+  ///
+  /// Same fire-and-forget contract as [save]: log, never rethrow.
   Future<void> delete(String id) async {
-    if (_box.containsKey(id)) {
-      await _box.delete(id);
+    try {
+      if (_box.containsKey(id)) {
+        await _box.delete(id);
+      }
+    } catch (e, st) {
+      // TODO(#3610-follow-up): surface to user
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
+        'where': 'ServiceReminderRepository.delete',
+        'reminderId': id,
+      }));
     }
   }
 

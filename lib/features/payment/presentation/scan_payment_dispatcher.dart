@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/logging/error_logger.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/qr_payment_decoder.dart';
 
@@ -109,6 +112,8 @@ class ScanPaymentDispatcher {
       return ok ? ScanPaymentOutcome.launched : ScanPaymentOutcome.launchFailed;
     } on Exception catch (e, st) {
       debugPrint('ScanPaymentDispatcher launch failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: const {'where': 'scanPayment launch'}));
       return ScanPaymentOutcome.launchFailed;
     }
   }
@@ -152,6 +157,8 @@ class ScanPaymentDispatcher {
         }
       } on Exception catch (e, st) {
         debugPrint('tryLaunchEpc $scheme failed: $e\n$st');
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+            context: {'where': 'scanPayment epc $scheme'}));
       }
     }
 
@@ -166,6 +173,8 @@ class ScanPaymentDispatcher {
       return EpcLaunchOutcome.copiedToClipboard;
     } on Exception catch (e, st) {
       debugPrint('tryLaunchEpc clipboard failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+          context: const {'where': 'scanPayment epc clipboard'}));
       return EpcLaunchOutcome.failed;
     }
   }

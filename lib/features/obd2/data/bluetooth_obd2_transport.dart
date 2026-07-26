@@ -8,6 +8,8 @@ import 'package:flutter/foundation.dart';
 
 import 'ble_disconnect_classifier.dart';
 import 'elm_byte_channel.dart';
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
+import '../../../core/telemetry/health_counters.dart';
 import '../../../../core/utils/event_channel_cancel.dart';
 import 'obd2_connection_errors.dart';
 import 'obd2_read_timeout.dart';
@@ -160,7 +162,10 @@ class BluetoothObd2Transport
         try {
           await _channel.close();
         } catch (_) {
-          // ignore: silent_catch — best-effort teardown of a half-open link before retrying
+          // Best-effort teardown, swallowed by design — counted (#3610).
+          healthCounters.increment('bt.teardown_fail');
+          BreadcrumbCollector.add('bt.teardown_fail',
+              detail: 'channel.close during open retry');
         }
         // #3014 — GATT-133 recovery: on a 133 (cache-poisoned device — a clone
         // whose GATT table mutated, or a stale cache from the aborted attempt),
@@ -173,7 +178,10 @@ class BluetoothObd2Transport
             try {
               await (ch as Obd2GattRecoverable).refreshGattCache();
             } catch (_) {
-              // ignore: silent_catch — OEM-variable reflection; swallow — the retry proceeds anyway.
+              // OEM-variable reflection, swallowed — counted (#3610).
+              healthCounters.increment('bt.teardown_fail');
+              BreadcrumbCollector.add('bt.teardown_fail',
+                  detail: 'refreshGattCache during open retry');
             }
           }
         }

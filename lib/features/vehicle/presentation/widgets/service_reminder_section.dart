@@ -93,10 +93,14 @@ class ServiceReminderSection extends ConsumerWidget {
       intervalKm: intervalKm,
       lastServiceOdometerKm: currentOdometerKm,
     );
+    // TODO(#3610-follow-up): surface to user — a failed save is only
+    // error-logged by the repository, the UI stays unaware.
     unawaited(ref.read(serviceReminderListProvider.notifier).save(reminder));
   }
 
   void _delete(WidgetRef ref, String id) {
+    // TODO(#3610-follow-up): surface to user — a failed delete is only
+    // error-logged by the repository, the UI stays unaware.
     unawaited(ref.read(serviceReminderListProvider.notifier).remove(id));
   }
 

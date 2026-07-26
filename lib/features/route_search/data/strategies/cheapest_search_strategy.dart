@@ -45,7 +45,12 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
         route.samplePoints[i],
     ];
 
-    debugPrint('CheapestSearch: querying ${sampledPoints.length} points with radius=${effectiveRadius.toStringAsFixed(1)}km');
+    // #3610 — gated so release builds skip the string interpolation
+    // (debugPrint itself is already a release no-op here).
+    if (kDebugMode) {
+      debugPrint(
+          'CheapestSearch: querying ${sampledPoints.length} points with radius=${effectiveRadius.toStringAsFixed(1)}km');
+    }
 
     const batchHelper = BatchQueryHelper();
     final results = await batchHelper.queryAll(

@@ -3,6 +3,8 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
+import '../../../core/telemetry/health_counters.dart';
 import 'elm327_protocol.dart';
 import 'obd2_comm_diagnostics.dart';
 import 'pid_probation.dart';
@@ -167,6 +169,10 @@ class SupportedPidsResolver {
       // must NOT pollute the user error log.
       debugPrint('OBD2 supported-PID cache prime failed — '
           'scanning blindly this session');
+      // #3610 — still best-effort, but counted so a chronically failing
+      // prime is visible in the field export.
+      healthCounters.increment('bt.teardown_fail');
+      BreadcrumbCollector.add('bt.teardown_fail', detail: 'pid cache prime');
     }
   }
 
@@ -186,6 +192,9 @@ class SupportedPidsResolver {
       // recoverable — we fall back to [_vehicleFallbackKey] below, so a
       // transient here must NOT pollute the user error log.
       debugPrint('OBD2 VIN read for cache key failed — using fallback key');
+      // #3610 — best-effort, but counted (see prime()).
+      healthCounters.increment('bt.teardown_fail');
+      BreadcrumbCollector.add('bt.teardown_fail', detail: 'vin cache key read');
     }
     return _vehicleFallbackKey;
   }
@@ -270,6 +279,10 @@ class SupportedPidsResolver {
           // already answered, so the bus state is settled here.
           debugPrint('OBD2 discoverSupportedPids failed on $command — '
               'returning ${supported.length} PIDs gathered so far');
+          // #3610 — best-effort, but counted (see prime()).
+          healthCounters.increment('bt.teardown_fail');
+          BreadcrumbCollector.add('bt.teardown_fail',
+              detail: 'pid group probe');
           break;
         }
       }

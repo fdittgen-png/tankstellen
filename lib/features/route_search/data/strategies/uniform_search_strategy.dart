@@ -50,9 +50,12 @@ class UniformSearchStrategy implements RouteSearchStrategy {
     RouteSearchCriterion criterion = RouteSearchCriterion.cheapest,
     void Function(List<SearchResultItem> partial)? onPartial,
   }) async {
-    debugPrint('UniformSearch: querying ${route.samplePoints.length} '
-        'sample points with radius=${searchRadiusKm}km, '
-        'topN=$topNPerSamplePoint, criterion=${criterion.key}');
+    // #3610 — gated so release builds skip the string interpolation.
+    if (kDebugMode) {
+      debugPrint('UniformSearch: querying ${route.samplePoints.length} '
+          'sample points with radius=${searchRadiusKm}km, '
+          'topN=$topNPerSamplePoint, criterion=${criterion.key}');
+    }
 
     const batchHelper = BatchQueryHelper();
     final results = await batchHelper.queryAll(

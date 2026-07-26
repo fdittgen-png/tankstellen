@@ -78,10 +78,16 @@ class RouteSearchState extends _$RouteSearchState {
       final criterion =
           profile?.routeSearchCriterion ?? RouteSearchCriterion.cheapest;
       final routingService = RoutingService();
-      debugPrint('RouteSearch: fetching route for ${usableWaypoints.length} waypoints, avoidHighways=$avoidHighways, strategy=${strategyType.key}');
+      if (kDebugMode) { // #3610 — release skips the interpolation.
+        debugPrint(
+            'RouteSearch: fetching route for ${usableWaypoints.length} waypoints, avoidHighways=$avoidHighways, strategy=${strategyType.key}');
+      }
       final routeResult = await routingService.getRoute(usableWaypoints, avoidHighways: avoidHighways);
       final route = routeResult.data;
-      debugPrint('RouteSearch: route=${route.distanceKm.round()}km, ${route.geometry.length} polyline pts, ${route.samplePoints.length} sample pts');
+      if (kDebugMode) {
+        debugPrint(
+            'RouteSearch: route=${route.distanceKm.round()}km, ${route.geometry.length} polyline pts, ${route.samplePoints.length} sample pts');
+      }
 
       // 2. Search stations using the selected strategy.
       // Use at least 15km radius for route searches to ensure coverage

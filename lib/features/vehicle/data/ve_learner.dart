@@ -237,15 +237,22 @@ class VeLearner {
     }
 
     if (distance < minDistanceKm) {
-      debugPrint('VeLearner: skip — distance $distance < $minDistanceKm km');
+      // #3610 — gated so release builds skip the string interpolation.
+      if (kDebugMode) {
+        debugPrint('VeLearner: skip — distance $distance < $minDistanceKm km');
+      }
       return null;
     }
     if (samples < minObd2Samples) {
-      debugPrint('VeLearner: skip — samples $samples < $minObd2Samples');
+      if (kDebugMode) {
+        debugPrint('VeLearner: skip — samples $samples < $minObd2Samples');
+      }
       return null;
     }
     if (integrated <= 0) {
-      debugPrint('VeLearner: skip — no integrated fuel on trips');
+      if (kDebugMode) {
+        debugPrint('VeLearner: skip — no integrated fuel on trips');
+      }
       return null;
     }
     final gap = (integrated - pumpedLiters).abs() / pumpedLiters;

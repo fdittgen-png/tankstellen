@@ -1,8 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import 'ocr_text_engine.dart';
 import 'recognized_text_adapter.dart';
 
@@ -28,9 +31,17 @@ class MlKitOcrTextEngine implements OcrTextEngine {
     bool languageCorrection = true,
     List<String> languages = const [],
   }) async {
-    final recognized =
-        await _recognizer.processImage(InputImage.fromFilePath(imagePath));
-    return (text: recognized.text, blocks: mapRecognizedText(recognized));
+    try {
+      final recognized =
+          await _recognizer.processImage(InputImage.fromFilePath(imagePath));
+      return (text: recognized.text, blocks: mapRecognizedText(recognized));
+    } catch (e, st) {
+      // Upstream (`ReceiptScanService`) already catches — log here so the
+      // recognizer-level failure reason survives into the trace export.
+      unawaited(errorLogger.log(ErrorLayer.services, e, st,
+          context: const {'ocrFailureReason': 'recognizerThrow'}));
+      rethrow;
+    }
   }
 
   @override

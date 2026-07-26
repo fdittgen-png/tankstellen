@@ -38,7 +38,11 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
     RouteSearchCriterion criterion = RouteSearchCriterion.cheapest,
     void Function(List<SearchResultItem> partial)? onPartial,
   }) async {
-    debugPrint('BalancedSearch: querying ${route.samplePoints.length} points with radius=${searchRadiusKm}km');
+    // #3610 — gated so release builds skip the string interpolation.
+    if (kDebugMode) {
+      debugPrint(
+          'BalancedSearch: querying ${route.samplePoints.length} points with radius=${searchRadiusKm}km');
+    }
 
     const batchHelper = BatchQueryHelper();
     final results = await batchHelper.queryAll(
