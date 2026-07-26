@@ -7125,6 +7125,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'vergangen';
 
   @override
+  String get qrLaunchConfirmTitle => 'Gescannten Link öffnen?';
+
+  @override
+  String qrLaunchConfirmBody(String host) {
+    return 'Dieser QR-Code führt zu $host. Öffnen Sie nur Links, denen Sie vertrauen.';
+  }
+
+  @override
+  String get qrLaunchConfirmOpen => 'Link öffnen';
+
+  @override
+  String get qrLaunchConfirmCancel => 'Abbrechen';
+
+  @override
   String get radarPinHelpTitle => 'Über das Anpinnen';
 
   @override

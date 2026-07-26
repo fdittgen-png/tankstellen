@@ -7052,6 +7052,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'elapsed';
 
   @override
+  String get qrLaunchConfirmTitle => 'Open scanned link?';
+
+  @override
+  String qrLaunchConfirmBody(String host) {
+    return 'This QR code points to $host. Only open links you trust.';
+  }
+
+  @override
+  String get qrLaunchConfirmOpen => 'Open link';
+
+  @override
+  String get qrLaunchConfirmCancel => 'Cancel';
+
+  @override
   String get radarPinHelpTitle => 'About pin';
 
   @override
@@ -15471,6 +15485,20 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripRecordingPipElapsedCaption => '⟦éłáƥšéđ ···⟧';
+
+  @override
+  String get qrLaunchConfirmTitle => '⟦Óƥéñ šçáññéđ łîñķ? ·······⟧';
+
+  @override
+  String qrLaunchConfirmBody(String host) {
+    return '⟦Ŧĥîš ɊŘ çóđé ƥóîñŧš ŧó $host. Óñłý óƥéñ łîñķš ýóú ŧřúšŧ. ··················⟧';
+  }
+
+  @override
+  String get qrLaunchConfirmOpen => '⟦Óƥéñ łîñķ ····⟧';
+
+  @override
+  String get qrLaunchConfirmCancel => '⟦Çáñçéł ···⟧';
 
   @override
   String get radarPinHelpTitle => '⟦Áƀóúŧ ƥîñ ····⟧';

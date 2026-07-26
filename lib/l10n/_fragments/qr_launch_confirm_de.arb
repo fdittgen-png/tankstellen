@@ -1,0 +1,24 @@
+{
+  "qrLaunchConfirmTitle": "Gescannten Link öffnen?",
+  "@qrLaunchConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before a scanned payment-QR web URL is handed to the browser (#3611)."
+  },
+  "qrLaunchConfirmBody": "Dieser QR-Code führt zu {host}. Öffnen Sie nur Links, denen Sie vertrauen.",
+  "@qrLaunchConfirmBody": {
+    "description": "Body of the #3611 QR-URL confirmation dialog. {host} is the full host of the scanned URL.",
+    "placeholders": {
+      "host": {
+        "type": "String",
+        "example": "pay.example.com"
+      }
+    }
+  },
+  "qrLaunchConfirmOpen": "Link öffnen",
+  "@qrLaunchConfirmOpen": {
+    "description": "Confirm button of the #3611 QR-URL confirmation dialog."
+  },
+  "qrLaunchConfirmCancel": "Abbrechen",
+  "@qrLaunchConfirmCancel": {
+    "description": "Cancel button of the #3611 QR-URL confirmation dialog."
+  }
+}

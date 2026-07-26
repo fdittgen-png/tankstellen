@@ -140,6 +140,17 @@ class StationDetailAppBarActions extends ConsumerWidget {
         break;
       case ScanPaymentOutcome.launchFailed:
         SnackBarHelper.showError(context, l10n.qrPaymentLaunchFailed);
+      case ScanPaymentOutcome.confirmUrl:
+        // #3611 — a scanned http(s) URL is attacker-controlled input:
+        // show the host-confirmation dialog before any browser launch.
+        final result = await ScanPaymentDispatcher.confirmAndLaunchUrl(
+          context,
+          target as QrPaymentUrl,
+        );
+        if (!context.mounted) break;
+        if (result == ScanPaymentOutcome.launchFailed) {
+          SnackBarHelper.showError(context, l10n.qrPaymentLaunchFailed);
+        }
       case ScanPaymentOutcome.confirmEpc:
         final epc = target as QrPaymentEpc;
         final confirmed = await showDialog<bool>(

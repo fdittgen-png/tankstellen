@@ -8,6 +8,7 @@ import 'dart:isolate';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
+import 'package:tankstellen/core/telemetry/pii_scrubber.dart';
 import 'package:tankstellen/core/telemetry/storage/isolate_error_spool.dart';
 import 'package:tankstellen/core/telemetry/storage/isolate_error_spool_entry.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
@@ -136,6 +137,34 @@ void main() {
       expect(entry.contextMap['duration'], '0:00:05.000000');
       expect(entry.contextMap['okString'], 'kept');
       expect(entry.contextMap['okInt'], 42);
+    });
+
+    test('#3611 — errorMessage and stack are PII-scrubbed at WRITE time '
+        '(coords + token never reach the unencrypted box)', () async {
+      await IsolateErrorSpool.enqueue(
+        isolateTaskName: 'radius_alert_scan',
+        error: Exception(
+            'fetch failed near 48.137154, 11.576124 with key '
+            'faketok_abcdefghijklmnopqrstuvwxyz012345'),
+        stack: StackTrace.fromString(
+            '#0 scan (scan.dart:1) lat=48.137154 lng=11.576124'),
+      );
+
+      // Assert against the RAW stored payload, not just the decoded
+      // entry — the point is what physically reaches the plain box.
+      final box = await Hive.openBox<String>(IsolateErrorSpool.boxName);
+      final raw = box.values.single;
+      expect(raw, isNot(contains('48.137154')));
+      expect(raw, isNot(contains('11.576124')));
+      expect(raw,
+          isNot(contains('faketok_abcdefghijklmnopqrstuvwxyz012345')));
+
+      final entry = (await IsolateErrorSpool.peek()).single;
+      expect(entry.errorMessage, contains(PiiScrubber.coordMarker));
+      expect(entry.errorMessage, contains(PiiScrubber.tokenMarker));
+      expect(entry.stack, contains(PiiScrubber.coordMarker));
+      expect(entry.errorMessage, contains('fetch failed'),
+          reason: 'non-PII context must survive the scrub');
     });
   });
 

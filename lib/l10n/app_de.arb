@@ -3407,6 +3407,28 @@
   "@tripRecordingPipElapsedCaption": {
     "description": "PiP overlay caption (#2094) shown under the big elapsed-time figure when the trip has just started and no distance / fuel data is available yet. Lowercase, unitless — pairs visually with 'L/100 km' / 'km' on the other branches."
   },
+  "qrLaunchConfirmTitle": "Gescannten Link öffnen?",
+  "@qrLaunchConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before a scanned payment-QR web URL is handed to the browser (#3611)."
+  },
+  "qrLaunchConfirmBody": "Dieser QR-Code führt zu {host}. Öffnen Sie nur Links, denen Sie vertrauen.",
+  "@qrLaunchConfirmBody": {
+    "description": "Body of the #3611 QR-URL confirmation dialog. {host} is the full host of the scanned URL.",
+    "placeholders": {
+      "host": {
+        "type": "String",
+        "example": "pay.example.com"
+      }
+    }
+  },
+  "qrLaunchConfirmOpen": "Link öffnen",
+  "@qrLaunchConfirmOpen": {
+    "description": "Confirm button of the #3611 QR-URL confirmation dialog."
+  },
+  "qrLaunchConfirmCancel": "Abbrechen",
+  "@qrLaunchConfirmCancel": {
+    "description": "Cancel button of the #3611 QR-URL confirmation dialog."
+  },
   "radarPinHelpTitle": "Über das Anpinnen",
   "@radarPinHelpTitle": {
     "description": "Title of the bottom sheet explaining the pin button on the fuel-station radar (search) screen (#2785). Opened by long-pressing the pin in the AppBar."

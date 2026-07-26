@@ -8,6 +8,7 @@ import 'hive_cipher_loader.dart';
 import 'hive_isolate_ownership.dart';
 import 'hive_legacy_migration.dart';
 import 'hive_schema_migration.dart';
+import 'hive_trip_box_encryption.dart';
 
 /// Thrown by [HiveBoxes.init] when a persistent box cannot be opened —
 /// its file is damaged beyond Hive's own crash recovery (#1686).
@@ -42,14 +43,12 @@ class HiveBoxes {
   static const String priceHistory = 'price_history';
   static const String alerts = 'alerts';
 
-  /// Per-vehicle per-situation consumption baselines (#769). Plain
-  /// averages like "7.2 L/100 km at highway cruise" are not PII and
-  /// live outside the encrypted set to keep startup cheap.
+  /// Per-vehicle per-situation consumption baselines (#769).
+  /// Driving-behaviour data — encrypted since #3611.
   static const String obd2Baselines = 'obd2_baselines';
 
-  /// Rolling log of finalised OBD2 trips (#726). Aggregated driving
-  /// metrics (distance, avg L/100 km, harsh events). Treated like the
-  /// baselines box: unencrypted, opened once at startup.
+  /// Rolling log of finalised OBD2 trips (#726): distance, avg
+  /// L/100 km, harsh events, GPS paths (#1374). Encrypted since #3611.
   static const String obd2TripHistory = 'obd2_trip_history';
 
   /// Earned gamification badges (#781). One JSON payload per earned
@@ -76,8 +75,7 @@ class HiveBoxes {
   /// the session id (ISO start timestamp). Entries are consumed by
   /// [TripRecordingController.resume] or auto-finalised into
   /// [obd2TripHistory] when the grace window expires. Same privacy
-  /// treatment as the other OBD2 boxes — unencrypted, opened once at
-  /// startup.
+  /// treatment as the other trip boxes — encrypted since #3611.
   static const String obd2PausedTrips = 'obd2_paused_trips';
 
   /// Write-through snapshot of the currently-recording OBD2 trip
@@ -85,7 +83,7 @@ class HiveBoxes {
   /// [TripRecording] provider rewrites every few seconds while a trip is
   /// live. Survives a process death so the recovery service can put the
   /// user back on the recording screen with their captured samples on
-  /// next launch. Unencrypted, opened once at startup.
+  /// next launch. Encrypted since #3611.
   static const String obd2ActiveTrip = 'obd2_active_trip';
 
   /// Rolling price snapshots used by the price-drop velocity detector
@@ -168,6 +166,12 @@ class HiveBoxes {
     obd2ActiveTrip,
     priceSnapshots,
     trafficSignalsCache,
+  };
+
+  /// Deferred boxes holding driving telemetry — AES-encrypted since
+  /// #3611, with a crash-safe migration in [HiveTripBoxEncryption].
+  static const _encryptedDeferredBoxes = {
+    obd2Baselines, obd2TripHistory, obd2PausedTrips, obd2ActiveTrip,
   };
 
   static Future<void>? _deferredInit;
@@ -264,9 +268,25 @@ class HiveBoxes {
   /// Idempotent — the result is cached, so every post-first-frame
   /// reader of a deferred box can `await HiveBoxes.initDeferred()` to
   /// be sure its box is open without re-running the opens.
-  static Future<void> initDeferred() => _deferredInit ??= Future.wait(
-        _deferredBoxes.map((name) => Hive.openBox<String>(name)),
-      ).whenComplete(() => HiveIsolateOwnership.markOwned(_deferredBoxes));
+  ///
+  /// #3611 — the four trip boxes ([_encryptedDeferredBoxes]) open with
+  /// the same AES cipher as the first-frame boxes, after a crash-safe
+  /// one-time plain→encrypted migration.
+  static Future<void> initDeferred() => _deferredInit ??= _openDeferred()
+      .whenComplete(() => HiveIsolateOwnership.markOwned(_deferredBoxes));
+
+  static Future<void> _openDeferred() async {
+    final cipher = await HiveCipherLoader.loadGuarded();
+    // The per-box migrations are independent — run in parallel (#1764).
+    await Future.wait(_encryptedDeferredBoxes
+        .map((name) => HiveTripBoxEncryption.migrate(name, cipher)));
+    await Future.wait([
+      for (final name in _deferredBoxes)
+        Hive.openBox<String>(name,
+            encryptionCipher:
+                _encryptedDeferredBoxes.contains(name) ? cipher : null),
+    ]);
+  }
 
   /// Initialize Hive in a background isolate with proper encryption.
   static Future<void> initInIsolate() async {

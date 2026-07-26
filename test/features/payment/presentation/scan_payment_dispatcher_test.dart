@@ -19,13 +19,46 @@ void main() {
   tearDown(ScanPaymentDispatcher.resetForTesting);
 
   group('ScanPaymentDispatcher.handle (#587)', () {
-    test('QrPaymentUrl → launcher called with the same URI', () async {
+    test('#3611 — QrPaymentUrl → confirmUrl, NO auto-launch', () async {
       _launcherReturn = true;
       final outcome = await ScanPaymentDispatcher.handle(
         const QrPaymentUrl('https://example.com/pay?id=42'),
       );
+      expect(outcome, ScanPaymentOutcome.confirmUrl);
+      expect(_launchedUris, isEmpty,
+          reason: 'a scanned URL must never launch before the user has '
+              'confirmed the host');
+    });
+
+    test('#3611 — launchConfirmedUrl launches the confirmed URI', () async {
+      _launcherReturn = true;
+      final outcome = await ScanPaymentDispatcher.launchConfirmedUrl(
+        const QrPaymentUrl('https://example.com/pay?id=42'),
+      );
       expect(outcome, ScanPaymentOutcome.launched);
       expect(_launchedUris.single.toString(), 'https://example.com/pay?id=42');
+    });
+
+    test('#3611 — launchConfirmedUrl surfaces launchFailed', () async {
+      _launcherReturn = false;
+      final outcome = await ScanPaymentDispatcher.launchConfirmedUrl(
+        const QrPaymentUrl('https://example.com/pay'),
+      );
+      expect(outcome, ScanPaymentOutcome.launchFailed);
+    });
+
+    test('#3611 — displayHostOf shows the bare host for https, '
+        'scheme-prefixed otherwise', () {
+      expect(
+        ScanPaymentDispatcher.displayHostOf(
+            Uri.parse('https://pay.example.com/x?y=1')),
+        'pay.example.com',
+      );
+      expect(
+        ScanPaymentDispatcher.displayHostOf(
+            Uri.parse('http://pay.example.com/x')),
+        'http://pay.example.com',
+      );
     });
 
     test('QrPaymentAppLink → launcher called with the scheme URI', () async {
@@ -63,8 +96,10 @@ void main() {
 
     test('launcher returning false → launchFailed', () async {
       _launcherReturn = false;
+      // #3611 — URL launches go through launchConfirmedUrl now; an
+      // app-link exercises the same _tryLaunch path via handle().
       final outcome = await ScanPaymentDispatcher.handle(
-        const QrPaymentUrl('https://example.com'),
+        const QrPaymentAppLink(uri: 'twint://pay', schemeLabel: 'TWINT'),
       );
       expect(outcome, ScanPaymentOutcome.launchFailed);
     });
@@ -74,7 +109,7 @@ void main() {
           (uri, {mode = LaunchMode.externalApplication}) async {
             throw Exception('boom');
           };
-      final outcome = await ScanPaymentDispatcher.handle(
+      final outcome = await ScanPaymentDispatcher.launchConfirmedUrl(
         const QrPaymentUrl('https://example.com'),
       );
       expect(outcome, ScanPaymentOutcome.launchFailed);
@@ -164,6 +199,56 @@ void main() {
       expect(_dialogResult, isFalse);
     });
   });
+
+  group('confirmAndLaunchUrl (#3611)', () {
+    testWidgets('a URL QR shows the confirmation dialog with the host',
+        (tester) async {
+      await _pumpUrlConfirm(
+          tester, const QrPaymentUrl('https://pay.example.com/x?id=1'));
+
+      expect(find.byKey(const Key('qr_launch_confirm_open')), findsOneWidget);
+      expect(find.byKey(const Key('qr_launch_confirm_cancel')),
+          findsOneWidget);
+      expect(find.textContaining('pay.example.com'), findsOneWidget);
+      expect(_launchedUris, isEmpty,
+          reason: 'nothing may launch while the dialog is up');
+    });
+
+    testWidgets('a plain-http URL shows the scheme alongside the host',
+        (tester) async {
+      await _pumpUrlConfirm(
+          tester, const QrPaymentUrl('http://pay.example.com/x'));
+
+      expect(
+          find.textContaining('http://pay.example.com'), findsOneWidget,
+          reason: 'a non-https scheme must be visibly flagged (#3611)');
+    });
+
+    testWidgets('cancel does NOT launch', (tester) async {
+      await _pumpUrlConfirm(
+          tester, const QrPaymentUrl('https://pay.example.com/x'));
+
+      await tester.tap(find.byKey(const Key('qr_launch_confirm_cancel')));
+      await tester.pumpAndSettle();
+
+      expect(_launchedUris, isEmpty);
+      expect(_urlConfirmOutcome, isNull,
+          reason: 'cancel yields null — the caller shows no snackbar');
+    });
+
+    testWidgets('confirm launches through the launcher seam',
+        (tester) async {
+      _launcherReturn = true;
+      await _pumpUrlConfirm(
+          tester, const QrPaymentUrl('https://pay.example.com/x?id=1'));
+
+      await tester.tap(find.byKey(const Key('qr_launch_confirm_open')));
+      await tester.pumpAndSettle();
+
+      expect(_launchedUris.single.toString(), 'https://pay.example.com/x?id=1');
+      expect(_urlConfirmOutcome, ScanPaymentOutcome.launched);
+    });
+  });
 }
 
 // --- test fakes ---------------------------------------------------
@@ -183,6 +268,35 @@ Future<bool> _fakeLauncher(
 Future<bool> _alwaysTrueProbe(Uri uri) async => true;
 
 bool? _dialogResult;
+ScanPaymentOutcome? _urlConfirmOutcome;
+
+/// Pumps a host screen whose button runs the full #3611
+/// confirm-then-launch flow, then taps it so the dialog is showing.
+Future<void> _pumpUrlConfirm(WidgetTester tester, QrPaymentUrl target) async {
+  _urlConfirmOutcome = null;
+  await tester.pumpWidget(
+    MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Builder(
+        builder: (outer) => Scaffold(
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                _urlConfirmOutcome =
+                    await ScanPaymentDispatcher.confirmAndLaunchUrl(
+                        outer, target);
+              },
+              child: const Text('scan'),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.tap(find.text('scan'));
+  await tester.pumpAndSettle();
+}
 
 Future<void> _pumpEpcDialog(WidgetTester tester, QrPaymentEpc epc) async {
   _dialogResult = null;
