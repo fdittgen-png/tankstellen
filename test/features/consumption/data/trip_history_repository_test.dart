@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
@@ -1150,6 +1151,198 @@ void main() {
 
       final loaded = repo.loadById(start.toIso8601String());
       expect(loaded!.summary.isVirtual, isFalse);
+    });
+  });
+
+  // #3613 — the summary-only decode path. jsonDecode still parses the
+  // whole stored string (safe by construction — no string surgery on the
+  // codec output), but the heavy per-tick payloads are never materialised
+  // into TripSample / diagnostic objects, which is the dominant decode
+  // cost for real trips.
+  //
+  // Rough micro-benchmark on this suite's VM (2026-07, Apple Silicon,
+  // JIT; the '5000-sample decode cost' case below, 20 iterations each):
+  // loadAll = 118 ms vs loadSummaries = 25 ms for a single 5000-sample
+  // trip — a ~4.7× cut, growing with sample count since the summary
+  // path is O(1) in object construction per trip.
+  group('summary-only decode path (#3613)', () {
+    List<TripSample> mkSamples(DateTime start, int n) => [
+          for (var i = 0; i < n; i++)
+            TripSample(
+              timestamp: start.add(Duration(seconds: i)),
+              speedKmh: 40 + (i % 50).toDouble(),
+              rpm: 1500 + (i % 900),
+              fuelRateLPerHour: 4.0 + (i % 10) / 10,
+            ),
+        ];
+
+    test('loadSummaries returns the same ids + summary fields as loadAll, '
+        'with empty samples but a truthful sampleCount', () async {
+      final repo = TripHistoryRepository(box: box);
+      final a = DateTime(2026, 7, 1, 8);
+      final b = DateTime(2026, 7, 2, 9);
+      await repo.save(TripHistoryEntry(
+        id: a.toIso8601String(),
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: a, km: 12),
+        samples: mkSamples(a, 40),
+        adapterFirmware: 'ELM327 v1.5',
+        verdict: 'good',
+      ));
+      await repo.save(TripHistoryEntry(
+        id: b.toIso8601String(),
+        vehicleId: 'car-b',
+        summary: mkSummary(startedAt: b, km: 7),
+      ));
+
+      final full = repo.loadAll();
+      final summaries = repo.loadSummaries();
+      expect(summaries.map((e) => e.id), full.map((e) => e.id),
+          reason: 'same entries, same newest-first order');
+      for (var i = 0; i < full.length; i++) {
+        expect(summaries[i].vehicleId, full[i].vehicleId);
+        expect(summaries[i].summary.distanceKm, full[i].summary.distanceKm);
+        expect(summaries[i].summary.startedAt, full[i].summary.startedAt);
+        expect(summaries[i].adapterFirmware, full[i].adapterFirmware);
+        expect(summaries[i].verdict, full[i].verdict);
+        expect(summaries[i].samples, isEmpty,
+            reason: 'the summary path must never materialise samples');
+        expect(summaries[i].sampleCount, full[i].samples.length,
+            reason: 'the stored count survives for the ghost de-dupe');
+      }
+    });
+
+    test('save-time ghost guard (now riding loadSummaries) still skips a '
+        '0-sample ghost whose sampled twin is stored (#2833)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 7, 3, 18);
+      final summary = mkSummary(startedAt: start, km: 9);
+      await repo.save(TripHistoryEntry(
+        id: '${start.toIso8601String()}#sampled',
+        vehicleId: 'car-a',
+        summary: summary,
+        samples: mkSamples(start, 30),
+      ));
+
+      // The finalisation double-save artefact: same summary, ~1 s later,
+      // zero samples. The guard must skip the write.
+      await repo.save(TripHistoryEntry(
+        id: '${start.add(const Duration(seconds: 1)).toIso8601String()}#ghost',
+        vehicleId: 'car-a',
+        summary: mkSummary(
+          startedAt: start.add(const Duration(seconds: 1)),
+          km: 9,
+        ),
+      ));
+
+      expect(box.length, 1, reason: 'the ghost must not be persisted');
+      expect(repo.loadAll().single.samples, hasLength(30));
+    });
+
+    test('save-time ghost guard still deletes a stored 0-sample ghost when '
+        'its sampled twin arrives (#2833)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 7, 4, 18);
+      await repo.save(TripHistoryEntry(
+        id: '${start.toIso8601String()}#ghost',
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: start, km: 9),
+      ));
+      await repo.save(TripHistoryEntry(
+        id: '${start.add(const Duration(seconds: 1)).toIso8601String()}#real',
+        vehicleId: 'car-a',
+        summary: mkSummary(
+          startedAt: start.add(const Duration(seconds: 1)),
+          km: 9,
+        ),
+        samples: mkSamples(start, 30),
+      ));
+
+      expect(box.length, 1, reason: 'the sampled twin replaces the ghost');
+      expect(repo.loadAll().single.sampleCount, 30);
+    });
+
+    test('a samples-reading consumer still gets full samples from '
+        'loadAll / loadById after a loadSummaries call', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 7, 5, 7);
+      final id = start.toIso8601String();
+      await repo.save(TripHistoryEntry(
+        id: id,
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: start),
+        samples: mkSamples(start, 25),
+      ));
+
+      repo.loadSummaries(); // must not disturb the stored payload
+      expect(repo.loadAll().single.samples, hasLength(25));
+      expect(repo.loadById(id)!.samples, hasLength(25));
+      expect(repo.loadById(id)!.samples.first.speedKmh, 40);
+    });
+
+    test('storedIds mirrors the box keys without decoding', () async {
+      final repo = TripHistoryRepository(box: box);
+      final a = DateTime(2026, 7, 6, 8);
+      final b = DateTime(2026, 7, 7, 8);
+      await repo.save(TripHistoryEntry(
+        id: a.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: a),
+      ));
+      await repo.save(TripHistoryEntry(
+        id: b.toIso8601String(),
+        vehicleId: null,
+        summary: mkSummary(startedAt: b),
+      ));
+      expect(repo.storedIds.toSet(),
+          {a.toIso8601String(), b.toIso8601String()});
+    });
+
+    test('a big trip (> compute threshold) round-trips through the '
+        'isolate-encoded save path', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 7, 8, 8);
+      const n = kTripSaveComputeSampleThreshold + 1;
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: start, km: 35),
+        samples: mkSamples(start, n),
+      ));
+
+      final loaded = repo.loadById(start.toIso8601String());
+      expect(loaded!.samples, hasLength(n),
+          reason: 'the compute() encode must persist the identical JSON');
+      expect(repo.loadSummaries().single.sampleCount, n);
+    });
+
+    test('5000-sample decode cost: loadSummaries is materially cheaper '
+        'than loadAll (correctness asserted; timings printed)', () async {
+      final repo = TripHistoryRepository(box: box);
+      final start = DateTime(2026, 7, 9, 8);
+      await repo.save(TripHistoryEntry(
+        id: start.toIso8601String(),
+        vehicleId: 'car-a',
+        summary: mkSummary(startedAt: start, km: 60),
+        samples: mkSamples(start, 5000),
+      ));
+
+      const iterations = 20;
+      final swFull = Stopwatch()..start();
+      for (var i = 0; i < iterations; i++) {
+        expect(repo.loadAll().single.samples, hasLength(5000));
+      }
+      swFull.stop();
+      final swSummary = Stopwatch()..start();
+      for (var i = 0; i < iterations; i++) {
+        expect(repo.loadSummaries().single.sampleCount, 5000);
+      }
+      swSummary.stop();
+      // Timing is environment-dependent — record it, don't gate on it.
+      // (Observed locally: full ≈ 4.7× the summary path; see group doc.)
+      debugPrint('#3613 decode cost, $iterations iters: '
+          'loadAll=${swFull.elapsedMilliseconds}ms '
+          'loadSummaries=${swSummary.elapsedMilliseconds}ms');
     });
   });
 }

@@ -41,12 +41,22 @@ class CacheEntry {
   /// the stale/offline fallback via [CacheManager.get]).
   final String? appBuild;
 
+  /// JSON-encoded size of [payload], stamped once at `put()` time
+  /// (#3613), or `null` for an entry persisted by a build that predates
+  /// the stamp. The eviction byte sweep used to `jsonEncode` EVERY
+  /// surviving payload on EVERY 30-min pass just to estimate its size;
+  /// stamping at write time makes the sweep read a stored int instead.
+  /// Legacy entries without the stamp fall back to one re-encode per
+  /// sweep until they age out (3× TTL) or are overwritten.
+  final int? approxBytes;
+
   CacheEntry({
     required this.payload,
     required this.storedAt,
     required this.originalSource,
     required this.ttl,
     this.appBuild,
+    this.approxBytes,
   });
 
   bool get isExpired => DateTime.now().difference(storedAt) > ttl;
@@ -123,6 +133,12 @@ class CacheManager implements CacheStrategy {
         // #3219 follow-up — stamp the writing build so [getFresh] can
         // refuse to serve another build's PARSED payload as fresh.
         'appBuild': AppConstants.appVersion,
+        // #3613 — stamp the payload's encoded byte length once here so
+        // the eviction byte sweep never has to re-encode it. `dataset:`
+        // entries are exempt from the byte sweep (#3155), so encoding
+        // their multi-MB payloads just to stamp a never-read number
+        // would be waste — they stay unstamped.
+        if (!key.startsWith('dataset:')) 'bytes': _encodedLength(data),
       });
     } on FileSystemException catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.storage, e, st,
@@ -158,6 +174,8 @@ class CacheManager implements CacheStrategy {
       originalSource: _sourceFrom(raw['source']),
       ttl: Duration(milliseconds: raw['ttlMs'] as int? ?? 300000),
       appBuild: raw['appBuild'] as String?,
+      // #3613 — absent on pre-stamp entries → null (sweep re-encodes).
+      approxBytes: raw['bytes'] as int?,
     );
   }
 
@@ -311,13 +329,22 @@ class CacheManager implements CacheStrategy {
     return i < 0 ? key : key.substring(0, i + 1);
   }
 
-  /// Cheap byte estimate for an entry — the length of its JSON-encoded
-  /// payload. Avoids re-encoding the Hive envelope; good enough to drive the
-  /// LRU ceiling.
-  static int _approxBytes(CacheEntry entry) {
+  /// Cheap byte estimate for an entry — the byte length stamped at
+  /// `put()` time (#3613), falling back to a one-off re-encode for
+  /// legacy entries persisted before the stamp existed. Good enough to
+  /// drive the LRU ceiling.
+  static int _approxBytes(CacheEntry entry) =>
+      entry.approxBytes ?? _encodedLength(entry.payload);
+
+  /// JSON-encoded length of [payload]; 0 when it can't be encoded (an
+  /// unencodable payload contributes nothing to the byte ceiling —
+  /// pre-#3613 behaviour).
+  static int _encodedLength(Map<String, dynamic> payload) {
     try {
-      return jsonEncode(entry.payload).length;
-    } on Object {
+      return jsonEncode(payload).length;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: const {'where': 'CacheManager: payload byte estimate'}));
       return 0;
     }
   }

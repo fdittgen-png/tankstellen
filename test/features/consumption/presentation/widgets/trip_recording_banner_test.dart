@@ -34,6 +34,18 @@ class _FakeTripRecording extends TripRecording {
   TripRecordingState build() => _initial;
 }
 
+/// Mutable fake — lets the #3613 select() tests emit successor states
+/// and observe whether the banner element got marked dirty.
+class _MutableTripRecording extends TripRecording {
+  final TripRecordingState _initial;
+  _MutableTripRecording(this._initial);
+
+  @override
+  TripRecordingState build() => _initial;
+
+  void emit(TripRecordingState next) => state = next;
+}
+
 /// Fake [PipMode] notifier — pins the app's PiP-mode flag for a test.
 class _FakePipMode extends PipMode {
   final bool _value;
@@ -477,6 +489,44 @@ void main() {
         ),
         findsNothing,
       );
+    });
+
+    testWidgets(
+        'unrelated state mutation does NOT rebuild the banner subtree — '
+        'the select() only projects the rendered fields (#3613)',
+        (tester) async {
+      final base = _activeState(
+        band: ConsumptionBand.normal,
+        delta: 0.05,
+        distance: 3.0,
+      );
+      final notifier = _MutableTripRecording(base);
+      await pumpApp(
+        tester,
+        const TripRecordingBanner(child: SizedBox()),
+        overrides: [tripRecordingProvider.overrideWith(() => notifier)],
+      );
+      final element = tester.element(find.byType(TripRecordingBanner));
+      expect(element.dirty, isFalse, reason: 'settled after the pump');
+
+      // Mutate a field the banner strip never renders (its consumer is
+      // the separate GpsDegradedBanner). The provider notifies, but the
+      // selected projection is unchanged → the element must stay clean.
+      notifier.emit(base.copyWith(reconnectPassiveWaiting: true));
+      expect(element.dirty, isFalse,
+          reason: 'a non-rendered field mutation must not mark the '
+              'app-wide banner wrapper dirty — that was the 1 Hz '
+              'whole-subtree rebuild #3613 removes');
+
+      // Control: a RENDERED field mutation must still rebuild.
+      notifier.emit(base.copyWith(
+        band: ConsumptionBand.eco,
+        reconnectPassiveWaiting: true,
+      ));
+      expect(element.dirty, isTrue,
+          reason: 'band drives the palette/icon — the banner must react');
+      await tester.pump();
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('GPS-only warm-up (null estimate) → no consumption text',

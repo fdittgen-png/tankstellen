@@ -179,9 +179,19 @@ class TripsSync {
   ///   phase 4).
   /// - Decode failures are skipped silently — one corrupt row should
   ///   never block the whole merge.
+  ///
+  /// #3613 — [localEntries] may be SUMMARY-ONLY decoded (empty `samples`
+  /// with the stored count on `sampleCount`): the reconcile itself only
+  /// reads ids + summaries. The one step that needs the heavy payload —
+  /// the local-only `trip_details` heal upload — hydrates each candidate
+  /// through [loadFull] (typically `TripHistoryRepository.loadById`)
+  /// right before uploading, so in the steady state (no local-only
+  /// entries) not a single sample is ever materialised. Pass null when
+  /// [localEntries] are already fully decoded.
   static Future<List<TripHistoryEntry>> merge(
-    List<TripHistoryEntry> localEntries,
-  ) async {
+    List<TripHistoryEntry> localEntries, {
+    TripHistoryEntry? Function(String id)? loadFull,
+  }) async {
     final client = TankSyncClient.client;
     final userId = client?.auth.currentUser?.id;
     if (client == null || userId == null) {
@@ -211,7 +221,16 @@ class TripsSync {
       // one upsert each instead of a serial per-entry loop.
       final localOnly =
           liveLocal.where((e) => !serverIds.contains(e.id)).toList();
-      await _uploadBatch(client, userId, localOnly);
+      // #3613 — re-hydrate summary-only entries so the details-heal
+      // upload still carries the samples/gpsd blob. A failed hydrate
+      // falls back to the entry we have (summary heals, details retry
+      // on the next pass — same as a pre-#3613 0-sample entry).
+      final uploadable = loadFull == null
+          ? localOnly
+          : localOnly
+              .map((e) => loadFull(e.id) ?? e)
+              .toList(growable: false);
+      await _uploadBatch(client, userId, uploadable);
 
       // Decode server-only rows (off the UI isolate, #3451) and return the
       // union the launch caller persists back to Hive (#2239 pins mergeRows).

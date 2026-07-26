@@ -28,6 +28,11 @@ part of 'nearest_widget_refresh_provider.dart';
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and
 /// releases both in onDispose.
+///
+/// #3613 — the heartbeat is presence- and lifecycle-gated: the periodic
+/// timer only runs while at least one home-screen widget is actually
+/// installed (probe fails open), pauses when the app is backgrounded,
+/// and re-probes + resumes on foreground.
 
 @ProviderFor(NearestWidgetRefresh)
 final nearestWidgetRefreshProvider = NearestWidgetRefreshProvider._();
@@ -52,6 +57,11 @@ final nearestWidgetRefreshProvider = NearestWidgetRefreshProvider._();
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and
 /// releases both in onDispose.
+///
+/// #3613 — the heartbeat is presence- and lifecycle-gated: the periodic
+/// timer only runs while at least one home-screen widget is actually
+/// installed (probe fails open), pauses when the app is backgrounded,
+/// and re-probes + resumes on foreground.
 final class NearestWidgetRefreshProvider
     extends $NotifierProvider<NearestWidgetRefresh, void> {
   /// Foreground heartbeat that rebuilds the home-screen widget — both the
@@ -74,6 +84,11 @@ final class NearestWidgetRefreshProvider
   /// Reading the provider once (e.g. from the app's root widget) starts
   /// the tick; the provider owns its Timer + [AppLifecycleListener] and
   /// releases both in onDispose.
+  ///
+  /// #3613 — the heartbeat is presence- and lifecycle-gated: the periodic
+  /// timer only runs while at least one home-screen widget is actually
+  /// installed (probe fails open), pauses when the app is backgrounded,
+  /// and re-probes + resumes on foreground.
   NearestWidgetRefreshProvider._()
     : super(
         from: null,
@@ -102,7 +117,7 @@ final class NearestWidgetRefreshProvider
 }
 
 String _$nearestWidgetRefreshHash() =>
-    r'5fc55400421ae8efc10a112b5e01e85ca36600bf';
+    r'74c3e86d1775832ab8e04d1abc4e18afa183def2';
 
 /// Foreground heartbeat that rebuilds the home-screen widget — both the
 /// favorites and the nearest variants — every
@@ -124,6 +139,11 @@ String _$nearestWidgetRefreshHash() =>
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and
 /// releases both in onDispose.
+///
+/// #3613 — the heartbeat is presence- and lifecycle-gated: the periodic
+/// timer only runs while at least one home-screen widget is actually
+/// installed (probe fails open), pauses when the app is backgrounded,
+/// and re-probes + resumes on foreground.
 
 abstract class _$NearestWidgetRefresh extends $Notifier<void> {
   void build();

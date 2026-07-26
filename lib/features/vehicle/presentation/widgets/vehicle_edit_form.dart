@@ -254,7 +254,8 @@ class VehicleEditForm extends ConsumerWidget {
                 // #2837 — when this vehicle reports fuel rate directly (PID 5E /
                 // MAF), the η_v calibration is irrelevant; de-emphasise it.
                 final directFuelRate = vehicleReportsDirectFuelRate(
-                  ref.watch(tripHistoryRepositoryProvider)?.loadAll() ??
+                  // #3613 — the detector reads vehicleId + summary only.
+                  ref.watch(tripHistoryRepositoryProvider)?.loadSummaries() ??
                       const [],
                   vehicleId: profile.id,
                 );

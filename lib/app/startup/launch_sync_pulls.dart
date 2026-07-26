@@ -118,7 +118,13 @@ class LaunchSyncPulls {
       final repo = TripHistoryRepository(
         box: Hive.box<String>(HiveBoxes.obd2TripHistory),
       );
-      changed = await mergeAndPruneTrips(repo, TripsSync.merge);
+      // #3613 — the merge input is summary-only decoded; the details-heal
+      // upload inside TripsSync.merge re-hydrates the (rare) local-only
+      // entries one by one via loadById.
+      changed = await mergeAndPruneTrips(
+        repo,
+        (local) => TripsSync.merge(local, loadFull: repo.loadById),
+      );
       await TripsSync.pruneOldDetails();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.sync, e, st,
@@ -151,8 +157,15 @@ class LaunchSyncPulls {
     TripHistoryRepository repo,
     Future<List<TripHistoryEntry>> Function(List<TripHistoryEntry>) merge,
   ) async {
-    final local = repo.loadAll();
-    final localIds = local.map((e) => e.id).toSet();
+    // #3613 — the "is it already stored?" check reads the raw box keys
+    // (the box is keyed by entry.id) instead of decoding every entry,
+    // and the merge reconciles at summary level: [merge] only reads
+    // ids + summaries here (its details-heal upload hydrates the rare
+    // local-only entries itself — see TripsSync.merge/loadFull). The
+    // merged local entries are never written back below, so their empty
+    // samples lists can't clobber stored telemetry.
+    final localIds = repo.storedIds.toSet();
+    final local = repo.loadSummaries();
     final merged = await merge(local);
     final mergedIds = merged.map((e) => e.id).toSet();
     var changed = 0;

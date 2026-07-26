@@ -293,7 +293,7 @@ class FillUpList extends _$FillUpList {
     if (repo == null) return const <String>[];
     return const FillUpTripLinker().linkedTripIdsInWindow(
       fillUp: fillUp,
-      history: repo.loadAll(),
+      history: repo.loadSummaries(), // #3613 — linker reads ids+summaries
       allFills: ref.read(fillUpRepositoryProvider).getAll(),
     );
   }
@@ -375,7 +375,7 @@ class FillUpList extends _$FillUpList {
       if (tripRepo == null) return null;
       final fillRepo = ref.read(fillUpRepositoryProvider);
       final allFills = fillRepo.getAll();
-      final history = tripRepo.loadAll();
+      final history = tripRepo.loadSummaries(); // #3613 — summary reconcile
       final trips = tripSummariesForVehicle(
         vehicleId: vehicleId,
         history: history,
@@ -658,7 +658,7 @@ class FillUpList extends _$FillUpList {
   String? _latestAdapterFirmwareFor(String vehicleId) {
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return null;
-    final history = repo.loadAll();
+    final history = repo.loadSummaries(); // #3613 — firmware+times only
     DateTime? bestWhen;
     String? best;
     for (final entry in history) {

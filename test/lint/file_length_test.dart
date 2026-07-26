@@ -165,9 +165,13 @@ void main() {
     // doesn't resurrect) plus the `deleteSummary` tombstone write — a real
     // fix, not boilerplate. Decomposition of this near-cap file is its own
     // future task.
+    // #3613 — re-grandfathered 414 → 433: `merge` gained the optional
+    // `loadFull` hydration seam (doc + per-entry re-hydrate of the
+    // local-only details-heal upload) so the launch pull can feed it
+    // summary-only decoded entries without losing the trip_details heal.
     'lib/core/sync/trips_sync.dart': (
-      lines: 414,
-      bumps: 0,
+      lines: 433,
+      bumps: 1,
       decompositionIssue: null,
     ),
     // #2415 — background_service.dart graduated: the scan body moved into
