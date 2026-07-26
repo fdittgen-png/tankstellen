@@ -7,8 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/logging/error_logger.dart';
-import '../../feature_management/application/feature_toggle_notifier.dart';
-import '../../feature_management/domain/feature.dart';
+import '../../feature_management/api.dart';
 
 part 'voice_coaching_enabled_provider.g.dart';
 
