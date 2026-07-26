@@ -132,7 +132,8 @@ void main() {
 
     final storage = _FakeCacheStorage();
     // Seed the EXACT envelope a pre-stamp build wrote: fresh (stored now,
-    // 6 h TTL like FR's searchResultTtl), parsed payload, NO appBuild key.
+    // 6 h TTL like FR's searchResultTtl), parsed payload, no stamp keys —
+    // under #3619 the missing `schema` stamp is what makes it a fresh-miss.
     storage.store[CacheKey.stationSearch(
       params.lat, params.lng, params.radiusKm, FuelType.all.apiValue,
       countryCode: 'FR',
