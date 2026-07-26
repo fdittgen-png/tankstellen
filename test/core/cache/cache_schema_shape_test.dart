@@ -42,15 +42,15 @@ void main() {
   // Deterministic fixtures; fields they leave null pin as `null` — the
   // signature tracks keys and populated types, which is where parser
   // shape drift lives.
-  final detail = StationDetail(
+  const detail = StationDetail(
     station: testStation,
-    openingTimes: const [
+    openingTimes: [
       OpeningTime(text: 'Mo-Fr', start: '06:00', end: '22:00'),
     ],
-    overrides: const ['override'],
+    overrides: ['override'],
     wholeDay: false,
     state: 'open',
-    openingHours: const WeeklyOpeningHours(),
+    openingHours: WeeklyOpeningHours(),
   );
   const prices = StationPrices(
     e5: 1.85,
