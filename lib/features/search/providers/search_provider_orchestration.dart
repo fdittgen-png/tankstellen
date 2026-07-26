@@ -9,11 +9,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/cache/cache_manager.dart';
 import '../../../core/services/geocoding_chain.dart';
+import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
+import '../../../core/services/station_search_peek.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/search_result_item.dart';
 import '../../../core/domain/station.dart';
+import '../../../core/country/country_provider.dart';
+import '../../../core/domain/search_params.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import 'ev_search_provider.dart';
@@ -195,3 +200,35 @@ ServiceResult<List<SearchResultItem>> _emptyEvSearchResult({Object? evError}) =>
               ),
             ],
     );
+
+/// #3618 — the fuel search with a stale-while-revalidate PREVIEW: if
+/// the cache holds ANY-age stations for this exact search cell, they
+/// are published through [publishPreview] IMMEDIATELY (prices are
+/// hours-stable; the freshness banner's "updated X ago" communicates
+/// the age), then the normal blocking chain runs and its result
+/// replaces the preview in place. EV searches skip the preview — their
+/// feed comes from a different service — and live surfaces (radar)
+/// don't come through here at all, keeping their blocking mode.
+Future<ServiceResult<List<Station>>> searchWithSwrPreview(
+  Ref ref,
+  SearchParams params, {
+  required bool isFuelSearch,
+  required CancelToken cancelToken,
+  required void Function(
+          AsyncValue<ServiceResult<List<SearchResultItem>>> preview)
+      publishPreview,
+}) async {
+  if (isFuelSearch) {
+    final cached = peekCachedStationSearch(
+      cache: ref.read(cacheManagerProvider),
+      countryCode: ref.read(activeCountryProvider).code,
+      params: params,
+    );
+    if (cached != null) {
+      publishPreview(AsyncValue.data(wrapFuelResultAsSearchItems(cached)));
+    }
+  }
+  return ref
+      .read(stationServiceProvider)
+      .searchStations(params, cancelToken: cancelToken);
+}

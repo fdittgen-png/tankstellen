@@ -237,9 +237,15 @@ class SearchState extends _$SearchState {
         sortBy: sortBy ?? SortBy.price,
         postalCode: resolvedPostalCode,
       );
-      final result = await ref
-          .read(stationServiceProvider)
-          .searchStations(params, cancelToken: cancelToken);
+      // #3618 — SWR: the last stations for this cell paint immediately;
+      // the network result then replaces them in place.
+      final result = await searchWithSwrPreview(
+        ref,
+        params,
+        isFuelSearch: evFuture == null,
+        cancelToken: cancelToken,
+        publishPreview: (preview) => state = preview,
+      );
       if (!ref.mounted) return;
       _publishCarSearch(result.data, resolved.fuelType);
       final finalState = await finalizeUnifiedResult(ref, result, evFuture);
