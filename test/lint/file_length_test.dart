@@ -155,8 +155,10 @@ void main() {
     // #3580 — re-grandfathered 678 → 695: the crash-forensics
     // startup wiring (breadcrumb persistence init + exit-info harvest).
     'lib/app/app_initializer.dart': (
-      lines: 695,
-      bumps: 15,
+      // #3610 — the eviction sweep's yield now lands in the health
+      // counters (cache.evicted, +5). Decomposition tracked by #3139.
+      lines: 700,
+      bumps: 16,
       decompositionIssue: 3139,
     ),
     // #3078 — grandfathered at 414 (was 400, right at the cap on master). The
@@ -660,6 +662,22 @@ void main() {
     // #3575/#3576 — re-grandfathered 1728 → 1780: the no-protocol
     // episode handler (pause → recoverVehicleProtocol → resume, throttled)
     // + stop-time stamping of the live GPS-physics estimate figures.
+    'lib/features/obd2/data/bluetooth_obd2_transport.dart': (
+      // #3610 — the two best-effort teardown catches now count a
+      // bt.teardown_fail health counter + breadcrumb (+8 over the cap).
+      // Decomposition candidate: the #3014 GATT-133 recovery block.
+      lines: 408,
+      bumps: 1,
+      decompositionIssue: 3141,
+    ),
+    'lib/features/route_search/providers/route_search_provider.dart': (
+      // #3610 — kDebugMode gates around the per-search debugPrints
+      // (+6 over the cap). Decomposition candidate: the strategy-run
+      // orchestration helpers.
+      lines: 406,
+      bumps: 1,
+      decompositionIssue: 3141,
+    ),
     'lib/features/obd2/data/trip_recording_controller.dart': (
       // #3602 — the engine-data staleness fence (freshness anchor, two
       // constants, the _emit gate + once-latched escalation, +51).

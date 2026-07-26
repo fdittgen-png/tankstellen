@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../../../core/logging/error_logger.dart';
 import '../domain/entities/feature_vector.dart';
 import 'tflite_interpreter.dart';
 
@@ -178,6 +181,8 @@ class TflitePricePredictor {
       debugPrint(
         'TflitePricePredictor.fromAsset: missing asset "$path": $e\n$st',
       );
+      unawaited(errorLogger.log(ErrorLayer.services, e, st,
+          context: const {'stage': 'load', 'where': 'tflite assetLoad'}));
       return null;
     }
 
@@ -188,6 +193,8 @@ class TflitePricePredictor {
       debugPrint(
         'TflitePricePredictor.fromAsset: interpreter build failed: $e\n$st',
       );
+      unawaited(errorLogger.log(ErrorLayer.services, e, st,
+          context: const {'stage': 'load', 'where': 'tflite interpreterBuild'}));
       return null;
     }
     if (interpreter == null) return null;
@@ -224,6 +231,12 @@ class TflitePricePredictor {
     final raw = output[0][0];
     if (!raw.isFinite) {
       debugPrint('TflitePricePredictor.predict: non-finite output ($raw)');
+      unawaited(errorLogger.log(
+        ErrorLayer.services,
+        StateError('TflitePricePredictor: non-finite output ($raw)'),
+        StackTrace.current,
+        context: const {'stage': 'inference', 'where': 'tflite predict'},
+      ));
       return null;
     }
     if (raw < _kMinPredictedCents || raw > _kMaxPredictedCents) {
@@ -231,6 +244,12 @@ class TflitePricePredictor {
         'TflitePricePredictor.predict: out-of-band output ($raw cents) — '
         'rejecting per static confidence gate',
       );
+      unawaited(errorLogger.log(
+        ErrorLayer.services,
+        StateError('TflitePricePredictor: out-of-band output ($raw cents)'),
+        StackTrace.current,
+        context: const {'stage': 'inference', 'where': 'tflite predict'},
+      ));
       return null;
     }
 

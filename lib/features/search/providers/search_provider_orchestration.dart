@@ -165,7 +165,14 @@ Future<AsyncValue<ServiceResult<List<SearchResultItem>>>>
     ref.read(eVSearchStateProvider).when(
           data: wrapEvResultAsSearchItems,
           loading: _emptyEvSearchResult,
-          error: (e, _) => _emptyEvSearchResult(evError: e),
+          error: (e, st) {
+            // #3610 — an EV-side failure only became a banner hint; log
+            // it so the OpenChargeMap outage is visible in field traces.
+            // The empty-result UI behaviour is unchanged.
+            unawaited(errorLogger.log(ErrorLayer.services, e, st,
+                context: const {'where': 'finalizeUnifiedResult ev'}));
+            return _emptyEvSearchResult(evError: e);
+          },
         ),
   );
 }

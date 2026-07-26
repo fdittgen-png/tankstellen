@@ -1,11 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -56,7 +59,14 @@ class _EvMapLayerState extends ConsumerState<EvMapLayer> {
     return async.when(
       data: _buildLayer,
       loading: () => const SizedBox.shrink(),
-      error: (_, _) => const SizedBox.shrink(),
+      error: (e, st) {
+        // #3610 — the EV layer silently vanishing looked identical to
+        // "no stations here"; log so field triage can tell them apart.
+        // The empty-state UI behaviour is unchanged.
+        unawaited(errorLogger.log(ErrorLayer.ui, e, st,
+            context: const {'where': 'EvMapLayer evStationsProvider'}));
+        return const SizedBox.shrink();
+      },
     );
   }
 

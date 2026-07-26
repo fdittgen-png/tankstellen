@@ -1,8 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:tflite_flutter/tflite_flutter.dart' as tfl;
+
+import '../../../core/logging/error_logger.dart';
 
 /// Thin abstraction over `tflite_flutter`'s [tfl.Interpreter]. Created
 /// for #1117 phase 2 so tests can inject a fake without loading the
@@ -58,6 +62,8 @@ class TfliteFlutterInterpreter implements TfliteInterpreter {
       debugPrint(
         'TfliteFlutterInterpreter.fromBuffer: failed to parse model bytes: $e\n$st',
       );
+      unawaited(errorLogger.log(ErrorLayer.services, e, st,
+          context: const {'stage': 'load', 'where': 'tflite fromBuffer'}));
       return null;
     }
   }
@@ -68,6 +74,8 @@ class TfliteFlutterInterpreter implements TfliteInterpreter {
       _delegate.run(input, output);
     } catch (e, st) {
       debugPrint('TfliteFlutterInterpreter.run: inference failed: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.services, e, st,
+          context: const {'stage': 'shape', 'where': 'tflite run'}));
     }
   }
 
@@ -77,6 +85,8 @@ class TfliteFlutterInterpreter implements TfliteInterpreter {
       _delegate.close();
     } catch (e, st) {
       debugPrint('TfliteFlutterInterpreter.close: $e\n$st');
+      unawaited(errorLogger.log(ErrorLayer.services, e, st,
+          context: const {'stage': 'teardown', 'where': 'tflite close'}));
     }
   }
 }

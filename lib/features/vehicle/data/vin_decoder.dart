@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/logging/error_logger.dart';
 import '../../../core/services/dio_factory.dart';
 import '../domain/entities/vin_data.dart';
 import 'wmi_table.dart' as wmi;
@@ -93,8 +96,12 @@ class VinDecoder {
       } on DioException catch (e, st) {
         debugPrint(
             'VinDecoder: vPIC failed (${e.type}): falling back to WMI\n$st');
+        unawaited(errorLogger.log(ErrorLayer.services, e, st,
+            context: const {'where': 'vpic', 'fallback': 'wmi'}));
       } on Object catch (e, st) {
         debugPrint('VinDecoder: unexpected error $e — falling back to WMI\n$st');
+        unawaited(errorLogger.log(ErrorLayer.services, e, st,
+            context: const {'where': 'vpic', 'fallback': 'wmi'}));
       }
     } else {
       debugPrint(

@@ -158,7 +158,12 @@ class AppInitializer {
       unawaited(HiveBoxes.initDeferred());
       // #2264 — bounded eviction (expiry + per-prefix budget + LRU byte
       // ceiling) replaces the one-shot 500-key expiry cap.
-      await CacheManager(storage).evictBounded();
+      final evicted = await CacheManager(storage).evictBounded();
+      // #3610 — eviction volume is a field signal (a runaway cache shows
+      // up as a growing per-day count); record it instead of dropping it.
+      if (evicted > 0) {
+        healthCounters.increment('cache.evicted', by: evicted);
+      }
       // #2317 — trim price-history rows past the 30-day retention window
       // once per cold start. The foreground record path (station detail)
       // never trims, so without this hook a heavy user accumulates

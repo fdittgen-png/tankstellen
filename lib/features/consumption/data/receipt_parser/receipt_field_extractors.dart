@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../ocr/pump_ocr_config.dart';
 import 'receipt_currency_profile.dart';
 
@@ -336,6 +339,13 @@ DateTime? buildDate(String dayStr, String monthStr, String yearStr) {
     return DateTime(year, month, day);
   } on FormatException catch (e, st) {
     debugPrint('Receipt date parse failed for "$dayStr/$monthStr/$yearStr": $e\n$st');
+    // The captured groups are digit-only regex matches — no PII.
+    unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
+      'where': 'receipt buildDate',
+      'day': dayStr,
+      'month': monthStr,
+      'year': yearStr,
+    }));
     return null;
   }
 }
