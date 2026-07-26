@@ -95,7 +95,7 @@ final class SearchStateProvider
   }
 }
 
-String _$searchStateHash() => r'81aed7f3015e87c17cbab28a1e75531149085d39';
+String _$searchStateHash() => r'8b9429d999dacfebc9215d4ef823c98edea0d498';
 
 /// Manages the station search lifecycle and exposes results as [AsyncValue].
 ///

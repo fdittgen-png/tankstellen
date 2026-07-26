@@ -13,8 +13,12 @@ import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/location/location_service.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/cache/cache_manager.dart';
+import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/services/geocoding_chain.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
+import 'package:tankstellen/core/services/station_service_chain_codec.dart';
+import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/domain/ev/charging_station.dart';
@@ -1228,4 +1232,191 @@ void main() {
       expect(stations, isEmpty);
     });
   });
+
+  group('#3618 stale-while-revalidate preview (searchByGps)', () {
+    const cachedStation = Station(
+      id: 'swr-cached-1',
+      name: 'Yesterday Station',
+      brand: 'JET',
+      street: 'Alte Str.',
+      postCode: '10115',
+      place: 'Berlin',
+      lat: 52.52,
+      lng: 13.405,
+      isOpen: true,
+      e10: 1.799,
+    );
+    const freshStation = Station(
+      id: 'swr-fresh-1',
+      name: 'Fresh Station',
+      brand: 'ARAL',
+      street: 'Neue Str.',
+      postCode: '10115',
+      place: 'Berlin',
+      lat: 52.52,
+      lng: 13.405,
+      isOpen: true,
+      e10: 1.749,
+    );
+
+    Position gpsFix() => Position(
+          latitude: 52.52,
+          longitude: 13.405,
+          timestamp: DateTime(2026, 7, 26),
+          accuracy: 5,
+          altitude: 0,
+          altitudeAccuracy: 0,
+          heading: 0,
+          headingAccuracy: 0,
+          speed: 0,
+          speedAccuracy: 0,
+        );
+
+    test(
+        'the last cached stations for the cell paint BEFORE the network '
+        'answers, then the fresh result replaces them in place', () async {
+      final mockLocation = MockLocationService();
+      when(() => mockLocation.getCurrentPosition())
+          .thenAnswer((_) async => gpsFix());
+      // No geocoder → no postal code in the cache key (the peek builds
+      // the identical key).
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenThrow(Exception('no geocoder in this test'));
+
+      final networkGate = Completer<ServiceResult<List<Station>>>();
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) => networkGate.future);
+
+      final cache = CacheManager(_SwrFakeCacheStorage());
+      final container = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(fakeStorage),
+        stationServiceProvider.overrideWithValue(mockStationService),
+        geocodingChainProvider.overrideWithValue(mockGeocoding),
+        locationServiceProvider.overrideWithValue(mockLocation),
+        userPositionProvider.overrideWith(() => _NullUserPosition()),
+        cacheManagerProvider.overrideWithValue(cache),
+      ]);
+      addTearDown(container.dispose);
+      // Keep the autoDispose provider alive across the async gaps.
+      container.listen(searchStateProvider, (_, _) {});
+
+      // Seed what "yesterday's" search wrote for this exact cell.
+      final countryCode = container.read(activeCountryProvider).code;
+      await cache.put(
+        CacheKey.stationSearch(52.52, 13.405, 10, FuelType.e10.apiValue,
+            countryCode: countryCode),
+        serializeStationList(const [cachedStation]),
+        ttl: CacheTtl.stationSearch,
+        source: ServiceSource.tankerkoenigApi,
+      );
+
+      final searchFuture = container
+          .read(searchStateProvider.notifier)
+          .searchByGps(fuelType: FuelType.e10, radiusKm: 10);
+
+      // Let GPS + geocode + the peek run; the network stays gated.
+      for (var i = 0; i < 20; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      final preview = container.read(searchStateProvider);
+      expect(preview.hasValue, isTrue,
+          reason: 'the SWR preview must have replaced the shimmer while '
+              'the network is still in flight');
+      final previewItems = preview.value!.data;
+      expect(previewItems.map((i) => i.id), ['swr-cached-1'],
+          reason: 'the preview is yesterday\'s cached station');
+
+      // The network lands: the fresh result replaces the preview.
+      networkGate.complete(ServiceResult(
+        data: const [freshStation],
+        source: ServiceSource.tankerkoenigApi,
+        fetchedAt: DateTime.now(),
+      ));
+      await searchFuture;
+      final finalState = container.read(searchStateProvider);
+      expect(finalState.value!.data.map((i) => i.id), ['swr-fresh-1']);
+    });
+
+    test('no cached cell → the shimmer stays until the network answers '
+        '(blocking mode unchanged)', () async {
+      final mockLocation = MockLocationService();
+      when(() => mockLocation.getCurrentPosition())
+          .thenAnswer((_) async => gpsFix());
+      when(() => mockGeocoding.coordinatesToAddress(any(), any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenThrow(Exception('no geocoder in this test'));
+      final networkGate = Completer<ServiceResult<List<Station>>>();
+      when(() => mockStationService.searchStations(any(),
+              cancelToken: any(named: 'cancelToken')))
+          .thenAnswer((_) => networkGate.future);
+
+      final container = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(fakeStorage),
+        stationServiceProvider.overrideWithValue(mockStationService),
+        geocodingChainProvider.overrideWithValue(mockGeocoding),
+        locationServiceProvider.overrideWithValue(mockLocation),
+        userPositionProvider.overrideWith(() => _NullUserPosition()),
+        cacheManagerProvider
+            .overrideWithValue(CacheManager(_SwrFakeCacheStorage())),
+      ]);
+      addTearDown(container.dispose);
+      container.listen(searchStateProvider, (_, _) {});
+
+      final searchFuture = container
+          .read(searchStateProvider.notifier)
+          .searchByGps(fuelType: FuelType.e10, radiusKm: 10);
+      for (var i = 0; i < 20; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      expect(container.read(searchStateProvider).isLoading, isTrue,
+          reason: 'no preview without a cached cell — no invented data');
+
+      networkGate.complete(ServiceResult(
+        data: const [freshStation],
+        source: ServiceSource.tankerkoenigApi,
+        fetchedAt: DateTime.now(),
+      ));
+      await searchFuture;
+      expect(
+        container.read(searchStateProvider).value!.data.map((i) => i.id),
+        ['swr-fresh-1'],
+      );
+    });
+  });
+}
+
+/// Minimal in-memory [CacheStorage] for the SWR tests — the real
+/// [CacheManager] envelope semantics over a plain map.
+class _SwrFakeCacheStorage implements CacheStorage {
+  final Map<String, dynamic> store = {};
+
+  @override
+  Future<void> cacheData(String key, dynamic data) async {
+    if (data == null) {
+      store.remove(key);
+    } else {
+      store[key] = data;
+    }
+  }
+
+  @override
+  Map<String, dynamic>? getCachedData(String key, {Duration? maxAge}) {
+    final raw = store[key];
+    if (raw is! Map) return null;
+    return Map<String, dynamic>.from(raw);
+  }
+
+  @override
+  Future<void> clearCache() async => store.clear();
+
+  @override
+  int get cacheEntryCount => store.length;
+
+  @override
+  Iterable<dynamic> get cacheKeys => store.keys;
+
+  @override
+  Future<void> deleteCacheEntry(String key) async => store.remove(key);
 }
