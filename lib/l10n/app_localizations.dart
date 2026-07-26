@@ -12896,6 +12896,108 @@ abstract class AppLocalizations {
   /// **'Tank filled to the brim — uncheck if this was a partial fill'**
   String get addFillUpIsFullTankSubtitle;
 
+  /// #3616 card title — per-plein consumption report on the Carburant tab
+  ///
+  /// In en, this message translates to:
+  /// **'Tank report'**
+  String get tankReportTitle;
+
+  /// No description provided for @tankReportHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} L/100 km'**
+  String tankReportHeadline(String value);
+
+  /// No description provided for @tankReportSincePrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Since the previous full tank: {km} km · {liters} L · {cost}'**
+  String tankReportSincePrevious(String km, String liters, String cost);
+
+  /// No description provided for @tankReportTrendUp.
+  ///
+  /// In en, this message translates to:
+  /// **'{delta} L/100 km more than the previous tank'**
+  String tankReportTrendUp(String delta);
+
+  /// No description provided for @tankReportTrendDown.
+  ///
+  /// In en, this message translates to:
+  /// **'{delta} L/100 km less than the previous tank'**
+  String tankReportTrendDown(String delta);
+
+  /// No description provided for @tankReportTrendFlat.
+  ///
+  /// In en, this message translates to:
+  /// **'Level with the previous tank'**
+  String get tankReportTrendFlat;
+
+  /// No description provided for @tankReportNoPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Evolution appears after your next full tank.'**
+  String get tankReportNoPrevious;
+
+  /// No description provided for @tankReportCoverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Recordings cover {pct} % of this tank'**
+  String tankReportCoverage(String pct);
+
+  /// No description provided for @tankReportRecordedAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded slice: {value} L/100 km'**
+  String tankReportRecordedAvg(String value);
+
+  /// No description provided for @tankReportExplainHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'What the recordings suggest'**
+  String get tankReportExplainHeader;
+
+  /// No description provided for @tankReportFactorHighRpm.
+  ///
+  /// In en, this message translates to:
+  /// **'High-RPM share {cur} % (was {prev} %)'**
+  String tankReportFactorHighRpm(String cur, String prev);
+
+  /// No description provided for @tankReportFactorHarsh.
+  ///
+  /// In en, this message translates to:
+  /// **'Harsh events {cur}/100 km (was {prev})'**
+  String tankReportFactorHarsh(String cur, String prev);
+
+  /// No description provided for @tankReportFactorColdStarts.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold starts {cur} (was {prev})'**
+  String tankReportFactorColdStarts(String cur, String prev);
+
+  /// No description provided for @tankReportFactorIdle.
+  ///
+  /// In en, this message translates to:
+  /// **'Idle share {cur} % (was {prev} %)'**
+  String tankReportFactorIdle(String cur, String prev);
+
+  /// No description provided for @tankReportCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'Recordings are spontaneous and cover only part of this tank — these hints are indicative, not the full story.'**
+  String get tankReportCaveat;
+
+  /// No description provided for @tankReportCalibrationUnder.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded estimates run {pct} % under pump truth'**
+  String tankReportCalibrationUnder(String pct);
+
+  /// No description provided for @tankReportCalibrationOver.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded estimates run {pct} % over pump truth'**
+  String tankReportCalibrationOver(String pct);
+
   /// Title of the Theme card on the Settings screen (#897). The card matches the Privacy + Storage card pattern and navigates to a dedicated theme picker screen.
   ///
   /// In en, this message translates to:
