@@ -44,16 +44,19 @@ List<TripHistoryEntry> dedupeGhostTrips(List<TripHistoryEntry> entries) {
 
   // Index the sampled entries by their summary key so the membership
   // test is O(1) per candidate ghost rather than O(n²) overall.
+  // #3613 — sampled-ness is read off `sampleCount`, not `samples`, so
+  // the de-dupe stays correct on summary-only decoded entries (whose
+  // samples list is deliberately never materialised).
   final sampledByKey = <String, List<TripHistoryEntry>>{};
   for (final e in entries) {
-    if (e.samples.isEmpty) continue;
+    if (e.sampleCount == 0) continue;
     (sampledByKey[_summaryKey(e.summary)] ??= <TripHistoryEntry>[]).add(e);
   }
   if (sampledByKey.isEmpty) return entries;
 
   final result = <TripHistoryEntry>[];
   for (final e in entries) {
-    if (e.samples.isEmpty && _hasSampledTwin(e, sampledByKey)) {
+    if (e.sampleCount == 0 && _hasSampledTwin(e, sampledByKey)) {
       // Drop the ghost — its full-sample twin survives.
       continue;
     }
@@ -74,12 +77,12 @@ Future<bool> guardGhostDoubleSave({
   required List<TripHistoryEntry> existing,
   required Future<void> Function(String id) deleteById,
 }) async {
-  if (entry.samples.isEmpty) {
+  if (entry.sampleCount == 0) {
     final survivors = dedupeGhostTrips([...existing, entry]);
     return !survivors.any((e) => identical(e, entry) || e.id == entry.id);
   }
   for (final other in existing) {
-    if (other.id == entry.id || other.samples.isNotEmpty) continue;
+    if (other.id == entry.id || other.sampleCount > 0) continue;
     final survivors = dedupeGhostTrips([entry, other]);
     if (!survivors.any((e) => e.id == other.id)) {
       await deleteById(other.id);

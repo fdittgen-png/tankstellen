@@ -44,7 +44,34 @@ class TripRecordingBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(tripRecordingProvider);
+    // #3613 — this wrapper sits above EVERY screen and the recording
+    // state emits at ~1 Hz, so watch only the fields the banner strip
+    // actually renders: phase (isActive / paused / palette), situation,
+    // band, liveDeltaFraction and the live reading (distance / elapsed /
+    // instant consumption / coaching hint / a11y label). Mutations to
+    // the non-rendered fields (dropReason, reconnectPassiveWaiting,
+    // gpsCoachingHint, connectStage, saveStage — each drawn by its own
+    // dedicated widget) no longer rebuild the whole app subtree. The
+    // record's == is structural, so an identical projection is a no-op.
+    // The PiP branch below re-watches the full state: the PiP tile is
+    // the ONLY thing on screen there, so selecting buys nothing.
+    final view = ref.watch(tripRecordingProvider.select((s) => (
+          phase: s.phase,
+          live: s.live,
+          situation: s.situation,
+          band: s.band,
+          liveDeltaFraction: s.liveDeltaFraction,
+        )));
+    // Re-assembled projection carrying exactly the rendered fields —
+    // keeps TripRecordingBannerContent/_semanticsLabel signatures (and
+    // behaviour) identical.
+    final state = TripRecordingState(
+      phase: view.phase,
+      live: view.live,
+      situation: view.situation,
+      band: view.band,
+      liveDeltaFraction: view.liveDeltaFraction,
+    );
     final obd2 = ref.watch(obd2ConnectionStatusProvider);
 
     // #3170 — arm the iOS Live Activity sync here, where every screen
@@ -127,7 +154,9 @@ class TripRecordingBanner extends ConsumerWidget {
 
       return _pipView(
         context,
-        state,
+        // #3613 — the compact tile is the whole UI in PiP; hand it the
+        // full state so it can keep reading any field it needs.
+        ref.watch(tripRecordingProvider),
         approachState: approach,
         fuelType: fuel,
         radarStation: radarStation,

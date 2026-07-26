@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -793,6 +794,103 @@ void main() {
               'the byte ceiling, so sizing it is pure waste (#3155)');
       expect(cache.get('dataset:FR:stations'), isNotNull,
           reason: 'the dataset entry itself still survives the sweep');
+    });
+  });
+
+  // #3613 — the byte-stamp: `put()` records the payload's encoded length
+  // on the envelope so the eviction byte sweep reads a stored int instead
+  // of re-encoding every surviving payload on every 30-min pass. Legacy
+  // (pre-stamp) envelopes fall back to the re-encode — the whole
+  // `evictBounded` group above stores stamp-less envelopes and still
+  // passes, which pins that fallback.
+  group('CacheManager - byte stamp at put() (#3613)', () {
+    test('put stamps the encoded payload byte length onto the envelope '
+        'and get() surfaces it', () async {
+      const payload = {'v': 'abc'};
+      await cache.put('search:x', payload,
+          ttl: const Duration(minutes: 5), source: ServiceSource.cache);
+
+      final raw = fakeStorage.getCachedData('search:x');
+      expect(raw!['bytes'], jsonEncode(payload).length,
+          reason: 'the stored envelope must carry the write-time stamp');
+      expect(cache.get('search:x')!.approxBytes, jsonEncode(payload).length);
+    });
+
+    test('dataset: entries stay unstamped — they are exempt from the byte '
+        'sweep, so encoding their multi-MB payload would be waste (#3155)',
+        () async {
+      await cache.put('dataset:FR:stations', {'stations': <dynamic>[]},
+          ttl: const Duration(hours: 6), source: ServiceSource.cache);
+      final raw = fakeStorage.getCachedData('dataset:FR:stations');
+      expect(raw!.containsKey('bytes'), isFalse);
+    });
+
+    test('the byte sweep uses the stamped value — the payload is NOT '
+        're-encoded, and eviction follows the stamp', () async {
+      final now = DateTime.now();
+      final oldProbe = _EncodeProbe();
+      final newProbe = _EncodeProbe();
+      // Two stamped envelopes whose stamps (5000 / 10) dwarf their real
+      // encoded size (~20 bytes). If the sweep re-encoded, the total
+      // would be ~40 bytes — far under the 1000-byte ceiling — and
+      // nothing would be evicted; honouring the stamps forces exactly
+      // the oldest one out.
+      Future<void> storeStamped(
+          String key, DateTime storedAt, Object probe, int bytes) {
+        return fakeStorage.cacheData(key, {
+          'payload': {'p': probe},
+          'storedAt': storedAt.millisecondsSinceEpoch,
+          'source': ServiceSource.cache.name,
+          'ttlMs': const Duration(hours: 1).inMilliseconds,
+          'bytes': bytes,
+        });
+      }
+
+      await storeStamped('search:old',
+          now.subtract(const Duration(minutes: 10)), oldProbe, 5000);
+      await storeStamped('search:new', now, newProbe, 10);
+
+      final evicted = await cache.evictBounded(
+        policy: const CacheEvictionPolicy(prefixBudget: 100, maxBytes: 1000),
+      );
+
+      expect(oldProbe.toJsonCalls, 0,
+          reason: 'a stamped entry must never be re-encoded by the sweep');
+      expect(newProbe.toJsonCalls, 0,
+          reason: 'a stamped entry must never be re-encoded by the sweep');
+      expect(evicted, 1,
+          reason: 'the 5000-byte stamp exceeds the 1000-byte ceiling, so '
+              'the sweep must evict the oldest stamped entry');
+      expect(cache.get('search:old'), isNull);
+      expect(cache.get('search:new'), isNotNull);
+    });
+
+    test('a legacy entry without the stamp is re-encoded once and still '
+        'evicted correctly under byte pressure', () async {
+      final now = DateTime.now();
+      // Legacy (no 'bytes') envelopes with real ~1 KB payloads.
+      Future<void> storeLegacy(String key, DateTime storedAt) {
+        return fakeStorage.cacheData(key, {
+          'payload': {'p': 'x' * 1000},
+          'storedAt': storedAt.millisecondsSinceEpoch,
+          'source': ServiceSource.cache.name,
+          'ttlMs': const Duration(hours: 1).inMilliseconds,
+        });
+      }
+
+      await storeLegacy(
+          'search:old', now.subtract(const Duration(minutes: 10)));
+      await storeLegacy('search:new', now);
+
+      final evicted = await cache.evictBounded(
+        policy: const CacheEvictionPolicy(prefixBudget: 100, maxBytes: 1200),
+      );
+
+      expect(evicted, 1,
+          reason: 'the re-encode fallback must still size legacy entries');
+      expect(cache.get('search:old'), isNull,
+          reason: 'oldest legacy entry evicted first under byte pressure');
+      expect(cache.get('search:new'), isNotNull);
     });
   });
 

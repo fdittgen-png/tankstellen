@@ -40,6 +40,11 @@ part 'nearest_widget_refresh_provider.g.dart';
 /// Reading the provider once (e.g. from the app's root widget) starts
 /// the tick; the provider owns its Timer + [AppLifecycleListener] and
 /// releases both in onDispose.
+///
+/// #3613 — the heartbeat is presence- and lifecycle-gated: the periodic
+/// timer only runs while at least one home-screen widget is actually
+/// installed (probe fails open), pauses when the app is backgrounded,
+/// and re-probes + resumes on foreground.
 @Riverpod(keepAlive: true)
 class NearestWidgetRefresh extends _$NearestWidgetRefresh {
   Timer? _timer;
@@ -65,6 +70,16 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
   @visibleForTesting
   Future<void> debugTick() => _tick();
 
+  /// #3613 — whether the periodic heartbeat is currently armed. Lets the
+  /// tests pin the presence gate + lifecycle pause without waiting out
+  /// the 2-minute cadence.
+  @visibleForTesting
+  bool get debugTimerActive => _timer != null;
+
+  /// #3613 — drive one presence-gated (re-)arm directly in tests.
+  @visibleForTesting
+  Future<void> debugArm() => _armIfWidgetsPresent();
+
   @override
   void build() {
     ref.onDispose(() {
@@ -73,17 +88,62 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
       _lifecycle?.dispose();
       _lifecycle = null;
     });
+    // #1803 — refresh again whenever the app returns to the foreground,
+    // so the widget's refresh button (which opens the app, #1801) and
+    // any ordinary resume leave the widget up to date. #3613 — the
+    // resume hook also re-runs the presence check (the user may have
+    // added/removed the home-screen widget while we were backgrounded),
+    // and `paused` cancels the heartbeat outright: a backgrounded app
+    // must not burn a station search every 2 minutes for a widget the
+    // OS repaints from its own WorkManager task anyway.
+    _lifecycle ??= AppLifecycleListener(
+      onResume: () => unawaited(_armIfWidgetsPresent()),
+      onPause: _cancelTimer,
+    );
+    // #3613 — arm the heartbeat (and fire the immediate first refresh)
+    // only when a home-screen widget is actually installed; a phone
+    // without one was paying the full 2-min refresh loop for nothing.
+    unawaited(_armIfWidgetsPresent());
+  }
+
+  /// Start (or stop) the heartbeat according to widget presence (#3613):
+  /// when at least one home-screen widget is installed, ensure the
+  /// periodic timer runs and fire an immediate tick (don't wait two
+  /// minutes); when none is, cancel the timer. The presence probe fails
+  /// OPEN — an errored `getInstalledWidgets` keeps the pre-#3613
+  /// always-on behaviour, because a stale widget is worse than a few
+  /// spare ticks.
+  Future<void> _armIfWidgetsPresent() async {
+    if (!await _widgetsPresent()) {
+      _cancelTimer();
+      return;
+    }
     _timer ??= Timer.periodic(
       kNearestWidgetForegroundInterval,
       (_) => _tick(),
     );
-    // #1803 — refresh again whenever the app returns to the foreground,
-    // so the widget's refresh button (which opens the app, #1801) and
-    // any ordinary resume leave the widget up to date.
-    _lifecycle ??= AppLifecycleListener(onResume: () => unawaited(_tick()));
-    // Fire one immediate refresh so the widget reflects the current
-    // session as soon as the user opens the app (don't wait two minutes).
-    unawaited(_tick());
+    await _tick();
+  }
+
+  void _cancelTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  /// True when at least one home-screen widget (any variant) is pinned,
+  /// read through the same `home_widget` bridge [HomeWidgetService]
+  /// uses for its per-widget keys. Fails open (true) so a broken probe
+  /// never strands the widget stale.
+  Future<bool> _widgetsPresent() async {
+    try {
+      final widgets = await HomeWidget.getInstalledWidgets();
+      return widgets.isNotEmpty;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {
+        'where': 'NearestWidgetRefresh: widget presence probe failed',
+      }));
+      return true;
+    }
   }
 
   Future<void> _tick() async {

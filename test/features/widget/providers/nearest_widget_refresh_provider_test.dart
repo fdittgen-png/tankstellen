@@ -19,6 +19,8 @@
 
 import 'dart:async';
 
+import 'dart:ui' show AppLifecycleState;
+
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,6 +61,15 @@ void main() {
           return null;
         case 'updateWidget':
           return true;
+        // #3613 — the heartbeat is presence-gated now; the default mock
+        // reports one pinned widget so the pre-existing heartbeat tests
+        // keep modelling the "widget installed" case they always assumed
+        // (the plugin maps a null channel result to an EMPTY list, which
+        // would silently gate everything off).
+        case 'getInstalledWidgets':
+          return <dynamic>[
+            <String, dynamic>{'androidWidgetId': 1},
+          ];
         default:
           return null;
       }
@@ -330,7 +341,14 @@ void main() {
               if (id == kWidgetManualRefreshRequestedAtKey) return iso;
               return null;
             }
-            if (call.method == 'getInstalledWidgets') return <dynamic>[];
+            if (call.method == 'getInstalledWidgets') {
+              // #3613 — keep reporting one pinned widget (matches the
+              // suite default) so a re-probe can't disarm the heartbeat
+              // mid-test.
+              return <dynamic>[
+                <String, dynamic>{'androidWidgetId': 1},
+              ];
+            }
             if (call.method == 'updateWidget') return true;
             return null;
           });
@@ -443,6 +461,153 @@ void main() {
       // Let the unawaited tick run to completion. If the catch in _tick
       // is removed, the test will fail with a zone-uncaught error here.
       await Future<void>.delayed(const Duration(milliseconds: 50));
+    });
+
+    // #3613 — the heartbeat is gated on widget presence and the app
+    // lifecycle: no pinned home-screen widget → no timer, no tick;
+    // backgrounding cancels the timer; foregrounding re-probes + re-arms.
+    group('presence + lifecycle gating (#3613)', () {
+      /// Re-wires the home_widget channel so `getInstalledWidgets`
+      /// reports [widgets] (empty = nothing pinned); everything else
+      /// keeps the suite's benign defaults.
+      void wireInstalledWidgets(List<dynamic> widgets) {
+        messenger.setMockMethodCallHandler(homeWidgetChannel, (call) async {
+          switch (call.method) {
+            case 'getInstalledWidgets':
+              return widgets;
+            case 'updateWidget':
+              return true;
+            default:
+              return null;
+          }
+        });
+      }
+
+      // AppLifecycleListener asserts on illegal jumps (e.g. resumed →
+      // paused directly), so walk the legal transition chains the OS
+      // itself produces.
+      void goPaused() {
+        for (final s in const [
+          AppLifecycleState.inactive,
+          AppLifecycleState.hidden,
+          AppLifecycleState.paused,
+        ]) {
+          TestWidgetsFlutterBinding.instance
+              .handleAppLifecycleStateChanged(s);
+        }
+      }
+
+      void goResumed() {
+        for (final s in const [
+          AppLifecycleState.hidden,
+          AppLifecycleState.inactive,
+          AppLifecycleState.resumed,
+        ]) {
+          TestWidgetsFlutterBinding.instance
+              .handleAppLifecycleStateChanged(s);
+        }
+      }
+
+      tearDown(() {
+        // Restore the foreground state so later suites aren't affected
+        // by a test that backgrounded the binding.
+        if (TestWidgetsFlutterBinding.instance.lifecycleState ==
+            AppLifecycleState.paused) {
+          goResumed();
+        }
+      });
+
+      test('no widget pinned → the heartbeat is never armed and no tick '
+          'fires', () async {
+        wireInstalledWidgets(<dynamic>[]);
+
+        container.read(nearestWidgetRefreshProvider);
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+
+        final notifier =
+            container.read(nearestWidgetRefreshProvider.notifier);
+        expect(notifier.debugTimerActive, isFalse,
+            reason: 'the 2-min periodic must not run for a widget nobody '
+                'has pinned');
+        expect(countingStorage.getSettingCalls, 0,
+            reason: 'not even the immediate first refresh should run');
+      });
+
+      test('a pinned widget → heartbeat armed + immediate tick (control)',
+          () async {
+        // Suite default mock already reports one pinned widget.
+        container.read(nearestWidgetRefreshProvider);
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+
+        final notifier =
+            container.read(nearestWidgetRefreshProvider.notifier);
+        expect(notifier.debugTimerActive, isTrue);
+        expect(countingStorage.getSettingCalls, greaterThanOrEqualTo(1));
+      });
+
+      test('a broken presence probe fails OPEN — the heartbeat still runs',
+          () async {
+        messenger.setMockMethodCallHandler(homeWidgetChannel, (call) async {
+          if (call.method == 'getInstalledWidgets') {
+            throw PlatformException(code: 'probe-broken');
+          }
+          if (call.method == 'updateWidget') return true;
+          return null;
+        });
+
+        container.read(nearestWidgetRefreshProvider);
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+
+        expect(
+            container
+                .read(nearestWidgetRefreshProvider.notifier)
+                .debugTimerActive,
+            isTrue,
+            reason: 'a stale widget is worse than a few spare ticks — an '
+                'errored probe must keep the pre-#3613 behaviour');
+      });
+
+      test('AppLifecycleState.paused cancels the heartbeat; resumed '
+          're-arms it and fires a tick', () async {
+        container.read(nearestWidgetRefreshProvider);
+        final notifier =
+            container.read(nearestWidgetRefreshProvider.notifier);
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+        expect(notifier.debugTimerActive, isTrue);
+        final ticksBeforePause = countingStorage.getSettingCalls;
+
+        goPaused();
+        expect(notifier.debugTimerActive, isFalse,
+            reason: 'a backgrounded app must not burn a station search '
+                'every 2 minutes — the OS-side WorkManager task repaints '
+                'the widget while we are away');
+
+        goResumed();
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+        expect(notifier.debugTimerActive, isTrue,
+            reason: 'foregrounding must re-arm the heartbeat');
+        expect(countingStorage.getSettingCalls,
+            greaterThan(ticksBeforePause),
+            reason: 'the resume hook still fires its immediate refresh');
+      });
+
+      test('resume while the widget was REMOVED disarms the heartbeat',
+          () async {
+        container.read(nearestWidgetRefreshProvider);
+        final notifier =
+            container.read(nearestWidgetRefreshProvider.notifier);
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+        expect(notifier.debugTimerActive, isTrue);
+
+        // The user unpins the widget while the app is backgrounded.
+        wireInstalledWidgets(<dynamic>[]);
+        goPaused();
+        goResumed();
+        await Future<void>.delayed(const Duration(milliseconds: 80));
+
+        expect(notifier.debugTimerActive, isFalse,
+            reason: 'the resume re-probe must notice the widget is gone');
+      });
     });
   });
 }
