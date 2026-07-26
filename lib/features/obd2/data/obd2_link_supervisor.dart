@@ -81,8 +81,11 @@ class Obd2LinkSupervisor {
     Stream<Obd2LinkDropEvent>? drops,
     this.initialBackoff = const Duration(milliseconds: 500),
     this.maxBackoff = const Duration(seconds: 30),
+    this.stormBackoff = const Duration(minutes: 5),
     Random? jitter,
+    DateTime Function()? now,
   })  : _dial = dial,
+        _now = now ?? DateTime.now,
         _jitter = jitter ?? Random() {
     _dropSubscription =
         (drops ?? Obd2LinkDropSignal.instance.drops).listen(_onDrop);
@@ -91,7 +94,33 @@ class Obd2LinkSupervisor {
   final Obd2LinkDialer _dial;
   final Duration initialBackoff;
   final Duration maxBackoff;
+
+  /// #3603 — the STAND-DOWN cadence: once [standDownThreshold]
+  /// consecutive identical-signature misses (the field storm: 20
+  /// rfcommOpenFail ladder timeouts at ~70 s each, 21 minutes of burned
+  /// battery) or rapid ready→drop flaps (#3625's blind spot: a success
+  /// that proves nothing) accumulate, the loop widens straight to this
+  /// interval instead of the doubling ladder. The no-dead-end invariant
+  /// holds — the loop still never self-terminates; it just stops
+  /// hammering a link that keeps failing the same way. Any user intent,
+  /// wake, signature change, or ready that SURVIVES [flapWindow]
+  /// restores the fast ladder.
+  final Duration stormBackoff;
+  final DateTime Function() _now;
   final Random _jitter;
+
+  /// #3603 — consecutive identical failures (or flaps) before the loop
+  /// stands down to [stormBackoff].
+  static const int standDownThreshold = 3;
+
+  /// #3603 — a ready that drops again within this window is a FLAP,
+  /// not a recovery: it must not reset the escalation.
+  static const Duration flapWindow = Duration(seconds: 30);
+
+  String? _lastMissSignature;
+  int _identicalMissStreak = 0;
+  DateTime? _readyAt;
+  int _flapStreak = 0;
 
   final ValueNotifier<Obd2LinkState> _state =
       ValueNotifier<Obd2LinkState>(Obd2LinkState.idle);
@@ -135,6 +164,12 @@ class Obd2LinkSupervisor {
   /// calm long-wait cadence (#2767's "passive waiting" banner copy).
   bool get backoffAtCap => _backoff >= maxBackoff;
 
+  /// #3603 — true while the loop holds the [stormBackoff] cadence
+  /// (telemetry / banner copy).
+  bool get inStandDown =>
+      _identicalMissStreak >= standDownThreshold ||
+      _flapStreak >= standDownThreshold;
+
   /// User/policy-initiated connect. Clears the disconnect intent, exits
   /// any parked state, and dials now. Joins the in-flight attempt if
   /// one exists (single flight). Returns the live service, or null when
@@ -143,6 +178,7 @@ class Obd2LinkSupervisor {
   Future<Obd2Service?> connect() {
     if (_disposed) return Future<Obd2Service?>.value();
     _userRequestedDisconnect = false;
+    _resetStandDown(); // #3603 — user intent is a positive signal
     _cancelBackoffTimer();
     return _attempt(userInitiated: true);
   }
@@ -157,6 +193,7 @@ class Obd2LinkSupervisor {
   Future<Obd2Service?> connectWith(Obd2LinkDialer dialer) {
     if (_disposed) return Future<Obd2Service?>.value();
     _userRequestedDisconnect = false;
+    _resetStandDown(); // #3603
     _cancelBackoffTimer();
     return _attempt(userInitiated: true, dialer: dialer);
   }
@@ -167,6 +204,7 @@ class Obd2LinkSupervisor {
     _userRequestedDisconnect = true;
     _cancelBackoffTimer();
     _attemptCount = 0;
+    _resetStandDown(); // #3603
     final dead = _service;
     _service = null;
     _setState(Obd2LinkState.userDisconnected);
@@ -194,6 +232,18 @@ class Obd2LinkSupervisor {
           '(${_state.value}) — not dialing');
       return;
     }
+    // #3603 — flap accounting: a ready that died within [flapWindow]
+    // is a flap, not a recovery; one that SURVIVED the window proves
+    // the link works and clears the streak.
+    final readyAt = _readyAt;
+    _readyAt = null;
+    if (readyAt != null) {
+      if (_now().difference(readyAt) < flapWindow) {
+        _flapStreak++;
+      } else {
+        _flapStreak = 0;
+      }
+    }
     // #3534 — the per-drop timeline starts here (detect → dial →
     // recovered); the field-validation checklist reads this chain out
     // of the breadcrumb export after an induced-drop drive.
@@ -201,6 +251,13 @@ class Obd2LinkSupervisor {
     _setState(Obd2LinkState.reconnecting);
     // Dial immediately on the first drop; backoff grows only on misses.
     if (_attemptInFlight == null && _backoffTimer == null) {
+      if (_flapStreak >= standDownThreshold) {
+        // #3603 — success-flap stand-down: the instant redial is what
+        // burned 20 dial→adopt→drop cycles in the field. Hold the
+        // storm cadence until a ready survives or the user acts.
+        _armBackoffTimer();
+        return;
+      }
       _backoff = Duration.zero;
       unawaited(_attempt(userInitiated: false));
     }
@@ -213,6 +270,7 @@ class Obd2LinkSupervisor {
     _cancelBackoffTimer();
     _service = null;
     _attemptCount = 0;
+    _resetStandDown(); // #3603 — the park itself is the stand-down
     // #3534 — the checklist's "engine-off parks the loop" line item.
     BreadcrumbCollector.add('OBD2 link parked', detail: 'engine off');
     _setState(Obd2LinkState.engineOff);
@@ -223,6 +281,7 @@ class Obd2LinkSupervisor {
   /// already-live link must do nothing.
   void wake() {
     if (_disposed || _state.value != Obd2LinkState.engineOff) return;
+    _resetStandDown(); // #3603 — movement is a positive signal
     _backoff = Duration.zero;
     _setState(Obd2LinkState.reconnecting);
     unawaited(_attempt(userInitiated: false));
@@ -329,10 +388,29 @@ class Obd2LinkSupervisor {
       _service = fresh;
       _backoff = Duration.zero;
       _attemptCount = 0;
+      // #3603 — a fresh ready clears the miss streak, but NOT the flap
+      // streak: a success that proves nothing (drops again inside
+      // [flapWindow]) must not reset the escalation — the 2026-07-03
+      // detector blind spot. The flap streak clears when a ready
+      // SURVIVES the window (checked at the next drop) or on intent.
+      _lastMissSignature = null;
+      _identicalMissStreak = 0;
+      _readyAt = _now();
       _setState(Obd2LinkState.ready);
       return fresh;
     }
     _attemptCount++;
+    // #3603 — identical-signature accounting: the field storm was 20
+    // TimeoutExceptions in a row; N of the SAME failure mean the next
+    // attempt will very likely fail the same way too.
+    final signature =
+        failure == null ? 'miss' : failure.runtimeType.toString();
+    if (signature == _lastMissSignature) {
+      _identicalMissStreak++;
+    } else {
+      _lastMissSignature = signature;
+      _identicalMissStreak = 1;
+    }
     // Miss (null or fault): grow the backoff and re-arm — but only when
     // auto-dialing is still allowed. There is deliberately NO attempt
     // cap and NO terminal-failed state.
@@ -349,11 +427,26 @@ class Obd2LinkSupervisor {
 
   void _armBackoffTimer() {
     _cancelBackoffTimer();
-    _backoff = _backoff == Duration.zero
-        ? initialBackoff
-        : _backoff * 2 > maxBackoff
-            ? maxBackoff
-            : _backoff * 2;
+    if (inStandDown) {
+      // #3603 — stand-down: jump straight to the storm cadence. The
+      // breadcrumb fires once on entry, not every tick.
+      if (_backoff < stormBackoff) {
+        BreadcrumbCollector.add(
+          'OBD2 reconnect stand-down',
+          detail: _flapStreak >= standDownThreshold
+              ? 'flap x$_flapStreak — holding ${stormBackoff.inSeconds}s'
+              : '$_lastMissSignature x$_identicalMissStreak — '
+                  'holding ${stormBackoff.inSeconds}s',
+        );
+      }
+      _backoff = stormBackoff;
+    } else {
+      _backoff = _backoff == Duration.zero
+          ? initialBackoff
+          : _backoff * 2 > maxBackoff
+              ? maxBackoff
+              : _backoff * 2;
+    }
     // 0–12.5% jitter de-syncs the retry cadence from the adapter's own
     // advertising/settling rhythm (same rationale as #3014's jitter).
     final jitterMs = _jitter.nextInt(1 + _backoff.inMilliseconds ~/ 8);
@@ -362,6 +455,15 @@ class Obd2LinkSupervisor {
       if (_disposed || !_mayAutoDial) return;
       unawaited(_attempt(userInitiated: false));
     });
+  }
+
+  /// #3603 — positive signal (user intent, wake, park): back to the
+  /// fast ladder.
+  void _resetStandDown() {
+    _lastMissSignature = null;
+    _identicalMissStreak = 0;
+    _flapStreak = 0;
+    _readyAt = null;
   }
 
   void _cancelBackoffTimer() {
