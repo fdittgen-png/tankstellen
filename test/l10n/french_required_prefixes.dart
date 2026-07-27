@@ -65,6 +65,7 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   'lessonCombustionHealth',
   'lessonTransport',
   'tankReport',
+  'highwayMode',
   'insightUpshiftCruise',
   'fuelBreakdownHighRpmCruise',
 

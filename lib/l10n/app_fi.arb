@@ -5570,5 +5570,10 @@
   "@qrLaunchConfirmCancel": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "highwayModeChip": "Highway mode — showing stations ahead on your route",
+  "@highwayModeChip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

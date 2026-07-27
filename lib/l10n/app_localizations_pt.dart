@@ -7948,6 +7948,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get radarSearching => 'Searching…';
 
   @override
+  String get highwayModeChip =>
+      'Highway mode — showing stations ahead on your route';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fixar mantém o ecrã ligado — usa mais bateria';
 

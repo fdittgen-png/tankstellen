@@ -20,6 +20,9 @@ import '../../approach/providers/fuel_station_radar_provider.dart';
 import '../../../core/services/radar/radar_in_radius_cache_provider.dart';
 import '../../widget/data/car_station_writer.dart';
 import 'search_filters_provider.dart';
+import '../../../core/services/radar/highway_mode.dart';
+import '../../../core/services/radar/highway_mode_provider.dart';
+import '../../../core/country/country_provider.dart';
 
 part 'radar_search_provider.g.dart';
 
@@ -255,6 +258,14 @@ class RadarSearch extends _$RadarSearch {
   /// down, then trigger a gated re-fetch in the background.
   void _onFix(Position p) {
     _lastFix = p;
+    // #3631 — feed the app-wide highway detector from the ONE live GPS
+    // stream this surface owns; the rank calls below read its verdict.
+    try {
+      ref.read(highwayModeProvider.notifier).onFix(p.speed);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+          context: const {'where': 'radar highwayMode onFix'}));
+    }
     if (!state.active) return;
     // 1. Immediate, network-free re-rank off the cached raw set so the distance
     //    captions + closeness bars move on every fix.
@@ -307,7 +318,14 @@ class RadarSearch extends _$RadarSearch {
           : const <Station>[];
 
       _lastRaw = [...corridor, ...nearby];
-      final ranked = RadarRanking.rank(_lastRaw, lat: lat, lng: lng, fuel: fuel);
+      final hw = _highwayArgs();
+      final ranked = RadarRanking.rank(_lastRaw,
+          lat: lat,
+          lng: lng,
+          fuel: fuel,
+          headingDegrees: hw.heading,
+          highwayAheadOnly: hw.active,
+          leftHandTraffic: hw.leftHand);
 
       // #2948 — publish to the Android Auto Radar screen (swallows write faults).
       unawaited(carWriter.writeRadar(ranked, fuel));
@@ -322,11 +340,35 @@ class RadarSearch extends _$RadarSearch {
     }
   }
 
+
+  /// #3631 — the highway ahead-filter arguments for the shared ranking:
+  /// active verdict + the freshest sanitized course + the active
+  /// country's driving side. Falls back to inactive on any read fault
+  /// (shell safety — ranking must never fail because a provider isn't up).
+  ({bool active, double? heading, bool leftHand}) _highwayArgs() {
+    try {
+      final active = ref.read(highwayModeProvider);
+      final heading = geo.sanitizedHeading(_lastFix?.heading);
+      final leftHand = kLeftHandTrafficCountries
+          .contains(ref.read(activeCountryProvider).code.toUpperCase());
+      return (active: active, heading: heading, leftHand: leftHand);
+    } catch (_) {
+      return (active: false, heading: null, leftHand: false);
+    }
+  }
+
   /// Re-rank the cached raw set against ([lat], [lng]) and publish — no network.
   void _republish(double lat, double lng) {
     if (_lastRaw.isEmpty) return;
     final fuel = ref.read(selectedFuelTypeProvider);
-    final ranked = RadarRanking.rank(_lastRaw, lat: lat, lng: lng, fuel: fuel);
+    final hw = _highwayArgs();
+    final ranked = RadarRanking.rank(_lastRaw,
+        lat: lat,
+        lng: lng,
+        fuel: fuel,
+        headingDegrees: hw.heading,
+        highwayAheadOnly: hw.active,
+        leftHandTraffic: hw.leftHand);
     unawaited(carWriter.writeRadar(ranked, fuel));
     // #3354 — stamp the live course so the scope can orient heading-up.
     state = state.copyWith(

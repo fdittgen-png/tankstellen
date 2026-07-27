@@ -24,6 +24,7 @@ import 'radar_scope_view.dart';
 import 'route_results_view.dart';
 import 'search_results_list.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/services/radar/highway_mode_provider.dart';
 
 /// Renders the result panel of `SearchScreen` based on the current
 /// [SearchMode] and [FuelType]:
@@ -160,6 +161,9 @@ class SearchResultsContent extends ConsumerWidget {
           // tells the user the spot is being refreshed (instead of silently
           // showing stale-position distances), and clears once the live fix
           // lands and the list re-ranks.
+          // #3631 — while highway mode is on, the list only carries
+          // stations actually reachable ahead; the chip says so.
+          final highway = ref.watch(highwayModeProvider);
           return Column(
             children: [
               // #3615 — the refresh banner slides in/out instead of
@@ -171,6 +175,16 @@ class SearchResultsContent extends ConsumerWidget {
                 child: radar.locating
                     ? _RadarUpdatingBanner(
                         message: l10n.radarUpdatingLocation)
+                    : const SizedBox(width: double.infinity),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                alignment: Alignment.topCenter,
+                child: highway
+                    ? _RadarUpdatingBanner(
+                        message: l10n.highwayModeChip,
+                        icon: Icons.fork_right)
                     : const SizedBox(width: double.infinity),
               ),
               Expanded(child: body),
@@ -275,9 +289,13 @@ class _RadarEmptyState extends StatelessWidget {
 /// user sees results instantly), and this strip signals the spot is being
 /// refreshed; it clears once the live fix lands and the list re-ranks.
 class _RadarUpdatingBanner extends StatelessWidget {
-  const _RadarUpdatingBanner({required this.message});
+  const _RadarUpdatingBanner({required this.message, this.icon});
 
   final String message;
+
+  /// #3631 — a static icon replaces the progress spinner for
+  /// state-chips (highway mode) that aren't "working on something".
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -290,11 +308,14 @@ class _RadarUpdatingBanner extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
-            width: 14,
-            height: 14,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
+          if (icon != null)
+            Icon(icon, size: 16, color: theme.colorScheme.onSurfaceVariant)
+          else
+            const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
           const SizedBox(width: 10),
           Flexible(
             child: Text(

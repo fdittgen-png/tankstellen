@@ -6,6 +6,7 @@ import '../../domain/station.dart';
 import '../mixins/station_service_helpers.dart';
 import '../../utils/geo_utils.dart' as geo;
 import '../../utils/station_extensions.dart';
+import 'highway_mode.dart';
 
 /// The single distance-ranking authority shared by every radar surface (#3267).
 ///
@@ -54,6 +55,15 @@ class RadarRanking {
     required double lng,
     required FuelType fuel,
     bool requirePrice = false,
+    // #3631 — highway mode: with a finite [headingDegrees] and
+    // [highwayAheadOnly], only stations actually reachable ahead survive
+    // (same-carriageway services + next-exit candidates); the
+    // opposite-carriageway trap is dropped. Falls back to the unfiltered
+    // set rather than ever returning empty (a low-fuel driver must never
+    // see nothing because of a heuristic).
+    double? headingDegrees,
+    bool highwayAheadOnly = false,
+    bool leftHandTraffic = false,
   }) {
     // 1. Dedup by id — last write wins (the in-radius merge row beats the
     // corridor row it follows).
@@ -73,9 +83,23 @@ class RadarRanking {
             fuel,
           );
 
+    // 2b. #3631 — the highway ahead-filter (see highway_mode.dart).
+    final Iterable<Station> directional;
+    if (highwayAheadOnly && headingDegrees != null) {
+      directional = filterStationsAhead(
+        stations: filtered.toList(growable: false),
+        lat: lat,
+        lng: lng,
+        headingDegrees: headingDegrees,
+        leftHandTraffic: leftHandTraffic,
+      ).stations;
+    } else {
+      directional = filtered;
+    }
+
     // 3. Live distance stamp + 4. distance sort.
     return [
-      for (final s in filtered)
+      for (final s in directional)
         s.copyWith(dist: geo.distanceMeters(lat, lng, s.lat, s.lng) / 1000.0),
     ]..sort((a, b) => a.dist.compareTo(b.dist));
   }
@@ -88,12 +112,18 @@ class RadarRanking {
     required double lat,
     required double lng,
     required FuelType fuel,
+    double? headingDegrees,
+    bool highwayAheadOnly = false,
+    bool leftHandTraffic = false,
   }) {
     final ranked = rank(
       stations,
       lat: lat,
       lng: lng,
       fuel: fuel,
+      headingDegrees: headingDegrees,
+      highwayAheadOnly: highwayAheadOnly,
+      leftHandTraffic: leftHandTraffic,
       requirePrice: true,
     );
     return ranked.isEmpty ? null : ranked.first;

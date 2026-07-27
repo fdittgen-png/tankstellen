@@ -11,6 +11,9 @@ import '../../profile/providers/profile_provider.dart';
 import '../../../core/services/radar/radar_ranking.dart';
 import 'effective_approach_state_provider.dart';
 import 'fuel_station_radar_provider.dart';
+import '../../../core/services/radar/highway_mode.dart';
+import '../../../core/services/radar/highway_mode_provider.dart';
+import '../../../core/country/country_provider.dart';
 
 part 'nearest_station_radar_provider.g.dart';
 
@@ -83,15 +86,36 @@ Future<Station?> nearestStationRadar(Ref ref) async {
     // the current fix (#2808 — the corridor `dist` is frozen at fetch time so
     // without this the PiP bar + caption never move) and return the nearest.
     // `null` when nothing in range is priced.
+    // #3631 — the PiP's single target must never be an opposite-carriageway
+    // station the driver cannot reach.
+    final hw = _highwaySafe(ref);
     return RadarRanking.nearestPriced(
       stations,
       lat: gps.latitude,
       lng: gps.longitude,
       fuel: fuel,
+      headingDegrees: geo.sanitizedHeading(gps.heading),
+      highwayAheadOnly: hw.active,
+      leftHandTraffic: hw.leftHand,
     );
   } on Object {
     // Radar / chain failure — treat as "no station nearby". The provider
     // re-runs on the next approach-state tick.
     return null;
+  }
+}
+
+/// #3631 — highway args resolved defensively: any not-up provider reads
+/// as "mode off" (these fall inside catch-all providers whose tests run
+/// minimal containers; ranking must never fail because of the filter).
+({bool active, bool leftHand}) _highwaySafe(Ref ref) {
+  try {
+    return (
+      active: ref.read(highwayModeProvider),
+      leftHand: kLeftHandTrafficCountries
+          .contains(ref.read(activeCountryProvider).code.toUpperCase()),
+    );
+  } catch (_) {
+    return (active: false, leftHand: false);
   }
 }
