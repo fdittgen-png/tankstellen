@@ -24,7 +24,7 @@ dependencies:
   riverpod_annotation: ^4.0.2
 
   # Networking
-  dio: ^5.10.0
+  dio: ^5.11.0
 
   # Local Storage
   hive: ^2.2.3
@@ -94,11 +94,11 @@ dependencies:
   # ^7.1.x once GitHub's macos-* runner image ships Xcode 26+ with the iOS
   # 26 SDK (or once connectivity_plus moves the iOS 26 path behind a Swift
   # `#if canImport(...)` / compiler-version gate).
-  connectivity_plus: ^7.3.0
+  connectivity_plus: ^7.3.1
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.1
   http: ^1.3.0
-  share_plus: ^13.2.1
+  share_plus: ^13.3.0
   # Inbound OS share-intent receiver (#2735 / Epic #2687) is now served by
   # the in-repo, GMS-free ShareIntentChannel (Android MethodChannel/
   # EventChannel on MainActivity, declared via AndroidManifest intent-filters)
@@ -120,14 +120,14 @@ dependencies:
   permission_handler: ^12.0.3
   flutter_secure_storage: ^10.3.1
   package_info_plus: ^10.2.1
-  sentry_flutter: ^9.24.0
+  sentry_flutter: ^9.25.0
   home_widget: ^0.9.3
   workmanager: ^0.9.0
   shimmer: ^3.0.0
   flutter_tts: ^4.2.0
-  flutter_local_notifications: ^22.1.0
+  flutter_local_notifications: ^22.2.0
   supabase_flutter: ^2.16.0
-  wakelock_plus: ^1.6.1
+  wakelock_plus: ^1.7.0
   app_badge_plus: ^1.3.2
   archive: ^4.0.9
   # User-driven .zip picker for the full-backup RESTORE flow (#2571).
@@ -178,7 +178,7 @@ dev_dependencies:
   # Required only by the FeedbackTokenSection widget test, which uses
   # `FlutterSecureStoragePlatform.instance` to inject a fake store
   # without going through the platform method channel (#952 phase 3).
-  flutter_secure_storage_platform_interface: ^2.0.1
+  flutter_secure_storage_platform_interface: ^2.0.2
   # Required only by the DrivingStationSheet widget test, which swaps
   # `UrlLauncherPlatform.instance` with a fake to assert the geo: URI
   # the Navigate button emits without going through a real intent.
