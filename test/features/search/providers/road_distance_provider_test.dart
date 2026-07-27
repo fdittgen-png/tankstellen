@@ -78,7 +78,7 @@ void main() {
       var calls = 0;
       final container = ProviderContainer(overrides: [
         roadDistanceFetcherProvider.overrideWithValue(
-          (lat, lng, dests) async {
+          (lat, lng, bearing, dests) async {
             calls++;
             return [for (var i = 0; i < dests.length; i++) 10.0 + i];
           },
@@ -110,7 +110,7 @@ void main() {
       var fail = false;
       final container = ProviderContainer(overrides: [
         roadDistanceFetcherProvider.overrideWithValue(
-          (lat, lng, dests) async {
+          (lat, lng, bearing, dests) async {
             if (fail) throw Exception('osrm down');
             return [7.7];
           },
@@ -127,6 +127,56 @@ void main() {
       await notifier.refresh(lat: 43.1, lng: 3.0, ranked: ranked);
       expect(container.read(roadDistancesProvider), {'a': 7.7},
           reason: 'routing is garnish — a failure must change nothing');
+    });
+  });
+
+  group('#3637 direction-aware bearings', () {
+    test('osrmTableParams: origin bearing + one empty entry per '
+        'destination; absent when no bearing', () {
+      final constrained = osrmTableParams(
+          destinationCount: 3, originBearingDegrees: 271.6);
+      expect(constrained['bearings'], '272,25;;;',
+          reason: 'rounded heading, tolerance, 3 unconstrained slots');
+      final free = osrmTableParams(destinationCount: 3);
+      expect(free.containsKey('bearings'), isFalse);
+      // Wrap-around + non-finite safety.
+      expect(
+          osrmTableParams(destinationCount: 1, originBearingDegrees: 365.0)[
+              'bearings'],
+          '5,25;');
+      expect(
+          osrmTableParams(
+                  destinationCount: 1,
+                  originBearingDegrees: double.nan)
+              .containsKey('bearings'),
+          isFalse);
+    });
+
+    test('osrmTableCoords is lon,lat ordered', () {
+      expect(
+        osrmTableCoords(43.0, 3.0, [(lat: 43.1, lng: 3.1)]),
+        '3.0,43.0;3.1,43.1',
+      );
+    });
+
+    test('the provider threads the heading to the fetch seam', () async {
+      double? seenBearing;
+      final container = ProviderContainer(overrides: [
+        roadDistanceFetcherProvider.overrideWithValue(
+          (lat, lng, bearing, dests) async {
+            seenBearing = bearing;
+            return [1.0];
+          },
+        ),
+      ]);
+      addTearDown(container.dispose);
+      await container.read(roadDistancesProvider.notifier).refresh(
+        lat: 43.0,
+        lng: 3.0,
+        ranked: [_station('a', 43.01, 3.0)],
+        headingDegrees: 88.0,
+      );
+      expect(seenBearing, 88.0);
     });
   });
 }

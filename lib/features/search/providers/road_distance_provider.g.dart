@@ -23,16 +23,19 @@ final class RoadDistanceFetcherProvider
           Future<List<double?>> Function(
             double lat,
             double lng,
+            double? bearingDegrees,
             List<({double lat, double lng})> destinations,
           ),
           Future<List<double?>> Function(
             double lat,
             double lng,
+            double? bearingDegrees,
             List<({double lat, double lng})> destinations,
           ),
           Future<List<double?>> Function(
             double lat,
             double lng,
+            double? bearingDegrees,
             List<({double lat, double lng})> destinations,
           )
         >
@@ -41,6 +44,7 @@ final class RoadDistanceFetcherProvider
           Future<List<double?>> Function(
             double lat,
             double lng,
+            double? bearingDegrees,
             List<({double lat, double lng})> destinations,
           )
         > {
@@ -66,6 +70,7 @@ final class RoadDistanceFetcherProvider
     Future<List<double?>> Function(
       double lat,
       double lng,
+      double? bearingDegrees,
       List<({double lat, double lng})> destinations,
     )
   >
@@ -75,6 +80,7 @@ final class RoadDistanceFetcherProvider
   Future<List<double?>> Function(
     double lat,
     double lng,
+    double? bearingDegrees,
     List<({double lat, double lng})> destinations,
   )
   create(Ref ref) {
@@ -86,6 +92,7 @@ final class RoadDistanceFetcherProvider
     Future<List<double?>> Function(
       double lat,
       double lng,
+      double? bearingDegrees,
       List<({double lat, double lng})> destinations,
     )
     value,
@@ -97,6 +104,7 @@ final class RoadDistanceFetcherProvider
             Future<List<double?>> Function(
               double lat,
               double lng,
+              double? bearingDegrees,
               List<({double lat, double lng})> destinations,
             )
           >(value),
@@ -105,7 +113,7 @@ final class RoadDistanceFetcherProvider
 }
 
 String _$roadDistanceFetcherHash() =>
-    r'e51a006f17661a15390f83f9c984d2d157b9cafe';
+    r'd0ec27cea4cc1fc08a152f30fcc16703d958fa52';
 
 /// Station-id → real road distance (km) for the radar surface (#3634).
 ///
@@ -161,7 +169,7 @@ final class RoadDistancesProvider
   }
 }
 
-String _$roadDistancesHash() => r'3f3e1638dd24f72f372f75b27a96c12b4b53f08a';
+String _$roadDistancesHash() => r'347c27d9a15f9375b5bc94de349335e2bd32cc05';
 
 /// Station-id → real road distance (km) for the radar surface (#3634).
 ///

@@ -169,27 +169,40 @@ class RoutingService {
   /// unreachable or omits the distances matrix (some servers disable the
   /// annotation) — callers keep the crow-flies figure then. Never maps
   /// durations onto distances.
+  /// #3637 — with [originBearingDegrees] the origin snaps only onto road
+  /// segments matching the travel direction (±[kOsrmBearingToleranceDeg]),
+  /// so a driver on the northbound carriageway gets northbound-departure
+  /// distances — the opposite carriageway and backwards departures cost
+  /// their real turn-around km. If the constrained call answers all-null
+  /// (no segment matched a noisy heading), ONE unconstrained retry keeps
+  /// the feature alive — direction-awareness must never cost the figures.
   Future<List<double?>> roadDistancesKm({
     required double originLat,
     required double originLng,
     required List<({double lat, double lng})> destinations,
+    double? originBearingDegrees,
   }) async {
     if (destinations.isEmpty) return const [];
-    final coords = StringBuffer('$originLng,$originLat');
-    for (final d in destinations) {
-      coords.write(';${d.lng},${d.lat}');
+    Future<List<double?>> call(double? bearing) async {
+      final response = await _dio.get<dynamic>(
+        '$_baseUrl/table/v1/driving/'
+        '${osrmTableCoords(originLat, originLng, destinations)}',
+        queryParameters: osrmTableParams(
+          destinationCount: destinations.length,
+          originBearingDegrees: bearing,
+        ),
+      );
+      return parseOsrmTableDistancesKm(
+        response.data as Map<String, dynamic>,
+        destinationCount: destinations.length,
+      );
     }
-    final response = await _dio.get<dynamic>(
-      '$_baseUrl/table/v1/driving/$coords',
-      queryParameters: {
-        'sources': '0',
-        'annotations': 'distance',
-      },
-    );
-    return parseOsrmTableDistancesKm(
-      response.data as Map<String, dynamic>,
-      destinationCount: destinations.length,
-    );
+
+    final first = await call(originBearingDegrees);
+    if (originBearingDegrees == null || first.any((d) => d != null)) {
+      return first;
+    }
+    return call(null);
   }
 }
 
@@ -215,4 +228,43 @@ List<double?> parseOsrmTableDistancesKm(
       else
         null,
   ];
+}
+
+/// Bearing snap tolerance (°) for the direction-aware origin (#3637) —
+/// wide enough for GPS course noise on a straight carriageway, narrow
+/// enough to exclude the opposite direction.
+const double kOsrmBearingToleranceDeg = 25;
+
+/// OSRM `lon,lat;lon,lat…` coordinate path segment (#3637, extracted so
+/// the query shape is unit-testable without Dio).
+String osrmTableCoords(
+  double originLat,
+  double originLng,
+  List<({double lat, double lng})> destinations,
+) {
+  final coords = StringBuffer('$originLng,$originLat');
+  for (final d in destinations) {
+    coords.write(';${d.lng},${d.lat}');
+  }
+  return coords.toString();
+}
+
+/// OSRM `/table` query parameters (#3637). The `bearings` list MUST
+/// carry one entry per coordinate — the origin's `deg,tolerance`
+/// followed by one empty (unconstrained) entry per destination.
+Map<String, String> osrmTableParams({
+  required int destinationCount,
+  double? originBearingDegrees,
+}) {
+  final params = <String, String>{
+    'sources': '0',
+    'annotations': 'distance',
+  };
+  final b = originBearingDegrees;
+  if (b != null && b.isFinite) {
+    params['bearings'] =
+        '${b.round() % 360},${kOsrmBearingToleranceDeg.round()}'
+        '${';' * destinationCount}';
+  }
+  return params;
 }

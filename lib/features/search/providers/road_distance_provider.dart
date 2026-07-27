@@ -27,12 +27,15 @@ const Duration kRoadDistanceRefetchInterval = Duration(seconds: 60);
 Future<List<double?>> Function(
   double lat,
   double lng,
+  double? bearingDegrees,
   List<({double lat, double lng})> destinations,
 ) roadDistanceFetcher(Ref ref) {
   final service = RoutingService();
-  return (lat, lng, destinations) => service.roadDistancesKm(
+  return (lat, lng, bearingDegrees, destinations) =>
+      service.roadDistancesKm(
         originLat: lat,
         originLng: lng,
+        originBearingDegrees: bearingDegrees,
         destinations: destinations,
       );
 }
@@ -62,6 +65,10 @@ class RoadDistances extends _$RoadDistances {
     required double lat,
     required double lng,
     required List<Station> ranked,
+    // #3637 — the sanitized GPS course: constrains the OSRM origin snap
+    // to the driver's carriageway/direction. Null (standstill, no fix)
+    // keeps the unconstrained behavior.
+    double? headingDegrees,
   }) async {
     if (ranked.isEmpty || _inFlight) return;
     final now = DateTime.now();
@@ -80,6 +87,7 @@ class RoadDistances extends _$RoadDistances {
       final kms = await fetch(
         lat,
         lng,
+        headingDegrees,
         [for (final s in top) (lat: s.lat, lng: s.lng)],
       );
       _lastLat = lat;
