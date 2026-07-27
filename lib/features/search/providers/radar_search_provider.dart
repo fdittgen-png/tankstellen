@@ -20,9 +20,9 @@ import '../../approach/providers/fuel_station_radar_provider.dart';
 import '../../../core/services/radar/radar_in_radius_cache_provider.dart';
 import '../../widget/data/car_station_writer.dart';
 import 'search_filters_provider.dart';
-import '../../../core/services/radar/highway_mode.dart';
 import '../../../core/services/radar/highway_mode_provider.dart';
-import '../../../core/country/country_provider.dart';
+import 'road_distance_provider.dart';
+import 'radar_highway_args.dart';
 
 part 'radar_search_provider.g.dart';
 
@@ -318,7 +318,7 @@ class RadarSearch extends _$RadarSearch {
           : const <Station>[];
 
       _lastRaw = [...corridor, ...nearby];
-      final hw = _highwayArgs();
+      final hw = highwayRankArgs(ref, _lastFix);
       final ranked = RadarRanking.rank(_lastRaw,
           lat: lat,
           lng: lng,
@@ -331,6 +331,20 @@ class RadarSearch extends _$RadarSearch {
       unawaited(carWriter.writeRadar(ranked, fuel));
 
       state = state.copyWith(stations: AsyncData<List<Station>>(ranked));
+
+      // #3634 — one gated OSRM /table call annotates the visible top-N
+      // with real road km (display enrichment; fire-and-forget, the
+      // notifier owns the movement/time gate and silent degrade).
+      try {
+        unawaited(ref.read(roadDistancesProvider.notifier).refresh(
+            lat: lat,
+            lng: lng,
+            ranked: ranked,
+            // #3637 — direction-aware origin snap (null at standstill).
+            headingDegrees: geo.sanitizedHeading(_lastFix?.heading)));
+      } catch (_) {
+        // ignore: silent_catch — shell safety: a not-up graph must not break the scan
+      }
     } catch (e, st) {
       // On a background (live) refresh, keep the last good results; only an
       // explicit (initial / retry) scan surfaces the error.
@@ -341,27 +355,12 @@ class RadarSearch extends _$RadarSearch {
   }
 
 
-  /// #3631 — the highway ahead-filter arguments for the shared ranking:
-  /// active verdict + the freshest sanitized course + the active
-  /// country's driving side. Falls back to inactive on any read fault
-  /// (shell safety — ranking must never fail because a provider isn't up).
-  ({bool active, double? heading, bool leftHand}) _highwayArgs() {
-    try {
-      final active = ref.read(highwayModeProvider);
-      final heading = geo.sanitizedHeading(_lastFix?.heading);
-      final leftHand = kLeftHandTrafficCountries
-          .contains(ref.read(activeCountryProvider).code.toUpperCase());
-      return (active: active, heading: heading, leftHand: leftHand);
-    } catch (_) {
-      return (active: false, heading: null, leftHand: false);
-    }
-  }
 
   /// Re-rank the cached raw set against ([lat], [lng]) and publish — no network.
   void _republish(double lat, double lng) {
     if (_lastRaw.isEmpty) return;
     final fuel = ref.read(selectedFuelTypeProvider);
-    final hw = _highwayArgs();
+    final hw = highwayRankArgs(ref, _lastFix);
     final ranked = RadarRanking.rank(_lastRaw,
         lat: lat,
         lng: lng,

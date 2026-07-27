@@ -21,3 +21,4 @@ export 'presentation/widgets/route_input.dart';
 export 'providers/route_input_provider.dart';
 export 'providers/route_search_params_provider.dart';
 export 'providers/route_search_provider.dart';
+export 'data/services/routing_service.dart';
