@@ -151,4 +151,4 @@ final class NearestStationRadarProvider
 }
 
 String _$nearestStationRadarHash() =>
-    r'bbae8635d6a1623b5895d1d964503f35fcf96023';
+    r'354f82d6e08c57e08ff3540a1f3a873a9313c6b4';

@@ -7855,6 +7855,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get radarSearching => 'Searching…';
 
   @override
+  String get highwayModeChip =>
+      'Highway mode — showing stations ahead on your route';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Pinning keeps the screen on — uses more battery';
 
@@ -16310,6 +16314,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get radarSearching => '⟦Šéářçĥîñǧ… ····⟧';
+
+  @override
+  String get highwayModeChip =>
+      '⟦Ĥîǧĥŵáý ɱóđé — šĥóŵîñǧ šŧáŧîóñš áĥéáđ óñ ýóúř řóúŧé ···················⟧';
 
   @override
   String get tripRecordingPinTooltip =>

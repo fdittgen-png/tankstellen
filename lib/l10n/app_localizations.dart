@@ -13676,6 +13676,12 @@ abstract class AppLocalizations {
   /// **'Searching…'**
   String get radarSearching;
 
+  /// #3631 chip over the radar list while sustained motorway driving is detected; the list drops opposite-direction stations
+  ///
+  /// In en, this message translates to:
+  /// **'Highway mode — showing stations ahead on your route'**
+  String get highwayModeChip;
+
   /// Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost.
   ///
   /// In en, this message translates to:

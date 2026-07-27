@@ -3794,6 +3794,10 @@
   "@radarSearching": {
     "description": "Label on the Fuel Station Radar launch button while a scan is initialising — the GPS fix is being acquired and/or the first station list is loading — so the user sees the radar is working rather than a button that silently flipped to 'Stop' (#3290)."
   },
+  "highwayModeChip": "Autobahn-Modus — nur Tankstellen voraus auf deiner Strecke",
+  "@highwayModeChip": {
+    "description": "#3631"
+  },
   "tripRecordingPinTooltip": "Anpinnen hält den Bildschirm an — verbraucht mehr Akku",
   "@tripRecordingPinTooltip": {
     "description": "Tooltip on the pin toggle in the trip-recording AppBar (#891). Warns the user that enabling pin keeps the screen awake at a battery cost."

@@ -42,5 +42,9 @@
   "radarSearching": "Searching…",
   "@radarSearching": {
     "description": "Label on the Fuel Station Radar launch button while a scan is initialising — the GPS fix is being acquired and/or the first station list is loading — so the user sees the radar is working rather than a button that silently flipped to 'Stop' (#3290)."
+  },
+  "highwayModeChip": "Highway mode — showing stations ahead on your route",
+  "@highwayModeChip": {
+    "description": "#3631 chip over the radar list while sustained motorway driving is detected; the list drops opposite-direction stations"
   }
 }

@@ -5465,5 +5465,6 @@
     }
   },
   "qrLaunchConfirmOpen": "Ouvrir le lien",
-  "qrLaunchConfirmCancel": "Annuler"
+  "qrLaunchConfirmCancel": "Annuler",
+  "highwayModeChip": "Mode autoroute — seules les stations devant vous sur votre trajet"
 }

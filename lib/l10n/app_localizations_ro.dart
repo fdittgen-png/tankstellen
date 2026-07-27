@@ -7944,6 +7944,10 @@ class AppLocalizationsRo extends AppLocalizations {
   String get radarSearching => 'Searching…';
 
   @override
+  String get highwayModeChip =>
+      'Highway mode — showing stations ahead on your route';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Fixarea menține ecranul aprins — consumă mai multă baterie';
 

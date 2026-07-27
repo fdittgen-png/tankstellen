@@ -7970,6 +7970,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get radarSearching => 'Searching…';
 
   @override
+  String get highwayModeChip =>
+      'Mode autoroute — seules les stations devant vous sur votre trajet';
+
+  @override
   String get tripRecordingPinTooltip =>
       'L\'épinglage garde l\'écran allumé — consomme plus de batterie';
 

@@ -7887,6 +7887,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get radarSearching => 'Searching…';
 
   @override
+  String get highwayModeChip =>
+      'Highway mode — showing stations ahead on your route';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Nålning håller skärmen på – förbrukar mer batteri';
 

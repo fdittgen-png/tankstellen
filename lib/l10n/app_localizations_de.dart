@@ -7940,6 +7940,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get radarSearching => 'Suche läuft…';
 
   @override
+  String get highwayModeChip =>
+      'Autobahn-Modus — nur Tankstellen voraus auf deiner Strecke';
+
+  @override
   String get tripRecordingPinTooltip =>
       'Anpinnen hält den Bildschirm an — verbraucht mehr Akku';
 
