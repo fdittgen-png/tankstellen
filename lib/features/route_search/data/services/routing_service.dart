@@ -161,4 +161,58 @@ class RoutingService {
 
     return samples;
   }
+
+  /// #3634 — real road distances from ONE origin to [destinations] in a
+  /// single OSRM `/table` request (`sources=0`, distance annotation).
+  ///
+  /// Returns km per destination, `null` where OSRM reports the point
+  /// unreachable or omits the distances matrix (some servers disable the
+  /// annotation) — callers keep the crow-flies figure then. Never maps
+  /// durations onto distances.
+  Future<List<double?>> roadDistancesKm({
+    required double originLat,
+    required double originLng,
+    required List<({double lat, double lng})> destinations,
+  }) async {
+    if (destinations.isEmpty) return const [];
+    final coords = StringBuffer('$originLng,$originLat');
+    for (final d in destinations) {
+      coords.write(';${d.lng},${d.lat}');
+    }
+    final response = await _dio.get<dynamic>(
+      '$_baseUrl/table/v1/driving/$coords',
+      queryParameters: {
+        'sources': '0',
+        'annotations': 'distance',
+      },
+    );
+    return parseOsrmTableDistancesKm(
+      response.data as Map<String, dynamic>,
+      destinationCount: destinations.length,
+    );
+  }
+}
+
+/// Pure parser for the OSRM `/table` response (#3634): the first (only)
+/// row of `distances` holds metres from the origin, index 0 being the
+/// origin-to-origin zero which is skipped. Null-safe against servers
+/// that omit the matrix, rows shorter than expected, and per-cell nulls
+/// (unreachable snap).
+List<double?> parseOsrmTableDistancesKm(
+  Map<String, dynamic> json, {
+  required int destinationCount,
+}) {
+  final none = List<double?>.filled(destinationCount, null);
+  if (json['code'] != 'Ok') return none;
+  final distances = json['distances'];
+  if (distances is! List || distances.isEmpty) return none;
+  final row = distances.first;
+  if (row is! List) return none;
+  return [
+    for (var i = 1; i <= destinationCount; i++)
+      if (i < row.length && row[i] is num)
+        (row[i] as num).toDouble() / 1000.0
+      else
+        null,
+  ];
 }
