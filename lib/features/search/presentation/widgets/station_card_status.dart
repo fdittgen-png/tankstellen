@@ -117,10 +117,33 @@ class _StationDetails extends StatelessWidget {
           children: [
             // #2622 — distance gets priority in this cramped row; the
             // timestamp (Flexible) is what wraps/ellipsises first.
-            Text(
-              PriceFormatter.formatDistance(station.dist),
-              style: theme.textTheme.bodySmall,
-            ),
+            // #3634 — when the OSRM table has answered for this station,
+            // the REAL road distance replaces the crow-flies figure (the
+            // route icon marks the difference); otherwise the haversine
+            // value stands as always.
+            Consumer(builder: (context, ref, _) {
+              final roadKm = ref.watch(
+                  roadDistancesProvider.select((m) => m[station.id]));
+              if (roadKm == null) {
+                return Text(
+                  PriceFormatter.formatDistance(station.dist),
+                  style: theme.textTheme.bodySmall,
+                );
+              }
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.route,
+                      size: 12,
+                      color: theme.colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 2),
+                  Text(
+                    PriceFormatter.formatDistance(roadKm),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+              );
+            }),
             if (station.updatedAt != null) ...[
               const SizedBox(width: 8),
               Icon(

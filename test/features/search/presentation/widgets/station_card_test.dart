@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
@@ -1147,14 +1148,17 @@ void main() {
 
       testWidgets('card uses elevation 1 in dark mode', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            theme: ThemeData.dark(),
-            home: const Scaffold(
-              body: StationCard(
-                station: testStation,
-                selectedFuelType: FuelType.e10,
+          // #3634 — the card's road-distance Consumer needs a scope.
+          ProviderScope(
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              theme: ThemeData.dark(),
+              home: const Scaffold(
+                body: StationCard(
+                  station: testStation,
+                  selectedFuelType: FuelType.e10,
+                ),
               ),
             ),
           ),
