@@ -336,9 +336,12 @@ class RadarSearch extends _$RadarSearch {
       // with real road km (display enrichment; fire-and-forget, the
       // notifier owns the movement/time gate and silent degrade).
       try {
-        unawaited(ref
-            .read(roadDistancesProvider.notifier)
-            .refresh(lat: lat, lng: lng, ranked: ranked));
+        unawaited(ref.read(roadDistancesProvider.notifier).refresh(
+            lat: lat,
+            lng: lng,
+            ranked: ranked,
+            // #3637 — direction-aware origin snap (null at standstill).
+            headingDegrees: geo.sanitizedHeading(_lastFix?.heading)));
       } catch (_) {
         // ignore: silent_catch — shell safety: a not-up graph must not break the scan
       }
