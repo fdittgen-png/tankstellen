@@ -332,6 +332,12 @@ class BluetoothObd2Transport
     _frame.clear();
     final completer = Completer<String>();
     _pending = completer;
+    // #3639 — the awaiter only attaches AFTER `_channel.write()` returns;
+    // a stalled write + concurrent disconnect() lets [_failPending] error
+    // this future with NO listener yet (unhandled "Transport closed" at
+    // PlatformDispatcher.onError). ignore() covers that gap; the real
+    // awaiter still receives the error unchanged.
+    completer.future.ignore();
     // Clear `_pending` on EVERY exit — success, timeout *or* a throwing
     // write (#2453). Before, if `_channel.write()` threw (device-not-
     // connected / GATT timeout) with `_pending` still set, every later

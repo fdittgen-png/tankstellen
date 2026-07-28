@@ -152,6 +152,36 @@ void main() {
       expect(() => transport.sendCommand('010D\r'), throwsStateError);
     });
 
+    test(
+        '#3639 disconnect() during a STALLED write does not surface an '
+        'unhandled Transport-closed error', () async {
+      final channel = _ScriptedChannel();
+      final transport = BluetoothObd2Transport(channel);
+      await transport.connect();
+
+      // The platform write on a dying link never returns — `_sendRaw` is
+      // suspended BEFORE the awaiter attaches to the pending completer.
+      channel.scriptWriteHang('010D\r');
+      unawaited(transport.sendCommand('010D\r').then(
+        (_) => fail('a stalled command must not succeed'),
+        // The abandoned command's error (if the caller path ever resumes)
+        // is expected and handled here.
+        onError: (Object _) {},
+      ));
+      // Let `_sendRaw` reach the stalled write.
+      await Future<void>.delayed(Duration.zero);
+
+      // Tearing down mid-write fails the pending completer while its
+      // future has no listener yet — this must NOT escape to the zone as
+      // an unhandled "Bad state: Transport closed" (the test framework
+      // fails the test if it does).
+      await transport.disconnect();
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(transport.isConnected, isFalse);
+    });
+
     test('sendCommand handles chunked notifications', () async {
       // BLE notifications often arrive in 20-byte chunks. The transport
       // must accumulate across chunks until the "> " prompt.
@@ -388,6 +418,7 @@ void main() {
 class _ScriptedChannel implements ElmByteChannel {
   final Map<String, List<List<int>>> _chunksByCommand = {};
   final Map<String, Object> _writeThrowsByCommand = {};
+  final Set<String> _writeHangsByCommand = {};
   final StreamController<List<int>> _controller =
       StreamController<List<int>>.broadcast();
   final List<List<int>> _writes = [];
@@ -418,6 +449,13 @@ class _ScriptedChannel implements ElmByteChannel {
   /// still recorded (so order assertions see it) before it throws.
   void scriptWriteThrows(String command, Object error) {
     _writeThrowsByCommand[command] = error;
+  }
+
+  /// #3639 — make `write()` STALL forever for a given command, simulating
+  /// a dying link whose platform write never returns. The write is still
+  /// recorded before stalling.
+  void scriptWriteHang(String command) {
+    _writeHangsByCommand.add(command);
   }
 
   /// #2295 — simulate a forwarded notify-stream error (what the real BLE
@@ -455,6 +493,11 @@ class _ScriptedChannel implements ElmByteChannel {
   Future<void> write(List<int> bytes) async {
     _writes.add(bytes);
     final command = String.fromCharCodes(bytes);
+    if (_writeHangsByCommand.contains(command)) {
+      // #3639 — stall forever: the platform write on a dying link that
+      // never completes.
+      return Completer<void>().future;
+    }
     final throwFor = _writeThrowsByCommand[command];
     if (throwFor != null) {
       // #2453 — the underlying BLE/GATT write rejected. The transport must
