@@ -670,8 +670,10 @@ void main() {
       // #3610 — the two best-effort teardown catches now count a
       // bt.teardown_fail health counter + breadcrumb (+8 over the cap).
       // Decomposition candidate: the #3014 GATT-133 recovery block.
-      lines: 408,
-      bumps: 1,
+      // #3639 — completer.future.ignore() + rationale comment closing the
+      // no-listener window that leaked an unhandled 'Transport closed' (+6).
+      lines: 414,
+      bumps: 2,
       decompositionIssue: 3141,
     ),
     'lib/features/route_search/providers/route_search_provider.dart': (
