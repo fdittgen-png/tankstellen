@@ -137,10 +137,28 @@ class Obd2LinkSupervisor {
   /// (research rule 2: there is no second dial path). On success the
   /// dialed service becomes the supervised link; the backoff loop keeps
   /// using the DEFAULT dialer afterwards.
-  Future<Obd2Service?> connectWith(Obd2LinkDialer dialer) {
+  /// #3642 — [automated] marks a machine-initiated arm (auto-record's
+  /// proximity/resume dials). Automation is NOT user intent: it respects
+  /// the user's park, never resets the #3603 stand-down, and during an
+  /// active stand-down returns null without dialing (the supervisor's
+  /// own timer keeps the cadence) — the 2026-07-29 field export's 36 ms
+  /// automated redials against a parked car ended in an OS CPU kill.
+  Future<Obd2Service?> connectWith(Obd2LinkDialer dialer,
+      {bool automated = false}) {
     if (_disposed) return Future<Obd2Service?>.value();
+    if (automated) {
+      if (!_mayAutoDial) return Future<Obd2Service?>.value();
+      if (_standDown.active) {
+        // Keep the hold: make sure a timer exists, but never dial now.
+        if (_attemptInFlight == null && _backoffTimer == null) {
+          _armBackoffTimer();
+        }
+        return Future<Obd2Service?>.value();
+      }
+      return _attempt(userInitiated: false, dialer: dialer);
+    }
     _userRequestedDisconnect = false;
-    _standDown.reset(); // #3603
+    _standDown.reset(); // #3603 — user intent is a positive signal
     _cancelBackoffTimer();
     return _attempt(userInitiated: true, dialer: dialer);
   }
@@ -206,12 +224,26 @@ class Obd2LinkSupervisor {
   /// Exit [Obd2LinkState.engineOff] (movement detected / app resumed)
   /// and dial. A no-op in every other state — waking a user-parked or
   /// already-live link must do nothing.
+  /// #3642 — it ALSO breaks an active stand-down hold: the escalated
+  /// holds (5 → 15 → 60 min) exist for a parked car, and this positive
+  /// signal must dial now, not wait out a 60-minute timer.
   void wake() {
-    if (_disposed || _state.value != Obd2LinkState.engineOff) return;
-    _standDown.reset(); // #3603 — movement is a positive signal
-    _backoff.reset();
-    _setState(Obd2LinkState.reconnecting);
-    unawaited(_attempt(userInitiated: false));
+    if (_disposed) return;
+    if (_state.value == Obd2LinkState.engineOff) {
+      _standDown.reset(); // #3603 — movement is a positive signal
+      _backoff.reset();
+      _setState(Obd2LinkState.reconnecting);
+      unawaited(_attempt(userInitiated: false));
+      return;
+    }
+    if (_state.value == Obd2LinkState.reconnecting && _standDown.active) {
+      _standDown.reset(); // #3642 — movement exits the escalated hold
+      _backoff.reset();
+      if (_attemptInFlight == null) {
+        _cancelBackoffTimer();
+        unawaited(_attempt(userInitiated: false));
+      }
+    }
   }
 
   /// The single intent gate (research rule 7): auto-dialing is allowed
@@ -334,13 +366,15 @@ class Obd2LinkSupervisor {
 
   void _armBackoffTimer() {
     _cancelBackoffTimer();
-    final wait = _backoff.advance(standDown: inStandDown);
-    if (_backoff.enteredStorm) {
-      // #3603 — the breadcrumb fires once on stand-down entry.
+    final wasStandDown = inStandDown;
+    final wait = _backoff.advance(standDown: wasStandDown);
+    if (wasStandDown) {
+      // #3603 / #3642 — one breadcrumb per storm-cadence arm, with the
+      // ACTUAL hold (the escalation lengthens it 5 → 15 → 60 min).
       BreadcrumbCollector.add(
         'OBD2 reconnect stand-down',
         detail: '${_standDown.detail} — '
-            'holding ${_backoff.storm.inSeconds}s',
+            'holding ${wait.inSeconds}s',
       );
     }
     _backoffTimer = Timer(wait, () {

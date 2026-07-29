@@ -118,6 +118,17 @@ class ReconnectBackoff {
   final Random _jitter;
   Duration _current = Duration.zero;
   bool _enteredStorm = false;
+  int _stormAdvances = 0;
+
+  /// #3642 — each consecutive storm-cadence advance means the previous
+  /// held attempt STILL failed identically, so the hold lengthens:
+  /// storm ×1 → ×3 → ×12 (5 → 15 → 60 min at the default). A parked car
+  /// (adapter powered, ignition off, permanently in range) otherwise
+  /// keeps a ~18% duty cycle of doomed ~67 s Bluetooth ladders running
+  /// all day — the field shape behind the 2026-07-29 `[EXCESSIVE CPU
+  /// USAGE]` process kill. Any positive signal ([reset], or a healthy
+  /// ladder advance) restores the fast cadence.
+  static const List<int> stormEscalation = [1, 3, 12];
 
   int get currentMs => _current.inMilliseconds;
   bool get atCap => _current >= max;
@@ -126,18 +137,28 @@ class ReconnectBackoff {
   /// storm hold — the caller breadcrumbs stand-down entry exactly once.
   bool get enteredStorm => _enteredStorm;
 
-  void reset() => _current = Duration.zero;
+  void reset() {
+    _current = Duration.zero;
+    _stormAdvances = 0;
+  }
 
   /// Grows the cadence and returns the wait including jitter.
   Duration advance({required bool standDown}) {
-    _enteredStorm = standDown && _current < storm;
-    _current = standDown
-        ? storm
-        : _current == Duration.zero
-            ? initial
-            : _current * 2 > max
-                ? max
-                : _current * 2;
+    _enteredStorm = standDown && _stormAdvances == 0;
+    if (standDown) {
+      final step = _stormAdvances >= stormEscalation.length
+          ? stormEscalation.last
+          : stormEscalation[_stormAdvances];
+      _stormAdvances++;
+      _current = storm * step;
+    } else {
+      _stormAdvances = 0;
+      _current = _current == Duration.zero
+          ? initial
+          : _current * 2 > max
+              ? max
+              : _current * 2;
+    }
     final jitterMs = _jitter.nextInt(1 + _current.inMilliseconds ~/ 8);
     return _current + Duration(milliseconds: jitterMs);
   }
