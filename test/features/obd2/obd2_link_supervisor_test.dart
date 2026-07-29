@@ -82,28 +82,27 @@ void main() {
       async.flushMicrotasks();
       expect(sup.state.value, Obd2LinkState.reconnecting);
 
-      // #3603 — three identical misses now stand the loop down to the
-      // storm cadence (default 5 min), so the horizon is longer; the
-      // INVARIANT under test is unchanged: no dead end, ever.
+      // #3603 / #3642 — three identical misses stand the loop down, and
+      // consecutive holds ESCALATE (5 → 15 → 60 min, capped), so the
+      // horizon is much longer; the INVARIANT under test is unchanged:
+      // no dead end, ever.
       async.elapse(const Duration(minutes: 40));
-      final callsAtForty = dialer.calls;
-      expect(callsAtForty, greaterThan(6),
-          reason: 'the loop must outlive the old terminalFailed cap');
+      expect(dialer.calls, 5,
+          reason: 'fast ladder ×3, then the 5 min and 15 min holds');
       expect(sup.state.value, Obd2LinkState.reconnecting,
           reason: 'no dead end — still trying');
 
-      // Stand-down cadence is steady, not runaway: over the next
-      // 16 minutes ≈3 storm-interval attempts.
-      async.elapse(const Duration(minutes: 16));
-      final callsInSecondWindow = dialer.calls - callsAtForty;
-      expect(callsInSecondWindow, inInclusiveRange(2, 4),
-          reason: 'storm ~5 min cadence ⇒ ≈3 attempts per 16 min');
+      // The escalated cadence parks at hourly — steady, never terminal.
+      async.elapse(const Duration(minutes: 55));
+      expect(dialer.calls, 6,
+          reason: 'the capped 60-min hold still dials — the loop must '
+              'outlive the old terminalFailed cap');
 
       // And when the adapter finally reappears, the loop connects. The
-      // queued miss still in front costs one more storm cycle, so give
-      // it two full periods (+ jitter).
+      // queued miss still in front costs one more capped hold, so two
+      // full 60-min periods (+ jitter) must pass.
       dialer.enqueue(_liveService());
-      async.elapse(const Duration(minutes: 12));
+      async.elapse(const Duration(minutes: 140));
       expect(sup.state.value, Obd2LinkState.ready);
       unawaited(sup.dispose());
       async.flushMicrotasks();

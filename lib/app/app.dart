@@ -12,6 +12,7 @@ import '../core/logging/error_logger.dart';
 import '../core/language/language_provider.dart';
 import '../core/notifications/notification_launch_listener.dart';
 import '../core/sync/app_resume_sync.dart';
+import '../core/telemetry/background_cpu_watchdog.dart';
 import '../core/theme/theme_mode_provider.dart';
 import '../features/consumption/presentation/widgets/share_receipt_listener.dart';
 import '../features/consumption/presentation/widgets/trip_recording_banner.dart';
@@ -92,6 +93,8 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
     // periodic Tier-1 already meets the SLA). Never throws; the
     // coordinator's cross-trigger cooldown absorbs rapid resumes.
     if (state == AppLifecycleState.resumed) {
+      // #3641 — foreground CPU is legitimate; disarm the watchdog.
+      BackgroundCpuWatchdog.instance.stop();
       unawaited(BackgroundService.onOpportunisticWake());
       // #3447 — the same free window drives the debounced TankSync pull
       // (≥15 min since the last completed pass, never while a trip is
@@ -107,6 +110,11 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
     // be wasteful. We still listen so a `paused` arriving via the
     // `inactive → paused` path routes through this observer.
     if (state != AppLifecycleState.paused) return;
+    // #3641 — arm the background CPU watchdog: the OS kills us for
+    // burning >25% of a core while paused, and only a live per-thread
+    // sample can name the culprit. Cheap (one proc read/min), no-op off
+    // Android, disarmed again on resume.
+    BackgroundCpuWatchdog.instance.start();
     try {
       final notifier = ref.read(tripRecordingProvider.notifier);
       unawaited(notifier.onAppBackgrounded());

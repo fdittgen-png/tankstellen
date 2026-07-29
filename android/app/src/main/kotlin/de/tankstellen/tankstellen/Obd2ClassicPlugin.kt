@@ -423,7 +423,21 @@ object Obd2ClassicPlugin {
                         endedByEof = true
                         break
                     }
-                    if (n == 0) continue
+                    if (n == 0) {
+                        // #3641 — some OEM stacks return 0-byte reads from a
+                        // half-dead socket instead of blocking; a bare
+                        // `continue` then busy-spins this thread at 100% CPU
+                        // (the [EXCESSIVE CPU USAGE] kill class). Yield
+                        // briefly; a live socket blocks in read() anyway, so
+                        // healthy links never pay this.
+                        try {
+                            Thread.sleep(5)
+                        } catch (_: InterruptedException) {
+                            Thread.currentThread().interrupt()
+                            break
+                        }
+                        continue
+                    }
                     val slice = buffer.copyOfRange(0, n).toList()
                     postToSink { sink -> sink.success(slice) }
                 }

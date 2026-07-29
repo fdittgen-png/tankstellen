@@ -477,10 +477,10 @@ class AutoTripCoordinator {
     final sup = linkSupervisor;
     Obd2Service? service;
     try {
-      service = sup?.service ??
-          (sup != null
-              ? await sup.connectWith(() => opener(config.mac))
-              : await opener(config.mac));
+      service = sup == null
+          ? await opener(config.mac)
+          : sup.service ?? // #3642 — automated: respect the stand-down hold
+              await sup.connectWith(() => opener(config.mac), automated: true);
     } catch (e, st) {
       service = null;
       AutoRecordTraceLog.add(

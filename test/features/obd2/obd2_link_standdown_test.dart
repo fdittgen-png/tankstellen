@@ -209,6 +209,133 @@ void main() {
     });
   });
 
+  test('#3642 consecutive storm holds ESCALATE 5 → 15 → 60 min — a parked '
+      'car stops costing an all-day dial duty cycle', () {
+    fakeAsync((async) {
+      dialer.enqueue(TimeoutException('ladder budget'));
+      final sup = build();
+      dropNow();
+      async.flushMicrotasks();
+      elapse(async, const Duration(seconds: 3));
+      expect(sup.inStandDown, isTrue);
+      expect(dialer.calls, 3);
+
+      // Hold 1: storm ×1 (5 min + ≤37 s jitter).
+      elapse(async, const Duration(minutes: 6));
+      expect(dialer.calls, 4, reason: 'first storm hold is 5 min');
+
+      // Hold 2: storm ×3 (15 min + ≤112 s jitter) — a 5-min cadence
+      // would have dialed twice more by 13 min.
+      elapse(async, const Duration(minutes: 13));
+      expect(dialer.calls, 4, reason: 'second hold escalated past 13 min');
+      elapse(async, const Duration(minutes: 4));
+      expect(dialer.calls, 5, reason: 'second storm hold is 15 min');
+
+      // Hold 3: storm ×12 (60 min + ≤7.5 min jitter), the cap.
+      elapse(async, const Duration(minutes: 55));
+      expect(dialer.calls, 5, reason: 'third hold escalated past 55 min');
+      elapse(async, const Duration(minutes: 13));
+      expect(dialer.calls, 6,
+          reason: 'the no-dead-end invariant survives the escalation — '
+              'the loop still dials, hourly');
+
+      // A user connect resets the escalation back to the fast ladder.
+      dialer.replaceAll(_liveService());
+      unawaited(sup.connect());
+      async.flushMicrotasks();
+      expect(sup.inStandDown, isFalse);
+      expect(sup.state.value, Obd2LinkState.ready);
+
+      unawaited(sup.dispose());
+      async.flushMicrotasks();
+    });
+  });
+
+  test('#3642 an AUTOMATED connectWith during a stand-down neither dials '
+      'nor resets the hold — automation is not user intent', () {
+    fakeAsync((async) {
+      dialer.enqueue(TimeoutException('ladder budget'));
+      final sup = build();
+      dropNow();
+      async.flushMicrotasks();
+      elapse(async, const Duration(seconds: 3));
+      expect(sup.inStandDown, isTrue);
+      final callsBefore = dialer.calls;
+
+      var overrideCalls = 0;
+      Obd2Service? got = _liveService(); // sentinel — must become null
+      unawaited(sup.connectWith(() async {
+        overrideCalls++;
+        return _liveService();
+      }, automated: true).then((s) => got = s));
+      async.flushMicrotasks();
+
+      expect(overrideCalls, 0,
+          reason: 'the 36 ms instant redial from the 2026-07-29 field '
+              'export — an automated arm must not dial into the hold');
+      expect(dialer.calls, callsBefore);
+      expect(got, isNull, reason: 'the caller sees a plain miss');
+      expect(sup.inStandDown, isTrue,
+          reason: 'the stand-down accounting survives the automated arm');
+
+      // The supervisor's own storm timer keeps ownership of the cadence.
+      elapse(async, const Duration(minutes: 6));
+      expect(dialer.calls, callsBefore + 1,
+          reason: 'the held dial still fires, with the DEFAULT dialer');
+
+      unawaited(sup.dispose());
+      async.flushMicrotasks();
+    });
+  });
+
+  test('#3642 an automated connectWith OUTSIDE a stand-down dials through '
+      'the normal single-flight machinery', () {
+    fakeAsync((async) {
+      dialer.enqueue(null);
+      final sup = build();
+
+      var overrideCalls = 0;
+      Obd2Service? got;
+      unawaited(sup.connectWith(() async {
+        overrideCalls++;
+        return _liveService();
+      }, automated: true).then((s) => got = s));
+      async.flushMicrotasks();
+
+      expect(overrideCalls, 1);
+      expect(got, isNotNull);
+      expect(sup.state.value, Obd2LinkState.ready);
+
+      unawaited(sup.dispose());
+      async.flushMicrotasks();
+    });
+  });
+
+  test('#3642 wake() breaks an active stand-down hold — sustained movement '
+      'must not wait out an escalated timer', () {
+    fakeAsync((async) {
+      dialer.enqueue(TimeoutException('ladder budget'));
+      final sup = build();
+      dropNow();
+      async.flushMicrotasks();
+      elapse(async, const Duration(seconds: 3));
+      expect(sup.inStandDown, isTrue);
+      final callsBefore = dialer.calls;
+
+      // The car drives off: the GPS movement nudge fires wake().
+      dialer.replaceAll(_liveService());
+      sup.wake();
+      async.flushMicrotasks();
+      expect(dialer.calls, callsBefore + 1,
+          reason: 'movement dials immediately instead of holding');
+      expect(sup.inStandDown, isFalse);
+      expect(sup.state.value, Obd2LinkState.ready);
+
+      unawaited(sup.dispose());
+      async.flushMicrotasks();
+    });
+  });
+
   test('user connect() exits the stand-down and dials immediately', () {
     fakeAsync((async) {
       dialer.enqueue(TimeoutException('ladder budget'));
