@@ -60,5 +60,23 @@
   "addFillUpIsFullTankSubtitle": "Tank filled to the brim — uncheck if this was a partial fill",
   "@addFillUpIsFullTankSubtitle": {
     "description": "Subtitle of the Full-tank toggle on the Add fill-up screen — explains the partial-fill alternative so users know when to flip the switch off (#1360)."
+  },
+  "tankLevelSourceFillUp": "Anchored at the last fill-up: {date}",
+  "@tankLevelSourceFillUp": {
+    "description": "Tank-card caption when the level is grounded on the most recent fill-up (#3647 tank level v2 — a full fill sets 100%, no trip simulation). Placeholder is the fill date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelSourceObd2": "OBD2 tank sensor · {date}",
+  "@tankLevelSourceObd2": {
+    "description": "Tank-card caption when an OBD2 fuel-level reading newer than the last fill-up grounds the level (#3647). Placeholder is the reading's date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

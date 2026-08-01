@@ -23,5 +23,37 @@
   "obd2PairingConfirmHint": "Confirm the pairing request on your phone",
   "@obd2PairingConfirmHint": {
     "description": "Hint shown under the connecting spinner while a FIRST-connect OBD2 adapter is waiting for the user to confirm the OS Bluetooth pairing dialog (#3181). Secure-BLE adapters like the OBDLink CX initiate pairing on the first connection; without this hint the spinner looks hung while the dialog waits."
+  },
+  "obd2ScanEmptyTitle": "No adapter found",
+  "@obd2ScanEmptyTitle": {
+    "description": "Heading of the diagnostic empty state in the OBD2 adapter picker, shown when a scan completed with zero candidates."
+  },
+  "obd2ScanEmptyReady": "Bluetooth is on and permissions are granted. Make sure the adapter is plugged into the OBD2 port and the ignition is on, then scan again.",
+  "@obd2ScanEmptyReady": {
+    "description": "Empty-scan explanation when every precondition is satisfied, so the adapter genuinely is not in range."
+  },
+  "obd2ScanBlockedUnsupported": "This device has no Bluetooth Low Energy hardware, so it cannot connect to an OBD2 adapter.",
+  "@obd2ScanBlockedUnsupported": {
+    "description": "Empty-scan explanation when the device has no BLE radio at all."
+  },
+  "obd2ScanBlockedBluetoothOff": "Bluetooth is switched off. Turn it on to scan for your adapter.",
+  "@obd2ScanBlockedBluetoothOff": {
+    "description": "Empty-scan explanation when the Bluetooth radio is off in system settings."
+  },
+  "obd2ScanBlockedPermission": "Sparkilo needs Bluetooth permission to find your adapter.",
+  "@obd2ScanBlockedPermission": {
+    "description": "Empty-scan explanation when the Bluetooth permission has not been granted and can still be requested in-app."
+  },
+  "obd2ScanBlockedPermissionSettings": "Bluetooth permission was denied permanently. Grant it in system settings to scan for your adapter.",
+  "@obd2ScanBlockedPermissionSettings": {
+    "description": "Empty-scan explanation when the permission is permanently denied, so re-prompting does nothing and the user must go to system settings."
+  },
+  "obd2ScanBlockedLocationServices": "Location services are switched off on this device. Android needs them enabled to scan for Bluetooth adapters — no location is recorded or shared.",
+  "@obd2ScanBlockedLocationServices": {
+    "description": "Empty-scan explanation for the Android-only case where location services are off system-wide, which makes a BLE scan silently return nothing. The reassurance is included because the requirement is an OS constraint, not a data-collection choice."
+  },
+  "obd2ScanOpenSettings": "Open settings",
+  "@obd2ScanOpenSettings": {
+    "description": "Button in the OBD2 empty-scan state that deep-links to the relevant system settings screen."
   }
 }

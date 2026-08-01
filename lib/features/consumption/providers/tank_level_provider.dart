@@ -3,24 +3,35 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../vehicle/providers/vehicle_providers.dart';
+import '../../../core/error/guarded.dart';
+import '../../obd2/api.dart';
+import '../../vehicle/api.dart';
+import '../data/obd2_fuel_level_snapshot_store.dart';
 import '../domain/services/tank_level_estimator.dart';
 import 'consumption_providers.dart';
-import 'trip_history_provider.dart';
 
 part 'tank_level_provider.g.dart';
 
-/// Current tank-level estimate for [vehicleId] (#1195).
+/// Tank level for [vehicleId] — v2 model (#3647): the most recent
+/// physical fill-up anchors the level (full → 100 %), an OBD2
+/// fuel-level reading newer than that fill overrides it, and trip
+/// recordings are not consulted at all.
 ///
-/// Composes the vehicle profile, the fill-up list filtered to that
-/// vehicle, and the trip history filtered to trips recorded since the
-/// most recent fill-up. The pure [estimateTankLevel] function does the
-/// math; this provider just wires inputs together and stays per-screen
-/// (no `keepAlive`).
+/// Sensor source preference:
+///  1. the LIVE reading while a recording is active
+///     ([currentObd2FuelLevelLitres] — PSA CAN > OEM litres > 0x2F),
+///     stamped "now";
+///  2. the persisted per-vehicle snapshot the tracker wrote during the
+///     last drive ([Obd2FuelLevelSnapshotStore]);
+///  3. none — the estimator stays on the fill anchor.
 ///
-/// Returns [TankLevelEstimate.unknown] when:
-/// * [vehicleId] does not match any stored vehicle profile
-/// * the vehicle has no fill-ups logged yet
+/// The live watch also keeps this provider rebuilding during a drive,
+/// so the Carburant card follows the gauge in real time; after the
+/// drive the live value drops to null and the freshly-persisted
+/// snapshot takes over seamlessly.
+///
+/// Returns [TankLevelEstimate.unknown] when [vehicleId] matches no
+/// stored vehicle profile or the vehicle has no fill-ups logged yet.
 @riverpod
 TankLevelEstimate tankLevel(Ref ref, String vehicleId) {
   final vehicles = ref.watch(vehicleProfileListProvider);
@@ -39,21 +50,26 @@ TankLevelEstimate tankLevel(Ref ref, String vehicleId) {
   // be defensive: a malformed import could hand us a different order.
   fillUps.sort((a, b) => b.date.compareTo(a.date));
 
-  // Pass every trip for the vehicle (with a real `startedAt`) — the
-  // estimator needs prior trips to compute "level just before the
-  // most recent partial fill" (#1360). Trips with null `startedAt`
-  // are dropped because they can't be placed on the timeline.
-  // The estimator additionally filters by date for the post-fill
-  // consumption tally, so the broader input is safe.
-  final allTrips = ref.watch(tripHistoryListProvider);
-  final vehicleTrips = allTrips.where((t) {
-    if (t.vehicleId != vehicleId) return false;
-    return t.summary.startedAt != null;
-  }).toList(growable: false);
+  // Shell-safety idiom (#2163): the live chain reaches into the
+  // recording graph, which isolated widget tests don't wire — degrade
+  // to "no live reading" instead of crashing the card.
+  final liveLitres = guard(
+    () {
+      final active = ref.watch(activeVehicleProfileProvider);
+      if (active?.id != vehicleId) return null;
+      return ref.watch(currentObd2FuelLevelLitresProvider);
+    },
+    where: 'tankLevel: live fuel-level watch failed',
+    fallback: null,
+  );
+
+  final sensor = liveLitres != null
+      ? Obd2FuelLevelSnapshot(liters: liveLitres, at: DateTime.now())
+      : ref.watch(obd2FuelLevelSnapshotStoreProvider).read(vehicleId);
 
   return estimateTankLevel(
     vehicle: vehicle,
     fillUps: fillUps,
-    trips: vehicleTrips,
+    sensor: sensor,
   );
 }

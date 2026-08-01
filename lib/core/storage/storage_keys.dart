@@ -168,4 +168,11 @@ class StorageKeys {
   /// prompted.
   static const String inAppReviewLastPromptIso =
       'in_app_review_last_prompt_iso';
+
+  /// #3647 — per-vehicle prefix for the persisted OBD2 fuel-level
+  /// snapshot (`<prefix><vehicleId>` -> JSON `{"l": litres, "at": ms}`).
+  /// The ONLY reader/writer is [Obd2FuelLevelSnapshotStore] (#3592
+  /// one-accessor rule).
+  static const String obd2FuelLevelSnapshotPrefix =
+      'obd2_fuel_level_snapshot_';
 }

@@ -62,9 +62,9 @@ void main() {
         levelL: 32.4,
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.obd2,
+        source: TankLevelSource.fillUp,
+        sensorReadAt: null,
         rangeKm: 462,
-        tripsSince: 1,
       );
 
       await pumpApp(
@@ -83,9 +83,9 @@ void main() {
         levelL: 32.4,
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.obd2,
+        source: TankLevelSource.fillUp,
+        sensorReadAt: null,
         rangeKm: 462,
-        tripsSince: 1,
       );
 
       await pumpApp(
@@ -104,9 +104,9 @@ void main() {
         levelL: 25,
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.obd2,
+        source: TankLevelSource.fillUp,
+        sensorReadAt: null,
         rangeKm: 357,
-        tripsSince: 0,
       );
 
       await pumpApp(
@@ -129,9 +129,9 @@ void main() {
         levelL: 6, // 6 / 50 = 12 % → low-fuel
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.obd2,
+        source: TankLevelSource.fillUp,
+        sensorReadAt: null,
         rangeKm: 86,
-        tripsSince: 5,
       );
 
       await pumpApp(
@@ -155,9 +155,9 @@ void main() {
         levelL: 10, // 20 %
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.obd2,
+        source: TankLevelSource.fillUp,
+        sensorReadAt: null,
         rangeKm: 143,
-        tripsSince: 4,
       );
 
       await pumpApp(
@@ -198,9 +198,9 @@ void main() {
         levelL: 32.4,
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.obd2,
+        source: TankLevelSource.fillUp,
+        sensorReadAt: null,
         rangeKm: 462,
-        tripsSince: 0,
       );
 
       await pumpApp(
@@ -217,34 +217,15 @@ void main() {
   });
 
   group('TankLevelCard — method label', () {
-    testWidgets('OBD2 method shows "OBD2 measured"', (tester) async {
-      final estimate = TankLevelEstimate(
-        levelL: 32.4,
-        capacityL: 50,
-        lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.obd2,
-        rangeKm: 462,
-        tripsSince: 1,
-      );
-
-      await pumpApp(
-        tester,
-        const TankLevelCard(),
-        overrides: _tankLevelOverride(estimate),
-      );
-
-      expect(find.textContaining('OBD2 measured'), findsOneWidget);
-    });
-
-    testWidgets('distanceFallback shows "distance-based estimate"',
+    testWidgets('fill-up source captions the anchor date (#3647)',
         (tester) async {
       final estimate = TankLevelEstimate(
-        levelL: 32.4,
+        levelL: 30,
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.distanceFallback,
-        rangeKm: 462,
-        tripsSince: 2,
+        source: TankLevelSource.fillUp,
+        sensorReadAt: null,
+        rangeKm: 400,
       );
 
       await pumpApp(
@@ -253,17 +234,21 @@ void main() {
         overrides: _tankLevelOverride(estimate),
       );
 
-      expect(find.textContaining('distance-based estimate'), findsOneWidget);
+      expect(
+        find.textContaining('Anchored at the last fill-up: 2026-04-27'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('mixed method shows "mixed measurement"', (tester) async {
+    testWidgets('OBD2-sensor source captions the reading date (#3647)',
+        (tester) async {
       final estimate = TankLevelEstimate(
-        levelL: 32.4,
+        levelL: 28.5,
         capacityL: 50,
         lastFillUpDate: DateTime(2026, 4, 27),
-        method: TankLevelEstimationMethod.mixed,
-        rangeKm: 462,
-        tripsSince: 3,
+        source: TankLevelSource.obd2Sensor,
+        sensorReadAt: DateTime(2026, 4, 29),
+        rangeKm: 380,
       );
 
       await pumpApp(
@@ -272,7 +257,10 @@ void main() {
         overrides: _tankLevelOverride(estimate),
       );
 
-      expect(find.textContaining('mixed measurement'), findsOneWidget);
+      expect(
+        find.textContaining('OBD2 tank sensor · 2026-04-29'),
+        findsOneWidget,
+      );
     });
   });
 }

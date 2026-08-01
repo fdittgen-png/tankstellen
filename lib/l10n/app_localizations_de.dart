@@ -6819,6 +6819,36 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bestätige die Koppelungsanfrage auf deinem Handy';
 
   @override
+  String get obd2ScanEmptyTitle => 'Kein Adapter gefunden';
+
+  @override
+  String get obd2ScanEmptyReady =>
+      'Bluetooth ist an und die Berechtigungen sind erteilt. Prüfe, ob der Adapter im OBD2-Anschluss steckt und die Zündung an ist, und suche dann erneut.';
+
+  @override
+  String get obd2ScanBlockedUnsupported =>
+      'Dieses Gerät hat keine Bluetooth-Low-Energy-Hardware und kann sich daher nicht mit einem OBD2-Adapter verbinden.';
+
+  @override
+  String get obd2ScanBlockedBluetoothOff =>
+      'Bluetooth ist ausgeschaltet. Schalte es ein, um nach deinem Adapter zu suchen.';
+
+  @override
+  String get obd2ScanBlockedPermission =>
+      'Sparkilo benötigt die Bluetooth-Berechtigung, um deinen Adapter zu finden.';
+
+  @override
+  String get obd2ScanBlockedPermissionSettings =>
+      'Die Bluetooth-Berechtigung wurde dauerhaft verweigert. Erteile sie in den Systemeinstellungen, um nach deinem Adapter zu suchen.';
+
+  @override
+  String get obd2ScanBlockedLocationServices =>
+      'Die Standortdienste sind auf diesem Gerät ausgeschaltet. Android benötigt sie, um nach Bluetooth-Adaptern zu suchen — es wird kein Standort aufgezeichnet oder geteilt.';
+
+  @override
+  String get obd2ScanOpenSettings => 'Einstellungen öffnen';
+
+  @override
   String get obd2ReconnectInProgress =>
       'Verbindung zum OBD2-Adapter wird wiederhergestellt…';
 
@@ -7498,6 +7528,16 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get addFillUpIsFullTankSubtitle =>
       'Tank bis zum Rand gefüllt — abwählen, wenn es eine Teilbetankung war';
+
+  @override
+  String tankLevelSourceFillUp(String date) {
+    return 'Verankert an der letzten Betankung: $date';
+  }
+
+  @override
+  String tankLevelSourceObd2(String date) {
+    return 'OBD2-Tanksensor · $date';
+  }
 
   @override
   String get tankReportTitle => 'Tank-Bericht';

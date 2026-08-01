@@ -3,27 +3,26 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/consumption/data/trip_history_repository.dart';
-import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
-import 'package:tankstellen/features/consumption/domain/services/tank_level_estimator.dart';
-import 'package:tankstellen/features/consumption/domain/trip_recorder.dart';
-import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
-import 'package:tankstellen/features/consumption/providers/tank_level_provider.dart';
-import 'package:tankstellen/features/consumption/providers/trip_history_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import 'package:tankstellen/features/consumption/data/obd2_fuel_level_snapshot_store.dart';
+import 'package:tankstellen/features/consumption/domain/entities/fill_up.dart';
+import 'package:tankstellen/features/consumption/domain/services/tank_level_estimator.dart';
+import 'package:tankstellen/features/consumption/providers/consumption_providers.dart';
+import 'package:tankstellen/features/consumption/providers/tank_level_provider.dart';
+import 'package:tankstellen/features/obd2/providers/current_obd2_fuel_level_provider.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
-/// Unit tests for the `tankLevelProvider` orchestration (Refs #561).
+/// Wiring tests for `tankLevelProvider` — v2 (#3647).
 ///
 /// The pure math lives in [estimateTankLevel] and is covered by
-/// `tank_level_estimator_test.dart`. These tests pin only the wiring
-/// the provider adds on top of the helper:
+/// `tank_level_estimator_test.dart`. These pin only what the provider
+/// adds on top:
 ///   * unknown sentinel for unknown vehicles / no fill-ups
-///   * fill-up vehicle filtering
-///   * defensive newest-first sort
-///   * trip filtering by vehicle, by lastFillUp date, and on null startedAt
-///   * happy path matches the helper's output for the filtered inputs
+///   * fill-up vehicle filtering + defensive newest-first sort
+///   * sensor preference: LIVE reading (active vehicle only) over the
+///     persisted snapshot, persisted snapshot over nothing
+///   * shell safety: an unwired live chain degrades to "no reading"
 class _StubVehicleProfileList extends VehicleProfileList {
   _StubVehicleProfileList(this._value);
   final List<VehicleProfile> _value;
@@ -40,356 +39,180 @@ class _StubFillUpList extends FillUpList {
   List<FillUp> build() => _value;
 }
 
-class _StubTripHistoryList extends TripHistoryList {
-  _StubTripHistoryList(this._value);
-  final List<TripHistoryEntry> _value;
+class _StubActiveVehicle extends ActiveVehicleProfile {
+  _StubActiveVehicle(this._value);
+  final VehicleProfile? _value;
 
   @override
-  List<TripHistoryEntry> build() => _value;
+  VehicleProfile? build() => _value;
+}
+
+/// In-memory snapshot store — no Hive, no settings box.
+class _FakeSnapshotStore implements Obd2FuelLevelSnapshotStore {
+  _FakeSnapshotStore([this.snapshots = const {}]);
+  final Map<String, Obd2FuelLevelSnapshot> snapshots;
+
+  @override
+  Obd2FuelLevelSnapshot? read(String vehicleId) => snapshots[vehicleId];
+
+  @override
+  Future<void> write(String vehicleId, Obd2FuelLevelSnapshot snapshot) async {
+    snapshots[vehicleId] = snapshot;
+  }
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+const _vehicle = VehicleProfile(
+  id: 'v1',
+  name: 'Test Car',
+  type: VehicleType.combustion,
+  tankCapacityL: 50,
+);
+
+FillUp _fill({
+  required String id,
+  required DateTime date,
+  double liters = 45,
+  String? vehicleId = 'v1',
+}) {
+  return FillUp(
+    id: id,
+    date: date,
+    liters: liters,
+    totalCost: liters * 1.8,
+    odometerKm: 0,
+    fuelType: FuelType.diesel,
+    vehicleId: vehicleId,
+  );
+}
+
+ProviderContainer _container({
+  List<VehicleProfile> vehicles = const [_vehicle],
+  List<FillUp> fillUps = const [],
+  VehicleProfile? activeVehicle,
+  double? liveLitres,
+  Map<String, Obd2FuelLevelSnapshot> snapshots = const {},
+}) {
+  final container = ProviderContainer(
+    overrides: [
+      vehicleProfileListProvider.overrideWith(
+        () => _StubVehicleProfileList(vehicles),
+      ),
+      fillUpListProvider.overrideWith(() => _StubFillUpList(fillUps)),
+      activeVehicleProfileProvider.overrideWith(
+        () => _StubActiveVehicle(activeVehicle),
+      ),
+      currentObd2FuelLevelLitresProvider.overrideWith((ref) => liveLitres),
+      obd2FuelLevelSnapshotStoreProvider.overrideWith(
+        (ref) => _FakeSnapshotStore(Map.of(snapshots)),
+      ),
+    ],
+  );
+  addTearDown(container.dispose);
+  return container;
 }
 
 void main() {
-  // 50 L combustion vehicle. Same shape as the estimator-test fixture
-  // so we can call [estimateTankLevel] directly and compare field-wise.
-  const vehicle = VehicleProfile(
-    id: 'v1',
-    name: 'Test Car',
-    type: VehicleType.combustion,
-    tankCapacityL: 50,
-  );
-
-  const otherVehicle = VehicleProfile(
-    id: 'v2',
-    name: 'Other Car',
-    type: VehicleType.combustion,
-    tankCapacityL: 60,
-  );
-
-  FillUp fillUp({
-    required String id,
-    required DateTime date,
-    String vehicleId = 'v1',
-    double liters = 45,
-  }) {
-    return FillUp(
-      id: id,
-      date: date,
-      liters: liters,
-      totalCost: liters * 1.8,
-      odometerKm: 100000,
-      fuelType: FuelType.diesel,
-      vehicleId: vehicleId,
-    );
-  }
-
-  TripHistoryEntry trip({
-    required String id,
-    required DateTime? startedAt,
-    required double distanceKm,
-    String vehicleId = 'v1',
-    double? fuelLitersConsumed,
-  }) {
-    return TripHistoryEntry(
-      id: id,
-      vehicleId: vehicleId,
-      summary: TripSummary(
-        distanceKm: distanceKm,
-        maxRpm: 0,
-        highRpmSeconds: 0,
-        idleSeconds: 0,
-        harshBrakes: 0,
-        harshAccelerations: 0,
-        fuelLitersConsumed: fuelLitersConsumed,
-        startedAt: startedAt,
-      ),
-    );
-  }
-
-  ProviderContainer makeContainer({
-    List<VehicleProfile> vehicles = const [],
-    List<FillUp> fillUps = const [],
-    List<TripHistoryEntry> trips = const [],
-  }) {
-    final c = ProviderContainer(overrides: [
-      vehicleProfileListProvider
-          .overrideWith(() => _StubVehicleProfileList(vehicles)),
-      fillUpListProvider.overrideWith(() => _StubFillUpList(fillUps)),
-      tripHistoryListProvider.overrideWith(() => _StubTripHistoryList(trips)),
-    ]);
-    addTearDown(c.dispose);
-    return c;
-  }
-
-  group('tankLevelProvider — unknown sentinel', () {
-    test('vehicleId not matching any stored vehicle → unknown', () {
-      final c = makeContainer(
-        vehicles: const [vehicle],
-        fillUps: [
-          fillUp(id: 'f1', date: DateTime(2026, 4, 1)),
-        ],
-      );
-
-      final result = c.read(tankLevelProvider('does-not-exist'));
-
-      expect(result.hasFillUp, isFalse);
-      expect(result.lastFillUpDate, isNull);
-      expect(result.levelL, 0);
-      expect(result.capacityL, isNull);
+  group('sentinels', () {
+    test('unknown vehicle id → unknown', () {
+      final c = _container(fillUps: [
+        _fill(id: 'f1', date: DateTime(2026, 4, 1)),
+      ]);
+      final e = c.read(tankLevelProvider('nope'));
+      expect(e.hasFillUp, isFalse);
     });
 
-    test('matched vehicle with zero fill-ups for it → unknown', () {
-      // The list contains a fill-up — but for OTHER vehicle. After the
-      // vehicleId filter, the per-vehicle list is empty, so the
-      // provider must still return the unknown sentinel.
-      final c = makeContainer(
-        vehicles: const [vehicle, otherVehicle],
-        fillUps: [
-          fillUp(id: 'f1', date: DateTime(2026, 4, 1), vehicleId: 'v2'),
-        ],
-      );
+    test('vehicle without fill-ups → unknown', () {
+      final c = _container();
+      expect(c.read(tankLevelProvider('v1')).hasFillUp, isFalse);
+    });
 
-      final result = c.read(tankLevelProvider('v1'));
-
-      expect(result.hasFillUp, isFalse);
-      expect(result.lastFillUpDate, isNull);
-      expect(result.levelL, 0);
+    test('fill-ups of OTHER vehicles are filtered out', () {
+      final c = _container(fillUps: [
+        _fill(id: 'f-other', date: DateTime(2026, 4, 1), vehicleId: 'v2'),
+      ]);
+      expect(c.read(tankLevelProvider('v1')).hasFillUp, isFalse);
     });
   });
 
-  group('tankLevelProvider — fill-up filtering', () {
-    test('fill-ups for other vehicles are excluded', () {
-      // v1 has one fill-up logging 45 L on Apr 1. v2 has a much later
-      // fill-up — if the provider didn't filter, it would pick v2's
-      // date as `lastFillUpDate`.
-      final v1FillUp = fillUp(id: 'f1', date: DateTime(2026, 4, 1));
-      final v2FillUp =
-          fillUp(id: 'f2', date: DateTime(2026, 4, 25), vehicleId: 'v2');
-
-      final c = makeContainer(
-        vehicles: const [vehicle, otherVehicle],
-        fillUps: [v2FillUp, v1FillUp],
-      );
-
-      final result = c.read(tankLevelProvider('v1'));
-
-      // Only v1's fill-up was considered → its date wins.
-      expect(result.lastFillUpDate, v1FillUp.date);
-      // No trips after Apr 1 in this container, so level is full
-      // capacity (50 L) and method is the vacuous obd2.
-      expect(result.levelL, 50);
-      expect(result.capacityL, 50);
-      expect(result.tripsSince, 0);
-      expect(result.method, TankLevelEstimationMethod.obd2);
-    });
-
-    test('fill-ups passed oldest-first are still treated newest-first '
-        'by the helper (defensive sort)', () {
-      // Fill-ups deliberately oldest-first to prove the provider
-      // re-sorts before delegating. The helper consults only the head
-      // entry, so picking the wrong head would change the answer:
-      //   - oldest as "last": Apr 1, capacity 50, no trips after that
-      //     → trips between Apr 1 and Apr 20 would be folded in.
-      //   - newest as "last" (correct): Apr 20, no trips after that
-      //     → level == capacity, no consumption.
-      final oldest = fillUp(id: 'f-old', date: DateTime(2026, 4, 1));
-      final newest = fillUp(id: 'f-new', date: DateTime(2026, 4, 20));
-      final tripBetween = trip(
-        id: 't-mid',
-        startedAt: DateTime(2026, 4, 10),
-        distanceKm: 100,
-        fuelLitersConsumed: 10,
-      );
-
-      final c = makeContainer(
-        vehicles: const [vehicle],
-        fillUps: [oldest, newest], // intentionally oldest-first
-        trips: [tripBetween],
-      );
-
-      final result = c.read(tankLevelProvider('v1'));
-
-      // Provider sorted internally → newest is the head → trip is
-      // BEFORE the head and is excluded.
-      expect(result.lastFillUpDate, newest.date);
-      expect(result.tripsSince, 0);
-      expect(result.levelL, 50);
+  group('fill wiring', () {
+    test('a malformed (oldest-first) list is defensively re-sorted — the '
+        'NEWEST fill anchors', () {
+      final c = _container(fillUps: [
+        _fill(id: 'f-old', date: DateTime(2026, 3, 1)),
+        _fill(id: 'f-new', date: DateTime(2026, 4, 1)),
+      ]);
+      final e = c.read(tankLevelProvider('v1'));
+      expect(e.lastFillUpDate, DateTime(2026, 4, 1));
+      expect(e.levelL, 50.0);
     });
   });
 
-  group('tankLevelProvider — trip filtering', () {
-    test('trips before the most recent fill-up are excluded', () {
-      final lastFillUp = fillUp(id: 'f1', date: DateTime(2026, 4, 1, 8));
-      final tripBefore = trip(
-        id: 't-old',
-        startedAt: DateTime(2026, 3, 20),
-        distanceKm: 100,
-        fuelLitersConsumed: 10,
-      );
-      final tripAfter = trip(
-        id: 't-new',
-        startedAt: DateTime(2026, 4, 1, 10),
-        distanceKm: 30,
-        fuelLitersConsumed: 2,
-      );
+  group('sensor wiring — live > persisted > none (#3647)', () {
+    final fills = [_fill(id: 'f1', date: DateTime(2026, 4, 1))];
 
-      final c = makeContainer(
-        vehicles: const [vehicle],
-        fillUps: [lastFillUp],
-        trips: [tripBefore, tripAfter],
-      );
-
-      final result = c.read(tankLevelProvider('v1'));
-
-      // 50 - 2 = 48; only the post-fill-up trip is folded in.
-      expect(result.tripsSince, 1);
-      expect(result.levelL, closeTo(48, 0.001));
+    test('no live reading, no snapshot → fill anchor', () {
+      final c = _container(fillUps: fills);
+      final e = c.read(tankLevelProvider('v1'));
+      expect(e.source, TankLevelSource.fillUp);
+      expect(e.levelL, 50.0);
     });
 
-    test('trips with startedAt == null are dropped from the helper input',
-        () {
-      final lastFillUp = fillUp(id: 'f1', date: DateTime(2026, 4, 1));
-      final nullStart = trip(
-        id: 't-null',
-        startedAt: null,
-        distanceKm: 50,
-        fuelLitersConsumed: 5,
+    test('persisted snapshot newer than the fill grounds the level', () {
+      final c = _container(
+        fillUps: fills,
+        snapshots: {
+          'v1': Obd2FuelLevelSnapshot(
+            liters: 31.5,
+            at: DateTime(2026, 4, 3),
+          ),
+        },
       );
-      final realTrip = trip(
-        id: 't-real',
-        startedAt: DateTime(2026, 4, 2),
-        distanceKm: 30,
-        fuelLitersConsumed: 2,
-      );
-
-      final c = makeContainer(
-        vehicles: const [vehicle],
-        fillUps: [lastFillUp],
-        trips: [nullStart, realTrip],
-      );
-
-      final result = c.read(tankLevelProvider('v1'));
-
-      // Only the real trip survives the filter; null-start stays out.
-      expect(result.tripsSince, 1);
-      expect(result.levelL, closeTo(48, 0.001));
+      final e = c.read(tankLevelProvider('v1'));
+      expect(e.source, TankLevelSource.obd2Sensor);
+      expect(e.levelL, 31.5);
     });
 
-    test('trips for other vehicles are excluded', () {
-      final lastFillUp = fillUp(id: 'f1', date: DateTime(2026, 4, 1));
-      final v1Trip = trip(
-        id: 't-v1',
-        startedAt: DateTime(2026, 4, 2),
-        distanceKm: 30,
-        fuelLitersConsumed: 2,
+    test('LIVE reading for the ACTIVE vehicle wins over the persisted '
+        'snapshot', () {
+      final c = _container(
+        fillUps: fills,
+        activeVehicle: _vehicle,
+        liveLitres: 28.0,
+        snapshots: {
+          'v1': Obd2FuelLevelSnapshot(
+            liters: 31.5,
+            at: DateTime(2026, 4, 3),
+          ),
+        },
       );
-      final v2Trip = trip(
-        id: 't-v2',
-        startedAt: DateTime(2026, 4, 3),
-        distanceKm: 100,
-        fuelLitersConsumed: 9,
-        vehicleId: 'v2',
-      );
-
-      final c = makeContainer(
-        vehicles: const [vehicle, otherVehicle],
-        fillUps: [lastFillUp],
-        trips: [v1Trip, v2Trip],
-      );
-
-      final result = c.read(tankLevelProvider('v1'));
-
-      // v2's trip is excluded → only v1's 2 L counted.
-      expect(result.tripsSince, 1);
-      expect(result.levelL, closeTo(48, 0.001));
+      final e = c.read(tankLevelProvider('v1'));
+      expect(e.source, TankLevelSource.obd2Sensor);
+      expect(e.levelL, 28.0);
     });
 
-    test('a trip starting exactly at lastFillUpDate is kept '
-        '(at-or-after, not strictly-after)', () {
-      final fillDate = DateTime(2026, 4, 1, 8);
-      final lastFillUp = fillUp(id: 'f1', date: fillDate);
-      final exactTrip = trip(
-        id: 't-exact',
-        startedAt: fillDate, // exactly at the boundary
-        distanceKm: 30,
-        fuelLitersConsumed: 2,
+    test('a live reading is IGNORED when the queried vehicle is not the '
+        'active one — the gauge belongs to the car that is driving', () {
+      const otherActive = VehicleProfile(
+        id: 'v2',
+        name: 'Other',
+        type: VehicleType.combustion,
       );
-
-      final c = makeContainer(
-        vehicles: const [vehicle],
-        fillUps: [lastFillUp],
-        trips: [exactTrip],
+      final c = _container(
+        fillUps: fills,
+        activeVehicle: otherActive,
+        liveLitres: 28.0,
+        snapshots: {
+          'v1': Obd2FuelLevelSnapshot(
+            liters: 31.5,
+            at: DateTime(2026, 4, 3),
+          ),
+        },
       );
-
-      final result = c.read(tankLevelProvider('v1'));
-
-      expect(result.tripsSince, 1);
-      expect(result.levelL, closeTo(48, 0.001));
-    });
-  });
-
-  group('tankLevelProvider — happy path', () {
-    test('matches estimateTankLevel for the filtered, sorted inputs', () {
-      // Mixed inputs: two fill-ups (oldest-first to exercise the
-      // sort), one trip for v2 (must be excluded), one trip with
-      // null startedAt (must be dropped), one real trip.
-      final oldFill = fillUp(id: 'f-old', date: DateTime(2026, 3, 15));
-      final newFill = fillUp(id: 'f-new', date: DateTime(2026, 4, 1));
-      final v1TripObd = trip(
-        id: 't1',
-        startedAt: DateTime(2026, 4, 2, 9),
-        distanceKm: 30,
-        fuelLitersConsumed: 2.5,
-      );
-      final v1TripFallback = trip(
-        id: 't2',
-        startedAt: DateTime(2026, 4, 3, 10),
-        distanceKm: 40,
-        // no fuelLitersConsumed → fallback path
-      );
-      final v2Trip = trip(
-        id: 't-v2',
-        startedAt: DateTime(2026, 4, 5),
-        distanceKm: 100,
-        fuelLitersConsumed: 8,
-        vehicleId: 'v2',
-      );
-      final nullStart = trip(
-        id: 't-null',
-        startedAt: null,
-        distanceKm: 999,
-        fuelLitersConsumed: 99,
-      );
-
-      final c = makeContainer(
-        vehicles: const [vehicle, otherVehicle],
-        fillUps: [oldFill, newFill],
-        trips: [v1TripObd, v2Trip, nullStart, v1TripFallback],
-      );
-
-      final result = c.read(tankLevelProvider('v1'));
-
-      // Compute the expected estimate by hand-applying the same
-      // filters the provider promises and calling the pure helper.
-      final expectedFillUps = [newFill, oldFill]; // newest-first
-      final expectedTrips = [v1TripObd, v1TripFallback];
-      final expected = estimateTankLevel(
-        vehicle: vehicle,
-        fillUps: expectedFillUps,
-        trips: expectedTrips,
-      );
-
-      expect(result.levelL, closeTo(expected.levelL, 0.0001));
-      expect(result.capacityL, expected.capacityL);
-      expect(result.lastFillUpDate, expected.lastFillUpDate);
-      expect(result.method, expected.method);
-      expect(result.rangeKm, closeTo(expected.rangeKm!, 0.0001));
-      expect(result.tripsSince, expected.tripsSince);
-
-      // Sanity: this configuration should genuinely exercise the
-      // mixed branch (one OBD2 + one fallback trip after the latest
-      // fill-up).
-      expect(result.method, TankLevelEstimationMethod.mixed);
-      expect(result.tripsSince, 2);
+      final e = c.read(tankLevelProvider('v1'));
+      expect(e.levelL, 31.5);
     });
   });
 }

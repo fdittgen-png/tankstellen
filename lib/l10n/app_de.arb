@@ -3299,6 +3299,14 @@
   "@obd2PairingConfirmHint": {
     "description": "Hint shown under the connecting spinner while a FIRST-connect OBD2 adapter is waiting for the user to confirm the OS Bluetooth pairing dialog (#3181). Secure-BLE adapters like the OBDLink CX initiate pairing on the first connection; without this hint the spinner looks hung while the dialog waits."
   },
+  "obd2ScanEmptyTitle": "Kein Adapter gefunden",
+  "obd2ScanEmptyReady": "Bluetooth ist an und die Berechtigungen sind erteilt. Prüfe, ob der Adapter im OBD2-Anschluss steckt und die Zündung an ist, und suche dann erneut.",
+  "obd2ScanBlockedUnsupported": "Dieses Gerät hat keine Bluetooth-Low-Energy-Hardware und kann sich daher nicht mit einem OBD2-Adapter verbinden.",
+  "obd2ScanBlockedBluetoothOff": "Bluetooth ist ausgeschaltet. Schalte es ein, um nach deinem Adapter zu suchen.",
+  "obd2ScanBlockedPermission": "Sparkilo benötigt die Bluetooth-Berechtigung, um deinen Adapter zu finden.",
+  "obd2ScanBlockedPermissionSettings": "Die Bluetooth-Berechtigung wurde dauerhaft verweigert. Erteile sie in den Systemeinstellungen, um nach deinem Adapter zu suchen.",
+  "obd2ScanBlockedLocationServices": "Die Standortdienste sind auf diesem Gerät ausgeschaltet. Android benötigt sie, um nach Bluetooth-Adaptern zu suchen — es wird kein Standort aufgezeichnet oder geteilt.",
+  "obd2ScanOpenSettings": "Einstellungen öffnen",
   "obd2ReconnectInProgress": "Verbindung zum OBD2-Adapter wird wiederhergestellt…",
   "@obd2ReconnectInProgress": {
     "description": "Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight."
@@ -3635,6 +3643,8 @@
   "tankLevelDetailSheetTitle": "Fahrten seit dem letzten Tankvorgang",
   "addFillUpIsFullTankLabel": "Voller Tank",
   "addFillUpIsFullTankSubtitle": "Tank bis zum Rand gefüllt — abwählen, wenn es eine Teilbetankung war",
+  "tankLevelSourceFillUp": "Verankert an der letzten Betankung: {date}",
+  "tankLevelSourceObd2": "OBD2-Tanksensor · {date}",
   "tankReportTitle": "Tank-Bericht",
   "tankReportHeadline": "{value} L/100 km",
   "tankReportSincePrevious": "Seit dem letzten Volltanken: {km} km · {liters} L · {cost}",

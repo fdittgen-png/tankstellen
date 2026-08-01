@@ -17,6 +17,7 @@ import 'maintenance_suggestion_card.dart';
 import 'monthly_insights_card.dart';
 import 'edit_virtual_trajet_sheet.dart';
 import 'shared_trips_section.dart';
+import 'tank_report_card.dart';
 import 'trajet_row.dart';
 
 /// Trajets tab body on the Consumption screen (#889).
@@ -148,6 +149,10 @@ class TrajetsTab extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               MonthlyInsightsCard(summary: monthlySummary),
+              // #3648 — the recordings-vs-pump tank report (#3616) lives
+              // on the Trajets tab now: everything recording-derived is
+              // Trajets-only per directive; Carburant stays fill-and-tank.
+              const TankReportCard(),
               const MaintenanceSuggestionList(),
               const SharedTripsSection(),
             ],
@@ -160,6 +165,8 @@ class TrajetsTab extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         MonthlyInsightsCard(summary: monthlySummary),
+        // #3648 — see the wide branch above.
+        const TankReportCard(),
         const MaintenanceSuggestionList(),
         const SharedTripsSection(),
         Expanded(child: trajetsList),
