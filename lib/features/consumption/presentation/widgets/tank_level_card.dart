@@ -166,28 +166,22 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     );
   }
 
+  /// #3647 tank level v2 — the caption names the level's SOURCE: the
+  /// fill-up anchor, or an OBD2 sensor reading newer than that fill.
+  /// Trip counts/methods are gone from this card by directive — the
+  /// recordings-vs-pump comparison lives on the Trajets tab (#3648).
   String _captionFor(AppLocalizations l, TankLevelEstimate estimate) {
-    final dateText = _formatDate(estimate.lastFillUpDate);
-    final countText = estimate.tripsSince.toString();
-    final lastFillUpLine = l.tankLevelLastFillUpFormat(dateText, countText);
-    final methodLabel = _methodLabel(l, estimate.method);
-    return '$lastFillUpLine · $methodLabel';
+    switch (estimate.source) {
+      case TankLevelSource.fillUp:
+        return l.tankLevelSourceFillUp(_formatDate(estimate.lastFillUpDate));
+      case TankLevelSource.obd2Sensor:
+        return l.tankLevelSourceObd2(_formatDate(estimate.sensorReadAt));
+    }
   }
 
   String _formatDate(DateTime? date) {
     if (date == null) return '';
     return '${date.year}-${twoDigits(date.month)}-${twoDigits(date.day)}';
-  }
-
-  String _methodLabel(AppLocalizations l, TankLevelEstimationMethod method) {
-    switch (method) {
-      case TankLevelEstimationMethod.obd2:
-        return l.tankLevelMethodObd2;
-      case TankLevelEstimationMethod.distanceFallback:
-        return l.tankLevelMethodDistanceFallback;
-      case TankLevelEstimationMethod.mixed:
-        return l.tankLevelMethodMixed;
-    }
   }
 
   Future<void> _openDetailSheet(BuildContext context, WidgetRef ref) async {

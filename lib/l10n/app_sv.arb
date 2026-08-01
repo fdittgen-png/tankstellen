@@ -5575,5 +5575,65 @@
   "@highwayModeChip": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2ScanEmptyTitle": "No adapter found",
+  "@obd2ScanEmptyTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ScanEmptyReady": "Bluetooth is on and permissions are granted. Make sure the adapter is plugged into the OBD2 port and the ignition is on, then scan again.",
+  "@obd2ScanEmptyReady": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ScanBlockedUnsupported": "This device has no Bluetooth Low Energy hardware, so it cannot connect to an OBD2 adapter.",
+  "@obd2ScanBlockedUnsupported": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ScanBlockedBluetoothOff": "Bluetooth is switched off. Turn it on to scan for your adapter.",
+  "@obd2ScanBlockedBluetoothOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ScanBlockedPermission": "Sparkilo needs Bluetooth permission to find your adapter.",
+  "@obd2ScanBlockedPermission": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ScanBlockedPermissionSettings": "Bluetooth permission was denied permanently. Grant it in system settings to scan for your adapter.",
+  "@obd2ScanBlockedPermissionSettings": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ScanBlockedLocationServices": "Location services are switched off on this device. Android needs them enabled to scan for Bluetooth adapters — no location is recorded or shared.",
+  "@obd2ScanBlockedLocationServices": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ScanOpenSettings": "Open settings",
+  "@obd2ScanOpenSettings": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tankLevelSourceFillUp": "Anchored at the last fill-up: {date}",
+  "@tankLevelSourceFillUp": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "tankLevelSourceObd2": "OBD2 tank sensor · {date}",
+  "@tankLevelSourceObd2": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

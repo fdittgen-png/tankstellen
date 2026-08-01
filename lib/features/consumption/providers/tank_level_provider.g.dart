@@ -8,32 +8,50 @@ part of 'tank_level_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Current tank-level estimate for [vehicleId] (#1195).
+/// Tank level for [vehicleId] — v2 model (#3647): the most recent
+/// physical fill-up anchors the level (full → 100 %), an OBD2
+/// fuel-level reading newer than that fill overrides it, and trip
+/// recordings are not consulted at all.
 ///
-/// Composes the vehicle profile, the fill-up list filtered to that
-/// vehicle, and the trip history filtered to trips recorded since the
-/// most recent fill-up. The pure [estimateTankLevel] function does the
-/// math; this provider just wires inputs together and stays per-screen
-/// (no `keepAlive`).
+/// Sensor source preference:
+///  1. the LIVE reading while a recording is active
+///     ([currentObd2FuelLevelLitres] — PSA CAN > OEM litres > 0x2F),
+///     stamped "now";
+///  2. the persisted per-vehicle snapshot the tracker wrote during the
+///     last drive ([Obd2FuelLevelSnapshotStore]);
+///  3. none — the estimator stays on the fill anchor.
 ///
-/// Returns [TankLevelEstimate.unknown] when:
-/// * [vehicleId] does not match any stored vehicle profile
-/// * the vehicle has no fill-ups logged yet
+/// The live watch also keeps this provider rebuilding during a drive,
+/// so the Carburant card follows the gauge in real time; after the
+/// drive the live value drops to null and the freshly-persisted
+/// snapshot takes over seamlessly.
+///
+/// Returns [TankLevelEstimate.unknown] when [vehicleId] matches no
+/// stored vehicle profile or the vehicle has no fill-ups logged yet.
 
 @ProviderFor(tankLevel)
 final tankLevelProvider = TankLevelFamily._();
 
-/// Current tank-level estimate for [vehicleId] (#1195).
+/// Tank level for [vehicleId] — v2 model (#3647): the most recent
+/// physical fill-up anchors the level (full → 100 %), an OBD2
+/// fuel-level reading newer than that fill overrides it, and trip
+/// recordings are not consulted at all.
 ///
-/// Composes the vehicle profile, the fill-up list filtered to that
-/// vehicle, and the trip history filtered to trips recorded since the
-/// most recent fill-up. The pure [estimateTankLevel] function does the
-/// math; this provider just wires inputs together and stays per-screen
-/// (no `keepAlive`).
+/// Sensor source preference:
+///  1. the LIVE reading while a recording is active
+///     ([currentObd2FuelLevelLitres] — PSA CAN > OEM litres > 0x2F),
+///     stamped "now";
+///  2. the persisted per-vehicle snapshot the tracker wrote during the
+///     last drive ([Obd2FuelLevelSnapshotStore]);
+///  3. none — the estimator stays on the fill anchor.
 ///
-/// Returns [TankLevelEstimate.unknown] when:
-/// * [vehicleId] does not match any stored vehicle profile
-/// * the vehicle has no fill-ups logged yet
+/// The live watch also keeps this provider rebuilding during a drive,
+/// so the Carburant card follows the gauge in real time; after the
+/// drive the live value drops to null and the freshly-persisted
+/// snapshot takes over seamlessly.
+///
+/// Returns [TankLevelEstimate.unknown] when [vehicleId] matches no
+/// stored vehicle profile or the vehicle has no fill-ups logged yet.
 
 final class TankLevelProvider
     extends
@@ -43,17 +61,26 @@ final class TankLevelProvider
           TankLevelEstimate
         >
     with $Provider<TankLevelEstimate> {
-  /// Current tank-level estimate for [vehicleId] (#1195).
+  /// Tank level for [vehicleId] — v2 model (#3647): the most recent
+  /// physical fill-up anchors the level (full → 100 %), an OBD2
+  /// fuel-level reading newer than that fill overrides it, and trip
+  /// recordings are not consulted at all.
   ///
-  /// Composes the vehicle profile, the fill-up list filtered to that
-  /// vehicle, and the trip history filtered to trips recorded since the
-  /// most recent fill-up. The pure [estimateTankLevel] function does the
-  /// math; this provider just wires inputs together and stays per-screen
-  /// (no `keepAlive`).
+  /// Sensor source preference:
+  ///  1. the LIVE reading while a recording is active
+  ///     ([currentObd2FuelLevelLitres] — PSA CAN > OEM litres > 0x2F),
+  ///     stamped "now";
+  ///  2. the persisted per-vehicle snapshot the tracker wrote during the
+  ///     last drive ([Obd2FuelLevelSnapshotStore]);
+  ///  3. none — the estimator stays on the fill anchor.
   ///
-  /// Returns [TankLevelEstimate.unknown] when:
-  /// * [vehicleId] does not match any stored vehicle profile
-  /// * the vehicle has no fill-ups logged yet
+  /// The live watch also keeps this provider rebuilding during a drive,
+  /// so the Carburant card follows the gauge in real time; after the
+  /// drive the live value drops to null and the freshly-persisted
+  /// snapshot takes over seamlessly.
+  ///
+  /// Returns [TankLevelEstimate.unknown] when [vehicleId] matches no
+  /// stored vehicle profile or the vehicle has no fill-ups logged yet.
   TankLevelProvider._({
     required TankLevelFamily super.from,
     required String super.argument,
@@ -106,19 +133,28 @@ final class TankLevelProvider
   }
 }
 
-String _$tankLevelHash() => r'28e95db22eaecc4ad3a7b376b02e549af3bd3be6';
+String _$tankLevelHash() => r'b86d1d5cdeec1adb0e54909f76fbc2a6b35c6591';
 
-/// Current tank-level estimate for [vehicleId] (#1195).
+/// Tank level for [vehicleId] — v2 model (#3647): the most recent
+/// physical fill-up anchors the level (full → 100 %), an OBD2
+/// fuel-level reading newer than that fill overrides it, and trip
+/// recordings are not consulted at all.
 ///
-/// Composes the vehicle profile, the fill-up list filtered to that
-/// vehicle, and the trip history filtered to trips recorded since the
-/// most recent fill-up. The pure [estimateTankLevel] function does the
-/// math; this provider just wires inputs together and stays per-screen
-/// (no `keepAlive`).
+/// Sensor source preference:
+///  1. the LIVE reading while a recording is active
+///     ([currentObd2FuelLevelLitres] — PSA CAN > OEM litres > 0x2F),
+///     stamped "now";
+///  2. the persisted per-vehicle snapshot the tracker wrote during the
+///     last drive ([Obd2FuelLevelSnapshotStore]);
+///  3. none — the estimator stays on the fill anchor.
 ///
-/// Returns [TankLevelEstimate.unknown] when:
-/// * [vehicleId] does not match any stored vehicle profile
-/// * the vehicle has no fill-ups logged yet
+/// The live watch also keeps this provider rebuilding during a drive,
+/// so the Carburant card follows the gauge in real time; after the
+/// drive the live value drops to null and the freshly-persisted
+/// snapshot takes over seamlessly.
+///
+/// Returns [TankLevelEstimate.unknown] when [vehicleId] matches no
+/// stored vehicle profile or the vehicle has no fill-ups logged yet.
 
 final class TankLevelFamily extends $Family
     with $FunctionalFamilyOverride<TankLevelEstimate, String> {
@@ -131,17 +167,26 @@ final class TankLevelFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Current tank-level estimate for [vehicleId] (#1195).
+  /// Tank level for [vehicleId] — v2 model (#3647): the most recent
+  /// physical fill-up anchors the level (full → 100 %), an OBD2
+  /// fuel-level reading newer than that fill overrides it, and trip
+  /// recordings are not consulted at all.
   ///
-  /// Composes the vehicle profile, the fill-up list filtered to that
-  /// vehicle, and the trip history filtered to trips recorded since the
-  /// most recent fill-up. The pure [estimateTankLevel] function does the
-  /// math; this provider just wires inputs together and stays per-screen
-  /// (no `keepAlive`).
+  /// Sensor source preference:
+  ///  1. the LIVE reading while a recording is active
+  ///     ([currentObd2FuelLevelLitres] — PSA CAN > OEM litres > 0x2F),
+  ///     stamped "now";
+  ///  2. the persisted per-vehicle snapshot the tracker wrote during the
+  ///     last drive ([Obd2FuelLevelSnapshotStore]);
+  ///  3. none — the estimator stays on the fill anchor.
   ///
-  /// Returns [TankLevelEstimate.unknown] when:
-  /// * [vehicleId] does not match any stored vehicle profile
-  /// * the vehicle has no fill-ups logged yet
+  /// The live watch also keeps this provider rebuilding during a drive,
+  /// so the Carburant card follows the gauge in real time; after the
+  /// drive the live value drops to null and the freshly-persisted
+  /// snapshot takes over seamlessly.
+  ///
+  /// Returns [TankLevelEstimate.unknown] when [vehicleId] matches no
+  /// stored vehicle profile or the vehicle has no fill-ups logged yet.
 
   TankLevelProvider call(String vehicleId) =>
       TankLevelProvider._(argument: vehicleId, from: this);

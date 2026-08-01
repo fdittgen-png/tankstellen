@@ -307,7 +307,7 @@ const _featurePairBaseline = <String, int>{
   'consumption -> profile': 10,
   'consumption -> search': 2,
   'consumption -> sync': 1,
-  'consumption -> vehicle': 37,
+  'consumption -> vehicle': 36,
   'driving -> approach': 1,
   'driving -> consumption': 5,
   'driving -> feature_management': 6,

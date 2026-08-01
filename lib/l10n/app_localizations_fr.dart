@@ -6846,6 +6846,36 @@ class AppLocalizationsFr extends AppLocalizations {
       'Confirm the pairing request on your phone';
 
   @override
+  String get obd2ScanEmptyTitle => 'No adapter found';
+
+  @override
+  String get obd2ScanEmptyReady =>
+      'Bluetooth is on and permissions are granted. Make sure the adapter is plugged into the OBD2 port and the ignition is on, then scan again.';
+
+  @override
+  String get obd2ScanBlockedUnsupported =>
+      'This device has no Bluetooth Low Energy hardware, so it cannot connect to an OBD2 adapter.';
+
+  @override
+  String get obd2ScanBlockedBluetoothOff =>
+      'Bluetooth is switched off. Turn it on to scan for your adapter.';
+
+  @override
+  String get obd2ScanBlockedPermission =>
+      'Sparkilo needs Bluetooth permission to find your adapter.';
+
+  @override
+  String get obd2ScanBlockedPermissionSettings =>
+      'Bluetooth permission was denied permanently. Grant it in system settings to scan for your adapter.';
+
+  @override
+  String get obd2ScanBlockedLocationServices =>
+      'Location services are switched off on this device. Android needs them enabled to scan for Bluetooth adapters — no location is recorded or shared.';
+
+  @override
+  String get obd2ScanOpenSettings => 'Open settings';
+
+  @override
   String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
 
   @override
@@ -7524,6 +7554,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get addFillUpIsFullTankSubtitle =>
       'Réservoir rempli à ras bord — décochez s\'il s\'agissait d\'un plein partiel';
+
+  @override
+  String tankLevelSourceFillUp(String date) {
+    return 'Ancré au dernier plein : $date';
+  }
+
+  @override
+  String tankLevelSourceObd2(String date) {
+    return 'Capteur de réservoir OBD2 · $date';
+  }
 
   @override
   String get tankReportTitle => 'Rapport de plein';

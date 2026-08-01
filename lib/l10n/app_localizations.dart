@@ -11728,6 +11728,54 @@ abstract class AppLocalizations {
   /// **'Confirm the pairing request on your phone'**
   String get obd2PairingConfirmHint;
 
+  /// Heading of the diagnostic empty state in the OBD2 adapter picker, shown when a scan completed with zero candidates.
+  ///
+  /// In en, this message translates to:
+  /// **'No adapter found'**
+  String get obd2ScanEmptyTitle;
+
+  /// Empty-scan explanation when every precondition is satisfied, so the adapter genuinely is not in range.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is on and permissions are granted. Make sure the adapter is plugged into the OBD2 port and the ignition is on, then scan again.'**
+  String get obd2ScanEmptyReady;
+
+  /// Empty-scan explanation when the device has no BLE radio at all.
+  ///
+  /// In en, this message translates to:
+  /// **'This device has no Bluetooth Low Energy hardware, so it cannot connect to an OBD2 adapter.'**
+  String get obd2ScanBlockedUnsupported;
+
+  /// Empty-scan explanation when the Bluetooth radio is off in system settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is switched off. Turn it on to scan for your adapter.'**
+  String get obd2ScanBlockedBluetoothOff;
+
+  /// Empty-scan explanation when the Bluetooth permission has not been granted and can still be requested in-app.
+  ///
+  /// In en, this message translates to:
+  /// **'Sparkilo needs Bluetooth permission to find your adapter.'**
+  String get obd2ScanBlockedPermission;
+
+  /// Empty-scan explanation when the permission is permanently denied, so re-prompting does nothing and the user must go to system settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth permission was denied permanently. Grant it in system settings to scan for your adapter.'**
+  String get obd2ScanBlockedPermissionSettings;
+
+  /// Empty-scan explanation for the Android-only case where location services are off system-wide, which makes a BLE scan silently return nothing. The reassurance is included because the requirement is an OS constraint, not a data-collection choice.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are switched off on this device. Android needs them enabled to scan for Bluetooth adapters — no location is recorded or shared.'**
+  String get obd2ScanBlockedLocationServices;
+
+  /// Button in the OBD2 empty-scan state that deep-links to the relevant system settings screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get obd2ScanOpenSettings;
+
   /// Shown while the trip-independent auto-reconnect controller is actively trying to re-establish a dropped OBD2 adapter link (Epic #3013 phase 3, #3019). Bounded backoff loop in flight.
   ///
   /// In en, this message translates to:
@@ -12919,6 +12967,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tank filled to the brim — uncheck if this was a partial fill'**
   String get addFillUpIsFullTankSubtitle;
+
+  /// Tank-card caption when the level is grounded on the most recent fill-up (#3647 tank level v2 — a full fill sets 100%, no trip simulation). Placeholder is the fill date.
+  ///
+  /// In en, this message translates to:
+  /// **'Anchored at the last fill-up: {date}'**
+  String tankLevelSourceFillUp(String date);
+
+  /// Tank-card caption when an OBD2 fuel-level reading newer than the last fill-up grounds the level (#3647). Placeholder is the reading's date.
+  ///
+  /// In en, this message translates to:
+  /// **'OBD2 tank sensor · {date}'**
+  String tankLevelSourceObd2(String date);
 
   /// #3616 card title — per-plein consumption report on the Carburant tab
   ///

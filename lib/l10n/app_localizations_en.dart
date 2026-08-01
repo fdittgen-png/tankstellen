@@ -6749,6 +6749,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'Confirm the pairing request on your phone';
 
   @override
+  String get obd2ScanEmptyTitle => 'No adapter found';
+
+  @override
+  String get obd2ScanEmptyReady =>
+      'Bluetooth is on and permissions are granted. Make sure the adapter is plugged into the OBD2 port and the ignition is on, then scan again.';
+
+  @override
+  String get obd2ScanBlockedUnsupported =>
+      'This device has no Bluetooth Low Energy hardware, so it cannot connect to an OBD2 adapter.';
+
+  @override
+  String get obd2ScanBlockedBluetoothOff =>
+      'Bluetooth is switched off. Turn it on to scan for your adapter.';
+
+  @override
+  String get obd2ScanBlockedPermission =>
+      'Sparkilo needs Bluetooth permission to find your adapter.';
+
+  @override
+  String get obd2ScanBlockedPermissionSettings =>
+      'Bluetooth permission was denied permanently. Grant it in system settings to scan for your adapter.';
+
+  @override
+  String get obd2ScanBlockedLocationServices =>
+      'Location services are switched off on this device. Android needs them enabled to scan for Bluetooth adapters — no location is recorded or shared.';
+
+  @override
+  String get obd2ScanOpenSettings => 'Open settings';
+
+  @override
   String get obd2ReconnectInProgress => 'Reconnecting to your OBD2 adapter…';
 
   @override
@@ -7419,6 +7449,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get addFillUpIsFullTankSubtitle =>
       'Tank filled to the brim — uncheck if this was a partial fill';
+
+  @override
+  String tankLevelSourceFillUp(String date) {
+    return 'Anchored at the last fill-up: $date';
+  }
+
+  @override
+  String tankLevelSourceObd2(String date) {
+    return 'OBD2 tank sensor · $date';
+  }
 
   @override
   String get tankReportTitle => 'Tank report';
@@ -15181,6 +15221,36 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Çóñƒîřɱ ŧĥé ƥáîřîñǧ řéɋúéšŧ óñ ýóúř ƥĥóñé ················⟧';
 
   @override
+  String get obd2ScanEmptyTitle => '⟦Ñó áđáƥŧéř ƒóúñđ ······⟧';
+
+  @override
+  String get obd2ScanEmptyReady =>
+      '⟦Ɓłúéŧóóŧĥ îš óñ áñđ ƥéřɱîššîóñš ářé ǧřáñŧéđ. Ṁáķé šúřé ŧĥé áđáƥŧéř îš ƥłúǧǧéđ îñŧó ŧĥé ÓƁĐ2 ƥóřŧ áñđ ŧĥé îǧñîŧîóñ îš óñ, ŧĥéñ šçáñ áǧáîñ. ·················································⟧';
+
+  @override
+  String get obd2ScanBlockedUnsupported =>
+      '⟦Ŧĥîš đéṽîçé ĥáš ñó Ɓłúéŧóóŧĥ Łóŵ Éñéřǧý ĥářđŵářé, šó îŧ çáññóŧ çóññéçŧ ŧó áñ ÓƁĐ2 áđáƥŧéř. ································⟧';
+
+  @override
+  String get obd2ScanBlockedBluetoothOff =>
+      '⟦Ɓłúéŧóóŧĥ îš šŵîŧçĥéđ óƒƒ. Ŧúřñ îŧ óñ ŧó šçáñ ƒóř ýóúř áđáƥŧéř. ·······················⟧';
+
+  @override
+  String get obd2ScanBlockedPermission =>
+      '⟦Šƥářķîłó ñééđš Ɓłúéŧóóŧĥ ƥéřɱîššîóñ ŧó ƒîñđ ýóúř áđáƥŧéř. ······················⟧';
+
+  @override
+  String get obd2ScanBlockedPermissionSettings =>
+      '⟦Ɓłúéŧóóŧĥ ƥéřɱîššîóñ ŵáš đéñîéđ ƥéřɱáñéñŧłý. Ǧřáñŧ îŧ îñ šýšŧéɱ šéŧŧîñǧš ŧó šçáñ ƒóř ýóúř áđáƥŧéř. ·····································⟧';
+
+  @override
+  String get obd2ScanBlockedLocationServices =>
+      '⟦Łóçáŧîóñ šéřṽîçéš ářé šŵîŧçĥéđ óƒƒ óñ ŧĥîš đéṽîçé. Áñđřóîđ ñééđš ŧĥéɱ éñáƀłéđ ŧó šçáñ ƒóř Ɓłúéŧóóŧĥ áđáƥŧéřš — ñó łóçáŧîóñ îš řéçóřđéđ óř šĥářéđ. ······················································⟧';
+
+  @override
+  String get obd2ScanOpenSettings => '⟦Óƥéñ šéŧŧîñǧš ·····⟧';
+
+  @override
   String get obd2ReconnectInProgress =>
       '⟦Řéçóññéçŧîñǧ ŧó ýóúř ÓƁĐ2 áđáƥŧéř… ·············⟧';
 
@@ -15866,6 +15936,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get addFillUpIsFullTankSubtitle =>
       '⟦Ŧáñķ ƒîłłéđ ŧó ŧĥé ƀřîɱ — úñçĥéçķ îƒ ŧĥîš ŵáš á ƥářŧîáł ƒîłł ·····················⟧';
+
+  @override
+  String tankLevelSourceFillUp(String date) {
+    return '⟦Áñçĥóřéđ áŧ ŧĥé łášŧ ƒîłł-úƥ: $date ··········⟧';
+  }
+
+  @override
+  String tankLevelSourceObd2(String date) {
+    return '⟦ÓƁĐ2 ŧáñķ šéñšóř · $date ······⟧';
+  }
 
   @override
   String get tankReportTitle => '⟦Ŧáñķ řéƥóřŧ ·····⟧';

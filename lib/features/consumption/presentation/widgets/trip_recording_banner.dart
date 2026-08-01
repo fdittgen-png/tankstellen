@@ -22,6 +22,7 @@ import '../../../obd2/api.dart';
 import '../../domain/driving_coaching.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/live_activity_provider.dart';
+import '../../providers/obd2_fuel_level_tracker.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/trip_recording_provider.dart';
 import 'gps_degraded_banner.dart';
@@ -84,6 +85,16 @@ class TripRecordingBanner extends ConsumerWidget {
       ref.watch(liveActivitySyncProvider);
     } on Object {
       // best-effort surface — never let it take the banner down
+    }
+    // #3647 — arm the OBD2 fuel-level tracker the same way: it persists
+    // the live tank reading per vehicle so the Carburant card can show
+    // the sensor truth BETWEEN drives (tank level v2 — fills anchor,
+    // the sensor tracks, no trip simulation). Watching from the banner
+    // keeps it alive for backgrounded recordings on every route.
+    try {
+      ref.watch(obd2FuelLevelTrackerProvider);
+    } on Object {
+      // best-effort — a harness without the recording graph skips it
     }
 
     // #1977 — once the OS shrinks the app into a Picture-in-Picture
