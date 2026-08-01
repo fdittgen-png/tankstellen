@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import '../entities/fill_up.dart';
+import 'fill_anchored_consumption.dart';
 import 'trip_length_aggregator.dart';
 
 /// How a [TankLevelEstimate] was derived (#1195).
@@ -141,15 +142,17 @@ TankLevelEstimate estimateTankLevel({
   final capacityL = vehicle.tankCapacityL;
   final upperBound = capacityL ?? double.infinity;
 
-  // #1191 — ground the estimate in the vehicle's REAL average consumption
-  // from its trip history (measured litres, else the GPS estimate — see
-  // [aggregateByTripLength]), falling back to the fleet default only when
-  // there is no usable trip data for this vehicle yet. This makes the
-  // tank-level and range estimates track how THIS car actually drinks,
-  // instead of a fixed 7.0 L/100 km fleet average.
-  final avgLPer100Km =
+  // #3645 — PREFER the fill-anchored (tank-to-tank) average: pumped
+  // litres ÷ odometer delta between full fills is the one physically
+  // true consumption measurement, captures unrecorded driving by
+  // construction, and carries no integrator/GPS-model bias. Every
+  // refuel thereby re-evaluates the tank ("so real und richtig wie
+  // möglich"). #1191 — the recorded-trip aggregate remains the fallback
+  // when no valid plein-to-plein window exists yet (young history,
+  // unset odometers), and the 7.0 fleet default the last resort.
+  final avgLPer100Km = fillAnchoredAvgLPer100Km(fillUps)?.avgLPer100Km ??
       aggregateByTripLength(trips, vehicleId: vehicle.id).overallAvgLPer100Km ??
-          _defaultAvgLPer100Km;
+      _defaultAvgLPer100Km;
 
   // Compute the starting level right after [lastFillUp] (#1360 partial-
   // fill branch). For full fills this is just capacity; for partials
@@ -246,8 +249,20 @@ double _initialLevelAfterFill({
   if (lastFill.isFullTank) {
     // Capacity wins when known; otherwise fall back to "tank held at
     // least the litres the user just pumped in", which is honest when
-    // capacity isn't configured.
+    // capacity isn't configured. A sensor reading is deliberately NOT
+    // consulted here: "full" is the user's physical statement at the
+    // pump, and the percent-derived 0x2F level habitually under-reads a
+    // brimmed tank.
     return capacityL ?? lastFill.liters;
+  }
+
+  // #3645 — partial fill with an OBD2-measured post-pump level (#1401
+  // phase 7a): the car's own gauge beats our walk-back simulation. The
+  // clamp keeps a glitched sensor honest against the configured
+  // capacity.
+  final measuredAfter = lastFill.fuelLevelAfterL;
+  if (measuredAfter != null) {
+    return measuredAfter.clamp(0.0, upper);
   }
 
   // Build a chronological (oldest→newest) view of every prior fill.
