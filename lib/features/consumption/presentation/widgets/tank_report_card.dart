@@ -8,6 +8,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/tank_report.dart';
 import '../../providers/tank_report_provider.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Per-tank insight card on the Carburant tab (#3616).
 ///
@@ -23,9 +24,17 @@ class TankReportCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final report = ref.watch(tankReportProvider);
-    final latest = report.latest;
-    if (latest == null) return const SizedBox.shrink();
+    // Shell-safety (#2163 idiom): since #3648 this card renders on the
+    // Trajets tab, whose harnesses don't all wire the fill-up/Hive
+    // graph. The card's contract is already "render nothing until a
+    // window closes" — an unwired provider is the same nothing.
+    final report = guard(
+      () => ref.watch(tankReportProvider),
+      where: 'TankReportCard: tank report watch failed',
+      fallback: null,
+    );
+    final latest = report?.latest;
+    if (report == null || latest == null) return const SizedBox.shrink();
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final evolution = report.evolution;

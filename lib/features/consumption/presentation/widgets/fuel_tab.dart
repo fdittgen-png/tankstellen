@@ -25,7 +25,6 @@ import 'consumption_stats_card.dart';
 import 'edit_correction_fill_up_sheet.dart';
 import 'fill_up_card.dart';
 import 'tank_level_card.dart';
-import 'tank_report_card.dart';
 
 /// Body of the Fuel tab on the Consumption screen.
 ///
@@ -78,10 +77,9 @@ class FuelTab extends ConsumerWidget {
         // comparison + evolution charts).
         onTap: () => context.push(RoutePaths.consumptionStats),
       ),
-      // #3616 — the per-tank insight loop: latest plein-to-plein window,
-      // evolution vs the previous tank, coverage-honest behavior hints,
-      // and the pump-truth residual. Renders nothing until a window closes.
-      const TankReportCard(),
+      // #3648 — the per-tank insight loop (recordings-vs-pump comparison,
+      // #3616) moved to the Trajets tab: the Carburant tab is purely
+      // fill-and-tank, everything recording-derived lives with the trips.
     ];
 
     Widget buildFillUpRow(int index) {
