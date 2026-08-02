@@ -13010,6 +13010,12 @@ abstract class AppLocalizations {
   /// **'OBD2 tank sensor · {date}'**
   String tankLevelSourceObd2(String date);
 
+  /// Caption line on the tank level card for multi-fuel vehicles (#3652). {mix} is a pre-composed list of fuel grade product names with percentages, e.g. 'Super E10 57 % · E85 / Bioéthanol 43 %'.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank mix: {mix}'**
+  String tankMixCaption(String mix);
+
   /// #3616 card title — per-plein consumption report on the Carburant tab
   ///
   /// In en, this message translates to:

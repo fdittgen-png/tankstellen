@@ -3,7 +3,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/features/consumption/domain/services/tank_level_estimator.dart';
+import 'package:tankstellen/features/consumption/domain/services/tank_mix_estimator.dart';
+import 'package:tankstellen/features/consumption/providers/tank_mix_provider.dart';
 import 'package:tankstellen/features/consumption/presentation/widgets/tank_level_card.dart';
 import 'package:tankstellen/features/consumption/providers/tank_level_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
@@ -261,6 +264,90 @@ void main() {
         find.textContaining('OBD2 tank sensor · 2026-04-29'),
         findsOneWidget,
       );
+    });
+  });
+
+  group('TankLevelCard — tank mix line (#3652)', () {
+    TankLevelEstimate estimate() => TankLevelEstimate(
+          levelL: 32.4,
+          capacityL: 50,
+          lastFillUpDate: DateTime(2026, 4, 27),
+          source: TankLevelSource.fillUp,
+          sensorReadAt: null,
+          rangeKm: 462,
+        );
+
+    testWidgets('renders the blend of a multi-fuel tank with grade names '
+        'and percentages', (tester) async {
+      final mix = TankMixEstimate(
+        shares: const [
+          TankMixShare(fuel: FuelType.e10, share: 0.57),
+          TankMixShare(fuel: FuelType.e85, share: 0.43),
+        ],
+        asOf: DateTime(2026, 4, 27),
+      );
+
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: <Object>[
+          ..._tankLevelOverride(estimate()),
+          tankMixProvider('stub-vehicle').overrideWith((ref) => mix),
+        ],
+      );
+
+      expect(find.byKey(const Key('tank_mix_line')), findsOneWidget);
+      expect(
+        find.textContaining('Super E10 57 %'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('E85'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('no mix line for a single-fuel vehicle (provider null)',
+        (tester) async {
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: <Object>[
+          ..._tankLevelOverride(estimate()),
+          tankMixProvider('stub-vehicle').overrideWith((ref) => null),
+        ],
+      );
+      expect(find.byKey(const Key('tank_mix_line')), findsNothing);
+    });
+
+    testWidgets('a pure tank (100 % one grade) stays silent', (tester) async {
+      final mix = TankMixEstimate(
+        shares: const [TankMixShare(fuel: FuelType.e85, share: 1.0)],
+        asOf: DateTime(2026, 4, 27),
+      );
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: <Object>[
+          ..._tankLevelOverride(estimate()),
+          tankMixProvider('stub-vehicle').overrideWith((ref) => mix),
+        ],
+      );
+      expect(find.byKey(const Key('tank_mix_line')), findsNothing);
+    });
+
+    testWidgets('an UNWIRED mix graph degrades silently — shell safety '
+        '(#2163)', (tester) async {
+      // No tankMixProvider override: the provider reaches
+      // fillUpListProvider, which isolated harnesses don't wire; the
+      // guard must swallow it and render no mix line.
+      await pumpApp(
+        tester,
+        const TankLevelCard(),
+        overrides: _tankLevelOverride(estimate()),
+      );
+      expect(find.byKey(const Key('tank_mix_line')), findsNothing);
+      expect(tester.takeException(), isNull);
     });
   });
 }

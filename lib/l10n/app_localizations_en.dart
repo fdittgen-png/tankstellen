@@ -7480,6 +7480,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tankMixCaption(String mix) {
+    return 'Tank mix: $mix';
+  }
+
+  @override
   String get tankReportTitle => 'Tank report';
 
   @override
@@ -15984,6 +15989,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String tankLevelSourceObd2(String date) {
     return '⟦ÓƁĐ2 ŧáñķ šéñšóř · $date ······⟧';
+  }
+
+  @override
+  String tankMixCaption(String mix) {
+    return '⟦Ŧáñķ ɱîẋ: $mix ···⟧';
   }
 
   @override

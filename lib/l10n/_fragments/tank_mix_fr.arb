@@ -1,0 +1,10 @@
+{
+  "tankMixCaption": "Mélange du réservoir : {mix}",
+  "@tankMixCaption": {
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
+  }
+}

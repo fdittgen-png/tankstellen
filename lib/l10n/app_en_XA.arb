@@ -2130,6 +2130,7 @@
   "addFillUpIsFullTankSubtitle": "⟦Ŧáñķ ƒîłłéđ ŧó ŧĥé ƀřîɱ — úñçĥéçķ îƒ ŧĥîš ŵáš á ƥářŧîáł ƒîłł ·····················⟧",
   "tankLevelSourceFillUp": "⟦Áñçĥóřéđ áŧ ŧĥé łášŧ ƒîłł-úƥ: {date} ··········⟧",
   "tankLevelSourceObd2": "⟦ÓƁĐ2 ŧáñķ šéñšóř · {date} ······⟧",
+  "tankMixCaption": "⟦Ŧáñķ ɱîẋ: {mix} ···⟧",
   "tankReportTitle": "⟦Ŧáñķ řéƥóřŧ ·····⟧",
   "tankReportHeadline": "⟦{value} Ł/100 ķɱ ·⟧",
   "tankReportSincePrevious": "⟦Šîñçé ŧĥé ƥřéṽîóúš ƒúłł ŧáñķ: {km} ķɱ · {liters} Ł · {cost} ············⟧",
