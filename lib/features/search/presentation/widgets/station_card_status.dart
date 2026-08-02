@@ -116,53 +116,77 @@ class _StationDetails extends StatelessWidget {
         Row(
           children: [
             // #2622 — distance gets priority in this cramped row; the
-            // timestamp (Flexible) is what wraps/ellipsises first.
+            // timestamp (Flexible, higher flex) is what wraps/ellipsises
+            // first. #3662 — the distance is Flexible too (low flex +
+            // ellipsis) so a user-raised text scale degrades to a
+            // truncated timestamp, never a RenderFlex overflow.
             // #3634 — when the OSRM table has answered for this station,
             // the REAL road distance replaces the crow-flies figure (the
             // route icon marks the difference); otherwise the haversine
             // value stands as always.
-            Consumer(builder: (context, ref, _) {
-              final roadKm = ref.watch(
-                  roadDistancesProvider.select((m) => m[station.id]));
-              if (roadKm == null) {
-                return Text(
-                  PriceFormatter.formatDistance(station.dist),
-                  style: theme.textTheme.bodySmall,
-                );
-              }
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.route,
-                      size: 12,
-                      color: theme.colorScheme.onSurfaceVariant),
-                  const SizedBox(width: 2),
-                  Text(
-                    PriceFormatter.formatDistance(roadKm),
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ],
-              );
-            }),
+            Flexible(
+              child: Consumer(
+                builder: (context, ref, _) {
+                  final roadKm = ref.watch(
+                    roadDistancesProvider.select((m) => m[station.id]),
+                  );
+                  if (roadKm == null) {
+                    return Text(
+                      PriceFormatter.formatDistance(station.dist),
+                      style: theme.textTheme.bodySmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  }
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.route,
+                        size: 12,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: 2),
+                      Flexible(
+                        child: Text(
+                          PriceFormatter.formatDistance(roadKm),
+                          style: theme.textTheme.bodySmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
             if (station.updatedAt != null) ...[
               const SizedBox(width: 8),
-              Icon(
-                Icons.update,
-                size: 12,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: Spacing.xs),
               Flexible(
-                child: Text(
-                  // #2622 — wrap the upstream pre-formatted timestamp as
-                  // "Updated {time}" so it reads as freshness, not a bare
-                  // code. (No relative "2h ago": updatedAt is a lossy,
-                  // per-country pre-formatted String.)
-                  l10n.stationUpdatedLabel(station.updatedAt!),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                flex: 3,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.update,
+                      size: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: Spacing.xs),
+                    Flexible(
+                      child: Text(
+                        // #2622 — wrap the upstream pre-formatted timestamp as
+                        // "Updated {time}" so it reads as freshness, not a bare
+                        // code. (No relative "2h ago": updatedAt is a lossy,
+                        // per-country pre-formatted String.)
+                        l10n.stationUpdatedLabel(station.updatedAt!),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

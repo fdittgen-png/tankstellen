@@ -59,6 +59,38 @@ void main() {
     );
   }
 
+  /// #3662 (llmwiki page 26) — text SCALING is the same bug class in
+  /// another axis: a user's 1.3x font setting expands every string at
+  /// once. Pumps [child] in plain English at a 1.3x text scale on the
+  /// same 320 dp viewport and fails on any overflow. Layouts that
+  /// survive the en_XA expansion usually survive large fonts — but
+  /// "usually" is not a test.
+  Future<void> pumpScaled(
+    WidgetTester tester,
+    Widget child, {
+    List<Object>? overrides,
+    String? widgetName,
+  }) async {
+    tester.view.physicalSize = const Size(320, 800);
+    tester.view.devicePixelRatio = 1.0;
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await pumpApp(tester, child, overrides: overrides);
+
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: '${widgetName ?? child.runtimeType} overflows at 320 dp '
+          'under a 1.3x text scale — a user-raised font setting breaks '
+          'its fixed-size chrome. Give the offending Row/Column a '
+          'Flexible/Expanded child, allow wrapping, or shorten the '
+          'layout.',
+    );
+  }
+
   group('Text-expansion overflow (pseudo-locale en_XA)', () {
     testWidgets('StationCard — open station', (tester) async {
       await pumpPseudo(
@@ -112,6 +144,81 @@ void main() {
 
     testWidgets('FuelTypeSelector — Germany fuel set', (tester) async {
       await pumpPseudo(
+        tester,
+        const FuelTypeSelector(),
+        overrides: [
+          fakeHiveStorageOverride().override,
+          activeCountryOverride(Countries.germany),
+          selectedFuelTypeOverride(FuelType.all),
+        ],
+        widgetName: 'FuelTypeSelector',
+      );
+    });
+  });
+
+  group('Text-scale overflow (1.3x font setting, #3662)', () {
+    testWidgets('StationCard — open station', (tester) async {
+      await pumpScaled(
+        tester,
+        const StationCard(
+          station: testStation,
+          selectedFuelType: FuelType.e10,
+        ),
+        widgetName: 'StationCard',
+      );
+    });
+
+    testWidgets('StationCard — favorite station', (tester) async {
+      await pumpScaled(
+        tester,
+        const StationCard(
+          station: testStation,
+          selectedFuelType: FuelType.e10,
+          isFavorite: true,
+        ),
+        widgetName: 'StationCard (favorite)',
+      );
+    });
+
+    testWidgets('ServiceStatusBanner — stale / offline banner',
+        (tester) async {
+      // #3660 — the wall-clock ratchet: a pinned mid-month instant, not
+      // a raw wall-clock read; the banner takes staleness explicitly.
+      final result = ServiceResult<List<String>>(
+        data: const ['cached'],
+        source: ServiceSource.cache,
+        fetchedAt: DateTime(2026, 3, 11, 14, 15),
+        isStale: true,
+        errors: const [],
+      );
+      await pumpScaled(
+        tester,
+        ServiceStatusBanner(result: result),
+        widgetName: 'ServiceStatusBanner',
+      );
+    });
+
+    testWidgets('LanguageSelector — choice-chip wrap', (tester) async {
+      // The selector's chip Wrap grows VERTICALLY at a raised text
+      // scale by design; on the real setup screen it sits inside a
+      // SingleChildScrollView (setup_screen.dart), so the scaled pass
+      // pumps it in the same container — a bottom overflow here would
+      // be a harness artifact, not a defect. Horizontal overflow (the
+      // real bug class) still fails.
+      await pumpScaled(
+        tester,
+        SingleChildScrollView(
+          child: LanguageSelector(
+            selected: AppLanguages.all.first,
+            onSelect: (_) {},
+          ),
+        ),
+        widgetName: 'LanguageSelector',
+      );
+    });
+
+    testWidgets('FuelTypeSelector — Germany fuel set', (tester) async {
+      await pumpScaled(
         tester,
         const FuelTypeSelector(),
         overrides: [

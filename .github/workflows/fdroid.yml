@@ -81,6 +81,10 @@ jobs:
       # keystore-less fdroid-only release (unsigned; F-Droid signs downstream).
       - name: Build fdroid release APK (unsigned)
         run: flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
+      # #3661 — size visible on every build; fails on an implausibly
+      # small artifact (llmwiki page 25).
+      - name: Artifact size -> job summary
+        run: bash scripts/report_artifact_sizes.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
       # Layer A (dependency graph) ALWAYS runs; layers B + strict C (dex,
       # #3480: class definitions AND dangling references must both be 0) run
       # on the release APK just produced — strict mode auto-enables on the

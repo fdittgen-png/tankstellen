@@ -133,6 +133,11 @@ jobs:
         # variable to `true` — no workflow edit needed.
         run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} ${{ vars.FGS_FORM_APPROVED == 'true' && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
 
+      # #3661 — size visible on every build; fails on an implausibly
+      # small artifact (llmwiki page 25).
+      - name: Artifact size -> job summary
+        run: bash scripts/report_artifact_sizes.sh build/app/outputs/bundle/playRelease/app-play-release.aab
+
       - name: Clean up decoded keystore
         if: always()
         run: rm -f "$ANDROID_KEYSTORE_PATH"
