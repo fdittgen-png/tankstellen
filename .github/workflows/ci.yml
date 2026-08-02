@@ -452,7 +452,14 @@ jobs:
           lcov "${ARGS[@]}" -o coverage/lcov.info
           echo "Merged ${#ARGS[@]} shard lcov files into coverage/lcov.info"
       - name: Check coverage threshold
-        run: bash scripts/check_coverage.sh
+        # EXPLICIT threshold (PROJECT_OVERVIEW §22-A): this used to pass no
+        # --threshold, silently enforcing the script's default while three
+        # documents claimed 45%. The number is now stated where it is
+        # enforced; raising it is a one-line, reviewable change. NB: this
+        # job runs only on non-PR events (see the job-level `if:`), so
+        # coverage is checked after merge — a deliberate autonomy trade
+        # (#2338 removed it from required checks), not an oversight.
+        run: bash scripts/check_coverage.sh --threshold 40
 
   # #1582 — Startup-budget gate split out of coverage-merge so PRs
   # still enforce it. Cheap: runs only the test/core/perf/ subset.
