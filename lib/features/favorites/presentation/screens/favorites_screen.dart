@@ -18,7 +18,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../providers/favorites_provider.dart';
 import '../widgets/alerts_tab.dart';
 import '../widgets/favorites_tab.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
@@ -189,14 +189,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen>
       // Surface the failure to the user instead of silently swallowing
       // it — the snackbar tells them the share didn't go through, and
       // the debugPrint keeps the cause in `flutter logs` for support.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'FavoritesScreen share image'},
-        ),
-      );
+      logFailure(e, st, where: 'FavoritesScreen share image');
       if (messenger == null) return;
       final errorMsg = l10n.favoritesShareError;
       messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));

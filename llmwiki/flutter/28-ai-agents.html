@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Working with AI agents — LLM Wiki · Flutter</title>
+<meta name="description" content="Division of labor between agents and an orchestrator, worktree fan-out, file affinity, the verify loop, generated-file merge rules, serial merge trains, verification traps, and the standing rules that make agent work safe.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Working with AI agents on a Flutter codebase","description":"Orchestration doctrine: division of labor, worktrees, file affinity, verify loops, merge mechanics, and the failure modes that bite.","dateModified":"2026-08-02","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">28 · Collaboration</span>
+<h1>Working with AI agents</h1>
+<p class="lede">Both source projects are substantially built and maintained with AI agents, and the practice that emerged is neither "let the agent do everything" nor "treat it as autocomplete" — it is an orchestration discipline with a division of labor, a verification loop that trusts nothing, and standing written rules that bind agents and humans identically. This page is that discipline, including the failure modes that taught it.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> agents</span>
+  <span><b>Updated</b> 2026-08-02</span>
+  <span><b>Depends on</b> 03 TDD, 18 GitHub, 23 GitHub craft</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#rules">Standing rules that bind agents and humans alike</a></li>
+<li><a href="#division">Division of labor: agents write, the orchestrator verifies</a></li>
+<li><a href="#affinity">File affinity decides the fan-out</a></li>
+<li><a href="#generated">Generated files never hand-merge</a></li>
+<li><a href="#mergetrain">Bundles and the serial merge train</a></li>
+<li><a href="#verification">Verification traps</a></li>
+<li><a href="#failures">Observed failure modes</a></li>
+</ol>
+</div>
+
+<section id="rules" data-chunk-id="agents.rules" data-tags="agents,rules,process,conventions">
+<h2>Standing rules that bind agents and humans alike</h2>
+
+<p>Both projects keep a version-controlled agent-rules file — the hard rules (string externalisation, issue-first, clean codegen, key parity), the coding rules, the testing rules and the git rules — addressed explicitly to "humans and AI assistants". Three properties make it work where a style guide would not:</p>
+
+<ul>
+<li><strong>It travels with the clone.</strong> A fresh agent session reads it before writing a line; nothing depends on the operator remembering to paste conventions into a prompt.</li>
+<li><strong>Most of its rules are machine-enforced anyway</strong> (<a href="03-tdd-and-testing.html#lint-tests">the lint-test suite</a>), so an agent that ignores the file fails CI rather than shipping a violation. The file explains; the tests enforce. Conventions decay, tests do not — and that goes double for agents, which have no memory of last week's review comments unless something writes it down.</li>
+<li><strong>Authorization boundaries are explicit.</strong> Standing permissions (merge green PRs) and per-request permissions (apply a database migration, trigger an outward-facing workflow that emails real people) are recorded as such. An agent inferring authorization from precedent is how a rehearsal email reaches a customer.</li>
+</ul>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Destructive, outward-facing or schema-changing actions need fresh, explicit approval — every time.</strong> Migrations to a live backend, store submissions, tester invitations, force-pushes: the standing rule in both projects is that yesterday's "yes" does not carry. The corollary for the operator: write the standing authorizations down precisely, because "merge on green without asking; migrations still need approval" is a sentence an agent can follow and an unwritten vibe is not.</p>
+</div>
+</section>
+
+<section id="division" data-chunk-id="agents.division" data-tags="agents,orchestration,worktrees,verify-loop">
+<h2>Division of labor: agents write, the orchestrator verifies</h2>
+
+<p>The doctrine came out of a marathon run — nine PRs, forty issues, roughly eight parallel agents in git worktrees — and its core insight survives even as agent capabilities grow: <strong>the verify loop belongs to the orchestrator</strong>.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Role</th><th>Does</th><th>Does not</th></tr></thead>
+<tbody>
+<tr><td><strong>Implementation agent</strong> (worktree)</td><td>Reads, greps, edits, writes; verifies every API it calls by reading its source; reports raw data — files touched and why, formulas to spot-check, APIs it was unsure of, expected codegen drift, deferrals</td><td>Commit, push, or claim test results it could not run</td></tr>
+<tr><td><strong>Orchestrator</strong></td><td>Runs the loop in the agent's worktree: deps → codegen → asset/l10n pipelines → analyze → targeted tests → fix → commit → rebase → push → PR → merge watcher</td><td>Trust a completion report without seeing the diff and, where claimed, the commit SHA</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Expect two to five real defects per agent bundle — an invented helper that was never defined, a test written against an API the platform hides, a formula transposed. The verify loop is where they die, which is the whole argument for it living with the party that can actually run the toolchain. Even when agents <em>can</em> run flutter and git themselves, the loop stays: agents report "done, committed" while the branch has no commit, and their writes keep landing in waves after the completion notification fires — treat a worktree as still mutating until its status is stable across two checks, and verify the SHA yourself.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: 242 test "failures" appear at once in an agent's bundle.</strong> A flood of failures that are all <code>loading … [E]</code> is one compile error, not 242 regressions — fix the single analyzer error first and re-run before triaging anything. The matching triage rule for big combined runs: a many-suite invocation can flake on isolation while every suite passes standalone, so re-run per-suite before believing a red — and before "fixing" anything.</p>
+</div>
+
+<p>Prompt guardrails that pay for themselves, every time: the project's lint contracts, file-size caps and boundary rules go in <em>every</em> agent prompt; agents on potentially-stale bases are steered to append-only, disjoint-hunk edits near known conflict magnets ("don't reorder existing entries"); and each agent gets an explicit "don't touch X — another agent owns it" list.</p>
+</section>
+
+<section id="affinity" data-chunk-id="agents.affinity" data-tags="agents,parallelism,file-ownership,forks">
+<h2>File affinity decides the fan-out</h2>
+
+<p>Whether work parallelises is a property of the <em>files</em>, not of the tasks. The thirty-second ownership check before launching a wave — which files will each task touch? — is the highest-leverage half-minute in multi-agent work.</p>
+
+<ul>
+<li><strong>File-disjoint tasks → parallel agents.</strong> Separate worktrees, or for lighter work, parallel forks in the shared checkout when each agent owns a different file (one translator per locale guide). Forks inherit the parent's context, so the prompt needs only the target file and the adaptation rules — and structurally-mirrored outputs should show near-identical <code>diff --numstat</code> shapes, which makes drift cheap to spot: the deviating count is the file to check first.</li>
+<li><strong>Same-file tasks → one agent</strong>, sequenced. Two agents in one area will independently extract the same helper under two names; the reconciliation (keep one, delete the twin, repoint imports) costs more than the parallelism saved.</li>
+<li><strong>Conflict magnets → serialised.</strong> Localisation aggregates, lockfiles, barrel files, shared test helpers: name them, and route every task that touches one through the same lane. Mechanical repo-wide burndowns go <em>last</em> — they touch every area the other bundles are editing.</li>
+<li><strong>One agent in the shared checkout → the checkout is theirs.</strong> Do not edit alongside it; your edits race its write waves. And parallel <em>sessions</em> collide too: when the branch changes under you mid-turn, read the log and the PR list before assuming anything — your uncommitted work may already be adopted and merged by the other session. Stand down rather than fight over a shared checkout.</li>
+</ul>
+
+<p>Worktree mechanics worth knowing cold: a branch held by a worktree cannot be checked out elsewhere — finish the work <em>in</em> that worktree; capture an agent's work as a staged diff (<code>git add -A &amp;&amp; git diff --cached HEAD</code>), which is correct regardless of how stale its base is, and apply elsewhere with <code>git apply --3way</code>; a pre-push hook that validates the main checkout's tree does not validate a pushed worktree ref, so the gates must run in the worktree itself.</p>
+</section>
+
+<section id="generated" data-chunk-id="agents.generated" data-tags="agents,codegen,merges,arb">
+<h2>Generated files never hand-merge</h2>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Resolve any conflict in a generated file by taking either side whole, then regenerating from the source of truth, then committing the output.</strong> Localisation aggregates, <code>*.g.dart</code>, freezed outputs, lockfiles: the fragments/annotations/manifest are the truth, the generated file is a build product, and a hand-merged build product is a third state that matches neither input. One regeneration per bundle, at the end, covers every conflict at once.</p>
+</div>
+
+<p>The rule has a squash-merge corollary that bites stacked work: when branch B was cut from branch A and A squash-merges to the default branch, B's next merge from that branch conflicts in <em>every file both touched</em> — the squash re-applies content B already has under a different commit identity. Resolution: keep B's side (it is the superset), then run the regeneration step so the generated files are rebuilt rather than believed. For hand-written files with two <em>added</em> blocks — two test files appending near the same seam — use <code>git merge-file</code> with the true base, never regex keep-both concatenation: the classic failure is a silently lost closing brace at the seam that surfaces as a parse error hundreds of lines later.</p>
+</section>
+
+<section id="mergetrain" data-chunk-id="agents.mergetrain" data-tags="agents,pull-requests,merge-train,ci">
+<h2>Bundles and the serial merge train</h2>
+
+<p>CI rounds are the scarce resource, so work ships in bundles — as many related issues per PR as review can bear, locally green <em>before</em> the PR exists, because the fix loop belongs in the worktree, not in CI.</p>
+
+<ul>
+<li><strong>One auto-merge PR in flight at a time.</strong> With strict-mode branch protection off (<a href="18-github.html#protection">the deliberate trade</a>), parallel armed PRs create rebase churn; a serial train — ship one, arm a background watcher on its state, let the merge notification trigger the next push — chains five PRs with zero behind-churn.</li>
+<li><strong>Watchers over polling:</strong> a background check-watcher per PR, after first waiting for checks to exist at all — a watcher armed before the first check registers reports an empty success.</li>
+<li><strong>GitHub's <code>mergeable</code> recomputes asynchronously</strong> after any push: poll until it leaves UNKNOWN before trusting either answer. Auto-merge survives force-pushes, but re-arming is idempotent — re-arm anyway.</li>
+<li><strong>A rerun is not a retest.</strong> Re-running a failed workflow re-uses the original merge commit — it does <em>not</em> recompute the PR's merge ref against the moved base. After the base branch gained the fix your PR needs, update the branch (merge the base in, or the API's update-branch call) and let a fresh run trigger; a rerun will fail identically forever.</li>
+<li><strong>Push protection rejects provider-shaped fake secrets</strong> in tests (<code>sk_live_…</code>). Use neutral fakes that still match the scrubber under test.</li>
+</ul>
+</section>
+
+<section id="verification" data-chunk-id="agents.verification" data-tags="agents,verification,shell,exit-codes">
+<h2>Verification traps</h2>
+
+<p>Agent work amplifies a specific class of shell mistake: the command that <em>looks</em> like verification and is not. These recur enough across both projects to earn their own section.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Trap</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td><code>flutter test | tail</code> reports the <em>pipe's</em> exit code — a red suite reads as green to any <code>$?</code> check. This shipped a broken commit more than once, including to the authors of the rule.</td><td>Run the suite bare; if output must be filtered, capture to a file and take <code>PIPESTATUS[0]</code></td></tr>
+<tr><td>Backticks inside a double-quoted <code>gh</code> comment body are command substitution — the code-formatted words execute as commands and vanish from the posted text</td><td>Single-quote or heredoc any body containing backticks; re-read what was actually posted</td></tr>
+<tr><td>Two identical script invocations returning byte-identical stale-looking output — and the file being inspected is in a different worktree than assumed</td><td>Worktrees multiply paths: verify <em>which</em> checkout a path resolves into before chasing ghosts; when in doubt, write a new script filename and re-run</td></tr>
+<tr><td>An agent's "no codegen-affecting changes" claim, with two generated-file diffs sitting in the tree</td><td>Run clean codegen in the worktree yourself before pushing; agents under-declare drift</td></tr>
+<tr><td>A locale-dependent comparison in CI — <code>printf "%.1f"</code> emitting a comma under a non-English shell, silently truncating the numeric compare</td><td>Integer arithmetic in gates; no float formatting in anything that decides pass/fail</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>The meta-rule: <strong>every verification claim needs a mechanism the verifier did not produce.</strong> A test suite proves a change; an exit code proves the suite ran; reading the posted comment proves the comment; the commit SHA proves the commit. An agent — or a human — reporting success without naming the mechanism has reported an intention.</p>
+</div>
+</section>
+
+<section id="failures" data-chunk-id="agents.failures" data-tags="agents,failure-modes,triage">
+<h2>Observed failure modes</h2>
+
+<p>Check these before debugging hard — each was observed at least once, and each has a cheap detection:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Failure</th><th>Detection</th></tr></thead>
+<tbody>
+<tr><td>Agent invented a helper it never defined</td><td>The first analyze in the verify loop</td></tr>
+<tr><td>Agent tested against an API the package version hides (re-exports differ between minors)</td><td>Check the actual <code>show</code> lists before believing the agent's reading</td></tr>
+<tr><td>Agent re-implemented a feature that already shipped, misled by a stale TODO</td><td>Prompt agents to check for existing implementations first; close as already-shipped when found</td></tr>
+<tr><td>Park-loop: an agent that backgrounds its own test runs stops repeatedly "waiting for the notification"</td><td>Nudge once ("read the output files directly, then commit or report"); if it parks again, stop it and finish the tail — the work is usually 90% done and correct</td></tr>
+<tr><td>Completion report with no commit; writes still landing after "done"</td><td>The SHA check and the two-reads-stable rule from the division-of-labor section</td></tr>
+<tr><td>An agent deletes an earlier fix's defensive code as "redundant"</td><td>That is a <a href="27-recurring-bugs.html#protocol">page-27 step-5</a> event regardless of who authored it — require the reproduction test green with the code removed</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>None of these failure modes is unique to machines — humans invent helpers, trust stale TODOs and misread re-exports too. What changes with agents is <em>rate and confidence</em>: an agent produces plausible-but-wrong work faster than a human and reports it with the same tone as correct work. The discipline on this page is therefore not "distrust agents" but "make trust mechanical": rules that travel with the clone, gates that run regardless of author, and verification that names its mechanism. That discipline made the projects better for their human contributors as well — which is the quiet argument that it was the right discipline all along.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's worktree-orchestration playbook, distilled from two recorded multi-agent runs (a 9-PR/40-issue marathon and a later 5-PR audit run with toolchain-capable agents), including the division of labor, diff-capture mechanics, park-loop handling and the serial merge train.</li>
+<li>Both projects' agent-rules files and their standing-versus-per-request authorization records (merge-on-green standing; migrations, store actions and outward-facing workflows per-request).</li>
+<li>Session-logged incidents behind the verification-trap table: the piped-exit-code false green (multiple recurrences), the backtick-eaten PR comments, the stale-merge-ref rerun, the squash-stack conflict recipe, the comma-locale CI gate, and the fake-secret push rejection.</li>
+<li>The fork fan-out pattern from a four-locale documentation translation run, including the numstat-shape drift check.</li>
+</ul>
+<p>This page originated as a maintained agent skill in the projects' shared tooling and is promoted here with the session-earned verification traps added. The division-of-labor doctrine is observed practice; its transferability to teams with different agent tooling is a recommendation.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

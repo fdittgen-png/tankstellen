@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub: repo, CI &amp; traceable process — LLM Wiki · Flutter</title>
+<meta name="description" content="Workflow topology, sharding, green-tree skips, required checks codified as data, the matrix-skip trap, Dependabot lockstep clusters and branch protection.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"GitHub repository and CI for Flutter","description":"Workflow topology, sharding, green-tree skips, required checks as data, the matrix-skip trap.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">18 · Ship</span>
+<h1>GitHub: repo, CI &amp; traceable process</h1>
+<p class="lede">A Flutter app with five distribution channels ends up with around twenty workflows. The question that decides whether that is manageable or miserable is which of them can block a merge — and the answer should be: as few as possible, all fast, all deterministic.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> gh</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 03 TDD · 05 Traceability</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#topology">Workflow topology</a></li>
+<li><a href="#gates">The gate workflow</a></li>
+<li><a href="#sharding">Sharding, and the matrix-skip trap</a></li>
+<li><a href="#greentree">Green-tree skipping</a></li>
+<li><a href="#codegen">The codegen-drift gate</a></li>
+<li><a href="#protection">Branch protection as data</a></li>
+<li><a href="#docsstub">The docs-stub mirror</a></li>
+<li><a href="#dependabot">Dependency updates and lockstep clusters</a></li>
+<li><a href="#templates">Issues, PRs and templates</a></li>
+<li><a href="#economics">CI economics</a></li>
+</ol>
+</div>
+
+<section id="topology" data-chunk-id="gh.topology" data-tags="ci,workflows,architecture">
+<h2>Workflow topology</h2>
+
+<p>Sort every workflow into one of four classes, and let the class determine its trigger, its cost and whether it can block a merge.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Class</th><th>Trigger</th><th>Blocks a merge?</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td><strong>Gate</strong></td><td>Every push and pull request</td><td><strong>Yes</strong></td><td>Analyze, test shards, codegen drift, localisation, one platform build, integration, startup budget</td></tr>
+<tr><td><strong>Advisory</strong></td><td>Every push and pull request</td><td><strong>No</strong></td><td>The libre no-proprietary-code audit, licence audit, security scan</td></tr>
+<tr><td><strong>Release</strong></td><td>Tags and dispatch</td><td>No</td><td>Store uploads, TestFlight, notarised DMG, MSI, catalog publish, listing sync</td></tr>
+<tr><td><strong>Scheduled</strong></td><td>Cron</td><td>No</td><td>Nightly full suite, flaky re-runs, endpoint canaries, daily beta builds</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>An advisory workflow must never become a required check.</strong> The libre audit builds a full release artifact and runs Gradle — a transient infrastructure failure would block every unrelated merge. Keep the fast, deterministic layer of such a check as the gate and the expensive layer as advisory. Say so in a comment at the top of the file, or someone will "helpfully" promote it.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Stagger every cron.</strong> Seven scheduled workflows all at midnight contend for runners and for whatever third parties they touch. Spread them across the day and off the hour — a schedule at <code>:23</code> is measurably less contended than one at <code>:00</code>. One project runs its dailies at 04:00, 04:30, 05:00, 05:23, 11:00, 16:00 and 21:00, deliberately.</p>
+</div>
+</section>
+
+<section id="gates" data-chunk-id="gh.gates" data-tags="ci,gates,workflow">
+<h2>The gate workflow</h2>
+
+<p>One workflow, one job per concern, so a failure names itself in the check list rather than requiring someone to open a log.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Job</th><th>Asserts</th><th>Typical</th></tr></thead>
+<tbody>
+<tr><td><code>analyze</code></td><td>Zero diagnostics, fatal on infos, over <code>lib/</code> <strong>and</strong> <code>test/</code></td><td>2–3 min</td></tr>
+<tr><td><code>codegen-drift</code></td><td>A clean regeneration produces no diff</td><td>4–6 min</td></tr>
+<tr><td><code>l10n-gate</code></td><td>The localisation pipeline produces no diff; every locale is complete</td><td>3–4 min</td></tr>
+<tr><td><code>test (0..3)</code></td><td>The suite, sharded, excluding untrusted tags</td><td>6–10 min each, in parallel</td></tr>
+<tr><td><code>build-android</code></td><td>A release artifact actually builds</td><td>8–12 min</td></tr>
+<tr><td><code>integration</code></td><td>End-to-end flows</td><td>5–8 min</td></tr>
+<tr><td><code>startup-budget</code></td><td>Cold start under the budget</td><td>3–5 min</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="yaml"><code>on:
+  push:
+    branches: [master]
+    tags: ['v*']
+    paths-ignore: ['**/*.md', 'docs/**', 'LICENSE', '.gitignore',
+                   'fastlane/metadata/**', 'ios/fastlane/**']
+  pull_request:
+    branches: [master]
+    paths-ignore: [ '…same list…' ]
+  schedule: [{ cron: '0 6 * * 0' }]     # weekly full run
+  workflow_dispatch:                     # manual re-fire, with a reason input
+    inputs:
+      reason: { description: 'Why (audit trail)', default: 'manual' }
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true</code></pre>
+
+<div class="callout why">
+<span class="tag">Why a manual dispatch input</span>
+<p>Because you will need to re-fire CI on an unchanged ref — after a branch update performed with the platform's own token (which does not trigger downstream workflows), or to retry a genuinely flaky run. The alternative is an empty commit, which pollutes history. A <code>reason</code> input makes the manual run self-documenting in the run list.</p>
+</div>
+
+<p>Cache aggressively and key precisely: the package cache on the lockfile, the build directory on the lockfile plus the Dart sources, Gradle caches on the Gradle files. A wrong cache key is worse than no cache, because it serves stale artifacts silently.</p>
+</section>
+
+<section id="sharding" data-chunk-id="gh.sharding" data-tags="ci,matrix,branch-protection,trap">
+<h2>Sharding, and the matrix-skip trap</h2>
+
+<p>Once the suite passes about twenty minutes, split it across a matrix. That introduces one specific hazard that will lock your repository if you meet it unprepared.</p>
+
+<pre data-lang="yaml"><code>test:
+  strategy:
+    fail-fast: false        # show EVERY failing shard in one run
+    matrix:
+      shard: [0, 1, 2, 3]
+  steps:
+    - uses: actions/checkout@v7
+      with: { fetch-depth: 0 }   # a diff-aware selector needs history
+    - run: flutter test --exclude-tags=network,flaky \
+             --total-shards=4 --shard-index=${{ matrix.shard }}</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a pull request can never merge. Required checks sit as "Expected — waiting for status to be reported", indefinitely, and auto-merge never fires.</strong></p>
+<p><strong>Cause:</strong> a <strong>matrix</strong> job skipped at <em>job</em> level never expands. The contexts <code>test (0)</code> … <code>test (3)</code> are therefore never reported at all — and branch protection waits for a status that will never arrive. This differs from a single-context job, whose <code>skipped</code> conclusion branch protection counts as a pass.</p>
+<p><strong>Fix:</strong> a matrix job must <em>always run</em>; gate each expensive <strong>step</strong> instead. On a skip every shard completes in seconds (just the checkout) and still reports success.</p>
+<pre data-lang="yaml"><code>test:
+  needs: [gate]
+  # NO job-level `if:` — the matrix must expand.
+  strategy: { matrix: { shard: [0,1,2,3] }, fail-fast: false }
+  steps:
+    - uses: actions/checkout@v7
+    - if: ${{ needs.gate.outputs.cached != 'true' }}
+      uses: subosito/flutter-action@v2
+      with: { channel: stable, flutter-version: "3.41.9" }
+    - if: ${{ needs.gate.outputs.cached != 'true' }}
+      run: flutter test --total-shards=4 --shard-index=${{ matrix.shard }}</code></pre>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Single-context jobs may skip at job level; matrix jobs must skip at step level.</strong> Write this as a comment above every matrix job. It is non-obvious, it is unrecoverable without an admin override when it bites, and it costs an afternoon to diagnose from scratch.</p>
+</div>
+</section>
+
+<section id="greentree" data-chunk-id="gh.greentree" data-tags="ci,caching,optimisation">
+<h2>Green-tree skipping</h2>
+
+<p>The heavy jobs are a pure function of the build-relevant source tree. If that exact tree has already passed, re-running them proves nothing.</p>
+
+<pre data-lang="text"><code>record-green   after a full green pass, save a cache marker keyed on a
+               hash of the build-relevant tree
+green-gate     on the next run, probe that marker with lookup-only
+               → HIT: every gated job/step skips
+               → MISS: everything runs</code></pre>
+
+<p>What this buys you, concretely: a rebase with no content change, a base-branch retarget, and a manual re-fire all become seconds instead of thirty minutes. On a repository where pull requests are frequently rebased, that is the single largest CI saving available.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Hash the build-relevant tree, not the commit.</strong> A commit hash changes on every rebase even when the content does not. Hash exactly the paths that can affect the result — sources, lockfiles, build configuration — and exclude documentation and store metadata, which the trigger already ignores.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Verify the skip is safe by construction: the marker must only be written after <em>every</em> gate passed, and the probe must be lookup-only so a probe cannot create the marker. Then reason about it once: a hit means this exact tree already produced a full green run, so skipping is not a shortcut but a deduplication.</p>
+</div>
+</section>
+
+<section id="codegen" data-chunk-id="gh.codegen" data-tags="codegen,ci,gate">
+<h2>The codegen-drift gate</h2>
+
+<p>Generated files are committed, so CI must prove a clean regeneration produces no diff.</p>
+
+<pre data-lang="yaml"><code>- run: dart run build_runner clean
+- run: dart run build_runner build --delete-conflicting-outputs
+- name: Fail on any drift
+  run: |
+    if ! git diff --quiet -- '*.g.dart' '*.freezed.dart'; then
+      echo "::error::Generated files are stale. Run clean codegen and commit."
+      git diff --stat -- '*.g.dart' '*.freezed.dart'
+      exit 1
+    fi</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Enforce it locally with a pre-push hook, or you will pay for it in CI round-trips.</strong> One project recorded codegen drift reaching CI four times in a single working session at roughly thirteen minutes each. A hook that runs the same clean regeneration and rejects the push turns that into a thirty-second local failure. Ship the hook in the repository, install it with a script, and provide a documented emergency bypass so nobody reaches for the blanket hook-skipping flag.</p>
+</div>
+
+<p>The same shape applies to the localisation pipeline: run the generator, then <code>git diff --exit-code</code> on the generated directory, with an error message naming the exact commands to run. An error message that tells you what to do is worth more than one that tells you what failed.</p>
+</section>
+
+<section id="protection" data-chunk-id="gh.protection" data-tags="branch-protection,configuration,drift">
+<h2>Branch protection as data</h2>
+
+<p>Codify the required-check set in a script you can diff, and give it a verify mode that reports drift against the live configuration.</p>
+
+<pre data-lang="bash"><code># The source of truth. Reviewable in a pull request; the console is not.
+TARGET_CHECKS=(
+  "analyze"
+  "test (0)" "test (1)" "test (2)" "test (3)"
+  "codegen-drift" "l10n-gate"
+  "build-android" "integration" "startup-budget"
+)
+
+verify() {   # report drift, exit non-zero
+  diff &lt;(printf '%s\n' "${TARGET_CHECKS[@]}" | sort) \
+       &lt;(gh api "$API" --jq '.contexts[]' | sort)
+}
+
+apply()  {   # idempotent PATCH
+  gh api -X PATCH "$API" --input - &lt;&lt;JSON
+{ "strict": false, "contexts": $(printf '%s\n' "${TARGET_CHECKS[@]}" | jq -R . | jq -s .) }
+JSON
+}</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: your documentation says direct pushes are blocked and CI must be green, and the API reports no protection at all.</strong> This is real: one project's wiki, contributing guide and agent rules all asserted branch protection that did not exist — no protection, no rulesets, nothing on the server. The rules were honoured by convention only, and nothing would have stopped a red merge. Documentation describing a guarantee your infrastructure does not provide is worse than none, because it stops people checking.</p>
+<p><strong>Countermeasure:</strong> the verify mode above, run periodically or in a scheduled workflow. Either the live configuration matches the committed target, or you get a diff.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why strict mode is usually off</span>
+<p>Strict mode requires every branch to be up to date with the base before merging. With no merge queue, each merge pushes every other open pull request out of date, and they all re-run CI — quadratic churn for no correctness benefit when the changes are file-disjoint. Turning it off is a deliberate trade: you accept the small risk of a semantic conflict between two independently-green branches in exchange for linear rather than quadratic CI cost. Record the reasoning next to the setting.</p>
+</div>
+
+<p>The corollary is a merge discipline: with strict mode off and no queue, <strong>serialise auto-merges</strong> — open pull request N+1 only after N has merged. And never arm auto-merge on a stacked pull request whose base is a feature branch: merging into an unprotected branch fires immediately and silently balloons the parent.</p>
+</section>
+
+<section id="docsstub" data-chunk-id="gh.docsstub" data-tags="ci,path-filters,required-checks">
+<h2>The docs-stub mirror</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a documentation-only pull request can never merge, because the required checks never run.</strong> Path filters that skip CI for documentation changes also skip the <em>reporting</em> of the required contexts. Branch protection waits forever.</p>
+<p><strong>Fix:</strong> a second workflow with the <em>same name</em>, triggered on exactly the paths the first one ignores, whose jobs are named identically and do nothing.</p>
+<pre data-lang="yaml"><code>name: CI                     # ← same workflow name
+on:
+  pull_request:
+    paths: ['**/*.md', 'docs/**', 'LICENSE', 'fastlane/metadata/**']
+jobs:
+  analyze:        { runs-on: ubuntu-latest, steps: [{ run: 'echo docs-only' }] }
+  codegen-drift:  { runs-on: ubuntu-latest, steps: [{ run: 'echo docs-only' }] }
+  l10n-gate:      { runs-on: ubuntu-latest, steps: [{ run: 'echo docs-only' }] }
+  build-android:  { runs-on: ubuntu-latest, steps: [{ run: 'echo docs-only' }] }
+  integration:    { runs-on: ubuntu-latest, steps: [{ run: 'echo docs-only' }] }
+  startup-budget: { runs-on: ubuntu-latest, steps: [{ run: 'echo docs-only' }] }
+  test:
+    strategy: { matrix: { shard: [0,1,2,3] } }
+    runs-on: ubuntu-latest
+    steps: [{ run: 'echo docs-only' }]</code></pre>
+<p>Note the matrix in the stub too — it must produce the same four contexts.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Keep the stub's job names and matrix in sync with the real workflow.</strong> Add a test that parses both YAML files and asserts the emitted context sets are identical. One project unit-tests its CI configuration for exactly this; without it, adding a gate job silently makes every documentation pull request unmergeable.</p>
+</div>
+</section>
+
+<section id="dependabot" data-chunk-id="gh.dependabot" data-tags="dependabot,dependencies,maintenance">
+<h2>Dependency updates and lockstep clusters</h2>
+
+<pre data-lang="yaml"><code>version: 2
+updates:
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule: { interval: "weekly", day: "monday" }
+    groups:
+      minor-and-patch: { update-types: ["minor", "patch"] }
+    open-pull-requests-limit: 5
+    ignore:
+      # Licence decision, not a drift update: the 2.x line moved to a
+      # commercial-only licence.
+      - dependency-name: "some_ble_package"
+        update-types: ["version-update:semver-major"]
+
+      # LOCKSTEP CLUSTER — every member must be listed. See the trap.
+      - dependency-name: "state_lint"
+      - dependency-name: "state_core"
+      - dependency-name: "state_annotation"
+      - dependency-name: "state_generator"
+      - dependency-name: "json_serializable"
+      - dependency-name: "json_annotation"
+
+      # Prereleases only, never stable holds.
+      - dependency-name: "codegen_package"
+        versions: [">=3.2.6-dev &lt;3.2.6"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule: { interval: "weekly", day: "monday" }
+    groups: { actions: { patterns: ["*"] } }</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: you ignore a package and the bot bumps it anyway.</strong> Ignoring one member of a transitively-coupled cluster does <em>not</em> stop the bot co-bumping it while resolving another member. One project was defeated by this twice before listing every member. When you find a cluster, add all of it in one edit, with a comment naming the upstream event that unblocks it.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Triage a red dependency pull request; do not close it.</strong> Three recurring causes, in order of frequency: a lockstep cluster (above); a secondary lockfile that needs regenerating (see <a href="17-fdroid.html#lockfile">page 17</a>); and a package whose new version references a platform SDK symbol newer than your CI runner's toolchain. All three are diagnosable in minutes once you know they exist, and all three recur weekly if left unaddressed.</p>
+</div>
+
+<p>Note that bot-authored pull requests cannot read repository secrets — a platform security policy, not a bug. Your build must therefore succeed without signing material. See <a href="13-android.html#signing">the deferred-throw pattern</a>.</p>
+</section>
+
+<section id="templates" data-chunk-id="gh.templates" data-tags="issues,pull-requests,templates">
+<h2>Issues, PRs and templates</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Template</th><th>Required fields worth enforcing</th></tr></thead>
+<tbody>
+<tr><td><strong>Bug</strong></td><td>What happened · steps to reproduce · <strong>app version and build number</strong> · platform. The version field alone resolves a large share of reports — see the stale-build trap on <a href="13-android.html#checklist">page 13</a>.</td></tr>
+<tr><td><strong>Feature</strong></td><td>Problem · proposal · <strong>a required checkbox group for the product's goals</strong>, with the note that a feature serving none will be pushed back on. This is where <a href="02-specification-driven-development.html#leitmotiv">the feature filter</a> becomes a workflow step.</td></tr>
+<tr><td><strong>Epic</strong></td><td>Goal in user-visible terms linking the spec section · dependency-ordered child breakdown · risks and open questions · <strong>a validation-gate checkbox</strong> — children may only be filed after the breakdown is validated.</td></tr>
+<tr><td><strong>New integration</strong></td><td>A domain-specific template for whatever you add repeatedly — a new country, a new provider, a new device profile. It turns a recurring task into a form.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The pull-request template is a checklist, and every item should map to something a reviewer would otherwise have to remember:</p>
+
+<pre data-lang="markdown"><code>## What
+&lt;one sentence&gt;
+
+Closes #
+
+## Checklist
+- [ ] Linked issue
+- [ ] Under 400 lines excluding generated files
+- [ ] No hard-coded user-facing strings; all locales updated
+- [ ] Clean codegen run; zero drift
+- [ ] Tests added/updated — bug fixes started from a failing test
+- [ ] `flutter analyze` clean, including `test/`
+- [ ] No proprietary dependency or tracking introduced</code></pre>
+
+<div class="callout why">
+<span class="tag">Why the 400-line limit is on the checklist rather than automated</span>
+<p>Because it needs judgement — a generated-file-heavy change or a mechanical rename legitimately exceeds it. A checklist item prompts the author to justify; an automated block would be gamed by splitting into artificial commits. Automate the objective rules; check-list the ones needing a human.</p>
+</div>
+</section>
+
+<section id="economics" data-chunk-id="gh.economics" data-tags="ci,cost,optimisation">
+<h2>CI economics</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Lever</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td><strong>Path filters plus a stub mirror</strong></td><td>Documentation changes cost seconds instead of half an hour</td></tr>
+<tr><td><strong>Green-tree skipping</strong></td><td>Rebases and re-fires cost seconds</td></tr>
+<tr><td><strong>Change-scoped jobs</strong></td><td>Security and licence audits run only when dependencies changed</td></tr>
+<tr><td><strong>Concurrency with cancel-in-progress</strong></td><td>A force-push cancels the superseded run instead of racing it</td></tr>
+<tr><td><strong>Dispatch-only expensive platforms</strong></td><td>macOS runners bill at a multiple of Linux; never run them per-PR</td></tr>
+<tr><td><strong>Precise cache keys</strong></td><td>Large saving; a wrong key is worse than none</td></tr>
+<tr><td><strong>Bundling related issues into one pull request</strong></td><td>The largest lever of all — five sequential PRs cost five CI runs plus four rebases</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Bundle changes that touch the same conflict-prone surface.</strong> Localisation fan-outs, generated files and the CI configuration itself are shared surfaces: two concurrent pull requests touching one of them will conflict, and the conflict costs a rebase plus a full re-run each. Keep at most one localisation-touching pull request in flight, and collapse workflow-file changes into a single change rather than a series.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a chain of auto-merge-armed pull requests stalls, and the ones behind go stale on the remote.</strong> When the head of a serialised chain stays red, the watchers on the ones behind eventually die and nothing recovers on its own. Verify the remote state — is auto-merge actually still armed, is the fix actually pushed to the branch you think — rather than the local state. Then re-arm manually. Serialised chains need a person to check on them; they are not fire-and-forget.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's twenty-workflow topology: the gate workflow with its green-tree cache marker, four-way test sharding, the codegen-drift and localisation gates, the docs-stub mirror re-emitting every required context, and the branch-protection script with its verify mode and target-check list.</li>
+<li>Its recorded matrix-skip incident and the resulting rule that matrix jobs gate per step, and its unit test over the CI YAML.</li>
+<li>Its dependency-bot configuration with the lockstep-cluster ignore list and the two recorded failures that produced it.</li>
+<li>The other project's documented-but-absent branch protection, recorded in its own known-gaps section — the source of the protection-drift trap.</li>
+</ul>
+<p>The CI-economics table is a synthesis of both projects' practice; the individual levers are observed, the ordering is a judgement.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

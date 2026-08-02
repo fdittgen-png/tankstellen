@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maps with OpenStreetMap — LLM Wiki · Flutter</title>
+<meta name="description" content="flutter_map and OSM tiles, the tile usage policy, a caching proxy, the grey-tile pathologies, markers and clustering, adding your own data layers, and contributing back to OSM.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Maps with OpenStreetMap in Flutter","description":"Tiles and the usage policy, a caching proxy, grey-tile pathologies, markers, custom data layers, contributing to OSM.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">22 · Runtime</span>
+<h1>Maps with OpenStreetMap</h1>
+<p class="lede">OpenStreetMap removes a proprietary dependency and replaces it with an obligation: you are now responsible for tiles, for attribution, and for not abusing a volunteer-funded service. The single most-repeated bug in this area — a grey basemap — has four distinct causes, and knowing all four is the difference between fixing it once and fixing it nine times.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> map</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations · 06 Caching</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#why">Why OSM, and what it obliges you to</a></li>
+<li><a href="#policy">The tile usage policy</a></li>
+<li><a href="#proxy">A caching tile proxy</a></li>
+<li><a href="#greytile">The four grey-tile pathologies</a></li>
+<li><a href="#onelayer">One hardened tile layer</a></li>
+<li><a href="#camera">Camera lifecycle</a></li>
+<li><a href="#markers">Markers, clustering and price pins</a></li>
+<li><a href="#overlays">Adding your own data</a></li>
+<li><a href="#geocoding">Geocoding and routing</a></li>
+<li><a href="#offline">Offline maps</a></li>
+<li><a href="#contributing">Contributing data back to OSM</a></li>
+</ol>
+</div>
+
+<section id="why" data-chunk-id="map.why" data-tags="openstreetmap,licensing,attribution">
+<h2>Why OSM, and what it obliges you to</h2>
+
+<p>OpenStreetMap is the only mapping stack that is simultaneously free of a proprietary SDK, redistributable, and good enough almost everywhere. That combination is what makes a libre build possible at all.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Gain</th><th>Obligation</th></tr></thead>
+<tbody>
+<tr><td>No proprietary services dependency — a prerequisite for a libre build</td><td>You supply the tiles, or arrange for someone to</td></tr>
+<tr><td>No per-request billing</td><td>You must not abuse the free community tile service</td></tr>
+<tr><td>Data you may redistribute and derive from</td><td><strong>Attribution is a licence condition, not a courtesy</strong></td></tr>
+<tr><td>You can fix the map itself</td><td>Improvements you make to the data belong to everyone</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Attribution is mandatory and must be visible on the map surface.</strong> The data licence requires crediting OpenStreetMap contributors wherever the map is shown. A line in an about screen is not sufficient — put it on or immediately adjacent to the map, and make it a tappable link to the copyright page. It costs one widget and it is a licence term.</p>
+<pre data-lang="dart"><code>RichAttributionWidget(
+  attributions: [
+    TextSourceAttribution(
+      'OpenStreetMap contributors',
+      onTap: () =&gt; launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+    ),
+  ],
+)</code></pre>
+</div>
+</section>
+
+<section id="policy" data-chunk-id="map.policy" data-tags="tiles,policy,rate-limiting">
+<h2>The tile usage policy</h2>
+
+<p>The community tile servers are donated infrastructure with a published usage policy. A mobile app with real users is, by default, exactly the kind of consumer that policy is written to constrain.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Requirement</th><th>What it means for an app</th></tr></thead>
+<tbody>
+<tr><td><strong>A valid, identifying User-Agent</strong></td><td>Not the default HTTP client string. Include an application identifier and a contact URL.</td></tr>
+<tr><td><strong>Cache aggressively</strong></td><td>Do not re-fetch a tile you already have. Both an on-device cache and an upstream cache.</td></tr>
+<tr><td><strong>No bulk downloading</strong></td><td>No pre-fetching whole regions from the community servers.</td></tr>
+<tr><td><strong>Heavy use should be self-hosted</strong></td><td>Beyond modest volume, run your own tiles or a proxy in front</td></tr>
+<tr><td>Blocking is real</td><td>Non-compliant clients get blocked by User-Agent, which presents to your users as a permanently grey map</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Use a stable, version-free, contact-carrying User-Agent.</strong> Version-free matters: a string containing your app version changes on every release, which looks to a rate limiter like a fleet of distinct clients and defeats any per-client reputation. Set one identifier for the life of the application.</p>
+<pre data-lang="text"><code>de.example.tile-proxy/1.0 (+https://github.com/org/app)</code></pre>
+</div>
+
+<div class="callout why">
+<span class="tag">Why this deserves attention before launch</span>
+<p>The failure mode is delayed and total. You ship, usage grows, and at some point the tile service blocks your identifier — at which point every user has a grey map, simultaneously, with no error visible in your own monitoring. It is not a gradual degradation you notice in time. Get the User-Agent and the caching right before you have users, not after.</p>
+</div>
+</section>
+
+<section id="proxy" data-chunk-id="map.proxy" data-tags="tiles,proxy,caching,edge-function">
+<h2>A caching tile proxy</h2>
+
+<p>The clean answer to the policy is a thin proxy you control, sitting between the app and the upstream tile server.</p>
+
+<pre data-lang="text"><code>app  →  https://your-backend/functions/v1/tiles/{z}/{x}/{y}.png
+            ├─ validates z/x/y bounds  (not an open relay)
+            ├─ sets ONE stable upstream User-Agent with a contact URL
+            ├─ caches 7 days at the edge (Cache-Control + CDN-Cache-Control)
+            └─ propagates upstream errors as-is, never caching them
+        →  https://tile.openstreetmap.org/{z}/{x}/{y}.png</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Property</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td><strong>Bounds validation</strong> (<code>z ∈ 0..19</code>, <code>x,y ∈ 0..2^z−1</code>)</td><td>Without it your proxy is an open relay onto the tile service and your identifier is what gets blocked. Out-of-range coordinates return a client error without touching upstream.</td></tr>
+<tr><td><strong>One server-side User-Agent</strong></td><td>Upstream sees one well-behaved client instead of every user's device. This is the single largest compliance improvement available.</td></tr>
+<tr><td><strong>A long edge cache</strong></td><td>A week is reasonable for a basemap. Set both the standard and the CDN-specific cache headers so intermediate caches honour it.</td></tr>
+<tr><td><strong>Errors are propagated, never cached</strong></td><td>Caching a transient upstream failure pins a grey tile for the whole cache lifetime — the worst possible outcome</td></tr>
+<tr><td><strong>Keep the direct URL as a fallback</strong></td><td>If the proxy URL is unset or misconfigured, degrade to direct rather than to grey. A misconfigured build should still render a map.</td></tr>
+<tr><td><strong>On-device cache stays on</strong></td><td>Its TTL stacks on top of the edge cache. Two layers, different failure modes.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Verify the proxy is actually caching by requesting the same tile twice and reading the cache-status header. A proxy that forwards every request is worse than no proxy: it adds a hop and still hammers upstream, while making you believe you are compliant.</p>
+</div>
+</section>
+
+<section id="greytile" data-chunk-id="map.greytile" data-tags="tiles,bugs,root-cause">
+<h2>The four grey-tile pathologies</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the basemap renders as grey squares — intermittently, on some devices, unreproducibly.</strong> This is the most-recurring bug in this whole subject area. One project "fixed" it <strong>nine times</strong> across two months of issues before stopping to enumerate the causes, because several distinct failures produce an identical grey square. Any one fix appears to work and the bug returns.</p>
+<p>The four causes, all of which must be addressed:</p>
+<ol>
+<li><strong>Transient upstream errors</strong> — rate-limit or server errors on individual tiles. <em>Fix:</em> a tile provider that retries with jittered backoff.</li>
+<li><strong>The pan-fetch race</strong> — panning queues fetches for tiles that scroll off-screen, and the backlog starves the visible ones. <em>Fix:</em> abort obsolete requests so in-flight fetches for off-screen coordinates are cancelled.</li>
+<li><strong>The error-tile cache trap</strong> — a failed tile is remembered as failed and never retried. <em>Fix:</em> an eviction strategy that drops failed tiles once they leave the viewport, so the next pan retries cleanly.</li>
+<li><strong>Grey while loading</strong> — the previous zoom level's painted tiles are discarded before the new ones arrive. <em>Fix:</em> a wider keep-buffer so the old level stays painted during the swap.</li>
+</ol>
+<p>A fifth, related one: a <strong>cold-start camera race</strong>, where tiles are requested before the layout has settled and the resulting fetches are for the wrong viewport. <em>Fix:</em> allow a parent to trigger a tile reset once its layout settles.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>This is the canonical case for the regression-escalation protocol.</strong> When a symptom recurs after a fix, stop patching and enumerate every code path that can produce it — the grey tile is one pixel pattern with five upstream causes. Fixing them one at a time, each time believing you are done, is how two months disappear. See <a href="03-tdd-and-testing.html#recurrence">page 03</a>.</p>
+</div>
+</section>
+
+<section id="onelayer" data-chunk-id="map.onelayer" data-tags="architecture,tiles,widget">
+<h2>One hardened tile layer</h2>
+
+<p>The architectural fix that ended the recurrence: <strong>exactly one</strong> way to instantiate a tile layer in the codebase, carrying all the mitigations, enforced by a lint test.</p>
+
+<pre data-lang="dart"><code>/// The ONLY legitimate way to create a TileLayer in this codebase.
+/// Every mitigation for the documented grey-tile pathologies lives here,
+/// so no call site can accidentally omit one.
+class HardenedTileLayer extends StatelessWidget {
+  const HardenedTileLayer({super.key, this.reset});
+
+  /// Lets a parent fire a tile reset when its layout settles
+  /// (the cold-start camera race).
+  final Stream&lt;void&gt;? reset;
+
+  @override
+  Widget build(BuildContext context) =&gt; TileLayer(
+        urlTemplate: AppConstants.tileUrl,          // proxy, or direct fallback
+        userAgentPackageName: AppConstants.tileUserAgent,
+        tileProvider: RetryNetworkTileProvider(),   // (1) jittered retry
+        // (2) upstream default, restored deliberately after a regression
+        abortObsoleteRequests: true,
+        // (3) failed tiles are dropped once off-screen
+        evictErrorTileStrategy: EvictErrorTileStrategy.notVisibleRespectMargin,
+        // (4) keep the previous level painted during a zoom swap
+        keepBuffer: 4,
+        reset: reset,
+      );
+}</code></pre>
+
+<div class="callout why">
+<span class="tag">Why a wrapper rather than a documented convention</span>
+<p>Before the wrapper, six of seven tile-layer call sites used the default provider with no mitigations. Trip detail, the trajectory map, the driving view and the radius picker all rendered grey on a transient upstream glitch — while the main map, which had been patched repeatedly, appeared fine. Every previous fix had patched one surface in isolation. A convention that six of seven sites do not follow is not a convention; a widget plus a lint test asserting no direct instantiation is.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The retry provider owns an HTTP client that must live for the visible lifetime of the layer.</strong> Recreating the client on rebuild cancels in-flight fetches and produces exactly the grey tiles it was written to prevent. Hold it in the state, not in <code>build</code>, and add a lint test pinning the call sites so a future refactor cannot quietly regress it.</p>
+</div>
+</section>
+
+<section id="camera" data-chunk-id="map.camera" data-tags="camera,lifecycle,flutter-map">
+<h2>Camera lifecycle</h2>
+
+<p>The second half of the grey-map problem is the camera. Imperative camera manipulation during build and layout is a reliable source of races.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Do</th><th>Instead of</th></tr></thead>
+<tbody>
+<tr><td>Declare the initial view with a camera-fit option in the map options</td><td>Calling a fit method imperatively after the first frame</td></tr>
+<tr><td>One guarded re-fit when the bounds genuinely change, in the did-update lifecycle</td><td>Re-fitting on every rebuild</td></tr>
+<tr><td>Keep the map state alive when it is inside a tab or a page view</td><td>Letting it rebuild from scratch on every tab switch</td></tr>
+<tr><td>Guard the re-fit on an actual bounds change</td><td>An unguarded re-fit, which fights the user's pan</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the map jumps back to its initial position while the user is panning.</strong> An unguarded re-fit in the did-update lifecycle fires on a rebuild caused by something unrelated — a provider emitting, a parent rebuilding — and yanks the camera. Compare the incoming bounds against the last-applied bounds and return early if unchanged. Users experience this as the map "fighting" them and it reads as a serious quality defect.</p>
+</div>
+
+<p>A related simplification worth taking: delete any bespoke cold-start reset window — a timer that resets the map for some seconds after launch to "handle" the camera race. It is a band-aid over the layout-settled problem, it is timing-dependent, and the declarative camera fit plus a settle-triggered reset stream replaces it entirely.</p>
+</section>
+
+<section id="markers" data-chunk-id="map.markers" data-tags="markers,clustering,performance">
+<h2>Markers, clustering and price pins</h2>
+
+<p>Thousands of markers will not render acceptably. Cluster them, and keep each marker cheap.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Concern</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Clustering</strong></td><td>A clustering layer above a threshold. Tune the radius by zoom — aggressive when zoomed out, off when zoomed in.</td></tr>
+<tr><td><strong>Marker cost</strong></td><td>A marker is a widget rendered for every visible pin. Keep it to a container plus text; no images decoded per marker, no shadows, no per-marker providers.</td></tr>
+<tr><td><strong>Viewport culling</strong></td><td>Only build markers within the visible bounds plus a margin. Do not hand the layer ten thousand markers and hope.</td></tr>
+<tr><td><strong>Colour encoding</strong></td><td>A green-to-red scale for a value, with a legend. Never colour alone — pair it with the number, for accessibility and for precision.</td></tr>
+<tr><td><strong>Tap targets</strong></td><td>The visual pin can be small; the tappable area must meet the platform guideline. Wrap in a larger transparent hit area.</td></tr>
+<tr><td><strong>Selection</strong></td><td>Render the selected marker in a separate layer above the cluster layer, or clustering will swallow it.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: markers render a placeholder such as <code>--</code> where a value is expected, even though the underlying record has data.</strong> The marker asked for one specific field and that field was null, while a usable value existed elsewhere on the record. Write a single resolver that returns the best available value with a documented precedence, and have every surface use it — the marker, the list row, the detail screen. One project added exactly such a resolver so a record with <em>any</em> usable value can never render as a placeholder.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Do not re-sort or re-cluster a visible list as asynchronous enrichment arrives.</strong> Markers jumping under the user's finger is worse than a slightly stale order. Display the enriched value per item immediately; change the ordering only when the enriching data source is complete and stable — and say in the issue that this is a deliberate boundary, or someone will "fix" it later.</p>
+</div>
+</section>
+
+<section id="overlays" data-chunk-id="map.overlays" data-tags="layers,polylines,data-visualisation">
+<h2>Adding your own data</h2>
+
+<p>The basemap is a backdrop. Everything you actually want to show goes in layers on top, and the layer order is the composition.</p>
+
+<pre data-lang="dart"><code>FlutterMap(
+  options: MapOptions(initialCameraFit: fit),
+  children: [
+    const HardenedTileLayer(),                    // 1. basemap
+    PolygonLayer(polygons: zones),                // 2. areas
+    PolylineLayer(polylines: routeSegments),      // 3. lines
+    CircleLayer(circles: [accuracyCircle]),       // 4. radii
+    MarkerClusterLayerWidget(options: clusters),  // 5. clustered points
+    MarkerLayer(markers: [selected, userPosition]), // 6. always-on-top points
+    const MapAttribution(),                       // 7. REQUIRED
+  ],
+)</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>What you want to show</th><th>Layer</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>A route or a recorded track</td><td>Polyline</td><td>Split into segments to colour by a per-segment value — speed, efficiency, elevation</td></tr>
+<tr><td>A search radius or GPS accuracy</td><td>Circle</td><td>Circles take metre radii, so they scale correctly with zoom, unlike a fixed-pixel marker</td></tr>
+<tr><td>A region, a boundary, a zone</td><td>Polygon</td><td>Semi-transparent fill plus a solid stroke</td></tr>
+<tr><td>Points of interest</td><td>Marker, clustered</td><td>See above</td></tr>
+<tr><td>A heat pattern</td><td>Overlay image, or many low-opacity circles</td><td>Pre-compute the raster; do not draw thousands of widgets</td></tr>
+<tr><td>A second raster source</td><td>A second tile layer with opacity</td><td>Terrain shading, a cycling layer, your own generated tiles</td></tr>
+<tr><td>Custom drawing</td><td>A widget layer with a custom painter</td><td>The escape hatch for anything the built-in layers cannot express</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Colour-code a track by segment, not by whole route.</strong> A single-colour polyline shows where you went; a segment-coloured one shows <em>where the interesting thing happened</em>, which is usually the actual question. Build the polyline as many short segments, each with a colour derived from its own value, and always ship a legend — an unlabelled colour scale is decoration.</p>
+</div>
+
+<p>For a track, downsample before rendering. A recording at one sample per second produces tens of thousands of points for a long trip; rendering them all costs frames and shows nothing a simplified line does not. Apply a line-simplification pass at display time and keep the full-resolution data for analysis.</p>
+</section>
+
+<section id="geocoding" data-chunk-id="map.geocoding" data-tags="nominatim,geocoding,routing,osrm">
+<h2>Geocoding and routing</h2>
+
+<p>Two adjacent services in the same ecosystem, each with its own usage policy that is stricter than the tile one.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Service</th><th>Does</th><th>Policy</th></tr></thead>
+<tbody>
+<tr><td><strong>Nominatim</strong></td><td>Address ↔ coordinate</td><td>Absolute maximum one request per second; identifying User-Agent; cache results; no bulk use. Heavier use means self-hosting.</td></tr>
+<tr><td><strong>OSRM</strong></td><td>Routing, plus a distance/duration matrix</td><td>The demo server is for development. Self-host for production.</td></tr>
+<tr><td><strong>Overpass</strong></td><td>Querying raw OSM data</td><td>Rate-limited and shared; cache heavily; never in a user-facing hot path.</td></tr>
+<tr><td><strong>Platform geocoding</strong></td><td>Address ↔ coordinate, on-device</td><td>No network policy, but availability and quality vary — good as a first tier</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Put every one of these behind the service chain with a long cache TTL.</strong> Geocoding results are effectively immutable — cache them for a week. Route geometry between two fixed points is stable for hours. The chain from <a href="01-foundations-architecture.html#service-chain">page 01</a> gives you fresh-first reads, stale fallback and per-source rate limiting without any of it being reimplemented per service, and it is what makes a one-request-per-second policy survivable.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Inventory an existing backend's other endpoints before adding a new one</span>
+<p>One project needed real road distances to many destinations and found it required no new service at all: the routing instance already used for route planning exposes a matrix endpoint — one origin, many destinations, one request. The same lesson had already occurred with a points-of-interest backend. The second feature on an existing backend is usually one endpoint away, and checking costs ten minutes.</p>
+</div>
+</section>
+
+<section id="offline" data-chunk-id="map.offline" data-tags="offline,caching,storage">
+<h2>Offline maps</h2>
+
+<p>Three levels, with very different costs.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Level</th><th>Mechanism</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td><strong>Incidental</strong></td><td>The on-device tile cache retains what the user has already viewed</td><td>Free. Covers "I was just here and lost signal".</td></tr>
+<tr><td><strong>Region download</strong></td><td>The user selects an area; you fetch its tiles for a zoom range</td><td>Storage, plus a policy problem — bulk downloading from the community servers is forbidden. Only do this against tiles you serve.</td></tr>
+<tr><td><strong>Bundled vector tiles</strong></td><td>A packaged vector tile file rendered on-device</td><td>Largest engineering cost; smallest data footprint; genuine full offline</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never bulk-download from the community tile servers.</strong> It is explicitly prohibited and it is the fastest way to get your identifier blocked, which grey-maps every user at once. If you want region download, it must come from tiles you host — which makes the proxy in <a href="#proxy">§Proxy</a> a prerequisite for the feature, not an optimisation.</p>
+</div>
+
+<p>Whatever the level, tell the user what is cached and let them clear it. Map tiles are usually the largest thing your app stores, and an app that silently occupies a gigabyte gets uninstalled.</p>
+</section>
+
+<section id="contributing" data-chunk-id="map.contributing" data-tags="osm,contributing,editing,data-quality">
+<h2>Contributing data back to OSM</h2>
+
+<p>If your app surfaces places, you will find places the map does not have — or has wrong. Fixing them upstream improves the map for everyone, and for you permanently.</p>
+
+<h3>How to add or correct information</h3>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Tool</th><th>Best for</th></tr></thead>
+<tbody>
+<tr><td><strong>iD</strong> — the browser editor at openstreetmap.org</td><td>Adding or fixing a single point. No installation, guided, hard to break anything.</td></tr>
+<tr><td><strong>Vespucci</strong> / <strong>Go Map!!</strong> — mobile editors</td><td>Surveying on the spot, standing in front of the thing you are mapping</td></tr>
+<tr><td><strong>JOSM</strong> — the desktop editor</td><td>Larger or repetitive edits, with validation and plugins</td></tr>
+<tr><td><strong>Overpass Turbo</strong></td><td>Not an editor — a query tool. Use it to find what is missing or inconsistent before editing.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The workflow is the same regardless of tool: sign in with an OSM account, place or select the object, choose a preset, fill in the tags, and upload as a <strong>changeset</strong> with a comment describing the change and its source.</p>
+
+<h3>Tagging, briefly</h3>
+
+<p>OSM data is nodes, ways and relations, each carrying free-form <code>key=value</code> tags. Conventions are documented on the OSM wiki and are the difference between data everyone can use and data nobody can query.</p>
+
+<pre data-lang="text"><code># A fuel station, tagged conventionally
+amenity=fuel
+brand=…
+operator=…
+opening_hours=Mo-Su 06:00-22:00
+fuel:diesel=yes
+fuel:octane_95=yes
+payment:cash=yes
+payment:debit_cards=yes
+
+# An EV charging point
+amenity=charging_station
+socket:type2=2
+socket:type2:output=22 kW
+capacity=2</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never bulk-import your app's data into OSM, and never edit from your app automatically.</strong> Automated and imported edits are governed by a community process that requires prior discussion and approval, and an unapproved import will be reverted and will damage your standing. If you want to help, the right shape is: let your users report a discrepancy, and either fix it yourself as a human-reviewed edit, or hand the user a deep link into an editor pre-positioned at that location.</p>
+</div>
+
+<pre data-lang="dart"><code>/// Deep-link a user into the browser editor at the right place, so a
+/// "this is wrong" report can become a real fix in about a minute.
+Uri osmEditLink(double lat, double lon) =&gt; Uri.parse(
+  'https://www.openstreetmap.org/edit#map=19/$lat/$lon',
+);</code></pre>
+
+<h3>What is worth contributing</h3>
+
+<ul>
+<li><strong>Missing objects you have verified in person.</strong> The strongest kind of contribution.</li>
+<li><strong>Opening hours</strong>, which are chronically incomplete and highly useful.</li>
+<li><strong>Attribute detail</strong> — which fuel grades, which connector types, which payment methods — where you have first-hand knowledge.</li>
+<li><strong>Corrections</strong> to something you found wrong on the ground.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why survey-based edits only</span>
+<p>OSM's data quality rests on a norm: you map what you have observed or what comes from a licence-compatible source. Copying from a proprietary map is a licence violation that poisons the data. Inferring from your own aggregated dataset may be fine or may be an import requiring discussion, depending on the source's licence and the scale — ask before doing it, not after.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Before reporting that upstream data is missing, verify against the <em>authoritative</em> source rather than your own parser's interpretation of it. One project told a user a location had no opening hours because its parser discarded a particular range as degenerate — the upstream's own interface displayed those hours correctly, because that range is a convention meaning "always open". The test asserting the discard was part of the bug. This applies to OSM as much as to any other feed.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's map reimplementation and its decision record: the single hardened tile-layer wrapper carrying all four grey-tile mitigations, the declarative camera fit replacing an imperative reset window, the best-available-value resolver so a marker never renders a placeholder, and the lint test pinning the tile-provider call sites.</li>
+<li>Its tile-proxy design: bounds validation to prevent open relaying, a stable version-free contact-carrying upstream User-Agent, a seven-day edge cache with matching CDN headers, error propagation without caching, and the direct URL retained as a documented fallback.</li>
+<li>The recorded history of the grey-tile bug — nine fixes across two months, and the finding that six of seven tile-layer call sites bypassed every mitigation — plus the discovery that an existing routing backend's matrix endpoint removed the need for a new service.</li>
+<li>Its opening-hours parser incident, which supplies the verify-against-the-authority check.</li>
+</ul>
+<p>The OSM usage policies, the tagging examples and the contribution workflow are from the OpenStreetMap project's own published conventions rather than from either codebase. Verify current policy details against the OSM wiki before relying on a specific limit.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

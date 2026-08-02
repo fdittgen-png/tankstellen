@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/country/country_config.dart';
 import '../../../../core/location/user_position_provider.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -64,16 +64,7 @@ class SearchChromeBanners extends ConsumerWidget {
       // #1692 — never surface a raw exception toString() to the user;
       // show a localized, actionable message instead. #2146 — route to
       // the exportable log so the cause is recoverable from a report.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'SearchScreen: userPosition.updateFromGps',
-          },
-        ),
-      );
+      logFailure(e, st, where: 'SearchScreen: userPosition.updateFromGps');
       if (!context.mounted) return;
       SnackBarHelper.showError(
         context,

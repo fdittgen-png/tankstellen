@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../../core/feedback/github_issue_reporter_provider.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -61,15 +62,11 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
     } catch (e, st) {
       // #2146 — route to errorLogger so secure-storage failures land
       // in the user-exportable log alongside other catches.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.storage,
-          e,
-          st,
-          context: const {
-            'where': 'FeedbackTokenSection._refresh: secure-storage read',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'FeedbackTokenSection._refresh: secure-storage read',
+        layer: ErrorLayer.storage,
       );
       if (!mounted) return;
       setState(() {
@@ -144,15 +141,11 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
       await _storage.write(key: kGithubFeedbackTokenKey, value: scrubbed);
     } catch (e, st) {
       // #2146 — same routing rationale as the read catch above.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.storage,
-          e,
-          st,
-          context: const {
-            'where': 'FeedbackTokenSection._setToken: secure-storage write',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'FeedbackTokenSection._setToken: secure-storage write',
+        layer: ErrorLayer.storage,
       );
       return;
     }
@@ -172,15 +165,11 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
       await _storage.delete(key: kGithubFeedbackTokenKey);
     } catch (e, st) {
       // #2146 — same routing rationale as the read/write catches above.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.storage,
-          e,
-          st,
-          context: const {
-            'where': 'FeedbackTokenSection._clearToken: secure-storage delete',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'FeedbackTokenSection._clearToken: secure-storage delete',
+        layer: ErrorLayer.storage,
       );
     }
     if (!mounted) return; // #3159 — see _setToken.

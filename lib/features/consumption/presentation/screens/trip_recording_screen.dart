@@ -41,7 +41,7 @@ import '../widgets/trip_radar_card.dart';
 import '../widgets/trip_recording_landscape_body.dart';
 import '../widgets/trip_save_progress.dart';
 import '../widgets/trip_start_progress.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Result returned when the user confirms saving a recorded trip
 /// from the summary screen (#726, #1185).
@@ -426,16 +426,7 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
       // A missing Riverpod override in a widget test that pumps this
       // screen without the profile graph must not crash the mount — the
       // safe fallback is "not auto-pinned", matching the default.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'TripRecordingScreen: auto-pin apply failed',
-          },
-        ),
-      );
+      logFailure(e, st, where: 'TripRecordingScreen: auto-pin apply failed');
     }
   }
 
@@ -970,15 +961,10 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
     } catch (e, st) {
       // A malformed fill-up set must not crash the summary card —
       // but log the cause rather than hiding it silently (#1682).
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'TripRecordingScreen: consumption summary calc failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'TripRecordingScreen: consumption summary calc failed',
       );
       return null;
     }

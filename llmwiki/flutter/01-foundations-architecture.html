@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundations &amp; architecture — LLM Wiki · Flutter</title>
+<meta name="description" content="The stack, feature-first layering, lint-enforced boundaries, Riverpod with codegen, freezed models, storage, and the service-chain fallback pattern.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Foundations & architecture","description":"Stack, feature-first layering, lint-enforced boundaries, Riverpod codegen, the service-chain fallback pattern.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">01 · Start here</span>
+<h1>Foundations &amp; architecture</h1>
+<p class="lede">One opinionated stack and one layering scheme, both chosen so that the rules can be checked by a machine rather than remembered by a person. The organising idea of this page: an architecture is only real to the extent that something fails when you violate it.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> arch</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> —</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#stack">The stack, and why each piece</a></li>
+<li><a href="#pinning">Pinning and dependency holds</a></li>
+<li><a href="#layout">Feature-first layout</a></li>
+<li><a href="#boundaries">Boundaries that are enforced</a></li>
+<li><a href="#state">State management with Riverpod</a></li>
+<li><a href="#models">Models, codegen and committed output</a></li>
+<li><a href="#service-chain">The service-chain pattern</a></li>
+<li><a href="#storage">Storage and the one-accessor rule</a></li>
+<li><a href="#platform">Cross-platform by default</a></li>
+<li><a href="#feature-flags">Feature flags and the enum cascade</a></li>
+</ol>
+</div>
+
+<section id="stack" data-chunk-id="arch.stack" data-tags="stack,dependencies,setup">
+<h2>The stack, and why each piece</h2>
+
+<p>Both source projects converged on the same core, independently enough that the overlap is informative.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Layer</th><th>Choice</th><th>Why this and not the obvious alternative</th></tr></thead>
+<tbody>
+<tr><td>Framework</td><td>Flutter 3.41 / Dart 3.11, pinned exactly in CI</td><td>A floating <code>channel: stable</code> once picked up an SDK whose bundled Gradle plugin hard-failed on a JVM-target mismatch in a transitive plugin. Pin it; bump it deliberately.</td></tr>
+<tr><td>State</td><td>Riverpod 3 with <code>@riverpod</code> codegen</td><td>Over BLoC: less ceremony per unit of state, compile-time provider wiring, and a test-override mechanism that does not require rebuilding the widget tree by hand. Over plain Provider: no runtime type lookups and no <code>ProviderNotFoundException</code> class of bug.</td></tr>
+<tr><td>Models</td><td>freezed + <code>json_serializable</code></td><td>Immutability, exhaustive union handling and <code>copyWith</code> for free. Set <code>explicit_to_json: true</code> — see the trap below.</td></tr>
+<tr><td>Routing</td><td>go_router</td><td>Declarative, deep-link-native, and it survives the platform-channel cold-start path that a <code>Navigator</code>-based scheme handles badly.</td></tr>
+<tr><td>Local storage</td><td>Hive, with encrypted boxes</td><td>Pure Dart, no native build step, key-value access matches the actual read pattern. Re-validated against Isar and Drift in a formal evaluation; the conclusion was that the migration cost exceeded the benefit for a key-value workload.</td></tr>
+<tr><td>HTTP</td><td>Dio, always via a factory</td><td>Interceptors are the point: per-client rate limiting, conditional GET, and retry live in one place instead of at every call site.</td></tr>
+<tr><td>Backend (optional)</td><td>Supabase, self-hostable</td><td>Open source, so "your data, your server" is a fact a user can act on rather than a marketing line; Postgres RLS is a real authorisation boundary. See <a href="07-supabase.html">page 07</a>.</td></tr>
+<tr><td>Maps</td><td>flutter_map + OpenStreetMap</td><td>No Google Maps dependency, which is a prerequisite for a libre build. See <a href="17-fdroid.html">page 17</a>.</td></tr>
+<tr><td>i18n</td><td>ARB + <code>flutter gen-l10n</code>, fragment-merged</td><td>Editing one 4700-key ARB file in parallel branches is a merge-conflict generator. Per-feature fragments merged by a build script are not.</td></tr>
+<tr><td>Background work</td><td>WorkManager (Android) / BGTaskScheduler (iOS)</td><td>Behind a plugin interface — see <a href="#platform">cross-platform by default</a>.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: nested objects silently vanish when a model round-trips through storage.</strong> Without <code>explicit_to_json: true</code> in <code>build.yaml</code>, <code>json_serializable</code> leaves nested <code>@JsonSerializable</code> types as object instances in the generated <code>toJson</code> output rather than converting them to maps. Hive — and anything else expecting plain maps — then drops them without an error.</p>
+<pre data-lang="yaml"><code>targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          explicit_to_json: true</code></pre>
+<p>A related and nastier variant: a field excluded with <code>@JsonKey(includeToJson: false)</code> disappears on <em>every</em> serialisation path, not just the one you were thinking about. In one project a structured opening-hours field was JSON-excluded and therefore lost on every cache, favourites and widget round-trip — the feature broke in five of six countries and the adapter unit tests stayed green throughout, because they tested the adapter rather than the search→codec→render path.</p>
+</div>
+</section>
+
+<section id="pinning" data-chunk-id="arch.pinning" data-tags="dependencies,dependabot,version-pinning">
+<h2>Pinning and dependency holds</h2>
+
+<p>Some dependencies must be held back, and the reason must be written next to the constraint or it will be bumped by the next automated update.</p>
+
+<p>Record every hold as a comment in <code>pubspec.yaml</code> <em>and</em> as an ignore entry in the update bot's configuration. Both, not either — this is the single most reliably relearned lesson in dependency management.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: an automated dependency PR is red on arrival, and closing it just brings it back next week.</strong> Packages that pin each other form a lock-step cluster. Ignoring one member does <em>not</em> stop the bot co-bumping it while resolving another member — it will chase the constraint and reproduce exactly the failure you thought you had suppressed. In one project a lint package, three state-management packages and two serialisation packages formed one cluster, ultimately gated on the Flutter SDK's own pin of a low-level metadata package; ignoring the lint package alone was defeated twice before every member was listed.</p>
+<p><strong>Countermeasure:</strong> when you discover a cluster, add <em>every</em> member to the ignore list in one edit, with a comment naming the upstream event that will unblock it.</p>
+</div>
+
+<p>Categories of hold worth distinguishing, because they resolve differently:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Kind of hold</th><th>Example</th><th>Resolves when</th></tr></thead>
+<tbody>
+<tr><td><strong>Licence</strong></td><td>A BLE package whose 2.x line moved to a commercial-only licence</td><td>A human makes a purchasing decision. Never by drift.</td></tr>
+<tr><td><strong>Breaking API</strong></td><td>A geo-primitives package whose 0.10 line rewrote types used pervasively</td><td>Someone schedules a migration pass. Not part of routine updates.</td></tr>
+<tr><td><strong>Toolchain</strong></td><td>A connectivity package whose iOS source references a symbol only present in a newer platform SDK than the CI runner's Xcode</td><td>The CI runner image ships the newer SDK. Track the runner-images issue.</td></tr>
+<tr><td><strong>Transitive lock-step</strong></td><td>The lint/analyzer/codegen cluster above</td><td>The bottom of the chain moves. List every member.</td></tr>
+<tr><td><strong>Prerelease leakage</strong></td><td>A bot pulling a <code>-dev</code> build into a stable group</td><td>Never — add a version-range exclusion permanently.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>A held dependency with no recorded reason is indistinguishable from neglect. Six months later someone bumps it "to catch up", CI goes red in a way nobody can explain quickly, and the hold is reinstated with a comment saying "breaks CI" — which is exactly the information that was already lost. Write the upstream condition, not the symptom.</p>
+</div>
+</section>
+
+<section id="layout" data-chunk-id="arch.layout" data-tags="architecture,layering,project-structure">
+<h2>Feature-first layout</h2>
+
+<p>Group by feature, not by technical layer, and keep a strict <code>core/</code> for things genuinely shared across features.</p>
+
+<pre data-lang="text"><code>lib/
+├── main.dart
+├── app/                      # composition root only
+│   ├── app.dart              # the MaterialApp / root widget
+│   ├── app_initializer.dart  # bootstrap sequencing
+│   ├── router.dart           # route table
+│   └── theme.dart
+├── core/                     # cross-cutting ONLY — no feature logic
+│   ├── cache/  storage/  network/  sync/  trace/  location/
+│   ├── notifications/  permissions/  platform/  theme/  widgets/
+│   └── utils/  types/  constants/
+└── features/&lt;name&gt;/
+    ├── data/                 # repositories, DTOs, remote + local sources
+    │   ├── models/
+    │   └── repositories/
+    ├── domain/               # PURE DART — no Flutter, no Hive, no Dio
+    │   ├── entities/
+    │   └── services/
+    ├── presentation/
+    │   ├── screens/
+    │   └── widgets/
+    └── providers/            # the ONLY bridge from presentation to data</code></pre>
+
+<p>The test tree mirrors it exactly, so <code>test/features/booking/…</code> corresponds to <code>lib/features/booking/…</code> without anyone having to decide where a new test file goes.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong><code>domain/</code> is pure Dart.</strong> No <code>package:flutter</code>, no storage library, no HTTP client. The payoff is that domain logic is unit-testable in milliseconds without a widget tester, an event loop pump, or a mocked platform channel — and that is what makes a 70% unit-test ratio achievable rather than aspirational.</p>
+</div>
+
+<p>Size budgets, applied per file: <strong>screens under 300 lines, providers under 200, repository methods under 50.</strong> These are arbitrary numbers whose value is that they are checked. When a file exceeds its budget, extract — do not raise the budget.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: three parallel pull requests all conflict in the same file, repeatedly.</strong> Files that grow past ~1000 lines become conflict magnets and then become permanent ones, because everybody who touches the feature has to touch them. One project accumulated a 1400-line trip-recording controller that three separate issues all needed to modify in the same week; every pairing conflicted. Identify these files explicitly, serialise work on them rather than parallelising, and schedule the decomposition as its own tracked work — the conflict cost is real and compounding.</p>
+</div>
+</section>
+
+<section id="boundaries" data-chunk-id="arch.boundaries" data-tags="architecture,lint,enforcement,static-analysis">
+<h2>Boundaries that are enforced</h2>
+
+<p>Every architectural rule in this section is backed by a test that fails the build, because unenforced layering rules decay within weeks.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Rule</th><th>Enforcement</th></tr></thead>
+<tbody>
+<tr><td><code>presentation/</code> never imports <code>data/</code> — always via <code>providers/</code></td><td>A test that walks import statements in every presentation file</td></tr>
+<tr><td>Features never import another feature's internals</td><td>A test counting cross-feature import pairs per file, with a snapshot that may only <em>decrease</em></td></tr>
+<tr><td>Files stay under their line budget</td><td>A test with a grandfathered allow-list of existing offenders, ratcheting down</td></tr>
+<tr><td>No user-facing string literals in widgets</td><td>A scanning test with a baseline that may only decrease, target zero</td></tr>
+<tr><td>No empty <code>catch (_) {}</code></td><td>A scanning test; see <a href="04-robustness.html">page 04</a></td></tr>
+<tr><td>Every <code>catch (e)</code> is <code>catch (e, st)</code> with the trace logged</td><td>A scanning test with an explicit opt-out comment for rethrow-only blocks</td></tr>
+<tr><td>No inline <code>BorderRadius.circular(n)</code> — design tokens only</td><td>A scanning test</td></tr>
+<tr><td>No inline <code>Platform.isIOS</code> in shared code</td><td>A scanning test; see <a href="#platform">cross-platform by default</a></td></tr>
+<tr><td>No string-literal route paths</td><td>A scanning test</td></tr>
+<tr><td>Design-system components only — no raw <code>AppBar</code>/<code>Card</code> in features</td><td>Scanning tests</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The pattern is always the same: a plain Dart test that reads the source tree, greps for the anti-pattern, and asserts the count against a committed baseline number. It costs perhaps forty lines per rule.</p>
+
+<pre data-lang="dart"><code>// test/lint/presentation_data_imports_test.dart — the shape of all of them
+void main() {
+  test('presentation never imports data directly', () {
+    final offenders = &lt;String&gt;[];
+    for (final file in Directory('lib/features')
+        .listSync(recursive: true)
+        .whereType&lt;File&gt;()
+        .where((f) =&gt; f.path.contains('/presentation/'))) {
+      final src = file.readAsStringSync();
+      for (final line in src.split('\n')) {
+        if (RegExp(r"^import .*/data/").hasMatch(line.trim())) {
+          offenders.add('${file.path}: ${line.trim()}');
+        }
+      }
+    }
+    expect(offenders, isEmpty,
+        reason: 'presentation must reach data through providers/');
+  });
+}</code></pre>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>The ratcheting baseline is what makes this adoptable in an existing codebase. You do not have to fix 400 violations before you can start enforcing; you record 400, forbid 401, and every pull request that reduces the number lowers the ceiling. The rule that the baseline may only ever decrease is the whole mechanism — the moment someone is allowed to raise it "just this once", the ratchet is gone.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>When decomposing a file, do not carry cross-feature imports into the new helper.</strong> Pass primitives — <code>bool byPrice</code>, not a <code>SortMode</code> enum owned by another feature. The boundary test counts pairs per file, so splitting a file can <em>raise</em> the count and fail the push even though the refactor looked purely mechanical.</p>
+</div>
+</section>
+
+<section id="state" data-chunk-id="arch.state" data-tags="riverpod,state-management,providers">
+<h2>State management with Riverpod</h2>
+
+<p>Use code generation exclusively; hand-written <code>Provider</code>/<code>StateProvider</code> declarations are banned so that there is one idiom to learn and one thing to grep for.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Annotation</th><th>Use for</th></tr></thead>
+<tbody>
+<tr><td><code>@riverpod</code> (auto-dispose)</td><td>Screen-scoped state. The default; reach for this unless you can name why not.</td></tr>
+<tr><td><code>@Riverpod(keepAlive: true)</code></td><td>Genuine app-lifetime state only: storage handles, the active profile, the current locale, a live device connection.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Call-site discipline:</p>
+
+<ul>
+<li><code>ref.watch</code> in <code>build()</code>. <code>ref.read</code> in event handlers. <code>ref.listen</code> for snackbars and navigation.</li>
+<li><strong>Never mix <code>watch</code> and <code>read</code> in one expression.</strong> Pick one; a mixed expression rebuilds unpredictably.</li>
+<li>After any <code>await</code> in widget code: <code>if (!context.mounted) return;</code>. Promote <code>use_build_context_synchronously</code> to <code>error</code> in the analyzer so this is not optional.</li>
+<li>Tests override with <code>ProviderScope(overrides: [...])</code>, always starting from a shared <code>standardTestOverrides()</code> helper so a new global dependency is wired once rather than in 200 test files.</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a test fails with <code>Actual: []</code> instead of an error, and the empty list makes no sense.</strong> Providers that end in a catch-all — <code>on Object { return const []; }</code> — turn any exception into an empty result. Add a <code>ref.read(otherProvider)</code> inside one, and in any test container that does not mock <code>otherProvider</code> the read throws, the catch-all swallows it, and you get a mysterious empty list rather than a stack trace.</p>
+<p><strong>Countermeasure:</strong> wrap new cross-provider reads in their own <code>try</code>/<code>catch</code> with an explicit safe default, so the failure is local and named rather than absorbed by the outer handler.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: <code>Bad state: No ProviderScope found</code> in exactly one test after adding a <code>Consumer</code>.</strong> Adding a <code>Consumer</code> inside a widely-reused widget breaks every test that pumps that widget without a scope. Most harnesses go through a scoped <code>pumpApp</code> helper; the one test that calls <code>tester.pumpWidget(MaterialApp(...))</code> directly is the one that breaks. Grep the widget's test files for raw <code>pumpWidget</code> before wiring a <code>Consumer</code> into it.</p>
+</div>
+</section>
+
+<section id="models" data-chunk-id="arch.models" data-tags="freezed,codegen,build-runner">
+<h2>Models, codegen and committed output</h2>
+
+<p>Generated files are committed to version control, which makes regenerating from clean a mandatory pre-push step.</p>
+
+<p>Commit <code>*.freezed.dart</code>, <code>*.g.dart</code> and the generated localisation Dart. The reason is practical: a fresh clone, and in particular an automated dependency-update pull request, otherwise looks broken until someone runs codegen — and CI cannot distinguish "generated files missing" from "generated files wrong".</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Regenerate from clean before every push. Never incrementally.</strong></p>
+<pre data-lang="bash"><code>dart run build_runner clean
+dart run build_runner build --delete-conflicting-outputs
+git add -- '*.g.dart' '*.freezed.dart'</code></pre>
+<p>An incremental build keeps stale content hashes that a clean CI run flags. A push that leaves any generated diff uncommitted is a defect — in one project it reached CI four times in a single working session at roughly thirteen minutes per round-trip. Do not defer it to "the next push".</p>
+<p><strong>Enforce it locally:</strong> a pre-push git hook that runs clean codegen and rejects the push on any drift turns a thirteen-minute CI failure into a thirty-second local one. Ship the hook in the repo and install it with a script; provide a documented emergency bypass so nobody is tempted to use <code>--no-verify</code>.</p>
+</div>
+
+<p>Do not run <code>dart format</code> across whole generated files — commit only the diff codegen actually produced, or every regeneration becomes an unreviewable whole-file change.</p>
+</section>
+
+<section id="service-chain" data-chunk-id="arch.service-chain" data-tags="networking,resilience,caching,fallback">
+<h2>The service-chain pattern</h2>
+
+<p>Every externally-sourced piece of data flows through one chain that provides fresh-first reads, stale fallback, request coalescing and rate limiting — so no call site reimplements any of it.</p>
+
+<pre data-lang="text"><code>cache.getFresh()          → hit? return with source=cache, isStale=false
+  ↓ miss
+service.fetch()           → success? write cache, return with source=&lt;api&gt;
+  ↓ failure
+cache.get()   (any age)   → hit? return with source=cache, isStale=true
+  ↓ miss
+throw ServiceChainExhaustedException(snapshot)</code></pre>
+
+<p>The return type carries provenance, not just data:</p>
+
+<pre data-lang="dart"><code>class ServiceResult&lt;T&gt; {
+  final T data;
+  final ServiceSource source;   // which API, or cache
+  final DateTime fetchedAt;
+  final bool isStale;
+  final List&lt;Object&gt; errors;    // what was tried and failed on the way
+}</code></pre>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Carrying <code>source</code> and <code>isStale</code> all the way to the UI is what makes honest degradation possible. The results header can name the live data source and link to it; a stale result can say so. Without provenance in the result type, the UI has no way to distinguish "fresh from the authority" from "eleven hours old" and will present both identically — which is the failure described in <a href="04-robustness.html#honest">page 04</a>.</p>
+</div>
+
+<p>Adding a new external source is then four steps and no new plumbing:</p>
+<ol>
+<li>Implement the abstract interface (<code>StationService</code>, <code>GeocodingProvider</code>, whatever the domain calls for).</li>
+<li>Register it in the registry that maps a key — a country, a region, a provider id — to the implementation.</li>
+<li>Build its HTTP client with the factory: <code>DioFactory.create(rateLimit: RateLimitConfig(minInterval: …))</code>. Never <code>Dio()</code> directly, or that source escapes rate limiting and interceptors.</li>
+<li>Add a recorded-response fixture and drive the real implementation with it in a test. See <a href="03-tdd-and-testing.html#false-green">false-green tests</a> for why a hand-written fake is not sufficient here.</li>
+</ol>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Chain tests must cover three cases every time: API success; API failure with a usable stale entry; total failure with nothing cached. If the third case does not have a test, the exception path is untested and will surface first in production.</p>
+</div>
+</section>
+
+<section id="storage" data-chunk-id="arch.storage" data-tags="hive,storage,secure-storage">
+<h2>Storage and the one-accessor rule</h2>
+
+<p>Key-value boxes with a documented encryption subset, keys declared as constants, and exactly one accessor per stored value.</p>
+
+<ul>
+<li><strong>Keys are constants in one class</strong> with a pinning test asserting uniqueness and naming convention. A duplicated key string is a silent data-corruption bug.</li>
+<li><strong>Encrypt the boxes holding anything personal.</strong> Derive the key from the platform secure store (Keystore/Keychain), never a constant.</li>
+<li><strong>Secrets never touch the plain store.</strong> API keys, backend URLs and tokens live in secure storage only, are never logged, and never appear in an export.</li>
+<li><strong>Normalise map types at the boundary.</strong> Hive returns <code>Map&lt;dynamic, dynamic&gt;</code>; a freezed <code>fromJson</code> needs <code>Map&lt;String, dynamic&gt;</code>. Put the conversion in one helper and always use it.</li>
+<li><strong>Background isolates need their own initialisation and a lock.</strong> A file-based mutex prevents a background task and the main isolate opening the same box concurrently.</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a feature reads a stored value as null forever, and the fallback is plausible enough that nobody notices.</strong> When a value has a dedicated accessor that adds semantics — reads the secure vault, applies a shipped default, caches — then <em>every</em> reader must go through it. A generic <code>getSetting(StorageKeys.x)</code> read of that same value compiles and appears to work, but returns null because the value lives in the vault.</p>
+<p>In one project the map screen read the plain settings box for an API key that the search screen fetched through the accessor. The map therefore served a small built-in demo dataset to every user, configured or not, for months — because the demo data rendered exactly like real data.</p>
+<p><strong>Countermeasure:</strong> when touching any settings key, grep for <em>all</em> readers of that constant and route them through the single accessor. Add a regression test per consumer that overrides a fake accessor and asserts the consumer used it.</p>
+</div>
+</section>
+
+<section id="platform" data-chunk-id="arch.platform" data-tags="cross-platform,plugin-pattern,architecture">
+<h2>Cross-platform by default</h2>
+
+<p>Features target every supported platform unless there is a reason they cannot; platform-specific code lives behind an interface, never in an inline branch.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>No inline <code>if (Platform.isIOS)</code> in shared code.</strong> Define an abstract capability, implement it once per platform, and select the implementation at composition time. Enforced by a scanning test.</p>
+</div>
+
+<pre data-lang="dart"><code>// core/sensors/imu_sensor_source.dart — the abstract seam
+abstract class ImuSensorSource {
+  Stream&lt;ImuSample&gt; get samples;
+  Future&lt;bool&gt; isAvailable();
+}
+
+// One implementation per platform, chosen in the composition root.
+// Tests inject a third: a deterministic replay source.</code></pre>
+
+<p>The benefits compound in three directions: the shared code stays readable; a platform that cannot do the thing degrades to a named "unsupported" state rather than a crash; and tests get a seam to inject into for free. Page <a href="12-nfc-rfid.html">12</a> shows the pattern applied to NFC, where the three-state availability enum is what makes a silent failure diagnosable in the field.</p>
+
+<p>The same discipline applies to build variants. Where a distribution channel forbids a dependency — a libre build that must not link proprietary libraries — swap the <em>package</em> at dependency-resolution time rather than branching in Dart. See <a href="17-fdroid.html">page 17</a>.</p>
+</section>
+
+<section id="feature-flags" data-chunk-id="arch.feature-flags" data-tags="feature-flags,enum-cascade,checklist">
+<h2>Feature flags and the enum cascade</h2>
+
+<p>A user-facing feature toggle is a fan-out across five or six files, and missing one of them fails the build in a confusing place.</p>
+
+<p>The model that worked: an enum of features, a manifest declaring each feature's default state per build channel and its prerequisite edges, and a settings surface that renders from the manifest.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>#</th><th>Touch point</th><th>Failure if skipped</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>The enum value, with a doc comment naming the issue and any prerequisites</td><td>—</td></tr>
+<tr><td>2</td><td>The manifest entry: per-channel default, <code>requires:</code> edges</td><td>A completeness test fails</td></tr>
+<tr><td>3</td><td>Label and description <code>case</code> arms in the settings widget</td><td>Compile error — the switches are exhaustive, which is the point</td></tr>
+<tr><td>4</td><td>Localisation keys for label, description and any blocked-toggle messages, fanned out to every locale</td><td>The locale-coverage gate fails</td></tr>
+<tr><td>5</td><td>The hard-coded <code>Feature.values.length</code> assertion in the settings test</td><td>That test fails</td></tr>
+<tr><td>6</td><td>Clean codegen, if the feature was wired into a freezed or provider consumer</td><td>The codegen-drift job fails</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Enum values may be reordered but never renamed.</strong> Persistence keys use <code>Enum.name</code>, so a rename silently resets that toggle for every existing user. If you must rename, write a migration.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Gate a flagged feature at both layers.</strong> Hide the entry point <em>and</em> bounce the deep link. A hidden button is not access control — the route is still reachable from a URL, a notification tap, or a restored navigation stack. Add a widget test for the hidden entry and a second for the bounced deep link.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>Both source repositories: <code>pubspec.yaml</code> with its inline hold rationales, <code>analysis_options.yaml</code>, <code>build.yaml</code>, the <code>test/lint/</code> suites, the architecture decision records covering state management, local-first design, storage evaluation and the cross-platform plugin pattern.</li>
+<li>Post-mortem notes attached to the traps: the nested-serialisation drop, the accessor-bypass demo-data incident, the catch-all silent-empty provider failure, and the codegen-drift recurrences.</li>
+</ul>
+<p>The line budgets (300/200/50) and the specific lint list are one project's calibration, not a universal standard — adopt the mechanism, choose your own numbers.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

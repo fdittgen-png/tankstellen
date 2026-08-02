@@ -16,7 +16,7 @@ import '../../domain/charging_log_readout.dart';
 import '../../domain/charging_log_validators.dart';
 import '../../providers/charging_logs_provider.dart';
 import '../widgets/charging_log_form_fields.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Form to add a new [ChargingLog] entry (#582 phase 2).
 ///
@@ -108,16 +108,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     try {
       activeId = ref.read(activeVehicleProfileProvider)?.id;
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'AddChargingLog: active vehicle unavailable',
-          },
-        ),
-      );
+      logFailure(e, st, where: 'AddChargingLog: active vehicle unavailable');
     }
     final evVehicles = vehicles.where((v) => v.isEv).toList(growable: false);
     if (activeId != null && evVehicles.any((v) => v.id == activeId)) {
@@ -174,14 +165,7 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'AddChargingLog._save'},
-        ),
-      );
+      logFailure(e, st, where: 'AddChargingLog._save');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -194,15 +178,10 @@ class _AddChargingLogScreenState extends ConsumerState<AddChargingLogScreen> {
     try {
       vehicles = ref.watch(vehicleProfileListProvider);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'AddChargingLog build: vehicle list unavailable',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'AddChargingLog build: vehicle list unavailable',
       );
       vehicles = const [];
     }

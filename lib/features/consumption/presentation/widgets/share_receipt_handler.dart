@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/router.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/navigation/root_navigator_key.dart';
@@ -134,14 +135,7 @@ class ShareReceiptHandler {
       // Any other type (video / arbitrary file) is genuinely unsupported.
       _showUnsupportedFormat();
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'ShareReceiptHandler.handle'},
-        ),
-      );
+      logFailure(e, st, where: 'ShareReceiptHandler.handle');
     }
   }
 
@@ -166,14 +160,7 @@ class ShareReceiptHandler {
       }
       _stashAndRoute(jpegPath);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'ShareReceiptHandler._rasterizeAndRoute'},
-        ),
-      );
+      logFailure(e, st, where: 'ShareReceiptHandler._rasterizeAndRoute');
       _showReadFailed();
     }
   }
@@ -203,16 +190,11 @@ class ShareReceiptHandler {
   bool _payloadAccepted(String path, String kind) {
     final size = _payloadSizeBytes(path);
     if (isAcceptableSharePayload(sizeBytes: size, path: path)) return true;
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        StateError('shared $kind payload rejected by the ingestion guard'),
-        StackTrace.current,
-        context: {
-          'where': 'ShareReceiptHandler._payloadAccepted',
-          'sizeBytes': size,
-        },
-      ),
+    logFailure(
+      StateError('shared $kind payload rejected by the ingestion guard'),
+      StackTrace.current,
+      where: 'ShareReceiptHandler._payloadAccepted',
+      extra: {'sizeBytes': size},
     );
     return false;
   }
@@ -223,14 +205,7 @@ class ShareReceiptHandler {
           .read(enabledFeaturesProvider)
           .contains(Feature.addFillUpShareIntentReceipt);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'ShareReceiptHandler._featureEnabled'},
-        ),
-      );
+      logFailure(e, st, where: 'ShareReceiptHandler._featureEnabled');
       return false;
     }
   }
@@ -239,14 +214,7 @@ class ShareReceiptHandler {
     try {
       unawaited(_ref.read(routerProvider).push(path));
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: {'where': 'ShareReceiptHandler: push failed for $path'},
-        ),
-      );
+      logFailure(e, st, where: 'ShareReceiptHandler: push failed for $path');
     }
   }
 

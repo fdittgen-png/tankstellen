@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Performance — LLM Wiki · Flutter</title>
+<meta name="description" content="Frame budgets, rebuild discipline, custom-painter repaint contracts, Impeller, isolates, image memory, startup as a CI budget, and app-size analysis — the performance practice both source projects converged on.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Flutter performance in practice","description":"Frame budgets, rebuild discipline, painter repaint contracts, Impeller, isolates, image memory, startup budgets and app size.","dateModified":"2026-08-02","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">25 · Quality</span>
+<h1>Performance</h1>
+<p class="lede">Performance work in Flutter is not one discipline but five: keeping builds cheap, keeping paints cheap, keeping the main isolate free, keeping images small in memory, and keeping the binary small on disk. Each has its own measuring tool and its own failure smell — and the practices here either shipped in one of the source projects or come from the official guidance, labelled accordingly.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> perf</span>
+  <span><b>Updated</b> 2026-08-02</span>
+  <span><b>Depends on</b> 01 Foundations, 03 TDD</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#budgets">Budgets before optimisations</a></li>
+<li><a href="#rebuilds">Rebuild discipline</a></li>
+<li><a href="#lists">Lists, grids and layout passes</a></li>
+<li><a href="#painting">Custom painters and the repaint contract</a></li>
+<li><a href="#impeller">Impeller, and what it does not fix</a></li>
+<li><a href="#isolates">The main isolate is for frames</a></li>
+<li><a href="#images">Images and memory</a></li>
+<li><a href="#startup">Startup as a CI budget</a></li>
+<li><a href="#size">App size</a></li>
+</ol>
+</div>
+
+<section id="budgets" data-chunk-id="perf.budgets" data-tags="performance,budgets,measurement,devtools">
+<h2>Budgets before optimisations</h2>
+
+<p>A performance practice starts with numbers, because without a budget every optimisation is a guess and every regression is invisible. These are the budgets that matter and where to read them.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Budget</th><th>Target</th><th>Where to measure</th></tr></thead>
+<tbody>
+<tr><td>Frame, 60&nbsp;Hz device</td><td>16&nbsp;ms total — roughly 8&nbsp;ms UI thread (build + layout) and 8&nbsp;ms raster</td><td>DevTools → Performance, in <strong>profile mode on a real device</strong></td></tr>
+<tr><td>Frame, 120&nbsp;Hz device</td><td>under 8&nbsp;ms total</td><td>same</td></tr>
+<tr><td>Cold start to first frame</td><td>a committed number per app — then a CI job that fails when it grows</td><td>a startup-budget CI check (below), <code>adb shell am start -W</code></td></tr>
+<tr><td>Main-isolate work item</td><td>a few milliseconds; beyond that it belongs on an isolate</td><td>DevTools CPU profiler</td></tr>
+<tr><td>Release artifact size</td><td>a tracked number, not a feeling</td><td><code>--analyze-size</code> + the DevTools App Size tool</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Measure in profile mode on a real device, never in debug on a simulator.</strong> Debug builds run with assertions, without AOT, and with a different rasteriser path; a simulator has desktop-class CPU and no thermal envelope. Every number collected outside profile-mode-on-device is noise, and optimising against noise makes code worse for nothing.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Press <code>P</code> in the run terminal (or enable the performance overlay) and scroll the busiest screen on the slowest device you support. Red bars in either graph are dropped frames. If the overlay is calm there, the app is fine — stop optimising and go build features.</p>
+</div>
+</section>
+
+<section id="rebuilds" data-chunk-id="perf.rebuilds" data-tags="performance,build,rebuilds,const,riverpod">
+<h2>Rebuild discipline</h2>
+
+<p>The cheapest frame is the one that rebuilds almost nothing, and rebuild scope is decided by code structure, not by the framework. Four habits keep it narrow.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Habit</th><th>Mechanism</th></tr></thead>
+<tbody>
+<tr><td><strong><code>const</code> everywhere the analyzer allows</strong></td><td>A <code>const</code> widget is reused, not rebuilt. Both projects enforce <code>prefer_const_constructors</code> as an analyzer lint, which turns the habit into a build error rather than a review comment.</td></tr>
+<tr><td><strong>Split big <code>build()</code>s into widget classes</strong></td><td>A widget class is a rebuild boundary; a helper function returning a widget is not. Extracting a subtree into its own <code>StatelessWidget</code> localises both rebuild scope and <code>const</code>-ability. The file-length budget from <a href="01-foundations-architecture.html#boundaries">page 01</a> pushes in the same direction for a second reason.</td></tr>
+<tr><td><strong>Watch narrow state</strong></td><td>With Riverpod, a widget that watches a whole async provider rebuilds on every change; watching a <code>select</code>-ed field, or splitting derived providers (the <a href="01-foundations-architecture.html#state">derived-provider graph</a>), rebuilds only what changed. The provider graph is the rebuild graph.</td></tr>
+<tr><td><strong>Pass <code>child</code> into animated builders</strong></td><td>Subtrees that do not depend on the animation are built once and handed to <code>AnimatedBuilder</code>/<code>ListenableBuilder</code> as <code>child</code>, not rebuilt per tick inside the builder closure.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a screen rebuilds on every provider change although nothing visible depends on it.</strong> The usual cause is a broad <code>ref.watch</code> in the screen's own <code>build</code> for a value only one small widget needs. Move the watch down into the widget that uses it. The one-line diagnostic is the IDE's "show widget rebuild information" toggle — widgets flashing on unrelated changes are watching too much.</p>
+</div>
+
+<p>One rule from the official guidance is worth repeating because it is invisible until it hurts: <strong>never override <code>operator ==</code> on a widget class</strong> to "help" the framework skip rebuilds. It turns tree diffing quadratic and usually pessimises the exact path it meant to optimise.</p>
+</section>
+
+<section id="lists" data-chunk-id="perf.lists" data-tags="performance,lists,layout,slivers">
+<h2>Lists, grids and layout passes</h2>
+
+<p>List performance is decided by two questions: are off-screen children built, and does layout need to interrogate children to size them. The answer to both should be no.</p>
+
+<ul>
+<li><strong>Builder constructors for anything unbounded.</strong> <code>ListView(children: [...])</code> builds every child; <code>ListView.builder</code> builds what is visible. The same for <code>GridView.builder</code>. A concrete-list constructor is fine only when the list is short and mostly on-screen.</li>
+<li><strong>Fixed extents beat measured extents.</strong> <code>itemExtent</code> or <code>prototypeItem</code> lets the scroll machinery jump to any offset arithmetically instead of laying out everything in between. One source project pins its timeline row heights, header heights and hour widths as named constants in a single geometry class — which serves layout speed <em>and</em> gives tests a stable coordinate contract to assert against.</li>
+<li><strong>Avoid intrinsic passes.</strong> <code>IntrinsicHeight</code>/<code>IntrinsicWidth</code> and tables without fixed column widths make layout O(N²)-ish by measuring children twice. DevTools' <em>Track layouts</em> option surfaces them as <code>'$runtimeType intrinsics'</code> events.</li>
+<li><strong>Fold data once per frame, not once per cell.</strong> A grid of N cells that each scan a list of M records does N×M work per build. One source project's month-availability grid hit exactly this and was refactored — after a profiled audit, not a hunch — to one fold over the reservations that produces a per-day map the cells index into. The pattern generalises: derive per-item view state in one pass above the list, hand each cell a lookup.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Deriving view state above the list rather than in each cell also moves the logic into a pure function that a unit test can cover without pumping a widget — the performance fix and the testability fix are the same refactor. This is the recurring shape of good Flutter performance work: the fast structure and the testable structure coincide.</p>
+</div>
+</section>
+
+<section id="painting" data-chunk-id="perf.painting" data-tags="performance,custompainter,repaint,opacity,cliprect">
+<h2>Custom painters and the repaint contract</h2>
+
+<p>A canvas-heavy surface — a floor plan, a chart, a map overlay — lives or dies by its <code>shouldRepaint</code>, because the framework repaints whenever the painter instance changes unless told otherwise.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong><code>shouldRepaint</code> compares every field that affects output, and nothing else.</strong> Comparing too little produces stale pixels; comparing too much (or defaulting to <code>true</code>) repaints the world on every build. Collections need value comparison — one source project's floor-plan painter compares its seat-id sets with <code>setEquals</code>, because reference equality on a freshly-built set would report a change every frame. Treat the field list in <code>shouldRepaint</code> as part of the painter's API: every new painter field must appear there, and a code review that adds a field without touching <code>shouldRepaint</code> has found a bug.</p>
+</div>
+
+<p>Around the painter, three framework-level costs dominate, all from the official guidance and all confirmed in practice:</p>
+
+<ul>
+<li><strong><code>saveLayer()</code> is the expensive call.</strong> It allocates an offscreen buffer and switches render targets — costly on mobile GPUs. Widgets can trigger it without you writing it: <code>Opacity</code> over a subtree, <code>ShaderMask</code>, <code>ColorFilter</code>, certain <code>Chip</code> and <code>Text</code> configurations. DevTools' checkerboard options show where offscreen layers happen.</li>
+<li><strong>Opacity has cheaper spellings.</strong> Fading an image? <code>FadeInImage</code> or opacity on the image paint itself. Animating a fade? <code>AnimatedOpacity</code>. A semi-transparent rectangle? A semi-transparent <em>color</em>, no wrapper widget at all.</li>
+<li><strong>Clip less, and never <code>Clip.antiAliasWithSaveLayer</code> casually.</strong> Rounded corners via <code>borderRadius</code> on a decoration are cheaper than <code>ClipRRect</code> around a subtree; pre-clip static images once instead of clipping every frame of an animation.</li>
+</ul>
+
+<p>For pan-and-zoom canvases, transform instead of repainting: an <code>InteractiveViewer</code> applying a matrix to an already-painted layer is cheap; recomputing the painting at every gesture tick is not. A <code>RepaintBoundary</code> around the canvas isolates it from surrounding UI churn — but add boundaries from profiler evidence, not speculatively, because each one costs memory for its layer.</p>
+</section>
+
+<section id="impeller" data-chunk-id="perf.impeller" data-tags="performance,impeller,shaders,jank">
+<h2>Impeller, and what it does not fix</h2>
+
+<p>Impeller — the default renderer on iOS and on modern Android — removes the classic first-run stutter by compiling shaders ahead of time instead of on first use. What used to be a whole discipline (shader warm-up captures, SkSL bundling) is gone on Impeller targets, and a page of advice with it.</p>
+
+<p>What Impeller does <em>not</em> change: everything else on this page. Overdraw, <code>saveLayer</code> pressure, oversized images and main-isolate stalls jank exactly as before — Impeller moves work off the first encounter, it does not make work free. Two practical notes:</p>
+
+<ul>
+<li><strong>Old Android devices may still run Skia.</strong> If your user base skews old (one source project's does, by domain), test the slowest supported device and do not assume the Impeller baseline. The renderer in use is printed at startup in verbose logs.</li>
+<li><strong>Renderer bugs are version-coupled.</strong> When a visual artifact appears only on one platform after a Flutter upgrade, check the engine tracker for the renderer before debugging your own paint code — and record the finding next to the pinned Flutter version (<a href="01-foundations-architecture.html">page 01</a>) so the next upgrade re-checks it.</li>
+</ul>
+</section>
+
+<section id="isolates" data-chunk-id="perf.isolates" data-tags="performance,isolates,compute,async">
+<h2>The main isolate is for frames</h2>
+
+<p>Dart's <code>async</code> does not create parallelism — an <code>await</code>ed JSON parse of a large payload still blocks frame production, because it runs on the main isolate between frames. The budget from the first section applies: a few milliseconds of synchronous work is fine; beyond that, move it.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Work</th><th>Where it belongs</th></tr></thead>
+<tbody>
+<tr><td>Parsing a large API response (rule of thumb: hundreds of KB and up)</td><td><code>Isolate.run()</code> / <code>compute()</code></td></tr>
+<tr><td>Building a PDF, an XLSX, an export archive</td><td>Off the frame path — an isolate, or at minimum chunked awaits; and behind a progress affordance, never a frozen tap</td></tr>
+<tr><td>Image decode at display size</td><td>The engine's decode thread — reached by giving it a target size (next section)</td></tr>
+<tr><td>Database/preferences reads at startup</td><td>After first frame (see <a href="#startup">startup</a>)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a widget test that exercises a heavy export hangs for ten minutes and then times out.</strong> Real async work — font asset loading, image encoding — cannot complete inside <code>FakeAsync</code>-pumped test time. The fix is <code>tester.runAsync()</code> around the triggering tap, which both projects' export tests do. The trap recurs every time a new export path gains its first test, which is why it is recorded here and in the test helpers.</p>
+</div>
+
+<p>Isolate boundaries copy their arguments (or transfer, for <code>TransferableTypedData</code>), so hand an isolate the raw bytes and get structured results back — do not ship it a lambda closing over half the app state, which serialises poorly and couples the isolate to everything the closure touches.</p>
+</section>
+
+<section id="images" data-chunk-id="perf.images" data-tags="performance,images,memory,cache">
+<h2>Images and memory</h2>
+
+<p>Decoded images are the single largest memory consumer in a typical app, and the failure is silent: a 4000×3000 photo displayed in a 100&nbsp;dp avatar still decodes at 48&nbsp;MB unless something says otherwise.</p>
+
+<ul>
+<li><strong>Decode at display size.</strong> <code>Image.memory(..., cacheWidth: ...)</code> / <code>cacheHeight</code>, or <code>ResizeImage</code>, makes the engine decode to the target resolution. For network images behind a list, a disk-and-memory caching loader keeps scroll-back from re-fetching and re-decoding.</li>
+<li><strong>Know the <code>imageCache</code> limits.</strong> The global cache defaults to 1000 entries / ~100&nbsp;MB; a gallery-like surface can either blow past it (evictions, re-decode jank) or hold far too much (memory pressure, background kill). Both directions are tunable — but only after DevTools' Memory view shows which direction you are failing in.</li>
+<li><strong>Dispose what you own.</strong> Controllers, streams, listeners, <code>ui.Image</code> handles from custom decode paths. One source project decodes floor-plan background photos to <code>ui.Image</code> for its painter — a path where a forgotten dispose leaks the full decoded bitmap, not a few bytes of Dart object.</li>
+<li><strong>Precache what the next screen definitely shows</strong> (<code>precacheImage</code>) — and nothing else. Speculative precaching is how memory problems start.</li>
+</ul>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>DevTools → Memory, on device, in profile mode: scroll every image-bearing surface, background the app, resume. A saw-tooth that returns to baseline is healthy; a staircase is a leak; an OS kill in the background is the image cache holding too much. On Android, an unexplained background kill also shows up in <code>ApplicationExitInfo</code> — the same forensics channel <a href="27-recurring-bugs.html#notraces">page 27</a> uses for crashes.</p>
+</div>
+</section>
+
+<section id="startup" data-chunk-id="perf.startup" data-tags="performance,startup,ci,budget">
+<h2>Startup as a CI budget</h2>
+
+<p>Cold start decays by accretion — every feature adds "just one" initialisation — so the only durable defence is a number that CI enforces. One source project runs a dedicated startup-budget job among its required checks; the other proves its release artifact boots at all (<a href="13-android.html#r8">the aliveness test</a>). Both are versions of the same idea: <strong>the artifact's runtime behaviour is a CI assertion, not a hope</strong>.</p>
+
+<p>The ordering rule that keeps the number small: <em>first frame first</em>. Everything that is not needed to paint the boot screen moves after it —</p>
+
+<ul>
+<li>Database / preferences opens, cache eviction sweeps, notification channel setup: after first frame, in an initializer that runs behind the splash.</li>
+<li>Network refreshes: after first frame, rendering from cache meanwhile (<a href="06-caching.html">page 06</a>'s stale-tier exists precisely so startup never waits on a network).</li>
+<li>Heavy, rarely-used capability code (an OCR model, a map stack) on Android: a deferred component downloaded on demand, which also moves its bytes out of the initial download.</li>
+</ul>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Lazy providers are the startup graph.</strong> With Riverpod, nothing runs until first watched — so keeping construction side-effect-free and initialisation explicit (an app-initializer seam, not constructor work in a <code>keepAlive</code> provider) means the boot path is exactly the providers the boot screen watches, and adding a feature cannot slow the start by existing. Constructor side effects in eagerly-created singletons are how startup budgets die.</p>
+</div>
+</section>
+
+<section id="size" data-chunk-id="perf.size" data-tags="performance,app-size,analyze-size,obfuscation">
+<h2>App size</h2>
+
+<p>Size is measured on release artifacts and tracked over time; a debug build's size means nothing. The toolchain gives exact numbers.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Technique</th><th>Command / mechanism</th></tr></thead>
+<tbody>
+<tr><td>Measure with attribution</td><td><code>flutter build apk --analyze-size</code> (any target) → open the JSON in DevTools' App Size tool for a per-package treemap</td></tr>
+<tr><td>True store size</td><td>Play Console's download/install sizes for an AAB; the App Thinning Size Report from an Xcode archive — stores strip per-device, so the local file overstates</td></tr>
+<tr><td>Strip symbols, keep crash mapping</td><td><code>--split-debug-info=&lt;dir&gt;</code> (+ <code>--obfuscate</code>) — both source projects ship this on iOS and archive the symbols as CI artifacts, because a stripped build without archived symbols makes every crash report unreadable (<a href="05-traceability.html">page 05</a>)</td></tr>
+<tr><td>Per-ABI delivery</td><td>An AAB does it server-side on Play; <code>--split-per-abi</code> for sideload APKs — one project ships per-ABI splits on its libre channel</td></tr>
+<tr><td>Dead weight</td><td>Icon tree-shaking is on by default; compress bundled PNG/JPEG; audit <code>assets/</code> for files nothing references; platform-conditional code behind <code>Platform.isX</code> checks compiles out of other targets</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the app grew 30&nbsp;MB and nobody can say when.</strong> Size has no equivalent of a failing test unless you build one — sizes drift in dependency bumps and asset additions that each look innocent. The cheap fix is a CI step that prints the release artifact size into the job summary on every build (both projects' packaging workflows do, one of them failing outright when the artifact is implausibly small — the <a href="16-windows.html#harvest">empty-harvest trap</a> in reverse). The number being visible in every PR is usually enough; a hard budget is the escalation if it is not.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>The official Flutter performance best-practices and app-size pages (build costs, <code>saveLayer</code>, opacity/clipping, intrinsic passes, <code>operator ==</code>, <code>--analyze-size</code>, deferred components), cross-checked 2026-08.</li>
+<li>One project's profiled month-grid fold ("one occupancy fold for the whole grid instead of one reservation scan per cell"), its painter's <code>setEquals</code>-based <code>shouldRepaint</code>, its pinned timeline geometry constants, its <code>tester.runAsync</code> export-test pattern, and its post-first-frame boot initializer.</li>
+<li>The other project's startup-budget required check, per-ABI splits, and both projects' <code>--split-debug-info</code> + symbol-archiving release lanes.</li>
+<li>Impeller status (default on iOS and modern Android; AOT shader compilation) from current official and ecosystem write-ups, 2026-08.</li>
+</ul>
+<p>The image-cache tuning numbers and the RepaintBoundary advice are general guidance rather than observed practice in the source projects; treat thresholds as starting points to be profiled, not facts.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Go-live runbook — LLM Wiki · Flutter</title>
+<meta name="description" content="The ordered checklist across five distribution channels, what only a human can do, irreplaceable secrets, staged rollout, rollback and the first-week watch.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Go-live runbook for a Flutter app","description":"Ordered checklist across five channels, human-only steps, staged rollout, rollback.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">19 · Ship</span>
+<h1>Go-live runbook</h1>
+<p class="lede">Shipping to five channels is not five times the work of shipping to one, but it is five sets of paperwork with five different review latencies. The thing that decides whether a launch takes a week or two months is how early you start the steps no automation can do for you.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> live</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 13–17 platform pages</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#humanonly">Start with what only a human can do</a></li>
+<li><a href="#irreplaceable">Irreplaceable material</a></li>
+<li><a href="#tminus">T-minus checklist</a></li>
+<li><a href="#order">The launch sequence</a></li>
+<li><a href="#rollout">Staged rollout</a></li>
+<li><a href="#rollback">Rollback</a></li>
+<li><a href="#firstweek">The first week</a></li>
+<li><a href="#cadence">Steady-state cadence</a></li>
+</ol>
+</div>
+
+<section id="humanonly" data-chunk-id="live.humanonly" data-tags="go-live,manual-steps,planning">
+<h2>Start with what only a human can do</h2>
+
+<p>Inventory these first, because each has a latency you cannot compress and several block everything downstream.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Step</th><th>Channel</th><th>Latency</th><th>Blocks</th></tr></thead>
+<tbody>
+<tr><td>Create the app record in the console</td><td>Both stores</td><td>Minutes</td><td><strong>The first upload.</strong> One store binds a package on first upload; the other needs the record created first — no API for it.</td></tr>
+<tr><td>Grant the publisher service account release permission</td><td>Play</td><td>Minutes</td><td>Every automated upload</td></tr>
+<tr><td>Enable app-group capability on each App ID</td><td>Apple, portal only</td><td>Minutes</td><td>Widget/extension signing. <strong>No API exists.</strong></td></tr>
+<tr><td>Create the Developer ID certificate</td><td>Apple, account holder only</td><td>Minutes</td><td>macOS notarisation. No API — see <a href="15-macos.html#accountholder">page 15</a>.</td></tr>
+<tr><td>Content rating questionnaire</td><td>Play</td><td>Minutes</td><td>Production listing</td></tr>
+<tr><td>Data safety / privacy nutrition label</td><td>Both</td><td>An hour, if the inventory exists</td><td>Production listing</td></tr>
+<tr><td><strong>Foreground-service declaration</strong></td><td>Play</td><td><strong>Days</strong> — plus a video</td><td>Background features. Has a catch-22; see <a href="13-android.html#fgs">page 13</a>.</td></tr>
+<tr><td><strong>Demo video for hardware features</strong></td><td>Apple, <em>every</em> submission</td><td>Hours to record</td><td>Review approval for background/Bluetooth features</td></tr>
+<tr><td>Beta App Review (first external build)</td><td>Apple</td><td><strong>Days</strong></td><td>External testers</td></tr>
+<tr><td>Catalog merge request</td><td>F-Droid</td><td><strong>Weeks</strong></td><td>Catalog listing only — self-hosting is not blocked</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Start the video-gated and review-gated items on day one of the launch runway.</strong> The foreground-service declaration and the Apple demo video are the two longest poles, and both are gated on a recording session rather than on code. Neither can be started at the end. Everything else — builds, uploads, listings — is automation that runs in minutes once the paperwork clears.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why videos dominate the timeline</span>
+<p>Both stores have the same problem with hardware-dependent features: a reviewer at a desk cannot exercise background recording or a Bluetooth link. Written descriptions do not clear it. A short recording on a physical device, showing every permission prompt, is the accepted evidence — and Apple's expectation is that it is refreshed for <em>every</em> submission, not once. Automate carrying the link (a repository secret appended to the review notes) so only the recording itself stays manual.</p>
+</div>
+</section>
+
+<section id="irreplaceable" data-chunk-id="live.irreplaceable" data-tags="secrets,backup,risk">
+<h2>Irreplaceable material</h2>
+
+<p>Some secrets can be rotated. These cannot. Back them up off-machine before launch, not after.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Material</th><th>If lost</th></tr></thead>
+<tbody>
+<tr><td><strong>The App Store Connect <code>.p8</code> key</strong></td><td>Downloadable exactly once. Apple will not re-issue it; you create a new key and update every consumer.</td></tr>
+<tr><td><strong>The certificate-repository passphrase</strong></td><td>The encrypted repository is permanently unreadable. One project lost one and had to stand up an entirely separate certificate repository rather than re-encrypt one a sibling app depended on.</td></tr>
+<tr><td><strong>The Android upload keystore and its passwords</strong></td><td>Recoverable via a store-side reset, but it is a support request with latency at the worst possible time.</td></tr>
+<tr><td><strong>The self-hosted repository signing key</strong></td><td>Users' clients trust that key. Replacing it means every existing installation must be uninstalled and reinstalled.</td></tr>
+<tr><td><strong>The Windows installer upgrade code</strong></td><td>Not secret, but permanent — see <a href="16-windows.html#upgradecode">page 16</a>. Commit it and never change it.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Run one restore drill before launch. On a machine that is not your development machine, fetch each backed-up secret and prove it works — decrypt the certificate repository, sign a throwaway artifact with the keystore, authenticate to the store API with the key. A backup you have never restored is a hypothesis.</p>
+</div>
+</section>
+
+<section id="tminus" data-chunk-id="live.tminus" data-tags="checklist,go-live">
+<h2>T-minus checklist</h2>
+
+<h3>Product</h3>
+<ul>
+<li>Every user-visible string is externalised; every locale is complete.</li>
+<li>The privacy screen, the privacy policy and both store declarations agree — one inventory, three artifacts (<a href="09-confidentiality.html#inventory">page 09</a>).</li>
+<li>Export and delete-all work and are tested, including caches.</li>
+<li>Every feature behind a flag has a sensible per-channel default.</li>
+<li>Every permission is requested late, explained first, and the app remains usable if refused.</li>
+<li>No feature depends on a background guarantee the platform does not give (<a href="21-background-and-pinning.html">page 21</a>).</li>
+</ul>
+
+<h3>Engineering</h3>
+<ul>
+<li>Full suite green on mainline; no tag-excluded test hiding a real failure.</li>
+<li>Clean codegen; zero drift.</li>
+<li>The <strong>release artifact launches</strong> on a real device or emulator — not just compiles (<a href="13-android.html#r8">page 13</a>).</li>
+<li>Merged manifest declares only intended permissions.</li>
+<li>Startup within budget on a low-end device.</li>
+<li>A capturing-proxy session reviewed: nothing unexpected leaves the device.</li>
+<li>Crash and trace export produce something readable.</li>
+<li>Version numbers monotonic and mapped to commits by a tag.</li>
+</ul>
+
+<h3>Store</h3>
+<ul>
+<li>Listing text and screenshots in every launch locale.</li>
+<li>Feature graphic exactly to spec, correctly named (a wrong filename is silently ignored).</li>
+<li>Privacy-policy URL resolves — verify it, do not assume.</li>
+<li>Content rating, data safety, target audience, ads declaration all filed.</li>
+<li>Review contact block complete; never fabricate a phone number.</li>
+<li>Demo video recorded, hosted unlisted with no login wall, link set.</li>
+<li>Tester lists populated and the opt-in link tested from a device that is not yours.</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: an upload succeeds and the listing does not change, or an image silently does not appear.</strong> Store metadata tooling is unforgiving about filenames and dimensions and mostly fails quietly. Two specific ones worth pinning: the feature graphic must be camelCase and exactly 1024×500; and a metadata sync that deletes remote images not present locally will silently remove screenshots you forgot to include. Publish the full set every time, and check the live listing afterwards.</p>
+</div>
+</section>
+
+<section id="order" data-chunk-id="live.order" data-tags="sequence,launch,channels">
+<h2>The launch sequence</h2>
+
+<p>Order matters, because each phase de-risks the next and the cheapest channels give you the fastest feedback.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Phase</th><th>Do</th><th>Why here</th></tr></thead>
+<tbody>
+<tr><td><strong>1 · Sideload</strong></td><td>Build a directly-installable artifact; run the on-device checklist</td><td>No store, no review, no latency. Every hardware feature validated before anyone else sees it.</td></tr>
+<tr><td><strong>2 · Self-hosted libre repo</strong></td><td>Publish the libre build to your own repository</td><td>An afternoon's work, real users, and it forces you to solve the dependency problem early (<a href="17-fdroid.html">page 17</a>).</td></tr>
+<tr><td><strong>3 · Internal testing</strong></td><td>Upload to the closed store track; a handful of testers</td><td>Proves signing, the upload pipeline and version codes end to end.</td></tr>
+<tr><td><strong>4 · TestFlight internal</strong></td><td>Upload; internal testers only</td><td>Instant, no review. Proves the iOS signing chain, which is the most fragile one.</td></tr>
+<tr><td><strong>5 · TestFlight external</strong></td><td>Submit to the external group</td><td><strong>First review gate.</strong> Needs the demo video. Days of latency — start it as soon as phase 4 is green.</td></tr>
+<tr><td><strong>6 · Open testing</strong></td><td>Public opt-in on the store</td><td>Real-device diversity at scale, still reversible.</td></tr>
+<tr><td><strong>7 · Desktop</strong></td><td>Notarised DMG and signed MSI attached to a release</td><td>No review; ship whenever the artifacts are green.</td></tr>
+<tr><td><strong>8 · Production, staged</strong></td><td>Promote at a small percentage</td><td>See below.</td></tr>
+<tr><td><strong>9 · Catalog submission</strong></td><td>Open the merge request</td><td>Weeks of latency and blocks nothing. Do it in parallel with phase 6.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never let phase 9 block phases 1–8.</strong> A catalog review can take weeks and is entirely outside your control. Your own repository already serves the users who wanted a libre build. Submit and forget; respond to review comments as they arrive.</p>
+</div>
+</section>
+
+<section id="rollout" data-chunk-id="live.rollout" data-tags="rollout,release,risk">
+<h2>Staged rollout</h2>
+
+<p>Promote in steps and give each step long enough for the signal to arrive.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Stage</th><th>Hold for</th><th>Watch</th></tr></thead>
+<tbody>
+<tr><td>1–5%</td><td>24 h</td><td>Crash-free rate against the previous release; store reviews</td></tr>
+<tr><td>10%</td><td>24 h</td><td>Same, plus any backend error-rate change</td></tr>
+<tr><td>25%</td><td>48 h — spanning a weekend if the app has weekday/weekend usage differences</td><td>Same</td></tr>
+<tr><td>50%</td><td>48 h</td><td>Same</td></tr>
+<tr><td>100%</td><td>—</td><td>Keep watching for a week</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Promote from the track that is actually current.</strong> If a daily build keeps the open-testing track fresh while the closed track is rarely updated, defaulting a promotion to the closed track silently ships a stale, lower-versioned build — and the store may reject the promotion for a non-increasing version code, which at least fails loudly. One project changed its promotion default specifically because of this. Make the source track an explicit, deliberate parameter.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the build succeeds, the upload fails on an argument error.</strong> Release notes containing embedded double quotes get argument-split when passed through a CI invocation. Because the build already succeeded, it reads as a mysterious late failure. Phrase release notes with single quotes or pass them via a file. Re-dispatching is safe — a fresh build number is minted.</p>
+</div>
+
+<p>Apple has no percentage rollout in the same form; the equivalent levers are phased release and holding a version in review until you are ready. Plan the two channels' timing separately rather than trying to synchronise them.</p>
+</section>
+
+<section id="rollback" data-chunk-id="live.rollback" data-tags="rollback,incident,release">
+<h2>Rollback</h2>
+
+<p>You cannot un-ship a version. What you can do is halt, supersede and communicate — decide which before you need it.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Situation</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>Bad build, staged rollout not complete</td><td><strong>Halt the rollout.</strong> Immediate; users past the halt keep the bad build, but no new ones get it.</td></tr>
+<tr><td>Bad build, fully rolled out</td><td>Ship a fix as a <em>higher</em> version. There is no downgrade — a version code must always increase.</td></tr>
+<tr><td>Bad build on iOS</td><td>Remove from sale or expire the TestFlight build, then submit a fix. Review latency applies, so this is slower than the other store.</td></tr>
+<tr><td>Bad build in your own repository</td><td>Rebuild the index with the previous artifact. This is the one channel where a true rollback is possible.</td></tr>
+<tr><td>Bad data rather than bad code</td><td>Fix it server-side if you can. A remote fix beats a client release every time — which is an argument for a small remote configuration surface.</td></tr>
+<tr><td>Bad desktop artifact</td><td>Delete the release asset and re-attach a corrected one. No install-base impact until someone downloads.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Write the halt procedure down before launch, with the exact console path.</strong> During an incident nobody should be navigating a console for the first time. Two sentences and a URL in the release documentation is enough, and it is the difference between halting in two minutes and halting in twenty.</p>
+</div>
+</section>
+
+<section id="firstweek" data-chunk-id="live.firstweek" data-tags="monitoring,launch,support">
+<h2>The first week</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Watch</th><th>Where</th><th>Acting threshold</th></tr></thead>
+<tbody>
+<tr><td>Crash-free rate</td><td>Store vitals — no SDK needed</td><td>Any drop against the previous release</td></tr>
+<tr><td>Store reviews</td><td>Both consoles</td><td>Read every one for the first week; they name the confusing part of your onboarding better than any analysis</td></tr>
+<tr><td>Excessive-resource warnings</td><td>Android vitals</td><td>Wake locks, background CPU, ANRs — these get you delisted, not just downranked</td></tr>
+<tr><td>Backend error rate</td><td>Your own logs</td><td>A launch is your first real load test</td></tr>
+<tr><td>Third-party endpoints</td><td>The canary (<a href="05-traceability.html#canary">page 05</a>)</td><td>Real usage finds rate limits synthetic probes do not</td></tr>
+<tr><td>Issue tracker</td><td>Your repository</td><td>The template's version field is what makes reports actionable</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a user insists a fixed bug is still present.</strong> Check their version before anything else. Open-testing channels lag production, and a user who joined a testing programme keeps receiving that channel's builds. The fastest resolution is to sideload a build from current mainline and confirm against that. Put the version and build number somewhere a user can read out — an about screen — and require it in the bug template.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>On day one, install from each public channel yourself, on a device that has never had the app: the store listing, your own repository, and each desktop download. Not the artifact you built — the one the channel actually serves. This catches a wrong signature, a broken download link, a missing asset and a stale index, all of which are invisible from the publishing side.</p>
+</div>
+</section>
+
+<section id="cadence" data-chunk-id="live.cadence" data-tags="release,cadence,automation">
+<h2>Steady-state cadence</h2>
+
+<p>After launch, most of this should run without you. A workable shape:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Cadence</th><th>What</th><th>Trigger</th></tr></thead>
+<tbody>
+<tr><td><strong>Daily</strong></td><td>A build to the open-testing track, tagged back to its commit</td><td>Scheduled</td></tr>
+<tr><td><strong>Daily</strong></td><td>A TestFlight build to the external group</td><td>Scheduled, staggered from the above</td></tr>
+<tr><td><strong>Nightly</strong></td><td>The full suite including tag-excluded tests</td><td>Scheduled</td></tr>
+<tr><td><strong>Weekly</strong></td><td>Dependency updates; endpoint canary</td><td>Scheduled</td></tr>
+<tr><td><strong>Per release</strong></td><td>Changelog entry, tag, staged promotion, desktop artifacts</td><td>A version tag</td></tr>
+<tr><td><strong>Per release</strong></td><td>A fresh demo video if hardware flows changed</td><td>Manual — the one genuinely unautomatable step</td></tr>
+<tr><td><strong>Quarterly</strong></td><td>Restore drill; capturing-proxy session; known-gaps review</td><td>Manual</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>No release-process optimisation may introduce a step that needs a human.</strong> The value of the pipeline is that a tag produces artifacts on every channel without supervision. A "quick manual check" added to the middle of it becomes the bottleneck for every future release, and it will be skipped under time pressure — which is worse than not having it. If a check matters, automate it or move it before the tag.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why keep a daily build even with no daily changes</span>
+<p>Three reasons. It proves the entire release pipeline still works — signing certificates expire, tokens are revoked, runner images change under you, and you want to discover that on a Tuesday rather than during a launch. It keeps the version-code sequence moving so there is never a gap to reason about. And it means "ship a fix" is an ordinary operation the pipeline performs nightly, not an exceptional one nobody has done in three months.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>Both projects' release workflows and their go-live documentation: the staged-rollout percentages and hold times, the promotion-source-track default change, the daily build-and-tag cadence, and the changelog gate on tag-triggered releases.</li>
+<li>One project's owner-blocked-items list — the console steps with no API, the foreground-service declaration with its video requirement, and the catalog submission running in parallel — and its irreplaceable-material inventory.</li>
+<li>The other project's per-channel notes: the App Store Connect app record that must pre-exist, the account-holder-only certificate, and the honest-degradation naming of unsigned desktop artifacts.</li>
+<li>Post-mortems supplying the traps: the quoted release notes, the silently-ignored store graphic, the metadata sync that deletes remote images, and the stale testing-channel build.</li>
+</ul>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

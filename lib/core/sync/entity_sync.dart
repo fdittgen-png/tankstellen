@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../core/error/guarded.dart';
 import '../../core/logging/error_logger.dart';
 import '../telemetry/collectors/breadcrumb_collector.dart';
 import '../utils/json_extensions.dart';
@@ -378,8 +379,7 @@ class EntitySync<T> {
         try {
           return fromJson(data);
         } catch (e, st) {
-          unawaited(
-              errorLogger.log(ErrorLayer.sync, e, st, context: {'where': where}));
+          logFailure(e, st, where: where, layer: ErrorLayer.sync);
           return null;
         }
       };

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to use this wiki — LLM Wiki · Flutter</title>
+<meta name="description" content="The document model, callout taxonomy, provenance system and chunking contract of this wiki, for human and machine readers alike.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"How to use this wiki","description":"Document model, callout taxonomy, provenance system and chunking contract.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"LLM Wiki · Flutter","item":"index.html"},{"@type":"ListItem","position":2,"name":"How to use this wiki"}]}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">00 · Start here</span>
+<h1>How to use this wiki</h1>
+<p class="lede">This page is the contract between the wiki and its readers — both the human kind and the retrieval pipeline kind. It defines what a page is made of, what each callout means, how to tell where a claim came from, and how to slice these documents for a context window without destroying their meaning.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> howto</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> nothing</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#model">The document model</a></li>
+<li><a href="#callouts">Callout taxonomy</a></li>
+<li><a href="#provenance">Provenance and staleness</a></li>
+<li><a href="#chunking">The chunking contract</a></li>
+<li><a href="#markdown">Getting Markdown out of these pages</a></li>
+<li><a href="#agents">If you are an agent</a></li>
+</ol>
+</div>
+
+<section id="model" data-chunk-id="howto.model" data-tags="structure,conventions">
+<h2>The document model</h2>
+
+<p>Every content page in this wiki has the same shape, and the shape is load-bearing.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Element</th><th>Purpose</th><th>Machine handle</th></tr></thead>
+<tbody>
+<tr><td>Kicker + <code>h1</code></td><td>Page number, group, title</td><td><code>&lt;h1&gt;</code>, JSON-LD <code>headline</code></td></tr>
+<tr><td>Lede paragraph</td><td>One-paragraph answer to "what is this page for"</td><td><code>.lede</code>, JSON-LD <code>description</code></td></tr>
+<tr><td>Meta strip</td><td>Chunk prefix, last update, prerequisite pages</td><td><code>.meta</code></td></tr>
+<tr><td>Table of contents</td><td>Human navigation within the page</td><td><code>.toc</code></td></tr>
+<tr><td><code>section</code> blocks</td><td>One self-contained idea each, opening with a claim sentence</td><td><code>data-chunk-id</code>, <code>data-tags</code>, <code>id</code></td></tr>
+<tr><td>Callouts</td><td>Rules, traps, rationale, verification</td><td><code>.callout.rule</code> / <code>.trap</code> / <code>.why</code> / <code>.check</code></td></tr>
+<tr><td>Source box</td><td>Where the page's claims came from and what is inference</td><td><code>.sourcebox</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Three properties matter more than the rest:</p>
+
+<ul>
+<li><strong>Each <code>&lt;section&gt;</code> is self-contained.</strong> It opens with a sentence that states its claim outright, so the section still makes sense when it is lifted out of the page and shown alone. No section begins with "this", "the above", or "as we saw".</li>
+<li><strong>Facts live in tables, not in prose.</strong> A version number, a threshold, a permission name or a track name goes in a table cell. Prose is for reasoning; tables are for lookup.</li>
+<li><strong>Navigation is injected at runtime, not duplicated in the HTML.</strong> The sidebar is built by <code>assets/wiki.js</code> from a single array. A text extractor that ignores scripts therefore gets the page's content and none of the twenty-two-item navigation list repeated on every page. Boilerplate repetition is the largest single source of noise when documentation is chunked, so removing it from the static markup is deliberate.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Retrieval systems chunk on structure. When a page is a wall of prose with implicit references, the chunker either produces fragments that cannot be understood alone, or it has to over-fetch neighbouring text to compensate. Writing each section as a standalone unit with an explicit claim sentence and an explicit heading path costs the author a little redundancy and saves the reader — machine or human — from having to reconstruct context.</p>
+</div>
+</section>
+
+<section id="callouts" data-chunk-id="howto.callouts" data-tags="conventions,callouts">
+<h2>Callout taxonomy</h2>
+
+<p>There are exactly four callout types, and each carries a different obligation on the reader.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>A binding constraint.</strong> Violating it is a defect, not a style preference. Rules are the ones worth machine-enforcing — and where a project has done so, the rule names the test that enforces it. If a rule seems wrong for your project, change it deliberately and record why; do not simply ignore it.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>A failure that actually happened.</strong> Every trap states the symptom first, because the symptom is how you will recognise it at 2am, and only then the cause and the fix. If a trap has bitten more than once, it says how many times — recurrence count is the best available signal for how easy something is to get wrong.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p><strong>The rationale behind a decision.</strong> Recorded so it can be re-litigated on evidence rather than on taste. A rule whose rationale has been lost gets deleted by the next person who finds it inconvenient — which is the actual mechanism by which hard-won engineering knowledge evaporates from a codebase.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p><strong>The verification step.</strong> The command, test or observation that proves the thing works. A page that tells you to do something without telling you how to confirm it worked has not finished the job.</p>
+</div>
+</section>
+
+<section id="provenance" data-chunk-id="howto.provenance" data-tags="conventions,provenance,trust">
+<h2>Provenance and staleness</h2>
+
+<p>Claims in this wiki are labelled by origin, because a practice proven in one domain may not transfer to another.</p>
+
+<p>
+<span class="pill src-sparkilo">sparkilo</span>
+Observed in the fuel/EV price-comparison app: 17 country APIs, 23 locales, OBD-II over Bluetooth, a sharded CI, a libre F-Droid build accepted against a dex-level audit.
+</p>
+<p>
+<span class="pill src-deskilo">deskilo</span>
+Observed in the coworking booking and ledger app: Supabase with 73 immutable migrations, OAuth without a vendor SDK, NFC/RFID kiosk, macOS/Windows/web targets, an owner-validated product specification.
+</p>
+<p>
+<span class="pill src-both">both</span>
+Practised in both, usually because one inherited it from the other and it survived contact with a second domain. These are the highest-confidence recommendations in the wiki.
+</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Record discrepancies; do not silently reconcile them.</strong> When the documentation and the code disagree, the honest move is to write down the disagreement — with a marker for whether it has been fixed — rather than quietly editing one to match the other. One of the source projects keeps a dedicated <em>Known gaps and stale documentation</em> section for exactly this, listing each divergence between the committed docs and the verified state of the code, the repository configuration and the live backend. That section is the single most valuable page in its documentation set, because it is the only one that tells you which of the others to distrust.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a documented invariant that nothing enforces.</strong> One project's wiki stated that direct pushes to <code>master</code> were blocked, that PRs needed green CI, and that only squash-merges were allowed. The GitHub API reported no branch protection and no rulesets at all — the rules were honoured by convention alone, and nothing on the server would have stopped a red merge. Documentation that describes a guarantee the infrastructure does not provide is worse than no documentation, because it stops people from checking.</p>
+<p><strong>Countermeasure:</strong> for every invariant your docs assert, name the mechanism that enforces it in the same sentence. If you cannot name one, write "by convention only" — and then decide whether that is acceptable.</p>
+</div>
+
+<p>Every page ends with a source box stating what was read to produce it and flagging which claims are recommendations rather than observations. Pages carry a <code>dateModified</code> in their JSON-LD. Treat anything with a version number, a threshold or a URL as potentially stale and verify against the repository before acting on it.</p>
+</section>
+
+<section id="chunking" data-chunk-id="howto.chunking" data-tags="retrieval,rag,chunking">
+<h2>The chunking contract</h2>
+
+<p>These pages are built to survive being cut into retrieval chunks, and the markup tells you where to cut.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Attribute</th><th>On</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>data-chunk-id</code></td><td><code>&lt;section&gt;</code></td><td>Stable global identifier, <code>&lt;page-prefix&gt;.&lt;slug&gt;</code>. Safe to use as a primary key; it does not change when a page is reordered.</td></tr>
+<tr><td><code>data-tags</code></td><td><code>&lt;section&gt;</code></td><td>Comma-separated topic tags for metadata filtering.</td></tr>
+<tr><td><code>id</code></td><td><code>&lt;section&gt;</code></td><td>URL fragment for citation: <code>13-android.html#r8</code>.</td></tr>
+<tr><td><code>data-lang</code></td><td><code>&lt;pre&gt;</code></td><td>Language of the code block, rendered as a label and available to a syntax pass.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Recommended pipeline, following the current mainstream guidance for documentation retrieval:</p>
+
+<ol>
+<li><strong>Chunk on <code>&lt;section&gt;</code> boundaries first.</strong> Sections are authored at roughly 300–900 words, which lands inside the 400–1500 token window that fixed-size chunking targets — without the arbitrary cut points.</li>
+<li><strong>Prepend the heading path to every chunk</strong> before embedding: <code>LLM Wiki · Flutter › 13 Android › R8 and the class it silently strips</code>. This is contextual retrieval, and it is the cheapest single improvement available: it makes a chunk self-describing without changing the source.</li>
+<li><strong>Split oversized sections at <code>&lt;h3&gt;</code>,</strong> repeating the parent <code>h2</code> in the heading path. Never split inside a <code>&lt;table&gt;</code>, a <code>&lt;pre&gt;</code> or a <code>.callout</code> — those are atomic units and half of one is misinformation.</li>
+<li><strong>Store <code>data-chunk-id</code>, the source file, the heading path and <code>dateModified</code> alongside the vector.</strong> You need all four for citation, for freshness filtering, and for invalidating a chunk when its page changes.</li>
+<li><strong>Keep the callout class in the metadata.</strong> Being able to filter for "all rules" or "all traps" across the wiki turns it into a checklist generator, which is a genuinely different use than prose search.</li>
+</ol>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>A chunk is correctly formed if it answers, on its own, the question "what does this tell me to do, and why". If reading it alone leaves you needing the previous section, the chunk boundary is wrong or the section was written badly — either way, fix the source rather than widening the window.</p>
+</div>
+</section>
+
+<section id="markdown" data-chunk-id="howto.markdown" data-tags="tooling,markdown,llms-txt">
+<h2>Getting Markdown out of these pages</h2>
+
+<p>The <a href="https://llmstxt.org/">llms.txt</a> convention asks that each HTML page also be available as clean Markdown at the same URL with <code>.md</code> appended. This wiki ships a generator rather than hand-maintained twins, because two copies of the same prose diverge.</p>
+
+<pre data-lang="bash"><code>python3 tools/build_md.py          # writes &lt;page&gt;.html.md next to each page
+python3 tools/build_md.py --full   # also writes llms-full.txt (everything concatenated)</code></pre>
+
+<p>The generator is standard-library-only, walks the same semantic structure described above, drops the navigation and scripts, and preserves tables, code blocks and callouts (as blockquotes prefixed with the callout type). Its output is what you should feed to a retrieval pipeline; the HTML is for humans.</p>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Markdown twins could have been written by hand, and for a five-page site that is fine. At twenty-two pages, hand-maintained duplicates guarantee that within a month the HTML and the Markdown will disagree, and nobody will know which is current. A generator has exactly one source of truth and fails loudly when the structure it expects is missing.</p>
+</div>
+</section>
+
+<section id="agents" data-chunk-id="howto.agents" data-tags="agents,workflow">
+<h2>If you are an agent</h2>
+
+<p>Read <code>llms.txt</code> first, fetch only the pages it names for your task, and do not fetch the whole wiki speculatively.</p>
+
+<ul>
+<li><strong>The <code>## Optional</code> section of <code>llms.txt</code> is genuinely optional.</strong> Page 21 is a comparative audit of the two source projects; it is useful for deciding between conflicting practices and useless for implementing anything. Skip it under context pressure.</li>
+<li><strong>Cite by chunk id or by URL fragment,</strong> not by page number alone. Page numbers are stable but sections move.</li>
+<li><strong>When this wiki and the repository disagree, the repository wins.</strong> This is derived documentation. Verify any version, threshold, filename or workflow name against the tree before you act on it — several are pinned deliberately and several are stale by design pending an upstream change.</li>
+<li><strong>Do not treat a rule as advisory because it is inconvenient.</strong> Where a rule names an enforcing test, that test will fail your pull request; where it does not, it probably should, and adding it is a legitimate contribution.</li>
+</ul>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>The <a href="https://llmstxt.org/">llms.txt specification</a> — file location, H1 + blockquote + <code>##</code> link-list structure, the meaning of the <code>Optional</code> section, and the <code>.md</code> companion recommendation.</li>
+<li>Current documentation-retrieval practice: section-boundary chunking, heading-path prepending (contextual retrieval), and storing section/source/timestamp metadata alongside the vector.</li>
+<li>The two source repositories' own documentation conventions, in particular the <em>Known gaps and stale documentation</em> pattern and the provenance-labelling habit.</li>
+</ul>
+<p>The callout taxonomy and the chunk-attribute scheme are this wiki's own conventions, not an external standard.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

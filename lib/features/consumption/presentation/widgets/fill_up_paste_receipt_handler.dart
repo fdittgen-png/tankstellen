@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/ereceipt/ereceipt_text_parser.dart';
@@ -73,14 +73,7 @@ Future<void> runPasteReceiptText(
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {'where': 'AddFillUp: paste-receipt parse failed'},
-      ),
-    );
+    logFailure(e, st, where: 'AddFillUp: paste-receipt parse failed');
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.show(context, l.pasteReceiptNoData);
     }

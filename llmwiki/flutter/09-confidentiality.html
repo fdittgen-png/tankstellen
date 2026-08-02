@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Confidentiality &amp; security — LLM Wiki · Flutter</title>
+<meta name="description" content="What never leaves the device, secure storage, secret hygiene in CI, store privacy declarations, the privacy dashboard, and export/delete rights.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Confidentiality and security","description":"What never leaves the device, secure storage, secret hygiene, store privacy declarations, export and delete.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">09 · Data</span>
+<h1>Confidentiality &amp; security</h1>
+<p class="lede">Privacy claims are testable. "Your location never leaves the device" is either true — in which case you can prove it with a test and a network capture — or it is marketing. This page is about making the claims true and then keeping them true as the app grows.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> conf</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 07 Supabase · 05 Traceability</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#inventory">Start with a data inventory</a></li>
+<li><a href="#storage">Secure storage versus plain storage</a></li>
+<li><a href="#transit">Data in transit</a></li>
+<li><a href="#secrets">Secret hygiene in the repository and CI</a></li>
+<li><a href="#permissions">Permissions: ask late, explain first</a></li>
+<li><a href="#dashboard">The privacy dashboard</a></li>
+<li><a href="#declarations">Store privacy declarations</a></li>
+<li><a href="#thirdparty">Third-party code as a confidentiality surface</a></li>
+<li><a href="#tests">Security tests that pay for themselves</a></li>
+</ol>
+</div>
+
+<section id="inventory" data-chunk-id="conf.inventory" data-tags="privacy,inventory,data-classification">
+<h2>Start with a data inventory</h2>
+
+<p>Before deciding how to protect anything, write down every category of data the app touches, where it lives, and whether it ever crosses the network. Everything else follows from that table.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Category</th><th>Stored where</th><th>Leaves the device?</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Precise location</td><td>Memory only, or an encrypted box for recorded trips</td><td><strong>As a query parameter only</strong>, ephemeral, never persisted server-side</td><td>The single most sensitive item in most apps</td></tr>
+<tr><td>API keys the user entered</td><td>Platform secure store</td><td><strong>Never</strong></td><td>Also excluded from every export</td></tr>
+<tr><td>Auth tokens</td><td>Platform secure store</td><td>To the auth backend only</td><td>Managed by the auth client; verify it uses the secure store</td></tr>
+<tr><td>Backend URL and publishable key</td><td>Secure store or a build define</td><td>Public by design</td><td>See <a href="07-supabase.html#model">the trust model</a></td></tr>
+<tr><td>User content (bookings, logs, entries)</td><td>Encrypted local box</td><td>Only when the user enabled sync</td><td>Sync is opt-in and reversible</td></tr>
+<tr><td>Anonymous device identifier</td><td>Local</td><td>To the sync backend, if enabled</td><td>Not an advertising id; not shared</td></tr>
+<tr><td>Diagnostics / trace log</td><td>Local ring buffer + file</td><td><strong>Only if the user explicitly shares it</strong></td><td>Redaction list is enforced by a test</td></tr>
+<tr><td>Analytics</td><td>—</td><td>—</td><td>Not collected. Stating this is only credible if it is true.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The inventory is the source for three artifacts, and they must agree:</strong> the privacy policy, the store data-safety declarations, and the app's own privacy screen. When one changes, all three change in the same pull request. A store declaration that contradicts your privacy policy is a compliance problem; one that contradicts your actual behaviour is a removal risk.</p>
+</div>
+</section>
+
+<section id="storage" data-chunk-id="conf.storage" data-tags="storage,encryption,keystore">
+<h2>Secure storage versus plain storage</h2>
+
+<p>Two tiers, and a clear rule for which goes where: anything that authenticates or authorises goes in the platform secure store; anything personal goes in an encrypted box whose key comes from that store.</p>
+
+<pre data-lang="dart"><code>// The encryption key for the local boxes lives in the platform secure
+// store, generated once. Never a constant, never derived from something
+// guessable like a device id.
+Future&lt;List&lt;int&gt;&gt; _boxKey(FlutterSecureStorage secure) async {
+  const k = 'hive_aes_key';
+  final existing = await secure.read(key: k);
+  if (existing != null) return base64Url.decode(existing);
+  final fresh = Hive.generateSecureKey();
+  await secure.write(key: k, value: base64UrlEncode(fresh));
+  return fresh;
+}</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Goes in the secure store</th><th>Goes in an encrypted box</th><th>May be plain</th></tr></thead>
+<tbody>
+<tr><td>Auth tokens</td><td>User content and history</td><td>Theme preference</td></tr>
+<tr><td>API keys</td><td>Profiles and vehicles</td><td>Locale override</td></tr>
+<tr><td>The box encryption key</td><td>Favourites, alerts, entries</td><td>Feature toggles</td></tr>
+<tr><td>Backend credentials</td><td>Recorded location traces</td><td>Non-personal caches</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a value read through the generic settings getter is always null, and the fallback looks plausible.</strong> When a value has a dedicated accessor that reads the secure store, a generic <code>getSetting(key)</code> read of the same key compiles and returns null forever — because the value is not in that box. One project served a built-in demo dataset to every user for months because one screen bypassed the accessor. See <a href="01-foundations-architecture.html#storage">the one-accessor rule</a>. This is a confidentiality issue as much as a correctness one: the same mistake in reverse writes a secret to the plain box.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never log a secret, and never include one in an export.</strong> Add both to the redaction test. The failure is usually indirect — a whole settings map dumped into a diagnostic, a request object printed on error, an exception message that embeds a URL with a token in the query string.</p>
+</div>
+</section>
+
+<section id="transit" data-chunk-id="conf.transit" data-tags="network,tls,privacy">
+<h2>Data in transit</h2>
+
+<ul>
+<li><strong>HTTPS everywhere, enforced by a test.</strong> One project has a test asserting no configured endpoint uses plain HTTP. It is ten lines and it catches the copy-pasted example URL.</li>
+<li><strong>Send the minimum.</strong> A location-based query needs a rounded coordinate and a radius, not a full fix with altitude, speed and heading. Rounding for the <a href="06-caching.html#keys">cache key</a> conveniently also reduces what you transmit.</li>
+<li><strong>Offer a coarse alternative.</strong> If a postal-code search gives an acceptable result, offer it — then location permission becomes genuinely optional, which is both better for the user and a materially better story in the store declaration.</li>
+<li><strong>Never put a secret in a query string.</strong> Query strings appear in server logs, proxy logs and crash reports. Headers only.</li>
+<li><strong>Consider whether a proxy leaks less than a direct call.</strong> A tile or geocoding proxy you control means the third party sees your server rather than every user's IP — at the cost of you now holding those requests. Decide deliberately and write down which trade you took.</li>
+</ul>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Run the app through a capturing proxy for one full session — first launch, permission grants, a search, a sync, sign-out — and read every request. This takes half an hour and is the only way to actually know what your app sends. Do it once per release cycle; the surprises are always in a dependency, not in your code.</p>
+</div>
+</section>
+
+<section id="secrets" data-chunk-id="conf.secrets" data-tags="ci,secrets,supply-chain">
+<h2>Secret hygiene in the repository and CI</h2>
+
+<p>Distinguish public configuration from real secrets, keep real secrets out of the tree entirely, and clean up anything CI writes to disk.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Material</th><th>Public?</th><th>Where it lives</th></tr></thead>
+<tbody>
+<tr><td>Backend URL, publishable key</td><td>Yes</td><td>Committed default or build define</td></tr>
+<tr><td>Service-role key</td><td><strong>No</strong></td><td>CI secret and the backend only. Never in the app, ever.</td></tr>
+<tr><td>Android upload keystore + passwords</td><td><strong>No</strong></td><td>CI secret (base64) plus an off-machine backup</td></tr>
+<tr><td>App Store Connect <code>.p8</code> key</td><td><strong>No</strong></td><td>CI secret. <strong>Apple will not re-issue it.</strong></td></tr>
+<tr><td>Certificate-repo passphrase</td><td><strong>No</strong></td><td>CI secret plus a password manager. Losing it makes the whole repo useless.</td></tr>
+<tr><td>Play publisher service account JSON</td><td><strong>No</strong></td><td>CI secret</td></tr>
+<tr><td>Third-party API keys</td><td>Depends</td><td>Secure store on-device if user-supplied; CI secret if build-time</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="yaml"><code># Restore a keystore for signing, then ALWAYS delete it — including when
+# the build fails, which is when a forgotten file is most likely to be
+# picked up by an artifact-upload step.
+- name: Restore upload keystore
+  run: |
+    echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d &gt; android/app/upload.p12
+    cat &gt; android/key.properties &lt;&lt;EOF
+    storeFile=upload.p12
+    storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+    keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+    keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+    EOF
+
+- name: Build
+  run: flutter build appbundle --release
+
+- name: Remove signing material
+  if: always()                       # ← the important part
+  run: rm -f android/app/upload.p12 android/key.properties</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Maintain an "irreplaceable material" list and back it up off-machine.</strong> Some secrets can be rotated; some cannot. An App Store Connect private key is downloadable exactly once. A certificate-repository passphrase, if lost, makes an encrypted repository permanently unreadable — one project hit precisely this and had to create a second certificate repository rather than recover the first. Write the list into the release documentation with a note on where each backup lives.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Secrets are unavailable to pull requests from forks, and that is correct.</strong> Design workflows to <em>degrade honestly</em> rather than fail confusingly: produce an unsigned artifact with a warning, skip the upload with a loud message. A dependency-update bot's pull request must still be able to build and test. See <a href="04-robustness.html#honest">honest degradation</a>.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Run a secret scanner over the full history, not just the working tree — <code>gitleaks detect --no-git=false</code> or equivalent. A key committed and then removed is still in the history and still compromised. If you find one, rotate it; deleting the commit is not sufficient because clones and forks exist.</p>
+</div>
+</section>
+
+<section id="permissions" data-chunk-id="conf.permissions" data-tags="permissions,ux,app-store">
+<h2>Permissions: ask late, explain first</h2>
+
+<p>Request a permission at the moment the user asks for the feature that needs it, after a screen explaining why — and that explanation screen must never block the app.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>A pre-permission explainer is Continue-only, and always proceeds.</strong> This is an App Store review requirement and it was the basis of a real 5.1.1 rejection. The screen may explain and it may offer Continue; it may not gate the app behind granting. The user must be able to reach the app's functionality — degraded, but reachable — without granting anything.</p>
+</div>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Permission</th><th>Ask when</th><th>Degrade to</th></tr></thead>
+<tbody>
+<tr><td>Location (while in use)</td><td>The user taps "search near me"</td><td>Manual location entry / postal code</td></tr>
+<tr><td>Location (background)</td><td>Only when a background feature is enabled, and never at first launch</td><td>Foreground-only operation, clearly labelled</td></tr>
+<tr><td>Bluetooth</td><td>The user opens the device-pairing screen</td><td>Everything that does not need a device</td></tr>
+<tr><td>Camera</td><td>The user taps scan or capture</td><td>Manual entry, file picker</td></tr>
+<tr><td>NFC</td><td>The user opens the tap surface</td><td>Manual identifier entry — see <a href="12-nfc-rfid.html">page 12</a></td></tr>
+<tr><td>Notifications</td><td>The user enables a feature that notifies</td><td>In-app indicators</td></tr>
+<tr><td>Storage</td><td>Never, if you can avoid it</td><td>A document picker needs no permission on modern Android</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: your manifest declares permissions you have never used.</strong> Dependencies merge their manifests into yours. One project shipped microphone, phone-state and legacy-storage permissions purely from libraries — nothing in the app ever used them. Users read the permission list, and reviewers do too. Audit the <em>merged</em> manifest, not your source manifest, and remove unwanted entries with a manifest-merger removal directive.</p>
+<pre data-lang="xml"><code>&lt;uses-permission android:name="android.permission.RECORD_AUDIO"
+                 tools:node="remove" /&gt;</code></pre>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Inspect the merged manifest after every dependency change: <code>./gradlew :app:processPlayReleaseManifest</code> then read <code>app/build/intermediates/merged_manifests/…/AndroidManifest.xml</code>. Add a test asserting the permission set matches an expected list, so a new dependency's additions are a build failure rather than a store surprise.</p>
+</div>
+</section>
+
+<section id="dashboard" data-chunk-id="conf.dashboard" data-tags="privacy,ux,gdpr,export">
+<h2>The privacy dashboard</h2>
+
+<p>One screen where the user can see every category of stored data, export all of it, and delete all of it. This is both a legal requirement in several jurisdictions and the most credible possible statement of your privacy claims.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Element</th><th>Behaviour</th></tr></thead>
+<tbody>
+<tr><td><strong>Per-category row counts</strong></td><td>What is stored, how much of it, in the user's own terms</td></tr>
+<tr><td><strong>Export</strong></td><td>One tap to JSON and CSV. Everything the user created, nothing secret.</td></tr>
+<tr><td><strong>Diagnostics export</strong></td><td>The trace log as a separate, clearly-labelled action</td></tr>
+<tr><td><strong>Delete everything (local)</strong></td><td>One tap, confirmed once, actually deletes — including caches</td></tr>
+<tr><td><strong>Delete everything (server)</strong></td><td>If sync is enabled, a distinct action that removes server rows too</td></tr>
+<tr><td><strong>Plain-language summary</strong></td><td>What never leaves the device, what does, and under what condition</td></tr>
+<tr><td><strong>Sync status</strong></td><td>Whether it is on, where it points, when it last ran</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Export must exclude every secret, and a test must prove it.</strong> Generate an export in a test with secrets populated and assert that no known secret key name or value appears in the output. Users share exports with support, in bug reports, and in public forums.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>"Delete everything" must include caches and derived data.</strong> A delete that clears the user's entries but leaves a cached response containing the same rows has not deleted anything. Enumerate the stores in the delete path the same way you enumerate them for <a href="06-caching.html#invalidation">cache invalidation</a>, and test it by asserting the store is empty afterwards.</p>
+</div>
+
+<p>A useful addition observed in one project: a <strong>test button for a hard-to-reproduce surface</strong> — a control that pushes a synthetic signal so a driving-mode overlay can be verified from a desk rather than a moving car. It costs little and turns an untestable feature into a testable one.</p>
+</section>
+
+<section id="declarations" data-chunk-id="conf.declarations" data-tags="app-store,play,compliance">
+<h2>Store privacy declarations</h2>
+
+<p>Both stores require a structured declaration of what you collect. Derive it from the inventory, keep it in the repository, and treat a change to it as a change requiring review.</p>
+
+<pre data-lang="markdown"><code># docs/play-store/DATA_SAFETY.md — the answer sheet, version-controlled
+
+- Collects or shares user data?      Yes
+- All data encrypted in transit?     Yes (HTTPS/TLS everywhere)
+- Users can request deletion?        Yes — in-app: Settings → Delete all data;
+                                     server: Sync → Data transparency → Delete
+- Privacy policy URL:                https://…/privacy-policy/
+
+## Location
+Collected? Yes · Approximate · Shared with third parties? Yes — sent to the
+price API as a search parameter · Processed ephemerally? Yes, never stored
+server-side · Required or optional? Optional (postal-code search available)
+· Purpose: app functionality
+
+## Device or other IDs
+Device IDs? No · Other identifiers? Yes — an anonymous UUID if sync is enabled
+· Shared? No · Optional? Yes · Purpose: app functionality
+
+## NOT collected
+Name, email (unless the user creates an account), phone, contacts, photos,
+messages, files, calendar, health, financial info, browsing history,
+installed apps, advertising ID, crash-free analytics.</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Keep the answer sheet in the repository, next to the privacy policy, and diff them against each other.</strong> The store console is a form you fill in once and forget; the repository copy is reviewable in a pull request. When a feature adds a data category, the reviewer sees the declaration change alongside the code.</p>
+</div>
+
+<p>Apple's equivalent is the privacy nutrition label plus, since recent SDK requirements, a <strong>privacy manifest</strong> for your app and for each third-party SDK that requires one. Audit your dependency list against Apple's required-reason API list before a submission; a missing manifest is an automated rejection at upload, not a review finding — so it fails fast, which is at least merciful.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the store's privacy-policy URL points somewhere that no longer exists.</strong> Store consoles hold their own copy of the URL, and a documentation-site restructure does not update it. One project moved its policy to a new path and had to update the console field by hand. Add "verify the privacy-policy URL resolves" to the go-live checklist in <a href="19-go-live.html">page 19</a>.</p>
+</div>
+</section>
+
+<section id="thirdparty" data-chunk-id="conf.thirdparty" data-tags="dependencies,supply-chain,licensing">
+<h2>Third-party code as a confidentiality surface</h2>
+
+<p>Every dependency can make network calls you did not write. Treat the dependency list as part of the privacy inventory.</p>
+
+<ul>
+<li><strong>Audit what a new dependency pulls in transitively</strong>, not just what it declares. An innocuous-looking plugin can drag in an entire proprietary services stack.</li>
+<li><strong>Run a licence audit in CI.</strong> Both projects forbid GPL dependencies; the check is a script over the resolved dependency set. Catching it at add-time is cheap, catching it at release-time is not.</li>
+<li><strong>Prefer packages that need no runtime permission.</strong> A document-picker package that routes through the OS picker needs no storage permission; a file-browser package does.</li>
+<li><strong>For a build channel that forbids proprietary code, prove the absence at the bytecode level</strong>, not the declaration level. Reference-level proof is a stricter bar than "no declared dependency" and it is the bar F-Droid actually applies — see <a href="17-fdroid.html#audit">page 17</a>.</li>
+<li><strong>Compile out anything that phones home, per channel.</strong> One project ships a crash reporter on the store builds and removes it entirely from the libre build, because a reporting SDK is classified as tracking there.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why the bytecode bar exists</span>
+<p>A dependency graph tells you what was <em>declared</em>. It does not tell you what survived into the shipped artifact, and it does not catch a dangling type reference that a scanner will flag. One project's catalog submission was rejected on references that a dependency-graph audit — and even a debug-build bytecode audit — could not see, because only the release-mode shrinker removes the dead code that carries them. If a channel's scanner reads the artifact, your audit must read the artifact too.</p>
+</div>
+</section>
+
+<section id="tests" data-chunk-id="conf.tests" data-tags="testing,security,ci">
+<h2>Security tests that pay for themselves</h2>
+
+<p>Six tests, each a few dozen lines, that between them cover the failure modes that actually occur.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Test</th><th>Asserts</th></tr></thead>
+<tbody>
+<tr><td><strong>No hard-coded secrets</strong></td><td>No source file contains a string matching known key shapes (JWT prefix, private-key header, long base64 assigned to a suggestive name)</td></tr>
+<tr><td><strong>No plaintext endpoints</strong></td><td>Every configured URL is <code>https://</code></td></tr>
+<tr><td><strong>Manifest security</strong></td><td>No <code>allowBackup</code> where it would leak data, no cleartext traffic, no exported component that should not be, and the permission set matches the expected list</td></tr>
+<tr><td><strong>Export redaction</strong></td><td>A generated export with secrets populated contains none of them</td></tr>
+<tr><td><strong>Authorisation matrix</strong></td><td>For each role, an operation that should be denied <em>is</em> denied — run against the real backend policies, not a fake</td></tr>
+<tr><td><strong>Privacy-doc parity</strong></td><td>The privacy policy, the data-safety sheet and the in-app summary list the same categories</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="dart"><code>test('exports contain no secret material', () async {
+  await apiKeys.write('tankerkoenig', 'SECRET-KEY-VALUE');
+  await secure.write(key: 'auth_token', value: 'SECRET-TOKEN-VALUE');
+
+  final export = await PrivacyExporter(storage, apiKeys).toJson();
+
+  expect(export, isNot(contains('SECRET-KEY-VALUE')));
+  expect(export, isNot(contains('SECRET-TOKEN-VALUE')));
+  for (final k in const ['auth_token', 'api_key', 'service_role', 'password']) {
+    expect(export.toLowerCase(), isNot(contains(k)));
+  }
+});</code></pre>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Once per release, do the three manual checks no test replaces: read the merged manifest, run one full session through a capturing proxy, and open an export in a text editor and read it. Each takes minutes and each has caught something that automation did not.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's privacy dashboard, its committed data-safety answer sheet, its security test suite (hard-coded secrets, plaintext endpoints, manifest security, RLS), and its decision to compile the crash reporter out of the libre channel.</li>
+<li>Both projects' CI signing steps with their <code>if: always()</code> cleanup, and one project's irreplaceable-material list.</li>
+<li>Post-mortems supplying the traps: the unused permissions merged in from dependencies, the moved privacy-policy URL, the accessor bypass, the lost certificate-repository passphrase, and the catalog rejection on bytecode references invisible to a dependency-graph audit.</li>
+<li>The App Store 5.1.1 rejection that produced the Continue-only pre-permission rule.</li>
+</ul>
+<p>The data inventory table is a composite of both projects; your categories will differ. The test snippets are illustrative reconstructions.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

@@ -847,9 +847,17 @@ void main() {
     // (the connect-failure catch now logs e/st before the mounted check).
     // 6 bumps — decomposition forced (#3141), tracked by the OPEN #3140
     // (successor to the closed #2187/#2188 the comments above reference).
+    // RATCHETED DOWN 555 -> 513: the `_buildBody` error branch moved to
+    // `obd2_scan_error_state.dart` and the empty branch to
+    // `obd2_scan_empty_state.dart` — real progress on #3140, not a bump.
+    // Then 513 -> 554 (bump 7, #3140 still open): the scan-readiness
+    // PRE-FLIGHT (#3140-adjacent UX fix) — resolve the probe before
+    // burning a radio-scan window so a blocked user gets the diagnostic
+    // instantly instead of after a guaranteed-timeout spinner. Net vs.
+    // the pre-decomposition 555: -1.
     'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': (
-      lines: 555,
-      bumps: 6,
+      lines: 554,
+      bumps: 7,
       decompositionIssue: 3140,
     ),
     // #2624 — shrank 463 → 450: dropped the post-frame `fitCamera` block

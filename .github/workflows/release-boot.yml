@@ -1,0 +1,194 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+# Release-launch aliveness check.
+#
+# ADVISORY workflow — deliberately NOT a required check. It builds a full
+# R8-shrunk release APK and boots an emulator; a transient Gradle or KVM
+# failure must never block `gh pr merge --auto`. Treat a red run as a real
+# signal to investigate, not as a merge gate.
+#
+# ## Why this exists
+#
+# The suite has ~15 000 tests and not one of them proves the artifact users
+# actually receive can reach its first frame. Code shrinking runs ONLY on
+# release builds, so an entire class of crash exists exclusively in the
+# shipped APK:
+#
+#   * R8 strips a class nothing references statically — used via reflection,
+#     by a serialisation library, or by a platform callback;
+#   * a `-keep` rule that used to cover it stops matching after a dependency
+#     bump renames a package;
+#   * a plugin's own consumer rules change under a version bump.
+#
+# All three produce the same symptom: the release build dies before the first
+# frame, every unit test passes, and the debug build is fine. The
+# countermeasure is not a better rule set — it is a test that runs the
+# artifact. Install it, launch it, assert the process is still alive.
+#
+# Crude, and it catches the whole class.
+
+name: Release boot check
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref to build (default: the triggering ref)'
+        required: false
+        type: string
+  push:
+    branches: [master]
+    paths:
+      # The surfaces that can break a release-only launch: app bootstrap,
+      # shrinker configuration, the Gradle build, and the dependency set.
+      - 'lib/main.dart'
+      - 'lib/app/**'
+      - 'lib/core/storage/**'
+      - 'lib/core/logging/**'
+      - 'lib/core/telemetry/**'
+      - 'android/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/release-boot.yml'
+
+concurrency:
+  group: release-boot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  boot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Pinned to the build-android-green SDK — same value as ci.yml.
+          flutter-version: "3.41.9"
+          cache: true
+
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: >-
+            ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*',
+            'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - run: flutter pub get
+
+      # No build_runner: generated files are committed (#1730) and the
+      # codegen-drift job in ci.yml already proves they are current.
+
+      # A THROWAWAY-signed release build. `flutter build apk --release`
+      # refuses to run without a release keystore (#48 forbids a silent
+      # debug-key fallback for real releases), but this artifact is never
+      # uploaded anywhere — it exists only to be launched on an emulator.
+      # The R8 shrinking, which is the entire point, is identical under
+      # any signing key.
+      #
+      # A keystore is GENERATED here rather than pointing at the runner's
+      # `~/.android/debug.keystore`: (a) that file does not exist on a
+      # fresh runner until AGP's *debug* signing config lazily creates it
+      # — wired as the *release* keystore it is just a missing file; and
+      # (b) `${{ env.ANDROID_SDK_ROOT }}` in an expression is empty — the
+      # `env.` context sees only workflow-declared vars, not runner
+      # machine vars.
+      - name: Generate a throwaway signing keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore "$RUNNER_TEMP/throwaway.jks" \
+            -storepass throwaway -keypass throwaway \
+            -alias throwaway -keyalg RSA -keysize 2048 -validity 1 \
+            -dname "CN=release-boot-check, OU=CI, O=none"
+
+      - name: Build the R8-shrunk release APK (throwaway-signed, never shipped)
+        run: |
+          flutter build apk --release --flavor play \
+            --target-platform android-x64 \
+            --build-number=1
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/throwaway.jks
+          ANDROID_KEYSTORE_PASSWORD: throwaway
+          ANDROID_KEY_ALIAS: throwaway
+          ANDROID_KEY_PASSWORD: throwaway
+
+      - name: Enable KVM for hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Cache the AVD snapshot — first run provisions it (~8-10 min),
+      # later runs boot from the snapshot in about two.
+      - name: Cache the AVD snapshot
+        uses: actions/cache@v6
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34-pixel6
+
+      - name: Create the AVD and generate a snapshot
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          force-avd-creation: false
+          emulator-options: >-
+            -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+            -camera-back none
+          disable-animations: false
+          script: echo "AVD snapshot generated"
+
+      - name: Install, launch, and assert the process survives
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          force-avd-creation: false
+          emulator-options: >-
+            -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio
+            -no-boot-anim -camera-back none
+          disable-animations: true
+          script: bash scripts/assert_release_boots.sh
+
+      # Always upload: on failure the log IS the investigation, and on
+      # success it is the baseline to diff the next failure against.
+      - name: Upload logcat
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-boot-logcat
+          path: |
+            /tmp/release-boot-logcat.txt
+            /tmp/release-boot-crash.txt
+          if-no-files-found: ignore
+          retention-days: 14

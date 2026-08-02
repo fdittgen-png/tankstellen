@@ -17,7 +17,7 @@ import '../../../price_history/presentation/widgets/price_stats_card.dart';
 import '../../../price_history/providers/price_history_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Price history graph widget that records the current price on init
 /// and always shows the chart (even with a single data point).
@@ -114,14 +114,7 @@ class _PriceHistorySectionState extends ConsumerState<PriceHistorySection> {
         }
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'PriceHistory DB fetch failed'},
-        ),
-      );
+      logFailure(e, st, where: 'PriceHistory DB fetch failed');
     }
     if (mounted) setState(() => _fetchedFromDb = true);
   }

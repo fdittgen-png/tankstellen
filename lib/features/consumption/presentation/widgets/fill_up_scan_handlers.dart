@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/feedback/github_issue_reporter.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -138,14 +138,7 @@ Future<void> runReceiptScan(
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {'where': 'runReceiptScan: receipt scan failed'},
-      ),
-    );
+    logFailure(e, st, where: 'runReceiptScan: receipt scan failed');
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.showError(context, l.scanReceiptFailed(e.toString()));
     }
@@ -221,16 +214,7 @@ Future<void> runPumpDisplayScan(
       SnackBarHelper.show(context, l.scanPumpSuccess);
     }
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {
-          'where': 'runPumpDisplayScan: pump display scan failed',
-        },
-      ),
-    );
+    logFailure(e, st, where: 'runPumpDisplayScan: pump display scan failed');
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.showError(context, l.scanPumpFailed(e.toString()));
     }

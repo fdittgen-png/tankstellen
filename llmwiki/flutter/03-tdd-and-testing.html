@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TDD &amp; the test pyramid — LLM Wiki · Flutter</title>
+<meta name="description" content="The 70/20/10 pyramid, the eight-step bug-fix protocol, twin-bug audits, fakes over mocks, false-green failure modes, coverage gates and CI sharding.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"TDD and the test pyramid","description":"The 70/20/10 pyramid, the eight-step bug-fix protocol, twin-bug audits, fakes over mocks, false-green failure modes.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">03 · Method</span>
+<h1>TDD &amp; the test pyramid</h1>
+<p class="lede">Tests exist to make a specific claim false when the code is wrong. Most of this page is about the ways a test suite can be large, green and worthless — because that is the failure mode that actually happens, and every rule here was written after one of them shipped.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> test</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#pyramid">The pyramid and what goes in each layer</a></li>
+<li><a href="#bugfix">The eight-step bug-fix protocol</a></li>
+<li><a href="#twin">Twin-bug audits</a></li>
+<li><a href="#false-green">False-green tests</a></li>
+<li><a href="#fakes">Fakes over mocks, and the shared override helper</a></li>
+<li><a href="#lint-tests">Tests that enforce architecture</a></li>
+<li><a href="#goldens">Goldens, accessibility and time</a></li>
+<li><a href="#running">Running the suite without lying to yourself</a></li>
+<li><a href="#coverage">Coverage gates and what they are worth</a></li>
+<li><a href="#recurrence">Regression escalation</a></li>
+</ol>
+</div>
+
+<section id="pyramid" data-chunk-id="test.pyramid" data-tags="testing,pyramid,strategy">
+<h2>The pyramid and what goes in each layer</h2>
+
+<p>Target 70% unit, 20% widget, 10% integration — and note that the ratio is achievable only because <code>domain/</code> is pure Dart.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Layer</th><th>Share</th><th>What belongs here</th><th>Speed</th></tr></thead>
+<tbody>
+<tr><td><strong>Unit</strong></td><td>70%</td><td>Domain services, calculators, parsers, state reducers, cache logic, anything in <code>domain/</code>. No widget tester, no pump.</td><td>Sub-millisecond each</td></tr>
+<tr><td><strong>Widget</strong></td><td>20%</td><td>A screen renders the right thing for a given provider state; a tap dispatches the right call; a hidden feature stays hidden.</td><td>Tens of milliseconds</td></tr>
+<tr><td><strong>Integration</strong></td><td>10%</td><td>Boot, first-run wizard, a full flow across screens, and on-device behaviour that a headless test cannot reach.</td><td>Seconds; runs on a device or emulator</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Two further categories sit outside the pyramid and are worth naming separately because they behave differently in CI:</p>
+
+<ul>
+<li><strong>Static lint tests</strong> — plain Dart tests that read the source tree and assert on it. They are unit tests by mechanism but architecture enforcement by purpose. See <a href="#lint-tests">below</a>.</li>
+<li><strong>Aliveness tests</strong> — a test that installs the real release artifact on a real emulator and asserts the process is still running fifteen seconds later. Not a unit test in any sense; the only thing that catches a class of failure described in <a href="13-android.html#r8">page 13</a>.</li>
+</ul>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Tag tests that cannot be trusted to gate a pull request, and exclude them by tag rather than by deletion.</strong> Two tags earn their keep: <code>network</code> for tests that hit real third-party APIs (an upstream timeout must never block a merge) and <code>flaky</code> for tests that have observably flaked without a related code change. Run PR and mainline CI with <code>--exclude-tags=network,flaky</code>, and run both tag sets in a nightly job so a genuine regression still surfaces within a day.</p>
+<pre data-lang="yaml"><code># dart_test.yaml — declaring the tags stops the runner warning about them
+tags:
+  network:
+    description: Hits real third-party APIs. Run on demand.
+  flaky:
+    description: Observably flaked in CI without a related code change.</code></pre>
+</div>
+</section>
+
+<section id="bugfix" data-chunk-id="test.bugfix" data-tags="testing,bug-fix,protocol,tdd">
+<h2>The eight-step bug-fix protocol</h2>
+
+<p>Every bug fix starts with a test that fails <em>for the same reason the app fails</em>. The remaining steps exist because each of them was skipped once and cost a second round-trip.</p>
+
+<ol>
+<li><strong>Grep the UI to find the exact method the failing widget calls.</strong> Not the method you think it should call — the one it does.</li>
+<li><strong>Write a failing test calling that exact method.</strong> The test must fail with the same error, or the same wrong value, that the app produces.</li>
+<li><strong>If the test passes immediately, you are testing the wrong thing.</strong> Re-read the widget. This step catches more mistakes than any other on the list.</li>
+<li><strong>Implement the fix; make the test pass.</strong></li>
+<li><strong>Run the full suite.</strong> Not the one file.</li>
+<li><strong>Only then build an artifact.</strong> Never build before the test proves the fix — a build cycle is minutes and proves nothing a test could not prove in seconds.</li>
+<li><strong>Grep all callers of any changed function or getter</strong> before asserting the new behaviour is safe.</li>
+<li><strong>Twin-bug audit.</strong> See <a href="#twin">the next section</a>.</li>
+</ol>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Step 3 is the one people skip and the one that matters. A test written from your mental model of the code passes on first run, you declare the bug fixed, and the actual defect is untouched — because your mental model was the bug. A test that does not fail first has told you nothing.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>If a fix adds an affordance, a test must exercise it.</strong> A pull request that adds a button, banner or dialog must include a test that <em>taps</em> it in the post-fix state. One project shipped a cold-start recovery banner whose Resume and End buttons were silent no-ops — the recovery path left the controller null, so both handlers returned immediately. A tap test would have failed on the first run.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Producer and consumer ship together.</strong> Never merge the reader half of a feature without the writer, or without a failing test that proves the gap. One project shipped a fuel-level badge whose backing fields no producer ever populated; the feature ran entirely dark in production until a later issue wired the writer. A feature with no producer is not closeable.</p>
+</div>
+</section>
+
+<section id="twin" data-chunk-id="test.twin" data-tags="testing,bug-fix,pattern-audit">
+<h2>Twin-bug audits</h2>
+
+<p>Before closing a bug, grep the codebase for the <em>pattern</em>, not just the file — the same defect almost always exists in a second location.</p>
+
+<p>What to search for:</p>
+
+<ul>
+<li>The same exception type leaking into the UI from a different call site.</li>
+<li>The same paired call sequence where only one of the pair was fixed.</li>
+<li>Twin screens sharing a widget — fix one, check the other.</li>
+<li>A second error surface in the same method (a future's <code>catchError</code> handled, the sibling stream's <code>onError</code> ten lines below left raw).</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a bug you just fixed reappears under a different issue number within a fortnight.</strong> In one project, four of six follow-up chains were "same bug, second location". One fixed an authentication screen and left the identical leak in the sync-setup screen. Another mapped a Bluetooth error on the <code>startScan</code> future and left the sibling <code>scanResults</code> stream's <code>onError</code> raw ten lines below. A thirty-second grep at fix time would have closed both at once, and in both cases the second report cost a full triage-fix-review-CI cycle.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Write the grep you ran into the pull-request description. It takes one line, it proves the audit happened, and it tells the next person which pattern to search when the bug comes back anyway.</p>
+</div>
+</section>
+
+<section id="false-green" data-chunk-id="test.false-green" data-tags="testing,false-green,fixtures,anti-pattern">
+<h2>False-green tests</h2>
+
+<p>The most dangerous test is one that passes for a reason unrelated to the behaviour it claims to check. Three species, all observed in production codebases.</p>
+
+<h3>Species 1 — the fake that echoes the request</h3>
+
+<p>A fake service that returns whatever it was asked for cannot detect a data-availability bug, because the bug is precisely that the real service does <em>not</em> return what you asked for.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a cross-border data bug survives three separate fixes, each with a passing test.</strong> A fake country service returned the requested fuel grade for any input. The real API for that country never returns that grade — it sells a different one. Every test passed; the feature was broken for every user in that country. The fake was not modelling the service, it was modelling the test's own expectation.</p>
+<p><strong>Countermeasure:</strong> for any bug about data <em>shape</em> or data <em>availability</em>, drive the real implementation with a <strong>recorded real-API fixture</strong>, and prove the test is red on the unfixed mainline before you fix it. Hand-written fakes are correct for behaviour tests and wrong for shape tests.</p>
+</div>
+
+<h3>Species 2 — testing the adapter instead of the path</h3>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: unit tests for a parser are green and the feature is broken in five of six regions.</strong> A structured opening-hours field was correctly parsed by the adapter — and then excluded from serialisation, so it was lost on every cache, favourites and widget round-trip. The adapter tests asserted the adapter's output. Nothing asserted the search → codec → render path.</p>
+<p><strong>Countermeasure:</strong> for anything that persists, test the round-trip, not the producer. Serialise, deserialise, and assert the field survived.</p>
+</div>
+
+<h3>Species 3 — trusting your own classification</h3>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: you tell a user their data is missing upstream, and it is not.</strong> A parser dropped an opening-hours range of <code>01:00–01:00</code> as "degenerate". The upstream authority's own web UI displayed those stations as open 24 hours — that range <em>is</em> the 24-hour convention in that dataset. The test asserting the drop was part of the bug.</p>
+<p><strong>Countermeasure:</strong> when a report says data is missing, verify against the <strong>authoritative upstream source</strong> — its own UI, its own documentation — before trusting your parser's classification of it.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>A bug-fix test must be demonstrated red on the unfixed code.</strong> Not "would fail" — actually run it against mainline and see it fail. This single habit eliminates all three species above, because a false-green test is by definition one that was never seen red.</p>
+</div>
+</section>
+
+<section id="fakes" data-chunk-id="test.fakes" data-tags="testing,fakes,mocks,riverpod">
+<h2>Fakes over mocks, and the shared override helper</h2>
+
+<p>Use a small hand-written fake for anything with behaviour; reserve a mocking library for verifying that a callback fired.</p>
+
+<pre data-lang="dart"><code>// Canonical shape: a fake lives in the test file that needs it, unless it
+// is shared, in which case it lives in test/helpers/.
+class _FakeStationService implements StationService {
+  _FakeStationService({this.stations = const [], this.throws});
+
+  final List&lt;Station&gt; stations;
+  final Object? throws;
+  int fetchCount = 0;
+
+  @override
+  Future&lt;List&lt;Station&gt;&gt; fetch(SearchQuery q) async {
+    fetchCount++;
+    if (throws != null) throw throws!;
+    return stations;
+  }
+}</code></pre>
+
+<p>Why a fake rather than a mock: the fake can hold state, so it can express "the second call returns something different", "this call must not happen twice", or "this fake mirrors the server's row-level-security visibility". A mock expresses only "was called with".</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Fakes must mirror the server's authorisation behaviour, not just its data shape.</strong> If the backend hides a field from non-owners, the fake must hide it too. One project's fake workspace repository answers an admin-invite-code getter only for owners — because a fake that is more permissive than the server produces widget tests that pass for users who would see an error in production.</p>
+</div>
+
+<p><strong>The shared override helper.</strong> Every widget test starts from one function:</p>
+
+<pre data-lang="dart"><code>// test/helpers/mock_providers.dart
+List&lt;Override&gt; standardTestOverrides({
+  AuthRepository? auth,
+  WorkspaceRepository? workspace,
+  Clock? clock,
+}) =&gt; [
+  authRepositoryProvider.overrideWithValue(auth ?? FakeAuthRepository()),
+  workspaceRepositoryProvider.overrideWithValue(workspace ?? FakeWorkspaceRepository()),
+  clockProvider.overrideWithValue(clock ?? FixedClock(DateTime.utc(2026, 3, 1))),
+  // …every app-lifetime dependency, defaulted
+];</code></pre>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Without a shared helper, adding one new app-lifetime provider breaks every widget test in the repository and each one is fixed by hand. With it, the new provider is defaulted in one place. The helper is also the natural home for the fixed clock that <a href="#goldens">the time section</a> insists on.</p>
+</div>
+</section>
+
+<section id="lint-tests" data-chunk-id="test.lint-tests" data-tags="testing,lint,architecture-enforcement">
+<h2>Tests that enforce architecture</h2>
+
+<p>A plain Dart test that reads the source tree is the cheapest available mechanism for enforcing a rule the analyzer cannot express.</p>
+
+<p>One project runs twenty-six of them. The catalogue is worth reproducing because each entry represents a class of defect somebody shipped:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Category</th><th>Rules enforced this way</th></tr></thead>
+<tbody>
+<tr><td><strong>Layering</strong></td><td>presentation must not import data; cross-feature import pairs may only decrease; file-length budgets with a ratcheting allow-list</td></tr>
+<tr><td><strong>Error handling</strong></td><td>no empty <code>catch (_) {}</code>; every <code>catch (e)</code> carries a stack trace; errors are not merely <code>debugPrint</code>ed</td></tr>
+<tr><td><strong>Localisation</strong></td><td>no hard-coded user-facing string literals; ARB fragment consistency; locale key parity; text-expansion survival</td></tr>
+<tr><td><strong>Design system</strong></td><td>no inline border radii; no raw <code>AppBar</code>/<code>Card</code> in feature code; no inline title theming</td></tr>
+<tr><td><strong>Platform</strong></td><td>no inline <code>Platform.isX</code> checks in shared code</td></tr>
+<tr><td><strong>Routing</strong></td><td>no string-literal route paths; an exact route-count assertion so a new route cannot be added silently</td></tr>
+<tr><td><strong>Contracts</strong></td><td>a "never throws" doc comment must have a sibling fault-injection test; declared-dependency hygiene; the analyzer severity table cannot silently regress</td></tr>
+<tr><td><strong>Docs parity</strong></td><td>decision-record format; a how-to guide matches the code it documents; the privacy policy matches the declared data practices</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a scanning test's regex false-matches and blocks an unrelated pull request.</strong> One project's "every icon button has a tooltip" test used a regex that also matched <code>SomethingIconButton(</code>. Scanning tests need their own tests, or at minimum an explicit allow-list and a failure message that prints the offending line — a lint failure whose message does not show you the match costs more time than the rule saves.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>A baseline may only ever decrease.</strong> Every ratcheting test commits a number. Lowering it is a normal pull request; raising it is forbidden, including "temporarily". The moment one exception is granted the ratchet stops working, because the next person cites the precedent.</p>
+</div>
+
+<p>One organisational hazard: the allow-list file is a shared surface and a conflict magnet. When two pull requests each re-grandfather the <em>same</em> file, the resolved number must be the <strong>combined post-merge line count</strong>, not either branch's figure. In one project, two PRs set 1402 and 1367; after both merged the real count was 1412.</p>
+</section>
+
+<section id="goldens" data-chunk-id="test.goldens" data-tags="testing,goldens,accessibility,time">
+<h2>Goldens, accessibility and time</h2>
+
+<h3>Do not commit locally-generated golden images</h3>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: golden tests pass locally and fail CI at 3–4% difference against a 1.5% tolerance, on every pull request.</strong> Font rasterisation differs between macOS and Linux. A golden baselined on a developer's Mac will never match a Linux runner. Either generate baselines <em>on the CI platform</em> in a container, or — the recommendation — prefer structural widget tests that assert on the widget tree rather than on pixels.</p>
+</div>
+
+<h3>Assert accessibility, do not hope for it</h3>
+
+<pre data-lang="dart"><code>testWidgets('booking screen meets tap-target guidelines', (tester) async {
+  final handle = tester.ensureSemantics();
+  await tester.pumpWidget(/* … */);
+  await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+  await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+  await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+  handle.dispose();
+});</code></pre>
+
+<p>Every interactive screen gets this. Every new tappable affordance needs a large enough target <em>and</em> its own test that taps it.</p>
+
+<h3>Pin the clock</h3>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: CI was green on the 28th and red on the 1st, with no commits in between.</strong> Two tests in one project asserted against the literal current month and against a period-bound seeded record. They passed for three weeks and failed at the month boundary. These are time bombs, not regressions — and bumping the string just resets the fuse for next month.</p>
+<p><strong>Countermeasure:</strong> inject a clock through the provider graph and default it to a fixed instant in <code>standardTestOverrides</code>. Never let a test read the wall clock. A grep for <code>DateTime.now()</code> in <code>test/</code> should return nothing.</p>
+</div>
+</section>
+
+<section id="running" data-chunk-id="test.running" data-tags="testing,ci,tooling">
+<h2>Running the suite without lying to yourself</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: "the tests passed" and they did not.</strong> Run <code>flutter test</code> <strong>bare</strong>. Piping it — <code>flutter test | tail</code>, <code>flutter test | grep -i fail</code> — yields the <em>pipe's</em> exit code, not the suite's. A red run reads as green to any script checking <code>$?</code>. If you need to filter the output, capture to a file and check the exit status separately.</p>
+<pre data-lang="bash"><code># wrong — exit code is tail's
+flutter test | tail -20
+
+# right
+flutter test 2&gt;&amp;1 | tee /tmp/test.log; status=${PIPESTATUS[0]}
+tail -20 /tmp/test.log; exit "$status"</code></pre>
+</div>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Command</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><code>flutter analyze</code></td><td>Zero tolerance, over <code>lib/</code> <strong>and</strong> <code>test/</code>. Agents and humans both routinely analyse only <code>lib/</code> and miss test-file lints that CI catches.</td></tr>
+<tr><td><code>flutter test</code></td><td>The full suite. Minutes, not seconds, once real — run it in the background and keep working.</td></tr>
+<tr><td><code>flutter test test/features/&lt;x&gt;/</code></td><td>One feature during the edit loop.</td></tr>
+<tr><td><code>flutter test --coverage</code></td><td>Produces <code>coverage/lcov.info</code> for the gate.</td></tr>
+<tr><td><code>flutter test --tags=network</code></td><td>The excluded upstream probes, on demand.</td></tr>
+<tr><td><code>flutter test integration_test -d &lt;device&gt;</code></td><td>On-device end-to-end.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>Sharding.</strong> Once the suite passes ~20 minutes, split it across parallel CI jobs. Four shards is a reasonable first step. Set <code>fail-fast: false</code> so one failing shard does not hide the others — you want every failure visible in one run, not one per round-trip. See <a href="18-github.html#sharding">page 18</a> for the matrix-skip trap that sharding introduces.</p>
+</section>
+
+<section id="coverage" data-chunk-id="test.coverage" data-tags="testing,coverage,metrics">
+<h2>Coverage gates and what they are worth</h2>
+
+<p>A coverage gate is a floor against catastrophic regression, not a measure of test quality — and setting it too low makes it decorative.</p>
+
+<pre data-lang="bash"><code># Parse lcov, exclude generated files, fail below the threshold.
+# LF = lines found, LH = lines hit.
+TOTAL=$(grep -h '^LF:' "$LCOV" | cut -d: -f2 | paste -sd+ | bc)
+HIT=$(grep  -h '^LH:' "$LCOV" | cut -d: -f2 | paste -sd+ | bc)
+PCT=$(( HIT * 100 / TOTAL ))
+[ "$PCT" -lt "$THRESHOLD" ] &amp;&amp; { echo "::error::coverage $PCT% &lt; $THRESHOLD%"; exit 1; }</code></pre>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Both source projects settled at a 45% line-coverage gate, and one of them says plainly in its own known-gaps section that this is <em>not</em> a meaningful ratchet: a thousand-test suite clears 45% comfortably, so the gate never fires and therefore never influences behaviour. That is an honest assessment worth copying. If a gate has not failed a build in a year, either raise it by a few points per quarter until it starts to bite, or stop presenting it as a quality control.</p>
+</div>
+
+<p>Exclude generated files from the denominator or the number is meaningless — a large freezed model set will carry the percentage on its own.</p>
+</section>
+
+<section id="recurrence" data-chunk-id="test.recurrence" data-tags="testing,regression,root-cause">
+<h2>Regression escalation</h2>
+
+<p>If a bug has been fixed before and came back, do not ship fix N+1. Stop and ask whether there are two different failure modes that look identical on screen.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the same user-visible symptom recurs across many issue numbers over months.</strong> One project's grey-map-tile bug was "fixed" nine times across a span of issues. Cause #1 was real and each fix addressed it correctly. Cause #2 produced an identical grey tile and was never isolated, so every fix appeared to work in testing and failed again in the field.</p>
+<p><strong>Protocol on the second recurrence:</strong></p>
+<ol>
+<li>Stop patching. Do not open a fix pull request.</li>
+<li>Enumerate <em>every</em> code path that can produce this exact symptom. Write them down.</li>
+<li>Add discriminating instrumentation — a distinct trace signature per path — and ship <em>that</em> alone.</li>
+<li>Wait for a real occurrence and read which path fired.</li>
+<li>Only then fix, with an integration-level reproduction test.</li>
+</ol>
+<p>Two further rules from the same experience: verify against the current mainline rather than a stale working branch, and <strong>never ship diagnostics as a product feature</strong> — instrumentation added for triage gets removed when the cause is found, or it becomes permanent noise nobody dares delete.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>Both projects' test trees (roughly 1500 and 161 test files respectively), their <code>dart_test.yaml</code> tag declarations, coverage scripts and CI sharding configuration.</li>
+<li>Post-mortems supplying the traps: the echoing-fake cross-border failure, the serialisation-drop round-trip failure, the upstream-classification error, the golden-platform mismatch, the month-boundary time bombs, the piped-exit-code incident, and the nine-times-fixed map bug.</li>
+<li>One project's twenty-six static lint tests, catalogued by category.</li>
+</ul>
+<p>The 70/20/10 ratio is a target both projects state; neither publishes a measured breakdown against it, so treat it as intent rather than as a reported figure.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

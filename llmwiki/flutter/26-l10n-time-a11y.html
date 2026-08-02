@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Localisation, time & accessibility — LLM Wiki · Flutter</title>
+<meta name="description" content="The ARB fragment pipeline and its CI gates, two locale strategies, text-expansion survival, ICU discipline, the two-clock timezone doctrine, the injectable clock, and accessibility as tests rather than intentions.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Localisation, time and accessibility for Flutter apps","description":"ARB pipeline, locale strategies, expansion survival, ICU, timezone doctrine, the clock seam, accessibility as tests.","dateModified":"2026-08-02","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">26 · Quality</span>
+<h1>Localisation, time &amp; accessibility</h1>
+<p class="lede">These three topics share a page because they share a failure mode: each works perfectly for the developer — who reads their own language, sits in one timezone, and does not use a screen reader — and breaks only for someone else. The countermeasure is the same for all three: turn the intention into a test, because nothing else survives.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> l10n</span>
+  <span><b>Updated</b> 2026-08-02</span>
+  <span><b>Depends on</b> 01 Foundations, 03 TDD</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#externalise">Every string externalised, ratchet-enforced</a></li>
+<li><a href="#fragments">The ARB fragment pipeline</a></li>
+<li><a href="#strategies">Two locale strategies, both valid</a></li>
+<li><a href="#expansion">Text-expansion survival</a></li>
+<li><a href="#icu">ICU discipline and locale-aware formatting</a></li>
+<li><a href="#timezones">The two-clock doctrine</a></li>
+<li><a href="#clockseam">The injectable clock</a></li>
+<li><a href="#a11y">Accessibility as tests</a></li>
+<li><a href="#regulation">The regulatory floor</a></li>
+</ol>
+</div>
+
+<section id="externalise" data-chunk-id="l10n.externalise" data-tags="i18n,arb,lint,ratchet">
+<h2>Every string externalised, ratchet-enforced</h2>
+
+<p>Both source projects carry the same hard rule: no hard-coded user-facing text, ever — every string goes through the generated localisations class with a defensive English fallback literal at the call site (<code>l10n?.key ?? 'English fallback'</code>), so a missing delegate degrades to English instead of crashing.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The rule is a lint test, not a convention.</strong> A repo-scanning test flags any <code>Text(</code> with a string literal that is not a <code>??</code> fallback, with a per-file baseline that may only shrink (<a href="03-tdd-and-testing.html#lint-tests">the ratchet pattern</a>). Retrofitting externalisation onto a mature codebase is a months-long slog; the ratchet lets a legacy codebase adopt the rule today — existing violations are grandfathered at their current count, new ones fail CI — and the baseline reaching zero is a measurable finish line.</p>
+</div>
+
+<p>Two companion gates make the rule complete:</p>
+
+<ul>
+<li><strong>Key parity:</strong> a test that every locale carries exactly the canonical locale's key set — missing keys <em>and</em> extra keys fail, because an extra key is usually a typo that silently never renders.</li>
+<li><strong>Pipeline cleanliness:</strong> CI regenerates the localisation outputs and fails on any diff, the same <a href="18-github.html#codegen">committed-codegen gate</a> as freezed/riverpod artifacts. Hand-edited generated ARB files are how two sources of truth are born.</li>
+</ul>
+</section>
+
+<section id="fragments" data-chunk-id="l10n.fragments" data-tags="i18n,arb,fragments,pipeline">
+<h2>The ARB fragment pipeline</h2>
+
+<p>A single <code>app_en.arb</code> with a thousand keys is a merge-conflict magnet and a review nightmare. Both projects instead keep <strong>per-feature fragments</strong> — <code>plan_en.arb</code>, <code>billing_fr.arb</code> — merged by a small tool into the aggregated per-locale files that <code>flutter gen-l10n</code> consumes.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Pipeline property</th><th>Why it is load-bearing</th></tr></thead>
+<tbody>
+<tr><td>Merge fails on duplicate keys across fragments of one locale</td><td>Two features can never silently shadow each other's strings — the collision is a build error at the merge, not a mystery at runtime</td></tr>
+<tr><td>Fragments are the source of truth; aggregates are generated and committed</td><td>Conflicts in the aggregates are resolved by <em>regenerating</em>, never by hand-merging — the rule that saves every multi-branch ARB conflict (<a href="28-ai-agents.html#generated">page 28</a>)</td></tr>
+<tr><td>English is canonical: every key must exist in an <code>_en</code> fragment</td><td>One locale is the reference the parity gate compares against; "canonical" is a property the tool checks, not a convention</td></tr>
+<tr><td>Fragment = feature module</td><td>A feature's strings live next to its code ownership; deleting a feature deletes its fragment, and the parity gate catches strays</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="strategies" data-chunk-id="l10n.strategies" data-tags="i18n,locales,strategy,translation">
+<h2>Two locale strategies, both valid</h2>
+
+<p>The source projects deliberately diverge here, and the comparison page's verdict stands: <em>either — both gate on parity, which is the part that matters</em>.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Many locales, machine-filled</th><th>Few locales, hand-maintained</th></tr></thead>
+<tbody>
+<tr><td>Shape</td><td>23 locales + a pseudo-locale; machine translation fills new keys, humans revise opportunistically</td><td>5 locales; every new key lands in all five, human-quality, <strong>in the same PR</strong></td></tr>
+<tr><td>Cost per key</td><td>Near zero at write time; revision debt accumulates</td><td>Five translations per key, every time</td></tr>
+<tr><td>Reads like</td><td>Fine to good; occasional machine artefacts</td><td>A native product</td></tr>
+<tr><td>Pre-translation window</td><td>Exists — keys ship before human review, so the pseudo-locale earns its keep catching layout breaks early</td><td>Does not exist — full-length translations exist from day one, so a pseudo-locale adds little (see next section)</td></tr>
+<tr><td>Fits when</td><td>Breadth is the product (a comparison app across 17 countries)</td><td>Depth is the product (a community app whose owner reads the locales)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>The strategy choice changes which <em>tests</em> pay off, which is why it belongs in an engineering wiki at all. Machine-fill needs the pseudo-locale and expansion tooling because untranslated-length text is a real production state; same-PR hand translation makes real-locale walks the honest test because the longest text a user will ever see already exists in the repo. Choosing tests without choosing the strategy first optimises the wrong risk.</p>
+</div>
+</section>
+
+<section id="expansion" data-chunk-id="l10n.expansion" data-tags="i18n,pseudo-locale,overflow,testing">
+<h2>Text-expansion survival</h2>
+
+<p>German compounds and French phrases run 20–40% past the English a layout was eyeballed against, and an overflow in a language the developer does not read ships silently — every widget test runs in English. Two mechanisms catch it, matched to the locale strategy above.</p>
+
+<ul>
+<li><strong>A pseudo-locale</strong> (machine-fill strategy): a generated locale that expands every string — prefix/suffix padding only, <code>[!! … !!]</code>, never touching the interior, so ICU placeholders and plural syntax survive the transformation intact. Registered under a reserved tag (Android's <code>en-XA</code> convention), it is reachable from a device's developer settings without polluting real users' locale resolution.</li>
+<li><strong>Real-locale narrow-width walks</strong> (hand-translation strategy): a widget test pumps the app in each shipping locale at phone width (360&nbsp;dp, portrait) and walks the main surfaces; any <code>RenderFlex</code> overflow fails with the locale and surface named. One source project ships exactly this, plus a growth guard asserting the navigation bar's destination count so a new surface cannot ship without joining the walk.</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the locale-walk test cannot navigate — taps miss, and <code>pageBack()</code> finds nothing.</strong> Three mechanics, each earned: navigate <strong>by icon, never by label</strong> (the labels are the thing under test and change per locale); never <code>tester.pageBack()</code> (it matches the literal "Back" <em>tooltip</em>, which is localised — <code>find.byType(BackButton)</code> is not); and scope every tap to the bar it lives in, because icons repeat across surfaces and an unscoped <code>.first</code> taps the occluded copy — after which the missed-tap warning quietly hides that a surface was never visited.</p>
+</div>
+
+<p>Text <em>scaling</em> is the same bug class in another axis: a user's 1.3× font setting expands every string at once. The same walk run once at a raised <code>textScaleFactor</code> covers it; layouts that survive German usually survive large fonts, but "usually" is not a test.</p>
+</section>
+
+<section id="icu" data-chunk-id="l10n.icu" data-tags="i18n,icu,plurals,formatting,currency">
+<h2>ICU discipline and locale-aware formatting</h2>
+
+<p>Grammar and formats are locale logic, not string logic, and the moment either is done with string concatenation the app is wrong in some language.</p>
+
+<ul>
+<li><strong>Plurals and selects live in ICU syntax inside the ARB</strong>, never as <code>count == 1 ? 'item' : 'items'</code> in Dart — languages have plural rules English does not (one/few/many/other), and only the message format knows them.</li>
+<li><strong>Placeholders, never concatenation.</strong> <code>'{name} joined {workspace}'</code> reorders freely per language; <code>name + ' joined ' + workspace</code> does not. A sentence assembled from two keys is a sentence some language cannot say.</li>
+<li><strong>Dates, numbers and currency render through <code>intl</code> formatters only</strong> — both projects ban raw string formatting for these by convention and catch stragglers in review. Note the decimal-separator trap generalises beyond the app: a CI gate comparing <code>printf "%.1f"</code> output numerically silently broke under a comma-locale shell (<a href="18-github.html">page 18</a>) — locale bugs are not confined to Dart.</li>
+<li><strong>Currency follows the domain, not the device.</strong> One project renders money in the <em>workspace's</em> currency (derived from its country) regardless of the viewer's locale — the locale decides the separators, the domain decides the unit. Conflating the two shows a French viewer a German workspace's prices in the wrong currency.</li>
+<li><strong>User-generated content is not translated.</strong> Workspace names, notes, statuses pass through verbatim; only the app's own strings localise.</li>
+</ul>
+
+<p>One deliberate, documented exception both projects converged on: <strong>data-interchange documents keep stable English identifiers</strong>. An XML schema's element names and an Excel export's column headers get referenced by importers, formulas and pivots — a header that renames itself when the owner's phone changes language breaks every consumer. The surrounding UI (tiles, snackbars, the bill PDF a member receives) localises like everything else; the file format does not. Write the decision at the top of the builder, because it looks like a rule violation to anyone who has not read the why.</p>
+</section>
+
+<section id="timezones" data-chunk-id="l10n.timezones" data-tags="time,timezones,utc,dst">
+<h2>The two-clock doctrine</h2>
+
+<p>An app whose domain has a <em>place</em> — a coworking space, a fuel station — has two clocks: the device's and the place's. Every time bug in one source project came from conflating them, and the doctrine that ended the class is short:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Rule</th><th>Consequence</th></tr></thead>
+<tbody>
+<tr><td><strong>Store UTC, always</strong></td><td>Timestamps in the database are <code>timestamptz</code>/ISO-UTC; conversion is a render-time concern</td></tr>
+<tr><td><strong>Recur in domain-local time</strong></td><td>A weekly 09:00 booking series stays 09:00 across DST because the recurrence is expanded in the workspace's IANA zone, not in UTC arithmetic</td></tr>
+<tr><td><strong>Day-based logic runs on the domain's calendar</strong></td><td>"Open days", closure dates, half-day windows anchor to the workspace zone — a developer's laptop in a different zone must not shift them</td></tr>
+<tr><td><strong>Windows straddle device days</strong></td><td>A domain-local full day (00:00–24:00 Paris) spans <em>two</em> device-local dates west of it; any cache or query keyed by device-local day must fetch both keys a half-open window touches</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a reservation made from the plan shows on one screen and not another, or lands at 01:15 local.</strong> Both happened, months apart, and both were the straddle rule: one surface fetched a single device-day cache key while a workspace-day window bucketed under the neighbouring key; earlier, month keys computed via UTC conversion queried June for a July calendar east of Greenwich. The fix each time was the same helper — derive the one-or-two day keys a half-open window touches, in the correct zone, in exactly one place — and a test pinned to a timezone far from the workspace's, because a test that runs in the workspace's own zone cannot see this bug class at all.</p>
+</div>
+</section>
+
+<section id="clockseam" data-chunk-id="l10n.clockseam" data-tags="time,clock,testing,seams">
+<h2>The injectable clock</h2>
+
+<p><code>DateTime.now()</code> in widget code is untestable in the only way that matters: it agrees with the calendar of the machine that runs it. One source project had CI green on the 28th and red on the 1st with no commits between — a test asserting the literal current month name, and a fake whose seeded period matched the month the test was written in. Time bombs, not regressions; bumping the strings only resets the fuse.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>One clock seam, pinned in every test, guarded by a lint.</strong> A <code>Clock</code> interface behind a provider (<code>SystemClock</code> in the app, a fixed instant in the shared test overrides — a mid-month Wednesday, so nothing lands on a weekend, month boundary or DST change by accident). The lint forbids <code>DateTime.now()</code> in <em>both</em> <code>lib/</code> and <code>test/</code> outside a shrink-only exempt list, because either half alone re-arms the bomb: a widget on the wall clock ignores the pin, a test seeding from the wall clock disagrees with it. Legitimate exemptions exist — cache-expiry measured against real time, log timestamps, OS scheduling — and each carries its reason in the list.</p>
+</div>
+
+<p>Two sharp edges from the migration, worth more than the happy path: a <em>nullable</em> <code>now</code> parameter with a <code>DateTime.now()</code> default is a wall-clock read wearing a parameter's clothes — making the parameter <em>required</em> found three real bugs where presence indicators used the wall clock while the surrounding screen browsed a different day. And on a cold Riverpod <code>AsyncNotifier</code>, a synchronous <code>.value</code> read is still loading and silently answers its default — <code>await</code> the <code>.future</code> when the answer gates behaviour.</p>
+</section>
+
+<section id="a11y" data-chunk-id="l10n.a11y" data-tags="accessibility,semantics,tap-targets,contrast,testing">
+<h2>Accessibility as tests</h2>
+
+<p>Flutter maintains a semantics tree alongside the widget tree for TalkBack and VoiceOver, and standard widgets populate it well — the gaps appear exactly where an app is most custom, which for both source projects means canvas surfaces. The discipline, again, is tests over intentions:</p>
+
+<ul>
+<li><strong>Tap targets, asserted:</strong> every interactive screen's test suite runs <code>meetsGuideline(androidTapTargetGuideline)</code> (48×48&nbsp;dp) — plus the iOS and labeled-target guidelines where adopted — and every new tappable affordance needs a big-enough target <em>and its own test that taps it</em>. The guard has real teeth: it caught a <code>FittedBox</code> silently shrinking a toolbar to 27.8&nbsp;dp, and it forbids the tempting <code>visualDensity.compact</code>-plus-padding combination that caps padded hit areas at 40&nbsp;dp.</li>
+<li><strong>State never by colour alone:</strong> a seat that is free/reserved/occupied pairs every colour with an icon or pattern — the rule exists in the design system and a reviewer can check it, but the colour side is machine-checked too: a runtime contrast-guard test walks the palette against the WCAG thresholds (4.5:1 normal text, 3:1 large) in both light and dark themes.</li>
+<li><strong>Custom paint gets explicit semantics:</strong> a floor-plan canvas is one big picture to a screen reader unless each seat contributes a labelled semantics node with its name and state. Budget for this when choosing a canvas over widgets — it is the hidden cost of custom painting.</li>
+<li><strong>Motion respects the platform setting:</strong> centralised animation durations (one motion-tokens class, not scattered <code>Duration</code>s) make honouring reduce-motion a one-place change instead of a hunt.</li>
+</ul>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>The five-minute audit no test replaces: turn on TalkBack or VoiceOver and complete the app's single most important flow — book the seat, record the payment — eyes closed. Every unlabelled button reads as "button", every unreachable control is simply absent, and both are findings no amount of green CI contradicts.</p>
+</div>
+</section>
+
+<section id="regulation" data-chunk-id="l10n.regulation" data-tags="accessibility,regulation,eaa,wcag">
+<h2>The regulatory floor</h2>
+
+<p>Accessibility stopped being purely voluntary for many apps in June 2025, when the European Accessibility Act's obligations took effect for consumer-facing digital services in the EU — with member-state enforcement and fines that scale with revenue. The harmonised technical standard is EN&nbsp;301&nbsp;549, which for app content largely incorporates WCAG&nbsp;2.1/2.2 level AA — the same contrast ratios, target sizes and semantics this page's tests already encode.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Instrument</th><th>What it means for an app team</th></tr></thead>
+<tbody>
+<tr><td>European Accessibility Act (in force for services since 2025-06)</td><td>E-commerce, banking, transport and similar consumer services in the EU must be accessible; microenterprises have carve-outs — check whether yours applies rather than assuming</td></tr>
+<tr><td>EN 301 549</td><td>The testable requirements — practically, WCAG AA plus platform-specific criteria; the tap-target, contrast and semantics tests above are its unit tests</td></tr>
+<tr><td>Store review</td><td>Not currently a hard accessibility gate on either store, so <em>your CI is the only enforcement you have</em> — which is the theme of this page</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>This section is regulatory context, not legal advice: scope questions (which services, which carve-outs, which member state's enforcement) belong to a lawyer. The engineering takeaway is narrower and safe: the practices above are no longer just craft — for many products they are the compliance work, already done.</p>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>Both projects' externalisation hard rule, ratcheting string lint, key-parity gates and ARB fragment pipelines (duplicate-key-failing merge, canonical English, committed aggregates).</li>
+<li>One project's 23-locale machine-fill strategy and pseudo-locale; the other's five-locale same-PR strategy and its real-locale narrow-width expansion walk with the icon-navigation, localized-tooltip and scoped-tap mechanics.</li>
+<li>The workspace-time doctrine and both recorded straddle incidents; the clock-seam migration including the required-parameter bug catch and the cold-provider read; the wall-clock lint with its exempt list.</li>
+<li>Tap-target guideline enforcement (including the FittedBox and visualDensity incidents), the runtime contrast-guard test, and the state-never-by-colour design rule.</li>
+<li>WCAG 2.2 thresholds, EN 301 549 and European Accessibility Act status from official Flutter accessibility documentation and current public summaries, 2026-08. The regulation section is context, explicitly not legal advice; the RTL and reduce-motion notes are recommendations, not observed practice.</li>
+</ul>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

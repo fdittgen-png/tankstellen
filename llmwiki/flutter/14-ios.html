@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iOS / iPhone — LLM Wiki · Flutter</title>
+<meta name="description" content="fastlane match, the keychain hang that eats a CI job, App Store Connect API-key limits, background modes, widget and share extensions, and the review-rejection playbook.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"iOS for Flutter apps","description":"match, the keychain hang, API-key limits, background modes, extensions, review rejections.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">14 · Platforms</span>
+<h1>iOS / iPhone</h1>
+<p class="lede">iOS costs more per release than every other channel combined, and almost all of it is signing and review. The engineering is not hard; the failure modes are opaque, the feedback loop runs in tens of minutes on billed runners, and several of them present as a job that hangs in silence.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> ios</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 09 Confidentiality · 10 Bluetooth</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#identities">Identities and what cannot be re-issued</a></li>
+<li><a href="#match">Signing with fastlane match</a></li>
+<li><a href="#keychain">The keychain hang</a></li>
+<li><a href="#ci">A CI job that survives</a></li>
+<li><a href="#asc">App Store Connect API-key limits</a></li>
+<li><a href="#background">Background modes</a></li>
+<li><a href="#extensions">Widget and share extensions</a></li>
+<li><a href="#privacy">Privacy manifests and usage strings</a></li>
+<li><a href="#review">The review-rejection playbook</a></li>
+<li><a href="#checklist">Release checklist</a></li>
+</ol>
+</div>
+
+<section id="identities" data-chunk-id="ios.identities" data-tags="apple,identity,secrets">
+<h2>Identities and what cannot be re-issued</h2>
+
+<p>Write down which account owns what, because iOS involves at least four identities and confusing two of them wastes a day.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Identity</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td><strong>Apple Developer account</strong></td><td>Frequently <em>not</em> the same address as your code-hosting account. Record it explicitly.</td></tr>
+<tr><td><strong>Team ID</strong></td><td>Ten characters. Appears in the fastlane app file, the match file and the Xcode project.</td></tr>
+<tr><td><strong>Bundle identifier</strong></td><td>Almost never equal to the Android application id. Each extension has its own, derived from the host's.</td></tr>
+<tr><td><strong>App Store Connect API key</strong></td><td>A <code>.p8</code> file plus a key id and an issuer id.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Three pieces of material here are irreplaceable. Back them up off-machine, today.</strong></p>
+<ul>
+<li><strong>The App Store Connect <code>.p8</code> private key</strong> — downloadable exactly once. Apple will not re-issue it.</li>
+<li><strong>The certificate-repository passphrase</strong> — without it, the encrypted repository is permanently unreadable. One project lost one and had to stand up an entirely separate certificate repository rather than re-encrypt a repository a sibling app depended on.</li>
+<li><strong>The distribution certificate's private key</strong>, if it exists only in a local keychain and not in the certificate repository.</li>
+</ul>
+<p>Keep an explicit "irreplaceable material" list in your release documentation naming where each backup lives.</p>
+</div>
+</section>
+
+<section id="match" data-chunk-id="ios.match" data-tags="fastlane,match,signing">
+<h2>Signing with fastlane match</h2>
+
+<p>Certificates and profiles live encrypted in a private repository; CI fetches them read-only and never mints anything.</p>
+
+<pre data-lang="ruby"><code># Matchfile
+# SSH, not HTTPS: a fine-grained token kept returning 403 even with
+# read-only contents scope. CI loads a read-only deploy key via an
+# ssh-agent action; humans use their own key.
+git_url("git@github.com:org/app-ios-certs.git")
+storage_mode("git")
+type("appstore")
+
+# EVERY signed target, or the archive fails with "No profile for …".
+# A widget extension is a separate code-signed target with its own App ID.
+app_identifier([
+  "de.example.app",
+  "de.example.app.WidgetExtension",
+])
+team_id("XXXXXXXXXX")
+
+# CI is ALWAYS read-only. Only a human on a trusted machine may create
+# certificates — that touches the developer portal and the encrypted repo.
+readonly(ENV["CI"] == "true")</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Lane</th><th>Runs where</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>match_bootstrap</code></td><td>Workstation only</td><td>One-time: create certificates and push them to the repository</td></tr>
+<tr><td><code>match_appstore</code></td><td>CI</td><td>Read-only fetch before building</td></tr>
+<tr><td><code>match_sync_appstore</code></td><td>CI, on demand</td><td><strong>Repair:</strong> write-mode, appstore type only, generates <em>missing</em> profiles without forcing new certificates. This is what you run when a new signed target has no profile.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: "No matching provisioning profiles found" after adding an extension.</strong> A new signed target needs its own App ID and its own profile. Add the identifier to the match file and run the repair lane — a plain read-only fetch cannot create what does not exist.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the archive fails on a missing entitlement after a profile regeneration.</strong> If the host app and an extension share an app group, <strong>both App IDs must have the App Groups capability enabled in the developer portal</strong> — and there is <em>no App Store Connect API endpoint for app groups</em>. It is a manual, portal-only step. Regenerated profiles carry the entitlement only if the capability is enabled first. Note this in the runbook; it is invisible from automation and will be rediscovered otherwise.</p>
+</div>
+</section>
+
+<section id="keychain" data-chunk-id="ios.keychain" data-tags="ci,keychain,codesign,hang">
+<h2>The keychain hang</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the CI job produces no output after the signing step and eventually hits the job timeout. No error, no stack, nothing.</strong> Without a dedicated keychain, match imports the certificate into the runner's login keychain — which on a headless machine is locked and whose password nothing knows. <code>codesign</code> then raises a GUI permission prompt that nobody can answer, and the job sits in silence until it is killed. Match usually logs a warning about being unable to configure the imported item to prevent a UI prompt; that warning is the only clue and it is easy to miss.</p>
+<p><strong>The fix is one line in the fastlane <code>before_all</code>:</strong></p>
+<pre data-lang="ruby"><code>before_all do
+  setup_ci if ENV["CI"] == "true"   # creates + unlocks a temporary keychain
+end</code></pre>
+<p>It is a no-op locally, so developer workflows are unaffected. This is the single highest-value line in an iOS CI configuration, and it is how one project's first TestFlight build died.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: "CocoaPods is installed but broken."</strong> A Ruby-setup action switches the active Ruby, and the system CocoaPods installation's gem home no longer matches. Reinstall pods under the active Ruby — with a committed <code>Gemfile</code> and <code>Gemfile.lock</code> and <code>bundle exec</code> everywhere — rather than relying on whatever the runner image ships.</p>
+</div>
+</section>
+
+<section id="ci" data-chunk-id="ios.ci" data-tags="ci,macos,workflow">
+<h2>A CI job that survives</h2>
+
+<p>macOS runners bill at a multiple of Linux, so iOS jobs are dispatch-triggered or scheduled — never on every pull request.</p>
+
+<pre data-lang="yaml"><code>jobs:
+  build-and-upload:
+    # PINNED, not macos-latest: the latest label migrates to a new major
+    # on a published date and takes the Xcode/SDK selection with it.
+    runs-on: macos-15
+    timeout-minutes: 60
+    permissions:
+      contents: write        # the post-upload tag push
+    steps:
+      - uses: actions/checkout@v7
+
+      # Apple rejects uploads built with an SDK older than the current
+      # major, so track the newest stable Xcode explicitly.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with: { xcode-version: latest-stable }
+
+      - uses: ruby/setup-ruby@v1
+        with: { bundler-cache: true }
+
+      # Read-only deploy key for the certificate repository.
+      - uses: webfactory/ssh-agent@v0.9.0
+        with: { ssh-private-key: "${{ secrets.MATCH_DEPLOY_KEY }}" }
+
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: "3.41.9" }
+
+      - name: Compute a monotonic build number
+        id: bn
+        run: echo "n=$(( 1000000 + ( $(date -u +%s) - 1751760000 ) / 60 ))" &gt;&gt; "$GITHUB_OUTPUT"
+
+      - run: bundle exec fastlane ios release_testflight
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          APP_STORE_CONNECT_API_KEY_ID:     ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID:  ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          FLUTTER_BUILD_NUMBER: ${{ steps.bn.outputs.n }}</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Detail</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Pin the runner image</td><td><code>macos-latest</code> migrates on a published date and changes your Xcode and SDK without a commit</td></tr>
+<tr><td>Newest stable Xcode</td><td>Apple rejects uploads built against an SDK older than the current major</td></tr>
+<tr><td>Build number via Flutter's flag</td><td>Set the project's version field to Flutter's build-number variable and pass <code>--build-number</code>; the Xcode versioning tool does not work reliably in this arrangement</td></tr>
+<tr><td>Same scheme as the other store</td><td>One number identifies a build everywhere — see <a href="05-traceability.html#build-to-commit">page 05</a></td></tr>
+<tr><td>Cache pods on the lockfile</td><td>Pod resolution is a large share of the job</td></tr>
+<tr><td>Upload debug symbols as an artifact</td><td>You will need them to symbolicate a crash months later</td></tr>
+<tr><td>Tag the commit after upload</td><td>Otherwise the shipped build maps to nothing</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="asc" data-chunk-id="ios.asc" data-tags="app-store-connect,api,limits">
+<h2>App Store Connect API-key limits</h2>
+
+<p>The API key does most things and cannot do several important ones. Knowing which in advance saves a cycle each.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Task</th><th>API?</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>Upload a build to TestFlight</td><td>Yes</td><td>The main path</td></tr>
+<tr><td>Manage beta groups and testers</td><td>Yes</td><td>With caveats — see <a href="20-testers-google-groups.html">page 20</a></td></tr>
+<tr><td>Push listing metadata</td><td>Yes</td><td>Never auto-submit for review</td></tr>
+<tr><td>Set beta review information</td><td>Yes</td><td>Ahead of a build, so the first external build sails through</td></tr>
+<tr><td><strong>Create an app record</strong></td><td><strong>No</strong></td><td><em>"The resource 'apps' does not allow 'CREATE'"</em>, whatever the key's role. Create it in the web UI.</td></tr>
+<tr><td><strong>Enable App Groups on an App ID</strong></td><td><strong>No</strong></td><td>Portal-only, manual</td></tr>
+<tr><td><strong>Create a Developer ID certificate</strong></td><td><strong>No</strong></td><td>Account holder only — see <a href="15-macos.html">page 15</a></td></tr>
+<tr><td>Manage users and access</td><td>Conditionally</td><td>An app-manager-scoped key <em>cannot</em>, by design. Degrade with a warning rather than failing.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the first TestFlight upload fails because no app record exists.</strong> Unlike the other store, which binds a package on first upload, Apple needs the record created beforehand. Automate a lane that <em>verifies</em> the record rather than creating it: have it report which bundle identifier the key can see, and list every app it can see if the expected one is missing. That turns a confusing failure into a readable one.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Any lane that mutates live App Store Connect state is dispatch-only, never scheduled.</strong> Adding a tester sends a real invitation email to a real person. Pushing listing metadata changes a public page. These are outward-facing actions and they belong behind a deliberate human trigger.</p>
+</div>
+</section>
+
+<section id="background" data-chunk-id="ios.background" data-tags="background,plist,capabilities">
+<h2>Background modes</h2>
+
+<p>iOS grants background execution as narrow, purpose-scoped capabilities that must be declared, justified in review, and designed around.</p>
+
+<pre data-lang="xml"><code>&lt;key&gt;UIBackgroundModes&lt;/key&gt;
+&lt;array&gt;
+  &lt;string&gt;location&lt;/string&gt;           &lt;!-- continued location updates --&gt;
+  &lt;string&gt;bluetooth-central&lt;/string&gt;  &lt;!-- keep a BLE peripheral connected --&gt;
+  &lt;string&gt;fetch&lt;/string&gt;              &lt;!-- opportunistic background refresh --&gt;
+  &lt;string&gt;processing&lt;/string&gt;         &lt;!-- scheduled longer tasks --&gt;
+&lt;/array&gt;</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Mode</th><th>What you actually get</th></tr></thead>
+<tbody>
+<tr><td><code>location</code></td><td>Continued updates while a session is active. The status bar shows an indicator. Review will ask what it is for.</td></tr>
+<tr><td><code>bluetooth-central</code></td><td>An established BLE connection survives backgrounding; state restoration can relaunch the app for a known peripheral.</td></tr>
+<tr><td><code>fetch</code></td><td>Occasional short windows, scheduled by the OS on its own judgement. <strong>Not</strong> a timer.</td></tr>
+<tr><td><code>processing</code></td><td>Longer tasks, typically while charging and idle. Also not a timer.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a background task that works reliably on Android fires unpredictably or not at all on iOS.</strong> Background task scheduling on iOS is <em>advisory</em>. The OS decides, based on usage patterns, battery and charge state, and it deprioritises apps the user opens rarely — which is exactly the profile of a utility app. Design for "this will run sometimes, possibly not for a day" and make the foreground path authoritative. Never promise the user a background frequency you cannot guarantee.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Every background capability must be justified in review, and a demo video is the most effective justification.</strong> Reviewers cannot reproduce a Bluetooth-plus-background-location feature on a desk with no hardware. A short recording on a physical device, showing the feature and every permission prompt, converts a rejection into an approval. See <a href="#review">the playbook</a>.</p>
+</div>
+</section>
+
+<section id="extensions" data-chunk-id="ios.extensions" data-tags="widgets,extensions,app-groups">
+<h2>Widget and share extensions</h2>
+
+<p>Each extension is a separate target with its own bundle identifier, its own provisioning profile, and its own entry in the match configuration.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Concern</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td><strong>App group</strong></td><td>The host↔extension data bridge. Enable the capability on <em>both</em> App IDs in the portal — no API for it.</td></tr>
+<tr><td><strong>Shared storage</strong></td><td>A shared user-defaults suite keyed on the group id. Keep the payload small and pre-rendered — an extension has a tight memory budget and cannot run your whole app.</td></tr>
+<tr><td><strong>Writing from Flutter</strong></td><td>Write the widget's data whenever the underlying value changes, not when the widget asks. The extension must never need to start your Dart runtime.</td></tr>
+<tr><td><strong>Deep links from a widget</strong></td><td>A tap must route correctly whether the app is cold or warm. Test both — the cold path is the one that breaks.</td></tr>
+<tr><td><strong>Adding the target</strong></td><td>Script it. Hand-editing the Xcode project file is error-prone and unreviewable; a script that adds the target and its sources is diffable and repeatable.</td></tr>
+<tr><td><strong>Share extension</strong></td><td>Receives content from other apps. Declare the accepted types narrowly, and hand off to the host app rather than doing real work in the extension.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the widget shows placeholder data forever, or shows correct data that never updates.</strong> Almost always the app group: either not enabled on both identifiers, or the suite name differs by a character between the Dart side and the Swift side. Log the resolved group identifier on both sides once and compare them — this is five minutes and it is otherwise an afternoon.</p>
+</div>
+</section>
+
+<section id="privacy" data-chunk-id="ios.privacy" data-tags="privacy,plist,compliance">
+<h2>Privacy manifests and usage strings</h2>
+
+<p>Every permission needs a usage string, and those strings are read by reviewers and by users.</p>
+
+<pre data-lang="xml"><code>&lt;key&gt;NSLocationWhenInUseUsageDescription&lt;/key&gt;
+&lt;string&gt;Finds stations near you. Your position stays on the device.&lt;/string&gt;
+&lt;key&gt;NSLocationAlwaysAndWhenInUseUsageDescription&lt;/key&gt;
+&lt;string&gt;Records your trip while the screen is off. Never shared.&lt;/string&gt;
+&lt;key&gt;NSBluetoothAlwaysUsageDescription&lt;/key&gt;
+&lt;string&gt;Connects to your adapter to read live data from the vehicle.&lt;/string&gt;
+&lt;key&gt;NSCameraUsageDescription&lt;/key&gt;
+&lt;string&gt;Scans codes and reads receipts. Images are processed on-device.&lt;/string&gt;</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Write usage strings as one specific sentence plus, where true, the privacy guarantee.</strong> "This app needs location access" is generic and invites a rejection asking what for. Naming the feature and stating that the data stays on the device answers the reviewer's question before it is asked.</p>
+</div>
+
+<p>Additionally, recent SDK requirements mean your app — and each third-party SDK that requires one — needs a <strong>privacy manifest</strong> declaring data collection and any required-reason API usage. A missing manifest is rejected at <em>upload</em>, not in review, which at least fails fast. Audit your dependency list against the required-reason list before a submission, and re-audit after any dependency bump.</p>
+</section>
+
+<section id="review" data-chunk-id="ios.review" data-tags="app-review,rejection,compliance">
+<h2>The review-rejection playbook</h2>
+
+<p>Three rejection grounds account for most of what a privacy-focused utility app with hardware features will encounter. All three are avoidable in advance.</p>
+
+<h3>Guideline 5.1.1 — permission gating</h3>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>A pre-permission explainer screen must be Continue-only and must always proceed.</strong> You may explain why you want a permission. You may not make the app unusable until it is granted. The screen gets one Continue button, and tapping it advances whether or not the user later grants anything. A "Grant / Cancel" pair where Cancel dead-ends is the exact shape that gets rejected.</p>
+</div>
+
+<h3>Guideline 3.1.1 — payments</h3>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>No links to external donation or purchase flows on iOS.</strong> A donation link that is fine on other channels must be hidden in the iOS build. Implement it as a single visibility flag consulted by every surface that could render such a link, so adding a new surface cannot reintroduce the violation.</p>
+</div>
+
+<h3>Guideline 2.1 — demonstrate hardware features</h3>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Supply a demo video with <em>every</em> submission when your app uses background location, Bluetooth, or any hardware a reviewer cannot exercise at a desk.</strong> Apple's own wording is that updated demo videos will be needed for every submission — not once. Requirements: recorded on a <strong>physical device</strong>, showing the feature working end to end, and showing <strong>every permission prompt</strong> as it appears.</p>
+<p>Automate carrying the link. Keep it in a repository secret and append it to the review notes from the lane, so it ships with every build without anyone remembering:</p>
+<pre data-lang="ruby"><code>BETA_REVIEW_NOTES_BASE =
+  "App uses anonymous auth on launch — no sign-in or account needed to " \
+  "use any feature. Free, ad-free, open-source.".freeze
+
+def beta_review_notes
+  video = ENV["DEMO_VIDEO_URL"]
+  return BETA_REVIEW_NOTES_BASE if video.nil? || video.strip.empty?
+  "#{BETA_REVIEW_NOTES_BASE} Demo video (physical iOS device, includes the " \
+  "background-location and Bluetooth flows with all permission prompts): " \
+  "#{video.strip}"
+end</code></pre>
+<p>Degrade rather than fail when the secret is unset — a fork or a first run should still be able to build.</p>
+</div>
+
+<p>Two supporting practices: fill the beta review contact block from secrets and <strong>never fabricate a phone number</strong> (return nil and skip the field instead); and push localised beta review information ahead of the build with a no-build lane, so the first external build does not sit waiting for a form.</p>
+</section>
+
+<section id="checklist" data-chunk-id="ios.checklist" data-tags="release,checklist">
+<h2>Release checklist</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>#</th><th>Check</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Build number strictly exceeds the last uploaded one</td></tr>
+<tr><td>2</td><td>Built with the current major SDK</td></tr>
+<tr><td>3</td><td>Every signed target has a valid profile; app-group capability enabled on all of them</td></tr>
+<tr><td>4</td><td>Every declared background mode is actually used, and justified in the notes</td></tr>
+<tr><td>5</td><td>Every usage string is specific and current</td></tr>
+<tr><td>6</td><td>Privacy manifest present, for the app and for every SDK that needs one</td></tr>
+<tr><td>7</td><td><strong>A fresh demo video is recorded and linked</strong>, on a physical device, showing every permission prompt</td></tr>
+<tr><td>8</td><td>No external purchase or donation link is reachable in this build</td></tr>
+<tr><td>9</td><td>Pre-permission screens are Continue-only and always proceed</td></tr>
+<tr><td>10</td><td>Debug symbols archived; the commit tagged</td></tr>
+<tr><td>11</td><td>App icon has no alpha channel (flatten it; the validator rejects transparency)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Before the first external build, run the no-build lane that pushes beta review information and confirm in the console that the contact block, the localised descriptions and the demo-video link are all present. Discovering a missing field after a build has been uploaded costs a full review cycle.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's iOS fastlane configuration: the match file with both signed targets and the CI-read-only rule, the <code>setup_ci</code> keychain fix and the incident that produced it, the repair lane for missing profiles, the localised beta review descriptions, and the demo-video link assembled from a repository secret.</li>
+<li>Its App Store rejection playbook covering guidelines 5.1.1, 3.1.1 and 2.1, and its note that app groups have no App Store Connect API endpoint.</li>
+<li>The other project's iOS workflow: the pinned runner image, the newest-stable Xcode requirement, the CocoaPods-under-active-Ruby fix, the SSH deploy key after token 403s, and the finding that an API key may not create an app record.</li>
+</ul>
+<p>The background-mode table and the privacy-manifest requirement are standard platform behaviour, included because they constrain what the rest of the page can promise.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

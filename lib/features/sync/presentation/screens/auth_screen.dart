@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
@@ -88,15 +89,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         context.pop();
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.sync,
-          e,
-          st,
-          context: const {
-            'where': 'AuthScreen._continueAsGuest: guest sign-in failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'AuthScreen._continueAsGuest: guest sign-in failed',
+        layer: ErrorLayer.sync,
       );
       if (mounted) {
         form.setError(friendlyAuthError(e, AppLocalizations.of(context)));
@@ -153,15 +150,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         context.pop();
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.sync,
-          e,
-          st,
-          context: const {
-            'where': 'AuthScreen._submitEmail: email auth failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'AuthScreen._submitEmail: email auth failed',
+        layer: ErrorLayer.sync,
       );
       if (mounted) {
         form.setError(friendlyAuthError(e, AppLocalizations.of(context)));
@@ -185,15 +178,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         context.pop();
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.sync,
-          e,
-          st,
-          context: const {
-            'where': 'AuthScreen._switchToAnonymous: switch failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'AuthScreen._switchToAnonymous: switch failed',
+        layer: ErrorLayer.sync,
       );
       if (mounted) {
         form.setError(friendlyAuthError(e, AppLocalizations.of(context)));

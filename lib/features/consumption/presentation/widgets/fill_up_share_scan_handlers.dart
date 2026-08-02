@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/receipt_parser.dart';
@@ -134,15 +134,10 @@ Future<void> runSharedReceiptScan(
       SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
     }
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {
-          'where': 'runSharedReceiptScan: shared receipt scan failed',
-        },
-      ),
+    logFailure(
+      e,
+      st,
+      where: 'runSharedReceiptScan: shared receipt scan failed',
     );
     if (state.isMounted() && context.mounted) {
       SnackBarHelper.showError(context, l.scanReceiptFailed(e.toString()));
@@ -192,16 +187,7 @@ void scheduleSharedReceiptScanIfPending(
   try {
     path = ref.read(pendingSharedReceiptProvider.notifier).consumeDeferred();
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {
-          'where': 'AddFillUp: pending shared-receipt read failed',
-        },
-      ),
-    );
+    logFailure(e, st, where: 'AddFillUp: pending shared-receipt read failed');
     return;
   }
   if (path == null) return;
@@ -236,15 +222,10 @@ void scheduleSharedReceiptTextIfPending(
         .read(pendingSharedReceiptTextProvider.notifier)
         .consumeDeferred();
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {
-          'where': 'AddFillUp: pending shared-receipt text read failed',
-        },
-      ),
+    logFailure(
+      e,
+      st,
+      where: 'AddFillUp: pending shared-receipt text read failed',
     );
     return;
   }
@@ -264,16 +245,7 @@ void scheduleSharedReceiptTextIfPending(
         SnackBarHelper.show(context, receiptScanSuccessMessage(l, outcome));
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'AddFillUp: shared-receipt text prefill failed',
-          },
-        ),
-      );
+      logFailure(e, st, where: 'AddFillUp: shared-receipt text prefill failed');
     }
   });
 }

@@ -13,7 +13,7 @@ import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Test-only override for the GPX save sink (#2032). Originally named
 /// `*ShareOverride` when this path used the OS share sheet; preserved
@@ -64,14 +64,7 @@ Future<void> shareTripGpx(
     // #2173 — themed success toast (matches the sibling error path).
     messenger.showSnackBar(SnackBarHelper.successSnackBar(scheme, ok));
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {'where': 'TripDetailScreen save GPX'},
-      ),
-    );
+    logFailure(e, st, where: 'TripDetailScreen save GPX');
     if (messenger == null) return;
     final errorMsg = l.trajetDetailShareError;
     messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));

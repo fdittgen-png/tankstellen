@@ -92,6 +92,11 @@ docs/*
 # not inside docs/decisions/ which is reserved for ADRs).
 !docs/test-audit-*.md
 !docs/test-always-run-bucket-*.md
+# #3658 — the complete project/architecture/CI/store reference (§22 audit)
+# and the ratchet-all-dimensions plan.
+!docs/PROJECT_OVERVIEW.md
+!docs/audits/
+!docs/audits/ratchet-all-dimensions-plan.md
 # Version-controlled mirror of the agent HARD RULES (#2355) — CLAUDE.md stays
 # gitignored (#296), so the rules live here to reach a fresh clone.
 !docs/AGENT_RULES.md
@@ -118,6 +123,7 @@ docs/guides/*
 !docs/guides/app-store-listing.md
 !docs/guides/go-live-runbook.md
 !docs/guides/ios-testflight-testers.md
+!docs/guides/store-demo-videos-and-declarations.md
 !docs/guides/obd2-link-rewrite-validation.md
 !docs/guides/opening-hours.md
 !docs/guides/play-fgs-declaration.md

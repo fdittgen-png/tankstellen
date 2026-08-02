@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows — LLM Wiki · Flutter</title>
+<meta name="description" content="MSI authoring with WiX, the absolute-path harvest trap, the permanent upgrade code, protocol handler registration, and building Windows artifacts from a Mac.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Windows desktop builds for Flutter","description":"WiX MSI authoring, the absolute-path harvest trap, the permanent upgrade code, CI from a Mac.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">16 · Platforms</span>
+<h1>Windows</h1>
+<p class="lede">Flutter builds a Windows executable with one command. Turning that into something a person can install, upgrade and uninstall is an installer-authoring problem, and installer authoring has a specific failure mode: it succeeds while producing an empty package.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> win</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 15 macOS</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#packaging">Choosing a packaging format</a></li>
+<li><a href="#wix">WiX authoring, and the version to pin</a></li>
+<li><a href="#harvest">The absolute-path harvest trap</a></li>
+<li><a href="#upgradecode">The upgrade code is permanent</a></li>
+<li><a href="#protocol">Protocol handlers and deep links</a></li>
+<li><a href="#signing">Code signing on Windows</a></li>
+<li><a href="#ci">CI from a Mac-based project</a></li>
+<li><a href="#platform">Platform differences that bite</a></li>
+</ol>
+</div>
+
+<section id="packaging" data-chunk-id="win.packaging" data-tags="windows,installer,distribution">
+<h2>Choosing a packaging format</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>MSI</th><th>MSIX</th><th>Zip</th></tr></thead>
+<tbody>
+<tr><td>Install location</td><td>Per-machine or per-user</td><td>Per-user, containerised</td><td>Wherever the user unzips it</td></tr>
+<tr><td>Upgrade in place</td><td>Yes, via the upgrade code</td><td>Yes</td><td>No</td></tr>
+<tr><td>Add/Remove Programs</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+<tr><td>Registry writes</td><td>Yes — needed for protocol handlers</td><td>Restricted by the container</td><td>No</td></tr>
+<tr><td>Microsoft Store</td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td>Authoring cost</td><td>Moderate — an XML document</td><td>Moderate</td><td>Zero</td></tr>
+<tr><td>Enterprise deployment</td><td>Excellent</td><td>Good</td><td>Poor</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Pick MSI for a direct-download desktop companion; pick MSIX only if you intend to publish to the Microsoft Store.</strong> MSI gives per-machine installation, a real uninstall entry, and unrestricted registry access — which you need the moment you want a custom URL scheme to work. A zip is fine for an internal preview and unacceptable as a public download, because it has no uninstall story at all.</p>
+</div>
+</section>
+
+<section id="wix" data-chunk-id="win.wix" data-tags="wix,msi,authoring">
+<h2>WiX authoring, and the version to pin</h2>
+
+<p>WiX turns an XML document into an MSI. A minimal but complete document for a Flutter app is about forty lines.</p>
+
+<pre data-lang="xml"><code>&lt;Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"&gt;
+  &lt;Package Name="MyApp" Manufacturer="Example"
+           Version="$(var.ProductVersion)"
+           UpgradeCode="CB5062A7-BF77-4543-B7F1-E88F3FF613F8"
+           Scope="perMachine"&gt;
+
+    &lt;MajorUpgrade DowngradeErrorMessage="A newer version is already installed." /&gt;
+    &lt;MediaTemplate EmbedCab="yes" /&gt;
+
+    &lt;StandardDirectory Id="ProgramFiles64Folder"&gt;
+      &lt;Directory Id="INSTALLFOLDER" Name="MyApp" /&gt;
+    &lt;/StandardDirectory&gt;
+
+    &lt;!-- Harvest the whole publish directory. PublishDir MUST be absolute. --&gt;
+    &lt;Files Include="$(var.PublishDir)\**"&gt;
+      &lt;Exclude Files="$(var.PublishDir)\**\*.pdb" /&gt;
+    &lt;/Files&gt;
+
+    &lt;StandardDirectory Id="ProgramMenuFolder"&gt;
+      &lt;Directory Id="AppMenuFolder" Name="MyApp"&gt;
+        &lt;Component Id="StartMenuShortcut" Guid="*"&gt;
+          &lt;Shortcut Id="AppShortcut" Name="MyApp"
+                    Target="[INSTALLFOLDER]myapp.exe"
+                    WorkingDirectory="INSTALLFOLDER" /&gt;
+          &lt;RemoveFolder Id="RemoveAppMenuFolder" On="uninstall" /&gt;
+          &lt;RegistryValue Root="HKCU" Key="Software\Example\MyApp"
+                         Name="installed" Type="integer" Value="1" KeyPath="yes" /&gt;
+        &lt;/Component&gt;
+      &lt;/Directory&gt;
+    &lt;/StandardDirectory&gt;
+  &lt;/Package&gt;
+&lt;/Wix&gt;</code></pre>
+
+<pre data-lang="bash"><code>wix build windows/installer/myapp.wxs \
+  -arch x64 \
+  -d ProductVersion=1.4.2 \
+  -d PublishDir="$(pwd)/build/windows/x64/runner/Release" \
+  -o "MyApp-1.4.2.msi"</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Pin the WiX major version.</strong> One project pins to the 5.x line for two concrete reasons: version 7 and later require accepting an open-source maintenance-fee licence agreement, which fails an unattended CI build with a specific error code; and 5.x shares the v4/v5 authoring schema, so the document above does not need rewriting. Treat a WiX major bump as a migration task, not a routine update.</p>
+</div>
+</section>
+
+<section id="harvest" data-chunk-id="win.harvest" data-tags="wix,trap,build">
+<h2>The absolute-path harvest trap</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the MSI builds successfully, installs successfully, and installs nothing. The file is a few kilobytes and contains a shortcut pointing at an executable that is not there.</strong></p>
+<p><strong>Cause:</strong> WiX resolves a <code>&lt;Files Include&gt;</code> wildcard <em>relative to the <code>.wxs</code> document</em>, not relative to the working directory. A repo-relative <code>PublishDir</code> therefore points somewhere that does not exist — and an empty harvest is <strong>not an error</strong> to WiX. It builds a valid, empty package and exits zero.</p>
+<p><strong>Fix:</strong> pass an absolute path, and then guard against the failure anyway, because the next person will hit it a different way:</p>
+<pre data-lang="powershell"><code>$publish = Resolve-Path "build/windows/x64/runner/Release"
+
+# Guard 1 — the payload must exist before we build.
+if (-not (Test-Path "$publish\myapp.exe")) {
+  throw "myapp.exe missing from $publish — did `flutter build windows` run?"
+}
+
+wix build windows/installer/myapp.wxs -arch x64 `
+  -d ProductVersion=$version -d PublishDir=$publish -o $msi
+
+# Guard 2 — an MSI that small cannot contain an application.
+if ((Get-Item $msi).Length -lt 10MB) {
+  throw "MSI is $((Get-Item $msi).Length) bytes — the harvest was empty."
+}</code></pre>
+<p>Both guards exist because in one project <em>every MSI built before the fix</em> was a 6 KB shortcut with no application in it, and nothing in the build output said so.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why a size guard rather than a content assertion</span>
+<p>You could enumerate the MSI's file table and assert the executable is present, and that is strictly better. A size floor is one line, catches the same failure, and has never produced a false positive in practice. Start with the cheap guard; upgrade it if it ever fires spuriously.</p>
+</div>
+</section>
+
+<section id="upgradecode" data-chunk-id="win.upgradecode" data-tags="msi,upgrade,identity">
+<h2>The upgrade code is permanent</h2>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The <code>UpgradeCode</code> GUID is your product's permanent identity. Generate it once, commit it, and never change it.</strong> Windows uses it to recognise that a new MSI supersedes an installed one. Change it and every future installer becomes, from the OS's point of view, a <em>different product</em> — it installs alongside the old one instead of replacing it, and users accumulate copies with no indication anything is wrong.</p>
+<p>Put a comment next to it in the document saying exactly this. It is a single GUID with no visible effect during development and catastrophic effect after release.</p>
+</div>
+
+<p>Version numbering rules that follow from how the installer compares versions:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>Only the first three fields are compared</td><td><code>1.4.2.7</code> and <code>1.4.2.9</code> are the <em>same version</em> to the upgrade logic. Never encode a build number in the fourth field and expect an upgrade.</td></tr>
+<tr><td>Each field has a maximum</td><td>Major and minor cap at 255; build caps at 65 535. A wall-clock build number will not fit — keep the MSI version as plain semver.</td></tr>
+<tr><td>Version must increase</td><td><code>MajorUpgrade</code> blocks downgrades with your message. Test that message once so you know users will understand it.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>The only meaningful installer test: install version N, launch it, install version N+1 <em>without uninstalling</em>, and confirm one entry in Add/Remove Programs, the new version running, and user data preserved. Then uninstall and confirm nothing is left behind except intentionally-kept user data. Run this once per release; it takes five minutes and it is the entire risk surface.</p>
+</div>
+</section>
+
+<section id="protocol" data-chunk-id="win.protocol" data-tags="deep-links,registry,protocol-handler">
+<h2>Protocol handlers and deep links</h2>
+
+<p>Custom URL schemes on Windows are registry entries the installer writes — which is one of the main reasons to prefer MSI over a container format.</p>
+
+<pre data-lang="xml"><code>&lt;Component Id="ProtocolHandler" Guid="*" Directory="INSTALLFOLDER"&gt;
+  &lt;RegistryKey Root="HKLM" Key="Software\Classes\myapp"&gt;
+    &lt;RegistryValue Type="string" Value="URL:MyApp Protocol" /&gt;
+    &lt;RegistryValue Name="URL Protocol" Type="string" Value="" /&gt;
+    &lt;RegistryKey Key="shell\open\command"&gt;
+      &lt;RegistryValue Type="string" Value="&amp;quot;[INSTALLFOLDER]myapp.exe&amp;quot; &amp;quot;%1&amp;quot;" /&gt;
+    &lt;/RegistryKey&gt;
+  &lt;/RegistryKey&gt;
+&lt;/Component&gt;</code></pre>
+
+<p>This makes <code>myapp://…</code> launch the application with the URL as its first argument — which matters for <a href="08-authentication.html#redirect">OAuth redirects</a>, for QR payloads and for links from other applications.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the first launch handles the URL and subsequent ones do not.</strong> Windows starts a <em>new process</em> for each protocol activation. If your app is already running, the second process must detect the first, hand it the URL, and exit — otherwise you get two windows and the URL lands in the wrong one. Implement single-instance handling (a named mutex plus an IPC hand-off) at the same time as the protocol handler, not later.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Quote the executable path and the argument in the registry value.</strong> The default install path contains a space (<code>C:\Program Files\…</code>). An unquoted command splits on it, and the resulting error message names a directory rather than the real problem.</p>
+</div>
+</section>
+
+<section id="signing" data-chunk-id="win.signing" data-tags="signing,smartscreen,certificates">
+<h2>Code signing on Windows</h2>
+
+<p>Signing is optional in the sense that an unsigned MSI installs. It is not optional in the sense that users will run it.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Unsigned</th><th>Standard certificate</th><th>Extended-validation certificate</th></tr></thead>
+<tbody>
+<tr><td>SmartScreen on first download</td><td>Prominent warning; the run option is hidden behind "More info"</td><td>Warning until reputation accumulates</td><td>Trusted immediately</td></tr>
+<tr><td>Cost</td><td>None</td><td>Annual</td><td>Higher annual, plus organisation validation</td></tr>
+<tr><td>Key storage</td><td>—</td><td>Increasingly hardware-token-only</td><td>Hardware token</td></tr>
+<tr><td>CI-friendly</td><td>—</td><td>Awkward — a token is physical; cloud signing services exist</td><td>Same</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>If you ship unsigned, say so on the download page and explain the warning.</strong> A user who hits an unexplained SmartScreen block concludes the software is malicious — which is the intended behaviour of the warning. A one-paragraph note ("this build is not code-signed; click More info → Run anyway") converts an abandoned download into a completed one. This is the Windows form of <a href="04-robustness.html#honest">honest degradation</a>: do not pretend the artifact is something it is not.</p>
+</div>
+
+<p>Hardware-token requirements make signing genuinely awkward for a CI pipeline. If you need it, budget for a cloud signing service rather than assuming a certificate file can sit in a secret.</p>
+</section>
+
+<section id="ci" data-chunk-id="win.ci" data-tags="ci,github-actions,cross-platform">
+<h2>CI from a Mac-based project</h2>
+
+<p>You do not need a Windows machine. A hosted Windows runner builds and packages, and the artifact comes back as a release asset.</p>
+
+<pre data-lang="yaml"><code>name: Windows MSI
+on:
+  workflow_dispatch:
+    inputs: { ref: { description: 'Ref to build', default: 'master' } }
+  pull_request:
+    paths: ['windows/**', '.github/workflows/windows-msi.yml']
+  push:
+    tags: ['v*']
+
+jobs:
+  msi:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with: { ref: "${{ inputs.ref || github.ref }}" }
+
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: "3.41.9" }
+
+      - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter build windows --release
+
+      # Pinned major — v7+ requires accepting a licence agreement that
+      # fails an unattended build.
+      - run: dotnet tool install --global wix --version 5.0.2
+
+      - name: Build the MSI (absolute PublishDir + both guards)
+        shell: pwsh
+        run: ./windows/installer/build.ps1 -Version "${{ steps.v.outputs.semver }}"
+
+      - uses: actions/upload-artifact@v4
+        with: { name: windows-msi, path: "*.msi" }
+
+      - name: Attach to the release on a tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: gh release upload "${GITHUB_REF#refs/tags/}" *.msi
+        env: { GH_TOKEN: "${{ github.token }}" }</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Run the Windows build on pull requests that touch shared Dart code, even though you only distribute from tags.</strong> A <code>dart:io</code> assumption, a path separator, or a plugin with no Windows implementation then fails in CI rather than at release time — when you are least able to absorb the delay. Build on PRs, package on tags.</p>
+</div>
+</section>
+
+<section id="platform" data-chunk-id="win.platform" data-tags="windows,dart,platform-differences">
+<h2>Platform differences that bite</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Area</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td><strong>Path separators</strong></td><td>Always <code>path.join</code>. A hard-coded <code>/</code> works in many places on Windows and fails in exactly the ones that matter.</td></tr>
+<tr><td><strong>Path length</strong></td><td>The classic 260-character limit still bites in deep build trees. Keep CI checkout paths short.</td></tr>
+<tr><td><strong>Line endings</strong></td><td>Set <code>* text=auto</code> in <code>.gitattributes</code>, or generated-file diffs will differ per platform and your codegen-drift job will fail on Windows for no real reason.</td></tr>
+<tr><td><strong>Case sensitivity</strong></td><td>The filesystem is case-insensitive. An import with the wrong case works on Windows and fails on Linux CI.</td></tr>
+<tr><td><strong>Secure storage</strong></td><td>Backed by the Windows credential store; quotas and behaviour differ from the mobile keychains. Test it, do not assume.</td></tr>
+<tr><td><strong>Window management</strong></td><td>Set a minimum window size in the native runner. The default is not usable.</td></tr>
+<tr><td><strong>Plugin coverage</strong></td><td>Sparser than macOS. Check each plugin has a Windows implementation before promising the target; a missing one usually throws at runtime.</td></tr>
+<tr><td><strong>Bluetooth / NFC / camera</strong></td><td>Assume unavailable and hide those surfaces. See <a href="12-nfc-rfid.html#status">three-state availability</a>.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the codegen-drift CI job fails only on the Windows runner.</strong> Line-ending normalisation. Generated files written on Windows carry <code>\r\n</code>, the committed versions carry <code>\n</code>, and every generated file appears modified. Fix it in <code>.gitattributes</code> before adding a Windows job, not after.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's Windows MSI workflow and its WiX v5 authoring: the pinned tool version with the licence-agreement rationale, the absolute-<code>PublishDir</code> requirement discovered after every earlier MSI shipped empty, the two guards (missing executable, undersized MSI), the permanent upgrade-code GUID, and the per-machine install with a Start-menu shortcut and a protocol-handler registration.</li>
+</ul>
+<p>The signing comparison, the single-instance protocol trap and the platform-differences table are general Windows knowledge rather than observations from that project's code.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

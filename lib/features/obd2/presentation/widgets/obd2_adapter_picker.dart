@@ -5,7 +5,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -16,8 +15,11 @@ import '../../data/obd2_adapter_identity.dart';
 import '../../data/obd2_connection_errors.dart';
 import '../../data/obd2_connection_service.dart';
 import '../../data/obd2_pairing_mode.dart';
+import '../../data/obd2_scan_readiness.dart';
 import '../../data/obd2_service.dart';
 import 'obd2_picker_supervised_dial.dart';
+import 'obd2_scan_empty_state.dart';
+import 'obd2_scan_error_state.dart';
 import '../obd2_connection_error_l10n.dart';
 import '../obd2_connect_telemetry.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -204,7 +206,7 @@ class Obd2AdapterPickerSheet extends ConsumerStatefulWidget {
       _Obd2AdapterPickerSheetState();
 }
 
-enum _Phase { scanning, selecting, connecting, error }
+enum _Phase { scanning, selecting, connecting, error, blocked }
 
 class _Obd2AdapterPickerSheetState
     extends ConsumerState<Obd2AdapterPickerSheet> {
@@ -236,6 +238,34 @@ class _Obd2AdapterPickerSheetState
       _candidates = const [];
       _error = null;
     });
+    unawaited(_preflightThenScan());
+  }
+
+  /// Resolve the scan-readiness probe BEFORE burning a radio-scan
+  /// window: a user with Bluetooth off (or Android location services
+  /// off — the blocker that makes a scan return empty with no error)
+  /// gets the diagnostic instantly instead of after a spinner that was
+  /// always going to time out.
+  ///
+  /// FAIL-OPEN by design: only a positively-identified, non-promptable
+  /// blocker diverts. `ready` scans, obviously — but so does a plain
+  /// `permissionDenied`, because `scan()` calls `permissions.request()`
+  /// and the scan IS the prompt; pre-flight-blocking it would mean the
+  /// OS permission dialog could never appear. The probe itself never
+  /// throws (probe faults resolve optimistically), so a broken probe
+  /// can never hide the scan path either.
+  Future<void> _preflightThenScan() async {
+    final readiness =
+        await ref.read(obd2ScanReadinessProbeProvider).resolve();
+    if (!mounted || _phase != _Phase.scanning) return;
+    if (!readiness.canScan && !readiness.isPromptable) {
+      setState(() => _phase = _Phase.blocked);
+      return;
+    }
+    _beginRadioScan();
+  }
+
+  void _beginRadioScan() {
     final connection = ref.read(obd2ConnectionProvider);
     _supportsClassicDiscovery = connection.supportsClassicDiscovery;
     unawaited(_sub?.cancel());
@@ -441,6 +471,8 @@ class _Obd2AdapterPickerSheetState
           ],
         );
       case _Phase.selecting:
+        // Zero candidates: the diagnostic empty state resolves WHY.
+        if (_candidates.isEmpty) return Obd2ScanEmptyState(onRetry: _startScan);
         // #3103 — recognized adapters first, then NAMED-but-unrecognized
         // devices under an "other devices" header so discovery surfaces ALL
         // adapters, not just catalog-known ones.
@@ -504,54 +536,18 @@ class _Obd2AdapterPickerSheetState
           ],
         );
       case _Phase.error:
-        // When the underlying error is a permission denial we surface
-        // a second CTA — "Open Settings" — alongside the existing
-        // Retry. This unblocks users who have already tapped "Don't
-        // Allow" on the iOS Bluetooth prompt (the system stops
-        // re-prompting and Retry alone never reaches a granted state).
-        // Tapping the button calls permission_handler's
-        // [openAppSettings], which deep-links into the app's row in
-        // iOS Settings (or the Apps page on Android). On a successful
-        // grant, the user comes back to the picker and Retry now
-        // succeeds.
-        final isPermissionError = _error is Obd2PermissionDenied;
-        return Column(
-          key: const Key('obdPickerError'),
-          children: [
-            Icon(Icons.error_outline,
-                color: Theme.of(context).colorScheme.error, size: 48),
-            const SizedBox(height: 8),
-            Text(
-              _error?.localizedMessage(l) ??
-                  l.errorUnknown,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              key: const Key('obdPickerRetry'),
-              onPressed: _startScan,
-              icon: const Icon(Icons.refresh),
-              label: Text(l.retry),
-            ),
-            if (isPermissionError) ...[
-              const SizedBox(height: 8),
-              OutlinedButton.icon(
-                key: const Key('obdPickerOpenSettings'),
-                onPressed: () {
-                  // Fire-and-forget — the OS handles the deep link, we
-                  // don't need the resolved bool. Best-effort: if the
-                  // platform reports failure we still leave the picker
-                  // in its error state so Retry stays accessible.
-                  unawaited(openAppSettings());
-                },
-                icon: const Icon(Icons.settings),
-                label: Text(
-                  l.obdPermissionDenied,
-                ),
-              ),
-            ],
-          ],
-        );
+        // A scan TIMEOUT is not an error to explain — it is an empty
+        // result to diagnose. Route it to the readiness-probing empty
+        // state, which names the actual blocker (radio off mid-scan,
+        // Android location services off, or genuinely nothing in
+        // range) instead of a generic "nothing found" sentence.
+        if (_error is Obd2ScanTimeout) {
+          return Obd2ScanEmptyState(onRetry: _startScan);
+        }
+        return Obd2ScanErrorState(error: _error, onRetry: _startScan);
+      case _Phase.blocked:
+        // Pre-flight found a non-promptable blocker — no scan ran.
+        return Obd2ScanEmptyState(onRetry: _startScan);
     }
   }
 }

@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specification-driven development — LLM Wiki · Flutter</title>
+<meta name="description" content="Writing an owner-validated, implementation-free specification; resolving contradictions before code; the amendment discipline that keeps a spec honest.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Specification-driven development","description":"An implementation-free spec, resolving contradictions before code, and the amendment discipline.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">02 · Method</span>
+<h1>Specification-driven development</h1>
+<p class="lede">A specification is not a backlog and not a design document. It is a validated statement of intended behaviour, free of implementation detail, that names its own contradictions and records how each was resolved. Written this way it stays useful for years; written any other way it is stale within a sprint.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> spec</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> —</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#why">Why a spec, when you have issues</a></li>
+<li><a href="#anatomy">Anatomy of a working specification</a></li>
+<li><a href="#contradictions">Resolving contradictions in writing</a></li>
+<li><a href="#leitmotiv">The feature filter</a></li>
+<li><a href="#amendment">Keeping a spec honest: the amendment discipline</a></li>
+<li><a href="#spec-to-issues">From spec to issues to code</a></li>
+<li><a href="#epics">Epics and the validation gate</a></li>
+<li><a href="#agents">Specifications and AI assistants</a></li>
+</ol>
+</div>
+
+<section id="why" data-chunk-id="spec.why" data-tags="specification,rationale,process">
+<h2>Why a spec, when you have issues</h2>
+
+<p>An issue tracker records intent in fragments, ordered by when someone thought of it; a specification records intent as a whole, ordered by how the product works.</p>
+
+<p>The two are not substitutes. In practice, the difference shows up at four moments:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Moment</th><th>With only issues</th><th>With a spec</th></tr></thead>
+<tbody>
+<tr><td>A new contributor arrives</td><td>Reads 300 closed issues to infer the domain model</td><td>Reads one document and knows the nouns</td></tr>
+<tr><td>Two features interact</td><td>The interaction is discovered in code review, or in production</td><td>The interaction was already a paragraph, because both features are on the same page</td></tr>
+<tr><td>A requirement is ambiguous</td><td>Each implementer resolves it differently; the product acquires two behaviours</td><td>The ambiguity is a recorded, resolved contradiction with a rationale</td></tr>
+<tr><td>An AI assistant is asked to implement something</td><td>It infers the domain from the code and confidently invents the parts that are missing</td><td>It is pointed at the section that defines the behaviour</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>The most expensive class of defect is not a wrong line of code — it is two subsystems that each behave correctly according to a different reading of the same requirement. That defect cannot be caught by a test, because both sides pass their own tests. It is caught by writing the requirement down once, in one place, and having a human with authority say "yes, that is what I meant".</p>
+</div>
+</section>
+
+<section id="anatomy" data-chunk-id="spec.anatomy" data-tags="specification,template,structure">
+<h2>Anatomy of a working specification</h2>
+
+<p>A specification that survives contact with implementation has a specific shape: domain nouns first, behaviour second, everything implementation-flavoured excluded by construction.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Section</th><th>Contains</th><th>Explicitly excludes</th></tr></thead>
+<tbody>
+<tr><td><strong>Status header</strong></td><td>Version, validation date, who validated it, repository, licence</td><td>—</td></tr>
+<tr><td><strong>Vision &amp; leitmotiv</strong></td><td>The two-sentence purpose and the two-to-four goals every feature must serve</td><td>Feature lists</td></tr>
+<tr><td><strong>Market position</strong></td><td>What exists already and why this is different</td><td>Marketing copy</td></tr>
+<tr><td><strong>Personas &amp; roles</strong></td><td>Each actor, what they may do, how roles compose</td><td>Auth implementation</td></tr>
+<tr><td><strong>Domain model</strong></td><td>Every noun, defined once, with its relationships and lifecycle states</td><td>Table names, column types</td></tr>
+<tr><td><strong>Behaviour, one section per surface</strong></td><td>What happens, in what order, with what edge cases and defaults</td><td>Widget names, class names</td></tr>
+<tr><td><strong>Rules &amp; configuration</strong></td><td>Every tunable, with its default, as a table</td><td>Where the setting is stored</td></tr>
+<tr><td><strong>Non-functional constraints</strong></td><td>Privacy, offline behaviour, platform reach, licence constraints</td><td>Library choices</td></tr>
+<tr><td><strong>Out of scope / later versions</strong></td><td>What was considered and deliberately deferred, with the version</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>No implementation detail in the specification.</strong> No framework names, no package names, no class names, no table names. The test: if switching from one state-management library to another would require editing the spec, the spec is contaminated. Implementation choices belong in architecture decision records, which the spec may link to but must not depend on.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Two quick audits that catch most drift. <strong>One:</strong> every noun used anywhere in the behaviour sections appears in the domain model with a definition. <strong>Two:</strong> every configurable value mentioned in prose also appears in the rules table with a default. A tunable named in prose but absent from the table is how two implementers end up choosing two different defaults.</p>
+</div>
+</section>
+
+<section id="contradictions" data-chunk-id="spec.contradictions" data-tags="specification,ambiguity,requirements">
+<h2>Resolving contradictions in writing</h2>
+
+<p>Requirements arrive contradictory. The valuable act is not eliminating the contradiction silently but recording it, resolving it, and leaving both the resolution and its reasoning in the document.</p>
+
+<p>The convention that works is a numbered callout inline at the point of resolution:</p>
+
+<pre data-lang="markdown"><code>&gt; **Resolved contradiction #1:** the original brief says check-in is "on the
+&gt; desk", and elsewhere "to a chair or office". Resolution: the bookable unit
+&gt; is the **seat** (the 6×4 slot); the chair is a property of the seat; a whole
+&gt; office is bookable only when flagged as such.
+
+&gt; **Resolved contradiction #2:** the brief lists plans as "100%, 50%,
+&gt; sometimes, or 50% and then, if more, paying more". Resolution: *"50% and if
+&gt; more, pay more"* **is** the Half plan with overage — it is not a fourth
+&gt; plan. "Sometimes" is the Flex plan.</code></pre>
+
+<p>A second, related convention covers hazards found during research rather than in the brief:</p>
+
+<pre data-lang="markdown"><code>&gt; **Resolved pitfall (research):** walk-up versus future-reservation conflicts
+&gt; and double-booking races are the #1 failure mode of these systems. All
+&gt; availability decisions are transactional and conflict-checked at
+&gt; confirmation time, never against a possibly-stale view.</code></pre>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Both callouts do the same job: they stop the question being reopened. Without the written resolution, the third engineer to read the brief re-derives the ambiguity, picks the other reading because it is marginally simpler, and ships a second behaviour. With it, the cost of revisiting the decision is bounded — you can disagree with the recorded reasoning, but you cannot accidentally rediscover the problem.</p>
+</div>
+
+<p>A resolved contradiction should record three things: <em>what</em> was ambiguous, <em>what</em> was decided, and — if the decision is not obvious — <em>why</em> that reading and not the other. Skip the third only when the resolution is self-evidently the only workable one.</p>
+</section>
+
+<section id="leitmotiv" data-chunk-id="spec.leitmotiv" data-tags="specification,scope,product">
+<h2>The feature filter</h2>
+
+<p>Name two to four goals in the specification, and make every feature justify itself against at least one of them. This is the cheapest scope-control mechanism available.</p>
+
+<p>Both source projects use one, and both state it identically in structure — an ordered list of goals, followed by an explicit sentence that a proposal serving none of them is refused before code is written.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Project</th><th>The filter</th></tr></thead>
+<tbody>
+<tr>
+  <td><span class="pill src-sparkilo">sparkilo</span></td>
+  <td>Every feature must reduce the cost of a kilometre driven: (1) buy fuel for less, (2) burn less of it per kilometre, (3) see what you actually spent.</td>
+</tr>
+<tr>
+  <td><span class="pill src-deskilo">deskilo</span></td>
+  <td>(1) Know where you can sit, (2) know what you owe or are owed, (3) run the space without a landlord platform.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>The mechanism only works if it is enforced somewhere a proposal cannot avoid. Put the goals in the feature-request issue template as a <strong>required checkbox group</strong>, with the sentence "a feature serving none of these will be pushed back on" next to it. That converts a stated value into a step in the workflow.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Order the goals, and treat the order as priority.</strong> An unordered list of goals lets any feature find a justification. An ordered one lets you say "this serves goal three, and we have unfinished work on goal one" — which is the conversation you actually need to have.</p>
+</div>
+</section>
+
+<section id="amendment" data-chunk-id="spec.amendment" data-tags="specification,maintenance,staleness">
+<h2>Keeping a spec honest: the amendment discipline</h2>
+
+<p>A validated specification must not be silently rewritten when the product moves past it. Annotate it instead — an amendment block plus inline superseded-notes — so the original intent and the current reality are both visible.</p>
+
+<p>The problem is structural. The specification's value comes from having been validated by whoever owns the product; rewriting it unilaterally destroys exactly that property. But leaving it unmarked while the product diverges makes it actively misleading. The resolution used successfully:</p>
+
+<ol>
+<li><strong>An amendment block immediately after the preamble</strong>, listing every area where the product has moved past the validated text, each pointing at the decision record or wiki page that now governs.</li>
+<li><strong>Inline superseded-notes at the affected sections</strong>, stating what changed and — importantly — whether the <em>constraint that produced</em> the original text still holds. A payments section written under a "no third-party SDKs" constraint may be superseded in its specifics while the constraint remains intact; saying so prevents the constraint being discarded along with the paragraph.</li>
+<li><strong>An explicit admission where a whole subsystem has no section yet.</strong> "The invoicing chain has no section of its own; see decision record 0010 and the wiki" is honest and actionable. Silence is neither.</li>
+</ol>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a design document describes shipped work as a proposal.</strong> One project's payments-integration document opened a section with "new migration (not yet written — ship with the first live provider)" while the document's own status line said "implemented". The migration had shipped months earlier, extended twice. Anyone reading section by section — which is how anyone reads a long document — would have concluded the feature did not exist.</p>
+<p><strong>Countermeasure:</strong> when a design document's status changes, grep it for future-tense construction ("will", "not yet", "to be", "planned") and resolve every hit. Retitle superseded sections as historical rather than deleting them; the reasoning is often still the best record of why the shipped thing has the shape it does.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Maintain a known-gaps section, and put it in the derived overview rather than the spec.</strong> One project's project-overview document ends with a numbered list of every discrepancy between the committed documentation and the verified state of the code, the repository configuration and the live backend — each marked fixed or outstanding. It is the most valuable section in the entire documentation set, because it is the only one that tells you which of the others to distrust. Reproduce this pattern; it costs an hour a quarter and it is the difference between documentation people trust and documentation people route around.</p>
+</div>
+</section>
+
+<section id="spec-to-issues" data-chunk-id="spec.spec-to-issues" data-tags="process,issues,traceability">
+<h2>From spec to issues to code</h2>
+
+<p>The chain runs specification → issue → branch → commit → pull request → release note, and every link carries the identifier of the previous one.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never develop without an issue.</strong> Every change traces to one. This is not bureaucracy — it is the mechanism that makes <a href="05-traceability.html">page 05</a>'s traceability chain possible at all. A commit with no issue is a change whose motivation is unrecoverable in six months.</p>
+</div>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Link</th><th>Carries</th><th>Convention</th></tr></thead>
+<tbody>
+<tr><td>Issue → spec</td><td>The spec section defining the behaviour</td><td>Linked in the issue body; the issue template prompts for it</td></tr>
+<tr><td>Branch → issue</td><td>Type prefix and a slug</td><td><code>feat/</code>, <code>fix/</code>, <code>refactor/</code>, <code>test/</code>, <code>docs/</code>, <code>chore/</code>, <code>ci/</code>, <code>perf/</code></td></tr>
+<tr><td>Commit → issue</td><td>Conventional-commit subject naming the scope</td><td><code>type(scope): imperative subject under 72 chars, no trailing period</code></td></tr>
+<tr><td>PR → issue</td><td>Auto-close keyword</td><td><code>Closes #NN</code> in the body</td></tr>
+<tr><td>Release note → PR</td><td>Generated from PR titles</td><td>Which is why PR titles must be written for a user, not a reviewer</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>One commit per closed issue, even inside a bundled pull request.</strong> The PR title summarises the bundle; the commit log preserves the per-issue rationale permanently. Squash-merging a five-issue PR into one commit destroys four fifths of that record — so squash each issue's work into its own commit before merging, and merge the PR as a stack of those.</p>
+</div>
+</section>
+
+<section id="epics" data-chunk-id="spec.epics" data-tags="process,epics,planning">
+<h2>Epics and the validation gate</h2>
+
+<p>Work larger than one pull request, or touching more than one subsystem, becomes an epic — and its breakdown is validated by the maintainer <em>before</em> any child issue is filed.</p>
+
+<p>The gate matters more than the format. Filing twelve child issues from an unvalidated breakdown produces twelve issues that all need re-scoping, plus the social cost of closing them. The sequence:</p>
+
+<ol>
+<li><strong>File the epic parent</strong> containing: the goal in user-visible terms with a link to the spec section; a dependency-ordered list of proposed child tasks; risks and open questions; and an explicit validation checkbox.</li>
+<li><strong>Stop.</strong> Get the breakdown validated.</li>
+<li><strong>Then</strong> file the children, in dependency order, each linking back to the parent.</li>
+<li><strong>Close the epic only after every child pull request has merged</strong> — not when they are in flight. A premature close pollutes the open-issue list if any of them is reverted.</li>
+</ol>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Signal</th><th>Task</th><th>Epic</th></tr></thead>
+<tbody>
+<tr><td>Pull requests needed</td><td>One</td><td>More than one</td></tr>
+<tr><td>Subsystems touched</td><td>One</td><td>Several</td></tr>
+<tr><td>Needs a decision recorded</td><td>No</td><td>Usually — often as the first child</td></tr>
+<tr><td>Schema or migration involved</td><td>Rarely</td><td>Often</td></tr>
+<tr><td>Can be described in one sentence</td><td>Yes</td><td>No</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Make the <em>first</em> child of a design-heavy epic a decision task whose deliverable is an architecture decision record, not code. It costs one issue and it prevents the far more common failure: three implementation children built on three incompatible assumptions, discovered at integration.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a parked issue reads as "still open" and nobody knows it is waiting on you.</strong> When work is deferred pending a decision, make the decision-needed state explicit — a label, a comment naming exactly what is being asked, and a proposed default so the answer can be "yes, do that". An issue left open with no marker is indistinguishable from an issue nobody has started, and it will sit there until someone asks why the count is not going down.</p>
+</div>
+</section>
+
+<section id="agents" data-chunk-id="spec.agents" data-tags="ai-agents,specification,workflow">
+<h2>Specifications and AI assistants</h2>
+
+<p>A written specification is disproportionately valuable when part of the implementation is done by a model, because a model will confidently fill any gap you leave.</p>
+
+<p>Three practices that made the difference:</p>
+
+<ul>
+<li><strong>Point at the section, not the repository.</strong> "Implement §5.2 series reservations" produces a scoped change. "Add recurring bookings" produces an invented domain model that will disagree with the one already in the database.</li>
+<li><strong>Keep a version-controlled rules file that agents load automatically</strong>, and make it a mirror of the binding rules rather than a second source. One project keeps its assistant-facing rules file deliberately untracked for local reasons, and therefore maintains a committed mirror at <code>docs/AGENT_RULES.md</code> so a fresh clone on another machine still carries the rules. Whatever the arrangement, the rules must travel with the repository.</li>
+<li><strong>State the lint rules up front in every implementation prompt.</strong> The rules that cost the most re-work were always the repo-specific ones a model cannot infer: the stack-trace-in-catch requirement, the design-token requirement, the "analyze includes <code>test/</code>" requirement. One project recorded the stack-trace rule being violated four times in a single session before it was added to the standard prompt preamble.</li>
+</ul>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>A specification is agent-ready when a model can answer, from the document alone: what are the nouns, what are the states each noun can be in, what happens on each user action including the error cases, and what is configurable with what default. If it has to read the code to answer any of those, the gap it fills will be an invention.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's owner-validated product specification, including its resolved-contradiction and resolved-pitfall conventions, its ordered feature filter, and its amendment block.</li>
+<li>Both projects' issue templates (bug, feature with the leitmotiv checkbox group, epic with the validation gate), pull-request templates, and committed agent-rules files.</li>
+<li>The known-gaps section of one project's derived overview document, which supplied the staleness examples in <a href="#amendment">the amendment discipline</a>.</li>
+</ul>
+<p>The task-versus-epic signal table is a synthesis of both projects' practice rather than a quotation from either.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

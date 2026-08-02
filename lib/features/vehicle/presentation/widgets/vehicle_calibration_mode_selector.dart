@@ -1,8 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,7 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../providers/calibration_mode_providers.dart';
 import '../../providers/vehicle_providers.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Rule / Fuzzy toggle for the vehicle baseline calibration (#894).
 ///
@@ -32,29 +30,19 @@ class VehicleCalibrationModeSelector extends ConsumerWidget {
 
     // The vehicle-list provider can throw when its storage dependency
     // is not wired (e.g. isolated widget tests that pump this section
-    // without a full app scope). Fall back to an empty card in that
-    // case rather than crashing the whole screen.
-    VehicleProfile profile;
-    try {
-      profile = ref
+    // without a full app scope). Fall back to an empty profile in that
+    // case rather than crashing the whole screen — the `id.isEmpty`
+    // branch below then hides the selector.
+    final profile = guard(
+      () => ref
           .watch(vehicleProfileListProvider)
           .firstWhere(
             (v) => v.id == vehicleId,
             orElse: () => const VehicleProfile(id: '', name: ''),
-          );
-    } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'VehicleCalibrationModeSelector: profile lookup failed',
-          },
-        ),
-      );
-      return const SizedBox.shrink();
-    }
+          ),
+      where: 'VehicleCalibrationModeSelector: profile lookup failed',
+      fallback: const VehicleProfile(id: '', name: ''),
+    );
 
     if (profile.id.isEmpty) {
       // Profile not yet saved — segmented button isn't wired.

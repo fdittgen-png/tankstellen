@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bluetooth &amp; BLE — LLM Wiki · Flutter</title>
+<meta name="description" content="Permission matrices per OS version, the classic-RFCOMM reconnect hang, dual reconnect authorities, connection state machines, background limits and device-layer testing.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Bluetooth and BLE in Flutter","description":"Permissions, reconnect hangs, dual reconnect authorities, state machines, background limits.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">10 · Device</span>
+<h1>Bluetooth &amp; BLE</h1>
+<p class="lede">Bluetooth is where a well-architected Flutter app usually meets its first genuinely hard problem. The API surface looks simple; the failure modes are timing-dependent, device-specific, and mostly invisible to unit tests. This page is a catalogue of the ones that cost real weeks.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> ble</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations · 04 Robustness</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#transports">Two transports, two failure profiles</a></li>
+<li><a href="#permissions">Permissions, by OS version</a></li>
+<li><a href="#state-machine">One connection state machine</a></li>
+<li><a href="#ownership">One reconnect authority</a></li>
+<li><a href="#rfcomm">The classic-RFCOMM reconnect hang</a></li>
+<li><a href="#park">Park, reuse and the dead-session trap</a></li>
+<li><a href="#liveness">Liveness on a stream that never errors</a></li>
+<li><a href="#background">Background execution limits</a></li>
+<li><a href="#registry">A device registry, not a special case</a></li>
+<li><a href="#testing">Testing a device layer</a></li>
+</ol>
+</div>
+
+<section id="transports" data-chunk-id="ble.transports" data-tags="bluetooth,ble,rfcomm,transport">
+<h2>Two transports, two failure profiles</h2>
+
+<p>"Bluetooth" means two incompatible things, and a device that supports both will behave differently on each.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>BLE (GATT)</th><th>Classic (RFCOMM / SPP)</th></tr></thead>
+<tbody>
+<tr><td>Model</td><td>Services, characteristics, notifications</td><td>A serial stream over a single channel</td></tr>
+<tr><td>Pairing</td><td>Usually none required</td><td>Usually system-paired first</td></tr>
+<tr><td>iOS support</td><td>Yes, via Core Bluetooth</td><td><strong>No</strong> for arbitrary devices (MFi programme only)</td></tr>
+<tr><td>Throughput</td><td>Low; MTU-limited</td><td>Higher</td></tr>
+<tr><td>Typical failure</td><td>Silent disconnect; notifications stop arriving</td><td><strong>Connect hangs indefinitely</strong> — see <a href="#rfcomm">below</a></td></tr>
+<tr><td>Timeout on connect</td><td>Plugin-provided</td><td><strong>None</strong> on Android's <code>connect()</code> — you must impose one</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Many real-world dongles are <strong>dual-mode</strong>: they advertise both, and which one you get depends on how the user paired them. Detect the transport rather than assuming, and record it in the trace log on every connection — half of all "it worked yesterday" reports are actually "it connected over the other transport yesterday".</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Abstract the transport behind one interface and select it at runtime.</strong> The rest of the app talks to a <code>DeviceLink</code> with connect / send / receive / disconnect. Which transport backs it is a detail of the link, discovered from the device. Without this seam, transport-specific behaviour leaks into the protocol layer and every fix has to be written twice.</p>
+</div>
+</section>
+
+<section id="permissions" data-chunk-id="ble.permissions" data-tags="permissions,android,ios,manifest">
+<h2>Permissions, by OS version</h2>
+
+<p>Android's Bluetooth permission model changed twice and the old shape is still required on older API levels — so you declare all of them, with version gates.</p>
+
+<pre data-lang="xml"><code>&lt;!-- Android 12+ (API 31+) --&gt;
+&lt;uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+    android:usesPermissionFlags="neverForLocation" /&gt;
+&lt;uses-permission android:name="android.permission.BLUETOOTH_CONNECT" /&gt;
+
+&lt;!-- Android 11 and below --&gt;
+&lt;uses-permission android:name="android.permission.BLUETOOTH"
+    android:maxSdkVersion="30" /&gt;
+&lt;uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+    android:maxSdkVersion="30" /&gt;
+&lt;!-- Scanning implied location before API 31. Only if you must support it. --&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+    android:maxSdkVersion="30" /&gt;
+
+&lt;uses-feature android:name="android.hardware.bluetooth_le"
+    android:required="false" /&gt;</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Declare <code>neverForLocation</code> on <code>BLUETOOTH_SCAN</code> if you do not derive location from scan results.</strong> Without it the scan permission implies location access, which shows up in the store listing's permission summary and in the data-safety declaration — and users read both. With it, you can honestly declare that Bluetooth is not a location channel for your app.</p>
+</div>
+
+<p>iOS needs usage descriptions in <code>Info.plist</code>, and the wording is reviewed:</p>
+
+<pre data-lang="xml"><code>&lt;key&gt;NSBluetoothAlwaysUsageDescription&lt;/key&gt;
+&lt;string&gt;Connects to your adapter to read live data from the device.&lt;/string&gt;
+&lt;key&gt;NSBluetoothPeripheralUsageDescription&lt;/key&gt;
+&lt;string&gt;Connects to your adapter to read live data from the device.&lt;/string&gt;</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: scanning returns nothing on one Android device and works on another, with permissions granted on both.</strong> On many Android builds, BLE scanning requires <em>location services to be switched on system-wide</em> — not merely the location permission granted. The scan then succeeds and returns an empty list, with no error. Check the location-services state explicitly and tell the user to enable it; an empty scan result is indistinguishable from "no devices nearby" otherwise.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Before debugging any scan problem, verify in this order: adapter powered on, permissions granted, location services on (Android), and the device actually advertising. Each has a distinct programmatic check. A scan layer that cannot report <em>which</em> of these failed will generate unactionable bug reports forever — the same three-state-availability argument made for NFC on <a href="12-nfc-rfid.html#status">page 12</a>.</p>
+</div>
+</section>
+
+<section id="state-machine" data-chunk-id="ble.state-machine" data-tags="state-machine,architecture,connection">
+<h2>One connection state machine</h2>
+
+<p>Model the link as an explicit state machine with named states and legal transitions. Boolean flags scattered across a controller cannot express "connecting but the user just cancelled", and that is exactly the state you will spend a week in.</p>
+
+<pre data-lang="dart"><code>enum LinkState {
+  idle,          // no device selected
+  scanning,
+  connecting,
+  handshaking,   // protocol init after transport is up
+  ready,         // usable
+  degraded,      // connected, but some capability is missing
+  reconnecting,
+  parked,        // deliberately held open but idle — see below
+  failed,        // terminal for this attempt; carries a reason
+}</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Property</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td>Every transition is logged with its trigger</td><td>The trace is the only forensic record; a state change with no recorded cause is a dead end during triage</td></tr>
+<tr><td><code>failed</code> carries a typed reason</td><td>"Adapter off", "out of range", "protocol timeout" and "user cancelled" need different UI. A generic failure means a generic, useless message.</td></tr>
+<tr><td><code>degraded</code> exists at all</td><td>A device connected but missing a capability is a real and common state. Collapsing it into "connected" makes the resulting bad data inexplicable.</td></tr>
+<tr><td>Illegal transitions throw in debug</td><td>Catches the class of bug where two code paths both drive the link</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The state machine is the single source of truth for the UI.</strong> No screen may infer connectivity from a side channel — a last-packet timestamp, a non-null session object, a boolean on a service. When two places can answer "are we connected", they will eventually disagree, and the UI will show a spinner over a working connection or a live reading over a dead one.</p>
+</div>
+</section>
+
+<section id="ownership" data-chunk-id="ble.ownership" data-tags="reconnect,concurrency,architecture">
+<h2>One reconnect authority</h2>
+
+<p>Exactly one component may decide to reconnect. Two is the single most destructive architecture mistake available in this area.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the app reconnects continuously during a session — connect traces appear 0–1 ms apart, alternating between two different initiators.</strong> Two reconnect authorities existed: an app-wide "keep the device connected" service and a session-scoped "the recording lost its link" manager. Each saw the other's disconnect as a failure and re-initiated. The adapter was hammered, the session never stabilised, and the user-visible symptom — "permanently reconnecting" — pointed at the radio rather than at the architecture.</p>
+<p><strong>The tell:</strong> connect attempts timestamped microseconds apart, with alternating source tags in the trace. If your traces do not carry a source tag on connection attempts, add one before doing anything else — it converts a week of guessing into a minute of reading.</p>
+<p><strong>The fix:</strong> an explicit ownership latch. While a session owns the link, the app-wide service stands down entirely.</p>
+</div>
+
+<pre data-lang="dart"><code>/// Exactly one owner may drive reconnection at a time.
+class LinkOwnership {
+  Object? _owner;
+
+  bool acquire(Object who) {
+    if (_owner != null &amp;&amp; _owner != who) return false;
+    _owner = who;
+    TraceLogger.instance.info('ble', 'link owned by $who');
+    return true;
+  }
+
+  void release(Object who) {
+    if (_owner == who) {
+      _owner = null;
+      TraceLogger.instance.info('ble', 'link released by $who');
+    }
+  }
+
+  bool mayReconnect(Object who) =&gt; _owner == null || _owner == who;
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Tag every connection attempt in the trace with its initiator.</strong> One field. It is the difference between a diagnosable reconnect storm and an unexplainable one, and you cannot add it retroactively to a log that has already been collected from a user.</p>
+</div>
+</section>
+
+<section id="rfcomm" data-chunk-id="ble.rfcomm" data-tags="rfcomm,android,timeout,reconnect">
+<h2>The classic-RFCOMM reconnect hang</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: after a dropped classic connection, the next connect attempt hangs for 80–120 seconds before failing, with the native layer logging a repeated read error.</strong> The adapter has a single serial channel, and the peer still considers it held after an abrupt drop. Android's <code>BluetoothSocket.connect()</code> has <strong>no timeout parameter</strong> and will block until the OS gives up — which can exceed two minutes. To the user, the app is frozen.</p>
+<p><strong>The fix is a watchdog, because the API gives you nothing else:</strong></p>
+<pre data-lang="dart"><code>Future&lt;DeviceLink&gt; connectClassic(DeviceId id) async {
+  final attempt = _platform.connect(id);          // may block for minutes
+  try {
+    return await attempt.timeout(const Duration(seconds: 7));
+  } on TimeoutException {
+    // Abandon the socket, force-close it, let the stack release the
+    // channel, and try once more. A second failure is reported as a
+    // typed, actionable error — not a hang.
+    await _platform.forceClose(id);
+    await Future&lt;void&gt;.delayed(const Duration(milliseconds: 800));
+    return await _platform
+        .connect(id)
+        .timeout(const Duration(seconds: 7),
+                 onTimeout: () =&gt; throw const LinkError.channelHeld());
+  }
+}</code></pre>
+<p>Seven seconds is empirical: a healthy classic connect completes in well under two, and anything past seven has essentially always failed. Tune against your own device population — but impose <em>a</em> timeout, because the platform will not.</p>
+</div>
+
+<p>Two supporting practices:</p>
+<ul>
+<li><strong>Always force-close before reconnecting</strong>, even when you believe the socket is already gone. It is cheap and it releases the channel.</li>
+<li><strong>Surface the wait.</strong> If a reconnect can take seven seconds, the UI must say "reconnecting" with a cancel affordance — not freeze. And per <a href="04-robustness.html">page 04</a>, an idle reconnect indicator should not blanket the whole app; a status dot carries it better than a full-width banner.</li>
+</ul>
+</section>
+
+<section id="park" data-chunk-id="ble.park" data-tags="lifecycle,state-machine,bug">
+<h2>Park, reuse and the dead-session trap</h2>
+
+<p>If you add a "parked" state to avoid tearing the link down between uses, you must also add the wake path — and prove something calls it.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a feature that worked stops working after a refactor, with no error anywhere. The link reports connected; nothing arrives.</strong> A park/reuse optimisation was added so the link survived between sessions. The <code>wake()</code> method that would revive a parked link <strong>had zero callers</strong>. The coordinator held a reference to a session that had been parked and then invalidated, so every command went into a dead object that dutifully accepted them.</p>
+<p><strong>Countermeasures, all three:</strong></p>
+<ol>
+<li><strong>Grep for callers of every new lifecycle method before merging.</strong> A public lifecycle method with no callers is either dead code or a missing wire-up, and both are bugs. This is <a href="03-tdd-and-testing.html#bugfix">step 7 of the bug-fix protocol</a> applied at write time.</li>
+<li><strong>Make a stale handle fail loudly.</strong> A parked or disposed session must throw on use, not silently accept. A dead object that accepts commands is the worst possible failure mode because it produces no evidence at all.</li>
+<li><strong>Add an integration test that exercises the full park → wake → use cycle</strong>, not just the individual transitions.</li>
+</ol>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Validate device-layer fixes on hardware, on a build that actually contains them.</strong> Both projects record device-layer fixes marked "needs on-device validation" that sat unvalidated across releases. A device-layer change is not done when CI is green — a headless test cannot observe a radio. Note the required validation explicitly in the pull request, and check the build number before concluding a fix did not work: a stale beta build is the most common cause of "still broken".</p>
+</div>
+</section>
+
+<section id="liveness" data-chunk-id="ble.liveness" data-tags="streams,watchdog,error-handling">
+<h2>Liveness on a stream that never errors</h2>
+
+<p>Device streams commonly emit a sentinel on failure rather than erroring, which makes <code>onError</code> and <code>onDone</code> unreachable — so liveness must ride the data path.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a watchdog never fires even though the device is plainly gone.</strong> A telemetry stream designed to emit <code>null</code> on a failed read, and to keep polling forever, never errors and never closes. Every callback-based liveness check attached to it is dead code. See <a href="04-robustness.html#streams">page 04</a> for the general form; the fix is an in-band tick counter:</p>
+<pre data-lang="dart"><code>sub = telemetry.listen((sample) {
+  if (sample == null &amp;&amp; !_link.isConnected) {
+    if (++_missed &gt; _threshold) _handleLoss();
+  } else {
+    _missed = 0;
+    _onSample(sample);
+  }
+});</code></pre>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: an uncaught "transport closed" error crashes an isolate at startup.</strong> A pending completer was completed with an error before any listener had attached. Dart treats an error delivered to a future or stream with no listener as unhandled. When you complete a pending operation with an error during teardown, either attach a no-op handler at creation time or check for listeners before completing — and prefer completing with a typed <em>value</em> representing the failure over completing with an error, for exactly this reason.</p>
+</div>
+</section>
+
+<section id="background" data-chunk-id="ble.background" data-tags="background,android,ios,foreground-service">
+<h2>Background execution limits</h2>
+
+<p>What a Bluetooth connection can do with the screen off is entirely different on the two platforms, and neither behaves the way the desktop mental model suggests.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Android</th><th>iOS</th></tr></thead>
+<tbody>
+<tr><td>Keep a connection alive in background</td><td>Yes, with a foreground service and its notification</td><td>Yes for BLE, with the <code>bluetooth-central</code> background mode</td></tr>
+<tr><td>Wake the app when a known device appears</td><td>Yes, via a scan with a pending intent</td><td>Yes, state-restoration relaunches the app for a known peripheral</td></tr>
+<tr><td>Sustained processing while backgrounded</td><td>Yes, in the foreground service</td><td><strong>Severely limited</strong> — brief windows only</td></tr>
+<tr><td>Classic RFCOMM</td><td>Yes</td><td><strong>Not available</strong> outside the MFi programme</td></tr>
+<tr><td>Store paperwork</td><td>A foreground-service declaration form</td><td>Background-mode entitlements, reviewed</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: location and sensor callbacks arrive in ~5-second batches instead of continuously once the screen is off.</strong> Android batches background delivery aggressively. A foreground service is the documented lever, but declaring one now requires a store-approved justification — and until that is approved, shipping the permission can block your release upload entirely. One project handles this with a single build-time flag that flips <em>both</em> halves in lockstep: the Dart code that requests the foreground service, and the manifest overlay that declares the permissions. The default build ships with zero foreground-service permissions so uploads never fail; one flag restores the whole feature once the paperwork clears. See <a href="13-android.html#fgs">page 13</a>.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Design the feature to degrade to foreground-only, and say so in the UI.</strong> Background device work is a privilege granted by two operating systems and two review teams, any of which can withdraw it. A feature that is worthless without it is a feature built on someone else's policy.</p>
+</div>
+</section>
+
+<section id="registry" data-chunk-id="ble.registry" data-tags="devices,configuration,compatibility">
+<h2>A device registry, not a special case</h2>
+
+<p>Real hardware varies. Put the variation in data — a registry keyed by advertised name, manufacturer id or service UUID — rather than in branches.</p>
+
+<pre data-lang="dart"><code>class AdapterProfile {
+  const AdapterProfile({
+    required this.matcher,          // name pattern / service UUID
+    required this.transport,        // ble | classic | dual
+    required this.initSequence,     // protocol handshake commands
+    this.connectTimeout = const Duration(seconds: 7),
+    this.requiresPairing = false,
+    this.knownQuirks = const &lt;String&gt;[],
+  });
+}</code></pre>
+
+<p>What belongs in the registry: the transport, the handshake, timeouts, whether system pairing is required, unsupported capabilities, and known quirks with a human-readable note. What does <em>not</em> belong: anything the device can be asked at runtime — always prefer interrogation over a hard-coded assumption, and fall back to the registry only for what cannot be discovered.</p>
+
+<div class="callout why">
+<span class="tag">Why a registry earns its keep</span>
+<p>Support becomes a data change instead of a code change. A user reports a dongle that will not connect; you add an entry with the right transport and timeout and ship it in the next release without touching the link layer. Publishing the registry as documentation also lets users check compatibility before buying — one project maintains exactly such a page, and it measurably reduces the support load.</p>
+</div>
+</section>
+
+<section id="testing" data-chunk-id="ble.testing" data-tags="testing,fakes,replay">
+<h2>Testing a device layer</h2>
+
+<p>You cannot unit-test a radio. You can test everything on either side of it, and that turns out to be most of what breaks.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Layer</th><th>How</th><th>Catches</th></tr></thead>
+<tbody>
+<tr><td><strong>Protocol codec</strong></td><td>Pure unit tests over recorded byte frames</td><td>Parsing, framing, checksums, malformed input</td></tr>
+<tr><td><strong>State machine</strong></td><td>Unit tests driving transitions directly</td><td>Illegal transitions, stuck states, missing wake paths</td></tr>
+<tr><td><strong>Link behaviour</strong></td><td>A fake transport with scripted delays, drops and garbage</td><td>Timeouts, retry logic, the reconnect storm</td></tr>
+<tr><td><strong>Session replay</strong></td><td>Replay a captured real session through the real stack</td><td>Regressions in decoding and in session lifecycle</td></tr>
+<tr><td><strong>On device</strong></td><td>A manual checklist per release</td><td>Everything else</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="dart"><code>/// A transport fake that can misbehave the way real hardware does.
+class ScriptedTransport implements DeviceTransport {
+  ScriptedTransport(this.script);
+  final List&lt;TransportEvent&gt; script;   // delay, bytes, drop, hang, garbage
+
+  @override
+  Future&lt;void&gt; connect() async {
+    final e = script.removeAt(0);
+    if (e.hangs) await Future&lt;void&gt;.delayed(const Duration(minutes: 2));
+    if (e.fails) throw const LinkError.unreachable();
+  }
+}</code></pre>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Three scripted scenarios worth having permanently, because each maps to a trap on this page: <strong>(1)</strong> connect hangs, then succeeds on retry — asserts the watchdog fires and the retry works; <strong>(2)</strong> a mid-session drop while a second component also wants the link — asserts exactly one reconnect authority acts; <strong>(3)</strong> the stream emits sentinels forever without erroring — asserts the in-band liveness check fires.</p>
+</div>
+
+<p>Keep a written on-device checklist for each release: cold connect, warm reconnect, mid-session drop and recovery, adapter powered off during use, phone Bluetooth toggled during use, backgrounded for five minutes, and device out of range and returning. Seven scenarios, ten minutes, and they cover the failures the automated suite structurally cannot reach.</p>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's OBD-II link layer and its rewrite epic: the dual-mode adapter registry, the published adapter-compatibility guide, the link-ownership latch, the 7-second RFCOMM watchdog, the park/reuse dead-session incident, the never-erroring telemetry stream, and the unhandled "transport closed" completer error.</li>
+<li>The same project's foreground-service gating: one build-time flag flipping both the Dart request and the manifest overlay, defaulting to zero foreground-service permissions.</li>
+<li>Its recorded reconnect-storm diagnosis, including the identifying signature of alternating sub-millisecond connect traces.</li>
+</ul>
+<p>The <code>LinkOwnership</code>, <code>AdapterProfile</code> and <code>ScriptedTransport</code> snippets are illustrative reconstructions of the described designs. The iOS/Android background-capability table is standard platform behaviour, included because it constrains what the rest of the page can promise.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

@@ -26,7 +26,7 @@ import '../widgets/trip_share_sheet.dart';
 import 'trip_detail_downloads.dart';
 import 'trip_detail_gpx_share.dart';
 import 'trip_detail_sample_converter.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Test-only override for the lazy fetcher (#1541 phase 4). Lets the
 /// trip-detail widget test inject a fake fetch result without spinning
@@ -259,14 +259,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         if (!mounted) return;
         await ref.read(tripHistoryListProvider.notifier).save(hydrated);
       } catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.ui,
-            e,
-            st,
-            context: const {'where': 'TripDetailScreen lazy-fetch'},
-          ),
-        );
+        logFailure(e, st, where: 'TripDetailScreen lazy-fetch');
       }
     });
   }
@@ -291,14 +284,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         // waiting for a route change.
         await countNotifier.refresh();
       } catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.ui,
-            e,
-            st,
-            context: const {'where': 'TripDetailScreen badge decrement'},
-          ),
-        );
+        logFailure(e, st, where: 'TripDetailScreen badge decrement');
       }
     });
   }
@@ -329,14 +315,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       // Surface the failure to the user instead of silently swallowing
       // it — the snackbar tells them the share didn't go through, and
       // the debugPrint keeps the cause in `flutter logs` for support.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'TripDetailScreen share image'},
-        ),
-      );
+      logFailure(e, st, where: 'TripDetailScreen share image');
       if (messenger == null) return;
       final errorMsg = l.trajetDetailShareError;
       messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));

@@ -1,0 +1,71 @@
+# LLM Wiki — Building Flutter Applications
+
+> A field-proven reference for building, testing, hardening and shipping cross-platform Flutter applications, derived from two production apps that ship to Google Play, the Apple App Store, F-Droid, macOS, Windows and the web. Every rule in this wiki traces to a specific failure that cost a CI round-trip, a store rejection, or a user-visible outage — the rationale is recorded next to the rule, not implied. Scope: architecture, specification-driven development, TDD, robustness, traceability, caching, Supabase, authentication, confidentiality, Bluetooth/BLE, barcode/QR, NFC/RFID, Android, iOS, macOS, Windows, F-Droid, GitHub CI, go-live and tester management.
+
+Conventions used throughout:
+- **RULE** callouts are binding constraints; violating one is a defect, not a style choice.
+- **TRAP** callouts record a failure that actually happened, with the symptom that identifies it.
+- **WHY** callouts carry the rationale for a decision, so it can be re-litigated on evidence.
+- **CHECK** callouts are verification steps — the command or test that proves the thing works.
+- Provenance pills mark whether a practice comes from project A (`sparkilo`), project B (`deskilo`), or both.
+- Every page has stable section anchors and `data-chunk-id` attributes so sections chunk cleanly for retrieval.
+
+## Start here
+
+- [How to use this wiki](00-how-to-use-this-wiki.html): the document model, callout taxonomy, provenance system, and how to chunk these pages for retrieval.
+- [Foundations & architecture](01-foundations-architecture.html): the stack, feature-first layering, the boundary rules that are lint-enforced, state management with Riverpod codegen, and the service-chain fallback pattern.
+
+## Method
+
+- [Specification-driven development](02-specification-driven-development.html): writing an owner-validated, implementation-free spec; resolving contradictions before code; the amendment discipline that keeps a spec honest as the product moves.
+- [TDD & the test pyramid](03-tdd-and-testing.html): the 70/20/10 pyramid, the eight-step bug-fix protocol, twin-bug audits, fakes over mocks, false-green failure modes, coverage gates.
+- [Robustness & error handling](04-robustness.html): never-silent catches, the guarded-mutation helper, honest degradation, episode gating, streams that swallow errors, producer/consumer parity.
+- [Traceability & observability](05-traceability.html): issue-first development, one commit per issue, the always-on trace ring buffer, crash forensics, and tracing a shipped build back to a commit.
+
+- [Recurring bugs & regressions](27-recurring-bugs.html): the protocol for a bug that comes back — stop patching, enumerate the causes hiding behind one symptom, fix the source not the trigger, write the reproduction at the level the bug lives, never delete another fix's defenses unproven, never ship diagnostics as product; plus detector blind spots, cycle-time fingerprinting and forensics for crashes that leave no traces.
+
+## Data & backend
+
+- [Caching](06-caching.html): the fresh/stale/miss tier model, TTL constants, cache-key design, schema-versioned invalidation, eviction that preserves stale fallback.
+- [Supabase backend](07-supabase.html): migrations as immutable numbered files, RLS default-deny, SECURITY DEFINER RPCs, the permission matrix kept in lockstep, edge functions, self-hostability and client/server schema parity.
+- [Authentication & Google sign-in](08-authentication.html): browser-based OAuth without a vendor SDK, anonymous-to-permanent upgrade preserving identity, deep-link redirects, linked identities, and why a button that cannot work is worse than no button.
+- [Confidentiality & security](09-confidentiality.html): what never leaves the device, secure storage vs plain storage, secret hygiene in CI, the store privacy declarations, and the consent-gated error reporter.
+
+## Device capabilities
+
+- [Bluetooth & BLE](10-bluetooth.html): permission matrices per OS version, the classic-RFCOMM reconnect hang, dual reconnect authorities, connection-state machines, and background limits.
+- [Barcode & QR](11-barcode-qr.html): the libre scanner swap for GMS-free builds, generating scannable codes, the injectable scanner seam for tests, and 7-segment OCR when there is no code to scan.
+- [NFC & RFID](12-nfc-rfid.html): three-state availability so a silent tap is diagnosable, session lifecycle on a long-lived kiosk, UID normalisation as a credential contract, platform reality.
+
+## Platform targets
+
+- [Android](13-android.html): flavors, signing that never falls back to debug, R8 and the class it silently strips, foreground services and the Play declaration, per-ABI version codes, manifest overlays.
+- [iOS / iPhone](14-ios.html): fastlane match, the keychain hang that eats a CI job, App Store Connect API-key limits, background execution, widget and share extensions, and the review-rejection playbook.
+- [macOS](15-macos.html): the sandbox and keychain decision tree, Developer ID versus App Store signing, notarisation as a hard requirement, and honest degradation for unsigned artifacts.
+- [Windows](16-windows.html): MSI authoring with WiX, the absolute-path harvest trap, the permanent upgrade code, and building Windows artifacts from a Mac.
+- [F-Droid](17-fdroid.html): the two distribution channels, making a build genuinely libre, the three-layer proprietary-code audit, the reproducible-build recipe, and the lockfile that must be regenerated.
+
+## Shipping
+
+- [GitHub: repo, CI & traceable process](18-github.html): workflow topology, sharding, green-tree skips, required checks codified as data, the matrix-skip trap, Dependabot lockstep clusters, branch protection.
+- [Go-live runbook](19-go-live.html): the ordered checklist across all five channels, what only a human can do, irreplaceable secrets, staged rollout, and rollback.
+- [Testers & Google Groups](20-testers-google-groups.html): managing Play testers with a Google Group, TestFlight internal versus external groups, public links, and the invitation mechanics that fail silently.
+
+## Runtime surfaces
+
+- [Background execution & always-visible UI](21-background-and-pinning.html): recording while the app is not in the foreground on Android, iOS and F-Droid; foreground services and their store declaration; batching, Doze and OEM process killers; push without a proprietary service; keeping the screen on; pinning the app; picture-in-picture tiles, Live Activities and home-screen widgets.
+- [Maps with OpenStreetMap](22-maps-openstreetmap.html): tiles and the usage policy, a caching tile proxy, the four grey-tile pathologies and the one hardened tile layer, camera lifecycle, markers and clustering, adding your own data layers, geocoding and routing, offline maps, and contributing data back to OSM.
+
+## Quality
+
+- [Performance](25-performance.html): frame and startup budgets measured in profile mode on device, rebuild discipline with const and narrow watches, list and layout economics, the custom-painter shouldRepaint contract, Impeller and what it does not fix, isolates for anything beyond a few milliseconds, image decode size and memory, startup as a CI budget, and app-size analysis with --analyze-size and split-debug-info.
+- [Localisation, time & accessibility](26-l10n-time-a11y.html): the ratchet-enforced string externalisation rule, the ARB fragment pipeline and its parity gates, machine-filled versus hand-maintained locale strategies, pseudo-locale and real-locale expansion survival, ICU discipline, the two-clock timezone doctrine, the injectable clock seam with its wall-clock lint, and accessibility enforced as tap-target, contrast and semantics tests under the European Accessibility Act floor.
+
+## Collaboration
+
+- [Working with AI agents](28-ai-agents.html): the orchestration discipline both projects converged on — standing rules that bind agents and humans, agents write while the orchestrator verifies, file affinity deciding the fan-out, generated files regenerated never hand-merged, the serial merge train, and the verification traps (piped exit codes, stale merge-ref reruns, backtick-eaten comment bodies) that make trust mechanical.
+- [GitHub craft](23-github-craft.html): writing issues someone can act on, labels and triage, GitHub Projects, branch and commit conventions, pull requests that get reviewed, review order, merge strategy and auto-merge, running and debugging CI, the README, the wiki, release notes, and the repository's own metadata files.
+
+## Optional
+
+- [Two projects compared](24-two-projects-compared.html): a candid audit of the two source projects — what each does better, what each is missing, and which practice to adopt when they disagree.

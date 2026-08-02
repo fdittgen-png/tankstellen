@@ -11,6 +11,7 @@ import '../../../sync/presentation/widgets/qr_share_widget.dart';
 import 'tank_sync_delete_data_tile.dart';
 import 'tank_sync_relink_tile.dart';
 import 'tank_sync_schema_outdated_tile.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/sync/sync_config.dart';
@@ -281,13 +282,11 @@ class TankSyncSection extends ConsumerWidget {
       } catch (e, st) {
         // #2146 — route to errorLogger so the failure lands on the
         // exportable log (the snackbar is transient).
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.sync,
-            e,
-            st,
-            context: const {'where': 'TankSyncSection: switchToAnonymous'},
-          ),
+        logFailure(
+          e,
+          st,
+          where: 'TankSyncSection: switchToAnonymous',
+          layer: ErrorLayer.sync,
         );
         if (context.mounted) {
           SnackBarHelper.showError(

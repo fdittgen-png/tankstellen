@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/permissions/location_permissions.dart';
 import '../../../../core/widgets/section_card.dart';
@@ -123,14 +124,7 @@ class AutoRecordSection extends ConsumerWidget {
             orElse: () => const VehicleProfile(id: '', name: ''),
           );
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'AutoRecordSection: profile lookup failed'},
-        ),
-      );
+      logFailure(e, st, where: 'AutoRecordSection: profile lookup failed');
       return const SizedBox.shrink();
     }
 
@@ -213,31 +207,21 @@ class AutoRecordSection extends ConsumerWidget {
     return ref.read(vehicleProfileListProvider.notifier).save(next);
   }
 
-  /// Persist [next] at drag-end and surface any write error to the user via
-  /// [SnackBarHelper.showError] (#2314 — slider onChangeEnd guard).
+  /// Persist [next] at drag-end and surface any write error to the user
+  /// (#2314 — slider onChangeEnd guard). One [runGuarded] call carries the
+  /// whole contract: trace + mounted check + error toast.
   Future<void> _persistWithFeedback(
     BuildContext context,
     WidgetRef ref,
     AppLocalizations l,
     VehicleProfile next,
-  ) async {
-    try {
-      await _persist(ref, next);
-    } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'AutoRecordSection._persistWithFeedback'},
-        ),
-      );
-      if (!context.mounted) return;
-      SnackBarHelper.showError(
-        context,
-        l.autoRecordBackgroundLocationRequestFailedSnackbar,
-      );
-    }
+  ) {
+    return runGuarded(
+      context,
+      where: 'AutoRecordSection._persistWithFeedback',
+      errorText: l.autoRecordBackgroundLocationRequestFailedSnackbar,
+      action: () => _persist(ref, next),
+    );
   }
 
   /// Map the four real states the auto-record orchestrator gates on

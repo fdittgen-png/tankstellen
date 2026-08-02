@@ -21,6 +21,7 @@ import 'impl/widget_group_id.dart';
 import 'impl/widget_reload_dispatcher.dart';
 import 'nearest_widget_data_builder.dart';
 import 'predictive_payload.dart';
+import '../../../core/error/guarded.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Manages data for the Android home screen widgets.
@@ -635,9 +636,7 @@ class HomeWidgetService {
       debugPrint('HomeWidget: $where skipped (benign) — $e');
       return;
     }
-    unawaited(
-      errorLogger.log(ErrorLayer.storage, e, st, context: {'where': where}),
-    );
+    logFailure(e, st, where: where, layer: ErrorLayer.storage);
   }
 }
 
