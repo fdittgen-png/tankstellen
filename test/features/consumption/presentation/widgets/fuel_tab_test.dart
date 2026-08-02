@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/achievements/domain/achievement.dart';
 import 'package:tankstellen/features/achievements/presentation/widgets/badge_shelf.dart';
@@ -174,6 +175,43 @@ void main() {
       expect(flexes, containsAllInOrder(<int>[2, 3]));
     });
   });
+
+  group('swipe-to-delete undo (#3664)', () {
+    testWidgets('dismissing a fill-up shows the undo snackbar and Undo '
+        'restores it in the provider state', (tester) async {
+      await pumpApp(
+        tester,
+        FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
+        overrides: [
+          achievementsProvider.overrideWithValue(earned),
+          gamificationEnabledProvider.overrideWithValue(false),
+          activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
+          fillUpListProvider.overrideWith(() => _MutableFillUpList(fillUps)),
+        ],
+      );
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(FuelTab)),
+      );
+      expect(container.read(fillUpListProvider), hasLength(1));
+
+      await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+
+      // Deleted from the provider; the undo affordance is up.
+      expect(container.read(fillUpListProvider), isEmpty);
+      expect(find.text(l10nEn.fillUpDeletedUndoSnackbar), findsOneWidget);
+
+      await tester.tap(find.text(l10nEn.undo));
+      await tester.pumpAndSettle();
+
+      // Restored: the captured fill-up is back, same id.
+      expect(
+        container.read(fillUpListProvider).map((f) => f.id),
+        contains('f1'),
+      );
+    });
+  });
 }
 
 /// Returns null for the active vehicle so [TankLevelCard] short-circuits
@@ -190,4 +228,26 @@ class _FixedFillUpList extends FillUpList {
 
   @override
   List<FillUp> build() => _value;
+}
+
+/// In-memory FillUpList whose remove/update mutate state directly —
+/// no repository, so the swipe-to-delete + undo flow (#3664) can be
+/// exercised without Hive.
+class _MutableFillUpList extends FillUpList {
+  _MutableFillUpList(this._value);
+  final List<FillUp> _value;
+
+  @override
+  List<FillUp> build() => List.of(_value);
+
+  @override
+  Future<void> remove(String id) async {
+    state = state.where((f) => f.id != id).toList();
+  }
+
+  @override
+  Future<void> update(FillUp fillUp) async {
+    state = [...state.where((f) => f.id != fillUp.id), fillUp];
+  }
+
 }

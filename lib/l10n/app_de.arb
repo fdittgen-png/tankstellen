@@ -3936,6 +3936,8 @@
   "tripVerdictAggressive": "Aggressiv",
   "tripVerdictDismiss": "Jetzt nicht",
   "tripVerdictThanks": "Danke — das hilft, deine Fahranalyse zu kalibrieren.",
+  "fillUpDeletedUndoSnackbar": "Tankfüllung gelöscht",
+  "trajetDeletedUndoSnackbar": "Aufzeichnung gelöscht",
   "unifiedFilterFuel": "Kraftstoff",
   "unifiedFilterEv": "EV",
   "unifiedFilterBoth": "Beide",

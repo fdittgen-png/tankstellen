@@ -14030,6 +14030,18 @@ abstract class AppLocalizations {
   /// **'Thanks — this helps calibrate your driving analysis.'**
   String get tripVerdictThanks;
 
+  /// Undo snackbar shown after a fill-up is deleted (swipe on the Carburant list or the correction sheet's delete button, #3664). The trailing Undo action restores it within the 10 s window.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-up deleted'**
+  String get fillUpDeletedUndoSnackbar;
+
+  /// Undo snackbar shown after a trip recording is deleted (trip detail screen or the virtual-trajet sheet, #3664). The trailing Undo action restores it within the 10 s window.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording deleted'**
+  String get trajetDeletedUndoSnackbar;
+
   /// Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c).
   ///
   /// In en, this message translates to:

@@ -43,7 +43,13 @@ class SnackBarHelper {
 
   static const Duration _infoDuration = Duration(seconds: 3);
   static const Duration _errorDuration = Duration(seconds: 5);
-  static const Duration _undoDuration = Duration(seconds: 4);
+
+  /// #3664 — the undo window for destructive actions (delete a fill-up,
+  /// a recording, a favorite, ignore a station). 10 seconds by
+  /// maintainer directive: an accidental delete must be recoverable
+  /// "without problems", and 4 s was gone before the user's eyes came
+  /// back from the swipe. Public so tests pin the contract.
+  static const Duration undoDuration = Duration(seconds: 10);
 
   // ---- Builders -------------------------------------------------------
   // Pure: take only already-resolved values, so they stay safe to call
@@ -142,6 +148,20 @@ class SnackBarHelper {
     );
   }
 
+  /// An undo [SnackBar] builder for call sites past an async gap or a
+  /// `Navigator.pop` (#3664): capture the [ScaffoldMessengerState] and
+  /// the localized [undoLabel] BEFORE the gap, then show this. Same
+  /// [undoDuration] window as [showWithUndo].
+  static SnackBar undoSnackBar(
+    String message, {
+    required VoidCallback onUndo,
+    required String undoLabel,
+  }) => infoSnackBar(
+    message,
+    duration: undoDuration,
+    action: SnackBarAction(label: undoLabel, onPressed: onUndo),
+  );
+
   /// Show a snackbar with an undo action. [undoLabel] defaults to the
   /// localized "Undo" string — never a hard-coded literal.
   static void showWithUndo(
@@ -153,11 +173,7 @@ class SnackBarHelper {
     if (!context.mounted) return;
     final label = undoLabel ?? AppLocalizations.of(context).undo;
     ScaffoldMessenger.of(context).showSnackBar(
-      infoSnackBar(
-        message,
-        duration: _undoDuration,
-        action: SnackBarAction(label: label, onPressed: onUndo),
-      ),
+      undoSnackBar(message, onUndo: onUndo, undoLabel: label),
     );
   }
 

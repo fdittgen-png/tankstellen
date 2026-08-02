@@ -678,6 +678,33 @@ void main() {
       expect(find.byKey(const Key('trip_detail_delete_button')), findsNothing);
     });
 
+    testWidgets('after delete, Undo restores the recording within the '
+        '10 s window (#3664)', (tester) async {
+      final handles = await _pumpDetail(
+        tester,
+        entry: _seedEntry(),
+        activeVehicle: vehicle,
+        vehicles: const [vehicle],
+        samples: _seedSamples(),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('trip_detail_delete_button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('trip_detail_delete_confirm')));
+      await tester.pumpAndSettle();
+
+      // The undo snackbar outlives the popped detail screen (the
+      // messenger was captured before the pop).
+      expect(find.text('Recording deleted'), findsOneWidget);
+      await tester.tap(find.text('Undo'));
+      await tester.pumpAndSettle();
+
+      // Undo re-saves the captured entry losslessly — same id.
+      expect(handles.tripsNotifier.saveCalls, hasLength(1));
+      expect(handles.tripsNotifier.saveCalls.single.id, 'trip-1');
+    });
+
     testWidgets('cancel → delete NOT called', (tester) async {
       final handles = await _pumpDetail(
         tester,

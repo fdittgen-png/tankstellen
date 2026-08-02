@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/add_fill_up_validators.dart';
@@ -125,9 +128,23 @@ class _EditCorrectionFillUpSheetState
   }
 
   Future<void> _delete() async {
-    await ref.read(fillUpListProvider.notifier).remove(widget.fillUp.id);
+    // #3664 — capture the messenger + localized strings BEFORE the
+    // await/pop (SnackBarHelper contract): the sheet's own context dies
+    // with the pop, but the undo snackbar must outlive it.
+    final messenger = ScaffoldMessenger.of(context);
+    final l = AppLocalizations.of(context);
+    final notifier = ref.read(fillUpListProvider.notifier);
+    final deleted = widget.fillUp;
+    await notifier.remove(deleted.id);
     if (!mounted) return;
     Navigator.of(context).pop();
+    messenger.showSnackBar(
+      SnackBarHelper.undoSnackBar(
+        l.fillUpDeletedUndoSnackbar,
+        undoLabel: l.undo,
+        onUndo: () => unawaited(notifier.update(deleted)),
+      ),
+    );
   }
 
   @override
