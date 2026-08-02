@@ -4191,6 +4191,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get catalogReresolveSnackbarAction => 'Aktualisieren';
 
   @override
+  String get catalogResetAction => 'Aus Fahrzeugdatenbank zurücksetzen';
+
+  @override
+  String get catalogResetConfirmTitle =>
+      'Aus der Fahrzeugdatenbank zurücksetzen?';
+
+  @override
+  String catalogResetConfirmBody(String vehicle) {
+    return 'Tankgröße, Motorleistung und Hubraum dieses Fahrzeugs werden durch die Datenbankwerte für $vehicle ersetzt. Andere Felder und deine Tankhistorie bleiben unverändert.';
+  }
+
+  @override
+  String get catalogResetNoMatchSnackbar =>
+      'Kein passender Eintrag in der Fahrzeugdatenbank für dieses Fahrzeug.';
+
+  @override
+  String get catalogResetDoneSnackbar =>
+      'Fahrzeugdaten aus der Datenbank zurückgesetzt.';
+
+  @override
   String get consumptionTabFuel => 'Kraftstoff';
 
   @override

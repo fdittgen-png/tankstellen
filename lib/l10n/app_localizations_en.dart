@@ -4148,6 +4148,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogReresolveSnackbarAction => 'Update';
 
   @override
+  String get catalogResetAction => 'Reset from vehicle database';
+
+  @override
+  String get catalogResetConfirmTitle => 'Reset from the vehicle database?';
+
+  @override
+  String catalogResetConfirmBody(String vehicle) {
+    return 'This replaces the tank capacity, engine power and displacement of this vehicle with the database values for $vehicle. Other fields and your fill-up history are not touched.';
+  }
+
+  @override
+  String get catalogResetNoMatchSnackbar =>
+      'No matching entry in the vehicle database for this vehicle.';
+
+  @override
+  String get catalogResetDoneSnackbar =>
+      'Vehicle data reset from the database.';
+
+  @override
   String get consumptionTabFuel => 'Fuel';
 
   @override
@@ -12545,6 +12564,26 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get catalogReresolveSnackbarAction => '⟦Úƥđáŧé ···⟧';
+
+  @override
+  String get catalogResetAction => '⟦Řéšéŧ ƒřóɱ ṽéĥîçłé đáŧáƀášé ···········⟧';
+
+  @override
+  String get catalogResetConfirmTitle =>
+      '⟦Řéšéŧ ƒřóɱ ŧĥé ṽéĥîçłé đáŧáƀášé? ············⟧';
+
+  @override
+  String catalogResetConfirmBody(String vehicle) {
+    return '⟦Ŧĥîš řéƥłáçéš ŧĥé ŧáñķ çáƥáçîŧý, éñǧîñé ƥóŵéř áñđ đîšƥłáçéɱéñŧ óƒ ŧĥîš ṽéĥîçłé ŵîŧĥ ŧĥé đáŧáƀášé ṽáłúéš ƒóř $vehicle. Óŧĥéř ƒîéłđš áñđ ýóúř ƒîłł-úƥ ĥîšŧóřý ářé ñóŧ ŧóúçĥéđ. ····························································⟧';
+  }
+
+  @override
+  String get catalogResetNoMatchSnackbar =>
+      '⟦Ñó ɱáŧçĥîñǧ éñŧřý îñ ŧĥé ṽéĥîçłé đáŧáƀášé ƒóř ŧĥîš ṽéĥîçłé. ······················⟧';
+
+  @override
+  String get catalogResetDoneSnackbar =>
+      '⟦Ṽéĥîçłé đáŧá řéšéŧ ƒřóɱ ŧĥé đáŧáƀášé. ··············⟧';
 
   @override
   String get consumptionTabFuel => '⟦Ƒúéł ··⟧';

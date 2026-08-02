@@ -15,6 +15,7 @@ _ReferenceVehicle _$ReferenceVehicleFromJson(Map<String, dynamic> json) =>
       yearEnd: (json['yearEnd'] as num?)?.toInt(),
       displacementCc: (json['displacementCc'] as num).toInt(),
       powerKw: (json['powerKw'] as num?)?.toInt(),
+      tankCapacityL: (json['tankCapacityL'] as num?)?.toDouble(),
       fuelType: json['fuelType'] as String,
       transmission: json['transmission'] as String,
       volumetricEfficiency:
@@ -37,6 +38,7 @@ Map<String, dynamic> _$ReferenceVehicleToJson(_ReferenceVehicle instance) =>
       'yearEnd': instance.yearEnd,
       'displacementCc': instance.displacementCc,
       'powerKw': instance.powerKw,
+      'tankCapacityL': instance.tankCapacityL,
       'fuelType': instance.fuelType,
       'transmission': instance.transmission,
       'volumetricEfficiency': instance.volumetricEfficiency,

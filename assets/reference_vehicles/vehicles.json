@@ -14,7 +14,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "PureTech 1.2 three-cylinder turbo DI. Electric e-208 sibling shares body but uses electric fuelType."
+    "notes": "PureTech 1.2 three-cylinder turbo DI. Electric e-208 sibling shares body but uses electric fuelType.",
+    "tankCapacityL": 44.0
   },
   {
     "make": "Peugeot",
@@ -31,7 +32,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "EMP2 V3 platform, PureTech 130 turbo DI most common variant."
+    "notes": "EMP2 V3 platform, PureTech 130 turbo DI most common variant.",
+    "tankCapacityL": 52.0
   },
   {
     "make": "Peugeot",
@@ -48,7 +50,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "BlueHDi 130 turbo DI; petrol 1.2 PureTech and PHEV variants exist."
+    "notes": "BlueHDi 130 turbo DI; petrol 1.2 PureTech and PHEV variants exist.",
+    "tankCapacityL": 53.0
   },
   {
     "make": "Peugeot",
@@ -82,7 +85,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "TCe 100 three-cylinder turbo DI. E-Tech hybrid uses 1.6 atmospheric."
+    "notes": "TCe 100 three-cylinder turbo DI. E-Tech hybrid uses 1.6 atmospheric.",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Renault",
@@ -99,7 +103,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "TCe 140 turbo DI most common; dCi 115 diesel and E-Tech PHEV also sold."
+    "notes": "TCe 140 turbo DI most common; dCi 115 diesel and E-Tech PHEV also sold.",
+    "tankCapacityL": 47.0
   },
   {
     "make": "Renault",
@@ -116,7 +121,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "TCe 100 turbo DI; CMF-B platform, shared with Clio V."
+    "notes": "TCe 100 turbo DI; CMF-B platform, shared with Clio V.",
+    "tankCapacityL": 48.0
   },
   {
     "make": "Renault",
@@ -133,7 +139,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "TCe 140 turbo DI; replaced by Austral in 2022."
+    "notes": "TCe 140 turbo DI; replaced by Austral in 2022.",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Citroen",
@@ -150,7 +157,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "PureTech 83 turbo DI. New gen IV launched 2024 keeps PSA UDS strategy."
+    "notes": "PureTech 83 turbo DI. New gen IV launched 2024 keeps PSA UDS strategy.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Citroen",
@@ -201,7 +209,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "TCe 90 turbo DI; CMF-B platform shared with Renault Clio V."
+    "notes": "TCe 90 turbo DI; CMF-B platform shared with Renault Clio V.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -218,7 +227,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "TCe 130 turbo DI; dCi 115 diesel and Bi-Fuel LPG variants also common."
+    "notes": "TCe 130 turbo DI; dCi 115 diesel and Bi-Fuel LPG variants also common.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Volkswagen",
@@ -252,7 +262,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with Skoda Fabia."
+    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with Skoda Fabia.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Volkswagen",
@@ -269,7 +280,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI turbo DI most common; 1.5 TSI petrol and eHybrid variants exist."
+    "notes": "2.0 TDI turbo DI most common; 1.5 TSI petrol and eHybrid variants exist.",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Volkswagen",
@@ -286,7 +298,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI Evo turbo DI; B9 generation (2024-) keeps vwUds strategy."
+    "notes": "2.0 TDI Evo turbo DI; B9 generation (2024-) keeps vwUds strategy.",
+    "tankCapacityL": 66.0
   },
   {
     "make": "Ford",
@@ -303,7 +316,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 EcoBoost three-cylinder turbo DI. Discontinued July 2023."
+    "notes": "1.0 EcoBoost three-cylinder turbo DI. Discontinued July 2023.",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Ford",
@@ -354,7 +368,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Built on PSA CMP platform; 1.2 PureTech turbo DI shares engine + PID strategy with Peugeot 208."
+    "notes": "Built on PSA CMP platform; 1.2 PureTech turbo DI shares engine + PID strategy with Peugeot 208.",
+    "tankCapacityL": 44.0
   },
   {
     "make": "Opel",
@@ -371,7 +386,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "EMP2 V3 platform; 1.2 PureTech turbo DI shares PSA UDS strategy with Peugeot 308."
+    "notes": "EMP2 V3 platform; 1.2 PureTech turbo DI shares PSA UDS strategy with Peugeot 308.",
+    "tankCapacityL": 52.0
   },
   {
     "make": "Toyota",
@@ -388,7 +404,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": true,
-    "notes": "1.5 Hybrid Dynamic Force Atkinson cycle; over 80% of EU sales are hybrid trim."
+    "notes": "1.5 Hybrid Dynamic Force Atkinson cycle; over 80% of EU sales are hybrid trim.",
+    "tankCapacityL": 36.0
   },
   {
     "make": "Toyota",
@@ -405,7 +422,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": true,
-    "notes": "1.8 Hybrid Atkinson most common; 2.0 Hybrid sportier trim shares PID strategy."
+    "notes": "1.8 Hybrid Atkinson most common; 2.0 Hybrid sportier trim shares PID strategy.",
+    "tankCapacityL": 43.0
   },
   {
     "make": "Toyota",
@@ -422,7 +440,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": true,
-    "notes": "2.5 Hybrid AWD-i Atkinson cycle; PHEV variant shares PID strategy."
+    "notes": "2.5 Hybrid AWD-i Atkinson cycle; PHEV variant shares PID strategy.",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Skoda",
@@ -439,7 +458,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 TSI eTSI turbo DI; MQB Evo platform shared with VW Golf VIII."
+    "notes": "1.5 TSI eTSI turbo DI; MQB Evo platform shared with VW Golf VIII.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Skoda",
@@ -456,7 +476,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with VW Polo."
+    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with VW Polo.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Fiat",
@@ -473,7 +494,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "0.9 TwinAir mHEV; new electric 500e has separate entry profile."
+    "notes": "0.9 TwinAir mHEV; new electric 500e has separate entry profile.",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Fiat",
@@ -490,7 +512,8 @@
     "inductionType": "turbocharged",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "0.9 TwinAir / 1.0 mHEV; long-running model on facelifted platform."
+    "notes": "0.9 TwinAir / 1.0 mHEV; long-running model on facelifted platform.",
+    "tankCapacityL": 37.0
   },
   {
     "make": "Hyundai",
@@ -507,7 +530,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 T-GDi Smartstream HEV/PHEV turbo DI; petrol and diesel mHEV also offered."
+    "notes": "1.6 T-GDi Smartstream HEV/PHEV turbo DI; petrol and diesel mHEV also offered.",
+    "tankCapacityL": 54.0
   },
   {
     "make": "Hyundai",
@@ -524,7 +548,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 T-GDi HEV turbo DI; Kona Electric sibling uses electric fuelType."
+    "notes": "1.6 T-GDi HEV turbo DI; Kona Electric sibling uses electric fuelType.",
+    "tankCapacityL": 47.0
   },
   {
     "make": "BMW",
@@ -592,7 +617,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 three-cylinder B38 turbo DI; replaced by F66 in 2024."
+    "notes": "1.5 three-cylinder B38 turbo DI; replaced by F66 in 2024.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Mercedes-Benz",
@@ -711,7 +737,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with VW Polo and Skoda Fabia."
+    "notes": "1.0 TSI turbo DI; MQB A0 platform shared with VW Polo and Skoda Fabia.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "SEAT",
@@ -728,7 +755,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 TSI eTSI turbo DI; MQB Evo platform shared with VW Golf VIII and Skoda Octavia."
+    "notes": "1.5 TSI eTSI turbo DI; MQB Evo platform shared with VW Golf VIII and Skoda Octavia.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Tesla",
@@ -794,7 +822,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 DIG-T HR10DDT turbo DI; CMF-B platform shared with Renault Captur."
+    "notes": "1.0 DIG-T HR10DDT turbo DI; CMF-B platform shared with Renault Captur.",
+    "tankCapacityL": 46.0
   },
   {
     "make": "Kia",
@@ -811,7 +840,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 T-GDi Smartstream HEV/PHEV turbo DI; shares N3 platform with Hyundai Tucson IV."
+    "notes": "1.6 T-GDi Smartstream HEV/PHEV turbo DI; shares N3 platform with Hyundai Tucson IV.",
+    "tankCapacityL": 54.0
   },
   {
     "make": "Kia",
@@ -828,7 +858,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 T-GDi Kappa turbo DI; 1.0 T-GDi and 1.6 CRDi diesel variants share PID strategy."
+    "notes": "1.4 T-GDi Kappa turbo DI; 1.0 T-GDi and 1.6 CRDi diesel variants share PID strategy.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Volvo",
@@ -862,7 +893,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K Blue diesel VNT + DI. Sibling of TCe 130 petrol entry; tank 50 L."
+    "notes": "1.5 dCi K9K Blue diesel VNT + DI. Sibling of TCe 130 petrol entry; tank 50 L.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -879,7 +911,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K Blue diesel VNT + DI. Stepway sibling shares engine; tank 50 L."
+    "notes": "1.5 dCi K9K Blue diesel VNT + DI. Stepway sibling shares engine; tank 50 L.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Renault",
@@ -896,7 +929,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi 90 Energy VNT + DI. Common French city diesel; tank 45 L."
+    "notes": "1.5 dCi 90 Energy VNT + DI. Common French city diesel; tank 45 L.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Renault",
@@ -913,7 +947,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K Energy diesel VNT + DI. Shares Clio IV platform; tank 45 L."
+    "notes": "1.5 dCi K9K Energy diesel VNT + DI. Shares Clio IV platform; tank 45 L.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Citroen",
@@ -930,7 +965,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 BlueHDi DV5R diesel turbo DI. Sibling of PureTech 83 petrol entry; tank 45 L."
+    "notes": "1.5 BlueHDi DV5R diesel turbo DI. Sibling of PureTech 83 petrol entry; tank 45 L.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Peugeot",
@@ -947,7 +983,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 BlueHDi DV5R diesel turbo DI. Replaced earlier 1.6 HDi mid-cycle; tank 50 L."
+    "notes": "1.5 BlueHDi DV5R diesel turbo DI. Replaced earlier 1.6 HDi mid-cycle; tank 50 L.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Volkswagen",
@@ -964,7 +1001,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI EA288 diesel turbo DI; sibling of 1.0 TSI petrol entry. Tank 40 L."
+    "notes": "1.6 TDI EA288 diesel turbo DI; sibling of 1.0 TSI petrol entry. Tank 40 L.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Volkswagen",
@@ -981,7 +1019,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 MPI 8v, dominant volume engine of the era"
+    "notes": "1.6 MPI 8v, dominant volume engine of the era",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Volkswagen",
@@ -998,7 +1037,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.9 TDI PD, the European fleet best-seller"
+    "notes": "1.9 TDI PD, the European fleet best-seller",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Volkswagen",
@@ -1015,7 +1055,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI common-rail, high-volume diesel"
+    "notes": "1.6 TDI common-rail, high-volume diesel",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Volkswagen",
@@ -1032,7 +1073,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 TSI EA211, top-selling petrol variant"
+    "notes": "1.4 TSI EA211, top-selling petrol variant",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Volkswagen",
@@ -1049,7 +1091,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 16v MPI, common supermini engine"
+    "notes": "1.4 16v MPI, common supermini engine",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Volkswagen",
@@ -1066,7 +1109,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 TSI, dominant later-life engine"
+    "notes": "1.2 TSI, dominant later-life engine",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Volkswagen",
@@ -1083,7 +1127,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI, fleet-favourite saloon/estate"
+    "notes": "2.0 TDI, fleet-favourite saloon/estate",
+    "tankCapacityL": 70.0
   },
   {
     "make": "Volkswagen",
@@ -1100,7 +1145,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI common-rail, DSG-equipped"
+    "notes": "2.0 TDI common-rail, DSG-equipped",
+    "tankCapacityL": 70.0
   },
   {
     "make": "Volkswagen",
@@ -1117,7 +1163,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI, the original compact SUV"
+    "notes": "2.0 TDI, the original compact SUV",
+    "tankCapacityL": 64.0
   },
   {
     "make": "Volkswagen",
@@ -1134,7 +1181,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.9 TDI PD, popular compact MPV"
+    "notes": "1.9 TDI PD, popular compact MPV",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Volkswagen",
@@ -1151,7 +1199,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI EA288, MQB-platform MPV"
+    "notes": "2.0 TDI EA288, MQB-platform MPV",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Volkswagen",
@@ -1168,7 +1217,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 MPI 3-cyl city car"
+    "notes": "1.0 MPI 3-cyl city car",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Volkswagen",
@@ -1185,7 +1235,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 TSI EA211 evo, big-volume crossover"
+    "notes": "1.5 TSI EA211 evo, big-volume crossover",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Volkswagen",
@@ -1202,7 +1253,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TSI sport coupe"
+    "notes": "2.0 TSI sport coupe",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Skoda",
@@ -1219,7 +1271,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.9 TDI, long-lived budget workhorse"
+    "notes": "1.9 TDI, long-lived budget workhorse",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Skoda",
@@ -1236,7 +1289,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI, hugely popular fleet car"
+    "notes": "2.0 TDI, hugely popular fleet car",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Skoda",
@@ -1253,7 +1307,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI EA288, MQB best-seller"
+    "notes": "2.0 TDI EA288, MQB best-seller",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Skoda",
@@ -1270,7 +1325,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 16v MPI supermini"
+    "notes": "1.4 16v MPI supermini",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Skoda",
@@ -1287,7 +1343,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 12v MPI, entry-level volume engine"
+    "notes": "1.2 12v MPI, entry-level volume engine",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Skoda",
@@ -1304,7 +1361,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TSI 3-cyl, dominant later engine"
+    "notes": "1.0 TSI 3-cyl, dominant later engine",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Skoda",
@@ -1321,7 +1379,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI, value executive saloon"
+    "notes": "2.0 TDI, value executive saloon",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Skoda",
@@ -1338,7 +1397,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI EA288, DSG fleet favourite"
+    "notes": "2.0 TDI EA288, DSG fleet favourite",
+    "tankCapacityL": 66.0
   },
   {
     "make": "Skoda",
@@ -1355,7 +1415,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI compact crossover"
+    "notes": "2.0 TDI compact crossover",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Skoda",
@@ -1372,7 +1433,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI 7-seat SUV"
+    "notes": "2.0 TDI 7-seat SUV",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Skoda",
@@ -1389,7 +1451,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TSI hatchback, Rapid successor"
+    "notes": "1.0 TSI hatchback, Rapid successor",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Skoda",
@@ -1406,7 +1469,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TSI compact crossover"
+    "notes": "1.0 TSI compact crossover",
+    "tankCapacityL": 50.0
   },
   {
     "make": "SEAT",
@@ -1423,7 +1487,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 16v MPI supermini"
+    "notes": "1.4 16v MPI supermini",
+    "tankCapacityL": 45.0
   },
   {
     "make": "SEAT",
@@ -1440,7 +1505,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 TSI, dominant later-life engine"
+    "notes": "1.2 TSI, dominant later-life engine",
+    "tankCapacityL": 45.0
   },
   {
     "make": "SEAT",
@@ -1457,7 +1523,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.9 TDI PD, Golf IV-based hatch"
+    "notes": "1.9 TDI PD, Golf IV-based hatch",
+    "tankCapacityL": 55.0
   },
   {
     "make": "SEAT",
@@ -1474,7 +1541,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI, PQ35 platform hatch"
+    "notes": "2.0 TDI, PQ35 platform hatch",
+    "tankCapacityL": 55.0
   },
   {
     "make": "SEAT",
@@ -1491,7 +1559,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 TSI EA211, MQB hatch"
+    "notes": "1.4 TSI EA211, MQB hatch",
+    "tankCapacityL": 50.0
   },
   {
     "make": "SEAT",
@@ -1508,7 +1577,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TSI subcompact crossover"
+    "notes": "1.0 TSI subcompact crossover",
+    "tankCapacityL": 40.0
   },
   {
     "make": "SEAT",
@@ -1525,7 +1595,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 TSI EA211 evo compact SUV"
+    "notes": "1.5 TSI EA211 evo compact SUV",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Audi",
@@ -1542,7 +1613,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI premium compact hatch"
+    "notes": "2.0 TDI premium compact hatch",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Audi",
@@ -1559,7 +1631,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI EA288, S tronic"
+    "notes": "2.0 TDI EA288, S tronic",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Audi",
@@ -1576,7 +1649,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 TSI premium supermini"
+    "notes": "1.2 TSI premium supermini",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Audi",
@@ -1593,7 +1667,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TFSI 3-cyl, S tronic"
+    "notes": "1.0 TFSI 3-cyl, S tronic",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Audi",
@@ -1610,7 +1685,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.9 TDI executive saloon"
+    "notes": "1.9 TDI executive saloon",
+    "tankCapacityL": 70.0
   },
   {
     "make": "Audi",
@@ -1695,7 +1771,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TFSI hot hatch, defined the segment"
+    "notes": "2.0 TFSI hot hatch, defined the segment",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Volkswagen",
@@ -1712,7 +1789,8 @@
     "inductionType": "supercharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 TSI Twincharger, supercharger plus turbo"
+    "notes": "1.4 TSI Twincharger, supercharger plus turbo",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Peugeot",
@@ -1729,7 +1807,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 8v TU3 best-seller"
+    "notes": "1.4 8v TU3 best-seller",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Peugeot",
@@ -1746,7 +1825,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 VTi 95"
+    "notes": "1.4 VTi 95",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Peugeot",
@@ -1763,7 +1843,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 HDi 110"
+    "notes": "1.6 HDi 110",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Peugeot",
@@ -1780,7 +1861,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 HDi 92"
+    "notes": "1.6 HDi 92",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Peugeot",
@@ -1797,7 +1879,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 PureTech 130"
+    "notes": "1.2 PureTech 130",
+    "tankCapacityL": 53.0
   },
   {
     "make": "Peugeot",
@@ -1814,7 +1897,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 HDi 112"
+    "notes": "1.6 HDi 112",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Peugeot",
@@ -1831,7 +1915,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 PureTech 110"
+    "notes": "1.2 PureTech 110",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Peugeot",
@@ -1848,7 +1933,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 HDi 140"
+    "notes": "2.0 HDi 140",
+    "tankCapacityL": 72.0
   },
   {
     "make": "Peugeot",
@@ -1865,7 +1951,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 HDi 112 MPV"
+    "notes": "1.6 HDi 112 MPV",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Peugeot",
@@ -1882,7 +1969,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 12v city car (PSA/Toyota triplet with C1/Aygo)"
+    "notes": "1.0 12v city car (PSA/Toyota triplet with C1/Aygo)",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Peugeot",
@@ -1899,7 +1987,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 VTi 68 city car"
+    "notes": "1.0 VTi 68 city car",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Citroen",
@@ -1950,7 +2039,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 HDi 110"
+    "notes": "1.6 HDi 110",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Citroen",
@@ -1967,7 +2057,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 e-HDi 92"
+    "notes": "1.6 e-HDi 92",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Citroen",
@@ -1984,7 +2075,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 12v city car"
+    "notes": "1.0 12v city car",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Citroen",
@@ -2001,7 +2093,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 VTi 68"
+    "notes": "1.0 VTi 68",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Citroen",
@@ -2035,7 +2128,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 HDi 90 Multispace"
+    "notes": "1.6 HDi 90 Multispace",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Citroen",
@@ -2069,7 +2163,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 THP 155"
+    "notes": "1.6 THP 155",
+    "tankCapacityL": 48.0
   },
   {
     "make": "DS",
@@ -2086,7 +2181,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 PureTech 110 post-DS-spinoff"
+    "notes": "1.2 PureTech 110 post-DS-spinoff",
+    "tankCapacityL": 48.0
   },
   {
     "make": "Opel",
@@ -2103,7 +2199,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 16v"
+    "notes": "1.2 16v",
+    "tankCapacityL": 44.0
   },
   {
     "make": "Opel",
@@ -2120,7 +2217,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 Twinport"
+    "notes": "1.2 Twinport",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Opel",
@@ -2137,7 +2235,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 16v"
+    "notes": "1.4 16v",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Opel",
@@ -2154,7 +2253,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 16v"
+    "notes": "1.6 16v",
+    "tankCapacityL": 52.0
   },
   {
     "make": "Opel",
@@ -2171,7 +2271,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 Twinport"
+    "notes": "1.6 Twinport",
+    "tankCapacityL": 52.0
   },
   {
     "make": "Opel",
@@ -2188,7 +2289,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.7 CDTI 110"
+    "notes": "1.7 CDTI 110",
+    "tankCapacityL": 56.0
   },
   {
     "make": "Opel",
@@ -2205,7 +2307,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 Turbo 150"
+    "notes": "1.4 Turbo 150",
+    "tankCapacityL": 48.0
   },
   {
     "make": "Opel",
@@ -2222,7 +2325,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 CDTI 160"
+    "notes": "2.0 CDTI 160",
+    "tankCapacityL": 70.0
   },
   {
     "make": "Opel",
@@ -2239,7 +2343,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 Turbo 140 (Mokka X)"
+    "notes": "1.4 Turbo 140 (Mokka X)",
+    "tankCapacityL": 54.0
   },
   {
     "make": "Opel",
@@ -2256,7 +2361,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 PureTech 110, PSA platform"
+    "notes": "1.2 PureTech 110, PSA platform",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Opel",
@@ -2273,7 +2379,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 PureTech 130, PSA EMP2 platform"
+    "notes": "1.2 PureTech 130, PSA EMP2 platform",
+    "tankCapacityL": 53.0
   },
   {
     "make": "Opel",
@@ -2307,7 +2414,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.8 16v MPV"
+    "notes": "1.8 16v MPV",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Fiat",
@@ -2324,7 +2432,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 8v (Grande Punto / Punto Evo)"
+    "notes": "1.4 8v (Grande Punto / Punto Evo)",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Fiat",
@@ -2341,7 +2450,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 8v"
+    "notes": "1.2 8v",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Fiat",
@@ -2358,7 +2468,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 MultiAir 140"
+    "notes": "1.4 MultiAir 140",
+    "tankCapacityL": 48.0
   },
   {
     "make": "Fiat",
@@ -2375,7 +2486,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 16v"
+    "notes": "1.4 16v",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Fiat",
@@ -2392,7 +2504,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 T-Jet 120"
+    "notes": "1.4 T-Jet 120",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Renault",
@@ -2409,7 +2522,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 16V high-volume petrol"
+    "notes": "1.2 16V high-volume petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Renault",
@@ -2426,7 +2540,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 16V D4F petrol"
+    "notes": "1.2 16V D4F petrol",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Renault",
@@ -2443,7 +2558,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "0.9 TCe 90 three-cylinder turbo"
+    "notes": "0.9 TCe 90 three-cylinder turbo",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Renault",
@@ -2460,7 +2576,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi common-rail diesel"
+    "notes": "1.5 dCi common-rail diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Renault",
@@ -2477,7 +2594,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi 110 common-rail diesel"
+    "notes": "1.5 dCi 110 common-rail diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Renault",
@@ -2494,7 +2612,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi MPV diesel"
+    "notes": "1.5 dCi MPV diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Renault",
@@ -2511,7 +2630,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi 110 MPV diesel"
+    "notes": "1.5 dCi 110 MPV diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Renault",
@@ -2528,7 +2648,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "0.9 TCe 90 turbo petrol"
+    "notes": "0.9 TCe 90 turbo petrol",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Renault",
@@ -2545,7 +2666,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 16V city-car petrol"
+    "notes": "1.2 16V city-car petrol",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Renault",
@@ -2562,7 +2684,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "0.9 TCe rear-engine turbo petrol"
+    "notes": "0.9 TCe rear-engine turbo petrol",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Renault",
@@ -2579,7 +2702,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 dCi common-rail diesel"
+    "notes": "2.0 dCi common-rail diesel",
+    "tankCapacityL": 66.0
   },
   {
     "make": "Renault",
@@ -2596,7 +2720,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi passenger van diesel"
+    "notes": "1.5 dCi passenger van diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Renault",
@@ -2647,7 +2772,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 16V budget hatch petrol"
+    "notes": "1.2 16V budget hatch petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -2664,7 +2790,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "0.9 TCe 90 turbo petrol"
+    "notes": "0.9 TCe 90 turbo petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -2681,7 +2808,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 MPI budget sedan petrol"
+    "notes": "1.4 MPI budget sedan petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -2698,7 +2826,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "0.9 TCe turbo petrol"
+    "notes": "0.9 TCe turbo petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -2715,7 +2844,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi SUV diesel"
+    "notes": "1.5 dCi SUV diesel",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -2732,7 +2862,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi 7-seat MPV diesel"
+    "notes": "1.5 dCi 7-seat MPV diesel",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -2765,7 +2896,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 TCe 110 three-cylinder turbo"
+    "notes": "1.0 TCe 110 three-cylinder turbo",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Nissan",
@@ -2782,7 +2914,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 16V city-car petrol"
+    "notes": "1.2 16V city-car petrol",
+    "tankCapacityL": 46.0
   },
   {
     "make": "Nissan",
@@ -2799,7 +2932,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 three-cylinder petrol"
+    "notes": "1.2 three-cylinder petrol",
+    "tankCapacityL": 41.0
   },
   {
     "make": "Nissan",
@@ -2816,7 +2950,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "0.9 IG-T turbo petrol (Renault TCe base)"
+    "notes": "0.9 IG-T turbo petrol (Renault TCe base)",
+    "tankCapacityL": 41.0
   },
   {
     "make": "Nissan",
@@ -2833,7 +2968,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi crossover diesel"
+    "notes": "1.5 dCi crossover diesel",
+    "tankCapacityL": 65.0
   },
   {
     "make": "Nissan",
@@ -2867,7 +3003,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 DIG-T turbo petrol"
+    "notes": "1.2 DIG-T turbo petrol",
+    "tankCapacityL": 46.0
   },
   {
     "make": "Nissan",
@@ -2884,7 +3021,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 three-cylinder mini-MPV petrol"
+    "notes": "1.2 three-cylinder mini-MPV petrol",
+    "tankCapacityL": 41.0
   },
   {
     "make": "Nissan",
@@ -2901,7 +3039,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 dCi SUV diesel"
+    "notes": "1.6 dCi SUV diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Nissan",
@@ -2950,7 +3089,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 Duratec port-injection petrol"
+    "notes": "1.4 Duratec port-injection petrol",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Ford",
@@ -2967,7 +3107,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 EcoBoost three-cylinder turbo"
+    "notes": "1.0 EcoBoost three-cylinder turbo",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Ford",
@@ -2984,7 +3125,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 Zetec-SE port-injection petrol"
+    "notes": "1.6 Zetec-SE port-injection petrol",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Ford",
@@ -3001,7 +3143,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 Duratec Ti-VCT petrol"
+    "notes": "1.6 Duratec Ti-VCT petrol",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Ford",
@@ -3018,7 +3161,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 EcoBoost turbo petrol"
+    "notes": "1.0 EcoBoost turbo petrol",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Ford",
@@ -3035,7 +3179,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDCi common-rail diesel"
+    "notes": "2.0 TDCi common-rail diesel",
+    "tankCapacityL": 70.0
   },
   {
     "make": "Ford",
@@ -3103,7 +3248,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 Fire port-injection petrol"
+    "notes": "1.2 Fire port-injection petrol",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Ford",
@@ -3120,7 +3266,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 EcoBoost mild-hybrid turbo petrol"
+    "notes": "1.0 EcoBoost mild-hybrid turbo petrol",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Ford",
@@ -3137,7 +3284,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 EcoBoost turbo petrol"
+    "notes": "1.0 EcoBoost turbo petrol",
+    "tankCapacityL": 52.0
   },
   {
     "make": "Toyota",
@@ -3154,7 +3302,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 VVT-i port-injection petrol"
+    "notes": "1.0 VVT-i port-injection petrol",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Toyota",
@@ -3171,7 +3320,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.33 Dual VVT-i port-injection petrol"
+    "notes": "1.33 Dual VVT-i port-injection petrol",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Toyota",
@@ -3188,7 +3338,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": true,
-    "notes": "1.5 VVT-i Atkinson-cycle hybrid"
+    "notes": "1.5 VVT-i Atkinson-cycle hybrid",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Toyota",
@@ -3205,7 +3356,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 Dual VVT-i petrol"
+    "notes": "1.6 Dual VVT-i petrol",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Toyota",
@@ -3239,7 +3391,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 Dual VVT-i petrol"
+    "notes": "1.6 Dual VVT-i petrol",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Toyota",
@@ -3256,7 +3409,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 D-4D common-rail diesel"
+    "notes": "2.0 D-4D common-rail diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Toyota",
@@ -3273,7 +3427,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 VVT-i three-cylinder petrol"
+    "notes": "1.0 VVT-i three-cylinder petrol",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Toyota",
@@ -3290,7 +3445,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 VVT-i three-cylinder petrol"
+    "notes": "1.0 VVT-i three-cylinder petrol",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Toyota",
@@ -3307,7 +3463,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 D-4D common-rail diesel"
+    "notes": "2.0 D-4D common-rail diesel",
+    "tankCapacityL": 60.0
   },
   {
     "make": "Toyota",
@@ -3324,7 +3481,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": true,
-    "notes": "1.8 VVT-i Atkinson-cycle hybrid"
+    "notes": "1.8 VVT-i Atkinson-cycle hybrid",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Toyota",
@@ -3341,7 +3499,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": true,
-    "notes": "1.8 VVT-i Atkinson-cycle hybrid"
+    "notes": "1.8 VVT-i Atkinson-cycle hybrid",
+    "tankCapacityL": 43.0
   },
   {
     "make": "Toyota",
@@ -3358,7 +3517,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": true,
-    "notes": "1.8 VVT-i Atkinson-cycle hybrid"
+    "notes": "1.8 VVT-i Atkinson-cycle hybrid",
+    "tankCapacityL": 43.0
   },
   {
     "make": "Hyundai",
@@ -3375,7 +3535,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.1 port-injection petrol"
+    "notes": "1.1 port-injection petrol",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Hyundai",
@@ -3392,7 +3553,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.25 Kappa port-injection petrol"
+    "notes": "1.25 Kappa port-injection petrol",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Hyundai",
@@ -3409,7 +3571,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.25 Kappa port-injection petrol"
+    "notes": "1.25 Kappa port-injection petrol",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Hyundai",
@@ -3426,7 +3589,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.25 Kappa port-injection petrol"
+    "notes": "1.25 Kappa port-injection petrol",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Hyundai",
@@ -3443,7 +3607,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 port-injection petrol"
+    "notes": "1.6 port-injection petrol",
+    "tankCapacityL": 53.0
   },
   {
     "make": "Hyundai",
@@ -3460,7 +3625,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 CRDi common-rail diesel"
+    "notes": "1.6 CRDi common-rail diesel",
+    "tankCapacityL": 53.0
   },
   {
     "make": "Hyundai",
@@ -3477,7 +3643,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 T-GDI turbo petrol"
+    "notes": "1.4 T-GDI turbo petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Hyundai",
@@ -3494,7 +3661,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.7 CRDi common-rail diesel; sold as ix35"
+    "notes": "1.7 CRDi common-rail diesel; sold as ix35",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Hyundai",
@@ -3511,7 +3679,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.7 CRDi common-rail diesel"
+    "notes": "1.7 CRDi common-rail diesel",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Hyundai",
@@ -3528,7 +3697,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.7 CRDi common-rail diesel"
+    "notes": "1.7 CRDi common-rail diesel",
+    "tankCapacityL": 62.0
   },
   {
     "make": "Hyundai",
@@ -3545,7 +3715,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.2 CRDi common-rail diesel"
+    "notes": "2.2 CRDi common-rail diesel",
+    "tankCapacityL": 64.0
   },
   {
     "make": "Kia",
@@ -3562,7 +3733,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.25 Kappa port-injection petrol"
+    "notes": "1.25 Kappa port-injection petrol",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Kia",
@@ -3579,7 +3751,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 port-injection petrol"
+    "notes": "1.4 port-injection petrol",
+    "tankCapacityL": 43.0
   },
   {
     "make": "Kia",
@@ -3596,7 +3769,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 MPi port-injection petrol"
+    "notes": "1.4 MPi port-injection petrol",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Kia",
@@ -3613,7 +3787,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 CRDi common-rail diesel"
+    "notes": "1.6 CRDi common-rail diesel",
+    "tankCapacityL": 53.0
   },
   {
     "make": "Kia",
@@ -3630,7 +3805,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.7 CRDi common-rail diesel"
+    "notes": "1.7 CRDi common-rail diesel",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Kia",
@@ -3647,7 +3823,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.7 CRDi common-rail diesel"
+    "notes": "1.7 CRDi common-rail diesel",
+    "tankCapacityL": 62.0
   },
   {
     "make": "Kia",
@@ -3681,7 +3858,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 GDi Atkinson-cycle hybrid (non-Toyota, atkinsonCycle flag false per spec)"
+    "notes": "1.6 GDi Atkinson-cycle hybrid (non-Toyota, atkinsonCycle flag false per spec)",
+    "tankCapacityL": 45.0
   },
   {
     "make": "BMW",
@@ -3834,7 +4012,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "Cooper 1.6 Prince N12 petrol"
+    "notes": "Cooper 1.6 Prince N12 petrol",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Mercedes-Benz",
@@ -3851,7 +4030,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "A180 CDI OM640 diesel"
+    "notes": "A180 CDI OM640 diesel",
+    "tankCapacityL": 54.0
   },
   {
     "make": "Mercedes-Benz",
@@ -3868,7 +4048,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "A180 CDI OM651 diesel"
+    "notes": "A180 CDI OM651 diesel",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Mercedes-Benz",
@@ -3885,7 +4066,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "B180 CDI OM651 diesel"
+    "notes": "B180 CDI OM651 diesel",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Mercedes-Benz",
@@ -4072,7 +4254,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.3 MZR petrol"
+    "notes": "1.3 MZR petrol",
+    "tankCapacityL": 43.0
   },
   {
     "make": "Mazda",
@@ -4089,7 +4272,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 MZR petrol"
+    "notes": "1.6 MZR petrol",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Mazda",
@@ -4106,7 +4290,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 Skyactiv-G petrol"
+    "notes": "2.0 Skyactiv-G petrol",
+    "tankCapacityL": 51.0
   },
   {
     "make": "Mazda",
@@ -4174,7 +4359,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 i-VTEC petrol"
+    "notes": "1.4 i-VTEC petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Honda",
@@ -4191,7 +4377,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.8 i-VTEC petrol"
+    "notes": "1.8 i-VTEC petrol",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Honda",
@@ -4208,7 +4395,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.0 VTEC Turbo petrol"
+    "notes": "1.0 VTEC Turbo petrol",
+    "tankCapacityL": 46.0
   },
   {
     "make": "Honda",
@@ -4225,7 +4413,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.4 i-VTEC petrol"
+    "notes": "1.4 i-VTEC petrol",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Honda",
@@ -4242,7 +4431,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.3 i-VTEC petrol"
+    "notes": "1.3 i-VTEC petrol",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Honda",
@@ -4259,7 +4449,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 i-DTEC diesel"
+    "notes": "1.6 i-DTEC diesel",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Suzuki",
@@ -4276,7 +4467,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.2 K12 petrol"
+    "notes": "1.2 K12 petrol",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Suzuki",
@@ -4293,7 +4485,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 Dualjet SHVS mild hybrid petrol"
+    "notes": "1.2 Dualjet SHVS mild hybrid petrol",
+    "tankCapacityL": 37.0
   },
   {
     "make": "Suzuki",
@@ -4310,7 +4503,8 @@
     "inductionType": "turbocharged",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 Boosterjet turbo petrol"
+    "notes": "1.4 Boosterjet turbo petrol",
+    "tankCapacityL": 47.0
   },
   {
     "make": "Suzuki",
@@ -4327,7 +4521,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.6 M16A petrol"
+    "notes": "1.6 M16A petrol",
+    "tankCapacityL": 47.0
   },
   {
     "make": "Smart",
@@ -4344,7 +4539,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 Mitsubishi 3B21 petrol, automated manual"
+    "notes": "1.0 Mitsubishi 3B21 petrol, automated manual",
+    "tankCapacityL": 33.0
   },
   {
     "make": "Smart",
@@ -4361,7 +4557,8 @@
     "inductionType": "naturallyAspirated",
     "directInjection": false,
     "atkinsonCycle": false,
-    "notes": "1.0 Renault H4D petrol"
+    "notes": "1.0 Renault H4D petrol",
+    "tankCapacityL": 28.0
   },
   {
     "make": "Audi",
@@ -4378,7 +4575,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI common-rail diesel"
+    "notes": "1.6 TDI common-rail diesel",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Audi",
@@ -4395,7 +4593,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "30 TDI"
+    "notes": "30 TDI",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Audi",
@@ -4446,7 +4645,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 HDi / e-HDi"
+    "notes": "1.6 HDi / e-HDi",
+    "tankCapacityL": 48.0
   },
   {
     "make": "DS",
@@ -4463,7 +4663,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 BlueHDi"
+    "notes": "1.6 BlueHDi",
+    "tankCapacityL": 48.0
   },
   {
     "make": "Dacia",
@@ -4480,7 +4681,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 Blue dCi"
+    "notes": "1.5 Blue dCi",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -4497,7 +4699,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K"
+    "notes": "1.5 dCi K9K",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Dacia",
@@ -4514,7 +4717,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K"
+    "notes": "1.5 dCi K9K",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Fiat",
@@ -4531,7 +4735,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 / 1.6 Multijet"
+    "notes": "1.3 / 1.6 Multijet",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Fiat",
@@ -4548,7 +4753,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 / 1.6 / 2.0 Multijet"
+    "notes": "1.3 / 1.6 / 2.0 Multijet",
+    "tankCapacityL": 48.0
   },
   {
     "make": "Fiat",
@@ -4565,7 +4771,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 / 1.9 Multijet"
+    "notes": "1.3 / 1.9 Multijet",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Fiat",
@@ -4582,7 +4789,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 Multijet"
+    "notes": "1.3 Multijet",
+    "tankCapacityL": 35.0
   },
   {
     "make": "Fiat",
@@ -4599,7 +4807,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 Multijet"
+    "notes": "1.3 Multijet",
+    "tankCapacityL": 37.0
   },
   {
     "make": "Fiat",
@@ -4616,7 +4825,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 / 1.6 Multijet"
+    "notes": "1.3 / 1.6 Multijet",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Ford",
@@ -4650,7 +4860,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 TDCi"
+    "notes": "1.5 TDCi",
+    "tankCapacityL": 52.0
   },
   {
     "make": "Ford",
@@ -4667,7 +4878,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 / 1.6 TDCi"
+    "notes": "1.4 / 1.6 TDCi",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Ford",
@@ -4684,7 +4896,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 / 1.5 / 1.6 TDCi"
+    "notes": "1.4 / 1.5 / 1.6 TDCi",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Ford",
@@ -4701,7 +4914,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 TDCi"
+    "notes": "1.5 TDCi",
+    "tankCapacityL": 42.0
   },
   {
     "make": "Ford",
@@ -4718,7 +4932,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.8 TDDi / TDCi"
+    "notes": "1.8 TDDi / TDCi",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Ford",
@@ -4735,7 +4950,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 / 1.8 / 2.0 TDCi"
+    "notes": "1.6 / 1.8 / 2.0 TDCi",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Ford",
@@ -4786,7 +5002,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Honda i-CTDi/i-DTEC 2.2 diesel sold across the EU."
+    "notes": "Honda i-CTDi/i-DTEC 2.2 diesel sold across the EU.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Honda",
@@ -4803,7 +5020,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Honda 1.6 i-DTEC Earth Dreams diesel."
+    "notes": "Honda 1.6 i-DTEC Earth Dreams diesel.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Honda",
@@ -4820,7 +5038,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 i-DTEC offered before EU diesel withdrawal."
+    "notes": "1.6 i-DTEC offered before EU diesel withdrawal.",
+    "tankCapacityL": 46.0
   },
   {
     "make": "Hyundai",
@@ -4837,7 +5056,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.1/1.4 CRDi diesels offered in Europe."
+    "notes": "1.1/1.4 CRDi diesels offered in Europe.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Hyundai",
@@ -4854,7 +5074,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.1 and 1.4 CRDi three-/four-cylinder diesels."
+    "notes": "1.1 and 1.4 CRDi three-/four-cylinder diesels.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Kia",
@@ -4871,7 +5092,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 CRDi U3 diesel in the third-gen Ceed."
+    "notes": "1.6 CRDi U3 diesel in the third-gen Ceed.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Kia",
@@ -4888,7 +5110,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.1/1.4 CRDi diesels offered in Europe."
+    "notes": "1.1/1.4 CRDi diesels offered in Europe.",
+    "tankCapacityL": 43.0
   },
   {
     "make": "Kia",
@@ -4905,7 +5128,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 CRDi offered early in the YB generation's life."
+    "notes": "1.4 CRDi offered early in the YB generation's life.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Kia",
@@ -4939,7 +5163,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 MZR-CD diesel (Peugeot DV4-derived) offered in Europe."
+    "notes": "1.4 MZR-CD diesel (Peugeot DV4-derived) offered in Europe.",
+    "tankCapacityL": 43.0
   },
   {
     "make": "Mazda",
@@ -4956,7 +5181,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 MZR-CD and 2.2 MZR-CD diesels in the BL generation."
+    "notes": "1.6 MZR-CD and 2.2 MZR-CD diesels in the BL generation.",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Mazda",
@@ -4973,7 +5199,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 and 2.2 Skyactiv-D diesels in the BM/BN generation."
+    "notes": "1.5 and 2.2 Skyactiv-D diesels in the BM/BN generation.",
+    "tankCapacityL": 51.0
   },
   {
     "make": "Mazda",
@@ -5024,7 +5251,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Cooper D 1.6 (PSA DV6, later BMW N47) diesel."
+    "notes": "Cooper D 1.6 (PSA DV6, later BMW N47) diesel.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Mini",
@@ -5041,7 +5269,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Cooper D with BMW B37 1.5 three-cylinder diesel."
+    "notes": "Cooper D with BMW B37 1.5 three-cylinder diesel.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Nissan",
@@ -5058,7 +5287,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Renault-sourced 1.5 dCi K9K diesel."
+    "notes": "Renault-sourced 1.5 dCi K9K diesel.",
+    "tankCapacityL": 46.0
   },
   {
     "make": "Nissan",
@@ -5075,7 +5305,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K diesel offered in the K12 Micra."
+    "notes": "1.5 dCi K9K diesel offered in the K12 Micra.",
+    "tankCapacityL": 46.0
   },
   {
     "make": "Nissan",
@@ -5092,7 +5323,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K diesel offered in some European markets."
+    "notes": "1.5 dCi K9K diesel offered in some European markets.",
+    "tankCapacityL": 41.0
   },
   {
     "make": "Nissan",
@@ -5109,7 +5341,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K diesel offered early in the K14's run."
+    "notes": "1.5 dCi K9K diesel offered early in the K14's run.",
+    "tankCapacityL": 41.0
   },
   {
     "make": "Nissan",
@@ -5126,7 +5359,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi K9K diesel offered in the European Note."
+    "notes": "1.5 dCi K9K diesel offered in the European Note.",
+    "tankCapacityL": 41.0
   },
   {
     "make": "Opel",
@@ -5143,7 +5377,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 CDTi and 1.7 DI/CDTi diesels in the Corsa C."
+    "notes": "1.3 CDTi and 1.7 DI/CDTi diesels in the Corsa C.",
+    "tankCapacityL": 44.0
   },
   {
     "make": "Opel",
@@ -5160,7 +5395,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 CDTi and 1.7 CDTi diesels in the Corsa D."
+    "notes": "1.3 CDTi and 1.7 CDTi diesels in the Corsa D.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Opel",
@@ -5177,7 +5413,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.3 CDTi diesel carried over into the Corsa E."
+    "notes": "1.3 CDTi diesel carried over into the Corsa E.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Opel",
@@ -5194,7 +5431,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "PSA-sourced 1.5 Diesel (DV5) in the Corsa F."
+    "notes": "PSA-sourced 1.5 Diesel (DV5) in the Corsa F.",
+    "tankCapacityL": 44.0
   },
   {
     "make": "Opel",
@@ -5211,7 +5449,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "PSA-derived 1.5 BlueHDi diesel."
+    "notes": "PSA-derived 1.5 BlueHDi diesel.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Opel",
@@ -5228,7 +5467,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Also offered with 2.0 CDTi; 1.5 is representative."
+    "notes": "Also offered with 2.0 CDTi; 1.5 is representative.",
+    "tankCapacityL": 53.0
   },
   {
     "make": "Opel",
@@ -5262,7 +5502,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Later facelift used 1.6 CDTi."
+    "notes": "Later facelift used 1.6 CDTi.",
+    "tankCapacityL": 54.0
   },
   {
     "make": "Opel",
@@ -5279,7 +5520,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 CDTi added in later years."
+    "notes": "2.0 CDTi added in later years.",
+    "tankCapacityL": 58.0
   },
   {
     "make": "Peugeot",
@@ -5296,7 +5538,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.9 D and 2.0 HDi also offered."
+    "notes": "1.9 D and 2.0 HDi also offered.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Peugeot",
@@ -5313,7 +5556,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 HDi also offered."
+    "notes": "1.4 HDi also offered.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Peugeot",
@@ -5347,7 +5591,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 and 1.7 dCi also offered."
+    "notes": "1.6 and 1.7 dCi also offered.",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Renault",
@@ -5381,7 +5626,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.5 dCi diesel."
+    "notes": "1.5 dCi diesel.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "SEAT",
@@ -5398,7 +5644,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI offered early in production run."
+    "notes": "1.6 TDI offered early in production run.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "SEAT",
@@ -5415,7 +5662,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI also offered."
+    "notes": "1.6 TDI also offered.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "SEAT",
@@ -5432,7 +5680,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 TDI also offered."
+    "notes": "1.4 TDI also offered.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "SEAT",
@@ -5449,7 +5698,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.2 and 1.4 TDI also offered."
+    "notes": "1.2 and 1.4 TDI also offered.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "SEAT",
@@ -5466,7 +5716,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI offered early in production run."
+    "notes": "1.6 TDI offered early in production run.",
+    "tankCapacityL": 40.0
   },
   {
     "make": "Skoda",
@@ -5483,7 +5734,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 TDI also offered."
+    "notes": "1.4 TDI also offered.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Skoda",
@@ -5500,7 +5752,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Earlier 1.4 TDI also offered."
+    "notes": "Earlier 1.4 TDI also offered.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Skoda",
@@ -5517,7 +5770,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.4 TDI offered in early production years."
+    "notes": "1.4 TDI offered in early production years.",
+    "tankCapacityL": 45.0
   },
   {
     "make": "Skoda",
@@ -5534,7 +5788,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI diesel."
+    "notes": "1.6 TDI diesel.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Skoda",
@@ -5551,7 +5806,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI diesel."
+    "notes": "1.6 TDI diesel.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Smart",
@@ -5568,7 +5824,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Rare 0.8 cdi three-cylinder diesel."
+    "notes": "Rare 0.8 cdi three-cylinder diesel.",
+    "tankCapacityL": 33.0
   },
   {
     "make": "Suzuki",
@@ -5585,7 +5842,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "Fiat-sourced 1.6 DDiS diesel."
+    "notes": "Fiat-sourced 1.6 DDiS diesel.",
+    "tankCapacityL": 47.0
   },
   {
     "make": "Suzuki",
@@ -5602,7 +5860,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 DDiS offered in early production years."
+    "notes": "1.6 DDiS offered in early production years.",
+    "tankCapacityL": 47.0
   },
   {
     "make": "Volkswagen",
@@ -5619,7 +5878,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "2.0 TDI diesel."
+    "notes": "2.0 TDI diesel.",
+    "tankCapacityL": 55.0
   },
   {
     "make": "Volkswagen",
@@ -5636,7 +5896,8 @@
     "inductionType": "vnt",
     "directInjection": true,
     "atkinsonCycle": false,
-    "notes": "1.6 TDI also offered."
+    "notes": "1.6 TDI also offered.",
+    "tankCapacityL": 50.0
   },
   {
     "make": "Volvo",

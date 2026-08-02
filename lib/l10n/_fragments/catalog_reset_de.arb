@@ -1,0 +1,14 @@
+{
+  "catalogResetAction": "Aus Fahrzeugdatenbank zurücksetzen",
+  "catalogResetConfirmTitle": "Aus der Fahrzeugdatenbank zurücksetzen?",
+  "catalogResetConfirmBody": "Tankgröße, Motorleistung und Hubraum dieses Fahrzeugs werden durch die Datenbankwerte für {vehicle} ersetzt. Andere Felder und deine Tankhistorie bleiben unverändert.",
+  "@catalogResetConfirmBody": {
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogResetNoMatchSnackbar": "Kein passender Eintrag in der Fahrzeugdatenbank für dieses Fahrzeug.",
+  "catalogResetDoneSnackbar": "Fahrzeugdaten aus der Datenbank zurückgesetzt."
+}

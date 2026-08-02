@@ -60,6 +60,7 @@ class VehicleEditForm extends ConsumerWidget {
     required this.onAdapterPaired,
     required this.onAdapterForget,
     required this.onResetVolumetricEfficiency,
+    required this.onResetFromCatalog,
     required this.obd2CardKey,
     required this.obd2HighlightAnimation,
     required this.onScrollToObd2Card,
@@ -96,6 +97,10 @@ class VehicleEditForm extends ConsumerWidget {
   final void Function(String? name, String? mac) onAdapterPaired;
   final VoidCallback onAdapterForget;
   final VoidCallback onResetVolumetricEfficiency;
+
+  /// #3651 — re-initialize the catalog-backed spec fields from the
+  /// reference vehicle database (confirm dialog owned by the screen).
+  final VoidCallback onResetFromCatalog;
   final GlobalKey obd2CardKey;
   final Animation<double>? obd2HighlightAnimation;
   final Future<void> Function() onScrollToObd2Card;
@@ -204,6 +209,7 @@ class VehicleEditForm extends ConsumerWidget {
                 onAdapterPaired: onAdapterPaired,
                 onAdapterForget: onAdapterForget,
                 onResetVolumetricEfficiency: onResetVolumetricEfficiency,
+                onResetFromCatalog: onResetFromCatalog,
                 currentOdometerKm: ref.latestOdometerKm(existingId!),
                 obd2CardKey: obd2CardKey,
                 obd2HighlightAnimation: obd2HighlightAnimation,

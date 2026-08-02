@@ -30,6 +30,7 @@ class VehicleExtrasSection {
     required void Function(String name, String mac) onAdapterPaired,
     required VoidCallback onAdapterForget,
     required VoidCallback onResetVolumetricEfficiency,
+    required VoidCallback onResetFromCatalog,
     required double? currentOdometerKm,
     Key? obd2CardKey,
     Animation<double>? obd2HighlightAnimation,
@@ -71,6 +72,16 @@ class VehicleExtrasSection {
         onPressed: onResetVolumetricEfficiency,
         icon: const Icon(Icons.local_gas_station_outlined),
         label: Text(l.veResetAction),
+      ),
+      // #3651 — re-initialize the catalog-backed spec fields (tank
+      // capacity, rated power, displacement) from the reference
+      // vehicle database. Distinct restore glyph so it can't be
+      // mistaken for the η_v calibration reset above.
+      const SizedBox(height: 12),
+      OutlinedButton.icon(
+        onPressed: onResetFromCatalog,
+        icon: const Icon(Icons.settings_backup_restore),
+        label: Text(l.catalogResetAction),
       ),
       // Service reminders (#584). Keyed by vehicle id; hidden on Add.
       const SizedBox(height: 16),

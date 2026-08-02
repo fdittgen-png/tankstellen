@@ -53,6 +53,7 @@ void main() {
                     onAdapterPaired: (_, _) {},
                     onAdapterForget: () {},
                     onResetVolumetricEfficiency: () {},
+                    onResetFromCatalog: () {},
                     currentOdometerKm: null,
                   ),
                 ),
@@ -96,6 +97,7 @@ void main() {
                     onAdapterPaired: (_, _) {},
                     onAdapterForget: () {},
                     onResetVolumetricEfficiency: () {},
+                    onResetFromCatalog: () {},
                     currentOdometerKm: null,
                   ),
                 ),
@@ -120,6 +122,61 @@ void main() {
         ),
         findsOneWidget,
       );
+    });
+
+    testWidgets(
+        'renders the reset-from-vehicle-database action (#3651) with the '
+        'restore glyph and fires its callback on tap', (tester) async {
+      tester.view.physicalSize = const Size(900, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      var resetTapped = 0;
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => ListView(
+                  children: VehicleExtrasSection.build(
+                    context: context,
+                    vehicleId: 'v1',
+                    adapterMac: null,
+                    adapterName: null,
+                    onAdapterPaired: (_, _) {},
+                    onAdapterForget: () {},
+                    onResetVolumetricEfficiency: () {},
+                    onResetFromCatalog: () => resetTapped++,
+                    currentOdometerKm: null,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final button = find.ancestor(
+        of: find.text('Reset from vehicle database'),
+        matching: find.byType(OutlinedButton),
+      );
+      expect(button, findsOneWidget);
+      // Distinct glyph from the η_v reset's fuel pump.
+      expect(
+        find.descendant(
+          of: button,
+          matching: find.byIcon(Icons.settings_backup_restore),
+        ),
+        findsOneWidget,
+      );
+      await tester.scrollUntilVisible(button, 200);
+      await tester.tap(button);
+      expect(resetTapped, 1);
     });
   });
 }

@@ -1,0 +1,14 @@
+{
+  "catalogResetAction": "Réinitialiser depuis la base véhicules",
+  "catalogResetConfirmTitle": "Réinitialiser depuis la base véhicules ?",
+  "catalogResetConfirmBody": "La capacité du réservoir, la puissance moteur et la cylindrée de ce véhicule seront remplacées par les valeurs de la base pour {vehicle}. Les autres champs et votre historique de pleins ne sont pas modifiés.",
+  "@catalogResetConfirmBody": {
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogResetNoMatchSnackbar": "Aucune entrée correspondante dans la base véhicules pour ce véhicule.",
+  "catalogResetDoneSnackbar": "Données du véhicule réinitialisées depuis la base."
+}

@@ -809,6 +809,134 @@ void main() {
     });
   });
 
+  group('VehicleFormControllers — tankCapacityL pre-fill (#3651)', () {
+    // Mirrors the enginePowerKw group above: the catalog row carries a
+    // curated nominal capacity, the controller must pre-fill it without
+    // clobbering user input, and buildProfile must fall back to the
+    // catalog value when the field was left blank.
+    const c107 = ReferenceVehicle(
+      make: 'Peugeot',
+      model: '107',
+      generation: 'I (2005-2014)',
+      yearStart: 2005,
+      yearEnd: 2014,
+      displacementCc: 998,
+      powerKw: 50,
+      tankCapacityL: 35,
+      fuelType: 'petrol',
+      transmission: 'manual',
+    );
+
+    test('applyReferenceVehicle pre-fills the tank controller from the '
+        'catalog row, without a spurious trailing .0', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.applyReferenceVehicle(c107);
+      expect(c.tankController.text, '35');
+    });
+
+    test('applyReferenceVehicle does NOT clobber a user-typed capacity', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.tankController.text = '38'; // user typed before picking
+      c.applyReferenceVehicle(c107);
+      expect(c.tankController.text, '38',
+          reason: 'a user-set capacity must survive a catalog pick');
+    });
+
+    test('applyReferenceVehicle leaves the field blank for a row without '
+        'a curated capacity (null tankCapacityL — no fabrication)', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      const uncurated = ReferenceVehicle(
+        make: 'Volvo',
+        model: 'XC60',
+        generation: 'XC60 I (2008-2017)',
+        yearStart: 2008,
+        displacementCc: 1984,
+        fuelType: 'diesel',
+        transmission: 'manual',
+      );
+      c.applyReferenceVehicle(uncurated);
+      expect(c.tankController.text, '');
+    });
+
+    test('new-vehicle buildProfile persists the capacity from the catalog '
+        'pick', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.applyReferenceVehicle(c107); // pre-fills the tank controller
+      final profile = c.buildProfile(
+        existing: null,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        referenceVehicle: c107,
+      );
+      expect(profile.tankCapacityL, 35.0);
+    });
+
+    test('new-vehicle buildProfile falls back to the catalog capacity when '
+        'the controller is blank (programmatic build without the picker)',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      final profile = c.buildProfile(
+        existing: null,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        referenceVehicle: c107,
+      );
+      expect(profile.tankCapacityL, 35.0);
+    });
+
+    test('new-vehicle buildProfile honours a user override over the '
+        'catalog capacity', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.tankController.text = '38';
+      final profile = c.buildProfile(
+        existing: null,
+        type: VehicleType.combustion,
+        connectors: const {},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        referenceVehicle: c107, // catalog says 35
+      );
+      expect(profile.tankCapacityL, 38.0);
+    });
+
+    test('EV vehicles never persist tankCapacityL, even from a catalog row',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      final profile = c.buildProfile(
+        existing: null,
+        type: VehicleType.ev,
+        connectors: const {ConnectorType.type2},
+        adapterMac: null,
+        adapterName: null,
+        engineDisplacementCc: null,
+        engineCylinders: null,
+        curbWeightKg: null,
+        referenceVehicle: c107,
+      );
+      expect(profile.tankCapacityL, isNull);
+    });
+  });
+
   group('VehicleFormControllers.dispose', () {
     test('does not throw when called once after construction', () {
       final c = VehicleFormControllers();

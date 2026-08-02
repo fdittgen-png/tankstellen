@@ -181,6 +181,16 @@ abstract class ReferenceVehicle with _$ReferenceVehicle {
     /// power-agnostic path.
     int? powerKw,
 
+    /// Nominal fuel-tank capacity in litres for this generation (#3651).
+    ///
+    /// Curated from the manufacturer's published specification for the
+    /// generation's highest-volume variant. Nullable: rows where the
+    /// nominal figure is not confidently known (or meaningless — the
+    /// EV placeholder rows) carry no value rather than a fabricated
+    /// one. A null here means "unknown capacity" — the pre-fill and
+    /// catalog-reset consumers simply leave the profile field alone.
+    double? tankCapacityL,
+
     /// One of "petrol", "diesel", "hybrid", "electric". Stored as a
     /// string (not enum) so adding a new fuel type is JSON-only.
     required String fuelType,

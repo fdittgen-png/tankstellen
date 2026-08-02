@@ -265,8 +265,26 @@ mixin _VehicleEditActions on ConsumerState<EditVehicleScreen> {
     );
     if (!mounted) return;
 
-    final updated = outcome.profile;
-    if (updated == null) return;
+    final merged = outcome.profile;
+    if (merged == null) return;
+    var updated = merged;
+
+    // #3651 — the OBD2/VIN flow resolved make/model but neither the VIN
+    // decoder (vPIC has no capacity field) nor the ECU reports the tank
+    // size. Backfill the nominal capacity from the reference catalog
+    // when the profile has none yet — model-confident matches only, so
+    // a brand-mate's tank never masquerades as this car's.
+    if (updated.tankCapacityL == null) {
+      final catalog = ref.read(referenceVehicleCatalogProvider).value ??
+          const <ReferenceVehicle>[];
+      final capacity = VehicleProfileCatalogMatcher.confidentMatch(
+        profile: updated,
+        catalog: catalog,
+      )?.tankCapacityL;
+      if (capacity != null) {
+        updated = updated.copyWith(tankCapacityL: capacity);
+      }
+    }
 
     // Persist the merged profile + reload local form state so the "(detected)"
     // badges + auto-filled fields show immediately.
