@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Background execution &amp; always-visible UI — LLM Wiki · Flutter</title>
+<meta name="description" content="Recording with the app in the background on Android, iOS and F-Droid; foreground services; keeping the screen on; pinning the app; picture-in-picture tiles, Live Activities and widgets.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Background execution and always-visible UI in Flutter","description":"Background recording per platform, foreground services, screen pinning, PiP tiles, Live Activities, widgets.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">21 · Runtime</span>
+<h1>Background execution &amp; always-visible UI</h1>
+<p class="lede">Two opposite problems that turn out to be the same problem. Running with the app <em>not</em> visible, and keeping something visible when the user is doing something else, are both requests for an exemption from the normal application lifecycle — and every operating system grants them narrowly, on conditions, and revokes them without warning.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> bg</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 13 Android · 14 iOS · 10 Bluetooth</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#matrix">What each platform actually allows</a></li>
+<li><a href="#android-fgs">Android: the foreground service</a></li>
+<li><a href="#android-throttle">Android: batching, Doze and OEM killers</a></li>
+<li><a href="#ios-bg">iOS: background modes and their limits</a></li>
+<li><a href="#fdroid-bg">F-Droid and push without proprietary services</a></li>
+<li><a href="#gate">One flag for the whole feature</a></li>
+<li><a href="#screen-on">Keeping the screen on</a></li>
+<li><a href="#pinning">Pinning the app in the foreground</a></li>
+<li><a href="#tiles">Small always-visible tiles</a></li>
+<li><a href="#testing">Testing background behaviour</a></li>
+</ol>
+</div>
+
+<section id="matrix" data-chunk-id="bg.matrix" data-tags="background,platform,capabilities">
+<h2>What each platform actually allows</h2>
+
+<p>Start here, because the honest answer constrains the feature you can design.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Capability</th><th>Android (store)</th><th>Android (libre)</th><th>iOS</th><th>Desktop</th></tr></thead>
+<tbody>
+<tr><td>Continuous GPS with the screen off</td><td>Yes, with a foreground service <strong>+ an approved declaration</strong></td><td>Yes, no declaration needed</td><td>Yes, with the <code>location</code> background mode</td><td>Yes, app just keeps running</td></tr>
+<tr><td>Hold a Bluetooth link in background</td><td>Yes, foreground service + declaration</td><td>Yes</td><td>Yes for BLE, <code>bluetooth-central</code>; <strong>no</strong> classic RFCOMM</td><td>Yes</td></tr>
+<tr><td>Sustained CPU work in background</td><td>Yes, inside the service</td><td>Yes</td><td><strong>No</strong> — short windows only</td><td>Yes</td></tr>
+<tr><td>Wake on a schedule</td><td>Yes, deferred and batched</td><td>Yes</td><td>Advisory only; the OS decides</td><td>Yes</td></tr>
+<tr><td>Wake on a device appearing</td><td>Yes, scan with a pending intent</td><td>Yes</td><td>BLE state restoration for a known peripheral</td><td>n/a</td></tr>
+<tr><td>Relaunch after reboot</td><td>Yes, boot receiver</td><td>Yes</td><td><strong>No</strong></td><td>Login item</td></tr>
+<tr><td>Push without a proprietary service</td><td>Store push, or self-hosted</td><td><strong>Self-hosted only</strong></td><td>Apple push (the only option)</td><td>n/a</td></tr>
+<tr><td>Store paperwork</td><td>A per-type declaration <strong>with a video</strong></td><td>None</td><td>Justification in review, usually a video</td><td>None</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Design the feature to degrade to foreground-only, and say so in the interface.</strong> Background execution is a privilege granted by two operating systems and two review teams, any of which can narrow it in a future version. A feature that is worthless without it is a feature built on someone else's policy. Recording that continues in the background and <em>also</em> works while you watch it is resilient; recording that only exists in the background is a liability.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why the libre column is the permissive one</span>
+<p>The operating-system restrictions are identical — it is the same Android. What differs is store <em>policy</em>: a catalog that reviews for freedom rather than for background-usage justification imposes no declaration. This has a practical consequence worth exploiting: a sideloaded or libre build can validate the whole background feature <strong>today</strong>, while the store declaration is still in review. Do not wait on paperwork to test your own code.</p>
+</div>
+</section>
+
+<section id="android-fgs" data-chunk-id="bg.android-fgs" data-tags="foreground-service,android,notification">
+<h2>Android: the foreground service</h2>
+
+<p>Android has no "run in the background" permission. What it has is a <strong>foreground service</strong>: a service the system keeps alive because it displays a persistent notification. The name is confusing and the mechanism is the entire background story.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Type</th><th>Permission</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><code>location</code></td><td><code>FOREGROUND_SERVICE_LOCATION</code></td><td>Trip or activity recording the user started</td></tr>
+<tr><td><code>connectedDevice</code></td><td><code>FOREGROUND_SERVICE_CONNECTED_DEVICE</code></td><td>Holding a link to a paired Bluetooth device</td></tr>
+<tr><td><code>dataSync</code></td><td><code>FOREGROUND_SERVICE_DATA_SYNC</code></td><td>A user-initiated upload or sync</td></tr>
+<tr><td><code>mediaPlayback</code></td><td><code>FOREGROUND_SERVICE_MEDIA_PLAYBACK</code></td><td>Audio</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="xml"><code>&lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE" /&gt;
+&lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" /&gt;
+&lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" /&gt;
+
+&lt;service
+    android:name=".autorecord.RecordingForegroundService"
+    android:foregroundServiceType="location|connectedDevice"
+    android:exported="false" /&gt;</code></pre>
+
+<div class="callout why">
+<span class="tag">Why you probably do not need background-location permission</span>
+<p>A foreground service <strong>started while the app is visible</strong> keeps receiving location updates on the ordinary <em>while in use</em> permission. You do not need <code>ACCESS_BACKGROUND_LOCATION</code> unless the app must locate the user when it has never been opened. Skipping it avoids a separate and stricter store declaration, avoids a permission a large share of users refuse, and materially improves your privacy declaration. One project deliberately does not request it and documents that decision next to the manifest entry — worth copying, including the comment.</p>
+</div>
+
+<p>Notification requirements that are not optional:</p>
+<ul>
+<li>It must appear promptly after the service starts and remain for the whole session.</li>
+<li>It must be <strong>localised</strong> — it is user-facing text and falls under the same rule as everything else.</li>
+<li>It should carry a stop action, so the user can end the session without opening the app.</li>
+<li>It should show live state (elapsed time, distance), because a static notification reads as stuck.</li>
+</ul>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The service stops the instant the user ends the session</strong> — from the app or from the notification. A foreground service that outlives its purpose is the single most common cause of a battery complaint, and store vitals will flag it before your users do.</p>
+</div>
+</section>
+
+<section id="android-throttle" data-chunk-id="bg.android-throttle" data-tags="doze,battery,oem,throttling">
+<h2>Android: batching, Doze and OEM killers</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: location and sensor callbacks arrive in bursts roughly every five seconds once the screen is off, instead of continuously.</strong> Android batches background delivery aggressively to save power. A foreground service is the documented lever that restores continuous delivery — which is why a feature can look correct in the foreground and produce a coarse, gappy track in the background.</p>
+<p><strong>Countermeasures:</strong> request the foreground service for the duration of the session; ask the location client for the cadence you actually need rather than accepting defaults; and, on the analysis side, treat gaps as expected — interpolate and mark the segment rather than assuming the user teleported.</p>
+</div>
+
+<p>Beyond the platform, several manufacturers add their own aggressive process management that ignores the standard rules.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Layer</th><th>Effect</th><th>What you can do</th></tr></thead>
+<tbody>
+<tr><td><strong>Doze / app standby</strong></td><td>Defers work when the device is idle</td><td>A foreground service is exempt while it runs</td></tr>
+<tr><td><strong>Battery optimisation</strong></td><td>Restricts background work per app</td><td>You may <em>request</em> an exemption — do it only when the user enables the feature, with an explanation, and never at launch</td></tr>
+<tr><td><strong>OEM process killers</strong></td><td>Kill the app regardless of a foreground service</td><td>Nothing programmatic. Detect the manufacturer and link the user to the relevant setting.</td></tr>
+<tr><td><strong>"Remove permissions if unused"</strong></td><td>Revokes permissions for apps unopened for months</td><td>Ask the user to exempt the app if it is genuinely a background-first tool</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Detect an interrupted session and recover rather than pretending it did not happen.</strong> Persist a session marker at start; on the next launch, if the marker is present and no clean stop was recorded, you were killed. Offer to resume or to save what was captured — and make sure those buttons actually work, which is <a href="03-tdd-and-testing.html#bugfix">the affordance-test rule</a>: one project shipped exactly this recovery banner with two silent no-op buttons because the recovery path left the controller null.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Test the kill path explicitly: start a session, then <code>adb shell am kill &lt;package&gt;</code>, then relaunch. You should get the recovery offer, and taking it should produce a usable result. This is a two-minute test that covers the most common real-world failure of any recording feature.</p>
+</div>
+</section>
+
+<section id="ios-bg" data-chunk-id="bg.ios-bg" data-tags="ios,background-modes,limits">
+<h2>iOS: background modes and their limits</h2>
+
+<pre data-lang="xml"><code>&lt;key&gt;UIBackgroundModes&lt;/key&gt;
+&lt;array&gt;
+  &lt;string&gt;location&lt;/string&gt;           &lt;!-- continued location updates --&gt;
+  &lt;string&gt;bluetooth-central&lt;/string&gt;  &lt;!-- keep a BLE peripheral connected --&gt;
+  &lt;string&gt;fetch&lt;/string&gt;              &lt;!-- opportunistic refresh --&gt;
+  &lt;string&gt;processing&lt;/string&gt;         &lt;!-- longer scheduled tasks --&gt;
+&lt;/array&gt;</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Mode</th><th>Reliable?</th><th>Reality</th></tr></thead>
+<tbody>
+<tr><td><code>location</code></td><td><strong>Yes</strong>, while a session is active</td><td>The status bar shows an indicator. This is the dependable one.</td></tr>
+<tr><td><code>bluetooth-central</code></td><td><strong>Yes</strong> for an established connection</td><td>State restoration can relaunch the app for a known peripheral</td></tr>
+<tr><td><code>fetch</code></td><td><strong>No</strong></td><td>Occasional short windows chosen by the OS. Not a timer.</td></tr>
+<tr><td><code>processing</code></td><td><strong>No</strong></td><td>Typically while charging and idle. Also not a timer.</td></tr>
+<tr><td>Significant location change</td><td>Mostly</td><td>Coarse, event-driven; can relaunch a terminated app. Good for "did the user start driving", useless for a track.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a background task that runs like clockwork on Android fires unpredictably or not at all on iOS.</strong> Background task scheduling on iOS is <em>advisory</em>. The system decides based on usage patterns, battery and charge state, and it deprioritises apps the user opens rarely — precisely the profile of a utility app. Design for "this will run sometimes, possibly not for a day", make the foreground path authoritative, and never promise the user a background frequency.</p>
+<p><strong>Corollary for alerting features:</strong> if you need a guaranteed delivery latency on iOS, the only mechanism that provides it is a push from your own server. Background fetch will not do it, and building a feature that assumes otherwise produces a promise you cannot keep.</p>
+</div>
+
+<p>Two further iOS realities worth stating plainly: there is <strong>no launch-at-boot</strong>, so a session cannot resume automatically after a restart; and <strong>classic Bluetooth is unavailable</strong> for arbitrary devices, so a dongle that only speaks serial profile has no iOS story at all.</p>
+</section>
+
+<section id="fdroid-bg" data-chunk-id="bg.fdroid" data-tags="fdroid,push,unifiedpush,libre">
+<h2>F-Droid and push without proprietary services</h2>
+
+<p>The libre build has the same OS-level capabilities and no store-policy layer — but it also has no proprietary push service, which changes how anything server-initiated has to work.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Need</th><th>Store build</th><th>Libre build</th></tr></thead>
+<tbody>
+<tr><td>Background recording</td><td>Foreground service + approved declaration</td><td>Foreground service, shipped unconditionally</td></tr>
+<tr><td>Scheduled local work</td><td>The platform work scheduler</td><td>Identical — it is not a proprietary component</td></tr>
+<tr><td>Server-initiated notification</td><td>The store's push service</td><td><strong>A self-hosted or federated push protocol</strong></td></tr>
+<tr><td>Local notifications</td><td>Platform API</td><td>Identical</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>If a channel forbids the proprietary push service, adopt an open push protocol rather than dropping the feature.</strong> A distributor-based protocol — where the user runs or chooses a push distributor app and your app registers an endpoint with it — gives server-initiated notifications with no proprietary dependency. One project ships exactly this. The trade is that the user must have a distributor installed, so detect its absence and degrade to polling with an explanation rather than silently never notifying.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why this shapes the whole alerting design</span>
+<p>If one channel has reliable push, one has an optional distributor, and iOS has push but no reliable background fetch, then a design that assumes uniform delivery is wrong on at least two of the three. The workable shape is a <em>tiered</em> one: an on-device evaluation loop that runs whenever the app is alive or a foreground service is running, plus push where it is available as an accelerator. State the delivery expectation per channel in your own documentation so nobody promises a latency the channel cannot meet.</p>
+</div>
+</section>
+
+<section id="gate" data-chunk-id="bg.gate" data-tags="feature-flag,build,lockstep">
+<h2>One flag for the whole feature</h2>
+
+<p>Background execution touches Dart code, the manifest and store paperwork. Those three must never disagree, so drive all of them from a single build-time flag.</p>
+
+<pre data-lang="bash"><code>flutter build appbundle --release --flavor play \
+  --dart-define=FGS_FORM_APPROVED=true</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Half</th><th>What the flag does</th></tr></thead>
+<tbody>
+<tr><td><strong>Dart</strong></td><td>A compile-time constant turns true, so the recorder requests the foreground service</td></tr>
+<tr><td><strong>Gradle</strong></td><td>The flavor manifest swaps to an overlay that declares the permissions and the service</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="kotlin"><code>// Flutter forwards --dart-define to Gradle as a comma-separated list of
+// base64 "KEY=VALUE" entries. Decoding it lets ONE flag flip both halves.
+val dartDefines: Map&lt;String, String&gt; =
+    (project.findProperty("dart-defines") as String?)
+        ?.split(",")
+        ?.mapNotNull { runCatching {
+            String(Base64.getDecoder().decode(it)).split("=", limit = 2)
+                .let { p -&gt; if (p.size == 2) p[0] to p[1] else null }
+        }.getOrNull() }
+        ?.toMap() ?: emptyMap()
+
+val fgsApproved = (dartDefines["FGS_FORM_APPROVED"]
+    ?: System.getenv("FGS_FORM_APPROVED") ?: "false")
+    .let { it.equals("true", true) || it == "1" }
+
+sourceSets {
+    getByName("play").manifest.srcFile(
+        if (fgsApproved) "src/play/AndroidManifestFgsApproved.xml"
+        else             "src/play/AndroidManifest.xml")
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The default build must ship with zero foreground-service permissions</strong>, so an upload can never be rejected while the declaration is pending. Add an audit script that asserts this and run it in CI — a gate that can silently regress is not a gate. After approval, one repository variable flips it for every subsequent build with no code change.</p>
+</div>
+
+<p>The libre flavor takes the overlay unconditionally: no store policy applies there, so there is nothing to gate.</p>
+</section>
+
+<section id="screen-on" data-chunk-id="bg.screen-on" data-tags="wakelock,screen,driving-mode">
+<h2>Keeping the screen on</h2>
+
+<p>The opposite requirement: the app is visible and must <em>stay</em> visible — a driving view, a kiosk, a live dashboard.</p>
+
+<pre data-lang="dart"><code>/// A facade so the platform call has a seam for tests, and so the
+/// enable/disable calls are reference-counted rather than racing.
+class WakelockFacade {
+  int _holders = 0;
+
+  Future&lt;void&gt; acquire() async {
+    if (_holders++ == 0) await WakelockPlus.enable();
+  }
+
+  Future&lt;void&gt; release() async {
+    if (--_holders &lt;= 0) {
+      _holders = 0;
+      await WakelockPlus.disable();
+    }
+  }
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Reference-count the wake lock and release it on every exit path.</strong> Two screens that both want the screen on will otherwise fight: the second to disable turns it off while the first still needs it. And a wake lock left held after the user leaves the screen drains the battery until the app is killed — which store vitals will report as an excessive-wake-lock warning, a metric that affects your listing.</p>
+</div>
+
+<p>Scope it tightly. Hold it while a recording session is active or a driving view is on screen; release it on pause, on navigation away, and in <code>dispose</code>. Make it a user-visible setting if the feature is long-running — some people will want the screen to sleep even during a session.</p>
+</section>
+
+<section id="pinning" data-chunk-id="bg.pinning" data-tags="screen-pinning,kiosk,lock-task">
+<h2>Pinning the app in the foreground</h2>
+
+<p>Two different things get called "pinning", and they have very different scopes.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>User-initiated screen pinning</th><th>Managed lock-task mode</th></tr></thead>
+<tbody>
+<tr><td>Who enables it</td><td>The user, from the recents view</td><td>A device owner / management profile</td></tr>
+<tr><td>Setup</td><td>Enable it once in system settings</td><td>Device provisioning</td></tr>
+<tr><td>Exit</td><td>A gesture, optionally requiring the device PIN</td><td>Only the app or the administrator</td></tr>
+<tr><td>Survives reboot</td><td>No</td><td>Yes</td></tr>
+<tr><td>Right for</td><td>Handing your phone to someone; a temporary kiosk</td><td>A permanently dedicated device</td></tr>
+<tr><td>iOS equivalent</td><td><strong>Guided Access</strong> — user-enabled, accessibility setting</td><td>Supervised-device single-app mode</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Build your own in-app kiosk mode rather than depending on OS pinning.</strong> OS pinning is a user setting you cannot enable programmatically without device-owner privileges, and it is unavailable or differently-named on iOS. What you <em>can</em> control is your own app: a mode entered and left with a separate device PIN, with no navigation out, no deep links accepted, no share sheet, an idle timeout back to a neutral screen, and a wake lock held for the duration. Then OS pinning becomes an optional hardening step the operator may add, not a dependency.</p>
+</div>
+
+<p>The kiosk rules that matter most, all of which follow from the screen being in a shared room: the idle state must show no personal data; every transient state must expire on its own, because the interaction model is "tap and walk away"; and a small corner should show diagnostic state — connectivity, hardware availability, last sync — because that is what makes remote support possible. See <a href="12-nfc-rfid.html#kiosk">page 12</a>.</p>
+</section>
+
+<section id="tiles" data-chunk-id="bg.tiles" data-tags="picture-in-picture,live-activity,widget,overlay">
+<h2>Small always-visible tiles</h2>
+
+<p>When the user is doing something else but still needs a glanceable readout, there are four mechanisms and they are not interchangeable.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Mechanism</th><th>Platform</th><th>Shows</th><th>Good for</th></tr></thead>
+<tbody>
+<tr><td><strong>Picture-in-picture</strong></td><td>Android</td><td>A small floating window over other apps, resizable, with actions</td><td>A live readout while the user navigates elsewhere</td></tr>
+<tr><td><strong>Live Activity</strong></td><td>iOS</td><td>Lock screen and the dynamic island</td><td>The iOS analogue of PiP for status, though it is not an interactive window</td></tr>
+<tr><td><strong>Persistent notification</strong></td><td>Both</td><td>Shade / lock screen, with actions</td><td>The universal fallback. Free with a foreground service.</td></tr>
+<tr><td><strong>Home-screen widget</strong></td><td>Both</td><td>The home screen, refreshed periodically</td><td>Glanceable state when the app is not running at all</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Picture-in-picture, in practice</h3>
+
+<p>PiP is what most people mean by "keep it visible as a small tile". It is an Android activity mode: the activity enters PiP, the system shrinks it into a floating window, and it keeps rendering.</p>
+
+<pre data-lang="xml"><code>&lt;activity
+    android:name=".MainActivity"
+    android:supportsPictureInPicture="true"
+    android:resizeableActivity="true"
+    android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation" /&gt;</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Design point</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td><strong>Design for the small size, not a scaled-down screen</strong></td><td>A PiP window is roughly a business card. One large number and one label. A shrunk full screen is unreadable.</td></tr>
+<tr><td><strong>Make the content context-adaptive</strong></td><td>One project's driving overlay shows live consumption when telemetry is available, distance when it is GPS-only mid-trip, and elapsed time during the pre-roll — one slot, the most useful value for the current state.</td></tr>
+<tr><td><strong>Allow a mode flip</strong></td><td>The same overlay flips to a large price layout when the driver comes within a station's radius. A tile that changes at the right moment is far more valuable than one that shows one thing forever.</td></tr>
+<tr><td><strong>Handle the lifecycle</strong></td><td>Entering PiP is a configuration change. Nothing may reinitialise, and the underlying session must be unaffected.</td></tr>
+<tr><td><strong>Provide a way back</strong></td><td>Tapping the window restores the app. Make that obvious.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Ship a way to test the tile without reproducing its trigger.</strong> An overlay that only appears when you are driving within a certain distance of something is nearly untestable — so add a control that pushes a synthetic trigger for thirty seconds. One project has exactly this in its privacy dashboard, and it converted an "only verifiable in a moving car" surface into one anyone can check from a desk. This is a general principle: any state that requires the physical world to reach deserves a synthetic entry point.</p>
+</div>
+
+<h3>Live Activities and widgets</h3>
+
+<p>A Live Activity is a separate iOS extension target with its own timeline, updated from the app or by push. Treat it like the widget: keep the payload small and pre-rendered, write it whenever the underlying value changes, and never require the extension to start your Dart runtime.</p>
+
+<p>For home-screen widgets, three things break most often: the shared storage identifier differing by a character between the two languages; the tap deep link failing on a cold start while working warm; and the refresh path assuming the app is running. Log the resolved shared-storage identifier on both sides once and compare — five minutes that otherwise costs an afternoon. See <a href="14-ios.html#extensions">page 14</a>.</p>
+</section>
+
+<section id="testing" data-chunk-id="bg.testing" data-tags="testing,background,validation">
+<h2>Testing background behaviour</h2>
+
+<p>Almost none of this is reachable from a widget test. Split it into what is testable and a short device checklist for what is not.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Layer</th><th>How</th></tr></thead>
+<tbody>
+<tr><td>Session state machine</td><td>Unit tests: start, pause, interrupt, recover, stop</td></tr>
+<tr><td>Interrupted-session recovery</td><td>Unit test the marker logic; widget-test the recovery banner and <strong>tap both its buttons</strong></td></tr>
+<tr><td>Wake-lock reference counting</td><td>Unit test the facade: two acquires, one release, still held</td></tr>
+<tr><td>Gap handling in the analysis</td><td>Unit tests over recorded traces with deliberate gaps</td></tr>
+<tr><td>The default manifest carries no service permissions</td><td>An audit script in CI</td></tr>
+<tr><td>Everything else</td><td>The device checklist below</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check — the device matrix</span>
+<p>Per release, on real hardware, for any background feature. Roughly twenty minutes and it covers what no automated test reaches.</p>
+<ol>
+<li>Start a session; lock the screen for five minutes; unlock — <strong>is the data continuous or gapped?</strong></li>
+<li>Start a session; switch to another app for five minutes; return.</li>
+<li>Start a session; open the PiP tile; use another app; confirm it updates.</li>
+<li>Start a session; kill the app (<code>adb shell am kill</code>); relaunch — <strong>is recovery offered, and does taking it work?</strong></li>
+<li>Start a session; toggle the relevant radio off and on mid-session.</li>
+<li>Start a session; let the battery saver engage.</li>
+<li>Stop from the notification rather than from the app.</li>
+<li>Reboot mid-session (Android) — confirm the state is sane afterwards.</li>
+<li>On a device from a manufacturer with aggressive process management, repeat steps 1 and 4.</li>
+</ol>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Validate on a build that actually contains the fix, and check the build number first.</strong> Both projects record background-layer fixes marked "needs on-device validation" that sat unvalidated across releases. A green CI run cannot observe a radio or a doze transition. And when someone reports a background feature still broken, the first question is which build they are on — a stale testing-channel build is the most common answer.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's foreground-service work: the two declared types with their permissions, the single build-time flag decoding dart-defines in Gradle to swap the manifest overlay, the default-zero-permissions guard with its audit script, and the documented decision not to request background location because a foreground service started while visible does not need it.</li>
+<li>Its driving-mode picture-in-picture overlay — the context-adaptive primary readout, the flip to a large price layout on approach, and the synthetic thirty-second test trigger in the privacy dashboard — plus its wake-lock facade and Live Activity coordinator.</li>
+<li>Its recorded background-batching symptom, its interrupted-session recovery banner (including the incident where both recovery buttons were silent no-ops), and its note that sideloaded and libre builds can validate the feature while the store declaration is pending.</li>
+<li>The other project's adoption of a distributor-based open push protocol in place of a proprietary push service, for a build that must stay free of it.</li>
+</ul>
+<p>The OEM-process-killer row and the pinning comparison are general platform knowledge. The wake-lock facade snippet is an illustrative reconstruction of the described reference-counting behaviour.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

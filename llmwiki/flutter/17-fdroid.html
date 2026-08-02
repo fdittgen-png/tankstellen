@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F-Droid — LLM Wiki · Flutter</title>
+<meta name="description" content="The two distribution channels, making a build genuinely libre, the three-layer proprietary-code audit, the reproducible-build recipe, and the lockfile that must be regenerated.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Shipping a Flutter app on F-Droid","description":"Two channels, making a build libre, the three-layer audit, the reproducible recipe.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">17 · Platforms</span>
+<h1>F-Droid</h1>
+<p class="lede">F-Droid is the only channel that inspects your bytecode. A dependency-graph audit that satisfies you will not satisfy their scanner, because it reads the shipped artifact and rejects even a dangling reference to a proprietary class. Everything on this page follows from that one fact.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> fdroid</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 13 Android · 09 Confidentiality</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#channels">Two channels: self-hosted and catalog</a></li>
+<li><a href="#libre">Making a build genuinely libre</a></li>
+<li><a href="#swap">Swapping dependencies before resolution</a></li>
+<li><a href="#audit">The three-layer audit</a></li>
+<li><a href="#recipe">The reproducible-build recipe</a></li>
+<li><a href="#lockfile">The second lockfile</a></li>
+<li><a href="#selfhosted">Running your own repository</a></li>
+<li><a href="#userfacing">What users need to be told</a></li>
+</ol>
+</div>
+
+<section id="channels" data-chunk-id="fdroid.channels" data-tags="fdroid,distribution,strategy">
+<h2>Two channels: self-hosted and catalog</h2>
+
+<p>You can publish immediately from your own repository, and separately submit to the official catalog. Do both, in that order.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Self-hosted repository</th><th>Official catalog</th></tr></thead>
+<tbody>
+<tr><td>Who builds</td><td>You</td><td><strong>Their buildserver, from your tagged source</strong></td></tr>
+<tr><td>Who signs</td><td>You, with a repo signing key</td><td>They do, with theirs</td></tr>
+<tr><td>Time to first release</td><td>An afternoon</td><td>Weeks — a merge request plus review</td></tr>
+<tr><td>Discoverability</td><td>Users must add your repository URL</td><td>Listed in every F-Droid client</td></tr>
+<tr><td>Audit bar</td><td>Yours to enforce</td><td>Their scanner, strictly</td></tr>
+<tr><td>Update mechanism</td><td>You regenerate the index</td><td>Automatic from your tags</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Stand up the self-hosted repository first.</strong> It gets a libre build into users' hands in an afternoon, and it forces you to solve the actual hard problem — making the build libre — before you are also waiting on someone else's review queue. The catalog submission then becomes a packaging exercise on a build you already trust.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why the catalog builds from source</span>
+<p>The whole proposition is that the binary corresponds to the published source. Their buildserver checks out your tagged commit, builds in a controlled environment, and signs the result. That means your build must be reproducible from a clean checkout with no secrets, no network beyond dependency resolution, and no manual steps — which is a genuinely useful constraint to satisfy even if you never submit.</p>
+</div>
+</section>
+
+<section id="libre" data-chunk-id="fdroid.libre" data-tags="gms,dependencies,libre">
+<h2>Making a build genuinely libre</h2>
+
+<p>Find every proprietary dependency, including the transitive ones, and give each a replacement or a removal. In one project this was five sources.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>What pulled it in</th><th>Proprietary payload</th><th>Resolution</th></tr></thead>
+<tbody>
+<tr><td>Location plugin</td><td>Play Services location</td><td>Exclude the group; the plugin falls back to the platform's own location manager, selected by a build-config flag</td></tr>
+<tr><td>Text-recognition plugin</td><td>ML Kit, Play Services base</td><td>Excluded. The feature detects the missing channel and degrades — the recognition call catches the missing-plugin exception and returns null</td></tr>
+<tr><td>In-app review plugin</td><td>Play Core</td><td>Excluded. The service swallows the resulting error and no-ops.</td></tr>
+<tr><td>Barcode scanner</td><td>ML Kit barcode backend</td><td>Replaced with an FFI binding to a free scanning library, selected when the flavor is libre. See <a href="11-barcode-qr.html#swap">page 11</a>.</td></tr>
+<tr><td>Crash reporter</td><td>A tracking SDK</td><td><strong>Compiled out entirely.</strong> Catalogs classify reporting SDKs as tracking.</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="kotlin"><code>// Exclude the proprietary groups from the libre flavor's graph.
+// Scope is the libre flavor ONLY — the store flavor is untouched.
+val excluded = listOf(
+    "com.google.android.gms",
+    "com.google.mlkit",
+    "com.google.android.play",
+    "io.sentry",
+)
+listOf(
+    "fdroidImplementation",
+    "fdroidReleaseRuntimeClasspath",
+    "fdroidDebugRuntimeClasspath",
+    "fdroidProfileRuntimeClasspath",
+).forEach { name -&gt;
+    configurations.matching { it.name == name }.configureEach {
+        excluded.forEach { g -&gt; exclude(group = g) }
+    }
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Every excluded dependency needs a graceful-degradation path and a test for it.</strong> Excluding a group means the plugin's platform channel simply is not there, and calling it raises a missing-plugin exception at runtime. Catch it at the service boundary and return a named unavailable state — never let it reach the UI as a crash. Then write the test that injects that exception and asserts the app stays usable.</p>
+</div>
+
+<pre data-lang="proguard"><code># proguard-rules-fdroid.pro — libre flavor ONLY.
+# The real classes are absent from this flavor's graph, so R8 would abort
+# with "Missing class …" without these.
+-dontwarn com.google.android.gms.**
+-dontwarn com.google.mlkit.**
+-dontwarn com.google.android.play.**
+-dontwarn io.sentry.**</code></pre>
+</section>
+
+<section id="swap" data-chunk-id="fdroid.swap" data-tags="dependencies,build,overrides">
+<h2>Swapping dependencies before resolution</h2>
+
+<p>Gradle exclusions handle the Android side. The Dart side needs the package itself replaced, before dependency resolution, or its symbols remain in the artifact.</p>
+
+<pre data-lang="text"><code>tool/apply_fdroid_overrides.dart          # runs BEFORE `flutter pub get`
+  ├─ pubspec_overrides.fdroid.yaml → pubspec_overrides.yaml
+  │     mobile_scanner:  { path: tool/fdroid_stubs/mobile_scanner }
+  │     in_app_review:   { path: tool/fdroid_stubs/in_app_review }
+  │     sentry_flutter:  { path: tool/fdroid_stubs/sentry_flutter }
+  └─ pubspec.fdroid.lock → pubspec.lock</code></pre>
+
+<p>Each stub is a package with the same public API whose implementations are no-ops or throw a named unavailable error. Nothing imports a stub directly — the application code selects the libre path at runtime — but the stub is what removes the real package's symbols from the build.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>A runtime branch is not enough.</strong> Writing <code>if (isLibre) useFreeScanner() else useMlKit()</code> selects correctly and still links both libraries into the artifact, where the scanner will find them. The swap must happen at dependency-resolution time. This is the single most common way a libre build fails an audit while appearing correct in every functional test.</p>
+</div>
+
+<p>Run the override tool as the first step of both the audit workflow and the catalog recipe's prebuild, so the audit runs against exactly the graph the catalog will build.</p>
+</section>
+
+<section id="audit" data-chunk-id="fdroid.audit" data-tags="audit,dex,r8,verification">
+<h2>The three-layer audit</h2>
+
+<p>Three layers, any of which failing fails the audit. The third is the one that matters and the one most projects skip.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Layer</th><th>Inspects</th><th>Bar</th></tr></thead>
+<tbody>
+<tr><td><strong>A — dependency graph</strong></td><td>The resolved runtime classpath, via Gradle</td><td>No proprietary coordinates. Fast, deterministic, always runs. This is what the reproducible build itself inspects.</td></tr>
+<tr><td><strong>B — bytecode definitions</strong></td><td>Every dex in the built APK</td><td>No proprietary class is <em>defined</em> in the shipped bytecode</td></tr>
+<tr><td><strong>C — strict references</strong></td><td>The same dex, on a <strong>release</strong> APK</td><td>Not even a <strong>dangling reference</strong> to a proprietary type. <strong>This is the bar the catalog's scanner applies.</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="bash"><code># Coordinates in the resolved graph (layer A).
+GRAPH='com\.google\.android\.gms|com\.google\.mlkit|com\.google\.android\.play|io\.sentry'
+
+# Type descriptors in the dex (layers B and C). Note the SLASH after
+# "google": the project's own plugin packages are com.google_mlkit_* with
+# an underscore, which this pattern correctly never matches.
+DEX='Lcom/google/android/gms/|Lcom/google/mlkit/|Lcom/google/android/play/|Lio/sentry/'
+
+unzip -o "$APK" 'classes*.dex' -d "$TMP"
+for d in "$TMP"/classes*.dex; do
+  dexdump -f "$d" 2>/dev/null | grep -Eo "$DEX" &amp;&amp; fail=1
+done</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a catalog merge request is rejected on references your own audit reported clean.</strong> Two causes, both real:</p>
+<ol>
+<li><strong>You audited a debug build.</strong> Only the release-mode shrinker removes the Flutter embedding's own dead references to optional store libraries. A debug dex retains them permanently, so a debug audit can never reach zero references — and a definition-only audit will not see them at all.</li>
+<li><strong>You audited the dependency graph only.</strong> A graph tells you what was declared, not what survived into the artifact.</li>
+</ol>
+<p><strong>Fix:</strong> build a <strong>release</strong> APK and run layers B and C on it. A correctly-prepared libre release dex audits at zero for every pattern. One project's submission was rejected on exactly these invisible references, and the strict reference gate was added afterwards specifically to catch them before a reviewer does.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Keep the audit workflow advisory, not a required check.</strong> It builds a full release APK and runs Gradle — a transient infrastructure failure must never block an unrelated merge. The authoritative fast gate is layer A; the artifact layers are the belt-and-braces proof you run on every push and read when it fails.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why an unsigned release build is correct here</span>
+<p>A libre-only release with no keystore produces an unsigned APK, and that is the sanctioned shape: the catalog signs downstream with its own key. Your signing configuration must permit this exact case while still refusing to fall back to a debug key for any other release — see the deferred-throw pattern on <a href="13-android.html#signing">page 13</a>.</p>
+</div>
+</section>
+
+<section id="recipe" data-chunk-id="fdroid.recipe" data-tags="metadata,recipe,reproducible-build">
+<h2>The reproducible-build recipe</h2>
+
+<p>The catalog metadata file tells their buildserver how to build your app. For a Flutter app with split APKs it is one build block per architecture.</p>
+
+<pre data-lang="yaml"><code>Categories: [ Internet, Navigation ]
+License: MIT
+AuthorName: Example
+SourceCode: https://github.com/org/app
+IssueTracker: https://github.com/org/app/issues
+Name: MyApp
+
+RepoType: git
+Repo: https://github.com/org/app.git
+
+Builds:
+  - versionName: 6.0.4
+    versionCode: 51372                  # base × 10 + abi index
+    commit: f85f238007aa7a85e6b52ebd24ac94604fb34051
+    output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
+    srclibs: [ flutter@stable ]
+    prebuild:
+      # Read the pinned SDK version out of the CI workflow — ONE source
+      # of truth for the toolchain version.
+      - flutterVersion=$(sed -n -E 's/.*flutter-version:\ "(.*)"/\1/p' .github/workflows/fdroid.yml)
+      - '[[ $flutterVersion ]]'
+      - git -C $$flutter$$ checkout -f $flutterVersion
+      - cp pubspec_overrides.fdroid.yaml pubspec_overrides.yaml
+      - cp pubspec.fdroid.lock pubspec.lock
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get --enforce-lockfile
+      - $$flutter$$/bin/dart run build_runner build --delete-conflicting-outputs
+    scanignore:
+      - third_party/vendored_plugin_a
+      - third_party/vendored_plugin_b
+    scandelete:
+      - .pub-cache
+    build:
+      - export PUB_CACHE=$(pwd)/.pub-cache
+      - $$flutter$$/bin/flutter build apk --release --flavor fdroid --split-per-abi
+        --target-platform android-arm64 --build-number=$(( $$VERCODE$$ / 10 ))
+        --dart-define=FORCE_LOCATION_MANAGER=true
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9.]+$
+VercodeOperation:
+  - '%c * 10 + 1'</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Element</th><th>Why it is written that way</th></tr></thead>
+<tbody>
+<tr><td><code>srclibs: flutter@stable</code> plus a checkout of the parsed version</td><td>Their buildserver needs the SDK. Parsing it from your CI workflow keeps one source of truth instead of a version that silently drifts.</td></tr>
+<tr><td><code>--enforce-lockfile</code></td><td>The build must be reproducible. Without it, resolution can pick different versions than you tested.</td></tr>
+<tr><td><code>scanignore</code></td><td>Their scanner flags vendored third-party source. List each vendored directory explicitly, with a comment saying why it is vendored.</td></tr>
+<tr><td><code>scandelete</code></td><td>Remove the local package cache before scanning, or the scan walks every downloaded dependency.</td></tr>
+<tr><td><code>--build-number=$(( VERCODE / 10 ))</code></td><td>Reverse the per-ABI multiplier so the app's internal build number matches the store's.</td></tr>
+<tr><td><code>AutoUpdateMode</code> / <code>UpdateCheckMode</code></td><td>New versions are picked up from your tags automatically — no further merge requests for routine releases.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Submit by forking the catalog's metadata repository, adding your file, and opening a merge request. Expect review iterations; the ones observed in practice were about dropping unnecessary keys and about the bytecode audit, not about the app.</p>
+</section>
+
+<section id="lockfile" data-chunk-id="fdroid.lockfile" data-tags="lockfile,dependencies,maintenance">
+<h2>The second lockfile</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the libre audit goes red on every dependency-update pull request, forever.</strong> A libre build has a different dependency graph — stubs instead of real packages — so it needs its own lockfile. That lockfile does not regenerate itself when the main one changes, so every routine dependency bump leaves it stale and the enforced-lockfile step fails.</p>
+<p><strong>Countermeasure:</strong> automate the regeneration in the same pull request, or add it as an explicit item in the dependency-update checklist. One project pays this cost manually on every such PR and names it in its own notes as a recurring, avoidable annoyance — which is exactly the shape of a task that should be scripted.</p>
+</div>
+
+<pre data-lang="bash"><code># Regenerate the libre lockfile after any dependency change.
+dart run tool/apply_fdroid_overrides.dart   # swap in stubs + libre lock
+flutter pub get                             # resolve and rewrite it
+cp pubspec.lock pubspec.fdroid.lock
+git checkout -- pubspec.lock pubspec_overrides.yaml   # restore the normal build
+git add pubspec.fdroid.lock</code></pre>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Enforce the lockfile in the audit workflow with <code>flutter pub get --enforce-lockfile</code>. That makes a stale libre lockfile fail in <em>your</em> CI rather than on the catalog's buildserver, where the feedback loop is measured in days.</p>
+</div>
+</section>
+
+<section id="selfhosted" data-chunk-id="fdroid.selfhosted" data-tags="self-hosted,repository,pages">
+<h2>Running your own repository</h2>
+
+<p>A repository is a signed index plus APKs, served over static hosting. The tooling generates both.</p>
+
+<pre data-lang="yaml"><code># fdroid/config.yml — secrets are NEVER inlined.
+repo_url: https://org.github.io/app/fdroid/repo
+repo_name: MyApp
+repo_description: &gt;-
+  The Google-services-free build — no proprietary services, open maps,
+  platform location only.
+repo_icon: icon.png
+
+keystore: keystore.p12                          # git-ignored
+keystorepass: {env: FDROID_REPO_KEYSTORE_PASSWORD}
+keypass:      {env: FDROID_REPO_KEY_PASSWORD}
+repo_keyalias: myapp-fdroid-repo</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Point</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td><strong>The repo key is not the app key</strong></td><td>Two separate keystores. The repo key signs the index; the app key signs the APK.</td></tr>
+<tr><td><strong>Passwords come from the environment</strong></td><td>The tooling supports an environment indirection. The same configuration then works locally and in CI with no secret in the file.</td></tr>
+<tr><td><strong>The keystore file is git-ignored</strong></td><td>Base64 it into a CI secret; decode it to a temporary path at build time and delete it in an <code>if: always()</code> step.</td></tr>
+<tr><td><strong>Single-version repository</strong></td><td>Unless you need an archive, drop older builds rather than accumulating them.</td></tr>
+<tr><td><strong>Publish on a version tag</strong></td><td>Build, sign, regenerate the index, deploy the static site.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the repository disappears after an unrelated documentation deploy.</strong> If your static site deploy does a full replace and the repository index is generated rather than committed, a docs-only deploy wipes it — the site publishes without the directory that was never in the repository. One project hit exactly this. Two fixes, and you want both: commit the generated index so it is part of the source tree, and give the two workflows a shared concurrency group so they can never deploy simultaneously.</p>
+</div>
+</section>
+
+<section id="userfacing" data-chunk-id="fdroid.userfacing" data-tags="documentation,users,signing">
+<h2>What users need to be told</h2>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Document the signature incompatibility prominently.</strong> An APK signed by you and one signed by the catalog cannot upgrade each other — Android refuses an install whose signature differs from the installed app's. A user switching channels must uninstall first, which loses local data unless they export it. Say this on the download page, next to both links, and make sure your export/import flow actually works before you publish to a second channel.</p>
+</div>
+
+<p>Also worth stating plainly, because it is the reason someone chose this channel:</p>
+
+<ul>
+<li><strong>What the libre build does not have.</strong> If a feature depends on an excluded dependency, say which and why — an honest "text recognition is unavailable in this build because it required a proprietary library" is better than a button that silently does nothing.</li>
+<li><strong>What replaced what.</strong> Platform location instead of the fused provider; a free scanning library instead of the proprietary one; no crash reporting at all.</li>
+<li><strong>How to add the repository.</strong> The URL, and a note that it is added under repositories in the client.</li>
+<li><strong>That there is no telemetry whatsoever</strong> in this build — which, if you compiled the reporter out, is a claim you can actually make.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why the exclusions are worth advertising</span>
+<p>The audience for a libre build self-selected for exactly this information. A clear statement of what was removed and what replaced it is not a list of limitations to them — it is the product description. Burying it reads as evasion.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's libre build: the Gradle group exclusions scoped to the libre flavor, the flavor-only ProGuard rules, the override tool that swaps stub packages before resolution, the separate libre lockfile enforced in CI, and the graceful-degradation paths for each excluded dependency.</li>
+<li>Its three-layer audit script — dependency graph, dex definitions, and the strict reference gate — together with the recorded catalog rejection on references that a debug-dex audit could not see, and the finding that only release-mode shrinking removes the framework's own dead references.</li>
+<li>Its catalog metadata recipe (three per-ABI builds, SDK version parsed from the CI workflow, enforced lockfile, scan ignores for vendored plugins) and its self-hosted repository configuration with environment-indirected passwords.</li>
+<li>The static-site deploy incident that wiped the self-hosted repository index, and the two-part fix.</li>
+</ul>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

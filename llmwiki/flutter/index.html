@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Wiki — Building Flutter Applications</title>
+<meta name="description" content="A field-proven reference for building, testing, hardening and shipping cross-platform Flutter applications to Play, the App Store, F-Droid, macOS, Windows and the web.">
+<link rel="stylesheet" href="assets/wiki.css">
+<link rel="alternate" type="text/markdown" href="llms.txt" title="Machine index (llms.txt)">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "LLM Wiki — Building Flutter Applications",
+  "description": "Field-proven reference for building, testing, hardening and shipping cross-platform Flutter applications.",
+  "dateModified": "2026-08-01",
+  "inLanguage": "en",
+  "about": ["Flutter", "Dart", "Supabase", "GitHub Actions", "Android", "iOS", "macOS", "Windows", "F-Droid", "Bluetooth", "NFC", "Test-driven development"],
+  "learningResourceType": "Reference documentation"
+}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+
+<article class="wide">
+
+<span class="kicker">LLM Wiki</span>
+<h1>Building Flutter applications</h1>
+
+<p class="lede">A reference for building, testing, hardening and shipping cross-platform Flutter apps — derived from two production applications that ship to Google Play, the Apple App Store, F-Droid, macOS, Windows and the web. Every rule here traces to a specific failure that cost a CI round-trip, a store rejection, or a user-visible outage.</p>
+
+<div class="meta">
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Pages</b> 29</span>
+  <span><b>Flutter</b> 3.41 / Dart 3.11</span>
+  <span><b>Machine index</b> <a href="llms.txt">llms.txt</a></span>
+</div>
+
+<section id="what-this-is" data-chunk-id="index.what-this-is" data-tags="overview,scope">
+<h2>What this is, and what it is not</h2>
+
+<p>This wiki is <strong>derived documentation</strong>. It consolidates the working practice of two real Flutter codebases into one reference. It is not a Flutter tutorial, not an API reference, and not a survey of alternatives — it is one coherent, opinionated way to build a Flutter application that survives contact with app stores, real devices and real users.</p>
+
+<p>The two source projects:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Project</th><th>Domain</th><th>What it proves out</th></tr></thead>
+<tbody>
+<tr>
+  <td><span class="pill src-sparkilo">sparkilo</span></td>
+  <td>Fuel &amp; EV price comparison across 17 countries, 23 languages, with OBD-II trip recording</td>
+  <td>Service-chain fallbacks over 17 unreliable third-party APIs · BLE + classic Bluetooth · a sharded CI with codified required checks · a genuinely libre F-Droid build accepted against a dex-level audit · 26 repo-specific lint tests · ~15 000 tests</td>
+</tr>
+<tr>
+  <td><span class="pill src-deskilo">deskilo</span></td>
+  <td>Coworking desk booking plus a community money ledger</td>
+  <td>Supabase with 73 immutable migrations and a default-deny RLS matrix · OAuth without a vendor SDK · NFC/RFID kiosk · barcode/QR · notarised macOS DMG · WiX MSI on Windows · a web target · an owner-validated product specification</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>Where they disagree, the disagreement is recorded rather than smoothed over — see <a href="24-two-projects-compared.html">Two projects compared</a>, which audits what each does better and what each is missing.</p>
+</section>
+
+<section id="reading-paths" data-chunk-id="index.reading-paths" data-tags="navigation,onboarding">
+<h2>Reading paths</h2>
+
+<p>Four entry points, depending on why you are here.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>If you are…</th><th>Read, in order</th></tr></thead>
+<tbody>
+<tr><td><b>Starting a new app</b></td><td>01 Foundations → 02 Specification → 03 TDD → 18 GitHub → 13/14 Android &amp; iOS</td></tr>
+<tr><td><b>Hardening an app that already exists</b></td><td>04 Robustness → 05 Traceability → 03 TDD → 27 Recurring bugs → 09 Confidentiality → 06 Caching</td></tr>
+<tr><td><b>Making it fast and world-ready</b></td><td>25 Performance → 26 Localisation, time &amp; accessibility → 03 TDD</td></tr>
+<tr><td><b>Trying to ship it</b></td><td>19 Go-live → 13–17 the platform pages for your targets → 20 Testers</td></tr>
+<tr><td><b>Building a recording, map or always-on feature</b></td><td>21 Background &amp; always-visible UI → 22 Maps → 10 Bluetooth → 06 Caching</td></tr>
+<tr><td><b>Setting up how a team works</b></td><td>23 GitHub craft → 18 GitHub CI → 02 Specification → 03 TDD</td></tr>
+<tr><td><b>An AI agent working in one of these codebases</b></td><td>00 How to use this wiki → then fetch only the pages named by <a href="llms.txt">llms.txt</a> for your task</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="contents" data-chunk-id="index.contents" data-tags="navigation,toc">
+<h2>All pages</h2>
+
+<h4>Start here</h4>
+<ul class="cards">
+<li><a href="00-how-to-use-this-wiki.html"><b>00 · How to use this wiki</b><span>Document model, callout taxonomy, provenance pills, and how to chunk these pages for retrieval.</span></a></li>
+<li><a href="01-foundations-architecture.html"><b>01 · Foundations &amp; architecture</b><span>Stack, feature-first layering, lint-enforced boundaries, Riverpod codegen, the service-chain pattern.</span></a></li>
+</ul>
+
+<h4>Method</h4>
+<ul class="cards">
+<li><a href="02-specification-driven-development.html"><b>02 · Specification-driven development</b><span>An implementation-free spec, resolving contradictions before code, and the amendment discipline.</span></a></li>
+<li><a href="03-tdd-and-testing.html"><b>03 · TDD &amp; the test pyramid</b><span>70/20/10, the eight-step bug-fix protocol, twin-bug audits, false-green failure modes.</span></a></li>
+<li><a href="04-robustness.html"><b>04 · Robustness &amp; error handling</b><span>Never-silent catches, guarded mutations, honest degradation, episode gating.</span></a></li>
+<li><a href="05-traceability.html"><b>05 · Traceability &amp; observability</b><span>Issue-first work, the trace ring buffer, crash forensics, build-to-commit mapping.</span></a></li>
+<li><a href="27-recurring-bugs.html"><b>27 · Recurring bugs &amp; regressions</b><span>The seven-step protocol, the nine-fix cautionary tale, detector blind spots, cycle-time fingerprinting, no-trace forensics.</span></a></li>
+</ul>
+
+<h4>Data &amp; backend</h4>
+<ul class="cards">
+<li><a href="06-caching.html"><b>06 · Caching</b><span>Fresh/stale/miss tiers, TTL constants, key design, schema-versioned invalidation.</span></a></li>
+<li><a href="07-supabase.html"><b>07 · Supabase backend</b><span>Immutable migrations, default-deny RLS, SECURITY DEFINER RPCs, client/server parity.</span></a></li>
+<li><a href="08-authentication.html"><b>08 · Authentication &amp; Google sign-in</b><span>OAuth without a vendor SDK, anonymous upgrade, deep-link redirects, linked identities.</span></a></li>
+<li><a href="09-confidentiality.html"><b>09 · Confidentiality &amp; security</b><span>What never leaves the device, secret hygiene, store privacy declarations.</span></a></li>
+</ul>
+
+<h4>Device capabilities</h4>
+<ul class="cards">
+<li><a href="10-bluetooth.html"><b>10 · Bluetooth &amp; BLE</b><span>Permission matrices, the RFCOMM reconnect hang, dual reconnect authorities, background limits.</span></a></li>
+<li><a href="11-barcode-qr.html"><b>11 · Barcode &amp; QR</b><span>The libre scanner swap, generating codes, the injectable scanner seam, 7-segment OCR.</span></a></li>
+<li><a href="12-nfc-rfid.html"><b>12 · NFC &amp; RFID</b><span>Three-state availability, kiosk session lifecycle, UID normalisation as a contract.</span></a></li>
+</ul>
+
+<h4>Platform targets</h4>
+<ul class="cards">
+<li><a href="13-android.html"><b>13 · Android</b><span>Flavors, signing that never falls back to debug, R8, foreground services, per-ABI codes.</span></a></li>
+<li><a href="14-ios.html"><b>14 · iOS / iPhone</b><span>match, the keychain hang, API-key limits, extensions, the review-rejection playbook.</span></a></li>
+<li><a href="15-macos.html"><b>15 · macOS</b><span>Sandbox and keychain, Developer ID vs App Store, notarisation, honest degradation.</span></a></li>
+<li><a href="16-windows.html"><b>16 · Windows</b><span>WiX MSI authoring, the absolute-path harvest trap, the permanent upgrade code.</span></a></li>
+<li><a href="17-fdroid.html"><b>17 · F-Droid</b><span>Two channels, making a build libre, the three-layer audit, the reproducible recipe.</span></a></li>
+</ul>
+
+<h4>Shipping</h4>
+<ul class="cards">
+<li><a href="18-github.html"><b>18 · GitHub: repo, CI &amp; process</b><span>Workflow topology, sharding, green-tree skips, required checks as data, the matrix-skip trap.</span></a></li>
+<li><a href="19-go-live.html"><b>19 · Go-live runbook</b><span>The ordered checklist across five channels, what only a human can do, staged rollout.</span></a></li>
+<li><a href="20-testers-google-groups.html"><b>20 · Testers &amp; Google Groups</b><span>Play testers via a Google Group, TestFlight internal vs external, invitation mechanics.</span></a></li>
+</ul>
+
+<h4>Runtime surfaces</h4>
+<ul class="cards">
+<li><a href="21-background-and-pinning.html"><b>21 · Background &amp; always-visible UI</b><span>Recording without the app in front, foreground services, Doze and OEM killers, screen pinning, PiP tiles, Live Activities, widgets.</span></a></li>
+<li><a href="22-maps-openstreetmap.html"><b>22 · Maps with OpenStreetMap</b><span>Tile policy and a caching proxy, the four grey-tile causes, markers, your own data layers, and contributing back to OSM.</span></a></li>
+</ul>
+
+<h4>Quality</h4>
+
+<ul class="cards">
+<li><a href="25-performance.html"><b>25 · Performance</b><span>Frame budgets, rebuild discipline, painter repaint contracts, Impeller, isolates, image memory, startup as a CI budget, app size.</span></a></li>
+<li><a href="26-l10n-time-a11y.html"><b>26 · Localisation, time &amp; accessibility</b><span>The ARB pipeline and its gates, two locale strategies, expansion survival, the two-clock doctrine, the injectable clock, accessibility as tests.</span></a></li>
+</ul>
+
+<h4>Collaboration</h4>
+<ul class="cards">
+<li><a href="23-github-craft.html"><b>23 · GitHub craft</b><span>Issues, labels, Projects, commits, pull requests, review, merge strategy, running CI, the README, the wiki and release notes.</span></a></li>
+<li><a href="28-ai-agents.html"><b>28 · Working with AI agents</b><span>Division of labor, worktree fan-out, file affinity, the verify loop, generated-file merge rules, serial merge trains, verification traps.</span></a></li>
+</ul>
+
+<h4>Appendix</h4>
+<ul class="cards">
+<li><a href="24-two-projects-compared.html"><b>24 · Two projects compared</b><span>A candid audit: what each source project does better, what each is missing, which to adopt.</span></a></li>
+</ul>
+</section>
+
+<section id="the-short-version" data-chunk-id="index.the-short-version" data-tags="summary,principles">
+<h2>The short version</h2>
+
+<p>If you read nothing else, these are the ten practices that produced the largest difference between the two projects' good months and their bad ones.</p>
+
+<ol>
+<li><strong>Write the specification before the code, and keep it honest.</strong> An implementation-free spec that names its own resolved contradictions is worth more than a backlog of tickets. <a href="02-specification-driven-development.html">→ 02</a></li>
+<li><strong>Every change traces to an issue; every shipped build traces to a commit.</strong> A version number that cannot be mapped back to a commit makes every user report unanswerable. <a href="05-traceability.html">→ 05</a></li>
+<li><strong>Bug fixes start with a test that fails for the same reason the app fails.</strong> Then grep for the same pattern elsewhere before closing. <a href="03-tdd-and-testing.html">→ 03</a></li>
+<li><strong>Never swallow an error, and never degrade silently.</strong> A fallback that renders indistinguishably from real data hides outages for months. <a href="04-robustness.html">→ 04</a></li>
+<li><strong>Generated code is committed, so regenerate from clean before every push.</strong> Incremental codegen keeps stale hashes that only a clean CI run catches. <a href="18-github.html#codegen">→ 18</a></li>
+<li><strong>Put the boundary in a test, not in a convention.</strong> Layering rules, string externalisation and file budgets that are not machine-checked decay within weeks. <a href="01-foundations-architecture.html#boundaries">→ 01</a></li>
+<li><strong>Default-deny at the database, not in the client.</strong> Row-level security is the only boundary that survives a modified client. <a href="07-supabase.html#rls">→ 07</a></li>
+<li><strong>Make the CI prove the artifact runs, not just that it compiles.</strong> A release build can pass every unit test and crash before the first frame. <a href="13-android.html#r8">→ 13</a></li>
+<li><strong>Codify required checks and secrets as data you can diff.</strong> Branch protection documented in prose but absent on the server protects nothing. <a href="18-github.html#protection">→ 18</a></li>
+<li><strong>Record the failure next to the rule.</strong> A rule whose rationale is lost gets deleted by the next person who finds it inconvenient. <a href="00-how-to-use-this-wiki.html#callouts">→ 00</a></li>
+</ol>
+</section>
+
+<div class="sourcebox">
+<h4>Provenance</h4>
+<p>Derived on 2026-08-01 from the working state of two repositories, their CI configurations, their store metadata, and their post-mortem notes. Where this wiki states a version, a threshold or a workflow name, it was read from the repository rather than recalled. Where a claim is an inference or a recommendation rather than an observed fact, it says so.</p>
+<p>The structure follows the <a href="https://llmstxt.org/">llms.txt</a> convention for machine indexes, plus semantic-HTML and per-section chunk metadata as described in <a href="00-how-to-use-this-wiki.html">page 00</a>.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

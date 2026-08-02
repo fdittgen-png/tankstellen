@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub craft: issues, commits, PRs, wiki &amp; projects — LLM Wiki · Flutter</title>
+<meta name="description" content="Writing issues people can act on, commit messages that survive, pull requests that get reviewed, merge strategy, running and debugging CI, the README, the wiki, and GitHub Projects.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"GitHub craft: issues, commits, PRs, wiki and projects","description":"Writing issues, commits, PRs, merge strategy, running CI, README, wiki and GitHub Projects.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">23 · Collaboration</span>
+<h1>GitHub craft</h1>
+<p class="lede">Page 18 covers the machinery — workflows, required checks, branch protection. This page covers the writing: issues someone can act on, commits that still explain themselves in two years, pull requests that get reviewed rather than rubber-stamped, and the three surfaces (README, wiki, project board) that most repositories get wrong in the same three ways.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> craft</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 18 GitHub CI · 02 Specification · 05 Traceability</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#issues">Writing an issue</a></li>
+<li><a href="#labels">Labels, milestones and triage</a></li>
+<li><a href="#projects">GitHub Projects</a></li>
+<li><a href="#branches">Branches</a></li>
+<li><a href="#commits">Commit messages</a></li>
+<li><a href="#prs">Pull requests</a></li>
+<li><a href="#review">Reviewing</a></li>
+<li><a href="#merge">Merge strategy</a></li>
+<li><a href="#ci-run">Running and debugging CI</a></li>
+<li><a href="#readme">The README</a></li>
+<li><a href="#wiki">The wiki</a></li>
+<li><a href="#releases">Releases and release notes</a></li>
+<li><a href="#meta">The repository's own metadata</a></li>
+</ol>
+</div>
+
+<section id="issues" data-chunk-id="craft.issues" data-tags="issues,writing,process">
+<h2>Writing an issue</h2>
+
+<p>An issue exists so that someone other than you, at some later date, can act on it without asking you anything. Everything below follows from that.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Element</th><th>Rule</th><th>Bad → good</th></tr></thead>
+<tbody>
+<tr><td><strong>Title</strong></td><td>State the <em>problem or outcome</em>, not the area. Readable in a list of 200.</td><td>"Map issues" → "Map renders grey tiles after panning quickly"</td></tr>
+<tr><td><strong>First line</strong></td><td>One sentence a stranger understands. No context needed.</td><td>"See Slack" → "Tiles fail to load and are never retried once they scroll off-screen."</td></tr>
+<tr><td><strong>Reproduction</strong></td><td>Numbered steps, actual result, expected result. Include the build number.</td><td>"Doesn't work on my phone" → steps 1–4 plus "6.0.4+5137, Android 14, Pixel 6"</td></tr>
+<tr><td><strong>Evidence</strong></td><td>Screenshot, log excerpt, trace export. Redact secrets.</td><td>—</td></tr>
+<tr><td><strong>Scope</strong></td><td>What is explicitly <em>not</em> in scope. Prevents the fix ballooning.</td><td>—</td></tr>
+<tr><td><strong>Acceptance</strong></td><td>How you will know it is done. For a bug: the test that would have caught it.</td><td>"Fix the map" → "A test asserts a failed tile is re-requested after leaving and re-entering the viewport."</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Require the app version and build number in the bug template.</strong> It is the single highest-yield field. A large share of "still broken" reports are a stale build from a testing channel, and without the number you cannot tell — you will debug a fixed bug. Put the version on an about screen where a user can copy it, and make the field required.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never develop without an issue.</strong> Every change traces to one. This is not bureaucracy — it is the first link of the chain in <a href="05-traceability.html#chain">page 05</a>, and a commit with no issue is a change whose motivation is unrecoverable in six months. If the work is genuinely trivial, the issue is one line and takes twenty seconds.</p>
+</div>
+
+<h3>Templates worth having</h3>
+
+<p>Use the form-based template format (a YAML file per template in the issue-template directory) rather than free-form markdown — you get required fields, dropdowns and checkboxes, which is what makes the rules above enforceable rather than aspirational.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Template</th><th>Required</th><th>Why it exists</th></tr></thead>
+<tbody>
+<tr><td><strong>Bug</strong></td><td>What happened · steps · <strong>version + build</strong> · platform</td><td>The default. Optional prompts for screenshots, locale, role.</td></tr>
+<tr><td><strong>Feature</strong></td><td>Problem · proposal · <strong>a checkbox group for the product's goals</strong></td><td>Turns <a href="02-specification-driven-development.html#leitmotiv">the feature filter</a> into a workflow step. State plainly: a feature serving none of these will be pushed back on.</td></tr>
+<tr><td><strong>Epic</strong></td><td>Goal in user terms + spec link · dependency-ordered children · risks · <strong>a validation-gate checkbox</strong></td><td>Children may only be filed after the breakdown is validated</td></tr>
+<tr><td><strong>Recurring domain task</strong></td><td>Whatever that task needs</td><td>If you add a country, a provider or a device profile repeatedly, make it a form. It turns tribal knowledge into a checklist.</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="yaml"><code># .github/ISSUE_TEMPLATE/bug_report.yml
+name: Bug report
+description: Something behaves incorrectly
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: What happened?, description: One sentence, then detail. }
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1.
+        2.
+        3.
+        Actual:
+        Expected:
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: App version and build number
+      description: Settings → About. Copy it exactly.
+      placeholder: "6.0.4+5137"
+    validations: { required: true }      # ← the highest-yield field
+  - type: dropdown
+    id: platform
+    attributes: { label: Platform, options: [Android, iOS, macOS, Windows, Web] }
+    validations: { required: true }</code></pre>
+
+<h3>Epics</h3>
+
+<p>Work larger than one pull request, or touching more than one subsystem, becomes an epic — and the breakdown is validated <em>before</em> any child is filed. Filing twelve children from an unvalidated breakdown produces twelve issues that all need re-scoping plus the social cost of closing them.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Close the epic after every child has merged, not while they are in flight.</strong> A premature close pollutes the open-issue list if any child is reverted, and it removes the tracking surface exactly when you still need it.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: an issue sits open for weeks and nobody realises it is waiting on <em>you</em>.</strong> When work is parked pending a decision, an untouched open issue is indistinguishable from an unstarted one. Make the state explicit: a <code>needs-decision</code> label, a comment naming exactly what is being asked, and a <strong>proposed default</strong> so the answer can be "yes, do that". One project had a parked issue read as "still open" until the user had to ask why the count was not dropping.</p>
+</div>
+</section>
+
+<section id="labels" data-chunk-id="craft.labels" data-tags="labels,triage,milestones">
+<h2>Labels, milestones and triage</h2>
+
+<p>Keep the label set small enough to hold in your head. Three axes is usually enough, and a fourth is usually someone's abandoned experiment.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Axis</th><th>Values</th><th>Who sets it</th></tr></thead>
+<tbody>
+<tr><td><strong>Type</strong></td><td><code>bug</code> · <code>enhancement</code> · <code>epic</code> · <code>docs</code> · <code>chore</code></td><td>The template, automatically</td></tr>
+<tr><td><strong>Area</strong></td><td><code>backend</code> · <code>l10n</code> · <code>ci</code> · <code>android</code> · <code>ios</code> — one per subsystem you actually route by</td><td>Triage</td></tr>
+<tr><td><strong>State</strong></td><td><code>needs-decision</code> · <code>blocked</code> · <code>good-first-issue</code></td><td>Triage</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why not a priority label</span>
+<p>Priority labels rot faster than anything else in a tracker: everything becomes high, nothing is ever demoted, and the label stops carrying information within a quarter. If you need ordering, use a <strong>milestone</strong> (what ships next) or a project-board field with a single-select you actively groom. If you do use priority labels, put a recurring calendar entry on re-grooming them, or do not bother.</p>
+</div>
+
+<p><strong>Milestones</strong> answer "what is in the next release" and nothing else. Keep a small fixed set — one project uses five iteration milestones as its roadmap — and give every new issue project + milestone + status at triage time, so the board is never lying about scope.</p>
+
+<h3>A triage pass</h3>
+
+<ol>
+<li><strong>Reproducible?</strong> If not, ask exactly one question and label it as awaiting information. Close it after a stated period with a friendly note inviting a reopen.</li>
+<li><strong>Duplicate?</strong> Close with a link. Never leave two live threads for one problem.</li>
+<li><strong>Actionable?</strong> If the acceptance criterion is unclear, write one — or ask the reporter for the outcome they wanted.</li>
+<li><strong>Size?</strong> One pull request, or an epic? See <a href="02-specification-driven-development.html#epics">page 02</a>.</li>
+<li><strong>Assign an area label and a milestone,</strong> or explicitly the backlog.</li>
+</ol>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Close stale issues, kindly and with a reason.</strong> An issue nobody will act on is noise that hides the ones you will. "Closing as we are not planning to do this; comment to reopen if it is still affecting you" is honest and reversible. A tracker with 400 open issues nobody reads is worse than one with 40 that are all live.</p>
+</div>
+</section>
+
+<section id="projects" data-chunk-id="craft.projects" data-tags="github-projects,planning,board">
+<h2>GitHub Projects</h2>
+
+<p>A project board is a <em>view</em> over issues, not a second source of truth. The moment work exists on the board and not in an issue, the board has become a place where information goes to be forgotten.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Element</th><th>Guidance</th></tr></thead>
+<tbody>
+<tr><td><strong>Scope</strong></td><td>One project per repository (or per product across repositories). Not one per epic — epics are issues.</td></tr>
+<tr><td><strong>Fields</strong></td><td>Fewer than you think. <em>Status</em> (single-select), <em>Iteration</em> or milestone, and at most one sizing field. Every extra field is one more thing that goes stale.</td></tr>
+<tr><td><strong>Status values</strong></td><td><code>Backlog</code> → <code>Ready</code> → <code>In progress</code> → <code>In review</code> → <code>Done</code>. Five is enough; the distinction between "ready" and "backlog" is the one that earns its keep.</td></tr>
+<tr><td><strong>Views</strong></td><td>A board grouped by status for daily work; a table grouped by milestone for planning; a filtered view of <code>needs-decision</code> for the maintainer.</td></tr>
+<tr><td><strong>Automation</strong></td><td>The built-in workflows: item added → Backlog; pull request opened → In review; issue closed → Done. Turn these on; they are what stops the board drifting.</td></tr>
+<tr><td><strong>Draft items</strong></td><td>Useful for a five-minute thought. Convert to a real issue the moment anyone might work on it — a draft is invisible outside the board.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Every new issue gets added to the project, given a status and a milestone at triage.</strong> An issue that exists only in the tracker is invisible on the board, and an issue on the board with no status sits in a column nobody looks at. Both failure modes end with "I thought someone was doing that".</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why a board at all for a solo maintainer</span>
+<p>Two reasons that survive having no team. It answers "what is actually next" without re-reading forty issues, which is the question that costs the most time at the start of a session. And a status field with an <em>In review</em> column makes stalled pull requests visible — which is exactly the failure described in <a href="18-github.html#economics">page 18</a>, where a serialised merge chain quietly stops moving and nothing surfaces it.</p>
+</div>
+</section>
+
+<section id="branches" data-chunk-id="craft.branches" data-tags="git,branching,workflow">
+<h2>Branches</h2>
+
+<pre data-lang="text"><code>feat/     a user-visible capability
+fix/      a defect
+refactor/ no behaviour change
+perf/     measurable performance work
+test/     tests only
+docs/     documentation only
+chore/    dependencies, tooling, housekeeping
+ci/       workflow and pipeline changes
+style/    formatting only</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Rule</th><th>Reason</th></tr></thead>
+<tbody>
+<tr><td>Branch from the default branch, always</td><td>Stacked branches make auto-merge dangerous — see below</td></tr>
+<tr><td>One concern per branch</td><td>A branch doing two things cannot be reviewed as either</td></tr>
+<tr><td>Short-lived: one to three days</td><td>A week-old branch is a merge conflict with a countdown</td></tr>
+<tr><td>Include the issue number or a slug in the name</td><td><code>fix/3641-cpu-watchdog</code> is self-documenting in a branch list</td></tr>
+<tr><td>Delete on merge (enable the repository setting)</td><td>A branch list with 60 merged branches is unusable</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: arming auto-merge on a stacked pull request merges it immediately and the parent balloons.</strong> A pull request whose base is a <em>feature branch</em> rather than the default branch targets an unprotected branch — so there is nothing for auto-merge to wait for and it fires at once. The change lands in the parent branch, whose pull request is now much larger than reviewed. Never arm auto-merge on a stacked pull request; merge those by hand, bottom-up.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule — forbidden operations</span>
+<p>Direct commits to the default branch. Force-push to the default branch. Bypassing hooks with the no-verify flag. Amending a commit that has been pushed and reviewed. Interactive rebase inside a script or CI. Each of these has a legitimate-seeming use and each destroys either review history or someone else's clone.</p>
+</div>
+</section>
+
+<section id="commits" data-chunk-id="craft.commits" data-tags="commits,conventional-commits,git">
+<h2>Commit messages</h2>
+
+<p>Conventional commits, because a machine reads the subject to generate release notes and a human reads the body to understand why.</p>
+
+<pre data-lang="text"><code>type(scope): imperative subject under 72 chars, no trailing period
+
+Why this change exists — the situation before, and what made it wrong.
+What was decided and what was rejected. Anything a reviewer would ask.
+Wrap at 72 columns.
+
+Closes #3641</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Part</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td><strong>Type</strong></td><td>The same set as the branch prefixes. <code>feat</code> and <code>fix</code> are user-visible; the rest are not, which is how release-note generation filters them.</td></tr>
+<tr><td><strong>Scope</strong></td><td>The subsystem, in the codebase's own vocabulary: <code>fix(obd2):</code>, <code>feat(search):</code>. Optional but nearly always worth it.</td></tr>
+<tr><td><strong>Subject</strong></td><td>Imperative mood ("add", not "added"), under 72 characters, no trailing period. It completes the sentence "if applied, this commit will…".</td></tr>
+<tr><td><strong>Body</strong></td><td><strong>Why, not what.</strong> The diff already says what. The body is where the reasoning lives, and it is the only place it will survive.</td></tr>
+<tr><td><strong>Trailers</strong></td><td><code>Closes #NN</code>, co-authors, references to a decision record.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>One commit per closed issue, even inside a bundled pull request.</strong> Bundling several issues into one pull request is often correct for CI economics. Squashing them into a single commit is not — the per-issue rationale becomes unrecoverable. Keep one commit per issue inside the branch and let the pull-request title summarise the bundle.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why the body matters more than the subject</span>
+<p>Subjects are read in bulk when scanning history. Bodies are read exactly once — by the person doing archaeology on a line of code, six months later, deciding whether they may change it. That reader is the highest-value audience any text in the repository has, and the body is the only thing written for them. A commit that changes a timeout from 30 to 7 seconds and says "adjust timeout" has thrown away the measurement that justified it.</p>
+</div>
+
+<p>Two smaller habits: do not <code>dart format</code> whole generated files, because it turns every regeneration into an unreviewable whole-file diff; and keep formatting-only changes in their own commit so a functional diff stays readable.</p>
+</section>
+
+<section id="prs" data-chunk-id="craft.prs" data-tags="pull-requests,review,writing">
+<h2>Pull requests</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Element</th><th>Guidance</th></tr></thead>
+<tbody>
+<tr><td><strong>Title</strong></td><td>Written for a <em>user</em>, not a reviewer — release notes are generated from it. "Fix grey map tiles after fast panning", not "Refactor tile provider".</td></tr>
+<tr><td><strong>Size</strong></td><td><strong>Under 400 lines</strong> excluding generated files. Above that, review quality collapses and approvals become rubber stamps.</td></tr>
+<tr><td><strong>What</strong></td><td>One sentence.</td></tr>
+<tr><td><strong>Why</strong></td><td>The problem, with <code>Closes #NN</code>.</td></tr>
+<tr><td><strong>How</strong></td><td>The technical approach, only if it is not obvious from the diff.</td></tr>
+<tr><td><strong>Testing</strong></td><td>What you ran, what you tested manually, on what device.</td></tr>
+<tr><td><strong>Screenshots</strong></td><td>Before and after, for anything visual. Non-negotiable.</td></tr>
+<tr><td><strong>Checklist</strong></td><td>The repository's standing requirements — see below.</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="markdown"><code>## What
+&lt;one sentence&gt;
+
+## Why
+Closes #
+
+## Testing
+- [ ] `flutter analyze` clean, including `test/`
+- [ ] `flutter test` passes
+- [ ] Manually tested on a device
+- [ ] New tests added; bug fixes started from a failing test
+
+## Checklist
+- [ ] Under 400 lines excluding generated files
+- [ ] No hard-coded user-facing strings; all locales updated
+- [ ] Clean codegen run; zero drift
+- [ ] No secrets, keys or credentials in the diff
+- [ ] No proprietary dependency or tracking introduced</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Self-review the diff on GitHub before requesting review.</strong> Read every line in the web interface, not your editor. You will find debug prints, a commented-out block, a stray file, and at least one thing you meant to rename. This takes three minutes and removes the most common review comments entirely — which means the reviewer spends their attention on the parts that need judgement.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Use a draft pull request for work in progress, and say what feedback you want.</strong> "Draft — the approach in <code>tile_provider.dart</code> is what I want an opinion on; the tests are not written yet" gets useful feedback. A silent draft gets none, and a non-draft pull request that is not ready wastes a reviewer's pass.</p>
+</div>
+
+<h3>Bundling</h3>
+
+<p>Bundling several issues into one pull request is often the right call: five sequential pull requests cost five full CI runs plus four rebases, and each merge pushes the others out of date. Bundle when the changes are related or touch the same files; keep them separate when a reviewer would need different context for each.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Always bundle changes touching a known conflict-magnet surface.</strong> Localisation fan-outs, generated files and the CI configuration itself: two concurrent pull requests touching one of these will conflict, and the conflict costs a rebase plus a full re-run each. Keep at most one localisation-touching pull request in flight at a time.</p>
+</div>
+</section>
+
+<section id="review" data-chunk-id="craft.review" data-tags="code-review,collaboration">
+<h2>Reviewing</h2>
+
+<p>Review in a fixed order, because the expensive problems are the ones you stop looking for after the first nitpick.</p>
+
+<ol>
+<li><strong>Does it solve the stated problem?</strong> Read the issue first, then the diff. A correct implementation of the wrong thing is the costliest outcome.</li>
+<li><strong>Is there a test that would have caught the bug?</strong> For a fix, this is the whole review. No test means the fix is unverified.</li>
+<li><strong>What breaks elsewhere?</strong> Look for other callers of a changed function, other screens sharing a widget, the same anti-pattern in a sibling file — the <a href="03-tdd-and-testing.html#twin">twin-bug audit</a>, applied by the reviewer.</li>
+<li><strong>Error paths.</strong> What happens when the network fails, the permission is denied, the value is null, the list is empty?</li>
+<li><strong>Then</strong> style, naming, structure.</li>
+</ol>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Comment type</th><th>Convention</th></tr></thead>
+<tbody>
+<tr><td><strong>Blocking</strong></td><td>State the problem and why it matters. Request changes.</td></tr>
+<tr><td><strong>Non-blocking</strong></td><td>Prefix with <code>nit:</code> or <code>optional:</code> so the author knows they may decline</td></tr>
+<tr><td><strong>Question</strong></td><td>Ask it as a question. Often the answer is good and the code needs a comment, not a change.</td></tr>
+<tr><td><strong>Praise</strong></td><td>Worth doing, briefly, for a genuinely good solution. It calibrates what "good" means here.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>If a review comment is about a rule, the outcome is a lint test — not a repeated comment.</strong> Any convention you have explained twice should be machine-checked. Reviewers should spend their attention on judgement, not on enforcement a forty-line test can do forever. See <a href="03-tdd-and-testing.html#lint-tests">page 03</a>.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Reviewing your own work as a solo maintainer</span>
+<p>The pull request is still worth it even with nobody else to approve it. The diff view catches things the editor does not, the description forces you to state the why while you still know it, and the checklist is a second pair of eyes you can actually rely on. Open the pull request, walk away for an hour, then read it as a stranger.</p>
+</div>
+</section>
+
+<section id="merge" data-chunk-id="craft.merge" data-tags="merge,squash,auto-merge">
+<h2>Merge strategy</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Strategy</th><th>History</th><th>Use when</th></tr></thead>
+<tbody>
+<tr><td><strong>Squash</strong></td><td>One commit per pull request on the default branch</td><td><strong>The default.</strong> Clean, bisectable, and the branch's messy intermediate commits disappear.</td></tr>
+<tr><td><strong>Merge commit</strong></td><td>Preserves every branch commit plus a merge node</td><td>When the individual commits are each meaningful and reviewed — for example a bundled pull request with one commit per issue.</td></tr>
+<tr><td><strong>Rebase</strong></td><td>Linear, no merge node, all commits preserved</td><td>Rarely. It rewrites hashes, so anything referencing them breaks.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Pick one strategy, enable only that button in the repository settings, and enable auto-delete of head branches.</strong> A repository where three merge buttons are available will accumulate three histories. If you bundle issues into one pull request and want the per-issue commits preserved, choose merge commits for those deliberately — but decide once, not per pull request.</p>
+</div>
+
+<h3>Auto-merge</h3>
+
+<p>Arm auto-merge and let the required checks gate it. Two constraints come with that:</p>
+
+<ul>
+<li><strong>Serialise.</strong> Without strict mode and without a merge queue, each merge pushes every other open pull request out of date. Open pull request N+1 only after N has merged, or you get quadratic CI churn.</li>
+<li><strong>Never on a stacked pull request.</strong> See the trap in <a href="#branches">§Branches</a>.</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a chain of armed pull requests stops moving and nothing surfaces it.</strong> When the head of a serialised chain stays red, the watchers on the ones behind eventually die and nothing recovers. Verify the <em>remote</em> state — is auto-merge still armed, is the fix actually pushed to the branch you think — rather than the local state, then re-arm manually. Serialised chains need a person to check on them.</p>
+</div>
+
+<p>If you have enough throughput for it, a <strong>merge queue</strong> removes the whole class: it tests each pull request against the post-merge state and merges in order. It is the correct answer to "should strict mode be on"; strict mode without a queue is the trade discussed in <a href="18-github.html#protection">page 18</a>.</p>
+</section>
+
+<section id="ci-run" data-chunk-id="craft.ci-run" data-tags="ci,debugging,workflow">
+<h2>Running and debugging CI</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Situation</th><th>Do</th></tr></thead>
+<tbody>
+<tr><td>A check failed</td><td>Read the <em>first</em> failure, not the last. Later failures are usually consequences.</td></tr>
+<tr><td>It passes locally and fails in CI</td><td>Suspect, in order: a case-sensitive filesystem, line endings, a missing generated file, an unpinned toolchain, a time zone, a test that depends on the wall clock.</td></tr>
+<tr><td>It failed once and passed on re-run</td><td><strong>Do not shrug.</strong> Tag it as flaky and move it out of the gate into a nightly job, so a genuine regression still surfaces within a day. An untracked flake trains everyone to re-run red checks.</td></tr>
+<tr><td>You need to re-fire on an unchanged ref</td><td>Use a manual dispatch with a reason input, not an empty commit.</td></tr>
+<tr><td>A required check never reports</td><td>A skipped matrix job, or a path filter with no stub mirror. See <a href="18-github.html#sharding">page 18</a>.</td></tr>
+<tr><td>You need to debug a runner</td><td>Add a temporary step that prints the environment and uploads the working directory as an artifact. Remove it in the same pull request that fixes the problem.</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="bash"><code>gh run list --workflow=ci.yml --branch=my-branch --limit 5
+gh run view &lt;run-id&gt; --log-failed        # only the failing steps
+gh run rerun &lt;run-id&gt; --failed           # re-run just those jobs
+gh workflow run ci.yml -f reason="retry after runner outage"
+gh pr checks &lt;pr&gt; --watch                # live status while you work</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Run the gates locally before pushing.</strong> A pre-push hook that runs analysis, clean codegen and the localisation pipeline turns a thirteen-minute CI round-trip into a thirty-second local failure. Ship the hook in the repository, install it with a script, and give it a documented emergency bypass so nobody reaches for the blanket hook-skipping flag — which also skips the hooks you actually need.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Do not over-poll a clean run</span>
+<p>When a pull request is armed and green on everything except the slow full-suite shards, trust it. Schedule one confirmation rather than checking every few minutes. Repeated polling of a run that is going to pass is pure overhead — the check that matters is the single one after it completes.</p>
+</div>
+</section>
+
+<section id="readme" data-chunk-id="craft.readme" data-tags="readme,documentation,onboarding">
+<h2>The README</h2>
+
+<p>The README answers four questions for four different readers in the first screen: what is this, can I use it, how do I run it, how do I contribute.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Section</th><th>Content</th><th>Common mistake</th></tr></thead>
+<tbody>
+<tr><td><strong>Name and one-line description</strong></td><td>What it is, for whom, in one sentence</td><td>A slogan instead of a description</td></tr>
+<tr><td><strong>Install badges</strong></td><td>Direct links to every channel you publish on</td><td>Only one channel linked</td></tr>
+<tr><td><strong>Status badges</strong></td><td>CI, licence, framework version. Three, not nine.</td><td>A badge wall nobody reads</td></tr>
+<tr><td><strong>The pitch</strong></td><td>Two or three paragraphs on the problem and your approach</td><td>Jumping straight to installation</td></tr>
+<tr><td><strong>Screenshots</strong></td><td><strong>Real ones, with captions.</strong> The highest-value content in the file.</td><td>None, or unlabelled</td></tr>
+<tr><td><strong>Features</strong></td><td>Grouped by user outcome, not by subsystem</td><td>A flat list of 60 bullets</td></tr>
+<tr><td><strong>Getting started</strong></td><td>Prerequisites with versions, then copy-pasteable commands</td><td>Commands that assume your machine</td></tr>
+<tr><td><strong>Architecture</strong></td><td>A directory tree with one line each, and the key patterns</td><td>An essay; link to it instead</td></tr>
+<tr><td><strong>Contributing</strong></td><td>Five numbered rules, then link the full guide</td><td>The whole guide inline</td></tr>
+<tr><td><strong>Licence</strong></td><td>Named and linked</td><td>Missing</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Screenshots with captions, in a table, grouped by what the user is trying to do.</strong> A README with a captioned screenshot grid communicates more in ten seconds than the feature list does in two minutes — and it is the only part most visitors read. Caption each one with what it shows and why it matters, and add alt text describing the screen for anyone who cannot see it.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Every number in the README is a staleness liability.</strong> "30 migrations", "600+ tests", "supports 12 countries" — all of these were true once. One project's README claimed 30 migrations when the tree had 73, and 600 tests when it had over a thousand. Either generate them, or round them ("a thousand-plus tests"), or leave them out. A precise wrong number damages trust in everything else on the page.</p>
+</div>
+
+<p>Keep the README under roughly a screen-and-a-half of reading before the fold, and link out for depth. If your README is the only documentation, it is too long; if it is a stub, nobody will get as far as the rest.</p>
+</section>
+
+<section id="wiki" data-chunk-id="craft.wiki" data-tags="wiki,documentation,github">
+<h2>The wiki</h2>
+
+<p>GitHub's wiki is a separate git repository with no pull requests and no review. That single property should decide what you put in it.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Content</th><th>Where</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Anything that must stay in sync with code</td><td><code>docs/</code> in the repository</td><td>Reviewed in the same pull request as the change; a stale doc is a visible diff</td></tr>
+<tr><td>Decision records, guides, specifications</td><td><code>docs/</code></td><td>Versioned with the code they describe</td></tr>
+<tr><td>End-user guides, FAQ, troubleshooting</td><td><strong>The wiki</strong></td><td>Edited frequently, not tied to a release, and readable without cloning</td></tr>
+<tr><td>Screenshots-heavy walkthroughs</td><td><strong>The wiki</strong></td><td>Large binaries you do not want in the source history</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Adopt this</span>
+<p><strong>Keep the wiki's source in the repository and publish it, rather than editing the wiki directly.</strong> Then wiki content gets review, history and CI like anything else. One project keeps its wiki pages in a <code>docs/wiki/</code> directory, and a build tool compiles the same user guides into the app's offline help — so documentation that fails to render fails the build. Documentation that is also a shipped artifact does not rot quietly.</p>
+</div>
+
+<p>Wiki structure that works:</p>
+
+<ul>
+<li><strong>A Home page that is a table of contents</strong> with one line per page saying who it is for and what it covers — not a welcome message.</li>
+<li><strong>A sidebar</strong> grouping pages by audience: developer pages, then user guides, one per language.</li>
+<li><strong>One page per audience-and-topic</strong>, not one per feature. "User guide" beats twelve feature pages nobody can navigate.</li>
+<li><strong>Link back into the repository</strong> for anything authoritative — the specification, decision records, migrations.</li>
+<li><strong>Say plainly which pages are user-facing and which are developer-facing.</strong> Mixing them makes both audiences bounce.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why writing user docs is a verification pass</span>
+<p>Fact-check every claim against the code as you write it. One project discovered a months-old bug — a screen silently serving demo data because it bypassed an accessor — precisely while writing the wiki chapter that described that feature. Documenting behaviour from memory is how a false claim gets published; documenting it from the code is a free audit.</p>
+</div>
+</section>
+
+<section id="releases" data-chunk-id="craft.releases" data-tags="releases,changelog,notes">
+<h2>Releases and release notes</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Artifact</th><th>Audience</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><strong><code>CHANGELOG.md</code></strong></td><td>Users and contributors</td><td>Written by hand, per change, in an <code>[Unreleased]</code> section</td></tr>
+<tr><td><strong>GitHub release notes</strong></td><td>Contributors</td><td>Auto-generated from pull-request titles, categorised by label</td></tr>
+<tr><td><strong>Store release notes</strong></td><td>Users only</td><td>Per-locale files in the store metadata directory</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="yaml"><code># .github/release.yml — categorise auto-generated notes
+changelog:
+  exclude:
+    labels: [chore, ci, dependencies]
+  categories:
+    - title: Added
+      labels: [enhancement]
+    - title: Fixed
+      labels: [bug]
+    - title: Documentation
+      labels: [docs]</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Keep an <code>[Unreleased]</code> section and gate the release on the entry existing.</strong> Every user-visible change lands there with its pull request; cutting a release renames the section. Make the release workflow refuse to ship a version with no matching entry. A changelog written retrospectively from a commit log is guesswork by someone reconstructing what a change meant to a user, and it reads like it.</p>
+</div>
+
+<p>Write user-facing notes in the user's terms. "Fixed a race in the tile provider's abort handling" is a commit subject; "Maps no longer show grey squares after panning quickly" is a release note. The translation is the work, and it is why generating store notes directly from commit subjects produces something nobody can read.</p>
+</section>
+
+<section id="meta" data-chunk-id="craft.meta" data-tags="repository,metadata,configuration">
+<h2>The repository's own metadata</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>File / setting</th><th>Worth it because</th></tr></thead>
+<tbody>
+<tr><td><code>.github/CODEOWNERS</code></td><td>Auto-requests review from the right person per path. Even solo, it documents ownership.</td></tr>
+<tr><td><code>.github/dependabot.yml</code></td><td>Weekly grouped updates. See <a href="18-github.html#dependabot">page 18</a> for the lockstep-cluster trap.</td></tr>
+<tr><td><code>.github/release.yml</code></td><td>Categorised auto-generated notes</td></tr>
+<tr><td><code>.github/FUNDING.yml</code></td><td>A sponsor button. Note that some app stores forbid linking external donations <em>from inside the app</em> — the repository is unaffected.</td></tr>
+<tr><td><code>SECURITY.md</code></td><td>Where to report a vulnerability privately. Enable private vulnerability reporting.</td></tr>
+<tr><td><code>CODE_OF_CONDUCT.md</code></td><td>Standard text; takes two minutes and matters the one time it is needed.</td></tr>
+<tr><td><code>CONTRIBUTING.md</code></td><td>The full version of the README's five rules</td></tr>
+<tr><td><code>.gitattributes</code></td><td><code>* text=auto</code>. Without it a Windows CI runner produces spurious generated-file diffs — see <a href="16-windows.html#platform">page 16</a>.</td></tr>
+<tr><td><code>.editorconfig</code></td><td>Indentation and line endings agreed across editors</td></tr>
+<tr><td>Topics and description</td><td>Repository discovery. Two minutes, permanently.</td></tr>
+<tr><td>Discussions</td><td>Enable if you get questions that are not issues. It keeps the tracker for actionable work.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>An agent-facing rules file must be version-controlled.</strong> If your assistant configuration file is deliberately untracked, keep a committed mirror — one project keeps its binding rules at <code>docs/AGENT_RULES.md</code> for exactly this reason, so a fresh clone on another machine still carries them. Rules that live only on one developer's disk are not rules.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Clone your own repository into a fresh directory and follow your own getting-started instructions on a machine that is not your daily one. Every assumption you did not know you were making surfaces in the first ten minutes — a missing toolchain version, an environment variable, a hook that was never installed, a step that only works because of something in your shell profile.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>Both projects' issue templates (bug with a required version field, feature with a goals checkbox group, epic with a validation gate), pull-request templates, label sets, milestone usage and project-board conventions.</li>
+<li>Their commit and branch conventions, the one-commit-per-issue rule, the under-400-line pull-request rule, the squash-merge policy, and the serialised auto-merge discipline with its stall failure mode.</li>
+<li>One project's changelog discipline with the release-workflow gate, its release-notes categorisation, and its committed agent-rules mirror.</li>
+<li>The other project's wiki-in-repository arrangement, where the same source is compiled into the app's offline help, and its README staleness findings — which supplied the rule about numbers.</li>
+</ul>
+<p>The review ordering, the label-axis model and the project-board field guidance are syntheses of both projects' practice rather than quotations from either.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

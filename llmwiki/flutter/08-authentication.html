@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Authentication &amp; Google sign-in — LLM Wiki · Flutter</title>
+<meta name="description" content="Browser-based OAuth without a vendor SDK, deep-link redirects, anonymous-to-permanent upgrade preserving identity, linked identities, session handling and device pairing.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Authentication and Google sign-in","description":"OAuth without a vendor SDK, anonymous upgrade, deep-link redirects, linked identities.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">08 · Data</span>
+<h1>Authentication &amp; Google sign-in</h1>
+<p class="lede">You can offer Google sign-in without shipping a single line of Google's code. Browser-delegated OAuth is fewer dependencies, works on every platform including a libre build with no Play Services, and — the part that actually matters — keeps the credential handling in a component the user already trusts.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> auth</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 07 Supabase · 09 Confidentiality</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#choice">SDK versus browser OAuth</a></li>
+<li><a href="#provider">Modelling providers as data</a></li>
+<li><a href="#redirect">Redirect URLs per platform</a></li>
+<li><a href="#config">Configuring Google as a provider</a></li>
+<li><a href="#anon">Anonymous accounts and the upgrade path</a></li>
+<li><a href="#linking">Linked identities</a></li>
+<li><a href="#session">Sessions, refresh and sign-out</a></li>
+<li><a href="#pairing">Device pairing without an account</a></li>
+<li><a href="#testing">Testing an auth layer</a></li>
+</ol>
+</div>
+
+<section id="choice" data-chunk-id="auth.choice" data-tags="oauth,architecture,decision">
+<h2>SDK versus browser OAuth</h2>
+
+<p>The native Google sign-in SDK gives you a one-tap account picker. Browser OAuth gives you everything else. For most apps, everything else wins.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Native SDK (<code>google_sign_in</code>)</th><th>Browser OAuth</th></tr></thead>
+<tbody>
+<tr><td>Account picker UX</td><td>Native sheet, one tap, no browser</td><td>Custom Tab / <code>ASWebAuthenticationSession</code>; still one tap if already signed in</td></tr>
+<tr><td>Dependency weight</td><td>Pulls Play Services on Android</td><td>None beyond the auth client you already have</td></tr>
+<tr><td>Works in a GMS-free build</td><td><strong>No</strong></td><td>Yes</td></tr>
+<tr><td>Works on desktop / web</td><td>Partially, with separate plugins</td><td>Yes, same code path</td></tr>
+<tr><td>Adding a second provider</td><td>A second SDK, second config, second code path</td><td>One enum value</td></tr>
+<tr><td>Credential handling</td><td>In your process</td><td>In the system browser — outside your process entirely</td></tr>
+<tr><td>Setup burden</td><td>SHA-1 fingerprints per signing key, per store</td><td>One redirect URL per platform</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why the fingerprint burden matters more than it sounds</span>
+<p>The native SDK ties an OAuth client to your app's signing certificate. Play App Signing means the certificate that signs the shipped artifact is <em>not</em> the one you uploaded, so you need both fingerprints registered. Add a debug key, an F-Droid build signed by a third party, and a CI key, and you have four fingerprints to keep in sync across two consoles — with the failure mode being a sign-in button that works in debug and fails silently in production. Browser OAuth has no fingerprint concept at all.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>If any distribution channel forbids proprietary dependencies, browser OAuth is not a preference — it is the only option.</strong> A libre build cannot link Play Services. Choosing the SDK means either dropping social sign-in from that channel or maintaining two auth implementations.</p>
+</div>
+</section>
+
+<section id="provider" data-chunk-id="auth.provider" data-tags="oauth,modelling,dart">
+<h2>Modelling providers as data</h2>
+
+<p>An enum with a display label and a wire name, plus a resolver that still recognises retired providers so existing linked accounts keep rendering.</p>
+
+<pre data-lang="dart"><code>/// Social sign-in providers offered next to e-mail + password.
+/// Browser-based OAuth, no vendor SDK — so the libre build stays free of
+/// proprietary services.
+///
+/// Google alone: Microsoft, Apple and Facebook were once offered but never
+/// configured server-side, so every tap on them ended in a provider error.
+/// A button that cannot work is worse than no button. [fromWire] still
+/// resolves the retired ids so an account that linked one keeps rendering.
+enum SocialProvider {
+  google('Google', 'google');
+
+  const SocialProvider(this.label, this.wireName);
+
+  /// Brand name — deliberately NOT translated.
+  final String label;
+
+  /// The backend's provider id.
+  final String wireName;
+
+  /// The catalog entry for a stored identity's provider id, or null for
+  /// non-social identities ('email', 'phone', …).
+  static SocialProvider? fromWire(String provider) =&gt;
+      values.where((p) =&gt; p.wireName == provider).firstOrNull;
+}
+
+/// One identity attached to the signed-in account.
+typedef LinkedIdentity = ({String id, String provider});</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never render a provider button that is not configured server-side.</strong> An unconfigured provider produces an opaque error after the user has already left your app for a browser — the worst possible place to fail. Ship the enum with only what is actually wired up, and keep <code>fromWire</code> tolerant so historical identities still display.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Provider names are brand names: never localise them.</strong> "Google" is "Google" in every locale. Mark the field with whatever exemption comment your no-hard-coded-strings lint uses, so the exemption is visible and justified rather than looking like an oversight.</p>
+</div>
+</section>
+
+<section id="redirect" data-chunk-id="auth.redirect" data-tags="oauth,deep-links,platform">
+<h2>Redirect URLs per platform</h2>
+
+<p>The OAuth callback needs somewhere to land, and that somewhere differs between web and native — one branch, resolved once.</p>
+
+<pre data-lang="dart"><code>static String get _redirect =&gt; kIsWeb
+    // Web: back to the page that started the flow. Must be listed in the
+    // backend's allowed redirect URLs, or the provider refuses.
+    ? Uri.base.origin + Uri.base.path
+    // Native: a custom scheme registered on each platform.
+    : 'de.example.app://login-callback';
+
+Future&lt;void&gt; signInWithSocial(SocialProvider provider) async {
+  await _client.auth.signInWithOAuth(
+    _oauth(provider),
+    redirectTo: _redirect,
+  );
+}</code></pre>
+
+<p>Register the scheme on every native platform:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Platform</th><th>Where</th><th>What</th></tr></thead>
+<tbody>
+<tr><td>Android</td><td><code>AndroidManifest.xml</code></td><td>An <code>intent-filter</code> with <code>VIEW</code> + <code>BROWSABLE</code> + <code>DEFAULT</code> and <code>&lt;data android:scheme="de.example.app"/&gt;</code></td></tr>
+<tr><td>iOS / macOS</td><td><code>Info.plist</code></td><td><code>CFBundleURLTypes</code> with the same scheme</td></tr>
+<tr><td>Windows</td><td>Installer</td><td>An <code>HKLM</code> protocol-handler registration — see <a href="16-windows.html">page 16</a></td></tr>
+<tr><td>Web</td><td>Backend config</td><td>Every origin you deploy to, listed as an allowed redirect URL</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: sign-in works locally and fails on the deployed web build with a redirect error.</strong> Each origin — <code>localhost</code> with its port, the preview URL, the production URL, and a project-pages URL with a path prefix — is a separate entry in the backend's allowed-redirect list. Add them all when you add the first, or you will rediscover this on every new deployment target.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the browser opens, the user authenticates, and the app never comes back to the foreground.</strong> The scheme is not registered, or it is registered with the wrong case, or on Android the intent filter is missing <code>BROWSABLE</code>. Test the scheme independently of OAuth before debugging the OAuth flow:</p>
+<pre data-lang="bash"><code>adb shell am start -a android.intent.action.VIEW -d "de.example.app://login-callback"
+xcrun simctl openurl booted "de.example.app://login-callback"</code></pre>
+<p>If that does not foreground your app, the problem is the scheme registration and nothing to do with authentication.</p>
+</div>
+</section>
+
+<section id="config" data-chunk-id="auth.config" data-tags="google,oauth,configuration">
+<h2>Configuring Google as a provider</h2>
+
+<p>With browser OAuth, Google configuration happens entirely in two consoles and never in your app.</p>
+
+<ol>
+<li><strong>Google Cloud Console → APIs &amp; Services → Credentials.</strong> Create an OAuth 2.0 <em>Web application</em> client. Web, not Android or iOS — the browser flow is a web flow regardless of which device it runs on. This is the point most first-time setups get wrong.</li>
+<li><strong>Authorised redirect URI:</strong> your auth backend's callback endpoint (for Supabase, <code>https://&lt;project&gt;.supabase.co/auth/v1/callback</code>). Not your app's custom scheme — the provider redirects to your backend, and your backend redirects to your app.</li>
+<li><strong>OAuth consent screen:</strong> app name, support email, logo, and the scopes. Keep the scopes minimal — <code>email</code> and <code>profile</code> are enough for identity. Anything more triggers a verification review and a warning banner for users.</li>
+<li><strong>Copy the client id and secret</strong> into the auth backend's Google provider configuration. The secret lives there, never in the app.</li>
+<li><strong>Add every app redirect URL</strong> (the custom scheme, and each web origin) to the auth backend's allowed-redirect list.</li>
+</ol>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The client secret never enters the repository or the binary.</strong> It lives in the auth backend's configuration. If a setup guide tells you to put a client secret in your Flutter app, the guide is describing a different flow — one you should not use in a distributed mobile app, because the secret is extractable from every install.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: <code>redirect_uri_mismatch</code>, and the URI in the error is not one you recognise.</strong> The URI in the error is the one your <em>backend</em> sent, not the one your app requested. Register that exact string — protocol, host, path, no trailing slash difference — in the Cloud Console. The two-hop structure (provider → backend → app) means there are two redirect lists to maintain and they contain different values.</p>
+</div>
+</section>
+
+<section id="anon" data-chunk-id="auth.anon" data-tags="anonymous,identity,migration">
+<h2>Anonymous accounts and the upgrade path</h2>
+
+<p>Sign the user in anonymously on first launch so every feature works immediately, and upgrade that same identity later — without ever minting a new one.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Upgrading an anonymous account must preserve the user id. Never call <code>signUp</code>.</strong> Use the link-identity or update-user flow. A fresh sign-up creates a new id, and every row the anonymous user created is instantly invisible to them under row-level security — their data is not deleted, it is orphaned, which is harder to explain and harder to recover.</p>
+<pre data-lang="dart"><code>// WRONG — mints a new uid, orphans everything the user already created.
+await client.auth.signUp(email: email, password: password);
+
+// RIGHT — attaches credentials to the EXISTING anonymous identity.
+await client.auth.updateUser(UserAttributes(email: email, password: password));
+// or, for a social provider:
+await client.auth.linkIdentity(OAuthProvider.google, redirectTo: _redirect);</code></pre>
+</div>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Stage</th><th>User sees</th><th>Identity</th></tr></thead>
+<tbody>
+<tr><td>First launch</td><td>The app works. No sign-in wall.</td><td>Anonymous uid, created silently</td></tr>
+<tr><td>Uses the app</td><td>Data saved locally and, if enabled, synced</td><td>Same uid; rows owned by it</td></tr>
+<tr><td>Wants a second device</td><td>"Add an email or sign in with Google to use this on another device"</td><td><strong>Same uid</strong>, now with credentials attached</td></tr>
+<tr><td>Signs in on device 2</td><td>Their data is there</td><td>Same uid, second session</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">Why anonymous-first</span>
+<p>A sign-in wall on first launch is the largest single drop-off point in a utility app, and for most features it buys nothing — the app works fine with a local identity. Deferring the ask until the user wants something that genuinely requires it (a second device, a shared workspace, a receipt) converts far better, and the request finally has an honest justification attached to it.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: users on a second device see an empty app and assume sync is broken.</strong> Anonymous identities are per-device by construction. Until the upgrade path exists, "cross-device sync" is not a feature you have — and if the UI implies otherwise, users will report data loss. Say plainly what the anonymous state does and does not give them.</p>
+</div>
+</section>
+
+<section id="linking" data-chunk-id="auth.linking" data-tags="identity,account-management,ux">
+<h2>Linked identities</h2>
+
+<p>An account can carry several identities — email, Google, others — and the user needs a screen that shows them and can add or remove one.</p>
+
+<pre data-lang="dart"><code>Future&lt;List&lt;LinkedIdentity&gt;&gt; linkedIdentities() async {
+  final identities = _client.auth.currentUser?.identities ?? const [];
+  return [
+    for (final i in identities) (id: i.id, provider: i.provider),
+  ];
+}
+
+Future&lt;void&gt; linkSocial(SocialProvider p) =&gt;
+    _client.auth.linkIdentity(_oauth(p), redirectTo: _redirect);
+
+Future&lt;void&gt; unlink(LinkedIdentity identity) async {
+  final all = await linkedIdentities();
+  if (all.length &lt;= 1) {
+    throw const AuthException('cannot_unlink_last_identity');
+  }
+  await _client.auth.unlinkIdentity(/* … */);
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never let a user unlink their last identity.</strong> The account becomes unreachable — not deleted, just permanently inaccessible, with its rows intact and no way to authenticate to them. Check the count before unlinking and raise a named error the UI can localise. This is the account-level analogue of the last-owner protection in <a href="07-supabase.html#invariants">page 07</a>, and it deserves the same treatment: enforce it server-side too if the platform allows.</p>
+</div>
+
+<p>Render unknown providers gracefully. If an identity's provider id does not resolve through <code>fromWire</code>, show the raw id rather than hiding the row — a hidden identity the user cannot see is one they cannot remove.</p>
+</section>
+
+<section id="session" data-chunk-id="auth.session" data-tags="session,tokens,storage">
+<h2>Sessions, refresh and sign-out</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Concern</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Token storage</strong></td><td>Platform secure storage — Keystore on Android, Keychain on iOS/macOS. Most auth clients handle this; verify rather than assume, and never let tokens reach a plain key-value box.</td></tr>
+<tr><td><strong>Refresh</strong></td><td>Handled by the client library. Your job is to react to the auth-state stream, not to schedule refreshes.</td></tr>
+<tr><td><strong>Auth state as a provider</strong></td><td>Expose the auth-state change stream as a keep-alive provider; route guards and sync triggers watch it. Do not poll <code>currentUser</code>.</td></tr>
+<tr><td><strong>Sign-out</strong></td><td>Clear the session <em>and</em> every cached view of that user's data. A stale cache after sign-out shows the previous user's rows to the next one — a confidentiality bug, not a cosmetic one.</td></tr>
+<tr><td><strong>Session expiry mid-use</strong></td><td>Surface it as a specific state, not a generic error. "Your session expired, sign in again" is actionable; "something went wrong" sends the user to support.</td></tr>
+<tr><td><strong>Desktop keychain</strong></td><td>macOS secure storage has its own failure mode — see <a href="15-macos.html#keychain">page 15</a>.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Sign-out must evict the cache.</strong> Enumerate every cache prefix scoped to a user and clear it in the sign-out path. This is the same enumeration problem as <a href="06-caching.html#invalidation">mutation invalidation</a> and it has the same countermeasure: list the prefixes in a comment next to the calls, and prefer over-eviction.</p>
+</div>
+</section>
+
+<section id="pairing" data-chunk-id="auth.pairing" data-tags="pairing,qr,onboarding">
+<h2>Device pairing without an account</h2>
+
+<p>For an app that is deliberately account-optional, a QR handshake moves an identity to a second device without introducing a password.</p>
+
+<p>The shape: device A renders a short-lived token as a QR code; device B scans it and exchanges it for the same identity. Requirements that make it safe rather than merely convenient:</p>
+
+<ul>
+<li><strong>Short expiry</strong> — a minute or two. A QR photographed and used tomorrow is a credential leak.</li>
+<li><strong>Single use</strong> — the token is consumed on redemption, server-side and atomically.</li>
+<li><strong>Server-generated, unguessable</strong> — from an unambiguous alphabet so a user can also type it. Exclude visually confusable characters (<code>0</code>/<code>O</code>, <code>1</code>/<code>l</code>/<code>I</code>); one project uses a 32-letter alphabet and a 10-character code.</li>
+<li><strong>Visible on both sides</strong> — device A should show that a pairing occurred, so an unexpected one is noticed.</li>
+</ul>
+
+<p>The same primitive covers invitations to a shared tenant: a single-use personal invitation is a pairing token with a target. See <a href="11-barcode-qr.html">page 11</a> for generating and scanning the code itself.</p>
+</section>
+
+<section id="testing" data-chunk-id="auth.testing" data-tags="testing,auth,fakes">
+<h2>Testing an auth layer</h2>
+
+<p>Fake the repository, not the network — and make the fake enforce the same rules the server does.</p>
+
+<pre data-lang="dart"><code>class FakeAuthRepository implements AuthRepository {
+  FakeAuthRepository({this.user, List&lt;LinkedIdentity&gt;? identities})
+      : _identities = identities ?? const [];
+
+  AppUser? user;
+  List&lt;LinkedIdentity&gt; _identities;
+  final _controller = StreamController&lt;AppUser?&gt;.broadcast();
+
+  @override
+  Stream&lt;AppUser?&gt; get authState =&gt; _controller.stream;
+
+  @override
+  Future&lt;void&gt; upgradeAnonymous({required String email}) async {
+    // Mirrors the real rule: the uid MUST NOT change.
+    user = user?.copyWith(email: email);
+    _controller.add(user);
+  }
+
+  @override
+  Future&lt;void&gt; unlink(LinkedIdentity i) async {
+    // Mirrors the server-side invariant, so a widget test cannot pass
+    // against behaviour the real backend refuses.
+    if (_identities.length &lt;= 1) {
+      throw const AuthException('cannot_unlink_last_identity');
+    }
+    _identities = [..._identities]..remove(i);
+  }
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The fake must enforce every invariant the server enforces.</strong> A permissive fake produces green widget tests for flows that fail in production — the last-identity unlink, the row a non-owner cannot see, the quota that is already exhausted. This is <a href="03-tdd-and-testing.html#false-green">the false-green failure</a> in its most expensive form, because auth bugs are discovered by users rather than by monitoring.</p>
+</div>
+
+<p>Cases worth an explicit test each: anonymous first launch creates an identity; upgrade preserves the uid; sign-out clears cached user data; an expired session surfaces the specific state; unlinking the last identity is refused; and an unrecognised provider id still renders.</p>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>The manual test that catches the most: sign in on device A, create data, upgrade to a permanent identity, sign in on device B, and confirm the data is there. Then sign out on B and confirm nothing of A's remains visible. Both halves — the second is the one people skip.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's auth feature: the <code>SocialProvider</code> enum with its retired-provider rationale, the <code>kIsWeb</code> redirect resolution, the linked-accounts screen, and the browser-OAuth-no-SDK decision recorded against its no-proprietary-services constraint.</li>
+<li>The other project's cross-device sync work: the anonymous-per-device identity model, the requirement that an anonymous-to-permanent upgrade preserve the uid rather than calling <code>signUp</code>, and the QR device-pairing design.</li>
+<li>Both projects' invite-code conventions (server-generated, unambiguous alphabet, single-use).</li>
+</ul>
+<p>The Google Cloud Console steps are standard provider configuration, stated here because the "Web application client, not Android client" point is the one most commonly gotten wrong with browser-delegated flows. The fake-repository code is illustrative.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

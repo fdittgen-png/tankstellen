@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testers &amp; Google Groups — LLM Wiki · Flutter</title>
+<meta name="description" content="Managing Play testers with a Google Group, TestFlight internal versus external groups, public links, and the invitation mechanics that fail silently.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Managing testers on Play and TestFlight","description":"Google Groups for Play tester lists, TestFlight internal vs external, public links, invitation mechanics.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">20 · Ship</span>
+<h1>Testers &amp; Google Groups</h1>
+<p class="lede">Tester management is the part of distribution that looks trivial and produces the most confused support conversations. Both stores have a mechanism that silently does nothing when misused, and both have an obvious-looking approach that does not scale past about ten people.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> test-mgmt</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 19 Go-live</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#tracks">Play testing tracks</a></li>
+<li><a href="#groups">Google Groups as the tester list</a></li>
+<li><a href="#optin">The opt-in link, and why it fails</a></li>
+<li><a href="#testflight">TestFlight: internal versus external</a></li>
+<li><a href="#invitations">Invitation mechanics that fail silently</a></li>
+<li><a href="#publiclink">Public links</a></li>
+<li><a href="#automation">Automating tester management</a></li>
+<li><a href="#feedback">Getting usable feedback</a></li>
+<li><a href="#offstore">Off-store channels</a></li>
+</ol>
+</div>
+
+<section id="tracks" data-chunk-id="test-mgmt.tracks" data-tags="play,tracks,testing">
+<h2>Play testing tracks</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Track</th><th>Audience</th><th>Review</th><th>Use for</th></tr></thead>
+<tbody>
+<tr><td><strong>Internal</strong></td><td>Up to 100 named testers</td><td>None — available in minutes</td><td>Proving the pipeline; your own devices</td></tr>
+<tr><td><strong>Closed (alpha)</strong></td><td>Named lists or Google Groups; can be several tracks</td><td>Light</td><td>A trusted tester cohort</td></tr>
+<tr><td><strong>Open (beta)</strong></td><td>Anyone with the opt-in link, optionally capped</td><td>Yes</td><td>Real-device diversity at scale</td></tr>
+<tr><td><strong>Production</strong></td><td>Everyone</td><td>Yes</td><td>Release, staged</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Keep one track continuously fresh and promote from that one.</strong> If a daily build feeds open testing while the internal track is updated rarely, a promotion defaulting to internal ships a stale, lower-versioned build. Make the source track an explicit parameter of your promotion workflow rather than a default nobody re-reads — one project changed exactly this default after being bitten.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a user reports a bug you fixed weeks ago, and swears they are on the latest version.</strong> They almost certainly are — of the <em>testing</em> track. A user who once opted into open testing keeps receiving that channel's builds after you ship to production, and the store gives them no obvious signal that they are on a different channel. Two countermeasures: tag beta builds visibly in-app (an about-screen suffix is enough), and document on your download page how to leave the testing programme.</p>
+</div>
+</section>
+
+<section id="groups" data-chunk-id="test-mgmt.groups" data-tags="google-groups,play,tester-management">
+<h2>Google Groups as the tester list</h2>
+
+<p>For any closed track with more than a handful of testers, use a <strong>Google Group</strong> as the tester list. You then manage membership in Groups rather than in the Play Console, which changes tester management from a release-engineering task into an ordinary administrative one.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Email list in the console</th><th>Google Group</th></tr></thead>
+<tbody>
+<tr><td>Adding a tester</td><td>Edit the list in Play Console, save, wait for propagation</td><td>Add them to the group — no console access needed</td></tr>
+<tr><td>Who can do it</td><td>Someone with console access</td><td>Any group manager</td></tr>
+<tr><td>Self-service joining</td><td>No</td><td>Yes, if the group allows requests</td></tr>
+<tr><td>Audit trail</td><td>Weak</td><td>Group membership history</td></tr>
+<tr><td>Scales to</td><td>Tens, painfully</td><td>Thousands</td></tr>
+<tr><td>Reuse across tracks/apps</td><td>Copy-paste</td><td>One group, referenced anywhere</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Setting it up</h3>
+
+<ol>
+<li>Create a group at <code>groups.google.com</code> — for example <code>myapp-testers@googlegroups.com</code>. A free Google Group is sufficient; a Workspace group works identically.</li>
+<li>Set who may join: open, request-and-approve, or invitation-only. <em>Request-and-approve</em> is usually right — it gives self-service without losing control.</li>
+<li>Play Console → <strong>Test and release → Testing → Closed testing</strong> → your track → <strong>Testers</strong> → choose the Google Groups option and enter the group's <strong>email address</strong>.</li>
+<li>Share the <strong>opt-in link</strong> shown on that page with the group.</li>
+</ol>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>The account a tester uses to join the group must be the same Google account signed in on their device.</strong> This is the single most common failure. Someone joins with a work address and installs on a phone signed in with a personal one; the store shows "item not found" and nothing indicates why. Say this explicitly in the invitation email — one sentence prevents most of the support load.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a tester was added but still cannot see the app, hours later.</strong> Check, in this order: <strong>(1)</strong> membership is <em>active</em>, not pending — a request-to-join group leaves people pending until approved; <strong>(2)</strong> the device account matches the group membership; <strong>(3)</strong> they have actually followed the opt-in link and accepted, which is a separate step from group membership; <strong>(4)</strong> propagation, which can take a few hours after a change; <strong>(5)</strong> the country — a track restricted by country excludes testers elsewhere with no explanation.</p>
+</div>
+
+<p>A practical convention: keep <em>two</em> groups — a small internal one for people who get everything immediately, and a larger external one for the closed track. Managing the boundary in Groups is easier than maintaining two console lists.</p>
+</section>
+
+<section id="optin" data-chunk-id="test-mgmt.optin" data-tags="play,opt-in,onboarding">
+<h2>The opt-in link, and why it fails</h2>
+
+<p>Being on the tester list is necessary and not sufficient — each tester must also follow the opt-in URL and accept.</p>
+
+<pre data-lang="text"><code>https://play.google.com/apps/testing/&lt;your.package.name&gt;</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Failure</th><th>Cause</th><th>What to tell the tester</th></tr></thead>
+<tbody>
+<tr><td>"Not an authorised tester"</td><td>Not on the list, or the wrong account</td><td>Confirm which address they joined with and which is on the device</td></tr>
+<tr><td>Opted in, store shows the production version</td><td>Store app cache</td><td>Force-stop the store app, clear its cache, retry after some minutes</td></tr>
+<tr><td>"Item not found" on the listing</td><td>The app has not yet been published to <em>any</em> track visible to them</td><td>Confirm the build has actually rolled out, not just been uploaded</td></tr>
+<tr><td>Opted in on the web, no update on the device</td><td>The device account differs from the browser account</td><td>Open the link in a browser signed in as the device account</td></tr>
+<tr><td>Was working, now gone</td><td>The track was superseded, or they were removed from the group</td><td>Check group membership and whether the track still has a live release</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Test the whole path yourself from a device that has never had the app, using an account that is not yours: join the group, follow the opt-in link, install from the store. Every step of that has failed for someone, and doing it once tells you which of your instructions are ambiguous.</p>
+</div>
+</section>
+
+<section id="testflight" data-chunk-id="test-mgmt.testflight" data-tags="testflight,apple,groups">
+<h2>TestFlight: internal versus external</h2>
+
+<p>Two kinds of tester with genuinely different mechanics, and picking the wrong one costs a review cycle.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Internal</th><th>External</th></tr></thead>
+<tbody>
+<tr><td>Limit</td><td>100 testers</td><td>10 000 testers</td></tr>
+<tr><td>Prerequisite</td><td><strong>Must be an App Store Connect user</strong> on your team</td><td>Just an email address — no Apple account needed</td></tr>
+<tr><td>Review</td><td>None</td><td><strong>Beta App Review on the first build</strong>; later builds go straight through</td></tr>
+<tr><td>Availability</td><td>Minutes after processing</td><td>After review clears</td></tr>
+<tr><td>Public link</td><td>No</td><td>Yes, with a tester cap</td></tr>
+<tr><td>Build expiry</td><td>90 days</td><td>90 days</td></tr>
+<tr><td>Use for</td><td>Your own devices, close collaborators</td><td>Everyone else</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Internal testers must be App Store Connect <em>users</em> first — being "added as a tester" is a two-step operation.</strong> You invite them as a user (scoped to this app only, with no provisioning rights), they accept the invitation, and only then can they be assigned to an internal group. Automation that tries to assign before acceptance appears to succeed and does nothing. Scope the invitation narrowly: visible to this app only, no provisioning permission.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the first external build sits waiting on a form nobody filled.</strong> Beta App Review needs the review contact block, the localised beta descriptions and — for anything using background execution or hardware — a demo video. Push all of it <em>ahead</em> of the build with a no-build lane, so the first external submission does not stall on data entry. See <a href="14-ios.html#review">page 14</a>.</p>
+</div>
+</section>
+
+<section id="invitations" data-chunk-id="test-mgmt.invitations" data-tags="api,testflight,automation,defensive">
+<h2>Invitation mechanics that fail silently</h2>
+
+<p>The tester APIs have several behaviours that make naive automation report success while doing nothing. Each of the following was added to one project's tester lane after a real failure.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Behaviour</th><th>Symptom</th><th>Defence</th></tr></thead>
+<tbody>
+<tr><td><strong>App-scoped lookup returns nothing for an existing tester</strong></td><td>A tester who exists on the account but is not yet indexed against this app looks absent, so the code tries to create them and hits a conflict</td><td>Look the tester up <strong>account-scoped</strong>, not app-scoped</td></tr>
+<tr><td><strong>The bulk endpoint returns success with per-tester errors inside</strong></td><td>A 200 response containing a failure for one address; nothing raises</td><td>Separate create-new and add-existing paths; parse the per-item results</td></tr>
+<tr><td><strong>An existing member's invitation cannot simply be re-sent</strong></td><td>"Resend" appears to work and no email arrives</td><td>Remove and re-add (external), or delete and recreate the pending invitation (internal)</td></tr>
+<tr><td><strong>An app-manager-scoped key cannot manage users</strong></td><td>An authorisation error that looks transient and is permanent</td><td>Warn and continue — this is a configuration limitation, not a failure. Say so in the log.</td></tr>
+<tr><td><strong>Assignment reports success before it is visible</strong></td><td>The tester is not in the group despite a successful call</td><td><strong>Re-fetch and verify</strong> before claiming success</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Verify by re-fetching, never by trusting the mutation's return.</strong> This is the general lesson: for any outward-facing API that sends a real email to a real person, the only trustworthy confirmation is reading the state back. A lane that says "added 3 testers" without re-fetching is reporting its own intent.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Tester-management workflows are dispatch-only. Never scheduled, never automatic on merge.</strong> Adding a tester sends a real invitation email. It is an outward-facing action with a human recipient and belongs behind a deliberate trigger — the same reasoning as listing-metadata publication.</p>
+</div>
+</section>
+
+<section id="publiclink" data-chunk-id="test-mgmt.publiclink" data-tags="public-link,recruitment,testflight">
+<h2>Public links</h2>
+
+<p>Both stores can hand you a URL that lets anyone join, with different properties.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Play open-testing opt-in link</th><th>TestFlight public link</th></tr></thead>
+<tbody>
+<tr><td>Cap</td><td>Optional tester cap on the track</td><td>Required cap, default around 100</td></tr>
+<tr><td>Approval</td><td>None — anyone with the link joins</td><td>None</td></tr>
+<tr><td>Review</td><td>The open track is reviewed</td><td>The group's first build is reviewed</td></tr>
+<tr><td>Revocation</td><td>Close the track</td><td>Disable the link</td></tr>
+<tr><td>Anonymity</td><td>You see aggregate numbers</td><td>You see tester emails</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Set a cap you can actually support, and remember a public link cannot be un-shared.</strong> Once the URL is in a forum post it is public permanently — the only lever afterwards is disabling it, which cuts off everyone. Start with a low cap and raise it; the reverse is not available.</p>
+</div>
+
+<p>Practical detail: create the external group with access to all builds enabled, so every subsequent build reaches the group without per-build assignment. Otherwise you will be assigning builds by hand forever, which is exactly the toil the group was meant to remove.</p>
+</section>
+
+<section id="automation" data-chunk-id="test-mgmt.automation" data-tags="automation,workflow,cli">
+<h2>Automating tester management</h2>
+
+<pre data-lang="yaml"><code>name: TestFlight testers
+on:
+  workflow_dispatch:            # dispatch-ONLY — this sends real email
+    inputs:
+      email:      { description: 'Address, or comma-separated list', required: true }
+      groups:     { description: 'Target groups (blank = every external group)' }
+      first_name: { description: 'Optional' }
+      last_name:  { description: 'Optional' }
+      resend:     { description: 'Remove and re-add to force a new invitation',
+                    type: boolean, default: false }
+jobs:
+  add:
+    # API-only: no build, no signing, no Xcode. Linux is fine and cheap.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with: { bundler-cache: true }
+      - run: bundle exec fastlane ios manage_testers
+        env:
+          TESTER_EMAIL: ${{ inputs.email }}
+          TESTER_GROUPS: ${{ inputs.groups }}
+          APP_STORE_CONNECT_API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          APP_STORE_CONNECT_API_KEY_ID:     ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID:  ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Design point</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Runs on Linux</td><td>It is API calls. A macOS runner here is pure waste.</td></tr>
+<tr><td>Idempotent</td><td>Re-adding an existing tester is a no-op, not a failure</td></tr>
+<tr><td>Blank groups means all external groups</td><td>The common case is "give this person everything"</td></tr>
+<tr><td>An explicit resend mode</td><td>Because a plain resend does not work — see <a href="#invitations">above</a></td></tr>
+<tr><td>Warn-and-continue on a permission limitation</td><td>An app-manager key cannot manage users; that is configuration, not failure</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The other store needs no equivalent automation if you use a Google Group — that <em>is</em> the automation. Membership changes propagate without touching the console, which is the whole argument for the approach.</p>
+</section>
+
+<section id="feedback" data-chunk-id="test-mgmt.feedback" data-tags="feedback,support,process">
+<h2>Getting usable feedback</h2>
+
+<p>Testers will report bugs in whatever channel is easiest. Make the useful channel the easy one.</p>
+
+<ul>
+<li><strong>Put the version and build number on an about screen</strong>, selectable so it can be copied. Then require it in the bug template. This single field resolves the largest category of unactionable report.</li>
+<li><strong>Ship a "report a problem" affordance</strong> that pre-fills device model, OS version, app version and a redacted trace excerpt, and opens your issue tracker. See <a href="05-traceability.html#reporting">page 05</a> — it is consent-gated by construction, because the user sees and sends it themselves.</li>
+<li><strong>Tag beta builds visibly.</strong> A suffix on the version string prevents an entire genre of confused report.</li>
+<li><strong>Tell testers what changed.</strong> Per-build release notes reach TestFlight testers directly; on the other store they appear in the listing. A build with no notes gets tested at random.</li>
+<li><strong>Ask specific questions.</strong> "Does the trip recording keep running when you lock the screen?" produces a usable answer; "let me know how it goes" does not.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why not an in-app feedback backend</span>
+<p>Because it is a data-collection surface you then have to declare, secure and maintain — and it duplicates an issue tracker you already run. Composing a pre-filled issue and handing it to the user costs nothing, keeps the report public and searchable, and lets you state truthfully that the app uploads nothing on its own.</p>
+</div>
+</section>
+
+<section id="offstore" data-chunk-id="test-mgmt.offstore" data-tags="sideload,fdroid,validation">
+<h2>Off-store channels</h2>
+
+<p>For anything hardware-dependent, the store channels are the slowest way to validate. Two faster paths:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Channel</th><th>Latency</th><th>Use for</th></tr></thead>
+<tbody>
+<tr><td><strong>Direct-install artifact from CI</strong></td><td>Minutes</td><td>Validating a device-layer fix today. Debug-signed on purpose: fine for sideloading, and structurally blocked from store upload.</td></tr>
+<tr><td><strong>Your own libre repository</strong></td><td>Hours</td><td>Real users, real updates, no review — and no store policy constraining what the build may contain.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Use the off-store path to validate anything blocked on store paperwork.</strong> If a background feature is switched off pending a declaration, it can still be exercised today on a sideloaded build — one project's own documentation says exactly this, and points at its dev-artifact workflow for that purpose. Waiting for a review to test your own code is a self-inflicted delay.</p>
+</div>
+
+<p>Two things to document for anyone you send a direct-install artifact to: they will need to allow installation from that source, and a differently-signed build cannot upgrade a store install — they must uninstall first, which loses local data unless they export it.</p>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's TestFlight tester lane and the specific defences it carries: account-scoped rather than app-scoped lookup, separate create-new and add-existing paths because the bulk endpoint returns per-item errors inside a success, the remove-and-re-add resend mode, the post-assignment verification re-fetch, and warn-and-continue when the key lacks user-management permission.</li>
+<li>The same project's external-group-with-public-link lane, its dispatch-only rule for outward-facing mutations, and its dev-artifact workflow used to validate features blocked on store paperwork.</li>
+<li>Its promotion-source-track default change, and the stale-testing-channel-build support pattern.</li>
+</ul>
+<p>The Google Groups material is standard Play Console behaviour rather than an observation from either project — neither uses a Group today — and is included because it is the mechanism that makes closed-track tester management scale past a hand-maintained list.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

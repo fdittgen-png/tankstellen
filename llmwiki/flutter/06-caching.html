@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Caching — LLM Wiki · Flutter</title>
+<meta name="description" content="The fresh/stale/miss tier model, TTL constants, cache-key design, schema-versioned invalidation, eviction that preserves stale fallback, and request coalescing.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Caching","description":"Fresh/stale/miss tiers, TTL constants, key design, schema-versioned invalidation, eviction.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">06 · Data</span>
+<h1>Caching</h1>
+<p class="lede">The cache is not an optimisation. In a local-first app it is the offline story, the rate-limit story and the resilience story at once — which is why the interesting design decision is not "how long do we keep things" but "who decides that stale is acceptable".</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> cache</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#tiers">Three tiers, and who chooses</a></li>
+<li><a href="#seam">The cache seam</a></li>
+<li><a href="#ttl">TTLs as named constants</a></li>
+<li><a href="#keys">Cache-key design</a></li>
+<li><a href="#schema">Schema-versioned invalidation</a></li>
+<li><a href="#eviction">Eviction that preserves stale fallback</a></li>
+<li><a href="#coalescing">Request coalescing and rate limiting</a></li>
+<li><a href="#invalidation">Invalidation on mutation</a></li>
+<li><a href="#testing">Testing a cache</a></li>
+</ol>
+</div>
+
+<section id="tiers" data-chunk-id="cache.tiers" data-tags="caching,architecture,staleness">
+<h2>Three tiers, and who chooses</h2>
+
+<p>A cache entry is in one of three states — fresh, stale, or absent — and <strong>the caller decides whether stale is acceptable</strong>, not the cache.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Tier</th><th>Condition</th><th>Served when</th></tr></thead>
+<tbody>
+<tr><td><strong>Fresh</strong></td><td><code>age ≤ ttl</code></td><td>Always. No network call.</td></tr>
+<tr><td><strong>Stale</strong></td><td><code>age &gt; ttl</code>, entry still present</td><td>The network attempt failed. Served with <code>isStale: true</code>.</td></tr>
+<tr><td><strong>Miss</strong></td><td>Never cached, or evicted</td><td>Nothing to serve — the chain exhausts and throws.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The consequence of putting the decision in the caller: <code>get()</code> returns the entry <em>regardless of age</em>, and exposes <code>isExpired</code> as a property. A cache API whose <code>get()</code> returns null for an expired entry has thrown away the offline fallback before the caller could ask for it.</p>
+
+<pre data-lang="dart"><code>class CacheEntry {
+  const CacheEntry({required this.payload, required this.storedAt, required this.ttl});
+
+  /// JSON-safe RAW data — server rows or row bundles, never parsed
+  /// domain objects. See the schema-version section for why.
+  final Object? payload;
+  final DateTime storedAt;
+  final Duration ttl;
+
+  Duration get age =&gt; DateTime.now().difference(storedAt);
+  bool get isExpired =&gt; age &gt; ttl;
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Cache raw payloads, not parsed domain objects.</strong> Store the server rows. Parsing on read costs microseconds and buys two things: the cache format does not change when a model gains a field, and a parser change cannot corrupt stored data — it can only fail to read it, which is detectable. Caching parsed objects makes every model refactor a data migration.</p>
+</div>
+</section>
+
+<section id="seam" data-chunk-id="cache.seam" data-tags="caching,testing,abstraction">
+<h2>The cache seam</h2>
+
+<p>Repositories read and write through an abstract store, so a widget test injects an in-memory implementation without touching the disk.</p>
+
+<pre data-lang="dart"><code>abstract class CacheStore {
+  /// The entry regardless of age — null only when never cached or
+  /// unreadable. Staleness is the CALLER's decision.
+  Future&lt;CacheEntry?&gt; get(String key);
+
+  Future&lt;void&gt; put(String key, Object? payload, {required Duration ttl});
+
+  /// Drops every entry whose key starts with [prefix] — the mutation
+  /// invalidation primitive.
+  Future&lt;void&gt; evictPrefix(String prefix);
+
+  Future&lt;void&gt; evictExpired();
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never write API responses to the raw key-value store directly.</strong> Everything goes through the cache manager. A direct <code>storage.put('some_response', json)</code> bypasses TTLs, bypasses schema versioning, bypasses eviction, and will be forgotten during the next invalidation change. Both source projects ban this explicitly; one enforces it with a scanning test.</p>
+</div>
+
+<p>The seam also gives you the one thing a filesystem-backed cache otherwise makes painful: deterministic tests. An in-memory fake with an injectable clock lets you assert fresh-hit, stale-hit and miss behaviour without <code>Future.delayed</code> anywhere.</p>
+</section>
+
+<section id="ttl" data-chunk-id="cache.ttl" data-tags="caching,ttl,configuration">
+<h2>TTLs as named constants</h2>
+
+<p>Every TTL is a named constant in one place, chosen from the data's real update cadence — never invented inline at a call site.</p>
+
+<pre data-lang="dart"><code>abstract final class CacheTtl {
+  /// Prices refresh upstream roughly every 5 minutes.
+  static const prices = Duration(minutes: 5);
+
+  /// Station locations. Forecourts do not move; an hour is conservative.
+  static const stationLocations = Duration(hours: 1);
+
+  /// Geocoding results for a typed query.
+  static const geocode = Duration(days: 7);
+
+  /// Route geometry between two fixed points.
+  static const route = Duration(hours: 6);
+
+  /// Reference data shipped by the backend (plans, categories, tariffs).
+  static const referenceData = Duration(hours: 12);
+}</code></pre>
+
+<div class="callout why">
+<span class="tag">Why the constant matters more than the value</span>
+<p>An inline <code>Duration(minutes: 5)</code> at a call site is invisible. When the upstream cadence changes, or when you need to reason about total network volume, you cannot find the values — and you will find <em>different</em> values for the same data reached through two paths. A named constant makes the policy reviewable in one screen.</p>
+</div>
+
+<p>Derive the TTL from the source, and write the derivation in the comment. A source that publishes a daily bulk file should not be polled every five minutes; a source that updates every five minutes should not be cached for an hour. Both projects annotate each country or source with its observed cadence for exactly this reason.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Separate the cadence of <em>identity</em> data from <em>value</em> data.</strong> Station locations change essentially never; their prices change hourly. Caching them together at the shorter TTL multiplies network volume for no benefit. One project's radar feature caches a wide-area location corridor for an hour and fetches prices just-in-time only for the handful of imminent candidates — which is what makes a continuous background scan affordable.</p>
+</div>
+</section>
+
+<section id="keys" data-chunk-id="cache.keys" data-tags="caching,keys,design">
+<h2>Cache-key design</h2>
+
+<p>A key must contain every input that changes the answer, and nothing that does not — and continuous inputs must be quantised or the hit rate collapses.</p>
+
+<pre data-lang="text"><code>&lt;type&gt;:&lt;scope&gt;:&lt;rounded-coords&gt;:&lt;radius&gt;:&lt;variant&gt;:&lt;extra&gt;
+
+search:fr:43.611,3.877:10:e10:—
+geocode:fr:—:—:—:34000+montpellier
+route:—:43.6110,3.8770|43.2965,5.3698:—:—:—</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Component</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td><strong>Coordinates</strong></td><td>Round. 3 decimals ≈ 110 m for a search radius; 4 decimals ≈ 11 m for geocoding. Unrounded coordinates give a 0% hit rate because no two GPS fixes are identical.</td></tr>
+<tr><td><strong>Scope</strong></td><td>Country, workspace, tenant — whatever partitions the data. It is also the prefix you will evict on.</td></tr>
+<tr><td><strong>Variant</strong></td><td>Anything that changes the response: fuel grade, language, unit system, filter set.</td></tr>
+<tr><td><strong>Order</strong></td><td>Most-general to most-specific, so prefix eviction works at every level.</td></tr>
+<tr><td><strong>Never include</strong></td><td>A timestamp, a request id, a session token, or a user id that does not change the payload. Each makes every key unique.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the cache appears to work in tests and never hits in production.</strong> The usual cause is an unrounded continuous value in the key — a raw GPS coordinate, a millisecond timestamp, a floating-point radius. Tests pass because they use fixed inputs. Instrument the hit rate in a debug build and look at it once; a cache with a near-zero hit rate is worse than no cache, because it pays the write cost too.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Write a test that builds the same logical request twice from two slightly-different inputs (GPS fixes 3 m apart) and asserts the keys are equal. Then one that builds two logically-different requests (different fuel grade) and asserts they differ. Those two tests catch nearly every key bug.</p>
+</div>
+</section>
+
+<section id="schema" data-chunk-id="cache.schema" data-tags="caching,invalidation,versioning">
+<h2>Schema-versioned invalidation</h2>
+
+<p>A manually-bumped schema version turns every cached entry written under the old shape into a miss.</p>
+
+<pre data-lang="dart"><code>/// Entries written under a different schema version are treated as misses:
+/// cached payloads are RAW server rows, so a build that changed a row
+/// parser's expectations must re-fetch rather than feed old-shaped rows to
+/// new code. Bump this when a cached row shape changes.
+const int cacheSchemaVersion = 1;</code></pre>
+
+<p>Store the version with the entry and compare on read; a mismatch is a miss.</p>
+
+<div class="callout why">
+<span class="tag">Why a manual version and not the app build number</span>
+<p>Keying on the build number invalidates the entire cache on every release, which throws away the offline story for anyone who updates while on a train. Row shapes only break on <em>deliberate</em> changes, so a manual bump is both sufficient and far cheaper. The cost is remembering to bump it — mitigate that by putting the constant directly above the parser it protects, and mentioning it in the pull-request checklist for any change to a cached model.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: after an update, a subset of users see crashes or empty screens that nobody can reproduce on a fresh install.</strong> Old-shaped rows being fed to a new parser. It is invisible in testing because test devices are usually freshly installed or have their storage cleared. Whenever you change a parsed shape, ask: is this shape cached? If yes, bump. If you cannot tell, bump anyway — the cost is one refetch.</p>
+</div>
+</section>
+
+<section id="eviction" data-chunk-id="cache.eviction" data-tags="caching,eviction,memory">
+<h2>Eviction that preserves stale fallback</h2>
+
+<p>Do not evict at the TTL. Evict at a multiple of it, or you destroy the stale tier the moment it becomes useful.</p>
+
+<p>The reasoning is direct: the stale tier exists to serve a request when the network fails. An eviction sweep that removes everything older than its TTL guarantees that nothing is ever available to the stale tier — the entry is deleted at exactly the moment it stops being fresh.</p>
+
+<pre data-lang="dart"><code>/// Runs on a 30-minute periodic timer. Only removes entries older than
+/// 3 × their own TTL, so a recently-expired entry remains available as
+/// the stale fallback when the network is down.
+Future&lt;void&gt; evictExpired() async {
+  final now = DateTime.now();
+  for (final key in await _keys()) {
+    final e = await get(key);
+    if (e == null) continue;
+    if (now.difference(e.storedAt) &gt; e.ttl * 3) {
+      await _remove(key);
+    }
+  }
+}</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Parameter</th><th>Typical</th><th>Trade-off</th></tr></thead>
+<tbody>
+<tr><td>Sweep interval</td><td>30 minutes</td><td>Shorter wastes CPU; longer lets a burst of writes accumulate before the first cleanup</td></tr>
+<tr><td>Retention multiple</td><td>3 × ttl</td><td>Lower shortens the offline window; higher grows the store. Tune per entry class if one dominates size.</td></tr>
+<tr><td>Size ceiling</td><td>Optional</td><td>If a payload class can be large (map tiles, images), add a byte budget with least-recently-used eviction on top of the age rule</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>The test that matters: write an entry, advance the injected clock past its TTL but under the retention multiple, simulate a network failure, and assert the stale entry is still served with <code>isStale: true</code>. If that test passes, the eviction policy is correct.</p>
+</div>
+</section>
+
+<section id="coalescing" data-chunk-id="cache.coalescing" data-tags="caching,concurrency,rate-limiting">
+<h2>Request coalescing and rate limiting</h2>
+
+<p>Two identical in-flight requests must become one, and every client must respect a per-source minimum interval.</p>
+
+<h3>Coalescing</h3>
+
+<pre data-lang="dart"><code>final _inFlight = &lt;String, Future&lt;ServiceResult&lt;T&gt;&gt;&gt;{};
+
+Future&lt;ServiceResult&lt;T&gt;&gt; fetch(String key) {
+  final existing = _inFlight[key];
+  if (existing != null) return existing;          // join the in-flight call
+  final future = _doFetch(key).whenComplete(() =&gt; _inFlight.remove(key));
+  _inFlight[key] = future;
+  return future;
+}</code></pre>
+
+<p>Without this, a screen with three widgets watching the same provider issues three identical requests on first build, and a scroll that rebuilds the list issues more. Coalescing is a few lines and typically removes the majority of redundant traffic.</p>
+
+<h3>Rate limiting</h3>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Rate limiting belongs on the HTTP client, per source, not on a global singleton.</strong> Build every client through a factory that takes the source's own minimum interval:</p>
+<pre data-lang="dart"><code>final dio = DioFactory.create(
+  baseUrl: source.baseUrl,
+  rateLimit: RateLimitConfig(minInterval: source.minInterval),
+);</code></pre>
+<p>A global limiter makes a slow source throttle a fast one. A per-call-site limiter gets forgotten at the next call site. The factory is the only place that cannot be bypassed by accident — which is why <code>Dio()</code> constructed directly is banned.</p>
+</div>
+
+<h3>Conditional requests</h3>
+
+<p>Where a source supports it, an <code>ETag</code>/<code>If-None-Match</code> or <code>Last-Modified</code>/<code>If-Modified-Since</code> interceptor turns a refresh into a 304 with no body. That is strictly better than a TTL for large payloads, because it refreshes freshness without transferring anything. Add it as an interceptor on the shared factory so every source benefits where the server cooperates.</p>
+</section>
+
+<section id="invalidation" data-chunk-id="cache.invalidation" data-tags="caching,invalidation,mutations">
+<h2>Invalidation on mutation</h2>
+
+<p>A local write must invalidate every cached read that could contain the written entity — which is why keys are ordered general-to-specific.</p>
+
+<pre data-lang="dart"><code>Future&lt;void&gt; createReservation(Reservation r) async {
+  await _remote.insert(r);
+  // Every cached view that could contain this reservation.
+  await _cache.evictPrefix('reservations:${r.workspaceId}:');
+  await _cache.evictPrefix('availability:${r.workspaceId}:${r.dateKey}:');
+}</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Strategy</th><th>When</th><th>Risk</th></tr></thead>
+<tbody>
+<tr><td><strong>Evict by prefix</strong></td><td>Default. Simple and correct.</td><td>Over-evicts; costs a refetch.</td></tr>
+<tr><td><strong>Write-through</strong></td><td>Single-entity reads where you know the new value exactly.</td><td>The local value can diverge from what the server computed (defaults, triggers, generated columns).</td></tr>
+<tr><td><strong>Optimistic update + reconcile</strong></td><td>Latency-sensitive UI.</td><td>Needs a rollback path and a test for it. Do not adopt casually.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a change saves correctly but a different screen keeps showing the old value until the app restarts.</strong> An invalidated read path was missed — typically an aggregate, a count, or a summary view that derives from the same rows under a different key prefix. When adding a mutation, enumerate <em>every</em> key prefix whose payload could include the mutated entity, and write that list in a comment next to the eviction calls. Prefer over-eviction: a needless refetch is invisible, a stale screen is a bug report.</p>
+</div>
+</section>
+
+<section id="testing" data-chunk-id="cache.testing" data-tags="caching,testing">
+<h2>Testing a cache</h2>
+
+<p>Three tests per cached path, always the same three, plus one for the eviction policy.</p>
+
+<pre data-lang="dart"><code>group('station search cache', () {
+  late FakeClock clock;
+  late InMemoryCacheStore cache;
+  late _FakeService service;
+
+  setUp(() {
+    clock = FakeClock(DateTime.utc(2026, 3, 1, 12));
+    cache = InMemoryCacheStore(clock: clock);
+    service = _FakeService();
+  });
+
+  test('fresh hit does not call the service', () async {
+    await cache.put(key, rows, ttl: CacheTtl.prices);
+    clock.advance(const Duration(minutes: 2));
+    final r = await chain.fetch(query);
+    expect(service.callCount, 0);
+    expect(r.isStale, isFalse);
+  });
+
+  test('stale hit is served when the service fails', () async {
+    await cache.put(key, rows, ttl: CacheTtl.prices);
+    clock.advance(const Duration(minutes: 20));      // expired, not evicted
+    service.throws = SocketException('offline');
+    final r = await chain.fetch(query);
+    expect(r.isStale, isTrue);
+    expect(r.source, ServiceSource.cache);
+  });
+
+  test('total failure throws with a chain snapshot', () async {
+    service.throws = SocketException('offline');
+    expect(() =&gt; chain.fetch(query),
+        throwsA(isA&lt;ServiceChainExhaustedException&gt;()));
+  });
+});</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never use a real clock in a cache test.</strong> Inject one. A test that calls <code>Future.delayed</code> to age an entry is slow, flaky, and cannot test a seven-day TTL at all. This is the same fixed-clock injection that <a href="03-tdd-and-testing.html#goldens">page 03</a> requires for date-dependent tests, and it should come from the same shared override helper.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's <code>CacheManager</code> — the fresh/stale/miss tiers, the <code>CacheTtl</code> constant class, the coordinate-rounding key convention, and the 30-minute sweep with a 3× retention multiple.</li>
+<li>The other project's <code>CacheStore</code>/<code>CacheEntry</code> port, including its <code>cacheSchemaVersion</code> constant and the raw-rows-not-parsed-objects rule, whose comment explicitly cites the earlier project's incident as the reason.</li>
+<li>The radar feature's split between hour-cached station locations and just-in-time price fetches.</li>
+</ul>
+<p>The coalescing snippet and the invalidation-strategy table are generalised patterns, not verbatim source.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

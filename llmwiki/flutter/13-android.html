@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Android — LLM Wiki · Flutter</title>
+<meta name="description" content="Flavors, signing that never falls back to debug, R8 and the class it silently strips, foreground services and the Play declaration, per-ABI version codes, manifest overlays.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Android for Flutter apps","description":"Flavors, signing, R8, foreground services, per-ABI version codes, manifest overlays.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">13 · Platforms</span>
+<h1>Android</h1>
+<p class="lede">Android is where most Flutter apps ship first and where the build system has the most ways to produce an artifact that looks correct and is not. Signing, shrinking, manifest merging and version codes each have a failure mode that passes CI and breaks on a user's device.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> android</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations · 09 Confidentiality</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#flavors">Flavors: store channels, not feature sets</a></li>
+<li><a href="#signing">Signing that never falls back to debug</a></li>
+<li><a href="#playsigning">Play App Signing</a></li>
+<li><a href="#r8">R8 and the class it silently strips</a></li>
+<li><a href="#manifest">Manifest merging and overlays</a></li>
+<li><a href="#fgs">Foreground services and the Play declaration</a></li>
+<li><a href="#versioncodes">Version codes, including per-ABI</a></li>
+<li><a href="#toolchain">Toolchain pinning</a></li>
+<li><a href="#auto">Android Auto</a></li>
+<li><a href="#checklist">Release checklist</a></li>
+</ol>
+</div>
+
+<section id="flavors" data-chunk-id="android.flavors" data-tags="gradle,flavors,build">
+<h2>Flavors: store channels, not feature sets</h2>
+
+<p>Use product flavors for <em>distribution channels</em> that differ in what they may link, never for feature variants — those belong in the feature-flag system.</p>
+
+<pre data-lang="kotlin"><code>flavorDimensions += "distribution"
+productFlavors {
+    create("play") {
+        dimension = "distribution"
+        // Google Play: proprietary services available.
+    }
+    create("fdroid") {
+        dimension = "distribution"
+        buildConfigField("boolean", "FORCE_LOCATION_MANAGER", "true")
+        proguardFiles("proguard-rules-fdroid.pro")
+    }
+}</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>One code base; channels differ only in what they may depend on.</strong> A flavor is not a place to put a feature. If two channels should behave differently for a product reason, that is a feature flag with a per-channel default — see <a href="01-foundations-architecture.html#feature-flags">the manifest pattern</a>. Flavors multiply build combinations, and each combination is a thing CI must build and you must test.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a Gradle command that works in a single-flavor project fails with "task not found".</strong> Once flavors exist, every task name carries the flavor: <code>compilePlayDebugKotlin</code>, not <code>compileDebugKotlin</code>; <code>assembleFdroidRelease</code>, not <code>assembleRelease</code>. Update every script, every documentation snippet and every CI step at the moment you add the first flavor, or you will rediscover this one command at a time.</p>
+</div>
+</section>
+
+<section id="signing" data-chunk-id="android.signing" data-tags="signing,keystore,gradle,security">
+<h2>Signing that never falls back to debug</h2>
+
+<p>Resolve signing from environment variables first, a local properties file second — and if a release build is requested with neither, <strong>fail the build</strong>.</p>
+
+<pre data-lang="kotlin"><code>fun resolveReleaseSigning(): ReleaseSigningConfig? {
+    val envPath  = System.getenv("ANDROID_KEYSTORE_PATH")
+    val envPass  = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+    val envAlias = System.getenv("ANDROID_KEY_ALIAS")
+    val envKey   = System.getenv("ANDROID_KEY_PASSWORD") ?: envPass
+
+    if (!envPath.isNullOrEmpty() &amp;&amp; !envPass.isNullOrEmpty() &amp;&amp; !envAlias.isNullOrEmpty()) {
+        return ReleaseSigningConfig(envPath, envPass, envAlias, envKey!!)
+    }
+    if (keystorePropertiesFile.exists()) { /* legacy local path */ }
+    return null
+}</code></pre>
+
+<pre data-lang="kotlin"><code>signingConfig = if (releaseSigning != null) {
+    signingConfigs.getByName("release")
+} else {
+    val tasks = gradle.startParameter.taskNames.map { it.lowercase() }
+    val releaseTasks = tasks.filter { it.contains("release") &amp;&amp; !it.contains("debug") }
+    val isReleaseRequested = releaseTasks.isNotEmpty()
+
+    // A libre-only release is legitimately UNSIGNED: that catalog's
+    // buildserver signs with its own key downstream.
+    val isLibreOnlyRelease =
+        isReleaseRequested &amp;&amp; releaseTasks.all { it.contains("fdroid") }
+
+    if (isReleaseRequested &amp;&amp; !isLibreOnlyRelease) {
+        throw GradleException(
+            "No release signing configuration available. Set " +
+            "ANDROID_KEYSTORE_PATH / ANDROID_KEYSTORE_PASSWORD / " +
+            "ANDROID_KEY_ALIAS, or create android/key.properties. " +
+            "Release builds never fall back to the debug key."
+        )
+    }
+    null   // debug builds, and the libre unsigned release
+}</code></pre>
+
+<div class="callout why">
+<span class="tag">Why the throw is deferred to release tasks only</span>
+<p>Evaluating the throw at configuration time breaks every debug build — including the ones an automated dependency-update bot runs, which legitimately cannot read the signing secrets because the platform strips them from bot-authored pull requests. Inspecting the requested task names is ugly and it is the mechanism that keeps both requirements true at once.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: an artifact builds and installs on a test device but will not upgrade an existing install, or the store rejects it.</strong> The debug key signed it. This is the failure the throw exists to prevent: a silent debug-key fallback produces something that looks like a valid release in every way until it reaches a real user. Never make the fallback silent; make it a build failure.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Delete restored signing material in an <code>if: always()</code> step.</strong> A keystore left on a runner after a failed build is exactly when an artifact-upload step is most likely to pick it up. See <a href="09-confidentiality.html#secrets">page 09</a>.</p>
+</div>
+</section>
+
+<section id="playsigning" data-chunk-id="android.playsigning" data-tags="play,signing,keys">
+<h2>Play App Signing</h2>
+
+<p>Two keys exist and conflating them causes a whole class of confusion.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Upload key</th><th>App signing key</th></tr></thead>
+<tbody>
+<tr><td>You hold it</td><td>Yes</td><td>No — the store does</td></tr>
+<tr><td>Signs</td><td>The bundle you upload</td><td>The APKs delivered to devices</td></tr>
+<tr><td>If lost</td><td>Recoverable — request a reset</td><td><strong>Not applicable</strong>; the store holds it</td></tr>
+<tr><td>Fingerprint used by third-party services</td><td>Only for pre-store testing</td><td><strong>This one</strong>, for anything checking the installed app's signature</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a signature-verified integration works in debug and on internal test, then fails in production.</strong> You registered the upload-key fingerprint. Production APKs are signed with the <em>app signing key</em>, whose fingerprint is different and is shown in the console under app integrity. Register both. This is one of the strongest arguments for <a href="08-authentication.html#choice">browser-based OAuth</a>, which has no fingerprint dependency at all.</p>
+</div>
+
+<p>Sideload-signature note worth documenting for users: an artifact signed by your key and one signed by a third-party catalog's key cannot upgrade each other. A user switching between channels must uninstall first, which loses local data unless they export it. Say so in the install instructions.</p>
+</section>
+
+<section id="r8" data-chunk-id="android.r8" data-tags="r8,proguard,release,crash">
+<h2>R8 and the class it silently strips</h2>
+
+<p>Code shrinking runs only on release builds, so an entire class of crash exists exclusively in the artifact your users get and never in anything you tested.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the release build dies before the first frame. Every unit test passes. The debug build is fine.</strong> R8 removed a class that nothing references statically — because it is used through reflection, or by a serialisation library, or by a platform callback. One project's release builds crashed at launch because the shrinker stripped a library's reflective serialisation usage.</p>
+<p><strong>The countermeasure is not a better rule set. It is a test that runs the artifact:</strong></p>
+<pre data-lang="yaml"><code>- name: Build the R8-shrunk release APK
+  run: flutter build apk --release --flavor play
+
+- name: Boot it on a real emulator and assert it survives
+  uses: reactivecircus/android-emulator-runner@v2
+  with:
+    api-level: 34
+    arch: x86_64
+    profile: pixel_6
+    script: |
+      adb install -r build/app/outputs/flutter-apk/app-play-release.apk
+      adb logcat -c
+      adb shell am start -W -n de.example.app/.MainActivity
+      sleep 15
+      adb shell pidof de.example.app || {
+        echo "::error::App died within 15s of launch"; adb logcat -d; exit 1; }</code></pre>
+<p>Crude, and it catches the entire class. Cache the emulator snapshot — one project cut this job from 8–10 minutes to about 2 that way — and upload the full log as an artifact on every outcome, because when it fails the log is the whole investigation.</p>
+</div>
+
+<p>Keep rules where they belong:</p>
+
+<pre data-lang="proguard"><code># proguard-rules.pro — base, all flavors
+-keep class com.example.model.** { *; }              # reflective serialisation
+-keepattributes Signature,*Annotation*,EnclosingMethod
+-keepclassmembers class * { @com.example.Keep *; }
+
+# proguard-rules-fdroid.pro — libre flavor ONLY
+# The proprietary classes are excluded from this flavor's graph, so R8
+# would abort with "Missing class …" without these.
+-dontwarn com.google.android.gms.**
+-dontwarn com.google.mlkit.**
+-dontwarn com.google.android.play.**</code></pre>
+
+<div class="callout why">
+<span class="tag">Why release-mode shrinking is also required for a libre audit</span>
+<p>Only R8 removes the framework's own dead references to optional store libraries. A debug artifact retains them, so a bytecode audit of a debug build can never reach the zero-reference bar that a catalog scanner applies. Build release, audit release. See <a href="17-fdroid.html#audit">page 17</a>.</p>
+</div>
+</section>
+
+<section id="manifest" data-chunk-id="android.manifest" data-tags="manifest,merging,permissions">
+<h2>Manifest merging and overlays</h2>
+
+<p>Your final manifest is the merge of yours and every dependency's — and dependencies add permissions you did not ask for.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the store listing shows permissions your app never uses.</strong> One project shipped microphone, phone-state and legacy-storage permissions purely from merged library manifests. Users read the permission list; so do reviewers. Remove them explicitly:</p>
+<pre data-lang="xml"><code>&lt;manifest xmlns:tools="http://schemas.android.com/tools"&gt;
+  &lt;uses-permission android:name="android.permission.RECORD_AUDIO"
+                   tools:node="remove" /&gt;
+  &lt;uses-permission android:name="android.permission.READ_PHONE_STATE"
+                   tools:node="remove" /&gt;
+&lt;/manifest&gt;</code></pre>
+</div>
+
+<p><strong>Flavor manifest overlays</strong> let a flavor add or restore declarations. Because a flavor source set outranks <code>main</code> in the merge, an overlay's plain declaration wins over a <code>tools:node="remove"</code> guard in <code>main</code> — which is the mechanism behind the foreground-service gate below.</p>
+
+<pre data-lang="kotlin"><code>sourceSets {
+    getByName("play").manifest.srcFile(
+        if (fgsFormApproved) "src/play/AndroidManifestFgsApproved.xml"
+        else                 "src/play/AndroidManifest.xml"
+    )
+}</code></pre>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Read the merged manifest after every dependency change, and assert on it:</p>
+<pre data-lang="bash"><code>./gradlew :app:processPlayReleaseManifest
+cat app/build/intermediates/merged_manifests/playRelease/AndroidManifest.xml</code></pre>
+<p>Then write a test that compares the permission set against an expected list, so a new dependency's additions fail the build rather than surprising you in the store console.</p>
+</div>
+</section>
+
+<section id="fgs" data-chunk-id="android.fgs" data-tags="foreground-service,play-policy,background">
+<h2>Foreground services and the Play declaration</h2>
+
+<p>Android has no "work in the background" permission. An app that keeps running with the screen off runs a <strong>foreground service</strong> — a service the OS keeps alive because it shows a persistent notification — and since recent policy changes, each service type needs a store-approved declaration.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Type</th><th>Permission</th><th>Typical use</th></tr></thead>
+<tbody>
+<tr><td><code>location</code></td><td><code>FOREGROUND_SERVICE_LOCATION</code></td><td>Trip or activity recording started by the user</td></tr>
+<tr><td><code>connectedDevice</code></td><td><code>FOREGROUND_SERVICE_CONNECTED_DEVICE</code></td><td>Holding a Bluetooth link to a paired device</td></tr>
+<tr><td><code>dataSync</code></td><td><code>FOREGROUND_SERVICE_DATA_SYNC</code></td><td>A user-initiated upload or sync</td></tr>
+<tr><td><code>mediaPlayback</code></td><td><code>FOREGROUND_SERVICE_MEDIA_PLAYBACK</code></td><td>Audio</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the publishing API rejects your bundle with "you must let us know whether your app uses any foreground service permissions" — and the declaration form does not exist in the console.</strong> A catch-22: the form appears only once an artifact declaring those permissions exists in a track, and the API refuses to accept such an artifact until the form is filled.</p>
+<p><strong>The way out is a manual browser upload.</strong> Build the declaring bundle locally, upload it through the console into a draft release (it need not roll out to anyone), and the declaration task appears under app content. Fill it, submit, and once approved the API accepts the same artifact.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Gate the whole feature behind one build-time flag that flips both halves in lockstep.</strong> The Dart code that requests the service and the manifest that declares the permissions must never disagree. One flag, read in both places:</p>
+<pre data-lang="bash"><code>flutter build appbundle --release --flavor play \
+  --dart-define=FGS_FORM_APPROVED=true</code></pre>
+<pre data-lang="kotlin"><code>// Gradle decodes Flutter's dart-defines and selects the manifest overlay.
+val dartDefines: Map&lt;String, String&gt; =
+    (project.findProperty("dart-defines") as String?)
+        ?.split(",")
+        ?.mapNotNull { runCatching {
+            String(Base64.getDecoder().decode(it)).split("=", limit = 2)
+                .let { p -&gt; if (p.size == 2) p[0] to p[1] else null }
+        }.getOrNull() }
+        ?.toMap() ?: emptyMap()
+
+val fgsFormApproved =
+    (dartDefines["FGS_FORM_APPROVED"] ?: System.getenv("FGS_FORM_APPROVED") ?: "false")
+        .let { it.equals("true", true) || it == "1" }</code></pre>
+<p>The default build ships with <strong>zero</strong> foreground-service permissions, so uploads never hit the rejection. After approval, one repository variable flips it for every subsequent build with no code change. Add a script that asserts the default artifact really carries none — the guard is worthless if it can silently regress.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why you may not need background location at all</span>
+<p>A foreground service <em>started while the app is visible</em> continues to receive location updates on the ordinary while-in-use permission. That means you can often avoid requesting the background-location permission entirely — which avoids a separate, stricter store declaration and a permission users refuse. Check whether your feature genuinely needs location while the app has never been opened; usually it does not.</p>
+</div>
+</section>
+
+<section id="versioncodes" data-chunk-id="android.versioncodes" data-tags="versioning,abi,release">
+<h2>Version codes, including per-ABI</h2>
+
+<p>The version code is a signed 32-bit integer that must strictly increase, across every track and every workflow that can publish.</p>
+
+<pre data-lang="bash"><code># Monotonic across workflows and machines; unique per minute.
+BUILD_NUMBER=$(( 1000000 + ( $(date -u +%s) - 1751760000 ) / 60 ))</code></pre>
+
+<p>Split APKs need a distinct code per ABI, and the conventional scheme is <code>base × 10 + abiIndex</code>:</p>
+
+<pre data-lang="kotlin"><code>// GATED to the libre flavor: the store flavor carries the large shared
+// wall-clock code, and ×10 would overflow the signed 32-bit ceiling.
+val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86_64" to 3)
+android.applicationVariants.configureEach {
+    if (flavorName == "fdroid") {
+        outputs.forEach { out -&gt;
+            val abi = out.filters.find { it.filterType == "ABI" }?.identifier
+            abiCodes[abi]?.let {
+                (out as ApkVariantOutputImpl).versionCodeOverride = versionCode * 10 + it
+            }
+        }
+    }
+}</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: version codes go negative, or the build fails on an integer overflow.</strong> A wall-clock-derived base is already around 2.03 × 10⁹; multiplying by ten exceeds 2 147 483 647. Apply the multiplier only to the flavor that needs split codes, and keep the store flavor on the shared value. See <a href="05-traceability.html#build-to-commit">page 05</a>.</p>
+</div>
+
+<p>App bundles do not need per-ABI codes — the store generates per-device APKs from one bundle. Per-ABI codes are for channels that distribute APKs directly.</p>
+</section>
+
+<section id="toolchain" data-chunk-id="android.toolchain" data-tags="gradle,jdk,pinning">
+<h2>Toolchain pinning</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Component</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td>Flutter SDK</td><td>Pinned exactly in every workflow. A floating stable channel once picked up an SDK whose bundled Gradle plugin hard-failed on a plugin's JVM-target mismatch.</td></tr>
+<tr><td>JDK</td><td>17, declared in both <code>compileOptions</code> and <code>kotlinOptions</code>. A mismatch between the two produces a confusing incremental-compilation failure.</td></tr>
+<tr><td>Core library desugaring</td><td>Enabled if any dependency needs modern <code>java.time</code> on older API levels — notification libraries commonly do.</td></tr>
+<tr><td>Gradle / AGP</td><td>Pinned in the wrapper and the plugin block. Let the update bot propose bumps; never float.</td></tr>
+<tr><td>NDK</td><td>Pinned via the Flutter-provided value so all plugins agree. Mismatched NDK versions across plugins is a common Gradle failure.</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="kotlin"><code>compileOptions {
+    isCoreLibraryDesugaringEnabled = true
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+kotlinOptions { jvmTarget = JavaVersion.VERSION_17.toString() }
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+}</code></pre>
+
+<p>On a development machine where the JDK is not the system default, export <code>JAVA_HOME</code> explicitly before any Gradle invocation — and write that into the contributing guide, because the resulting error message does not name the cause.</p>
+</section>
+
+<section id="auto" data-chunk-id="android.auto" data-tags="android-auto,car,testing">
+<h2>Android Auto</h2>
+
+<p>Car support is a separate library and a separate set of screens, and it is one of the few Android-specific surfaces that is genuinely unit-testable.</p>
+
+<ul>
+<li><code>androidx.car.app</code> is a plain support library with no proprietary-services dependency, so a libre build is unaffected — but register the car components only in the store flavor's manifest if that is where you want them.</li>
+<li>Car screens are testable under a JVM test runner with the library's own screen controller. That requires merged Android resources and unmocked platform stubs in your test options.</li>
+<li>The in-car permission flow goes through the car context, not the normal activity flow. Version the library carefully: the in-car location-permission path stabilised in a specific release, and earlier versions will not do it.</li>
+</ul>
+
+<pre data-lang="kotlin"><code>testOptions {
+    unitTests.isIncludeAndroidResources = true
+    unitTests.isReturnDefaultValues = true
+}</code></pre>
+</section>
+
+<section id="checklist" data-chunk-id="android.checklist" data-tags="release,checklist">
+<h2>Release checklist</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>#</th><th>Check</th><th>How</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Release build is signed with the real upload key</td><td><code>apksigner verify --print-certs</code>; confirm it is not the debug certificate</td></tr>
+<tr><td>2</td><td>The release artifact actually launches</td><td>The emulator aliveness job in <a href="#r8">§R8</a></td></tr>
+<tr><td>3</td><td>Merged manifest declares only intended permissions</td><td><code>processPlayReleaseManifest</code> + the assertion test</td></tr>
+<tr><td>4</td><td>Foreground-service permissions match the approval state</td><td>The audit script; zero unless the flag is set</td></tr>
+<tr><td>5</td><td>Version code strictly exceeds every published track</td><td>Read the console or the API before uploading</td></tr>
+<tr><td>6</td><td>Changelog entry exists for this version</td><td>The CI gate in <a href="05-traceability.html#changelog">page 05</a></td></tr>
+<tr><td>7</td><td>Per-locale release notes contain no embedded double quotes</td><td>See the trap below</td></tr>
+<tr><td>8</td><td>Bundle size is not unexpectedly larger</td><td>Compare against the previous release; a jump means a dependency pulled something in</td></tr>
+<tr><td>9</td><td>The build maps back to a commit</td><td>The tag push-back step</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the build succeeds and the upload step fails on an argument error.</strong> Release notes containing embedded double quotes get argument-split by the shell when passed through a CI invocation. The build has already succeeded, so it reads as a late, mysterious failure. Phrase release notes with single quotes, or pass them via a file. Re-dispatching is safe — a fresh build number is minted.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a user insists a fixed bug is still present.</strong> Check the version they are running before anything else. Open-testing channels lag, and a tester who joined a testing programme keeps receiving that channel's builds rather than production. The fastest resolution is to sideload a build from the current mainline and confirm against that. Put the version and build number on an about screen where a user can read them out.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's <code>build.gradle.kts</code>: the environment-first signing resolution with its deferred throw and its libre-unsigned exception, the two-flavor distribution dimension, the dart-defines decoder driving the manifest overlay, the flavor-gated per-ABI version-code override, and the car-app test options.</li>
+<li>Its foreground-service declaration guide, including the catch-22 and the manual-browser-upload workaround, and the observation that a foreground service started while visible avoids needing background location.</li>
+<li>The other project's emulator aliveness workflow, written specifically after an R8-stripped reflective dependency crashed release builds before the first frame, with a cached emulator snapshot.</li>
+<li>Post-mortems supplying the remaining traps: the merged-in unused permissions, the quoted release notes, and the stale testing-channel build.</li>
+</ul>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

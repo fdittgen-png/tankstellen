@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>macOS — LLM Wiki · Flutter</title>
+<meta name="description" content="The sandbox and keychain decision tree, Developer ID versus App Store signing, notarisation as a hard requirement, DMG packaging and honest degradation for unsigned artifacts.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"macOS desktop builds for Flutter","description":"Sandbox and keychain, Developer ID vs App Store, notarisation, DMG packaging, honest degradation.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">15 · Platforms</span>
+<h1>macOS</h1>
+<p class="lede">Adding a macOS target to an existing Flutter app takes an afternoon. Making the resulting app openable by someone who downloads it takes considerably longer, and the reason is notarisation — which is no longer optional and whose absence produces a file that simply refuses to run.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> mac</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 14 iOS</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#channels">Two distribution channels, two certificates</a></li>
+<li><a href="#notarisation">Notarisation is not optional</a></li>
+<li><a href="#accountholder">The certificate only the account holder can create</a></li>
+<li><a href="#sandbox">The sandbox decision</a></li>
+<li><a href="#keychain">Secure storage and error −34018</a></li>
+<li><a href="#packaging">Packaging a DMG</a></li>
+<li><a href="#ci">CI that degrades honestly</a></li>
+<li><a href="#adapting">Adapting a mobile UI</a></li>
+</ol>
+</div>
+
+<section id="channels" data-chunk-id="mac.channels" data-tags="macos,distribution,signing">
+<h2>Two distribution channels, two certificates</h2>
+
+<p>Decide the channel first; it determines the certificate, the entitlements and whether the sandbox is negotiable.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Direct download (DMG)</th><th>Mac App Store</th></tr></thead>
+<tbody>
+<tr><td>Certificate</td><td><strong>Developer ID Application</strong></td><td><strong>Apple Distribution</strong> (Mac)</td></tr>
+<tr><td>Sandbox</td><td>Optional</td><td><strong>Mandatory</strong></td></tr>
+<tr><td>Hardened runtime</td><td><strong>Required</strong> (for notarisation)</td><td>Handled by the store</td></tr>
+<tr><td>Notarisation</td><td><strong>Required</strong></td><td>Not applicable</td></tr>
+<tr><td>Review</td><td>None</td><td>Full review</td></tr>
+<tr><td>Update mechanism</td><td>Yours to build</td><td>The store</td></tr>
+<tr><td>Time to first release</td><td>Days</td><td>Weeks</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>For a companion desktop build of a mobile app, ship a notarised DMG.</strong> The store adds review latency and a mandatory sandbox for an audience that is usually a fraction of your mobile users. The DMG path is faster, has no review, and — once the automation exists — costs nothing per release. Revisit only if desktop becomes a primary channel.</p>
+</div>
+
+<p>Both certificates can live in the same fastlane certificate repository alongside your iOS ones; fetch the Developer ID one with the platform set to macOS. Apple's per-team certificate limits are counted per type, so adding a Developer ID certificate does not consume an iOS distribution slot.</p>
+</section>
+
+<section id="notarisation" data-chunk-id="mac.notarisation" data-tags="notarisation,gatekeeper,macos">
+<h2>Notarisation is not optional</h2>
+
+<p>Since macOS 15, an application Apple has not notarised is <strong>refused outright</strong> on a downloading Mac — and the old right-click-Open bypass is gone.</p>
+
+<div class="callout why">
+<span class="tag">Why this changes the calculus</span>
+<p>Historically an unsigned Mac app was merely inconvenient: a scary dialog and a right-click. That is no longer true. Without notarisation you are not shipping a slightly awkward download — you are shipping a file people cannot open at all, with an error message that suggests the file is damaged. Notarisation moved from "polish" to "the build is useless without it".</p>
+</div>
+
+<p>The pipeline, in order — and the order matters:</p>
+
+<pre data-lang="bash"><code>set -euo pipefail
+APP="build/macos/Build/Products/Release/MyApp.app"
+
+# 1. Sign nested code FIRST — frameworks, dylibs, helpers — then the bundle
+#    LAST. Signing the outer bundle first invalidates when the inner code
+#    is signed afterwards.
+find "$APP/Contents/Frameworks" -name "*.framework" -o -name "*.dylib" | while read -r f; do
+  codesign --force --timestamp --options runtime \
+           --sign "$DEVELOPER_ID" "$f"
+done
+
+# 2. The bundle, with the hardened runtime and the entitlements.
+codesign --force --timestamp --options runtime \
+         --entitlements macos/Runner/Release.entitlements \
+         --sign "$DEVELOPER_ID" "$APP"
+
+# 3. Verify BEFORE spending time on notarisation.
+codesign --verify --deep --strict --verbose=2 "$APP"
+
+# 4. Package.
+hdiutil create -volname "MyApp" -srcfolder "$APP" -ov -format UDZO MyApp.dmg
+codesign --force --timestamp --sign "$DEVELOPER_ID" MyApp.dmg
+
+# 5. Notarise the DMG and WAIT for the verdict.
+xcrun notarytool submit MyApp.dmg \
+  --key "$ASC_KEY_PATH" --key-id "$ASC_KEY_ID" --issuer "$ASC_ISSUER" \
+  --wait
+
+# 6. Staple the ticket so the app opens offline.
+xcrun stapler staple MyApp.dmg
+
+# 7. Assert Gatekeeper accepts it — so a build that would be refused on
+#    someone's Mac fails HERE instead.
+spctl --assess --type open --context context:primary-signature -vv MyApp.dmg</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Step 7 is the point of the whole script.</strong> Signing and notarising without asserting the verdict means you discover the failure from a user. The <code>spctl</code> assessment is the same check the OS performs on open, so a green CI run means the artifact will actually launch.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: notarisation is rejected with "the signature does not include a secure timestamp" or "the executable does not have the hardened runtime enabled".</strong> Both come from missing <code>codesign</code> flags. <code>--timestamp</code> and <code>--options runtime</code> are required on <em>every</em> signature, including nested frameworks. Add them to a helper function rather than repeating them, so one call site cannot omit them.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: notarisation succeeds, but the app still refuses to open on a machine with no network.</strong> The ticket was not stapled. Notarisation registers the artifact with Apple; stapling attaches the proof to the file so Gatekeeper can verify offline. Without it, an offline user is blocked.</p>
+</div>
+</section>
+
+<section id="accountholder" data-chunk-id="mac.accountholder" data-tags="certificates,apple,portal">
+<h2>The certificate only the account holder can create</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: creating a Developer ID certificate through the API fails with <em>"This operation can only be performed by the Account Holder"</em>.</strong> No App Store Connect API key can mint a Developer ID certificate, whatever its role. It is a deliberate restriction — that certificate signs software distributed outside the store, so Apple ties it to the person legally responsible for the account.</p>
+<p><strong>The one-time manual step:</strong></p>
+<ol>
+<li>Sign in to Xcode as the <em>account holder</em>.</li>
+<li>Settings → Accounts → Manage Certificates → <strong>+</strong> → <strong>Developer ID Application</strong>.</li>
+<li>Import it into the shared certificate repository:
+<pre data-lang="bash"><code>fastlane match import --type developer_id</code></pre></li>
+</ol>
+<p>After that CI can fetch it read-only like any other. Write this into the runbook — it is invisible from automation and will otherwise be rediscovered under time pressure.</p>
+</div>
+</section>
+
+<section id="sandbox" data-chunk-id="mac.sandbox" data-tags="entitlements,sandbox,macos">
+<h2>The sandbox decision</h2>
+
+<p>Outside the Mac App Store the sandbox is optional. Enable it anyway unless something concrete requires otherwise — but know what it costs before you do.</p>
+
+<pre data-lang="xml"><code>&lt;!-- macos/Runner/Release.entitlements --&gt;
+&lt;dict&gt;
+  &lt;key&gt;com.apple.security.app-sandbox&lt;/key&gt;&lt;true/&gt;
+  &lt;key&gt;com.apple.security.network.client&lt;/key&gt;&lt;true/&gt;
+
+  &lt;!-- Only what you actually use. Each one is a question you may be asked. --&gt;
+  &lt;key&gt;com.apple.security.files.user-selected.read-write&lt;/key&gt;&lt;true/&gt;
+  &lt;key&gt;com.apple.security.device.bluetooth&lt;/key&gt;&lt;true/&gt;
+  &lt;key&gt;com.apple.security.personal-information.location&lt;/key&gt;&lt;true/&gt;
+
+  &lt;!-- Required by the keychain — see below. --&gt;
+  &lt;key&gt;keychain-access-groups&lt;/key&gt;
+  &lt;array&gt;&lt;string&gt;$(AppIdentifierPrefix)de.example.app&lt;/string&gt;&lt;/array&gt;
+&lt;/dict&gt;</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Sandboxed</th><th>Not sandboxed</th></tr></thead>
+<tbody>
+<tr><td>File access limited to what the user picks in a panel</td><td>Full filesystem access subject to normal permissions</td></tr>
+<tr><td>Keychain is per-app and needs an access group</td><td>Broader keychain access</td></tr>
+<tr><td>Network needs an explicit entitlement</td><td>Unrestricted</td></tr>
+<tr><td>Required for the store; a credible security posture for a privacy-focused app</td><td>Simpler; occasionally the only way to do something</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Keep <code>Debug</code> and <code>Release</code> entitlements in sync, and diff them in review.</strong> The default Flutter macOS project ships separate files, and the classic failure is a capability that works in debug and is missing in release — discovered after signing, when the feedback loop is at its longest.</p>
+</div>
+</section>
+
+<section id="keychain" data-chunk-id="mac.keychain" data-tags="keychain,secure-storage,error-34018">
+<h2>Secure storage and error −34018</h2>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: secure storage throws <code>-34018</code> (<code>errSecMissingEntitlement</code>) on macOS while the identical code works on iOS.</strong> The macOS keychain requires the app to declare a keychain access group, and the entitlement must be present in the build configuration you are actually running. Three distinct causes, checked in this order:</p>
+<ol>
+<li><strong>No <code>keychain-access-groups</code> entitlement.</strong> Add it to <em>both</em> the debug and release entitlement files, using <code>$(AppIdentifierPrefix)</code> plus your bundle identifier.</li>
+<li><strong>Running an unsigned debug build.</strong> Entitlements only take effect on a signed binary. <code>flutter run -d macos</code> with no signing identity configured produces a binary whose entitlements are inert. Configure at least a development signing identity in the Xcode project.</li>
+<li><strong>Bundle identifier mismatch.</strong> The access group must correspond to the actual bundle identifier. A stale identifier from a project template silently breaks the match.</li>
+</ol>
+<p>This one error accounts for the majority of "my Flutter app works everywhere except macOS" reports involving stored credentials.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Verify what the built binary actually carries, rather than what the file says it should:</p>
+<pre data-lang="bash"><code>codesign -d --entitlements - build/macos/Build/Products/Release/MyApp.app</code></pre>
+<p>If <code>keychain-access-groups</code> is absent from that output, the entitlement file is not reaching the build — which is a project-configuration problem, not a code problem.</p>
+</div>
+</section>
+
+<section id="packaging" data-chunk-id="mac.packaging" data-tags="dmg,packaging,distribution">
+<h2>Packaging a DMG</h2>
+
+<p>A DMG is a disk image containing the app bundle and, conventionally, a symlink to <code>/Applications</code> so the user can drag one onto the other.</p>
+
+<pre data-lang="bash"><code>STAGE=$(mktemp -d)
+cp -R "$APP" "$STAGE/"
+ln -s /Applications "$STAGE/Applications"      # the drag target
+
+hdiutil create -volname "MyApp" -srcfolder "$STAGE" \
+               -ov -format UDZO "MyApp.dmg"</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Consideration</th><th>Guidance</th></tr></thead>
+<tbody>
+<tr><td><strong>Sign the DMG too</strong></td><td>Not only the app inside it. Notarisation applies to the container you distribute.</td></tr>
+<tr><td><strong>Name it with the version</strong></td><td><code>MyApp-1.4.2.dmg</code>. Users keep downloads; an ambiguous name generates support questions.</td></tr>
+<tr><td><strong>Universal binary</strong></td><td>Build for both architectures unless you have a reason not to. A user on the other architecture running under translation is a support case waiting to happen.</td></tr>
+<tr><td><strong>Updates</strong></td><td>Direct distribution has no update mechanism. At minimum, check a version endpoint on launch and link to the download page. A full self-updater is a large project — be sure you want it.</td></tr>
+<tr><td><strong>Attach it to a release</strong></td><td>On a version tag, attach the DMG to the release so the download link is stable and versioned.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="ci" data-chunk-id="mac.ci" data-tags="ci,degradation,workflow">
+<h2>CI that degrades honestly</h2>
+
+<p>A macOS build job must handle three situations: full secrets available, no signing identity, and a fork pull request with no secrets at all — and it must not lie about which one happened.</p>
+
+<pre data-lang="yaml"><code>jobs:
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: "3.41.9" }
+
+      - name: Fetch the Developer ID certificate
+        continue-on-error: true          # a fork PR legitimately cannot
+        run: bundle exec fastlane match_developer_id
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+      - run: flutter build macos --release
+
+      - name: Sign, notarise, staple, verify
+        id: sign
+        continue-on-error: true
+        run: bash scripts/sign_and_notarize_macos.sh
+
+      - name: Name the artifact for what it is
+        run: |
+          if [ "${{ steps.sign.outcome }}" != "success" ]; then
+            mv MyApp.dmg MyApp-unsigned.dmg
+            echo "::warning::No Developer ID available — this DMG is UNSIGNED \
+            and macOS will refuse to open it. Build it locally with signing \
+            secrets, or download the signed release artifact."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with: { name: macos-dmg, path: "*.dmg" }</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>An artifact that cannot do its job says so in its own filename.</strong> A file called <code>MyApp.dmg</code> that macOS refuses to open is worse than one called <code>MyApp-unsigned.dmg</code> with a warning attached — the first generates a bug report about a corrupt download, the second is self-explanatory. This is <a href="04-robustness.html#honest">honest degradation</a>, and the DMG case is where the principle was named.</p>
+</div>
+
+<p>Trigger the job on dispatch, on pull requests touching the macOS directory or the signing script, and on version tags. Not on every push — macOS runner minutes bill at a multiple of Linux.</p>
+</section>
+
+<section id="adapting" data-chunk-id="mac.adapting" data-tags="desktop,ui,adaptation">
+<h2>Adapting a mobile UI</h2>
+
+<p>The build succeeding is not the same as the app being usable. A phone layout on a desktop window is technically running and practically unpleasant.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Area</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td><strong>Window sizing</strong></td><td>Set a sensible minimum size in the native window controller. A Flutter desktop window defaults to a size that fits nothing.</td></tr>
+<tr><td><strong>Layout</strong></td><td>Break at width, not at platform. The same responsive rules that give you a tablet layout give you a desktop one.</td></tr>
+<tr><td><strong>Navigation</strong></td><td>A bottom tab bar is wrong on desktop. Switch to a rail or a sidebar above a breakpoint.</td></tr>
+<tr><td><strong>Input</strong></td><td>Keyboard shortcuts, hover states, right-click menus, text selection. Desktop users expect all four.</td></tr>
+<tr><td><strong>Unavailable capabilities</strong></td><td>No camera in many cases, no NFC, no telephony. Hide those surfaces rather than showing a failing button — the same <a href="12-nfc-rfid.html#status">three-state availability</a> discipline.</td></tr>
+<tr><td><strong>Files</strong></td><td>Real save and open panels; drag-and-drop into the window. This is where a desktop build genuinely beats the mobile one.</td></tr>
+<tr><td><strong>Plugin coverage</strong></td><td>Check every plugin has a macOS implementation before promising the target. A missing implementation usually throws at runtime, not at build time.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Run the desktop build in CI on any pull request that touches shared code, even if you do not distribute from that run. A <code>dart:io</code> import that reaches web code, or a plugin with no desktop implementation, then fails in CI rather than in front of a user. Compilation is cheap insurance for a secondary platform nobody remembers to test.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's macOS workflow and its signing script: nested-frameworks-first signing, hardened runtime, <code>notarytool</code> submission with wait, stapling, and the <code>spctl</code> assertion so a build that would be refused fails in CI.</li>
+<li>Its recorded finding that an App Store Connect API key cannot create a Developer ID certificate — the account-holder restriction and the Xcode plus <code>match import</code> workaround.</li>
+<li>The same project's honest-degradation naming rule for unsigned DMGs, and its statement that since macOS 15 an un-notarised downloaded app is refused outright with no right-click bypass.</li>
+</ul>
+<p>The keychain <code>-34018</code> diagnosis and the UI-adaptation table are general platform knowledge; the entitlements snippet is illustrative.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

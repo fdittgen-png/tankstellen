@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supabase backend — LLM Wiki · Flutter</title>
+<meta name="description" content="Immutable numbered migrations, default-deny RLS, SECURITY DEFINER RPCs, the permission matrix kept in lockstep, edge functions, self-hostability and client/server schema parity.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Supabase backend","description":"Immutable migrations, default-deny RLS, SECURITY DEFINER RPCs, client/server schema parity.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">07 · Data</span>
+<h1>Supabase backend</h1>
+<p class="lede">Postgres with row-level security is the only authorisation boundary in a mobile app that survives a modified client. Everything on this page follows from taking that seriously: the client is untrusted, the database enforces, and the migration history is the specification of what the database enforces.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> sb</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations · 09 Confidentiality</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#model">The trust model</a></li>
+<li><a href="#migrations">Migrations are numbered and immutable</a></li>
+<li><a href="#rls">Row-level security: default deny</a></li>
+<li><a href="#helpers">Role helpers and the recursion problem</a></li>
+<li><a href="#rpc">Writes behind SECURITY DEFINER RPCs</a></li>
+<li><a href="#matrix">The permission matrix</a></li>
+<li><a href="#invariants">Invariants belong in the database</a></li>
+<li><a href="#functions">Edge functions and scheduled work</a></li>
+<li><a href="#parity">Client/server schema parity</a></li>
+<li><a href="#selfhost">Self-hostability</a></li>
+<li><a href="#offline">Offline, sync and deletion</a></li>
+</ol>
+</div>
+
+<section id="model" data-chunk-id="sb.model" data-tags="security,architecture,trust">
+<h2>The trust model</h2>
+
+<p>The mobile app ships with a publishable key that every user has. That key is not a secret and must not be treated as one — it is an entry ticket, and row-level security is the door.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Component</th><th>Trusted?</th><th>Consequence</th></tr></thead>
+<tbody>
+<tr><td>The Flutter client</td><td><strong>No</strong></td><td>Anyone can extract the key, replay requests, and call any table or function the key can reach</td></tr>
+<tr><td>The publishable/anon key</td><td><strong>No</strong> — it is public by design</td><td>Committing it to the repository is fine and expected. Committing the <em>service-role</em> key is a breach.</td></tr>
+<tr><td>The JWT claims</td><td>Yes — signed by the backend</td><td><code>auth.uid()</code> is reliable inside a policy</td></tr>
+<tr><td>RLS policies</td><td>Yes</td><td>The actual boundary</td></tr>
+<tr><td><code>SECURITY DEFINER</code> functions</td><td>Yes, if <code>search_path</code> is pinned and execute is revoked from <code>public</code></td><td>Where writes with business rules live</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Any check that exists only in Dart is a UX affordance, not a security control.</strong> Hiding a button, disabling a field, filtering a list client-side — all fine for usability, all worthless against a crafted request. Every one of them must have a corresponding policy or function check. When you write a client-side guard, write the server-side one in the same pull request.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why the anon key can be committed</span>
+<p>Because it grants exactly the permissions RLS allows to an unauthenticated or authenticated role, and no more. One project ships the same URL and publishable key in the store binary, the F-Droid binary and the web build, and states so explicitly: RLS is the boundary. If that statement makes you uncomfortable, the discomfort is a signal that the policies are not yet doing their job — not that the key needs hiding.</p>
+</div>
+</section>
+
+<section id="migrations" data-chunk-id="sb.migrations" data-tags="migrations,sql,process">
+<h2>Migrations are numbered and immutable</h2>
+
+<p>Numbered SQL files, applied in order, never edited after they have been applied anywhere. A fix is a new migration.</p>
+
+<pre data-lang="text"><code>supabase/migrations/
+  0001_initial_schema.sql
+  0002_rls_policies.sql
+  0003_indexes.sql
+  …
+  0051_personal_invitations.sql
+  0052_member_join_validation.sql       ← supersedes an interim 0051 draft
+  …
+  0073_vat_grants_hardening.sql</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never edit an applied migration.</strong> Any environment that already ran it will not re-run it, so the edit reaches new deployments only — and you now have two databases with the same migration history and different schemas. That divergence is silent and it is discovered at the worst possible moment.</p>
+</div>
+
+<p>Write migrations so they converge from any prior state:</p>
+
+<ul>
+<li><code>create table if not exists</code>, <code>drop policy if exists</code> before <code>create policy</code>, <code>drop function if exists</code> before redefining.</li>
+<li>When a migration supersedes an interim draft, have it <strong>explicitly drop the draft's leftovers</strong> in its first section, and say so in the file header.</li>
+<li>Put a header comment in every file: what it does, what it supersedes, and anything unusual about how it was applied.</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the applied-migrations table lists a name with no matching file, and it looks like schema drift.</strong> It usually is not. In one project two such rows turned out to be (a) a section of a larger migration that had been applied as its own row, with the parent file's header saying exactly that, and (b) an interim draft superseded the same day, whose successor explicitly dropped its leftovers.</p>
+<p><strong>The lesson, worth writing into your own docs:</strong> a migration-row name that does not match a file is <em>not</em> evidence of drift until you have read the file. Verify convergence — check that the successor uses <code>if exists</code> guards for everything the draft created — rather than assuming either way.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Periodically rebuild a scratch database from <code>migrations/</code> alone and diff its schema against the live one. That is the only real proof the repository is complete. Do it before any release that touches the schema.</p>
+</div>
+</section>
+
+<section id="rls" data-chunk-id="sb.rls" data-tags="rls,security,postgres">
+<h2>Row-level security: default deny</h2>
+
+<p>Enable RLS on a table in the same migration that creates it, and grant only what is needed. Any operation not explicitly allowed is blocked.</p>
+
+<pre data-lang="sql"><code>create table reservations (
+  id            uuid primary key default gen_random_uuid(),
+  workspace_id  uuid not null references workspaces(id) on delete cascade,
+  member_id     uuid not null references members(id)    on delete cascade,
+  seat_id       uuid not null references seats(id),
+  starts_at     timestamptz not null,
+  ends_at       timestamptz not null,
+  created_at    timestamptz not null default now()
+);
+
+-- Immediately, in the same migration. A table created without this is
+-- world-readable to anyone holding the publishable key.
+alter table reservations enable row level security;
+
+create policy reservations_select on reservations
+  for select using (is_member_of(workspace_id));
+
+-- No insert/update/delete policy: writes go through an RPC (see below).</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>A new table gets <code>enable row level security</code> in the same statement block that creates it.</strong> Not in a follow-up migration, not "before we go live". A table without RLS is readable and writable by every holder of the publishable key, which is every user of your app and anyone who downloads it.</p>
+</div>
+
+<p><strong>Denormalise the scope column.</strong> Copy <code>workspace_id</code> (or your tenant key) onto every table, even where it is reachable by a join. Every policy then becomes a single helper call instead of a correlated subquery — which matters both for readability and for query plans, since the policy is evaluated per row.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Secrets tables get zero policies.</strong> A table holding provider credentials, webhook signing keys, or anything similar should have RLS enabled and <em>no</em> policy at all, so it is unreachable from the client role entirely. It is read only by <code>SECURITY DEFINER</code> functions and edge functions using the service role.</p>
+</div>
+</section>
+
+<section id="helpers" data-chunk-id="sb.helpers" data-tags="rls,postgres,security-definer">
+<h2>Role helpers and the recursion problem</h2>
+
+<p>Membership checks must be <code>SECURITY DEFINER</code> functions with a pinned <code>search_path</code>, or a policy on the membership table cannot consult the membership table.</p>
+
+<pre data-lang="sql"><code>create or replace function is_member_of(ws uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public          -- pinned: callers cannot shadow objects
+as $$
+  select exists (
+    select 1 from members m
+    where m.workspace_id = ws
+      and m.user_id = auth.uid()
+      and m.status &lt;&gt; 'exited'
+  );
+$$;
+
+revoke execute on function is_member_of(uuid) from public, anon;
+grant   execute on function is_member_of(uuid) to authenticated;</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: <code>infinite recursion detected in policy for relation "members"</code>.</strong> The select policy on <code>members</code> calls a helper that queries <code>members</code>, which triggers the policy again. <code>SECURITY DEFINER</code> breaks the loop because the function body runs as the owner and bypasses RLS on the tables it reads.</p>
+<p><strong>The two obligations that come with it:</strong> pin <code>search_path</code> so a caller cannot create a shadowing object in a schema earlier on the path, and revoke execute from <code>public</code> and <code>anon</code> so an unauthenticated caller cannot invoke it directly.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Every new function gets <code>revoke execute … from public, anon</code>.</strong> Postgres grants execute to <code>public</code> by default. A helper that leaks membership existence, or an RPC that performs a write, is reachable by an unauthenticated caller until you revoke it. Make the revoke part of the function template so it cannot be forgotten.</p>
+</div>
+
+<p>Keep the helper set small and composable — typically <code>is_member_of</code>, <code>is_admin_of</code>, <code>is_owner_of</code>, and one for "shares a tenant with this user". Roles compose additively, so an owner passes all three.</p>
+</section>
+
+<section id="rpc" data-chunk-id="sb.rpc" data-tags="rpc,writes,transactions">
+<h2>Writes behind SECURITY DEFINER RPCs</h2>
+
+<p>Reads go through policies; writes with any business rule go through a function, because a policy can only answer yes or no — it cannot check a quota, cap an end time, or create two rows atomically.</p>
+
+<pre data-lang="sql"><code>create or replace function check_in(p_seat uuid, p_until timestamptz)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_ws     uuid;
+  v_member uuid;
+  v_end    timestamptz := p_until;
+  v_next   timestamptz;
+  v_id     uuid;
+begin
+  select workspace_id into v_ws from seats where id = p_seat;
+  if v_ws is null then raise exception 'seat_not_found'; end if;
+
+  select id into v_member from members
+   where workspace_id = v_ws and user_id = auth.uid() and status &lt;&gt; 'exited';
+  if v_member is null then raise exception 'not_a_member'; end if;
+
+  -- Cap at the next reservation on this seat, if any.
+  select min(starts_at) into v_next from reservations
+   where seat_id = p_seat and starts_at &gt; now();
+  if v_next is not null and v_next &lt; v_end then v_end := v_next; end if;
+
+  -- Conflict check and insert in ONE transaction — never against a
+  -- possibly-stale client view.
+  if exists (
+    select 1 from reservations
+     where seat_id = p_seat and starts_at &lt; v_end and ends_at &gt; now()
+  ) then
+    raise exception 'seat_taken';
+  end if;
+
+  insert into reservations (workspace_id, member_id, seat_id, starts_at, ends_at)
+  values (v_ws, v_member, p_seat, now(), v_end)
+  returning id into v_id;
+
+  return v_id;
+end;
+$$;
+
+revoke execute on function check_in(uuid, timestamptz) from public, anon;
+grant   execute on function check_in(uuid, timestamptz) to authenticated;</code></pre>
+
+<div class="callout why">
+<span class="tag">Why the whole decision must be one transaction</span>
+<p>Double-booking is the characteristic failure of any reservation system, and it comes from checking availability against a view the client fetched some seconds ago. The client's list is always stale by the time the user taps. Making the conflict check and the insert one server-side statement is the only construction where the answer cannot change between the check and the write.</p>
+</div>
+
+<p><strong>Raise named errors, not sentences.</strong> <code>raise exception 'seat_taken'</code> gives the client a stable code it can map to a localised message. A prose error message becomes a string comparison in Dart and breaks the moment someone improves the wording.</p>
+</section>
+
+<section id="matrix" data-chunk-id="sb.matrix" data-tags="rls,documentation,security-review">
+<h2>The permission matrix</h2>
+
+<p>Maintain a document mapping every table and operation to every role, with the mechanism that enforces it — and update it in the same pull request as the migration.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Table</th><th>Operation</th><th>anon</th><th>user</th><th>worker</th><th>admin</th><th>owner</th><th>Mechanism</th></tr></thead>
+<tbody>
+<tr><td>profiles</td><td>select own</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td><code>profiles_select</code></td></tr>
+<tr><td>profiles</td><td>insert</td><td>—</td><td>auto</td><td>auto</td><td>auto</td><td>auto</td><td><code>handle_new_user</code> trigger only</td></tr>
+<tr><td>workspaces</td><td>select</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td><code>is_member_of()</code></td></tr>
+<tr><td>workspaces</td><td>insert</td><td>—</td><td>RPC</td><td>RPC</td><td>RPC</td><td>RPC</td><td><code>create_workspace()</code> — creator becomes owner</td></tr>
+<tr><td>workspaces</td><td>update / delete</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td><code>is_owner_of()</code></td></tr>
+<tr><td>members</td><td>update roles</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td><code>members_update_owner</code></td></tr>
+<tr><td>members</td><td>leave</td><td>—</td><td>—</td><td>RPC</td><td>RPC</td><td>RPC</td><td><code>leave_workspace()</code> sets status</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Every migration touching a table, a policy or a <code>SECURITY DEFINER</code> function updates the matrix in the same pull request, re-runs the security advisors, and pastes the advisor result into the pull-request description.</strong> All four parts. The matrix without the advisor run is a claim; the advisor run without the matrix is a number nobody can interpret.</p>
+</div>
+
+<p>The matrix earns its keep in review. A reviewer cannot hold thirty policies in their head, but they can read one row and ask "should an admin really be able to do that?" — which is the question that catches over-broad grants.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a delete is blocked for users who should be allowed it.</strong> A defensive client-side or policy-level block added "for safety" on top of RLS that already scopes rows to the owner. The RLS was already correct; the extra guard was over-broad and only removed functionality. Before adding a belt-and-braces restriction, check what the policy already guarantees — the matrix is where you check.</p>
+</div>
+</section>
+
+<section id="invariants" data-chunk-id="sb.invariants" data-tags="postgres,triggers,invariants">
+<h2>Invariants belong in the database</h2>
+
+<p>A rule that must always hold is a trigger or a constraint, not a code path — because there is always a second code path.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Invariant</th><th>Mechanism</th></tr></thead>
+<tbody>
+<tr><td>A tenant always has at least one owner</td><td><code>before update or delete</code> trigger that raises if the change would leave none. The last owner can be <em>replaced</em>, never removed.</td></tr>
+<tr><td>Exited members lose all visibility</td><td>Every role helper filters <code>status &lt;&gt; 'exited'</code> — one place, not per policy</td></tr>
+<tr><td>An invite code is unique and unguessable</td><td>Server-generated from an unambiguous alphabet (no <code>0</code>/<code>O</code>, <code>1</code>/<code>l</code>), unique index</td></tr>
+<tr><td>Rejoining does not duplicate a membership</td><td>The join RPC re-activates an exited row rather than inserting</td></tr>
+<tr><td>A payment settles exactly once</td><td>Unique index on the idempotency key. Choose the key carefully — see the trap below.</td></tr>
+<tr><td>Time ranges do not overlap</td><td><code>exclude using gist</code> constraint, or the RPC-level conflict check above</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a payment is captured twice, or a settlement webhook arrives before the capture it refers to.</strong> Keying idempotency on the payment-provider's capture id fails when the provider reports settlement before a capture id exists. One project keys on <code>(provider, order_id)</code> instead — an identifier that exists from the first moment of the flow — so a settlement arriving early still settles exactly once. Pick the earliest stable identifier in the external system's lifecycle, not the most specific one.</p>
+</div>
+</section>
+
+<section id="functions" data-chunk-id="sb.functions" data-tags="edge-functions,deno,scheduling">
+<h2>Edge functions and scheduled work</h2>
+
+<p>Edge functions are for work that needs a secret, a third party, or a schedule — never for work a policy or an RPC can do.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Legitimate use</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Holds a secret the client must never see</td><td>Calling a payment provider or an invoicing gateway with a private key</td></tr>
+<tr><td>Talks to a third party</td><td>Fetching upstream prices, sending an e-invoice, pushing a notification</td></tr>
+<tr><td>Runs on a schedule</td><td>Nightly aggregation, alert evaluation, cleanup — triggered by <code>pg_cron</code></td></tr>
+<tr><td>Proxies and caches on behalf of clients</td><td>A map-tile proxy that caches upstream tiles in storage</td></tr>
+<tr><td>Validates something the client cannot be trusted to validate</td><td>Report moderation, quota computation over other users' rows</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre data-lang="sql"><code>-- Scheduling lives in a migration too, so it is versioned with everything else.
+select cron.schedule(
+  'evaluate-alerts',
+  '*/15 * * * *',
+  $$ select net.http_post(
+       url     := current_setting('app.functions_url') || '/check-alerts',
+       headers := jsonb_build_object('Authorization',
+                    'Bearer ' || current_setting('app.service_key'))
+     ) $$
+);</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Log every outbound call to a third party with a hash of the payload, and never the payload itself.</strong> One project records every e-invoice transmission attempt with a SHA-256 of what left the system. That gives you proof of what was sent, and the ability to detect a duplicate, without storing customer data in a log table. Store the hash, the timestamp, the target and the response status.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: an integration is "built and tested" but has never actually reached the third party.</strong> An adapter with unit tests, a function that deploys, and logging that works still proves nothing about the external system's acceptance of your payload. One project is explicit in its own known-gaps section that its e-invoice path is blocked on a real provider account and no document has yet reached a real endpoint from that code. Mark such a path clearly as unverified end-to-end, in the documentation, until a real transmission has succeeded.</p>
+</div>
+</section>
+
+<section id="parity" data-chunk-id="sb.parity" data-tags="sync,schema,parity,testing">
+<h2>Client/server schema parity</h2>
+
+<p>If the app also stores data locally, the local schema and the remote schema must move together — otherwise a self-hoster gets silent per-table sync failures.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Adding a new synced table, or a new explicit non-JSON column, requires updating the schema verifier in the same pull request.</strong> That means: the required/optional table lists, the setup SQL the app hands to self-hosters, the RLS policies in that SQL, any RPC — and a bump of the schema version so an outdated deployment is flagged rather than silently broken.</p>
+<p><strong>Adding a <em>field</em> is usually transparent</strong> when entities are stored whole in a JSONB <code>data</code> column. That is a good reason to prefer JSONB for synced payloads: the common change requires no coordination at all.</p>
+</div>
+
+<pre data-lang="dart"><code>// A drift-guard test: every table the sync layer talks to must appear in
+// the verifier's list and in the setup SQL.
+test('every synced table is declared in the schema verifier', () {
+  final used = &lt;String&gt;{};
+  for (final f in Directory('lib/core/sync').listSync(recursive: true)
+      .whereType&lt;File&gt;().where((f) =&gt; f.path.endsWith('.dart'))) {
+    for (final m in RegExp(r"\.from\('([a-z_]+)'\)")
+        .allMatches(f.readAsStringSync())) {
+      used.add(m.group(1)!);
+    }
+  }
+  final declared = {...SchemaVerifier.requiredTables,
+                    ...SchemaVerifier.optionalTables};
+  expect(used.difference(declared), isEmpty,
+      reason: 'synced table missing from the verifier and the wizard SQL');
+});</code></pre>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Update the fake repository in the same pull request as the server contract.</strong> Widget tests run against fakes. A fake that still models the old contract makes every test green while the real path is broken — the <a href="03-tdd-and-testing.html#false-green">false-green</a> failure applied to the backend.</p>
+</div>
+</section>
+
+<section id="selfhost" data-chunk-id="sb.selfhost" data-tags="self-hosting,configuration,build">
+<h2>Self-hostability</h2>
+
+<p>Accept the backend URL and key as build-time defines with committed defaults, and ship the setup SQL inside the app.</p>
+
+<pre data-lang="bash"><code>flutter build appbundle --release \
+  --dart-define=SUPABASE_URL=https://xxxx.supabase.co \
+  --dart-define=SUPABASE_KEY=&lt;publishable key&gt;</code></pre>
+
+<pre data-lang="dart"><code>abstract final class BackendConfig {
+  static const url = String.fromEnvironment('SUPABASE_URL',
+      defaultValue: 'https://reference-project.supabase.co');
+  static const key = String.fromEnvironment('SUPABASE_KEY',
+      defaultValue: '&lt;committed publishable key&gt;');
+  static bool get isReference =&gt; url == /* the default */ '';
+}</code></pre>
+
+<p>For a user-facing self-host flow, an in-app wizard is better than a README:</p>
+
+<ol>
+<li>The user creates their own project and pastes the URL and publishable key.</li>
+<li>The app renders the setup SQL — generated from the same source as the verifier — for them to run once.</li>
+<li>The app verifies the schema: which required tables exist, which are missing, what version the deployment is at.</li>
+<li>On a version mismatch, the app surfaces a specific, actionable notice rather than failing per-table at runtime.</li>
+</ol>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Run the wizard SQL against an empty project and then run the app's own verifier against it. If the verifier reports anything missing, the SQL and the verifier have diverged — which is exactly the drift the parity rule above exists to prevent, and the only test that proves it end to end.</p>
+</div>
+</section>
+
+<section id="offline" data-chunk-id="sb.offline" data-tags="sync,offline,deletion">
+<h2>Offline, sync and deletion</h2>
+
+<p>Local-first means the app works with no backend at all and treats sync as an enhancement. That has three consequences that are easy to get wrong.</p>
+
+<h3>Sync must be bidirectional, and usually starts out not being</h3>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a second device shows none of the first device's data, and nobody notices for a long time because the first device looks perfect.</strong> Upload is the easy half and gets built first; the pull path is deferred and then forgotten. One project shipped a sync layer that was upload-only for several entity types — the server received everything and the client never read any of it back. Audit each entity explicitly: does it push, does it pull, and is there a test for the pull?</p>
+</div>
+
+<h3>Deletion needs tombstones</h3>
+
+<p>Without them, a delete on device A is undone by device B's next upload, which still has the row. Record deletions in a tombstone table with a timestamp, propagate them like any other change, and keep a local pending-deletions journal so a delete performed offline is not lost.</p>
+
+<h3>Identity must survive an upgrade</h3>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Upgrading an anonymous account to a permanent one must preserve the user id.</strong> Use the platform's link/update-user flow, never <code>signUp</code> — a fresh sign-up mints a new id and every row the anonymous user created becomes orphaned under RLS. See <a href="08-authentication.html#anon">page 08</a>.</p>
+</div>
+
+<p>Two smaller practices worth adopting: store all timestamps in UTC and convert only for display (recurring rules are the exception — they recur in the tenant's local time); and decode large sync payloads in a background isolate so a big pull does not drop frames.</p>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's Supabase directory: 73 numbered migrations, 5 edge functions, <code>pg_cron</code> schedules declared in migrations, and its <code>SUPABASE_RLS_MATRIX.md</code> with the role model and the database-enforced invariants.</li>
+<li>The other project's sync layer: the schema verifier, the wizard SQL, the schema-version constant, and the drift-guard test asserting every <code>.from()</code> table is declared.</li>
+<li>Post-mortems supplying the traps: the interim-migration false drift, the upload-only sync gap, the over-broad delete block, and the idempotency-key choice in the payments integration.</li>
+</ul>
+<p>The <code>check_in</code> function is a reconstruction that combines the documented behaviour (atomic walk-up check-in, capping at the next reservation) with the project's stated function conventions; it is not a verbatim copy of a migration.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

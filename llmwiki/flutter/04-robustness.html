@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robustness &amp; error handling — LLM Wiki · Flutter</title>
+<meta name="description" content="Never-silent catches, the guarded-mutation helper, honest degradation, episode gating, streams that swallow errors, and telling the truth about persistence.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Robustness and error handling","description":"Never-silent catches, guarded mutations, honest degradation, episode gating, streams that swallow errors.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">04 · Method</span>
+<h1>Robustness &amp; error handling</h1>
+<p class="lede">A robust app is not one that never fails. It is one where every failure is visible to someone who can act on it — the user, the log, or the test suite — and where nothing important fails quietly. Almost every rule here exists because something failed quietly for months.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> rob</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#never-silent">The never-silent-catch rules</a></li>
+<li><a href="#guarded">One guarded-mutation helper</a></li>
+<li><a href="#analyzer">Analyzer settings that catch real bugs</a></li>
+<li><a href="#honest">Honest degradation</a></li>
+<li><a href="#episode">Episode gating for repeated failures</a></li>
+<li><a href="#streams">Streams that swallow errors</a></li>
+<li><a href="#persistence">Telling the truth about persistence</a></li>
+<li><a href="#boot">Boot, recovery and the startup budget</a></li>
+<li><a href="#never-throws">"Never throws" is a contract</a></li>
+</ol>
+</div>
+
+<section id="never-silent" data-chunk-id="rob.never-silent" data-tags="error-handling,lint,rules">
+<h2>The never-silent-catch rules</h2>
+
+<p>Three rules, all machine-enforced, that between them eliminate the entire category of "the app did nothing and we have no idea why".</p>
+
+<div class="callout rule">
+<span class="tag">Rule 1 — no empty catch</span>
+<p><code>catch (_) {}</code> is forbidden. Enforced by a scanning test. An empty catch is a decision to discard evidence, made by someone who will not be the one debugging it.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule 2 — always capture the stack trace</span>
+<p>Every <code>catch (e)</code> is <code>catch (e, st)</code>, and <code>st</code> reaches the logger or trace recorder. A rethrow-only block may opt out with an explicit comment naming the reason. Enforced by a scanning test.</p>
+<pre data-lang="dart"><code>// wrong — the location is gone
+try { await repo.save(x); } catch (e) { debugPrint('save failed: $e'); }
+
+// right
+try {
+  await repo.save(x);
+} catch (e, st) {
+  debugPrint('save failed: $e\n$st');
+  TraceLogger.instance.error('storage', 'save failed', error: e, stackTrace: st);
+}</code></pre>
+<p>This rule was violated four times in a single working session on one project before it was added to the standard preamble given to implementation agents — the reflex to write a swallow-and-print catch is very strong.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule 3 — an error is not handled by printing it</span>
+<p>A catch whose entire body is a <code>debugPrint</code> has not handled anything; it has converted an exception into a line nobody reads on a device nobody has. Enforced by a separate scanning test. Every caught error must do at least one of: recover with a named fallback, surface to the user, or record to the trace log. Printing is additive, never sufficient.</p>
+</div>
+</section>
+
+<section id="guarded" data-chunk-id="rob.guarded" data-tags="error-handling,helper,dry">
+<h2>One guarded-mutation helper</h2>
+
+<p>The ten-line try/catch that every mutating call site was open-coding becomes one function, and the call site becomes one line.</p>
+
+<pre data-lang="dart"><code>/// Runs a mutating [action] with the error boilerplate every call site used
+/// to open-code: on failure the error is printed, traced under
+/// [domain]/[message], and — when [errorText] is given and [context] is still
+/// mounted — surfaced as an error snackbar. Returns whether it succeeded.
+Future&lt;bool&gt; runGuarded(
+  BuildContext context, {
+  required String domain,
+  required String message,
+  required Future&lt;void&gt; Function() action,
+  String? errorText,
+}) async {
+  try {
+    await action();
+    return true;
+  } catch (e, st) {
+    debugPrint('$message: $e\n$st');
+    TraceLogger.instance.error(domain, message, error: e, stackTrace: st);
+    if (errorText != null &amp;&amp; context.mounted) {
+      AppSnack.error(context, errorText);
+    }
+    return false;
+  }
+}</code></pre>
+
+<pre data-lang="dart"><code>// Call site: one line, correct by construction.
+if (!await runGuarded(context,
+    domain: 'money',
+    message: 'fee band save failed',
+    errorText: l10n.genericSaveError,
+    action: () =&gt; repo.replaceFeeBands(id, bands))) {
+  return;
+}</code></pre>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Three properties fall out at once. The <code>context.mounted</code> check cannot be forgotten because it lives in the helper. The trace domain is a required parameter, so no call site records an untagged error. And the boolean return replaces the pattern where a failed mutation silently continued into the success path — which is the actual bug this helper was written to kill.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Make the safe path shorter than the unsafe one.</strong> This is the general principle the helper illustrates. If correct error handling takes ten lines and sloppy handling takes two, the codebase will fill with two-line versions regardless of what the guidelines say. Build the helper, then the correct version is the convenient one.</p>
+</div>
+</section>
+
+<section id="analyzer" data-chunk-id="rob.analyzer" data-tags="analyzer,lint,static-analysis,configuration">
+<h2>Analyzer settings that catch real bugs</h2>
+
+<p>Turn on strict language modes and promote the correctness lints to errors — every entry below corresponds to a defect class that shipped at least once.</p>
+
+<pre data-lang="yaml"><code>include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude: [ third_party/** ]        # vendored code keeps upstream conventions
+  language:
+    strict-casts: true               # no implicit downcasts
+    strict-inference: true           # no uninferable invocations
+    strict-raw-types: true           # no bare generics
+  errors:
+    invalid_annotation_target: ignore        # freezed @JsonKey false positive
+    use_build_context_synchronously: error   # StateError on unmounted widget
+    unawaited_futures: error                 # fire-and-forget persistence races
+    discarded_futures: error                 # same, in sync contexts
+    cancel_subscriptions: error              # leaked StreamSubscription
+    close_sinks: error                       # leaked StreamController
+    avoid_slow_async_io: error
+    avoid_type_to_string: error
+    no_logic_in_create_state: error
+    throw_in_finally: error
+    unnecessary_statements: error
+    unrelated_type_equality_checks: error
+    valid_regexps: error
+    avoid_print: info                        # style-weighted, still fatal in CI</code></pre>
+
+<div class="callout why">
+<span class="tag">Why strict-casts specifically</span>
+<p>One project paid for implicit dynamic casts twice in its storage and JSON codec layer before enabling <code>strict-casts</code>. The failure mode is characteristic: a <code>Map&lt;dynamic, dynamic&gt;</code> coming out of a key-value store flows into code expecting <code>Map&lt;String, dynamic&gt;</code>, compiles cleanly, and throws at runtime on a device in a different locale or with older stored data. Strict casts turn that into a compile-time diagnostic.</p>
+</div>
+
+<p>Two operational notes:</p>
+
+<ul>
+<li><strong>Run the analyzer fatal on infos in CI</strong>, and over <code>test/</code> as well as <code>lib/</code>. A test file tripping a lint is still a lint.</li>
+<li><strong>Pin the severity table with a test.</strong> One project has a test asserting that <code>analysis_options.yaml</code> still promotes each of these to <code>error</code>, so a well-meaning edit cannot quietly downgrade the set.</li>
+</ul>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a lint rule cannot be suppressed at the site where the exception is legitimate.</strong> Some analyzer-plugin rules do not honour <code>// ignore:</code> comments. When that happens, the only lever is disabling the rule globally — so document the full inventory of sites that would have carried an ignore comment, in the configuration file itself, along with the upstream condition that will let you re-enable it. Otherwise the disabled rule looks like laziness to the next reader and gets either re-enabled blindly or forgotten permanently.</p>
+</div>
+</section>
+
+<section id="honest" data-chunk-id="rob.honest" data-tags="degradation,fallback,ux,observability">
+<h2>Honest degradation</h2>
+
+<p>A fallback that is indistinguishable from the real thing hides outages and bugs indefinitely. Every degraded state needs a recognisable signature.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a feature has been broken for months and nobody reported it, because the broken state looks plausible.</strong> One project's map screen fell back to a small built-in demo dataset when its API key was unavailable. The demo stations rendered exactly like real ones. The key was being read from the wrong store — so <em>every</em> user got demo data, configured or not, and nobody noticed because there was nothing to notice.</p>
+<p><strong>Countermeasure — three parts, all required:</strong></p>
+<ol>
+<li><strong>Give the fallback a signature.</strong> A visible banner, a distinct marker style, a "sample data" label. Something a screenshot in a bug report will show.</li>
+<li><strong>Log the downgrade.</strong> A trace entry saying which tier served this result and why the tier above it did not.</li>
+<li><strong>Document the tell in user-facing docs.</strong> "The same handful of generic stations everywhere means the live fetch failed" turns a confused user into a useful report.</li>
+</ol>
+</div>
+
+<p>The same principle applies to build artifacts, and it is where the phrase came from:</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>An artifact that cannot do its job must say so in its own name.</strong> One project's macOS workflow produces a DMG even when no signing certificate is available — but names it <code>AppName-unsigned.dmg</code> and emits a build warning explaining what the user will have to do. A file called <code>AppName.dmg</code> that macOS refuses to open is worse than one that admits what it is. Generalise: a partial export, an unsigned build, a degraded dataset — name it, do not disguise it.</p>
+</div>
+
+<p>And to results that travel through the app:</p>
+
+<ul>
+<li>Carry <code>source</code> and <code>isStale</code> in the result type all the way to the UI (<a href="01-foundations-architecture.html#service-chain">the service-chain pattern</a>) so the presentation layer <em>can</em> be honest.</li>
+<li>When a heuristic filter produces nothing on a safety-relevant surface, <strong>fall back to unfiltered, never to empty</strong> — and expose that in the API. One project's directional filter returns the full candidate list when nothing survives the cone, with <code>result.filtered == false</code> so the UI can say "showing all". A driver low on fuel must never see zero results because of a heuristic.</li>
+</ul>
+</section>
+
+<section id="episode" data-chunk-id="rob.episode" data-tags="logging,error-handling,observability">
+<h2>Episode gating for repeated failures</h2>
+
+<p>Repeated identical failures get a counter, not a log entry each — otherwise one outage evicts the traces you actually need.</p>
+
+<p>The failure is mechanical. A bounded error log holds, say, 500 entries. A backend goes down overnight and a sync retry fires every two minutes. By morning the log contains 300 copies of the same connection error and nothing else — every trace from the crash you were actually investigating has been evicted by the noise.</p>
+
+<pre data-lang="dart"><code>/// Collapses consecutive identical failures into one entry plus a count.
+class EpisodeGate {
+  EpisodeGate({this.window = const Duration(minutes: 30)});
+
+  final Duration window;
+  String? _signature;
+  DateTime? _first;
+  int _count = 0;
+
+  /// Returns the suppressed count to stamp on the next DISTINCT trace,
+  /// or null when this error should be logged normally.
+  int? suppress(String signature, DateTime now) {
+    if (signature == _signature &amp;&amp;
+        _first != null &amp;&amp;
+        now.difference(_first!) &lt; window) {
+      _count++;
+      return _count;                // caller skips the log entry
+    }
+    final carried = _count;
+    _signature = signature;
+    _first = now;
+    _count = 0;
+    return carried &gt; 0 ? null : null; // stamp `carried` on the new entry
+  }
+}</code></pre>
+
+<p>Build the signature from the error type plus the operation, not from the message — messages often embed a timestamp or an id that makes every occurrence look unique.</p>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Simulate it: make a dependency fail continuously for an hour of simulated time and assert that the bounded log still contains the entries that preceded the outage. If they are gone, the gate is not working.</p>
+</div>
+</section>
+
+<section id="streams" data-chunk-id="rob.streams" data-tags="streams,dart,error-handling,watchdog">
+<h2>Streams that swallow errors</h2>
+
+<p>A stream that emits a sentinel on failure and never errors or closes makes every <code>onError</code> and <code>onDone</code> handler attached to it dead code.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a watchdog never fires, even though the underlying device is clearly gone.</strong> Several device-facing streams are designed to emit <code>null</code> when a read fails, and to keep polling forever. That is a reasonable design — the consumer wants "no reading right now", not a terminated stream. But a liveness check written as <code>stream.listen(..., onError: reconnect, onDone: reconnect)</code> will <em>never</em> run, because neither callback is ever invoked.</p>
+<p><strong>Countermeasure:</strong> read the stream's contract before wiring error callbacks. For a never-erroring stream, put the liveness check <em>in band</em> — evaluate a condition on every tick (for example, poll <code>!service.isConnected</code>) rather than waiting for a callback that cannot arrive.</p>
+</div>
+
+<pre data-lang="dart"><code>// Wrong for a never-erroring stream — both callbacks are unreachable.
+sub = telemetry.listen(_onSample, onError: _reconnect, onDone: _reconnect);
+
+// Right — the liveness check rides the data path.
+sub = telemetry.listen((sample) {
+  if (sample == null &amp;&amp; !_service.isConnected) {
+    _missedTicks++;
+    if (_missedTicks &gt; _threshold) _reconnect();
+  } else {
+    _missedTicks = 0;
+    _onSample(sample);
+  }
+});</code></pre>
+
+<p>Related discipline: enable <code>cancel_subscriptions</code> and <code>close_sinks</code> as analyzer <em>errors</em>. A leaked subscription on a screen that is pushed repeatedly is a slow memory and CPU leak that presents as "the app gets sluggish after a while", which is the hardest kind of report to act on.</p>
+</section>
+
+<section id="persistence" data-chunk-id="rob.persistence" data-tags="ux,persistence,honesty">
+<h2>Telling the truth about persistence</h2>
+
+<p>The UI must not imply a save decision is pending when the data is already stored.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: users report losing data they explicitly discarded — or keeping data they thought they discarded.</strong> A summary sheet appeared after an operation, offering "Save" and "Discard". The record had already been written to storage when the operation ended. "Discard" dismissed the sheet and left the record in place. Users who tapped Discard found the item still there; users who assumed Discard worked never checked.</p>
+<p><strong>Countermeasure:</strong> align the affordances with what storage actually did.</p>
+<ul>
+<li>Already saved? Say "saved automatically", offer <strong>Done</strong> and a real <strong>Delete</strong>.</li>
+<li>Not yet saved? Then and only then offer Save and Discard — and make Discard actually discard.</li>
+<li>Never offer a control whose label describes an action the code does not perform.</li>
+</ul>
+</div>
+
+<p>The general rule this instance illustrates: <strong>the interface is a claim about system state, and a false claim is a defect of the same severity as a crash</strong> — often worse, because a crash is reported and a false claim is believed.</p>
+</section>
+
+<section id="boot" data-chunk-id="rob.boot" data-tags="startup,recovery,performance">
+<h2>Boot, recovery and the startup budget</h2>
+
+<p>Startup is the one code path every user executes, and the one where a failure produces no UI to report it from.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Concern</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td><strong>Global handlers first</strong></td><td>Install <code>FlutterError.onError</code> and <code>PlatformDispatcher.instance.onError</code> before anything else, routing both into the trace recorder. An error during initialisation is otherwise invisible.</td></tr>
+<tr><td><strong>Storage failure is survivable</strong></td><td>If the local store cannot open — corrupt box, migration failure, denied sandbox — mount a minimal recovery host that offers export and reset rather than crash-looping. One project runs a bare provider scope for these pre-initialisation hosts.</td></tr>
+<tr><td><strong>Defer what can be deferred</strong></td><td>Open only the boxes the first frame needs; open the rest lazily. Mark the deferred set explicitly so the split is visible.</td></tr>
+<tr><td><strong>Budget it, and enforce the budget</strong></td><td>A cold-start budget (one project uses 2000 ms) checked by a CI job. Startup regressions are cumulative and invisible per-commit.</td></tr>
+<tr><td><strong>Prove the release artifact boots</strong></td><td>Unit tests cannot catch a release-only crash. See <a href="13-android.html#r8">page 13</a> — a shrinker removing a class used only by reflection produces a build that passes every test and dies before the first frame.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>The aliveness test, in one line of CI: install the release build on an emulator, clear the log, launch with a deterministic activity name, wait fifteen seconds, and assert the process id still exists. It is crude and it catches the entire class.</p>
+</div>
+</section>
+
+<section id="never-throws" data-chunk-id="rob.never-throws" data-tags="contracts,testing,documentation">
+<h2>"Never throws" is a contract</h2>
+
+<p>A doc comment claiming a function never throws is an API contract, and it needs a fault-injection test proving it.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p>Any function documented as never-throwing must have a sibling test that injects a failure into each of its dependencies and asserts the function returns normally. One project enforces this with a scanning test that pairs the doc-comment marker with the existence of the test — and it went red twice in one session because the rule is easy to forget when adding the doc comment feels like the finishing touch.</p>
+</div>
+
+<p>Design the seams so injection is possible:</p>
+
+<pre data-lang="dart"><code>class TraceLogger {
+  TraceLogger({
+    Future&lt;Directory&gt; Function()? directoryProvider,  // inject a thrower
+    this.capacity = 500,
+    this.maxFileBytes = 512 * 1024,
+  }) : _directoryProvider = directoryProvider;
+
+  bool _fileDisabled = false;   // set once file IO fails — degrade to memory
+
+  /// Never throws. File IO is strictly best-effort: any failure (missing
+  /// directory, full disk, sandbox denial) degrades this logger to
+  /// memory-only for the rest of the process.
+  Future&lt;void&gt; log(TraceEntry e) async { /* … */ }
+}</code></pre>
+
+<p>Note the design: the logger takes its directory provider as a constructor parameter specifically so a test can pass one that throws. A logger that calls <code>getApplicationSupportDirectory()</code> directly cannot be fault-tested at all — the seam is the point.</p>
+
+<div class="callout why">
+<span class="tag">Why an error logger must never throw</span>
+<p>Because it is called from catch blocks. A logger that throws inside a catch block replaces a recoverable error with an unrecoverable one, at exactly the moment the system is already degraded. The same reasoning applies to crash reporters, analytics, and anything else on the failure path.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's <code>runGuarded</code> helper and <code>TraceLogger</code> (including its never-throws contract and injectable directory provider); the other's analyzer configuration with its promoted severity table and the test pinning it.</li>
+<li>Both projects' scanning lint tests for empty catches, missing stack traces, and print-only catch bodies.</li>
+<li>Post-mortems supplying the traps: the demo-data fallback that was invisible for months, the overnight-outage log eviction, the never-erroring telemetry stream, the Discard-that-kept-the-record sheet, and the unsigned-artifact naming decision.</li>
+</ul>
+<p>The <code>EpisodeGate</code> code is an illustrative reconstruction of the described behaviour, not a verbatim copy of either project's implementation.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

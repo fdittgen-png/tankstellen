@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barcode &amp; QR — LLM Wiki · Flutter</title>
+<meta name="description" content="The libre scanner swap for GMS-free builds, generating scannable codes, printable code sheets, the injectable scanner seam, and OCR when there is no code to scan.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Barcode and QR in Flutter","description":"Libre scanner swap, generating codes, the injectable scanner seam, OCR fallback.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">11 · Device</span>
+<h1>Barcode &amp; QR</h1>
+<p class="lede">Scanning is the easy half. The interesting decisions are which engine you can ship in which build channel, how to keep a camera surface testable, and what to do when the thing you need to read is a seven-segment display rather than a code.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> code</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations · 17 F-Droid</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#engines">Choosing a scanner engine</a></li>
+<li><a href="#swap">The per-channel engine swap</a></li>
+<li><a href="#seam">An injectable scanner seam</a></li>
+<li><a href="#generating">Generating codes</a></li>
+<li><a href="#printable">Printable code sheets</a></li>
+<li><a href="#payload">Payload design</a></li>
+<li><a href="#ux">Scanner UX</a></li>
+<li><a href="#ocr">When there is no code: OCR</a></li>
+</ol>
+</div>
+
+<section id="engines" data-chunk-id="code.engines" data-tags="barcode,scanner,dependencies">
+<h2>Choosing a scanner engine</h2>
+
+<p>Two realistic options in Flutter, and the deciding factor is usually your distribution channels rather than accuracy.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>ML Kit-backed (<code>mobile_scanner</code>)</th><th>ZXing via FFI (<code>flutter_zxing</code>)</th></tr></thead>
+<tbody>
+<tr><td>Accuracy on damaged / angled codes</td><td>Better</td><td>Good</td></tr>
+<tr><td>Android dependency</td><td>Google ML Kit → Play Services</td><td>Bundled native library, no services</td></tr>
+<tr><td>Ships in a libre build</td><td><strong>No</strong></td><td>Yes</td></tr>
+<tr><td>iOS</td><td>Vision or ML Kit</td><td>Same FFI library</td></tr>
+<tr><td>Desktop</td><td>Limited</td><td>Yes</td></tr>
+<tr><td>Binary size</td><td>Smaller if Play Services provides the model</td><td>A few MB of native library per ABI</td></tr>
+<tr><td>Offline first scan</td><td>May download a model</td><td>Always available</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>If you ship to any channel that forbids proprietary services, pick the libre engine for that channel — and consider picking it everywhere.</strong> One codebase with one scanner is cheaper to maintain than two. One project keeps the ML Kit engine on its store builds and swaps in the ZXing engine for the libre build; the honest assessment is that the accuracy difference did not justify the dual path, and a single ZXing path would have been simpler.</p>
+</div>
+</section>
+
+<section id="swap" data-chunk-id="code.swap" data-tags="build-variants,fdroid,dependencies">
+<h2>The per-channel engine swap</h2>
+
+<p>Swap the <em>package</em> at dependency-resolution time, not with a runtime branch — a runtime branch still links both libraries into the artifact.</p>
+
+<p>This is the point people get wrong. Writing <code>if (AppFlavor.isLibre) useZxing() else useMlKit()</code> selects the engine correctly and leaves every ML Kit class in the binary, where a channel's bytecode scanner will find them. The swap must happen before the build sees the dependency.</p>
+
+<pre data-lang="text"><code>tool/apply_fdroid_overrides.dart      # run BEFORE `pub get`
+  ├─ copies pubspec_overrides.fdroid.yaml → pubspec_overrides.yaml
+  │     mobile_scanner: { path: tool/fdroid_stubs/mobile_scanner }   ← no-op stub
+  └─ copies pubspec.fdroid.lock → pubspec.lock                       ← libre lockfile</code></pre>
+
+<p>The stub is a package with the same public API whose methods throw or return an unavailable state. Nothing imports it directly; the real code selects the ZXing path when the flavor is libre, and the stub exists solely so the ML Kit symbols leave the dependency graph.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Maintain a second lockfile for the libre build and regenerate it on every dependency change.</strong> One project's F-Droid audit goes red on <em>every</em> dependency-update pull request until <code>pubspec.fdroid.lock</code> is regenerated by hand. Automate it or add it to the update checklist — it is a recurring cost that is trivially avoidable and reliably forgotten.</p>
+</div>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Prove the swap worked by auditing the built artifact, not the dependency graph. See <a href="17-fdroid.html#audit">page 17</a> — a release-mode bytecode scan must report zero references, not merely zero declared dependencies.</p>
+</div>
+</section>
+
+<section id="seam" data-chunk-id="code.seam" data-tags="testing,camera,architecture">
+<h2>An injectable scanner seam</h2>
+
+<p>A camera preview cannot run in a widget test. Put the scanner behind a widget-level seam so tests inject a fake that emits a scripted result.</p>
+
+<pre data-lang="dart"><code>/// Production embeds the real camera reader; tests inject a fake that
+/// fires [onCode] on demand. Same idiom as the NFC reader seam.
+typedef ScannerBuilder = Widget Function({
+  required ValueChanged&lt;String&gt; onCode,
+  required VoidCallback onCancel,
+});
+
+class QrScanWidget extends StatelessWidget {
+  const QrScanWidget({super.key, required this.onCode, this.builder});
+
+  final ValueChanged&lt;String&gt; onCode;
+
+  /// Overridden in tests. Defaults to the real camera reader.
+  final ScannerBuilder? builder;
+
+  @override
+  Widget build(BuildContext context) =&gt;
+      (builder ?? _realScanner)(onCode: onCode, onCancel: () =&gt; Navigator.pop(context));
+}</code></pre>
+
+<pre data-lang="dart"><code>testWidgets('scanning a workspace code joins that workspace', (tester) async {
+  late ValueChanged&lt;String&gt; emit;
+  await tester.pumpWidget(_app(
+    scannerBuilder: ({required onCode, required onCancel}) {
+      emit = onCode;                       // capture the callback
+      return const SizedBox.shrink();      // no camera in a widget test
+    },
+  ));
+
+  emit('deskilo://join?ws=abc123&amp;t=XYZ');  // simulate a scan
+  await tester.pumpAndSettle();
+
+  expect(find.text('Joined workspace'), findsOneWidget);
+});</code></pre>
+
+<div class="callout why">
+<span class="tag">Why a widget-level seam rather than a service</span>
+<p>Because the thing that breaks is usually the <em>screen</em>, not the decoder: a scan that fires twice, a navigation that happens after the widget unmounts, a result handled while a dialog is open. Injecting at the widget boundary lets a test drive exactly those paths. The decoder itself is third-party code with its own tests; you do not need to test that ZXing can read a QR code.</p>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: one scan produces two navigations, or a duplicate record.</strong> Scanner callbacks fire per detected frame, so a code held in view for half a second fires many times. Debounce on the decoded value and stop the scanner on first accept:</p>
+<pre data-lang="dart"><code>String? _last;
+void _onCode(String value) {
+  if (value == _last) return;
+  _last = value;
+  _controller.stop();          // stop BEFORE the async work
+  unawaited(_handle(value));
+}</code></pre>
+<p>Stop the controller before awaiting, not after — the frames arriving during the await are exactly the duplicates.</p>
+</div>
+</section>
+
+<section id="generating" data-chunk-id="code.generating" data-tags="qr,generation,ui">
+<h2>Generating codes</h2>
+
+<p>Generating a QR code on screen is a widget; the decisions that matter are error correction, quiet zone and contrast.</p>
+
+<pre data-lang="dart"><code>QrImageView(
+  data: payload,
+  version: QrVersions.auto,
+  // M (~15% recovery) is the right default for a screen. Use H (~30%)
+  // only when a logo is overlaid or the code will be printed and handled.
+  errorCorrectionLevel: QrErrorCorrectLevel.M,
+  size: 240,
+  // The quiet zone is REQUIRED by the spec. Without it many scanners
+  // simply fail, and the failure looks like a bad camera.
+  padding: const EdgeInsets.all(16),
+  backgroundColor: Colors.white,   // always light background
+  eyeStyle: const QrEyeStyle(color: Colors.black),
+)</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Decision</th><th>Guidance</th></tr></thead>
+<tbody>
+<tr><td><strong>Error correction</strong></td><td>M on screen; H when printed, laminated, or overlaid with a logo. Higher correction means a denser code for the same payload.</td></tr>
+<tr><td><strong>Quiet zone</strong></td><td>Non-negotiable. At least four modules of margin. Most "the scanner does not work" reports are a missing quiet zone.</td></tr>
+<tr><td><strong>Contrast and polarity</strong></td><td>Dark on light. Inverted codes are optional in the spec and many scanners skip them.</td></tr>
+<tr><td><strong>Dark mode</strong></td><td>Force a white card behind the code regardless of theme. A QR code on a dark surface scans poorly.</td></tr>
+<tr><td><strong>Screen brightness</strong></td><td>Raise it while a code is displayed for scanning, and restore it after.</td></tr>
+<tr><td><strong>Payload size</strong></td><td>Shorter is denser-free. Prefer an id over an embedded JSON blob — see <a href="#payload">payload design</a>.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="printable" data-chunk-id="code.printable" data-tags="pdf,printing,qr">
+<h2>Printable code sheets</h2>
+
+<p>When codes are physical — a code per seat, per asset, per member badge — generate a PDF on-device rather than sending anything to a server.</p>
+
+<pre data-lang="dart"><code>pw.BarcodeWidget(
+  barcode: pw.Barcode.qrCode(),
+  data: 'app://seat?id=$seatId',
+  width: 96,
+  height: 96,
+)</code></pre>
+
+<p>Practical requirements learned from shipping this:</p>
+
+<ul>
+<li><strong>Label every code with human-readable text.</strong> A sheet of anonymous squares is unusable when one falls off a desk. Print the seat name or asset id under each.</li>
+<li><strong>Embed a font.</strong> The PDF base-14 fonts cannot encode a euro sign or a typographic minus. One project embeds Roboto specifically for this. If your labels can contain a currency symbol or a non-ASCII name, embed.</li>
+<li><strong>Lay out for a real page.</strong> A grid with cut marks on A4 and Letter, with margins inside any printer's unprintable area.</li>
+<li><strong>Codes must survive a photocopier.</strong> That means high error correction, generous quiet zones and a minimum module size — do not shrink to fit more per page.</li>
+<li><strong>PDF/A if it is an archival document.</strong> That brings an embedded colour profile and font-embedding requirements; only take that on if a regulation demands it.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why generate the PDF on-device</span>
+<p>It keeps a print flow working offline, it avoids sending an inventory of your physical space to a server, and it removes an entire backend surface. The only cost is that you write the layout code yourself, which for a grid of codes is an afternoon.</p>
+</div>
+</section>
+
+<section id="payload" data-chunk-id="code.payload" data-tags="qr,payload,security">
+<h2>Payload design</h2>
+
+<p>Encode a reference, not a record — and treat every scanned payload as hostile input.</p>
+
+<pre data-lang="text"><code>app://join?ws=abc123&amp;t=8FKQ2M7XPD     ← good: opaque ids, short, deep-linkable
+app://seat?id=a1b2c3                   ← good
+{"workspace":"abc123","name":"…"}      ← bad: verbose, stale on read, no verification</code></pre>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Rule</th><th>Reason</th></tr></thead>
+<tbody>
+<tr><td><strong>Reference, do not embed</strong></td><td>A printed code containing data is stale the moment the data changes. An id is resolved fresh on every scan.</td></tr>
+<tr><td><strong>Use your deep-link scheme</strong></td><td>The same payload then works from a camera app, a messaging app, or a printed sheet — one handler, three entry points.</td></tr>
+<tr><td><strong>Validate server-side</strong></td><td>Anyone can generate a QR code containing any string. The scan is an <em>input</em>, never an authorisation.</td></tr>
+<tr><td><strong>Tokens are single-use and short-lived</strong></td><td>A photographed invite code used a week later is a credential leak. See <a href="08-authentication.html#pairing">device pairing</a>.</td></tr>
+<tr><td><strong>Unambiguous alphabet for typeable codes</strong></td><td>Exclude <code>0</code>/<code>O</code> and <code>1</code>/<code>l</code>/<code>I</code>. One project uses a 32-letter alphabet and a 10-character code so the QR always has a typed fallback.</td></tr>
+<tr><td><strong>Bound the length before parsing</strong></td><td>A scanner can return a very long string. Reject over a sane limit before doing anything with it.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Always provide a manual entry path next to the scanner.</strong> Cameras fail: no permission, a broken lens, a damaged code, a user on a device with no camera. A code the user can read aloud and type is the difference between a degraded experience and a blocked one — and it costs one text field.</p>
+</div>
+</section>
+
+<section id="ux" data-chunk-id="code.ux" data-tags="ux,camera,permissions">
+<h2>Scanner UX</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Element</th><th>Behaviour</th></tr></thead>
+<tbody>
+<tr><td><strong>Permission</strong></td><td>Requested when the user taps scan, after a one-line explanation. Never at launch. See <a href="09-confidentiality.html#permissions">page 09</a>.</td></tr>
+<tr><td><strong>Permanently denied</strong></td><td>Detect it and offer a button that opens system settings — plus the manual entry field. Re-prompting does nothing and looks broken.</td></tr>
+<tr><td><strong>Reticle</strong></td><td>An overlay showing where to aim. Users hold the phone too far away without one.</td></tr>
+<tr><td><strong>Torch</strong></td><td>A toggle. Codes are often scanned in badly-lit places.</td></tr>
+<tr><td><strong>Feedback on accept</strong></td><td>Haptic plus a visual confirmation, immediately, before the async work resolves.</td></tr>
+<tr><td><strong>Unrecognised code</strong></td><td>Say "this is not a valid X code" and keep scanning. Do not close the scanner on a wrong code.</td></tr>
+<tr><td><strong>Lifecycle</strong></td><td>Stop the camera when the route is backgrounded or popped. A live camera in the background drains battery and shows a privacy indicator.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the camera stays on after leaving the scanner, or is black on return.</strong> The controller must be disposed on pop and re-created on push, and paused/resumed with the app lifecycle. Widget disposal alone is not enough — a route kept alive in a tab bar keeps the camera running. Hook <code>AppLifecycleState</code> as well as <code>dispose</code>.</p>
+</div>
+</section>
+
+<section id="ocr" data-chunk-id="code.ocr" data-tags="ocr,mlkit,vision,seven-segment">
+<h2>When there is no code: OCR</h2>
+
+<p>Sometimes the value you need is printed on a receipt or lit on a display with no code anywhere. That is a different problem and a much harder one.</p>
+
+<h3>Text recognition: two engines, one per platform</h3>
+
+<p>On-device text recognition is mature: ML Kit on Android, Vision on iOS. One project uses Vision exclusively on iOS and strips the ML Kit pods from the IPA entirely with vendored dependency overrides — tens of megabytes of framework for code that never ran, because the plugin linked both platforms unconditionally.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: your iOS binary is far larger than expected.</strong> A cross-platform ML plugin links its full native stack on both platforms even if you only call it on one. If you use the platform's own engine on iOS, check whether the plugin still pulls the other one in — and if it does, vendor a copy with the unused platform removed. Remove the vendored fork when upstream offers a per-platform opt-out.</p>
+</div>
+
+<h3>Seven-segment displays: label-anchored regions</h3>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a text recogniser reads all the labels on a display and none of the numbers.</strong> General text recognisers are trained on typefaces. Seven-segment digits are disconnected line segments and read as nothing at all — while the printed words next to them ("VOLUME", "TOTAL", "PRICE") are recognised perfectly.</p>
+<p><strong>The failed approach:</strong> fixed template regions of interest per device model. It cannot work with a hand-held camera, because the display is never in the same place twice.</p>
+<p><strong>The approach that worked:</strong> use the general recogniser for what it <em>is</em> good at — finding the label boxes — and derive each value's region from the position of its label. A generous region below or beside "TOTAL" will contain the digits regardless of framing, and a dedicated segment decoder runs inside that region.</p>
+</div>
+
+<pre data-lang="text"><code>1. Run text recognition   → label boxes with positions
+2. Match labels against a per-vendor anchor config
+     { "label": "TOTAL", "anchor": "below", "widthFactor": 2.2, … }
+3. Derive a value region from each matched label box
+4. Run the seven-segment decoder INSIDE that region
+5. Validate: plausible range, decimal places, cross-field arithmetic</code></pre>
+
+<p>Because the decoder segments within the derived region, the region only has to <em>contain</em> the digits — it can be generous. That is what makes the approach robust to a hand-held camera.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Ship a vendor configuration as data, not code, and let it be opt-in per layout.</strong> Anchor definitions in a JSON asset mean a new display layout is a data change. Keep a fixture corpus of real photographs and run the whole pipeline against it in tests — this is the recorded-fixture discipline from <a href="03-tdd-and-testing.html#false-green">page 03</a>, and OCR is where it matters most, because a synthetic rendering of a display is not a photograph of one.</p>
+</div>
+
+<p>Whatever the source, <strong>always show the user the parsed value in an editable field before committing it</strong>. OCR is a typing accelerator, not an authority. A wrong value silently accepted is worse than no OCR at all.</p>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's scanner swap: the ZXing FFI reader selected for the libre flavor, the no-op stub package, the override tool that runs before dependency resolution, and the separate libre lockfile.</li>
+<li>Its QR generation for workspace join codes, seat codes and member badges, including the on-device PDF sheets and the embedded font requirement.</li>
+<li>The other project's OCR work: the label-anchored region approach that replaced fixed template regions, the vendor anchor configuration as a JSON asset, and the vendored ML plugin forks that strip the unused platform.</li>
+</ul>
+<p>The injectable scanner seam is described in one project's source comments as sharing an idiom with its NFC reader; the code here is an illustrative reconstruction.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

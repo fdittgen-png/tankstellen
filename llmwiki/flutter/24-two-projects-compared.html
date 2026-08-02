@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two projects compared — LLM Wiki · Flutter</title>
+<meta name="description" content="A candid audit of the two source projects: what each does better, what each is missing, and which practice to adopt when they disagree.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Two projects compared","description":"What each source project does better, what each is missing, and which practice to adopt.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">24 · Appendix</span>
+<h1>Two projects compared</h1>
+<p class="lede">This wiki merges two codebases that share a methodology and diverge in practice. Where they diverge, one of them is usually right — and it is not always the older or larger one. This page is the audit: what each does better, what each is missing, and which to copy.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> cmp</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Status</b> Optional — useful for deciding between practices, not for implementing</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#profiles">The two projects</a></li>
+<li><a href="#deskilo-better">What the younger project does better</a></li>
+<li><a href="#sparkilo-better">What the older project does better</a></li>
+<li><a href="#gaps">What both are missing</a></li>
+<li><a href="#verdicts">Verdicts where they disagree</a></li>
+<li><a href="#adopt">If you adopt only five things</a></li>
+</ol>
+</div>
+
+<section id="profiles" data-chunk-id="cmp.profiles" data-tags="comparison,context">
+<h2>The two projects</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th><span class="pill src-sparkilo">sparkilo</span></th><th><span class="pill src-deskilo">deskilo</span></th></tr></thead>
+<tbody>
+<tr><td>Domain</td><td>Fuel and EV price comparison, 17 countries, OBD-II trip recording</td><td>Coworking desk booking plus a community money ledger</td></tr>
+<tr><td>Age</td><td>~2 years</td><td>~1 month at the time of this audit</td></tr>
+<tr><td>Dart files</td><td>Large — hundreds of features across 29 feature modules</td><td>293</td></tr>
+<tr><td>Tests</td><td>~1 500 files, ~15 000 cases</td><td>161 files, 1 013 cases</td></tr>
+<tr><td>Locales</td><td>23 + a pseudo-locale</td><td>5</td></tr>
+<tr><td>Backend</td><td>Optional sync; 17 third-party data sources</td><td>Supabase-first; 73 migrations, 5 edge functions</td></tr>
+<tr><td>Platforms</td><td>Android, iOS, Android Auto</td><td>Android, iOS, <strong>macOS, Windows, web</strong></td></tr>
+<tr><td>Channels</td><td>Play, App Store, self-hosted libre repo, catalog submission</td><td>Play, TestFlight, libre recipe (draft), DMG, MSI, Pages</td></tr>
+<tr><td>CI workflows</td><td>20</td><td>10</td></tr>
+<tr><td>Distinctive strength</td><td>Depth of enforcement and CI engineering</td><td>Honesty of documentation and breadth of platforms</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The second inherited the first's conventions nearly wholesale, which makes the divergences informative: each one is a place where a second domain, or a second look, produced a different answer.</p>
+</section>
+
+<section id="deskilo-better" data-chunk-id="cmp.deskilo-better" data-tags="comparison,documentation,practices">
+<h2>What the younger project does better</h2>
+
+<p>Twelve practices worth importing wholesale. Several are documentation habits, which is not a coincidence — a young project writes its documentation while it still remembers why.</p>
+
+<h3>1. A known-gaps section that names its own stale documentation</h3>
+
+<div class="callout rule">
+<span class="tag">Adopt this first</span>
+<p>Its overview document ends with a numbered list of every discrepancy between the committed documentation and the verified state of the code, the repository configuration and the live backend — each marked fixed or outstanding, each with the evidence. It records that its own branch protection does not exist despite three documents claiming it does; that two tests are date-dependent time bombs; that its coverage gate is not a meaningful ratchet; that a design document described shipped work as a proposal.</p>
+<p>This is the most valuable section in either project's documentation, because it is the only one that tells you which of the others to distrust. The older project has no equivalent — its overview is uniformly confident, which means a reader cannot tell where it is stale.</p>
+</div>
+
+<h3>2. "Derived document" framing</h3>
+
+<p>Its overview opens by saying what it consolidates and that the originals remain authoritative for their own areas, with discrepancies recorded rather than silently reconciled. That single paragraph sets the right expectation and licenses the known-gaps section that follows.</p>
+
+<h3>3. Quantified scale</h3>
+
+<p>A table of measured counts — source files, test cases, migrations, translation keys, routes, workflows — near the top. It makes staleness detectable: when the README said "30 migrations" and the tree had 73, the table is what surfaced it.</p>
+
+<h3>4. An owner-validated, implementation-free specification</h3>
+
+<p>A real product specification with a validation date and a named validator, deliberately free of framework and class names, carrying numbered <em>resolved contradictions</em> and <em>resolved pitfalls</em>. The older project has decision records and an excellent README, but no equivalent statement of intended behaviour — its behaviour is defined by its code and its issue history. See <a href="02-specification-driven-development.html">page 02</a>.</p>
+
+<h3>5. Every CI mechanic annotated with the failure that produced it</h3>
+
+<p>Its CI documentation reads as a series of earned lessons: the keychain that hangs a job in silence, the CocoaPods installation broken by a Ruby switch, the token that kept returning 403, the harvest path that silently produced empty installers, the shrinker that stripped a reflective dependency. Each is stated as symptom → cause → fix. The older project has more sophisticated CI and documents mostly the <em>what</em>.</p>
+
+<h3>6. "Degrades honestly" as a named principle</h3>
+
+<p>An unsigned artifact is named <code>-unsigned</code> and carries a warning explaining what the user must do, because <em>a file the OS refuses to open is worse than one that admits what it is</em>. The principle generalises to fallback data, partial exports and skipped uploads — and it is the frame under which <a href="04-robustness.html#honest">page 04</a> is written.</p>
+
+<h3>7. An irreplaceable-material list</h3>
+
+<p>An explicit inventory of secrets that cannot be regenerated — the once-downloadable API key, the passphrase whose loss makes an encrypted repository useless, the master keystore — with backup locations. Written after losing one of them.</p>
+
+<h3>8. Separating what automation cannot do</h3>
+
+<p>A per-channel list of owner-only steps with no API: create the app record, grant the service account permission, enable a portal-only capability, fill the console-only forms. This is what makes a launch plan realistic rather than optimistic.</p>
+
+<h3>9. A release-launch aliveness test on a real emulator</h3>
+
+<div class="callout rule">
+<span class="tag">Adopt this</span>
+<p>A workflow that builds the shrunk release artifact, installs it on an emulator, launches it with a deterministic activity name, waits fifteen seconds and asserts the process still exists — with a cached emulator snapshot cutting the job to about two minutes. It was written after release builds crashed before the first frame because the shrinker stripped a reflective dependency, and it catches that entire class. The older project, with vastly more tests, has nothing that proves its release artifact runs. See <a href="13-android.html#r8">page 13</a>.</p>
+</div>
+
+<h3>10. A permission matrix kept in lockstep</h3>
+
+<p>A document mapping every table and operation to every role with the enforcing mechanism, plus a rule that any migration touching a table, policy or privileged function updates the matrix in the same pull request, re-runs the security advisors, and pastes the advisor output into the pull-request description. Four parts, all required.</p>
+
+<h3>11. Documentation as a build input</h3>
+
+<p>Its wiki user guides are compiled into in-app offline help by a build tool. Documentation that is also a shipped artifact does not rot quietly, because a rendering failure is a build failure.</p>
+
+<h3>12. Small engineering conveniences worth stealing</h3>
+
+<ul>
+<li><strong>A guarded-mutation helper</strong> replacing the ten-line try/catch every call site was open-coding, with a boolean return so failure cannot fall through into the success path (<a href="04-robustness.html#guarded">page 04</a>).</li>
+<li><strong>A three-state hardware availability enum</strong> — ready, off, unsupported — written after a field report that a tap "was not read" with no way to distinguish three causes (<a href="12-nfc-rfid.html#status">page 12</a>).</li>
+<li><strong>The bare-<code>flutter test</code> warning</strong>: piping the command yields the pipe's exit code, so a red run reads as green.</li>
+<li><strong>The migration-drift lesson written back into the docs</strong>: a migration row with no matching file is not evidence of drift until you have read the file. The correction of an earlier wrong conclusion is recorded rather than quietly edited.</li>
+</ul>
+</section>
+
+<section id="sparkilo-better" data-chunk-id="cmp.sparkilo-better" data-tags="comparison,ci,enforcement">
+<h2>What the older project does better</h2>
+
+<p>Mostly enforcement and CI engineering — the things a codebase acquires when many people, human and otherwise, have had the chance to violate a convention.</p>
+
+<h3>1. Branch protection codified as data</h3>
+
+<p>A script holding the required-check list as an array, with a verify mode that diffs the live configuration and an idempotent apply mode. The younger project documents branch protection in three places and has none — the API reports no protection and no rulesets. The rules are honoured by convention alone. This is the sharpest contrast between the two.</p>
+
+<h3>2. Twenty-six repo-specific static lint tests</h3>
+
+<p>Plain Dart tests that read the source tree and enforce layering, error handling, localisation, design tokens, platform abstraction, routing, contracts and documentation parity — each with a ratcheting baseline that may only decrease. The younger project relies on the analyzer plus review. Over two years, the difference compounds.</p>
+
+<h3>3. CI that scales</h3>
+
+<p>Four-way test sharding, a green-tree cache that skips heavy jobs when the identical source tree already passed, per-step gating for matrix jobs, change-scoped audit jobs, and a stub workflow that re-emits every required context for documentation-only changes. The younger project runs a single sequential job — correct for its size, with no path to a fifteen-thousand-test suite.</p>
+
+<h3>4. A fifth hard rule for backend parity</h3>
+
+<p>Client/server schema parity is a numbered hard rule with a drift-guard test that fails when a synced table is missing from the setup SQL. The younger project has the practice in its conventions but not as a rule with a test.</p>
+
+<h3>5. A pseudo-locale for text expansion</h3>
+
+<p>A generated locale that expands every string, catching layout overflow before a translator does. Cheap, and it catches a class of bug that only appears in languages the developer does not read.</p>
+
+<h3>6. Depth in the areas it has lived in</h3>
+
+<ul>
+<li><strong>The service-chain abstraction</strong> — fresh/stale/miss with provenance in the result type, over 17 unreliable third-party sources. The younger project ported the cache but not the chain.</li>
+<li><strong>A three-layer libre audit</strong> reaching the bytecode-reference bar a catalog scanner actually applies. The younger project greps its dependency declarations — which would not have caught the rejection the older one received.</li>
+<li><strong>An endpoint canary</strong> that live-probes every third-party source weekly and tracks outages in one rolling issue.</li>
+<li><strong>Fifteen decision records</strong>, one superseded with a forward link, and a test enforcing their format.</li>
+<li><strong>Crash forensics</strong> — process-death record harvesting, crash-surviving breadcrumbs, and episode gating so one outage cannot evict the traces you need.</li>
+</ul>
+
+<h3>7. Parallel-agent orchestration doctrine</h3>
+
+<p>A written file-affinity discipline for running many concurrent implementation agents: file-disjoint work goes to separate agents, same-file work to one, named conflict-magnet surfaces are serialised, and a thirty-second ownership check precedes every wave. Specialised, and the only written treatment of the problem in either project.</p>
+</section>
+
+<section id="gaps" data-chunk-id="cmp.gaps" data-tags="comparison,gaps">
+<h2>What both are missing</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Gap</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td><strong>A meaningful coverage ratchet</strong></td><td>Both gate at 45%, which a thousand-test suite clears without effort. The younger project says so in its own known-gaps section. A gate that has never failed a build is not a control.</td></tr>
+<tr><td><strong>Pinned clocks in tests</strong></td><td>Two date-dependent tests in one project went red at a month boundary with no commit in between. Neither project injects a clock by default in its shared test overrides.</td></tr>
+<tr><td><strong>Cross-pollination of platform knowledge</strong></td><td>One has the Bluetooth depth and no desktop; the other has desktop, NFC and barcode and no Bluetooth. Neither documents the other's area — which is one of the reasons this wiki exists.</td></tr>
+<tr><td><strong>Tester management at scale</strong></td><td>Neither uses a Google Group for closed-track testers; both maintain lists by hand. See <a href="20-testers-google-groups.html">page 20</a>.</td></tr>
+<tr><td><strong>End-to-end verification of external integrations</strong></td><td>One project's e-invoice path is built, logged and untested against a real endpoint — which it states honestly. The general lesson: an adapter with unit tests proves nothing about the external system's acceptance.</td></tr>
+<tr><td><strong>Automated regeneration of the secondary lockfile</strong></td><td>The libre lockfile is regenerated by hand on every dependency bump, going red in between. Trivially scriptable, done in neither.</td></tr>
+<tr><td><strong>Licence-header completeness</strong></td><td>One project relicensed and left ten files declaring the old licence. A header check is twenty lines.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="verdicts" data-chunk-id="cmp.verdicts" data-tags="comparison,decisions,recommendations">
+<h2>Verdicts where they disagree</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Question</th><th>Older</th><th>Younger</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Branch protection</td><td>Codified, verified, enforced</td><td>Documented, absent</td><td><strong>Older.</strong> Either enforce it or write "by convention only" — the current state is the worst of both.</td></tr>
+<tr><td>Known-gaps section</td><td>None</td><td>Detailed, marked, dated</td><td><strong>Younger.</strong> Highest-value single practice in this comparison.</td></tr>
+<tr><td>Product specification</td><td>Code plus decision records</td><td>Owner-validated, implementation-free</td><td><strong>Younger</strong> — provided the amendment discipline is maintained. An unmaintained spec is worse than none.</td></tr>
+<tr><td>Enforcement style</td><td>26 machine-checked rules</td><td>Analyzer plus review</td><td><strong>Older.</strong> Conventions decay; tests do not.</td></tr>
+<tr><td>CI architecture</td><td>Sharded, cached, gated</td><td>Single sequential job</td><td><strong>Younger for its size, older as the destination.</strong> Do not shard 1 000 tests; do plan for it.</td></tr>
+<tr><td>Release-artifact verification</td><td>Builds it</td><td>Builds it <em>and boots it</em></td><td><strong>Younger.</strong> Compilation is not evidence of launching.</td></tr>
+<tr><td>Libre audit depth</td><td>Three layers to the bytecode-reference bar</td><td>A dependency-declaration grep</td><td><strong>Older.</strong> The weaker bar would not have caught the real rejection.</td></tr>
+<tr><td>Error-handling ergonomics</td><td>Rules plus lint tests</td><td>A helper that makes the correct path shortest</td><td><strong>Both.</strong> The helper reduces violations; the lint catches the rest.</td></tr>
+<tr><td>Platform breadth</td><td>Mobile plus car</td><td>Mobile plus three desktop targets</td><td><strong>Younger</strong>, if you want them. Each target is a permanent maintenance commitment.</td></tr>
+<tr><td>Locale strategy</td><td>23, machine-filled, pseudo-locale</td><td>5, hand-maintained</td><td><strong>Either.</strong> Machine-fill scales; hand-maintenance reads better. Both gate on parity, which is the part that matters.</td></tr>
+<tr><td>Documentation honesty</td><td>Confident throughout</td><td>Confident, with a ledger of where it is not</td><td><strong>Younger,</strong> decisively.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout why">
+<span class="tag">The pattern in these verdicts</span>
+<p>The older project wins on <em>enforcement</em> — the machinery that stops a convention decaying over two years of contributors. The younger wins on <em>honesty</em> — the documentation habits that keep a reader correctly calibrated about what is true. Those are complementary, not competing, and neither is a substitute for the other. A codebase with perfect enforcement and confident-but-stale documentation misleads exactly as effectively as one with honest documentation and no enforcement.</p>
+</div>
+</section>
+
+<section id="adopt" data-chunk-id="cmp.adopt" data-tags="recommendations,summary">
+<h2>If you adopt only five things</h2>
+
+<ol>
+<li><strong>A known-gaps section</strong> in your derived documentation, listing every discrepancy between what the docs claim and what you have verified, each marked fixed or outstanding. An hour a quarter. It is the difference between documentation people trust and documentation people route around.</li>
+<li><strong>Branch protection codified as data</strong>, with a verify mode. If the live configuration cannot be diffed against a committed target, you do not know what it is.</li>
+<li><strong>A release-artifact aliveness test.</strong> Install the shrunk release build on an emulator and assert the process survives fifteen seconds. It catches a class of crash that no unit test can reach.</li>
+<li><strong>Static lint tests with ratcheting baselines</strong> for the rules your analyzer cannot express. Forty lines each, adoptable in a legacy codebase without fixing anything first, and they never forget.</li>
+<li><strong>Record the failure next to the rule.</strong> Every rule in both projects that survived contact with a new contributor is one whose rationale was written down. The ones that were deleted as inconvenient were the ones where it was not.</li>
+</ol>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>A quick audit of your own project against this page: can you name, without looking, which of your documented invariants are machine-enforced and which are conventions? If not, that list is your known-gaps section, and writing it is the first item above.</p>
+</div>
+</section>
+
+<section id="adoption" data-chunk-id="cmp.adoption" data-tags="adoption,status,changelog">
+<h2>Adoption status</h2>
+
+<p>This page is an audit of a point in time. What has since been acted on, in the older project, is recorded here rather than by editing the findings above — the finding and its resolution are both useful.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Recommendation</th><th>Status</th><th>What landed</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>1.</b> A known-gaps section</td>
+  <td>✅ Adopted</td>
+  <td>A §22 in the derived overview, with seven verified entries. Two were real: the coverage gate is 40 % rather than the documented 45 %, and it runs only on pushes to the default branch — never on a pull request. Both had been stated incorrectly in three places.</td>
+</tr>
+<tr>
+  <td><b>2.</b> Branch protection codified as data</td>
+  <td>✅ Already present, now verified</td>
+  <td><code>--verify</code> reports <code>strict=false</code> and all ten required checks matching the committed target. Recorded in the known-gaps section as a passing check, so the next audit has a baseline.</td>
+</tr>
+<tr>
+  <td><b>3.</b> A release-artifact aliveness test</td>
+  <td>✅ Adopted</td>
+  <td>An advisory workflow builds the R8-shrunk release APK, installs it on an API-34 emulator with a cached AVD snapshot, launches it by explicit component name, and asserts the process survives fifteen seconds <em>and</em> logged no fatal exception. Logcat uploads on every outcome. <strong>Not yet executed</strong> — recorded as an outstanding gap.</td>
+</tr>
+<tr>
+  <td><b>4.</b> Static lint tests with ratcheting baselines</td>
+  <td>✅ Extended (27th rule)</td>
+  <td>A ratchet forbidding new hand-rolled <code>unawaited(errorLogger.log(...))</code> blocks, with a grandfathered set of twelve files that may only shrink and a pinned length so widening it fails the build.</td>
+</tr>
+<tr>
+  <td><b>The guarded-mutation helper</b> (from the younger project's list)</td>
+  <td>✅ Adopted, migrated, <b>ratchet at zero</b></td>
+  <td>Four helpers — <code>logFailure</code>, <code>guard</code>, <code>guardAsync</code>, <code>runGuarded</code> — replacing the seven-line block found in 26 files. 72 call sites migrated by pattern, the remaining 16 (extra context keys, synthetic errors, non-ui layers) by hand; the ratchet's grandfathered set is <strong>empty and pinned at zero</strong>. Fifteen fault-injection tests back the never-throws contract — one added after a second-look review found the helper could throw out of its own catch block when the context had no snackbar-messenger ancestor. <code>runGuarded</code> shipped with zero consumers (the exact producer-without-consumer anti-pattern this wiki warns about) and now guards the auto-record persist and the backup-export pipeline.</td>
+</tr>
+<tr>
+  <td><b>The three-state hardware availability enum</b></td>
+  <td>✅ Adopted, generalised, <b>wired end-to-end</b></td>
+  <td>Applied to Bluetooth rather than NFC, where the same diagnosability gap was worse: an empty OBD2 scan had <em>five</em> causes and the app could distinguish two. <code>Obd2ScanReadiness</code> resolves all five in priority order, including the silent one — Android location services switched off system-wide, which makes a BLE scan return an empty list with no error anywhere. The second-look review found the first wiring was <em>dead code</em>: the scan surfaces an empty window as a timeout <em>error</em>, so the empty-state branch was unreachable. It is now wired at three points — a <strong>pre-flight</strong> that resolves the probe before burning a radio-scan window (a blocked user gets the diagnostic instantly, not after a guaranteed-timeout spinner), the timeout error itself, and the defensive empty-list branch. The probe <strong>fails open</strong>: only a positively-identified, non-promptable blocker may divert, because the scan is what triggers the OS permission prompt, and a probe fault must never hide a scan that would have worked.</td>
+</tr>
+<tr>
+  <td><b>5.</b> Record the failure next to the rule</td>
+  <td>◐ Ongoing</td>
+  <td>Every artifact above carries its rationale in a doc comment — the duplication count, the specific bugs the ceremony hid, the field report behind the readiness enum. This is a habit rather than a deliverable.</td>
+</tr>
+<tr>
+  <td>Pinned clocks in tests</td>
+  <td>◐ Lower risk than assessed</td>
+  <td>Re-measured: the older project already injects a <code>DateTime Function()</code> seam per class throughout <code>lib/</code>, and a scan found no literal month/year assertions of the kind that broke the younger project at a month boundary. The 416 <code>DateTime.now()</code> calls in its tests are test-data construction, not assertions. Left as-is.</td>
+</tr>
+<tr>
+  <td>A meaningful coverage ratchet</td>
+  <td>⚠ Open</td>
+  <td>Now documented accurately instead of aspirationally, which is the prerequisite. Raising it, and moving the check somewhere a pull request can see, remains a decision.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: an "adopted" practice that was never exercised.</strong> The second-look review of this very adoption pass found three defects in work all tests had blessed: <code>runGuarded</code> could throw out of its own catch block (no snackbar-messenger ancestor — the fault-injection suite only ever pumped a full app scaffold); the empty-scan diagnostic was unreachable dead code (the scan reports an empty window as a timeout error, a contract the wiring never checked); and the boot-check workflow referenced <code>${{ env.ANDROID_SDK_ROOT }}</code>, which is empty in the expressions context, plus a keystore that does not exist on a fresh runner. All three share one lesson: <em>green tests prove the paths the tests take</em>. A helper needs a fault injected at every seam it guards, a UI state needs the trigger that actually produces it, and a workflow has proven nothing until its first real run.</p>
+</div>
+
+<div class="callout why">
+<span class="tag">Why record adoption rather than edit the findings</span>
+<p>Because the finding is the reusable part. "The coverage gate says 45 % and enforces 40 %" is worth more to the next reader than a silently corrected number, and the pairing shows what a known-gaps audit actually yields — in this case two live inaccuracies in three documents, found in about ten minutes by checking claims against the files rather than against memory.</p>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>Both repositories as of 2026-08-01: their overview documents, agent-rules files, decision records, CI workflows, lint suites, store metadata and release guides.</li>
+<li>The younger project's known-gaps section, which supplied several of the findings attributed to it here — including the absent branch protection, the date-dependent tests, the coverage-gate assessment, the incomplete licence-header migration and the unverified external integration. Those are its own disclosures, not external criticism.</li>
+<li>The older project's branch-protection script, lint suite, CI topology and libre-audit script.</li>
+</ul>
+<p>Counts are as measured on that date and will drift. Verdicts are judgements, argued from the evidence above rather than measured.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recurring bugs & regressions — LLM Wiki · Flutter</title>
+<meta name="description" content="What to do when a bug comes back: the seven-step protocol, the nine-fix cautionary tale, multi-cause symptoms, source versus trigger, detector blind spots, cycle-time fingerprinting, and forensics for crashes that leave no traces.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"The recurring-bug protocol","description":"Stop patching, isolate the root cause, separate look-alike failure modes, write the integration-level reproduction, never ship diagnostics as product.","dateModified":"2026-08-02","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">27 · Method</span>
+<h1>Recurring bugs &amp; regressions</h1>
+<p class="lede">A bug that comes back is not the same bug being fixed badly — it is usually a symptom with more than one cause, and each patch closes one path while leaving another open. The moment a bug recurs, the job changes: stop patching, start diagnosing. This page is the protocol for that moment, and the eight-month, nine-fix saga that paid for it.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> rebug</span>
+  <span><b>Updated</b> 2026-08-02</span>
+  <span><b>Depends on</b> 03 TDD, 04 Robustness, 05 Traceability</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#trigger">When this protocol applies</a></li>
+<li><a href="#tale">The cautionary tale: nine fixes, one symptom</a></li>
+<li><a href="#protocol">The seven steps</a></li>
+<li><a href="#detectors">Detector blind spots and circular gates</a></li>
+<li><a href="#fingerprint">Cycle-time fingerprinting</a></li>
+<li><a href="#notraces">Crashes with no traces</a></li>
+<li><a href="#antipatterns">Anti-patterns</a></li>
+</ol>
+</div>
+
+<section id="trigger" data-chunk-id="rebug.trigger" data-tags="regressions,process,triage">
+<h2>When this protocol applies</h2>
+
+<p>The protocol has a mechanical trigger, because the whole point is to interrupt the instinct to write one more quick patch. Invoke it when <em>any</em> of these is true:</p>
+
+<ul>
+<li>An issue title contains <em>regression of #NN</em>, <em>despite #NN</em>, <em>leaks past #NN</em>, <em>twin of #NN</em>, or <em>#NN follow-up</em> — for a bug, not a planned phase.</li>
+<li>You are about to write the <strong>third or later</strong> fix for the same user-visible symptom.</li>
+<li>A fix you are reviewing <strong>deletes defensive code</strong> added by an earlier fix for the same symptom.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why</span>
+<p>Two fixes for one symptom can be honest bad luck. Three is a pattern, and the pattern almost always means the model of the bug is wrong — not the patches. From the third fix on, every additional patch has negative expected value: it costs a CI round-trip, adds a defensive layer someone will later have to reason about, and postpones the diagnosis that was needed at fix two.</p>
+</div>
+</section>
+
+<section id="tale" data-chunk-id="rebug.tale" data-tags="regressions,case-study,root-cause">
+<h2>The cautionary tale: nine fixes, one symptom</h2>
+
+<p>One source project's map showed grey tiles on cold start. The issue chain ran <strong>#473 → #498 → #709 → #843 → #930 → #1164 → #1240 → #1268 → #1316</strong> — nine "fixes" across eight months for one symptom. Step by step, what actually happened:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Stage</th><th>What went wrong</th></tr></thead>
+<tbody>
+<tr><td>The symptom hid two causes</td><td>Grey tiles came from (a) a <em>failed</em> HTTP tile fetch, and (b) a fetch that was <em>never issued</em> because the tile layer captured a zero-size viewport from an offstage pre-mount. Identical on screen; unrelated in code.</td></tr>
+<tr><td>#843: right fix, wrong conclusion</td><td>Correctly fixed cause (a) — then declared it "the root cause" and <strong>deleted the cause-(b) defenses</strong> earlier fixes had added. Cold start regressed immediately; #1164 had to re-add the deleted scaffolding. Pure churn.</td></tr>
+<tr><td>#930, #1240: self-inflicted</td><td>Bugs in #843's own new code.</td></tr>
+<tr><td>#1164, #1268, #1316: trigger-patching</td><td>Each guarded one more <em>situation</em> that exposed cause (b) — tab-flip, app-resume, cold-start-direct — without ever fixing cause (b) itself.</td></tr>
+<tr><td>#1316: the confession</td><td>Shipped an in-app debug overlay so the user could collect evidence — a tacit admission the root cause was still unknown after eight fixes.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Net result: code that worked by brute force — around five redundant rebuild triggers, two magic timing constants, ~150 lines of regression-diary comments, a shipped debug overlay, and a dead duplicate file. Every step of the protocol below is the negation of one row of this table.</p>
+</section>
+
+<section id="protocol" data-chunk-id="rebug.protocol" data-tags="regressions,protocol,root-cause,testing">
+<h2>The seven steps</h2>
+
+<p><strong>1 · Stop. Do not write fix N+1 yet.</strong> The instinct after a regression is to patch the newly-found path. One more patch on an un-isolated root cause just moves the leak.</p>
+
+<p><strong>2 · Enumerate the failure modes — are there actually two?</strong> List every distinct <em>cause</em> that produces this symptom, each with its precise mechanism. A failed fetch and a never-issued fetch both render grey; they are different bugs. If you find two, split the symptom-level issue into one issue per cause — the tracker should model the causes, not the pixels.</p>
+
+<p><strong>3 · Find the source, not the trigger.</strong> A trigger is a situation that exposes the bug — "tab-flip", "app-resume". The source is the one defect all triggers share. The tell that you are trigger-patching: each fix guards a new situation with a new flag. Fix the source once and every trigger stops mattering.</p>
+
+<p><strong>4 · Write the reproduction test at the level the bug lives.</strong> Every map fix added a unit test for its own knob; none tested the integration path the bug lived in. The bug was a widget-lifecycle race, so the honest test had to pump the real widget through the real lifecycle transition. Write that test and make it the regression lock — a future "delete the defenses" change must fail CI, not a code review.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>5 · Never delete another fix's defenses without proving they are dead.</strong> Proof means: the reproduction test from step 4 passes <em>with the defensive code removed</em>. #843 deleted defenses on the assumption its cause was the whole story; it was not, and the deletion alone caused a release-visible regression. Default to keeping defenses.</p>
+</div>
+
+<p><strong>6 · Never ship diagnostics as product.</strong> If you cannot reproduce and need field evidence, the instrumentation goes behind a debug flag or into a debug build — never into production UI with translated strings across every locale. A shipped debug overlay is a confession that step 3 was skipped. (The line, precisely: a consent-gated <em>local</em> error log the user can export is legitimate permanent infrastructure — see <a href="05-traceability.html">page 05</a>; a user-facing overlay is not. The test is whether it changes product UI.)</p>
+
+<p><strong>7 · Clean up the patch-pile in the same effort.</strong> Once the source is fixed, delete the now-redundant triggers, the magic timing constants, the regression-diary comments, the superseded files. A root-cause fix that leaves the scaffolding is half done — the next maintainer cannot tell live code from dead. If the cleanup touches more than a handful of files or multiple subsystems, it is an Epic with the structural fix, the scaffolding removal and the regression test as separate children (<a href="23-github-craft.html">page 23</a>).</p>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>The protocol succeeded when three things are true: the reproduction test is red on the pre-fix commit and green after; the fix count for this symptom stops growing; and a grep for the symptom's guard flags and timing constants comes back empty. If any defensive scaffolding survived, either it is load-bearing (then the source is not fully fixed) or it is dead (then step 7 is not done).</p>
+</div>
+</section>
+
+<section id="detectors" data-chunk-id="rebug.detectors" data-tags="regressions,detectors,state-machines">
+<h2>Detector blind spots and circular gates</h2>
+
+<p>Two failure classes survive even a correct root-cause fix, both observed in a Bluetooth reconnect saga and both general:</p>
+
+<ul>
+<li><strong>A counter only sees the failure shape it was built for.</strong> A wedge detector counting consecutive <em>failed</em> connect ladders is blind to success-then-instant-drop <em>flapping</em> — the connect completes, the session dies in seconds, and the success resets the backoff, so the loop never converges and the detector never fires. When adding any storm or stand-down detector, enumerate the other terminal shapes — hard failure, silent success, short-lived success, timeout — and give each its own latch or an explicit "covered by X" note. Corollary: a success signal must never blindly reset escalation state; only a success that <em>proves itself</em> (a session lifetime over a threshold, an explicit user action) may.</li>
+<li><strong>Never let a gate validate a value the system itself derived.</strong> A receipt-OCR gate "verified" litres × price = total — on a total it had computed from those same two mis-assigned numbers. Tautological confidence 1.0 on garbage. Confidence must count independently-read inputs only; derived fields are flagged and never raise it.</li>
+</ul>
+
+<p>Related hand-off rule from the same saga: <strong>a state machine's "ready" state is not proof its held resource is alive.</strong> After an external teardown, the supervisor still held the corpse in <code>ready</code>. Any seam that hands a resource across layers checks the resource's own liveness, never just the holder's state.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>When a user's debug export reproduces the bug, copy it verbatim into <code>test/fixtures/</code> as the red-on-master test.</strong> A real field artifact beats any synthetic reproduction — it encodes the rotation, the OCR mangling, the timing pattern you would never invent. Synthesising "something like it" re-introduces exactly the assumptions the bug lives in.</p>
+</div>
+</section>
+
+<section id="fingerprint" data-chunk-id="rebug.fingerprint" data-tags="regressions,diagnosis,timing">
+<h2>Cycle-time fingerprinting</h2>
+
+<p>When a failure repeats on a steady period, <strong>the period names the driver</strong>: measure what single step in the system takes exactly that long. A field reconnect loop ran at ~4.7&nbsp;s — precisely the duration of one connect dial — which proved the sequence was dial → adopt → <em>instant</em> drop (the failure took ~0&nbsp;s), not a timeout, not a backoff, not a watchdog. One number eliminated three hypotheses before any code was read.</p>
+
+<p>The inverse reading matters too: <strong>a run of success traces at machine cadence is itself the anomaly</strong>. Twenty successful connects in a hundred seconds means success is not sticking — the question becomes "who consumes the success?", not "why does it fail?". Either way the log's <em>rhythm</em> is evidence before its contents are.</p>
+</section>
+
+<section id="notraces" data-chunk-id="rebug.notraces" data-tags="regressions,forensics,crashes,exitinfo">
+<h2>Crashes with no traces</h2>
+
+<p>When a recurring crash leaves nothing in the app's own error log, the absence of traces <em>is</em> the diagnosis: the failure lives in a layer your handlers cannot see — native code, an ANR, an OOM kill, an injected wrapper — or the evidence dies with the process because it only ever lived in memory. The move is a <strong>forensics-first pass</strong>: ship instrumentation that harvests OS-level exit records (Android's <code>ApplicationExitInfo</code>) and persists the in-memory diagnostics to disk — and only then hypothesise.</p>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: "recording crashes, nothing in the log" — for months.</strong> One source project's saga resolved three days after shipping an exit-info harvest: the culprit was a store-injected integrity wrapper that no dev build even contained — unfindable by any amount of reading your own code. Corollary: <strong>an environment-conditional crash points at the environment delta.</strong> Only-on-store-build, only-on-one-OEM, only-after-store-update — list what that channel adds or changes (re-signing wrappers, split installs, vendor patches) before auditing your own code.</p>
+</div>
+
+<p>This instrumentation is not the step-6 anti-pattern: a local, consent-gated error log the user can export changes no product UI and is legitimate permanent infrastructure. The forbidden thing remains the user-facing overlay shipped because diagnosis stalled.</p>
+</section>
+
+<section id="antipatterns" data-chunk-id="rebug.antipatterns" data-tags="regressions,anti-patterns,summary">
+<h2>Anti-patterns</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Anti-pattern</th><th>Which step it violates</th></tr></thead>
+<tbody>
+<tr><td>Patching the trigger you just found</td><td>Step 3 — that is fix N+1; find the source first</td></tr>
+<tr><td>Assuming one symptom = one cause</td><td>Step 2 — the most expensive sagas are two causes wearing one symptom</td></tr>
+<tr><td>Deleting defenses on a hunch</td><td>Step 5 — prove they are dead with the reproduction test, or keep them</td></tr>
+<tr><td>Shipping a debug overlay as a feature</td><td>Step 6 — instrumentation is not a deliverable</td></tr>
+<tr><td>Fixing the source but leaving the patch-pile</td><td>Step 7 — half a cleanup is still a patch-pile</td></tr>
+<tr><td>Unit-testing each fix's own knob</td><td>Step 4 — the reproduction must live at the level the bug lives</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>The nine-issue map grey-tiles chain in one source project, read end to end: the two-cause split, the deleted-defenses regression, the trigger patches, the shipped overlay, and the eventual Epic that removed the scaffolding.</li>
+<li>The same project's Bluetooth reconnect saga: the flapping-blind wedge detector, the success-resets-backoff loop, the 4.7-second cycle-time diagnosis, and the ready-state-versus-live-resource hand-off rule.</li>
+<li>Its receipt-OCR circular-confidence incident and the verbatim-fixture rule that followed.</li>
+<li>Its "recording crashes, nothing in the log" resolution via an <code>ApplicationExitInfo</code> harvest, and the store-injected-wrapper finding.</li>
+</ul>
+<p>This page originated as a maintained agent skill in the projects' shared tooling; it is promoted here because the protocol is human process, not agent process. All incidents are observed; the protocol's step ordering is the recommendation distilled from them.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

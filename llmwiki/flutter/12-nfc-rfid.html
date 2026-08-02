@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NFC &amp; RFID — LLM Wiki · Flutter</title>
+<meta name="description" content="Three-state availability so a silent tap is diagnosable, session lifecycle on a long-lived kiosk, UID normalisation as a credential contract, and platform reality.">
+<link rel="stylesheet" href="assets/wiki.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"NFC and RFID in Flutter","description":"Three-state availability, kiosk session lifecycle, UID normalisation as a credential contract.","dateModified":"2026-08-01","isPartOf":{"@type":"Collection","name":"LLM Wiki — Building Flutter Applications"}}
+</script>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar" aria-label="Wiki navigation"></nav>
+<main class="main">
+<article>
+
+<span class="kicker">12 · Device</span>
+<h1>NFC &amp; RFID</h1>
+<p class="lede">NFC has one design decision that dominates all the others: what your code does when it cannot read a tag. Get that wrong and you ship a surface where "I tapped my card and nothing happened" is unanswerable — which, on a wall-mounted tablet nobody can attach a debugger to, is the end of the investigation.</p>
+
+<div class="meta">
+  <span><b>Chunk prefix</b> nfc</span>
+  <span><b>Updated</b> 2026-08-01</span>
+  <span><b>Depends on</b> 01 Foundations · 04 Robustness</span>
+</div>
+
+<div class="toc">
+<h4>On this page</h4>
+<ol>
+<li><a href="#reality">Platform reality</a></li>
+<li><a href="#status">Three-state availability</a></li>
+<li><a href="#session">Session lifecycle on a long-lived kiosk</a></li>
+<li><a href="#uid">UID normalisation as a credential contract</a></li>
+<li><a href="#security">What an NFC UID is and is not</a></li>
+<li><a href="#enrolment">Enrolment and revocation</a></li>
+<li><a href="#kiosk">Kiosk mode around the reader</a></li>
+<li><a href="#ndef">NDEF versus raw UID</a></li>
+<li><a href="#testing">Testing an NFC surface</a></li>
+</ol>
+</div>
+
+<section id="reality" data-chunk-id="nfc.reality" data-tags="nfc,platform,capabilities">
+<h2>Platform reality</h2>
+
+<p>NFC is an Android feature with an iOS asterisk, and for the tablet-on-a-wall use case it is Android only.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Android</th><th>iOS</th><th>Desktop / web</th></tr></thead>
+<tbody>
+<tr><td>Read a tag UID</td><td>Yes</td><td>iPhone 7+ with the Core NFC entitlement</td><td>No</td></tr>
+<tr><td>Background tag dispatch</td><td>Yes — the OS can launch your app on a tap</td><td>Limited; background reads only on newer models, NDEF only</td><td>No</td></tr>
+<tr><td>Continuous polling</td><td>Yes</td><td><strong>No</strong> — each read is a modal, user-initiated session</td><td>No</td></tr>
+<tr><td>Tablets</td><td>Common</td><td><strong>iPads have no NFC hardware at all</strong></td><td>—</td></tr>
+<tr><td>Entitlement needed</td><td>A manifest permission</td><td>A provisioning-profile entitlement</td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>For an always-on tap surface, target Android and hide the path everywhere else.</strong> iOS cannot poll continuously — every read is a modal sheet the user must dismiss — and no iPad has the hardware. Treat every other platform as <code>unsupported</code> and hide the affordance rather than shipping a button that opens a sheet and does nothing.</p>
+</div>
+
+<pre data-lang="xml"><code>&lt;!-- Android --&gt;
+&lt;uses-permission android:name="android.permission.NFC" /&gt;
+&lt;!-- required:false — the app must still install on devices without NFC --&gt;
+&lt;uses-feature android:name="android.hardware.nfc" android:required="false" /&gt;</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: the app is not installable on a large share of devices.</strong> Declaring <code>android.hardware.nfc</code> without <code>required="false"</code> makes the store filter out every device with no NFC chip. Same for camera, Bluetooth and location hardware. Always declare optional hardware as optional and check availability at runtime.</p>
+</div>
+</section>
+
+<section id="status" data-chunk-id="nfc.status" data-tags="nfc,diagnostics,api-design">
+<h2>Three-state availability</h2>
+
+<p>A boolean <code>isAvailable</code> is not enough. There are three distinct reasons a tap will not read, and each needs a different message, so the API must distinguish them.</p>
+
+<pre data-lang="dart"><code>/// The precise NFC state of THIS device. The kiosk sheet shows it so a
+/// silent tap path is diagnosable at the wall.
+enum NfcStatus {
+  /// Adapter present and enabled — a session can read taps.
+  ready,
+
+  /// Adapter present but turned OFF in the device's system settings.
+  off,
+
+  /// No NFC here: non-Android platform, or no adapter hardware.
+  unsupported,
+}
+
+class NfcUidReader {
+  /// Resolved fresh on every call — the user can toggle NFC while the
+  /// sheet is open, and a cached answer would be wrong.
+  Future&lt;NfcStatus&gt; status() async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return NfcStatus.unsupported;
+    }
+    try {
+      return switch (await NfcManager.instance.checkAvailability()) {
+        NfcAvailability.enabled  =&gt; NfcStatus.ready,
+        NfcAvailability.disabled =&gt; NfcStatus.off,
+        _                        =&gt; NfcStatus.unsupported,
+      };
+    } catch (e, st) {
+      debugPrint('nfc availability check failed: $e\n$st');
+      TraceLogger.instance
+          .error('nfc', 'availability check failed', error: e, stackTrace: st);
+      return NfcStatus.unsupported;
+    }
+  }
+}</code></pre>
+
+<div class="callout why">
+<span class="tag">Why three states and not two</span>
+<p>This comes directly from a field report: <em>"the RFID was not read"</em>, with no way to tell whether the tablet lacked the hardware, had NFC switched off in system settings, or had a session that failed to start. Three different problems, three different fixes, one indistinguishable symptom. The enum turns a support conversation into a glance at the screen.</p>
+</div>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>State</th><th>What the UI says</th><th>What it offers</th></tr></thead>
+<tbody>
+<tr><td><code>ready</code></td><td>"Hold the card to the back of the device."</td><td>The tap target, plus manual entry</td></tr>
+<tr><td><code>off</code></td><td>"NFC is switched off in this device's settings — turn it on to read cards."</td><td>A button opening system NFC settings, plus manual entry</td></tr>
+<tr><td><code>unsupported</code></td><td>Nothing about NFC at all</td><td>Manual entry only; the tap path is hidden entirely</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Resolve the status fresh on every call, never cache it.</strong> The user can toggle NFC in the notification shade while your sheet is open — which is exactly what they will do after reading your <code>off</code> message. A cached <code>off</code> would then persist and make your own instruction appear not to work.</p>
+</div>
+</section>
+
+<section id="session" data-chunk-id="nfc.session" data-tags="nfc,lifecycle,kiosk,robustness">
+<h2>Session lifecycle on a long-lived kiosk</h2>
+
+<p>A wall tablet opens the same sheet hundreds of times a day, and each open must leave the reader in a known state — which means stopping before starting, and never letting a failed start pass silently.</p>
+
+<pre data-lang="dart"><code>/// Starts a read session; [onUid] fires with the normalised UID of the
+/// first tag presented. Returns whether a session is actually up, so the
+/// UI can say so rather than showing a tap icon over a dead reader.
+Future&lt;bool&gt; startRead({required ValueChanged&lt;String&gt; onUid}) async {
+  // A previous sheet's unawaited stop() may still be in flight on a
+  // long-lived tablet — stop first, ourselves, unconditionally.
+  await stop();
+  try {
+    await _startSession(onUid);
+    return true;
+  } catch (e, st) {
+    debugPrint('nfc start failed, retrying: $e\n$st');
+    TraceLogger.instance
+        .error('nfc', 'start failed, retrying', error: e, stackTrace: st);
+    await Future&lt;void&gt;.delayed(const Duration(milliseconds: 400));
+    try {
+      await _startSession(onUid);
+      return true;
+    } catch (e, st) {
+      TraceLogger.instance
+          .error('nfc', 'start retry failed', error: e, stackTrace: st);
+      return false;                      // caller MUST surface this
+    }
+  }
+}</code></pre>
+
+<p>Four properties, each of which was added after a real failure:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Property</th><th>The failure it prevents</th></tr></thead>
+<tbody>
+<tr><td><strong>Stop before start, always</strong></td><td>A previous sheet's teardown still in flight leaves the adapter claimed and the new session fails</td></tr>
+<tr><td><strong>One retry with a short delay</strong></td><td>The adapter needs a moment after a stop; a bare retry succeeds where an immediate start does not</td></tr>
+<tr><td><strong>Returns a boolean</strong></td><td>The sheet used to show a tap icon over a dead reader forever. A start that can fail must report it.</td></tr>
+<tr><td><strong>Traced at every step</strong></td><td>A wall tablet has no debugger. The trace log is the only forensic record.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Never show a tap affordance unless a session is confirmed running.</strong> This is <a href="04-robustness.html#honest">honest degradation</a> applied to a hardware surface: a tap icon is a promise that a tap will be read. If <code>startRead</code> returns false, show the failure and the manual-entry fallback — do not show the icon and hope.</p>
+</div>
+
+<p>Also stop the session on route pop, on app background, and on a successful read. An orphaned session on Android will intercept taps intended for another app.</p>
+</section>
+
+<section id="uid" data-chunk-id="nfc.uid" data-tags="nfc,uid,contract,normalisation">
+<h2>UID normalisation as a credential contract</h2>
+
+<p>The tag UID is bytes. The moment it becomes a credential, its textual form is a contract between the reader, the storage layer and the server — so normalise it in exactly one place and write the rule down.</p>
+
+<pre data-lang="dart"><code>/// The badge credential contract, shared with the server-side
+/// `register_nfc_badge` function: lowercase hex, no separators.
+///   [0x04, 0xA2, 0x2B, 0x7C]  →  "04a22b7c"
+String normaliseUid(List&lt;int&gt; bytes) =&gt;
+    bytes.map((b) =&gt; b.toRadixString(16).padLeft(2, '0')).join();</code></pre>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a card enrolled on one device is not recognised on another.</strong> The same tag can be rendered as <code>04A22B7C</code>, <code>04:a2:2b:7c</code>, <code>04-A2-2B-7C</code>, or byte-reversed depending on the platform, the plugin version and the technology the tag was discovered under. If enrolment and verification use different formatters — or one of them was written before the other — the comparison silently never matches.</p>
+<p><strong>Countermeasures:</strong> one normalisation function, called on both paths; the rule stated in a comment at the function <em>and</em> in the server-side function that stores it; and a unit test with real captured byte arrays asserting the exact expected string. Never compare raw byte lists across a network boundary.</p>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Store a hash, not the UID, if the credential is sensitive.</strong> A UID is a bearer token for whatever it unlocks. If your threat model includes a leaked database, store a salted hash and compare hashes — the reader normalises and hashes, the server compares. You lose the ability to display "card ending 7c", which is usually an acceptable trade.</p>
+</div>
+</section>
+
+<section id="security" data-chunk-id="nfc.security" data-tags="security,threat-model,nfc">
+<h2>What an NFC UID is and is not</h2>
+
+<p>A UID is an identifier, not an authenticator. Design the feature so that is acceptable, or use cryptographic tags.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Property</th><th>Reality</th></tr></thead>
+<tbody>
+<tr><td>Uniqueness</td><td>Usually, on genuine tags. Not guaranteed — some cards use random UIDs per session, and clones exist.</td></tr>
+<tr><td>Cloneability</td><td><strong>Trivial.</strong> Writable-UID cards and phone emulators are cheap and widely available.</td></tr>
+<tr><td>Readable by others</td><td>Yes. Any phone can read the UID of a card in someone's pocket at close range.</td></tr>
+<tr><td>Authentication strength</td><td><strong>None.</strong> Comparable to knowing a username.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Match the mechanism to the consequence.</strong> A UID is fine for a convenience action in a semi-trusted physical space — checking in at a desk, logging an activity — where the worst case is a nuisance and the space itself provides the real access control. It is <em>not</em> fine for unlocking a door, authorising a payment, or anything an attacker would spend five minutes to defeat. For those, use a tag with mutual authentication and a proper key hierarchy, or a different mechanism entirely.</p>
+</div>
+
+<p>Compensating controls that are cheap and worth having even for low-stakes uses:</p>
+
+<ul>
+<li><strong>Bind the tap to a physical context.</strong> A kiosk in a known location constrains who can tap; a phone in a pocket does not.</li>
+<li><strong>Make the action auditable and visible.</strong> The person whose badge was used should see the resulting event, so misuse is noticed.</li>
+<li><strong>Make it reversible.</strong> A check-in can be undone; a payment cannot.</li>
+<li><strong>Rate-limit per badge.</strong> Twenty taps a minute is not a person.</li>
+<li><strong>Allow instant revocation</strong> — see below.</li>
+</ul>
+</section>
+
+<section id="enrolment" data-chunk-id="nfc.enrolment" data-tags="nfc,enrolment,admin">
+<h2>Enrolment and revocation</h2>
+
+<p>Enrolment is an administrative action performed on a trusted device: an authorised user opens a member's record, taps the card, and the normalised UID is stored against that member.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Requirement</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td><strong>Authorised roles only</strong></td><td>Enforced server-side in the registration function, not by hiding the button. See <a href="07-supabase.html#rpc">page 07</a>.</td></tr>
+<tr><td><strong>One badge per person, per space</strong></td><td>A unique index on the normalised UID within the tenant. Enrolling an already-registered card must fail with a named error, not create a duplicate.</td></tr>
+<tr><td><strong>Show what was read</strong></td><td>Display the normalised UID during enrolment so the operator can confirm the right card was tapped.</td></tr>
+<tr><td><strong>Instant revocation</strong></td><td>Removing a badge takes effect on the next tap. If the kiosk caches a badge list for offline operation, that cache needs a short TTL and a revocation push.</td></tr>
+<tr><td><strong>Manual alternative</strong></td><td>An operator on a device without NFC must still be able to type a UID. Otherwise enrolment is blocked by hardware.</td></tr>
+<tr><td><strong>Audit the enrolment</strong></td><td>Who enrolled which badge for whom, and when. Badge assignment is a privilege grant.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout trap">
+<span class="tag">Trap</span>
+<p><strong>Symptom: a revoked badge keeps working at the kiosk.</strong> An offline-capable kiosk that caches the badge list will honour a revoked badge until the cache expires. Decide explicitly: either the kiosk requires connectivity for a tap (simple, correct, fails when the network does), or it caches with a short TTL and you accept a bounded revocation window — and you write that window into the admin UI so nobody assumes revocation is instant when it is not.</p>
+</div>
+</section>
+
+<section id="kiosk" data-chunk-id="nfc.kiosk" data-tags="kiosk,android,ux">
+<h2>Kiosk mode around the reader</h2>
+
+<p>A tap surface usually lives inside a kiosk mode — a restricted state on a shared device — and that has its own requirements independent of NFC.</p>
+
+<ul>
+<li><strong>Entering kiosk mode is authenticated; leaving it is too.</strong> A device PIN held separately from user credentials is the usual shape, so an operator can lock the tablet into the surface and only they can unlock it.</li>
+<li><strong>No navigation out.</strong> No back affordance to the rest of the app, no deep links accepted, no share sheet.</li>
+<li><strong>No personal data on screen at rest.</strong> The idle state shows the space, not a member. A name appears only in direct response to that member's own tap, and clears on a timer.</li>
+<li><strong>Auto-return to idle.</strong> Every screen returns to the tap prompt after a short timeout, so the last user's result is not left visible.</li>
+<li><strong>Keep the screen on, and handle the reboot.</strong> A wall tablet needs a wake lock, and needs to come back into kiosk mode after a power cut without an operator present.</li>
+<li><strong>Show the diagnostic state.</strong> The three-state NFC status, connectivity, and the last successful sync — small, in a corner. This is what makes a remote support call possible.</li>
+</ul>
+
+<div class="callout why">
+<span class="tag">Why the idle-state rule matters most</span>
+<p>A kiosk is a screen in a shared room. Anything it displays is displayed to everyone who walks past, indefinitely. The default state must therefore be information-free, and every transient state must expire on its own — you cannot rely on the user to navigate away, because the interaction model is "tap and walk off".</p>
+</div>
+</section>
+
+<section id="ndef" data-chunk-id="nfc.ndef" data-tags="nfc,ndef,tags">
+<h2>NDEF versus raw UID</h2>
+
+<p>Two ways to use a tag, with different trade-offs.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th></th><th>Raw UID</th><th>NDEF payload</th></tr></thead>
+<tbody>
+<tr><td>Works with</td><td>Any tag, including existing access cards</td><td>Tags you write yourself</td></tr>
+<tr><td>Setup</td><td>Enrol the card the user already carries</td><td>Write each tag before deployment</td></tr>
+<tr><td>Content</td><td>An identifier only</td><td>A URI, text, or your own record type</td></tr>
+<tr><td>Background launch</td><td>Limited</td><td>The OS can launch your app from a URI record</td></tr>
+<tr><td>iOS support</td><td>Weaker</td><td>Better — NDEF is the supported path</td></tr>
+<tr><td>Tamper resistance</td><td>UID is factory-set on genuine tags</td><td>Payload is rewritable unless locked</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Use raw UIDs when people already carry cards you want to reuse. Use NDEF with a URI record when you are deploying tags yourself and want a tap to open your app at a specific place — a tag on a desk, a machine, a shelf. The URI should be the same deep link your <a href="11-barcode-qr.html#payload">QR payload</a> uses, so one handler serves both.</p>
+
+<div class="callout rule">
+<span class="tag">Rule</span>
+<p><strong>Lock NDEF tags after writing them if they are deployed in public.</strong> An unlocked tag can be rewritten by anyone with a phone, turning your desk label into a link to anywhere. Locking is irreversible, so verify the payload before you lock — and keep a spare.</p>
+</div>
+</section>
+
+<section id="testing" data-chunk-id="nfc.testing" data-tags="testing,nfc,fakes">
+<h2>Testing an NFC surface</h2>
+
+<p>No emulator has an NFC radio. Everything above the reader is testable; the reader itself needs an injectable seam and a hardware checklist.</p>
+
+<pre data-lang="dart"><code>abstract class NfcReader {
+  Future&lt;NfcStatus&gt; status();
+  Future&lt;bool&gt; startRead({required ValueChanged&lt;String&gt; onUid});
+  Future&lt;void&gt; stop();
+}
+
+class FakeNfcReader implements NfcReader {
+  FakeNfcReader({this.state = NfcStatus.ready, this.startSucceeds = true});
+
+  NfcStatus state;
+  bool startSucceeds;
+  ValueChanged&lt;String&gt;? _sink;
+  int startCount = 0, stopCount = 0;
+
+  @override
+  Future&lt;NfcStatus&gt; status() async =&gt; state;
+
+  @override
+  Future&lt;bool&gt; startRead({required ValueChanged&lt;String&gt; onUid}) async {
+    startCount++;
+    if (!startSucceeds) return false;
+    _sink = onUid;
+    return true;
+  }
+
+  @override
+  Future&lt;void&gt; stop() async { stopCount++; _sink = null; }
+
+  /// Test-only: simulate a card being presented.
+  void tap(String uid) =&gt; _sink?.call(uid);
+}</code></pre>
+
+<div class="callout check">
+<span class="tag">Check</span>
+<p>Six widget tests that cover the whole surface: <strong>(1)</strong> <code>ready</code> shows the tap affordance; <strong>(2)</strong> <code>off</code> shows the settings hint and hides the tap icon; <strong>(3)</strong> <code>unsupported</code> hides the NFC path entirely and shows manual entry; <strong>(4)</strong> a failed start surfaces an error rather than a tap icon; <strong>(5)</strong> a tap with a known UID performs the action; <strong>(6)</strong> a tap with an unknown UID shows a clear "card not recognised" and keeps the session open.</p>
+</div>
+
+<p>Plus a unit test for <a href="#uid">normalisation</a> against real captured byte arrays, and a short hardware checklist per release: enrol a card, tap it, tap an unknown card, revoke and re-tap, toggle NFC off mid-session, and reboot the kiosk device.</p>
+</section>
+
+<div class="sourcebox">
+<h4>Sources for this page</h4>
+<ul>
+<li>One project's <code>NfcUidReader</code>: the three-state <code>NfcStatus</code> enum with its field-report rationale, the stop-before-start plus one-retry session logic, the boolean return so a dead reader is surfaced, the lowercase-hex-no-separators UID contract shared with the server-side registration function, and the Android-only platform gate.</li>
+<li>The same project's kiosk feature: the device PIN, the kiosk gate screen, and the RFID/NFC badge feature toggle whose description states the Android + NFC hardware requirement.</li>
+</ul>
+<p>The security assessment of UIDs, the enrolment requirements table and the NDEF comparison are general domain knowledge rather than observations from either project. The fake-reader code is illustrative.</p>
+</div>
+
+<nav class="footnav"></nav>
+</article>
+</main>
+</div>
+<script src="assets/wiki.js"></script>
+</body>
+</html>
