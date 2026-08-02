@@ -184,6 +184,11 @@ jobs:
             --obfuscate --split-debug-info=build/symbols \
             ${{ vars.FGS_FORM_APPROVED == 'true' && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
 
+      # #3661 — size visible on every build; fails on an implausibly
+      # small artifact (llmwiki page 25).
+      - name: Artifact size -> job summary
+        run: bash scripts/report_artifact_sizes.sh build/app/outputs/bundle/playRelease/app-play-release.aab
+
       # Per-ABI APKs were dropped from the public nightly release on
       # purpose — Play App Signing re-signs every Play install with
       # Google's app-signing key (different from the upload key the

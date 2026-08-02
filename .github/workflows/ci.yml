@@ -755,6 +755,11 @@ jobs:
       - name: Build App Bundle (release)
         if: github.event_name != 'pull_request'
         run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
+      # #3661 — size visible on every build; fails on an implausibly
+      # small artifact (llmwiki page 25).
+      - name: Artifact sizes -> job summary
+        if: github.event_name != 'pull_request'
+        run: bash scripts/report_artifact_sizes.sh 'build/app/outputs/flutter-apk/app-*-play-release.apk' 'build/app/outputs/bundle/playRelease/app-play-release.aab'
       # #2947 — assert the MERGED play manifest declares ZERO
       # FOREGROUND_SERVICE* permissions, so a future accidental FGS re-merge
       # (the Android Auto v2 live bridge is a BOUND service, no FGS) trips CI
