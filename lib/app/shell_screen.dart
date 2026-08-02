@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../core/logging/error_logger.dart';
+import '../core/error/guarded.dart';
 import '../core/storage/storage_providers.dart';
 import '../core/utils/frame_callbacks.dart';
 import '../core/widgets/snackbar_helper.dart';
@@ -169,17 +169,16 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
         initialLocation: index == widget.navigationShell.currentIndex,
       );
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: {
-            'source': 'ShellScreen.goBranch',
-            'index': index,
-            'currentIndex': widget.navigationShell.currentIndex,
-          },
-        ),
+      // NB: the locator key is normalised 'source' -> 'where' — the
+      // canonical trace-context key every other call site uses.
+      logFailure(
+        e,
+        st,
+        where: 'ShellScreen.goBranch',
+        extra: {
+          'index': index,
+          'currentIndex': widget.navigationShell.currentIndex,
+        },
       );
     }
   }
@@ -223,14 +222,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
       );
     } catch (e, st) {
       // #3143 — release-visible: debugPrint is no-opped in release.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: {'where': 'ShellScreen swipe hint'},
-        ),
-      );
+      logFailure(e, st, where: 'ShellScreen swipe hint');
     }
   }
 

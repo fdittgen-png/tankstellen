@@ -18,7 +18,7 @@ import '../../../vehicle/providers/vin_decoder_provider.dart';
 import '../../providers/onboarding_obd2_connector.dart';
 import '../../providers/onboarding_platform_steps_provider.dart';
 import '../../providers/onboarding_wizard_provider.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Optional onboarding step (#816) that lets a new user connect their
 /// OBD2 adapter, auto-read the VIN, decode it via the vPIC / WMI
@@ -142,14 +142,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     try {
       decoded = await ref.read(decodedVinProvider(vin).future);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'OnboardingObd2Step: VIN decode failed'},
-        ),
-      );
+      logFailure(e, st, where: 'OnboardingObd2Step: VIN decode failed');
       decoded = null;
     }
 
@@ -192,15 +185,10 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
     try {
       await _saveDecodedProfile(decoded);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'OnboardingObd2Step: save decoded profile failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'OnboardingObd2Step: save decoded profile failed',
       );
     }
     if (!mounted) return;

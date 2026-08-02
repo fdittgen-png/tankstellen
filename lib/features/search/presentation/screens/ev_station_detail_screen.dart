@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/widgets/responsive_layout.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/theme/fuel_colors.dart';
@@ -64,14 +64,7 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
       final enriched = (await enricher.enrich([widget.station])).first;
       if (mounted) setState(() => _station = enriched);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'EVStationDetailScreen: enrich on open'},
-        ),
-      );
+      logFailure(e, st, where: 'EVStationDetailScreen: enrich on open');
     }
   }
 
@@ -113,15 +106,10 @@ class _EVStationDetailScreenState extends ConsumerState<EVStationDetailScreen> {
         SnackBarHelper.showError(context, l10n.evStationNotFound);
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'EVStationDetailScreen._refreshStation: refresh failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'EVStationDetailScreen._refreshStation: refresh failed',
       );
       if (mounted) {
         SnackBarHelper.showError(

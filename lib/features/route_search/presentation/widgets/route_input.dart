@@ -9,7 +9,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/location/location_service.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
 import '../../../../core/utils/frame_callbacks.dart';
@@ -113,14 +113,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       _startController.text = l10n.currentLocation;
     } catch (e, st) {
       // #2146 — route to the exportable log; the snackbar is transient.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'RouteInput._useGpsForStart'},
-        ),
-      );
+      logFailure(e, st, where: 'RouteInput._useGpsForStart');
       if (mounted) {
         final l10n = AppLocalizations.of(context);
         SnackBarHelper.showError(context, '${l10n.gpsError}: $e');
@@ -255,14 +248,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       widget.onSearch(waypoints);
     } catch (e, st) {
       // #2146 — route to the exportable log; the snackbar is transient.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'RouteInput.resolveAndSearch'},
-        ),
-      );
+      logFailure(e, st, where: 'RouteInput.resolveAndSearch');
       if (mounted) {
         SnackBarHelper.showError(
           context,

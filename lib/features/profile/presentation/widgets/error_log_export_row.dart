@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/services/sensitive_clipboard.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
@@ -120,15 +121,10 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
       try {
         await _shareErrorLogAsFile(json);
       } on Object catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.ui,
-            e,
-            st,
-            context: const {
-              'where': 'ErrorLogExportRow._exportErrorLog: share fallback',
-            },
-          ),
+        logFailure(
+          e,
+          st,
+          where: 'ErrorLogExportRow._exportErrorLog: share fallback',
         );
         await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
         if (!mounted) return;
@@ -215,16 +211,12 @@ class _ErrorLogExportRowState extends ConsumerState<ErrorLogExportRow> {
       if (!mounted) return;
       SnackBarHelper.showSuccess(context, l.savedToDownloadsFolder);
     } on Object catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.storage,
-          e,
-          st,
-          context: const {
-            'where': 'ErrorLogExportRow._saveExportToDownloads',
-            'fileName': 'tankstellen-error-log.json',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'ErrorLogExportRow._saveExportToDownloads',
+        layer: ErrorLayer.storage,
+        extra: const {'fileName': 'tankstellen-error-log.json'},
       );
       if (!mounted) return;
       SnackBarHelper.showSuccess(context, copySnackbar);

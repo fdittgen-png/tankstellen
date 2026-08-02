@@ -19,7 +19,7 @@ import '../../../map/data/sparkilo_tile_layer.dart';
 import '../../data/exporters/gpx_exporter.dart';
 import '../../data/trip_history_repository.dart';
 import '../../providers/trip_history_provider.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Test seam: replace the OS share sheet hand-off with a callback that
 /// captures the outgoing payload (#2030). Lets widget tests assert on
@@ -138,14 +138,7 @@ class TrajetsMapScreen extends ConsumerWidget {
       // #2173 — themed success toast (matches the sibling error path).
       messenger.showSnackBar(SnackBarHelper.successSnackBar(scheme, ok));
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'TrajetsMapScreen save GPX'},
-        ),
-      );
+      logFailure(e, st, where: 'TrajetsMapScreen save GPX');
       if (messenger == null) return;
       final errorMsg = l.trajetsMapShareError;
       messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));

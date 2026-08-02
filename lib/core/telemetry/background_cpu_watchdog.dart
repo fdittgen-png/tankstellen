@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import '../logging/error_logger.dart';
 import 'collectors/breadcrumb_collector.dart';
 import 'impl/proc_cpu_support.dart';
+import '../../core/error/guarded.dart';
 
 /// #3641 — lifecycle-gated CPU watchdog for the `[EXCESSIVE CPU USAGE]`
 /// process kills.
@@ -166,13 +167,11 @@ class BackgroundCpuWatchdog {
         '(OS kill limit 25%) — top threads: $threadList';
     onReport?.call(summary);
     BreadcrumbCollector.add('bg-cpu-overload', detail: summary);
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.background,
-        StateError('BackgroundCpuWatchdog: $summary'),
-        StackTrace.current,
-        context: const {'where': 'BackgroundCpuWatchdog (#3641)'},
-      ),
+    logFailure(
+      StateError('BackgroundCpuWatchdog: $summary'),
+      StackTrace.current,
+      where: 'BackgroundCpuWatchdog (#3641)',
+      layer: ErrorLayer.background,
     );
   }
 

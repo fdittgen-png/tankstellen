@@ -20,7 +20,7 @@ import '../../data/receipt_scan_service.dart';
 import 'bad_scan_form_view.dart';
 import 'bad_scan_issue_created_surface.dart';
 import 'bad_scan_report_formatters.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Test seams: widget tests substitute these for the real
 /// platform-channel / secure-storage backed implementations.
@@ -216,28 +216,12 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
       if (!mounted) return;
       setState(() => _createdIssueUrl = url);
     } on GithubReporterException catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'BadScanReportSheet: GitHub submission failed',
-          },
-        ),
-      );
+      logFailure(e, st, where: 'BadScanReportSheet: GitHub submission failed');
       await _runShareFallback(showSnackbar: true);
     } catch (e, st) {
       // Secure-storage / image-read / unexpected errors — still fall
       // back so the user can always ship a report.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'BadScanReportSheet: unexpected failure'},
-        ),
-      );
+      logFailure(e, st, where: 'BadScanReportSheet: unexpected failure');
       await _runShareFallback(showSnackbar: true);
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -278,15 +262,10 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     try {
       await share(params);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'BadScanReportSheet: share fallback itself failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'BadScanReportSheet: share fallback itself failed',
       );
     }
   }
@@ -298,14 +277,7 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     try {
       await launcher(url);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'BadScanReportSheet: launchUrl failed'},
-        ),
-      );
+      logFailure(e, st, where: 'BadScanReportSheet: launchUrl failed');
     }
   }
 
@@ -313,16 +285,7 @@ class _BadScanReportSheetState extends ConsumerState<BadScanReportSheet> {
     try {
       return await File(path).readAsBytes();
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'BadScanReportSheet: could not read scan image',
-          },
-        ),
-      );
+      logFailure(e, st, where: 'BadScanReportSheet: could not read scan image');
       return Uint8List(0);
     }
   }

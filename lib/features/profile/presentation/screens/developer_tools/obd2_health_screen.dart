@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../core/logging/error_logger.dart';
+import '../../../../../core/error/guarded.dart';
 import '../../../../../core/sharing/public_file_exporter.dart';
 import '../../../../../core/widgets/page_scaffold.dart';
 import '../../../../../core/widgets/section_header.dart';
@@ -331,27 +331,14 @@ class Obd2HealthScreen extends ConsumerWidget {
         SnackBarHelper.successSnackBar(scheme, l.savedToDownloadsFolder),
       );
     } on MissingPluginException catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where':
-                'Obd2HealthScreen download: public_files channel unavailable',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'Obd2HealthScreen download: public_files channel unavailable',
       );
       _showDownloadError(scheme, l, messenger);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'Obd2HealthScreen download: json write'},
-        ),
-      );
+      logFailure(e, st, where: 'Obd2HealthScreen download: json write');
       _showDownloadError(scheme, l, messenger);
     }
   }

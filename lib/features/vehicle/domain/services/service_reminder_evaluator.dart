@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/service_reminder_repository.dart';
 import '../entities/service_reminder.dart';
 import 'service_reminder_trigger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Copy of the strings the notification renders. The evaluator accepts
@@ -94,15 +95,11 @@ class ServiceReminderEvaluator {
       try {
         await repository.save(updated);
       } catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.other,
-            e,
-            st,
-            context: const {
-              'where': 'ServiceReminderEvaluator: failed to persist flag',
-            },
-          ),
+        logFailure(
+          e,
+          st,
+          where: 'ServiceReminderEvaluator: failed to persist flag',
+          layer: ErrorLayer.other,
         );
         continue;
       }
@@ -116,15 +113,11 @@ class ServiceReminderEvaluator {
           ),
         );
       } catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.other,
-            e,
-            st,
-            context: const {
-              'where': 'ServiceReminderEvaluator: notification failed',
-            },
-          ),
+        logFailure(
+          e,
+          st,
+          where: 'ServiceReminderEvaluator: notification failed',
+          layer: ErrorLayer.other,
         );
       }
       fired.add(updated);

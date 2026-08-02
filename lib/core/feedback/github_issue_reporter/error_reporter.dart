@@ -10,6 +10,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../widgets/snackbar_helper.dart';
 import 'error_report_formatter.dart';
 import 'error_report_payload.dart';
+import '../../../core/error/guarded.dart';
 import '../../../core/logging/error_logger.dart';
 
 /// Launches a URL in the external browser.
@@ -95,13 +96,11 @@ class ErrorReporter {
       if (launched) _rememberFingerprint(payload.fingerprint);
       return launched;
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.other,
-          e,
-          st,
-          context: const {'where': 'ErrorReporter launch failed'},
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'ErrorReporter launch failed',
+        layer: ErrorLayer.other,
       );
       return false;
     }

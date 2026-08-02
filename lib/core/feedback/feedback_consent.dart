@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../core/error/guarded.dart';
 import '../../core/logging/error_logger.dart';
 
 /// Tri-state consent for the GitHub bad-scan reporter (#952 phase 3).
@@ -53,13 +54,11 @@ class FeedbackConsent {
           return FeedbackConsentState.unset;
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.other,
-          e,
-          st,
-          context: const {'where': 'FeedbackConsent.read failed'},
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'FeedbackConsent.read failed',
+        layer: ErrorLayer.other,
       );
       return FeedbackConsentState.unset;
     }
@@ -82,13 +81,11 @@ class FeedbackConsent {
           return;
       }
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.other,
-          e,
-          st,
-          context: const {'where': 'FeedbackConsent.write failed'},
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'FeedbackConsent.write failed',
+        layer: ErrorLayer.other,
       );
     }
   }

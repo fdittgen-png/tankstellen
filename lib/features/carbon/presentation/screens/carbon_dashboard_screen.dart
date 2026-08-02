@@ -15,7 +15,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../consumption/providers/consumption_providers.dart';
 import '../../domain/monthly_summary.dart';
 import '../widgets/charts_tab.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Hook for the share-sheet handoff used by [CarbonDashboardScreen]
 /// (#2005). Production sends [ShareParams] straight to
@@ -115,14 +115,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
     } on Object catch (e, st) {
       // Share-sheet wiring failures should never crash the screen.
       // The user can re-tap; the failure ends in the debug console.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'CarbonDashboardScreen: share failed'},
-        ),
-      );
+      logFailure(e, st, where: 'CarbonDashboardScreen: share failed');
     }
   }
 }

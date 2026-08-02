@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/alerts/background/background_service.dart';
 import '../core/constants/app_constants.dart';
 import '../core/country/country_switch_listener.dart';
-import '../core/logging/error_logger.dart';
+import '../core/error/guarded.dart';
 import '../core/language/language_provider.dart';
 import '../core/notifications/notification_launch_listener.dart';
 import '../core/sync/app_resume_sync.dart';
@@ -79,14 +79,7 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
           .onAppLifecycleStateChanged(state);
     } catch (e, st) {
       // #3143 — release-visible: debugPrint is no-opped in release.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: {'where': 'onAppLifecycleStateChanged'},
-        ),
-      );
+      logFailure(e, st, where: 'onAppLifecycleStateChanged');
     }
     // #3169 — every foreground resume is a free execution window: fire an
     // opportunistic alert scan (iOS headless one-off; Android no-op — its
@@ -119,14 +112,7 @@ class _TankstellenAppState extends ConsumerState<TankstellenApp>
       final notifier = ref.read(tripRecordingProvider.notifier);
       unawaited(notifier.onAppBackgrounded());
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: {'where': 'onAppBackgrounded'},
-        ),
-      );
+      logFailure(e, st, where: 'onAppBackgrounded');
     }
   }
 

@@ -23,6 +23,7 @@ import '../widgets/sync_adoption_step.dart';
 import '../widgets/sync_done_step.dart';
 import '../widgets/sync_mode_step.dart';
 import '../widgets/wizard_create_new.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 
 /// Clean 3-step sync setup: Mode -> Credentials (if needed) -> Auth -> Done.
@@ -124,15 +125,11 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.sync,
-          e,
-          st,
-          context: const {
-            'where': 'SyncSetupScreen._onAuthSubmit: connect/sign-in failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'SyncSetupScreen._onAuthSubmit: connect/sign-in failed',
+        layer: ErrorLayer.sync,
       );
       if (mounted) {
         ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
@@ -172,15 +169,11 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
       await Future<void>.delayed(const Duration(milliseconds: 1500));
       if (mounted) Navigator.pop(context);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.sync,
-          e,
-          st,
-          context: const {
-            'where': 'SyncSetupScreen._onAdopt: adopt connect/sign-in failed',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'SyncSetupScreen._onAdopt: adopt connect/sign-in failed',
+        layer: ErrorLayer.sync,
       );
       if (mounted) {
         ctrl.setError(friendlyAuthError(e, AppLocalizations.of(context)));
@@ -207,14 +200,7 @@ class _SyncSetupScreenState extends ConsumerState<SyncSetupScreen> {
           ref.read(syncSetupControllerProvider.notifier).startAdoption(email);
         }
       } catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.ui,
-            e,
-            st,
-            context: const {'where': 'QR code parse failed'},
-          ),
-        );
+        logFailure(e, st, where: 'QR code parse failed');
         if (mounted) {
           SnackBarHelper.showError(
             context,

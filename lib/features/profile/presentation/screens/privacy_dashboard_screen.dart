@@ -12,6 +12,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/sensitive_clipboard.dart';
@@ -169,15 +170,10 @@ class _PrivacyDashboardScreenState
         // Share-sheet wiring failed; fall back to clipboard so the bug
         // report isn't blocked on a platform-channel hiccup. #2146 —
         // also surface on the exportable log.
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.ui,
-            e,
-            st,
-            context: const {
-              'where': 'PrivacyDashboard._exportErrorLog: share fallback',
-            },
-          ),
+        logFailure(
+          e,
+          st,
+          where: 'PrivacyDashboard._exportErrorLog: share fallback',
         );
         await SensitiveClipboard.copy(json); // #3611 — auto-clears in 60 s
         if (!mounted) return;
@@ -312,16 +308,12 @@ class _PrivacyDashboardScreenState
       SnackBarHelper.showSuccess(context, l.savedToDownloadsFolder);
     } on Object catch (e, st) {
       // #2146 — surface on the user-exportable log.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.storage,
-          e,
-          st,
-          context: {
-            'where': 'PrivacyDashboard._saveExportToDownloads',
-            'fileName': fileName,
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'PrivacyDashboard._saveExportToDownloads',
+        layer: ErrorLayer.storage,
+        extra: {'fileName': fileName},
       );
       if (!mounted) return;
       SnackBarHelper.showSuccess(context, copySnackbar);

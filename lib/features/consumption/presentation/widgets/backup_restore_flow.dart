@@ -8,7 +8,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -57,14 +57,7 @@ class BackupRestoreFlow {
     try {
       bytes = await (debugFilePickerOverride ?? _pickZipBytes)();
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'BackupRestoreFlow: file pick failed'},
-        ),
-      );
+      logFailure(e, st, where: 'BackupRestoreFlow: file pick failed');
       if (!context.mounted) return;
       SnackBarHelper.showError(context, l.restoreBackupFailed);
       return;
@@ -128,36 +121,15 @@ class BackupRestoreFlow {
       }
       SnackBarHelper.showSuccess(context, msg);
     } on BackupZipReadException catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'BackupRestoreFlow: corrupt zip'},
-        ),
-      );
+      logFailure(e, st, where: 'BackupRestoreFlow: corrupt zip');
       if (!context.mounted) return;
       SnackBarHelper.showError(context, l.restoreBackupCorrupt);
     } on BackupXmlReadException catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'BackupRestoreFlow: bad XML/version'},
-        ),
-      );
+      logFailure(e, st, where: 'BackupRestoreFlow: bad XML/version');
       if (!context.mounted) return;
       SnackBarHelper.showError(context, l.restoreBackupCorrupt);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'BackupRestoreFlow: import failed'},
-        ),
-      );
+      logFailure(e, st, where: 'BackupRestoreFlow: import failed');
       if (!context.mounted) return;
       SnackBarHelper.showError(context, l.restoreBackupFailed);
     }

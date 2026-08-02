@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/utils/payment_app_launcher.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -49,16 +49,11 @@ class PayWithAppButton extends StatelessWidget {
     } on Exception catch (e, st) {
       // #2146 — route to the exportable log so a missing deep-link
       // handler is visible from a bug report.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: {
-            'where': 'PayWithAppButton._launch',
-            'app': app.displayName,
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'PayWithAppButton._launch',
+        extra: {'app': app.displayName},
       );
     }
   }

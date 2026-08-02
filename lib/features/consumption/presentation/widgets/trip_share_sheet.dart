@@ -9,7 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/sync/trip_shares_sync.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 
 /// Hook for handing a freshly-minted share link to the OS share sheet
 /// (#2240). Production uses `SharePlus.instance.share`; widget tests
@@ -134,14 +134,7 @@ class _TripShareSheetState extends State<TripShareSheet> {
     try {
       await sink(ShareParams(text: link));
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {'where': 'TripShareSheet share link'},
-        ),
-      );
+      logFailure(e, st, where: 'TripShareSheet share link');
     }
     if (!mounted) return;
     SnackBarHelper.showSuccess(context, l.tripShareLinkCreated);

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../storage/storage_providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/error/guarded.dart';
 import '../../core/logging/error_logger.dart';
 import '../theme/app_radius.dart';
 
@@ -55,13 +56,11 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
     } catch (e, st) {
       // Widget tests without an initialized settings box — keep the
       // banner hidden rather than crashing.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.other,
-          e,
-          st,
-          context: const {'where': 'HelpBanner: cannot read shown flag'},
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'HelpBanner: cannot read shown flag',
+        layer: ErrorLayer.other,
       );
     }
   }
@@ -71,13 +70,11 @@ class _HelpBannerState extends ConsumerState<HelpBanner> {
       final settings = ref.read(settingsStorageProvider);
       await settings.putSetting(widget.storageKey, true);
     } catch (e, st) {
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.other,
-          e,
-          st,
-          context: const {'where': 'HelpBanner: cannot persist dismiss'},
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'HelpBanner: cannot persist dismiss',
+        layer: ErrorLayer.other,
       );
     }
     if (mounted) {

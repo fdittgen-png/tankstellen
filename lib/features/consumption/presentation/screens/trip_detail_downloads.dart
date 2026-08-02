@@ -5,7 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -93,14 +93,7 @@ Future<void> _downloadTripText(
     final ok = l.savedToDownloadsFolder;
     messenger.showSnackBar(SnackBarHelper.successSnackBar(scheme, ok));
   } catch (e, st) {
-    unawaited(
-      errorLogger.log(
-        ErrorLayer.ui,
-        e,
-        st,
-        context: const {'where': 'TripDetailScreen download'},
-      ),
-    );
+    logFailure(e, st, where: 'TripDetailScreen download');
     if (messenger == null) return;
     final errorMsg = l.trajetDetailDownloadError;
     messenger.showSnackBar(SnackBarHelper.errorSnackBar(scheme, errorMsg));

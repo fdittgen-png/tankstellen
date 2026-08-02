@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -99,15 +99,10 @@ class AlertStationPickerSheet extends ConsumerWidget {
       try {
         stations.add(Station.fromJson(raw));
       } catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.ui,
-            e,
-            st,
-            context: {
-              'where': 'AlertStationPicker: skipping malformed fav $id',
-            },
-          ),
+        logFailure(
+          e,
+          st,
+          where: 'AlertStationPicker: skipping malformed fav $id',
         );
       }
     }

@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/user_position_provider.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/providers/app_state_provider.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -205,15 +205,10 @@ class LocationSectionWidget extends ConsumerWidget {
     } catch (e, st) {
       // #2146 — record the GPS failure on the exportable log so a user
       // bug report has the stack trace instead of just a snackbar.
-      unawaited(
-        errorLogger.log(
-          ErrorLayer.ui,
-          e,
-          st,
-          context: const {
-            'where': 'LocationSection._updateGps: userPosition.updateFromGps',
-          },
-        ),
+      logFailure(
+        e,
+        st,
+        where: 'LocationSection._updateGps: userPosition.updateFromGps',
       );
       if (context.mounted) {
         final l10n = AppLocalizations.of(context);

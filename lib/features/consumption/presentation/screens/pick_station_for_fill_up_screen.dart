@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +8,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/station.dart';
-import '../../../../core/logging/error_logger.dart';
+import '../../../../core/error/guarded.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -43,15 +42,10 @@ class PickStationForFillUpScreen extends ConsumerWidget {
       try {
         stations.add(Station.fromJson(raw));
       } catch (e, st) {
-        unawaited(
-          errorLogger.log(
-            ErrorLayer.ui,
-            e,
-            st,
-            context: {
-              'where': 'PickStationForFillUp: skipping malformed favorite $id',
-            },
-          ),
+        logFailure(
+          e,
+          st,
+          where: 'PickStationForFillUp: skipping malformed favorite $id',
         );
       }
     }
