@@ -5665,5 +5665,15 @@
   "@catalogResetDoneSnackbar": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "tankMixCaption": "Tank mix: {mix}",
+  "@tankMixCaption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -7,8 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
+import '../../../../core/error/guarded.dart';
 import '../../domain/services/tank_level_estimator.dart';
 import '../../providers/tank_level_provider.dart';
+import '../../providers/tank_mix_provider.dart';
 import '../../providers/trip_history_provider.dart';
 
 /// Tank-level card on the Fuel tab (#1195).
@@ -159,11 +161,46 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
+              // #3652 — the current tank's fuel mix for multi-fuel
+              // vehicles (E10 topped onto E85 → a blend of both; the
+              // consumption depends on it). The provider returns null
+              // for single-fuel vehicles; a pure tank stays silent via
+              // isBlend. Shell-safe (#2163) like the report card.
+              if (_mixLine(ref, l) case final mixText?) ...[
+                const SizedBox(height: 4),
+                Text(
+                  mixText,
+                  key: const Key('tank_mix_line'),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  /// #3652 — "Tank mix: Super E10 57 % · E85 / Bioéthanol 43 %", or
+  /// null when there is nothing to say (single-fuel vehicle, pure tank,
+  /// unwired provider graph in an isolated test harness). Grade names
+  /// come from [FuelType.displayName] — the same product-name labels
+  /// the fuel pickers render (#713).
+  String? _mixLine(WidgetRef ref, AppLocalizations l) {
+    final mix = guard(
+      () => ref.watch(tankMixProvider(vehicleId)),
+      where: 'TankLevelCard: tank mix watch failed',
+      fallback: null,
+    );
+    if (mix == null || !mix.isBlend()) return null;
+    final parts = [
+      for (final s in mix.shares)
+        if (s.share >= 0.01)
+          '${s.fuel.displayName} ${(s.share * 100).round()} %',
+    ].join(' · ');
+    return l.tankMixCaption(parts);
   }
 
   /// #3647 tank level v2 — the caption names the level's SOURCE: the

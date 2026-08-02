@@ -7585,6 +7585,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String tankMixCaption(String mix) {
+    return 'Tank mix: $mix';
+  }
+
+  @override
   String get tankReportTitle => 'Rapport de plein';
 
   @override

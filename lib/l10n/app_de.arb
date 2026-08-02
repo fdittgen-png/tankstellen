@@ -3657,6 +3657,14 @@
   "addFillUpIsFullTankSubtitle": "Tank bis zum Rand gefüllt — abwählen, wenn es eine Teilbetankung war",
   "tankLevelSourceFillUp": "Verankert an der letzten Betankung: {date}",
   "tankLevelSourceObd2": "OBD2-Tanksensor · {date}",
+  "tankMixCaption": "Tankmischung: {mix}",
+  "@tankMixCaption": {
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
   "tankReportTitle": "Tank-Bericht",
   "tankReportHeadline": "{value} L/100 km",
   "tankReportSincePrevious": "Seit dem letzten Volltanken: {km} km · {liters} L · {cost}",
