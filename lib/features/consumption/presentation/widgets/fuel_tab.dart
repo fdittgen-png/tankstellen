@@ -14,6 +14,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
@@ -94,7 +95,16 @@ class FuelTab extends ConsumerWidget {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (_) {
-          unawaited(ref.read(fillUpListProvider.notifier).remove(fillUp.id));
+          final notifier = ref.read(fillUpListProvider.notifier);
+          unawaited(notifier.remove(fillUp.id));
+          // #3664 — capture-and-restore undo: the swiped entity is held
+          // in this closure; Undo re-saves it (same id, fresh updatedAt
+          // so the LWW sync merge propagates the resurrection too).
+          SnackBarHelper.showWithUndo(
+            context,
+            AppLocalizations.of(context).fillUpDeletedUndoSnackbar,
+            onUndo: () => unawaited(notifier.update(fillUp)),
+          );
         },
         child: FillUpCard(
           fillUp: fillUp,

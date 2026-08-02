@@ -1,0 +1,10 @@
+{
+  "fillUpDeletedUndoSnackbar": "Fill-up deleted",
+  "@fillUpDeletedUndoSnackbar": {
+    "description": "Undo snackbar shown after a fill-up is deleted (swipe on the Carburant list or the correction sheet's delete button, #3664). The trailing Undo action restores it within the 10 s window."
+  },
+  "trajetDeletedUndoSnackbar": "Recording deleted",
+  "@trajetDeletedUndoSnackbar": {
+    "description": "Undo snackbar shown after a trip recording is deleted (trip detail screen or the virtual-trajet sheet, #3664). The trailing Undo action restores it within the 10 s window."
+  }
+}

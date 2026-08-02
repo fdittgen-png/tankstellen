@@ -8148,6 +8148,12 @@ class AppLocalizationsDe extends AppLocalizations {
       'Danke — das hilft, deine Fahranalyse zu kalibrieren.';
 
   @override
+  String get fillUpDeletedUndoSnackbar => 'Tankfüllung gelöscht';
+
+  @override
+  String get trajetDeletedUndoSnackbar => 'Aufzeichnung gelöscht';
+
+  @override
   String get unifiedFilterFuel => 'Kraftstoff';
 
   @override

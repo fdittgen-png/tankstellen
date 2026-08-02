@@ -346,8 +346,29 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       ),
     );
     if (confirmed != true || !context.mounted) return;
-    await ref.read(tripHistoryListProvider.notifier).delete(widget.tripId);
+    // #3664 — capture-and-restore undo. The whole entry (summary +
+    // embedded detail) lives in one Hive row; hold it in this closure
+    // and Undo re-saves it losslessly. Messenger + strings are captured
+    // BEFORE the pop (SnackBarHelper contract) because this screen's
+    // context dies with it.
+    final notifier = ref.read(tripHistoryListProvider.notifier);
+    final deleted = ref
+        .read(tripHistoryListProvider)
+        .where((t) => t.id == widget.tripId)
+        .firstOrNull;
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    final undoLabel = l.undo;
+    final message = l.trajetDeletedUndoSnackbar;
+    await notifier.delete(widget.tripId);
     if (!context.mounted) return;
     context.pop();
+    if (deleted == null || messenger == null) return;
+    messenger.showSnackBar(
+      SnackBarHelper.undoSnackBar(
+        message,
+        undoLabel: undoLabel,
+        onUndo: () => unawaited(notifier.save(deleted)),
+      ),
+    );
   }
 }

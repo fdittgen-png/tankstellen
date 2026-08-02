@@ -122,7 +122,8 @@ void main() {
       expect(snackBar.action!.label, 'Undo');
     });
 
-    testWidgets('showWithUndo() has 4-second duration', (tester) async {
+    testWidgets('showWithUndo() has the 10-second undo window (#3664)',
+        (tester) async {
       await pumpApp(tester, Builder(
         builder: (context) => ElevatedButton(
           onPressed: () => SnackBarHelper.showWithUndo(
@@ -137,8 +138,35 @@ void main() {
       await tester.tap(find.text('Tap'));
       await tester.pump();
 
+      // 10 s by maintainer directive — an accidental delete (fill-up,
+      // recording, favorite, ignored station) must stay recoverable
+      // long enough for the user's eyes to come back from the swipe.
       final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
-      expect(snackBar.duration, const Duration(seconds: 4));
+      expect(snackBar.duration, const Duration(seconds: 10));
+      expect(snackBar.duration, SnackBarHelper.undoDuration);
+    });
+
+    testWidgets('tapping Undo fires the callback (#3664)', (tester) async {
+      var undone = 0;
+      await pumpApp(tester, Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () => SnackBarHelper.showWithUndo(
+            context,
+            'Removed',
+            onUndo: () => undone++,
+          ),
+          child: const Text('Tap'),
+        ),
+      ));
+
+      await tester.tap(find.text('Tap'));
+      // Let the snackbar's entrance animation finish so the action
+      // button is actually hit-testable.
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Undo'));
+      await tester.pump();
+
+      expect(undone, 1);
     });
 
     testWidgets('showWithUndo() supports custom undo label', (tester) async {

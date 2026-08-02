@@ -7867,6 +7867,14 @@
   "@tripVerdictThanks": {
     "description": "Confirmation line shown in place of the verdict prompt right after the driver answers (#3501)."
   },
+  "fillUpDeletedUndoSnackbar": "Fill-up deleted",
+  "@fillUpDeletedUndoSnackbar": {
+    "description": "Undo snackbar shown after a fill-up is deleted (swipe on the Carburant list or the correction sheet's delete button, #3664). The trailing Undo action restores it within the 10 s window."
+  },
+  "trajetDeletedUndoSnackbar": "Recording deleted",
+  "@trajetDeletedUndoSnackbar": {
+    "description": "Undo snackbar shown after a trip recording is deleted (trip detail screen or the virtual-trajet sheet, #3664). The trailing Undo action restores it within the 10 s window."
+  },
   "unifiedFilterFuel": "Fuel",
   "@unifiedFilterFuel": {
     "description": "Filter chip label that narrows the unified search list to fuel pumps only (#1116 phase 3c)."

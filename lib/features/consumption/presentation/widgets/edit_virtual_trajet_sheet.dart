@@ -1,10 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/add_fill_up_validators.dart';
@@ -77,9 +80,25 @@ class _EditVirtualTrajetSheetState
   }
 
   Future<void> _delete() async {
-    await ref.read(tripHistoryListProvider.notifier).delete(widget.entry.id);
+    // #3664 — capture the messenger + localized strings BEFORE the
+    // await/pop: the sheet's context dies with the pop, but the undo
+    // snackbar must outlive it. The whole entry (summary + embedded
+    // detail) lives in one Hive row, so re-saving it restores the
+    // recording losslessly.
+    final messenger = ScaffoldMessenger.of(context);
+    final l = AppLocalizations.of(context);
+    final notifier = ref.read(tripHistoryListProvider.notifier);
+    final deleted = widget.entry;
+    await notifier.delete(deleted.id);
     if (!mounted) return;
     Navigator.of(context).pop();
+    messenger.showSnackBar(
+      SnackBarHelper.undoSnackBar(
+        l.trajetDeletedUndoSnackbar,
+        undoLabel: l.undo,
+        onUndo: () => unawaited(notifier.save(deleted)),
+      ),
+    );
   }
 
   @override

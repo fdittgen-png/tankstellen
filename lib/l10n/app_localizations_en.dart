@@ -8061,6 +8061,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Thanks — this helps calibrate your driving analysis.';
 
   @override
+  String get fillUpDeletedUndoSnackbar => 'Fill-up deleted';
+
+  @override
+  String get trajetDeletedUndoSnackbar => 'Recording deleted';
+
+  @override
   String get unifiedFilterFuel => 'Fuel';
 
   @override
@@ -16590,6 +16596,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripVerdictThanks =>
       '⟦Ŧĥáñķš — ŧĥîš ĥéłƥš çáłîƀřáŧé ýóúř đřîṽîñǧ áñáłýšîš. ···················⟧';
+
+  @override
+  String get fillUpDeletedUndoSnackbar => '⟦Ƒîłł-úƥ đéłéŧéđ ······⟧';
+
+  @override
+  String get trajetDeletedUndoSnackbar => '⟦Řéçóřđîñǧ đéłéŧéđ ·······⟧';
 
   @override
   String get unifiedFilterFuel => '⟦Ƒúéł ··⟧';

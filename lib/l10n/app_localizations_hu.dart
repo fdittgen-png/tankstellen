@@ -8146,6 +8146,12 @@ class AppLocalizationsHu extends AppLocalizations {
       'Thanks — this helps calibrate your driving analysis.';
 
   @override
+  String get fillUpDeletedUndoSnackbar => 'Fill-up deleted';
+
+  @override
+  String get trajetDeletedUndoSnackbar => 'Recording deleted';
+
+  @override
   String get unifiedFilterFuel => 'Üzemanyag';
 
   @override

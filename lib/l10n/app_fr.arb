@@ -5548,5 +5548,15 @@
         "type": "String"
       }
     }
+  },
+  "fillUpDeletedUndoSnackbar": "Fill-up deleted",
+  "@fillUpDeletedUndoSnackbar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDeletedUndoSnackbar": "Recording deleted",
+  "@trajetDeletedUndoSnackbar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
