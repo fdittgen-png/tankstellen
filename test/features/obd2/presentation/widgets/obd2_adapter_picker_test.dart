@@ -16,7 +16,10 @@ import 'package:tankstellen/features/obd2/data/bluetooth_facade.dart';
 import 'package:tankstellen/features/obd2/data/elm_byte_channel.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_errors.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connection_service.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart'
+    show BluetoothAdapterState;
 import 'package:tankstellen/features/obd2/data/obd2_permissions.dart';
+import 'package:tankstellen/features/obd2/data/obd2_scan_readiness.dart';
 import 'package:tankstellen/features/obd2/data/obd2_service.dart';
 import 'package:tankstellen/features/obd2/presentation/widgets/obd2_adapter_picker.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
@@ -501,6 +504,66 @@ void main() {
       expect(list.savedProfiles.single.obd2AdapterName, 'vLinker FD');
     });
   });
+
+  group('scan-readiness pre-flight + timeout diagnosis', () {
+    testWidgets(
+      'a non-promptable blocker (Bluetooth off) diverts to the diagnostic '
+      'BEFORE any radio scan — the candidate a scan would have found never '
+      'renders',
+      (tester) async {
+        // The facade WOULD emit a hit; the pre-flight must prevent the
+        // scan from ever running, so that hit must never appear.
+        final svc = _buildService([
+          [_scanHit(name: 'vLinker FD', rssi: -55)],
+        ]);
+        await _pumpWithProbe(
+          tester,
+          svc,
+          _probeResolving(adapter: BluetoothAdapterState.off),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('obdPickerEmpty')), findsOneWidget);
+        expect(find.byKey(const Key('obdPickerScanning')), findsNothing);
+        expect(find.byKey(const Key('obdPickerError')), findsNothing);
+        expect(find.text('vLinker FD'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'a plain (promptable) permission denial does NOT pre-flight-block — '
+      'the scan runs, because the scan is what triggers the OS prompt',
+      (tester) async {
+        final svc = _buildService([
+          [_scanHit(name: 'vLinker FD', rssi: -55)],
+        ]);
+        await _pumpWithProbe(
+          tester,
+          svc,
+          _probeResolving(permission: Obd2PermissionState.denied),
+        );
+        await tester.pumpAndSettle();
+
+        // The scan ran and found the adapter.
+        expect(find.byKey(const Key('obdPickerSelecting')), findsOneWidget);
+        expect(find.text('vLinker FD'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'an empty scan window (Obd2ScanTimeout) renders the readiness '
+      'diagnostic, not the generic error state',
+      (tester) async {
+        // One empty batch, stream closes -> sawAny=false -> Obd2ScanTimeout.
+        final svc = _buildService(const [[]]);
+        await _pumpWithProbe(tester, svc, _probeResolving());
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('obdPickerEmpty')), findsOneWidget);
+        expect(find.byKey(const Key('obdPickerError')), findsNothing);
+      },
+    );
+  });
 }
 
 /// [VehicleProfileList] fake that seeds an initial list and records every
@@ -641,9 +704,54 @@ class _NoopObd2Service implements Obd2Service {
 
   @override
   noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
 }
 
 // --- helpers ---------------------------------------------------------
+
+
+/// Probe with every seam injected — no platform bindings touched.
+Obd2ScanReadinessProbe _probeResolving({
+  bool supported = true,
+  Obd2PermissionState permission = Obd2PermissionState.granted,
+  BluetoothAdapterState adapter = BluetoothAdapterState.on,
+  bool locationServices = true,
+}) =>
+    Obd2ScanReadinessProbe(
+      permissions: _FakePermissions(permission),
+      isSupported: () async => supported,
+      adapterState: () async => adapter,
+      locationServicesEnabled: () async => locationServices,
+      isAndroid: () => true,
+    );
+
+Future<void> _pumpWithProbe(
+  WidgetTester tester,
+  Obd2ConnectionService svc,
+  Obd2ScanReadinessProbe probe,
+) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        obd2ConnectionProvider.overrideWith((_) => svc),
+        obd2ScanReadinessProbeProvider.overrideWith((_) => probe),
+        vehicleProfileListProvider.overrideWith(
+          () => _RecordingVehicleList(const []),
+        ),
+        activeVehicleProfileProvider.overrideWith(
+          () => _StubActiveVehicle(null),
+        ),
+      ],
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: SingleChildScrollView(child: Obd2AdapterPickerSheet()),
+        ),
+      ),
+    ),
+  );
+}
 
 Future<void> _pump(WidgetTester tester, Obd2ConnectionService svc) async {
   await tester.pumpWidget(
