@@ -4183,6 +4183,25 @@ class AppLocalizationsSk extends AppLocalizations {
   String get catalogReresolveSnackbarAction => 'Aktualizovať';
 
   @override
+  String get catalogResetAction => 'Reset from vehicle database';
+
+  @override
+  String get catalogResetConfirmTitle => 'Reset from the vehicle database?';
+
+  @override
+  String catalogResetConfirmBody(String vehicle) {
+    return 'This replaces the tank capacity, engine power and displacement of this vehicle with the database values for $vehicle. Other fields and your fill-up history are not touched.';
+  }
+
+  @override
+  String get catalogResetNoMatchSnackbar =>
+      'No matching entry in the vehicle database for this vehicle.';
+
+  @override
+  String get catalogResetDoneSnackbar =>
+      'Vehicle data reset from the database.';
+
+  @override
   String get consumptionTabFuel => 'Palivo';
 
   @override

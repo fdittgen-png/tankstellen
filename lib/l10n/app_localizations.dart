@@ -7496,6 +7496,36 @@ abstract class AppLocalizations {
   /// **'Update'**
   String get catalogReresolveSnackbarAction;
 
+  /// OutlinedButton label on the edit-vehicle screen that re-initializes the catalog-backed spec fields (tank capacity, rated power, displacement) from the bundled reference vehicle database (#3651). Also the confirming action inside the dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset from vehicle database'**
+  String get catalogResetAction;
+
+  /// AlertDialog title for the catalog reset confirmation (#3651).
+  ///
+  /// In en, this message translates to:
+  /// **'Reset from the vehicle database?'**
+  String get catalogResetConfirmTitle;
+
+  /// AlertDialog body for the catalog reset confirmation (#3651). {vehicle} is the matched catalog row, e.g. 'Peugeot 107 I (2005-2014)'.
+  ///
+  /// In en, this message translates to:
+  /// **'This replaces the tank capacity, engine power and displacement of this vehicle with the database values for {vehicle}. Other fields and your fill-up history are not touched.'**
+  String catalogResetConfirmBody(String vehicle);
+
+  /// Snackbar shown when the catalog reset can't find a model-confident reference vehicle row for the profile (#3651).
+  ///
+  /// In en, this message translates to:
+  /// **'No matching entry in the vehicle database for this vehicle.'**
+  String get catalogResetNoMatchSnackbar;
+
+  /// Snackbar confirming the catalog reset was applied (#3651).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle data reset from the database.'**
+  String get catalogResetDoneSnackbar;
+
   /// Label for the fuel fill-ups tab on the ConsumptionScreen (#582 phase 2).
   ///
   /// In en, this message translates to:

@@ -190,6 +190,98 @@ void main() {
     });
   });
 
+  group('VehicleProfileCatalogMatcher.confidentMatch (#3651)', () {
+    test('the persisted referenceVehicleId slug wins, even over the '
+        'make/model text fields', () {
+      final profile = VehicleProfile(
+        id: 'p-slug',
+        name: 'My car',
+        // Free-text fields point at a DIFFERENT model — the slug the
+        // user actually picked is the stronger signal.
+        make: 'Peugeot',
+        model: '308',
+        referenceVehicleId:
+            VehicleProfileCatalogMatcher.slugFor(peugeot208II),
+      );
+      final match = VehicleProfileCatalogMatcher.confidentMatch(
+        profile: profile,
+        catalog: catalog,
+      );
+      expect(match, peugeot208II);
+    });
+
+    test('make + model resolves like bestMatch tiers 1/2', () {
+      const profile = VehicleProfile(
+        id: 'p-mm',
+        name: 'My 208',
+        make: 'Peugeot',
+        model: '208',
+        year: 2020,
+      );
+      final match = VehicleProfileCatalogMatcher.confidentMatch(
+        profile: profile,
+        catalog: catalog,
+      );
+      expect(match, peugeot208II);
+    });
+
+    test('REJECTS the make-only tier — a brand-mate\'s spec data must '
+        'not masquerade as this car\'s', () {
+      const profile = VehicleProfile(
+        id: 'p-makeonly',
+        name: 'Some Peugeot',
+        make: 'Peugeot',
+        model: 'Unknown Model',
+      );
+      // bestMatch would fall back to the first Peugeot row here…
+      expect(
+        VehicleProfileCatalogMatcher.bestMatch(
+          profile: profile,
+          catalog: catalog,
+        ),
+        isNotNull,
+      );
+      // …confidentMatch must not.
+      expect(
+        VehicleProfileCatalogMatcher.confidentMatch(
+          profile: profile,
+          catalog: catalog,
+        ),
+        isNull,
+      );
+    });
+
+    test('returns null without a model (and without a slug)', () {
+      const profile = VehicleProfile(
+        id: 'p-nomodel',
+        name: 'Mystery',
+        make: 'Peugeot',
+      );
+      expect(
+        VehicleProfileCatalogMatcher.confidentMatch(
+          profile: profile,
+          catalog: catalog,
+        ),
+        isNull,
+      );
+    });
+
+    test('a stale slug that matches no row falls back to make + model', () {
+      const profile = VehicleProfile(
+        id: 'p-stale',
+        name: 'My Clio',
+        make: 'Renault',
+        model: 'Clio',
+        referenceVehicleId: 'removed-row-slug',
+      );
+      final match = VehicleProfileCatalogMatcher.confidentMatch(
+        profile: profile,
+        catalog: catalog,
+      );
+      expect(match, renaultClio);
+    });
+  });
+
   group('VehicleProfileCatalogMatcher.slugFor', () {
     test('produces lowercase dashed slugs for catalog entries', () {
       expect(

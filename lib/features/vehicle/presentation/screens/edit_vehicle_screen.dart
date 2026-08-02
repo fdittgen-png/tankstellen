@@ -11,6 +11,8 @@ import '../../../../core/widgets/discard_changes_dialog.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2_vin_reader.dart';
+import '../../data/reference_vehicle_catalog_provider.dart';
+import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../domain/entities/vin_data.dart';
@@ -18,6 +20,7 @@ import '../../providers/obd2_vin_reader_provider.dart';
 import '../../providers/vehicle_providers.dart';
 import '../../providers/vin_adapter_pair_auto_populator_provider.dart';
 import '../../providers/vin_decoder_provider.dart';
+import '../widgets/catalog_reset_confirm_dialog.dart';
 import '../widgets/reference_vehicle_picker.dart';
 import '../widgets/ve_reset_confirm_dialog.dart';
 import '../widgets/vehicle_edit_form.dart';
@@ -28,6 +31,7 @@ import '../widgets/vin_info_sheet.dart';
 import '../../../../core/logging/error_logger.dart';
 
 part 'edit_vehicle_screen_actions.dart';
+part 'edit_vehicle_screen_catalog_reset.dart';
 
 /// Sentinel for the four "leave alone" arguments on
 /// [_VehicleEditActions._saveCalibrationOverride] — `null` is a
@@ -48,7 +52,10 @@ class EditVehicleScreen extends ConsumerStatefulWidget {
 }
 
 class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
-    with SingleTickerProviderStateMixin, _VehicleEditActions {
+    with
+        SingleTickerProviderStateMixin,
+        _VehicleEditActions,
+        _VehicleCatalogResetAction {
   @override
   final _formKey = GlobalKey<FormState>();
   @override
@@ -279,6 +286,7 @@ class _EditVehicleScreenState extends ConsumerState<EditVehicleScreen>
         onAdapterPaired: _onAdapterChanged,
         onAdapterForget: () => _onAdapterChanged(null, null),
         onResetVolumetricEfficiency: _resetVolumetricEfficiency,
+        onResetFromCatalog: _resetFromCatalog,
         obd2CardKey: _obd2CardKey,
         obd2HighlightAnimation: _obd2HighlightController,
         onScrollToObd2Card: _scrollToAndHighlightObd2Card,

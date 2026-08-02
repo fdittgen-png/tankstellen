@@ -233,5 +233,63 @@ void main() {
         );
       }
     });
+
+    // #3651 — curated nominal tank capacities.
+    group('tankCapacityL', () {
+      Future<List<ReferenceVehicle>> load() async {
+        final raw = await rootBundle
+            .loadString('assets/reference_vehicles/vehicles.json');
+        return (json.decode(raw) as List<dynamic>)
+            .cast<Map<String, dynamic>>()
+            .map(ReferenceVehicle.fromJson)
+            .toList();
+      }
+
+      test('every curated capacity is a plausible passenger-car tank '
+          '(25–100 L)', () async {
+        for (final v in await load()) {
+          final cap = v.tankCapacityL;
+          if (cap == null) continue;
+          expect(cap, inInclusiveRange(25, 100),
+              reason: '${v.make} ${v.model} ${v.generation}: $cap L is '
+                  'outside the plausible passenger-car band');
+        }
+      });
+
+      test('electric rows never carry a tank capacity', () async {
+        for (final v in await load()) {
+          if (v.fuelType == 'electric') {
+            expect(v.tankCapacityL, isNull,
+                reason: '${v.make} ${v.model} is electric');
+          }
+        }
+      });
+
+      test('the #3651 reference case ships: Peugeot 107 I = 35 L, shared '
+          'with its Citroen C1 / Toyota Aygo platform triplet', () async {
+        final entries = await load();
+        ReferenceVehicle byModel(String make, String model, int yearStart) =>
+            entries.firstWhere((v) =>
+                v.make == make &&
+                v.model == model &&
+                v.yearStart == yearStart);
+        expect(byModel('Peugeot', '107', 2005).tankCapacityL, 35.0);
+        expect(byModel('Citroen', 'C1', 2005).tankCapacityL, 35.0);
+        expect(byModel('Toyota', 'Aygo', 2005).tankCapacityL, 35.0);
+      });
+
+      test('coverage floor: the majority of combustion rows carry a '
+          'curated capacity (only ratchets up)', () async {
+        final entries = await load();
+        final combustion =
+            entries.where((v) => v.fuelType != 'electric').toList();
+        final curated =
+            combustion.where((v) => v.tankCapacityL != null).length;
+        // 261 of 328 combustion rows at introduction; never regress
+        // below 250 — uncurated rows may only shrink as figures are
+        // confirmed, never grow.
+        expect(curated, greaterThanOrEqualTo(250));
+      });
+    });
   });
 }

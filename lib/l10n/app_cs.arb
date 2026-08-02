@@ -5635,5 +5635,35 @@
         "type": "String"
       }
     }
+  },
+  "catalogResetAction": "Reset from vehicle database",
+  "@catalogResetAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "catalogResetConfirmTitle": "Reset from the vehicle database?",
+  "@catalogResetConfirmTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "catalogResetConfirmBody": "This replaces the tank capacity, engine power and displacement of this vehicle with the database values for {vehicle}. Other fields and your fill-up history are not touched.",
+  "@catalogResetConfirmBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogResetNoMatchSnackbar": "No matching entry in the vehicle database for this vehicle.",
+  "@catalogResetNoMatchSnackbar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "catalogResetDoneSnackbar": "Vehicle data reset from the database.",
+  "@catalogResetDoneSnackbar": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

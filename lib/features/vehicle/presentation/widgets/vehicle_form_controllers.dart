@@ -97,7 +97,20 @@ class VehicleFormControllers {
     if (ref.powerKw != null && powerKwController.text.trim().isEmpty) {
       powerKwController.text = ref.powerKw.toString();
     }
+    // #3651 — pre-fill the nominal tank capacity from the catalog row,
+    // same no-clobber rule. Rows without a curated capacity leave the
+    // field blank rather than fabricating a figure.
+    final tankCapacityL = ref.tankCapacityL;
+    if (tankCapacityL != null && tankController.text.trim().isEmpty) {
+      tankController.text = _formatLitres(tankCapacityL);
+    }
   }
+
+  /// Render a litres figure without a spurious trailing `.0` — the
+  /// curated catalog capacities are whole litres, and "35" reads
+  /// better in the field than "35.0".
+  static String _formatLitres(double v) =>
+      v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
 
   /// Map the catalog's coarse fuel-type string onto a
   /// [VehicleProfile.preferredFuelType] code (the same string the
@@ -169,8 +182,14 @@ class VehicleFormControllers {
         : _parseDouble(maxChargingKwController.text);
     final supportedConnectors =
         type == VehicleType.combustion ? <ConnectorType>{} : {...connectors};
-    final tankCapacityL =
-        type == VehicleType.ev ? null : _parseDouble(tankController.text);
+    // #3651 — like `enginePowerKw` below, the catalog row is the
+    // fallback when the controller is blank (programmatic builds that
+    // skipped the picker UI); `referenceVehicle` is only ever non-null
+    // on the new-vehicle path.
+    final tankCapacityL = type == VehicleType.ev
+        ? null
+        : (_parseDouble(tankController.text) ??
+            referenceVehicle?.tankCapacityL);
     // Epic #3015 — rated power in kW. EV power is out of scope, so EVs
     // never persist it. The controller already carries either the
     // catalog pre-fill (no-clobber) or the user's typed override, so

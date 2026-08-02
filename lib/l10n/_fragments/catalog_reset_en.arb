@@ -1,0 +1,27 @@
+{
+  "catalogResetAction": "Reset from vehicle database",
+  "@catalogResetAction": {
+    "description": "OutlinedButton label on the edit-vehicle screen that re-initializes the catalog-backed spec fields (tank capacity, rated power, displacement) from the bundled reference vehicle database (#3651). Also the confirming action inside the dialog."
+  },
+  "catalogResetConfirmTitle": "Reset from the vehicle database?",
+  "@catalogResetConfirmTitle": {
+    "description": "AlertDialog title for the catalog reset confirmation (#3651)."
+  },
+  "catalogResetConfirmBody": "This replaces the tank capacity, engine power and displacement of this vehicle with the database values for {vehicle}. Other fields and your fill-up history are not touched.",
+  "@catalogResetConfirmBody": {
+    "description": "AlertDialog body for the catalog reset confirmation (#3651). {vehicle} is the matched catalog row, e.g. 'Peugeot 107 I (2005-2014)'.",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogResetNoMatchSnackbar": "No matching entry in the vehicle database for this vehicle.",
+  "@catalogResetNoMatchSnackbar": {
+    "description": "Snackbar shown when the catalog reset can't find a model-confident reference vehicle row for the profile (#3651)."
+  },
+  "catalogResetDoneSnackbar": "Vehicle data reset from the database.",
+  "@catalogResetDoneSnackbar": {
+    "description": "Snackbar confirming the catalog reset was applied (#3651)."
+  }
+}

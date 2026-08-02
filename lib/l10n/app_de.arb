@@ -1863,6 +1863,18 @@
   "@catalogReresolveSnackbarAction": {
     "description": "Action button on the #1396 catalog re-resolve snackbar — taps push the vehicle edit screen so the user can re-pick their catalog row."
   },
+  "catalogResetAction": "Aus Fahrzeugdatenbank zurücksetzen",
+  "catalogResetConfirmTitle": "Aus der Fahrzeugdatenbank zurücksetzen?",
+  "catalogResetConfirmBody": "Tankgröße, Motorleistung und Hubraum dieses Fahrzeugs werden durch die Datenbankwerte für {vehicle} ersetzt. Andere Felder und deine Tankhistorie bleiben unverändert.",
+  "@catalogResetConfirmBody": {
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogResetNoMatchSnackbar": "Kein passender Eintrag in der Fahrzeugdatenbank für dieses Fahrzeug.",
+  "catalogResetDoneSnackbar": "Fahrzeugdaten aus der Datenbank zurückgesetzt.",
   "consumptionTabFuel": "Kraftstoff",
   "consumptionTabCharging": "Laden",
   "noChargingLogsTitle": "Noch keine Ladeeinträge",

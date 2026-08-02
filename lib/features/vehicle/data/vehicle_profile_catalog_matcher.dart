@@ -80,6 +80,36 @@ class VehicleProfileCatalogMatcher {
     return null;
   }
 
+  /// #3651 — resolve the catalog row for [profile] with **model-level**
+  /// confidence: the persisted [VehicleProfile.referenceVehicleId] slug
+  /// first (the row the user actually picked), then the make+model
+  /// tiers of [bestMatch].
+  ///
+  /// Never falls back to [bestMatch]'s make-only tier — that tier is
+  /// fine for brand-wide OBD-II quirks (PID strategy), but per-model
+  /// spec data (tank capacity, rated power, displacement) from a random
+  /// brand-mate must not masquerade as this car's. Callers backfilling
+  /// or resetting profile fields from the catalog use this, not
+  /// [bestMatch].
+  static ReferenceVehicle? confidentMatch({
+    required VehicleProfile profile,
+    required List<ReferenceVehicle> catalog,
+  }) {
+    final slug = profile.referenceVehicleId;
+    if (slug != null && slug.isNotEmpty) {
+      for (final entry in catalog) {
+        if (slugFor(entry) == slug) return entry;
+      }
+    }
+    final model = profile.model?.trim().toLowerCase();
+    if (model == null || model.isEmpty) return null;
+    final match = bestMatch(profile: profile, catalog: catalog);
+    if (match == null) return null;
+    // Reject a tier-3 (make-only) result: the returned row's model must
+    // actually be the profile's model.
+    return match.model.toLowerCase() == model ? match : null;
+  }
+
   /// Builds the persistent slug for a catalog entry. Stored on the
   /// profile as [VehicleProfile.referenceVehicleId] so subsequent app
   /// launches can resolve the same row without re-running the matcher.
