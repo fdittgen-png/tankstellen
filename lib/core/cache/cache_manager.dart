@@ -247,7 +247,10 @@ class CacheManager implements CacheStrategy {
       if (key is! String) continue;
       final entry = get(key);
       if (entry == null) continue;
-      // Evict if age exceeds 3x TTL
+      // Evict if age exceeds 3x TTL. #3668 — `search:` entries are exempt:
+      // they are the last-known results the stale-first paint serves at
+      // startup (the per-prefix budget and byte ceiling still bound them).
+      if (key.startsWith('search:')) continue;
       if (entry.age > entry.ttl * 3) {
         await _storage.deleteCacheEntry(key);
         evicted++;
@@ -277,10 +280,14 @@ class CacheManager implements CacheStrategy {
       entries.add(MapEntry(raw, entry));
     }
 
-    // Pass 1 — expiry (> 3x TTL).
+    // Pass 1 — expiry (> 3x TTL). #3668 — `search:` entries are exempt
+    // from the expiry sweep: they are the last-known results the
+    // stale-first paint serves at startup (a week-old price list with the
+    // stale banner beats a skeleton). Pass 2's per-prefix budget and
+    // pass 3's byte ceiling still bound them.
     final survivors = <MapEntry<String, CacheEntry>>[];
     for (final e in entries) {
-      if (e.value.age > e.value.ttl * 3) {
+      if (!e.key.startsWith('search:') && e.value.age > e.value.ttl * 3) {
         await _storage.deleteCacheEntry(e.key);
         evicted++;
       } else {

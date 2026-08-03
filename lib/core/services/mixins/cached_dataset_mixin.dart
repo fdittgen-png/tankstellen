@@ -3,7 +3,18 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show debugPrint;
+
 import '../persistent_dataset.dart';
+
+export 'keyed_cached_dataset_mixin.dart';
+
+/// #3668 — how long a cold-path dataset fetch may run before an existing
+/// (even hard-stale) disk copy is served and the fetch continues in the
+/// background. First paint must never wait on a whole-country download
+/// when ANY previous copy exists. Mutable top-level (the
+/// `stationTransientRetryDelay` pattern) so tests can shrink it.
+Duration datasetStaleServeDeadline = const Duration(seconds: 2);
 
 /// Mixin for services that download a full national dataset and cache it
 /// in memory (MITECO, MISE, Argentina, Denmark).
@@ -102,21 +113,7 @@ mixin CachedDatasetMixin {
   }) async {
     if (cached != null && isDatasetFresh(softTtl)) return cached;
 
-    // Disk read-through — survives cold start + offline. #3154 — the
-    // deserialize runs through compute() inside [PersistentDataset.readAsync]
-    // so the ~11k-fromJson rehydrate stays off the UI isolate.
-    if (cached == null || !isDatasetFresh(hardTtl)) {
-      final disk = await persistent.readAsync();
-      if (disk != null && disk.age <= hardTtl) {
-        store(disk.value);
-        markDatasetRefreshedAt(disk.age);
-        if (disk.age <= softTtl) return disk.value;
-        // Soft-stale: fall through to refresh, but keep the disk copy as a
-        // fallback if the network is unavailable.
-      }
-    }
-
-    try {
+    Future<T> refresh() async {
       // #2313 — dedupe concurrent downloads (one fetch for N simultaneous
       // cold/soft-stale searches). The disk write below runs only for the
       // caller that actually performed the fetch; piggy-backing callers skip
@@ -127,16 +124,73 @@ mixin CachedDatasetMixin {
       markDatasetRefreshed();
       await persistent.write(value, hardTtl: hardTtl);
       return value;
-    } on Object {
-      // Network failed — serve any persisted copy rather than throw.
-      final disk = await persistent.readAsync();
-      if (disk != null) {
-        store(disk.value);
-        markDatasetRefreshedAt(disk.age);
-        return disk.value;
-      }
-      rethrow;
     }
+
+    // #3668 — in-memory soft-stale (still within the hard TTL): serve NOW,
+    // refresh in the background. Blocking a search on the whole-country
+    // re-download while holding a servable copy was the startup-skeleton
+    // bug this fixes.
+    if (cached != null && isDatasetFresh(hardTtl)) {
+      _refreshInBackground(refresh);
+      return cached;
+    }
+
+    // Disk read-through — survives cold start + offline. #3154 — the
+    // deserialize runs through compute() inside [PersistentDataset.readAsync]
+    // so the ~11k-fromJson rehydrate stays off the UI isolate.
+    final disk = await persistent.readAsync();
+    if (disk != null && disk.age <= hardTtl) {
+      store(disk.value);
+      markDatasetRefreshedAt(disk.age);
+      if (disk.age <= softTtl) return disk.value;
+      // #3668 — soft-stale disk copy: serve NOW, refresh in the background
+      // (was: fall through and BLOCK on the refresh).
+      _refreshInBackground(refresh);
+      return disk.value;
+    }
+
+    // Past the hard TTL (or nothing persisted): the fetch must run — but a
+    // hard-stale disk copy still caps the wait at [datasetStaleServeDeadline]
+    // (#3668): fresh data is preferred, a blank screen is not.
+    final pending = refresh();
+    if (disk == null) {
+      try {
+        return await pending;
+      } on Object {
+        // Network failed — serve any persisted copy rather than throw.
+        final lateDisk = await persistent.readAsync();
+        if (lateDisk != null) {
+          store(lateDisk.value);
+          markDatasetRefreshedAt(lateDisk.age);
+          return lateDisk.value;
+        }
+        rethrow;
+      }
+    }
+    try {
+      return await pending.timeout(datasetStaleServeDeadline);
+    } on TimeoutException {
+      _swallowBackground(pending);
+      store(disk.value);
+      markDatasetRefreshedAt(disk.age);
+      return disk.value;
+    } on Object {
+      store(disk.value);
+      markDatasetRefreshedAt(disk.age);
+      return disk.value;
+    }
+  }
+
+  /// Fire-and-forget a refresh future, logging (never throwing) its
+  /// eventual failure — an unhandled async error would crash the zone
+  /// (#3668).
+  void _refreshInBackground(Future<Object?> Function() refresh) =>
+      _swallowBackground(refresh());
+
+  void _swallowBackground(Future<Object?> pending) {
+    unawaited(pending.then<void>((_) {}).catchError((Object e, StackTrace st) {
+      debugPrint('CachedDatasetMixin: background dataset refresh failed: $e');
+    }));
   }
 
   /// Completeness-gated variant of [loadPersistentDataset] (#2249).
@@ -170,16 +224,7 @@ mixin CachedDatasetMixin {
   }) async {
     if (cached != null && isDatasetFresh(softTtl)) return cached;
 
-    if (cached == null || !isDatasetFresh(hardTtl)) {
-      final disk = await persistent.readAsync(); // #3154 — off-isolate
-      if (disk != null && disk.age <= hardTtl) {
-        store(disk.value);
-        markDatasetRefreshedAt(disk.age);
-        if (disk.age <= softTtl) return disk.value;
-      }
-    }
-
-    try {
+    Future<T> refresh() async {
       final value = await _dedupedFetch<T>(fetch);
       store(value);
       if (isComplete(value)) {
@@ -193,125 +238,50 @@ mixin CachedDatasetMixin {
         await persistent.write(value, hardTtl: shortTtl);
       }
       return value;
-    } on Object {
-      final disk = await persistent.readAsync(); // #3154 — off-isolate
-      if (disk != null) {
-        store(disk.value);
-        markDatasetRefreshedAt(disk.age);
-        return disk.value;
-      }
-      rethrow;
-    }
-  }
-}
-
-/// Keyed variant of [CachedDatasetMixin] (#3156).
-///
-/// Some bulk feeds are not ONE national dataset but a *family* of datasets
-/// keyed by a sub-national identifier (ES MITECO: one row set per province).
-/// [CachedDatasetMixin] is single-dataset — one freshness clock, one in-flight
-/// fetch slot — which forced MITECO to hand-roll the very same TTL /
-/// read-through / offline-fallback state machine, a fork where mixin fixes
-/// (the #2313 fetch dedupe, the #3154 off-isolate disk deserialize) never
-/// reached Spain. This mixin is that state machine with per-[key] clocks and
-/// in-flight slots.
-mixin KeyedCachedDatasetMixin {
-  final Map<String, DateTime> _keyedCachedAt = {};
-
-  /// Per-key in-flight fetch slots — same #2313 dedupe contract as
-  /// [CachedDatasetMixin]: concurrent callers for the SAME key share one
-  /// download (the first caller's closure, so a later caller's `CancelToken`
-  /// only awaits, never cancels); different keys fetch independently.
-  final Map<String, Future<dynamic>> _keyedPendingLoads = {};
-
-  /// Whether the in-memory dataset for [key] is still fresh.
-  bool isKeyedDatasetFresh(String key, Duration ttl) {
-    final cachedAt = _keyedCachedAt[key];
-    return cachedAt != null && DateTime.now().difference(cachedAt) < ttl;
-  }
-
-  /// Mark [key]'s in-memory dataset as just refreshed.
-  void markKeyedDatasetRefreshed(String key) =>
-      _keyedCachedAt[key] = DateTime.now();
-
-  /// Stamp [key]'s freshness clock to [age] ago — used when a dataset is
-  /// rehydrated from disk so its remaining freshness reflects the persisted
-  /// copy's age, not the moment of rehydration (#2264).
-  void markKeyedDatasetRefreshedAt(String key, Duration age) =>
-      _keyedCachedAt[key] = DateTime.now().subtract(age);
-
-  /// Per-key [CachedDatasetMixin.loadPersistentDataset] — identical
-  /// soft/hard-TTL, read-through, dedupe and offline-fallback semantics, with
-  /// two host-shaped differences:
-  ///
-  ///  - [persistent] is nullable, so hosts whose disk cache is optional (the
-  ///    pure in-memory parser tests pass no [CacheStrategy]) run the same code
-  ///    path minus the disk steps, and
-  ///  - when [fetch] fails and no disk copy exists, a stale in-memory [cached]
-  ///    copy is served as the last resort before rethrowing (the pre-#3156
-  ///    MITECO offline behaviour: hours-stale province rows beat failing the
-  ///    whole search).
-  Future<T> loadKeyedPersistentDataset<T>({
-    required String key,
-    required T? cached,
-    required Duration softTtl,
-    required Duration hardTtl,
-    required PersistentDataset<T>? persistent,
-    required Future<T> Function() fetch,
-    required void Function(T value) store,
-  }) async {
-    if (cached != null && isKeyedDatasetFresh(key, softTtl)) return cached;
-
-    // Disk read-through — survives cold start + offline; deserialize runs
-    // through compute() inside [PersistentDataset.readAsync] (#3154).
-    if (persistent != null &&
-        (cached == null || !isKeyedDatasetFresh(key, hardTtl))) {
-      final disk = await persistent.readAsync();
-      if (disk != null && disk.age <= hardTtl) {
-        store(disk.value);
-        markKeyedDatasetRefreshedAt(key, disk.age);
-        if (disk.age <= softTtl) return disk.value;
-        // Soft-stale: fall through to refresh, keeping the disk copy as the
-        // fallback if the network is unavailable.
-      }
     }
 
-    try {
-      final value = await _dedupedKeyedFetch<T>(key, fetch);
-      store(value);
-      markKeyedDatasetRefreshed(key);
-      await persistent?.write(value, hardTtl: hardTtl);
-      return value;
-    } on Object {
-      // Network failed — serve any persisted copy rather than throw.
-      if (persistent != null) {
-        final disk = await persistent.readAsync(); // #3154 — off-isolate
-        if (disk != null) {
-          store(disk.value);
-          markKeyedDatasetRefreshedAt(key, disk.age);
-          return disk.value;
+    // #3668 — soft-stale (memory or disk) serves immediately with a
+    // background refresh; a hard-stale disk copy caps the cold fetch at
+    // [datasetStaleServeDeadline]. Same shape as [loadPersistentDataset].
+    if (cached != null && isDatasetFresh(hardTtl)) {
+      _refreshInBackground(refresh);
+      return cached;
+    }
+
+    final disk = await persistent.readAsync(); // #3154 — off-isolate
+    if (disk != null && disk.age <= hardTtl) {
+      store(disk.value);
+      markDatasetRefreshedAt(disk.age);
+      if (disk.age <= softTtl) return disk.value;
+      _refreshInBackground(refresh);
+      return disk.value;
+    }
+
+    final pending = refresh();
+    if (disk == null) {
+      try {
+        return await pending;
+      } on Object {
+        final lateDisk = await persistent.readAsync(); // #3154 — off-isolate
+        if (lateDisk != null) {
+          store(lateDisk.value);
+          markDatasetRefreshedAt(lateDisk.age);
+          return lateDisk.value;
         }
+        rethrow;
       }
-      // Last resort: a stale in-memory copy beats failing the search.
-      if (cached != null) return cached;
-      rethrow;
     }
-  }
-
-  /// Per-key twin of the unkeyed mixin's deduped fetch (#2313): collapses
-  /// concurrent calls for the same [key] onto a single in-flight future,
-  /// clearing the slot once it settles so a later call refetches.
-  Future<T> _dedupedKeyedFetch<T>(String key, Future<T> Function() fetch) {
-    final inFlight = _keyedPendingLoads[key];
-    if (inFlight != null) return inFlight.then((v) => v as T);
-    final started = fetch();
-    _keyedPendingLoads[key] = started;
-    return started.whenComplete(() {
-      // Only clear if it's still our future (a later refetch may have
-      // replaced it).
-      if (identical(_keyedPendingLoads[key], started)) {
-        unawaited(_keyedPendingLoads.remove(key));
-      }
-    });
+    try {
+      return await pending.timeout(datasetStaleServeDeadline);
+    } on TimeoutException {
+      _swallowBackground(pending);
+      store(disk.value);
+      markDatasetRefreshedAt(disk.age);
+      return disk.value;
+    } on Object {
+      store(disk.value);
+      markDatasetRefreshedAt(disk.age);
+      return disk.value;
+    }
   }
 }

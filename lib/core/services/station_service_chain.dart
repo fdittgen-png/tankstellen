@@ -23,6 +23,8 @@ import 'station_service.dart';
 import 'station_service_chain_codec.dart';
 import 'station_transient_retry.dart';
 
+part 'station_service_chain_coalescing.dart';
+
 /// Orchestrates station data retrieval with fallback:
 ///
 ///   1. Fresh cache (< TTL) → return immediately (skip API)
@@ -50,10 +52,12 @@ import 'station_transient_retry.dart';
 /// When no policy is supplied (legacy call sites + most chain unit tests) the
 /// chain defaults to the polled path with [CacheTtl.stationSearch], so its
 /// observable behaviour is unchanged.
-class StationServiceChain implements StationService {
+class StationServiceChain with _ChainCoalescing implements StationService {
+  @override
   final StationService _primary;
   final CacheStrategy _cache;
   final ServiceSource _errorSource;
+  @override
   final String countryCode;
 
   /// Data-source policy (#2264). Controls whether [searchStations] uses the
@@ -67,6 +71,7 @@ class StationServiceChain implements StationService {
   /// `Feature.debugMode` the registry hands a live recorder here and the
   /// network-vs-cache outcome of each access is recorded for the rate-limit
   /// compliance + cache-hit-ratio export.
+  @override
   final DataAccessRecorder? _recorder;
 
   /// Shared foreground+background per-provider request budget (#2866). When
@@ -75,17 +80,8 @@ class StationServiceChain implements StationService {
   /// next background scan can see that the foreground just hit this provider
   /// and skip it within its `minInterval`. Null for the legacy call sites /
   /// unit tests that don't wire a budget — then no stamp is written.
+  @override
   final ProviderRequestBudget? _budget;
-
-  /// In-flight request deduplication: concurrent calls for the same cache key
-  /// share a single Future instead of hitting the API multiple times.
-  /// Entries are removed in the finally block of [_throughChain] and also
-  /// evicted if older than [_inFlightMaxAge] to prevent leaks.
-  final _inFlight = <String, Future<ServiceResult<dynamic>>>{};
-  final _inFlightTimestamps = <String, DateTime>{};
-
-  /// Max time an entry can stay in _inFlight before forced eviction.
-  static const _inFlightMaxAge = Duration(minutes: 2);
 
   StationServiceChain(this._primary, this._cache, {
     ServiceSource errorSource = ServiceSource.tankerkoenigApi,
@@ -187,8 +183,23 @@ class StationServiceChain implements StationService {
     // under load) and the Argentina CKAN bulk-download (#1955 — slow
     // first-byte triggering Dio's connect timeout). Both recover on a
     // second attempt within a second.
-    final apiClock = Stopwatch()..start();
-    try {
+    //
+    // #3668 — the stale tier is a LATENCY fallback too, not only a
+    // failure fallback. When a servable stale entry exists, the fetch
+    // races a short first-paint deadline: past it, the stale entry is
+    // served (`isStale: true` — the ServiceStatusBanner renders the
+    // "updating" state) while the fetch keeps running in the background
+    // and caches its result, so the NEXT read is fresh. Field case: FR
+    // legacy polling on weak 4G held the search skeleton >10 s (worst
+    // case ~90 s: 15 s connect + 30 s receive + one retry) with
+    // yesterday's results sitting in Hive the whole time.
+    final staleForRace = _staleResult<T>(
+      cacheKey, endpoint, deserialize, check, errors,
+      recordHit: false,
+    );
+
+    Future<ServiceResult<T>> fetchAndCache() async {
+      final apiClock = Stopwatch()..start();
       final result = await callWithTransientRetry(apiCall);
       apiClock.stop();
       await _cache.put(
@@ -206,6 +217,27 @@ class StationServiceChain implements StationService {
       // minInterval. Fire-and-forget; null in legacy/test call sites.
       _budget?.recordRequest(countryCode);
       return result;
+    }
+
+    final pending = fetchAndCache();
+    try {
+      if (staleForRace != null) {
+        return await pending.timeout(stalePaintDeadline);
+      }
+      return await pending;
+    } on TimeoutException {
+      // Deadline hit with a stale fallback in hand: serve it now, let the
+      // fetch finish (and cache) in the background. Its eventual failure
+      // is logged, never thrown into the void.
+      unawaited(pending.then<void>((_) {}).catchError((Object e, StackTrace st) {
+        recordDataAccessFailure(countryCode);
+        logStationApiFailure(e is Exception ? e : Exception(e.toString()), st,
+            countryCode: countryCode, cacheKey: cacheKey);
+      }));
+      recordDataAccess(_recorder, countryCode, endpoint,
+          DataAccessHit.hiveStale, ServiceSource.cache,
+          count: dataAccessResultCount(staleForRace!.data), isStale: true);
+      return staleForRace;
     } on Exception catch (e, st) {
       recordDataAccessFailure(countryCode); // #3146 — always-on tally
       // #3370/#2296 — breadcrumb an EXPECTED `unsupported` gap (e.g. Luxembourg
@@ -221,27 +253,56 @@ class StationServiceChain implements StationService {
       ));
     }
 
-    // Step 3: Stale cache
-    final stale = _cache.get(cacheKey);
-    if (stale != null) {
-      final data = deserialize(stale.payload);
-      if (data != null && check(data)) {
-        recordDataAccess(_recorder, countryCode, endpoint,
-            DataAccessHit.hiveStale, ServiceSource.cache,
-            count: dataAccessResultCount(data), isStale: true);
-        return ServiceResult(
-          data: data,
-          source: ServiceSource.cache,
-          fetchedAt: stale.storedAt,
-          isStale: true,
-          errors: errors,
-        );
-      }
-    }
+    // Step 3: Stale cache (fetch failed — re-read so the hit is recorded
+    // and the accumulated errors ride along on the result).
+    final stale = _staleResult<T>(
+      cacheKey, endpoint, deserialize, check, errors,
+      recordHit: true,
+    );
+    if (stale != null) return stale;
 
     // Step 4: Nothing worked
     throw ServiceChainExhaustedException(errors: errors);
   }
+
+  /// Deserialize the stale cache entry for [cacheKey] into a servable
+  /// [ServiceResult], or null when absent/invalid (#3668). [recordHit]
+  /// controls whether the diagnostics recorder is stamped — the race
+  /// pre-read must not record a hit it may never serve.
+  ServiceResult<T>? _staleResult<T>(
+    String cacheKey,
+    DataAccessEndpoint endpoint,
+    T? Function(Map<String, dynamic> data) deserialize,
+    bool Function(T data) check,
+    List<ServiceError> errors, {
+    required bool recordHit,
+  }) {
+    final stale = _cache.get(cacheKey);
+    if (stale == null) return null;
+    final data = deserialize(stale.payload);
+    if (data == null || !check(data)) return null;
+    if (recordHit) {
+      recordDataAccess(_recorder, countryCode, endpoint,
+          DataAccessHit.hiveStale, ServiceSource.cache,
+          count: dataAccessResultCount(data), isStale: true);
+    }
+    return ServiceResult(
+      data: data,
+      source: ServiceSource.cache,
+      fetchedAt: stale.storedAt,
+      isStale: true,
+      errors: List.of(errors),
+    );
+  }
+
+  /// #3668 — first-paint deadline for the stale race: when a servable
+  /// stale entry exists, the API call gets this long to answer before
+  /// the stale entry is served and the fetch continues in the
+  /// background. 2 s keeps a fast network fresh-first while capping the
+  /// startup skeleton; mutable for tests (pattern of
+  /// [transientRetryDelay]).
+  @visibleForTesting
+  static Duration stalePaintDeadline = const Duration(seconds: 2);
 
   /// Delay between the first and second attempt of the in-chain transient
   /// retry. Re-exports the single source of truth in
@@ -301,59 +362,6 @@ class StationServiceChain implements StationService {
     return identical(filtered, result.data) ? result : result.withData(filtered);
   }
 
-  /// Bulk-dataset search path (#2264): no per-key Hive cache. Adds only the
-  /// resilience layers that matter — in-flight coalescing + the single
-  /// transient retry — then returns the primary's result verbatim, so search
-  /// results are byte-identical to calling the primary directly.
-  Future<ServiceResult<List<Station>>> _bulkSearch(
-    SearchParams params, {
-    CancelToken? cancelToken,
-  }) async {
-    _evictStaleInFlight();
-    final key = 'bulk:${CacheKey.stationSearch(
-      params.lat, params.lng, params.radiusKm, params.fuelType.apiValue,
-      countryCode: countryCode,
-      postalCode: params.postalCode,
-      locationName: params.locationName,
-    )}';
-
-    if (_inFlight.containsKey(key)) {
-      final result = await _inFlight[key]!;
-      if (result.data is List<Station>) {
-        recordDataAccess(_recorder, countryCode,
-            DataAccessEndpoint.bulkDataset, DataAccessHit.coalesced,
-            result.source,
-            count: dataAccessResultCount(result.data),
-            isStale: result.isStale);
-        return result.withData<List<Station>>(result.data as List<Station>);
-      }
-    }
-
-    final future = callWithTransientRetry(
-      () => _primary.searchStations(params, cancelToken: cancelToken),
-    );
-    _inFlight[key] = future;
-    _inFlightTimestamps[key] = DateTime.now();
-    final bulkClock = Stopwatch()..start();
-    try {
-      final result = await future;
-      bulkClock.stop();
-      recordDataAccess(_recorder, countryCode, DataAccessEndpoint.bulkDataset,
-          DataAccessHit.networkApi, result.source,
-          count: dataAccessResultCount(result.data),
-          latencyMicros: bulkClock.elapsedMicroseconds,
-          isStale: result.isStale);
-      // #2866 — stamp the shared per-provider (here: per-dataset) budget so a
-      // background scan won't re-download the whole-country dataset within the
-      // policy's minInterval after a foreground search just fetched it.
-      _budget?.recordRequest(countryCode);
-      return result;
-    } finally {
-      unawaited(_inFlight.remove(key) ?? Future<void>.value());
-      _inFlightTimestamps.remove(key);
-    }
-  }
-
   @override
   Future<ServiceResult<StationDetail>> getStationDetail(
     String stationId,
@@ -381,20 +389,4 @@ class StationServiceChain implements StationService {
         deserialize: deserializePrices,
         ttl: CacheTtl.prices,
       );
-
-  /// Remove in-flight entries older than [_inFlightMaxAge].
-  /// Guards against orphaned futures from unhandled exceptions or timeouts.
-  void _evictStaleInFlight() {
-    final now = DateTime.now();
-    final staleKeys = _inFlightTimestamps.entries
-        .where((e) => now.difference(e.value) > _inFlightMaxAge)
-        .map((e) => e.key)
-        .toList();
-    for (final key in staleKeys) {
-      unawaited(_inFlight.remove(key));
-      _inFlightTimestamps.remove(key);
-      debugPrint('StationServiceChain: evicted stale in-flight entry: $key');
-    }
-  }
-
 }

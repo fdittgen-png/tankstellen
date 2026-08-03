@@ -57,12 +57,17 @@ void main() {
     'lib/core/services/diagnostics/data_access_recorder.dart': 2,
     'lib/core/services/geocoding_chain.dart': 6,
     'lib/core/services/impl/demo_station_service.dart': 4,
-    'lib/core/services/mixins/cached_dataset_mixin.dart': 6,
+    // #3668 decomposition: 6 reads split 3/3 with the keyed mixin —
+    // a move, not a widening (total unchanged).
+    'lib/core/services/mixins/cached_dataset_mixin.dart': 3,
+    'lib/core/services/mixins/keyed_cached_dataset_mixin.dart': 3,
     'lib/core/services/mixins/station_service_helpers.dart': 2,
     'lib/core/services/radar/highway_mode_provider.dart': 1,
     'lib/core/services/rate_limit_interceptor.dart': 1,
     'lib/core/services/service_result.dart': 1,
-    'lib/core/services/station_service_chain.dart': 4,
+    // #3668 decomposition: 4 reads split 2/2 with the coalescing part.
+    'lib/core/services/station_service_chain.dart': 2,
+    'lib/core/services/station_service_chain_coalescing.dart': 2,
     'lib/core/services/widgets/freshness_badge.dart': 1,
     'lib/core/storage/stores/cache_hive_store.dart': 2,
     'lib/core/sync/baselines_sync.dart': 1,
