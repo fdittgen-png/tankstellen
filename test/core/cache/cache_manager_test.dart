@@ -403,6 +403,36 @@ void main() {
       expect(cache.get('still-fresh'), isNotNull);
     });
 
+    test('search:-prefixed entries are EXEMPT from the 3x-TTL sweep — '
+        'they are the stale-first paint\'s startup fallback (#3668)',
+        () async {
+      // storedAt epoch 0 → decades past any TTL.
+      await fakeStorage.cacheData('search:FR:48.85:2.35:10.0:e85', {
+        'payload': {'stations': <Object>[]},
+        'storedAt': 0,
+        'source': ServiceSource.cache.index,
+        'ttlMs': 1,
+      });
+      await fakeStorage.cacheData('detail:ancient', {
+        'payload': {'x': 1},
+        'storedAt': 0,
+        'source': ServiceSource.cache.index,
+        'ttlMs': 1,
+      });
+
+      final evicted = await cache.evictExpired();
+      expect(evicted, 1, reason: 'only the non-search entry goes');
+      expect(cache.get('search:FR:48.85:2.35:10.0:e85'), isNotNull,
+          reason: 'last-known search results must survive — a week-old '
+              'price list with the stale banner beats a startup skeleton');
+      expect(cache.get('detail:ancient'), isNull);
+
+      // The bounded sweep honours the same exemption in its pass 1.
+      final evicted2 = await cache.evictBounded();
+      expect(evicted2, 0);
+      expect(cache.get('search:FR:48.85:2.35:10.0:e85'), isNotNull);
+    });
+
     test('evictExpired returns 0 when nothing to evict', () async {
       await cache.put('fresh', {'v': 1},
           ttl: const Duration(hours: 1), source: ServiceSource.cache);

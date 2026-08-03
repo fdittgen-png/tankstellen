@@ -11,6 +11,8 @@ import 'package:tankstellen/core/services/service_result.dart';
 
 class _TestCached with CachedDatasetMixin {}
 
+class _TestKeyedCached with KeyedCachedDatasetMixin {}
+
 /// Tiny in-memory CacheStrategy for the persistence tests.
 class _MemCache implements CacheStrategy {
   final Map<String, CacheEntry> _store = {};
@@ -422,4 +424,160 @@ void main() {
       expect(persistent.read()?.value, [5, 5]);
     });
   });
+  group('stale-first serve + background refresh (#3668)', () {
+    setUp(() => datasetStaleServeDeadline = const Duration(milliseconds: 50));
+    tearDown(() => datasetStaleServeDeadline = const Duration(seconds: 2));
+
+    test('a soft-stale DISK copy is served immediately; the refresh runs '
+        'in the background and persists', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      await persistent.write([1, 2], hardTtl: const Duration(days: 1));
+
+      final gate = Completer<void>();
+      var fetchCalls = 0;
+      final result = await cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: Duration.zero, // just-written copy is already soft-stale
+        hardTtl: const Duration(days: 1),
+        persistent: persistent,
+        fetch: () async {
+          fetchCalls++;
+          await gate.future;
+          return [9];
+        },
+        store: (_) {},
+      );
+
+      expect(result, [1, 2],
+          reason: 'the servable copy must paint first — the whole-country '
+              'refresh may not block the search');
+      expect(fetchCalls, 1, reason: 'the background refresh must start');
+
+      gate.complete();
+      await pumpEventQueue();
+      expect(persistent.read()?.value, [9],
+          reason: 'the background refresh must persist its result');
+      expect(cached.isDatasetFresh(const Duration(minutes: 5)), isTrue,
+          reason: 'the background refresh must stamp the freshness clock');
+    });
+
+    test('an in-memory soft-stale copy is served immediately with a '
+        'background refresh', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      cached.markDatasetRefreshed(); // in-memory copy exists…
+      final gate = Completer<void>();
+
+      final result = await cached.loadPersistentDataset<List<int>>(
+        cached: const [5],
+        softTtl: Duration.zero, // …but is already soft-stale
+        hardTtl: const Duration(days: 1),
+        persistent: persistent,
+        fetch: () async {
+          await gate.future;
+          return [9];
+        },
+        store: (_) {},
+      );
+
+      expect(result, const [5]);
+      gate.complete();
+      await pumpEventQueue();
+      expect(persistent.read()?.value, [9]);
+    });
+
+    test('a HARD-stale disk copy still caps the cold fetch at the '
+        'deadline instead of blanking the screen', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      // hardTtl zero → the persisted copy is immediately past the hard TTL.
+      await persistent.write([1, 2], hardTtl: const Duration(days: 1));
+
+      final gate = Completer<void>();
+      final result = await cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: Duration.zero,
+        hardTtl: Duration.zero,
+        persistent: persistent,
+        fetch: () async {
+          await gate.future;
+          return [9];
+        },
+        store: (_) {},
+      );
+
+      expect(result, [1, 2],
+          reason: 'past the deadline, an ancient copy beats a skeleton');
+      gate.complete();
+      await pumpEventQueue();
+      expect(persistent.read()?.value, [9]);
+    });
+
+    test('with NOTHING persisted the cold fetch still blocks (true first '
+        'run — there is nothing to serve instead)', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      final result = await cached.loadPersistentDataset<List<int>>(
+        cached: null,
+        softTtl: Duration.zero,
+        hardTtl: Duration.zero,
+        persistent: persistent,
+        fetch: () async => [9],
+        store: (_) {},
+      );
+      expect(result, [9]);
+    });
+
+    test('a FAILING background refresh completes normally — the swallow '
+        'is the never-throws boundary, fault-injected (#3668)', () async {
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      await persistent.write([1, 2], hardTtl: const Duration(days: 1));
+
+      // Soft-stale copy → serve-then-refresh; the refresh THROWS.
+      await expectLater(
+        cached.loadPersistentDataset<List<int>>(
+          cached: null,
+          softTtl: Duration.zero,
+          hardTtl: const Duration(days: 1),
+          persistent: persistent,
+          fetch: () async => throw StateError('upstream down'),
+          store: (_) {},
+        ),
+        completes,
+      );
+      // Let the background failure settle — it must be swallowed (logged),
+      // never thrown into the zone.
+      await pumpEventQueue();
+    });
+
+    test('keyed variant: soft-stale disk copy serves immediately with a '
+        'background refresh', () async {
+      final keyed = _TestKeyedCached();
+      final cache = _MemCache();
+      final persistent = _intDataset(cache);
+      await persistent.write([1, 2], hardTtl: const Duration(days: 1));
+
+      final gate = Completer<void>();
+      final result = await keyed.loadKeyedPersistentDataset<List<int>>(
+        key: 'p1',
+        cached: null,
+        softTtl: Duration.zero,
+        hardTtl: const Duration(days: 1),
+        persistent: persistent,
+        fetch: () async {
+          await gate.future;
+          return [9];
+        },
+        store: (_) {},
+      );
+
+      expect(result, [1, 2]);
+      gate.complete();
+      await pumpEventQueue();
+      expect(persistent.read()?.value, [9]);
+    });
+  });
+
 }
