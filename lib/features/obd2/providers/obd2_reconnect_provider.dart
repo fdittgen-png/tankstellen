@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
@@ -14,6 +15,7 @@ import '../data/obd2_comm_diagnostics.dart';
 import '../data/obd2_connect_trace.dart';
 import '../data/obd2_connect_trace_log.dart';
 import '../data/obd2_connection_service.dart';
+import '../data/obd2_dial_budget.dart';
 import '../data/obd2_disconnect_quietly.dart';
 import '../data/obd2_link_supervisor.dart';
 import '../data/obd2_service.dart';
@@ -141,7 +143,13 @@ class Obd2Reconnect extends _$Obd2Reconnect {
   /// Shell safety: the app shell watches this provider, so failed
   /// dependency reads (not-yet-bootstrapped graph / widget-test scope)
   /// must degrade to a no-op dial, never crash the shell.
-  Future<Obd2Service?> _dialDefault() async {
+  Future<Obd2Service?> _dialDefault() =>
+      // #3671 — the automatic reconnect dial runs under a whole-attempt
+      // budget; see [dialWithBudget] for the field pathology (a single
+      // liveReconnect attempt grinding 21 minutes in the background).
+      dialWithBudget(_dialDefaultBody);
+
+  Future<Obd2Service?> _dialDefaultBody() async {
     final Obd2ConnectionService connection;
     final LastGoodAdapterStore pinStore;
     try {
@@ -195,7 +203,18 @@ class Obd2Reconnect extends _$Obd2Reconnect {
       }
     }
 
-    // Re-scan fallback.
+    // Re-scan fallback — #3671: only while the app is visible. The
+    // scan is the expensive step of a dial (continuous BLE callbacks on
+    // the main looper, throttled-but-not-free in background); with the
+    // phone parked away from the car overnight it ground for tens of
+    // minutes per attempt until the OS killed the process for excessive
+    // background CPU. The direct by-MAC dials above still run, so
+    // auto-record keeps recovering the moment the adapter answers; the
+    // scan-based rescue resumes on the next foreground dial.
+    if (shouldSkipRescanWhenBackgrounded(_lifecycleStateOrNull())) {
+      BreadcrumbCollector.add('obd2-reconnect: rescan skipped (backgrounded)');
+      return null;
+    }
     final rescanned = await Obd2ConnectTraceLog.runWithOrigin(
       Obd2ConnectOrigin.liveReconnect,
       () => pinned != null
@@ -204,6 +223,17 @@ class Obd2Reconnect extends _$Obd2Reconnect {
       transportDecisionReason: 'reconnect-rescan',
     );
     return _classify(rescanned);
+  }
+
+  /// #3671 — the app lifecycle, or null when the widgets binding is not
+  /// up (pure-Dart provider tests / early startup). Null errs on the
+  /// visible side, keeping the full dial.
+  AppLifecycleState? _lifecycleStateOrNull() {
+    try {
+      return WidgetsBinding.instance.lifecycleState;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// The active vehicle's pinned adapter MAC (#3553), or null when no
@@ -249,3 +279,16 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     }));
   }
 }
+
+/// #3671 — whether a reconnect dial should skip its re-scan fallback.
+///
+/// `paused` / `hidden` / `detached` are genuinely backgrounded — the
+/// user cannot see the app, and a BLE scan there burns main-looper CPU
+/// for a rescue no one is waiting on. `inactive` (a transient overlay,
+/// the iOS app-switcher flash) and `resumed` keep the full dial.
+/// A null lifecycle (engine not yet told) errs on the visible side.
+bool shouldSkipRescanWhenBackgrounded(AppLifecycleState? lifecycle) =>
+    lifecycle == AppLifecycleState.paused ||
+    lifecycle == AppLifecycleState.hidden ||
+    lifecycle == AppLifecycleState.detached;
+
