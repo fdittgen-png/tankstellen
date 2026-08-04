@@ -108,7 +108,14 @@ class DeletionsSync {
 
   /// #3331 — one actionable breadcrumb (NOT an ERROR trace) for the
   /// outdated-self-host-schema case, so it doesn't flood the error log.
+  /// #3672 — once per SESSION: the field export showed it 3x within
+  /// 400 ms (one per recorded tombstone); the message is identical and
+  /// actionable exactly once.
+  static bool _breadcrumbedAbsentThisSession = false;
+
   static void _breadcrumbDeletionsAbsent() {
+    if (_breadcrumbedAbsentThisSession) return;
+    _breadcrumbedAbsentThisSession = true;
     BreadcrumbCollector.add(
       'sync: deletions table absent',
       detail: 'self-host TankSync schema predates the deletion-tombstones '
