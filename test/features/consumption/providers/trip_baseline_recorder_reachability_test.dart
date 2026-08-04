@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,8 @@ import 'package:tankstellen/features/consumption/data/baseline_store.dart';
 import 'package:tankstellen/features/obd2/data/trip_live_reading.dart';
 import 'package:tankstellen/features/consumption/domain/situation_classifier.dart';
 import 'package:tankstellen/features/consumption/providers/trip_baseline_recorder.dart';
+import 'package:tankstellen/features/sync/providers/baseline_sync_enabled_provider.dart';
+import 'package:tankstellen/features/consumption/providers/trip_baseline_sync.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
@@ -269,6 +272,39 @@ void main() {
               '${mode.name} mode (#2515)');
     });
   }
+
+  group('non-blocking stop (#3670)', () {
+    test('flushAndSync returns even when the server baseline merge NEVER '
+        'completes — the stop UI must not wait on the network', () async {
+      const profile = VehicleProfile(
+        id: 'v-hang',
+        name: 'Hang test car',
+        type: VehicleType.combustion,
+      );
+      final container = ProviderContainer(overrides: [
+        activeVehicleProfileProvider.overrideWith(
+          () => _StubActiveVehicle(profile),
+        ),
+        baselineSyncEnabledProvider.overrideWithValue(true),
+      ]);
+      addTearDown(container.dispose);
+
+      // The field shape: a self-host Supabase that answers nothing (TLS
+      // handshake grinding). The merge future never completes.
+      debugBaselineMergeOverride =
+          ({required vehicleId, localJson}) => Completer<String?>().future;
+      addTearDown(
+          () => debugBaselineMergeOverride = null);
+
+      DateTime clock() => DateTime(2026, 3, 11, 14, 30);
+      final recorder = container.read(_recorderProvider(clock));
+      await recorder.load();
+
+      // Must resolve promptly: the local flush is awaited, the server
+      // merge is fire-and-forget behind its own 15 s cap.
+      await recorder.flushAndSync().timeout(const Duration(seconds: 2));
+    });
+  });
 }
 
 /// Exposes a [TripBaselineRecorder] built with the provider's own
