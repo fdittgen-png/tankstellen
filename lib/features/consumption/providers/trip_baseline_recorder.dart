@@ -7,8 +7,6 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
-import '../../../core/sync/baselines_sync.dart';
-import '../../sync/providers/baseline_sync_enabled_provider.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../../vehicle/domain/fuzzy_classifier.dart';
 import '../../vehicle/providers/calibration_mode_providers.dart';
@@ -16,6 +14,7 @@ import '../../vehicle/providers/vehicle_providers.dart';
 import '../data/baseline_store.dart';
 import '../../obd2/api.dart';
 import '../domain/baseline_rolling_state.dart';
+import 'trip_baseline_sync.dart';
 import '../domain/cold_start_baselines.dart';
 import '../domain/situation_classifier.dart';
 import '../../../core/logging/error_logger.dart';
@@ -115,7 +114,14 @@ class TripBaselineRecorder {
         unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: baseline flush failed'}));
       }
       // #780 — fold in the server copy once the local flush lands.
-      await _syncBaselineAfterFlush(vid);
+      // #3670 — fire-and-forget: the merge is a network round-trip to a
+      // possibly-unreachable self-host Supabase, and awaiting it held
+      // the stop UI at "Saving to history…" for minutes in the field
+      // (handshake failures + 30 s sync timeouts in the same log). The
+      // local flush above is the durable part; the server fold-in may
+      // land whenever the network allows. _syncBaselineAfterFlush
+      // never throws (its own catch), so unawaited is safe.
+      unawaited(syncBaselineAfterFlush(_ref, vid));
     }
     _store = null;
     _vehicleId = null;
@@ -369,34 +375,4 @@ class TripBaselineRecorder {
   /// trip. No-op when the Hive box is closed or the sync client
   /// is offline/unauthenticated — both paths return the input
   /// payload unchanged.
-  Future<void> _syncBaselineAfterFlush(String vehicleId) async {
-    try {
-      // #780 phase 3 — honour the opt-in setting. Default false so
-      // users who never toggled it in the sync setup screen don't
-      // silently upload driving data. Ungated favourite sync etc.
-      // are unaffected.
-      // #1373 phase 3e — read the central feature flag instead of the
-      // legacy Hive key. ref.read (not watch) — this is a one-shot
-      // gate at flush time, not a reactive dependency.
-      final enabled = _ref.read(baselineSyncEnabledProvider);
-      if (!enabled) return;
-      if (!Hive.isBoxOpen(HiveBoxes.obd2Baselines)) return;
-      final box = Hive.box<String>(HiveBoxes.obd2Baselines);
-      final key = 'baseline:$vehicleId';
-      final localJson = box.get(key);
-      final merged = await BaselinesSync.merge(
-        vehicleId: vehicleId,
-        localJson: localJson,
-      );
-      if (merged != null && merged != localJson) {
-        await box.put(key, merged);
-        // No in-memory cache refresh needed — _store is nulled out
-        // right after this call and the next trip creates a fresh
-        // BaselineStore whose loadVehicle reads the merged JSON
-        // from disk.
-      }
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'TripRecording.stop: baseline sync failed'}));
-    }
-  }
 }
