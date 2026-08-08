@@ -4,8 +4,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/error/guarded.dart';
-import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../obd2/api.dart';
 
@@ -136,21 +134,12 @@ class _ResetConnectionButtonState
   bool _busy = false;
 
   Future<void> _reset() async {
-    final l = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.maybeOf(context);
     setState(() => _busy = true);
-    // Shell-safe (#2163): an unwired provider graph (isolated widget
-    // tests) degrades to "no link", never a crash.
-    final linked = await guardAsync(
-      () => ref.read(obd2ReconnectProvider.notifier).resetConnection(),
-      where: 'VehicleAdapterSection: OBD2 reset failed',
-      fallback: false,
-    );
+    // #3678 — the shared reset run (guarded + honest snackbar; the
+    // messenger is captured inside, before the await).
+    await runObd2ConnectionReset(context, ref);
     if (!mounted) return;
     setState(() => _busy = false);
-    messenger?.showSnackBar(SnackBarHelper.infoSnackBar(
-      linked ? l.obd2ResetConnectionDone : l.obd2ResetConnectionNoLink,
-    ));
   }
 
   @override

@@ -48,6 +48,7 @@ void main() {
               onEnterPip: () => fired.add('pip'),
               onTogglePause: () => fired.add('pause'),
               onStop: () => fired.add('stop'),
+              onResetConnection: () => fired.add('reset'),
             ),
           ],
         ),
@@ -174,5 +175,19 @@ void main() {
       expect(find.bySemanticsLabel('Unpin recording form'), findsOneWidget);
       handle.dispose();
     });
+    testWidgets('Reset-connection item (#3678) lives in the kebab and '
+        'fires — including while CONNECTING (isActive false), the hung '
+        'start it exists for', (tester) async {
+      await tester.pumpWidget(harness(isActive: false));
+      await openKebab(tester);
+
+      final reset = find.byKey(const Key('tripResetConnectionButton'));
+      expect(reset, findsOneWidget);
+      expect(find.text('Reset connection'), findsOneWidget);
+      await tester.tap(reset);
+      await tester.pumpAndSettle();
+      expect(fired, contains('reset'));
+    });
+
   });
 }
