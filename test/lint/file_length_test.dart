@@ -676,14 +676,6 @@ void main() {
       bumps: 2,
       decompositionIssue: 3141,
     ),
-    'lib/features/obd2/data/obd2_link_supervisor.dart': (
-      // #3642 — automated-arm gating (connectWith(automated:)) +
-      // stand-down escalation wiring + wake() hold-break (+15 over the
-      // cap). Decomposition candidate: the park/wake state block.
-      lines: 415,
-      bumps: 1,
-      decompositionIssue: 3141,
-    ),
     'lib/features/route_search/providers/route_search_provider.dart': (
       // #3610 — kDebugMode gates around the per-search debugPrints
       // (+6 over the cap). Decomposition candidate: the strategy-run

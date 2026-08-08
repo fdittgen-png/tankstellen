@@ -1,0 +1,5 @@
+{
+  "obd2ResetConnection": "Verbindung zurücksetzen",
+  "obd2ResetConnectionDone": "Adapter zurückgesetzt — Verbindung wiederhergestellt",
+  "obd2ResetConnectionNoLink": "Adapter zurückgesetzt — Wiederverbindung läuft im Hintergrund"
+}

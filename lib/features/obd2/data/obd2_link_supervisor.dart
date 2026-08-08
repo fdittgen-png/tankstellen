@@ -15,6 +15,8 @@ import 'obd2_service.dart';
 
 export 'obd2_link_state.dart';
 
+part 'obd2_link_supervisor_actions.dart';
+
 /// How the supervisor obtains a live, initialized [Obd2Service]. The
 /// closure encapsulates *how* to dial (direct-by-MAC, scan fallback,
 /// cross-transport policy — owned by the connection service); the
@@ -208,43 +210,6 @@ class Obd2LinkSupervisor {
     }
   }
 
-  /// Park the loop for a classified-silent bus (#3035). The next
-  /// [wake] or [connect] re-arms.
-  void noteEngineOff() {
-    if (_disposed || _state.value == Obd2LinkState.userDisconnected) return;
-    _cancelBackoffTimer();
-    _service = null;
-    _attemptCount = 0;
-    _standDown.reset(); // #3603 — the park itself is the stand-down
-    // #3534 — the checklist's "engine-off parks the loop" line item.
-    BreadcrumbCollector.add('OBD2 link parked', detail: 'engine off');
-    _setState(Obd2LinkState.engineOff);
-  }
-
-  /// Exit [Obd2LinkState.engineOff] (movement detected / app resumed)
-  /// and dial. A no-op in every other state — waking a user-parked or
-  /// already-live link must do nothing.
-  /// #3642 — it ALSO breaks an active stand-down hold: the escalated
-  /// holds (5 → 15 → 60 min) exist for a parked car, and this positive
-  /// signal must dial now, not wait out a 60-minute timer.
-  void wake() {
-    if (_disposed) return;
-    if (_state.value == Obd2LinkState.engineOff) {
-      _standDown.reset(); // #3603 — movement is a positive signal
-      _backoff.reset();
-      _setState(Obd2LinkState.reconnecting);
-      unawaited(_attempt(userInitiated: false));
-      return;
-    }
-    if (_state.value == Obd2LinkState.reconnecting && _standDown.active) {
-      _standDown.reset(); // #3642 — movement exits the escalated hold
-      _backoff.reset();
-      if (_attemptInFlight == null) {
-        _cancelBackoffTimer();
-        unawaited(_attempt(userInitiated: false));
-      }
-    }
-  }
 
   /// The single intent gate (research rule 7): auto-dialing is allowed
   /// unless the user parked the link or the bus is classified off.

@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/error/guarded.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../obd2/api.dart';
 
@@ -72,14 +74,20 @@ class VehicleAdapterSection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  key: const Key('vehicleAdapterForget'),
-                  onPressed: onForget,
-                  icon: const Icon(Icons.link_off),
-                  label: Text(l.vehicleAdapterForget),
-                ),
+              // #3676 — hard reset: ATZ chip reset on the dongle (best
+              // effort), full link recycle, fresh dial. Sits beside
+              // Forget so every link-lifecycle action lives in one card.
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const _ResetConnectionButton(),
+                  TextButton.icon(
+                    key: const Key('vehicleAdapterForget'),
+                    onPressed: onForget,
+                    icon: const Icon(Icons.link_off),
+                    label: Text(l.vehicleAdapterForget),
+                  ),
+                ],
               ),
             ] else ...[
               Text(l.vehicleAdapterEmpty, style: theme.textTheme.bodySmall),
@@ -107,5 +115,58 @@ class VehicleAdapterSection extends ConsumerWidget {
         ? result.profile.displayName
         : result.candidate.deviceName;
     onPaired(name, result.candidate.deviceId);
+  }
+}
+
+/// #3676 — "Reset connection": sends an ATZ chip reset to the dongle
+/// (best effort — the closest software equivalent to power-cycling
+/// it), tears the link down completely and re-dials fresh. Stateful
+/// only for the busy spinner; the actual work lives on
+/// [Obd2Reconnect.resetConnection].
+class _ResetConnectionButton extends ConsumerStatefulWidget {
+  const _ResetConnectionButton();
+
+  @override
+  ConsumerState<_ResetConnectionButton> createState() =>
+      _ResetConnectionButtonState();
+}
+
+class _ResetConnectionButtonState
+    extends ConsumerState<_ResetConnectionButton> {
+  bool _busy = false;
+
+  Future<void> _reset() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    setState(() => _busy = true);
+    // Shell-safe (#2163): an unwired provider graph (isolated widget
+    // tests) degrades to "no link", never a crash.
+    final linked = await guardAsync(
+      () => ref.read(obd2ReconnectProvider.notifier).resetConnection(),
+      where: 'VehicleAdapterSection: OBD2 reset failed',
+      fallback: false,
+    );
+    if (!mounted) return;
+    setState(() => _busy = false);
+    messenger?.showSnackBar(SnackBarHelper.infoSnackBar(
+      linked ? l.obd2ResetConnectionDone : l.obd2ResetConnectionNoLink,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return TextButton.icon(
+      key: const Key('vehicleAdapterReset'),
+      onPressed: _busy ? null : _reset,
+      icon: _busy
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.restart_alt),
+      label: Text(l.obd2ResetConnection),
+    );
   }
 }

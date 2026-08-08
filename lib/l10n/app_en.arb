@@ -6199,6 +6199,18 @@
   "@autoRecordNotificationText": {
     "description": "Body of the Android auto-record foreground-service notification (#3505). Handed to the native side at arm time."
   },
+  "obd2ResetConnection": "Reset connection",
+  "@obd2ResetConnection": {
+    "description": "Button in the vehicle screen's OBD2 adapter section (#3676): sends an ATZ chip reset to the dongle (best effort), tears the link down completely and re-dials fresh."
+  },
+  "obd2ResetConnectionDone": "Adapter reset — connection re-established",
+  "@obd2ResetConnectionDone": {
+    "description": "Success snackbar after the OBD2 connection reset (#3676): the redial produced a live link."
+  },
+  "obd2ResetConnectionNoLink": "Adapter reset — reconnecting in the background",
+  "@obd2ResetConnectionNoLink": {
+    "description": "Snackbar after the OBD2 connection reset (#3676) when the immediate redial found no adapter (out of range / ignition off): the reconnect loop keeps trying automatically."
+  },
   "ocrTesterTitle": "OCR tester",
   "@ocrTesterTitle": {
     "description": "Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode."

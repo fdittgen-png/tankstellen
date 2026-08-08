@@ -78,6 +78,14 @@ class Obd2Reconnect extends _$Obd2Reconnect {
     return sup.state.value;
   }
 
+  /// #3676 — user-initiated hard reset: ATZ on the dongle (best
+  /// effort), full link recycle, fresh dial. Returns true when the
+  /// redial produced a live service.
+  Future<bool> resetConnection() async {
+    final svc = await supervisor.resetLink();
+    return svc != null;
+  }
+
   DateTime? _reconnectingSince;
 
   void _onLinkState(Obd2LinkState next) {
