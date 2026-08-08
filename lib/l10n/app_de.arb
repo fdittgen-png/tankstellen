@@ -2870,6 +2870,17 @@
   "hapticEcoCoachSettingTitle": "Echtzeit-Eco-Coaching",
   "hapticEcoCoachSettingSubtitle": "Sanftes Vibrieren + Hinweis am Bildschirm, wenn du beim Cruisen aufs Pedal trittst",
   "hapticEcoCoachSnackBarMessage": "Locker vom Pedal — Ausrollen spart mehr",
+  "highwayViaExit": "über Ausfahrt {ref} · +{km} km",
+  "@highwayViaExit": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      }
+    }
+  },
   "semanticsNavigateTo": "Zu {name} navigieren",
   "semanticsRemoveFromFavorites": "{name} aus den Favoriten entfernen",
   "showOnMapSemanticLabel": "Tankstellen auf Karte anzeigen",

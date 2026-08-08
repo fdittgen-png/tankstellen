@@ -5994,6 +5994,11 @@ class AppLocalizationsSl extends AppLocalizations {
       'Nežno s plinom — drsenje prihrani več';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigiraj do $name';
   }

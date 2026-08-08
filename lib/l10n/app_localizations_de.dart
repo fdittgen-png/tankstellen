@@ -6022,6 +6022,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Locker vom Pedal — Ausrollen spart mehr';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'über Ausfahrt $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Zu $name navigieren';
   }

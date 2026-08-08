@@ -6010,6 +6010,11 @@ class AppLocalizationsSk extends AppLocalizations {
       'Šetrite plynom — voľný beh šetrí viac';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigovať na $name';
   }

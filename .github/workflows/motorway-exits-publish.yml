@@ -1,0 +1,86 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Motorway Exits Publish
+
+# #3633 — per-country motorway-exit datasets for highway mode v2, via
+# the proven fuel-gr rolling-release pattern (#3549): extract every OSM
+# `highway=motorway_junction` node per supported country through
+# Overpass and publish one compact JSON per country as assets of the
+# rolling `motorway-exits` release:
+#   https://github.com/fdittgen-png/tankstellen/releases/download/motorway-exits/exits_fr.json
+#
+# Exits change on the timescale of YEARS, so monthly is generous; the
+# app caches each country's asset for a year (soft-refresh monthly) and
+# degrades to exit-less v1 highway mode when the asset was never
+# fetched. A partially-failed run publishes the countries that
+# succeeded (each is its own asset; the app keeps its cached copy for
+# the rest) and goes red so the gap is retried.
+#
+# Data: © OpenStreetMap contributors, ODbL — attribution ships with the
+# app's existing OSM attribution surface.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 3 * *' # monthly, the 3rd at 03:00 UTC (Overpass off-peak)
+
+permissions:
+  contents: write # release asset upload
+
+concurrency:
+  group: motorway-exits-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90 # 17 countries × (query + retries + courtesy gaps)
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Extract motorway exits per country (Overpass)
+        id: extract
+        # continue-on-error so a partial run still PUBLISHES the
+        # successful countries below; the final step re-fails the job.
+        continue-on-error: true
+        run: python3 tool/motorway_exits/publish_motorway_exits.py "$RUNNER_TEMP/exits"
+
+      - name: Publish to the rolling motorway-exits release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=("$RUNNER_TEMP"/exits/exits_*.json)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::no exit datasets produced — nothing to publish"
+            exit 1
+          fi
+          gh release view motorway-exits --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create motorway-exits --repo "$GITHUB_REPOSITORY" \
+              --title "Motorway exits (rolling data release)" \
+              --notes "Machine-updated monthly by motorway-exits-publish.yml (#3633): per-country OSM highway=motorway_junction nodes for highway mode v2. Data © OpenStreetMap contributors, ODbL. Not an app release." \
+              --prerelease
+          gh release upload motorway-exits "${files[@]}" \
+            --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Summary + propagate extract failure
+        env:
+          EXTRACT_OUTCOME: ${{ steps.extract.outcome }}
+        run: |
+          {
+            echo "## Motorway exits publish"
+            echo ""
+            for f in "$RUNNER_TEMP"/exits/exits_*.json; do
+              [ -f "$f" ] || continue
+              echo "- \`$(basename "$f")\`: $(wc -c < "$f") bytes"
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$EXTRACT_OUTCOME" != "success" ]; then
+            echo "::error::one or more countries failed to extract (published the rest)"
+            exit 1
+          fi

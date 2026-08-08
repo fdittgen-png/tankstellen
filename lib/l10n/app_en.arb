@@ -5113,6 +5113,18 @@
   "@hapticEcoCoachSnackBarMessage": {
     "description": "SnackBar copy shown on the trip-recording screen when the eco-coach heuristic fires (#1273). Co-located with the haptic; same toggle gates both surfaces."
   },
+  "highwayViaExit": "via exit {ref} · +{km} km",
+  "@highwayViaExit": {
+    "description": "Highway mode v2 (#3633): sub-line on a radar station card naming the motorway exit that serves an off-highway station and the straight-line detour from that exit. {ref} is the signposted exit number/name from OSM, {km} the detour with one decimal.",
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      }
+    }
+  },
   "semanticsNavigateTo": "Navigate to {name}",
   "@semanticsNavigateTo": {
     "placeholders": {

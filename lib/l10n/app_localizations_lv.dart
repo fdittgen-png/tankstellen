@@ -6019,6 +6019,11 @@ class AppLocalizationsLv extends AppLocalizations {
       'Uzmanīgi ar gāzi — skriešana ietaupa vairāk';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigēt uz $name';
   }

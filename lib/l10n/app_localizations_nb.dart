@@ -5982,6 +5982,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'Slipp opp for gassen – frihjuling sparer mer';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Naviger til $name';
   }

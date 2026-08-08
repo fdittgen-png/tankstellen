@@ -6023,6 +6023,11 @@ class AppLocalizationsRo extends AppLocalizations {
       'Ușor cu acceleratorul — inerția economisește mai mult';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navighează către $name';
   }

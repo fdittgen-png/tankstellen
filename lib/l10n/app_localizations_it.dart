@@ -6013,6 +6013,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Giù l\'acceleratore — il rilascio del gas fa risparmiare di più';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Naviga verso $name';
   }

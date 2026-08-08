@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/services/radar/motorway_exits.dart';
+import 'package:tankstellen/core/services/radar/motorway_exits_provider.dart';
 import 'package:tankstellen/core/theme/dark_mode_colors.dart';
 import 'package:tankstellen/core/theme/fuel_colors.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
@@ -1446,5 +1448,45 @@ void main() {
         closeTo(0.38, 1e-9),
       );
     });
+    testWidgets('highway mode v2 (#3633): silent without an exit '
+        'annotation', (tester) async {
+      await pumpApp(
+        tester,
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
+      );
+      expect(find.byIcon(Icons.fork_right), findsNothing);
+    });
+
+    testWidgets('highway mode v2 (#3633): renders "via exit {ref} · +km" '
+        'from the side-channel annotation', (tester) async {
+      await pumpApp(
+        tester,
+        const StationCard(station: testStation, selectedFuelType: FuelType.e10),
+        overrides: <Object>[
+          highwayExitInfoMapProvider.overrideWith(
+            () => _FixedExitInfoMap({
+              testStation.id: const HighwayExitInfo(
+                exitLabel: '36',
+                detourKm: 1.24,
+                alongKm: 4.2,
+              ),
+            }),
+          ),
+        ],
+      );
+      expect(find.byIcon(Icons.fork_right), findsOneWidget);
+      expect(find.textContaining('via exit 36'), findsOneWidget);
+      expect(find.textContaining('+1.2 km'), findsOneWidget);
+    });
+
   });
 }
+
+class _FixedExitInfoMap extends HighwayExitInfoMap {
+  _FixedExitInfoMap(this._value);
+  final Map<String, HighwayExitInfo> _value;
+
+  @override
+  Map<String, HighwayExitInfo> build() => _value;
+}
+

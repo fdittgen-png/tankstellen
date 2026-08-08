@@ -6024,6 +6024,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Kíméletes gáz — a gurulás több üzemanyagot takarít meg';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigálás ide: $name';
   }

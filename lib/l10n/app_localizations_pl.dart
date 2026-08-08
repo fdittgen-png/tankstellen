@@ -6007,6 +6007,11 @@ class AppLocalizationsPl extends AppLocalizations {
       'Łagodniej z gazem — wybieg oszczędza więcej';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Nawiguj do $name';
   }

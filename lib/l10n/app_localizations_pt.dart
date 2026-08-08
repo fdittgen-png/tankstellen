@@ -6023,6 +6023,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Devagar no acelerador — deslizar poupa mais';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navegar até $name';
   }

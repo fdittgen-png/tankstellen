@@ -6025,6 +6025,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Suave con el acelerador: dejarse llevar ahorra más';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navegar a $name';
   }

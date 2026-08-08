@@ -6038,6 +6038,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Doucement sur l\'accélérateur — la roue libre économise plus';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Naviguer vers $name';
   }

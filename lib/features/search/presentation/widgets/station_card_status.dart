@@ -192,6 +192,46 @@ class _StationDetails extends StatelessWidget {
             ],
           ],
         ),
+        // #3633 — highway mode v2: "via exit {ref} · +{km} km" under the
+        // distance row when the radar's exit layer annotated this
+        // station (same side-channel pattern as roadDistancesProvider).
+        // Absent off-highway / for on-road service areas / when the
+        // exits asset hasn't loaded — the row simply doesn't render.
+        Consumer(
+          builder: (context, ref, _) {
+            final info = ref.watch(
+              highwayExitInfoMapProvider.select((m) => m[station.id]),
+            );
+            if (info == null) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.fork_right,
+                    size: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 2),
+                  Flexible(
+                    child: Text(
+                      l10n.highwayViaExit(
+                        info.exitLabel,
+                        info.detourKm.toStringAsFixed(1),
+                      ),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
         // #2899/#2984 — Fuel Station Radar closeness bar: the SAME green→accent
         // [ProximityFillBar] the trip radar card + PiP overlay use, so all
         // three radar surfaces fill identically as the driver nears a station.
