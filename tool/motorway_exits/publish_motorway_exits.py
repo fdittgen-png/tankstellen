@@ -49,7 +49,7 @@ USER_AGENT = (
 )
 
 QUERY = """
-[out:json][timeout:180];
+[out:json][timeout:300];
 area["ISO3166-1"="{cc}"][admin_level=2]->.c;
 node["highway"="motorway_junction"](area.c);
 out;
@@ -77,6 +77,12 @@ def fetch(cc: str) -> dict:
 
 
 def compact(cc: str, raw: dict) -> dict:
+    # An Overpass timeout/overload often returns HTTP 200 with a `remark`
+    # and few/no elements — a SILENT EMPTY that shipped a 77-byte
+    # exits_de.json on the first run. Surface it as a failure instead.
+    remark = raw.get("remark")
+    if remark:
+        raise RuntimeError(f"{cc}: Overpass remark: {remark}")
     exits = []
     for el in raw.get("elements", []):
         if el.get("type") != "node":
@@ -113,6 +119,15 @@ def main() -> int:
             payload = compact(cc, fetch(cc))
         except Exception as e:  # noqa: BLE001 — collected, run continues
             print(f"  {cc}: FAILED — {e}", flush=True)
+            failures.append(cc)
+            continue
+        # Every supported country has a motorway network; zero exits is
+        # always a query failure (area resolution / truncation), never
+        # reality. Publishing an empty asset would silently downgrade
+        # that country to v1 for a month — fail it instead (the app
+        # keeps the previous cached copy).
+        if not payload["exits"]:
+            print(f"  {cc}: FAILED — query returned ZERO exits", flush=True)
             failures.append(cc)
             continue
         out = out_dir / f"exits_{cc.lower()}.json"
