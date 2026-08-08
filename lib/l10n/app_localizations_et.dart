@@ -5982,6 +5982,11 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kerge gaasiga — libisemine säästab rohkem';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigeeri sihtkohta $name';
   }

@@ -5700,5 +5700,18 @@
   "@obd2ResetConnectionNoLink": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "highwayViaExit": "via exit {ref} · +{km} km",
+  "@highwayViaExit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      },
+      "km": {
+        "type": "String"
+      }
+    }
   }
 }

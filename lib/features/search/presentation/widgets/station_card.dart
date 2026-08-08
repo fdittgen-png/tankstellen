@@ -25,6 +25,7 @@ import '../../../../core/domain/station.dart';
 import 'amenity_chips.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/road_distance_provider.dart';
+import '../../../../core/services/radar/motorway_exits_provider.dart';
 
 part 'station_card_price_column.dart';
 part 'station_card_price_row.dart';

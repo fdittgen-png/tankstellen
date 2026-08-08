@@ -6016,6 +6016,11 @@ class AppLocalizationsLt extends AppLocalizations {
       'Atsargiau su akseleratoriumi — inercinė eiga taupo daugiau';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Nuvykti į $name';
   }

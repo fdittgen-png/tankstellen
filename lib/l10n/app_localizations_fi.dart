@@ -5983,6 +5983,11 @@ class AppLocalizationsFi extends AppLocalizations {
       'Pehmeästi kaasulla — liuku säästää enemmän';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigoi kohteeseen $name';
   }

@@ -6032,6 +6032,11 @@ class AppLocalizationsEl extends AppLocalizations {
       'Ελαφρύτερο γκάζι — η αδράνεια εξοικονομεί περισσότερα';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Πλοήγηση προς $name';
   }

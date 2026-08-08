@@ -6003,6 +6003,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Rustig aan het gas — uitrollen bespaart meer';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigeer naar $name';
   }

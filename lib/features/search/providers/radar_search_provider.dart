@@ -22,6 +22,7 @@ import '../../widget/data/car_station_writer.dart';
 import 'search_filters_provider.dart';
 import '../../../core/services/radar/highway_mode_provider.dart';
 import 'road_distance_provider.dart';
+import 'radar_exit_layer.dart';
 import 'radar_highway_args.dart';
 
 part 'radar_search_provider.g.dart';
@@ -319,13 +320,10 @@ class RadarSearch extends _$RadarSearch {
 
       _lastRaw = [...corridor, ...nearby];
       final hw = highwayRankArgs(ref, _lastFix);
-      final ranked = RadarRanking.rank(_lastRaw,
-          lat: lat,
-          lng: lng,
-          fuel: fuel,
-          headingDegrees: hw.heading,
-          highwayAheadOnly: hw.active,
-          leftHandTraffic: hw.leftHand);
+      // #3633 — shared rank + v2 exit layer (along-track sort + "via
+      // exit" annotations; a no-op off-highway).
+      final ranked =
+          rankWithExitLayer(ref, _lastRaw, lat: lat, lng: lng, fuel: fuel, hw: hw);
 
       // #2948 — publish to the Android Auto Radar screen (swallows write faults).
       unawaited(carWriter.writeRadar(ranked, fuel));
@@ -361,13 +359,8 @@ class RadarSearch extends _$RadarSearch {
     if (_lastRaw.isEmpty) return;
     final fuel = ref.read(selectedFuelTypeProvider);
     final hw = highwayRankArgs(ref, _lastFix);
-    final ranked = RadarRanking.rank(_lastRaw,
-        lat: lat,
-        lng: lng,
-        fuel: fuel,
-        headingDegrees: hw.heading,
-        highwayAheadOnly: hw.active,
-        leftHandTraffic: hw.leftHand);
+    final ranked =
+        rankWithExitLayer(ref, _lastRaw, lat: lat, lng: lng, fuel: fuel, hw: hw);
     unawaited(carWriter.writeRadar(ranked, fuel));
     // #3354 — stamp the live course so the scope can orient heading-up.
     state = state.copyWith(

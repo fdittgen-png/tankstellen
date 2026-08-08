@@ -10488,6 +10488,12 @@ abstract class AppLocalizations {
   /// **'Easy on the throttle — coasting saves more'**
   String get hapticEcoCoachSnackBarMessage;
 
+  /// Highway mode v2 (#3633): sub-line on a radar station card naming the motorway exit that serves an off-highway station and the straight-line detour from that exit. {ref} is the signposted exit number/name from OSM, {km} the detour with one decimal.
+  ///
+  /// In en, this message translates to:
+  /// **'via exit {ref} · +{km} km'**
+  String highwayViaExit(String ref, String km);
+
   /// No description provided for @semanticsNavigateTo.
   ///
   /// In en, this message translates to:

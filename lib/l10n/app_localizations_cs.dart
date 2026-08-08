@@ -5994,6 +5994,11 @@ class AppLocalizationsCs extends AppLocalizations {
   String get hapticEcoCoachSnackBarMessage => 'Mírnit plyn — výběh šetří více';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigovat na $name';
   }

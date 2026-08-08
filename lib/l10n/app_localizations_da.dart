@@ -5981,6 +5981,11 @@ class AppLocalizationsDa extends AppLocalizations {
       'Let på speederen — kystning sparer mere';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Naviger til $name';
   }

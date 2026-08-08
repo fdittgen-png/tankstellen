@@ -6033,6 +6033,11 @@ class AppLocalizationsBg extends AppLocalizations {
       'По-леко с педала — инерцията спестява повече';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Навигация до $name';
   }

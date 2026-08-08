@@ -1,0 +1,9 @@
+{
+  "highwayViaExit": "über Ausfahrt {ref} · +{km} km",
+  "@highwayViaExit": {
+    "placeholders": {
+      "ref": {"type": "String"},
+      "km": {"type": "String"}
+    }
+  }
+}

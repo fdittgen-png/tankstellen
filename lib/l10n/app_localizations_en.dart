@@ -5954,6 +5954,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Easy on the throttle — coasting saves more';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigate to $name';
   }
@@ -14445,6 +14450,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get hapticEcoCoachSnackBarMessage =>
       '⟦Éášý óñ ŧĥé ŧĥřóŧŧłé — çóášŧîñǧ šáṽéš ɱóřé ···············⟧';
+
+  @override
+  String highwayViaExit(String ref, String km) {
+    return '⟦ṽîá éẋîŧ $ref · +$km ķɱ ····⟧';
+  }
 
   @override
   String semanticsNavigateTo(String name) {

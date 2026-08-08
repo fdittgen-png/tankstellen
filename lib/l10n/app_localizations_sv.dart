@@ -5980,6 +5980,11 @@ class AppLocalizationsSv extends AppLocalizations {
       'Varsamt med gasen – frihjul sparar mer';
 
   @override
+  String highwayViaExit(String ref, String km) {
+    return 'via exit $ref · +$km km';
+  }
+
+  @override
   String semanticsNavigateTo(String name) {
     return 'Navigera till $name';
   }
