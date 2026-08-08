@@ -8,7 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 /// Overflow targets the recording kebab dispatches via its single
 /// `onSelected` path (#2764). Each item maps to a callback the host
 /// [TripRecordingScreen] already owns (pin / help / PiP).
-enum _RecordingOverflowAction { pin, help, pip }
+enum _RecordingOverflowAction { pin, help, pip, resetLink }
 
 /// Trailing app-bar actions for the active trip-recording screen (#2764).
 ///
@@ -36,6 +36,7 @@ class RecordingAppBarActions extends StatelessWidget {
     required this.onEnterPip,
     required this.onTogglePause,
     required this.onStop,
+    required this.onResetConnection,
   });
 
   /// Whether the recording form is currently pinned (wake lock held).
@@ -60,6 +61,12 @@ class RecordingAppBarActions extends StatelessWidget {
   final VoidCallback onTogglePause;
   final VoidCallback onStop;
 
+  /// #3678 — hard reset of the OBD2 link (ATZ + recycle + fresh dial),
+  /// reachable from the connecting phase (a hung start) through the
+  /// whole recording. Mid-trip this is the same drop→ready→re-bind
+  /// path the trip layer's LinkState subscription already survives.
+  final VoidCallback onResetConnection;
+
   void _onSelected(_RecordingOverflowAction action) {
     switch (action) {
       case _RecordingOverflowAction.pin:
@@ -68,6 +75,8 @@ class RecordingAppBarActions extends StatelessWidget {
         onShowPinHelp();
       case _RecordingOverflowAction.pip:
         onEnterPip();
+      case _RecordingOverflowAction.resetLink:
+        onResetConnection();
     }
   }
 
@@ -129,6 +138,16 @@ class RecordingAppBarActions extends StatelessWidget {
               child: _MenuRow(
                 icon: Icons.help_outline,
                 label: l.tripRecordingPinHelpTooltip,
+              ),
+            ),
+            // #3678 — hard reset of the OBD2 link. Lives in the kebab
+            // (not primary) — reached deliberately, not mid-glance.
+            PopupMenuItem<_RecordingOverflowAction>(
+              key: const Key('tripResetConnectionButton'),
+              value: _RecordingOverflowAction.resetLink,
+              child: _MenuRow(
+                icon: Icons.restart_alt,
+                label: l.obd2ResetConnection,
               ),
             ),
             // #1884 — minimise to PiP; Android-only.

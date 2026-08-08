@@ -768,6 +768,8 @@ class _TripRecordingScreenState extends ConsumerState<TripRecordingScreen> {
                 onEnterPip: () => _pip.enterPip(),
                 onTogglePause: _togglePause,
                 onStop: _onStop,
+                // #3678 — shared reset run (guarded, honest snackbar).
+                onResetConnection: () => runObd2ConnectionReset(context, ref),
               ),
             ],
       bodyPadding: EdgeInsets.zero,

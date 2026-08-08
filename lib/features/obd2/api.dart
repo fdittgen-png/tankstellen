@@ -56,6 +56,7 @@ export 'data/trip_distance_source.dart';
 export 'data/trip_live_reading.dart';
 export 'data/trip_recording_controller.dart';
 export 'domain/services/obd2_analytics_signals.dart';
+export 'presentation/obd2_connection_reset_action.dart';
 export 'presentation/obd2_connect_telemetry.dart';
 export 'presentation/obd2_connection_error_l10n.dart';
 export 'presentation/widgets/obd2_adapter_picker.dart';
