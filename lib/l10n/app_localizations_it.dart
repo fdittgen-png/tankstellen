@@ -6887,6 +6887,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get autoRecordNotificationText => 'Watching for your OBD2 adapter';
 
   @override
+  String get obd2ResetConnection => 'Reset connection';
+
+  @override
+  String get obd2ResetConnectionDone =>
+      'Adapter reset — connection re-established';
+
+  @override
+  String get obd2ResetConnectionNoLink =>
+      'Adapter reset — reconnecting in the background';
+
+  @override
   String get ocrTesterTitle => 'Tester OCR';
 
   @override

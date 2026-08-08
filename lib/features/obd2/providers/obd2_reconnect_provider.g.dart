@@ -145,7 +145,7 @@ final class Obd2ReconnectProvider
   }
 }
 
-String _$obd2ReconnectHash() => r'8a241fd89983d859604ebd1bc70721c3540fbf2d';
+String _$obd2ReconnectHash() => r'577ca25ff26694120cd98e32382620476ce6e2a5';
 
 /// App-wide owner of THE [Obd2LinkSupervisor] (#3529, Epic #3527).
 ///

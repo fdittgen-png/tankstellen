@@ -5558,5 +5558,20 @@
   "@trajetDeletedUndoSnackbar": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2ResetConnection": "Reset connection",
+  "@obd2ResetConnection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ResetConnectionDone": "Adapter reset — connection re-established",
+  "@obd2ResetConnectionDone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "obd2ResetConnectionNoLink": "Adapter reset — reconnecting in the background",
+  "@obd2ResetConnectionNoLink": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

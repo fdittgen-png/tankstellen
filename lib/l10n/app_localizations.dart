@@ -11842,6 +11842,24 @@ abstract class AppLocalizations {
   /// **'Watching for your OBD2 adapter'**
   String get autoRecordNotificationText;
 
+  /// Button in the vehicle screen's OBD2 adapter section (#3676): sends an ATZ chip reset to the dongle (best effort), tears the link down completely and re-dials fresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset connection'**
+  String get obd2ResetConnection;
+
+  /// Success snackbar after the OBD2 connection reset (#3676): the redial produced a live link.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter reset — connection re-established'**
+  String get obd2ResetConnectionDone;
+
+  /// Snackbar after the OBD2 connection reset (#3676) when the immediate redial found no adapter (out of range / ignition off): the reconnect loop keeps trying automatically.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter reset — reconnecting in the background'**
+  String get obd2ResetConnectionNoLink;
+
   /// Title of the gated developer OCR tester screen that runs the pump / receipt OCR pipeline on a chosen image and shows the full reasoning trace (#2518, Epic #2516). Only visible in Developer / Debug mode.
   ///
   /// In en, this message translates to:

@@ -36,6 +36,16 @@ class _ScriptedDialer {
   }
 }
 
+/// #3676 — a transport whose commands never complete (a wedged ELM):
+/// exercises the ATZ bound in [Obd2LinkSupervisor.resetLink].
+class _NeverAnsweringTransport extends FakeObd2Transport {
+  @override
+  Future<String> sendCommand(String cmd) {
+    sentCommands.add(cmd);
+    return Completer<String>().future;
+  }
+}
+
 void main() {
   late StreamController<Obd2LinkDropEvent> drops;
   late _ScriptedDialer dialer;
@@ -333,6 +343,81 @@ void main() {
           reason: 'fault → backoff → next attempt succeeds');
       unawaited(sup.dispose());
       async.flushMicrotasks();
+    });
+  });
+
+  group('resetLink — user-initiated hard reset (#3676)', () {
+    test('sends ATZ to the LIVE adapter, recycles it, and adopts a fresh '
+        'dial', () {
+      fakeAsync((async) {
+        final firstTransport = FakeObd2Transport();
+        unawaited(firstTransport.connect()); // a LIVE link takes commands
+        final first = Obd2Service(firstTransport);
+        final second = _liveService();
+        dialer.enqueue(first);
+        dialer.enqueue(second);
+        final sup = build();
+
+        unawaited(sup.connect());
+        async.flushMicrotasks();
+        expect(sup.service, same(first));
+
+        Obd2Service? redialed;
+        unawaited(sup.resetLink().then((s) => redialed = s));
+        async.flushMicrotasks();
+
+        expect(firstTransport.sentCommands, contains('ATZ'),
+            reason: 'the chip reset must reach the dongle before the '
+                'recycle tears the socket down');
+        expect(firstTransport.isConnected, isFalse,
+            reason: 'the old link is fully recycled (fresh socket rule)');
+        expect(redialed, same(second));
+        expect(sup.state.value, Obd2LinkState.ready);
+        unawaited(sup.dispose());
+        async.flushMicrotasks();
+      });
+    });
+
+    test('with NO live link the ATZ step is skipped and the reset is just '
+        'a fresh user dial (also usable from the userDisconnected park)',
+        () {
+      fakeAsync((async) {
+        dialer.enqueue(_liveService());
+        final sup = build();
+        expect(sup.state.value, Obd2LinkState.idle);
+
+        Obd2Service? redialed;
+        unawaited(sup.resetLink().then((s) => redialed = s));
+        async.flushMicrotasks();
+        expect(redialed, isNotNull);
+        expect(sup.state.value, Obd2LinkState.ready);
+        unawaited(sup.dispose());
+        async.flushMicrotasks();
+      });
+    });
+
+    test('a WEDGED adapter that never answers ATZ cannot stall the reset '
+        '— the 4 s bound fires and the redial still runs', () {
+      fakeAsync((async) {
+        final wedged = Obd2Service(_NeverAnsweringTransport());
+        final fresh = _liveService();
+        dialer.enqueue(wedged);
+        dialer.enqueue(fresh);
+        final sup = build();
+        unawaited(sup.connect());
+        async.flushMicrotasks();
+        expect(sup.service, same(wedged));
+
+        Obd2Service? redialed;
+        unawaited(sup.resetLink().then((s) => redialed = s));
+        async.elapse(const Duration(seconds: 5)); // past the ATZ bound
+        async.flushMicrotasks();
+        expect(redialed, same(fresh),
+            reason: 'the ATZ timeout is swallowed; the recycle+redial is '
+                'the real reset');
+        unawaited(sup.dispose());
+        async.flushMicrotasks();
+      });
     });
   });
 

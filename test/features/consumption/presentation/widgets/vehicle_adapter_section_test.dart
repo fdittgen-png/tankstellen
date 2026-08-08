@@ -87,5 +87,46 @@ void main() {
       expect(find.byKey(const Key('vehicleAdapterPair')), findsOneWidget);
       expect(find.byKey(const Key('vehicleAdapterForget')), findsNothing);
     });
+    testWidgets('paired state offers the Reset-connection action (#3676) '
+        'and it degrades shell-safely in an unwired harness', (tester) async {
+      await pumpApp(
+        tester,
+        VehicleAdapterSection(
+          adapterMac: 'AA:BB:CC:DD:EE:FF',
+          adapterName: 'vLinker FS 1234',
+          onPaired: (_, _) {},
+          onForget: () {},
+        ),
+      );
+      final reset = find.byKey(const Key('vehicleAdapterReset'));
+      expect(reset, findsOneWidget);
+      expect(find.text('Reset connection'), findsOneWidget);
+
+      // Tapping in an isolated harness (no OBD2 graph wired) must not
+      // crash — the guard degrades to "no link" and the honest
+      // "reconnecting in the background" snackbar shows.
+      await tester.tap(reset);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(
+        find.textContaining('reconnecting in the background'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('unpaired state hides the Reset action — there is no '
+        'link to reset (#3676)', (tester) async {
+      await pumpApp(
+        tester,
+        VehicleAdapterSection(
+          adapterMac: null,
+          adapterName: null,
+          onPaired: (_, _) {},
+          onForget: () {},
+        ),
+      );
+      expect(find.byKey(const Key('vehicleAdapterReset')), findsNothing);
+    });
+
   });
 }
