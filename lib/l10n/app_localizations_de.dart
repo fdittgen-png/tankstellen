@@ -4271,6 +4271,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Monat';
 
   @override
+  String get confirmDeleteTitle => 'Löschen?';
+
+  @override
+  String get confirmDeleteBody =>
+      'Soll dieser Eintrag wirklich gelöscht werden?';
+
+  @override
   String get consoFeatureGroupTitle => 'Verbrauch';
 
   @override

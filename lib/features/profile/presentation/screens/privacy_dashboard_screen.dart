@@ -22,6 +22,7 @@ import '../../../../core/export/data_exporter.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/privacy_data_provider.dart';
 import '../widgets/config_verification_widget.dart';
@@ -339,31 +340,12 @@ class _PrivacyDashboardScreenState
 
   Future<bool?> _confirmDelete() {
     final l = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: Icon(
-          Icons.warning_amber_rounded,
-          color: theme.colorScheme.error,
-          size: 48,
-        ),
-        title: Text(l.privacyDeleteTitle),
-        content: Text(l.privacyDeleteBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l.cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: theme.colorScheme.error,
-            ),
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l.privacyDeleteConfirm),
-          ),
-        ],
-      ),
+    // #3682 — the ONE shared destructive-action dialog.
+    return confirmDestructiveAction(
+      context,
+      title: l.privacyDeleteTitle,
+      message: l.privacyDeleteBody,
+      confirmLabel: l.privacyDeleteConfirm,
     );
   }
 }

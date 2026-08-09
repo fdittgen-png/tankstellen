@@ -47,11 +47,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Both actions are TextButtons inside the AlertDialog.
-      final actions = find.descendant(
+      // #3682 — Cancel is a TextButton; the destructive action is the
+      // shared error-styled FilledButton.
+      final cancels = find.descendant(
         of: find.byType(AlertDialog),
         matching: find.byType(TextButton),
       );
-      expect(actions, findsNWidgets(2));
+      expect(cancels, findsOneWidget);
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
@@ -121,7 +123,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsNothing);
-      expect(await result, isNull);
+      // #3682 — barrier now maps to FALSE (see shared dialog).
+      expect(await result, isFalse);
     });
   });
 }

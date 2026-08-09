@@ -4255,6 +4255,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Měsíc';
 
   @override
+  String get confirmDeleteTitle => 'Delete?';
+
+  @override
+  String get confirmDeleteBody => 'Do you really want to delete this?';
+
+  @override
   String get consoFeatureGroupTitle => 'Spotřeba';
 
   @override

@@ -7634,6 +7634,18 @@ abstract class AppLocalizations {
   /// **'Month'**
   String get chargingChartsMonthAxis;
 
+  /// Title of the shared destructive-action confirmation dialog (#3682) shown before EVERY delete in the app.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete?'**
+  String get confirmDeleteTitle;
+
+  /// Generic body of the shared delete confirmation (#3682), used when a surface passes no item-specific message.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to delete this?'**
+  String get confirmDeleteBody;
+
   /// No description provided for @consoFeatureGroupTitle.
   ///
   /// In en, this message translates to:

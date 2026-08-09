@@ -4272,6 +4272,12 @@ class AppLocalizationsLv extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Mēnesis';
 
   @override
+  String get confirmDeleteTitle => 'Delete?';
+
+  @override
+  String get confirmDeleteBody => 'Do you really want to delete this?';
+
+  @override
   String get consoFeatureGroupTitle => 'Patēriņš';
 
   @override

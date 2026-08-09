@@ -16,6 +16,7 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/confirm_delete.dart';
 
 PriceAlert _alert({
   String id = 'alert-1',
@@ -179,7 +180,7 @@ void main() {
         find.byType(Dismissible),
         const Offset(-600, 0),
       );
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       expect(notifier.removeCalls, ['alert-99']);
       // SnackBar text uses l10n alertDeleted with the station name.

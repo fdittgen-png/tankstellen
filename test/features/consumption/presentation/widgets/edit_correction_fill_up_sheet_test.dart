@@ -13,6 +13,8 @@ import 'package:tankstellen/features/consumption/providers/consumption_providers
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/confirm_delete.dart';
+
 /// #1361 phase 2b — widget tests for [EditCorrectionFillUpSheet].
 ///
 /// Mirrors the Riverpod-test pattern from
@@ -201,7 +203,7 @@ void main() {
     await tester.tap(
       find.widgetWithText(OutlinedButton, 'Delete correction'),
     );
-    await tester.pump();
+    await confirmPendingDelete(tester); // #3682
     await tester.pump(const Duration(milliseconds: 50));
 
     final all = container.read(fillUpListProvider);

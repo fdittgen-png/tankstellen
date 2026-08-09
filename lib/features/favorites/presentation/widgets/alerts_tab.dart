@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/theme/fuel_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -74,6 +75,9 @@ class AlertsTab extends StatelessWidget {
               return Dismissible(
                 key: ValueKey(alert.id),
                 direction: DismissDirection.endToStart,
+                // #3682 — the app-wide delete confirmation (allowlisted
+                // raw Dismissible: it keeps its labeled background).
+                confirmDismiss: (_) => confirmDestructiveAction(context),
                 background: Container(
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(right: 24),

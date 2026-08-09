@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/swipe_to_delete.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -231,16 +231,11 @@ class _AlertListTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Dismissible(
-      key: ValueKey(alert.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 24),
-        color: DarkModeColors.error(context),
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      onDismissed: (_) {
+    // #3682 — the shared swipe-to-delete carries the app-wide delete
+    // confirmation.
+    return SwipeToDelete(
+      dismissKey: ValueKey(alert.id),
+      onDismissed: () {
         unawaited(ref.read(alertProvider.notifier).removeAlert(alert.id));
         SnackBarHelper.show(context, l10n.alertDeleted(alert.stationName));
       },
@@ -333,16 +328,11 @@ class _RadiusAlertListTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
-    return Dismissible(
-      key: ValueKey('radius-${alert.id}'),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 24),
-        color: DarkModeColors.error(context),
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      onDismissed: (_) {
+    // #3682 — the shared swipe-to-delete carries the app-wide delete
+    // confirmation.
+    return SwipeToDelete(
+      dismissKey: ValueKey('radius-${alert.id}'),
+      onDismissed: () {
         // #2494 — mirror the per-station tile (:142): a past-tense
         // confirmation with an Undo that re-inserts the deleted alert,
         // rather than the old interrogative "Delete radius alert?" copy

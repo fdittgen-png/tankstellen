@@ -11,6 +11,7 @@ import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/profile_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -54,6 +55,9 @@ class FavoriteStationDismissible extends ConsumerWidget {
           );
           return false;
         }
+        // #3682 — the app-wide delete confirmation before the removal.
+        if (!await confirmDestructiveAction(context)) return false;
+        if (!context.mounted) return false;
         await favorites.remove(station.id);
         if (!context.mounted) return true;
         final l10nSnack = AppLocalizations.of(context);

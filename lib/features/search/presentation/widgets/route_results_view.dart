@@ -12,6 +12,7 @@ import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../route_search/data/cross_border_corridor.dart'
@@ -216,6 +217,9 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           );
           return false;
         } else {
+          // #3682 — the app-wide delete confirmation before hiding.
+          if (!await confirmDestructiveAction(context)) return false;
+          if (!context.mounted) return false;
           await ignored.add(item.id);
           if (context.mounted) {
             final stationLabel = item.station.brand.isNotEmpty

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../l10n/app_localizations.dart';
 import '../domain/entities/loyalty_card.dart';
 import '../providers/loyalty_provider.dart';
@@ -87,24 +88,13 @@ class LoyaltySettingsScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     // #3159 — capture before the dialog await; see _openAddSheet.
     final cards = ref.read(loyaltyCardsProvider.notifier);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l.loyaltyDeleteConfirmTitle),
-        content: Text(l.loyaltyDeleteConfirmBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l.delete),
-          ),
-        ],
-      ),
+    // #3682 — the ONE shared destructive-action dialog.
+    final confirmed = await confirmDestructiveAction(
+      context,
+      title: l.loyaltyDeleteConfirmTitle,
+      message: l.loyaltyDeleteConfirmBody,
     );
-    if (confirmed == true) {
+    if (confirmed) {
       await cards.remove(card.id);
     }
   }

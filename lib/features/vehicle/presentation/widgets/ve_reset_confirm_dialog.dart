@@ -1,8 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Destructive-action confirmation dialog for the η_v calibration
@@ -16,22 +17,13 @@ class VeResetConfirmDialog {
   /// `null`, which callers should treat as "do nothing".
   static Future<bool?> show(BuildContext context) {
     final l = AppLocalizations.of(context);
-    return showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l.veResetConfirmTitle),
-        content: Text(l.veResetConfirmBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l.veResetAction),
-          ),
-        ],
-      ),
+    // #3682 — delegates to the ONE shared destructive-action dialog;
+    // this class stays as the call-site-stable named entry point.
+    return confirmDestructiveAction(
+      context,
+      title: l.veResetConfirmTitle,
+      message: l.veResetConfirmBody,
+      confirmLabel: l.veResetAction,
     );
   }
 }

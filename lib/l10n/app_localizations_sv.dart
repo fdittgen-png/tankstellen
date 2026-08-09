@@ -4245,6 +4245,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Månad';
 
   @override
+  String get confirmDeleteTitle => 'Delete?';
+
+  @override
+  String get confirmDeleteBody => 'Do you really want to delete this?';
+
+  @override
   String get consoFeatureGroupTitle => 'Förbrukning';
 
   @override

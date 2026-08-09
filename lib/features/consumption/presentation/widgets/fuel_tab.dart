@@ -10,11 +10,11 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
-import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/swipe_to_delete.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../achievements/presentation/widgets/badge_shelf.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
@@ -85,16 +85,11 @@ class FuelTab extends ConsumerWidget {
 
     Widget buildFillUpRow(int index) {
       final fillUp = fillUps[index];
-      return Dismissible(
-        key: ValueKey(fillUp.id),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 24),
-          color: DarkModeColors.error(context),
-          child: const Icon(Icons.delete, color: Colors.white),
-        ),
-        onDismissed: (_) {
+      // #3682 — the shared swipe-to-delete carries the app-wide delete
+      // confirmation; the #3664 undo stays as the second net.
+      return SwipeToDelete(
+        dismissKey: ValueKey(fillUp.id),
+        onDismissed: () {
           final notifier = ref.read(fillUpListProvider.notifier);
           unawaited(notifier.remove(fillUp.id));
           // #3664 — capture-and-restore undo: the swiped entity is held

@@ -4244,6 +4244,12 @@ class AppLocalizationsEt extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Kuu';
 
   @override
+  String get confirmDeleteTitle => 'Delete?';
+
+  @override
+  String get confirmDeleteBody => 'Do you really want to delete this?';
+
+  @override
   String get consoFeatureGroupTitle => 'Kulu';
 
   @override

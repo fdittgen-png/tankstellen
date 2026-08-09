@@ -19,6 +19,7 @@ import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/confirm_delete.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 /// Widget tests for the gamification opt-out gate on [FuelTab] (#1194).
@@ -196,7 +197,7 @@ void main() {
       expect(container.read(fillUpListProvider), hasLength(1));
 
       await tester.drag(find.byType(Dismissible), const Offset(-500, 0));
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       // Deleted from the provider; the undo affordance is up.
       expect(container.read(fillUpListProvider), isEmpty);

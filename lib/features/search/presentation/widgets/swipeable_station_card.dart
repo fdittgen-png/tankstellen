@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_tier.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../loyalty/providers/loyalty_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -59,6 +60,8 @@ class SwipeableStationCard extends ConsumerWidget {
           onNavigate();
           return false; // Don't dismiss — just trigger navigation
         } else {
+          // #3682 — the app-wide delete confirmation before hiding.
+          if (!await confirmDestructiveAction(context)) return false;
           onIgnore();
           return true; // Dismiss — remove from list
         }

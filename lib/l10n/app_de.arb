@@ -1893,6 +1893,8 @@
   "chargingEfficiencyTitle": "Effizienz (kWh/100 km)",
   "chargingChartsEmpty": "Noch nicht genügend Daten",
   "chargingChartsMonthAxis": "Monat",
+  "confirmDeleteTitle": "Löschen?",
+  "confirmDeleteBody": "Soll dieser Eintrag wirklich gelöscht werden?",
   "consoFeatureGroupTitle": "Verbrauch",
   "consoFeatureGroupDescription": "Verfolgen Sie Ihren Verbrauch — manuelle Tankvorgänge oder automatische OBD2-Fahrtaufzeichnung.",
   "consoModeOff": "Aus",

@@ -9,6 +9,7 @@ import 'package:tankstellen/features/search/presentation/widgets/swipeable_stati
 import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/confirm_delete.dart';
 
 void main() {
   group('SwipeableStationCard', () {
@@ -108,7 +109,7 @@ void main() {
         find.byType(Dismissible),
         const Offset(-500, 0),
       );
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       expect(ignoreCalled, isTrue);
     });

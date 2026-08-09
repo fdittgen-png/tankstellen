@@ -68,7 +68,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertDialog), findsNothing);
-      expect(await result, isNull);
+      // #3682 — the shared dialog maps barrier dismiss to FALSE (still
+      // "do nothing" for every caller; the tri-state null is gone).
+      expect(await result, isFalse);
     });
   });
 }

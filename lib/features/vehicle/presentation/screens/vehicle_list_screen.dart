@@ -8,6 +8,7 @@ import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../../../core/widgets/help_banner.dart';
 import '../../../../core/widgets/page_scaffold.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../providers/vehicle_providers.dart';
 import '../widgets/vehicle_card.dart';
@@ -85,24 +86,13 @@ class VehicleListScreen extends ConsumerWidget {
     // element throws a StateError under Riverpod 3, and the screen can be
     // popped out from underneath the open dialog.
     final vehicles = ref.read(vehicleProfileListProvider.notifier);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l.vehicleDeleteTitle),
-        content: Text(l.vehicleDeleteMessage(name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l.delete),
-          ),
-        ],
-      ),
+    // #3682 — the ONE shared destructive-action dialog.
+    final confirmed = await confirmDestructiveAction(
+      context,
+      title: l.vehicleDeleteTitle,
+      message: l.vehicleDeleteMessage(name),
     );
-    if (confirmed == true) {
+    if (confirmed) {
       await vehicles.remove(id);
     }
   }
