@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/dark_mode_colors.dart';
+import '../../../../core/widgets/swipe_to_delete.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../ev/domain/entities/charging_log.dart';
@@ -64,16 +64,11 @@ class ChargingTab extends ConsumerWidget {
                 return const _ChargingChartsSection();
               }
               final log = ordered[index - 1];
-              return Dismissible(
-                key: ValueKey('charging-${log.id}'),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 24),
-                  color: DarkModeColors.error(context),
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                onDismissed: (_) {
+              // #3682 — the shared swipe-to-delete carries the app-wide
+              // delete confirmation.
+              return SwipeToDelete(
+                dismissKey: ValueKey('charging-${log.id}'),
+                onDismissed: () {
                   unawaited(
                     ref.read(chargingLogsProvider.notifier).remove(log.id),
                   );

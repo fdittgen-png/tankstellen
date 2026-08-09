@@ -25,6 +25,7 @@ import 'package:url_launcher_platform_interface/url_launcher_platform_interface.
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/confirm_delete.dart';
 import '../../../../mocks/mocks.dart';
 
 /// One reusable station — kept tiny so test bodies focus on the swipe
@@ -299,7 +300,7 @@ void main() {
         const Offset(-500, 0),
         1000,
       );
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       expect(favorites.removeCalls, [_station.id]);
 
@@ -332,7 +333,7 @@ void main() {
         const Offset(-500, 0),
         1000,
       );
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       // Press the undo action. Tapping the SnackBarAction triggers the
       // notifier's add() with both id and the original Station entity.

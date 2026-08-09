@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/add_fill_up_validators.dart';
@@ -128,6 +129,9 @@ class _EditCorrectionFillUpSheetState
   }
 
   Future<void> _delete() async {
+    // #3682 — the app-wide delete confirmation.
+    if (!await confirmDestructiveAction(context)) return;
+    if (!mounted) return;
     // #3664 — capture the messenger + localized strings BEFORE the
     // await/pop (SnackBarHelper contract): the sheet's own context dies
     // with the pop, but the undo snackbar must outlive it.

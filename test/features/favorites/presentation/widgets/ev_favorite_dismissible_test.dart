@@ -9,6 +9,7 @@ import 'package:tankstellen/features/favorites/presentation/widgets/ev_favorite_
 import 'package:tankstellen/features/favorites/providers/ev_favorites_provider.dart';
 
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/confirm_delete.dart';
 
 /// Regression tests for #1958 — EV-charger favorites must be swipeable
 /// like fuel-station favorites (`FavoriteStationDismissible`).
@@ -69,7 +70,7 @@ void main() {
         const Offset(-500, 0),
         1000,
       );
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       // Removal routed to the EV favorites notifier — not the fuel one.
       expect(recording.removeCalls, ['ev-charger-7']);
@@ -96,7 +97,7 @@ void main() {
         const Offset(-500, 0),
         1000,
       );
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
       await tester.tap(find.text('Undo'));
       await tester.pumpAndSettle();
 

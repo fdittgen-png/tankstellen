@@ -4275,6 +4275,12 @@ class AppLocalizationsBg extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Месец';
 
   @override
+  String get confirmDeleteTitle => 'Delete?';
+
+  @override
+  String get confirmDeleteBody => 'Do you really want to delete this?';
+
+  @override
   String get consoFeatureGroupTitle => 'Разход';
 
   @override

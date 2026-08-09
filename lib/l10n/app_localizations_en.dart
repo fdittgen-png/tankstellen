@@ -4226,6 +4226,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chargingChartsMonthAxis => 'Month';
 
   @override
+  String get confirmDeleteTitle => 'Delete?';
+
+  @override
+  String get confirmDeleteBody => 'Do you really want to delete this?';
+
+  @override
   String get consoFeatureGroupTitle => 'Consumption';
 
   @override
@@ -12671,6 +12677,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get chargingChartsMonthAxis => '⟦Ṁóñŧĥ ··⟧';
+
+  @override
+  String get confirmDeleteTitle => '⟦Đéłéŧé? ···⟧';
+
+  @override
+  String get confirmDeleteBody =>
+      '⟦Đó ýóú řéáłłý ŵáñŧ ŧó đéłéŧé ŧĥîš? ············⟧';
 
   @override
   String get consoFeatureGroupTitle => '⟦Çóñšúɱƥŧîóñ ·····⟧';

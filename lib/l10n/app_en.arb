@@ -2859,6 +2859,14 @@
   "@chargingChartsMonthAxis": {
     "description": "Axis label for the X axis (month) on the charging charts (#582 phase 3)."
   },
+  "confirmDeleteTitle": "Delete?",
+  "@confirmDeleteTitle": {
+    "description": "Title of the shared destructive-action confirmation dialog (#3682) shown before EVERY delete in the app."
+  },
+  "confirmDeleteBody": "Do you really want to delete this?",
+  "@confirmDeleteBody": {
+    "description": "Generic body of the shared delete confirmation (#3682), used when a surface passes no item-specific message."
+  },
   "consoFeatureGroupTitle": "Consumption",
   "consoFeatureGroupDescription": "Track your consumption — manual fill-ups, or automatic OBD2 trip recording.",
   "consoModeOff": "Off",

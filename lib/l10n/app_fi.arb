@@ -5713,5 +5713,15 @@
         "type": "String"
       }
     }
+  },
+  "confirmDeleteTitle": "Delete?",
+  "@confirmDeleteTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "confirmDeleteBody": "Do you really want to delete this?",
+  "@confirmDeleteBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

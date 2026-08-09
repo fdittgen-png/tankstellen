@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/situation_classifier.dart';
 import '../../providers/vehicle_baseline_summary_provider.dart';
@@ -241,22 +242,12 @@ class _VehicleBaselineSectionState
     WidgetRef ref,
     AppLocalizations l,
   ) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l.vehicleBaselineResetConfirmTitle),
-        content: Text(l.vehicleBaselineResetConfirmBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l.vehicleBaselineReset),
-          ),
-        ],
-      ),
+    // #3682 — the ONE shared destructive-action dialog.
+    final confirm = await confirmDestructiveAction(
+      context,
+      title: l.vehicleBaselineResetConfirmTitle,
+      message: l.vehicleBaselineResetConfirmBody,
+      confirmLabel: l.vehicleBaselineReset,
     );
     // #3159 — guard before the post-dialog ref use: a dead WidgetRef throws
     // a StateError under Riverpod 3, and the read itself performs the reset

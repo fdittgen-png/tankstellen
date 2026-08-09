@@ -13,6 +13,7 @@ import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dar
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/pump_app.dart';
+import '../../../../helpers/confirm_delete.dart';
 
 void main() {
   group('AlertsScreen radius section (#578 phase 2)', () {
@@ -97,7 +98,7 @@ void main() {
         find.text('Home diesel'),
         const Offset(-600, 0),
       );
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       expect(fake.removedIds, ['r1']);
     });
@@ -126,7 +127,7 @@ void main() {
       );
 
       await tester.drag(find.text('Home diesel'), const Offset(-600, 0));
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       // Past-tense deletion copy with the alert's label.
       expect(find.text('Radius alert "Home diesel" deleted'), findsOneWidget);
@@ -157,7 +158,7 @@ void main() {
       );
 
       await tester.drag(find.text('Home diesel'), const Offset(-600, 0));
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester); // #3682
 
       expect(fake.removedIds, ['r1']);
       expect(fake.addedAlerts, isEmpty);

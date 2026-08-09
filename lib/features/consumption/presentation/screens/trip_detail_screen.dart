@@ -14,6 +14,7 @@ import '../../../../core/sync/trip_shares_sync_enabled_provider.dart';
 import '../../../../core/sync/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -327,23 +328,14 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     WidgetRef ref,
     AppLocalizations l,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l.trajetDetailDeleteConfirmTitle),
-        content: Text(l.trajetDetailDeleteConfirmBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l.trajetDetailDeleteConfirmCancel),
-          ),
-          TextButton(
-            key: const Key('trip_detail_delete_confirm'),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l.trajetDetailDeleteConfirmConfirm),
-          ),
-        ],
-      ),
+    // #3682 — the ONE shared destructive-action dialog (the stable
+    // per-surface test key rides on the confirm button).
+    final confirmed = await confirmDestructiveAction(
+      context,
+      title: l.trajetDetailDeleteConfirmTitle,
+      message: l.trajetDetailDeleteConfirmBody,
+      confirmLabel: l.trajetDetailDeleteConfirmConfirm,
+      confirmKey: const Key('trip_detail_delete_confirm'),
     );
     if (confirmed != true || !context.mounted) return;
     // #3664 — capture-and-restore undo. The whole entry (summary +

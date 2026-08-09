@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/widgets/swipe_to_delete.dart';
 
 import '../../helpers/pump_app.dart';
+import '../../helpers/confirm_delete.dart';
 
 void main() {
   group('SwipeToDelete', () {
@@ -46,10 +47,32 @@ void main() {
         ),
       );
 
-      // Swipe right to left
+      // Swipe right to left — #3682: the shared confirmation gates it.
       await tester.drag(find.text('Swipe me'), const Offset(-500, 0));
-      await tester.pumpAndSettle();
+      await confirmPendingDelete(tester);
       expect(dismissed, true);
+    });
+
+    testWidgets('cancelling the confirmation keeps the row (#3682)',
+        (tester) async {
+      var dismissed = false;
+      await pumpApp(
+        tester,
+        SwipeToDelete(
+          dismissKey: const ValueKey('test-cancel'),
+          onDismissed: () => dismissed = true,
+          child: const SizedBox(width: 200, height: 50, child: Text('Keep me')),
+        ),
+      );
+
+      await tester.drag(find.text('Keep me'), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(dismissed, isFalse);
+      expect(find.text('Keep me'), findsOneWidget,
+          reason: 'a cancelled confirmation restores the row');
     });
 
     testWidgets('shows red background with delete icon on swipe', (tester) async {

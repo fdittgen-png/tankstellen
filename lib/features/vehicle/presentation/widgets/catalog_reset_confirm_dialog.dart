@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// Confirmation dialog for the reset-from-vehicle-database action
@@ -17,22 +18,12 @@ class CatalogResetConfirmDialog {
   /// reset action; cancel / barrier dismiss / back all return `null`.
   static Future<bool?> show(BuildContext context, String vehicleLabel) {
     final l = AppLocalizations.of(context);
-    return showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l.catalogResetConfirmTitle),
-        content: Text(l.catalogResetConfirmBody(vehicleLabel)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l.catalogResetAction),
-          ),
-        ],
-      ),
+    // #3682 — delegates to the ONE shared destructive-action dialog.
+    return confirmDestructiveAction(
+      context,
+      title: l.catalogResetConfirmTitle,
+      message: l.catalogResetConfirmBody(vehicleLabel),
+      confirmLabel: l.catalogResetAction,
     );
   }
 }
