@@ -85,6 +85,10 @@ class MonthlyBarChart extends StatelessWidget {
   }
 }
 
+/// Rounded top corners of every bar / stack-top segment — one shared
+/// const so the inline-radius ratchet (#lint) counts a single site.
+const Radius _barCorner = Radius.circular(3);
+
 class _BarChartPainter extends CustomPainter {
   final List<MonthlySummary> summaries;
   final double Function(MonthlySummary) valueOf;
@@ -165,8 +169,8 @@ class _BarChartPainter extends CustomPainter {
       if (segments == null || segments.isEmpty) {
         final rect = RRect.fromRectAndCorners(
           Rect.fromLTWH(left, top, barWidth, barHeight),
-          topLeft: const Radius.circular(3),
-          topRight: const Radius.circular(3),
+          topLeft: _barCorner,
+          topRight: _barCorner,
         );
         canvas.drawRRect(rect, barPaint);
       } else {
@@ -187,8 +191,8 @@ class _BarChartPainter extends CustomPainter {
           canvas.drawRRect(
             RRect.fromRectAndCorners(
               Rect.fromLTWH(left, segTop, barWidth, segHeight),
-              topLeft: isTop ? const Radius.circular(3) : Radius.zero,
-              topRight: isTop ? const Radius.circular(3) : Radius.zero,
+              topLeft: isTop ? _barCorner : Radius.zero,
+              topRight: isTop ? _barCorner : Radius.zero,
             ),
             segPaint,
           );
