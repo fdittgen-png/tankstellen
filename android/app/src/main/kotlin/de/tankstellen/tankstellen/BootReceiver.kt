@@ -43,7 +43,13 @@ class BootReceiver : BroadcastReceiver() {
 
         // Re-arm only when WorkManager was previously initialized from Dart;
         // the shared enqueuer guards on the persisted callback handle so a
-        // fresh install with no alerts re-arms nothing.
+        // fresh install with no alerts re-arms nothing. #3688 — the
+        // enqueuer's freshness gate also refuses when the handle predates
+        // the installed build: on MY_PACKAGE_REPLACED the handle is ALWAYS
+        // stale (the update just invalidated it), and enqueueing anyway
+        // leaked one live FlutterEngine per app update. The periodic
+        // schedule survives in WorkManager's DB regardless; the next
+        // foreground launch re-persists the handle and re-arms.
         Log.d(TAG, "boot: re-arming background-scan registration")
         BackgroundScanEnqueuer.enqueue(
             context,
