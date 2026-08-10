@@ -1,0 +1,6 @@
+• Faster start: your last results appear instantly, prices refresh in the background
+• Tank level v2: a full fill sets 100%, OBD2 tracks in between, E85/E10 mix is accounted for
+• Highway mode: stations sorted by what you can reach, with "via exit" hints
+• OBD2: reset button, smarter reconnects (less battery), trip saving never hangs on bad network
+• Deletes now ask first and can be undone for 10 seconds
+• Vehicle database fills your tank capacity automatically

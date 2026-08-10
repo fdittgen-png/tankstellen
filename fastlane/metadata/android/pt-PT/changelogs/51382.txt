@@ -1,0 +1,6 @@
+• Arranque mais rápido: últimos resultados aparecem de imediato, preços atualizam em segundo plano
+• Depósito v2: atesto completo = 100%, monitorização OBD2, mistura E85/E10 considerada
+• Modo autoestrada: ordenação por acessibilidade real, com indicações «via saída»
+• OBD2: botão de reinício, reconexão mais eficiente, gravação nunca bloqueia sem rede
+• Eliminar pede confirmação e pode ser anulado durante 10 s
+• A base de veículos preenche a capacidade do depósito
