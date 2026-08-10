@@ -1,0 +1,6 @@
+• Schnellerer Start: letzte Ergebnisse sofort, Preise aktualisieren im Hintergrund
+• Tankstand v2: Vollbetankung = 100 %, OBD2 verfolgt dazwischen, E85/E10-Mix wird berücksichtigt
+• Autobahnmodus: Sortierung nach Erreichbarkeit, mit „über Ausfahrt“-Hinweisen
+• OBD2: Reset-Knopf, sparsamere Wiederverbindung, Speichern hängt nie mehr am Netz
+• Löschen fragt jetzt nach und ist 10 Sekunden rückgängig machbar
+• Fahrzeugdatenbank füllt die Tankgröße automatisch

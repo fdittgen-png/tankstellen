@@ -1,0 +1,6 @@
+• Démarrage plus rapide : derniers résultats affichés aussitôt, prix actualisés en arrière-plan
+• Réservoir v2 : plein = 100 %, suivi OBD2 entre les pleins, mélange E85/E10 pris en compte
+• Mode autoroute : tri par accessibilité réelle, repères « via sortie »
+• OBD2 : bouton de réinitialisation, reconnexion plus sobre, enregistrement jamais bloqué par le réseau
+• Les suppressions demandent confirmation, annulables pendant 10 s
+• La base véhicules remplit la capacité du réservoir

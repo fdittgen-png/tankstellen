@@ -1,0 +1,6 @@
+• Inicio más rápido: los últimos resultados aparecen al instante, precios en segundo plano
+• Depósito v2: llenado completo = 100 %, seguimiento OBD2, mezcla E85/E10 tenida en cuenta
+• Modo autopista: orden por accesibilidad real, con indicaciones «vía salida»
+• OBD2: botón de reinicio, reconexión más eficiente, el guardado ya no se bloquea sin red
+• Borrar pide confirmación y se puede deshacer durante 10 s
+• La base de vehículos rellena la capacidad del depósito

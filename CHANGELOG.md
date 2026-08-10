@@ -12,6 +12,32 @@ About-screen build number always maps back to a commit.
 
 ## [Unreleased]
 
+## [6.0.5] - 2026-08-10 (Build 5138)
+
+### Added
+
+- Tank level v2: a full fill anchors 100 %, the OBD2 sensor tracks between
+  fills, and the E85/E10 tank mix is computed per fill-up (#3645-#3652).
+- Reference-catalog tank capacities, auto-filled on add / via OBD2, with a
+  "reset from vehicle database" action (#3651).
+- Highway mode v2: exit-aware suggestions ("via exit 36 - +1.2 km") ordered
+  by reachable-first along-track distance, from monthly OSM exit datasets
+  (#3633).
+- OBD2 "Reset connection" on the vehicle screen and the recording page -
+  ATZ chip reset + full link recycle (#3676, #3678).
+- Every delete asks first (one shared confirmation) and stays undoable for
+  10 seconds (#3682, #3664).
+
+### Fixed
+
+- Startup no longer waits on the network: last-known stations paint within
+  ~2 s and refresh in the background; last results survive long absences
+  (#3668).
+- Stopping a recording never hangs on a slow/unreachable sync server -
+  "Saving to history" is local-only (#3670).
+- Background reconnect can no longer burn CPU for minutes (whole-dial
+  budget + no background scans) - the OS process kills are gone (#3671).
+
 ## [6.0.4] - 2026-07-06 (Build 5137)
 
 ### Changed

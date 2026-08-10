@@ -1,0 +1,6 @@
+• Avvio più rapido: gli ultimi risultati appaiono subito, i prezzi si aggiornano in background
+• Serbatoio v2: pieno = 100%, monitoraggio OBD2, miscela E85/E10 considerata
+• Modalità autostrada: ordinamento per raggiungibilità, con indicazioni «via uscita»
+• OBD2: pulsante di reset, riconnessione più efficiente, salvataggio mai bloccato dalla rete
+• L'eliminazione chiede conferma ed è annullabile per 10 s
+• Il database veicoli compila la capacità del serbatoio
