@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'hive_cipher_loader.dart';
+import 'hive_isolate_boxes.dart';
 import 'hive_isolate_ownership.dart';
 import 'hive_legacy_migration.dart';
 import 'hive_schema_migration.dart';
@@ -289,52 +290,15 @@ class HiveBoxes {
   }
 
   /// Initialize Hive in a background isolate with proper encryption.
-  static Future<void> initInIsolate() async {
-    await Hive.initFlutter();
-    final cipher = await HiveCipherLoader.loadGuarded();
-    await Hive.openBox<dynamic>(settings, encryptionCipher: cipher);
-    await Hive.openBox<dynamic>(favorites, encryptionCipher: cipher);
-    await Hive.openBox<dynamic>(profiles, encryptionCipher: cipher); // #2205 BG widget
-    await Hive.openBox<dynamic>(alerts, encryptionCipher: cipher);
-    await Hive.openBox<dynamic>(cache, encryptionCipher: cipher);
-    await Hive.openBox<dynamic>(priceHistory, encryptionCipher: cipher);
-    // #579 — velocity detector reads/writes snapshots from the BG
-    // isolate, mirroring the main-isolate open above.
-    await Hive.openBox<String>(priceSnapshots);
-    // #1105 — isolate error spool: background-isolate errors written
-    // here while Riverpod is unavailable, drained by the foreground
-    // initialiser into TraceRecorder.
-    await Hive.openBox<String>(isolateErrorSpool);
-    // #2866 — feature flags (uncipher'd, mirroring the foreground open) so the
-    // background scan can read the developer-mode flag to dev-gate the #2824
-    // data-access trace export. Best-effort; the scan no-ops the trace if this
-    // is unavailable.
-    await Hive.openBox<dynamic>(featureFlags);
-  }
+  /// #3689 — lives in [HiveIsolateBoxes]: background opens pin a
+  /// never-compact strategy so a BG isolate can't rename box files under
+  /// the foreground's open handles.
+  static Future<void> initInIsolate() => HiveIsolateBoxes.initInIsolate();
 
-  /// Close the Hive boxes opened by [initInIsolate] at the end of a
-  /// background task to release file handles.
-  ///
-  /// #2670 — boxes [HiveIsolateOwnership] records as main-isolate-owned (from
-  /// [init] / [initDeferred] / [initForTest]) are **skipped**: when the scan
-  /// ran inside the foreground isolate these are the live, shared global
-  /// handles the rest of the app still uses, and closing them produced the
-  /// `FileSystemException: File closed, path='…/cache.hive'` field crash. A
-  /// true spawned `dart:isolate` worker never ran [init], so its registry is
-  /// empty and every [initInIsolate] handle is still closed.
-  static Future<void> closeIsolateBoxes() async {
-    final boxNames = [settings, favorites, alerts, cache, priceHistory, priceSnapshots, isolateErrorSpool, featureFlags];
-    for (final name in boxNames) {
-      if (HiveIsolateOwnership.isOwned(name)) continue;
-      try {
-        if (Hive.isBoxOpen(name)) {
-          await Hive.box<dynamic>(name).close();
-        }
-      } catch (e, st) {
-        debugPrint('HiveBoxes: failed to close box "$name": $e\n$st');
-      }
-    }
-  }
+  /// Close the Hive boxes opened by [initInIsolate] (#2670 ownership guard
+  /// applies — see [HiveIsolateBoxes.closeIsolateBoxes]).
+  static Future<void> closeIsolateBoxes() =>
+      HiveIsolateBoxes.closeIsolateBoxes();
 
   @visibleForTesting
   static Future<void> initForTest() async {

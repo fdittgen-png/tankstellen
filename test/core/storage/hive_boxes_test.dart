@@ -63,28 +63,43 @@ void main() {
           );
         }
 
-        // Extract initInIsolate() method body
+        // #3689 — initInIsolate moved to HiveIsolateBoxes; its opens route
+        // through the local `open` helper so every background open pins the
+        // never-compact strategy. The six PII boxes must pass the cipher.
+        final isolateSource =
+            File('lib/core/storage/hive_isolate_boxes.dart').readAsStringSync();
         final isolateMatch = RegExp(
           r'static Future<void> initInIsolate\(\) async \{(.*?)\n  \}',
           dotAll: true,
-        ).firstMatch(source);
+        ).firstMatch(isolateSource);
         expect(isolateMatch, isNotNull,
-            reason: 'initInIsolate() method must exist');
+            reason: 'initInIsolate() method must exist in HiveIsolateBoxes');
         final isolateBody = isolateMatch!.group(1)!;
 
-        // All Hive.openBox calls in initInIsolate() must use encryptionCipher
-        final isolateOpenBoxCalls = RegExp(r'Hive\.openBox\([^)]+\)')
-            .allMatches(isolateBody)
-            .map((m) => m.group(0)!)
-            .toList();
-        for (final call in isolateOpenBoxCalls) {
+        for (final boxName in [
+          'settings',
+          'favorites',
+          'profiles',
+          'alerts',
+          'cache',
+          'priceHistory',
+        ]) {
           expect(
-            call.contains('encryptionCipher'),
+            isolateBody
+                .contains('open<dynamic>(HiveBoxes.$boxName, boxCipher: '),
             isTrue,
-            reason: 'All Hive.openBox calls in initInIsolate() must use '
-                'encryptionCipher: found "$call" without it',
+            reason: 'initInIsolate must open the encrypted $boxName box '
+                'with the cipher',
           );
         }
+        // The helper is the single Hive.openBox site — it must carry both
+        // the cipher pass-through and the #3689 never-compact strategy.
+        expect(
+          isolateSource.contains('compactionStrategy: _neverCompact'),
+          isTrue,
+          reason: 'background opens must never compact (#3689) — a BG '
+              'compaction renames box files under the foreground handles',
+        );
       });
 
       test('all six domain boxes are in the encrypted set', () {
@@ -149,8 +164,9 @@ void main() {
       });
 
       test('initInIsolate() opens the six background boxes', () {
+        // #3689 — the isolate box lifecycle lives in HiveIsolateBoxes.
         final source =
-            File('lib/core/storage/hive_boxes.dart').readAsStringSync();
+            File('lib/core/storage/hive_isolate_boxes.dart').readAsStringSync();
 
         final isolateMatch = RegExp(
           r'static Future<void> initInIsolate\(\) async \{(.*?)\n  \}',
