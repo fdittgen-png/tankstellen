@@ -30,10 +30,13 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
         // the WorkManager periodic tasks, NOT a reliability guarantee. The
         // coordinator's cross-trigger cooldown (#2415) dedups this against a
         // concurrent periodic scan, so it is a cheap no-op when one just ran.
+        // #3688 — respectCooldown: the 30-min OS wake churns one background
+        // FlutterEngine per enqueue; the native 60-min cooldown halves that.
         BackgroundScanEnqueuer.enqueue(
             context,
             dartTask = WIDGET_SCAN_TASK,
             uniqueName = WIDGET_SCAN_UNIQUE_NAME,
+            respectCooldown = true,
         )
     }
 
@@ -70,18 +73,22 @@ class FuelPriceWidgetProvider : AppWidgetProvider() {
             // The coordinator's cross-trigger cooldown (#2415) dedups this
             // against a concurrent periodic scan, so a rapid tap is cheap.
             StationWidgetRenderer.ACTION_REFRESH -> {
-                val id = intent.getIntExtra(
-                    StationWidgetRenderer.EXTRA_APP_WIDGET_ID,
-                    AppWidgetManager.INVALID_APPWIDGET_ID,
-                )
-                if (id != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                    StationWidgetRenderer.setRefreshing(context, id)
-                }
-                BackgroundScanEnqueuer.enqueue(
+                // #3688 — enqueue FIRST: the freshness gate may refuse (stale
+                // callback handle after an update), and the glyph must only
+                // dim for a scan that will actually run — otherwise the
+                // widget shows "refreshing" forever.
+                val enqueued = BackgroundScanEnqueuer.enqueue(
                     context,
                     dartTask = WIDGET_SCAN_TASK,
                     uniqueName = WIDGET_SCAN_UNIQUE_NAME,
                 )
+                val id = intent.getIntExtra(
+                    StationWidgetRenderer.EXTRA_APP_WIDGET_ID,
+                    AppWidgetManager.INVALID_APPWIDGET_ID,
+                )
+                if (enqueued && id != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    StationWidgetRenderer.setRefreshing(context, id)
+                }
             }
         }
     }

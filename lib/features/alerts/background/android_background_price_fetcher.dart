@@ -1,9 +1,14 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../../core/background/background_price_fetcher.dart';
+import '../../../core/logging/error_logger.dart';
 import 'background_service.dart';
 
 /// Android implementation of [BackgroundPriceFetcher] using WorkManager.
@@ -29,9 +34,14 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
   AndroidBackgroundPriceFetcher({Workmanager? workmanager})
       : _workmanager = workmanager ?? Workmanager();
 
+  /// #3688 — key read natively by `BackgroundScanEnqueuer.handleIsFresh`
+  /// (shared_preferences persists it as `flutter.bg_handle_build`).
+  static const handleBuildKey = 'bg_handle_build';
+
   @override
   Future<void> init() async {
     await _workmanager.initialize(callbackDispatcher);
+    await _stampHandleBuild();
 
     // #2300 — register with ExistingPeriodicWorkPolicy.update so a repeated
     // init() (every app launch) is idempotent: it refreshes the existing task
@@ -56,6 +66,30 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
   @override
   Future<void> cancelAll() async {
     await _workmanager.cancelAll();
+  }
+
+  /// #3688 — record WHICH build just persisted the WorkManager callback
+  /// handle. The native `BackgroundScanEnqueuer` refuses to enqueue when
+  /// this stamp doesn't match the installed build: a handle persisted by a
+  /// previous build resolves to nothing in the new Dart snapshot, and the
+  /// workmanager `BackgroundWorker` failure path leaks its freshly created
+  /// FlutterEngine alive (43 live engines in the field tombstone). The
+  /// stamp is also refreshed by the boot re-arm's background `init()`, so
+  /// the gate reopens as soon as ANY isolate re-persists the handle.
+  ///
+  /// Best-effort: on failure the stamp stays stale, which only suppresses
+  /// opportunistic widget scans until the next successful launch — the
+  /// fail-safe direction.
+  Future<void> _stampHandleBuild() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(handleBuildKey, info.buildNumber);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.background, e, st, context: const {
+        'where': 'AndroidBackgroundPriceFetcher: stamp handle build (#3688)',
+      }));
+    }
   }
 
   /// #3169 — deliberate no-op on Android. The twice-daily WorkManager
