@@ -131,6 +131,26 @@ class TripDetailSample {
   /// combustion-health heuristic (total trim = STFT + LTFT).
   final double? ltft;
 
+  // ---- #3692 — turbo/thermal signals, read through [origin] ---------
+  // The lossless origin round-trip (#3594) means new always-persisted
+  // TripSample signals need no converter plumbing (read via [domain]):
+  // null for hand-built instances and legacy trips → charts self-hide.
+
+  /// Intake air temperature °C (PID 0x0F, #3692).
+  double? get iatC => domain?.iatC;
+
+  /// Ignition timing advance °CA (PID 0x0E, #3692).
+  double? get timingAdvanceDeg => domain?.timingAdvanceDeg;
+
+  /// Boost = MAP − ambient baro in kPa (#3692) — positive under boost,
+  /// negative at vacuum. Null unless BOTH pressures were recorded.
+  double? get boostKpa {
+    final map = domain?.mapKpa;
+    final baro = domain?.baroKpa;
+    if (map == null || baro == null) return null;
+    return map - baro;
+  }
+
   /// Reported horizontal GPS accuracy in metres (#2963). Carried through
   /// from `TripSample.hAccuracyM` so the canonical accel-event gate's
   /// bad-fix guard (`countAccelEvents`, kAccelEventAccuracyGateM) can fire

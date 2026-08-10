@@ -5723,5 +5723,20 @@
   "@confirmDeleteBody": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "trajetDetailChartBoost": "Boost pressure (MAP − ambient)",
+  "@trajetDetailChartBoost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailChartIat": "Intake air temperature",
+  "@trajetDetailChartIat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "trajetDetailChartTiming": "Ignition timing advance",
+  "@trajetDetailChartTiming": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

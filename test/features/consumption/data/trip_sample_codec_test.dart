@@ -81,6 +81,8 @@ void main() {
         mapKpa: 78.0,
         stft: 3.5,
         ltft: -1.5,
+        iatC: 38.0,
+        timingAdvanceDeg: 12.5,
       );
       final json = sampleToJson(s);
       expect(json['mf'], 12.4);
@@ -92,6 +94,9 @@ void main() {
       expect(back.mapKpa, 78.0);
       expect(back.stft, 3.5);
       expect(back.ltft, -1.5);
+      // #3692 — the turbo-record signals round-trip.
+      expect(back.iatC, 38.0);
+      expect(back.timingAdvanceDeg, 12.5);
     });
 
     test('capture OFF (raw inputs null) writes NO raw-input keys', () {

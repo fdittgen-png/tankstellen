@@ -62,6 +62,9 @@ Map<String, dynamic> sampleToJson(TripSample s) => {
       if (s.mapKpa != null) 'mp': s.mapKpa,
       if (s.stft != null) 'sf': s.stft,
       if (s.ltft != null) 'lf': s.ltft,
+      // #3692 — IAT + timing advance (always-on engine signals).
+      if (s.iatC != null) 'ia': s.iatC,
+      if (s.timingAdvanceDeg != null) 'ta': s.timingAdvanceDeg,
     };
 
 TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
@@ -101,4 +104,7 @@ TripSample sampleFromJson(Map<String, dynamic> j) => TripSample(
       mapKpa: (j['mp'] as num?)?.toDouble(),
       stft: (j['sf'] as num?)?.toDouble(),
       ltft: (j['lf'] as num?)?.toDouble(),
+      // #3692 — legacy trips carry neither key → null.
+      iatC: (j['ia'] as num?)?.toDouble(),
+      timingAdvanceDeg: (j['ta'] as num?)?.toDouble(),
     );

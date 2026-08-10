@@ -236,6 +236,9 @@ class Elm327Commands {
   /// °C = A − 40 (one-byte response).
   static const intakeAirTempCommand = '010F\r';
 
+  /// Mode 01 PID 0E — ignition timing advance (#3692).
+  static const timingAdvanceCommand = '010E\r';
+
   /// Request short-term fuel trim, bank 1 (%). Mode 01, PID 06. Used
   /// to correct the MAF- and speed-density-based fuel-rate formulas
   /// for the ECU's real-time mixture adjustment (#813). Formula:

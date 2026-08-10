@@ -13670,6 +13670,24 @@ abstract class AppLocalizations {
   /// **'Couldn\'t share the GPX file'**
   String get trajetsMapShareError;
 
+  /// Trip-detail chart title: turbo boost = manifold absolute pressure minus ambient baro, kPa (#3692)
+  ///
+  /// In en, this message translates to:
+  /// **'Boost pressure (MAP − ambient)'**
+  String get trajetDetailChartBoost;
+
+  /// Trip-detail chart title: intake air temperature °C, PID 0x0F (#3692)
+  ///
+  /// In en, this message translates to:
+  /// **'Intake air temperature'**
+  String get trajetDetailChartIat;
+
+  /// Trip-detail chart title: ignition timing advance °CA, PID 0x0E (#3692)
+  ///
+  /// In en, this message translates to:
+  /// **'Ignition timing advance'**
+  String get trajetDetailChartTiming;
+
   /// Title of the trip-length consumption card on the Carbon dashboard Charts tab — splits trips into short/medium/long buckets so the user can see cold-start fuel waste vs. cruising efficiency (#1191).
   ///
   /// In en, this message translates to:

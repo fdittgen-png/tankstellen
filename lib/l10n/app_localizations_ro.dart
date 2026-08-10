@@ -7951,6 +7951,15 @@ class AppLocalizationsRo extends AppLocalizations {
   String get trajetsMapShareError => 'Fișierul GPX nu a putut fi partajat';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Consum pe lungimea călătoriei';
 
   @override

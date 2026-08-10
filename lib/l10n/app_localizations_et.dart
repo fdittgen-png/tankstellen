@@ -7893,6 +7893,15 @@ class AppLocalizationsEt extends AppLocalizations {
   String get trajetsMapShareError => 'GPX-faili ei õnnestunud jagada';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Tarbimine reisi pikkuse järgi';
 
   @override

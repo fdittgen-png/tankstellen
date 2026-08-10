@@ -7961,6 +7961,15 @@ class AppLocalizationsBg extends AppLocalizations {
   String get trajetsMapShareError => 'GPX файлът не може да бъде споделен';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Разход по дължина на пътуването';
 
   @override
