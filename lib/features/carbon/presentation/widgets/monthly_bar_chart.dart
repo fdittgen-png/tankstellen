@@ -16,6 +16,15 @@ import '../../domain/monthly_summary.dart';
 /// Consistent with the rest of the project: no external chart library,
 /// pure paint operations, cheap to rebuild. One bar per month, label
 /// at the bottom, max value reference line at the top.
+/// One coloured slice of a stacked bar (#3691) — e.g. the E85 share of
+/// a month's litres. Segments stack bottom-up in list order.
+class BarSegment {
+  final double value;
+  final Color color;
+
+  const BarSegment({required this.value, required this.color});
+}
+
 class MonthlyBarChart extends StatelessWidget {
   /// The summaries to render, oldest first.
   final List<MonthlySummary> summaries;
@@ -29,12 +38,19 @@ class MonthlyBarChart extends StatelessWidget {
   /// Unit suffix shown on the max-value label (e.g. "€", "kg").
   final String unitLabel;
 
+  /// Optional per-bar stacked segments (#3691), aligned with
+  /// [summaries]. When provided, bar i renders its segments bottom-up
+  /// instead of one solid [color] — the additive per-fuel breakdown.
+  /// [valueOf] still scales the axis, so segments should sum to it.
+  final List<List<BarSegment>>? stacks;
+
   const MonthlyBarChart({
     super.key,
     required this.summaries,
     required this.valueOf,
     required this.color,
     required this.unitLabel,
+    this.stacks,
   });
 
   @override
@@ -61,6 +77,7 @@ class MonthlyBarChart extends StatelessWidget {
           unitLabel: unitLabel,
           labelColor: onSurface,
           monthFormat: DateFormat.MMM(locale),
+          stacks: stacks,
         ),
         size: Size.infinite,
       ),
@@ -78,6 +95,9 @@ class _BarChartPainter extends CustomPainter {
   /// Locale-aware short-month formatter for the X-axis labels (#2971).
   final DateFormat monthFormat;
 
+  /// Per-bar stacked segments (#3691); null = solid bars.
+  final List<List<BarSegment>>? stacks;
+
   _BarChartPainter({
     required this.summaries,
     required this.valueOf,
@@ -85,6 +105,7 @@ class _BarChartPainter extends CustomPainter {
     required this.unitLabel,
     required this.labelColor,
     required this.monthFormat,
+    this.stacks,
   });
 
   @override
@@ -138,12 +159,42 @@ class _BarChartPainter extends CustomPainter {
       final cx = leftInset + slot * i + slot / 2;
       final left = cx - barWidth / 2;
       final top = topInset + chartHeight - barHeight;
-      final rect = RRect.fromRectAndCorners(
-        Rect.fromLTWH(left, top, barWidth, barHeight),
-        topLeft: const Radius.circular(3),
-        topRight: const Radius.circular(3),
-      );
-      canvas.drawRRect(rect, barPaint);
+      final segments = stacks != null && i < stacks!.length
+          ? stacks![i]
+          : null;
+      if (segments == null || segments.isEmpty) {
+        final rect = RRect.fromRectAndCorners(
+          Rect.fromLTWH(left, top, barWidth, barHeight),
+          topLeft: const Radius.circular(3),
+          topRight: const Radius.circular(3),
+        );
+        canvas.drawRRect(rect, barPaint);
+      } else {
+        // Stacked bottom-up (#3691): each fuel's share as its own
+        // colour, the topmost segment keeping the rounded corners.
+        var bottom = topInset + chartHeight;
+        for (var si = 0; si < segments.length; si++) {
+          final seg = segments[si];
+          final segHeight = effectiveMax > 0
+              ? (seg.value / effectiveMax) * chartHeight
+              : 0.0;
+          if (segHeight <= 0) continue;
+          final segTop = bottom - segHeight;
+          final isTop = si == segments.length - 1;
+          final segPaint = Paint()
+            ..color = seg.color
+            ..style = PaintingStyle.fill;
+          canvas.drawRRect(
+            RRect.fromRectAndCorners(
+              Rect.fromLTWH(left, segTop, barWidth, segHeight),
+              topLeft: isTop ? const Radius.circular(3) : Radius.zero,
+              topRight: isTop ? const Radius.circular(3) : Radius.zero,
+            ),
+            segPaint,
+          );
+          bottom = segTop;
+        }
+      }
 
       // Month label below the bar.
       final m = summaries[i].month;
@@ -185,6 +236,7 @@ class _BarChartPainter extends CustomPainter {
     return oldDelegate.summaries != summaries ||
         oldDelegate.color != color ||
         oldDelegate.unitLabel != unitLabel ||
+        oldDelegate.stacks != stacks ||
         oldDelegate.monthFormat.locale != monthFormat.locale;
   }
 }

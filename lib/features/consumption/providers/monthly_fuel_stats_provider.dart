@@ -3,6 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/domain/fuel_type.dart';
+import '../domain/entities/consumption_stats.dart';
 import '../domain/services/fill_up_monthly_stats_aggregator.dart';
 import 'consumption_providers.dart';
 
@@ -19,3 +21,38 @@ part 'monthly_fuel_stats_provider.g.dart';
 @riverpod
 List<MonthlyFuelStats> monthlyFuelStats(Ref ref) =>
     FillUpMonthlyStatsAggregator.byMonth(ref.watch(fillUpListProvider));
+
+/// Distinct fuel types present in the fill-up list, first-seen order —
+/// drives the per-fuel filter chips on the statistics page (#3691).
+@riverpod
+List<FuelType> loggedFuelTypes(Ref ref) {
+  final seen = <FuelType>[];
+  for (final f in ref.watch(fillUpListProvider)) {
+    if (!seen.contains(f.fuelType)) seen.add(f.fuelType);
+  }
+  return seen;
+}
+
+/// [monthlyFuelStats] restricted to ONE fuel type (#3691) — null keeps
+/// the all-fuels view. Same aggregator, filtered input, so every
+/// per-month metric answers "how does THIS fuel perform on the car".
+@riverpod
+List<MonthlyFuelStats> monthlyFuelStatsForFuel(Ref ref, FuelType? fuel) {
+  if (fuel == null) return ref.watch(monthlyFuelStatsProvider);
+  return FillUpMonthlyStatsAggregator.byMonth([
+    for (final f in ref.watch(fillUpListProvider))
+      if (f.fuelType == fuel) f,
+  ]);
+}
+
+/// [consumptionStats] restricted to ONE fuel type (#3691) — null keeps
+/// the all-fuels aggregate. Feeds the header tiles and the
+/// month-over-month card under a fuel filter.
+@riverpod
+ConsumptionStats consumptionStatsForFuel(Ref ref, FuelType? fuel) {
+  if (fuel == null) return ref.watch(consumptionStatsProvider);
+  return ConsumptionStats.fromFillUps([
+    for (final f in ref.watch(fillUpListProvider))
+      if (f.fuelType == fuel) f,
+  ]);
+}
