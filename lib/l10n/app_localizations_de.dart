@@ -7950,6 +7950,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die GPX-Datei konnte nicht geteilt werden';
 
   @override
+  String get trajetDetailChartBoost => 'Ladedruck (MAP − Umgebung)';
+
+  @override
+  String get trajetDetailChartIat => 'Ansauglufttemperatur';
+
+  @override
+  String get trajetDetailChartTiming => 'Zündzeitpunkt (Frühzündung)';
+
+  @override
   String get tripLengthCardTitle => 'Verbrauch nach Fahrtlänge';
 
   @override

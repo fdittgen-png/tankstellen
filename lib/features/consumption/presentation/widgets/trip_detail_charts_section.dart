@@ -40,6 +40,11 @@ class TripDetailChartsSection extends StatelessWidget {
     final hasCoolantSamples = samples.any((s) => s.coolantTempC != null);
     final hasAltitudeSamples = samples.any((s) => s.altitudeM != null);
     final hasLambdaSamples = samples.any((s) => s.lambda != null);
+    // #3692 — turbo/thermal signals via the lossless origin.
+    final hasBoostSamples = samples.any((s) => s.boostKpa != null);
+    final hasIatSamples = samples.any((s) => s.iatC != null);
+    final hasTimingSamples =
+        samples.any((s) => s.timingAdvanceDeg != null);
 
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
@@ -95,6 +100,23 @@ class TripDetailChartsSection extends StatelessWidget {
             TripChartSection(
               title: l.trajetDetailChartLambda,
               chart: TripDetailLambdaChart(samples: samples),
+            ),
+          // #3692 — the turbo record: boost, charge temperature, and
+          // the ECU's timing response.
+          if (hasBoostSamples)
+            TripChartSection(
+              title: l.trajetDetailChartBoost,
+              chart: TripDetailBoostChart(samples: samples),
+            ),
+          if (hasIatSamples)
+            TripChartSection(
+              title: l.trajetDetailChartIat,
+              chart: TripDetailIatChart(samples: samples),
+            ),
+          if (hasTimingSamples)
+            TripChartSection(
+              title: l.trajetDetailChartTiming,
+              chart: TripDetailTimingChart(samples: samples),
             ),
         ],
       ),

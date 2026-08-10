@@ -147,3 +147,64 @@ class TripDetailLambdaChart extends StatelessWidget {
     );
   }
 }
+
+/// Boost-over-time line chart (#3692): MAP − ambient baro in kPa —
+/// positive when the turbo is on boost, negative at manifold vacuum.
+/// Parent gates on any non-null [TripDetailSample.boostKpa]; self-falls
+/// back to the empty caption otherwise.
+class TripDetailBoostChart extends StatelessWidget {
+  final List<TripDetailSample> samples;
+  final Color? color;
+
+  const TripDetailBoostChart({super.key, required this.samples, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return _TripDetailLineChart(
+      samples: samples,
+      color: color,
+      valueOf: (s) => s.boostKpa,
+      unit: 'kPa',
+      emptyWhenAllNull: true,
+    );
+  }
+}
+
+/// Intake-air-temperature-over-time line chart (#3692, PID 0x0F).
+class TripDetailIatChart extends StatelessWidget {
+  final List<TripDetailSample> samples;
+  final Color? color;
+
+  const TripDetailIatChart({super.key, required this.samples, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return _TripDetailLineChart(
+      samples: samples,
+      color: color,
+      valueOf: (s) => s.iatC,
+      unit: '°C',
+      emptyWhenAllNull: true,
+    );
+  }
+}
+
+/// Ignition-timing-advance-over-time line chart (#3692, PID 0x0E) —
+/// knock retard under boost reads as sudden drops.
+class TripDetailTimingChart extends StatelessWidget {
+  final List<TripDetailSample> samples;
+  final Color? color;
+
+  const TripDetailTimingChart({super.key, required this.samples, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return _TripDetailLineChart(
+      samples: samples,
+      color: color,
+      valueOf: (s) => s.timingAdvanceDeg,
+      unit: '°',
+      emptyWhenAllNull: true,
+    );
+  }
+}

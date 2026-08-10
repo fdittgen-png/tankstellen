@@ -7963,6 +7963,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get trajetsMapShareError => 'Αδυναμία κοινοποίησης του αρχείου GPX';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Κατανάλωση ανά μήκος ταξιδιού';
 
   @override

@@ -7943,6 +7943,15 @@ class AppLocalizationsLv extends AppLocalizations {
   String get trajetsMapShareError => 'GPX failu nevarēja kopīgot';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Patēriņš pēc brauciena garuma';
 
   @override

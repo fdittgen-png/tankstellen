@@ -430,6 +430,24 @@ void main() {
     });
   });
 
+  group('parseTimingAdvanceDeg (PID 0E, #3692)', () {
+    test('41 0E 80 -> 0 °CA (128/2 - 64)', () {
+      expect(Elm327Parsers.parseTimingAdvanceDeg('41 0E 80'), 0.0);
+    });
+
+    test('41 0E 00 -> -64 °CA (full retard)', () {
+      expect(Elm327Parsers.parseTimingAdvanceDeg('41 0E 00'), -64.0);
+    });
+
+    test('41 0E FF -> 63.5 °CA (full advance)', () {
+      expect(Elm327Parsers.parseTimingAdvanceDeg('41 0E FF'), 63.5);
+    });
+
+    test('wrong PID returns null', () {
+      expect(Elm327Parsers.parseTimingAdvanceDeg('41 0F 80'), isNull);
+    });
+  });
+
   group('parseIntakeAirTempCelsius (PID 0F)', () {
     test('41 0F 28 -> 0 °C (40 - 40)', () {
       expect(

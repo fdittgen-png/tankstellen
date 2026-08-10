@@ -7895,6 +7895,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get trajetsMapShareError => 'Det gick inte att dela GPX-filen';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Förbrukning per reselängd';
 
   @override

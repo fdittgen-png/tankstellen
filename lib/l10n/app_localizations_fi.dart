@@ -7900,6 +7900,15 @@ class AppLocalizationsFi extends AppLocalizations {
   String get trajetsMapShareError => 'GPX-tiedostoa ei voitu jakaa';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Kulutus matkan pituuden mukaan';
 
   @override
