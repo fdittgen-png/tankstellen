@@ -437,9 +437,11 @@ void main() {
     // (successor to the closed #2187/#2188 the comments above reference).
     // (+3, same #3427 strict-gate change: the precision collaborator now
     // subscribes through isPidKnownSupported — comment + call reshape.)
+    // (+15, #3692: timing-advance PID subscription + the two persisted-
+    // signal getters — the turbo record.)
     'lib/features/obd2/data/live_sample_snapshot.dart': (
-      lines: 831,
-      bumps: 6,
+      lines: 846,
+      bumps: 7,
       decompositionIssue: 3140,
     ),
     // #2379 — re-grandfathered 1457 → 1468: threaded the
@@ -688,9 +690,10 @@ void main() {
       // #3625 — post-reconnect grace: replaceService opens an 8 s window
       // during which transport errors / null parses feed the #3575
       // protocol recovery instead of the drop verdict (+27).
+      // #3692 — stamp IAT + timing advance, MAP always-on (+10).
       // Decomposition tracked by #3140.
-      lines: 1858,
-      bumps: 21,
+      lines: 1868,
+      bumps: 22,
       decompositionIssue: 3140,
     ),
     // #2798 — grandfathered at 408 (8 over): the pump path now retries OCR

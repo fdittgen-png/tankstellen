@@ -7911,6 +7911,15 @@ class AppLocalizationsCs extends AppLocalizations {
   String get trajetsMapShareError => 'Soubor GPX nelze sdílet';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Spotřeba podle délky cesty';
 
   @override

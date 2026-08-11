@@ -1434,9 +1434,19 @@ class TripRecordingController {
         // slow-cadence ticks while the flag is on (else null = not
         // written). Each is independently null-safe per PID support.
         mafGramsPerSecond: captureRaw ? snap.latestMaf : null,
-        mapKpa: captureRaw ? snap.latestMapKpa : null,
+        // #3692 — MAP is ALWAYS persisted now (no longer only under the
+        // diagnostic flag): with baro it yields boost (MAP − baro), the
+        // turbo signal the consumption record was missing. Slow-cadence
+        // hold-last values, compact-key null-skipped — storage stays
+        // negligible on cars without the PID.
+        mapKpa: snap.latestMapKpa,
         stft: captureRaw ? snap.latestStft : null,
         ltft: captureRaw ? snap.latestLtft : null,
+        // #3692 — IAT (polled since #2505, now persisted) + timing
+        // advance: charge temperature and knock retard both move
+        // consumption on a boosted engine.
+        iatC: snap.latestIatCelsius,
+        timingAdvanceDeg: snap.latestTimingAdvanceDeg,
       );
       // #2653 — thread the live distance provenance so the detector
       // suppresses harsh scoring on the `virtual` dead-reckoning source.

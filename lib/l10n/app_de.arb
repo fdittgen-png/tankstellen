@@ -3784,6 +3784,18 @@
   "trajetsMapShareGpx": "GPX teilen",
   "trajetsMapEmpty": "Keine der ausgewählten Fahrten enthält GPS-Daten.",
   "trajetsMapShareError": "Die GPX-Datei konnte nicht geteilt werden",
+  "trajetDetailChartBoost": "Ladedruck (MAP − Umgebung)",
+  "@trajetDetailChartBoost": {
+    "description": "Trip-detail chart title: turbo boost = manifold absolute pressure minus ambient baro, kPa (#3692)"
+  },
+  "trajetDetailChartIat": "Ansauglufttemperatur",
+  "@trajetDetailChartIat": {
+    "description": "Trip-detail chart title: intake air temperature °C, PID 0x0F (#3692)"
+  },
+  "trajetDetailChartTiming": "Zündzeitpunkt (Frühzündung)",
+  "@trajetDetailChartTiming": {
+    "description": "Trip-detail chart title: ignition timing advance °CA, PID 0x0E (#3692)"
+  },
   "tripLengthCardTitle": "Verbrauch nach Fahrtlänge",
   "tripLengthBucketShort": "Kurz (<5 km)",
   "tripLengthBucketMedium": "Mittel (5–25 km)",

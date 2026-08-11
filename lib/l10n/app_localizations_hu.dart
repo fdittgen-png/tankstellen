@@ -7945,6 +7945,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trajetsMapShareError => 'A GPX-fájlt nem sikerült megosztani';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Fogyasztás úthossz szerint';
 
   @override

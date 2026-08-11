@@ -170,6 +170,18 @@ class TripSample {
   /// diagnostic-capture raw input.
   final double? ltft;
 
+  // ---- #3692 — consumption-relevant engine signals, always stored ----
+
+  /// Intake air temperature in °C (PID 0x0F). Polled since #2505 for
+  /// the speed-density air-mass estimate but never persisted; charge
+  /// density (and thus consumption on a turbo car) follows it.
+  final double? iatC;
+
+  /// Ignition timing advance in °CA before TDC (PID 0x0E). Knock
+  /// retard under boost shows up here — the ECU trading efficiency for
+  /// safety on hot/low-octane charge is directly consumption-relevant.
+  final double? timingAdvanceDeg;
+
   const TripSample({
     required this.timestamp,
     required this.speedKmh,
@@ -198,6 +210,8 @@ class TripSample {
     this.mapKpa,
     this.stft,
     this.ltft,
+    this.iatC,
+    this.timingAdvanceDeg,
   });
 
   /// Return a copy with [estimatedFuelRateLPerHour] replaced (#2431).
@@ -235,5 +249,7 @@ class TripSample {
         mapKpa: mapKpa,
         stft: stft,
         ltft: ltft,
+        iatC: iatC,
+        timingAdvanceDeg: timingAdvanceDeg,
       );
 }

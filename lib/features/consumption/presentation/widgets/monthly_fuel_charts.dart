@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/theme/fuel_colors.dart';
 import '../../../carbon/domain/monthly_summary.dart';
 import '../../../carbon/presentation/widgets/monthly_bar_chart.dart';
 import '../../domain/services/fill_up_monthly_stats_aggregator.dart';
+import 'localized_fuel_name.dart';
 
 /// Per-metric monthly evolution bar charts for the consumption-statistics
 /// page (#2698).
@@ -28,7 +31,18 @@ class MonthlyFuelCharts extends StatelessWidget {
   /// Per-month stats, oldest first — straight from `monthlyFuelStats`.
   final List<MonthlyFuelStats> months;
 
-  const MonthlyFuelCharts({super.key, required this.months});
+  /// Per-fuel monthly stats (#3691): when ≥2 fuels are present, the
+  /// ADDITIVE charts (litres, spend) stack each month's bar by fuel —
+  /// with a colour legend — so the user sees how each fuel performs.
+  /// Ratio charts (price/L, L/100km) stay aggregate; the page's fuel
+  /// filter provides their per-fuel reading.
+  final Map<FuelType, List<MonthlyFuelStats>> perFuel;
+
+  const MonthlyFuelCharts({
+    super.key,
+    required this.months,
+    this.perFuel = const {},
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +77,55 @@ class MonthlyFuelCharts extends StatelessWidget {
           ),
     ];
 
+    // Per-fuel stacks aligned with [months] (#3691): fuel → month →
+    // metric, missing months contribute 0.
+    final stackedFuels = perFuel.length >= 2 ? perFuel : null;
+    List<List<BarSegment>>? stacksOf(
+      double Function(MonthlyFuelStats) pick,
+    ) {
+      if (stackedFuels == null) return null;
+      final byFuelMonth = {
+        for (final e in stackedFuels.entries)
+          e.key: {for (final m in e.value) m.month: pick(m)},
+      };
+      return [
+        for (final m in months)
+          [
+            for (final e in byFuelMonth.entries)
+              BarSegment(
+                value: e.value[m.month] ?? 0,
+                color: FuelColors.forType(e.key),
+              ),
+          ],
+      ];
+    }
+
     return Column(
       children: [
+        if (stackedFuels != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+            child: Wrap(
+              key: const Key('fuel_stack_legend'),
+              spacing: 12,
+              runSpacing: 4,
+              children: [
+                for (final fuel in stackedFuels.keys)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.circle,
+                          size: 10, color: FuelColors.forType(fuel)),
+                      const SizedBox(width: 4),
+                      Text(
+                        localizedFuelName(l, fuel),
+                        style: theme.textTheme.labelSmall,
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
         _chart(
           context,
           key: const Key('monthly_litres_chart'),
@@ -72,6 +133,7 @@ class MonthlyFuelCharts extends StatelessWidget {
           summaries: rows((m) => m.stats.totalLiters),
           color: theme.colorScheme.primary,
           unitLabel: 'L',
+          stacks: stacksOf((m) => m.stats.totalLiters),
         ),
         _chart(
           context,
@@ -80,6 +142,7 @@ class MonthlyFuelCharts extends StatelessWidget {
           summaries: rows((m) => m.stats.totalSpent),
           color: theme.colorScheme.tertiary,
           unitLabel: PriceFormatter.currency,
+          stacks: stacksOf((m) => m.stats.totalSpent),
         ),
         _chart(
           context,
@@ -109,6 +172,7 @@ class MonthlyFuelCharts extends StatelessWidget {
     required List<MonthlySummary> summaries,
     required Color color,
     required String unitLabel,
+    List<List<BarSegment>>? stacks,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -120,6 +184,7 @@ class MonthlyFuelCharts extends StatelessWidget {
           valueOf: (s) => s.totalCost,
           color: color,
           unitLabel: unitLabel,
+          stacks: stacks,
         ),
       ),
     );

@@ -38,15 +38,21 @@ class _NoVehicle extends ActiveVehicleProfile {
   VehicleProfile? build() => null;
 }
 
-FillUp _f(String id, DateTime date, double liters, double cost, double odo) =>
-    FillUp(
-      id: id,
-      date: date,
-      liters: liters,
-      totalCost: cost,
-      odometerKm: odo,
-      fuelType: FuelType.e10,
-    );
+FillUp _f(
+  String id,
+  DateTime date,
+  double liters,
+  double cost,
+  double odo, {
+  FuelType fuel = FuelType.e10,
+}) => FillUp(
+  id: id,
+  date: date,
+  liters: liters,
+  totalCost: cost,
+  odometerKm: odo,
+  fuelType: fuel,
+);
 
 void main() {
   silenceErrorLoggerSpool();
@@ -117,5 +123,85 @@ void main() {
 
     expect(find.byType(MonthlyFuelComparisonCard), findsNothing);
     expect(find.byType(MonthlyBarChart), findsNothing);
+  });
+
+  testWidgets(
+    'multi-fuel logs get the fuel filter chips, the stack legend, and '
+    'a per-fuel view on chip tap (#3691)',
+    (tester) async {
+      final mixed = <FillUp>[
+        _f('jan-e5', DateTime(2026, 1, 10), 40, 60, 10000),
+        _f(
+          'jan-e85',
+          DateTime(2026, 1, 20),
+          30,
+          25,
+          10500,
+          fuel: FuelType.e85,
+        ),
+        _f('feb-e5', DateTime(2026, 2, 3), 50, 75, 11000),
+        _f(
+          'feb-e85',
+          DateTime(2026, 2, 20),
+          45,
+          35,
+          12000,
+          fuel: FuelType.e85,
+        ),
+      ];
+      await pumpApp(
+        tester,
+        const ConsumptionStatisticsPage(),
+        overrides: overrides(mixed),
+      );
+
+      // The filter row: All + one chip per logged fuel.
+      expect(find.byKey(const Key('fuel_filter_all')), findsOneWidget);
+      expect(
+        find.byKey(const Key('fuel_filter_FuelTypeE10')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('fuel_filter_FuelTypeE85')),
+        findsOneWidget,
+      );
+
+      // All-fuels view stacks the additive charts and shows the legend.
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('fuel_stack_legend')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byKey(const Key('fuel_stack_legend')), findsOneWidget);
+
+      // Selecting one fuel drops the stack legend (single-series view)
+      // and keeps every chart rendered for that fuel alone. The chips
+      // sit at the top — scroll back up first.
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('fuel_filter_FuelTypeE85')),
+        -300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byKey(const Key('fuel_filter_FuelTypeE85')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('fuel_stack_legend')), findsNothing);
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('monthly_litres_chart')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.byType(MonthlyBarChart), findsWidgets);
+    },
+  );
+
+  testWidgets('single-fuel logs never show the filter chips', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      const ConsumptionStatisticsPage(),
+      overrides: overrides(twoMonths),
+    );
+    expect(find.byKey(const Key('fuel_filter_all')), findsNothing);
   });
 }

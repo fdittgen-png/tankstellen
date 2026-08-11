@@ -4,6 +4,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tankstellen/features/alerts/background/android_background_price_fetcher.dart';
 import 'package:tankstellen/core/background/background_price_fetcher.dart';
 import 'package:tankstellen/features/alerts/background/background_service.dart';
@@ -268,6 +270,78 @@ void main() {
     test('cancelAll method exists and is callable', () {
       final fetcher = AndroidBackgroundPriceFetcher();
       expect(fetcher.cancelAll, isA<Function>());
+    });
+
+    // #3688 — the handle-freshness stamp is a Dart↔Kotlin contract: Dart
+    // persists WHICH build persisted the WorkManager callback handle;
+    // the native BackgroundScanEnqueuer refuses to enqueue on mismatch
+    // (a stale handle leaks a live FlutterEngine per background wake).
+    test('init stamps the build number the callback handle belongs to '
+        '(#3688)', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
+      PackageInfo.setMockInitialValues(
+        appName: 'tankstellen',
+        packageName: 'de.tankstellen.fuelprices',
+        version: '6.0.5',
+        buildNumber: '51383',
+        buildSignature: '',
+      );
+      final wm = _RecordingWorkmanager();
+
+      await AndroidBackgroundPriceFetcher(workmanager: wm).init();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(
+        prefs.getString(AndroidBackgroundPriceFetcher.handleBuildKey),
+        '51383',
+        reason: 'the stamp must record the build that ran '
+            'Workmanager().initialize',
+      );
+    });
+
+    test('the stamp key matches the native gate\'s SharedPreferences key '
+        '(#3688)', () {
+      // shared_preferences persists Dart keys with a `flutter.` prefix in
+      // the FlutterSharedPreferences XML the Kotlin side reads.
+      expect(AndroidBackgroundPriceFetcher.handleBuildKey, 'bg_handle_build');
+      final kotlin = File(
+        'android/app/src/main/kotlin/de/tankstellen/tankstellen/'
+        'BackgroundScanEnqueuer.kt',
+      ).readAsStringSync();
+      expect(
+        kotlin.contains('"flutter.bg_handle_build"'),
+        isTrue,
+        reason: 'BackgroundScanEnqueuer must read the flutter.-prefixed '
+            'stamp key',
+      );
+      expect(
+        kotlin.contains('"FlutterSharedPreferences"'),
+        isTrue,
+        reason: 'the stamp lives in the shared_preferences XML file',
+      );
+    });
+
+    test('the widget periodic wake respects the native cooldown; the '
+        'boot re-arm and refresh tap do not (#3688)', () {
+      final widgetProvider = File(
+        'android/app/src/main/kotlin/de/tankstellen/tankstellen/'
+        'FuelPriceWidgetProvider.kt',
+      ).readAsStringSync();
+      expect(
+        widgetProvider.contains('respectCooldown = true'),
+        isTrue,
+        reason: 'the 30-min OS wake must ride the 60-min engine-churn '
+            'cooldown',
+      );
+      // The refresh tap only dims the glyph when a scan was enqueued —
+      // otherwise a gated tap leaves the widget "refreshing" forever.
+      expect(
+        widgetProvider.contains('val enqueued = BackgroundScanEnqueuer'),
+        isTrue,
+        reason: 'ACTION_REFRESH must branch its glyph feedback on the '
+            'enqueue result',
+      );
     });
 
     test('uses the BackgroundService periodic task name constant', () {

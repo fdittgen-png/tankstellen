@@ -7977,6 +7977,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trajetsMapShareError => 'Impossible de partager le fichier GPX';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Consommation par longueur de trajet';
 
   @override

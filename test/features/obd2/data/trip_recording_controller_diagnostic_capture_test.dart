@@ -85,10 +85,11 @@ void main() {
     });
 
     test('with capture OFF the raw mixture inputs stay null '
-        '(zero storage growth)', () async {
+        '(zero storage growth) — except MAP, always-on since #3692 '
+        '(with baro it IS the boost/turbo record)', () async {
       final s = await _captureOneSample(diagnosticCapture: false);
       expect(s.mafGramsPerSecond, isNull);
-      expect(s.mapKpa, isNull);
+      expect(s.mapKpa, 65.0);
       expect(s.stft, isNull);
       expect(s.ltft, isNull);
     });

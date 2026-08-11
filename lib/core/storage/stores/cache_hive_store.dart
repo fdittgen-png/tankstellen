@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:meta/meta.dart';
 
 import '../../data/storage_repository.dart';
 import '../../logging/error_logger.dart';
 import '../hive_boxes.dart';
+import '../hive_cache_recovery.dart';
 
 /// Hive-backed implementation of [CacheStorage] and [ItineraryStorage].
 ///
@@ -24,6 +27,35 @@ import '../hive_boxes.dart';
 /// `VelocityAlertCooldown`). The root close-site is fixed in
 /// [HiveBoxes.closeIsolateBoxes]; this is the belt-and-braces reader guard.
 class CacheHiveStore implements CacheStorage, ItineraryStorage {
+  /// Recovery hook — [HiveCacheRecovery.recover] in production, a fake in
+  /// tests (the dead-handle state can't be produced via Hive's public API).
+  CacheHiveStore({@visibleForTesting Future<bool> Function()? recover})
+      : _recover = recover ?? HiveCacheRecovery.recover;
+
+  final Future<bool> Function() _recover;
+
+  /// #3689 — write-path self-heal. A box whose FILE handle died (foreign
+  /// compaction, #3689) still passes [_boxOrNull] (`isBoxOpen` is registry
+  /// state) but throws `FileSystemException: File closed` on every write.
+  /// Recover the box once and retry; on a second failure rethrow so the
+  /// caller's storage-layer logging ([CacheManager.put]'s catch) records it.
+  /// Public-for-testing: the dead-handle throw can't be produced through
+  /// Hive's public API, so tests drive [op] directly with a throwing fake.
+  @visibleForTesting
+  Future<void> writeWithRecovery(
+      Future<void> Function(Box<dynamic> box) op) async {
+    final box = _boxOrNull();
+    if (box == null) return;
+    try {
+      await op(box);
+    } on FileSystemException {
+      if (!await _recover()) rethrow;
+      final reopened = _boxOrNull();
+      if (reopened == null) return;
+      await op(reopened);
+    }
+  }
+
   Box<dynamic>? _boxOrNull() {
     try {
       if (!Hive.isBoxOpen(HiveBoxes.cache)) return null;
@@ -37,14 +69,11 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
 
   // Cache
   @override
-  Future<void> cacheData(String key, dynamic data) async {
-    final box = _boxOrNull();
-    if (box == null) return;
-    await box.put(key, {
-      'data': data,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-    });
-  }
+  Future<void> cacheData(String key, dynamic data) =>
+      writeWithRecovery((box) => box.put(key, {
+            'data': data,
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+          }));
 
   @override
   Map<String, dynamic>? getCachedData(String key, {Duration? maxAge}) {
@@ -69,19 +98,14 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
   }
 
   @override
-  Future<void> clearCache() async {
-    final box = _boxOrNull();
-    if (box != null) await box.clear();
-  }
+  Future<void> clearCache() => writeWithRecovery((box) => box.clear());
 
   @override
   Iterable<dynamic> get cacheKeys => _boxOrNull()?.keys ?? const [];
 
   @override
-  Future<void> deleteCacheEntry(String key) async {
-    final box = _boxOrNull();
-    if (box != null) await box.delete(key);
-  }
+  Future<void> deleteCacheEntry(String key) =>
+      writeWithRecovery((box) => box.delete(key));
 
   @override
   int get cacheEntryCount => _boxOrNull()?.length ?? 0;
@@ -100,10 +124,8 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
   }
 
   @override
-  Future<void> saveItineraries(List<Map<String, dynamic>> itineraries) async {
-    final box = _boxOrNull();
-    if (box != null) await box.put('itineraries', itineraries);
-  }
+  Future<void> saveItineraries(List<Map<String, dynamic>> itineraries) =>
+      writeWithRecovery((box) => box.put('itineraries', itineraries));
 
   @override
   Future<void> addItinerary(Map<String, dynamic> itinerary) async {

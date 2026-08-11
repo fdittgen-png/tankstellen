@@ -7863,6 +7863,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trajetsMapShareError => 'Couldn\'t share the GPX file';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Consumption by trip length';
 
   @override
@@ -16415,6 +16424,16 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get trajetsMapShareError =>
       '⟦Çóúłđñ\'ŧ šĥářé ŧĥé ǦƤẊ ƒîłé ··········⟧';
+
+  @override
+  String get trajetDetailChartBoost =>
+      '⟦Ɓóóšŧ ƥřéššúřé (ṀÁƤ − áɱƀîéñŧ) ··········⟧';
+
+  @override
+  String get trajetDetailChartIat => '⟦Îñŧáķé áîř ŧéɱƥéřáŧúřé ·········⟧';
+
+  @override
+  String get trajetDetailChartTiming => '⟦Îǧñîŧîóñ ŧîɱîñǧ áđṽáñçé ·········⟧';
 
   @override
   String get tripLengthCardTitle => '⟦Çóñšúɱƥŧîóñ ƀý ŧřîƥ łéñǧŧĥ ··········⟧';

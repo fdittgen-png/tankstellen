@@ -121,6 +121,9 @@ class LiveSampleSnapshot {
   double? _latestOilTempC;
   double? _latestAmbientTempC;
 
+  /// #3692 — ignition timing advance (PID 0x0E), latest value.
+  double? _latestTimingAdvanceDeg;
+
   // #1374 phase 1 — most recent GPS fix, pushed in by the provider when
   // the `Feature.gpsTripPath` flag is enabled (the controller never
   // subscribes to Geolocator itself — that lives at the provider layer).
@@ -196,6 +199,11 @@ class LiveSampleSnapshot {
   }
   double? get latestOilTempC => _latestOilTempC;
   double? get latestAmbientTempC => _latestAmbientTempC;
+
+  /// #3692 — the persisted-signal getters: IAT was latched since #2505
+  /// but never exposed for recording; timing advance is new.
+  double? get latestIatCelsius => _latestIatCelsius;
+  double? get latestTimingAdvanceDeg => _latestTimingAdvanceDeg;
   double? get latestMaf => _latestMaf;
   double? get latestMapKpa => _latestMapKpa;
   double? get latestStft => _latestStft;
@@ -391,6 +399,13 @@ class LiveSampleSnapshot {
         _latestIatCelsius = v;
         _latestIatAt = _clock(); // #2505 — latch for the staleness window.
       }
+    });
+    // #3692 — timing advance (0x0E): knock retard under boost is a
+    // consumption signal. Slow tier; optionalPid-gated, absent → null.
+    _sub(scheduler, Elm327Protocol.timingAdvanceCommand,
+        hz: 0.5, tier: PidTier.slowCorrection, optionalPid: 0x0E, (r) {
+      final v = Elm327Protocol.parseTimingAdvanceDeg(r);
+      if (v != null) _latestTimingAdvanceDeg = v;
     });
     // #2456 — absolute baro (0x33). Ambient pressure changes only with
     // altitude / weather, so 0.5 Hz is ample. optionalPid-gated: absent →

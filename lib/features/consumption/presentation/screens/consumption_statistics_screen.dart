@@ -11,10 +11,14 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/theme/fuel_colors.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../providers/consumption_providers.dart';
+import '../../domain/services/fill_up_monthly_stats_aggregator.dart';
 import '../../providers/monthly_fuel_stats_provider.dart';
 import '../widgets/fuel_type_efficiency_card.dart';
+import '../widgets/localized_fuel_name.dart';
 import '../widgets/monthly_fuel_charts.dart';
 import '../widgets/monthly_fuel_comparison_card.dart';
 
@@ -27,15 +31,37 @@ import '../widgets/monthly_fuel_comparison_card.dart';
 ///
 /// Every figure is derived from the existing fill-up list — no new
 /// storage. Renders an empty state when the user has logged nothing yet.
-class ConsumptionStatisticsPage extends ConsumerWidget {
+class ConsumptionStatisticsPage extends ConsumerStatefulWidget {
   const ConsumptionStatisticsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumptionStatisticsPage> createState() =>
+      _ConsumptionStatisticsPageState();
+}
+
+class _ConsumptionStatisticsPageState
+    extends ConsumerState<ConsumptionStatisticsPage> {
+  /// The fuel-filter selection (#3691): null = all fuels. Every stat
+  /// and chart on the page follows it, so "how does E85 perform on the
+  /// car" is one tap away.
+  FuelType? _fuel;
+
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final stats = ref.watch(consumptionStatsProvider);
-    final months = ref.watch(monthlyFuelStatsProvider);
-    final hasData = stats.fillUpCount > 0;
+    final fuels = ref.watch(loggedFuelTypesProvider);
+    // A vanished selection (fill-up deleted) falls back to all fuels.
+    final fuel = fuels.contains(_fuel) ? _fuel : null;
+    final stats = ref.watch(consumptionStatsForFuelProvider(fuel));
+    final months = ref.watch(monthlyFuelStatsForFuelProvider(fuel));
+    final perFuel = fuel == null && fuels.length >= 2
+        ? {
+            for (final f in fuels)
+              f: ref.watch(monthlyFuelStatsForFuelProvider(f)),
+          }
+        : const <FuelType, List<MonthlyFuelStats>>{};
+    final hasData =
+        ref.watch(consumptionStatsProvider).fillUpCount > 0;
 
     final Widget body = hasData
         ? ListView(
@@ -44,6 +70,31 @@ class ConsumptionStatisticsPage extends ConsumerWidget {
               bottom: 16 + MediaQuery.of(context).viewPadding.bottom,
             ),
             children: [
+              // Per-fuel filter (#3691) — only for multi-fuel logs.
+              if (fuels.length >= 2)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                  child: Wrap(
+                    spacing: 8,
+                    children: [
+                      ChoiceChip(
+                        key: const Key('fuel_filter_all'),
+                        label: Text(l.allFuels),
+                        selected: fuel == null,
+                        onSelected: (_) => setState(() => _fuel = null),
+                      ),
+                      for (final f in fuels)
+                        ChoiceChip(
+                          key: Key('fuel_filter_${f.runtimeType}'),
+                          avatar: Icon(Icons.circle,
+                              size: 12, color: FuelColors.forType(f)),
+                          label: Text(localizedFuelName(l, f)),
+                          selected: fuel == f,
+                          onSelected: (_) => setState(() => _fuel = f),
+                        ),
+                    ],
+                  ),
+                ),
               _HeaderTiles(stats: stats),
               MonthlyFuelComparisonCard(months: months),
               // #2887 — per-fuel €/km comparison for a multi-fuel
@@ -56,7 +107,7 @@ class ConsumptionStatisticsPage extends ConsumerWidget {
                 title: l.consumptionStatsTrendsTitle,
                 leadingIcon: Icons.show_chart,
               ),
-              MonthlyFuelCharts(months: months),
+              MonthlyFuelCharts(months: months, perFuel: perFuel),
             ],
           )
         : EmptyState(

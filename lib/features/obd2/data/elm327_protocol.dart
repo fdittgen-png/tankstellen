@@ -74,6 +74,7 @@ class Elm327Protocol {
   static const intakeManifoldPressureCommand =
       Elm327Commands.intakeManifoldPressureCommand;
   static const intakeAirTempCommand = Elm327Commands.intakeAirTempCommand;
+  static const timingAdvanceCommand = Elm327Commands.timingAdvanceCommand;
   static const shortTermFuelTrimCommand =
       Elm327Commands.shortTermFuelTrimCommand;
   static const longTermFuelTrimCommand = Elm327Commands.longTermFuelTrimCommand;
@@ -145,6 +146,8 @@ class Elm327Protocol {
 
   static double? parseIntakeAirTempCelsius(String raw) =>
       Elm327Parsers.parseIntakeAirTempCelsius(raw);
+  static double? parseTimingAdvanceDeg(String raw) =>
+      Elm327Parsers.parseTimingAdvanceDeg(raw);
 
   static double? parseCoolantTempCelsius(String raw) =>
       Elm327Parsers.parseCoolantTempCelsius(raw);

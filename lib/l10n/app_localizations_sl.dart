@@ -7907,6 +7907,15 @@ class AppLocalizationsSl extends AppLocalizations {
   String get trajetsMapShareError => 'Datoteke GPX ni bilo mogoče deliti';
 
   @override
+  String get trajetDetailChartBoost => 'Boost pressure (MAP − ambient)';
+
+  @override
+  String get trajetDetailChartIat => 'Intake air temperature';
+
+  @override
+  String get trajetDetailChartTiming => 'Ignition timing advance';
+
+  @override
   String get tripLengthCardTitle => 'Poraba glede na dolžino vožnje';
 
   @override

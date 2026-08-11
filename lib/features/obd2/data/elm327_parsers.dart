@@ -193,6 +193,16 @@ class Elm327Parsers {
     return bytes[2].toDouble() - 40.0;
   }
 
+  /// Parse ignition timing advance from Mode 01 PID 0E response
+  /// (#3692). Formula: °CA = A/2 − 64 (single byte). Response:
+  /// "41 0E XX". Range −64°..+63.5° before TDC — knock retard under
+  /// boost reads as a sudden drop.
+  static double? parseTimingAdvanceDeg(String raw) {
+    final bytes = parseModeOneBody(raw, 0x0E, minBytes: 3);
+    if (bytes == null) return null;
+    return bytes[2] / 2.0 - 64.0;
+  }
+
   /// Parse engine coolant temperature from Mode 01 PID 05 response
   /// (#1262). Formula: °C = A − 40 (single byte) — same encoding as
   /// PID 0F (intake air). Response: "41 05 XX". Range −40 °C to
