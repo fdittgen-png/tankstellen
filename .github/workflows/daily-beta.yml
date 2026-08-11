@@ -35,6 +35,16 @@ on:
         description: 'Release notes (overrides per-version changelog files)'
         required: false
         type: string
+      fgs_bundle:
+        description: 'Build WITH the FGS permissions for this run only (#3695 — surfaces the #3436 declaration; ignores the FGS_FORM_APPROVED variable)'
+        required: false
+        type: boolean
+        default: false
+      skip_upload:
+        description: 'Skip the Play upload + tag; the AAB is available as a workflow artifact (#3695 — the pre-declaration API 403s on FGS bundles)'
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: daily-open-testing
@@ -131,22 +141,39 @@ jobs:
         # ("you must let us know whether your app uses any Foreground
         # Service permissions"). Once the declaration clears, set the
         # variable to `true` — no workflow edit needed.
-        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} ${{ vars.FGS_FORM_APPROVED == 'true' && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
+        # #3695 — the fgs_bundle dispatch input forces the define for ONE
+        # run (mints the #3436 declaration-surfacing bundle) without
+        # flipping the global variable, which would 403 the next scheduled
+        # upload.
+        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} ${{ (vars.FGS_FORM_APPROVED == 'true' || github.event.inputs.fgs_bundle == 'true') && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
 
       # #3661 — size visible on every build; fails on an implausibly
       # small artifact (llmwiki page 25).
       - name: Artifact size -> job summary
         run: bash scripts/report_artifact_sizes.sh build/app/outputs/bundle/playRelease/app-play-release.aab
 
+      # #3695 — always archive the signed AAB: a failed Play upload used to
+      # lose the build, and the skip_upload path exists purely to fetch it.
+      - name: Archive AAB as workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: app-play-release-${{ steps.bn.outputs.build_number }}
+          path: build/app/outputs/bundle/playRelease/app-play-release.aab
+          retention-days: 14
+          if-no-files-found: ignore
+
       - name: Clean up decoded keystore
         if: always()
         run: rm -f "$ANDROID_KEYSTORE_PATH"
 
       - uses: actions/setup-python@v7
+        if: github.event.inputs.skip_upload != 'true'
         with:
           python-version: '3.12'
 
       - name: Install Python deps
+        if: github.event.inputs.skip_upload != 'true'
         # #1999 — `google-auth-httplib2` is a transitive dep of
         # `google-api-python-client`, but make it explicit so a future
         # constraint change in the upstream wheel can't silently
@@ -155,6 +182,7 @@ jobs:
         run: pip install --quiet google-api-python-client google-auth google-auth-httplib2
 
       - name: Decode service-account key
+        if: github.event.inputs.skip_upload != 'true'
         env:
           SA_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
         run: |
@@ -166,6 +194,7 @@ jobs:
           echo "PLAY_KEY_PATH=$RUNNER_TEMP/play-key.json" >> "$GITHUB_ENV"
 
       - name: Upload to Play Store
+        if: github.event.inputs.skip_upload != 'true'
         run: |
           python tools/upload_to_play.py \
             --aab build/app/outputs/bundle/playRelease/app-play-release.aab \
@@ -174,7 +203,7 @@ jobs:
             ${{ github.event.inputs.release_notes && format('--release-notes "{0}"', github.event.inputs.release_notes) || '' }}
 
       - name: Clean up service-account key
-        if: always()
+        if: always() && github.event.inputs.skip_upload != 'true'
         run: rm -f "$PLAY_KEY_PATH"
 
       - name: Tag the shipped build (vX.Y.Z+BUILD)
