@@ -108,6 +108,15 @@
         tools:node="remove"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
         tools:node="remove"/>
+    <!-- workmanager_android ≥0.10 unconditionally merges SHORT_SERVICE for
+         its expedited-work path. We never request expedited/short-service
+         work (normal one-offs + periodic only), and ANY merged
+         FOREGROUND_SERVICE* permission trips the Play Foreground Service
+         Use form (same #1498 gate as above) — strip it in every build,
+         including FGS_FORM_APPROVED ones (the overlays re-declare only the
+         permissions our own services actually use). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SHORT_SERVICE"
+        tools:node="remove"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <!-- #2413 — Tier-1 background scan hardening. WorkManager persists its

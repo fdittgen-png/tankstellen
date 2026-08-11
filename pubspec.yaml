@@ -47,7 +47,7 @@ dependencies:
   sensors_plus: ^7.1.0
 
   # Routing
-  go_router: ^17.3.0
+  go_router: ^17.4.0
 
   # UI
   flex_color_scheme: ^8.1.0
@@ -120,15 +120,15 @@ dependencies:
   permission_handler: ^12.0.3
   flutter_secure_storage: ^10.3.1
   package_info_plus: ^10.2.1
-  sentry_flutter: ^9.25.0
+  sentry_flutter: ^9.26.0
   home_widget: ^0.9.3
-  workmanager: ^0.9.0
+  workmanager: ^0.10.7
   shimmer: ^3.0.0
   flutter_tts: ^4.2.0
   flutter_local_notifications: ^22.2.0
-  supabase_flutter: ^2.16.0
+  supabase_flutter: ^2.17.1
   wakelock_plus: ^1.7.0
-  app_badge_plus: ^1.3.2
+  app_badge_plus: ^1.3.3
   archive: ^4.0.9
   # User-driven .zip picker for the full-backup RESTORE flow (#2571).
   # file_selector over file_picker: no runtime storage permission on
@@ -178,7 +178,7 @@ dev_dependencies:
   # Required only by the FeedbackTokenSection widget test, which uses
   # `FlutterSecureStoragePlatform.instance` to inject a fake store
   # without going through the platform method channel (#952 phase 3).
-  flutter_secure_storage_platform_interface: ^2.0.2
+  flutter_secure_storage_platform_interface: ^2.0.3
   # Required only by the DrivingStationSheet widget test, which swaps
   # `UrlLauncherPlatform.instance` with a fake to assert the geo: URI
   # the Navigate button emits without going through a real intent.
