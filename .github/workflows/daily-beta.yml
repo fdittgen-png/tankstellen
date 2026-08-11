@@ -207,6 +207,9 @@ jobs:
         run: rm -f "$PLAY_KEY_PATH"
 
       - name: Tag the shipped build (vX.Y.Z+BUILD)
+        # #3695 — nothing shipped on skip_upload runs; tagging would also
+        # fail from a non-master dispatch ref.
+        if: github.event.inputs.skip_upload != 'true'
         # #3177 — every CI-minted versionCode must map back to a commit
         # (the About-screen build number is the documented first triage
         # step). Annotated tag pushed with the default GITHUB_TOKEN:
