@@ -167,13 +167,31 @@ jobs:
         if: always()
         run: rm -f "$ANDROID_KEYSTORE_PATH"
 
+      # #3708 — ONE upload gate: skip_upload, or an fgs_bundle built while
+      # the Play "Foreground services" declaration (#3436) is not approved.
+      # A pre-approval FGS bundle can NEVER be committed via the API (the
+      # #1498 403) — its only consumer is the manual Console upload, and
+      # run #276 burned a 13-min build learning that again.
+      - name: Resolve upload gate
+        id: gate
+        run: |
+          if [ "${{ github.event.inputs.skip_upload }}" = "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::skip_upload — AAB available as workflow artifact"
+          elif [ "${{ github.event.inputs.fgs_bundle }}" = "true" ] && [ "${{ vars.FGS_FORM_APPROVED }}" != "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::fgs_bundle without an approved FGS declaration — Play upload auto-skipped (#3708). Download the AAB artifact and upload it manually per docs/guides/play-fgs-declaration.md"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v7
-        if: github.event.inputs.skip_upload != 'true'
+        if: steps.gate.outputs.skip != 'true'
         with:
           python-version: '3.12'
 
       - name: Install Python deps
-        if: github.event.inputs.skip_upload != 'true'
+        if: steps.gate.outputs.skip != 'true'
         # #1999 — `google-auth-httplib2` is a transitive dep of
         # `google-api-python-client`, but make it explicit so a future
         # constraint change in the upstream wheel can't silently
@@ -182,7 +200,7 @@ jobs:
         run: pip install --quiet google-api-python-client google-auth google-auth-httplib2
 
       - name: Decode service-account key
-        if: github.event.inputs.skip_upload != 'true'
+        if: steps.gate.outputs.skip != 'true'
         env:
           SA_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
         run: |
@@ -194,7 +212,7 @@ jobs:
           echo "PLAY_KEY_PATH=$RUNNER_TEMP/play-key.json" >> "$GITHUB_ENV"
 
       - name: Upload to Play Store
-        if: github.event.inputs.skip_upload != 'true'
+        if: steps.gate.outputs.skip != 'true'
         run: |
           python tools/upload_to_play.py \
             --aab build/app/outputs/bundle/playRelease/app-play-release.aab \
@@ -203,13 +221,13 @@ jobs:
             ${{ github.event.inputs.release_notes && format('--release-notes "{0}"', github.event.inputs.release_notes) || '' }}
 
       - name: Clean up service-account key
-        if: always() && github.event.inputs.skip_upload != 'true'
+        if: always() && steps.gate.outputs.skip != 'true'
         run: rm -f "$PLAY_KEY_PATH"
 
       - name: Tag the shipped build (vX.Y.Z+BUILD)
         # #3695 — nothing shipped on skip_upload runs; tagging would also
         # fail from a non-master dispatch ref.
-        if: github.event.inputs.skip_upload != 'true'
+        if: steps.gate.outputs.skip != 'true'
         # #3177 — every CI-minted versionCode must map back to a commit
         # (the About-screen build number is the documented first triage
         # step). Annotated tag pushed with the default GITHUB_TOKEN:
