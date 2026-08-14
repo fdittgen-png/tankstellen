@@ -137,6 +137,50 @@ void main() {
       await sub.cancel();
     });
 
+    test('#3699 aclConnected events feed the STATIC engine-start hint '
+        'stream and never reach the sealed adapter-event stream', () async {
+      messenger.setMockMethodCallHandler(
+        methodChannel,
+        (call) async => true,
+      );
+
+      late MockStreamHandlerEventSink sink;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockStreamHandler(
+        eventChannel,
+        MockStreamHandler.inline(
+          onListen: (_, events) {
+            sink = events;
+          },
+        ),
+      );
+
+      final adapterEvents = <BackgroundAdapterEvent>[];
+      final hints = <DateTime>[];
+      final sub = listener.events.listen(adapterEvents.add);
+      final hintSub =
+          AndroidBackgroundAdapterListener.engineStartHints.listen(hints.add);
+
+      await listener.start(mac: 'AA:BB:CC:DD:EE:01');
+
+      sink.success(<String, Object?>{
+        'type': 'aclConnected',
+        'mac': '11:22:33:44:55:66', // the CAR AUDIO mac, not the adapter
+        'atMillis': 1700000000000,
+      });
+      await Future<void>.delayed(Duration.zero);
+
+      expect(adapterEvents, isEmpty,
+          reason: 'a process-wide hint must not impersonate an adapter '
+              'transition (the coordinator filters by MAC and would '
+              'misread it)');
+      expect(hints, hasLength(1));
+      expect(hints.single.millisecondsSinceEpoch, 1700000000000);
+
+      await sub.cancel();
+      await hintSub.cancel();
+    });
+
     test('malformed events are dropped (no crash, no sealed-event emission)',
         () async {
       messenger.setMockMethodCallHandler(

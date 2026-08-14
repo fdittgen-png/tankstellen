@@ -92,27 +92,31 @@ void main() {
       async.flushMicrotasks();
       expect(sup.state.value, Obd2LinkState.reconnecting);
 
-      // #3603 / #3642 — three identical misses stand the loop down, and
-      // consecutive holds ESCALATE (5 → 15 → 60 min, capped), so the
-      // horizon is much longer; the INVARIANT under test is unchanged:
-      // no dead end, ever.
+      // #3603 / #3642 / #3699 — three identical misses stand the loop
+      // down, and consecutive holds ESCALATE (5 → 15 min, capped at 15
+      // since #3699: the 60-min cap blinded engine starts); the
+      // INVARIANT under test is unchanged: no dead end, ever.
+      // 40 min = ladder (~0) + 5-min hold + 15-min hold + a second
+      // 15-min hold (+ jitter) — 6 dials.
       async.elapse(const Duration(minutes: 40));
-      expect(dialer.calls, 5,
-          reason: 'fast ladder ×3, then the 5 min and 15 min holds');
+      expect(dialer.calls, 6,
+          reason: 'fast ladder ×3, then the 5 min hold and two capped '
+              '15 min holds');
       expect(sup.state.value, Obd2LinkState.reconnecting,
           reason: 'no dead end — still trying');
 
-      // The escalated cadence parks at hourly — steady, never terminal.
+      // The escalated cadence parks at ≤15-min periods — steady, never
+      // terminal.
       async.elapse(const Duration(minutes: 55));
-      expect(dialer.calls, 6,
-          reason: 'the capped 60-min hold still dials — the loop must '
+      expect(dialer.calls, greaterThanOrEqualTo(9),
+          reason: 'the capped 15-min hold keeps dialing — the loop must '
               'outlive the old terminalFailed cap');
 
       // And when the adapter finally reappears, the loop connects. The
       // queued miss still in front costs one more capped hold, so two
-      // full 60-min periods (+ jitter) must pass.
+      // full 15-min periods (+ jitter) must pass.
       dialer.enqueue(_liveService());
-      async.elapse(const Duration(minutes: 140));
+      async.elapse(const Duration(minutes: 40));
       expect(sup.state.value, Obd2LinkState.ready);
       unawaited(sup.dispose());
       async.flushMicrotasks();

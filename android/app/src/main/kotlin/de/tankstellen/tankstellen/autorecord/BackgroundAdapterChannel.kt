@@ -72,6 +72,9 @@ object BackgroundAdapterChannel {
     fun registerWith(flutterEngine: FlutterEngine, context: Context) {
         appContext = context.applicationContext
 
+        // #3699 — ACL engine-start hints ride this channel's event stream.
+        BtAclEngineStartReceiver.register(context)
+
         val method = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, METHOD_CHANNEL)
         method.setMethodCallHandler { call, result -> handle(call, result) }
 
