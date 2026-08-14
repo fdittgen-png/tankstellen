@@ -3,7 +3,7 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
 
 import '../persistent_dataset.dart';
 import 'cached_dataset_mixin.dart' show datasetStaleServeDeadline;
@@ -130,11 +130,21 @@ mixin KeyedCachedDatasetMixin {
 
   /// Keyed twin of the unkeyed mixin's background-swallow (#3668).
   void _swallowKeyedBackground(Future<Object?> pending) {
-    unawaited(pending.then<void>((_) {}).catchError((Object e, StackTrace st) {
+    final tracked =
+        pending.then<void>((_) {}).catchError((Object e, StackTrace st) {
       debugPrint(
           'KeyedCachedDatasetMixin: background dataset refresh failed: $e');
-    }));
+    });
+    // #3703 — see the unkeyed twin: tests await this instead of racing
+    // pumpEventQueue against the chain.
+    debugLastKeyedBackgroundRefresh = tracked;
+    unawaited(tracked);
   }
+
+  /// #3703 — the most recent fire-and-forget keyed refresh chain, for
+  /// tests to await deterministically.
+  @visibleForTesting
+  Future<void>? debugLastKeyedBackgroundRefresh;
 
   /// Per-key twin of the unkeyed mixin's deduped fetch (#2313): collapses
   /// concurrent calls for the same [key] onto a single in-flight future,

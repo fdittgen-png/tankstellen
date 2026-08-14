@@ -319,7 +319,8 @@ void main() {
           reason: 'high peak clears the micro-jolt floor');
     });
 
-    test('records past the cap are counted, not stored', () {
+    test('#3702 UNCONFIRMED records stop at their own cap — the tooShort '
+        'flood is bounded', () {
       final det = ImuEventDetector();
       var t = t0;
       for (var i = 0; i < kImuEventRecordCap + 5; i++) {
@@ -330,8 +331,42 @@ void main() {
             startSpeedKmh: 40);
         t = feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 40);
       }
-      expect(det.eventRecords, hasLength(kImuEventRecordCap));
-      expect(det.droppedEventRecords, 5);
+      expect(det.eventRecords, hasLength(kImuUnconfirmedRecordCap),
+          reason: 'near-misses keep only a representative calibration '
+              'sample (field trips stored 48 tooShort blips, #3702)');
+      expect(det.droppedEventRecords,
+          kImuEventRecordCap + 5 - kImuUnconfirmedRecordCap);
+    });
+
+    test('#3702 CONFIRMED events are stored even after the tooShort flood '
+        'exhausted the near-miss cap', () {
+      final det = ImuEventDetector();
+      var t = t0;
+      // Flood: 20 tooShort bursts (cap is 16).
+      for (var i = 0; i < 20; i++) {
+        t = feed(det,
+            start: t, count: 10, mag: 5.0, startSpeedKmh: 40);
+        t = feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 40);
+      }
+      // Then a REAL sustained hard accel (>= 1 s strong + rising speed).
+      t = feed(det,
+          start: t,
+          count: 45,
+          mag: 5.0,
+          startSpeedKmh: 30,
+          speedStepKmh: 0.5);
+      feed(det, start: t, count: 5, mag: 0.2, startSpeedKmh: 55);
+
+      final confirmed =
+          det.eventRecords.where((r) => r.outcome == 'accel').toList();
+      expect(confirmed, hasLength(1),
+          reason: 'a confirmed harsh event must NEVER be crowded out by '
+              'near-miss noise (#3702 — the old shared cap dropped it)');
+      expect(
+          det.eventRecords
+              .where((r) => r.outcome == 'tooShort')
+              .length,
+          kImuUnconfirmedRecordCap);
     });
   });
 }
