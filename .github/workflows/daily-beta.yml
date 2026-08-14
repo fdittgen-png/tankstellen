@@ -235,6 +235,14 @@ jobs:
         # recursion guard), so deploy.yml's `on: push: tags: v*` does NOT
         # fire for these — manual `git push origin v...` stays the only
         # way to trigger a Play production deploy.
+        # #3710 — soft-fail: GITHUB_TOKEN can never hold the `workflows`
+        # scope, so a workflow-file PR merging between this run's checkout
+        # and its tag push makes GitHub reject the ref ("refusing to allow
+        # a GitHub App to create or update workflow ... without `workflows`
+        # permission"). The bundle is already LIVE on Play at that point —
+        # a missing bookkeeping tag must not paint the run red. The warning
+        # carries the exact command to push the tag manually.
+        continue-on-error: true
         run: |
           set -euo pipefail
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
@@ -242,7 +250,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "$TAG" -m "Beta build ${{ steps.bn.outputs.build_number }} (track: ${{ github.event.inputs.track || 'beta' }}) — $GITHUB_SHA"
-          git push origin "$TAG"
+          if ! git push origin "$TAG"; then
+            echo "::warning::Tag push rejected (workflow-file race, #3710). The build IS shipped. Push the tag manually: SKIP_PREPUSH=1 git tag -a '$TAG' $GITHUB_SHA -m 'Beta build ${{ steps.bn.outputs.build_number }}' && SKIP_PREPUSH=1 git push origin '$TAG'"
+            exit 1
+          fi
           echo "Tagged $TAG"
 
       - name: Summary
