@@ -45,6 +45,27 @@ class TankMixEstimate {
   /// only a trace of a second grade) reads as single-fuel.
   bool isBlend({double minShare = 0.01}) =>
       shares.where((s) => s.share >= minShare).length >= 2;
+
+  /// #3701 — share-weighted ethanol volume fraction of the tank content
+  /// (0..1), from the nominal ethanol content of each grade (E85 ≈ 85 %,
+  /// E10 = 10 %, E5/E98 = 5 %). Drives the combustion-health lesson's
+  /// fuel-explains-the-trims gate: an ECU running an E85-heavy tank
+  /// legitimately holds LTFT around +20‥30 % (stoich 9.8:1 vs 14.7:1) —
+  /// that is the fuel, not a P0171-style fault.
+  double get ethanolVolumeFraction {
+    var fraction = 0.0;
+    for (final s in shares) {
+      fraction += s.share * _nominalEthanolContent(s.fuel);
+    }
+    return fraction.clamp(0.0, 1.0);
+  }
+
+  static double _nominalEthanolContent(FuelType fuel) {
+    if (fuel == FuelType.e85) return 0.85;
+    if (fuel == FuelType.e10) return 0.10;
+    if (fuel == FuelType.e5 || fuel == FuelType.e98) return 0.05;
+    return 0.0;
+  }
 }
 
 /// Estimate the fuel mix of the current tank content from the fill-up

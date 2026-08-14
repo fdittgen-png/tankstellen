@@ -150,10 +150,40 @@ class CombustionHealthRule implements DrivingLessonRule {
   @override
   String get id => combustionHealthLessonId;
 
+  /// #3701 — extra fuel an ethanol blend legitimately demands, as trim
+  /// percent per unit ethanol volume fraction: E100 stoich (9.0:1) vs
+  /// gasoline (14.7:1) means pure ethanol needs ~+34 % fuel mass, so an
+  /// E85 tank explains LTFT around +29 %.
+  static const double _trimPctPerEthanolFraction = 34.0;
+
+  /// Tolerance on top of the fuel-explained trim before a lean signal is
+  /// considered a real fault again (sensor scatter + blend uncertainty).
+  static const double _ethanolExplainedTolerancePct = 8.0;
+
   @override
   DrivingLesson? evaluate(LessonContext context, AppLocalizations l) {
     final signal = combustionHealthSignal(context.samples);
     if (!signal.fired) return null;
+
+    // #3701 — an E85-heavy tank makes sustained positive trims the
+    // CORRECT operating point, not a P0171-style defect: firing "lean
+    // mixture — possible inefficiency" on every trip of an E85
+    // conversion was a false alarm (2026-08-14 field exports, +25 %
+    // LTFT on every drive). Suppress the lean signal when the tank-mix
+    // model explains the magnitude; a genuinely excessive trim (beyond
+    // fuel + tolerance) still fires, as do rich-side signals.
+    // Only a genuinely ethanol-heavy tank (≥ ~E15 equivalent) changes the
+    // expected trim band — ordinary E5/E10 tanks keep the stock rule so a
+    // real vacuum-leak lean condition is never masked by trace ethanol.
+    final ethanol = context.expectedEthanolShare;
+    if (signal.kind == CombustionHealthKind.leanCompensation &&
+        ethanol != null &&
+        ethanol >= 0.15 &&
+        signal.magnitudePct <=
+            ethanol * _trimPctPerEthanolFraction +
+                _ethanolExplainedTolerancePct) {
+      return null;
+    }
 
     final pct = formatLessonPercent(signal.magnitudePct);
     final (String title, String advice) = switch (signal.kind!) {
