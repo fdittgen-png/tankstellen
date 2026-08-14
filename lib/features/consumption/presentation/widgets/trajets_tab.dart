@@ -103,34 +103,35 @@ class TrajetsTab extends ConsumerWidget {
     // Stack double-counted it).
     const bottomInset = kFabScrollClearance;
 
+    Widget rowFor(BuildContext context, TripHistoryEntry entry) {
+      final vehicle = entry.vehicleId == null
+          ? activeVehicle
+          : vehicles.where((v) => v.id == entry.vehicleId).firstOrNull ??
+                activeVehicle;
+      return TrajetRow(
+        entry: entry,
+        vehicle: vehicle,
+        l: l,
+        theme: theme,
+        // #2444 — a virtual reconciliation trajet opens the
+        // dedicated edit sheet (it has no recorded path / samples
+        // to show on the trip-detail screen); a real trip routes
+        // to its detail page as before.
+        onTap: entry.summary.isVirtual
+            ? () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  builder: (_) => EditVirtualTrajetSheet(entry: entry),
+                )
+            : () => TripDetailRoute(entry.id).push<void>(context),
+      );
+    }
+
     final trajetsList = ListView.builder(
       key: const Key('trajets_list'),
       padding: const EdgeInsets.only(top: 4, bottom: bottomInset),
       itemCount: filtered.length,
-      itemBuilder: (context, index) {
-        final entry = filtered[index];
-        final vehicle = entry.vehicleId == null
-            ? activeVehicle
-            : vehicles.where((v) => v.id == entry.vehicleId).firstOrNull ??
-                  activeVehicle;
-        return TrajetRow(
-          entry: entry,
-          vehicle: vehicle,
-          l: l,
-          theme: theme,
-          // #2444 — a virtual reconciliation trajet opens the
-          // dedicated edit sheet (it has no recorded path / samples
-          // to show on the trip-detail screen); a real trip routes
-          // to its detail page as before.
-          onTap: entry.summary.isVirtual
-              ? () => showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) => EditVirtualTrajetSheet(entry: entry),
-                  )
-              : () => TripDetailRoute(entry.id).push<void>(context),
-        );
-      },
+      itemBuilder: (context, index) => rowFor(context, filtered[index]),
     );
 
     // #2018 — landscape / tablet split: left = monthly-insights
@@ -161,16 +162,29 @@ class TrajetsTab extends ConsumerWidget {
         detail: trajetsList,
       );
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        MonthlyInsightsCard(summary: monthlySummary),
-        // #3648 — see the wide branch above.
-        const TankReportCard(),
-        const MaintenanceSuggestionList(),
-        const SharedTripsSection(),
-        Expanded(child: trajetsList),
-      ],
+    // Field report: the pinned cards left only a sliver of the screen
+    // scrolling. ONE scroll view now carries cards AND rows — the same
+    // whole-page scroll every other tab has (the wide split already
+    // scrolls both panes).
+    return ListView.builder(
+      key: const Key('trajets_list'),
+      padding: const EdgeInsets.only(top: 4, bottom: bottomInset),
+      itemCount: filtered.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MonthlyInsightsCard(summary: monthlySummary),
+              // #3648 — see the wide branch above.
+              const TankReportCard(),
+              const MaintenanceSuggestionList(),
+              const SharedTripsSection(),
+            ],
+          );
+        }
+        return rowFor(context, filtered[index - 1]);
+      },
     );
   }
 }
