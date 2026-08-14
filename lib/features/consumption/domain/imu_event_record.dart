@@ -20,6 +20,15 @@ const int kImuEventRecordCap = 48;
 const double kImuMicroJoltMaxDuration = 0.15;
 const double kImuMicroJoltMaxPeak = 4.5;
 
+/// #3702 — per-trip cap on UNCONFIRMED records (tooShort / ambiguous /
+/// cornerGeometry near-misses). The 2026-08-14 field exports carried up
+/// to 48 stored tooShort blips (and 23,926 dropped) per trip: the noise
+/// filled [kImuEventRecordCap] and — worse — CONFIRMED harsh events
+/// finalized after slot 48 were silently dropped from the calibration
+/// export. Near-misses only need a representative sample for threshold
+/// calibration; confirmed events keep the remaining slots guaranteed.
+const int kImuUnconfirmedRecordCap = 16;
+
 /// One strong-manoeuvre stretch as the IMU detector saw it (#3589) —
 /// confirmed events AND rejected near-misses, so the accel/brake
 /// thresholds can be calibrated against labeled magnitude distributions
@@ -101,6 +110,7 @@ class ImuStretchTracker {
   double _lastNetDeltaKmh = 0;
   bool _sawCornerGeometry = false;
   String? _confirmedOutcome;
+  int _unconfirmedCount = 0; // #3702 — see [kImuUnconfirmedRecordCap]
 
   /// Records finalized so far (open stretch not included — call
   /// [finish] first at harvest time).
@@ -176,10 +186,19 @@ class ImuStretchTracker {
             : _sawCornerGeometry && _peakYaw >= kSharpCornerYawRateRadPerSec
                 ? 'cornerGeometry'
                 : 'ambiguous');
+    // #3702 — near-misses stop at their own cap so noise can never crowd
+    // confirmed events out of the export (a 48-slot list full of
+    // tooShort blips used to drop every later confirmed harsh event).
+    if (_confirmedOutcome == null &&
+        _unconfirmedCount >= kImuUnconfirmedRecordCap) {
+      _dropped++;
+      return;
+    }
     if (_records.length >= kImuEventRecordCap) {
       _dropped++;
       return;
     }
+    if (_confirmedOutcome == null) _unconfirmedCount++;
     _records.add(ImuEventRecord(
       outcome: outcome,
       peakMps2: _peakMps2,
