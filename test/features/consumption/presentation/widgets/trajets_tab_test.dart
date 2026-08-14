@@ -383,6 +383,61 @@ void main() {
       // summary, not a crashed widget that bailed before the title.
       expect(find.text('This month vs last month'), findsOneWidget);
     });
+
+    testWidgets(
+      'narrow layout: cards and rows share ONE scroll view — the cards '
+      'scroll away with the list (field report: only a sliver scrolled)',
+      (tester) async {
+        tester.view.physicalSize = const Size(400, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final trips = [
+          for (var i = 0; i < 20; i++)
+            _entry(
+              id: 'trip-$i',
+              vehicleId: 'v1',
+              startedAt: DateTime(2026, 4, 22, 9).add(Duration(hours: i)),
+              endedAt: DateTime(
+                2026,
+                4,
+                22,
+                9,
+                30,
+              ).add(Duration(hours: i)),
+              distanceKm: 12.0,
+            ),
+        ];
+
+        await _pumpTab(
+          tester,
+          vehicleId: null,
+          trips: trips,
+          vehicles: [combustionVehicle],
+          activeVehicle: combustionVehicle,
+        );
+
+        // The insights card lives INSIDE the trajets scroll view…
+        final list = find.byKey(const Key('trajets_list'));
+        expect(
+          find.descendant(
+            of: list,
+            matching: find.byKey(const ValueKey('monthly_insights_card')),
+          ),
+          findsOneWidget,
+        );
+
+        // …so scrolling the page moves it off-screen instead of
+        // pinning it over a tiny list strip.
+        await tester.drag(list, const Offset(0, -600));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const ValueKey('monthly_insights_card')),
+          findsNothing,
+        );
+      },
+    );
   });
 
   group('TrajetsTab — populated list', () {
