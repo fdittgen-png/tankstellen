@@ -73,6 +73,21 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   @override
   Stream<BackgroundAdapterEvent> get events => _controller.stream;
 
+  /// #3699 — engine-start hints from the native `BtAclEngineStartReceiver`
+  /// (`{"type": "aclConnected"}` payloads on the same events channel).
+  /// STATIC: the hint is a process-wide signal (the phone linked to SOME
+  /// Bluetooth device — in the car, that's the audio system at ignition
+  /// on), not a per-adapter transition, so it deliberately bypasses the
+  /// sealed [BackgroundAdapterEvent] hierarchy and the per-coordinator
+  /// MAC filter. Emits the native event timestamp; the consumer
+  /// ([engineStartHintWake]) applies the staleness gate — the native
+  /// ring buffer can replay minutes-old hints on (re)subscribe.
+  static final StreamController<DateTime> _hintController =
+      StreamController<DateTime>.broadcast();
+
+  /// Broadcast stream of ACL engine-start hint timestamps (#3699).
+  static Stream<DateTime> get engineStartHints => _hintController.stream;
+
   /// #3505 — localized notification title/body handed to the native FGS at
   /// arm time (null keeps the built-in English fallback). Settable fields
   /// (not `start` params) so the [BackgroundAdapterListener] interface and
@@ -193,6 +208,11 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
         return AdapterConnected(mac: mac, at: at);
       case 'disconnect':
         return AdapterDisconnected(mac: mac, at: at);
+      // #3699 — process-wide engine-start hint, not an adapter event:
+      // routed to the static hint stream, never to the coordinator.
+      case 'aclConnected':
+        _hintController.add(at);
+        return null;
       default:
         debugPrint(
           'AndroidBackgroundAdapterListener: dropping event with '

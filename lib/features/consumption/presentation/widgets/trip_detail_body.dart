@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
+import 'trip_detail_lessons.dart';
 import '../../data/driving_insights_analyzer.dart';
 import '../../data/driving_score_calculator.dart';
 import '../../data/lessons/driving_lesson_registry.dart';
@@ -18,7 +19,6 @@ import '../../domain/fuel_event_attribution.dart';
 import '../../domain/gps_coverage_report.dart';
 import '../../domain/gps_driving_features.dart';
 import '../../domain/lessons/driving_lesson.dart';
-import '../../domain/lessons/driving_lesson_rule.dart';
 import '../../domain/services/throttle_rpm_histogram_calculator.dart';
 import '../../domain/trip_recorder.dart';
 import 'driving_analysis_trace_card.dart';
@@ -246,25 +246,22 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
     // toggling back on instantly restores the score without a re-render.
     final showGamification = ref.watch(gamificationEnabledProvider);
 
-    // Post-trip lessons (#2251) — resolved here because the localized
-    // titles depend on the active locale, but built off the cached
-    // [_insights] / [_score] (and the stored summary) so the O(n)
-    // analyzer / score passes don't re-run on a theme / locale rebuild.
+    // Post-trip lessons (#2251/#3701) — see [buildTripDetailLessons].
     // Empty for EV / empty trips on the same gating rule as the card
     // below, and the registry returns [] when no rule fires (the
     // empty-state path).
     final List<DrivingLesson> lessons = (widget.isEv || widget.samples.isEmpty)
         ? const []
-        : _lessonRegistry.evaluateContext(
-            LessonContext(
-              summary: widget.entry.summary,
-              samples: widget.samples
-                  .map(tripDetailToTripSample)
-                  .toList(growable: false),
-              score: _score,
-              insights: _insights,
-            ),
-            l,
+        : buildTripDetailLessons(
+            ref: ref,
+            registry: _lessonRegistry,
+            entry: widget.entry,
+            samples: widget.samples
+                .map(tripDetailToTripSample)
+                .toList(growable: false),
+            score: _score,
+            insights: _insights,
+            l: l,
           );
 
     // Wrap the report content in a [RepaintBoundary] so the Share

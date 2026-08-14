@@ -13,6 +13,7 @@ import '../../features/obd2/data/ios_state_restoration_provider.dart';
 import '../../features/consumption/providers/auto_record_orchestrator.dart';
 import '../../features/obd2/providers/obd2_comm_diagnostics_gate_provider.dart';
 import '../../features/obd2/providers/obd2_debug_logging_provider.dart';
+import '../../features/obd2/providers/obd2_engine_start_hint_provider.dart';
 import '../../features/consumption/providers/trip_ve_recompute_provider.dart';
 import '../../features/vehicle/data/reference_vehicle_catalog_provider.dart';
 import '../../features/vehicle/data/repositories/vehicle_profile_repository.dart';
@@ -156,6 +157,15 @@ class ProviderWarmupPhase {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.background, e, st,
           context: {'where': 'autoRecordOrchestrator init'}));
+    }
+    // #3699 — ACL engine-start hints wake the reconnect supervisor so a
+    // pocketed phone connects at ignition-on instead of waiting out a
+    // parked stand-down hold.
+    try {
+      container.read(engineStartHintWakeProvider);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.background, e, st,
+          context: {'where': 'engineStartHintWake init'}));
     }
   }
 

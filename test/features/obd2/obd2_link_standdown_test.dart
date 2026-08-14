@@ -209,8 +209,9 @@ void main() {
     });
   });
 
-  test('#3642 consecutive storm holds ESCALATE 5 → 15 → 60 min — a parked '
-      'car stops costing an all-day dial duty cycle', () {
+  test('#3642/#3699 consecutive storm holds ESCALATE 5 → 15 min and CAP '
+      'at 15 — a parked car stops hammering, but an engine start is never '
+      'more than one hold away', () {
     fakeAsync((async) {
       dialer.enqueue(TimeoutException('ladder budget'));
       final sup = build();
@@ -231,13 +232,15 @@ void main() {
       elapse(async, const Duration(minutes: 4));
       expect(dialer.calls, 5, reason: 'second storm hold is 15 min');
 
-      // Hold 3: storm ×12 (60 min + ≤7.5 min jitter), the cap.
-      elapse(async, const Duration(minutes: 55));
-      expect(dialer.calls, 5, reason: 'third hold escalated past 55 min');
+      // Hold 3: STILL ×3 — #3699 capped the ×12 (60 min) step: overnight
+      // holds past an hour left the morning drive without hands-free
+      // connect for the whole hold (2026-08-11 field log).
       elapse(async, const Duration(minutes: 13));
+      expect(dialer.calls, 5, reason: 'third hold escalated past 13 min');
+      elapse(async, const Duration(minutes: 4));
       expect(dialer.calls, 6,
           reason: 'the no-dead-end invariant survives the escalation — '
-              'the loop still dials, hourly');
+              'the loop still dials every ≤15 min (#3699 cap)');
 
       // A user connect resets the escalation back to the fast ladder.
       dialer.replaceAll(_liveService());

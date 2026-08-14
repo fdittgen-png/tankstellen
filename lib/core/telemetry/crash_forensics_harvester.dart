@@ -81,26 +81,76 @@ class CrashForensicsHarvester {
       ));
     }
 
+    // #3700 — group non-crash exits by reason: a phone under memory
+    // pressure produces DOZENS of routine background reclaims between two
+    // launches, and one 50-slot log trace per exit evicted the actually
+    // diagnostic traces (the 2026-08-14 export spent 24 slots on
+    // individual process deaths). One trace per reason keeps every fact
+    // (count, rss range, individual timestamps) in a single slot.
+    // crash_native stays one-trace-per-exit: each carries its own
+    // tombstone, and that stream is what solved #3688.
+    final grouped = <String, List<Map<dynamic, dynamic>>>{};
     for (final entry in (decoded['exits'] as List? ?? const [])) {
       if (entry is! Map) continue;
       final reason = entry['reason']?.toString() ?? 'unknown';
       if (_routineReasons.contains(reason)) continue;
       final stamp = _stamp(entry['timestampMs']);
       final trace = entry['trace']?.toString() ?? '';
+      if (reason == 'crash_native') {
+        unawaited(errorLogger.log(
+          ErrorLayer.background,
+          PreviousProcessDeath(
+            'process died: $reason '
+            '(${entry['importance']}, $stamp, '
+            'pss=${entry['pssKb']}kB rss=${entry['rssKb']}kB) '
+            '${entry['description'] ?? ''}',
+          ),
+          trace.isEmpty ? StackTrace.current : StackTrace.fromString(trace),
+          context: {
+            'where': 'crash forensics: ApplicationExitInfo (#3580)',
+            'reason': reason,
+            'importance': entry['importance']?.toString() ?? '',
+            'crashedAt': stamp,
+            'lastBreadcrumbs': breadcrumbs,
+          },
+        ));
+      } else {
+        grouped.putIfAbsent(reason, () => []).add(entry);
+      }
+    }
+
+    for (final MapEntry(key: reason, value: entries) in grouped.entries) {
+      final stamps = [for (final e in entries) _stamp(e['timestampMs'])];
+      final rss = [
+        for (final e in entries)
+          if (e['rssKb'] is num) (e['rssKb'] as num).toInt()
+      ]..sort();
+      final rssRange = rss.isEmpty
+          ? 'rss=?'
+          : rss.length == 1
+              ? 'rss=${rss.single}kB'
+              : 'rss=${rss.first}-${rss.last}kB';
+      final importances =
+          {for (final e in entries) e['importance']?.toString() ?? ''}
+              .join('/');
+      // The most recent exit's description + trace represent the group;
+      // full per-exit timestamps ride in context.
+      final last = entries.last;
+      final trace = last['trace']?.toString() ?? '';
       unawaited(errorLogger.log(
         ErrorLayer.background,
         PreviousProcessDeath(
-          'process died: $reason '
-          '(${entry['importance']}, $stamp, '
-          'pss=${entry['pssKb']}kB rss=${entry['rssKb']}kB) '
-          '${entry['description'] ?? ''}',
+          'process died: $reason x${entries.length} '
+          '($importances, $rssRange, ${stamps.first} -> ${stamps.last}) '
+          '${last['description'] ?? ''}',
         ),
         trace.isEmpty ? StackTrace.current : StackTrace.fromString(trace),
         context: {
-          'where': 'crash forensics: ApplicationExitInfo (#3580)',
+          'where': 'crash forensics: ApplicationExitInfo (#3580, '
+              'coalesced #3700)',
           'reason': reason,
-          'importance': entry['importance']?.toString() ?? '',
-          'crashedAt': stamp,
+          'count': entries.length.toString(),
+          'crashedAt': stamps.join(', '),
           'lastBreadcrumbs': breadcrumbs,
         },
       ));

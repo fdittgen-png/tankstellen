@@ -45,11 +45,20 @@ class LessonContext {
   /// found nothing in (the empty-state path).
   final List<DrivingInsight> insights;
 
+  /// #3701 — expected ethanol volume fraction (0..1) of the tank content
+  /// at trip time, from the tank-mix model (#3652). Null when unknown
+  /// (no mix data, single-fuel vehicle, or a caller without provider
+  /// access — e.g. the bare GPX export path). Lets fuel-aware rules
+  /// (combustion health) distinguish "the ECU is fighting a fault" from
+  /// "the ECU is correctly trimming for E85".
+  final double? expectedEthanolShare;
+
   const LessonContext({
     required this.summary,
     required this.samples,
     required this.score,
     required this.insights,
+    this.expectedEthanolShare,
   });
 
   /// The cost line with the given [labelKey], or null when the analyzer

@@ -226,6 +226,57 @@ void main() {
       expect(lesson.impact, lessThan(0.01));
     });
 
+    // #3701 — E85 tanks legitimately hold LTFT +20‥30 %: stoich 9.8:1 vs
+    // 14.7:1. The 2026-08-14 field exports fired "lean mixture +25% —
+    // possible inefficiency" on EVERY trip of an E85 conversion.
+    group('#3701 tank-mix ethanol gate', () {
+      LessonContext ethanolCtx(List<TripSample> samples, double? share) =>
+          LessonContext(
+            summary: summary(),
+            samples: samples,
+            score: DrivingScore.perfect,
+            insights: const <DrivingInsight>[],
+            expectedEthanolShare: share,
+          );
+
+      test('an E85-heavy tank (75% ethanol) SUPPRESSES a +25% lean trim — '
+          'that is the fuel, not a fault', () {
+        final lesson = rule.evaluate(
+            ethanolCtx(warmSamples(count: 14, stft: 5, ltft: 25), 0.75), l);
+        expect(lesson, isNull,
+            reason: '25% <= 0.75*34 + 8 tolerance — fully fuel-explained');
+      });
+
+      test('the same trims WITHOUT mix data still fire (null keeps the '
+          'stock rule)', () {
+        final lesson = rule.evaluate(
+            ethanolCtx(warmSamples(count: 14, stft: 5, ltft: 25), null), l);
+        expect(lesson, isNotNull);
+      });
+
+      test('a trim BEYOND what the ethanol explains still fires — a real '
+          'fault is never masked', () {
+        // 0.20 ethanol explains ~6.8% + 8 tolerance = 14.8%; 25% exceeds it.
+        final lesson = rule.evaluate(
+            ethanolCtx(warmSamples(count: 14, stft: 5, ltft: 25), 0.20), l);
+        expect(lesson, isNotNull);
+      });
+
+      test('trace ethanol (E10 tank, 10%) never gates — below the 15% '
+          'flex threshold', () {
+        final lesson = rule.evaluate(
+            ethanolCtx(warmSamples(count: 14, stft: 6, ltft: 16), 0.10), l);
+        expect(lesson, isNotNull);
+      });
+
+      test('RICH compensation is never ethanol-gated (wrong direction '
+          'for a lean-running blend)', () {
+        final lesson = rule.evaluate(
+            ethanolCtx(warmSamples(count: 14, stft: -6, ltft: -16), 0.75), l);
+        expect(lesson, isNotNull);
+      });
+    });
+
     test('fires the rich-compensation lesson on sustained negative trim', () {
       final lesson =
           rule.evaluate(ctx(warmSamples(count: 14, stft: -6, ltft: -16)), l);

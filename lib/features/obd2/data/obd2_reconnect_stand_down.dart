@@ -122,13 +122,22 @@ class ReconnectBackoff {
 
   /// #3642 — each consecutive storm-cadence advance means the previous
   /// held attempt STILL failed identically, so the hold lengthens:
-  /// storm ×1 → ×3 → ×12 (5 → 15 → 60 min at the default). A parked car
-  /// (adapter powered, ignition off, permanently in range) otherwise
-  /// keeps a ~18% duty cycle of doomed ~67 s Bluetooth ladders running
-  /// all day — the field shape behind the 2026-07-29 `[EXCESSIVE CPU
-  /// USAGE]` process kill. Any positive signal ([reset], or a healthy
-  /// ladder advance) restores the fast cadence.
-  static const List<int> stormEscalation = [1, 3, 12];
+  /// storm ×1 → ×3, capped at ×3 (5 → 15 → 15 min at the default). A
+  /// parked car (adapter powered, ignition off, permanently in range)
+  /// otherwise keeps a ~18% duty cycle of doomed ~67 s Bluetooth
+  /// ladders running all day — the field shape behind the 2026-07-29
+  /// `[EXCESSIVE CPU USAGE]` process kill. Any positive signal
+  /// ([reset], or a healthy ladder advance) restores the fast cadence.
+  ///
+  /// #3699 — the cap came DOWN from ×12 (60 min): overnight-parked
+  /// misses escalated the hold past an hour, and an engine start
+  /// mid-hold left hands-free connect blind for the whole drive
+  /// (2026-08-11 field log: holds of 927→3693→3982 s while the user's
+  /// morning drives connected only after opening the app). A ≤15-min
+  /// probe cadence is ~2% Bluetooth duty — cheap since the #3671 dial
+  /// budget bounds each probe — and the ACL engine-start hint (#3699)
+  /// usually breaks the hold the moment the ignition turns on anyway.
+  static const List<int> stormEscalation = [1, 3, 3];
 
   int get currentMs => _current.inMilliseconds;
   bool get atCap => _current >= max;
