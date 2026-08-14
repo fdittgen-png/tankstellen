@@ -3,7 +3,7 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint, visibleForTesting;
 
 import '../persistent_dataset.dart';
 
@@ -188,10 +188,22 @@ mixin CachedDatasetMixin {
       _swallowBackground(refresh());
 
   void _swallowBackground(Future<Object?> pending) {
-    unawaited(pending.then<void>((_) {}).catchError((Object e, StackTrace st) {
+    final tracked =
+        pending.then<void>((_) {}).catchError((Object e, StackTrace st) {
       debugPrint('CachedDatasetMixin: background dataset refresh failed: $e');
-    }));
+    });
+    // #3703 — deterministic completion handle: the nightly full suite
+    // raced `pumpEventQueue()` against this chain (fetch → store →
+    // persist) on loaded runners and lost. Tests await the handle.
+    debugLastBackgroundRefresh = tracked;
+    unawaited(tracked);
   }
+
+  /// #3703 — the most recent fire-and-forget refresh chain, for tests to
+  /// await instead of pumping the event queue. Null until the first
+  /// background refresh of this instance.
+  @visibleForTesting
+  Future<void>? debugLastBackgroundRefresh;
 
   /// Completeness-gated variant of [loadPersistentDataset] (#2249).
   ///

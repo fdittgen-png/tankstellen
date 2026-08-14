@@ -455,7 +455,9 @@ void main() {
       expect(fetchCalls, 1, reason: 'the background refresh must start');
 
       gate.complete();
-      await pumpEventQueue();
+      // #3703 — await the chain handle, not pumpEventQueue: loaded CI
+      // runners lost that race two nightlies in a row.
+      await cached.debugLastBackgroundRefresh;
       expect(persistent.read()?.value, [9],
           reason: 'the background refresh must persist its result');
       expect(cached.isDatasetFresh(const Duration(minutes: 5)), isTrue,
@@ -483,7 +485,7 @@ void main() {
 
       expect(result, const [5]);
       gate.complete();
-      await pumpEventQueue();
+      await cached.debugLastBackgroundRefresh; // #3703 — deterministic
       expect(persistent.read()?.value, [9]);
     });
 
@@ -510,7 +512,7 @@ void main() {
       expect(result, [1, 2],
           reason: 'past the deadline, an ancient copy beats a skeleton');
       gate.complete();
-      await pumpEventQueue();
+      await cached.debugLastBackgroundRefresh; // #3703 — deterministic
       expect(persistent.read()?.value, [9]);
     });
 
@@ -548,8 +550,9 @@ void main() {
         completes,
       );
       // Let the background failure settle — it must be swallowed (logged),
-      // never thrown into the zone.
-      await pumpEventQueue();
+      // never thrown into the zone. #3703 — the handle completes normally
+      // BECAUSE the swallow caught the error; awaiting it IS the assertion.
+      await cached.debugLastBackgroundRefresh;
     });
 
     test('keyed variant: soft-stale disk copy serves immediately with a '
@@ -575,7 +578,7 @@ void main() {
 
       expect(result, [1, 2]);
       gate.complete();
-      await pumpEventQueue();
+      await keyed.debugLastKeyedBackgroundRefresh; // #3703 — deterministic
       expect(persistent.read()?.value, [9]);
     });
   });
