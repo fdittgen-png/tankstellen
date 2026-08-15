@@ -45,6 +45,7 @@ void main() {
         isEstimate: false,
         distanceText: distanceText,
         pausedLabel: 'Paused',
+        recordingLabel: 'Recording trip',
         stationName: stationName,
         priceText: priceText,
       );
@@ -101,10 +102,7 @@ void main() {
       await coordinator.apply(content(distanceText: '1.2 km'));
 
       expect(controller.calls, ['start', 'update']);
-      expect(
-        controller.lastUpdatePayload,
-        containsPair('distanceText', '1.2 km'),
-      );
+      expect(controller.lastUpdatePayload?.distanceText, '1.2 km');
     });
 
     test('the throttle window restarts from the last SENT update', () async {
@@ -140,7 +138,7 @@ void main() {
       ));
 
       expect(controller.calls, ['start', 'update']);
-      expect(controller.lastUpdatePayload, containsPair('mode', 'approach'));
+      expect(controller.lastUpdatePayload?.mode, LiveActivityMode.approach);
     });
 
     test('a station change within approach mode is a transition', () async {
@@ -229,7 +227,7 @@ class _FakeLiveActivityController extends LiveActivityController {
 
   final bool supported;
   final List<String> calls = [];
-  Map<String, Object?>? lastUpdatePayload;
+  LiveActivityContent? lastUpdatePayload;
   bool startResult = true;
   String? throwOn;
 
@@ -237,14 +235,14 @@ class _FakeLiveActivityController extends LiveActivityController {
   bool get isSupported => supported;
 
   @override
-  Future<bool> startActivity(Map<String, Object?> content) async {
+  Future<bool> startActivity(LiveActivityContent content) async {
     if (throwOn == 'start') throw StateError('injected start fault');
     calls.add('start');
     return startResult;
   }
 
   @override
-  Future<void> updateActivity(Map<String, Object?> content) async {
+  Future<void> updateActivity(LiveActivityContent content) async {
     if (throwOn == 'update') throw StateError('injected update fault');
     calls.add('update');
     lastUpdatePayload = content;

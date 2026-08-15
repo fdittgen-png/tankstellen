@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/consumption/data/live_activity_controller.dart';
+import 'package:tankstellen/features/consumption/domain/live_activity_content.dart';
 
 /// Unit coverage for [LiveActivityController] — the Dart side of the
 /// `tankstellen/live_activity` channel (#3170). The Live Activity render
@@ -12,6 +13,19 @@ import 'package:tankstellen/features/consumption/data/live_activity_controller.d
 /// method names, payload pass-through, the iOS-only guard, and the
 /// never-throws degradation on platform errors (the fault-injection
 /// sibling for the class's never-throw doccontract).
+
+LiveActivityContent _content({bool paused = false}) => LiveActivityContent(
+      mode: LiveActivityMode.recording,
+      paused: paused,
+      startedAtEpochMs: 1000000,
+      bigFigure: '5.8',
+      bigCaption: 'L/100 km',
+      isEstimate: false,
+      distanceText: null,
+      pausedLabel: 'Paused',
+      recordingLabel: 'Recording trip',
+    );
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -41,7 +55,7 @@ void main() {
 
       final controller = LiveActivityController();
       final ok = await controller
-          .startActivity(<String, Object?>{'mode': 'recording', 'paused': false});
+          .startActivity(_content());
 
       expect(ok, isTrue);
       expect(calls.single.method, 'start');
@@ -55,7 +69,7 @@ void main() {
         () async {
       messenger.setMockMethodCallHandler(channel, (call) async => false);
       expect(
-        await LiveActivityController().startActivity(const {}),
+        await LiveActivityController().startActivity(_content()),
         isFalse,
       );
     });
@@ -66,7 +80,7 @@ void main() {
         throw PlatformException(code: 'activitykit');
       });
       expect(
-        await LiveActivityController().startActivity(const {}),
+        await LiveActivityController().startActivity(_content()),
         isFalse,
       );
     });
@@ -81,9 +95,9 @@ void main() {
       });
 
       final controller = LiveActivityController();
-      await controller.updateActivity(<String, Object?>{'bigFigure': '5.8'});
+      await controller.updateActivity(_content());
       // Second call hits the injected fault — must not throw.
-      await controller.updateActivity(<String, Object?>{'bigFigure': '6.0'});
+      await controller.updateActivity(_content());
 
       expect(calls.map((c) => c.method), everyElement('update'));
       expect(calls.first.arguments, containsPair('bigFigure', '5.8'));
@@ -104,14 +118,16 @@ void main() {
         '(MissingPluginException fault)', () async {
       // No mock handler installed → MissingPluginException path.
       final controller = LiveActivityController();
-      expect(await controller.startActivity(const {}), isFalse);
-      await controller.updateActivity(const {});
+      expect(await controller.startActivity(_content()), isFalse);
+      await controller.updateActivity(_content());
       await controller.endActivity();
     });
   });
 
   group('LiveActivityController off iOS', () {
-    setUp(() => debugDefaultTargetPlatformOverride = TargetPlatform.android);
+    // #3722 — Android is now a SUPPORTED platform (ongoing-tile twin);
+    // fuchsia stands in for "no live surface exists here".
+    setUp(() => debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia);
 
     test('isSupported is false and calls are inert no-ops', () async {
       var invoked = false;
@@ -122,8 +138,8 @@ void main() {
 
       final controller = LiveActivityController();
       expect(controller.isSupported, isFalse);
-      expect(await controller.startActivity(const {}), isFalse);
-      await controller.updateActivity(const {});
+      expect(await controller.startActivity(_content()), isFalse);
+      await controller.updateActivity(_content());
       await controller.endActivity();
       expect(invoked, isFalse,
           reason: 'no channel traffic on a platform without Live Activities');

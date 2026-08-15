@@ -107,7 +107,7 @@ class LiveActivityCoordinator {
 
     final now = _clock();
     if (!_active) {
-      final started = await _controller.startActivity(content.toChannelMap());
+      final started = await _controller.startActivity(content);
       if (started) {
         _active = true;
         _lastSent = content;
@@ -133,6 +133,6 @@ class LiveActivityCoordinator {
 
     _lastSent = content;
     _lastSentAt = now;
-    await _controller.updateActivity(content.toChannelMap());
+    await _controller.updateActivity(content);
   }
 }

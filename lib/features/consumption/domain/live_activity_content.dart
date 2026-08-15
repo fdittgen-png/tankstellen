@@ -63,6 +63,13 @@ class LiveActivityContent {
   /// [RadarCloseness.fillFor] scale. Null collapses the bar.
   final double? progress;
 
+  /// #3722 — localized "Recording trip" label for the ANDROID ongoing
+  /// notification title. Deliberately NOT part of [toChannelMap]: the
+  /// iOS bridge decodes the map into a strict `ContentState`, and the
+  /// Swift widget carries its own title strings — adding keys there
+  /// would break the documented lock-step.
+  final String recordingLabel;
+
   const LiveActivityContent({
     required this.mode,
     required this.paused,
@@ -72,6 +79,7 @@ class LiveActivityContent {
     required this.isEstimate,
     required this.distanceText,
     required this.pausedLabel,
+    required this.recordingLabel,
     this.stationName,
     this.priceText,
     this.fuelLabel,
@@ -110,6 +118,7 @@ class LiveActivityContent {
       other.isEstimate == isEstimate &&
       other.distanceText == distanceText &&
       other.pausedLabel == pausedLabel &&
+      other.recordingLabel == recordingLabel &&
       other.stationName == stationName &&
       other.priceText == priceText &&
       other.fuelLabel == fuelLabel &&
@@ -126,6 +135,7 @@ class LiveActivityContent {
     isEstimate,
     distanceText,
     pausedLabel,
+    recordingLabel,
     stationName,
     priceText,
     fuelLabel,
@@ -167,6 +177,7 @@ LiveActivityContent? buildLiveActivityContent({
           1000) *
       1000;
   final pausedLabel = l.tripBannerPaused;
+  final recordingLabel = l.tripBannerRecording; // #3722 — Android tile title
   final distance = live?.distanceKmSoFar;
   final distanceText = (distance != null && distance >= 0.1)
       ? '${distance.toStringAsFixed(1)} km'
@@ -215,6 +226,7 @@ LiveActivityContent? buildLiveActivityContent({
       isEstimate: isEstimate,
       distanceText: distanceText,
       pausedLabel: pausedLabel,
+      recordingLabel: recordingLabel,
       stationName: station.name.isNotEmpty ? station.name : station.brand,
       priceText: price != null ? PriceFormatter.formatPrice(price) : '--',
       fuelLabel: fuel.displayName,
@@ -251,5 +263,6 @@ LiveActivityContent? buildLiveActivityContent({
     isEstimate: isEstimate,
     distanceText: distanceText,
     pausedLabel: pausedLabel,
+    recordingLabel: recordingLabel,
   );
 }
