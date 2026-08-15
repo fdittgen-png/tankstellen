@@ -1,0 +1,206 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: MIT
+
+name: Release Train
+
+# #3720 — ONE dispatch that ships every distribution surface for a channel,
+# with fault-isolated legs: one platform failing never cancels the others,
+# and the always-running notify job reports exactly which legs failed and
+# why — as a run summary, a GitHub issue (= GitHub notification + email to
+# the owner, zero extra secrets), and optionally a direct SMTP email when
+# the MAIL_SMTP_SERVER / MAIL_USERNAME / MAIL_PASSWORD / MAIL_TO secrets
+# are configured (e.g. GMX free SMTP: mail.gmx.net:587).
+#
+# Channel mapping:
+#   beta:        Play beta upload (daily-beta.yml)
+#                iOS TestFlight incl. external Beta App Review
+#                  (ios-testflight.yml, distribute=true)
+#                F-Droid: SKIPPED by design — the self-hosted repo serves
+#                  the stable stream only.
+#   production:  Play promote beta -> production at 100% (promote-release.yml)
+#                F-Droid self-hosted repo publish (fdroid-publish.yml)
+#                iOS: reported as MANUAL — App Store submission needs the
+#                  #3537 demo video + review notes; no automated lane yet.
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Release channel'
+        required: true
+        type: choice
+        options: [beta, production]
+        default: beta
+      release_notes:
+        description: 'Release notes (Play + TestFlight; per-version changelogs used when empty)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+  actions: read
+
+concurrency:
+  group: release-train
+  cancel-in-progress: false
+
+jobs:
+  android-beta:
+    if: inputs.channel == 'beta'
+    uses: ./.github/workflows/daily-beta.yml
+    with:
+      track: beta
+      release_notes: ${{ inputs.release_notes }}
+    secrets: inherit
+
+  android-production:
+    if: inputs.channel == 'production'
+    uses: ./.github/workflows/promote-release.yml
+    with:
+      from_track: beta
+      to_track: production
+    secrets: inherit
+
+  ios-testflight:
+    if: inputs.channel == 'beta'
+    uses: ./.github/workflows/ios-testflight.yml
+    with:
+      release_notes: ${{ inputs.release_notes || 'Release train build.' }}
+      distribute: true
+    secrets: inherit
+
+  fdroid:
+    if: inputs.channel == 'production'
+    uses: ./.github/workflows/fdroid-publish.yml
+    secrets: inherit
+
+  notify:
+    # The whole point: runs NO MATTER WHAT, so partial failures are
+    # reported instead of silently truncating the train.
+    if: always()
+    needs: [android-beta, android-production, ios-testflight, fdroid]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Collect leg results
+        id: legs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          R_AB: ${{ needs.android-beta.result }}
+          R_AP: ${{ needs.android-production.result }}
+          R_IOS: ${{ needs.ios-testflight.result }}
+          R_FD: ${{ needs.fdroid.result }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          declare -A LEGS
+          if [ "$CHANNEL" = "beta" ]; then
+            LEGS["Android (Play beta)"]="$R_AB"
+            LEGS["iOS (TestFlight + Beta App Review)"]="$R_IOS"
+            LEGS["F-Droid"]="skipped-by-design (stable stream only)"
+          else
+            LEGS["Android (Play production, promote 100%)"]="$R_AP"
+            LEGS["F-Droid (self-hosted repo)"]="$R_FD"
+            LEGS["iOS (App Store)"]="manual (needs #3537 demo video; no automated lane)"
+          fi
+
+          FAILED=0
+          {
+            echo "## Release Train — channel: $CHANNEL"
+            echo ""
+            echo "| Leg | Result |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for leg in "${!LEGS[@]}"; do
+            r="${LEGS[$leg]}"
+            icon="✅"
+            case "$r" in
+              failure) icon="❌"; FAILED=$((FAILED+1));;
+              cancelled) icon="🚫"; FAILED=$((FAILED+1));;
+              skipped*|manual*) icon="⏭️";;
+            esac
+            echo "| $leg | $icon $r |" >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
+
+          # Error excerpts for every failed job of THIS run (the failed
+          # legs' logs are complete by the time notify runs).
+          if [ "$FAILED" -gt 0 ]; then
+            gh run view "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --log-failed 2>/dev/null \
+              | grep -viE "^\s*$" | tail -n 120 > failed-excerpt.txt || true
+            if [ ! -s failed-excerpt.txt ]; then
+              echo "(no log excerpt available yet — open the run for details)" > failed-excerpt.txt
+            fi
+          fi
+
+      - name: Open failure issue (GitHub notification + email to owner)
+        if: steps.legs.outputs.failed != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANNEL: ${{ inputs.channel }}
+          R_AB: ${{ needs.android-beta.result }}
+          R_AP: ${{ needs.android-production.result }}
+          R_IOS: ${{ needs.ios-testflight.result }}
+          R_FD: ${{ needs.fdroid.result }}
+        run: |
+          set -euo pipefail
+          {
+            echo "Release Train (**$CHANNEL**) finished with failed leg(s). Every other leg was still attempted and deployed if it worked."
+            echo ""
+            echo "| Leg | Result |"
+            echo "|---|---|"
+            if [ "$CHANNEL" = "beta" ]; then
+              echo "| Android (Play beta) | $R_AB |"
+              echo "| iOS (TestFlight) | $R_IOS |"
+            else
+              echo "| Android (Play production) | $R_AP |"
+              echo "| F-Droid | $R_FD |"
+            fi
+            echo ""
+            echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo ""
+            echo "<details><summary>Error excerpt (last 120 log lines of the failed jobs)</summary>"
+            echo ""
+            echo '```'
+            cat failed-excerpt.txt
+            echo '```'
+            echo "</details>"
+          } > issue-body.md
+          gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "release-train ($CHANNEL) — ${{ steps.legs.outputs.failed }} leg(s) failed ($(date -u +%Y-%m-%d))" \
+            --label "type/bug" --label "area/ci" \
+            --body-file issue-body.md
+
+      - name: Direct email (optional — needs MAIL_* secrets)
+        if: steps.legs.outputs.failed != '0'
+        env:
+          MAIL_SMTP_SERVER: ${{ secrets.MAIL_SMTP_SERVER }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          if [ -z "$MAIL_SMTP_SERVER" ] || [ -z "$MAIL_USERNAME" ] || [ -z "$MAIL_PASSWORD" ] || [ -z "$MAIL_TO" ]; then
+            echo "MAIL_* secrets not configured — the GitHub issue above already emails the owner via GitHub notifications. To enable direct SMTP mail set MAIL_SMTP_SERVER (e.g. mail.gmx.net), MAIL_USERNAME, MAIL_PASSWORD, MAIL_TO."
+            exit 0
+          fi
+          {
+            echo "Subject: [Sparkilo] Release Train ($CHANNEL) - ${{ steps.legs.outputs.failed }} leg(s) failed"
+            echo "To: $MAIL_TO"
+            echo "From: $MAIL_USERNAME"
+            echo ""
+            echo "Release Train ($CHANNEL) finished with failures. Working legs were still deployed."
+            echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo ""
+            echo "--- error excerpt ---"
+            cat failed-excerpt.txt
+          } > mail.txt
+          curl --ssl-reqd --url "smtp://$MAIL_SMTP_SERVER:587" \
+            --mail-from "$MAIL_USERNAME" --mail-rcpt "$MAIL_TO" \
+            --user "$MAIL_USERNAME:$MAIL_PASSWORD" \
+            --upload-file mail.txt

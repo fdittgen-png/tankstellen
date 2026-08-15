@@ -19,6 +19,24 @@ name: Daily Open-Testing Build
 on:
   schedule:
     - cron: '0 16 * * *'
+  # #3720 — callable from the Release Train orchestrator.
+  workflow_call:
+    inputs:
+      track:
+        required: false
+        type: string
+        default: beta
+      release_notes:
+        required: false
+        type: string
+      fgs_bundle:
+        required: false
+        type: boolean
+        default: false
+      skip_upload:
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       track:
@@ -145,7 +163,7 @@ jobs:
         # run (mints the #3436 declaration-surfacing bundle) without
         # flipping the global variable, which would 403 the next scheduled
         # upload.
-        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} ${{ (vars.FGS_FORM_APPROVED == 'true' || github.event.inputs.fgs_bundle == 'true') && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
+        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }} ${{ (vars.FGS_FORM_APPROVED == 'true' || inputs.fgs_bundle == true) && '--dart-define=FGS_FORM_APPROVED=true' || '' }}
 
       # #3661 — size visible on every build; fails on an implausibly
       # small artifact (llmwiki page 25).
@@ -175,10 +193,10 @@ jobs:
       - name: Resolve upload gate
         id: gate
         run: |
-          if [ "${{ github.event.inputs.skip_upload }}" = "true" ]; then
+          if [ "${{ inputs.skip_upload }}" = "true" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "::notice::skip_upload — AAB available as workflow artifact"
-          elif [ "${{ github.event.inputs.fgs_bundle }}" = "true" ] && [ "${{ vars.FGS_FORM_APPROVED }}" != "true" ]; then
+          elif [ "${{ inputs.fgs_bundle }}" = "true" ] && [ "${{ vars.FGS_FORM_APPROVED }}" != "true" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "::notice::fgs_bundle without an approved FGS declaration — Play upload auto-skipped (#3708). Download the AAB artifact and upload it manually per docs/guides/play-fgs-declaration.md"
           else
@@ -217,8 +235,8 @@ jobs:
           python tools/upload_to_play.py \
             --aab build/app/outputs/bundle/playRelease/app-play-release.aab \
             --key "$PLAY_KEY_PATH" \
-            --track "${{ github.event.inputs.track || 'beta' }}" \
-            ${{ github.event.inputs.release_notes && format('--release-notes "{0}"', github.event.inputs.release_notes) || '' }}
+            --track "${{ inputs.track || 'beta' }}" \
+            ${{ inputs.release_notes && format('--release-notes "{0}"', inputs.release_notes) || '' }}
 
       - name: Clean up service-account key
         if: always() && steps.gate.outputs.skip != 'true'
@@ -249,7 +267,7 @@ jobs:
           TAG="v${VERSION}+${{ steps.bn.outputs.build_number }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$TAG" -m "Beta build ${{ steps.bn.outputs.build_number }} (track: ${{ github.event.inputs.track || 'beta' }}) — $GITHUB_SHA"
+          git tag -a "$TAG" -m "Beta build ${{ steps.bn.outputs.build_number }} (track: ${{ inputs.track || 'beta' }}) — $GITHUB_SHA"
           if ! git push origin "$TAG"; then
             echo "::warning::Tag push rejected (workflow-file race, #3710). The build IS shipped. Push the tag manually: SKIP_PREPUSH=1 git tag -a '$TAG' $GITHUB_SHA -m 'Beta build ${{ steps.bn.outputs.build_number }}' && SKIP_PREPUSH=1 git push origin '$TAG'"
             exit 1
@@ -262,5 +280,5 @@ jobs:
           echo "## Daily Open-Testing Release" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Build number:** ${{ steps.bn.outputs.build_number }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Track:** ${{ github.event.inputs.track || 'beta' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Track:** ${{ inputs.track || 'beta' }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Trigger:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"

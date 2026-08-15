@@ -18,6 +18,8 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+  # #3720 — callable from the Release Train orchestrator.
+  workflow_call:
 
 permissions:
   contents: read

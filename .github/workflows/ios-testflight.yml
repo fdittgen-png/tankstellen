@@ -14,6 +14,21 @@ name: iOS TestFlight Build
 # external 'extern' TestFlight group; plain manual runs stay internal-only.
 
 on:
+  # #3720 — callable from the Release Train orchestrator.
+  workflow_call:
+    inputs:
+      release_notes:
+        required: false
+        type: string
+        default: 'Daily build.'
+      distribute:
+        required: false
+        type: boolean
+        default: false
+      sync_certs:
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       release_notes:
@@ -148,7 +163,7 @@ jobs:
           # ASC_API_KEY_FILEPATH was exported by the decode step above so the
           # Fastfile's `asc_api_key` helper picks up the on-disk .p8.
           IOS_BUILD_NUMBER: ${{ steps.bn.outputs.build_number }}
-          TESTFLIGHT_CHANGELOG: ${{ github.event.inputs.release_notes || 'Daily build.' }}
+          TESTFLIGHT_CHANGELOG: ${{ inputs.release_notes || 'Daily build.' }}
           # Scheduled runs always distribute externally; manual runs only when
           # the distribute input is checked.
           DISTRIBUTE: ${{ github.event_name == 'schedule' || inputs.distribute }}
@@ -217,5 +232,5 @@ jobs:
             echo "- **Build number:** ${{ steps.bn.outputs.build_number }}"
             echo "- **Bundle ID:** de.tankstellen.tankstellen"
             echo "- **Trigger:** ${{ github.event_name }}"
-            echo "- **Changelog:** ${{ github.event.inputs.release_notes || 'Daily build.' }}"
+            echo "- **Changelog:** ${{ inputs.release_notes || 'Daily build.' }}"
           } >> "$GITHUB_STEP_SUMMARY"
