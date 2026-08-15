@@ -46,6 +46,9 @@ void main() {
         distanceText: distanceText,
         pausedLabel: 'Paused',
         recordingLabel: 'Recording trip',
+        pauseActionLabel: 'Pause',
+        resumeActionLabel: 'Resume',
+        stopActionLabel: 'Stop recording',
         stationName: stationName,
         priceText: priceText,
       );

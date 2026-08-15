@@ -26,10 +26,15 @@ part 'live_activity_provider.g.dart';
 /// admits exactly one native counterpart, so one Dart binding mirrors
 /// the [PipController] singleton convention.
 @Riverpod(keepAlive: true)
-LiveActivityController liveActivityController(Ref ref) =>
-    // #3722 — the controller wires its own Android notifier internally
-    // (it is the sanctioned platform-dispatch seam, #3163).
-    LiveActivityController();
+LiveActivityController liveActivityController(Ref ref) {
+  // #3722 — the controller wires its own Android notifier internally
+  // (it is the sanctioned platform-dispatch seam, #3163).
+  final controller = LiveActivityController();
+  // #3724 — kill the swipe-resurrect heartbeat with the container
+  // (widget-test teardown; a production container never disposes this).
+  ref.onDispose(controller.dispose);
+  return controller;
+}
 
 /// The single app-wide [LiveActivityCoordinator] — keepAlive so its
 /// throttle state (last-sent content / timestamps) survives across

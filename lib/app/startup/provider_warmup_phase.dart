@@ -13,6 +13,7 @@ import '../../features/obd2/data/ios_state_restoration_provider.dart';
 import '../../features/consumption/providers/auto_record_orchestrator.dart';
 import '../../features/obd2/providers/obd2_comm_diagnostics_gate_provider.dart';
 import '../../features/obd2/providers/obd2_debug_logging_provider.dart';
+import '../../features/consumption/providers/trip_tile_action_listener_provider.dart';
 import '../../features/obd2/providers/obd2_engine_start_hint_provider.dart';
 import '../../features/consumption/providers/trip_ve_recompute_provider.dart';
 import '../../features/vehicle/data/reference_vehicle_catalog_provider.dart';
@@ -166,6 +167,14 @@ class ProviderWarmupPhase {
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.background, e, st,
           context: {'where': 'engineStartHintWake init'}));
+    }
+    // #3724 — the Android recording tile's Pause/Resume/Stop buttons
+    // route onto the recorder through one dispatcher listener.
+    try {
+      container.read(tripTileActionListenerProvider);
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.background, e, st,
+          context: {'where': 'tripTileActionListener init'}));
     }
   }
 

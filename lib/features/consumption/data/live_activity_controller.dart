@@ -100,6 +100,14 @@ class LiveActivityController {
   /// End and immediately dismiss the activity (trip stopped). Also ends
   /// any activity left over from a previous process so a crash can't
   /// strand a stale surface on the lock screen.
+  /// #3724 — release the Android notifier's swipe-resurrect heartbeat
+  /// when the owning provider dies (widget tests would otherwise trip
+  /// Flutter's pending-timer teardown check; production containers never
+  /// dispose this, so it is effectively test-lifecycle hygiene).
+  void dispose() {
+    _android?.disposeHeartbeat();
+  }
+
   Future<void> endActivity() async {
     if (_isAndroid) {
       await _android!.end();

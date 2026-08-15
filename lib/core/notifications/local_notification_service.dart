@@ -139,6 +139,14 @@ class LocalNotificationService implements NotificationService {
   /// notification tap into the global dispatcher.
   static void _onDidReceiveNotificationResponse(
       NotificationResponse response) {
+    // #3724 — notification ACTION taps carry their actionId; synthesize a
+    // routable payload so ONE dispatcher stream serves both taps and
+    // actions (the trip-tile listener matches the `trip_action:` prefix).
+    final actionId = response.actionId;
+    if (actionId != null && actionId.isNotEmpty) {
+      NotificationTapDispatcher.instance.dispatch('trip_action:$actionId');
+      return;
+    }
     NotificationTapDispatcher.instance.dispatch(response.payload);
   }
 

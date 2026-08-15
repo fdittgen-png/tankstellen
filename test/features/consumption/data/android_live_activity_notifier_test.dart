@@ -1,6 +1,9 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,6 +31,9 @@ LiveActivityContent _content({
       distanceText: distanceText,
       pausedLabel: 'Trip paused',
       recordingLabel: 'Recording trip',
+      pauseActionLabel: 'Pause',
+      resumeActionLabel: 'Resume',
+      stopActionLabel: 'Stop recording',
       stationName: stationName,
       priceText: priceText,
       fuelLabel: fuelLabel,
@@ -97,6 +103,45 @@ void main() {
     });
   });
 
+  group('#3724 tile v2', () {
+    test('recording exposes Pause + Stop actions; paused swaps Pause for '
+        'Resume', () {
+      final rec = buildAndroidLiveActivityRender(_content());
+      expect(rec.actions.map((a) => a.id).toList(),
+          [AndroidLiveActivityNotifier.actionPause,
+           AndroidLiveActivityNotifier.actionStop]);
+      expect(rec.actions.first.label, 'Pause');
+
+      final paused = buildAndroidLiveActivityRender(_content(paused: true));
+      expect(paused.actions.map((a) => a.id).toList(),
+          [AndroidLiveActivityNotifier.actionResume,
+           AndroidLiveActivityNotifier.actionStop]);
+      expect(paused.actions.last.label, 'Stop recording');
+    });
+
+    test('the swipe-resurrect heartbeat re-posts while active and dies '
+        'with end()', () {
+      fakeAsync((async) {
+        final plugin = _CountingPlugin();
+        final notifier = AndroidLiveActivityNotifier(plugin: plugin);
+        unawaited(notifier.show(_content()));
+        async.flushMicrotasks();
+        expect(plugin.shows, 1);
+
+        // Two heartbeats: a dismissed tile is back within [heartbeat].
+        async.elapse(AndroidLiveActivityNotifier.heartbeat * 2);
+        expect(plugin.shows, 3);
+
+        unawaited(notifier.end());
+        async.flushMicrotasks();
+        expect(plugin.cancels, 1);
+        async.elapse(AndroidLiveActivityNotifier.heartbeat * 3);
+        expect(plugin.shows, 3,
+            reason: 'end() must kill the heartbeat with the tile');
+      });
+    });
+  });
+
   group('never-throws contract (#3722 fault injection)', () {
     test('a throwing plugin is swallowed — show returns false, end '
         'completes normally', () async {
@@ -113,6 +158,29 @@ void main() {
       'ContentState lock-step stays untouched (#3722)', () {
     expect(_content().toChannelMap().containsKey('recordingLabel'), isFalse);
   });
+}
+
+/// Counts show/cancel — drives the #3724 heartbeat test.
+class _CountingPlugin implements FlutterLocalNotificationsPlugin {
+  int shows = 0;
+  int cancels = 0;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    final name = invocation.memberName.toString();
+    if (name.contains('"show"')) {
+      shows++;
+      return Future<void>.value();
+    }
+    if (name.contains('"cancel"')) {
+      cancels++;
+      return Future<void>.value();
+    }
+    if (name.contains('resolvePlatformSpecificImplementation')) {
+      return null; // no channel creation in tests
+    }
+    return Future<void>.value();
+  }
 }
 
 /// Every plugin call throws — drives the never-throw boundary.

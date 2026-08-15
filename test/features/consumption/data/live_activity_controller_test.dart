@@ -24,6 +24,9 @@ LiveActivityContent _content({bool paused = false}) => LiveActivityContent(
       distanceText: null,
       pausedLabel: 'Paused',
       recordingLabel: 'Recording trip',
+      pauseActionLabel: 'Pause',
+      resumeActionLabel: 'Resume',
+      stopActionLabel: 'Stop recording',
     );
 
 void main() {
