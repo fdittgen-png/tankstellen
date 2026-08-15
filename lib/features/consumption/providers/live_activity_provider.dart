@@ -27,6 +27,8 @@ part 'live_activity_provider.g.dart';
 /// the [PipController] singleton convention.
 @Riverpod(keepAlive: true)
 LiveActivityController liveActivityController(Ref ref) =>
+    // #3722 — the controller wires its own Android notifier internally
+    // (it is the sanctioned platform-dispatch seam, #3163).
     LiveActivityController();
 
 /// The single app-wide [LiveActivityCoordinator] — keepAlive so its
