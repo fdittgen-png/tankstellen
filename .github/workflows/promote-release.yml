@@ -15,6 +15,21 @@ name: Promote Release
 # waits in the publishing overview for the final publish click.
 
 on:
+  # #3720 — callable from the Release Train orchestrator.
+  workflow_call:
+    inputs:
+      from_track:
+        required: false
+        type: string
+        default: beta
+      to_track:
+        required: false
+        type: string
+        default: production
+      dry_run:
+        required: false
+        type: boolean
+        default: false
   workflow_dispatch:
     inputs:
       from_track:
@@ -67,10 +82,10 @@ jobs:
       - name: Promote at 100%
         run: |
           python tools/promote_release.py \
-            --from-track "${{ github.event.inputs.from_track }}" \
-            --to-track "${{ github.event.inputs.to_track }}" \
+            --from-track "${{ inputs.from_track }}" \
+            --to-track "${{ inputs.to_track }}" \
             --key "$PLAY_KEY_PATH" \
-            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+            ${{ inputs.dry_run == true && '--dry-run' || '' }}
 
       - name: Clean up service-account key
         if: always()
@@ -80,6 +95,6 @@ jobs:
         if: always()
         run: |
           echo "## Promote Release" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **${{ github.event.inputs.from_track }} → ${{ github.event.inputs.to_track }}** at 100% (status: completed)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Dry run: ${{ github.event.inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **${{ inputs.from_track }} → ${{ inputs.to_track }}** at 100% (status: completed)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Dry run: ${{ inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Managed publishing: check the publishing overview after review for the final publish click." >> "$GITHUB_STEP_SUMMARY"
