@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fdittgen-png.github.io/tankstellen/sitemap.xml

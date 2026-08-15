@@ -246,6 +246,28 @@
 
     .center { text-align: center; }
   </style>
+  <!-- #3715 — web discoverability: canonical + structured data so search
+       engines index THIS page (and surface the Play install link) instead
+       of only the GitHub repo. -->
+  <link rel="canonical" href="https://fdittgen-png.github.io/tankstellen/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Sparkilo: Fuel Prices & Gas",
+    "operatingSystem": "ANDROID",
+    "applicationCategory": "TravelApplication",
+    "description": "Free, ad-free, open-source app for real-time official fuel prices and EV charging across 17 countries. Route to the cheapest station, price alerts, OBD2 consumption tracking — privacy-first, no account.",
+    "installUrl": "https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices",
+    "url": "https://fdittgen-png.github.io/tankstellen/",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+    "author": { "@type": "Person", "name": "Florian DITTGEN" },
+    "sameAs": [
+      "https://github.com/fdittgen-png/tankstellen",
+      "https://play.google.com/store/apps/details?id=de.tankstellen.fuelprices"
+    ]
+  }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
