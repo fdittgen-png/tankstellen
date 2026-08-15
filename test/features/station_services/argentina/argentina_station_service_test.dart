@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/error/exceptions.dart';
@@ -316,7 +318,10 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
     // `network` so CI's --exclude-tags=network skips it; the deterministic
     // error-path coverage lives in the withDio cert/connection tests below.
     test('searchStations throws ApiException on network failure',
-        tags: 'network', () async {
+        tags: 'network',
+        // #3717 — the live CSV is tens of MB; a slow runner needs more
+        // than the 30 s default before OUR 90 s bound below kicks in.
+        timeout: const Timeout(Duration(minutes: 3)), () async {
       const params = SearchParams(
         lat: -34.6, lng: -58.4, radiusKm: 10.0,
       );
@@ -324,30 +329,42 @@ col0,col1,col2,TestCo,Dir,Loc,Prov,col7,col8,Nafta premium,col10,col11,100.5,202
       // network error (ApiException) or the specific cert-expired path
       // (#837 — UpstreamCertificateException) is acceptable here, since the
       // real upstream cert is currently expired and the test harness has no
-      // network.
+      // network. #3717 — a SLOW live endpoint is also a network-failure
+      // shape: bound the call ourselves so the nightly-flaky runner never
+      // dies on the framework timeout mid-download.
       try {
-        await service.searchStations(params);
+        await service
+            .searchStations(params)
+            .timeout(const Duration(seconds: 90));
         // If it somehow succeeds (cached data), just verify the result
       } on ApiException catch (e) {
         expect(e.message, isNotEmpty);
       } on UpstreamCertificateException catch (e) {
         expect(e.host, 'datos.energia.gob.ar');
+      } on TimeoutException {
+        // Accepted: the live endpoint is reachable but too slow — exactly
+        // the nondeterminism this network-tagged probe tolerates (#3717).
       }
     });
 
     test('searchStations returns valid ServiceResult type',
-        tags: 'network', () async {
+        tags: 'network',
+        timeout: const Timeout(Duration(minutes: 3)), () async {
       const params = SearchParams(
         lat: -34.6, lng: -58.4, radiusKm: 10.0,
       );
       try {
-        final result = await service.searchStations(params);
+        final result = await service
+            .searchStations(params)
+            .timeout(const Duration(seconds: 90));
         expect(result.source, ServiceSource.argentinaApi);
         expect(result.data, isA<List<Station>>());
       } on ApiException catch (_) {
         // Expected if no network
       } on UpstreamCertificateException catch (_) {
         // Expected if the live cert is expired (#837)
+      } on TimeoutException {
+        // Accepted: reachable-but-slow endpoint (#3717).
       }
     });
   });
